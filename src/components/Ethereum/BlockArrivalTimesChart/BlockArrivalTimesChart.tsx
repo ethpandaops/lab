@@ -119,6 +119,18 @@ export function BlockArrivalTimesChart({
         showArea: false,
         visible: false, // Hidden by default
       },
+      // Attestation deadline - horizontal line at 4 seconds (simple approach - just a regular series)
+      {
+        name: 'Attestation deadline',
+        data: data.map(d => [d.x, attestationDeadlineSeconds] as [number, number]),
+        color: '#ef4444', // red
+        smooth: false,
+        showSymbol: false,
+        lineWidth: 2,
+        lineStyle: 'dashed' as const,
+        showArea: false,
+        showEndLabel: true,
+      },
     ];
 
     // Calculate max Y value from data
@@ -157,13 +169,6 @@ export function BlockArrivalTimesChart({
             enableDataZoom={true}
             animationDuration={300}
             relativeSlots={relativeSlots}
-            markLines={[
-              {
-                value: attestationDeadlineSeconds,
-                label: 'Attestation deadline',
-                lineStyle: 'dotted',
-              },
-            ]}
           />
         </>
       )}

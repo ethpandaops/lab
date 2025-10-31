@@ -81,7 +81,6 @@ export function MultiLineChart({
   aggregateSeriesName = 'Average',
   enableSeriesFilter = false,
   relativeSlots,
-  markLines,
 }: MultiLineChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -289,7 +288,7 @@ export function MultiLineChart({
 
   // Build series configuration
   // Note: Don't filter by visible property here - displayedSeries already handles visibility via visibleSeries state
-  const seriesConfig = displayedSeries.map((s, idx) => {
+  const seriesConfig = displayedSeries.map(s => {
     // Use explicit color or auto-assign from palette
     const originalIndex = series.indexOf(s);
     const seriesColor = s.color || extendedPalette[originalIndex % extendedPalette.length];
@@ -311,32 +310,15 @@ export function MultiLineChart({
       itemStyle: {
         color: seriesColor,
       },
-      // Add markLine to ALL series (workaround - ECharts sometimes doesn't render markLine on smooth series)
-      ...(markLines && markLines.length > 0
+      // Add end label if requested
+      ...(s.showEndLabel
         ? {
-            markLine: {
-              symbol: 'none',
-              silent: false,
-              animation: false,
-              label: {
-                show: idx === 0, // Only show label on first series to avoid duplicates
-                position: 'end' as const,
-                formatter: (params: { name?: string }) => params.name || '',
-                color: themeColors.foreground,
-                fontSize: 12,
-              },
-              lineStyle: {
-                type: 'dotted' as const,
-              },
-              data: markLines.map(line => ({
-                name: line.label,
-                yAxis: line.value,
-                lineStyle: {
-                  color: line.color || themeColors.danger,
-                  type: line.lineStyle || ('dotted' as const),
-                  width: 3,
-                },
-              })),
+            endLabel: {
+              show: true,
+              formatter: s.name,
+              color: seriesColor,
+              fontSize: 12,
+              fontWeight: 'bold' as const,
             },
           }
         : {}),
