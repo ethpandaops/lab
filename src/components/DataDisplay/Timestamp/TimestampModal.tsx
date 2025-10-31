@@ -300,7 +300,7 @@ function TimestampRow({ label, value, onCopy, isCopied, badge, isLive }: Timesta
           </div>
         )}
       </td>
-      <td className="px-4 py-3">
+      <td className="py-3 pr-4 pl-8">
         <div className="font-mono text-sm/5 break-all text-muted">{value}</div>
       </td>
       <td className="w-16 px-4 py-3 text-right">
@@ -346,7 +346,7 @@ function ClickableTimestampRow({ label, timestamp, context, onOpenModal }: Click
       <td className="w-48 px-4 py-3">
         <span className="text-xs/5 font-medium text-muted">{label}</span>
       </td>
-      <td className="px-4 py-3">
+      <td className="py-3 pr-4 pl-8">
         <div className="font-mono text-sm/5 break-all text-primary underline decoration-dotted underline-offset-4">
           {formattedTime}
         </div>
