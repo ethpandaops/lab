@@ -236,7 +236,7 @@ export function GlobeChart({
         option={option}
         style={{ height, width: '100%', minHeight: height }}
         onChartReady={instance => setEchartsInstance(instance)}
-        notMerge={true}
+        notMerge={false}
         lazyUpdate={true}
       />
     </div>

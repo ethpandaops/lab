@@ -624,7 +624,7 @@ export function MultiLineChart({
         echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
-        notMerge={true}
+        notMerge={false}
         opts={{ renderer: 'canvas' }}
       />
     </>

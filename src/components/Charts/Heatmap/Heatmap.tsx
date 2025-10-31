@@ -205,7 +205,7 @@ export function HeatmapChart({
         echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
-        notMerge={true}
+        notMerge={false}
         lazyUpdate={true}
       />
     </div>
