@@ -73,9 +73,9 @@ export function HeatmapChart({
       right: showVisualMap ? 90 : 16,
       bottom: 28,
       left: 64,
-      // ECharts v6: use outerBounds instead of deprecated containLabel
-      outerBoundsMode: 'same' as const,
-      outerBoundsContain: 'axisLabel' as const,
+      // containLabel: true ensures axis labels are contained within the grid
+      // This is the recommended approach for most use cases
+      containLabel: true,
     },
     xAxis: {
       type: 'category',
@@ -177,11 +177,9 @@ export function HeatmapChart({
             borderWidth: 1,
           }),
         },
+        // ECharts has built-in hover effects; only customize if needed
         emphasis: {
-          itemStyle: {
-            shadowBlur: 10,
-            shadowColor: colors.black,
-          },
+          focus: 'self' as const,
         },
       },
     ],

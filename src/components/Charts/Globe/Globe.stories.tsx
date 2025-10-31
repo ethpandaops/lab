@@ -178,3 +178,122 @@ export const Minimal: Story = {
     );
   },
 };
+
+/**
+ * Realistic: Globe with realistic PBR shading and post-processing effects
+ * Demonstrates enhanced visual quality with realistic materials, SSAO, and temporal super sampling
+ */
+export const Realistic: Story = {
+  args: {
+    lines,
+    points,
+    autoRotate: true,
+    showEffect: true,
+    shading: 'realistic',
+    roughness: 0.2,
+    metalness: 0,
+    enablePostEffect: true,
+    enableTemporalSuperSampling: true,
+    lightIntensity: 0.1,
+    ambientLightIntensity: 0,
+    ...earthTextures,
+  },
+  play: async ({ canvasElement }) => {
+    // Test that globe container renders
+    const globeContainer = canvasElement.querySelector('.w-full');
+    await expect(globeContainer).toBeInTheDocument();
+
+    // Test that ECharts container renders
+    const echartsContainer = canvasElement.querySelector('[_echarts_instance_]');
+    await expect(echartsContainer).toBeInTheDocument();
+
+    // Test that canvas element is created by ECharts (wait for it to render)
+    await waitFor(
+      () => {
+        const chartCanvas = canvasElement.querySelector('canvas');
+        expect(chartCanvas).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
+  },
+};
+
+/**
+ * Atmosphere: Globe with atmospheric glow effect
+ * Shows realistic atmospheric scattering around the globe
+ */
+export const Atmosphere: Story = {
+  args: {
+    lines,
+    points,
+    autoRotate: true,
+    showEffect: true,
+    showAtmosphere: true,
+    lightIntensity: 0.8,
+    ambientLightIntensity: 0.2,
+    ...earthTextures,
+  },
+  play: async ({ canvasElement }) => {
+    // Test that globe container renders
+    const globeContainer = canvasElement.querySelector('.w-full');
+    await expect(globeContainer).toBeInTheDocument();
+
+    // Test that ECharts container renders
+    const echartsContainer = canvasElement.querySelector('[_echarts_instance_]');
+    await expect(echartsContainer).toBeInTheDocument();
+
+    // Test that canvas element is created by ECharts (wait for it to render)
+    await waitFor(
+      () => {
+        const chartCanvas = canvasElement.querySelector('canvas');
+        expect(chartCanvas).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
+  },
+};
+
+/**
+ * Enhanced: Globe combining all advanced features
+ * Realistic shading, post-effects, temporal super sampling, and atmospheric glow
+ */
+export const Enhanced: Story = {
+  args: {
+    lines,
+    points,
+    title: 'Enhanced Globe Visualization',
+    autoRotate: true,
+    showEffect: true,
+    shading: 'realistic',
+    roughness: 0.2,
+    metalness: 0,
+    enablePostEffect: true,
+    enableTemporalSuperSampling: true,
+    showAtmosphere: true,
+    lightIntensity: 0.1,
+    ambientLightIntensity: 0,
+    lineColor: colors.cyan[500],
+    pointColor: colors.amber[500],
+    pointSize: 4,
+    pointOpacity: 0.6,
+    ...earthTextures,
+  },
+  play: async ({ canvasElement }) => {
+    // Test that globe container renders
+    const globeContainer = canvasElement.querySelector('.w-full');
+    await expect(globeContainer).toBeInTheDocument();
+
+    // Test that ECharts container renders
+    const echartsContainer = canvasElement.querySelector('[_echarts_instance_]');
+    await expect(echartsContainer).toBeInTheDocument();
+
+    // Test that canvas element is created by ECharts (wait for it to render)
+    await waitFor(
+      () => {
+        const chartCanvas = canvasElement.querySelector('canvas');
+        expect(chartCanvas).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
+  },
+};

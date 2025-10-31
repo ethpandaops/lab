@@ -87,12 +87,50 @@ export interface GlobeChartProps {
    */
   pointOpacity?: number;
   /**
-   * Whether to merge new options with existing chart (false) or replace entirely (true)
-   * Set to false for better performance when updating frequently
+   * Shading method for globe rendering
+   * - 'lambert': Simple diffuse shading for matte surfaces (default)
+   * - 'realistic': PBR-based rendering with metalness and roughness parameters
+   * - 'color': Basic flat coloring for simple visualizations
+   * @default 'lambert'
+   */
+  shading?: 'lambert' | 'realistic' | 'color';
+  /**
+   * Material roughness (0-1) when using realistic shading
+   * Higher values create more matte/rough surfaces
+   * @default 0.8
+   */
+  roughness?: number;
+  /**
+   * Material metalness (0-1) when using realistic shading
+   * Higher values make surface more metallic
+   * @default 0
+   */
+  metalness?: number;
+  /**
+   * Enable post-processing effects (SSAO, depth of field, etc.)
+   * Enhances visual quality but requires more GPU resources
    * @default false
    */
+  enablePostEffect?: boolean;
   /**
-   * Whether to defer chart updates to next animation frame for better performance
-   * @default true
+   * Enable temporal super sampling for anti-aliasing
+   * Progressively enhances image quality when globe is static
+   * @default true (when postEffect is enabled)
    */
+  enableTemporalSuperSampling?: boolean;
+  /**
+   * Show atmospheric glow effect around the globe
+   * @default false
+   */
+  showAtmosphere?: boolean;
+  /**
+   * Main light intensity (0-2)
+   * @default 0.4
+   */
+  lightIntensity?: number;
+  /**
+   * Ambient light intensity (0-2)
+   * @default 0.4
+   */
+  ambientLightIntensity?: number;
 }

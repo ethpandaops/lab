@@ -67,9 +67,7 @@ export function GeographicalMapView2D({ nodes, isLoading }: GeographicalMapViewP
       height={600}
       pointSizeMultiplier={0.8}
       pointColor={themeColors.primary}
-      mapColor={themeColors.muted}
       roam={true}
-      animationDuration={300}
     />
   );
 }

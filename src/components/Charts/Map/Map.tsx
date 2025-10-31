@@ -1,7 +1,6 @@
 import type React from 'react';
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
-import type { ECharts } from 'echarts';
 import * as echarts from 'echarts';
 // Use selective imports to avoid "geo3D exists" warning (ECharts v6 + echarts-gl)
 import { Lines3DChart, Scatter3DChart } from 'echarts-gl/charts';
@@ -52,8 +51,6 @@ export function MapChart({
 }: MapChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
   const { theme } = useTheme();
-  const [echartsInstance, setEchartsInstance] = useState<ECharts | null>(null);
-  const [mapLoaded, setMapLoaded] = useState(false);
 
   // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
   const convertedLineColor = lineColor ? resolveCssColorToHex(lineColor) : undefined;
@@ -61,46 +58,52 @@ export function MapChart({
   const convertedEnvironment = environment ? resolveCssColorToHex(environment) : undefined;
   const convertedPointColor = pointColor ? resolveCssColorToHex(pointColor) : undefined;
 
-  // Load and register world map on mount
-  useEffect(() => {
-    const loadWorldMap = async (): Promise<void> => {
-      try {
-        // Fetch world map GeoJSON from local public directory
-        const response = await fetch('/data/maps/world.json');
-        const worldGeoJson = await response.json();
+  // Load and register world map on mount - use a ref to track loading state
+  // This ensures the map is registered before rendering
+  const mapRegistered = useMemo(() => {
+    let registered = false;
 
-        // Register the map with echarts
-        echarts.registerMap('world', worldGeoJson);
-        setMapLoaded(true);
-      } catch (error) {
-        console.error('Failed to load world map:', error);
-        setMapLoaded(false);
+    // Check if map is already registered
+    try {
+      const existingMap = echarts.getMap('world');
+      if (existingMap) {
+        registered = true;
       }
-    };
+    } catch {
+      // Map not registered yet
+    }
 
-    loadWorldMap();
+    return registered;
   }, []);
+
+  useEffect(() => {
+    if (!mapRegistered) {
+      const loadWorldMap = async (): Promise<void> => {
+        try {
+          // Fetch world map GeoJSON from local public directory
+          const response = await fetch('/data/maps/world.json');
+          const worldGeoJson = await response.json();
+
+          // Register the map with echarts
+          echarts.registerMap('world', worldGeoJson);
+        } catch (error) {
+          console.error('Failed to load world map:', error);
+        }
+      };
+
+      loadWorldMap();
+    }
+  }, [mapRegistered]);
 
   // Prepare options and memoize to avoid unnecessary re-renders
   const option = useMemo(() => {
-    // Prepare route data for lines3D
-    const routeData = routes.map(route => ({
-      coords: [route.from, route.to],
-      name: route.name,
-    }));
-
-    // Prepare point data for scatter3D
-    const pointData = points.map(point => ({
-      name: point.name,
-      value: [...point.coords, point.value || 1],
-    }));
-
-    const series: Array<Record<string, unknown>> = [];
-
     // Determine theme-aware defaults (treat both dark and star as dark themes)
     const isDark = theme === 'dark' || theme === 'star';
 
-    // Add routes series if there are routes
+    // Prepare series data
+    const series: Array<Record<string, unknown>> = [];
+
+    // Add lines3D series for routes if present
     if (routes.length > 0) {
       series.push({
         type: 'lines3D',
@@ -120,11 +123,14 @@ export function MapChart({
           color: convertedLineColor || CHART_CATEGORICAL_COLORS[0],
           opacity: 0.05,
         },
-        data: routeData,
+        data: routes.map(route => ({
+          coords: [route.from, route.to],
+          name: route.name,
+        })),
       });
     }
 
-    // Add points series if there are points
+    // Add scatter3D series for points if present
     if (points.length > 0) {
       series.push({
         type: 'scatter3D',
@@ -143,7 +149,10 @@ export function MapChart({
             show: false,
           },
         },
-        data: pointData,
+        data: points.map(point => ({
+          name: point.name,
+          value: [...point.coords, point.value || 1],
+        })),
       });
     }
 
@@ -191,6 +200,12 @@ export function MapChart({
         },
         postEffect: {
           enable: true,
+          SSAO: {
+            enable: true,
+            radius: 2,
+            intensity: 1,
+            quality: 'medium',
+          },
         },
         groundPlane: {
           show: false,
@@ -205,10 +220,10 @@ export function MapChart({
           },
         },
         viewControl: {
-          distance: distance,
-          alpha: alpha,
-          minDistance: minDistance,
-          maxDistance: maxDistance,
+          distance,
+          alpha,
+          minDistance,
+          maxDistance,
           panMouseButton: 'left',
           rotateMouseButton: 'right',
           autoRotate: false,
@@ -217,7 +232,7 @@ export function MapChart({
         itemStyle: {
           color: convertedMapColor || themeColors.muted,
         },
-        regionHeight: regionHeight,
+        regionHeight,
       },
       series,
     };
@@ -240,30 +255,14 @@ export function MapChart({
     theme,
   ]);
 
-  useEffect(() => {
-    if (echartsInstance) {
-      // Re-render when options change
-      echartsInstance.setOption(option);
-    }
-  }, [echartsInstance, option]);
-
-  // Don't render until map is loaded
-  if (!mapLoaded) {
-    return (
-      <div className="flex w-full items-center justify-center" style={{ height }}>
-        <div className="text-foreground">Loading map...</div>
-      </div>
-    );
-  }
-
   return (
     <div className="h-full w-full">
       <ReactECharts
         option={option}
         style={{ height, width: '100%', minHeight: height }}
-        onChartReady={instance => setEchartsInstance(instance)}
-        notMerge={true}
-        lazyUpdate={false}
+        notMerge={false}
+        lazyUpdate={true}
+        opts={{ renderer: 'canvas' }}
       />
     </div>
   );

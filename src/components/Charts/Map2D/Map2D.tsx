@@ -1,10 +1,9 @@
 import type React from 'react';
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
 import type { Map2DChartProps, PointData } from './Map2D.types';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { useTheme } from '@/hooks/useTheme';
 
 /**
  * Map2DChart - A high-performance 2D map visualization component using ECharts
@@ -30,27 +29,18 @@ export function Map2DChart({
   lineColor,
   pointColor,
   pointSizeMultiplier = 2.5,
-  mapColor: _mapColor,
   roam = true,
-  animationDuration = 300,
   resetKey,
 }: Map2DChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
-  const { theme } = useTheme();
   const [mapLoaded, setMapLoaded] = useState(false);
   const chartRef = useRef<ReactECharts | null>(null);
   const allSeenPointsRef = useRef<Map<string, PointData>>(new Map());
   const previousResetKeyRef = useRef(resetKey);
 
-  // Use refs for values that are used in the effect but shouldn't trigger re-renders
-  const pointColorRef = useRef(pointColor || themeColors.primary);
-  const pointSizeMultiplierRef = useRef(pointSizeMultiplier);
-  const foregroundColorRef = useRef(themeColors.foreground);
-
-  // Update refs when props change
-  pointColorRef.current = pointColor || themeColors.primary;
-  pointSizeMultiplierRef.current = pointSizeMultiplier;
-  foregroundColorRef.current = themeColors.foreground;
+  // Memoize derived values
+  const computedPointColor = pointColor || themeColors.primary;
+  const computedForegroundColor = themeColors.foreground;
 
   // Load and register world map on mount
   useEffect(() => {
@@ -71,6 +61,50 @@ export function Map2DChart({
 
     loadWorldMap();
   }, []);
+
+  // Create a memoized function to generate scatter series config
+  const createScatterSeries = useCallback(
+    (data: Array<{ name?: string; value: number[] }>) => ({
+      type: 'scatter',
+      coordinateSystem: 'geo',
+      zlevel: 3,
+      symbol: 'circle',
+      symbolSize: (value: number[]) => {
+        const pointValue = value[2] || 1;
+        const baseSize = 3;
+        const maxSize = 7;
+        const size = Math.min(maxSize, baseSize + Math.log(pointValue + 1) * 0.8);
+        return size * pointSizeMultiplier;
+      },
+      itemStyle: {
+        color: computedPointColor,
+        opacity: 0.85,
+        shadowBlur: 3,
+        shadowColor: computedPointColor,
+        shadowOffsetX: 0,
+        shadowOffsetY: 0,
+        borderWidth: 0,
+        borderColor: 'transparent',
+      },
+      emphasis: {
+        scale: 1.4,
+        focus: 'self',
+        itemStyle: {
+          opacity: 0.95,
+          shadowBlur: 6,
+          borderWidth: 1,
+          borderColor: computedForegroundColor,
+        },
+      },
+      data,
+      large: true,
+      largeThreshold: 1000,
+      progressive: 500,
+      progressiveThreshold: 1000,
+      animation: false,
+    }),
+    [pointSizeMultiplier, computedPointColor, computedForegroundColor]
+  );
 
   // Track all points seen during this slot and update chart
   useEffect(() => {
@@ -119,56 +153,16 @@ export function Map2DChart({
       const scatterSeriesIndex = series.findIndex(s => s.type === 'scatter');
 
       if (scatterSeriesIndex !== -1) {
-        // Rebuild complete scatter series with new data
+        // Rebuild complete scatter series with new data using shared config
         chart.setOption(
           {
-            series: [
-              {
-                type: 'scatter',
-                coordinateSystem: 'geo',
-                zlevel: 3,
-                symbol: 'circle',
-                symbolSize: (value: number[]) => {
-                  const pointValue = value[2] || 1;
-                  const baseSize = 3;
-                  const maxSize = 7;
-                  const size = Math.min(maxSize, baseSize + Math.log(pointValue + 1) * 0.8);
-                  return size * pointSizeMultiplierRef.current;
-                },
-                itemStyle: {
-                  color: pointColorRef.current,
-                  opacity: 0.85,
-                  shadowBlur: 3,
-                  shadowColor: pointColorRef.current,
-                  shadowOffsetX: 0,
-                  shadowOffsetY: 0,
-                  borderWidth: 0,
-                  borderColor: 'transparent',
-                },
-                emphasis: {
-                  scale: 1.4,
-                  focus: 'self',
-                  itemStyle: {
-                    opacity: 0.95,
-                    shadowBlur: 6,
-                    borderWidth: 1,
-                    borderColor: foregroundColorRef.current,
-                  },
-                },
-                data: pointData,
-                large: true,
-                largeThreshold: 1000,
-                progressive: 500,
-                progressiveThreshold: 1000,
-                animation: false,
-              },
-            ],
+            series: [createScatterSeries(pointData)],
           },
           { replaceMerge: ['series'] }
         );
       }
     }
-  }, [points, mapLoaded, resetKey]);
+  }, [points, mapLoaded, resetKey, createScatterSeries]);
 
   // Prepare initial options - only calculated once on mount
   // We update data via setOption in useEffect, so option should never recalculate
@@ -209,54 +203,12 @@ export function Map2DChart({
     }
 
     // Always create scatter series (starts empty, data appended via effect)
-    series.push({
-      type: 'scatter',
-      coordinateSystem: 'geo',
-      zlevel: 3,
-      symbol: 'circle',
-      symbolSize: (value: number[]) => {
-        // Scale point size based on value (index 2 is the value)
-        const pointValue = value[2] || 1;
-        // Small, clean node sizes following best practices
-        const baseSize = 3;
-        const maxSize = 7;
-        const size = Math.min(maxSize, baseSize + Math.log(pointValue + 1) * 0.8);
-        return size * pointSizeMultiplier;
-      },
-      itemStyle: {
-        color: pointColor || themeColors.primary,
-        opacity: 0.85,
-        shadowBlur: 3,
-        shadowColor: pointColor || themeColors.primary,
-        shadowOffsetX: 0,
-        shadowOffsetY: 0,
-        borderWidth: 0,
-        borderColor: 'transparent',
-      },
-      emphasis: {
-        scale: 1.4,
-        focus: 'self',
-        itemStyle: {
-          opacity: 0.95,
-          shadowBlur: 6,
-          borderWidth: 1,
-          borderColor: themeColors.foreground,
-        },
-      },
-      data: [], // Start empty, will be populated by effect
-      // Performance optimizations for large datasets
-      large: true,
-      largeThreshold: 1000,
-      progressive: 500,
-      progressiveThreshold: 1000,
-      animation: false, // Disable animation for better append performance
-    });
+    // Use the shared createScatterSeries function to avoid duplication
+    series.push(createScatterSeries([]));
 
     return {
       backgroundColor: 'transparent',
       animation: false, // Disable animation for progressive updates
-      animationDuration,
-      animationEasing: 'cubicOut',
       tooltip: {
         show: true,
         trigger: 'item',
@@ -286,13 +238,13 @@ export function Map2DChart({
       title: title
         ? {
             text: title,
+            left: 'center',
+            top: 10,
             textStyle: {
               color: themeColors.foreground,
               fontSize: 16,
               fontWeight: 600,
             },
-            left: 'center',
-            top: 8,
           }
         : undefined,
       geo: {
@@ -319,16 +271,18 @@ export function Map2DChart({
       },
       series,
     };
-    // Depend on the actual color values (primitives) to avoid stale theme colors
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    mapLoaded,
-    theme,
+    routes,
+    showEffect,
+    lineColor,
     themeColors.primary,
-    themeColors.muted,
-    themeColors.accent,
-    themeColors.foreground,
+    themeColors.surface,
     themeColors.border,
+    themeColors.foreground,
+    themeColors.muted,
+    title,
+    roam,
+    createScatterSeries,
   ]);
 
   // Don't render until map is loaded

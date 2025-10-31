@@ -12,12 +12,6 @@ export interface LineChartProps {
    */
   title?: string;
   /**
-   * Title alignment (deprecated - use titleLeft instead)
-   * @default 'center'
-   * @deprecated Use titleLeft instead
-   */
-  titleAlign?: 'left' | 'center' | 'right';
-  /**
    * Title font size
    * @default 16
    */
