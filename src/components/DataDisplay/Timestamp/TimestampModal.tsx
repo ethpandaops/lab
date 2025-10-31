@@ -208,7 +208,7 @@ interface TimestampRowProps {
  */
 function TimestampRow({ label, value, onCopy, isCopied, badge, isLive }: TimestampRowProps): JSX.Element {
   return (
-    <tr className="group bg-background transition-colors hover:bg-surface">
+    <tr onClick={onCopy} className="group cursor-pointer bg-background transition-colors hover:bg-surface">
       <td className="w-48 px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="text-xs/5 font-medium text-muted">{label}</span>
@@ -231,22 +231,18 @@ function TimestampRow({ label, value, onCopy, isCopied, badge, isLive }: Timesta
         )}
       </td>
       <td className="px-4 py-3">
-        <div className="font-mono text-sm/6 break-all text-foreground">{value}</div>
+        <div className="font-mono text-sm/6 break-all text-foreground/80">{value}</div>
       </td>
       <td className="w-16 px-4 py-3 text-right">
-        <button
-          type="button"
-          onClick={onCopy}
+        <div
           className={clsx(
-            'rounded-xs p-2 transition-all',
-            isCopied
-              ? 'bg-success/20 text-success'
-              : 'text-muted opacity-0 group-hover:opacity-100 hover:bg-border hover:text-foreground dark:hover:bg-muted/20'
+            'inline-flex rounded-xs p-2 transition-all',
+            isCopied ? 'bg-success/20 text-success' : 'text-muted opacity-0 group-hover:opacity-100'
           )}
           aria-label={`Copy ${label}`}
         >
           {isCopied ? <CheckIcon className="size-4" /> : <ClipboardDocumentIcon className="size-4" />}
-        </button>
+        </div>
       </td>
     </tr>
   );
