@@ -6,7 +6,7 @@ import { MobileSlotHeader } from '../MobileSlotHeader';
 import { BlockDetailsCard } from '../BlockDetailsCard';
 import { BottomBar } from '../BottomBar';
 import { ScrollingTimeline } from '@/components/Lists/ScrollingTimeline';
-import { SlotProgressTimeline } from '@/components/Ethereum/SlotProgressTimeline';
+import { SlotTimeline } from '@/components/Ethereum/SlotTimeline';
 import { useSlotViewData, useSlotProgressData } from '../../hooks';
 import type { SlotViewLayoutProps, TimeFilteredData } from './SlotViewLayout.types';
 
@@ -258,9 +258,17 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
           />
         </div>
 
-        {/* Slim Slot Progress - 50px */}
+        {/* Slot Time Progress - 50px */}
         <div className="h-[50px] shrink-0 border-b border-border bg-surface px-3 py-2">
-          <SlotProgressTimeline phases={slotProgressPhases} mode="live" currentTime={currentTime} showStats={false} />
+          <SlotTimeline
+            phases={slotData.sidebarPhases}
+            currentTime={currentTime}
+            slotDuration={12000}
+            showInlineLabels={false}
+            showTimeCutovers={false}
+            height={32}
+            onTimeClick={handleTimeClick}
+          />
         </div>
 
         {/* Slim Timeline - 100px */}
