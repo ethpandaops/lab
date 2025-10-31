@@ -245,8 +245,8 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
 
       {/* Mobile Layout - Vertical Stack */}
       <div className="flex h-[calc(100vh-65px)] flex-col overflow-hidden md:hidden">
-        {/* Mobile Slot Header - 64px (includes 1px timeline) */}
-        <div className="h-[64px] shrink-0">
+        {/* Mobile Slot Header - 60px */}
+        <div className="h-[60px] shrink-0">
           <MobileSlotHeader
             currentSlot={currentSlot}
             isPlaying={isPlaying}
@@ -254,8 +254,6 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
             onBackward={actions.previousSlot}
             onForward={actions.nextSlot}
             isLive={mode === 'live'}
-            currentTime={currentTime}
-            slotDuration={12000}
           />
         </div>
 
