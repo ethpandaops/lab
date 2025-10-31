@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { LineChart as EChartsLine } from 'echarts/charts';
@@ -86,22 +86,31 @@ export function MultiLineChart({
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
   // Helper functions for relative slot display
-  const toRelativeSlot = (absoluteSlot: number): number => {
-    if (!relativeSlots) return absoluteSlot;
-    return absoluteSlot - relativeSlots.epoch * 32 + 1;
-  };
+  const toRelativeSlot = useCallback(
+    (absoluteSlot: number): number => {
+      if (!relativeSlots) return absoluteSlot;
+      return absoluteSlot - relativeSlots.epoch * 32 + 1;
+    },
+    [relativeSlots]
+  );
 
-  const formatSlotLabel = (absoluteSlot: number): string => {
-    if (!relativeSlots) return formatSmartDecimal(absoluteSlot, 0);
-    const relativeSlot = toRelativeSlot(absoluteSlot);
-    return `${relativeSlot}`;
-  };
+  const formatSlotLabel = useCallback(
+    (absoluteSlot: number): string => {
+      if (!relativeSlots) return formatSmartDecimal(absoluteSlot, 0);
+      const relativeSlot = toRelativeSlot(absoluteSlot);
+      return `${relativeSlot}`;
+    },
+    [relativeSlots, toRelativeSlot]
+  );
 
-  const formatSlotTooltip = (absoluteSlot: number): string => {
-    if (!relativeSlots) return formatSmartDecimal(absoluteSlot, 0);
-    const relativeSlot = toRelativeSlot(absoluteSlot);
-    return `Slot: ${formatSmartDecimal(absoluteSlot, 0)} (${relativeSlot}/32)`;
-  };
+  const formatSlotTooltip = useCallback(
+    (absoluteSlot: number): string => {
+      if (!relativeSlots) return formatSmartDecimal(absoluteSlot, 0);
+      const relativeSlot = toRelativeSlot(absoluteSlot);
+      return `Slot: ${formatSmartDecimal(absoluteSlot, 0)} (${relativeSlot}/32)`;
+    },
+    [relativeSlots, toRelativeSlot]
+  );
 
   // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
   const convertedColorPalette = colorPalette?.map(color => resolveCssColorToHex(color));
@@ -228,212 +237,211 @@ export function MultiLineChart({
     showAggregate,
   ]);
 
-  // Build x-axis configuration
-  const xAxisConfig = {
-    type: xAxis.type,
-    name: xAxis.name,
-    nameLocation: 'middle' as const,
-    nameGap: 30,
-    nameTextStyle: { color: themeColors.muted },
-    data: xAxis.type === 'category' ? xAxis.labels : undefined,
-    boundaryGap: xAxis.type === 'category',
-    axisLine: { lineStyle: { color: themeColors.border } },
-    axisLabel: {
-      color: themeColors.muted,
-      fontSize: 12,
-      formatter: xAxis.formatter || (relativeSlots ? (value: number) => formatSlotLabel(value) : undefined),
-      showMaxLabel: false, // Don't force-render the max value to avoid awkward tick spacing
-    },
-    splitLine: {
-      lineStyle: {
-        color: themeColors.border,
-        opacity: 0.3,
+  // Build complete option
+  // Memoize based on actual data that should trigger re-animation
+  const option = useMemo(() => {
+    // Build x-axis configuration
+    const xAxisConfig = {
+      type: xAxis.type,
+      name: xAxis.name,
+      nameLocation: 'middle' as const,
+      nameGap: 30,
+      nameTextStyle: { color: themeColors.muted },
+      data: xAxis.type === 'category' ? xAxis.labels : undefined,
+      boundaryGap: xAxis.type === 'category',
+      axisLine: { lineStyle: { color: themeColors.border } },
+      axisLabel: {
+        color: themeColors.muted,
+        fontSize: 12,
+        formatter: xAxis.formatter || (relativeSlots ? (value: number) => formatSlotLabel(value) : undefined),
+        showMaxLabel: false, // Don't force-render the max value to avoid awkward tick spacing
       },
-    },
-    min: xAxis.type === 'value' ? xAxis.min : undefined,
-    max: xAxis.type === 'value' ? xAxis.max : undefined,
-  };
-
-  // Build y-axis configuration
-  const yAxisConfig = {
-    type: 'value' as const,
-    name: yAxis?.name,
-    nameLocation: 'middle' as const,
-    nameGap: yAxis?.name ? 50 : 0,
-    nameTextStyle: { color: themeColors.muted },
-    axisLine: { show: false },
-    axisTick: { show: false },
-    splitLine: {
-      lineStyle: {
-        color: themeColors.border,
-        type: 'dashed' as const,
-      },
-    },
-    axisLabel: {
-      color: themeColors.muted,
-      fontSize: 12,
-      formatter: yAxis?.formatter,
-    },
-    min: yAxis?.min,
-    max: yAxis?.max,
-    minInterval: yAxis?.minInterval,
-  };
-
-  // Build series configuration
-  const seriesConfig = displayedSeries
-    .filter(s => s.visible !== false)
-    .map((s, index) => {
-      // Use explicit color or auto-assign from palette
-      const seriesColor = s.color || extendedPalette[index % extendedPalette.length];
-
-      const baseConfig = {
-        name: s.name,
-        type: 'line' as const,
-        data: s.data,
-        smooth: s.smooth ?? false,
-        step: s.step ?? false,
-        connectNulls,
-        showSymbol: s.showSymbol ?? false,
-        symbolSize: s.symbolSize ?? 4,
+      splitLine: {
         lineStyle: {
-          color: seriesColor,
-          width: s.lineWidth ?? 2,
-          type: s.lineStyle ?? ('solid' as const),
+          color: themeColors.border,
+          opacity: 0.3,
         },
-        itemStyle: {
-          color: seriesColor,
-        },
-      };
+      },
+      min: xAxis.type === 'value' ? xAxis.min : undefined,
+      max: xAxis.type === 'value' ? xAxis.max : undefined,
+    };
 
-      // Add area style if requested
-      if (s.showArea) {
-        return {
-          ...baseConfig,
-          areaStyle: {
-            color:
-              s.areaOpacity !== undefined
-                ? hexToRgba(seriesColor, s.areaOpacity)
-                : {
-                    type: 'linear' as const,
-                    x: 0,
-                    y: 0,
-                    x2: 0,
-                    y2: 1,
-                    colorStops: [
-                      {
-                        offset: 0,
-                        color: hexToRgba(seriesColor, 0.5),
-                      },
-                      {
-                        offset: 1,
-                        color: hexToRgba(seriesColor, 0.06),
-                      },
-                    ],
-                  },
+    // Build y-axis configuration
+    const yAxisConfig = {
+      type: 'value' as const,
+      name: yAxis?.name,
+      nameLocation: 'middle' as const,
+      nameGap: yAxis?.name ? 50 : 0,
+      nameTextStyle: { color: themeColors.muted },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: {
+        lineStyle: {
+          color: themeColors.border,
+          type: 'dashed' as const,
+        },
+      },
+      axisLabel: {
+        color: themeColors.muted,
+        fontSize: 12,
+        formatter: yAxis?.formatter,
+      },
+      min: yAxis?.min,
+      max: yAxis?.max,
+      minInterval: yAxis?.minInterval,
+    };
+
+    // Build series configuration
+    const seriesConfig = displayedSeries
+      .filter(s => s.visible !== false)
+      .map((s, index) => {
+        // Use explicit color or auto-assign from palette
+        const seriesColor = s.color || extendedPalette[index % extendedPalette.length];
+
+        const baseConfig = {
+          name: s.name,
+          type: 'line' as const,
+          data: s.data,
+          smooth: s.smooth ?? false,
+          step: s.step ?? false,
+          connectNulls,
+          showSymbol: s.showSymbol ?? false,
+          symbolSize: s.symbolSize ?? 4,
+          lineStyle: {
+            color: seriesColor,
+            width: s.lineWidth ?? 2,
+            type: s.lineStyle ?? ('solid' as const),
+          },
+          itemStyle: {
+            color: seriesColor,
           },
         };
-      }
 
-      return baseConfig;
-    });
+        // Add area style if requested
+        if (s.showArea) {
+          return {
+            ...baseConfig,
+            areaStyle: {
+              color:
+                s.areaOpacity !== undefined
+                  ? hexToRgba(seriesColor, s.areaOpacity)
+                  : {
+                      type: 'linear' as const,
+                      x: 0,
+                      y: 0,
+                      x2: 0,
+                      y2: 1,
+                      colorStops: [
+                        {
+                          offset: 0,
+                          color: hexToRgba(seriesColor, 0.5),
+                        },
+                        {
+                          offset: 1,
+                          color: hexToRgba(seriesColor, 0.06),
+                        },
+                      ],
+                    },
+            },
+          };
+        }
 
-  // Calculate grid padding
-  // Title is always rendered by component, never by ECharts
-  // ECharts v6: outerBounds adds padding for tick labels, axis names need explicit space
-  const gridConfig = {
-    top: grid?.top ?? 16,
-    right: grid?.right,
-    bottom: grid?.bottom ?? (xAxis.name ? 30 : 24),
-    left: grid?.left ?? (yAxis?.name ? 30 : 8),
-    // ECharts v6: use outerBounds instead of deprecated containLabel
-    outerBoundsMode: 'same' as const,
-    outerBoundsContain: 'axisLabel' as const,
-  };
+        return baseConfig;
+      });
 
-  // Create default smart tooltip formatter
-  // Auto-enable if valueDecimals is set OR if no custom formatter is provided
-  const effectiveValueDecimals = yAxis?.valueDecimals ?? (tooltipFormatter ? undefined : 2);
-  const defaultTooltipFormatter =
-    !tooltipFormatter && effectiveValueDecimals !== undefined
-      ? (params: unknown): string => {
-          // ECharts passes array for 'axis' trigger, single object for 'item' trigger
-          const dataPoints = Array.isArray(params) ? params : [params];
+    // Calculate grid padding
+    // Title is always rendered by component, never by ECharts
+    // ECharts v6: outerBounds adds padding for tick labels, axis names need explicit space
+    const gridConfig = {
+      top: grid?.top ?? 16,
+      right: grid?.right,
+      bottom: grid?.bottom ?? (xAxis.name ? 30 : 24),
+      left: grid?.left ?? (yAxis?.name ? 30 : 8),
+      // ECharts v6: use outerBounds instead of deprecated containLabel
+      outerBoundsMode: 'same' as const,
+      outerBoundsContain: 'axisLabel' as const,
+    };
 
-          // Build tooltip HTML
-          let html = '';
+    // Create default smart tooltip formatter
+    // Auto-enable if valueDecimals is set OR if no custom formatter is provided
+    const effectiveValueDecimals = yAxis?.valueDecimals ?? (tooltipFormatter ? undefined : 2);
+    const defaultTooltipFormatter =
+      !tooltipFormatter && effectiveValueDecimals !== undefined
+        ? (params: unknown): string => {
+            // ECharts passes array for 'axis' trigger, single object for 'item' trigger
+            const dataPoints = Array.isArray(params) ? params : [params];
 
-          // Add x-axis label (first item's axis value)
-          // For numeric x-axis, format as integer to avoid decimals like "9876543.5"
-          // When relativeSlots is enabled, show both absolute and relative values
-          if (dataPoints.length > 0 && dataPoints[0]) {
-            const firstPoint = dataPoints[0] as { axisValue?: string | number };
-            if (firstPoint.axisValue !== undefined) {
-              const axisLabel =
-                typeof firstPoint.axisValue === 'number'
-                  ? relativeSlots
-                    ? formatSlotTooltip(firstPoint.axisValue)
-                    : formatSmartDecimal(firstPoint.axisValue, 0) // 0 decimals = integers only
-                  : firstPoint.axisValue;
-              html += `<div style="margin-bottom: 4px; font-weight: 600;">${axisLabel}</div>`;
-            }
-          }
+            // Build tooltip HTML
+            let html = '';
 
-          // Add each series - apply smart decimal formatting to y values
-          dataPoints.forEach(point => {
-            const p = point as {
-              marker?: string;
-              seriesName?: string;
-              value?: number | [number, number];
-            };
-
-            if (p.marker && p.seriesName !== undefined) {
-              // Extract y value
-              const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
-
-              if (yValue !== undefined && yValue !== null) {
-                const formattedValue = formatSmartDecimal(yValue, effectiveValueDecimals);
-                html += `<div style="display: flex; align-items: center; gap: 8px;">`;
-                html += p.marker;
-                html += `<span>${p.seriesName}:</span>`;
-                html += `<span style="font-weight: 600; margin-left: auto;">${formattedValue}</span>`;
-                html += `</div>`;
+            // Add x-axis label (first item's axis value)
+            // For numeric x-axis, format as integer to avoid decimals like "9876543.5"
+            // When relativeSlots is enabled, show both absolute and relative values
+            if (dataPoints.length > 0 && dataPoints[0]) {
+              const firstPoint = dataPoints[0] as { axisValue?: string | number };
+              if (firstPoint.axisValue !== undefined) {
+                const axisLabel =
+                  typeof firstPoint.axisValue === 'number'
+                    ? relativeSlots
+                      ? formatSlotTooltip(firstPoint.axisValue)
+                      : formatSmartDecimal(firstPoint.axisValue, 0) // 0 decimals = integers only
+                    : firstPoint.axisValue;
+                html += `<div style="margin-bottom: 4px; font-weight: 600;">${axisLabel}</div>`;
               }
             }
-          });
 
-          return html;
-        }
-      : undefined;
+            // Add each series - apply smart decimal formatting to y values
+            dataPoints.forEach(point => {
+              const p = point as {
+                marker?: string;
+                seriesName?: string;
+                value?: number | [number, number];
+              };
 
-  // Build tooltip configuration
-  const tooltipConfig = {
-    trigger: tooltipTrigger,
-    backgroundColor: themeColors.surface,
-    borderColor: themeColors.border,
-    borderWidth: 1,
-    textStyle: {
-      color: themeColors.foreground,
-      fontSize: 12,
-    },
-    axisPointer:
-      tooltipTrigger === 'axis'
-        ? {
-            type: 'line' as const,
-            lineStyle: {
-              color: themeColors.muted,
-              type: 'dashed' as const,
-            },
+              if (p.marker && p.seriesName !== undefined) {
+                // Extract y value
+                const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+
+                if (yValue !== undefined && yValue !== null) {
+                  const formattedValue = formatSmartDecimal(yValue, effectiveValueDecimals);
+                  html += `<div style="display: flex; align-items: center; gap: 8px;">`;
+                  html += p.marker;
+                  html += `<span>${p.seriesName}:</span>`;
+                  html += `<span style="font-weight: 600; margin-left: auto;">${formattedValue}</span>`;
+                  html += `</div>`;
+                }
+              }
+            });
+
+            return html;
           }
-        : undefined,
-    formatter: tooltipFormatter || defaultTooltipFormatter,
-    appendToBody: true, // Render tooltip in document body to prevent container clipping
-  };
+        : undefined;
 
-  // Build complete option
-  // Memoize based on actual data that should trigger re-animation, not intermediate objects
-  // Use JSON.stringify for deep comparison of complex props
-  const option = useMemo(
-    () => ({
+    // Build tooltip configuration
+    const tooltipConfig = {
+      trigger: tooltipTrigger,
+      backgroundColor: themeColors.surface,
+      borderColor: themeColors.border,
+      borderWidth: 1,
+      textStyle: {
+        color: themeColors.foreground,
+        fontSize: 12,
+      },
+      axisPointer:
+        tooltipTrigger === 'axis'
+          ? {
+              type: 'line' as const,
+              lineStyle: {
+                color: themeColors.muted,
+                type: 'dashed' as const,
+              },
+            }
+          : undefined,
+      formatter: tooltipFormatter || defaultTooltipFormatter,
+      appendToBody: true, // Render tooltip in document body to prevent container clipping
+    };
+
+    return {
       animation: true,
       animationDuration,
       animationEasing: 'cubicOut' as const,
@@ -459,22 +467,26 @@ export function MultiLineChart({
             },
           ]
         : undefined,
-    }),
-    [
-      animationDuration,
-      themeColors.foreground,
-      themeColors.border,
-      themeColors.muted,
-      JSON.stringify(series),
-      JSON.stringify(xAxis),
-      JSON.stringify(yAxis),
-      enableDataZoom,
-      showLegend,
-      enableSeriesFilter,
-      connectNulls,
-      height,
-    ]
-  );
+    };
+  }, [
+    animationDuration,
+    themeColors.foreground,
+    themeColors.border,
+    themeColors.muted,
+    themeColors.surface,
+    xAxis,
+    yAxis,
+    displayedSeries,
+    grid,
+    tooltipFormatter,
+    tooltipTrigger,
+    enableDataZoom,
+    connectNulls,
+    extendedPalette,
+    relativeSlots,
+    formatSlotLabel,
+    formatSlotTooltip,
+  ]);
 
   const chartContent = (
     <>

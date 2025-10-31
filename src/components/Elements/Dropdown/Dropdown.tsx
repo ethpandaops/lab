@@ -3,11 +3,6 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import clsx from 'clsx';
 import type { DropdownProps, DropdownItemProps, DropdownHeaderProps, DropdownSectionProps } from './Dropdown.types';
 
-const alignStyles = {
-  left: 'left-0 origin-top-left',
-  right: 'right-0 origin-top-right',
-};
-
 /**
  * Dropdown component using Headless UI Menu
  *
@@ -35,14 +30,14 @@ export function Dropdown({
       {isValidElement(trigger) ? <MenuButton as="div">{trigger}</MenuButton> : <MenuButton>{trigger}</MenuButton>}
 
       <MenuItems
+        anchor={align === 'left' ? 'bottom start' : 'bottom end'}
         transition
         className={clsx(
-          'absolute z-10 mt-2 w-56 rounded-md bg-surface shadow-lg outline-1 outline-border',
+          'z-50 mt-2 w-56 rounded-md bg-surface shadow-lg outline-1 outline-border [--anchor-gap:8px]',
           'transition data-closed:scale-95 data-closed:transform data-closed:opacity-0',
           'data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in',
           'dark:bg-surface dark:shadow-none dark:-outline-offset-1 dark:outline-border',
-          withDividers && 'divide-y divide-border dark:divide-border',
-          alignStyles[align]
+          withDividers && 'divide-y divide-border dark:divide-border'
         )}
       >
         {children}
@@ -98,24 +93,21 @@ export function DropdownItem({
   );
 
   // Render icon with appropriate styles
-  const renderIcon = (): React.ReactNode | null => {
-    if (!icon || !isValidElement(icon)) return null;
-
-    return cloneElement(icon, {
-      'aria-hidden': 'true',
-      className: iconClasses,
-    } as Record<string, unknown>);
-  };
+  const iconElement = icon
+    ? cloneElement(icon as React.ReactElement<{ className?: string }>, {
+        className: iconClasses,
+      })
+    : null;
 
   const content = (
     <>
-      {renderIcon()}
-      {children}
+      {iconElement}
+      <span>{children}</span>
     </>
   );
 
-  // Render as anchor if href is provided
-  if (href && !disabled) {
+  // Render as link if href is provided
+  if (href) {
     return (
       <MenuItem disabled={disabled}>
         <a href={href} className={clsx(itemClasses, 'group')}>

@@ -11,6 +11,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { z } from 'zod';
 import { NetworkProvider } from '@/providers/NetworkProvider';
 import { ThemeProvider } from '@/providers/ThemeProvider';
+import { TimezoneProvider } from '@/providers/TimezoneProvider';
 import { ThemeToggle } from '@/components/Layout/ThemeToggle';
 import { ConfigGate } from '@/components/Overlays/ConfigGate';
 import { FeatureGate } from '@/components/Overlays/FeatureGate';
@@ -122,46 +123,48 @@ function RootComponent(): JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <ConfigGate>
-          <NetworkProvider>
-            <HeadContent />
-            <div className="min-h-dvh bg-background">
-              {/* Sidebar (mobile + desktop) */}
-              <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <TimezoneProvider>
+          <ConfigGate>
+            <NetworkProvider>
+              <HeadContent />
+              <div className="min-h-dvh bg-background">
+                {/* Sidebar (mobile + desktop) */}
+                <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-              {/* Mobile header */}
-              <div className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-surface/95 px-4 py-4 shadow-sm backdrop-blur-xl sm:px-6 lg:hidden">
-                <div className="flex items-center gap-x-6">
-                  <button
-                    type="button"
-                    onClick={() => setSidebarOpen(!sidebarOpen)}
-                    className="group -m-2.5 flex h-10 w-10 flex-col items-center justify-center gap-1.5 p-2.5 lg:hidden"
-                    aria-label="Toggle sidebar"
-                    aria-pressed={sidebarOpen}
-                  >
-                    <span className="sr-only">Toggle sidebar</span>
-                    <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:translate-y-2 group-[[aria-pressed=true]]:rotate-45" />
-                    <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:opacity-0" />
-                    <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:-translate-y-2 group-[[aria-pressed=true]]:-rotate-45" />
-                  </button>
-                  <Link to="/" className="flex items-center gap-2">
-                    <img alt="Lab Logo" src="/images/lab.png" className="size-8" />
-                    <span className="font-sans text-xl font-bold text-foreground">The Lab</span>
-                  </Link>
+                {/* Mobile header */}
+                <div className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-surface/95 px-4 py-4 shadow-sm backdrop-blur-xl sm:px-6 lg:hidden">
+                  <div className="flex items-center gap-x-6">
+                    <button
+                      type="button"
+                      onClick={() => setSidebarOpen(!sidebarOpen)}
+                      className="group -m-2.5 flex h-10 w-10 flex-col items-center justify-center gap-1.5 p-2.5 lg:hidden"
+                      aria-label="Toggle sidebar"
+                      aria-pressed={sidebarOpen}
+                    >
+                      <span className="sr-only">Toggle sidebar</span>
+                      <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:translate-y-2 group-[[aria-pressed=true]]:rotate-45" />
+                      <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:opacity-0" />
+                      <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:-translate-y-2 group-[[aria-pressed=true]]:-rotate-45" />
+                    </button>
+                    <Link to="/" className="flex items-center gap-2">
+                      <img alt="Lab Logo" src="/images/lab.png" className="size-8" />
+                      <span className="font-sans text-xl font-bold text-foreground">The Lab</span>
+                    </Link>
+                  </div>
+                  <ThemeToggle />
                 </div>
-                <ThemeToggle />
-              </div>
 
-              {/* Main content */}
-              <main className="bg-background lg:pl-72">
-                <FeatureGate>
-                  <Breadcrumb />
-                  <Outlet />
-                </FeatureGate>
-              </main>
-            </div>
-          </NetworkProvider>
-        </ConfigGate>
+                {/* Main content */}
+                <main className="bg-background lg:pl-72">
+                  <FeatureGate>
+                    <Breadcrumb />
+                    <Outlet />
+                  </FeatureGate>
+                </main>
+              </div>
+            </NetworkProvider>
+          </ConfigGate>
+        </TimezoneProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
