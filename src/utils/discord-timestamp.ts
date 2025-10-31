@@ -92,16 +92,17 @@ export function formatDiscordTimestamp(timestamp: number, style: DiscordTimestam
 /**
  * Get all Discord timestamp formats for a given timestamp
  * @param timestamp - Unix timestamp in seconds
- * @returns Object with all Discord timestamp formats
+ * @returns Object with all Discord timestamp formats in display order
  */
 export function getAllDiscordFormats(timestamp: number): Record<DiscordTimestampStyle, string> {
+  // Order matches Discord's display order
   return {
+    F: formatDiscordTimestamp(timestamp, 'F'),
+    f: formatDiscordTimestamp(timestamp, 'f'),
+    D: formatDiscordTimestamp(timestamp, 'D'),
+    d: formatDiscordTimestamp(timestamp, 'd'),
     t: formatDiscordTimestamp(timestamp, 't'),
     T: formatDiscordTimestamp(timestamp, 'T'),
-    d: formatDiscordTimestamp(timestamp, 'd'),
-    D: formatDiscordTimestamp(timestamp, 'D'),
-    f: formatDiscordTimestamp(timestamp, 'f'),
-    F: formatDiscordTimestamp(timestamp, 'F'),
     R: formatDiscordTimestamp(timestamp, 'R'),
   };
 }
@@ -159,13 +160,14 @@ function formatRelativeTime(timestamp: number): string {
 
 /**
  * Get Discord timestamp style descriptions
+ * Matches Discord's format descriptions exactly
  */
 export const DISCORD_STYLE_LABELS: Record<DiscordTimestampStyle, string> = {
-  t: 'Short Time',
-  T: 'Long Time',
-  d: 'Short Date',
-  D: 'Long Date',
-  f: 'Short Date/Time',
-  F: 'Long Date/Time',
-  R: 'Relative Time',
+  F: 'Long Date/Time', // Friday 31 October 2025 at 16:32
+  f: 'Short Date/Time', // 31 October 2025 at 16:32
+  D: 'Long Date', // 31 October 2025
+  d: 'Short Date', // 31/10/2025
+  t: 'Short Time', // 16:32
+  T: 'Long Time', // 16:32:56
+  R: 'Relative Time', // 0 seconds ago
 };

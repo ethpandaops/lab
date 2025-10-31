@@ -1,9 +1,10 @@
-import { type JSX, useState, useCallback } from 'react';
+import { type JSX, useState, useCallback, useEffect } from 'react';
 import { ClipboardDocumentIcon, CheckIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { useNetwork } from '@/hooks/useNetwork';
-import { formatTimestamp } from '@/utils/time';
+import { useInterval } from '@/hooks/useInterval';
+import { formatTimestamp, getRelativeTime } from '@/utils/time';
 import { timestampToSlot } from '@/pages/ethereum/live/utils/slot-time';
 import { slotToEpoch } from '@/utils/beacon';
 import { getAllDiscordFormats, DISCORD_STYLE_LABELS } from '@/utils/discord-timestamp';
@@ -21,12 +22,13 @@ interface TimestampModalProps extends TimestampModalContentProps {
  * Shows:
  * - Local and UTC timestamps (full)
  * - Unix timestamp
+ * - Live-updating relative time
  * - Beacon chain slot and epoch (based on selected network)
  * - All Discord relative time formats
  */
 export function TimestampModal({ open, onClose, timestamp }: TimestampModalProps): JSX.Element {
   return (
-    <Dialog open={open} onClose={onClose} title="Timestamp Details" size="lg">
+    <Dialog open={open} onClose={onClose} title="Timestamp Details" size="xl">
       <TimestampModalContent timestamp={timestamp} />
     </Dialog>
   );
@@ -38,6 +40,16 @@ export function TimestampModal({ open, onClose, timestamp }: TimestampModalProps
 function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.Element {
   const { currentNetwork } = useNetwork();
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [liveRelativeTime, setLiveRelativeTime] = useState<string>(getRelativeTime(timestamp));
+
+  // Update live relative time every second
+  useEffect(() => {
+    setLiveRelativeTime(getRelativeTime(timestamp));
+  }, [timestamp]);
+
+  useInterval(() => {
+    setLiveRelativeTime(getRelativeTime(timestamp));
+  }, 1000);
 
   // Calculate beacon chain values if genesis_time is available
   const beaconData = currentNetwork?.genesis_time
@@ -74,7 +86,7 @@ function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.E
       {/* Standard Formats Section */}
       <section>
         <h3 className="mb-3 text-sm/5 font-semibold text-foreground">Standard Formats</h3>
-        <div className="space-y-2">
+        <div className="grid grid-cols-2 gap-2">
           <TimestampField
             label="Local Time"
             value={localTimestamp}
@@ -93,6 +105,13 @@ function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.E
             onCopy={() => handleCopy(timestamp.toString(), 'unix')}
             isCopied={copiedField === 'unix'}
           />
+          <TimestampField
+            label="Relative Time (Live)"
+            value={liveRelativeTime}
+            onCopy={() => handleCopy(liveRelativeTime, 'relative')}
+            isCopied={copiedField === 'relative'}
+            isLive
+          />
         </div>
       </section>
 
@@ -100,7 +119,7 @@ function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.E
       {beaconData && currentNetwork && (
         <section>
           <h3 className="mb-3 text-sm/5 font-semibold text-foreground">Beacon Chain ({currentNetwork.name})</h3>
-          <div className="space-y-2">
+          <div className="grid grid-cols-2 gap-2">
             <TimestampField
               label="Slot"
               value={beaconData.slot.toLocaleString()}
@@ -120,7 +139,7 @@ function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.E
       {/* Discord Formats Section */}
       <section>
         <h3 className="mb-3 text-sm/5 font-semibold text-foreground">Discord Formats</h3>
-        <div className="space-y-2">
+        <div className="grid grid-cols-2 gap-2">
           {(Object.entries(discordFormats) as [DiscordTimestampStyle, string][]).map(([style, value]) => (
             <TimestampField
               key={style}
@@ -128,7 +147,7 @@ function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.E
               value={value}
               onCopy={() => handleCopy(value, `discord-${style}`)}
               isCopied={copiedField === `discord-${style}`}
-              badge={style}
+              badge={`<t:${timestamp}:${style}>`}
             />
           ))}
         </div>
@@ -143,18 +162,28 @@ interface TimestampFieldProps {
   onCopy: () => void;
   isCopied: boolean;
   badge?: string;
+  isLive?: boolean;
 }
 
 /**
  * Individual timestamp field row with copy button
  */
-function TimestampField({ label, value, onCopy, isCopied, badge }: TimestampFieldProps): JSX.Element {
+function TimestampField({ label, value, onCopy, isCopied, badge, isLive }: TimestampFieldProps): JSX.Element {
   return (
     <div className="flex items-start justify-between gap-4 rounded-sm bg-background px-4 py-3">
       <div className="min-w-0 flex-1">
         <div className="mb-1 flex items-center gap-2">
           <span className="text-xs/4 font-medium text-muted">{label}</span>
-          {badge && (
+          {isLive && (
+            <span className="text-2xs/3 flex items-center gap-1.5 rounded-xs bg-success/20 px-1.5 py-0.5 font-semibold text-success">
+              <span className="relative flex size-1.5">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-75"></span>
+                <span className="relative inline-flex size-1.5 rounded-full bg-success"></span>
+              </span>
+              LIVE
+            </span>
+          )}
+          {badge && !isLive && (
             <span className="text-2xs/3 rounded-xs bg-accent/20 px-1.5 py-0.5 font-mono font-semibold text-accent">
               {badge}
             </span>
