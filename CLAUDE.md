@@ -418,59 +418,18 @@ decorators: [
 
 ## Slot & Epoch Display
 
-### Formatting Standards
+**Never use locale formatting** (no commas) - slots/epochs are blockchain identifiers.
 
-Slot and epoch numbers are blockchain identifiers and **must never** be displayed with locale-specific formatting (commas, periods, etc.). They should always render as plain integers.
-
-**❌ Wrong:**
-```tsx
-{slot.toLocaleString()}              // "1,234,567" - NO!
-{new Intl.NumberFormat().format(epoch)} // "12,345" - NO!
-```
-
-**✅ Correct:**
-```tsx
-import { formatSlot, formatEpoch } from '@/utils';
-
-{formatSlot(slot)}     // "1234567"
-{formatEpoch(epoch)}   // "12345"
-```
-
-### Linking to Detail Pages
-
-When displaying slot or epoch numbers, **always use the reusable link components** to provide navigation to their detail pages:
-
+**UI displays** (tables, cards):
 ```tsx
 import { Slot, Epoch } from '@/components/Ethereum';
-
-// Link to slot detail page
-<Slot slot={1234567} />
-
-// Link to epoch detail page
-<Epoch epoch={12345} />
-
-// Plain text (non-linked) - only when linking is not appropriate
-<Slot slot={1234567} noLink />
-<Epoch epoch={12345} noLink />
+<Slot slot={1234567} />        // Linked to detail page
+<Epoch epoch={12345} noLink /> // Plain text
 ```
 
-### When to Use Components vs Utils
-
-**Use `<Slot>` and `<Epoch>` components:**
-- In tables, cards, lists, and UI displays
-- Anywhere users might want to navigate to slot/epoch details
-- Default behavior for all user-facing displays
-
-**Use `formatSlot()` and `formatEpoch()` utils:**
-- In page titles and meta tags
-- In chart tooltips (when custom rendering needed)
-- In computed strings or labels where JSX isn't available
-- When you explicitly need non-linked display
-
-### Implementation Notes
-
-- Components automatically format numbers without commas
-- Components use TanStack Router's `<Link>` for navigation
-- Components accept `className` prop for styling
-- Components are in `src/components/Ethereum/` category
-- Utils are in `src/utils/number.ts`
+**String contexts** (titles, tooltips):
+```tsx
+import { formatSlot, formatEpoch } from '@/utils';
+{formatSlot(slot)}   // "1234567"
+{formatEpoch(epoch)} // "12345"
+```
