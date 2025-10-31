@@ -10,6 +10,10 @@ import type { MapChartProps } from './Map.types';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useTheme } from '@/hooks/useTheme';
 import { resolveCssColorToHex } from '@/utils/color';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+// Get data visualization colors once at module level
+const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
 // Register echarts-gl components selectively to prevent duplicate registration
 echarts.use([Lines3DChart, Scatter3DChart, Geo3DComponent]);
@@ -113,7 +117,7 @@ export function MapChart({
         blendMode: 'lighter',
         lineStyle: {
           width: 0.2,
-          color: convertedLineColor || themeColors.primary,
+          color: convertedLineColor || CHART_CATEGORICAL_COLORS[0],
           opacity: 0.05,
         },
         data: routeData,
@@ -128,7 +132,7 @@ export function MapChart({
         symbol: 'circle',
         symbolSize: pointSize,
         itemStyle: {
-          color: convertedPointColor || themeColors.primary,
+          color: convertedPointColor || CHART_CATEGORICAL_COLORS[0],
           opacity: 0.8,
         },
         label: {
