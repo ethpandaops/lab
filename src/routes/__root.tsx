@@ -62,7 +62,22 @@ if (typeof window !== 'undefined' && window.__BOUNDS__) {
 
 function RootComponent(): JSX.Element {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isAppleWatch, setIsAppleWatch] = useState(false);
   const router = useRouter();
+
+  // Detect Apple Watch screen size (typically 136-205px wide)
+  useEffect(() => {
+    const checkScreenSize = (): void => {
+      setIsAppleWatch(window.innerWidth <= 205);
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []);
 
   // Close sidebar on route navigation (path changes only, not search params)
   useEffect(() => {
@@ -77,6 +92,21 @@ function RootComponent(): JSX.Element {
       unsubscribe();
     };
   }, [router]);
+
+  // Show clown emoji for Apple Watch screens
+  if (isAppleWatch) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <div className="flex min-h-dvh items-center justify-center bg-background">
+            <span className="text-9xl" role="img" aria-label="Clown face">
+              🤡
+            </span>
+          </div>
+        </ThemeProvider>
+      </QueryClientProvider>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
