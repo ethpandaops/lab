@@ -1,4 +1,4 @@
-import { type JSX, useMemo } from 'react';
+import { type JSX, useMemo, forwardRef } from 'react';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { LineChart as EChartsLine } from 'echarts/charts';
@@ -23,28 +23,31 @@ echarts.use([EChartsLine, GridComponent, TooltipComponent, TitleComponent, Canva
  * />
  * ```
  */
-export function LineChart({
-  data = [820, 932, 901, 934, 1290, 1330, 1320],
-  labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-  title,
-  titleAlign: _titleAlign = 'center',
-  titleFontSize = 16,
-  titleFontFamily,
-  titleFontWeight = 600,
-  titleLeft = 'center',
-  titleTop = 8,
-  height = 400,
-  smooth = true,
-  showArea = false,
-  color,
-  yMax,
-  xMax,
-  connectNulls = false,
-  animationDuration = 300,
-  xAxisLabelInterval = 'auto',
-  xAxisTitle,
-  yAxisTitle,
-}: LineChartProps): JSX.Element {
+export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function LineChart(
+  {
+    data = [820, 932, 901, 934, 1290, 1330, 1320],
+    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    title,
+    titleAlign: _titleAlign = 'center',
+    titleFontSize = 16,
+    titleFontFamily,
+    titleFontWeight = 600,
+    titleLeft = 'center',
+    titleTop = 8,
+    height = 400,
+    smooth = true,
+    showArea = false,
+    color,
+    yMax,
+    xMax,
+    connectNulls = false,
+    animationDuration = 300,
+    xAxisLabelInterval = 'auto',
+    xAxisTitle,
+    yAxisTitle,
+  },
+  ref
+): JSX.Element {
   const themeColors = useThemeColors();
 
   // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
@@ -215,6 +218,7 @@ export function LineChart({
   return (
     <div className={height === '100%' ? 'h-full w-full' : 'w-full'} style={{ pointerEvents: 'none' }}>
       <ReactEChartsCore
+        ref={ref}
         echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
@@ -223,4 +227,4 @@ export function LineChart({
       />
     </div>
   );
-}
+});
