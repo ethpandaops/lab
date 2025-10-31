@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
 // Use selective imports to avoid "geo3D exists" warning (ECharts v6 + echarts-gl)
@@ -51,6 +51,7 @@ export function MapChart({
 }: MapChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
   const { theme } = useTheme();
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
   const convertedLineColor = lineColor ? resolveCssColorToHex(lineColor) : undefined;
@@ -58,26 +59,21 @@ export function MapChart({
   const convertedEnvironment = environment ? resolveCssColorToHex(environment) : undefined;
   const convertedPointColor = pointColor ? resolveCssColorToHex(pointColor) : undefined;
 
-  // Load and register world map on mount - use a ref to track loading state
-  // This ensures the map is registered before rendering
-  const mapRegistered = useMemo(() => {
-    let registered = false;
-
+  // Load and register world map on mount
+  useEffect(() => {
     // Check if map is already registered
+    let alreadyRegistered = false;
     try {
       const existingMap = echarts.getMap('world');
       if (existingMap) {
-        registered = true;
+        alreadyRegistered = true;
+        setMapLoaded(true);
       }
     } catch {
       // Map not registered yet
     }
 
-    return registered;
-  }, []);
-
-  useEffect(() => {
-    if (!mapRegistered) {
+    if (!alreadyRegistered) {
       const loadWorldMap = async (): Promise<void> => {
         try {
           // Fetch world map GeoJSON from local public directory
@@ -86,17 +82,26 @@ export function MapChart({
 
           // Register the map with echarts
           echarts.registerMap('world', worldGeoJson);
+          setMapLoaded(true);
         } catch (error) {
           console.error('Failed to load world map:', error);
+          setMapLoaded(false);
         }
       };
 
       loadWorldMap();
     }
-  }, [mapRegistered]);
+  }, []);
 
   // Prepare options and memoize to avoid unnecessary re-renders
   const option = useMemo(() => {
+    // Don't create option until map is loaded to avoid accessing undefined map data
+    if (!mapLoaded) {
+      return {
+        backgroundColor: 'transparent',
+      };
+    }
+
     // Determine theme-aware defaults (treat both dark and star as dark themes)
     const isDark = theme === 'dark' || theme === 'star';
 
@@ -237,6 +242,7 @@ export function MapChart({
       series,
     };
   }, [
+    mapLoaded,
     routes,
     points,
     title,
@@ -254,6 +260,15 @@ export function MapChart({
     themeColors,
     theme,
   ]);
+
+  // Don't render until map is loaded
+  if (!mapLoaded) {
+    return (
+      <div className="flex w-full items-center justify-center" style={{ height }}>
+        <div className="text-foreground">Loading map...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full w-full">
