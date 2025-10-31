@@ -76,6 +76,11 @@ export interface SeriesData {
    * @default false
    */
   step?: false | 'start' | 'middle' | 'end';
+  /**
+   * Show label at the end of the line
+   * @default false
+   */
+  showEndLabel?: boolean;
 }
 
 /**
