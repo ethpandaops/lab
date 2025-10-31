@@ -6,7 +6,11 @@ import { GridComponent, TooltipComponent, TitleComponent } from 'echarts/compone
 import { CanvasRenderer } from 'echarts/renderers';
 import { hexToRgba, resolveCssColorToHex } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import type { LineChartProps } from './Line.types';
+
+// Get data visualization colors once at module level
+const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
 // Register ECharts components
 echarts.use([EChartsLine, GridComponent, TooltipComponent, TitleComponent, CanvasRenderer]);
@@ -139,7 +143,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           symbol: 'none',
           showSymbol: false,
           lineStyle: {
-            color: convertedColor || themeColors.primary,
+            color: convertedColor || CHART_CATEGORICAL_COLORS[0],
             width: 3,
           },
           areaStyle: showArea
@@ -153,11 +157,11 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
                   colorStops: [
                     {
                       offset: 0,
-                      color: hexToRgba(convertedColor || themeColors.primary, 0.5),
+                      color: hexToRgba(convertedColor || CHART_CATEGORICAL_COLORS[0], 0.5),
                     },
                     {
                       offset: 1,
-                      color: hexToRgba(convertedColor || themeColors.primary, 0.06),
+                      color: hexToRgba(convertedColor || CHART_CATEGORICAL_COLORS[0], 0.06),
                     },
                   ],
                 },
@@ -210,7 +214,6 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
       themeColors.foreground,
       themeColors.border,
       themeColors.muted,
-      themeColors.primary,
       themeColors.background,
     ]
   );

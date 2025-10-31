@@ -99,8 +99,8 @@ export function AttestationLatencyChart({ username }: AttestationLatencyChartPro
         name: 'Median Latency (ms)',
       }}
       height={300}
-      showLegend={series.length > 1 && series.length <= 10}
-      enableSeriesFilter={series.length > 10}
+      showLegend={series.length > 1 && series.length <= 5}
+      enableSeriesFilter={series.length > 5}
       enableDataZoom={true}
       enableAggregateToggle={false}
       tooltipTrigger="item"

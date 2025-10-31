@@ -1,8 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { IndexPage } from '@/pages/ethereum/data-availability/das-custody';
+import { dasCustodySearchSchema } from '@/pages/ethereum/data-availability/das-custody/IndexPage.types';
 
 export const Route = createFileRoute('/ethereum/data-availability/das-custody/')({
   component: IndexPage,
+  validateSearch: dasCustodySearchSchema,
   head: () => ({
     meta: [
       { title: `DAS Custody | ${import.meta.env.VITE_BASE_TITLE}` },

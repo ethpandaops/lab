@@ -7,7 +7,8 @@ import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Table } from '@/components/Lists/Table';
 
-import { MissedAttestationsByEpochChart } from './components';
+import { TopEntitiesChart } from '@/components/Ethereum/TopEntitiesChart';
+
 import { useEpochsData } from './hooks';
 
 /**
@@ -144,11 +145,14 @@ export function IndexPage(): React.JSX.Element {
 
       <div id="metrics" className="mt-8">
         <h2 className="mb-4 text-xl font-semibold text-foreground">Metrics</h2>
-        <MissedAttestationsByEpochChart
-          missedAttestationsByEntity={missedAttestationsByEntity}
-          topEntitiesCount={10}
+        <TopEntitiesChart
+          data={missedAttestationsByEntity.map(m => ({ x: m.epoch, entity: m.entity, count: m.count }))}
+          xAxis={{ name: 'Epoch', min: epochRange?.min, max: epochRange?.max }}
+          yAxis={{ name: 'Missed' }}
+          title="Offline Validators"
+          topN={10}
           anchorId="offline-validators-chart"
-          epochRange={epochRange}
+          emptyMessage="No offline validators detected in these epochs"
         />
       </div>
     </Container>

@@ -19,8 +19,9 @@ export interface SeriesData {
   /**
    * Series data - simple values, [x, y] tuples, or objects with value and metadata
    * Object format allows storing additional data for enhanced tooltips
+   * Supports null values for missing data points
    */
-  data: number[] | Array<[number, number]> | (number | null)[] | EnrichedDataPoint[];
+  data: number[] | Array<[number, number]> | Array<[number, number | null]> | (number | null)[] | EnrichedDataPoint[];
   /**
    * Series color (hex or rgb)
    */
@@ -242,4 +243,13 @@ export interface MultiLineChartProps {
    * @default false
    */
   enableSeriesFilter?: boolean;
+  /**
+   * Display x-axis values relative to an epoch (shows 1-32 instead of absolute slot numbers)
+   * When enabled, tooltips will show both absolute and relative values
+   * Format: "Slot: 12907872 (1/32)"
+   */
+  relativeSlots?: {
+    /** The epoch number to calculate relative slots from */
+    epoch: number;
+  };
 }
