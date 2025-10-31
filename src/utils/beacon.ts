@@ -131,3 +131,24 @@ export function getEpochSlotRange(epoch: number): { firstSlot: number; lastSlot:
   const lastSlot = firstSlot + SLOTS_PER_EPOCH - 1;
   return { firstSlot, lastSlot };
 }
+
+/**
+ * Check if the current epoch is at or after a target fork epoch
+ *
+ * @param currentEpoch - Current epoch number
+ * @param forkEpoch - Target fork epoch (undefined if not configured for network)
+ * @returns true if current epoch >= fork epoch, false otherwise
+ *
+ * @example
+ * ```tsx
+ * isEpochAtOrAfter(1000, 500) // Returns true (1000 >= 500)
+ * isEpochAtOrAfter(100, 500) // Returns false (100 < 500)
+ * isEpochAtOrAfter(1000, undefined) // Returns false (fork not configured)
+ * ```
+ */
+export function isEpochAtOrAfter(currentEpoch: number, forkEpoch?: number): boolean {
+  if (forkEpoch === undefined) {
+    return false;
+  }
+  return currentEpoch >= forkEpoch;
+}

@@ -1,33 +1,32 @@
 import { type JSX } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fctHeadFirstSeenByNodeServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import { fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { useLatencyChartSeries } from '../../hooks/useLatencyChartData';
 import { useSlotWindowQuery } from '../../hooks/useSlotWindowQuery';
 import { useNetwork } from '@/hooks/useNetwork';
 
-export interface HeadLatencyChartProps {
+export interface DataColumnLatencyChartProps {
   username: string;
 }
 
 /**
- * Line chart showing head propagation latency for a contributor's nodes.
+ * Line chart showing data column propagation latency for a contributor's nodes.
  *
- * Displays `seen_slot_start_diff` (ms) from FctHeadFirstSeenByNode over slots.
- * Each data point represents when a head event was first observed by the contributor's
- * nodes relative to slot start time.
+ * Displays `seen_slot_start_diff` (ms) from FctBlockDataColumnSidecarFirstSeenByNode over slots.
+ * Data columns were introduced in PeerDAS (Fusaka upgrade) for improved data availability sampling.
  *
- * Lower latency = faster head update propagation = better sync performance.
+ * Lower latency = faster data column propagation = better network positioning.
  *
  * @param username - Contributor username to filter data
  */
-export function HeadLatencyChart({ username }: HeadLatencyChartProps): JSX.Element {
+export function DataColumnLatencyChart({ username }: DataColumnLatencyChartProps): JSX.Element {
   const queryRange = useSlotWindowQuery(20);
   const { currentNetwork } = useNetwork();
 
   const { data, isLoading, error } = useQuery({
-    ...fctHeadFirstSeenByNodeServiceListOptions({
+    ...fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions({
       query: {
         username_eq: username,
         slot_start_date_time_gte: queryRange?.slot_start_date_time_gte,
@@ -40,7 +39,10 @@ export function HeadLatencyChart({ username }: HeadLatencyChartProps): JSX.Eleme
     placeholderData: previousData => previousData,
   });
 
-  const { series, minSlot, maxSlot, dataCount } = useLatencyChartSeries(data, 'fct_head_first_seen_by_node');
+  const { series, minSlot, maxSlot, dataCount } = useLatencyChartSeries(
+    data,
+    'fct_block_data_column_sidecar_first_seen_by_node'
+  );
 
   // Only show loading skeleton on initial load, not on refetch
   if (isLoading) {
@@ -50,7 +52,7 @@ export function HeadLatencyChart({ username }: HeadLatencyChartProps): JSX.Eleme
   if (error) {
     return (
       <div className="rounded-sm border border-danger/20 bg-danger/10 p-4 text-danger">
-        Error loading head data: {error.message}
+        Error loading data column data: {error.message}
       </div>
     );
   }
@@ -58,7 +60,7 @@ export function HeadLatencyChart({ username }: HeadLatencyChartProps): JSX.Eleme
   if (dataCount === 0) {
     return (
       <div className="flex h-[400px] items-center justify-center rounded-sm border border-border bg-surface text-muted">
-        No head data available for this time range
+        No data column data available for this time range
       </div>
     );
   }
