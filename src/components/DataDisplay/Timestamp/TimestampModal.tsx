@@ -196,13 +196,13 @@ function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.E
                     <ClickableTimestampRow
                       label="Slot Start"
                       timestamp={beaconData.slotStart}
-                      context={`Slot ${beaconData.slot} Start`}
+                      context={`Slot ${beaconData.slot.toLocaleString()}`}
                       onOpenModal={handleOpenNestedModal}
                     />
                     <ClickableTimestampRow
                       label="Slot End"
                       timestamp={slotEnd}
-                      context={`Slot ${beaconData.slot} End`}
+                      context={`Slot ${beaconData.slot.toLocaleString()}`}
                       onOpenModal={handleOpenNestedModal}
                     />
                     <TimestampRow
@@ -214,13 +214,13 @@ function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.E
                     <ClickableTimestampRow
                       label="Epoch Start"
                       timestamp={beaconData.epochStart}
-                      context={`Epoch ${beaconData.epoch} Start`}
+                      context={`Epoch ${beaconData.epoch.toLocaleString()}`}
                       onOpenModal={handleOpenNestedModal}
                     />
                     <ClickableTimestampRow
                       label="Epoch End"
                       timestamp={epochEnd}
-                      context={`Epoch ${beaconData.epoch} End`}
+                      context={`Epoch ${beaconData.epoch.toLocaleString()}`}
                       onOpenModal={handleOpenNestedModal}
                     />
                   </tbody>
