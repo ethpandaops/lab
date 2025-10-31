@@ -283,20 +283,8 @@ export function Map2DChart({
       },
       series,
     };
-  }, [
-    mapLoaded,
-    routes,
-    showEffect,
-    lineColor,
-    themeColors.primary,
-    themeColors.surface,
-    themeColors.border,
-    themeColors.foreground,
-    themeColors.muted,
-    title,
-    roam,
-    createScatterSeries,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapLoaded]); // Only recalculate when map loads - after that we update via setOption
 
   // Don't render until map is loaded
   if (!mapLoaded) {
