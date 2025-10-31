@@ -125,8 +125,12 @@ export function usePreAggregatedLatencyChartSeries(
         data: chartData,
         color: extendedPalette[index % extendedPalette.length],
         showSymbol: true,
-        symbolSize: 4,
+        symbolSize: 2,
         lineWidth: 2,
+        emphasis: {
+          focus: 'series',
+          symbolSize: 6,
+        },
       });
     });
 

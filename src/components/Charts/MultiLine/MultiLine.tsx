@@ -85,24 +85,6 @@ export function MultiLineChart({
   const themeColors = useThemeColors();
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
-  // Helper functions for relative slot display
-  const toRelativeSlot = (absoluteSlot: number): number => {
-    if (!relativeSlots) return absoluteSlot;
-    return absoluteSlot - relativeSlots.epoch * 32 + 1;
-  };
-
-  const formatSlotLabel = (absoluteSlot: number): string => {
-    if (!relativeSlots) return formatSmartDecimal(absoluteSlot, 0);
-    const relativeSlot = toRelativeSlot(absoluteSlot);
-    return `${relativeSlot}`;
-  };
-
-  const formatSlotTooltip = (absoluteSlot: number): string => {
-    if (!relativeSlots) return formatSmartDecimal(absoluteSlot, 0);
-    const relativeSlot = toRelativeSlot(absoluteSlot);
-    return `Slot: ${formatSmartDecimal(absoluteSlot, 0)} (${relativeSlot}/32)`;
-  };
-
   // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
   const convertedColorPalette = colorPalette?.map(color => resolveCssColorToHex(color));
 
@@ -235,57 +217,6 @@ export function MultiLineChart({
     showAggregate,
   ]);
 
-  // Build x-axis configuration
-  const xAxisConfig = {
-    type: xAxis.type,
-    name: xAxis.name,
-    nameLocation: 'middle' as const,
-    nameGap: 30,
-    nameTextStyle: { color: themeColors.muted },
-    data: xAxis.type === 'category' ? xAxis.labels : undefined,
-    boundaryGap: xAxis.type === 'category',
-    axisLine: { lineStyle: { color: themeColors.border } },
-    axisLabel: {
-      color: themeColors.muted,
-      fontSize: 12,
-      formatter: xAxis.formatter || (relativeSlots ? (value: number) => formatSlotLabel(value) : undefined),
-      showMaxLabel: false, // Don't force-render the max value to avoid awkward tick spacing
-    },
-    splitLine: {
-      lineStyle: {
-        color: themeColors.border,
-        opacity: 0.3,
-      },
-    },
-    min: xAxis.type === 'value' ? xAxis.min : undefined,
-    max: xAxis.type === 'value' ? xAxis.max : undefined,
-  };
-
-  // Build y-axis configuration
-  const yAxisConfig = {
-    type: 'value' as const,
-    name: yAxis?.name,
-    nameLocation: 'middle' as const,
-    nameGap: yAxis?.name ? 50 : 0,
-    nameTextStyle: { color: themeColors.muted },
-    axisLine: { show: false },
-    axisTick: { show: false },
-    splitLine: {
-      lineStyle: {
-        color: themeColors.border,
-        type: 'dashed' as const,
-      },
-    },
-    axisLabel: {
-      color: themeColors.muted,
-      fontSize: 12,
-      formatter: yAxis?.formatter,
-    },
-    min: yAxis?.min,
-    max: yAxis?.max,
-    minInterval: yAxis?.minInterval,
-  };
-
   // Build series configuration
   // Note: Don't filter by visible property here - displayedSeries already handles visibility via visibleSeries state
   const seriesConfig = displayedSeries.map(s => {
@@ -310,6 +241,19 @@ export function MultiLineChart({
       itemStyle: {
         color: seriesColor,
       },
+      // Add emphasis configuration for hover effects
+      ...(s.emphasis
+        ? {
+            emphasis: {
+              focus: s.emphasis.focus,
+              itemStyle: {
+                color: seriesColor,
+              },
+              ...(s.emphasis.showSymbol !== undefined ? { showSymbol: s.emphasis.showSymbol } : {}),
+              ...(s.emphasis.symbolSize !== undefined ? { symbolSize: s.emphasis.symbolSize } : {}),
+            },
+          }
+        : {}),
       // Add label at the right side of the chart if requested
       ...(s.showEndLabel
         ? {
@@ -367,101 +311,170 @@ export function MultiLineChart({
     return baseConfig;
   });
 
-  // Calculate grid padding
-  // Title is always rendered by component, never by ECharts
-  // ECharts v6: outerBounds adds padding for tick labels, axis names need explicit space
-  const gridConfig = {
-    top: grid?.top ?? 16,
-    right: grid?.right,
-    bottom: grid?.bottom ?? (xAxis.name ? 30 : 24),
-    left: grid?.left ?? (yAxis?.name ? 30 : 8),
-    // ECharts v6: use outerBounds instead of deprecated containLabel
-    outerBoundsMode: 'same' as const,
-    outerBoundsContain: 'axisLabel' as const,
-  };
-
-  // Create default smart tooltip formatter
-  // Auto-enable if valueDecimals is set OR if no custom formatter is provided
-  const effectiveValueDecimals = yAxis?.valueDecimals ?? (tooltipFormatter ? undefined : 2);
-  const defaultTooltipFormatter =
-    !tooltipFormatter && effectiveValueDecimals !== undefined
-      ? (params: unknown): string => {
-          // ECharts passes array for 'axis' trigger, single object for 'item' trigger
-          const dataPoints = Array.isArray(params) ? params : [params];
-
-          // Build tooltip HTML
-          let html = '';
-
-          // Add x-axis label (first item's axis value)
-          // For numeric x-axis, format as integer to avoid decimals like "9876543.5"
-          // When relativeSlots is enabled, show both absolute and relative values
-          if (dataPoints.length > 0 && dataPoints[0]) {
-            const firstPoint = dataPoints[0] as { axisValue?: string | number };
-            if (firstPoint.axisValue !== undefined) {
-              const axisLabel =
-                typeof firstPoint.axisValue === 'number'
-                  ? relativeSlots
-                    ? formatSlotTooltip(firstPoint.axisValue)
-                    : formatSmartDecimal(firstPoint.axisValue, 0) // 0 decimals = integers only
-                  : firstPoint.axisValue;
-              html += `<div style="margin-bottom: 4px; font-weight: 600;">${axisLabel}</div>`;
-            }
-          }
-
-          // Add each series - apply smart decimal formatting to y values
-          dataPoints.forEach(point => {
-            const p = point as {
-              marker?: string;
-              seriesName?: string;
-              value?: number | [number, number];
-            };
-
-            if (p.marker && p.seriesName !== undefined) {
-              // Extract y value
-              const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
-
-              if (yValue !== undefined && yValue !== null) {
-                const formattedValue = formatSmartDecimal(yValue, effectiveValueDecimals);
-                html += `<div style="display: flex; align-items: center; gap: 8px;">`;
-                html += p.marker;
-                html += `<span>${p.seriesName}:</span>`;
-                html += `<span style="font-weight: 600; margin-left: auto;">${formattedValue}</span>`;
-                html += `</div>`;
-              }
-            }
-          });
-
-          return html;
-        }
-      : undefined;
-
-  // Build tooltip configuration
-  const tooltipConfig = {
-    trigger: tooltipTrigger,
-    backgroundColor: themeColors.surface,
-    borderColor: themeColors.border,
-    borderWidth: 1,
-    textStyle: {
-      color: themeColors.foreground,
-      fontSize: 12,
-    },
-    axisPointer:
-      tooltipTrigger === 'axis'
-        ? {
-            type: 'line' as const,
-            lineStyle: {
-              color: themeColors.muted,
-              type: 'dashed' as const,
-            },
-          }
-        : undefined,
-    formatter: tooltipFormatter || defaultTooltipFormatter,
-    appendToBody: true, // Render tooltip in document body to prevent container clipping
-  };
-
   // Build complete option
   // Memoize based on actual data that should trigger re-animation, not intermediate objects
   const option = useMemo(() => {
+    // Helper functions for relative slot display
+    const toRelativeSlot = (absoluteSlot: number): number => {
+      if (!relativeSlots) return absoluteSlot;
+      return absoluteSlot - relativeSlots.epoch * 32 + 1;
+    };
+
+    const formatSlotLabel = (absoluteSlot: number): string => {
+      if (!relativeSlots) return formatSmartDecimal(absoluteSlot, 0);
+      const relativeSlot = toRelativeSlot(absoluteSlot);
+      return `${relativeSlot}`;
+    };
+
+    const formatSlotTooltip = (absoluteSlot: number): string => {
+      if (!relativeSlots) return formatSmartDecimal(absoluteSlot, 0);
+      const relativeSlot = toRelativeSlot(absoluteSlot);
+      return `Slot: ${formatSmartDecimal(absoluteSlot, 0)} (${relativeSlot}/32)`;
+    };
+
+    // Build x-axis configuration
+    const xAxisConfig = {
+      type: xAxis.type,
+      name: xAxis.name,
+      nameLocation: 'middle' as const,
+      nameGap: 30,
+      nameTextStyle: { color: themeColors.muted },
+      data: xAxis.type === 'category' ? xAxis.labels : undefined,
+      boundaryGap: xAxis.type === 'category',
+      axisLine: { lineStyle: { color: themeColors.border } },
+      axisLabel: {
+        color: themeColors.muted,
+        fontSize: 12,
+        formatter: xAxis.formatter || (relativeSlots ? (value: number) => formatSlotLabel(value) : undefined),
+        showMaxLabel: false, // Don't force-render the max value to avoid awkward tick spacing
+      },
+      splitLine: {
+        lineStyle: {
+          color: themeColors.border,
+          opacity: 0.3,
+        },
+      },
+      min: xAxis.type === 'value' ? xAxis.min : undefined,
+      max: xAxis.type === 'value' ? xAxis.max : undefined,
+    };
+
+    // Build y-axis configuration
+    const yAxisConfig = {
+      type: 'value' as const,
+      name: yAxis?.name,
+      nameLocation: 'middle' as const,
+      nameGap: yAxis?.name ? 50 : 0,
+      nameTextStyle: { color: themeColors.muted },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: {
+        lineStyle: {
+          color: themeColors.border,
+          type: 'dashed' as const,
+        },
+      },
+      axisLabel: {
+        color: themeColors.muted,
+        fontSize: 12,
+        formatter: yAxis?.formatter,
+      },
+      min: yAxis?.min,
+      max: yAxis?.max,
+      minInterval: yAxis?.minInterval,
+    };
+
+    // Calculate grid padding
+    // Title is always rendered by component, never by ECharts
+    // ECharts v6: outerBounds adds padding for tick labels, axis names need explicit space
+    const gridConfig = {
+      top: grid?.top ?? 16,
+      right: grid?.right,
+      bottom: grid?.bottom ?? (xAxis.name ? 30 : 24),
+      left: grid?.left ?? (yAxis?.name ? 30 : 8),
+      // ECharts v6: use outerBounds instead of deprecated containLabel
+      outerBoundsMode: 'same' as const,
+      outerBoundsContain: 'axisLabel' as const,
+    };
+
+    // Create default smart tooltip formatter
+    // Auto-enable if valueDecimals is set OR if no custom formatter is provided
+    const effectiveValueDecimals = yAxis?.valueDecimals ?? (tooltipFormatter ? undefined : 2);
+    const defaultTooltipFormatter =
+      !tooltipFormatter && effectiveValueDecimals !== undefined
+        ? (params: unknown): string => {
+            // ECharts passes array for 'axis' trigger, single object for 'item' trigger
+            const dataPoints = Array.isArray(params) ? params : [params];
+
+            // Build tooltip HTML
+            let html = '';
+
+            // Add x-axis label (first item's axis value)
+            // For numeric x-axis, format as integer to avoid decimals like "9876543.5"
+            // When relativeSlots is enabled, show both absolute and relative values
+            if (dataPoints.length > 0 && dataPoints[0]) {
+              const firstPoint = dataPoints[0] as { axisValue?: string | number };
+              if (firstPoint.axisValue !== undefined) {
+                const axisLabel =
+                  typeof firstPoint.axisValue === 'number'
+                    ? relativeSlots
+                      ? formatSlotTooltip(firstPoint.axisValue)
+                      : formatSmartDecimal(firstPoint.axisValue, 0) // 0 decimals = integers only
+                    : firstPoint.axisValue;
+                html += `<div style="margin-bottom: 4px; font-weight: 600;">${axisLabel}</div>`;
+              }
+            }
+
+            // Add each series - apply smart decimal formatting to y values
+            dataPoints.forEach(point => {
+              const p = point as {
+                marker?: string;
+                seriesName?: string;
+                value?: number | [number, number];
+              };
+
+              if (p.marker && p.seriesName !== undefined) {
+                // Extract y value
+                const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+
+                if (yValue !== undefined && yValue !== null) {
+                  const formattedValue = formatSmartDecimal(yValue, effectiveValueDecimals);
+                  html += `<div style="display: flex; align-items: center; gap: 8px;">`;
+                  html += p.marker;
+                  html += `<span>${p.seriesName}:</span>`;
+                  html += `<span style="font-weight: 600; margin-left: auto;">${formattedValue}</span>`;
+                  html += `</div>`;
+                }
+              }
+            });
+
+            return html;
+          }
+        : undefined;
+
+    // Build tooltip configuration
+    const tooltipConfig = {
+      trigger: tooltipTrigger,
+      backgroundColor: themeColors.surface,
+      borderColor: themeColors.border,
+      borderWidth: 1,
+      textStyle: {
+        color: themeColors.foreground,
+        fontSize: 12,
+      },
+      axisPointer:
+        tooltipTrigger === 'axis'
+          ? {
+              type: 'line' as const,
+              lineStyle: {
+                color: themeColors.muted,
+                type: 'dashed' as const,
+              },
+            }
+          : undefined,
+      formatter: tooltipFormatter || defaultTooltipFormatter,
+      appendToBody: true, // Render tooltip in document body to prevent container clipping
+    };
+
     return {
       animation: true,
       animationDuration,
@@ -491,13 +504,15 @@ export function MultiLineChart({
     };
   }, [
     animationDuration,
-    themeColors.foreground,
+    themeColors,
     enableDataZoom,
     seriesConfig,
-    gridConfig,
-    xAxisConfig,
-    yAxisConfig,
-    tooltipConfig,
+    xAxis,
+    yAxis,
+    grid,
+    tooltipTrigger,
+    tooltipFormatter,
+    relativeSlots,
   ]);
 
   const chartContent = (

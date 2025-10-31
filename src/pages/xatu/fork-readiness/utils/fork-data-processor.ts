@@ -55,6 +55,7 @@ function calculateClientReadiness(
 
     nodeStatuses.push({
       nodeName: node.meta_client_name || 'unknown',
+      username: node.username,
       version,
       isReady,
       classification: node.meta_consensus_implementation,

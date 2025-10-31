@@ -81,6 +81,26 @@ export interface SeriesData {
    * @default false
    */
   showEndLabel?: boolean;
+  /**
+   * Emphasis configuration for hover effects
+   * Allows customizing how the series appears when hovered
+   */
+  emphasis?: {
+    /**
+     * Focus behavior when hovering
+     * - 'series': Highlights the entire series
+     * - 'self': Only highlights the hovered point
+     */
+    focus?: 'series' | 'self';
+    /**
+     * Show symbols when hovering (overrides showSymbol)
+     */
+    showSymbol?: boolean;
+    /**
+     * Symbol size when hovering (overrides symbolSize)
+     */
+    symbolSize?: number;
+  };
 }
 
 /**
