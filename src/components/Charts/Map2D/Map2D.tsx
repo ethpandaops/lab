@@ -153,16 +153,22 @@ export function Map2DChart({
       const scatterSeriesIndex = series.findIndex(s => s.type === 'scatter');
 
       if (scatterSeriesIndex !== -1) {
-        // Rebuild complete scatter series with new data using shared config
+        // Update only the data property, not the entire series
+        // This prevents flickering by preserving the series instance
         chart.setOption(
           {
-            series: [createScatterSeries(pointData)],
+            series: [
+              {
+                type: 'scatter',
+                data: pointData,
+              },
+            ],
           },
-          { replaceMerge: ['series'] }
+          { notMerge: false }
         );
       }
     }
-  }, [points, mapLoaded, resetKey, createScatterSeries]);
+  }, [points, mapLoaded, resetKey]);
 
   // Prepare initial options - only calculated once on mount
   // We update data via setOption in useEffect, so option should never recalculate
