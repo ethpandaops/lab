@@ -98,7 +98,7 @@ function RootComponent(): JSX.Element {
       }
 
       // Close sidebar if the network search param changed or was removed
-      const currentNetwork = event.toLocation.search?.network;
+      const currentNetwork = (event.toLocation.search as Record<string, unknown>)?.network as string | undefined;
       if (currentNetwork !== previousNetwork) {
         setSidebarOpen(false);
         previousNetwork = currentNetwork;
