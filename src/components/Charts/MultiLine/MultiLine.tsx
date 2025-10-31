@@ -310,15 +310,26 @@ export function MultiLineChart({
       itemStyle: {
         color: seriesColor,
       },
-      // Add end label if requested
+      // Add label at the right side of the chart if requested
       ...(s.showEndLabel
         ? {
-            endLabel: {
-              show: true,
-              formatter: s.name,
-              color: seriesColor,
-              fontSize: 12,
-              fontWeight: 'bold' as const,
+            markPoint: {
+              symbol: 'none',
+              label: {
+                show: true,
+                position: 'insideEndTop' as const,
+                formatter: s.name,
+                color: seriesColor,
+                fontSize: 12,
+                fontWeight: 'bold' as const,
+                backgroundColor: 'transparent',
+              },
+              data: [
+                {
+                  xAxis: 'max' as const,
+                  yAxis: Array.isArray(s.data[0]) ? (s.data[0] as [number, number])[1] : 0,
+                },
+              ],
             },
           }
         : {}),
