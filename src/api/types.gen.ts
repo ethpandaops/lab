@@ -796,6 +796,109 @@ export type FctBlockBlobFirstSeenByNode = {
   username?: string;
 };
 
+export type FctBlockDataColumnSidecarFirstSeenByNode = {
+  /**
+   * The beacon block root hash
+   */
+  block_root?: string;
+  /**
+   * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified"
+   */
+  classification?: string;
+  /**
+   * The data column index
+   */
+  column_index?: number;
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Autonomous system number of the client
+   */
+  meta_client_geo_autonomous_system_number?: number | null;
+  /**
+   * Autonomous system organization of the client
+   */
+  meta_client_geo_autonomous_system_organization?: string | null;
+  /**
+   * City of the client
+   */
+  meta_client_geo_city?: string;
+  /**
+   * Continent code of the client
+   */
+  meta_client_geo_continent_code?: string;
+  /**
+   * Country of the client
+   */
+  meta_client_geo_country?: string;
+  /**
+   * Country code of the client
+   */
+  meta_client_geo_country_code?: string;
+  /**
+   * Latitude of the client
+   */
+  meta_client_geo_latitude?: number | null;
+  /**
+   * Longitude of the client
+   */
+  meta_client_geo_longitude?: number | null;
+  /**
+   * Implementation of the client
+   */
+  meta_client_implementation?: string;
+  /**
+   * Name of the client
+   */
+  meta_client_name?: string;
+  /**
+   * Version of the client
+   */
+  meta_client_version?: string;
+  /**
+   * Ethereum consensus client implementation
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * Ethereum consensus client version
+   */
+  meta_consensus_version?: string;
+  /**
+   * ID of the node
+   */
+  node_id?: string;
+  /**
+   * The time from slot start for the client to see the data column
+   */
+  seen_slot_start_diff?: number;
+  /**
+   * The slot number
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Source of the event
+   */
+  source?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Username of the node
+   */
+  username?: string;
+};
+
 export type FctBlockFirstSeenByNode = {
   /**
    * The beacon block root hash
@@ -2201,6 +2304,13 @@ export type GetFctBlockBlobFirstSeenByNodeResponse = {
 };
 
 /**
+ * Response for getting a single fct_block_data_column_sidecar_first_seen_by_node record
+ */
+export type GetFctBlockDataColumnSidecarFirstSeenByNodeResponse = {
+  item?: FctBlockDataColumnSidecarFirstSeenByNode;
+};
+
+/**
  * Response for getting a single fct_block_first_seen_by_node record
  */
 export type GetFctBlockFirstSeenByNodeResponse = {
@@ -3250,6 +3360,20 @@ export type ListFctBlockBlobFirstSeenByNodeResponse = {
    * The list of fct_block_blob_first_seen_by_node.
    */
   fct_block_blob_first_seen_by_node?: Array<FctBlockBlobFirstSeenByNode>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_data_column_sidecar_first_seen_by_node records
+ */
+export type ListFctBlockDataColumnSidecarFirstSeenByNodeResponse = {
+  /**
+   * The list of fct_block_data_column_sidecar_first_seen_by_node.
+   */
+  fct_block_data_column_sidecar_first_seen_by_node?: Array<FctBlockDataColumnSidecarFirstSeenByNode>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -11987,6 +12111,946 @@ export type FctBlockBlobFirstSeenByNodeServiceGetResponses = {
 
 export type FctBlockBlobFirstSeenByNodeServiceGetResponse =
   FctBlockBlobFirstSeenByNodeServiceGetResponses[keyof FctBlockBlobFirstSeenByNodeServiceGetResponses];
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * The beacon block root hash (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * The beacon block root hash (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * The beacon block root hash (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * The beacon block root hash (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * The beacon block root hash (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * The beacon block root hash (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * The beacon block root hash (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * The beacon block root hash (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * The beacon block root hash (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * The data column index (filter: eq)
+     */
+    column_index_eq?: number;
+    /**
+     * The data column index (filter: ne)
+     */
+    column_index_ne?: number;
+    /**
+     * The data column index (filter: lt)
+     */
+    column_index_lt?: number;
+    /**
+     * The data column index (filter: lte)
+     */
+    column_index_lte?: number;
+    /**
+     * The data column index (filter: gt)
+     */
+    column_index_gt?: number;
+    /**
+     * The data column index (filter: gte)
+     */
+    column_index_gte?: number;
+    /**
+     * The data column index (filter: between_min)
+     */
+    column_index_between_min?: number;
+    /**
+     * The data column index (filter: between_max_value)
+     */
+    column_index_between_max_value?: number;
+    /**
+     * The data column index (filter: in_values) (comma-separated list)
+     */
+    column_index_in_values?: string;
+    /**
+     * The data column index (filter: not_in_values) (comma-separated list)
+     */
+    column_index_not_in_values?: string;
+    /**
+     * Name of the client (filter: eq)
+     */
+    meta_client_name_eq?: string;
+    /**
+     * Name of the client (filter: ne)
+     */
+    meta_client_name_ne?: string;
+    /**
+     * Name of the client (filter: contains)
+     */
+    meta_client_name_contains?: string;
+    /**
+     * Name of the client (filter: starts_with)
+     */
+    meta_client_name_starts_with?: string;
+    /**
+     * Name of the client (filter: ends_with)
+     */
+    meta_client_name_ends_with?: string;
+    /**
+     * Name of the client (filter: like)
+     */
+    meta_client_name_like?: string;
+    /**
+     * Name of the client (filter: not_like)
+     */
+    meta_client_name_not_like?: string;
+    /**
+     * Name of the client (filter: in_values) (comma-separated list)
+     */
+    meta_client_name_in_values?: string;
+    /**
+     * Name of the client (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_name_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Source of the event (filter: eq)
+     */
+    source_eq?: string;
+    /**
+     * Source of the event (filter: ne)
+     */
+    source_ne?: string;
+    /**
+     * Source of the event (filter: contains)
+     */
+    source_contains?: string;
+    /**
+     * Source of the event (filter: starts_with)
+     */
+    source_starts_with?: string;
+    /**
+     * Source of the event (filter: ends_with)
+     */
+    source_ends_with?: string;
+    /**
+     * Source of the event (filter: like)
+     */
+    source_like?: string;
+    /**
+     * Source of the event (filter: not_like)
+     */
+    source_not_like?: string;
+    /**
+     * Source of the event (filter: in_values) (comma-separated list)
+     */
+    source_in_values?: string;
+    /**
+     * Source of the event (filter: not_in_values) (comma-separated list)
+     */
+    source_not_in_values?: string;
+    /**
+     * The slot number (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot number (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot number (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot number (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot number (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot number (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot number (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot number (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot number (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot number (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * The time from slot start for the client to see the data column (filter: eq)
+     */
+    seen_slot_start_diff_eq?: number;
+    /**
+     * The time from slot start for the client to see the data column (filter: ne)
+     */
+    seen_slot_start_diff_ne?: number;
+    /**
+     * The time from slot start for the client to see the data column (filter: lt)
+     */
+    seen_slot_start_diff_lt?: number;
+    /**
+     * The time from slot start for the client to see the data column (filter: lte)
+     */
+    seen_slot_start_diff_lte?: number;
+    /**
+     * The time from slot start for the client to see the data column (filter: gt)
+     */
+    seen_slot_start_diff_gt?: number;
+    /**
+     * The time from slot start for the client to see the data column (filter: gte)
+     */
+    seen_slot_start_diff_gte?: number;
+    /**
+     * The time from slot start for the client to see the data column (filter: between_min)
+     */
+    seen_slot_start_diff_between_min?: number;
+    /**
+     * The time from slot start for the client to see the data column (filter: between_max_value)
+     */
+    seen_slot_start_diff_between_max_value?: number;
+    /**
+     * The time from slot start for the client to see the data column (filter: in_values) (comma-separated list)
+     */
+    seen_slot_start_diff_in_values?: string;
+    /**
+     * The time from slot start for the client to see the data column (filter: not_in_values) (comma-separated list)
+     */
+    seen_slot_start_diff_not_in_values?: string;
+    /**
+     * Username of the node (filter: eq)
+     */
+    username_eq?: string;
+    /**
+     * Username of the node (filter: ne)
+     */
+    username_ne?: string;
+    /**
+     * Username of the node (filter: contains)
+     */
+    username_contains?: string;
+    /**
+     * Username of the node (filter: starts_with)
+     */
+    username_starts_with?: string;
+    /**
+     * Username of the node (filter: ends_with)
+     */
+    username_ends_with?: string;
+    /**
+     * Username of the node (filter: like)
+     */
+    username_like?: string;
+    /**
+     * Username of the node (filter: not_like)
+     */
+    username_not_like?: string;
+    /**
+     * Username of the node (filter: in_values) (comma-separated list)
+     */
+    username_in_values?: string;
+    /**
+     * Username of the node (filter: not_in_values) (comma-separated list)
+     */
+    username_not_in_values?: string;
+    /**
+     * ID of the node (filter: eq)
+     */
+    node_id_eq?: string;
+    /**
+     * ID of the node (filter: ne)
+     */
+    node_id_ne?: string;
+    /**
+     * ID of the node (filter: contains)
+     */
+    node_id_contains?: string;
+    /**
+     * ID of the node (filter: starts_with)
+     */
+    node_id_starts_with?: string;
+    /**
+     * ID of the node (filter: ends_with)
+     */
+    node_id_ends_with?: string;
+    /**
+     * ID of the node (filter: like)
+     */
+    node_id_like?: string;
+    /**
+     * ID of the node (filter: not_like)
+     */
+    node_id_not_like?: string;
+    /**
+     * ID of the node (filter: in_values) (comma-separated list)
+     */
+    node_id_in_values?: string;
+    /**
+     * ID of the node (filter: not_in_values) (comma-separated list)
+     */
+    node_id_not_in_values?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: eq)
+     */
+    classification_eq?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: ne)
+     */
+    classification_ne?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: contains)
+     */
+    classification_contains?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: starts_with)
+     */
+    classification_starts_with?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: ends_with)
+     */
+    classification_ends_with?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: like)
+     */
+    classification_like?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: not_like)
+     */
+    classification_not_like?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: in_values) (comma-separated list)
+     */
+    classification_in_values?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: not_in_values) (comma-separated list)
+     */
+    classification_not_in_values?: string;
+    /**
+     * Version of the client (filter: eq)
+     */
+    meta_client_version_eq?: string;
+    /**
+     * Version of the client (filter: ne)
+     */
+    meta_client_version_ne?: string;
+    /**
+     * Version of the client (filter: contains)
+     */
+    meta_client_version_contains?: string;
+    /**
+     * Version of the client (filter: starts_with)
+     */
+    meta_client_version_starts_with?: string;
+    /**
+     * Version of the client (filter: ends_with)
+     */
+    meta_client_version_ends_with?: string;
+    /**
+     * Version of the client (filter: like)
+     */
+    meta_client_version_like?: string;
+    /**
+     * Version of the client (filter: not_like)
+     */
+    meta_client_version_not_like?: string;
+    /**
+     * Version of the client (filter: in_values) (comma-separated list)
+     */
+    meta_client_version_in_values?: string;
+    /**
+     * Version of the client (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_version_not_in_values?: string;
+    /**
+     * Implementation of the client (filter: eq)
+     */
+    meta_client_implementation_eq?: string;
+    /**
+     * Implementation of the client (filter: ne)
+     */
+    meta_client_implementation_ne?: string;
+    /**
+     * Implementation of the client (filter: contains)
+     */
+    meta_client_implementation_contains?: string;
+    /**
+     * Implementation of the client (filter: starts_with)
+     */
+    meta_client_implementation_starts_with?: string;
+    /**
+     * Implementation of the client (filter: ends_with)
+     */
+    meta_client_implementation_ends_with?: string;
+    /**
+     * Implementation of the client (filter: like)
+     */
+    meta_client_implementation_like?: string;
+    /**
+     * Implementation of the client (filter: not_like)
+     */
+    meta_client_implementation_not_like?: string;
+    /**
+     * Implementation of the client (filter: in_values) (comma-separated list)
+     */
+    meta_client_implementation_in_values?: string;
+    /**
+     * Implementation of the client (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_implementation_not_in_values?: string;
+    /**
+     * City of the client (filter: eq)
+     */
+    meta_client_geo_city_eq?: string;
+    /**
+     * City of the client (filter: ne)
+     */
+    meta_client_geo_city_ne?: string;
+    /**
+     * City of the client (filter: contains)
+     */
+    meta_client_geo_city_contains?: string;
+    /**
+     * City of the client (filter: starts_with)
+     */
+    meta_client_geo_city_starts_with?: string;
+    /**
+     * City of the client (filter: ends_with)
+     */
+    meta_client_geo_city_ends_with?: string;
+    /**
+     * City of the client (filter: like)
+     */
+    meta_client_geo_city_like?: string;
+    /**
+     * City of the client (filter: not_like)
+     */
+    meta_client_geo_city_not_like?: string;
+    /**
+     * City of the client (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_city_in_values?: string;
+    /**
+     * City of the client (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_city_not_in_values?: string;
+    /**
+     * Country of the client (filter: eq)
+     */
+    meta_client_geo_country_eq?: string;
+    /**
+     * Country of the client (filter: ne)
+     */
+    meta_client_geo_country_ne?: string;
+    /**
+     * Country of the client (filter: contains)
+     */
+    meta_client_geo_country_contains?: string;
+    /**
+     * Country of the client (filter: starts_with)
+     */
+    meta_client_geo_country_starts_with?: string;
+    /**
+     * Country of the client (filter: ends_with)
+     */
+    meta_client_geo_country_ends_with?: string;
+    /**
+     * Country of the client (filter: like)
+     */
+    meta_client_geo_country_like?: string;
+    /**
+     * Country of the client (filter: not_like)
+     */
+    meta_client_geo_country_not_like?: string;
+    /**
+     * Country of the client (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_country_in_values?: string;
+    /**
+     * Country of the client (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_country_not_in_values?: string;
+    /**
+     * Country code of the client (filter: eq)
+     */
+    meta_client_geo_country_code_eq?: string;
+    /**
+     * Country code of the client (filter: ne)
+     */
+    meta_client_geo_country_code_ne?: string;
+    /**
+     * Country code of the client (filter: contains)
+     */
+    meta_client_geo_country_code_contains?: string;
+    /**
+     * Country code of the client (filter: starts_with)
+     */
+    meta_client_geo_country_code_starts_with?: string;
+    /**
+     * Country code of the client (filter: ends_with)
+     */
+    meta_client_geo_country_code_ends_with?: string;
+    /**
+     * Country code of the client (filter: like)
+     */
+    meta_client_geo_country_code_like?: string;
+    /**
+     * Country code of the client (filter: not_like)
+     */
+    meta_client_geo_country_code_not_like?: string;
+    /**
+     * Country code of the client (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_country_code_in_values?: string;
+    /**
+     * Country code of the client (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_country_code_not_in_values?: string;
+    /**
+     * Continent code of the client (filter: eq)
+     */
+    meta_client_geo_continent_code_eq?: string;
+    /**
+     * Continent code of the client (filter: ne)
+     */
+    meta_client_geo_continent_code_ne?: string;
+    /**
+     * Continent code of the client (filter: contains)
+     */
+    meta_client_geo_continent_code_contains?: string;
+    /**
+     * Continent code of the client (filter: starts_with)
+     */
+    meta_client_geo_continent_code_starts_with?: string;
+    /**
+     * Continent code of the client (filter: ends_with)
+     */
+    meta_client_geo_continent_code_ends_with?: string;
+    /**
+     * Continent code of the client (filter: like)
+     */
+    meta_client_geo_continent_code_like?: string;
+    /**
+     * Continent code of the client (filter: not_like)
+     */
+    meta_client_geo_continent_code_not_like?: string;
+    /**
+     * Continent code of the client (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_continent_code_in_values?: string;
+    /**
+     * Continent code of the client (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_continent_code_not_in_values?: string;
+    /**
+     * Filter meta_client_geo_longitude using value
+     */
+    meta_client_geo_longitude_value?: number;
+    /**
+     * Filter meta_client_geo_latitude using value
+     */
+    meta_client_geo_latitude_value?: number;
+    /**
+     * Autonomous system number of the client (filter: eq)
+     */
+    meta_client_geo_autonomous_system_number_eq?: number;
+    /**
+     * Autonomous system number of the client (filter: ne)
+     */
+    meta_client_geo_autonomous_system_number_ne?: number;
+    /**
+     * Autonomous system number of the client (filter: lt)
+     */
+    meta_client_geo_autonomous_system_number_lt?: number;
+    /**
+     * Autonomous system number of the client (filter: lte)
+     */
+    meta_client_geo_autonomous_system_number_lte?: number;
+    /**
+     * Autonomous system number of the client (filter: gt)
+     */
+    meta_client_geo_autonomous_system_number_gt?: number;
+    /**
+     * Autonomous system number of the client (filter: gte)
+     */
+    meta_client_geo_autonomous_system_number_gte?: number;
+    /**
+     * Autonomous system number of the client (filter: between_min)
+     */
+    meta_client_geo_autonomous_system_number_between_min?: number;
+    /**
+     * Autonomous system number of the client (filter: between_max_value)
+     */
+    meta_client_geo_autonomous_system_number_between_max_value?: number;
+    /**
+     * Autonomous system number of the client (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_autonomous_system_number_in_values?: string;
+    /**
+     * Autonomous system number of the client (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_autonomous_system_number_not_in_values?: string;
+    /**
+     * Autonomous system organization of the client (filter: eq)
+     */
+    meta_client_geo_autonomous_system_organization_eq?: string;
+    /**
+     * Autonomous system organization of the client (filter: ne)
+     */
+    meta_client_geo_autonomous_system_organization_ne?: string;
+    /**
+     * Autonomous system organization of the client (filter: contains)
+     */
+    meta_client_geo_autonomous_system_organization_contains?: string;
+    /**
+     * Autonomous system organization of the client (filter: starts_with)
+     */
+    meta_client_geo_autonomous_system_organization_starts_with?: string;
+    /**
+     * Autonomous system organization of the client (filter: ends_with)
+     */
+    meta_client_geo_autonomous_system_organization_ends_with?: string;
+    /**
+     * Autonomous system organization of the client (filter: like)
+     */
+    meta_client_geo_autonomous_system_organization_like?: string;
+    /**
+     * Autonomous system organization of the client (filter: not_like)
+     */
+    meta_client_geo_autonomous_system_organization_not_like?: string;
+    /**
+     * Autonomous system organization of the client (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_autonomous_system_organization_in_values?: string;
+    /**
+     * Autonomous system organization of the client (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_autonomous_system_organization_not_in_values?: string;
+    /**
+     * Ethereum consensus client version (filter: eq)
+     */
+    meta_consensus_version_eq?: string;
+    /**
+     * Ethereum consensus client version (filter: ne)
+     */
+    meta_consensus_version_ne?: string;
+    /**
+     * Ethereum consensus client version (filter: contains)
+     */
+    meta_consensus_version_contains?: string;
+    /**
+     * Ethereum consensus client version (filter: starts_with)
+     */
+    meta_consensus_version_starts_with?: string;
+    /**
+     * Ethereum consensus client version (filter: ends_with)
+     */
+    meta_consensus_version_ends_with?: string;
+    /**
+     * Ethereum consensus client version (filter: like)
+     */
+    meta_consensus_version_like?: string;
+    /**
+     * Ethereum consensus client version (filter: not_like)
+     */
+    meta_consensus_version_not_like?: string;
+    /**
+     * Ethereum consensus client version (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_version_in_values?: string;
+    /**
+     * Ethereum consensus client version (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_version_not_in_values?: string;
+    /**
+     * Ethereum consensus client implementation (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * Ethereum consensus client implementation (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * Ethereum consensus client implementation (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * Ethereum consensus client implementation (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * Ethereum consensus client implementation (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * Ethereum consensus client implementation (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * Ethereum consensus client implementation (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * Ethereum consensus client implementation (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * Ethereum consensus client implementation (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_data_column_sidecar_first_seen_by_node to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockDataColumnSidecarFirstSeenByNode` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node';
+};
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeServiceListError =
+  FctBlockDataColumnSidecarFirstSeenByNodeServiceListErrors[keyof FctBlockDataColumnSidecarFirstSeenByNodeServiceListErrors];
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockDataColumnSidecarFirstSeenByNodeResponse;
+};
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponse =
+  FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponses[keyof FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponses];
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node/{slot_start_date_time}';
+};
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeServiceGetError =
+  FctBlockDataColumnSidecarFirstSeenByNodeServiceGetErrors[keyof FctBlockDataColumnSidecarFirstSeenByNodeServiceGetErrors];
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockDataColumnSidecarFirstSeenByNodeResponse;
+};
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse =
+  FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponses[keyof FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponses];
 
 export type FctBlockFirstSeenByNodeServiceListData = {
   body?: never;
