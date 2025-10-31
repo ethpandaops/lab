@@ -81,6 +81,7 @@ export function MultiLineChart({
   aggregateSeriesName = 'Average',
   enableSeriesFilter = false,
   relativeSlots,
+  markLines,
 }: MultiLineChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -113,6 +114,7 @@ export function MultiLineChart({
   const [showAggregate, setShowAggregate] = useState(false);
 
   // Manage visible series when interactive legend is enabled
+  // Include all series in the set, respecting initial visible property
   const [visibleSeries, setVisibleSeries] = useState<Set<string>>(
     new Set(series.filter(s => s.visible !== false).map(s => s.name))
   );
@@ -124,13 +126,17 @@ export function MultiLineChart({
   const seenSeriesNamesRef = useRef<Set<string>>(new Set());
 
   // Update visible series when series prop changes
-  // Preserve user selections and only auto-show genuinely new series
+  // Preserve user selections and only auto-show genuinely new series (respecting initial visible property)
   useEffect(() => {
-    const currentSeriesNames = new Set(series.filter(s => s.visible !== false).map(s => s.name));
+    // Track ALL series names (including those with visible: false)
+    const allSeriesNames = new Set(series.map(s => s.name));
+
+    // Get series that should be visible by default (visible !== false)
+    const defaultVisibleNames = new Set(series.filter(s => s.visible !== false).map(s => s.name));
 
     // Find genuinely new series (never seen before)
     const newSeriesNames = new Set<string>();
-    currentSeriesNames.forEach(name => {
+    allSeriesNames.forEach(name => {
       if (!seenSeriesNamesRef.current.has(name)) {
         newSeriesNames.add(name);
         seenSeriesNamesRef.current.add(name); // Track that we've seen this series
@@ -142,20 +148,22 @@ export function MultiLineChart({
       const updated = new Set(prevVisible);
       let changed = false;
 
-      // Remove series that no longer exist
+      // Remove series that no longer exist at all
       prevVisible.forEach(name => {
-        if (!currentSeriesNames.has(name)) {
+        if (!allSeriesNames.has(name)) {
           updated.delete(name);
           changed = true;
         }
       });
 
-      // Auto-add only genuinely new series
+      // Auto-add only genuinely new series that are visible by default
       if (newSeriesNames.size > 0) {
         newSeriesNames.forEach(name => {
-          updated.add(name);
+          if (defaultVisibleNames.has(name)) {
+            updated.add(name);
+            changed = true;
+          }
         });
-        changed = true;
       }
 
       // Return same reference if nothing changed to avoid re-render
@@ -280,62 +288,95 @@ export function MultiLineChart({
   };
 
   // Build series configuration
-  const seriesConfig = displayedSeries
-    .filter(s => s.visible !== false)
-    .map((s, index) => {
-      // Use explicit color or auto-assign from palette
-      const seriesColor = s.color || extendedPalette[index % extendedPalette.length];
+  // Note: Don't filter by visible property here - displayedSeries already handles visibility via visibleSeries state
+  let markLineAdded = false;
+  const seriesConfig = displayedSeries.map(s => {
+    // Use explicit color or auto-assign from palette
+    const originalIndex = series.indexOf(s);
+    const seriesColor = s.color || extendedPalette[originalIndex % extendedPalette.length];
 
-      const baseConfig = {
-        name: s.name,
-        type: 'line' as const,
-        data: s.data,
-        smooth: s.smooth ?? false,
-        step: s.step ?? false,
-        connectNulls,
-        showSymbol: s.showSymbol ?? false,
-        symbolSize: s.symbolSize ?? 4,
-        lineStyle: {
-          color: seriesColor,
-          width: s.lineWidth ?? 2,
-          type: s.lineStyle ?? ('solid' as const),
-        },
-        itemStyle: {
-          color: seriesColor,
+    const baseConfig = {
+      name: s.name,
+      type: 'line' as const,
+      data: s.data,
+      smooth: s.smooth ?? false,
+      step: s.step ?? false,
+      connectNulls,
+      showSymbol: s.showSymbol ?? false,
+      symbolSize: s.symbolSize ?? 4,
+      lineStyle: {
+        color: seriesColor,
+        width: s.lineWidth ?? 2,
+        type: s.lineStyle ?? ('solid' as const),
+      },
+      itemStyle: {
+        color: seriesColor,
+      },
+      // Add markLine to first visible series with data if markLines are provided
+      // Note: Only add once to avoid duplicates
+      ...(!markLineAdded && markLines && markLines.length > 0 && s.data.length > 0
+        ? (() => {
+            markLineAdded = true;
+            return {
+              markLine: {
+                symbol: 'none', // No arrows at line ends
+                silent: false, // Allow interactions
+                label: {
+                  show: true,
+                  position: 'end' as const,
+                  formatter: (params: { data: { label?: string } }) => params.data.label || '',
+                  color: themeColors.foreground,
+                  fontSize: 12,
+                },
+                lineStyle: {
+                  type: 'dotted' as const,
+                },
+                data: markLines.map(line => ({
+                  yAxis: line.value,
+                  label: line.label,
+                  lineStyle: {
+                    color: line.color || themeColors.danger,
+                    type: line.lineStyle || ('dotted' as const),
+                    width: 2,
+                  },
+                })),
+              },
+            };
+          })()
+        : {}),
+    };
+
+    // Add area style if requested
+    if (s.showArea) {
+      return {
+        ...baseConfig,
+        areaStyle: {
+          color:
+            s.areaOpacity !== undefined
+              ? hexToRgba(seriesColor, s.areaOpacity)
+              : {
+                  type: 'linear' as const,
+                  x: 0,
+                  y: 0,
+                  x2: 0,
+                  y2: 1,
+                  colorStops: [
+                    {
+                      offset: 0,
+                      color: hexToRgba(seriesColor, 0.5),
+                    },
+                    {
+                      offset: 1,
+                      color: hexToRgba(seriesColor, 0.06),
+                    },
+                  ],
+                },
         },
       };
+    }
 
-      // Add area style if requested
-      if (s.showArea) {
-        return {
-          ...baseConfig,
-          areaStyle: {
-            color:
-              s.areaOpacity !== undefined
-                ? hexToRgba(seriesColor, s.areaOpacity)
-                : {
-                    type: 'linear' as const,
-                    x: 0,
-                    y: 0,
-                    x2: 0,
-                    y2: 1,
-                    colorStops: [
-                      {
-                        offset: 0,
-                        color: hexToRgba(seriesColor, 0.5),
-                      },
-                      {
-                        offset: 1,
-                        color: hexToRgba(seriesColor, 0.06),
-                      },
-                    ],
-                  },
-          },
-        };
-      }
-
-      return baseConfig;
-    });
+    return baseConfig;
+  });
 
   // Calculate grid padding
   // Title is always rendered by component, never by ECharts
@@ -465,14 +506,19 @@ export function MultiLineChart({
       themeColors.foreground,
       themeColors.border,
       themeColors.muted,
-      JSON.stringify(series),
+      themeColors.danger,
+      JSON.stringify(displayedSeries),
       JSON.stringify(xAxis),
       JSON.stringify(yAxis),
+      JSON.stringify(markLines),
       enableDataZoom,
-      showLegend,
-      enableSeriesFilter,
       connectNulls,
       height,
+      seriesConfig,
+      gridConfig,
+      xAxisConfig,
+      yAxisConfig,
+      tooltipConfig,
     ]
   );
 

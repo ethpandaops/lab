@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { Alert } from '@/components/Feedback/Alert';
 import { BaseFeeChart } from '@/components/Ethereum/BaseFeeChart';
 import { BlobCountChart } from '@/components/Ethereum/BlobCountChart';
+import { BlockArrivalTimesChart } from '@/components/Ethereum/BlockArrivalTimesChart';
 import { BlockSizeChart } from '@/components/Ethereum/BlockSizeChart';
 import { BlockValueChart } from '@/components/Ethereum/BlockValueChart';
 import { GasUsedChart } from '@/components/Ethereum/GasUsedChart';
@@ -194,6 +195,19 @@ export function DetailPage(): React.JSX.Element {
             }))}
             xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="block-size-chart"
+            relativeSlots={{ epoch }}
+          />
+          <BlockArrivalTimesChart
+            data={data.blockArrivalTimeSeries.map(d => ({
+              x: d.slot,
+              min: d.min,
+              p05: d.p05,
+              p50: d.p50,
+              p90: d.p90,
+              max: d.max,
+            }))}
+            xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
+            anchorId="block-arrival-times-chart"
             relativeSlots={{ epoch }}
           />
         </div>

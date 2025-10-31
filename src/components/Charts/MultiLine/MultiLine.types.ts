@@ -252,4 +252,18 @@ export interface MultiLineChartProps {
     /** The epoch number to calculate relative slots from */
     epoch: number;
   };
+  /**
+   * Horizontal reference lines to display on the chart
+   * Useful for showing thresholds, deadlines, or other significant values
+   */
+  markLines?: Array<{
+    /** Y-axis value where the line should be drawn */
+    value: number;
+    /** Label for the line */
+    label: string;
+    /** Line color (defaults to danger color) */
+    color?: string;
+    /** Line style */
+    lineStyle?: 'solid' | 'dashed' | 'dotted';
+  }>;
 }

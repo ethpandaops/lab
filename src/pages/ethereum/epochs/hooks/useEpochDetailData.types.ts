@@ -119,6 +119,24 @@ export interface BlockSizeDataPoint {
 }
 
 /**
+ * Block arrival time statistics for a single slot
+ */
+export interface BlockArrivalDataPoint {
+  /** Slot number */
+  slot: number;
+  /** Minimum arrival time (ms from slot start) */
+  min: number | null;
+  /** 5th percentile arrival time (ms from slot start) */
+  p05: number | null;
+  /** Median arrival time (ms from slot start) */
+  p50: number | null;
+  /** 90th percentile arrival time (ms from slot start) */
+  p90: number | null;
+  /** Maximum arrival time (ms from slot start) */
+  max: number | null;
+}
+
+/**
  * Complete epoch detail data
  */
 export interface EpochDetailData {
@@ -136,6 +154,8 @@ export interface EpochDetailData {
   blockProductionTimeSeries: BlockProductionDataPoint[];
   /** Block size time series */
   blockSizeTimeSeries: BlockSizeDataPoint[];
+  /** Block arrival time statistics time series */
+  blockArrivalTimeSeries: BlockArrivalDataPoint[];
 }
 
 /**
