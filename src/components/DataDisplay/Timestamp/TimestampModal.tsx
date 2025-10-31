@@ -1,4 +1,5 @@
 import { type JSX, useState, useCallback, useEffect } from 'react';
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { ClipboardDocumentIcon, CheckIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { Dialog } from '@/components/Overlays/Dialog';
@@ -81,92 +82,115 @@ function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.E
 
   const discordFormats = getAllDiscordFormats(timestamp);
 
-  return (
-    <div className="space-y-5">
-      {/* Standard Formats Table */}
-      <section>
-        <h3 className="mb-3 text-sm/6 font-semibold text-foreground">Standard Formats</h3>
-        <div className="overflow-hidden rounded-sm border border-border">
-          <table className="w-full">
-            <tbody className="divide-y divide-border">
-              <TimestampRow
-                label="Local Time"
-                value={localTimestamp}
-                onCopy={() => handleCopy(localTimestamp, 'local')}
-                isCopied={copiedField === 'local'}
-              />
-              <TimestampRow
-                label="UTC Time"
-                value={utcTimestamp}
-                onCopy={() => handleCopy(utcTimestamp, 'utc')}
-                isCopied={copiedField === 'utc'}
-              />
-              <TimestampRow
-                label="Unix Timestamp"
-                value={timestamp.toString()}
-                onCopy={() => handleCopy(timestamp.toString(), 'unix')}
-                isCopied={copiedField === 'unix'}
-              />
-              <TimestampRow
-                label="Relative Time"
-                value={liveRelativeTime}
-                onCopy={() => handleCopy(liveRelativeTime, 'relative')}
-                isCopied={copiedField === 'relative'}
-                isLive
-              />
-            </tbody>
-          </table>
-        </div>
-      </section>
+  const tabs = [
+    { name: 'Standard', count: 4 },
+    ...(beaconData && currentNetwork ? [{ name: 'Beacon Chain', count: 2 }] : []),
+    { name: 'Discord', count: 7 },
+  ];
 
-      {/* Beacon Chain Table */}
-      {beaconData && currentNetwork && (
-        <section>
-          <h3 className="mb-3 text-sm/6 font-semibold text-foreground">
-            Beacon Chain <span className="font-normal text-muted">({currentNetwork.name})</span>
-          </h3>
+  return (
+    <TabGroup>
+      <TabList className="flex gap-2 border-b border-border">
+        {tabs.map(tab => (
+          <Tab
+            key={tab.name}
+            className={({ selected }) =>
+              clsx(
+                'px-4 py-2.5 text-sm/6 font-medium transition-colors focus:outline-hidden',
+                selected ? 'border-b-2 border-primary text-foreground' : 'text-muted hover:text-foreground'
+              )
+            }
+          >
+            {tab.name}
+            <span className="text-2xs/3 ml-2 rounded-xs bg-background px-1.5 py-0.5 font-semibold">{tab.count}</span>
+          </Tab>
+        ))}
+      </TabList>
+
+      <TabPanels className="mt-4">
+        {/* Standard Formats Panel */}
+        <TabPanel>
           <div className="overflow-hidden rounded-sm border border-border">
             <table className="w-full">
               <tbody className="divide-y divide-border">
                 <TimestampRow
-                  label="Slot"
-                  value={beaconData.slot.toLocaleString()}
-                  onCopy={() => handleCopy(beaconData.slot.toString(), 'slot')}
-                  isCopied={copiedField === 'slot'}
+                  label="Local Time"
+                  value={localTimestamp}
+                  onCopy={() => handleCopy(localTimestamp, 'local')}
+                  isCopied={copiedField === 'local'}
                 />
                 <TimestampRow
-                  label="Epoch"
-                  value={beaconData.epoch.toLocaleString()}
-                  onCopy={() => handleCopy(beaconData.epoch.toString(), 'epoch')}
-                  isCopied={copiedField === 'epoch'}
+                  label="UTC Time"
+                  value={utcTimestamp}
+                  onCopy={() => handleCopy(utcTimestamp, 'utc')}
+                  isCopied={copiedField === 'utc'}
+                />
+                <TimestampRow
+                  label="Unix Timestamp"
+                  value={timestamp.toString()}
+                  onCopy={() => handleCopy(timestamp.toString(), 'unix')}
+                  isCopied={copiedField === 'unix'}
+                />
+                <TimestampRow
+                  label="Relative Time"
+                  value={liveRelativeTime}
+                  onCopy={() => handleCopy(liveRelativeTime, 'relative')}
+                  isCopied={copiedField === 'relative'}
+                  isLive
                 />
               </tbody>
             </table>
           </div>
-        </section>
-      )}
+        </TabPanel>
 
-      {/* Discord Formats Table */}
-      <section>
-        <h3 className="mb-3 text-sm/6 font-semibold text-foreground">Discord Formats</h3>
-        <div className="overflow-hidden rounded-sm border border-border">
-          <table className="w-full">
-            <tbody className="divide-y divide-border">
-              {(Object.entries(discordFormats) as [DiscordTimestampStyle, string][]).map(([style, value]) => (
-                <TimestampRow
-                  key={style}
-                  label={DISCORD_STYLE_LABELS[style]}
-                  value={value}
-                  onCopy={() => handleCopy(value, `discord-${style}`)}
-                  isCopied={copiedField === `discord-${style}`}
-                  badge={`<t:${timestamp}:${style}>`}
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
+        {/* Beacon Chain Panel */}
+        {beaconData && currentNetwork && (
+          <TabPanel>
+            <div className="mb-3 text-sm/6 text-muted">
+              Network: <span className="font-semibold text-foreground">{currentNetwork.name}</span>
+            </div>
+            <div className="overflow-hidden rounded-sm border border-border">
+              <table className="w-full">
+                <tbody className="divide-y divide-border">
+                  <TimestampRow
+                    label="Slot"
+                    value={beaconData.slot.toLocaleString()}
+                    onCopy={() => handleCopy(beaconData.slot.toString(), 'slot')}
+                    isCopied={copiedField === 'slot'}
+                  />
+                  <TimestampRow
+                    label="Epoch"
+                    value={beaconData.epoch.toLocaleString()}
+                    onCopy={() => handleCopy(beaconData.epoch.toString(), 'epoch')}
+                    isCopied={copiedField === 'epoch'}
+                  />
+                </tbody>
+              </table>
+            </div>
+          </TabPanel>
+        )}
+
+        {/* Discord Formats Panel */}
+        <TabPanel>
+          <div className="overflow-hidden rounded-sm border border-border">
+            <table className="w-full">
+              <tbody className="divide-y divide-border">
+                {(Object.entries(discordFormats) as [DiscordTimestampStyle, string][]).map(([style, value]) => (
+                  <TimestampRow
+                    key={style}
+                    label={DISCORD_STYLE_LABELS[style]}
+                    value={value}
+                    onCopy={() => handleCopy(value, `discord-${style}`)}
+                    isCopied={copiedField === `discord-${style}`}
+                    badge={`<t:${timestamp}:${style}>`}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </TabPanel>
+      </TabPanels>
+    </TabGroup>
   );
 }
 
