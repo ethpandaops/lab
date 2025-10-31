@@ -133,12 +133,12 @@ export function BlockArrivalTimesChart({
       },
     ];
 
-    // Calculate max Y value from data
+    // Calculate max Y value from data (excluding Max series)
     const dataMaxY =
-      Math.max(...data.flatMap(d => [d.min, d.p05, d.p50, d.p90, d.max].filter((v): v is number => v !== null))) / 1000; // Convert to seconds
+      Math.max(...data.flatMap(d => [d.min, d.p05, d.p50, d.p90].filter((v): v is number => v !== null))) / 1000; // Convert to seconds
 
-    // Ensure y-axis includes attestation deadline with some padding
-    const maxY = Math.max(dataMaxY, attestationDeadlineSeconds) * 1.1;
+    // Default to 12 seconds unless data exceeds it
+    const maxY = dataMaxY > 12 ? dataMaxY * 1.1 : 12;
 
     return { series, minX, maxY };
   }, [data, CHART_CATEGORICAL_COLORS, attestationDeadlineSeconds]);
