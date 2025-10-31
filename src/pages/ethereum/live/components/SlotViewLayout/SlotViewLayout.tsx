@@ -272,8 +272,8 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
         </div>
 
         {/* Slim Timeline - 100px */}
-        <div className="h-[100px] shrink-0 border-b border-border bg-surface">
-          <ScrollingTimeline items={slotData.sidebarItems} currentTime={currentTime} autoScroll={true} />
+        <div className="h-[100px] shrink-0 overflow-hidden border-b border-border bg-surface">
+          <ScrollingTimeline items={slotData.sidebarItems} currentTime={currentTime} autoScroll={true} height="100px" />
         </div>
 
         {/* Map - 279px (adjusted) */}
