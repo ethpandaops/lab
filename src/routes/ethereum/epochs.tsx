@@ -4,6 +4,7 @@ export const Route = createFileRoute('/ethereum/epochs')({
   component: Outlet,
   beforeLoad: () => ({
     getTitle: () => 'Epochs',
+    getBreadcrumb: () => ({ label: 'Epochs' }),
   }),
   head: () => ({
     meta: [

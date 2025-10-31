@@ -1,5 +1,5 @@
 import { type JSX } from 'react';
-import { Link, useParams } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
@@ -47,9 +47,6 @@ export function DetailPage(): JSX.Element {
           title="Invalid slot number"
           description={`"${slotParam}" is not a valid slot number. Please provide a positive integer.`}
         />
-        <Link to="/ethereum/slots" className="mt-4 inline-block text-primary hover:underline">
-          ← Back to slots
-        </Link>
       </Container>
     );
   }
@@ -80,9 +77,6 @@ export function DetailPage(): JSX.Element {
       <Container>
         <Header title={`Slot ${slot}`} description={`Epoch ${epoch}`} />
         <Alert variant="error" title="Error loading slot data" description={error.message} />
-        <Link to="/ethereum/slots" className="mt-4 inline-block text-primary hover:underline">
-          ← Back to slots
-        </Link>
       </Container>
     );
   }
@@ -97,9 +91,6 @@ export function DetailPage(): JSX.Element {
           title="No data available"
           description={`No data has been recorded for slot ${slot}. This slot may not have occurred yet, or data collection may not have been active.`}
         />
-        <Link to="/ethereum/slots" className="mt-4 inline-block text-primary hover:underline">
-          ← Back to slots
-        </Link>
       </Container>
     );
   }
@@ -176,9 +167,6 @@ export function DetailPage(): JSX.Element {
       <div className="mb-6 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex-1">
           <Header title="Slot Detail" description="Detailed slot analysis and visualization" />
-          <Link to="/ethereum/slots" className="mt-4 inline-block text-primary hover:underline">
-            ← Back to slots
-          </Link>
         </div>
 
         {/* BlockArt - p5.js 3D cube */}

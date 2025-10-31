@@ -4,6 +4,9 @@ import { IndexPage } from '@/pages/ethereum/epochs';
 
 export const Route = createFileRoute('/ethereum/epochs/')({
   component: IndexPage,
+  beforeLoad: () => ({
+    getBreadcrumb: () => ({ show: false }), // Index routes should not show breadcrumbs
+  }),
   head: () => ({
     meta: [
       { title: `Epochs | ${import.meta.env.VITE_BASE_TITLE}` },

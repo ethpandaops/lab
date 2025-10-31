@@ -22,6 +22,9 @@ function DetailPageWithSlotPlayer(): JSX.Element {
 
 export const Route = createFileRoute('/xatu/contributors/$id')({
   component: DetailPageWithSlotPlayer,
+  beforeLoad: ({ params }) => ({
+    getBreadcrumb: () => ({ label: params.id }),
+  }),
   head: ctx => ({
     meta: [
       { title: `${ctx.params.id} | ${import.meta.env.VITE_BASE_TITLE}` },

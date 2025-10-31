@@ -5,6 +5,9 @@ import { dasCustodySearchSchema } from '@/pages/ethereum/data-availability/das-c
 export const Route = createFileRoute('/ethereum/data-availability/das-custody/')({
   component: IndexPage,
   validateSearch: dasCustodySearchSchema,
+  beforeLoad: () => ({
+    getBreadcrumb: () => ({ label: 'DAS Custody' }),
+  }),
   head: () => ({
     meta: [
       { title: `DAS Custody | ${import.meta.env.VITE_BASE_TITLE}` },

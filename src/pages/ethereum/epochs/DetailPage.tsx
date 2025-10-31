@@ -1,4 +1,4 @@
-import { Link, useParams } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
 import { Alert } from '@/components/Feedback/Alert';
@@ -76,9 +76,6 @@ export function DetailPage(): React.JSX.Element {
       <Container>
         <Header title="Invalid Epoch" description="The epoch parameter must be a valid non-negative integer" />
         <Alert variant="error" title="Invalid Epoch" description={`"${params.epoch}" is not a valid epoch number.`} />
-        <Link to="/ethereum/epochs" className="mt-4 inline-block text-primary hover:underline">
-          ← Back to Epochs
-        </Link>
       </Container>
     );
   }
@@ -99,9 +96,6 @@ export function DetailPage(): React.JSX.Element {
       <Container>
         <Header title={`Epoch ${epoch}`} description="Error loading epoch data" />
         <Alert variant="error" title="Error Loading Epoch Data" description={error.message} />
-        <Link to="/ethereum/epochs" className="mt-4 inline-block text-primary hover:underline">
-          ← Back to Epochs
-        </Link>
       </Container>
     );
   }
@@ -116,9 +110,6 @@ export function DetailPage(): React.JSX.Element {
           title="No Data Available"
           description="No data was found for this epoch. It may not have occurred yet or data may not be available."
         />
-        <Link to="/ethereum/epochs" className="mt-4 inline-block text-primary hover:underline">
-          ← Back to Epochs
-        </Link>
       </Container>
     );
   }
@@ -134,11 +125,6 @@ export function DetailPage(): React.JSX.Element {
     <Container>
       {/* Header */}
       <Header title={`Epoch ${epoch}`} description={`${timestamp.toLocaleString()} (${relativeTime})`} />
-
-      {/* Back link */}
-      <Link to="/ethereum/epochs" className="mb-6 inline-block text-sm text-primary hover:underline">
-        ← Back to Epochs
-      </Link>
 
       {/* Basic Info Card */}
       <div className="mt-6">

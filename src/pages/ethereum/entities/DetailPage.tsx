@@ -1,4 +1,4 @@
-import { Link, useParams } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
 import { Alert } from '@/components/Feedback/Alert';
@@ -50,9 +50,6 @@ export function DetailPage(): React.JSX.Element {
       <Container>
         <Header title="Invalid Entity" description="The entity parameter could not be decoded" />
         <Alert variant="error" title="Invalid Entity" description={`"${params.entity}" is not a valid entity name.`} />
-        <Link to="/ethereum/entities" className="mt-4 inline-block text-primary hover:underline">
-          ← Back to Entities
-        </Link>
       </Container>
     );
   }
@@ -73,9 +70,6 @@ export function DetailPage(): React.JSX.Element {
       <Container>
         <Header title={entityName} description="Error loading entity data" />
         <Alert variant="error" title="Error Loading Entity Data" description={error.message} />
-        <Link to="/ethereum/entities" className="mt-4 inline-block text-primary hover:underline">
-          ← Back to Entities
-        </Link>
       </Container>
     );
   }
@@ -90,9 +84,6 @@ export function DetailPage(): React.JSX.Element {
           title="No Data Available"
           description="No data was found for this entity. It may not exist or data may not be available."
         />
-        <Link to="/ethereum/entities" className="mt-4 inline-block text-primary hover:underline">
-          ← Back to Entities
-        </Link>
       </Container>
     );
   }
@@ -103,11 +94,6 @@ export function DetailPage(): React.JSX.Element {
     <Container>
       {/* Header */}
       <Header title={entityName} description={`Last active ${relativeTime}`} />
-
-      {/* Back link */}
-      <Link to="/ethereum/entities" className="mb-6 inline-block text-sm text-primary hover:underline">
-        ← Back to Entities
-      </Link>
 
       {/* Basic Info Card */}
       <div className="mt-6">

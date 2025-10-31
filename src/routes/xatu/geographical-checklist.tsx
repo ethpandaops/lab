@@ -3,6 +3,9 @@ import { IndexPage } from '@/pages/xatu/geographical-checklist';
 
 export const Route = createFileRoute('/xatu/geographical-checklist')({
   component: IndexPage,
+  beforeLoad: () => ({
+    getBreadcrumb: () => ({ label: 'Geographical Checklist' }),
+  }),
   head: () => ({
     meta: [
       {

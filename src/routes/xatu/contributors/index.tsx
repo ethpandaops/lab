@@ -3,6 +3,9 @@ import { IndexPage } from '@/pages/xatu/contributors';
 
 export const Route = createFileRoute('/xatu/contributors/')({
   component: IndexPage,
+  beforeLoad: () => ({
+    getBreadcrumb: () => ({ show: false }), // Index routes should not show breadcrumbs
+  }),
   head: () => ({
     meta: [
       {

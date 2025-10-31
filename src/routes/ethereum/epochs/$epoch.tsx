@@ -4,6 +4,9 @@ import { DetailPage } from '@/pages/ethereum/epochs';
 
 export const Route = createFileRoute('/ethereum/epochs/$epoch')({
   component: DetailPage,
+  beforeLoad: ({ params }) => ({
+    getBreadcrumb: () => ({ label: params.epoch }),
+  }),
   head: ctx => ({
     meta: [
       { title: `Epoch ${ctx.params.epoch} | ${import.meta.env.VITE_BASE_TITLE}` },

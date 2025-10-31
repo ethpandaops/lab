@@ -3,6 +3,9 @@ import { DetailPage } from '@/pages/ethereum/slots';
 
 export const Route = createFileRoute('/ethereum/slots/$slot')({
   component: DetailPage,
+  beforeLoad: ({ params }) => ({
+    getBreadcrumb: () => ({ label: params.slot }),
+  }),
   head: ctx => ({
     meta: [
       {

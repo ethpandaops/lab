@@ -3,6 +3,9 @@ import { IndexPage } from '@/pages/xatu/fork-readiness';
 
 export const Route = createFileRoute('/xatu/fork-readiness')({
   component: IndexPage,
+  beforeLoad: () => ({
+    getBreadcrumb: () => ({ label: 'Fork Readiness' }),
+  }),
   head: () => ({
     meta: [
       {
