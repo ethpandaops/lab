@@ -12,61 +12,68 @@ const (
 )
 
 // Query to get latest block state delta
+// Uses canonical_execution_storage_diffs table for execution layer data
+//
+// TODO(performance): This query scans the entire canonical_execution_storage_diffs table (10.6B+ rows)
+// which causes severe performance issues (30s+ timeouts). We need to either:
+// 1. Create a materialized view that pre-aggregates state changes by block number
+// 2. Add indexes on (block_number, from_value, to_value) columns
+// 3. Create a separate pre-aggregated table (like int_address_storage_slot_*) but for execution layer
+// 4. Use the existing int_address_storage_slot_* tables but add proper execution block number mapping
 const queryLatestBlockDelta = `
 WITH latest_block AS (
     SELECT MAX(block_number) as max_block
-    FROM {database}.int_address_storage_slot_last_access
+    FROM {database}.canonical_execution_storage_diffs
 ),
-new_slots AS (
-    SELECT count() as count
-    FROM {database}.int_address_storage_slot_first_access
-    WHERE block_number = (SELECT max_block FROM latest_block)
-),
-last_access AS (
+storage_stats AS (
     SELECT
-        count() as total,
-        countIf(value = '0x0000000000000000000000000000000000000000000000000000000000000000') as cleared
-    FROM {database}.int_address_storage_slot_last_access
+        countIf(from_value = '' OR from_value = '0x0000000000000000000000000000000000000000000000000000000000000000') as new_slots,
+        countIf(to_value = '0x0000000000000000000000000000000000000000000000000000000000000000') as cleared_slots,
+        countIf(
+            (from_value != '' AND from_value != '0x0000000000000000000000000000000000000000000000000000000000000000') AND
+            (to_value != '0x0000000000000000000000000000000000000000000000000000000000000000')
+        ) as modified_slots
+    FROM {database}.canonical_execution_storage_diffs
     WHERE block_number = (SELECT max_block FROM latest_block)
 )
 SELECT
     (SELECT max_block FROM latest_block) as block_number,
-    (SELECT count FROM new_slots) as new_slots,
-    (SELECT cleared FROM last_access) as cleared_slots,
-    (SELECT total FROM last_access) - (SELECT count FROM new_slots) as modified_slots
+    new_slots,
+    cleared_slots,
+    modified_slots
+FROM storage_stats
 `
 
 // Query to get top contributors for latest block
+// Uses canonical_execution_storage_diffs table for execution layer data
+//
+// TODO(performance): This query also suffers from the same performance issue as queryLatestBlockDelta.
+// See TODO comments above for solutions. This needs materialized views or pre-aggregated tables.
 const queryLatestBlockTopContributors = `
 WITH latest_block AS (
     SELECT max(block_number) as block_number
-    FROM {database}.int_address_storage_slot_first_access
+    FROM {database}.canonical_execution_storage_diffs
 ),
-new_slots AS (
+address_stats AS (
     SELECT
         address,
-        count() as new_slots
-    FROM {database}.int_address_storage_slot_first_access
-    WHERE block_number = (SELECT block_number FROM latest_block)
-    GROUP BY address
-),
-cleared_slots AS (
-    SELECT
-        address,
-        countIf(value = '0x0000000000000000000000000000000000000000000000000000000000000000') as cleared_slots,
-        count() as modified_slots
-    FROM {database}.int_address_storage_slot_last_access
+        countIf(from_value = '' OR from_value = '0x0000000000000000000000000000000000000000000000000000000000000000') as new_slots,
+        countIf(
+            (from_value != '' AND from_value != '0x0000000000000000000000000000000000000000000000000000000000000000') AND
+            (to_value != '0x0000000000000000000000000000000000000000000000000000000000000000')
+        ) as modified_slots,
+        countIf(to_value = '0x0000000000000000000000000000000000000000000000000000000000000000') as cleared_slots
+    FROM {database}.canonical_execution_storage_diffs
     WHERE block_number = (SELECT block_number FROM latest_block)
     GROUP BY address
 )
 SELECT
-    coalesce(n.address, c.address) as address,
-    coalesce(n.new_slots, 0) as new_slots,
-    coalesce(c.modified_slots, 0) as modified_slots,
-    coalesce(c.cleared_slots, 0) as cleared_slots,
-    (coalesce(n.new_slots, 0) - coalesce(c.cleared_slots, 0)) * {bytes_per_slot} as net_bytes
-FROM new_slots n
-FULL OUTER JOIN cleared_slots c ON n.address = c.address
+    address,
+    new_slots,
+    modified_slots,
+    cleared_slots,
+    (new_slots - cleared_slots) * {bytes_per_slot} as net_bytes
+FROM address_stats
 ORDER BY abs(net_bytes) DESC
 LIMIT 10
 `
@@ -181,6 +188,76 @@ ORDER BY abs(
     )
 ) ASC
 LIMIT 1
+`
+
+// Query to get state growth categorized by contract (Paradigm Figures 2 & 3)
+// Uses canonical_execution_storage_diffs table for execution layer data
+//
+// TODO(performance): CRITICAL PERFORMANCE ISSUE - This query times out (60s+) on production data.
+// The canonical_execution_storage_diffs table has 10.6B+ rows and querying from genesis scans
+// billions of rows. This is NOT production-ready. Solutions:
+//
+// Option 1 (RECOMMENDED): Create pre-aggregated materialized views
+//   - CREATE MATERIALIZED VIEW mv_daily_state_growth_by_address AS
+//     SELECT toDate(...) as day, address, sum(slots_added), sum(slots_cleared)
+//     FROM canonical_execution_storage_diffs GROUP BY day, address
+//   - Similar views for monthly/yearly aggregations
+//   - These views would reduce query time from 60s+ to <1s
+//
+// Option 2: Add proper indexes
+//   - INDEX idx_block_address ON canonical_execution_storage_diffs (block_number, address)
+//   - INDEX idx_time_address ON canonical_execution_storage_diffs (updated_date_time, address)
+//   - This may help but won't solve the fundamental issue of scanning billions of rows
+//
+// Option 3: Create a separate aggregated table
+//   - Similar to int_address_storage_slot_* but with EXECUTION block numbers instead of beacon slots
+//   - Pre-compute daily/monthly aggregations during data ingestion
+//   - Store results in dedicated tables: canonical_execution_daily_state_growth, etc.
+//
+// Until one of these solutions is implemented, this query will timeout on any reasonable time range.
+const queryStateGrowthByCategory = `
+WITH block_range AS (
+    SELECT
+        CASE
+            WHEN {start_block} = 0 THEN (SELECT min(block_number) FROM {database}.canonical_execution_storage_diffs)
+            ELSE {start_block}
+        END as start_block,
+        CASE
+            WHEN {end_block} = 0 THEN (SELECT max(block_number) FROM {database}.canonical_execution_storage_diffs)
+            ELSE {end_block}
+        END as end_block
+),
+-- Get storage changes per address per time bucket
+storage_changes AS (
+    SELECT
+        {time_bucket_expression} as time_bucket,
+        address,
+        -- Count new slots (from_value is empty/zero)
+        countIf(from_value = '' OR from_value = '0x0000000000000000000000000000000000000000000000000000000000000000') as slots_added,
+        -- Count cleared slots (to_value is zero)
+        countIf(to_value = '0x0000000000000000000000000000000000000000000000000000000000000000') as slots_cleared
+    FROM {database}.canonical_execution_storage_diffs
+    WHERE block_number >= (SELECT start_block FROM block_range)
+      AND block_number <= (SELECT end_block FROM block_range)
+    GROUP BY time_bucket, address
+),
+-- Calculate net growth per contract per period
+net_growth AS (
+    SELECT
+        time_bucket,
+        address,
+        slots_added - slots_cleared as net_slots,
+        (slots_added - slots_cleared) * {bytes_per_slot} as net_bytes
+    FROM storage_changes
+)
+SELECT
+    time_bucket,
+    address,
+    net_slots,
+    net_bytes
+FROM net_growth
+WHERE net_bytes != 0  -- Filter out contracts with zero growth
+ORDER BY time_bucket ASC, abs(net_bytes) DESC
 `
 
 // Query to get contract state composition (for Paradigm diagram)

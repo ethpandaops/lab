@@ -181,6 +181,13 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 			Description: "Get time-series data of state growth",
 		},
 		{
+			Path:        "/{network}/state/growth-by-category",
+			Handler:     r.handleStateGrowthByCategory,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheBrowserShort,
+			Description: "Get categorized state growth over time (Paradigm Figures 2 & 3)",
+		},
+		{
 			Path:        "/{network}/state/contract/{address}",
 			Handler:     r.handleContractStateActivity,
 			Methods:     []string{http.MethodGet, http.MethodOptions},

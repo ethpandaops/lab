@@ -12,7 +12,8 @@ import (
 
 const (
 	// Genesis times for different networks (Unix timestamps)
-	GenesisTimeMainnet = 1606824023 // Dec 1, 2020 12:00:23 PM UTC
+	// These are execution layer genesis times for use with canonical_execution_storage_diffs table
+	GenesisTimeMainnet = 1438269973 // July 30, 2015 3:26:13 PM UTC (Ethereum mainnet genesis)
 	GenesisTimeHolesky = 1695902400 // Sep 28, 2023 12:00:00 PM UTC
 	GenesisTimeHoodi   = 1712923200 // Apr 12, 2024 12:00:00 PM UTC
 	GenesisTimeSepolia = 1655733600 // Jun 20, 2022 2:00:00 PM UTC

@@ -610,6 +610,24 @@ export class RestApiClient {
     const response = await this.fetchWithRetry<any>(url);
     return response as HierarchicalStateResponse;
   }
+
+  /**
+   * Get categorized state growth over time (Paradigm Figures 2 & 3)
+   * @param network Network name
+   * @param params Query parameters (granularity, start_block, end_block, top_contracts)
+   * @returns Time-series growth data by category
+   */
+  async getStateGrowthByCategory(
+    network: string,
+    params?: { granularity?: string; start_block?: number; end_block?: number; top_contracts?: number },
+  ): Promise<any> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateGrowthByCategory(network)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return response;
+  }
 }
 
 /**

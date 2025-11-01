@@ -14,6 +14,7 @@ import type {
 import { ResponsiveLine } from '@nivo/line';
 import { defaultNivoTheme } from '@/components/charts/NivoTheme';
 import { PlotlyTreemap } from '@/components/state/PlotlyTreemap';
+import StateGrowthByCategory from '@/components/state/StateGrowthByCategory';
 
 // Helper function to format bytes
 function formatBytes(bytes: number): string {
@@ -49,7 +50,7 @@ function StateAnalyzer() {
   const [granularity, setGranularity] = useState<StateGranularity>('hour' as StateGranularity);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'growth' | 'composition'>('growth');
+  const [activeTab, setActiveTab] = useState<'growth' | 'composition' | 'categorized'>('growth');
 
   useEffect(() => {
     let lastBlockNumber = 0;
@@ -240,6 +241,16 @@ function StateAnalyzer() {
               }`}
             >
               State Composition
+            </button>
+            <button
+              onClick={() => setActiveTab('categorized')}
+              className={`px-6 py-3 font-mono text-sm transition-colors border-b-2 ${
+                activeTab === 'categorized'
+                  ? 'text-accent border-accent'
+                  : 'text-secondary border-transparent hover:text-primary'
+              }`}
+            >
+              Categorized Growth
             </button>
           </div>
 
@@ -472,6 +483,14 @@ function StateAnalyzer() {
           {/* State Composition Tab */}
           {activeTab === 'composition' && (
             <PlotlyTreemap />
+          )}
+
+          {/* Categorized Growth Tab */}
+          {activeTab === 'categorized' && (
+            <StateGrowthByCategory
+              selectedNetwork={selectedNetwork}
+              restClient={restClient}
+            />
           )}
         </>
       )}

@@ -97,3 +97,11 @@ func (sa *StateAnalytics) GetHierarchicalState(
 ) (*pb.GetHierarchicalStateResponse, error) {
 	return sa.service.GetHierarchicalState(ctx, req)
 }
+
+// GetStateGrowthByCategory returns time-series state growth data categorized by contract type.
+func (sa *StateAnalytics) GetStateGrowthByCategory(
+	ctx context.Context,
+	req *pb.GetStateGrowthByCategoryRequest,
+) (*pb.GetStateGrowthByCategoryResponse, error) {
+	return sa.service.GetStateGrowthByCategory(ctx, req)
+}

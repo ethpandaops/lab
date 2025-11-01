@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.10
 // 	protoc        v5.29.3
-// source: state_analytics.proto
+// source: pkg/server/proto/state_analytics/state_analytics.proto
 
 package state_analytics
 
@@ -58,11 +58,11 @@ func (x GetTopStateAddersRequest_Period) String() string {
 }
 
 func (GetTopStateAddersRequest_Period) Descriptor() protoreflect.EnumDescriptor {
-	return file_state_analytics_proto_enumTypes[0].Descriptor()
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_enumTypes[0].Descriptor()
 }
 
 func (GetTopStateAddersRequest_Period) Type() protoreflect.EnumType {
-	return &file_state_analytics_proto_enumTypes[0]
+	return &file_pkg_server_proto_state_analytics_state_analytics_proto_enumTypes[0]
 }
 
 func (x GetTopStateAddersRequest_Period) Number() protoreflect.EnumNumber {
@@ -71,7 +71,7 @@ func (x GetTopStateAddersRequest_Period) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use GetTopStateAddersRequest_Period.Descriptor instead.
 func (GetTopStateAddersRequest_Period) EnumDescriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{3, 0}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{3, 0}
 }
 
 type GetTopStateRemoversRequest_Period int32
@@ -110,11 +110,11 @@ func (x GetTopStateRemoversRequest_Period) String() string {
 }
 
 func (GetTopStateRemoversRequest_Period) Descriptor() protoreflect.EnumDescriptor {
-	return file_state_analytics_proto_enumTypes[1].Descriptor()
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_enumTypes[1].Descriptor()
 }
 
 func (GetTopStateRemoversRequest_Period) Type() protoreflect.EnumType {
-	return &file_state_analytics_proto_enumTypes[1]
+	return &file_pkg_server_proto_state_analytics_state_analytics_proto_enumTypes[1]
 }
 
 func (x GetTopStateRemoversRequest_Period) Number() protoreflect.EnumNumber {
@@ -123,7 +123,7 @@ func (x GetTopStateRemoversRequest_Period) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use GetTopStateRemoversRequest_Period.Descriptor instead.
 func (GetTopStateRemoversRequest_Period) EnumDescriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{6, 0}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{6, 0}
 }
 
 type GetStateGrowthChartRequest_Period int32
@@ -165,11 +165,11 @@ func (x GetStateGrowthChartRequest_Period) String() string {
 }
 
 func (GetStateGrowthChartRequest_Period) Descriptor() protoreflect.EnumDescriptor {
-	return file_state_analytics_proto_enumTypes[2].Descriptor()
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_enumTypes[2].Descriptor()
 }
 
 func (GetStateGrowthChartRequest_Period) Type() protoreflect.EnumType {
-	return &file_state_analytics_proto_enumTypes[2]
+	return &file_pkg_server_proto_state_analytics_state_analytics_proto_enumTypes[2]
 }
 
 func (x GetStateGrowthChartRequest_Period) Number() protoreflect.EnumNumber {
@@ -178,7 +178,7 @@ func (x GetStateGrowthChartRequest_Period) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use GetStateGrowthChartRequest_Period.Descriptor instead.
 func (GetStateGrowthChartRequest_Period) EnumDescriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{9, 0}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{9, 0}
 }
 
 type GetStateGrowthChartRequest_Granularity int32
@@ -217,11 +217,11 @@ func (x GetStateGrowthChartRequest_Granularity) String() string {
 }
 
 func (GetStateGrowthChartRequest_Granularity) Descriptor() protoreflect.EnumDescriptor {
-	return file_state_analytics_proto_enumTypes[3].Descriptor()
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_enumTypes[3].Descriptor()
 }
 
 func (GetStateGrowthChartRequest_Granularity) Type() protoreflect.EnumType {
-	return &file_state_analytics_proto_enumTypes[3]
+	return &file_pkg_server_proto_state_analytics_state_analytics_proto_enumTypes[3]
 }
 
 func (x GetStateGrowthChartRequest_Granularity) Number() protoreflect.EnumNumber {
@@ -230,7 +230,7 @@ func (x GetStateGrowthChartRequest_Granularity) Number() protoreflect.EnumNumber
 
 // Deprecated: Use GetStateGrowthChartRequest_Granularity.Descriptor instead.
 func (GetStateGrowthChartRequest_Granularity) EnumDescriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{9, 1}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{9, 1}
 }
 
 type ContractStateEvent_EventType int32
@@ -269,11 +269,11 @@ func (x ContractStateEvent_EventType) String() string {
 }
 
 func (ContractStateEvent_EventType) Descriptor() protoreflect.EnumDescriptor {
-	return file_state_analytics_proto_enumTypes[4].Descriptor()
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_enumTypes[4].Descriptor()
 }
 
 func (ContractStateEvent_EventType) Type() protoreflect.EnumType {
-	return &file_state_analytics_proto_enumTypes[4]
+	return &file_pkg_server_proto_state_analytics_state_analytics_proto_enumTypes[4]
 }
 
 func (x ContractStateEvent_EventType) Number() protoreflect.EnumNumber {
@@ -282,7 +282,59 @@ func (x ContractStateEvent_EventType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ContractStateEvent_EventType.Descriptor instead.
 func (ContractStateEvent_EventType) EnumDescriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{16, 0}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{16, 0}
+}
+
+type GetStateGrowthByCategoryRequest_Granularity int32
+
+const (
+	GetStateGrowthByCategoryRequest_GRANULARITY_UNSPECIFIED GetStateGrowthByCategoryRequest_Granularity = 0
+	GetStateGrowthByCategoryRequest_GRANULARITY_DAILY       GetStateGrowthByCategoryRequest_Granularity = 1 // Daily state growth (like Figure 3 but daily)
+	GetStateGrowthByCategoryRequest_GRANULARITY_MONTHLY     GetStateGrowthByCategoryRequest_Granularity = 2 // Monthly state growth (Paradigm Figure 3)
+	GetStateGrowthByCategoryRequest_GRANULARITY_YEARLY      GetStateGrowthByCategoryRequest_Granularity = 3 // Yearly aggregates
+)
+
+// Enum value maps for GetStateGrowthByCategoryRequest_Granularity.
+var (
+	GetStateGrowthByCategoryRequest_Granularity_name = map[int32]string{
+		0: "GRANULARITY_UNSPECIFIED",
+		1: "GRANULARITY_DAILY",
+		2: "GRANULARITY_MONTHLY",
+		3: "GRANULARITY_YEARLY",
+	}
+	GetStateGrowthByCategoryRequest_Granularity_value = map[string]int32{
+		"GRANULARITY_UNSPECIFIED": 0,
+		"GRANULARITY_DAILY":       1,
+		"GRANULARITY_MONTHLY":     2,
+		"GRANULARITY_YEARLY":      3,
+	}
+)
+
+func (x GetStateGrowthByCategoryRequest_Granularity) Enum() *GetStateGrowthByCategoryRequest_Granularity {
+	p := new(GetStateGrowthByCategoryRequest_Granularity)
+	*p = x
+	return p
+}
+
+func (x GetStateGrowthByCategoryRequest_Granularity) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (GetStateGrowthByCategoryRequest_Granularity) Descriptor() protoreflect.EnumDescriptor {
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_enumTypes[5].Descriptor()
+}
+
+func (GetStateGrowthByCategoryRequest_Granularity) Type() protoreflect.EnumType {
+	return &file_pkg_server_proto_state_analytics_state_analytics_proto_enumTypes[5]
+}
+
+func (x GetStateGrowthByCategoryRequest_Granularity) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use GetStateGrowthByCategoryRequest_Granularity.Descriptor instead.
+func (GetStateGrowthByCategoryRequest_Granularity) EnumDescriptor() ([]byte, []int) {
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{24, 0}
 }
 
 // Request/Response messages for GetLatestBlockDelta
@@ -294,7 +346,7 @@ type GetLatestBlockDeltaRequest struct {
 
 func (x *GetLatestBlockDeltaRequest) Reset() {
 	*x = GetLatestBlockDeltaRequest{}
-	mi := &file_state_analytics_proto_msgTypes[0]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -306,7 +358,7 @@ func (x *GetLatestBlockDeltaRequest) String() string {
 func (*GetLatestBlockDeltaRequest) ProtoMessage() {}
 
 func (x *GetLatestBlockDeltaRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[0]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -319,7 +371,7 @@ func (x *GetLatestBlockDeltaRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLatestBlockDeltaRequest.ProtoReflect.Descriptor instead.
 func (*GetLatestBlockDeltaRequest) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{0}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{0}
 }
 
 type GetLatestBlockDeltaResponse struct {
@@ -338,7 +390,7 @@ type GetLatestBlockDeltaResponse struct {
 
 func (x *GetLatestBlockDeltaResponse) Reset() {
 	*x = GetLatestBlockDeltaResponse{}
-	mi := &file_state_analytics_proto_msgTypes[1]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -350,7 +402,7 @@ func (x *GetLatestBlockDeltaResponse) String() string {
 func (*GetLatestBlockDeltaResponse) ProtoMessage() {}
 
 func (x *GetLatestBlockDeltaResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[1]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -363,7 +415,7 @@ func (x *GetLatestBlockDeltaResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLatestBlockDeltaResponse.ProtoReflect.Descriptor instead.
 func (*GetLatestBlockDeltaResponse) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{1}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetLatestBlockDeltaResponse) GetBlockNumber() uint64 {
@@ -436,7 +488,7 @@ type ContractStateDelta struct {
 
 func (x *ContractStateDelta) Reset() {
 	*x = ContractStateDelta{}
-	mi := &file_state_analytics_proto_msgTypes[2]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -448,7 +500,7 @@ func (x *ContractStateDelta) String() string {
 func (*ContractStateDelta) ProtoMessage() {}
 
 func (x *ContractStateDelta) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[2]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -461,7 +513,7 @@ func (x *ContractStateDelta) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ContractStateDelta.ProtoReflect.Descriptor instead.
 func (*ContractStateDelta) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{2}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ContractStateDelta) GetAddress() string {
@@ -517,7 +569,7 @@ type GetTopStateAddersRequest struct {
 
 func (x *GetTopStateAddersRequest) Reset() {
 	*x = GetTopStateAddersRequest{}
-	mi := &file_state_analytics_proto_msgTypes[3]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -529,7 +581,7 @@ func (x *GetTopStateAddersRequest) String() string {
 func (*GetTopStateAddersRequest) ProtoMessage() {}
 
 func (x *GetTopStateAddersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[3]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -542,7 +594,7 @@ func (x *GetTopStateAddersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTopStateAddersRequest.ProtoReflect.Descriptor instead.
 func (*GetTopStateAddersRequest) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{3}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetTopStateAddersRequest) GetPeriod() GetTopStateAddersRequest_Period {
@@ -570,7 +622,7 @@ type GetTopStateAddersResponse struct {
 
 func (x *GetTopStateAddersResponse) Reset() {
 	*x = GetTopStateAddersResponse{}
-	mi := &file_state_analytics_proto_msgTypes[4]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -582,7 +634,7 @@ func (x *GetTopStateAddersResponse) String() string {
 func (*GetTopStateAddersResponse) ProtoMessage() {}
 
 func (x *GetTopStateAddersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[4]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -595,7 +647,7 @@ func (x *GetTopStateAddersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTopStateAddersResponse.ProtoReflect.Descriptor instead.
 func (*GetTopStateAddersResponse) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{4}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetTopStateAddersResponse) GetAdders() []*StateAdder {
@@ -634,7 +686,7 @@ type StateAdder struct {
 
 func (x *StateAdder) Reset() {
 	*x = StateAdder{}
-	mi := &file_state_analytics_proto_msgTypes[5]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -646,7 +698,7 @@ func (x *StateAdder) String() string {
 func (*StateAdder) ProtoMessage() {}
 
 func (x *StateAdder) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[5]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -659,7 +711,7 @@ func (x *StateAdder) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StateAdder.ProtoReflect.Descriptor instead.
 func (*StateAdder) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{5}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *StateAdder) GetRank() uint32 {
@@ -722,7 +774,7 @@ type GetTopStateRemoversRequest struct {
 
 func (x *GetTopStateRemoversRequest) Reset() {
 	*x = GetTopStateRemoversRequest{}
-	mi := &file_state_analytics_proto_msgTypes[6]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -734,7 +786,7 @@ func (x *GetTopStateRemoversRequest) String() string {
 func (*GetTopStateRemoversRequest) ProtoMessage() {}
 
 func (x *GetTopStateRemoversRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[6]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -747,7 +799,7 @@ func (x *GetTopStateRemoversRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTopStateRemoversRequest.ProtoReflect.Descriptor instead.
 func (*GetTopStateRemoversRequest) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{6}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetTopStateRemoversRequest) GetPeriod() GetTopStateRemoversRequest_Period {
@@ -775,7 +827,7 @@ type GetTopStateRemoversResponse struct {
 
 func (x *GetTopStateRemoversResponse) Reset() {
 	*x = GetTopStateRemoversResponse{}
-	mi := &file_state_analytics_proto_msgTypes[7]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -787,7 +839,7 @@ func (x *GetTopStateRemoversResponse) String() string {
 func (*GetTopStateRemoversResponse) ProtoMessage() {}
 
 func (x *GetTopStateRemoversResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[7]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -800,7 +852,7 @@ func (x *GetTopStateRemoversResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTopStateRemoversResponse.ProtoReflect.Descriptor instead.
 func (*GetTopStateRemoversResponse) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{7}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GetTopStateRemoversResponse) GetRemovers() []*StateRemover {
@@ -840,7 +892,7 @@ type StateRemover struct {
 
 func (x *StateRemover) Reset() {
 	*x = StateRemover{}
-	mi := &file_state_analytics_proto_msgTypes[8]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -852,7 +904,7 @@ func (x *StateRemover) String() string {
 func (*StateRemover) ProtoMessage() {}
 
 func (x *StateRemover) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[8]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -865,7 +917,7 @@ func (x *StateRemover) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StateRemover.ProtoReflect.Descriptor instead.
 func (*StateRemover) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{8}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *StateRemover) GetRank() uint32 {
@@ -935,7 +987,7 @@ type GetStateGrowthChartRequest struct {
 
 func (x *GetStateGrowthChartRequest) Reset() {
 	*x = GetStateGrowthChartRequest{}
-	mi := &file_state_analytics_proto_msgTypes[9]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -947,7 +999,7 @@ func (x *GetStateGrowthChartRequest) String() string {
 func (*GetStateGrowthChartRequest) ProtoMessage() {}
 
 func (x *GetStateGrowthChartRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[9]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -960,7 +1012,7 @@ func (x *GetStateGrowthChartRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStateGrowthChartRequest.ProtoReflect.Descriptor instead.
 func (*GetStateGrowthChartRequest) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{9}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GetStateGrowthChartRequest) GetPeriod() GetStateGrowthChartRequest_Period {
@@ -987,7 +1039,7 @@ type GetStateGrowthChartResponse struct {
 
 func (x *GetStateGrowthChartResponse) Reset() {
 	*x = GetStateGrowthChartResponse{}
-	mi := &file_state_analytics_proto_msgTypes[10]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -999,7 +1051,7 @@ func (x *GetStateGrowthChartResponse) String() string {
 func (*GetStateGrowthChartResponse) ProtoMessage() {}
 
 func (x *GetStateGrowthChartResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[10]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1012,7 +1064,7 @@ func (x *GetStateGrowthChartResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStateGrowthChartResponse.ProtoReflect.Descriptor instead.
 func (*GetStateGrowthChartResponse) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{10}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *GetStateGrowthChartResponse) GetDataPoints() []*StateGrowthDataPoint {
@@ -1045,7 +1097,7 @@ type StateGrowthDataPoint struct {
 
 func (x *StateGrowthDataPoint) Reset() {
 	*x = StateGrowthDataPoint{}
-	mi := &file_state_analytics_proto_msgTypes[11]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1057,7 +1109,7 @@ func (x *StateGrowthDataPoint) String() string {
 func (*StateGrowthDataPoint) ProtoMessage() {}
 
 func (x *StateGrowthDataPoint) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[11]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1070,7 +1122,7 @@ func (x *StateGrowthDataPoint) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StateGrowthDataPoint.ProtoReflect.Descriptor instead.
 func (*StateGrowthDataPoint) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{11}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *StateGrowthDataPoint) GetTimestamp() *timestamppb.Timestamp {
@@ -1144,7 +1196,7 @@ type StateSummary struct {
 
 func (x *StateSummary) Reset() {
 	*x = StateSummary{}
-	mi := &file_state_analytics_proto_msgTypes[12]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1156,7 +1208,7 @@ func (x *StateSummary) String() string {
 func (*StateSummary) ProtoMessage() {}
 
 func (x *StateSummary) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[12]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1169,7 +1221,7 @@ func (x *StateSummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StateSummary.ProtoReflect.Descriptor instead.
 func (*StateSummary) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{12}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *StateSummary) GetTotalSlotsAdded() uint64 {
@@ -1232,7 +1284,7 @@ type GetContractStateActivityRequest struct {
 
 func (x *GetContractStateActivityRequest) Reset() {
 	*x = GetContractStateActivityRequest{}
-	mi := &file_state_analytics_proto_msgTypes[13]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1244,7 +1296,7 @@ func (x *GetContractStateActivityRequest) String() string {
 func (*GetContractStateActivityRequest) ProtoMessage() {}
 
 func (x *GetContractStateActivityRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[13]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1257,7 +1309,7 @@ func (x *GetContractStateActivityRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetContractStateActivityRequest.ProtoReflect.Descriptor instead.
 func (*GetContractStateActivityRequest) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{13}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *GetContractStateActivityRequest) GetAddress() string {
@@ -1287,7 +1339,7 @@ type GetContractStateActivityResponse struct {
 
 func (x *GetContractStateActivityResponse) Reset() {
 	*x = GetContractStateActivityResponse{}
-	mi := &file_state_analytics_proto_msgTypes[14]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1299,7 +1351,7 @@ func (x *GetContractStateActivityResponse) String() string {
 func (*GetContractStateActivityResponse) ProtoMessage() {}
 
 func (x *GetContractStateActivityResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[14]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1312,7 +1364,7 @@ func (x *GetContractStateActivityResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetContractStateActivityResponse.ProtoReflect.Descriptor instead.
 func (*GetContractStateActivityResponse) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{14}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GetContractStateActivityResponse) GetAddress() string {
@@ -1364,7 +1416,7 @@ type ContractStateMetrics struct {
 
 func (x *ContractStateMetrics) Reset() {
 	*x = ContractStateMetrics{}
-	mi := &file_state_analytics_proto_msgTypes[15]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1376,7 +1428,7 @@ func (x *ContractStateMetrics) String() string {
 func (*ContractStateMetrics) ProtoMessage() {}
 
 func (x *ContractStateMetrics) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[15]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1389,7 +1441,7 @@ func (x *ContractStateMetrics) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ContractStateMetrics.ProtoReflect.Descriptor instead.
 func (*ContractStateMetrics) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{15}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *ContractStateMetrics) GetTotalSlots() uint64 {
@@ -1447,7 +1499,7 @@ type ContractStateEvent struct {
 
 func (x *ContractStateEvent) Reset() {
 	*x = ContractStateEvent{}
-	mi := &file_state_analytics_proto_msgTypes[16]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1459,7 +1511,7 @@ func (x *ContractStateEvent) String() string {
 func (*ContractStateEvent) ProtoMessage() {}
 
 func (x *ContractStateEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[16]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1472,7 +1524,7 @@ func (x *ContractStateEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ContractStateEvent.ProtoReflect.Descriptor instead.
 func (*ContractStateEvent) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{16}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ContractStateEvent) GetBlockNumber() uint64 {
@@ -1522,7 +1574,7 @@ type GetContractStateCompositionRequest struct {
 
 func (x *GetContractStateCompositionRequest) Reset() {
 	*x = GetContractStateCompositionRequest{}
-	mi := &file_state_analytics_proto_msgTypes[17]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1534,7 +1586,7 @@ func (x *GetContractStateCompositionRequest) String() string {
 func (*GetContractStateCompositionRequest) ProtoMessage() {}
 
 func (x *GetContractStateCompositionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[17]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1547,7 +1599,7 @@ func (x *GetContractStateCompositionRequest) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use GetContractStateCompositionRequest.ProtoReflect.Descriptor instead.
 func (*GetContractStateCompositionRequest) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{17}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *GetContractStateCompositionRequest) GetLimit() uint32 {
@@ -1583,7 +1635,7 @@ type GetContractStateCompositionResponse struct {
 
 func (x *GetContractStateCompositionResponse) Reset() {
 	*x = GetContractStateCompositionResponse{}
-	mi := &file_state_analytics_proto_msgTypes[18]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1595,7 +1647,7 @@ func (x *GetContractStateCompositionResponse) String() string {
 func (*GetContractStateCompositionResponse) ProtoMessage() {}
 
 func (x *GetContractStateCompositionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[18]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1608,7 +1660,7 @@ func (x *GetContractStateCompositionResponse) ProtoReflect() protoreflect.Messag
 
 // Deprecated: Use GetContractStateCompositionResponse.ProtoReflect.Descriptor instead.
 func (*GetContractStateCompositionResponse) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{18}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *GetContractStateCompositionResponse) GetContracts() []*ContractStateEntry {
@@ -1653,7 +1705,7 @@ type ContractStateEntry struct {
 
 func (x *ContractStateEntry) Reset() {
 	*x = ContractStateEntry{}
-	mi := &file_state_analytics_proto_msgTypes[19]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1665,7 +1717,7 @@ func (x *ContractStateEntry) String() string {
 func (*ContractStateEntry) ProtoMessage() {}
 
 func (x *ContractStateEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[19]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1678,7 +1730,7 @@ func (x *ContractStateEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ContractStateEntry.ProtoReflect.Descriptor instead.
 func (*ContractStateEntry) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{19}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ContractStateEntry) GetAddress() string {
@@ -1736,7 +1788,7 @@ type ContractState struct {
 
 func (x *ContractState) Reset() {
 	*x = ContractState{}
-	mi := &file_state_analytics_proto_msgTypes[20]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1748,7 +1800,7 @@ func (x *ContractState) String() string {
 func (*ContractState) ProtoMessage() {}
 
 func (x *ContractState) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[20]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1761,7 +1813,7 @@ func (x *ContractState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ContractState.ProtoReflect.Descriptor instead.
 func (*ContractState) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{20}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ContractState) GetStorageSlotCount() uint64 {
@@ -1810,7 +1862,7 @@ type GetHierarchicalStateRequest struct {
 
 func (x *GetHierarchicalStateRequest) Reset() {
 	*x = GetHierarchicalStateRequest{}
-	mi := &file_state_analytics_proto_msgTypes[21]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1822,7 +1874,7 @@ func (x *GetHierarchicalStateRequest) String() string {
 func (*GetHierarchicalStateRequest) ProtoMessage() {}
 
 func (x *GetHierarchicalStateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[21]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1835,7 +1887,7 @@ func (x *GetHierarchicalStateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetHierarchicalStateRequest.ProtoReflect.Descriptor instead.
 func (*GetHierarchicalStateRequest) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{21}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *GetHierarchicalStateRequest) GetMaxDepth() uint32 {
@@ -1863,7 +1915,7 @@ type GetHierarchicalStateResponse struct {
 
 func (x *GetHierarchicalStateResponse) Reset() {
 	*x = GetHierarchicalStateResponse{}
-	mi := &file_state_analytics_proto_msgTypes[22]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1875,7 +1927,7 @@ func (x *GetHierarchicalStateResponse) String() string {
 func (*GetHierarchicalStateResponse) ProtoMessage() {}
 
 func (x *GetHierarchicalStateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[22]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1888,7 +1940,7 @@ func (x *GetHierarchicalStateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetHierarchicalStateResponse.ProtoReflect.Descriptor instead.
 func (*GetHierarchicalStateResponse) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{22}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *GetHierarchicalStateResponse) GetRoot() *StateNode {
@@ -1925,7 +1977,7 @@ type StateNode struct {
 
 func (x *StateNode) Reset() {
 	*x = StateNode{}
-	mi := &file_state_analytics_proto_msgTypes[23]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1937,7 +1989,7 @@ func (x *StateNode) String() string {
 func (*StateNode) ProtoMessage() {}
 
 func (x *StateNode) ProtoReflect() protoreflect.Message {
-	mi := &file_state_analytics_proto_msgTypes[23]
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1950,7 +2002,7 @@ func (x *StateNode) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StateNode.ProtoReflect.Descriptor instead.
 func (*StateNode) Descriptor() ([]byte, []int) {
-	return file_state_analytics_proto_rawDescGZIP(), []int{23}
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *StateNode) GetName() string {
@@ -1988,11 +2040,384 @@ func (x *StateNode) GetMetadata() map[string]string {
 	return nil
 }
 
-var File_state_analytics_proto protoreflect.FileDescriptor
+// Request/Response for GetStateGrowthByCategory (Paradigm Figures 2 & 3)
+type GetStateGrowthByCategoryRequest struct {
+	state                 protoimpl.MessageState                      `protogen:"open.v1"`
+	Granularity           GetStateGrowthByCategoryRequest_Granularity `protobuf:"varint,1,opt,name=granularity,proto3,enum=state_analytics.GetStateGrowthByCategoryRequest_Granularity" json:"granularity,omitempty"`
+	StartBlock            uint64                                      `protobuf:"varint,2,opt,name=start_block,json=startBlock,proto3" json:"start_block,omitempty"`                                      // Optional: start from specific block (0 = genesis)
+	EndBlock              uint64                                      `protobuf:"varint,3,opt,name=end_block,json=endBlock,proto3" json:"end_block,omitempty"`                                            // Optional: end at specific block (0 = latest)
+	TopContractsPerPeriod uint32                                      `protobuf:"varint,4,opt,name=top_contracts_per_period,json=topContractsPerPeriod,proto3" json:"top_contracts_per_period,omitempty"` // Top N contracts per time period (default 100)
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
 
-const file_state_analytics_proto_rawDesc = "" +
+func (x *GetStateGrowthByCategoryRequest) Reset() {
+	*x = GetStateGrowthByCategoryRequest{}
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetStateGrowthByCategoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetStateGrowthByCategoryRequest) ProtoMessage() {}
+
+func (x *GetStateGrowthByCategoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetStateGrowthByCategoryRequest.ProtoReflect.Descriptor instead.
+func (*GetStateGrowthByCategoryRequest) Descriptor() ([]byte, []int) {
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *GetStateGrowthByCategoryRequest) GetGranularity() GetStateGrowthByCategoryRequest_Granularity {
+	if x != nil {
+		return x.Granularity
+	}
+	return GetStateGrowthByCategoryRequest_GRANULARITY_UNSPECIFIED
+}
+
+func (x *GetStateGrowthByCategoryRequest) GetStartBlock() uint64 {
+	if x != nil {
+		return x.StartBlock
+	}
+	return 0
+}
+
+func (x *GetStateGrowthByCategoryRequest) GetEndBlock() uint64 {
+	if x != nil {
+		return x.EndBlock
+	}
+	return 0
+}
+
+func (x *GetStateGrowthByCategoryRequest) GetTopContractsPerPeriod() uint32 {
+	if x != nil {
+		return x.TopContractsPerPeriod
+	}
+	return 0
+}
+
+type GetStateGrowthByCategoryResponse struct {
+	state         protoimpl.MessageState      `protogen:"open.v1"`
+	TimeSeries    []*CategoryGrowthTimeSeries `protobuf:"bytes,1,rep,name=time_series,json=timeSeries,proto3" json:"time_series,omitempty"`
+	StartBlock    uint64                      `protobuf:"varint,2,opt,name=start_block,json=startBlock,proto3" json:"start_block,omitempty"`
+	EndBlock      uint64                      `protobuf:"varint,3,opt,name=end_block,json=endBlock,proto3" json:"end_block,omitempty"`
+	StartTime     *timestamppb.Timestamp      `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	EndTime       *timestamppb.Timestamp      `protobuf:"bytes,5,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetStateGrowthByCategoryResponse) Reset() {
+	*x = GetStateGrowthByCategoryResponse{}
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetStateGrowthByCategoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetStateGrowthByCategoryResponse) ProtoMessage() {}
+
+func (x *GetStateGrowthByCategoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetStateGrowthByCategoryResponse.ProtoReflect.Descriptor instead.
+func (*GetStateGrowthByCategoryResponse) Descriptor() ([]byte, []int) {
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *GetStateGrowthByCategoryResponse) GetTimeSeries() []*CategoryGrowthTimeSeries {
+	if x != nil {
+		return x.TimeSeries
+	}
+	return nil
+}
+
+func (x *GetStateGrowthByCategoryResponse) GetStartBlock() uint64 {
+	if x != nil {
+		return x.StartBlock
+	}
+	return 0
+}
+
+func (x *GetStateGrowthByCategoryResponse) GetEndBlock() uint64 {
+	if x != nil {
+		return x.EndBlock
+	}
+	return 0
+}
+
+func (x *GetStateGrowthByCategoryResponse) GetStartTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartTime
+	}
+	return nil
+}
+
+func (x *GetStateGrowthByCategoryResponse) GetEndTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndTime
+	}
+	return nil
+}
+
+type CategoryGrowthTimeSeries struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Timestamp     *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                         // Period timestamp (start of day/month/year)
+	BlockNumber   uint64                 `protobuf:"varint,2,opt,name=block_number,json=blockNumber,proto3" json:"block_number,omitempty"` // Representative block for this period
+	Categories    []*CategoryGrowthData  `protobuf:"bytes,3,rep,name=categories,proto3" json:"categories,omitempty"`
+	TotalNetSlots int64                  `protobuf:"varint,4,opt,name=total_net_slots,json=totalNetSlots,proto3" json:"total_net_slots,omitempty"` // Total across all categories
+	TotalNetBytes int64                  `protobuf:"varint,5,opt,name=total_net_bytes,json=totalNetBytes,proto3" json:"total_net_bytes,omitempty"` // Total bytes across all categories
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CategoryGrowthTimeSeries) Reset() {
+	*x = CategoryGrowthTimeSeries{}
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CategoryGrowthTimeSeries) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CategoryGrowthTimeSeries) ProtoMessage() {}
+
+func (x *CategoryGrowthTimeSeries) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CategoryGrowthTimeSeries.ProtoReflect.Descriptor instead.
+func (*CategoryGrowthTimeSeries) Descriptor() ([]byte, []int) {
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *CategoryGrowthTimeSeries) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *CategoryGrowthTimeSeries) GetBlockNumber() uint64 {
+	if x != nil {
+		return x.BlockNumber
+	}
+	return 0
+}
+
+func (x *CategoryGrowthTimeSeries) GetCategories() []*CategoryGrowthData {
+	if x != nil {
+		return x.Categories
+	}
+	return nil
+}
+
+func (x *CategoryGrowthTimeSeries) GetTotalNetSlots() int64 {
+	if x != nil {
+		return x.TotalNetSlots
+	}
+	return 0
+}
+
+func (x *CategoryGrowthTimeSeries) GetTotalNetBytes() int64 {
+	if x != nil {
+		return x.TotalNetBytes
+	}
+	return 0
+}
+
+type CategoryGrowthData struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Category           string                 `protobuf:"bytes,1,opt,name=category,proto3" json:"category,omitempty"`                                                   // "Other", "ERC-20", "DeFi", etc. (initially all "Other")
+	TopContracts       []*ContractGrowthData  `protobuf:"bytes,2,rep,name=top_contracts,json=topContracts,proto3" json:"top_contracts,omitempty"`                       // Top contributing contracts
+	NetSlotsAdded      int64                  `protobuf:"varint,3,opt,name=net_slots_added,json=netSlotsAdded,proto3" json:"net_slots_added,omitempty"`                 // Net slot change for this category in period
+	NetBytesAdded      int64                  `protobuf:"varint,4,opt,name=net_bytes_added,json=netBytesAdded,proto3" json:"net_bytes_added,omitempty"`                 // Net bytes change for this category in period
+	PercentageOfPeriod float64                `protobuf:"fixed64,5,opt,name=percentage_of_period,json=percentageOfPeriod,proto3" json:"percentage_of_period,omitempty"` // % of total growth in this period
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *CategoryGrowthData) Reset() {
+	*x = CategoryGrowthData{}
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CategoryGrowthData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CategoryGrowthData) ProtoMessage() {}
+
+func (x *CategoryGrowthData) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CategoryGrowthData.ProtoReflect.Descriptor instead.
+func (*CategoryGrowthData) Descriptor() ([]byte, []int) {
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *CategoryGrowthData) GetCategory() string {
+	if x != nil {
+		return x.Category
+	}
+	return ""
+}
+
+func (x *CategoryGrowthData) GetTopContracts() []*ContractGrowthData {
+	if x != nil {
+		return x.TopContracts
+	}
+	return nil
+}
+
+func (x *CategoryGrowthData) GetNetSlotsAdded() int64 {
+	if x != nil {
+		return x.NetSlotsAdded
+	}
+	return 0
+}
+
+func (x *CategoryGrowthData) GetNetBytesAdded() int64 {
+	if x != nil {
+		return x.NetBytesAdded
+	}
+	return 0
+}
+
+func (x *CategoryGrowthData) GetPercentageOfPeriod() float64 {
+	if x != nil {
+		return x.PercentageOfPeriod
+	}
+	return 0
+}
+
+type ContractGrowthData struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	Address              string                 `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	Label                string                 `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`                                         // Optional contract name
+	NetSlotsAdded        int64                  `protobuf:"varint,3,opt,name=net_slots_added,json=netSlotsAdded,proto3" json:"net_slots_added,omitempty"` // Can be negative if slots were cleared
+	NetBytesAdded        int64                  `protobuf:"varint,4,opt,name=net_bytes_added,json=netBytesAdded,proto3" json:"net_bytes_added,omitempty"`
+	PercentageOfCategory float64                `protobuf:"fixed64,5,opt,name=percentage_of_category,json=percentageOfCategory,proto3" json:"percentage_of_category,omitempty"` // % of category growth
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *ContractGrowthData) Reset() {
+	*x = ContractGrowthData{}
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ContractGrowthData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ContractGrowthData) ProtoMessage() {}
+
+func (x *ContractGrowthData) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ContractGrowthData.ProtoReflect.Descriptor instead.
+func (*ContractGrowthData) Descriptor() ([]byte, []int) {
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *ContractGrowthData) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *ContractGrowthData) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *ContractGrowthData) GetNetSlotsAdded() int64 {
+	if x != nil {
+		return x.NetSlotsAdded
+	}
+	return 0
+}
+
+func (x *ContractGrowthData) GetNetBytesAdded() int64 {
+	if x != nil {
+		return x.NetBytesAdded
+	}
+	return 0
+}
+
+func (x *ContractGrowthData) GetPercentageOfCategory() float64 {
+	if x != nil {
+		return x.PercentageOfCategory
+	}
+	return 0
+}
+
+var File_pkg_server_proto_state_analytics_state_analytics_proto protoreflect.FileDescriptor
+
+const file_pkg_server_proto_state_analytics_state_analytics_proto_rawDesc = "" +
 	"\n" +
-	"\x15state_analytics.proto\x12\x0fstate_analytics\x1a\x1fgoogle/protobuf/timestamp.proto\"\x1c\n" +
+	"6pkg/server/proto/state_analytics/state_analytics.proto\x12\x0fstate_analytics\x1a\x1fgoogle/protobuf/timestamp.proto\"\x1c\n" +
 	"\x1aGetLatestBlockDeltaRequest\"\xc8\x03\n" +
 	"\x1bGetLatestBlockDeltaResponse\x12!\n" +
 	"\fblock_number\x18\x01 \x01(\x04R\vblockNumber\x12C\n" +
@@ -2167,7 +2592,47 @@ const file_state_analytics_proto_rawDesc = "" +
 	"\bmetadata\x18\x05 \x03(\v2(.state_analytics.StateNode.MetadataEntryR\bmetadata\x1a;\n" +
 	"\rMetadataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x012\xd3\x06\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xec\x02\n" +
+	"\x1fGetStateGrowthByCategoryRequest\x12^\n" +
+	"\vgranularity\x18\x01 \x01(\x0e2<.state_analytics.GetStateGrowthByCategoryRequest.GranularityR\vgranularity\x12\x1f\n" +
+	"\vstart_block\x18\x02 \x01(\x04R\n" +
+	"startBlock\x12\x1b\n" +
+	"\tend_block\x18\x03 \x01(\x04R\bendBlock\x127\n" +
+	"\x18top_contracts_per_period\x18\x04 \x01(\rR\x15topContractsPerPeriod\"r\n" +
+	"\vGranularity\x12\x1b\n" +
+	"\x17GRANULARITY_UNSPECIFIED\x10\x00\x12\x15\n" +
+	"\x11GRANULARITY_DAILY\x10\x01\x12\x17\n" +
+	"\x13GRANULARITY_MONTHLY\x10\x02\x12\x16\n" +
+	"\x12GRANULARITY_YEARLY\x10\x03\"\x9e\x02\n" +
+	" GetStateGrowthByCategoryResponse\x12J\n" +
+	"\vtime_series\x18\x01 \x03(\v2).state_analytics.CategoryGrowthTimeSeriesR\n" +
+	"timeSeries\x12\x1f\n" +
+	"\vstart_block\x18\x02 \x01(\x04R\n" +
+	"startBlock\x12\x1b\n" +
+	"\tend_block\x18\x03 \x01(\x04R\bendBlock\x129\n" +
+	"\n" +
+	"start_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
+	"\bend_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\aendTime\"\x8c\x02\n" +
+	"\x18CategoryGrowthTimeSeries\x128\n" +
+	"\ttimestamp\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12!\n" +
+	"\fblock_number\x18\x02 \x01(\x04R\vblockNumber\x12C\n" +
+	"\n" +
+	"categories\x18\x03 \x03(\v2#.state_analytics.CategoryGrowthDataR\n" +
+	"categories\x12&\n" +
+	"\x0ftotal_net_slots\x18\x04 \x01(\x03R\rtotalNetSlots\x12&\n" +
+	"\x0ftotal_net_bytes\x18\x05 \x01(\x03R\rtotalNetBytes\"\xfc\x01\n" +
+	"\x12CategoryGrowthData\x12\x1a\n" +
+	"\bcategory\x18\x01 \x01(\tR\bcategory\x12H\n" +
+	"\rtop_contracts\x18\x02 \x03(\v2#.state_analytics.ContractGrowthDataR\ftopContracts\x12&\n" +
+	"\x0fnet_slots_added\x18\x03 \x01(\x03R\rnetSlotsAdded\x12&\n" +
+	"\x0fnet_bytes_added\x18\x04 \x01(\x03R\rnetBytesAdded\x120\n" +
+	"\x14percentage_of_period\x18\x05 \x01(\x01R\x12percentageOfPeriod\"\xca\x01\n" +
+	"\x12ContractGrowthData\x12\x18\n" +
+	"\aaddress\x18\x01 \x01(\tR\aaddress\x12\x14\n" +
+	"\x05label\x18\x02 \x01(\tR\x05label\x12&\n" +
+	"\x0fnet_slots_added\x18\x03 \x01(\x03R\rnetSlotsAdded\x12&\n" +
+	"\x0fnet_bytes_added\x18\x04 \x01(\x03R\rnetBytesAdded\x124\n" +
+	"\x16percentage_of_category\x18\x05 \x01(\x01R\x14percentageOfCategory2\xd4\a\n" +
 	"\x0eStateAnalytics\x12p\n" +
 	"\x13GetLatestBlockDelta\x12+.state_analytics.GetLatestBlockDeltaRequest\x1a,.state_analytics.GetLatestBlockDeltaResponse\x12j\n" +
 	"\x11GetTopStateAdders\x12).state_analytics.GetTopStateAddersRequest\x1a*.state_analytics.GetTopStateAddersResponse\x12p\n" +
@@ -2175,120 +2640,136 @@ const file_state_analytics_proto_rawDesc = "" +
 	"\x13GetStateGrowthChart\x12+.state_analytics.GetStateGrowthChartRequest\x1a,.state_analytics.GetStateGrowthChartResponse\x12\x7f\n" +
 	"\x18GetContractStateActivity\x120.state_analytics.GetContractStateActivityRequest\x1a1.state_analytics.GetContractStateActivityResponse\x12\x88\x01\n" +
 	"\x1bGetContractStateComposition\x123.state_analytics.GetContractStateCompositionRequest\x1a4.state_analytics.GetContractStateCompositionResponse\x12s\n" +
-	"\x14GetHierarchicalState\x12,.state_analytics.GetHierarchicalStateRequest\x1a-.state_analytics.GetHierarchicalStateResponseBEZCgithub.com/ethpandaops/lab/backend/pkg/server/proto/state_analyticsb\x06proto3"
+	"\x14GetHierarchicalState\x12,.state_analytics.GetHierarchicalStateRequest\x1a-.state_analytics.GetHierarchicalStateResponse\x12\x7f\n" +
+	"\x18GetStateGrowthByCategory\x120.state_analytics.GetStateGrowthByCategoryRequest\x1a1.state_analytics.GetStateGrowthByCategoryResponseBEZCgithub.com/ethpandaops/lab/backend/pkg/server/proto/state_analyticsb\x06proto3"
 
 var (
-	file_state_analytics_proto_rawDescOnce sync.Once
-	file_state_analytics_proto_rawDescData []byte
+	file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescOnce sync.Once
+	file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescData []byte
 )
 
-func file_state_analytics_proto_rawDescGZIP() []byte {
-	file_state_analytics_proto_rawDescOnce.Do(func() {
-		file_state_analytics_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_state_analytics_proto_rawDesc), len(file_state_analytics_proto_rawDesc)))
+func file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescGZIP() []byte {
+	file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescOnce.Do(func() {
+		file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_pkg_server_proto_state_analytics_state_analytics_proto_rawDesc), len(file_pkg_server_proto_state_analytics_state_analytics_proto_rawDesc)))
 	})
-	return file_state_analytics_proto_rawDescData
+	return file_pkg_server_proto_state_analytics_state_analytics_proto_rawDescData
 }
 
-var file_state_analytics_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
-var file_state_analytics_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
-var file_state_analytics_proto_goTypes = []any{
-	(GetTopStateAddersRequest_Period)(0),        // 0: state_analytics.GetTopStateAddersRequest.Period
-	(GetTopStateRemoversRequest_Period)(0),      // 1: state_analytics.GetTopStateRemoversRequest.Period
-	(GetStateGrowthChartRequest_Period)(0),      // 2: state_analytics.GetStateGrowthChartRequest.Period
-	(GetStateGrowthChartRequest_Granularity)(0), // 3: state_analytics.GetStateGrowthChartRequest.Granularity
-	(ContractStateEvent_EventType)(0),           // 4: state_analytics.ContractStateEvent.EventType
-	(*GetLatestBlockDeltaRequest)(nil),          // 5: state_analytics.GetLatestBlockDeltaRequest
-	(*GetLatestBlockDeltaResponse)(nil),         // 6: state_analytics.GetLatestBlockDeltaResponse
-	(*ContractStateDelta)(nil),                  // 7: state_analytics.ContractStateDelta
-	(*GetTopStateAddersRequest)(nil),            // 8: state_analytics.GetTopStateAddersRequest
-	(*GetTopStateAddersResponse)(nil),           // 9: state_analytics.GetTopStateAddersResponse
-	(*StateAdder)(nil),                          // 10: state_analytics.StateAdder
-	(*GetTopStateRemoversRequest)(nil),          // 11: state_analytics.GetTopStateRemoversRequest
-	(*GetTopStateRemoversResponse)(nil),         // 12: state_analytics.GetTopStateRemoversResponse
-	(*StateRemover)(nil),                        // 13: state_analytics.StateRemover
-	(*GetStateGrowthChartRequest)(nil),          // 14: state_analytics.GetStateGrowthChartRequest
-	(*GetStateGrowthChartResponse)(nil),         // 15: state_analytics.GetStateGrowthChartResponse
-	(*StateGrowthDataPoint)(nil),                // 16: state_analytics.StateGrowthDataPoint
-	(*StateSummary)(nil),                        // 17: state_analytics.StateSummary
-	(*GetContractStateActivityRequest)(nil),     // 18: state_analytics.GetContractStateActivityRequest
-	(*GetContractStateActivityResponse)(nil),    // 19: state_analytics.GetContractStateActivityResponse
-	(*ContractStateMetrics)(nil),                // 20: state_analytics.ContractStateMetrics
-	(*ContractStateEvent)(nil),                  // 21: state_analytics.ContractStateEvent
-	(*GetContractStateCompositionRequest)(nil),  // 22: state_analytics.GetContractStateCompositionRequest
-	(*GetContractStateCompositionResponse)(nil), // 23: state_analytics.GetContractStateCompositionResponse
-	(*ContractStateEntry)(nil),                  // 24: state_analytics.ContractStateEntry
-	(*ContractState)(nil),                       // 25: state_analytics.ContractState
-	(*GetHierarchicalStateRequest)(nil),         // 26: state_analytics.GetHierarchicalStateRequest
-	(*GetHierarchicalStateResponse)(nil),        // 27: state_analytics.GetHierarchicalStateResponse
-	(*StateNode)(nil),                           // 28: state_analytics.StateNode
-	nil,                                         // 29: state_analytics.StateNode.MetadataEntry
-	(*timestamppb.Timestamp)(nil),               // 30: google.protobuf.Timestamp
+var file_pkg_server_proto_state_analytics_state_analytics_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
+var file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
+var file_pkg_server_proto_state_analytics_state_analytics_proto_goTypes = []any{
+	(GetTopStateAddersRequest_Period)(0),             // 0: state_analytics.GetTopStateAddersRequest.Period
+	(GetTopStateRemoversRequest_Period)(0),           // 1: state_analytics.GetTopStateRemoversRequest.Period
+	(GetStateGrowthChartRequest_Period)(0),           // 2: state_analytics.GetStateGrowthChartRequest.Period
+	(GetStateGrowthChartRequest_Granularity)(0),      // 3: state_analytics.GetStateGrowthChartRequest.Granularity
+	(ContractStateEvent_EventType)(0),                // 4: state_analytics.ContractStateEvent.EventType
+	(GetStateGrowthByCategoryRequest_Granularity)(0), // 5: state_analytics.GetStateGrowthByCategoryRequest.Granularity
+	(*GetLatestBlockDeltaRequest)(nil),               // 6: state_analytics.GetLatestBlockDeltaRequest
+	(*GetLatestBlockDeltaResponse)(nil),              // 7: state_analytics.GetLatestBlockDeltaResponse
+	(*ContractStateDelta)(nil),                       // 8: state_analytics.ContractStateDelta
+	(*GetTopStateAddersRequest)(nil),                 // 9: state_analytics.GetTopStateAddersRequest
+	(*GetTopStateAddersResponse)(nil),                // 10: state_analytics.GetTopStateAddersResponse
+	(*StateAdder)(nil),                               // 11: state_analytics.StateAdder
+	(*GetTopStateRemoversRequest)(nil),               // 12: state_analytics.GetTopStateRemoversRequest
+	(*GetTopStateRemoversResponse)(nil),              // 13: state_analytics.GetTopStateRemoversResponse
+	(*StateRemover)(nil),                             // 14: state_analytics.StateRemover
+	(*GetStateGrowthChartRequest)(nil),               // 15: state_analytics.GetStateGrowthChartRequest
+	(*GetStateGrowthChartResponse)(nil),              // 16: state_analytics.GetStateGrowthChartResponse
+	(*StateGrowthDataPoint)(nil),                     // 17: state_analytics.StateGrowthDataPoint
+	(*StateSummary)(nil),                             // 18: state_analytics.StateSummary
+	(*GetContractStateActivityRequest)(nil),          // 19: state_analytics.GetContractStateActivityRequest
+	(*GetContractStateActivityResponse)(nil),         // 20: state_analytics.GetContractStateActivityResponse
+	(*ContractStateMetrics)(nil),                     // 21: state_analytics.ContractStateMetrics
+	(*ContractStateEvent)(nil),                       // 22: state_analytics.ContractStateEvent
+	(*GetContractStateCompositionRequest)(nil),       // 23: state_analytics.GetContractStateCompositionRequest
+	(*GetContractStateCompositionResponse)(nil),      // 24: state_analytics.GetContractStateCompositionResponse
+	(*ContractStateEntry)(nil),                       // 25: state_analytics.ContractStateEntry
+	(*ContractState)(nil),                            // 26: state_analytics.ContractState
+	(*GetHierarchicalStateRequest)(nil),              // 27: state_analytics.GetHierarchicalStateRequest
+	(*GetHierarchicalStateResponse)(nil),             // 28: state_analytics.GetHierarchicalStateResponse
+	(*StateNode)(nil),                                // 29: state_analytics.StateNode
+	(*GetStateGrowthByCategoryRequest)(nil),          // 30: state_analytics.GetStateGrowthByCategoryRequest
+	(*GetStateGrowthByCategoryResponse)(nil),         // 31: state_analytics.GetStateGrowthByCategoryResponse
+	(*CategoryGrowthTimeSeries)(nil),                 // 32: state_analytics.CategoryGrowthTimeSeries
+	(*CategoryGrowthData)(nil),                       // 33: state_analytics.CategoryGrowthData
+	(*ContractGrowthData)(nil),                       // 34: state_analytics.ContractGrowthData
+	nil,                                              // 35: state_analytics.StateNode.MetadataEntry
+	(*timestamppb.Timestamp)(nil),                    // 36: google.protobuf.Timestamp
 }
-var file_state_analytics_proto_depIdxs = []int32{
-	30, // 0: state_analytics.GetLatestBlockDeltaResponse.block_timestamp:type_name -> google.protobuf.Timestamp
-	7,  // 1: state_analytics.GetLatestBlockDeltaResponse.top_contributors:type_name -> state_analytics.ContractStateDelta
+var file_pkg_server_proto_state_analytics_state_analytics_proto_depIdxs = []int32{
+	36, // 0: state_analytics.GetLatestBlockDeltaResponse.block_timestamp:type_name -> google.protobuf.Timestamp
+	8,  // 1: state_analytics.GetLatestBlockDeltaResponse.top_contributors:type_name -> state_analytics.ContractStateDelta
 	0,  // 2: state_analytics.GetTopStateAddersRequest.period:type_name -> state_analytics.GetTopStateAddersRequest.Period
-	10, // 3: state_analytics.GetTopStateAddersResponse.adders:type_name -> state_analytics.StateAdder
+	11, // 3: state_analytics.GetTopStateAddersResponse.adders:type_name -> state_analytics.StateAdder
 	1,  // 4: state_analytics.GetTopStateRemoversRequest.period:type_name -> state_analytics.GetTopStateRemoversRequest.Period
-	13, // 5: state_analytics.GetTopStateRemoversResponse.removers:type_name -> state_analytics.StateRemover
+	14, // 5: state_analytics.GetTopStateRemoversResponse.removers:type_name -> state_analytics.StateRemover
 	2,  // 6: state_analytics.GetStateGrowthChartRequest.period:type_name -> state_analytics.GetStateGrowthChartRequest.Period
 	3,  // 7: state_analytics.GetStateGrowthChartRequest.granularity:type_name -> state_analytics.GetStateGrowthChartRequest.Granularity
-	16, // 8: state_analytics.GetStateGrowthChartResponse.data_points:type_name -> state_analytics.StateGrowthDataPoint
-	17, // 9: state_analytics.GetStateGrowthChartResponse.summary:type_name -> state_analytics.StateSummary
-	30, // 10: state_analytics.StateGrowthDataPoint.timestamp:type_name -> google.protobuf.Timestamp
-	20, // 11: state_analytics.GetContractStateActivityResponse.metrics:type_name -> state_analytics.ContractStateMetrics
-	21, // 12: state_analytics.GetContractStateActivityResponse.recent_events:type_name -> state_analytics.ContractStateEvent
-	30, // 13: state_analytics.ContractStateEvent.timestamp:type_name -> google.protobuf.Timestamp
+	17, // 8: state_analytics.GetStateGrowthChartResponse.data_points:type_name -> state_analytics.StateGrowthDataPoint
+	18, // 9: state_analytics.GetStateGrowthChartResponse.summary:type_name -> state_analytics.StateSummary
+	36, // 10: state_analytics.StateGrowthDataPoint.timestamp:type_name -> google.protobuf.Timestamp
+	21, // 11: state_analytics.GetContractStateActivityResponse.metrics:type_name -> state_analytics.ContractStateMetrics
+	22, // 12: state_analytics.GetContractStateActivityResponse.recent_events:type_name -> state_analytics.ContractStateEvent
+	36, // 13: state_analytics.ContractStateEvent.timestamp:type_name -> google.protobuf.Timestamp
 	4,  // 14: state_analytics.ContractStateEvent.event_type:type_name -> state_analytics.ContractStateEvent.EventType
-	24, // 15: state_analytics.GetContractStateCompositionResponse.contracts:type_name -> state_analytics.ContractStateEntry
-	30, // 16: state_analytics.GetContractStateCompositionResponse.timestamp:type_name -> google.protobuf.Timestamp
-	25, // 17: state_analytics.ContractStateEntry.state:type_name -> state_analytics.ContractState
-	28, // 18: state_analytics.GetHierarchicalStateResponse.root:type_name -> state_analytics.StateNode
-	30, // 19: state_analytics.GetHierarchicalStateResponse.timestamp:type_name -> google.protobuf.Timestamp
-	28, // 20: state_analytics.StateNode.children:type_name -> state_analytics.StateNode
-	29, // 21: state_analytics.StateNode.metadata:type_name -> state_analytics.StateNode.MetadataEntry
-	5,  // 22: state_analytics.StateAnalytics.GetLatestBlockDelta:input_type -> state_analytics.GetLatestBlockDeltaRequest
-	8,  // 23: state_analytics.StateAnalytics.GetTopStateAdders:input_type -> state_analytics.GetTopStateAddersRequest
-	11, // 24: state_analytics.StateAnalytics.GetTopStateRemovers:input_type -> state_analytics.GetTopStateRemoversRequest
-	14, // 25: state_analytics.StateAnalytics.GetStateGrowthChart:input_type -> state_analytics.GetStateGrowthChartRequest
-	18, // 26: state_analytics.StateAnalytics.GetContractStateActivity:input_type -> state_analytics.GetContractStateActivityRequest
-	22, // 27: state_analytics.StateAnalytics.GetContractStateComposition:input_type -> state_analytics.GetContractStateCompositionRequest
-	26, // 28: state_analytics.StateAnalytics.GetHierarchicalState:input_type -> state_analytics.GetHierarchicalStateRequest
-	6,  // 29: state_analytics.StateAnalytics.GetLatestBlockDelta:output_type -> state_analytics.GetLatestBlockDeltaResponse
-	9,  // 30: state_analytics.StateAnalytics.GetTopStateAdders:output_type -> state_analytics.GetTopStateAddersResponse
-	12, // 31: state_analytics.StateAnalytics.GetTopStateRemovers:output_type -> state_analytics.GetTopStateRemoversResponse
-	15, // 32: state_analytics.StateAnalytics.GetStateGrowthChart:output_type -> state_analytics.GetStateGrowthChartResponse
-	19, // 33: state_analytics.StateAnalytics.GetContractStateActivity:output_type -> state_analytics.GetContractStateActivityResponse
-	23, // 34: state_analytics.StateAnalytics.GetContractStateComposition:output_type -> state_analytics.GetContractStateCompositionResponse
-	27, // 35: state_analytics.StateAnalytics.GetHierarchicalState:output_type -> state_analytics.GetHierarchicalStateResponse
-	29, // [29:36] is the sub-list for method output_type
-	22, // [22:29] is the sub-list for method input_type
-	22, // [22:22] is the sub-list for extension type_name
-	22, // [22:22] is the sub-list for extension extendee
-	0,  // [0:22] is the sub-list for field type_name
+	25, // 15: state_analytics.GetContractStateCompositionResponse.contracts:type_name -> state_analytics.ContractStateEntry
+	36, // 16: state_analytics.GetContractStateCompositionResponse.timestamp:type_name -> google.protobuf.Timestamp
+	26, // 17: state_analytics.ContractStateEntry.state:type_name -> state_analytics.ContractState
+	29, // 18: state_analytics.GetHierarchicalStateResponse.root:type_name -> state_analytics.StateNode
+	36, // 19: state_analytics.GetHierarchicalStateResponse.timestamp:type_name -> google.protobuf.Timestamp
+	29, // 20: state_analytics.StateNode.children:type_name -> state_analytics.StateNode
+	35, // 21: state_analytics.StateNode.metadata:type_name -> state_analytics.StateNode.MetadataEntry
+	5,  // 22: state_analytics.GetStateGrowthByCategoryRequest.granularity:type_name -> state_analytics.GetStateGrowthByCategoryRequest.Granularity
+	32, // 23: state_analytics.GetStateGrowthByCategoryResponse.time_series:type_name -> state_analytics.CategoryGrowthTimeSeries
+	36, // 24: state_analytics.GetStateGrowthByCategoryResponse.start_time:type_name -> google.protobuf.Timestamp
+	36, // 25: state_analytics.GetStateGrowthByCategoryResponse.end_time:type_name -> google.protobuf.Timestamp
+	36, // 26: state_analytics.CategoryGrowthTimeSeries.timestamp:type_name -> google.protobuf.Timestamp
+	33, // 27: state_analytics.CategoryGrowthTimeSeries.categories:type_name -> state_analytics.CategoryGrowthData
+	34, // 28: state_analytics.CategoryGrowthData.top_contracts:type_name -> state_analytics.ContractGrowthData
+	6,  // 29: state_analytics.StateAnalytics.GetLatestBlockDelta:input_type -> state_analytics.GetLatestBlockDeltaRequest
+	9,  // 30: state_analytics.StateAnalytics.GetTopStateAdders:input_type -> state_analytics.GetTopStateAddersRequest
+	12, // 31: state_analytics.StateAnalytics.GetTopStateRemovers:input_type -> state_analytics.GetTopStateRemoversRequest
+	15, // 32: state_analytics.StateAnalytics.GetStateGrowthChart:input_type -> state_analytics.GetStateGrowthChartRequest
+	19, // 33: state_analytics.StateAnalytics.GetContractStateActivity:input_type -> state_analytics.GetContractStateActivityRequest
+	23, // 34: state_analytics.StateAnalytics.GetContractStateComposition:input_type -> state_analytics.GetContractStateCompositionRequest
+	27, // 35: state_analytics.StateAnalytics.GetHierarchicalState:input_type -> state_analytics.GetHierarchicalStateRequest
+	30, // 36: state_analytics.StateAnalytics.GetStateGrowthByCategory:input_type -> state_analytics.GetStateGrowthByCategoryRequest
+	7,  // 37: state_analytics.StateAnalytics.GetLatestBlockDelta:output_type -> state_analytics.GetLatestBlockDeltaResponse
+	10, // 38: state_analytics.StateAnalytics.GetTopStateAdders:output_type -> state_analytics.GetTopStateAddersResponse
+	13, // 39: state_analytics.StateAnalytics.GetTopStateRemovers:output_type -> state_analytics.GetTopStateRemoversResponse
+	16, // 40: state_analytics.StateAnalytics.GetStateGrowthChart:output_type -> state_analytics.GetStateGrowthChartResponse
+	20, // 41: state_analytics.StateAnalytics.GetContractStateActivity:output_type -> state_analytics.GetContractStateActivityResponse
+	24, // 42: state_analytics.StateAnalytics.GetContractStateComposition:output_type -> state_analytics.GetContractStateCompositionResponse
+	28, // 43: state_analytics.StateAnalytics.GetHierarchicalState:output_type -> state_analytics.GetHierarchicalStateResponse
+	31, // 44: state_analytics.StateAnalytics.GetStateGrowthByCategory:output_type -> state_analytics.GetStateGrowthByCategoryResponse
+	37, // [37:45] is the sub-list for method output_type
+	29, // [29:37] is the sub-list for method input_type
+	29, // [29:29] is the sub-list for extension type_name
+	29, // [29:29] is the sub-list for extension extendee
+	0,  // [0:29] is the sub-list for field type_name
 }
 
-func init() { file_state_analytics_proto_init() }
-func file_state_analytics_proto_init() {
-	if File_state_analytics_proto != nil {
+func init() { file_pkg_server_proto_state_analytics_state_analytics_proto_init() }
+func file_pkg_server_proto_state_analytics_state_analytics_proto_init() {
+	if File_pkg_server_proto_state_analytics_state_analytics_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_state_analytics_proto_rawDesc), len(file_state_analytics_proto_rawDesc)),
-			NumEnums:      5,
-			NumMessages:   25,
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_pkg_server_proto_state_analytics_state_analytics_proto_rawDesc), len(file_pkg_server_proto_state_analytics_state_analytics_proto_rawDesc)),
+			NumEnums:      6,
+			NumMessages:   30,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_state_analytics_proto_goTypes,
-		DependencyIndexes: file_state_analytics_proto_depIdxs,
-		EnumInfos:         file_state_analytics_proto_enumTypes,
-		MessageInfos:      file_state_analytics_proto_msgTypes,
+		GoTypes:           file_pkg_server_proto_state_analytics_state_analytics_proto_goTypes,
+		DependencyIndexes: file_pkg_server_proto_state_analytics_state_analytics_proto_depIdxs,
+		EnumInfos:         file_pkg_server_proto_state_analytics_state_analytics_proto_enumTypes,
+		MessageInfos:      file_pkg_server_proto_state_analytics_state_analytics_proto_msgTypes,
 	}.Build()
-	File_state_analytics_proto = out.File
-	file_state_analytics_proto_goTypes = nil
-	file_state_analytics_proto_depIdxs = nil
+	File_pkg_server_proto_state_analytics_state_analytics_proto = out.File
+	file_pkg_server_proto_state_analytics_state_analytics_proto_goTypes = nil
+	file_pkg_server_proto_state_analytics_state_analytics_proto_depIdxs = nil
 }

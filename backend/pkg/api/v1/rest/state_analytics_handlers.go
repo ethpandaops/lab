@@ -287,3 +287,48 @@ func parseUint64(value string, defaultValue uint64) uint64 {
 
 	return parsed
 }
+
+// handleStateGrowthByCategory returns time-series state growth data categorized by contract type
+func (r *PublicRouter) handleStateGrowthByCategory(w http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	network := vars["network"]
+
+	// Parse query parameters
+	queryParams := req.URL.Query()
+	granularity := parseCategoryGranularity(queryParams.Get("granularity"))
+	startBlock := parseUint64(queryParams.Get("start_block"), 0)
+	endBlock := parseUint64(queryParams.Get("end_block"), 0)
+	topContracts := parseLimit(queryParams.Get("top_contracts"), 100)
+
+	// Add network to gRPC metadata
+	ctx := metadata.NewOutgoingContext(req.Context(), metadata.Pairs("network", network))
+
+	// Call gRPC service
+	resp, err := r.stateAnalyticsClient.GetStateGrowthByCategory(ctx, &state_analytics_pb.GetStateGrowthByCategoryRequest{
+		Granularity:           granularity,
+		StartBlock:            startBlock,
+		EndBlock:              endBlock,
+		TopContractsPerPeriod: topContracts,
+	})
+	if err != nil {
+		r.HandleGRPCError(w, req, err)
+		return
+	}
+
+	r.WriteJSONResponseOK(w, req, resp)
+}
+
+// parseCategoryGranularity parses granularity query parameter for category growth
+func parseCategoryGranularity(value string) state_analytics_pb.GetStateGrowthByCategoryRequest_Granularity {
+	switch value {
+	case "daily", "GRANULARITY_DAILY":
+		return state_analytics_pb.GetStateGrowthByCategoryRequest_GRANULARITY_DAILY
+	case "monthly", "GRANULARITY_MONTHLY":
+		return state_analytics_pb.GetStateGrowthByCategoryRequest_GRANULARITY_MONTHLY
+	case "yearly", "GRANULARITY_YEARLY":
+		return state_analytics_pb.GetStateGrowthByCategoryRequest_GRANULARITY_YEARLY
+	default:
+		// Default to monthly (Paradigm Figure 3 style)
+		return state_analytics_pb.GetStateGrowthByCategoryRequest_GRANULARITY_MONTHLY
+	}
+}

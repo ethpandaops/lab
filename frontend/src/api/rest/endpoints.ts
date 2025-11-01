@@ -43,6 +43,7 @@ export const API_V1_ENDPOINTS = {
     `/api/v1/${network}/state/contract/${address}`,
   stateComposition: (network: string) => `/api/v1/${network}/state/composition`,
   stateHierarchical: (network: string) => `/api/v1/${network}/state/hierarchical`,
+  stateGrowthByCategory: (network: string) => `/api/v1/${network}/state/growth-by-category`,
 };
 
 /**

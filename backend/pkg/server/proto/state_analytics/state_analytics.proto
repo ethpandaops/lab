@@ -28,6 +28,9 @@ service StateAnalytics {
 
   // GetHierarchicalState returns state organized hierarchically by category -> protocol -> contract
   rpc GetHierarchicalState(GetHierarchicalStateRequest) returns (GetHierarchicalStateResponse);
+
+  // GetStateGrowthByCategory returns time-series state growth data categorized by contract type
+  rpc GetStateGrowthByCategory(GetStateGrowthByCategoryRequest) returns (GetStateGrowthByCategoryResponse);
 }
 
 // Request/Response messages for GetLatestBlockDelta
@@ -244,4 +247,51 @@ message StateNode {
   uint64 size_bytes = 3;             // Total size of this node and children
   repeated StateNode children = 4;   // Child nodes
   map<string, string> metadata = 5;  // Additional data (address, color, etc.)
+}
+
+// Request/Response for GetStateGrowthByCategory (Paradigm Figures 2 & 3)
+message GetStateGrowthByCategoryRequest {
+  enum Granularity {
+    GRANULARITY_UNSPECIFIED = 0;
+    GRANULARITY_DAILY = 1;    // Daily state growth (like Figure 3 but daily)
+    GRANULARITY_MONTHLY = 2;  // Monthly state growth (Paradigm Figure 3)
+    GRANULARITY_YEARLY = 3;   // Yearly aggregates
+  }
+  Granularity granularity = 1;
+
+  uint64 start_block = 2;          // Optional: start from specific block (0 = genesis)
+  uint64 end_block = 3;            // Optional: end at specific block (0 = latest)
+  uint32 top_contracts_per_period = 4;  // Top N contracts per time period (default 100)
+}
+
+message GetStateGrowthByCategoryResponse {
+  repeated CategoryGrowthTimeSeries time_series = 1;
+  uint64 start_block = 2;
+  uint64 end_block = 3;
+  google.protobuf.Timestamp start_time = 4;
+  google.protobuf.Timestamp end_time = 5;
+}
+
+message CategoryGrowthTimeSeries {
+  google.protobuf.Timestamp timestamp = 1;  // Period timestamp (start of day/month/year)
+  uint64 block_number = 2;                  // Representative block for this period
+  repeated CategoryGrowthData categories = 3;
+  int64 total_net_slots = 4;                // Total across all categories
+  int64 total_net_bytes = 5;                // Total bytes across all categories
+}
+
+message CategoryGrowthData {
+  string category = 1;              // "Other", "ERC-20", "DeFi", etc. (initially all "Other")
+  repeated ContractGrowthData top_contracts = 2;  // Top contributing contracts
+  int64 net_slots_added = 3;        // Net slot change for this category in period
+  int64 net_bytes_added = 4;        // Net bytes change for this category in period
+  double percentage_of_period = 5;  // % of total growth in this period
+}
+
+message ContractGrowthData {
+  string address = 1;
+  string label = 2;                 // Optional contract name
+  int64 net_slots_added = 3;        // Can be negative if slots were cleared
+  int64 net_bytes_added = 4;
+  double percentage_of_category = 5;  // % of category growth
 }

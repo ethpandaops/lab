@@ -17,6 +17,8 @@ import (
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 )
 
 // Common query parameter names used across REST API handlers
@@ -74,22 +76,40 @@ func (r *PublicRouter) HandleGRPCError(w http.ResponseWriter, req *http.Request,
 
 // WriteJSONResponse safely writes a JSON response, handling encoding errors properly.
 func (r *PublicRouter) WriteJSONResponse(w http.ResponseWriter, req *http.Request, statusCode int, response interface{}) {
-	// Buffer the response first to catch encoding errors.
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
-		// Encoding failed - we haven't written anything yet, so we can send an error
-		r.log.WithError(err).WithField("type", response).Error("Failed to encode response")
-		r.HandleGRPCError(w, req, err)
+	var jsonBytes []byte
+	var err error
 
-		return
+	// Check if response is a protobuf message
+	if msg, ok := response.(proto.Message); ok {
+		// Use protojson for protobuf messages to properly serialize timestamps
+		marshaler := protojson.MarshalOptions{
+			UseProtoNames:   true,  // Use proto field names (snake_case)
+			EmitUnpopulated: false, // Don't emit zero values
+		}
+		jsonBytes, err = marshaler.Marshal(msg)
+		if err != nil {
+			r.log.WithError(err).WithField("type", response).Error("Failed to marshal protobuf response")
+			r.HandleGRPCError(w, req, err)
+			return
+		}
+	} else {
+		// Use standard JSON encoding for non-protobuf responses
+		var buf bytes.Buffer
+		if err := json.NewEncoder(&buf).Encode(response); err != nil {
+			// Encoding failed - we haven't written anything yet, so we can send an error
+			r.log.WithError(err).WithField("type", response).Error("Failed to encode response")
+			r.HandleGRPCError(w, req, err)
+			return
+		}
+		jsonBytes = buf.Bytes()
 	}
 
 	// Set headers only after successful encoding.
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 
-	// Write the buffered response
-	if _, err := w.Write(buf.Bytes()); err != nil {
+	// Write the response
+	if _, err := w.Write(jsonBytes); err != nil {
 		// Headers sent at this point, client disconnected most likely.
 		r.log.WithError(err).Debug("Failed to write response")
 	}

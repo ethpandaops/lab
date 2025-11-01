@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.29.3
-// source: state_analytics.proto
+// source: pkg/server/proto/state_analytics/state_analytics.proto
 
 package state_analytics
 
@@ -26,6 +26,7 @@ const (
 	StateAnalytics_GetContractStateActivity_FullMethodName    = "/state_analytics.StateAnalytics/GetContractStateActivity"
 	StateAnalytics_GetContractStateComposition_FullMethodName = "/state_analytics.StateAnalytics/GetContractStateComposition"
 	StateAnalytics_GetHierarchicalState_FullMethodName        = "/state_analytics.StateAnalytics/GetHierarchicalState"
+	StateAnalytics_GetStateGrowthByCategory_FullMethodName    = "/state_analytics.StateAnalytics/GetStateGrowthByCategory"
 )
 
 // StateAnalyticsClient is the client API for StateAnalytics service.
@@ -48,6 +49,8 @@ type StateAnalyticsClient interface {
 	GetContractStateComposition(ctx context.Context, in *GetContractStateCompositionRequest, opts ...grpc.CallOption) (*GetContractStateCompositionResponse, error)
 	// GetHierarchicalState returns state organized hierarchically by category -> protocol -> contract
 	GetHierarchicalState(ctx context.Context, in *GetHierarchicalStateRequest, opts ...grpc.CallOption) (*GetHierarchicalStateResponse, error)
+	// GetStateGrowthByCategory returns time-series state growth data categorized by contract type
+	GetStateGrowthByCategory(ctx context.Context, in *GetStateGrowthByCategoryRequest, opts ...grpc.CallOption) (*GetStateGrowthByCategoryResponse, error)
 }
 
 type stateAnalyticsClient struct {
@@ -128,6 +131,16 @@ func (c *stateAnalyticsClient) GetHierarchicalState(ctx context.Context, in *Get
 	return out, nil
 }
 
+func (c *stateAnalyticsClient) GetStateGrowthByCategory(ctx context.Context, in *GetStateGrowthByCategoryRequest, opts ...grpc.CallOption) (*GetStateGrowthByCategoryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetStateGrowthByCategoryResponse)
+	err := c.cc.Invoke(ctx, StateAnalytics_GetStateGrowthByCategory_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StateAnalyticsServer is the server API for StateAnalytics service.
 // All implementations must embed UnimplementedStateAnalyticsServer
 // for forward compatibility.
@@ -148,6 +161,8 @@ type StateAnalyticsServer interface {
 	GetContractStateComposition(context.Context, *GetContractStateCompositionRequest) (*GetContractStateCompositionResponse, error)
 	// GetHierarchicalState returns state organized hierarchically by category -> protocol -> contract
 	GetHierarchicalState(context.Context, *GetHierarchicalStateRequest) (*GetHierarchicalStateResponse, error)
+	// GetStateGrowthByCategory returns time-series state growth data categorized by contract type
+	GetStateGrowthByCategory(context.Context, *GetStateGrowthByCategoryRequest) (*GetStateGrowthByCategoryResponse, error)
 	mustEmbedUnimplementedStateAnalyticsServer()
 }
 
@@ -178,6 +193,9 @@ func (UnimplementedStateAnalyticsServer) GetContractStateComposition(context.Con
 }
 func (UnimplementedStateAnalyticsServer) GetHierarchicalState(context.Context, *GetHierarchicalStateRequest) (*GetHierarchicalStateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetHierarchicalState not implemented")
+}
+func (UnimplementedStateAnalyticsServer) GetStateGrowthByCategory(context.Context, *GetStateGrowthByCategoryRequest) (*GetStateGrowthByCategoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStateGrowthByCategory not implemented")
 }
 func (UnimplementedStateAnalyticsServer) mustEmbedUnimplementedStateAnalyticsServer() {}
 func (UnimplementedStateAnalyticsServer) testEmbeddedByValue()                        {}
@@ -326,6 +344,24 @@ func _StateAnalytics_GetHierarchicalState_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StateAnalytics_GetStateGrowthByCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetStateGrowthByCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateAnalyticsServer).GetStateGrowthByCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StateAnalytics_GetStateGrowthByCategory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateAnalyticsServer).GetStateGrowthByCategory(ctx, req.(*GetStateGrowthByCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // StateAnalytics_ServiceDesc is the grpc.ServiceDesc for StateAnalytics service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -361,7 +397,11 @@ var StateAnalytics_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "GetHierarchicalState",
 			Handler:    _StateAnalytics_GetHierarchicalState_Handler,
 		},
+		{
+			MethodName: "GetStateGrowthByCategory",
+			Handler:    _StateAnalytics_GetStateGrowthByCategory_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "state_analytics.proto",
+	Metadata: "pkg/server/proto/state_analytics/state_analytics.proto",
 }
