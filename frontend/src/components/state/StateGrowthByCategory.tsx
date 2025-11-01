@@ -39,8 +39,6 @@ interface StateGrowthByCategoryProps {
   restClient: any;
 }
 
-type Granularity = 'daily' | 'monthly' | 'yearly';
-
 const StateGrowthByCategory: React.FC<StateGrowthByCategoryProps> = ({
   selectedNetwork,
   restClient,
@@ -48,7 +46,6 @@ const StateGrowthByCategory: React.FC<StateGrowthByCategoryProps> = ({
   const [data, setData] = useState<StateGrowthByCategoryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [granularity, setGranularity] = useState<Granularity>('monthly');
 
   const fetchData = async () => {
     if (!restClient || !selectedNetwork) return;
@@ -57,13 +54,14 @@ const StateGrowthByCategory: React.FC<StateGrowthByCategoryProps> = ({
     setError(null);
 
     try {
-      console.log(`[StateGrowthByCategory] Fetching ${granularity} data for ${selectedNetwork}`);
+      console.log(`[StateGrowthByCategory] Fetching latest daily data for ${selectedNetwork}`);
 
+      // Query only the latest day's data
       const response = await restClient.getStateGrowthByCategory(selectedNetwork, {
-        granularity: granularity,
+        granularity: 'daily',
         top_contracts: 100,
-        start_block: 0, // Query from genesis
-        end_block: 0, // Query to latest
+        start_block: 0, // Will be set to latest day by backend
+        end_block: 0, // Latest block
       });
 
       console.log('[StateGrowthByCategory] Response:', response);
@@ -78,55 +76,63 @@ const StateGrowthByCategory: React.FC<StateGrowthByCategoryProps> = ({
 
   useEffect(() => {
     fetchData();
-  }, [selectedNetwork, restClient, granularity]);
+  }, [selectedNetwork, restClient]);
 
-  // Process data for Plotly stacked area chart
+  // Process data for Plotly bar chart (category on X axis)
   const plotData = useMemo(() => {
     if (!data || !data.time_series || data.time_series.length === 0) {
       return [];
     }
 
-    // Group by category across all time periods
-    const categoryMap = new Map<string, { x: string[]; y: number[] }>();
+    // Get the latest day's data (should only be one entry)
+    const latestDay = data.time_series[data.time_series.length - 1];
 
-    data.time_series.forEach((timeSeries) => {
-      const timestamp = new Date(timeSeries.timestamp).toISOString();
+    if (!latestDay || !latestDay.categories || latestDay.categories.length === 0) {
+      return [];
+    }
 
-      timeSeries.categories.forEach((cat) => {
-        if (!categoryMap.has(cat.category)) {
-          categoryMap.set(cat.category, { x: [], y: [] });
-        }
+    // Define all possible categories
+    const allCategories = [
+      'DeFi',
+      'NFT',
+      'ERC20',
+      'Gaming',
+      'Bridge',
+      'Oracle',
+      'DAO',
+      'Identity',
+      'Other'
+    ];
 
-        const categoryData = categoryMap.get(cat.category)!;
-        categoryData.x.push(timestamp);
-        // Convert bytes to MB for better readability
-        categoryData.y.push(cat.net_bytes_added / 1024 / 1024);
-      });
+    // Create a map of category -> value from the response
+    const categoryValues = new Map<string, number>();
+    latestDay.categories.forEach((cat) => {
+      categoryValues.set(cat.category, cat.net_bytes_added / 1024 / 1024);
     });
 
-    // Convert to Plotly traces (stacked area chart)
-    const traces: any[] = [];
-    let colorIndex = 0;
+    // Create arrays with all categories, filling in 0 for missing ones
+    const categories: string[] = [];
+    const values: number[] = [];
+    const colors: string[] = [];
 
-    categoryMap.forEach((categoryData, categoryName) => {
-      traces.push({
-        name: categoryName,
-        x: categoryData.x,
-        y: categoryData.y,
-        type: 'bar',
-        marker: {
-          color: PARADIGM_COLORS[colorIndex % PARADIGM_COLORS.length],
-        },
-        hovertemplate:
-          '<b>%{fullData.name}</b><br>' +
-          'Date: %{x|%Y-%m-%d}<br>' +
-          'Growth: %{y:.2f} MB<br>' +
-          '<extra></extra>',
-      });
-      colorIndex++;
+    allCategories.forEach((category, index) => {
+      categories.push(category);
+      values.push(categoryValues.get(category) || 0);
+      colors.push(PARADIGM_COLORS[index % PARADIGM_COLORS.length]);
     });
 
-    return traces;
+    return [{
+      type: 'bar',
+      x: categories,
+      y: values,
+      marker: {
+        color: colors,
+      },
+      hovertemplate:
+        '<b>%{x}</b><br>' +
+        'State Growth: %{y:.2f} MB<br>' +
+        '<extra></extra>',
+    }];
   }, [data]);
 
   // Calculate summary statistics
@@ -176,57 +182,21 @@ const StateGrowthByCategory: React.FC<StateGrowthByCategoryProps> = ({
 
   return (
     <div className="w-full flex flex-col space-y-4">
-      {/* Header with controls */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h3 className="text-lg font-semibold">Categorized State Growth Over Time</h3>
-          <p className="text-sm text-muted-foreground">
-            Similar to Paradigm's "How to raise the gas limit" Figures 2 & 3
-          </p>
-        </div>
-
-        {/* Granularity selector */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => setGranularity('daily')}
-            className={`px-4 py-2 rounded ${
-              granularity === 'daily'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-            }`}
-          >
-            Daily
-          </button>
-          <button
-            onClick={() => setGranularity('monthly')}
-            className={`px-4 py-2 rounded ${
-              granularity === 'monthly'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-            }`}
-          >
-            Monthly
-          </button>
-          <button
-            onClick={() => setGranularity('yearly')}
-            className={`px-4 py-2 rounded ${
-              granularity === 'yearly'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-            }`}
-          >
-            Yearly
-          </button>
-        </div>
+      {/* Header */}
+      <div>
+        <h3 className="text-lg font-semibold">Latest Day State Growth by Contract</h3>
+        <p className="text-sm text-muted-foreground">
+          Showing state growth for the most recent day in the database
+        </p>
       </div>
 
       {/* Summary statistics */}
       {summary && data && (
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-4 gap-4">
           <div className="bg-surface border border-border rounded-lg p-4">
-            <div className="text-sm text-muted-foreground">Earliest Data</div>
+            <div className="text-sm text-muted-foreground">Latest Date</div>
             <div className="text-lg font-bold">
-              {data.start_time ? new Date(data.start_time).toLocaleDateString() : 'N/A'}
+              {data.end_time ? new Date(data.end_time).toLocaleDateString() : 'N/A'}
             </div>
           </div>
           <div className="bg-surface border border-border rounded-lg p-4">
@@ -234,31 +204,27 @@ const StateGrowthByCategory: React.FC<StateGrowthByCategoryProps> = ({
             <div className="text-2xl font-bold">{summary.totalGrowthMB} MB</div>
           </div>
           <div className="bg-surface border border-border rounded-lg p-4">
-            <div className="text-sm text-muted-foreground">Avg per Period</div>
-            <div className="text-2xl font-bold">{summary.avgGrowthPerPeriodMB} MB</div>
-          </div>
-          <div className="bg-surface border border-border rounded-lg p-4">
             <div className="text-sm text-muted-foreground">Max Growth</div>
             <div className="text-2xl font-bold">{summary.maxGrowthMB} MB</div>
           </div>
           <div className="bg-surface border border-border rounded-lg p-4">
-            <div className="text-sm text-muted-foreground">Periods</div>
+            <div className="text-sm text-muted-foreground">Unique Contracts</div>
             <div className="text-2xl font-bold">{summary.periods}</div>
           </div>
         </div>
       )}
 
-      {/* Stacked area chart */}
+      {/* Bar chart by category */}
       <div className="w-full bg-surface border border-border rounded-lg" style={{ height: '600px' }}>
         <Plot
           data={plotData}
           layout={{
             title: {
-              text: `State Growth by Category (${granularity})`,
+              text: 'State Growth by Category (Latest Day)',
               font: { color: '#e5e7eb' },
             },
             xaxis: {
-              title: 'Time',
+              title: 'Category',
               color: '#9ca3af',
               gridcolor: '#374151',
             },
@@ -267,18 +233,11 @@ const StateGrowthByCategory: React.FC<StateGrowthByCategoryProps> = ({
               color: '#9ca3af',
               gridcolor: '#374151',
             },
-            barmode: 'stack',
-            hovermode: 'x unified',
-            showlegend: true,
-            legend: {
-              orientation: 'v',
-              x: 1.02,
-              y: 1,
-              font: { color: '#e5e7eb' },
-            },
+            hovermode: 'closest',
+            showlegend: false,
             paper_bgcolor: 'transparent',
             plot_bgcolor: '#1f2937',
-            margin: { l: 60, r: 150, t: 60, b: 60 },
+            margin: { l: 60, r: 60, t: 60, b: 60 },
           }}
           config={{
             responsive: true,

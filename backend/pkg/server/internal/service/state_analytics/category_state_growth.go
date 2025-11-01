@@ -35,6 +35,45 @@ func (s *Service) GetStateGrowthByCategory(
 		return nil, err
 	}
 
+	// For daily granularity, only query the latest day to avoid timeout
+	var startBlock, endBlock uint64
+	if req.Granularity == pb.GetStateGrowthByCategoryRequest_GRANULARITY_DAILY {
+		// Query to get the latest day's block range
+		latestDayQuery := fmt.Sprintf(`
+			WITH latest AS (
+				SELECT max(block_number) as max_block
+				FROM %s.canonical_execution_storage_diffs
+			),
+			latest_day AS (
+				SELECT toDate(toDateTime(%d + max_block * 12)) as day
+				FROM latest
+			),
+			day_start AS (
+				SELECT toUnixTimestamp(toDateTime(day)) as ts
+				FROM latest_day
+			),
+			day_end AS (
+				SELECT toUnixTimestamp(toDateTime(day) + INTERVAL 1 DAY) as ts
+				FROM latest_day
+			)
+			SELECT
+				((SELECT ts FROM day_start) - %d) / 12 as start_block,
+				((SELECT ts FROM day_end) - %d) / 12 as end_block
+		`, network, s.getGenesisTime(network), s.getGenesisTime(network), s.getGenesisTime(network))
+
+		latestDayRows, err := client.Query(ctx, latestDayQuery)
+		if err != nil || len(latestDayRows) == 0 {
+			s.recordMetrics(method, network, StatusError, time.Since(startTime).Seconds())
+			return nil, fmt.Errorf("failed to get latest day range: %w", err)
+		}
+
+		startBlock = getUint64(latestDayRows[0], "start_block")
+		endBlock = getUint64(latestDayRows[0], "end_block")
+	} else {
+		startBlock = req.StartBlock
+		endBlock = req.EndBlock
+	}
+
 	// Determine time bucket expression based on granularity
 	var timeBucketExpr string
 	switch req.Granularity {
@@ -57,9 +96,9 @@ func (s *Service) GetStateGrowthByCategory(
 			s.getGenesisTime(network),
 		)
 	default:
-		// Default to monthly
+		// Default to daily for latest day
 		timeBucketExpr = fmt.Sprintf(
-			"toStartOfMonth(toDateTime(%d + block_number * 12))",
+			"toDate(toDateTime(%d + block_number * 12))",
 			s.getGenesisTime(network),
 		)
 	}
@@ -73,8 +112,8 @@ func (s *Service) GetStateGrowthByCategory(
 	// Build query with replacements
 	query := queryStateGrowthByCategory
 	query = strings.ReplaceAll(query, "{database}", network)
-	query = strings.ReplaceAll(query, "{start_block}", fmt.Sprintf("%d", req.StartBlock))
-	query = strings.ReplaceAll(query, "{end_block}", fmt.Sprintf("%d", req.EndBlock))
+	query = strings.ReplaceAll(query, "{start_block}", fmt.Sprintf("%d", startBlock))
+	query = strings.ReplaceAll(query, "{end_block}", fmt.Sprintf("%d", endBlock))
 	query = strings.ReplaceAll(query, "{bytes_per_slot}", fmt.Sprintf("%d", BytesPerSlot))
 	query = strings.ReplaceAll(query, "{time_bucket_expression}", timeBucketExpr)
 
@@ -131,7 +170,7 @@ func (s *Service) GetStateGrowthByCategory(
 		return ti.Before(tj)
 	})
 
-	var startBlock, endBlock uint64
+	// Track actual start/end blocks from data (reuse variables from earlier)
 	genesisTime := s.getGenesisTime(network)
 
 	for _, period := range sortedPeriods {
