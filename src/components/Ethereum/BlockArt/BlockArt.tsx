@@ -41,6 +41,7 @@ export function BlockArt({
   const containerRef = useRef<HTMLDivElement>(null);
   const p5InstanceRef = useRef<p5 | null>(null);
   const themeColorsRef = useRef<BlockArtColors | null>(null);
+  const isCleanedUpRef = useRef(false);
   const themeColors = useThemeColors();
 
   // Use theme colors as defaults
@@ -59,6 +60,9 @@ export function BlockArt({
 
   useEffect(() => {
     if (!containerRef.current) return;
+
+    // Reset cleanup flag on mount
+    isCleanedUpRef.current = false;
 
     // Hash-based seed for procedural generation
     const hashToSeed = (hash?: string): number => {
@@ -120,15 +124,21 @@ export function BlockArt({
       };
 
       p.setup = () => {
-        const canvas = p.createCanvas(width, height, p.WEBGL);
-        canvas.parent(containerRef.current!);
+        p.createCanvas(width, height, p.WEBGL);
         p.randomSeed(seed);
+        p.loop(); // Ensure animation loop starts
 
         // Initialize cached colors
         updateCachedColors();
       };
 
       p.draw = () => {
+        // Stop drawing if component is cleaned up
+        if (isCleanedUpRef.current) {
+          p.noLoop();
+          return;
+        }
+
         // Update colors if theme changed
         if (themeColorsRef.current) {
           updateCachedColors();
@@ -169,12 +179,18 @@ export function BlockArt({
       };
     };
 
-    // Create p5 instance directly (no wrapper!)
-    p5InstanceRef.current = new p5(sketch);
+    // Create p5 instance with container ref for proper cleanup
+    const instance = new p5(sketch, containerRef.current);
+    p5InstanceRef.current = instance;
 
     // Cleanup on unmount
     return () => {
+      isCleanedUpRef.current = true;
+
       if (p5InstanceRef.current) {
+        // First stop the loop explicitly
+        p5InstanceRef.current.noLoop();
+        // Then remove the canvas and cleanup
         p5InstanceRef.current.remove();
         p5InstanceRef.current = null;
       }
