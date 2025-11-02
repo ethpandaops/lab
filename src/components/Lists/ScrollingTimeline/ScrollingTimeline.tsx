@@ -96,6 +96,9 @@ export function ScrollingTimeline({
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
+  // Store stable ref callbacks per item ID to prevent TimelineItemComponent re-renders
+  const refCallbacks = useRef<Map<string, (el: HTMLDivElement | null) => void>>(new Map());
+
   // Auto-scroll to the active item based on currentTime
   const lastScrolledItemRef = useRef<string | null>(null);
 
@@ -187,19 +190,26 @@ export function ScrollingTimeline({
           {items.map(item => {
             const status = itemStatuses.get(item.id) || 'pending';
 
+            // Get or create stable ref callback for this item
+            let refCallback = refCallbacks.current.get(item.id);
+            if (!refCallback) {
+              refCallback = (el: HTMLDivElement | null) => {
+                if (el) {
+                  itemRefs.current.set(item.id, el);
+                } else {
+                  itemRefs.current.delete(item.id);
+                }
+              };
+              refCallbacks.current.set(item.id, refCallback);
+            }
+
             return (
               <TimelineItemComponent
                 key={item.id}
                 item={item}
                 status={status}
                 formatTime={formatTime}
-                onRefChange={el => {
-                  if (el) {
-                    itemRefs.current.set(item.id, el);
-                  } else {
-                    itemRefs.current.delete(item.id);
-                  }
-                }}
+                onRefChange={refCallback}
               />
             );
           })}
