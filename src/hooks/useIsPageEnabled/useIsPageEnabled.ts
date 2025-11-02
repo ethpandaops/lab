@@ -21,7 +21,7 @@ import { useNetwork } from '@/hooks/useNetwork';
  * {
  *   "features": [
  *     {
- *       "path": "/ethereum/data-availability/das-custody",
+ *       "path": "/ethereum/data-availability/custody",
  *       "disabled_networks": ["mainnet"]
  *     }
  *   ]
@@ -31,9 +31,9 @@ import { useNetwork } from '@/hooks/useNetwork';
  * @example
  * ```tsx
  * function MyLink() {
- *   const isEnabled = useIsPageEnabled('/ethereum/das-custody');
+ *   const isEnabled = useIsPageEnabled('/ethereum/data-availability/custody');
  *   if (!isEnabled) return null;
- *   return <Link to="/ethereum/das-custody">DAS Custody</Link>;
+ *   return <Link to="/ethereum/data-availability/custody">Custody</Link>;
  * }
  * ```
  */
