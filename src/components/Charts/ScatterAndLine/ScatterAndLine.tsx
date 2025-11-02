@@ -182,6 +182,7 @@ export function ScatterAndLineChart({
       ],
       tooltip: {
         trigger: tooltipTrigger,
+        triggerOn: 'mousemove' as const,
         backgroundColor: themeColors.background,
         borderColor: themeColors.border,
         borderWidth: 1,
@@ -189,6 +190,17 @@ export function ScatterAndLineChart({
           color: themeColors.foreground,
           fontSize: 12,
         },
+        axisPointer:
+          tooltipTrigger === 'axis'
+            ? {
+                type: 'line' as const,
+                lineStyle: {
+                  color: themeColors.muted,
+                  type: 'dashed' as const,
+                },
+                snap: true,
+              }
+            : undefined,
         formatter: tooltipFormatter,
       },
       legend: showLegend
@@ -231,31 +243,39 @@ export function ScatterAndLineChart({
           z: s.z,
         })),
         // Line series
-        ...lineSeries.map((s, index) => ({
-          name: s.name,
-          data: s.data,
-          type: 'line' as const,
-          smooth: s.smooth ?? true,
-          symbol: s.symbol ?? 'none',
-          symbolSize: s.symbolSize ?? 4,
-          lineStyle: {
-            color: s.color ?? getSeriesColor(scatterSeries.length + index),
-            width: s.lineWidth ?? 3,
-          },
-          itemStyle: {
-            color: s.color ?? getSeriesColor(scatterSeries.length + index),
-          },
-          emphasis:
-            s.symbol && s.symbol !== 'none'
-              ? {
-                  lineStyle: {
-                    width: (s.lineWidth ?? 3) + 1,
-                  },
-                }
-              : undefined,
-          yAxisIndex: s.yAxisIndex ?? 0,
-          z: s.z,
-        })),
+        ...lineSeries.map((s, index) => {
+          const lineColor = s.color ?? getSeriesColor(scatterSeries.length + index);
+          return {
+            name: s.name,
+            data: s.data,
+            type: 'line' as const,
+            smooth: s.smooth ?? true,
+            symbol: s.symbol ?? 'none',
+            symbolSize: s.symbolSize ?? 4,
+            lineStyle: {
+              color: lineColor,
+              width: s.lineWidth ?? 3,
+            },
+            itemStyle: {
+              color: lineColor,
+            },
+            emphasis: {
+              focus: 'series' as const,
+              showSymbol: true,
+              symbolSize: 8,
+              lineStyle: {
+                width: (s.lineWidth ?? 3) + 1,
+              },
+              itemStyle: {
+                color: lineColor,
+                borderColor: themeColors.background,
+                borderWidth: 2,
+              },
+            },
+            yAxisIndex: s.yAxisIndex ?? 0,
+            z: s.z,
+          };
+        }),
       ],
     };
   }, [
