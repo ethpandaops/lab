@@ -682,3 +682,56 @@ export const CustomTooltip: Story = {
     );
   },
 };
+
+/**
+ * Hover emphasis with small symbols that enlarge on hover
+ * Perfect for dense time series data - keeps charts clean while maintaining tooltip functionality
+ */
+export const EmphasisHover: Story = {
+  render: () => {
+    const themeColors = useThemeColors();
+    const palette = [themeColors.primary, themeColors.accent, '#10b981', '#f59e0b', '#8b5cf6'];
+
+    const startSlot = 1000;
+    const slotCount = 30;
+
+    return (
+      <MultiLineChart
+        series={Array.from({ length: 5 }, (_, nodeIdx) => ({
+          name: `Node ${nodeIdx + 1}`,
+          data: Array.from({ length: slotCount }, (_, slotIdx) => {
+            const slot = startSlot + slotIdx;
+            const baseLatency = 200 + nodeIdx * 20;
+            const variance = Math.sin(slotIdx * nodeIdx * 0.3) * 15;
+            return [slot, Math.round(baseLatency + variance)] as [number, number];
+          }),
+          color: palette[nodeIdx],
+          showSymbol: true,
+          symbolSize: 2,
+          lineWidth: 2,
+          emphasis: {
+            focus: 'series',
+            symbolSize: 6,
+          },
+        }))}
+        xAxis={{
+          type: 'value',
+          name: 'Slot',
+          min: startSlot,
+          max: startSlot + slotCount - 1,
+          formatter: (value: number | string) => value.toLocaleString(),
+        }}
+        yAxis={{
+          name: 'Latency (ms)',
+        }}
+        title="Hover Emphasis Example"
+        subtitle="Tiny symbols (size 2) enlarge to size 6 on hover with series highlighting"
+        showCard={true}
+        showLegend={true}
+        enableDataZoom={true}
+        tooltipTrigger="item"
+        height={400}
+      />
+    );
+  },
+};

@@ -42,6 +42,7 @@ export function EpochArt({
   const containerRef = useRef<HTMLDivElement>(null);
   const p5InstanceRef = useRef<p5 | null>(null);
   const themeColorsRef = useRef<EpochArtColors | null>(null);
+  const isCleanedUpRef = useRef(false);
   const themeColors = useThemeColors();
 
   // Use theme colors as defaults
@@ -60,6 +61,9 @@ export function EpochArt({
 
   useEffect(() => {
     if (!containerRef.current) return;
+
+    // Reset cleanup flag on mount
+    isCleanedUpRef.current = false;
 
     // Parse hex color helper
     const parseColor = (hex: string): { r: number; g: number; b: number } => {
@@ -116,15 +120,21 @@ export function EpochArt({
           containerRef.current.removeChild(containerRef.current.firstChild);
         }
 
-        const canvas = p.createCanvas(width, height, p.WEBGL);
-        canvas.parent(containerRef.current!);
+        p.createCanvas(width, height, p.WEBGL);
         p.randomSeed(epochNumber);
+        p.loop(); // Ensure animation loop starts
 
         // Initialize cached colors
         updateCachedColors();
       };
 
       p.draw = () => {
+        // Stop drawing if component is cleaned up
+        if (isCleanedUpRef.current) {
+          p.noLoop();
+          return;
+        }
+
         // Update colors if theme changed
         if (themeColorsRef.current) {
           updateCachedColors();
@@ -201,18 +211,18 @@ export function EpochArt({
       };
     };
 
-    // Clean up any existing p5 instance first
-    if (p5InstanceRef.current) {
-      p5InstanceRef.current.remove();
-      p5InstanceRef.current = null;
-    }
-
-    // Create p5 instance
-    p5InstanceRef.current = new p5(sketch);
+    // Create p5 instance with container ref for proper cleanup
+    const instance = new p5(sketch, containerRef.current);
+    p5InstanceRef.current = instance;
 
     // Cleanup on unmount
     return () => {
+      isCleanedUpRef.current = true;
+
       if (p5InstanceRef.current) {
+        // First stop the loop explicitly
+        p5InstanceRef.current.noLoop();
+        // Then remove the canvas and cleanup
         p5InstanceRef.current.remove();
         p5InstanceRef.current = null;
       }

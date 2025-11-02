@@ -21,6 +21,7 @@ import type {
   SlotData,
   SlotMissedAttestationEntity,
   UseEpochDetailDataReturn,
+  BlockArrivalDataPoint,
 } from './useEpochDetailData.types';
 
 /**
@@ -399,6 +400,54 @@ export function useEpochDetailData(epoch: number): UseEpochDetailDataReturn {
       };
     });
 
+    // Build block arrival time series - calculate percentiles per slot
+    // Group block first seen times by slot
+    const arrivalTimesBySlot = new Map<number, number[]>();
+    blockFirstSeenData.forEach(record => {
+      const slot = record.slot;
+      const seenTime = record.seen_slot_start_diff;
+      if (slot !== undefined && seenTime !== undefined && seenTime !== null) {
+        if (!arrivalTimesBySlot.has(slot)) {
+          arrivalTimesBySlot.set(slot, []);
+        }
+        arrivalTimesBySlot.get(slot)!.push(seenTime);
+      }
+    });
+
+    // Calculate percentiles for each slot
+    const calculatePercentile = (values: number[], percentile: number): number => {
+      if (values.length === 0) return 0;
+      const sorted = [...values].sort((a, b) => a - b);
+      const index = Math.ceil((percentile / 100) * sorted.length) - 1;
+      return sorted[Math.max(0, index)];
+    };
+
+    const blockArrivalTimeSeries: BlockArrivalDataPoint[] = Array.from({ length: 32 }, (_, i) => {
+      const slot = firstSlot + i;
+      const times = arrivalTimesBySlot.get(slot);
+
+      if (!times || times.length === 0) {
+        return {
+          slot,
+          min: null,
+          p05: null,
+          p50: null,
+          p90: null,
+          max: null,
+        };
+      }
+
+      const sorted = [...times].sort((a, b) => a - b);
+      return {
+        slot,
+        min: sorted[0],
+        p05: calculatePercentile(times, 5),
+        p50: calculatePercentile(times, 50),
+        p90: calculatePercentile(times, 90),
+        max: sorted[sorted.length - 1],
+      };
+    });
+
     return {
       stats,
       slots,
@@ -407,6 +456,7 @@ export function useEpochDetailData(epoch: number): UseEpochDetailDataReturn {
       mevTimeSeries,
       blockProductionTimeSeries,
       blockSizeTimeSeries,
+      blockArrivalTimeSeries,
     };
   }, [results, isLoading, error, currentNetwork, epoch, epochStartTime, firstSlot]);
 

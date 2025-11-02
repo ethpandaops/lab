@@ -86,12 +86,22 @@ function RootComponent(): JSX.Element {
     };
   }, []);
 
-  // Close sidebar on route navigation (path changes only, not search params)
+  // Close sidebar on route navigation (path changes or network search param changes)
   useEffect(() => {
+    let previousNetwork: string | undefined;
+
     const unsubscribe = router.subscribe('onBeforeLoad', event => {
-      // Only close sidebar if the path actually changed, not just search params
+      // Close sidebar if the path changed
       if (event.pathChanged) {
         setSidebarOpen(false);
+        return;
+      }
+
+      // Close sidebar if the network search param changed or was removed
+      const currentNetwork = (event.toLocation.search as Record<string, unknown>)?.network as string | undefined;
+      if (currentNetwork !== previousNetwork) {
+        setSidebarOpen(false);
+        previousNetwork = currentNetwork;
       }
     });
 
@@ -127,12 +137,12 @@ function RootComponent(): JSX.Element {
           <ConfigGate>
             <NetworkProvider>
               <HeadContent />
-              <div className="min-h-dvh bg-background">
+              <div className="bg-background">
                 {/* Sidebar (mobile + desktop) */}
                 <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
                 {/* Mobile header */}
-                <div className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-surface/95 px-4 py-4 shadow-sm backdrop-blur-xl sm:px-6 lg:hidden">
+                <div className="fixed top-0 right-0 left-0 z-40 flex items-center justify-between border-b border-border bg-surface/95 px-4 py-4 shadow-sm backdrop-blur-xl sm:px-6 lg:hidden">
                   <div className="flex items-center gap-x-6">
                     <button
                       type="button"
@@ -155,7 +165,7 @@ function RootComponent(): JSX.Element {
                 </div>
 
                 {/* Main content */}
-                <main className="bg-background lg:pl-72">
+                <main className="bg-background pt-[65px] lg:min-h-dvh lg:pt-0 lg:pl-72">
                   <FeatureGate>
                     <Breadcrumb />
                     <Outlet />

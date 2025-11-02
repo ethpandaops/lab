@@ -620,13 +620,15 @@ export function MultiLineChart({
         </div>
       )}
 
-      <ReactEChartsCore
-        echarts={echarts}
-        option={option}
-        style={{ height, width: '100%', minHeight: height }}
-        notMerge={false}
-        opts={{ renderer: 'canvas' }}
-      />
+      <div style={{ pointerEvents: 'none' }}>
+        <ReactEChartsCore
+          echarts={echarts}
+          option={option}
+          style={{ height, width: '100%', minHeight: height, pointerEvents: 'auto' }}
+          notMerge={false}
+          opts={{ renderer: 'canvas' }}
+        />
+      </div>
     </>
   );
 

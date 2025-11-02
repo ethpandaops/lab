@@ -126,8 +126,12 @@ export function useLatencyChartSeries(data: unknown, dataKey: string): LatencyCh
         data: chartData,
         color: extendedPalette[index % extendedPalette.length],
         showSymbol: true,
-        symbolSize: 4,
+        symbolSize: 2,
         lineWidth: 2,
+        emphasis: {
+          focus: 'series',
+          symbolSize: 6,
+        },
       });
     });
 
