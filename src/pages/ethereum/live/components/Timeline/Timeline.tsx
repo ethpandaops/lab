@@ -40,7 +40,7 @@ function TimelineComponent({
           <button
             type="button"
             onClick={onBackward}
-            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-muted focus:ring-3 focus:ring-primary focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-muted focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Go backward"
             disabled={!onBackward}
           >
@@ -51,7 +51,7 @@ function TimelineComponent({
           <button
             type="button"
             onClick={onPlayPause}
-            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-muted focus:ring-3 focus:ring-primary focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-muted focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={isPlaying ? 'Pause' : 'Play'}
             disabled={!onPlayPause}
           >
@@ -62,7 +62,7 @@ function TimelineComponent({
           <button
             type="button"
             onClick={onForward}
-            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-muted focus:ring-3 focus:ring-primary focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-muted focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Go forward"
             disabled={!onForward}
           >
