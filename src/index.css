@@ -298,9 +298,17 @@
   }
 
   /* Global focus styles - use primary color */
-  *:focus-visible {
+  /* Only apply to keyboard navigation (focus-visible) and exclude interactive elements that have custom focus styles */
+  *:focus-visible:not(button):not(a):not([role='button']):not(input):not(textarea):not(select) {
     outline: 2px solid var(--primary-value);
     outline-offset: 2px;
+  }
+
+  /* Remove default focus outline from buttons, links, and role=button elements */
+  button:focus-visible,
+  a:focus-visible,
+  [role='button']:focus-visible {
+    outline: none;
   }
 
   /* Initial state for fade-in animations - elements start invisible */
