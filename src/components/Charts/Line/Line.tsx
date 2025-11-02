@@ -166,14 +166,23 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
               }
             : undefined,
           emphasis: {
+            focus: 'series' as const,
+            showSymbol: true,
+            symbolSize: 8,
             lineStyle: {
               width: 4,
+            },
+            itemStyle: {
+              color: convertedColor || CHART_CATEGORICAL_COLORS[0],
+              borderColor: themeColors.background,
+              borderWidth: 2,
             },
           },
         },
       ],
       tooltip: {
         trigger: 'axis',
+        triggerOn: 'mousemove' as const,
         backgroundColor: themeColors.background,
         borderColor: themeColors.border,
         borderWidth: 1,
@@ -187,6 +196,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
             color: themeColors.muted,
             type: 'dashed',
           },
+          snap: true,
         },
       },
     }),

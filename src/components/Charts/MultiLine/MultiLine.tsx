@@ -242,18 +242,26 @@ export function MultiLineChart({
         color: seriesColor,
       },
       // Add emphasis configuration for hover effects
-      ...(s.emphasis
+      // Auto-enable symbol display on hover for better interactivity (especially important for step charts)
+      emphasis: s.emphasis
         ? {
-            emphasis: {
-              focus: s.emphasis.focus,
-              itemStyle: {
-                color: seriesColor,
-              },
-              ...(s.emphasis.showSymbol !== undefined ? { showSymbol: s.emphasis.showSymbol } : {}),
-              ...(s.emphasis.symbolSize !== undefined ? { symbolSize: s.emphasis.symbolSize } : {}),
+            focus: s.emphasis.focus,
+            itemStyle: {
+              color: seriesColor,
             },
+            ...(s.emphasis.showSymbol !== undefined ? { showSymbol: s.emphasis.showSymbol } : {}),
+            ...(s.emphasis.symbolSize !== undefined ? { symbolSize: s.emphasis.symbolSize } : {}),
           }
-        : {}),
+        : {
+            focus: 'series' as const,
+            showSymbol: true,
+            symbolSize: 8,
+            itemStyle: {
+              color: seriesColor,
+              borderColor: themeColors.background,
+              borderWidth: 2,
+            },
+          },
       // Add label at the right side of the chart if requested
       ...(s.showEndLabel
         ? {
@@ -454,6 +462,7 @@ export function MultiLineChart({
     // Build tooltip configuration
     const tooltipConfig = {
       trigger: tooltipTrigger,
+      triggerOn: 'mousemove' as const, // Enable fine-grained mousemove tracking for step charts
       backgroundColor: themeColors.surface,
       borderColor: themeColors.border,
       borderWidth: 1,
@@ -469,6 +478,7 @@ export function MultiLineChart({
                 color: themeColors.muted,
                 type: 'dashed' as const,
               },
+              snap: true, // Snap to data points for better step chart interaction
             }
           : undefined,
       formatter: tooltipFormatter || defaultTooltipFormatter,
