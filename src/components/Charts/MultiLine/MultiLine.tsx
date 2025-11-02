@@ -289,62 +289,106 @@ export function MultiLineChart({
     };
 
     // Build series configuration
-    const seriesConfig = displayedSeries
-      .filter(s => s.visible !== false)
-      .map((s, index) => {
-        // Use explicit color or auto-assign from palette
-        const seriesColor = s.color || extendedPalette[index % extendedPalette.length];
+    // Note: Don't filter by visible property here - displayedSeries already handles visibility via visibleSeries state
+    const seriesConfig = displayedSeries.map(s => {
+      // Use explicit color or auto-assign from palette
+      const originalIndex = series.indexOf(s);
+      const seriesColor = s.color || extendedPalette[originalIndex % extendedPalette.length];
 
-        const baseConfig = {
-          name: s.name,
-          type: 'line' as const,
-          data: s.data,
-          smooth: s.smooth ?? false,
-          step: s.step ?? false,
-          connectNulls,
-          showSymbol: s.showSymbol ?? false,
-          symbolSize: s.symbolSize ?? 4,
-          lineStyle: {
-            color: seriesColor,
-            width: s.lineWidth ?? 2,
-            type: s.lineStyle ?? ('solid' as const),
-          },
-          itemStyle: {
-            color: seriesColor,
+      const baseConfig = {
+        name: s.name,
+        type: 'line' as const,
+        data: s.data,
+        smooth: s.smooth ?? false,
+        step: s.step ?? false,
+        connectNulls,
+        showSymbol: s.showSymbol ?? false,
+        symbolSize: s.symbolSize ?? 4,
+        lineStyle: {
+          color: seriesColor,
+          width: s.lineWidth ?? 2,
+          type: s.lineStyle ?? ('solid' as const),
+        },
+        itemStyle: {
+          color: seriesColor,
+        },
+        // Add emphasis configuration for hover effects
+        // Auto-enable symbol display on hover for better interactivity (especially important for step charts)
+        emphasis: s.emphasis
+          ? {
+              focus: s.emphasis.focus,
+              itemStyle: {
+                color: seriesColor,
+              },
+              ...(s.emphasis.showSymbol !== undefined ? { showSymbol: s.emphasis.showSymbol } : {}),
+              ...(s.emphasis.symbolSize !== undefined ? { symbolSize: s.emphasis.symbolSize } : {}),
+            }
+          : {
+              focus: 'series' as const,
+              showSymbol: true,
+              symbolSize: 8,
+              itemStyle: {
+                color: seriesColor,
+                borderColor: themeColors.background,
+                borderWidth: 2,
+              },
+            },
+        // Add label at the right side of the chart if requested
+        ...(s.showEndLabel
+          ? {
+              markPoint: {
+                symbol: 'none',
+                label: {
+                  show: true,
+                  position: 'insideEndTop' as const,
+                  formatter: s.name,
+                  color: seriesColor,
+                  fontSize: 12,
+                  fontWeight: 'bold' as const,
+                  backgroundColor: 'transparent',
+                },
+                data: [
+                  {
+                    xAxis: 'max' as const,
+                    yAxis: Array.isArray(s.data[0]) ? (s.data[0] as [number, number])[1] : 0,
+                  },
+                ],
+              },
+            }
+          : {}),
+      };
+
+      // Add area style if requested
+      if (s.showArea) {
+        return {
+          ...baseConfig,
+          areaStyle: {
+            color:
+              s.areaOpacity !== undefined
+                ? hexToRgba(seriesColor, s.areaOpacity)
+                : {
+                    type: 'linear' as const,
+                    x: 0,
+                    y: 0,
+                    x2: 0,
+                    y2: 1,
+                    colorStops: [
+                      {
+                        offset: 0,
+                        color: hexToRgba(seriesColor, 0.5),
+                      },
+                      {
+                        offset: 1,
+                        color: hexToRgba(seriesColor, 0.06),
+                      },
+                    ],
+                  },
           },
         };
+      }
 
-        // Add area style if requested
-        if (s.showArea) {
-          return {
-            ...baseConfig,
-            areaStyle: {
-              color:
-                s.areaOpacity !== undefined
-                  ? hexToRgba(seriesColor, s.areaOpacity)
-                  : {
-                      type: 'linear' as const,
-                      x: 0,
-                      y: 0,
-                      x2: 0,
-                      y2: 1,
-                      colorStops: [
-                        {
-                          offset: 0,
-                          color: hexToRgba(seriesColor, 0.5),
-                        },
-                        {
-                          offset: 1,
-                          color: hexToRgba(seriesColor, 0.06),
-                        },
-                      ],
-                    },
-            },
-          };
-        }
-
-        return baseConfig;
-      });
+      return baseConfig;
+    });
 
     // Calculate grid padding
     // Title is always rendered by component, never by ECharts
@@ -414,6 +458,7 @@ export function MultiLineChart({
     // Build tooltip configuration
     const tooltipConfig = {
       trigger: tooltipTrigger,
+      triggerOn: 'mousemove' as const, // Enable fine-grained mousemove tracking for step charts
       backgroundColor: themeColors.surface,
       borderColor: themeColors.border,
       borderWidth: 1,
@@ -429,6 +474,7 @@ export function MultiLineChart({
                 color: themeColors.muted,
                 type: 'dashed' as const,
               },
+              snap: true, // Snap to data points for better step chart interaction
             }
           : undefined,
       formatter: tooltipFormatter || defaultTooltipFormatter,
