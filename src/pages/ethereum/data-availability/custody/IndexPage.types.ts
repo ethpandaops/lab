@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
 /**
- * Zod schema for DAS custody search parameters
+ * Zod schema for custody search parameters
  * Validates hierarchical drill-down state in URL
  */
-export const dasCustodySearchSchema = z.object({
+export const custodySearchSchema = z.object({
   // Date string (YYYY-MM-DD) for day-level drill-down
   date: z.string().optional(),
 
@@ -24,14 +24,14 @@ export const dasCustodySearchSchema = z.object({
 /**
  * TypeScript type inferred from Zod schema
  */
-export type DasCustodySearch = z.infer<typeof dasCustodySearchSchema>;
+export type CustodySearch = z.infer<typeof custodySearchSchema>;
 
 /**
  * Validates hierarchical consistency of search params
  * @param search - Search params to validate
  * @returns Error message if invalid, undefined if valid
  */
-export function validateSearchParamHierarchy(search: DasCustodySearch): string | undefined {
+export function validateSearchParamHierarchy(search: CustodySearch): string | undefined {
   // Slot requires epoch
   if (search.slot !== undefined && search.epoch === undefined) {
     return 'Slot parameter requires epoch parameter';

@@ -2,7 +2,7 @@ import { type JSX } from 'react';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 
 /**
- * Loading skeleton for DAS Custody page
+ * Loading skeleton for Custody page
  * Matches the structure of the actual page content with shimmer effects
  */
 export function DataAvailabilitySkeleton(): JSX.Element {

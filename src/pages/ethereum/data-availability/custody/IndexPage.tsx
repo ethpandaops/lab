@@ -37,7 +37,7 @@ import {
   transformBlobsToRows,
 } from '@/pages/ethereum/data-availability/utils/data-availability-transform';
 import { fetchAllPages } from '@/utils/api-pagination';
-import type { DasCustodySearch } from './IndexPage.types';
+import type { CustodySearch } from './IndexPage.types';
 import { validateSearchParamHierarchy } from './IndexPage.types';
 
 /**
@@ -84,7 +84,7 @@ const SLOTS_PER_EPOCH = 32;
  * Derives the current drill-down level from URL search parameters
  * Validates hierarchical consistency and falls back to window view on error
  */
-function deriveCurrentLevel(search: DasCustodySearch): DrillDownLevel {
+function deriveCurrentLevel(search: CustodySearch): DrillDownLevel {
   // Validate hierarchical consistency
   const validationError = validateSearchParamHierarchy(search);
   if (validationError) {
@@ -138,12 +138,12 @@ function deriveCurrentLevel(search: DasCustodySearch): DrillDownLevel {
 }
 
 /**
- * DAS Custody page showing PeerDAS data availability across drill-down levels
+ * Custody page showing PeerDAS data availability across drill-down levels
  */
 export function IndexPage(): JSX.Element {
   // URL-based state management
-  const navigate = useNavigate({ from: '/ethereum/data-availability/das-custody/' });
-  const search = useSearch({ from: '/ethereum/data-availability/das-custody/' });
+  const navigate = useNavigate({ from: '/ethereum/data-availability/custody/' });
+  const search = useSearch({ from: '/ethereum/data-availability/custody/' });
 
   // Timezone preference
   const { timezone } = useTimezone();
@@ -634,7 +634,7 @@ export function IndexPage(): JSX.Element {
     return (
       <Container>
         <Header
-          title="DAS Custody"
+          title="Custody"
           description="PeerDAS data availability visualization showing column custody across validators"
         />
         <div className="rounded-sm border border-danger/20 bg-danger/10 p-4 text-danger">
@@ -647,7 +647,7 @@ export function IndexPage(): JSX.Element {
   return (
     <Container>
       <Header
-        title="DAS Custody"
+        title="Custody"
         description="PeerDAS data availability visualization showing column custody across validators"
       />
 
