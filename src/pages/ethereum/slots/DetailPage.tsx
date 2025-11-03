@@ -4,7 +4,6 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
-import { BlockArt } from '@/components/Ethereum/BlockArt';
 import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
 import { formatEpoch } from '@/utils';
@@ -164,45 +163,38 @@ export function DetailPage(): JSX.Element {
 
   return (
     <Container>
-      {/* BlockArt - p5.js 3D cube */}
-      <div className="mb-6 flex items-center justify-center lg:justify-end">
-        <BlockArt
-          width={180}
-          height={180}
-          blockHash={data.blockHead[0]?.block_root}
-          blockNumber={data.blockHead[0]?.execution_payload_block_number ?? slot}
-        />
-      </div>
-
       <div className="space-y-6">
-        {/* Basic slot information card */}
         <SlotBasicInfoCard slot={slot} epoch={epoch} data={data} />
 
         {/* Attestations Section */}
         <ScrollAnchor id="attestations">
           <Header size="xs" title="Attestations" showAccent={false} />
         </ScrollAnchor>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-          <AttestationArrivalsChart
-            attestationData={attestationData}
-            totalExpectedValidators={totalExpectedValidators}
-          />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="lg:col-span-2">
+            <AttestationArrivalsChart
+              attestationData={attestationData}
+              totalExpectedValidators={totalExpectedValidators}
+            />
+          </div>
           <AttestationParticipationCard correctnessData={attestationCorrectnessData} />
           <AttestationHeadCorrectnessCard correctnessData={attestationCorrectnessData} />
-          <AttestationsByEntity
-            data={data.missedAttestations}
-            title="Missed Attestations by Entity"
-            subtitle={missedAttestationsSubtitle}
-            anchorId="missed-attestations"
-            emptyMessage="No missed attestations for this slot"
-          />
+          <div className="lg:col-span-2">
+            <AttestationsByEntity
+              data={data.missedAttestations}
+              title="Missed Attestations by Entity"
+              subtitle={missedAttestationsSubtitle}
+              anchorId="missed-attestations"
+              emptyMessage="No missed attestations for this slot"
+            />
+          </div>
         </div>
 
-        {/* Block Propagation Section */}
-        <ScrollAnchor id="block-propagation">
-          <Header size="xs" title="Block Propagation" showAccent={false} />
+        {/* Propagation Section */}
+        <ScrollAnchor id="propagation">
+          <Header size="xs" title="Propagation" showAccent={false} />
         </ScrollAnchor>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <BlockPropagationChart blockPropagationData={blockPropagationData} />
           <BlobPropagationChart blobPropagationData={blobPropagationData} />
         </div>
@@ -211,7 +203,7 @@ export function DetailPage(): JSX.Element {
         <ScrollAnchor id="execution">
           <Header size="xs" title="Execution" showAccent={false} />
         </ScrollAnchor>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6">
           <BlockSizeEfficiencyChart blockHead={data.blockHead[0]} />
         </div>
 
@@ -224,13 +216,15 @@ export function DetailPage(): JSX.Element {
             <ScrollAnchor id="mev">
               <Header size="xs" title="MEV" showAccent={false} />
             </ScrollAnchor>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               {mevBiddingData.length > 0 && (
-                <MevBiddingTimelineChart
-                  biddingData={mevBiddingData}
-                  winningMevValue={winningMevValue}
-                  winningBuilder={winningBuilder}
-                />
+                <div className="lg:col-span-2">
+                  <MevBiddingTimelineChart
+                    biddingData={mevBiddingData}
+                    winningMevValue={winningMevValue}
+                    winningBuilder={winningBuilder}
+                  />
+                </div>
               )}
               {data.relayBids.length > 0 && (
                 <RelayDistributionChart relayData={data.relayBids} winningRelay={winningRelay} />
@@ -239,12 +233,14 @@ export function DetailPage(): JSX.Element {
                 <BuilderCompetitionChart builderData={data.builderBids} winningBuilder={winningBuilder} />
               )}
               {data.preparedBlocks.length > 0 && (
-                <PreparedBlocksComparisonChart
-                  preparedBlocks={data.preparedBlocks}
-                  proposedBlock={proposedBlock}
-                  winningBidTimestamp={winningBidTimestamp}
-                  slotStartTime={data.blockHead[0]?.slot_start_date_time}
-                />
+                <div className="lg:col-span-2">
+                  <PreparedBlocksComparisonChart
+                    preparedBlocks={data.preparedBlocks}
+                    proposedBlock={proposedBlock}
+                    winningBidTimestamp={winningBidTimestamp}
+                    slotStartTime={data.blockHead[0]?.slot_start_date_time}
+                  />
+                </div>
               )}
             </div>
           </>
