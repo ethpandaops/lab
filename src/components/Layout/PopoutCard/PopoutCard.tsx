@@ -192,7 +192,7 @@ export function PopoutCard({
   };
 
   /**
-   * Handle copy to clipboard with toast notification
+   * Handle copy to clipboard - returns a Blob for CopyToClipboard component
    */
   const handleCopyToClipboard = async (): Promise<Blob> => {
     // Use modal content if modal is open, otherwise use card
