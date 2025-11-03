@@ -1,5 +1,4 @@
 import { useParams } from '@tanstack/react-router';
-import { useMemo } from 'react';
 
 import { Alert } from '@/components/Feedback/Alert';
 import { BaseFeeChart } from '@/components/Ethereum/BaseFeeChart';
@@ -43,90 +42,11 @@ export function DetailPage(): React.JSX.Element {
   useNetworkChangeRedirect(context.redirectOnNetworkChange);
 
   // Parse and validate epoch parameter
-  const epoch = useMemo(() => {
-    const parsed = parseInt(params.epoch, 10);
-    if (isNaN(parsed) || parsed < 0) {
-      return null;
-    }
-    return parsed;
-  }, [params.epoch]);
+  const parsed = parseInt(params.epoch, 10);
+  const epoch = isNaN(parsed) || parsed < 0 ? null : parsed;
 
   // Fetch data for this epoch
   const { data, isLoading, error } = useEpochDetailData(epoch ?? 0);
-
-  // Memoize chart data transformations to prevent chart remounting
-  // Only data props need memoization - simple config objects don't
-  const blobCountData = useMemo(
-    () => data?.blockProductionTimeSeries.map(d => ({ x: d.slot, value: d.blobCount })) ?? [],
-    [data?.blockProductionTimeSeries]
-  );
-
-  const gasUsedData = useMemo(
-    () =>
-      data?.blockProductionTimeSeries
-        .filter(d => d.gasUsed !== null)
-        .map(d => ({ x: d.slot, gasUsed: d.gasUsed!, gasLimit: d.gasLimit ?? undefined })) ?? [],
-    [data?.blockProductionTimeSeries]
-  );
-
-  const transactionCountData = useMemo(
-    () =>
-      data?.blockProductionTimeSeries
-        .filter(d => d.transactionCount !== null)
-        .map(d => ({ x: d.slot, value: d.transactionCount! })) ?? [],
-    [data?.blockProductionTimeSeries]
-  );
-
-  const baseFeeData = useMemo(
-    () =>
-      data?.blockProductionTimeSeries
-        .filter(d => d.baseFeePerGas !== null)
-        .map(d => ({ x: d.slot, value: d.baseFeePerGas! })) ?? [],
-    [data?.blockProductionTimeSeries]
-  );
-
-  const blockSizeData = useMemo(
-    () =>
-      data?.blockSizeTimeSeries.map(d => ({
-        x: d.slot,
-        consensusSize: d.consensusSize,
-        consensusSizeCompressed: d.consensusSizeCompressed,
-        executionSize: d.executionSize,
-        executionSizeCompressed: d.executionSizeCompressed,
-      })) ?? [],
-    [data?.blockSizeTimeSeries]
-  );
-
-  const blockArrivalData = useMemo(
-    () =>
-      data?.blockArrivalTimeSeries.map(d => ({
-        x: d.slot,
-        min: d.min,
-        p05: d.p05,
-        p50: d.p50,
-        p90: d.p90,
-        max: d.max,
-      })) ?? [],
-    [data?.blockArrivalTimeSeries]
-  );
-
-  const mevAdoptionData = useMemo(
-    () => data?.mevTimeSeries.map(d => ({ hasMev: d.hasMev })) ?? [],
-    [data?.mevTimeSeries]
-  );
-
-  const blockValueData = useMemo(
-    () =>
-      data?.mevTimeSeries
-        .filter(d => d.blockValue !== null)
-        .map(d => ({ x: d.slot, value: weiToEth(d.blockValue!) })) ?? [],
-    [data?.mevTimeSeries]
-  );
-
-  const missedAttestationsData = useMemo(
-    () => data?.missedAttestationsByEntity.map(m => ({ x: m.slot, entity: m.entity, count: m.count })) ?? [],
-    [data?.missedAttestationsByEntity]
-  );
 
   // Handle invalid epoch
   if (epoch === null) {
@@ -187,42 +107,61 @@ export function DetailPage(): React.JSX.Element {
         </ScrollAnchor>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <BlobCountChart
-            data={blobCountData}
+            data={data.blockProductionTimeSeries.map(d => ({ x: d.slot, value: d.blobCount }))}
             xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="blob-count-chart"
             relativeSlots={{ epoch }}
             syncGroup="slot-number"
           />
           <GasUsedChart
-            data={gasUsedData}
+            data={data.blockProductionTimeSeries
+              .filter(d => d.gasUsed !== null)
+              .map(d => ({ x: d.slot, gasUsed: d.gasUsed!, gasLimit: d.gasLimit ?? undefined }))}
             xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="gas-chart"
             relativeSlots={{ epoch }}
             syncGroup="slot-number"
           />
           <TransactionCountChart
-            data={transactionCountData}
+            data={data.blockProductionTimeSeries
+              .filter(d => d.transactionCount !== null)
+              .map(d => ({ x: d.slot, value: d.transactionCount! }))}
             xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="transaction-count-chart"
             relativeSlots={{ epoch }}
             syncGroup="slot-number"
           />
           <BaseFeeChart
-            data={baseFeeData}
+            data={data.blockProductionTimeSeries
+              .filter(d => d.baseFeePerGas !== null)
+              .map(d => ({ x: d.slot, value: d.baseFeePerGas! }))}
             xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="base-fee-chart"
             relativeSlots={{ epoch }}
             syncGroup="slot-number"
           />
           <BlockSizeChart
-            data={blockSizeData}
+            data={data.blockSizeTimeSeries.map(d => ({
+              x: d.slot,
+              consensusSize: d.consensusSize,
+              consensusSizeCompressed: d.consensusSizeCompressed,
+              executionSize: d.executionSize,
+              executionSizeCompressed: d.executionSizeCompressed,
+            }))}
             xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="block-size-chart"
             relativeSlots={{ epoch }}
             syncGroup="slot-number"
           />
           <BlockArrivalTimesChart
-            data={blockArrivalData}
+            data={data.blockArrivalTimeSeries.map(d => ({
+              x: d.slot,
+              min: d.min,
+              p05: d.p05,
+              p50: d.p50,
+              p90: d.p90,
+              max: d.max,
+            }))}
             xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="block-arrival-times-chart"
             relativeSlots={{ epoch }}
@@ -237,9 +176,11 @@ export function DetailPage(): React.JSX.Element {
           <h2 className="mb-4 text-xl font-semibold text-foreground">MEV</h2>
         </ScrollAnchor>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <MevAdoptionChart data={mevAdoptionData} anchorId="mev-adoption-chart" />
+          <MevAdoptionChart data={data.mevTimeSeries.map(d => ({ hasMev: d.hasMev }))} anchorId="mev-adoption-chart" />
           <BlockValueChart
-            data={blockValueData}
+            data={data.mevTimeSeries
+              .filter(d => d.blockValue !== null)
+              .map(d => ({ x: d.slot, value: weiToEth(d.blockValue!) }))}
             xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="block-value-chart"
             relativeSlots={{ epoch }}
@@ -256,7 +197,7 @@ export function DetailPage(): React.JSX.Element {
           <h2 className="mb-4 text-xl font-semibold text-foreground">Attestations</h2>
         </ScrollAnchor>
         <TopEntitiesChart
-          data={missedAttestationsData}
+          data={data.missedAttestationsByEntity.map(m => ({ x: m.slot, entity: m.entity, count: m.count }))}
           xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
           yAxis={{ name: 'Missed' }}
           title="Offline Validators"

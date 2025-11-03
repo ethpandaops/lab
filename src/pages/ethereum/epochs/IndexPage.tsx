@@ -1,5 +1,4 @@
 import { useNavigate } from '@tanstack/react-router';
-import { useMemo } from 'react';
 
 import { Alert } from '@/components/Feedback/Alert';
 import { Container } from '@/components/Layout/Container';
@@ -28,30 +27,21 @@ export function IndexPage(): React.JSX.Element {
   const navigate = useNavigate();
   const { epochs, missedAttestationsByEntity, isLoading, error, currentEpoch } = useEpochsData();
 
-  // Memoize chart data to prevent chart remounting
-  const chartData = useMemo(
-    () => missedAttestationsByEntity.map(m => ({ x: m.epoch, entity: m.entity, count: m.count })),
-    [missedAttestationsByEntity]
-  );
+  const tableData = epochs.map(epoch => {
+    const isCurrent = epoch.epoch === currentEpoch;
+    // For current epoch, show "-" for missed blocks since it's incomplete
+    const missedBlocks = isCurrent ? null : epoch.missedBlockCount;
 
-  // Format table data - show all 10 epochs
-  const tableData = useMemo(() => {
-    return epochs.map(epoch => {
-      const isCurrent = epoch.epoch === currentEpoch;
-      // For current epoch, show "-" for missed blocks since it's incomplete
-      const missedBlocks = isCurrent ? null : epoch.missedBlockCount;
-
-      return {
-        epoch: epoch.epoch,
-        timestamp: epoch.epochStartDateTime,
-        blocks: `${epoch.canonicalBlockCount}/${epoch.canonicalBlockCount + epoch.missedBlockCount}`,
-        missedBlocks,
-        participation: `${(epoch.participationRate * 100).toFixed(2)}%`,
-        participationValue: epoch.participationRate,
-        isCurrent,
-      };
-    });
-  }, [epochs, currentEpoch]);
+    return {
+      epoch: epoch.epoch,
+      timestamp: epoch.epochStartDateTime,
+      blocks: `${epoch.canonicalBlockCount}/${epoch.canonicalBlockCount + epoch.missedBlockCount}`,
+      missedBlocks,
+      participation: `${(epoch.participationRate * 100).toFixed(2)}%`,
+      participationValue: epoch.participationRate,
+      isCurrent,
+    };
+  });
 
   // Handle row click navigation
   const handleRowClick = (row: (typeof tableData)[0]): void => {
@@ -145,7 +135,7 @@ export function IndexPage(): React.JSX.Element {
       <div id="metrics" className="mt-8">
         <h2 className="mb-4 text-xl font-semibold text-foreground">Metrics</h2>
         <TopEntitiesChart
-          data={chartData}
+          data={missedAttestationsByEntity.map(m => ({ x: m.epoch, entity: m.entity, count: m.count }))}
           xAxis={{
             name: 'Epoch',
             min: epochs.length > 0 ? Math.min(...epochs.map(e => e.epoch)) : undefined,
