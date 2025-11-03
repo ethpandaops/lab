@@ -122,15 +122,17 @@ export function MultiLineChart({
   const [showAggregate, setShowAggregate] = useState(false);
 
   // Manage visible series when interactive legend is enabled
+  // Use lazy initialization to ensure stable initial Set reference across StrictMode remounts
   const [visibleSeries, setVisibleSeries] = useState<Set<string>>(
-    new Set(series.filter(s => s.visible !== false).map(s => s.name))
+    () => new Set(series.filter(s => s.visible !== false).map(s => s.name))
   );
 
   // Series filter state
   const [searchQuery, setSearchQuery] = useState('');
 
   // Track all series names we've ever seen to detect genuinely new series
-  const seenSeriesNamesRef = useRef<Set<string>>(new Set());
+  // Initialize with current series to prevent treating them as "new" on mount/remount
+  const seenSeriesNamesRef = useRef<Set<string>>(new Set(series.filter(s => s.visible !== false).map(s => s.name)));
 
   // Update visible series when series prop changes
   // Preserve user selections and only auto-show genuinely new series

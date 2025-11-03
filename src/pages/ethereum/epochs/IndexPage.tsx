@@ -39,6 +39,21 @@ export function IndexPage(): React.JSX.Element {
     };
   }, [epochs]);
 
+  // Memoize chart data to prevent recreation on every render
+  const chartData = useMemo(
+    () => missedAttestationsByEntity.map(m => ({ x: m.epoch, entity: m.entity, count: m.count })),
+    [missedAttestationsByEntity]
+  );
+
+  // Memoize xAxis config to prevent recreation on every render
+  const xAxisConfig = useMemo(
+    () => ({ name: 'Epoch', min: epochRange?.min, max: epochRange?.max }),
+    [epochRange?.min, epochRange?.max]
+  );
+
+  // Memoize yAxis config to prevent recreation on every render
+  const yAxisConfig = useMemo(() => ({ name: 'Missed' }), []);
+
   // Format table data - show all 10 epochs
   const tableData = useMemo(() => {
     return epochs.map(epoch => {
@@ -151,9 +166,9 @@ export function IndexPage(): React.JSX.Element {
       <div id="metrics" className="mt-8">
         <h2 className="mb-4 text-xl font-semibold text-foreground">Metrics</h2>
         <TopEntitiesChart
-          data={missedAttestationsByEntity.map(m => ({ x: m.epoch, entity: m.entity, count: m.count }))}
-          xAxis={{ name: 'Epoch', min: epochRange?.min, max: epochRange?.max }}
-          yAxis={{ name: 'Missed' }}
+          data={chartData}
+          xAxis={xAxisConfig}
+          yAxis={yAxisConfig}
           title="Offline Validators"
           topN={10}
           anchorId="offline-validators-chart"
