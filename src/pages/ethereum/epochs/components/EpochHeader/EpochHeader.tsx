@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import { EpochArt } from '@/components/Ethereum/EpochArt';
 import { getRelativeTime } from '@/utils/time';
+import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { EpochHeaderProps } from './EpochHeader.types';
 
 /**
@@ -10,18 +11,6 @@ import type { EpochHeaderProps } from './EpochHeader.types';
 export function EpochHeader({ epoch, stats, timestamp }: EpochHeaderProps): React.JSX.Element {
   const participationPercent = (stats.participationRate * 100).toFixed(2);
   const avgBlockSeconds = stats.averageBlockFirstSeenTime ? stats.averageBlockFirstSeenTime / 1000 : null;
-
-  // Format as ISO 8601 with timezone
-  const isoTimestamp = new Date(timestamp * 1000).toLocaleString('en-CA', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-    timeZoneName: 'short',
-  });
 
   return (
     <>
@@ -40,7 +29,22 @@ export function EpochHeader({ epoch, stats, timestamp }: EpochHeaderProps): Reac
         <div className="mb-6 flex items-center justify-between gap-6">
           <div>
             <h1 className="text-4xl font-bold tracking-tight text-foreground">Epoch {epoch}</h1>
-            <p className="mt-2 font-mono text-sm text-muted">{isoTimestamp}</p>
+            <div className="mt-2">
+              <Timestamp timestamp={timestamp} format="custom" className="text-sm text-muted">
+                {ts =>
+                  new Date(ts * 1000).toLocaleString('en-CA', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false,
+                    timeZoneName: 'short',
+                  })
+                }
+              </Timestamp>
+            </div>
           </div>
 
           {/* EpochArt - smaller */}
