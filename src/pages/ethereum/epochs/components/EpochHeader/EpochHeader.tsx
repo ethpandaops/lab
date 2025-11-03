@@ -30,12 +30,11 @@ export function EpochHeader({ epoch, stats, timestamp }: EpochHeaderProps): Reac
             <h1 className="text-4xl font-bold tracking-tight text-foreground">Epoch {epoch}</h1>
             <p className="mt-2 text-sm text-muted">
               {formatTimestamp(timestamp, {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
+                month: 'short',
                 day: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit',
+                timeZoneName: 'short',
               })}{' '}
               · {getRelativeTime(timestamp)}
             </p>
