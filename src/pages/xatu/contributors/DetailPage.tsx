@@ -12,7 +12,8 @@ import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table';
 import { UserDetailsSkeleton } from './components/UserDetailsSkeleton';
 import type { UserClassification } from './components/UserCard/UserCard.types';
-import { getClassificationLabel, getClassificationBadgeClasses, getRelativeTime, getCountryFlag } from '@/utils';
+import { getClassificationLabel, getClassificationBadgeClasses, getCountryFlag, getRelativeTime } from '@/utils';
+import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { useSlotPlayerMeta } from '@/hooks/useSlotPlayer';
 import { SlotPlayerControls } from './components/SlotPlayerControls';
 import { BlockLatencyChart } from './components/BlockLatencyChart';
@@ -82,7 +83,7 @@ const nodeColumns: Column<FctNodeActiveLast24h>[] = [
     header: 'Last Seen',
     accessor: (node: FctNodeActiveLast24h) => {
       if (node.last_seen_date_time) {
-        return getRelativeTime(node.last_seen_date_time);
+        return <Timestamp timestamp={node.last_seen_date_time} format="relative" />;
       }
       return '-';
     },

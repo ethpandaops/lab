@@ -1,38 +1,13 @@
 import { Link } from '@tanstack/react-router';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import { EpochArt } from '@/components/Ethereum/EpochArt';
+import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { EpochHeaderProps } from './EpochHeader.types';
-
-/**
- * Format a Unix timestamp as relative time
- */
-function formatRelativeTime(unixSeconds: number): string {
-  const now = Date.now();
-  const timestamp = unixSeconds * 1000;
-  const diffMs = now - timestamp;
-  const diffSeconds = Math.floor(diffMs / 1000);
-  const diffMinutes = Math.floor(diffSeconds / 60);
-  const diffHours = Math.floor(diffMinutes / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffSeconds < 60) {
-    return `${diffSeconds}s ago`;
-  }
-  if (diffMinutes < 60) {
-    return `${diffMinutes}m ago`;
-  }
-  if (diffHours < 24) {
-    return `${diffHours}h ago`;
-  }
-  return `${diffDays}d ago`;
-}
 
 /**
  * Unified epoch header - everything in a single card
  */
 export function EpochHeader({ epoch, stats, timestamp }: EpochHeaderProps): React.JSX.Element {
-  const date = new Date(timestamp * 1000);
-  const relativeTime = formatRelativeTime(timestamp);
   const participationPercent = (stats.participationRate * 100).toFixed(2);
   const avgBlockSeconds = stats.averageBlockFirstSeenTime ? stats.averageBlockFirstSeenTime / 1000 : null;
 
@@ -54,7 +29,8 @@ export function EpochHeader({ epoch, stats, timestamp }: EpochHeaderProps): Reac
           <div>
             <h1 className="text-4xl font-bold tracking-tight text-foreground">Epoch {epoch}</h1>
             <p className="mt-2 text-sm text-muted">
-              {date.toLocaleString()} · {relativeTime}
+              <Timestamp timestamp={timestamp} format="long" disableModal /> ·{' '}
+              <Timestamp timestamp={timestamp} format="relative" disableModal />
             </p>
           </div>
 
