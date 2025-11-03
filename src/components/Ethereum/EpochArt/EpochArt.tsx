@@ -161,9 +161,9 @@ export function EpochArt({
           animationProgress = 0;
         }
 
-        // Draw 32 blocks in reading order (4 columns x 8 rows)
-        const cols = 4;
-        const rows = 8;
+        // Draw 32 blocks in reading order (8 columns x 4 rows)
+        const cols = 8;
+        const rows = 4;
         const blockSize = 10;
         const spacing = 14;
         const blockDepth = 10;

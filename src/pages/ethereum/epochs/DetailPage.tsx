@@ -70,7 +70,7 @@ export function DetailPage(): React.JSX.Element {
         'block-arrival-times-chart',
       ],
     },
-    { hash: 'attestations', anchors: ['missed-attestations-chart'] },
+    { hash: 'validators', anchors: ['missed-attestations-chart'] },
     {
       hash: 'mev',
       anchors: [
@@ -154,7 +154,7 @@ export function DetailPage(): React.JSX.Element {
           <TabList className="flex gap-2 border-b border-border">
             <Tab hash="slots">Slots</Tab>
             <Tab hash="blocks">Blocks</Tab>
-            <Tab hash="attestations">Attestations</Tab>
+            <Tab hash="validators">Validators</Tab>
             <Tab hash="mev">MEV</Tab>
           </TabList>
 
@@ -231,7 +231,7 @@ export function DetailPage(): React.JSX.Element {
               </div>
             </TabPanel>
 
-            {/* Attestations Tab */}
+            {/* Validators Tab */}
             <TabPanel>
               <TopEntitiesChart
                 data={data.missedAttestationsByEntity.map(m => ({ x: m.slot, entity: m.entity, count: m.count }))}
