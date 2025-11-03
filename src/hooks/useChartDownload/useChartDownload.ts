@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { toPng } from 'html-to-image';
 import type { EChartsInstance } from 'echarts-for-react';
+import { useTheme } from '@/hooks/useTheme';
 import type { ChartDownloadResult, UseChartDownloadOptions } from './useChartDownload.types';
 
 /**
@@ -23,6 +24,17 @@ import type { ChartDownloadResult, UseChartDownloadOptions } from './useChartDow
  * ```
  */
 export function useChartDownload(): ChartDownloadResult {
+  const { theme } = useTheme();
+
+  /**
+   * Get the background color based on current theme
+   */
+  const getBackgroundColor = useCallback((): string => {
+    // Use theme-appropriate surface color
+    // Light theme: sand-50 (#fafaf9), Dark theme: #242424
+    return theme === 'light' ? '#fafaf9' : '#242424';
+  }, [theme]);
+
   /**
    * Load an image and return as HTMLImageElement
    */
@@ -142,16 +154,19 @@ export function useChartDownload(): ChartDownloadResult {
       const {
         pixelRatio = 2,
         headerPath = '/images/header.png',
-        backgroundColor = 'transparent',
+        backgroundColor,
         watermark = false,
         watermarkText = 'ethpandaops.io',
         includeHeader = true,
       } = options;
 
+      // Use theme-appropriate background color if not specified
+      const bgColor = backgroundColor ?? getBackgroundColor();
+
       // Capture the HTML element as an image
       const elementDataUrl = await toPng(element, {
         pixelRatio,
-        backgroundColor,
+        backgroundColor: bgColor,
         cacheBust: true,
       });
 
@@ -179,11 +194,9 @@ export function useChartDownload(): ChartDownloadResult {
         throw new Error('Failed to get canvas 2D context');
       }
 
-      // Fill background if specified
-      if (backgroundColor !== 'transparent') {
-        ctx.fillStyle = backgroundColor;
-        ctx.fillRect(0, 0, elementWidth, totalHeight);
-      }
+      // Fill background
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, elementWidth, totalHeight);
 
       // Draw header (scaled to fit width, maintaining aspect ratio)
       const headerAspectRatio = headerImg.width / headerImg.height;
@@ -214,7 +227,7 @@ export function useChartDownload(): ChartDownloadResult {
 
       return canvas.toDataURL('image/png');
     },
-    [loadImage]
+    [loadImage, getBackgroundColor]
   );
 
   /**
