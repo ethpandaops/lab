@@ -112,7 +112,7 @@ export function DetailPage(): React.JSX.Element {
         <ScrollAnchor id="metrics">
           <h2 className="mb-4 text-xl font-semibold text-foreground">Metrics</h2>
         </ScrollAnchor>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <BlobCountChart
             data={data.blockProductionTimeSeries.map(d => ({ x: d.slot, value: d.blobCount }))}
             xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
@@ -182,7 +182,7 @@ export function DetailPage(): React.JSX.Element {
         <ScrollAnchor id="mev">
           <h2 className="mb-4 text-xl font-semibold text-foreground">MEV</h2>
         </ScrollAnchor>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <MevAdoptionChart data={data.mevTimeSeries.map(d => ({ hasMev: d.hasMev }))} anchorId="mev-adoption-chart" />
           <BlockValueChart
             data={data.mevTimeSeries

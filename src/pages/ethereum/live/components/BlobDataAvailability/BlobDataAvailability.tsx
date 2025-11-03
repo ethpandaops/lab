@@ -1,12 +1,10 @@
 import type { JSX } from 'react';
 import { useMemo, memo } from 'react';
-import ReactECharts from 'echarts-for-react';
 import clsx from 'clsx';
-import { useThemeColors } from '@/hooks/useThemeColors';
+import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
+import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { BlobDataAvailabilityProps } from './BlobDataAvailability.types';
 import { getDataVizColors } from '@/utils/dataVizColors';
-import type { EChartsOption } from 'echarts';
-import type { TooltipFormatterParams, TooltipFormatterParam } from '@/types/echarts';
 
 /**
  * BlobDataAvailability - Page-specific component for visualizing blob data availability
@@ -37,330 +35,140 @@ function BlobDataAvailabilityComponent({
   visibleContinentalPropagationData,
   currentTime: _currentTime,
   maxTime = 12000,
+  variant = 'both',
   className,
 }: BlobDataAvailabilityProps): JSX.Element {
-  const themeColors = useThemeColors();
   const { CONTINENT_COLORS } = getDataVizColors();
+  // Prepare First Seen scatter data for ScatterAndLineChart
+  const firstSeenScatterSeries = useMemo(() => {
+    if (deduplicatedBlobData.length === 0) return [];
 
-  // Static base configuration for First Seen chart (theme-dependent but data-independent)
-  const firstSeenBaseConfig = useMemo(
-    () => ({
-      animation: false,
-      title: {
-        text: 'BLOB FIRST SEEN',
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 13,
-        },
-        left: 16,
-        top: 12,
-        show: window.innerWidth >= 768,
+    return [
+      {
+        name: 'Blobs',
+        data: deduplicatedBlobData.map(blob => [blob.time, parseInt(blob.blobId)] as [number, number]),
+        symbolSize: 8,
       },
-      grid: {
-        top: window.innerWidth >= 768 ? 48 : 20,
-        bottom: 20,
-        left: 50,
-        right: 16,
-      },
-      xAxis: {
-        type: 'value' as const,
-        name: 'Slot Time (s)',
-        nameLocation: 'middle' as const,
-        nameGap: 25,
-        nameTextStyle: {
-          color: themeColors.muted,
-          fontSize: 10,
-        },
-        min: 0,
-        max: maxTime,
-        interval: 4000,
-        axisLine: {
-          lineStyle: {
-            color: themeColors.border,
-          },
-        },
-        axisLabel: {
-          color: themeColors.muted,
-          fontSize: 10,
-          formatter: (value: number) => `${Math.round(value / 1000)}`,
-        },
-        splitLine: {
-          show: true,
-          lineStyle: {
-            color: themeColors.border,
-            type: 'solid' as const,
-            opacity: 0.3,
-          },
-        },
-      },
-      tooltip: {
-        trigger: 'item' as const,
-        backgroundColor: themeColors.background,
-        borderColor: themeColors.border,
-        borderWidth: 1,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
-        formatter: (params: TooltipFormatterParams) => {
-          const param = params as TooltipFormatterParam;
-          const data = param.data as [number, string];
-          return `Blob ${data[1]}<br/>Time: ${(data[0] / 1000).toFixed(2)}s`;
-        },
-      },
-      legend: {
-        show: false,
-        bottom: 8,
-        left: 'center' as const,
-      },
-    }),
-    [themeColors, maxTime]
-  );
+    ];
+  }, [deduplicatedBlobData]);
 
-  // Static base configuration for Continental Propagation chart
-  const continentalPropagationBaseConfig = useMemo(
-    () => ({
-      animation: false,
-      title: {
-        text: 'CONTINENTAL PROPAGATION',
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 13,
-        },
-        left: 16,
-        top: 12,
-        // Hide title on mobile - tab already provides label
-        show: window.innerWidth >= 768,
-      },
-      grid: {
-        // Mobile: smaller top padding since no title
-        top: window.innerWidth >= 768 ? 48 : 20,
-        bottom: 40, // Increased to make room for legend
-        left: 50,
-        right: 16,
-      },
-      tooltip: {
-        trigger: 'axis' as const,
-        backgroundColor: themeColors.background,
-        borderColor: themeColors.border,
-        borderWidth: 1,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
-        formatter: (params: TooltipFormatterParams) => {
-          if (!params || !Array.isArray(params) || params.length === 0) return '';
-          const time = ((params[0].data as [number, number])[0] / 1000).toFixed(2);
-          const lines = [`Time: ${time}s`];
-          params.forEach((param: TooltipFormatterParam) => {
-            const data = param.data as [number, number];
-            lines.push(`${param.seriesName}: ${data[1].toFixed(1)}%`);
-          });
-          return lines.join('<br/>');
-        },
-        axisPointer: {
-          type: 'line' as const,
-          lineStyle: {
-            color: themeColors.muted,
-            type: 'dashed' as const,
-          },
-        },
-      },
-    }),
-    [themeColors]
-  );
-
-  // Prepare First Seen scatter chart - only recreate when data changes
-  const firstSeenOption = useMemo((): EChartsOption => {
-    const scatterData = deduplicatedBlobData.map(blob => [blob.time, blob.blobId, blob.color]);
-    const uniqueBlobIds = [...new Set(deduplicatedBlobData.map(b => b.blobId))].sort();
-
-    return {
-      ...firstSeenBaseConfig,
-      yAxis: {
-        type: 'category' as const,
-        data: uniqueBlobIds,
-        name: 'Blob',
-        nameLocation: 'middle' as const,
-        nameGap: 40,
-        nameTextStyle: {
-          color: themeColors.muted,
-          fontSize: 10,
-        },
-        axisLine: {
-          lineStyle: {
-            color: themeColors.border,
-          },
-        },
-        axisLabel: {
-          color: themeColors.muted,
-          fontSize: 10,
-        },
-        splitLine: {
-          show: true,
-          lineStyle: {
-            color: themeColors.border,
-            type: 'solid' as const,
-            opacity: 0.3,
-          },
-        },
-      },
-      series: [
-        {
-          type: 'scatter' as const,
-          data: scatterData,
-          symbolSize: 8,
-          itemStyle: {
-            color: (params: { data: [number, string, string | undefined] }) => {
-              return params.data[2] || themeColors.primary;
-            },
-          },
-        },
-      ],
-    } as EChartsOption;
-  }, [deduplicatedBlobData, firstSeenBaseConfig, themeColors]);
-
-  // Prepare Continental Propagation chart - only recreate when data changes
-  const continentalPropagationOption = useMemo((): EChartsOption => {
-    // Fallback colors array from CONTINENT_COLORS for unknown continents
+  // Prepare Continental Propagation data for MultiLineChart
+  // Convert time from milliseconds to seconds for display
+  const continentalLineSeries = useMemo(() => {
     const defaultColors = Object.values(CONTINENT_COLORS);
 
-    // Calculate dynamic x-axis range based on active data
-    // Find the time range where meaningful propagation happens (0% to 100%)
-    let minActiveTime = Infinity;
-    let maxActiveTime = -Infinity;
+    return visibleContinentalPropagationData.map((continent, idx) => ({
+      name: continent.continent,
+      data: continent.data.map(point => [point.time / 1000, point.percentage] as [number, number]),
+      color: continent.color || defaultColors[idx % defaultColors.length],
+      step: 'end' as const,
+    }));
+  }, [visibleContinentalPropagationData, CONTINENT_COLORS]);
 
-    visibleContinentalPropagationData.forEach(continent => {
-      if (continent.data.length === 0) return;
+  // Render based on variant
+  if (variant === 'first-seen-only') {
+    return (
+      <div className={clsx('flex h-full flex-col bg-surface p-3', className)}>
+        <div className="mb-2 shrink-0">
+          <h3 className="text-sm font-semibold text-foreground uppercase">Blob First Seen</h3>
+        </div>
+        <div className="min-h-0 flex-1">
+          <ScatterAndLineChart
+            scatterSeries={firstSeenScatterSeries}
+            xAxisTitle="Slot Time (s)"
+            yAxisTitle="Blob"
+            xMax={maxTime}
+            xInterval={4000}
+            xAxisFormatter={(value: number) => `${Math.round(value / 1000)}`}
+            yAxisFormatter={(value: number) => (Number.isInteger(value) ? `${value}` : '')}
+            height="100%"
+            animation={false}
+            showLegend={false}
+          />
+        </div>
+      </div>
+    );
+  }
 
-      // Find first point above 0% and last point before 100%
-      const firstActivePoint = continent.data.find(p => p.percentage > 0);
-      const lastActivePoint = [...continent.data].reverse().find(p => p.percentage < 100);
+  if (variant === 'continental-only') {
+    return (
+      <div className={clsx('flex h-full flex-col bg-surface p-3', className)}>
+        <div className="mb-2 shrink-0">
+          <h3 className="text-sm font-semibold text-foreground uppercase">Continental Propagation</h3>
+        </div>
+        <div className="min-h-0 flex-1">
+          <MultiLineChart
+            series={continentalLineSeries}
+            xAxis={{ type: 'value', name: 'Slot Time (s)', min: 0, max: maxTime / 1000 }}
+            yAxis={{ name: 'Complete (%)', max: 100 }}
+            height="100%"
+            showLegend={true}
+            legendPosition="bottom"
+            useNativeLegend={true}
+            animationDuration={0}
+          />
+        </div>
+      </div>
+    );
+  }
 
-      if (firstActivePoint) {
-        minActiveTime = Math.min(minActiveTime, firstActivePoint.time);
-      }
-      if (lastActivePoint) {
-        maxActiveTime = Math.max(maxActiveTime, lastActivePoint.time);
-      }
-    });
-
-    // Add padding to the range for better visibility (10% on each side)
-    const hasActiveData = minActiveTime !== Infinity && maxActiveTime !== -Infinity;
-    const dataRange = hasActiveData ? maxActiveTime - minActiveTime : 0;
-    const padding = Math.max(dataRange * 0.1, 500); // At least 500ms padding
-
-    const xAxisMin = hasActiveData ? Math.max(0, minActiveTime - padding) : 0;
-    const xAxisMax = hasActiveData ? Math.min(maxTime, maxActiveTime + padding) : maxTime;
-
-    return {
-      ...continentalPropagationBaseConfig,
-      xAxis: {
-        type: 'value' as const,
-        name: 'Slot Time (s)',
-        nameLocation: 'middle' as const,
-        nameGap: 25,
-        nameTextStyle: {
-          color: themeColors.muted,
-          fontSize: 10,
-        },
-        min: xAxisMin,
-        max: xAxisMax,
-        axisLine: {
-          lineStyle: {
-            color: themeColors.border,
-          },
-        },
-        axisLabel: {
-          color: themeColors.muted,
-          fontSize: 10,
-          formatter: (value: number) => (value / 1000).toFixed(1),
-        },
-        splitLine: {
-          show: true,
-          lineStyle: {
-            color: themeColors.border,
-            type: 'solid' as const,
-            opacity: 0.3,
-          },
-        },
-      },
-      yAxis: {
-        type: 'value' as const,
-        name: 'Complete',
-        nameLocation: 'middle' as const,
-        nameGap: 40,
-        nameTextStyle: {
-          color: themeColors.muted,
-          fontSize: 10,
-        },
-        max: 100,
-        axisLine: {
-          show: false,
-        },
-        axisTick: {
-          show: false,
-        },
-        splitLine: {
-          show: true,
-          lineStyle: {
-            color: themeColors.border,
-            type: 'solid' as const,
-            opacity: 0.3,
-          },
-        },
-        axisLabel: {
-          color: themeColors.muted,
-          fontSize: 10,
-          formatter: '{value}%',
-        },
-      },
-      series: visibleContinentalPropagationData.map((continent, idx) => ({
-        name: continent.continent,
-        data: continent.data.map(point => [point.time, point.percentage]),
-        type: 'line' as const,
-        step: 'end' as const,
-        symbol: 'none' as const,
-        showSymbol: false,
-        lineStyle: {
-          color: continent.color || defaultColors[idx % defaultColors.length],
-          width: 2,
-        },
-      })),
-      legend: {
-        show: visibleContinentalPropagationData.length > 0,
-        orient: 'horizontal' as const,
-        bottom: 4,
-        left: 'center' as const,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 9,
-        },
-        itemWidth: 14,
-        itemHeight: 2,
-        itemGap: 12,
-      },
-    } as EChartsOption;
-  }, [visibleContinentalPropagationData, continentalPropagationBaseConfig, themeColors, maxTime, CONTINENT_COLORS]);
-
+  // Default: both charts side-by-side
   return (
     <>
       {/* Desktop: Two-column layout */}
-      <div className={clsx('hidden h-full grid-cols-12 gap-4 md:grid', className)}>
-        {/* First Seen Chart - 6 columns */}
-        <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-1">
-          <ReactECharts option={firstSeenOption} style={{ height: '100%', width: '100%' }} />
+      <div className={clsx('hidden h-full grid-cols-2 lg:grid', className)}>
+        {/* First Seen Chart */}
+        <div className="flex h-full flex-col border-r border-border bg-background p-3">
+          <div className="mb-2 shrink-0">
+            <h3 className="text-sm font-semibold text-foreground uppercase">Blob First Seen</h3>
+          </div>
+          <div className="min-h-0 flex-1">
+            <ScatterAndLineChart
+              scatterSeries={firstSeenScatterSeries}
+              xAxisTitle="Slot Time (s)"
+              yAxisTitle="Blob"
+              xMax={maxTime}
+              xInterval={4000}
+              xAxisFormatter={(value: number) => `${Math.round(value / 1000)}`}
+              height="100%"
+              animation={false}
+              showLegend={false}
+            />
+          </div>
         </div>
 
-        {/* Continental Propagation Chart - 6 columns */}
-        <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-1">
-          <ReactECharts option={continentalPropagationOption} style={{ height: '100%', width: '100%' }} />
+        {/* Continental Propagation Chart */}
+        <div className="flex h-full flex-col bg-background p-3">
+          <div className="mb-2 shrink-0">
+            <h3 className="text-sm font-semibold text-foreground uppercase">Continental Propagation</h3>
+          </div>
+          <div className="min-h-0 flex-1">
+            <MultiLineChart
+              series={continentalLineSeries}
+              xAxis={{ type: 'value', name: 'Slot Time (s)', min: 0, max: maxTime }}
+              yAxis={{ name: 'Complete (%)', max: 100 }}
+              height="100%"
+              showLegend={true}
+              legendPosition="bottom"
+              useNativeLegend={true}
+              animationDuration={0}
+            />
+          </div>
         </div>
       </div>
 
       {/* Mobile: Continental Propagation only, fullscreen */}
-      <div className={clsx('h-full bg-background md:hidden', className)}>
-        <ReactECharts option={continentalPropagationOption} style={{ height: '100%', width: '100%' }} />
+      <div className={clsx('h-full bg-background lg:hidden', className)}>
+        <MultiLineChart
+          series={continentalLineSeries}
+          xAxis={{ type: 'value', name: 'Slot Time (s)', min: 0, max: maxTime }}
+          yAxis={{ name: 'Complete (%)', max: 100 }}
+          height="100%"
+          showLegend={true}
+          legendPosition="bottom"
+          useNativeLegend={true}
+          animationDuration={0}
+        />
       </div>
     </>
   );
@@ -369,6 +177,7 @@ function BlobDataAvailabilityComponent({
 // Custom comparison function to prevent re-renders when data hasn't changed
 const arePropsEqual = (prevProps: BlobDataAvailabilityProps, nextProps: BlobDataAvailabilityProps): boolean => {
   return (
+    prevProps.currentTime === nextProps.currentTime &&
     prevProps.deduplicatedBlobData === nextProps.deduplicatedBlobData &&
     prevProps.visibleContinentalPropagationData === nextProps.visibleContinentalPropagationData &&
     prevProps.maxTime === nextProps.maxTime

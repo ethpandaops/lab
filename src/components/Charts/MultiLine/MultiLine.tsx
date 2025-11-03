@@ -70,6 +70,8 @@ export function MultiLineChart({
   subtitle,
   height: _height = 400,
   showLegend = false,
+  legendPosition = 'top',
+  useNativeLegend = false,
   showCard = false,
   enableDataZoom = false,
   tooltipFormatter,
@@ -401,7 +403,8 @@ export function MultiLineChart({
     const gridConfig = {
       top: grid?.top ?? 16,
       right: grid?.right ?? 24,
-      bottom: grid?.bottom ?? (xAxis.name ? 30 : 24),
+      bottom:
+        grid?.bottom ?? (useNativeLegend && showLegend && legendPosition === 'bottom' ? 65 : xAxis.name ? 30 : 24),
       left: grid?.left ?? (yAxis?.name ? 24 : 8),
       // ECharts v6: use outerBounds instead of deprecated containLabel
       outerBoundsMode: 'same' as const,
@@ -502,6 +505,22 @@ export function MultiLineChart({
       yAxis: yAxisConfig,
       series: seriesConfig,
       tooltip: tooltipConfig,
+      legend:
+        useNativeLegend && showLegend
+          ? {
+              show: true,
+              orient: 'horizontal' as const,
+              [legendPosition]: legendPosition === 'bottom' ? 10 : 10,
+              left: 'center' as const,
+              textStyle: {
+                color: themeColors.foreground,
+                fontSize: 12,
+              },
+              itemWidth: 14,
+              itemHeight: 10,
+              itemGap: 16,
+            }
+          : undefined,
       dataZoom: enableDataZoom
         ? [
             {
@@ -535,6 +554,9 @@ export function MultiLineChart({
     relativeSlots,
     formatSlotLabel,
     formatSlotTooltip,
+    useNativeLegend,
+    showLegend,
+    legendPosition,
   ]);
 
   const chartContent = (
@@ -632,8 +654,8 @@ export function MultiLineChart({
         </div>
       )}
 
-      {/* Interactive Legend Controls */}
-      {showLegend && series.length > 1 && (
+      {/* Interactive Legend Controls - Top */}
+      {showLegend && !useNativeLegend && series.length > 1 && legendPosition === 'top' && (
         <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-border pb-4">
           <span className="text-sm/6 font-medium text-muted">Series:</span>
           {series
@@ -676,7 +698,14 @@ export function MultiLineChart({
         </div>
       )}
 
-      <div style={{ pointerEvents: 'none' }}>
+      <div
+        style={{
+          pointerEvents: 'none',
+          height: _height === '100%' ? '100%' : 'auto',
+          flex: _height === '100%' ? '1 1 0%' : undefined,
+          minHeight: _height === '100%' ? 0 : undefined,
+        }}
+      >
         <ReactEChartsCore
           ref={chartRef}
           echarts={echarts}
@@ -691,6 +720,50 @@ export function MultiLineChart({
           opts={{ renderer: 'canvas' }}
         />
       </div>
+
+      {/* Interactive Legend Controls - Bottom */}
+      {showLegend && !useNativeLegend && series.length > 1 && legendPosition === 'bottom' && (
+        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
+          <span className="text-sm/6 font-medium text-muted">Series:</span>
+          {series
+            .filter(s => !enableAggregateToggle || s.name !== aggregateSeriesName)
+            .map(s => {
+              const isVisible = visibleSeries.has(s.name);
+              const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
+              return (
+                <button
+                  key={s.name}
+                  onClick={() => toggleSeries(s.name)}
+                  className={`flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs/5 transition-colors ${
+                    isVisible
+                      ? 'bg-surface-hover text-foreground'
+                      : 'hover:bg-surface-hover/50 bg-surface/50 text-muted/50'
+                  }`}
+                >
+                  <span
+                    className="h-2 w-2 rounded-full"
+                    style={{
+                      backgroundColor: isVisible ? seriesColor : 'transparent',
+                      border: `2px solid ${seriesColor}`,
+                    }}
+                  />
+                  <span className="font-medium">{s.name}</span>
+                </button>
+              );
+            })}
+          {/* Aggregate Toggle Button - aligned right in same row */}
+          {enableAggregateToggle && (
+            <button
+              onClick={() => setShowAggregate(!showAggregate)}
+              className={`ml-auto rounded-sm px-2 py-1 text-xs/5 transition-colors ${
+                showAggregate ? 'bg-muted/20 text-foreground' : 'text-muted hover:bg-muted/10'
+              }`}
+            >
+              {showAggregate ? '✓' : '○'} {aggregateSeriesName}
+            </button>
+          )}
+        </div>
+      )}
     </>
   );
 
@@ -710,5 +783,5 @@ export function MultiLineChart({
   }
 
   // Return unwrapped chart
-  return <div className="w-full">{chartContent}</div>;
+  return <div className={_height === '100%' ? 'h-full w-full' : 'w-full'}>{chartContent}</div>;
 }
