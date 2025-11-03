@@ -68,7 +68,7 @@ export function MultiLineChart({
   yAxis,
   title,
   subtitle,
-  height = 400,
+  height: _height = 400,
   showLegend = false,
   showCard = false,
   enableDataZoom = false,
@@ -274,7 +274,7 @@ export function MultiLineChart({
       type: 'value' as const,
       name: yAxis?.name,
       nameLocation: 'middle' as const,
-      nameGap: yAxis?.name ? 50 : 0,
+      nameGap: yAxis?.name ? 35 : 0,
       nameTextStyle: { color: themeColors.muted },
       axisLine: { show: false },
       axisTick: { show: false },
@@ -400,9 +400,12 @@ export function MultiLineChart({
     // ECharts v6: grid now handles label containment by default with explicit padding
     const gridConfig = {
       top: grid?.top ?? 16,
-      right: grid?.right ?? 16,
-      bottom: grid?.bottom ?? (xAxis.name ? 50 : 24),
-      left: grid?.left ?? (yAxis?.name ? 50 : 16),
+      right: grid?.right ?? 24,
+      bottom: grid?.bottom ?? (xAxis.name ? 30 : 24),
+      left: grid?.left ?? (yAxis?.name ? 24 : 8),
+      // ECharts v6: use outerBounds instead of deprecated containLabel
+      outerBoundsMode: 'same' as const,
+      outerBoundsContain: 'axisLabel' as const,
     };
 
     // Create default smart tooltip formatter
@@ -518,9 +521,11 @@ export function MultiLineChart({
     themeColors.border,
     themeColors.muted,
     themeColors.surface,
+    themeColors.background,
     xAxis,
     yAxis,
     displayedSeries,
+    series,
     grid,
     tooltipFormatter,
     tooltipTrigger,
@@ -676,7 +681,12 @@ export function MultiLineChart({
           ref={chartRef}
           echarts={echarts}
           option={option}
-          style={{ height, width: '100%', minHeight: height, pointerEvents: 'auto' }}
+          style={{
+            height: typeof _height === 'number' && !(showLegend && series.length > 1) ? _height + 52 : _height,
+            width: '100%',
+            minHeight: typeof _height === 'number' && !(showLegend && series.length > 1) ? _height + 52 : _height,
+            pointerEvents: 'auto',
+          }}
           notMerge={false}
           opts={{ renderer: 'canvas' }}
         />

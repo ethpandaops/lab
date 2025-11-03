@@ -5,6 +5,7 @@ import {
   ClipboardDocumentIcon,
   EllipsisVerticalIcon,
 } from '@heroicons/react/24/outline';
+import { clsx } from 'clsx';
 import { Card } from '@/components/Layout/Card';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
@@ -243,9 +244,9 @@ export function PopoutCard({
 
   return (
     <>
-      <div ref={cardRef}>
+      <div ref={cardRef} className="h-full">
         <Card
-          className={className}
+          className={clsx('flex h-full flex-col', className)}
           header={
             <div className="flex w-full items-center justify-between gap-4">
               <div className="min-w-0 flex-1 space-y-1">
