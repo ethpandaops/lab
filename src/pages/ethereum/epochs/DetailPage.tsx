@@ -19,6 +19,8 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
 import { formatEpoch } from '@/utils';
 import { weiToEth } from '@/utils/ethereum';
+import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
+import { Route } from '@/routes/ethereum/epochs/$epoch';
 
 import { EpochHeader, EpochSlotsTable } from './components';
 import { useEpochDetailData } from './hooks';
@@ -35,6 +37,10 @@ import { useEpochDetailData } from './hooks';
  */
 export function DetailPage(): React.JSX.Element {
   const params = useParams({ from: '/ethereum/epochs/$epoch' });
+  const context = Route.useRouteContext();
+
+  // Redirect to epochs index when network changes
+  useNetworkChangeRedirect(context.redirectOnNetworkChange);
 
   // Parse and validate epoch parameter
   const epoch = useMemo(() => {

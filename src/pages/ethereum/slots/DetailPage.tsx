@@ -7,6 +7,8 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
 import { formatEpoch } from '@/utils';
+import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
+import { Route } from '@/routes/ethereum/slots/$slot';
 import { useSlotDetailData } from './hooks/useSlotDetailData';
 import { SlotBasicInfoCard } from './components/SlotBasicInfoCard';
 import { AttestationArrivalsChart } from './components/AttestationArrivalsChart';
@@ -27,6 +29,10 @@ import { BuilderCompetitionChart } from './components/BuilderCompetitionChart';
  */
 export function DetailPage(): JSX.Element {
   const { slot: slotParam } = useParams({ from: '/ethereum/slots/$slot' });
+  const context = Route.useRouteContext();
+
+  // Redirect to slots index when network changes
+  useNetworkChangeRedirect(context.redirectOnNetworkChange);
 
   // Parse slot number from URL parameter
   const slot = parseInt(slotParam, 10);

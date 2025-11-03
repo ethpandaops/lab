@@ -6,6 +6,7 @@ export const Route = createFileRoute('/ethereum/epochs/$epoch')({
   component: DetailPage,
   beforeLoad: ({ params }) => ({
     getBreadcrumb: () => ({ label: params.epoch }),
+    redirectOnNetworkChange: '/ethereum/epochs',
   }),
   head: ctx => ({
     meta: [
