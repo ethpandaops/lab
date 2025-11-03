@@ -5,7 +5,7 @@ import { NotificationProvider } from '@/providers/NotificationProvider';
 import { CopyToClipboard } from './CopyToClipboard';
 
 // Helper to render with NotificationProvider
-const renderWithProvider = (ui: React.ReactElement) => {
+const renderWithProvider = (ui: React.ReactElement): ReturnType<typeof render> => {
   return render(<NotificationProvider>{ui}</NotificationProvider>);
 };
 
