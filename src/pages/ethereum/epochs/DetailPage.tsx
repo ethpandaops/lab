@@ -1,4 +1,6 @@
 import { useParams } from '@tanstack/react-router';
+import { useMemo } from 'react';
+import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 
 import { Alert } from '@/components/Feedback/Alert';
 import { BaseFeeChart } from '@/components/Ethereum/BaseFeeChart';
@@ -15,10 +17,11 @@ import { TransactionCountChart } from '@/components/Ethereum/TransactionCountCha
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
-import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
+import { Tab } from '@/components/Navigation/Tab';
 import { formatEpoch } from '@/utils';
 import { weiToEth } from '@/utils/ethereum';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
+import { useHashTabs } from '@/hooks/useHashTabs';
 import { Route } from '@/routes/ethereum/epochs/$epoch';
 
 import { EpochHeader, EpochSlotsTable } from './components';
@@ -47,6 +50,40 @@ export function DetailPage(): React.JSX.Element {
 
   // Fetch data for this epoch
   const { data, isLoading, error } = useEpochDetailData(epoch ?? 0);
+
+  // Hash-based tab routing
+  const { selectedIndex, onChange } = useHashTabs([
+    { hash: 'slots' },
+    {
+      hash: 'blocks',
+      anchors: [
+        'blob-count-chart',
+        'gas-chart',
+        'transaction-count-chart',
+        'base-fee-chart',
+        'block-size-chart',
+        'block-arrival-times-chart',
+      ],
+    },
+    { hash: 'validators', anchors: ['missed-attestations-chart'] },
+    {
+      hash: 'mev',
+      anchors: [
+        'mev-adoption-chart',
+        'block-value-chart',
+        'mev-builder-distribution-chart',
+        'mev-relay-distribution-chart',
+      ],
+    },
+  ]);
+
+  // Calculate p95 block arrival time
+  const p95BlockArrivalTime = useMemo(() => {
+    if (!data) return null;
+    const p90Values = data.blockArrivalTimeSeries.filter(d => d.p90 !== null).map(d => d.p90!);
+    if (p90Values.length === 0) return null;
+    return p90Values.reduce((sum, val) => sum + val, 0) / p90Values.length / 1000; // Convert to seconds
+  }, [data]);
 
   // Handle invalid epoch
   if (epoch === null) {
@@ -97,124 +134,134 @@ export function DetailPage(): React.JSX.Element {
 
   return (
     <Container>
-      {/* Unified Header with breadcrumbs, title, and stats */}
-      <EpochHeader epoch={epoch} stats={data.stats} timestamp={data.stats.epochStartDateTime} />
+      {/* Unified Header with all stats integrated */}
+      <EpochHeader
+        epoch={epoch}
+        stats={data.stats}
+        timestamp={data.stats.epochStartDateTime}
+        p95BlockArrivalTime={p95BlockArrivalTime}
+      />
 
-      {/* Metrics Charts - Grid Layout */}
+      {/* Tabbed Content */}
       <div className="mt-8">
-        <ScrollAnchor id="metrics">
-          <h2 className="mb-4 text-xl font-semibold text-foreground">Metrics</h2>
-        </ScrollAnchor>
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <BlobCountChart
-            data={data.blockProductionTimeSeries.map(d => ({ x: d.slot, value: d.blobCount }))}
-            xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
-            anchorId="blob-count-chart"
-            relativeSlots={{ epoch }}
-            syncGroup="slot-number"
-          />
-          <GasUsedChart
-            data={data.blockProductionTimeSeries
-              .filter(d => d.gasUsed !== null)
-              .map(d => ({ x: d.slot, gasUsed: d.gasUsed!, gasLimit: d.gasLimit ?? undefined }))}
-            xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
-            anchorId="gas-chart"
-            relativeSlots={{ epoch }}
-            syncGroup="slot-number"
-          />
-          <TransactionCountChart
-            data={data.blockProductionTimeSeries
-              .filter(d => d.transactionCount !== null)
-              .map(d => ({ x: d.slot, value: d.transactionCount! }))}
-            xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
-            anchorId="transaction-count-chart"
-            relativeSlots={{ epoch }}
-            syncGroup="slot-number"
-          />
-          <BaseFeeChart
-            data={data.blockProductionTimeSeries
-              .filter(d => d.baseFeePerGas !== null)
-              .map(d => ({ x: d.slot, value: d.baseFeePerGas! }))}
-            xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
-            anchorId="base-fee-chart"
-            relativeSlots={{ epoch }}
-            syncGroup="slot-number"
-          />
-          <BlockSizeChart
-            data={data.blockSizeTimeSeries.map(d => ({
-              x: d.slot,
-              consensusSize: d.consensusSize,
-              consensusSizeCompressed: d.consensusSizeCompressed,
-              executionSize: d.executionSize,
-              executionSizeCompressed: d.executionSizeCompressed,
-            }))}
-            xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
-            anchorId="block-size-chart"
-            relativeSlots={{ epoch }}
-            syncGroup="slot-number"
-          />
-          <BlockArrivalTimesChart
-            data={data.blockArrivalTimeSeries.map(d => ({
-              x: d.slot,
-              min: d.min,
-              p05: d.p05,
-              p50: d.p50,
-              p90: d.p90,
-              max: d.max,
-            }))}
-            xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
-            anchorId="block-arrival-times-chart"
-            relativeSlots={{ epoch }}
-            syncGroup="slot-number"
-          />
-        </div>
-      </div>
+        <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
+          <TabList className="flex gap-2 border-b border-border">
+            <Tab hash="slots">Slots</Tab>
+            <Tab hash="blocks">Blocks</Tab>
+            <Tab hash="validators">Validators</Tab>
+            <Tab hash="mev">MEV</Tab>
+          </TabList>
 
-      {/* MEV */}
-      <div className="mt-8">
-        <ScrollAnchor id="mev">
-          <h2 className="mb-4 text-xl font-semibold text-foreground">MEV</h2>
-        </ScrollAnchor>
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <MevAdoptionChart data={data.mevTimeSeries.map(d => ({ hasMev: d.hasMev }))} anchorId="mev-adoption-chart" />
-          <BlockValueChart
-            data={data.mevTimeSeries
-              .filter(d => d.blockValue !== null)
-              .map(d => ({ x: d.slot, value: weiToEth(d.blockValue!) }))}
-            xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
-            anchorId="block-value-chart"
-            relativeSlots={{ epoch }}
-            syncGroup="slot-number"
-          />
-          <MevBuilderDistributionChart data={data.mevTimeSeries} anchorId="mev-builder-distribution-chart" />
-          <MevRelayDistributionChart data={data.mevTimeSeries} anchorId="mev-relay-distribution-chart" />
-        </div>
-      </div>
+          <TabPanels className="mt-6">
+            {/* Slots Tab */}
+            <TabPanel>
+              <EpochSlotsTable slots={data.slots} />
+            </TabPanel>
 
-      {/* Attestations */}
-      <div className="mt-8">
-        <ScrollAnchor id="attestations">
-          <h2 className="mb-4 text-xl font-semibold text-foreground">Attestations</h2>
-        </ScrollAnchor>
-        <TopEntitiesChart
-          data={data.missedAttestationsByEntity.map(m => ({ x: m.slot, entity: m.entity, count: m.count }))}
-          xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
-          yAxis={{ name: 'Missed' }}
-          title="Offline Validators"
-          topN={10}
-          anchorId="missed-attestations-chart"
-          emptyMessage="No offline validators detected in this epoch"
-          relativeSlots={{ epoch }}
-          syncGroup="slot-number"
-        />
-      </div>
+            {/* Blocks Tab */}
+            <TabPanel>
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <BlobCountChart
+                  data={data.blockProductionTimeSeries.map(d => ({ x: d.slot, value: d.blobCount }))}
+                  xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
+                  anchorId="blob-count-chart"
+                  relativeSlots={{ epoch }}
+                  syncGroup="slot-number"
+                />
+                <GasUsedChart
+                  data={data.blockProductionTimeSeries
+                    .filter(d => d.gasUsed !== null)
+                    .map(d => ({ x: d.slot, gasUsed: d.gasUsed!, gasLimit: d.gasLimit ?? undefined }))}
+                  xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
+                  anchorId="gas-chart"
+                  relativeSlots={{ epoch }}
+                  syncGroup="slot-number"
+                />
+                <TransactionCountChart
+                  data={data.blockProductionTimeSeries
+                    .filter(d => d.transactionCount !== null)
+                    .map(d => ({ x: d.slot, value: d.transactionCount! }))}
+                  xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
+                  anchorId="transaction-count-chart"
+                  relativeSlots={{ epoch }}
+                  syncGroup="slot-number"
+                />
+                <BaseFeeChart
+                  data={data.blockProductionTimeSeries
+                    .filter(d => d.baseFeePerGas !== null)
+                    .map(d => ({ x: d.slot, value: d.baseFeePerGas! }))}
+                  xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
+                  anchorId="base-fee-chart"
+                  relativeSlots={{ epoch }}
+                  syncGroup="slot-number"
+                />
+                <BlockSizeChart
+                  data={data.blockSizeTimeSeries.map(d => ({
+                    x: d.slot,
+                    consensusSize: d.consensusSize,
+                    consensusSizeCompressed: d.consensusSizeCompressed,
+                    executionSize: d.executionSize,
+                    executionSizeCompressed: d.executionSizeCompressed,
+                  }))}
+                  xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
+                  anchorId="block-size-chart"
+                  relativeSlots={{ epoch }}
+                  syncGroup="slot-number"
+                />
+                <BlockArrivalTimesChart
+                  data={data.blockArrivalTimeSeries.map(d => ({
+                    x: d.slot,
+                    min: d.min,
+                    p05: d.p05,
+                    p50: d.p50,
+                    p90: d.p90,
+                    max: d.max,
+                  }))}
+                  xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
+                  anchorId="block-arrival-times-chart"
+                  relativeSlots={{ epoch }}
+                  syncGroup="slot-number"
+                />
+              </div>
+            </TabPanel>
 
-      {/* Slots Table */}
-      <div className="mt-8">
-        <ScrollAnchor id="slot-details">
-          <h2 className="mb-4 text-xl font-semibold text-foreground">Slot Details</h2>
-        </ScrollAnchor>
-        <EpochSlotsTable slots={data.slots} />
+            {/* Validators Tab */}
+            <TabPanel>
+              <TopEntitiesChart
+                data={data.missedAttestationsByEntity.map(m => ({ x: m.slot, entity: m.entity, count: m.count }))}
+                xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
+                yAxis={{ name: 'Missed' }}
+                title="Offline Validators"
+                topN={10}
+                anchorId="missed-attestations-chart"
+                emptyMessage="No offline validators detected in this epoch"
+                relativeSlots={{ epoch }}
+                syncGroup="slot-number"
+              />
+            </TabPanel>
+
+            {/* MEV Tab */}
+            <TabPanel>
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <MevAdoptionChart
+                  data={data.mevTimeSeries.map(d => ({ hasMev: d.hasMev }))}
+                  anchorId="mev-adoption-chart"
+                />
+                <BlockValueChart
+                  data={data.mevTimeSeries
+                    .filter(d => d.blockValue !== null)
+                    .map(d => ({ x: d.slot, value: weiToEth(d.blockValue!) }))}
+                  xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
+                  anchorId="block-value-chart"
+                  relativeSlots={{ epoch }}
+                  syncGroup="slot-number"
+                />
+                <MevBuilderDistributionChart data={data.mevTimeSeries} anchorId="mev-builder-distribution-chart" />
+                <MevRelayDistributionChart data={data.mevTimeSeries} anchorId="mev-relay-distribution-chart" />
+              </div>
+            </TabPanel>
+          </TabPanels>
+        </TabGroup>
       </div>
     </Container>
   );

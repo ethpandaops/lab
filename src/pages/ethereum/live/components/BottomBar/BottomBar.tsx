@@ -1,6 +1,6 @@
 import { type JSX, memo, useState } from 'react';
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
-import clsx from 'clsx';
+import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import { Tab } from '@/components/Navigation/Tab';
 import { BlobDataAvailability } from '../BlobDataAvailability';
 import { DataColumnDataAvailability } from '../DataColumnDataAvailability';
 import { AttestationArrivals } from '../AttestationArrivals';
@@ -96,40 +96,9 @@ function BottomBarComponent({
       <div className="flex h-full flex-col bg-background md:border-t md:border-border lg:hidden">
         <TabGroup selectedIndex={selectedTab} onChange={setSelectedTab} className="flex min-h-0 flex-1 flex-col">
           <TabList className="flex shrink-0 border-y border-border bg-surface/50">
-            {showBlobAvailability && (
-              <Tab
-                className={({ selected }) =>
-                  clsx(
-                    'flex-1 px-4 py-2.5 text-sm font-medium transition-colors',
-                    selected ? 'border-b-2 border-primary text-foreground' : 'text-muted hover:text-foreground'
-                  )
-                }
-              >
-                Propagation
-              </Tab>
-            )}
-            {showDataColumnAvailability && (
-              <Tab
-                className={({ selected }) =>
-                  clsx(
-                    'flex-1 px-4 py-2.5 text-sm font-medium transition-colors',
-                    selected ? 'border-b-2 border-primary text-foreground' : 'text-muted hover:text-foreground'
-                  )
-                }
-              >
-                Data Columns
-              </Tab>
-            )}
-            <Tab
-              className={({ selected }) =>
-                clsx(
-                  'flex-1 px-4 py-2.5 text-sm font-medium transition-colors',
-                  selected ? 'border-b-2 border-primary text-foreground' : 'text-muted hover:text-foreground'
-                )
-              }
-            >
-              Attestations
-            </Tab>
+            {showBlobAvailability && <Tab className="flex-1">Propagation</Tab>}
+            {showDataColumnAvailability && <Tab className="flex-1">Data Columns</Tab>}
+            <Tab className="flex-1">Attestations</Tab>
           </TabList>
           <TabPanels className="min-h-0 flex-1 md:p-3">
             {showBlobAvailability && (

@@ -7,9 +7,10 @@ import type { EpochArtProps } from './EpochArt.types';
  * EpochArt - A 3D visualization of an epoch using p5.js
  *
  * Features:
- * - 32-segment ring representing the 32 slots in an epoch
- * - Segments light up based on filled slots
- * - Rotating visualization
+ * - 32 blocks arranged in a snaking blockchain grid (4 columns × 8 rows)
+ * - Blocks light up based on filled slots
+ * - Animated connecting lines that draw sequentially through the snaking path
+ * - Static 90-degree rotation for side view (no spinning)
  * - Theme-aware colors
  * - Transparent background
  * - Procedural variations based on epoch number
@@ -77,7 +78,9 @@ export function EpochArt({
 
     // Create the sketch
     const sketch = (p: p5): void => {
-      let rotation = 0;
+      // Animation progress for sequential line drawing (0 to 1)
+
+      let animationProgress = 0;
 
       // Cache parsed colors
       let cachedColors = {
@@ -148,66 +151,68 @@ export function EpochArt({
         p.directionalLight(255, 255, 255, 0, 0, -1);
         p.pointLight(255, 255, 255, 100, -100, 100);
 
-        // Rotate the entire scene
-        rotation += 0.005;
-        p.rotateX(p.PI / 6);
-        p.rotateY(rotation);
+        // Slight tilt to see 3D depth
+        p.rotateX(-0.3);
+        p.rotateY(0.1);
 
-        // Draw outer glow ring
-        p.push();
-        p.noFill();
-        p.strokeWeight(2);
-        p.stroke(cachedColors.glowR, cachedColors.glowG, cachedColors.glowB, 60);
-        p.torus(50, 3);
-        p.pop();
-
-        // Draw 32 segments representing slots
-        const segments = 32;
-        const radius = 45;
-        const segmentAngle = p.TWO_PI / segments;
-        const segmentThickness = 4;
-        const segmentDepth = 8;
-
-        for (let i = 0; i < segments; i++) {
-          const angle = i * segmentAngle;
-
-          p.push();
-          p.rotateZ(angle);
-          p.translate(radius, 0, 0);
-
-          // Determine if this slot is filled
-          const isFilled = i < filledSlots;
-
-          if (isFilled) {
-            // Filled slot - bright and solid
-            p.strokeWeight(1);
-            p.stroke(cachedColors.accentR, cachedColors.accentG, cachedColors.accentB, 255);
-            p.fill(cachedColors.primaryR, cachedColors.primaryG, cachedColors.primaryB, 220);
-          } else {
-            // Empty slot - dim and transparent
-            p.strokeWeight(1);
-            p.stroke(cachedColors.primaryR, cachedColors.primaryG, cachedColors.primaryB, 100);
-            p.fill(cachedColors.primaryR, cachedColors.primaryG, cachedColors.primaryB, 50);
-          }
-
-          p.box(segmentThickness, segmentThickness, segmentDepth);
-          p.pop();
+        // Animate the blocks (each block takes ~2 seconds, full cycle ~64 seconds)
+        animationProgress += 0.0005;
+        if (animationProgress > 1) {
+          animationProgress = 0;
         }
 
-        // Draw center core
-        p.push();
-        p.noStroke();
-        p.fill(cachedColors.accentR, cachedColors.accentG, cachedColors.accentB, 150);
-        p.sphere(12);
-        p.pop();
+        // Draw 32 blocks in reading order (8 columns x 4 rows)
+        const cols = 8;
+        const rows = 4;
+        const blockSize = 10;
+        const spacing = 14;
+        const blockDepth = 10;
 
-        // Draw inner ring
-        p.push();
-        p.noFill();
-        p.strokeWeight(2);
-        p.stroke(cachedColors.primaryR, cachedColors.primaryG, cachedColors.primaryB, 180);
-        p.torus(20, 2);
-        p.pop();
+        // Calculate grid dimensions and centering offset
+        const gridWidth = (cols - 1) * spacing;
+        const gridHeight = (rows - 1) * spacing;
+        const offsetX = -gridWidth / 2;
+        const offsetY = -gridHeight / 2;
+
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            // Calculate block index in reading order (left-to-right, top-to-bottom)
+            // Row 0: 0,1,2,3 | Row 1: 4,5,6,7 | Row 2: 8,9,10,11 etc.
+            const blockIndex = row * cols + col;
+
+            // Position in 3D space
+            // x = horizontal position (left to right)
+            // y = vertical position (top to bottom)
+            const x = offsetX + col * spacing;
+            const y = offsetY + row * spacing;
+            const z = 0;
+
+            // Calculate if this block should be filled based on animation progress
+            const blockProgress = blockIndex / 32;
+            const blockActivated = animationProgress >= blockProgress;
+
+            p.push();
+            p.translate(x, y, z);
+
+            // Determine if this slot is filled
+            const isFilled = blockIndex < filledSlots;
+
+            if (blockActivated && isFilled) {
+              // Activated and filled slot - bright and solid
+              p.strokeWeight(1);
+              p.stroke(cachedColors.accentR, cachedColors.accentG, cachedColors.accentB, 255);
+              p.fill(cachedColors.primaryR, cachedColors.primaryG, cachedColors.primaryB, 220);
+            } else {
+              // Unactivated or empty slot - just outline, no fill
+              p.strokeWeight(1);
+              p.stroke(cachedColors.primaryR, cachedColors.primaryG, cachedColors.primaryB, 120);
+              p.noFill();
+            }
+
+            p.box(blockSize, blockSize, blockDepth);
+            p.pop();
+          }
+        }
       };
     };
 
