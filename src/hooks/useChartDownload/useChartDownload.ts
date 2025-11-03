@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { toPng } from 'html-to-image';
 import type { EChartsInstance } from 'echarts-for-react';
-import { useTheme } from '@/hooks/useTheme';
+import { resolveCssColorToHex } from '@/utils/color';
 import type { ChartDownloadResult, UseChartDownloadOptions } from './useChartDownload.types';
 
 /**
@@ -24,24 +24,13 @@ import type { ChartDownloadResult, UseChartDownloadOptions } from './useChartDow
  * ```
  */
 export function useChartDownload(): ChartDownloadResult {
-  // useTheme is optional - it may not be available in test environments or outside ThemeProvider
-  let theme: 'light' | 'dark' = 'dark';
-  try {
-    const themeContext = useTheme();
-    theme = themeContext.theme;
-  } catch {
-    // ThemeProvider not available - default to dark theme
-    theme = 'dark';
-  }
-
   /**
-   * Get the background color based on current theme
+   * Get the background color from CSS variable --color-surface
+   * This works across all themes (light, dark, star) dynamically
    */
   const getBackgroundColor = useCallback((): string => {
-    // Use theme-appropriate surface color
-    // Light theme: sand-50 (#fafaf9), Dark theme: #242424
-    return theme === 'light' ? '#fafaf9' : '#242424';
-  }, [theme]);
+    return resolveCssColorToHex('var(--color-surface)', '#242424');
+  }, []);
 
   /**
    * Load an image and return as HTMLImageElement
