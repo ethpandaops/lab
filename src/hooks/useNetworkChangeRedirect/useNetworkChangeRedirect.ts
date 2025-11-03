@@ -43,7 +43,6 @@ export function useNetworkChangeRedirect(redirectPath?: string): void {
       // Check if network changed (including undefined → defined or defined → undefined)
       if (currentNetwork !== previousNetworkRef.current) {
         // Update ref for next comparison
-        const previousNetwork = previousNetworkRef.current;
         previousNetworkRef.current = currentNetwork;
 
         // Navigate to parent path, preserving the new network param
