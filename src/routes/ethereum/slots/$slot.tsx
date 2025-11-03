@@ -5,6 +5,7 @@ export const Route = createFileRoute('/ethereum/slots/$slot')({
   component: DetailPage,
   beforeLoad: ({ params }) => ({
     getBreadcrumb: () => ({ label: params.slot }),
+    redirectOnNetworkChange: '/ethereum/slots',
   }),
   head: ctx => ({
     meta: [
