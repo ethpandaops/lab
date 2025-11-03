@@ -4,7 +4,6 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
-import { BlockArt } from '@/components/Ethereum/BlockArt';
 import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
 import { formatEpoch } from '@/utils';
@@ -164,18 +163,7 @@ export function DetailPage(): JSX.Element {
 
   return (
     <Container>
-      {/* BlockArt - p5.js 3D cube */}
-      <div className="mb-6 flex items-center justify-center lg:justify-end">
-        <BlockArt
-          width={180}
-          height={180}
-          blockHash={data.blockHead[0]?.block_root}
-          blockNumber={data.blockHead[0]?.execution_payload_block_number ?? slot}
-        />
-      </div>
-
       <div className="space-y-6">
-        {/* Basic slot information card */}
         <SlotBasicInfoCard slot={slot} epoch={epoch} data={data} />
 
         {/* Attestations Section */}
