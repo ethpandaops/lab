@@ -1,4 +1,4 @@
-import { type JSX } from 'react';
+import { type JSX, memo } from 'react';
 import { Link } from '@tanstack/react-router';
 import { PlayIcon, PauseIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
@@ -12,7 +12,7 @@ import type { MobileSlotHeaderProps } from './MobileSlotHeader.types';
  * Displays slot number, epoch, and playback controls in a horizontal layout
  * optimized for mobile screens.
  */
-export function MobileSlotHeader({
+function MobileSlotHeaderComponent({
   currentSlot,
   isPlaying,
   onPlayPause,
@@ -72,3 +72,17 @@ export function MobileSlotHeader({
     </div>
   );
 }
+
+// Custom comparison function to prevent re-renders when data hasn't changed
+const arePropsEqual = (prevProps: MobileSlotHeaderProps, nextProps: MobileSlotHeaderProps): boolean => {
+  return (
+    prevProps.currentSlot === nextProps.currentSlot &&
+    prevProps.isPlaying === nextProps.isPlaying &&
+    prevProps.isLive === nextProps.isLive &&
+    prevProps.onPlayPause === nextProps.onPlayPause &&
+    prevProps.onBackward === nextProps.onBackward &&
+    prevProps.onForward === nextProps.onForward
+  );
+};
+
+export const MobileSlotHeader = memo(MobileSlotHeaderComponent, arePropsEqual);

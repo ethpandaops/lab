@@ -3,6 +3,7 @@ import { Card } from '@/components/Layout/Card';
 import { Badge } from '@/components/Elements/Badge';
 import { Slot } from '@/components/Ethereum/Slot';
 import { Epoch } from '@/components/Ethereum/Epoch';
+import { BlockArt } from '@/components/Ethereum/BlockArt';
 import { formatGasWithPercentage } from '@/utils';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { SlotBasicInfoCardProps } from './SlotBasicInfoCard.types';
@@ -77,124 +78,137 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
         </div>
       }
     >
-      {/* Slot Information Grid - More compact and information-dense layout */}
-      <div className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3 lg:grid-cols-4">
-        {/* Slot Number */}
-        <div>
-          <dt className="text-xs font-medium text-muted">Slot</dt>
-          <dd className="mt-1 text-base/7 font-semibold text-foreground">
-            <Slot slot={slot} noLink />
-          </dd>
-        </div>
+      <div className="flex flex-col gap-6 lg:flex-row">
+        <div className="flex-1">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3 lg:grid-cols-4">
+            {/* Slot Number */}
+            <div>
+              <dt className="text-xs font-medium text-muted">Slot</dt>
+              <dd className="mt-1 text-base/7 font-semibold text-foreground">
+                <Slot slot={slot} noLink />
+              </dd>
+            </div>
 
-        {/* Epoch */}
-        <div>
-          <dt className="text-xs font-medium text-muted">Epoch</dt>
-          <dd className="mt-1 text-base/7 font-semibold text-foreground">
-            <Epoch epoch={epoch} />
-          </dd>
-        </div>
+            {/* Epoch */}
+            <div>
+              <dt className="text-xs font-medium text-muted">Epoch</dt>
+              <dd className="mt-1 text-base/7 font-semibold text-foreground">
+                <Epoch epoch={epoch} />
+              </dd>
+            </div>
 
-        {/* Slot Timestamp */}
-        <div className="col-span-2">
-          <dt className="text-xs font-medium text-muted">Slot Time</dt>
-          <dd className="mt-1 text-sm text-foreground">
-            {blockHead?.slot_start_date_time ? (
-              <Timestamp timestamp={blockHead.slot_start_date_time} format="short" />
-            ) : blockProposer?.slot_start_date_time ? (
-              <Timestamp timestamp={blockProposer.slot_start_date_time} format="short" />
-            ) : (
-              'N/A'
-            )}
-          </dd>
-        </div>
-
-        {/* Relative Time */}
-        <div className="col-span-2 sm:col-span-1">
-          <dt className="text-xs font-medium text-muted">Age</dt>
-          <dd className="mt-1 text-sm text-foreground">
-            {blockHead?.slot_start_date_time ? (
-              <Timestamp timestamp={blockHead.slot_start_date_time} format="relative" />
-            ) : blockProposer?.slot_start_date_time ? (
-              <Timestamp timestamp={blockProposer.slot_start_date_time} format="relative" />
-            ) : (
-              'N/A'
-            )}
-          </dd>
-        </div>
-
-        {/* Epoch Timestamp */}
-        <div className="col-span-2 sm:col-span-1">
-          <dt className="text-xs font-medium text-muted">Epoch Start</dt>
-          <dd className="mt-1 text-sm text-foreground">
-            {blockHead?.epoch_start_date_time ? (
-              <Timestamp timestamp={blockHead.epoch_start_date_time} format="short" />
-            ) : (
-              'N/A'
-            )}
-          </dd>
-        </div>
-
-        {/* Proposer Index */}
-        <div className="col-span-2">
-          <dt className="text-xs font-medium text-muted">Proposer</dt>
-          <dd className="mt-1 text-sm text-foreground">
-            {blockProposer?.proposer_validator_index !== undefined ? (
-              <>
-                {proposerLink ? (
-                  <a
-                    href={proposerLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    Validator {blockProposer.proposer_validator_index}
-                  </a>
+            {/* Slot Timestamp */}
+            <div className="col-span-2">
+              <dt className="text-xs font-medium text-muted">Slot Time</dt>
+              <dd className="mt-1 text-sm text-foreground">
+                {blockHead?.slot_start_date_time ? (
+                  <Timestamp timestamp={blockHead.slot_start_date_time} format="short" />
+                ) : blockProposer?.slot_start_date_time ? (
+                  <Timestamp timestamp={blockProposer.slot_start_date_time} format="short" />
                 ) : (
-                  `Validator ${blockProposer.proposer_validator_index}`
+                  'N/A'
                 )}
-                {proposerEntity?.entity && <span className="ml-2 text-muted">({proposerEntity.entity})</span>}
-              </>
-            ) : (
-              'N/A'
-            )}
-          </dd>
-        </div>
+              </dd>
+            </div>
 
-        {/* Block Root */}
-        <div className="col-span-2">
-          <dt className="text-xs font-medium text-muted">Block Root</dt>
-          <dd className="mt-1 font-mono text-xs text-foreground">{formatBlockRoot(blockHead?.block_root)}</dd>
-        </div>
+            {/* Relative Time */}
+            <div className="col-span-2 sm:col-span-1">
+              <dt className="text-xs font-medium text-muted">Age</dt>
+              <dd className="mt-1 text-sm text-foreground">
+                {blockHead?.slot_start_date_time ? (
+                  <Timestamp timestamp={blockHead.slot_start_date_time} format="relative" />
+                ) : blockProposer?.slot_start_date_time ? (
+                  <Timestamp timestamp={blockProposer.slot_start_date_time} format="relative" />
+                ) : (
+                  'N/A'
+                )}
+              </dd>
+            </div>
 
-        {/* Execution Block Number */}
-        <div>
-          <dt className="text-xs font-medium text-muted">Execution Block</dt>
-          <dd className="mt-1 text-base/7 font-semibold text-foreground">
-            {blockHead?.execution_payload_block_number ?? 'N/A'}
-          </dd>
-        </div>
+            {/* Epoch Timestamp */}
+            <div className="col-span-2 sm:col-span-1">
+              <dt className="text-xs font-medium text-muted">Epoch Start</dt>
+              <dd className="mt-1 text-sm text-foreground">
+                {blockHead?.epoch_start_date_time ? (
+                  <Timestamp timestamp={blockHead.epoch_start_date_time} format="short" />
+                ) : (
+                  'N/A'
+                )}
+              </dd>
+            </div>
 
-        {/* Blob Count */}
-        <div>
-          <dt className="text-xs font-medium text-muted">Blobs</dt>
-          <dd className="mt-1 text-base/7 font-semibold text-foreground">
-            {blobCount?.blob_count !== undefined && blobCount?.blob_count !== null ? `${blobCount.blob_count}` : '0'}
-          </dd>
-        </div>
+            {/* Proposer Index */}
+            <div className="col-span-2">
+              <dt className="text-xs font-medium text-muted">Proposer</dt>
+              <dd className="mt-1 text-sm text-foreground">
+                {blockProposer?.proposer_validator_index !== undefined ? (
+                  <>
+                    {proposerLink ? (
+                      <a
+                        href={proposerLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        Validator {blockProposer.proposer_validator_index}
+                      </a>
+                    ) : (
+                      `Validator ${blockProposer.proposer_validator_index}`
+                    )}
+                    {proposerEntity?.entity && <span className="ml-2 text-muted">({proposerEntity.entity})</span>}
+                  </>
+                ) : (
+                  'N/A'
+                )}
+              </dd>
+            </div>
 
-        {/* MEV Value */}
-        <div className="col-span-2 sm:col-span-1">
-          <dt className="text-xs font-medium text-muted">MEV Value</dt>
-          <dd className="mt-1 text-base/7 font-semibold text-foreground">{formatMevValue(blockMev?.value)}</dd>
-        </div>
+            {/* Block Root */}
+            <div className="col-span-2">
+              <dt className="text-xs font-medium text-muted">Block Root</dt>
+              <dd className="mt-1 font-mono text-xs text-foreground">{formatBlockRoot(blockHead?.block_root)}</dd>
+            </div>
 
-        {/* Gas Used / Limit */}
-        <div className="col-span-2 sm:col-span-3 lg:col-span-1">
-          <dt className="text-xs font-medium text-muted">Gas Used / Limit</dt>
-          <dd className="mt-1 text-sm text-foreground">
-            {formatGasWithPercentage(blockHead?.execution_payload_gas_used, blockHead?.execution_payload_gas_limit)}
-          </dd>
+            {/* Execution Block Number */}
+            <div>
+              <dt className="text-xs font-medium text-muted">Execution Block</dt>
+              <dd className="mt-1 text-base/7 font-semibold text-foreground">
+                {blockHead?.execution_payload_block_number ?? 'N/A'}
+              </dd>
+            </div>
+
+            {/* Blob Count */}
+            <div>
+              <dt className="text-xs font-medium text-muted">Blobs</dt>
+              <dd className="mt-1 text-base/7 font-semibold text-foreground">
+                {blobCount?.blob_count !== undefined && blobCount?.blob_count !== null
+                  ? `${blobCount.blob_count}`
+                  : '0'}
+              </dd>
+            </div>
+
+            {/* MEV Value */}
+            <div className="col-span-2 sm:col-span-1">
+              <dt className="text-xs font-medium text-muted">MEV Value</dt>
+              <dd className="mt-1 text-base/7 font-semibold text-foreground">{formatMevValue(blockMev?.value)}</dd>
+            </div>
+
+            {/* Gas Used / Limit */}
+            <div className="col-span-2 sm:col-span-3 lg:col-span-1">
+              <dt className="text-xs font-medium text-muted">Gas Used / Limit</dt>
+              <dd className="mt-1 text-sm text-foreground">
+                {formatGasWithPercentage(blockHead?.execution_payload_gas_used, blockHead?.execution_payload_gas_limit)}
+              </dd>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-center lg:items-start">
+          <BlockArt
+            width={180}
+            height={180}
+            blockHash={blockHead?.block_root}
+            blockNumber={blockHead?.execution_payload_block_number ?? slot}
+          />
         </div>
       </div>
     </Card>

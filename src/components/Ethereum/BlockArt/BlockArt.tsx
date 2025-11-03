@@ -124,6 +124,12 @@ export function BlockArt({
       };
 
       p.setup = () => {
+        // Clean up any existing canvases in the container before creating new one
+        if (containerRef.current) {
+          const existingCanvases = containerRef.current.querySelectorAll('canvas');
+          existingCanvases.forEach(canvas => canvas.remove());
+        }
+
         p.createCanvas(width, height, p.WEBGL);
         p.randomSeed(seed);
         p.loop(); // Ensure animation loop starts
@@ -193,6 +199,12 @@ export function BlockArt({
         // Then remove the canvas and cleanup
         p5InstanceRef.current.remove();
         p5InstanceRef.current = null;
+      }
+
+      // Extra cleanup: manually remove any remaining canvases
+      if (containerRef.current) {
+        const canvases = containerRef.current.querySelectorAll('canvas');
+        canvases.forEach(canvas => canvas.remove());
       }
     };
   }, [width, height, blockHash, blockNumber]); // Removed color deps - they update via ref

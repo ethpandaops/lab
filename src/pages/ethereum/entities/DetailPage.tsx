@@ -6,6 +6,8 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
+import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
+import { Route } from '@/routes/ethereum/entities/$entity';
 
 import {
   AttestationRateChart,
@@ -30,6 +32,10 @@ import { useEntityDetailData } from './hooks';
  */
 export function DetailPage(): React.JSX.Element {
   const params = useParams({ from: '/ethereum/entities/$entity' });
+  const context = Route.useRouteContext();
+
+  // Redirect to entities index when network changes
+  useNetworkChangeRedirect(context.redirectOnNetworkChange);
 
   // Decode entity name from URL parameter
   const entityName = useMemo(() => {

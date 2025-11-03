@@ -242,8 +242,8 @@ export function BoxPlot({
         echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
-        notMerge={true}
-        lazyUpdate={false}
+        notMerge={false}
+        lazyUpdate={true}
       />
     </div>
   );

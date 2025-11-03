@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { LineChart as EChartsLine } from 'echarts/charts';
@@ -85,6 +85,33 @@ export function MultiLineChart({
   const themeColors = useThemeColors();
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
+  // Helper functions for relative slot display
+  const toRelativeSlot = useCallback(
+    (absoluteSlot: number): number => {
+      if (!relativeSlots) return absoluteSlot;
+      return absoluteSlot - relativeSlots.epoch * 32 + 1;
+    },
+    [relativeSlots]
+  );
+
+  const formatSlotLabel = useCallback(
+    (absoluteSlot: number): string => {
+      if (!relativeSlots) return formatSmartDecimal(absoluteSlot, 0);
+      const relativeSlot = toRelativeSlot(absoluteSlot);
+      return `${relativeSlot}`;
+    },
+    [relativeSlots, toRelativeSlot]
+  );
+
+  const formatSlotTooltip = useCallback(
+    (absoluteSlot: number): string => {
+      if (!relativeSlots) return formatSmartDecimal(absoluteSlot, 0);
+      const relativeSlot = toRelativeSlot(absoluteSlot);
+      return `Slot: ${formatSmartDecimal(absoluteSlot, 0)} (${relativeSlot}/32)`;
+    },
+    [relativeSlots, toRelativeSlot]
+  );
+
   // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
   const convertedColorPalette = colorPalette?.map(color => resolveCssColorToHex(color));
 
@@ -95,7 +122,6 @@ export function MultiLineChart({
   const [showAggregate, setShowAggregate] = useState(false);
 
   // Manage visible series when interactive legend is enabled
-  // Include all series in the set, respecting initial visible property
   const [visibleSeries, setVisibleSeries] = useState<Set<string>>(
     new Set(series.filter(s => s.visible !== false).map(s => s.name))
   );
@@ -107,17 +133,13 @@ export function MultiLineChart({
   const seenSeriesNamesRef = useRef<Set<string>>(new Set());
 
   // Update visible series when series prop changes
-  // Preserve user selections and only auto-show genuinely new series (respecting initial visible property)
+  // Preserve user selections and only auto-show genuinely new series
   useEffect(() => {
-    // Track ALL series names (including those with visible: false)
-    const allSeriesNames = new Set(series.map(s => s.name));
-
-    // Get series that should be visible by default (visible !== false)
-    const defaultVisibleNames = new Set(series.filter(s => s.visible !== false).map(s => s.name));
+    const currentSeriesNames = new Set(series.filter(s => s.visible !== false).map(s => s.name));
 
     // Find genuinely new series (never seen before)
     const newSeriesNames = new Set<string>();
-    allSeriesNames.forEach(name => {
+    currentSeriesNames.forEach(name => {
       if (!seenSeriesNamesRef.current.has(name)) {
         newSeriesNames.add(name);
         seenSeriesNamesRef.current.add(name); // Track that we've seen this series
@@ -129,22 +151,20 @@ export function MultiLineChart({
       const updated = new Set(prevVisible);
       let changed = false;
 
-      // Remove series that no longer exist at all
+      // Remove series that no longer exist
       prevVisible.forEach(name => {
-        if (!allSeriesNames.has(name)) {
+        if (!currentSeriesNames.has(name)) {
           updated.delete(name);
           changed = true;
         }
       });
 
-      // Auto-add only genuinely new series that are visible by default
+      // Auto-add only genuinely new series
       if (newSeriesNames.size > 0) {
         newSeriesNames.forEach(name => {
-          if (defaultVisibleNames.has(name)) {
-            updated.add(name);
-            changed = true;
-          }
+          updated.add(name);
         });
+        changed = true;
       }
 
       // Return same reference if nothing changed to avoid re-render
@@ -217,129 +237,9 @@ export function MultiLineChart({
     showAggregate,
   ]);
 
-  // Build series configuration
-  // Note: Don't filter by visible property here - displayedSeries already handles visibility via visibleSeries state
-  const seriesConfig = displayedSeries.map(s => {
-    // Use explicit color or auto-assign from palette
-    const originalIndex = series.indexOf(s);
-    const seriesColor = s.color || extendedPalette[originalIndex % extendedPalette.length];
-
-    const baseConfig = {
-      name: s.name,
-      type: 'line' as const,
-      data: s.data,
-      smooth: s.smooth ?? false,
-      step: s.step ?? false,
-      connectNulls,
-      showSymbol: s.showSymbol ?? false,
-      symbolSize: s.symbolSize ?? 4,
-      lineStyle: {
-        color: seriesColor,
-        width: s.lineWidth ?? 2,
-        type: s.lineStyle ?? ('solid' as const),
-      },
-      itemStyle: {
-        color: seriesColor,
-      },
-      // Add emphasis configuration for hover effects
-      // Auto-enable symbol display on hover for better interactivity (especially important for step charts)
-      emphasis: s.emphasis
-        ? {
-            focus: s.emphasis.focus,
-            itemStyle: {
-              color: seriesColor,
-            },
-            ...(s.emphasis.showSymbol !== undefined ? { showSymbol: s.emphasis.showSymbol } : {}),
-            ...(s.emphasis.symbolSize !== undefined ? { symbolSize: s.emphasis.symbolSize } : {}),
-          }
-        : {
-            focus: 'series' as const,
-            showSymbol: true,
-            symbolSize: 8,
-            itemStyle: {
-              color: seriesColor,
-              borderColor: themeColors.background,
-              borderWidth: 2,
-            },
-          },
-      // Add label at the right side of the chart if requested
-      ...(s.showEndLabel
-        ? {
-            markPoint: {
-              symbol: 'none',
-              label: {
-                show: true,
-                position: 'insideEndTop' as const,
-                formatter: s.name,
-                color: seriesColor,
-                fontSize: 12,
-                fontWeight: 'bold' as const,
-                backgroundColor: 'transparent',
-              },
-              data: [
-                {
-                  xAxis: 'max' as const,
-                  yAxis: Array.isArray(s.data[0]) ? (s.data[0] as [number, number])[1] : 0,
-                },
-              ],
-            },
-          }
-        : {}),
-    };
-
-    // Add area style if requested
-    if (s.showArea) {
-      return {
-        ...baseConfig,
-        areaStyle: {
-          color:
-            s.areaOpacity !== undefined
-              ? hexToRgba(seriesColor, s.areaOpacity)
-              : {
-                  type: 'linear' as const,
-                  x: 0,
-                  y: 0,
-                  x2: 0,
-                  y2: 1,
-                  colorStops: [
-                    {
-                      offset: 0,
-                      color: hexToRgba(seriesColor, 0.5),
-                    },
-                    {
-                      offset: 1,
-                      color: hexToRgba(seriesColor, 0.06),
-                    },
-                  ],
-                },
-        },
-      };
-    }
-
-    return baseConfig;
-  });
-
   // Build complete option
-  // Memoize based on actual data that should trigger re-animation, not intermediate objects
+  // Memoize based on actual data that should trigger re-animation
   const option = useMemo(() => {
-    // Helper functions for relative slot display
-    const toRelativeSlot = (absoluteSlot: number): number => {
-      if (!relativeSlots) return absoluteSlot;
-      return absoluteSlot - relativeSlots.epoch * 32 + 1;
-    };
-
-    const formatSlotLabel = (absoluteSlot: number): string => {
-      if (!relativeSlots) return formatSmartDecimal(absoluteSlot, 0);
-      const relativeSlot = toRelativeSlot(absoluteSlot);
-      return `${relativeSlot}`;
-    };
-
-    const formatSlotTooltip = (absoluteSlot: number): string => {
-      if (!relativeSlots) return formatSmartDecimal(absoluteSlot, 0);
-      const relativeSlot = toRelativeSlot(absoluteSlot);
-      return `Slot: ${formatSmartDecimal(absoluteSlot, 0)} (${relativeSlot}/32)`;
-    };
-
     // Build x-axis configuration
     const xAxisConfig = {
       type: xAxis.type,
@@ -352,9 +252,7 @@ export function MultiLineChart({
       axisLine: { lineStyle: { color: themeColors.border } },
       axisLabel: {
         color: themeColors.muted,
-        fontSize: 12,
         formatter: xAxis.formatter || (relativeSlots ? (value: number) => formatSlotLabel(value) : undefined),
-        showMaxLabel: false, // Don't force-render the max value to avoid awkward tick spacing
       },
       splitLine: {
         lineStyle: {
@@ -383,7 +281,6 @@ export function MultiLineChart({
       },
       axisLabel: {
         color: themeColors.muted,
-        fontSize: 12,
         formatter: yAxis?.formatter,
       },
       min: yAxis?.min,
@@ -391,17 +288,116 @@ export function MultiLineChart({
       minInterval: yAxis?.minInterval,
     };
 
+    // Build series configuration
+    // Note: Don't filter by visible property here - displayedSeries already handles visibility via visibleSeries state
+    const seriesConfig = displayedSeries.map(s => {
+      // Use explicit color or auto-assign from palette
+      const originalIndex = series.indexOf(s);
+      const seriesColor = s.color || extendedPalette[originalIndex % extendedPalette.length];
+
+      const baseConfig = {
+        name: s.name,
+        type: 'line' as const,
+        data: s.data,
+        smooth: s.smooth ?? false,
+        step: s.step ?? false,
+        connectNulls,
+        showSymbol: s.showSymbol ?? false,
+        symbolSize: s.symbolSize ?? 4,
+        lineStyle: {
+          color: seriesColor,
+          width: s.lineWidth ?? 2,
+          type: s.lineStyle ?? ('solid' as const),
+        },
+        itemStyle: {
+          color: seriesColor,
+        },
+        // Add emphasis configuration for hover effects
+        // Auto-enable symbol display on hover for better interactivity (especially important for step charts)
+        emphasis: s.emphasis
+          ? {
+              focus: s.emphasis.focus,
+              itemStyle: {
+                color: seriesColor,
+              },
+              ...(s.emphasis.showSymbol !== undefined ? { showSymbol: s.emphasis.showSymbol } : {}),
+              ...(s.emphasis.symbolSize !== undefined ? { symbolSize: s.emphasis.symbolSize } : {}),
+            }
+          : {
+              focus: 'series' as const,
+              showSymbol: true,
+              symbolSize: 8,
+              itemStyle: {
+                color: seriesColor,
+                borderColor: themeColors.background,
+                borderWidth: 2,
+              },
+            },
+        // Add label at the right side of the chart if requested
+        ...(s.showEndLabel
+          ? {
+              markPoint: {
+                symbol: 'none',
+                label: {
+                  show: true,
+                  position: 'insideEndTop' as const,
+                  formatter: s.name,
+                  color: seriesColor,
+                  fontSize: 12,
+                  fontWeight: 'bold' as const,
+                  backgroundColor: 'transparent',
+                },
+                data: [
+                  {
+                    xAxis: 'max' as const,
+                    yAxis: Array.isArray(s.data[0]) ? (s.data[0] as [number, number])[1] : 0,
+                  },
+                ],
+              },
+            }
+          : {}),
+      };
+
+      // Add area style if requested
+      if (s.showArea) {
+        return {
+          ...baseConfig,
+          areaStyle: {
+            color:
+              s.areaOpacity !== undefined
+                ? hexToRgba(seriesColor, s.areaOpacity)
+                : {
+                    type: 'linear' as const,
+                    x: 0,
+                    y: 0,
+                    x2: 0,
+                    y2: 1,
+                    colorStops: [
+                      {
+                        offset: 0,
+                        color: hexToRgba(seriesColor, 0.5),
+                      },
+                      {
+                        offset: 1,
+                        color: hexToRgba(seriesColor, 0.06),
+                      },
+                    ],
+                  },
+          },
+        };
+      }
+
+      return baseConfig;
+    });
+
     // Calculate grid padding
     // Title is always rendered by component, never by ECharts
-    // ECharts v6: outerBounds adds padding for tick labels, axis names need explicit space
+    // ECharts v6: grid now handles label containment by default with explicit padding
     const gridConfig = {
       top: grid?.top ?? 16,
-      right: grid?.right,
-      bottom: grid?.bottom ?? (xAxis.name ? 30 : 24),
-      left: grid?.left ?? (yAxis?.name ? 30 : 8),
-      // ECharts v6: use outerBounds instead of deprecated containLabel
-      outerBoundsMode: 'same' as const,
-      outerBoundsContain: 'axisLabel' as const,
+      right: grid?.right ?? 16,
+      bottom: grid?.bottom ?? (xAxis.name ? 50 : 24),
+      left: grid?.left ?? (yAxis?.name ? 50 : 16),
     };
 
     // Create default smart tooltip formatter
@@ -486,14 +482,13 @@ export function MultiLineChart({
     };
 
     return {
-      animation: true,
+      // ECharts v6: animation is enabled by default with optimized performance
       animationDuration,
       animationEasing: 'cubicOut' as const,
       backgroundColor: 'transparent',
       textStyle: {
         color: themeColors.foreground,
       },
-      // Never pass title to ECharts - component always renders it
       grid: gridConfig,
       xAxis: xAxisConfig,
       yAxis: yAxisConfig,
@@ -514,15 +509,22 @@ export function MultiLineChart({
     };
   }, [
     animationDuration,
-    themeColors,
-    enableDataZoom,
-    seriesConfig,
+    themeColors.foreground,
+    themeColors.border,
+    themeColors.muted,
+    themeColors.surface,
     xAxis,
     yAxis,
+    displayedSeries,
     grid,
-    tooltipTrigger,
     tooltipFormatter,
+    tooltipTrigger,
+    enableDataZoom,
+    connectNulls,
+    extendedPalette,
     relativeSlots,
+    formatSlotLabel,
+    formatSlotTooltip,
   ]);
 
   const chartContent = (
@@ -669,7 +671,7 @@ export function MultiLineChart({
           echarts={echarts}
           option={option}
           style={{ height, width: '100%', minHeight: height, pointerEvents: 'auto' }}
-          notMerge={true}
+          notMerge={false}
           opts={{ renderer: 'canvas' }}
         />
       </div>
