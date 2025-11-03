@@ -1,4 +1,4 @@
-import { type JSX, useMemo, useRef, useCallback } from 'react';
+import { type JSX, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useSlotPlayerState, useSlotPlayerProgress, useSlotPlayerActions } from '@/hooks/useSlotPlayer';
 import { Map2DChart } from '@/components/Charts/Map2D';
 import { Sidebar } from '../Sidebar';
@@ -89,7 +89,18 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
   const lastChartTimeRef = useRef(-1);
   const lastSlotRef = useRef(currentSlot);
 
+  // Stable reference for the returned data object - only mutate properties
+  const timeFilteredDataRef = useRef<TimeFilteredData>({
+    visibleMapPoints: [],
+    attestationCount: 0,
+    attestationPercentage: 0,
+    deduplicatedBlobData: [],
+    visibleContinentalPropagationData: [],
+    attestationChartValues: [],
+  });
+
   // Reset refs when slot changes
+  // IMPORTANT: Create NEW array instances so components see them as changed
   if (currentSlot !== lastSlotRef.current) {
     mapIndexRef.current = -1;
     visibleMapPointsRef.current = [];
@@ -100,9 +111,30 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
     attestationChartValuesRef.current = [];
     lastChartTimeRef.current = -1;
     lastSlotRef.current = currentSlot;
+
+    // Create NEW arrays for the stable reference object
+    // This ensures components receive different array references and can detect the reset
+    const emptyMapPoints: typeof sortedMapPoints = [];
+    const emptyBlobData: typeof deduplicatedBlobTimeline = [];
+    const emptyContinentalData: typeof sortedContinentalSeries = [];
+    const emptyAttestationValues: (number | null)[] = [];
+
+    timeFilteredDataRef.current.visibleMapPoints = emptyMapPoints;
+    timeFilteredDataRef.current.attestationCount = 0;
+    timeFilteredDataRef.current.attestationPercentage = 0;
+    timeFilteredDataRef.current.deduplicatedBlobData = emptyBlobData;
+    timeFilteredDataRef.current.visibleContinentalPropagationData = emptyContinentalData;
+    timeFilteredDataRef.current.attestationChartValues = emptyAttestationValues;
+
+    // Store these empty arrays in refs so useEffect can detect they need updating
+    visibleMapPointsRef.current = emptyMapPoints;
+    deduplicatedBlobDataRef.current = emptyBlobData;
+    visibleContinentalPropagationDataRef.current = emptyContinentalData;
+    attestationChartValuesRef.current = emptyAttestationValues;
   }
 
-  const timeFilteredData = useMemo<TimeFilteredData>(() => {
+  // Update timeFilteredDataRef in place - no new objects, no re-renders
+  useEffect(() => {
     const mapIndex = upperBound(sortedMapPoints, point => point.earliestSeenTime, currentTime);
 
     // Only update map points if index changed
@@ -110,11 +142,20 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
       visibleMapPointsRef.current =
         mapIndex === sortedMapPoints.length ? sortedMapPoints : sortedMapPoints.slice(0, mapIndex);
       mapIndexRef.current = mapIndex;
+      timeFilteredDataRef.current.visibleMapPoints = visibleMapPointsRef.current;
     }
 
     const attestationCount = slotData.attestationActualCount;
     const attestationPercentage =
       slotData.attestationTotalExpected > 0 ? (attestationCount / slotData.attestationTotalExpected) * 100 : 0;
+
+    // Only update if changed
+    if (timeFilteredDataRef.current.attestationCount !== attestationCount) {
+      timeFilteredDataRef.current.attestationCount = attestationCount;
+    }
+    if (timeFilteredDataRef.current.attestationPercentage !== attestationPercentage) {
+      timeFilteredDataRef.current.attestationPercentage = attestationPercentage;
+    }
 
     const blobIndex = upperBound(deduplicatedBlobTimeline, blob => blob.time, currentTime);
 
@@ -125,6 +166,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
           ? deduplicatedBlobTimeline
           : deduplicatedBlobTimeline.slice(0, blobIndex);
       blobIndexRef.current = blobIndex;
+      timeFilteredDataRef.current.deduplicatedBlobData = deduplicatedBlobDataRef.current;
     }
 
     // Only update continental data if any index changed
@@ -148,6 +190,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
             };
       });
       continentalIndicesRef.current = newContinentalIndices;
+      timeFilteredDataRef.current.visibleContinentalPropagationData = visibleContinentalPropagationDataRef.current;
     }
 
     // Only rebuild attestation chart values when needed
@@ -159,16 +202,8 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
         return attestationTimeToCount.get(time) ?? 0;
       });
       lastChartTimeRef.current = roundedTime;
+      timeFilteredDataRef.current.attestationChartValues = attestationChartValuesRef.current;
     }
-
-    return {
-      visibleMapPoints: visibleMapPointsRef.current,
-      attestationCount,
-      attestationPercentage,
-      deduplicatedBlobData: deduplicatedBlobDataRef.current,
-      visibleContinentalPropagationData: visibleContinentalPropagationDataRef.current,
-      attestationChartValues: attestationChartValuesRef.current,
-    };
   }, [
     sortedMapPoints,
     deduplicatedBlobTimeline,
@@ -178,6 +213,9 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
     slotData.attestationTotalExpected,
     currentTime,
   ]);
+
+  // Return stable reference - never changes
+  const timeFilteredData = timeFilteredDataRef.current;
 
   return (
     <>
