@@ -35,40 +35,28 @@ func (s *Service) GetStateGrowthByCategory(
 		return nil, err
 	}
 
-	// For daily granularity, only query the latest day to avoid timeout
+	// For daily granularity, query the last 7,150 blocks (approximately 24 hours at 12 sec/block)
 	var startBlock, endBlock uint64
 	if req.Granularity == pb.GetStateGrowthByCategoryRequest_GRANULARITY_DAILY {
-		// Query to get the latest day's block range
-		latestDayQuery := fmt.Sprintf(`
-			WITH latest AS (
-				SELECT max(block_number) as max_block
-				FROM %s.canonical_execution_storage_diffs
-			),
-			latest_day AS (
-				SELECT toDate(toDateTime(%d + max_block * 12)) as day
-				FROM latest
-			),
-			day_start AS (
-				SELECT toUnixTimestamp(toDateTime(day)) as ts
-				FROM latest_day
-			),
-			day_end AS (
-				SELECT toUnixTimestamp(toDateTime(day) + INTERVAL 1 DAY) as ts
-				FROM latest_day
-			)
-			SELECT
-				((SELECT ts FROM day_start) - %d) / 12 as start_block,
-				((SELECT ts FROM day_end) - %d) / 12 as end_block
-		`, network, s.getGenesisTime(network), s.getGenesisTime(network), s.getGenesisTime(network))
+		// Query to get the latest block
+		latestBlockQuery := fmt.Sprintf(`
+			SELECT max(block_number) as max_block
+			FROM %s.canonical_execution_storage_diffs
+		`, network)
 
-		latestDayRows, err := client.Query(ctx, latestDayQuery)
-		if err != nil || len(latestDayRows) == 0 {
+		latestRows, err := client.Query(ctx, latestBlockQuery)
+		if err != nil || len(latestRows) == 0 {
 			s.recordMetrics(method, network, StatusError, time.Since(startTime).Seconds())
-			return nil, fmt.Errorf("failed to get latest day range: %w", err)
+			return nil, fmt.Errorf("failed to get latest block: %w", err)
 		}
 
-		startBlock = getUint64(latestDayRows[0], "start_block")
-		endBlock = getUint64(latestDayRows[0], "end_block")
+		endBlock = getUint64(latestRows[0], "max_block")
+		// Query last 7,150 blocks (approximately 24 hours at 12 sec/block)
+		if endBlock > 7149 {
+			startBlock = endBlock - 7149
+		} else {
+			startBlock = 0
+		}
 	} else {
 		startBlock = req.StartBlock
 		endBlock = req.EndBlock
@@ -78,11 +66,9 @@ func (s *Service) GetStateGrowthByCategory(
 	var timeBucketExpr string
 	switch req.Granularity {
 	case pb.GetStateGrowthByCategoryRequest_GRANULARITY_DAILY:
-		// Group by day using block timestamps
-		timeBucketExpr = fmt.Sprintf(
-			"toDate(toDateTime(%d + block_number * 12))",
-			s.getGenesisTime(network),
-		)
+		// For daily, use a constant bucket since we're querying ~1 day of data
+		// No timestamp needed - we return block numbers for daily granularity
+		timeBucketExpr = "'latest_period'"
 	case pb.GetStateGrowthByCategoryRequest_GRANULARITY_MONTHLY:
 		// Group by month (Paradigm Figure 3 style)
 		timeBucketExpr = fmt.Sprintf(
@@ -92,15 +78,12 @@ func (s *Service) GetStateGrowthByCategory(
 	case pb.GetStateGrowthByCategoryRequest_GRANULARITY_YEARLY:
 		// Group by year
 		timeBucketExpr = fmt.Sprintf(
-			"toYear(toDateTime(%d + block_number * 12))",
+			"toStartOfYear(toDateTime(%d + block_number * 12))",
 			s.getGenesisTime(network),
 		)
 	default:
-		// Default to daily for latest day
-		timeBucketExpr = fmt.Sprintf(
-			"toDate(toDateTime(%d + block_number * 12))",
-			s.getGenesisTime(network),
-		)
+		// Default to constant bucket
+		timeBucketExpr = "'latest_period'"
 	}
 
 	// Set defaults for optional parameters
@@ -116,6 +99,9 @@ func (s *Service) GetStateGrowthByCategory(
 	query = strings.ReplaceAll(query, "{end_block}", fmt.Sprintf("%d", endBlock))
 	query = strings.ReplaceAll(query, "{bytes_per_slot}", fmt.Sprintf("%d", BytesPerSlot))
 	query = strings.ReplaceAll(query, "{time_bucket_expression}", timeBucketExpr)
+
+	// Log the query for debugging
+	s.log.WithField("network", network).Debugf("Executing state growth query: %s", query)
 
 	// Execute query
 	rows, err := client.Query(ctx, query)
@@ -156,22 +142,17 @@ func (s *Service) GetStateGrowthByCategory(
 	// Convert to sorted time series
 	var timeSeries []*pb.CategoryGrowthTimeSeries
 
-	// Get sorted time periods
+	// Get sorted time periods (for daily this will be just one: "latest_period")
 	var sortedPeriods []interface{}
 	for period := range timePeriods {
 		sortedPeriods = append(sortedPeriods, period)
 	}
 
-	// Sort periods chronologically
+	// Sort periods (for monthly/yearly, this will sort by date; for daily it's just one bucket)
 	sort.Slice(sortedPeriods, func(i, j int) bool {
-		// Convert to time for comparison
-		ti := periodToTime(sortedPeriods[i], s.getGenesisTime(network))
-		tj := periodToTime(sortedPeriods[j], s.getGenesisTime(network))
-		return ti.Before(tj)
+		// Simple string/value comparison
+		return fmt.Sprintf("%v", sortedPeriods[i]) < fmt.Sprintf("%v", sortedPeriods[j])
 	})
-
-	// Track actual start/end blocks from data (reuse variables from earlier)
-	genesisTime := s.getGenesisTime(network)
 
 	for _, period := range sortedPeriods {
 		contracts := timePeriods[period]
@@ -218,20 +199,35 @@ func (s *Service) GetStateGrowthByCategory(
 			})
 		}
 
-		// Convert period to timestamp and block number
-		periodTime := periodToTime(period, genesisTime)
-		blockNumber := uint64((periodTime.Unix() - genesisTime) / 12)
+		// For daily granularity, we don't use timestamps - just show the block number
+		// For monthly/yearly, we can still derive from the period value
+		var periodTime time.Time
+		var blockNumber uint64
 
-		// Track start and end blocks
-		if startBlock == 0 || blockNumber < startBlock {
-			startBlock = blockNumber
+		if req.Granularity == pb.GetStateGrowthByCategoryRequest_GRANULARITY_DAILY {
+			// For daily, use the end block as the reference
+			blockNumber = endBlock
+			// Don't set timestamp for daily - we're showing block-based data
+			periodTime = time.Time{}
+			s.log.Debugf("DAILY: period=%v, periodTime.IsZero()=%v", period, periodTime.IsZero())
+		} else {
+			// For monthly/yearly, convert period to time
+			periodTime = periodToTime(period, s.getGenesisTime(network))
+			if bn, ok := period.(uint64); ok {
+				blockNumber = bn
+			}
 		}
-		if blockNumber > endBlock {
-			endBlock = blockNumber
+
+		var timestampProto *timestamppb.Timestamp
+		if !periodTime.IsZero() {
+			timestampProto = timestamppb.New(periodTime)
+			s.log.Debugf("Setting timestamp: %v", periodTime)
+		} else {
+			s.log.Debugf("NOT setting timestamp (periodTime.IsZero()=true)")
 		}
 
 		timeSeries = append(timeSeries, &pb.CategoryGrowthTimeSeries{
-			Timestamp:      timestamppb.New(periodTime),
+			Timestamp:      timestampProto,
 			BlockNumber:    blockNumber,
 			Categories:     []*pb.CategoryGrowthData{categoryData},
 			TotalNetSlots:  totalNetSlots,
@@ -241,12 +237,24 @@ func (s *Service) GetStateGrowthByCategory(
 
 	s.recordMetrics(method, network, StatusSuccess, time.Since(startTime).Seconds())
 
+	// For daily granularity, we don't set timestamps in the response
+	// For monthly/yearly, use the timestamps from the data
+	var startTimeProto, endTimeProto *timestamppb.Timestamp
+	if req.Granularity != pb.GetStateGrowthByCategoryRequest_GRANULARITY_DAILY && len(timeSeries) > 0 {
+		if timeSeries[0].Timestamp != nil {
+			startTimeProto = timeSeries[0].Timestamp
+		}
+		if timeSeries[len(timeSeries)-1].Timestamp != nil {
+			endTimeProto = timeSeries[len(timeSeries)-1].Timestamp
+		}
+	}
+
 	return &pb.GetStateGrowthByCategoryResponse{
 		TimeSeries: timeSeries,
 		StartBlock: startBlock,
 		EndBlock:   endBlock,
-		StartTime:  timestamppb.New(time.Unix(genesisTime+int64(startBlock)*12, 0)),
-		EndTime:    timestamppb.New(time.Unix(genesisTime+int64(endBlock)*12, 0)),
+		StartTime:  startTimeProto,
+		EndTime:    endTimeProto,
 	}, nil
 }
 

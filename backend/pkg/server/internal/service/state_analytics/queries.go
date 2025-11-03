@@ -191,11 +191,16 @@ LIMIT 1
 `
 
 // Query to get state growth categorized by contract (Paradigm Figures 2 & 3)
-// Uses canonical_execution_storage_diffs table for execution layer data
+// Uses canonical_execution_storage_diffs table for execution layer data (NOT beacon chain)
 //
-// TODO(performance): CRITICAL PERFORMANCE ISSUE - This query times out (60s+) on production data.
-// The canonical_execution_storage_diffs table has 10.6B+ rows and querying from genesis scans
-// billions of rows. This is NOT production-ready. Solutions:
+// IMPORTANT: This query operates on EXECUTION LAYER blocks only. Do NOT use beacon chain tables
+// like int_block_canonical - they have different block number spaces.
+//
+// Current implementation: Queries last ~7,150 execution blocks (24 hours) to limit scan size.
+// Query time: ~2-5 minutes due to scanning 10.6B row table without materialized views.
+//
+// TODO(performance): Performance can be improved with pre-aggregated materialized views.
+// The canonical_execution_storage_diffs table has 10.6B+ rows. Solutions:
 //
 // Option 1 (RECOMMENDED): Create pre-aggregated materialized views
 //   - CREATE MATERIALIZED VIEW mv_daily_state_growth_by_address AS
