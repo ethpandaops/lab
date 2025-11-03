@@ -12,6 +12,7 @@ const mockRouter = {
 
 vi.mock('@tanstack/react-router', () => ({
   useRouter: () => mockRouter,
+  useNavigate: () => mockNavigate,
 }));
 
 describe('useNetworkChangeRedirect', () => {
