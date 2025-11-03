@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { getDataVizColors } from './dataVizColors';
+import { getDataVizColors, invalidateDataVizColorsCache } from './dataVizColors';
 
 describe('getDataVizColors', () => {
   let mockElement: HTMLElement;
@@ -81,9 +81,11 @@ describe('getDataVizColors', () => {
 
     vi.restoreAllMocks();
 
-    // Clear the cache by triggering a mutation
-    // This forces the cache to reset for the next test
-    document.documentElement.className = `test-${Date.now()}`;
+    // Explicitly invalidate cache for next test
+    invalidateDataVizColorsCache();
+
+    // Reset to light theme
+    document.documentElement.className = '';
   });
 
   describe('BLOB_COLORS', () => {
@@ -232,10 +234,10 @@ describe('getDataVizColors', () => {
       expect(firstCallCount).toBe(33);
     });
 
-    it('should invalidate cache when html class changes', () => {
+    it('should invalidate cache when theme changes', () => {
       const firstCall = getDataVizColors();
 
-      // Trigger cache invalidation by changing html class (simulates theme change)
+      // Trigger cache invalidation by adding theme class
       document.documentElement.className = 'dark';
 
       // Allow MutationObserver to process
@@ -243,14 +245,16 @@ describe('getDataVizColors', () => {
         setTimeout(() => {
           const secondCall = getDataVizColors();
 
-          // Should be different object references after cache invalidation
+          // Should be different object references after theme change
           expect(firstCall).not.toBe(secondCall);
           resolve();
         }, 50);
       });
     });
 
-    it('should recompute colors after cache invalidation', () => {
+    it('should recompute colors after theme change', () => {
+      // Start with light theme (empty className)
+      document.documentElement.className = '';
       getDataVizColors();
 
       // Update mock to return different colors
@@ -265,8 +269,8 @@ describe('getDataVizColors', () => {
         } as unknown as CSSStyleDeclaration;
       }) as typeof window.getComputedStyle;
 
-      // Invalidate cache
-      document.documentElement.className = 'light';
+      // Invalidate cache by changing to dark theme
+      document.documentElement.className = 'dark';
 
       // Allow MutationObserver to process
       return new Promise<void>(resolve => {
@@ -280,25 +284,39 @@ describe('getDataVizColors', () => {
   });
 
   describe('MutationObserver behavior', () => {
-    it('should observe html class attribute changes', () => {
-      // Create spy on MutationObserver
-      const _observeSpy = vi.spyOn(MutationObserver.prototype, 'observe');
-
-      // Force module re-evaluation would be complex, so we verify the observer is working
-      // by checking that class changes trigger cache invalidation
+    it('should invalidate cache only on theme changes (dark/star)', () => {
       const firstCall = getDataVizColors();
-      document.documentElement.className = 'theme-dark';
+
+      // Add dark theme class
+      document.documentElement.className = 'dark';
 
       return new Promise<void>(resolve => {
         setTimeout(() => {
           const secondCall = getDataVizColors();
+          // Should invalidate cache on theme change
           expect(firstCall).not.toBe(secondCall);
           resolve();
         }, 50);
       });
     });
 
-    it('should only monitor class attribute changes', () => {
+    it('should NOT invalidate cache on non-theme class changes', () => {
+      const firstCall = getDataVizColors();
+
+      // Add a non-theme class (should not invalidate cache)
+      document.documentElement.className = 'some-other-class';
+
+      return new Promise<void>(resolve => {
+        setTimeout(() => {
+          const secondCall = getDataVizColors();
+          // Should be the same reference (cache not invalidated)
+          expect(firstCall).toBe(secondCall);
+          resolve();
+        }, 50);
+      });
+    });
+
+    it('should only monitor class attribute changes, not other attributes', () => {
       const firstCall = getDataVizColors();
 
       // Change a different attribute (should not invalidate cache)
@@ -359,8 +377,8 @@ describe('getDataVizColors', () => {
         } as unknown as CSSStyleDeclaration;
       }) as typeof window.getComputedStyle;
 
-      // Invalidate cache
-      document.documentElement.className = 'test-empty';
+      // Invalidate cache by switching to dark theme (triggers cache invalidation)
+      document.documentElement.className = 'dark';
 
       // Wait for MutationObserver to process
       await new Promise(resolve => setTimeout(resolve, 50));
@@ -387,8 +405,8 @@ describe('getDataVizColors', () => {
         } as unknown as CSSStyleDeclaration;
       }) as typeof window.getComputedStyle;
 
-      // Invalidate cache
-      document.documentElement.className = 'test-whitespace';
+      // Invalidate cache by switching to star theme (triggers cache invalidation)
+      document.documentElement.className = 'star';
 
       // Wait for MutationObserver to process
       await new Promise(resolve => setTimeout(resolve, 50));

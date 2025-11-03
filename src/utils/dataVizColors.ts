@@ -117,6 +117,14 @@ function computeDataVizColors(): {
 }
 
 /**
+ * Invalidate the data viz colors cache (for testing)
+ * @internal
+ */
+export function invalidateDataVizColorsCache(): void {
+  cache.colors = null;
+}
+
+/**
  * Get data visualization colors from CSS variables
  *
  * These colors represent data categories (not UI elements) and remain
