@@ -30,10 +30,18 @@ export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
   const { slot: currentSlot } = useBeaconClock();
 
   /**
-   * Sort slots by slot number descending (newest first)
+   * Sort slots by slot number ascending (oldest first)
    */
   const sortedSlots = useMemo((): SlotData[] => {
-    return [...slots].sort((a, b) => b.slot - a.slot);
+    return [...slots].sort((a, b) => a.slot - b.slot);
+  }, [slots]);
+
+  /**
+   * Get the epoch number from the first slot
+   */
+  const epoch = useMemo(() => {
+    if (slots.length === 0) return 0;
+    return Math.floor(slots[0].slot / 32);
   }, [slots]);
 
   /**
@@ -41,6 +49,13 @@ export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
    */
   const columns: Column<SlotData>[] = useMemo(
     () => [
+      {
+        header: 'Slot in Epoch',
+        accessor: row => {
+          const slotInEpoch = (row.slot % 32) + 1;
+          return <span className="text-muted">{slotInEpoch}/32</span>;
+        },
+      },
       {
         header: 'Slot',
         accessor: row => {
