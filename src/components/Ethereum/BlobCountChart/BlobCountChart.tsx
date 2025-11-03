@@ -92,7 +92,6 @@ export function BlobCountChart({
             valueDecimals: 0, // No decimals in tooltips
           }}
           height={isInModal ? 600 : chartHeight}
-          grid={{ left: 60 }}
           showLegend={false}
           enableDataZoom={true}
           animationDuration={300}

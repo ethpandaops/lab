@@ -82,7 +82,7 @@ export function Card({
         </div>
       )}
       {header && <div className={clsx('relative z-10 px-4 py-5 sm:px-6', styles.header)}>{header}</div>}
-      <div className={clsx('relative z-10 px-4 py-5 sm:p-6', styles.main)}>{children}</div>
+      <div className={clsx('relative z-10 flex-1 px-4 py-5 sm:p-6', styles.main)}>{children}</div>
       {footer && <div className={clsx('relative z-10 px-4 py-4 sm:px-6', styles.footer)}>{footer}</div>}
     </div>
   );

@@ -52,7 +52,7 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
     titleLeft = 'center',
     titleTop = 8,
     orientation = 'vertical',
-    height = 400,
+    height: _height = 400,
     color,
     max,
     barWidth = '60%',
@@ -230,12 +230,12 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
   ]);
 
   return (
-    <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
+    <div className={_height === '100%' ? 'h-full w-full' : 'w-full'}>
       <ReactEChartsCore
         ref={ref}
         echarts={echarts}
         option={option}
-        style={{ height, width: '100%', minHeight: height }}
+        style={{ height: _height, width: '100%', minHeight: _height }}
         notMerge={true}
         lazyUpdate={false}
       />

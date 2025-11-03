@@ -115,7 +115,6 @@ export function GasUsedChart({
             valueDecimals: 1,
           }}
           height={isInModal ? 600 : chartHeight}
-          grid={{ left: 60 }}
           showLegend={shouldShowLegend}
           enableDataZoom={true}
           animationDuration={300}
