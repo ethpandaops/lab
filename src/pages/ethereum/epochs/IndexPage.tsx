@@ -28,32 +28,11 @@ export function IndexPage(): React.JSX.Element {
   const navigate = useNavigate();
   const { epochs, missedAttestationsByEntity, isLoading, error, currentEpoch } = useEpochsData();
 
-  // Calculate epoch range from all epochs data
-  const epochRange = useMemo(() => {
-    if (epochs.length === 0) {
-      return undefined;
-    }
-    const epochNumbers = epochs.map(e => e.epoch).sort((a, b) => a - b);
-    return {
-      min: epochNumbers[0],
-      max: epochNumbers[epochNumbers.length - 1],
-    };
-  }, [epochs]);
-
-  // Memoize chart data to prevent recreation on every render
+  // Memoize chart data to prevent chart remounting
   const chartData = useMemo(
     () => missedAttestationsByEntity.map(m => ({ x: m.epoch, entity: m.entity, count: m.count })),
     [missedAttestationsByEntity]
   );
-
-  // Memoize xAxis config to prevent recreation on every render
-  const xAxisConfig = useMemo(
-    () => ({ name: 'Epoch', min: epochRange?.min, max: epochRange?.max }),
-    [epochRange?.min, epochRange?.max]
-  );
-
-  // Memoize yAxis config to prevent recreation on every render
-  const yAxisConfig = useMemo(() => ({ name: 'Missed' }), []);
 
   // Format table data - show all 10 epochs
   const tableData = useMemo(() => {
@@ -167,8 +146,12 @@ export function IndexPage(): React.JSX.Element {
         <h2 className="mb-4 text-xl font-semibold text-foreground">Metrics</h2>
         <TopEntitiesChart
           data={chartData}
-          xAxis={xAxisConfig}
-          yAxis={yAxisConfig}
+          xAxis={{
+            name: 'Epoch',
+            min: epochs.length > 0 ? Math.min(...epochs.map(e => e.epoch)) : undefined,
+            max: epochs.length > 0 ? Math.max(...epochs.map(e => e.epoch)) : undefined,
+          }}
+          yAxis={{ name: 'Missed' }}
           title="Offline Validators"
           topN={10}
           anchorId="offline-validators-chart"

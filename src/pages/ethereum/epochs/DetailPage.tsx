@@ -54,18 +54,8 @@ export function DetailPage(): React.JSX.Element {
   // Fetch data for this epoch
   const { data, isLoading, error } = useEpochDetailData(epoch ?? 0);
 
-  // Calculate epoch slot boundaries (32 slots per epoch)
-  const startSlot = (epoch ?? 0) * 32;
-  const endSlot = startSlot + 31;
-
-  // Memoize xAxis config (shared across most charts) - must be before conditional returns
-  const slotXAxis = useMemo(() => ({ name: 'Slot', min: startSlot, max: endSlot }), [startSlot, endSlot]);
-
-  // Memoize relativeSlots config (shared across charts) - must be before conditional returns
-  const relativeSlots = useMemo(() => ({ epoch: epoch ?? 0 }), [epoch]);
-
-  // Memoize all chart data transformations - must be before conditional returns
-  // Use empty arrays when data is not available to maintain hook order
+  // Memoize chart data transformations to prevent chart remounting
+  // Only data props need memoization - simple config objects don't
   const blobCountData = useMemo(
     () => data?.blockProductionTimeSeries.map(d => ({ x: d.slot, value: d.blobCount })) ?? [],
     [data?.blockProductionTimeSeries]
@@ -138,8 +128,6 @@ export function DetailPage(): React.JSX.Element {
     [data?.missedAttestationsByEntity]
   );
 
-  const yAxisMissed = useMemo(() => ({ name: 'Missed' }), []);
-
   // Handle invalid epoch
   if (epoch === null) {
     return (
@@ -184,6 +172,9 @@ export function DetailPage(): React.JSX.Element {
     );
   }
 
+  const startSlot = epoch * 32;
+  const endSlot = startSlot + 31;
+
   return (
     <Container>
       {/* Unified Header with breadcrumbs, title, and stats */}
@@ -197,44 +188,44 @@ export function DetailPage(): React.JSX.Element {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <BlobCountChart
             data={blobCountData}
-            xAxis={slotXAxis}
+            xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="blob-count-chart"
-            relativeSlots={relativeSlots}
+            relativeSlots={{ epoch }}
             syncGroup="slot-number"
           />
           <GasUsedChart
             data={gasUsedData}
-            xAxis={slotXAxis}
+            xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="gas-chart"
-            relativeSlots={relativeSlots}
+            relativeSlots={{ epoch }}
             syncGroup="slot-number"
           />
           <TransactionCountChart
             data={transactionCountData}
-            xAxis={slotXAxis}
+            xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="transaction-count-chart"
-            relativeSlots={relativeSlots}
+            relativeSlots={{ epoch }}
             syncGroup="slot-number"
           />
           <BaseFeeChart
             data={baseFeeData}
-            xAxis={slotXAxis}
+            xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="base-fee-chart"
-            relativeSlots={relativeSlots}
+            relativeSlots={{ epoch }}
             syncGroup="slot-number"
           />
           <BlockSizeChart
             data={blockSizeData}
-            xAxis={slotXAxis}
+            xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="block-size-chart"
-            relativeSlots={relativeSlots}
+            relativeSlots={{ epoch }}
             syncGroup="slot-number"
           />
           <BlockArrivalTimesChart
             data={blockArrivalData}
-            xAxis={slotXAxis}
+            xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="block-arrival-times-chart"
-            relativeSlots={relativeSlots}
+            relativeSlots={{ epoch }}
             syncGroup="slot-number"
           />
         </div>
@@ -249,9 +240,9 @@ export function DetailPage(): React.JSX.Element {
           <MevAdoptionChart data={mevAdoptionData} anchorId="mev-adoption-chart" />
           <BlockValueChart
             data={blockValueData}
-            xAxis={slotXAxis}
+            xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="block-value-chart"
-            relativeSlots={relativeSlots}
+            relativeSlots={{ epoch }}
             syncGroup="slot-number"
           />
           <MevBuilderDistributionChart data={data.mevTimeSeries} anchorId="mev-builder-distribution-chart" />
@@ -266,13 +257,13 @@ export function DetailPage(): React.JSX.Element {
         </ScrollAnchor>
         <TopEntitiesChart
           data={missedAttestationsData}
-          xAxis={slotXAxis}
-          yAxis={yAxisMissed}
+          xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
+          yAxis={{ name: 'Missed' }}
           title="Offline Validators"
           topN={10}
           anchorId="missed-attestations-chart"
           emptyMessage="No offline validators detected in this epoch"
-          relativeSlots={relativeSlots}
+          relativeSlots={{ epoch }}
           syncGroup="slot-number"
         />
       </div>
