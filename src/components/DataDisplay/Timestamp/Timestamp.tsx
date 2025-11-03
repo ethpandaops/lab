@@ -67,6 +67,7 @@ export function Timestamp({
           day: 'numeric',
           hour: '2-digit',
           minute: '2-digit',
+          timeZoneName: 'short',
         });
       case 'long':
         return formatTimestamp(timestamp, {
@@ -76,6 +77,7 @@ export function Timestamp({
           day: 'numeric',
           hour: '2-digit',
           minute: '2-digit',
+          timeZoneName: 'short',
         });
       default:
         return getRelativeTime(timestamp);

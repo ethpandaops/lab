@@ -79,12 +79,12 @@ export function getRelativeTime(timestamp?: number | null): string {
 /**
  * Format a Unix timestamp to a human-readable date string
  * @param timestamp - Unix timestamp in seconds
- * @param options - Intl.DateTimeFormat options
- * @returns Formatted date string
+ * @param options - Intl.DateTimeFormat options (defaults include timezone)
+ * @returns Formatted date string with timezone
  *
  * @example
  * ```ts
- * formatTimestamp(1609459200); // "Jan 1, 2021, 12:00:00 AM"
+ * formatTimestamp(1609459200); // "Jan 1, 2021, 12:00:00 AM AEDT"
  * formatTimestamp(1609459200, { dateStyle: 'short', timeStyle: 'short' }); // "1/1/21, 12:00 AM"
  * ```
  */
@@ -97,6 +97,7 @@ export function formatTimestamp(
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
+    timeZoneName: 'short',
   }
 ): string {
   return new Date(timestamp * 1000).toLocaleString(undefined, options);

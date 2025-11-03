@@ -10,6 +10,9 @@ import { timestampToSlot, slotToTimestamp } from '@/pages/ethereum/live/utils/sl
 import { slotToEpoch, epochToTimestamp, SECONDS_PER_SLOT, SLOTS_PER_EPOCH } from '@/utils/beacon';
 import { getAllDiscordFormats, DISCORD_STYLE_LABELS } from '@/utils/discord-timestamp';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
+import { formatSlot, formatEpoch } from '@/utils/number';
+import { Slot } from '@/components/Ethereum/Slot';
+import { Epoch } from '@/components/Ethereum/Epoch';
 import type { DiscordTimestampStyle } from '@/utils/discord-timestamp';
 import type { TimestampModalContentProps } from './Timestamp.types';
 
@@ -189,40 +192,42 @@ function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.E
               <div className="overflow-hidden rounded-sm border border-border">
                 <table className="w-full">
                   <tbody className="divide-y divide-border">
-                    <TimestampRow
+                    <LinkableRow
                       label="Slot"
-                      value={beaconData.slot.toLocaleString()}
-                      onCopy={() => handleCopy(beaconData.slot.toString(), 'slot')}
+                      onCopy={() => handleCopy(formatSlot(beaconData.slot), 'slot')}
                       isCopied={copiedField === 'slot'}
-                    />
+                    >
+                      <Slot slot={beaconData.slot} />
+                    </LinkableRow>
                     <ClickableTimestampRow
                       label="Slot Start"
                       timestamp={beaconData.slotStart}
-                      context={`Slot ${beaconData.slot.toLocaleString()}`}
+                      context={`Slot ${formatSlot(beaconData.slot)}`}
                       onOpenModal={handleOpenNestedModal}
                     />
                     <ClickableTimestampRow
                       label="Slot End"
                       timestamp={slotEnd}
-                      context={`Slot ${beaconData.slot.toLocaleString()}`}
+                      context={`Slot ${formatSlot(beaconData.slot)}`}
                       onOpenModal={handleOpenNestedModal}
                     />
-                    <TimestampRow
+                    <LinkableRow
                       label="Epoch"
-                      value={beaconData.epoch.toLocaleString()}
-                      onCopy={() => handleCopy(beaconData.epoch.toString(), 'epoch')}
+                      onCopy={() => handleCopy(formatEpoch(beaconData.epoch), 'epoch')}
                       isCopied={copiedField === 'epoch'}
-                    />
+                    >
+                      <Epoch epoch={beaconData.epoch} />
+                    </LinkableRow>
                     <ClickableTimestampRow
                       label="Epoch Start"
                       timestamp={beaconData.epochStart}
-                      context={`Epoch ${beaconData.epoch.toLocaleString()}`}
+                      context={`Epoch ${formatEpoch(beaconData.epoch)}`}
                       onOpenModal={handleOpenNestedModal}
                     />
                     <ClickableTimestampRow
                       label="Epoch End"
                       timestamp={epochEnd}
-                      context={`Epoch ${beaconData.epoch.toLocaleString()}`}
+                      context={`Epoch ${formatEpoch(beaconData.epoch)}`}
                       onOpenModal={handleOpenNestedModal}
                     />
                   </tbody>
@@ -357,6 +362,41 @@ function ClickableTimestampRow({ label, timestamp, context, onOpenModal }: Click
         <div className="inline-flex rounded-xs p-2 text-muted opacity-0 transition-all group-hover:opacity-100">
           <ClipboardDocumentIcon className="size-4" />
         </div>
+      </td>
+    </tr>
+  );
+}
+
+interface LinkableRowProps {
+  label: string;
+  onCopy: () => void;
+  isCopied: boolean;
+  children: JSX.Element;
+}
+
+/**
+ * Row with linkable component (Slot or Epoch) that includes copy functionality
+ */
+function LinkableRow({ label, onCopy, isCopied, children }: LinkableRowProps): JSX.Element {
+  return (
+    <tr className="group bg-background transition-colors hover:bg-surface">
+      <td className="w-48 px-4 py-3">
+        <span className="text-xs/5 font-medium text-muted">{label}</span>
+      </td>
+      <td className="py-3 pr-4 pl-8">
+        <div className="font-mono text-sm/5 text-foreground">{children}</div>
+      </td>
+      <td className="w-16 px-4 py-3 text-right">
+        <button
+          onClick={onCopy}
+          className={clsx(
+            'inline-flex rounded-xs p-2 transition-all',
+            isCopied ? 'bg-success/20 text-success' : 'text-muted opacity-0 group-hover:opacity-100'
+          )}
+          aria-label={`Copy ${label}`}
+        >
+          {isCopied ? <CheckIcon className="size-4" /> : <ClipboardDocumentIcon className="size-4" />}
+        </button>
       </td>
     </tr>
   );

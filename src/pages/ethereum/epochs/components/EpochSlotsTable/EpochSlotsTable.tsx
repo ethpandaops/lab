@@ -6,7 +6,7 @@ import { Badge } from '@/components/Elements/Badge';
 import { Slot } from '@/components/Ethereum/Slot';
 import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
-import { formatTimestamp, getRelativeTime } from '@/utils/time';
+import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { useBeaconClock } from '@/hooks/useBeaconClock';
 import type { SlotData } from '../../hooks/useEpochDetailData.types';
 import type { EpochSlotsTableProps } from './EpochSlotsTable.types';
@@ -71,8 +71,12 @@ export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
         header: 'Timestamp',
         accessor: row => (
           <div>
-            <div className="text-muted">{formatTimestamp(row.slotStartDateTime)}</div>
-            <div className="text-sm text-muted">{getRelativeTime(row.slotStartDateTime)}</div>
+            <div className="text-muted">
+              <Timestamp timestamp={row.slotStartDateTime} format="short" />
+            </div>
+            <div className="text-sm text-muted">
+              <Timestamp timestamp={row.slotStartDateTime} format="relative" />
+            </div>
           </div>
         ),
       },
