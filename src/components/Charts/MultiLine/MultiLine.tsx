@@ -13,6 +13,7 @@ import {
 import { CanvasRenderer } from 'echarts/renderers';
 import { hexToRgba, formatSmartDecimal, getDataVizColors, resolveCssColorToHex } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { useSharedCrosshairs } from '@/hooks/useSharedCrosshairs';
 import { Disclosure } from '@/components/Layout/Disclosure';
 import type { MultiLineChartProps } from './MultiLine.types';
 
@@ -81,7 +82,11 @@ export function MultiLineChart({
   aggregateSeriesName = 'Average',
   enableSeriesFilter = false,
   relativeSlots,
+  syncGroup,
 }: MultiLineChartProps): React.JSX.Element {
+  // Get callback ref for crosshair sync
+  const chartRef = useSharedCrosshairs({ syncGroup });
+
   const themeColors = useThemeColors();
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
@@ -668,6 +673,7 @@ export function MultiLineChart({
 
       <div style={{ pointerEvents: 'none' }}>
         <ReactEChartsCore
+          ref={chartRef}
           echarts={echarts}
           option={option}
           style={{ height, width: '100%', minHeight: height, pointerEvents: 'auto' }}

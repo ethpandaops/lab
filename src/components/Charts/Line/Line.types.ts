@@ -95,4 +95,9 @@ export interface LineChartProps {
    * Y-axis title/name
    */
   yAxisTitle?: string;
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }

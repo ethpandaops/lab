@@ -12,6 +12,11 @@ export interface BlockSizeDataPoint {
   executionSize: number | null;
   /** Execution layer block size in bytes (compressed) */
   executionSizeCompressed: number | null;
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }
 
 /**
@@ -26,6 +31,11 @@ export interface BlockSizeXAxisConfig {
   max?: number;
   /** Optional formatter for axis labels */
   formatter?: (value: number | string) => string;
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }
 
 /**
@@ -56,4 +66,9 @@ export interface BlockSizeChartProps {
     /** The epoch number to calculate relative slots from */
     epoch: number;
   };
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }

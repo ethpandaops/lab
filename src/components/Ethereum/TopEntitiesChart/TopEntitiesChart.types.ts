@@ -10,6 +10,11 @@ export interface EntityMetricDataPoint {
   entity: string;
   /** Metric value for this entity at this point */
   count: number;
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }
 
 /**
@@ -24,6 +29,11 @@ export interface XAxisConfig {
   max?: number;
   /** Optional formatter for axis labels */
   formatter?: (value: number | string) => string;
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }
 
 /**
@@ -32,6 +42,11 @@ export interface XAxisConfig {
 export interface YAxisConfig {
   /** Axis label (e.g., 'Missed Attestations', 'Count') */
   name: string;
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }
 
 export interface TopEntitiesChartProps {
@@ -99,4 +114,9 @@ export interface TopEntitiesChartProps {
     /** The epoch number to calculate relative slots from */
     epoch: number;
   };
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }

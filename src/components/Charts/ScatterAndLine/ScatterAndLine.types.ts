@@ -192,4 +192,9 @@ export interface ScatterAndLineChartProps {
    * @default 150
    */
   animationDuration?: number;
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }

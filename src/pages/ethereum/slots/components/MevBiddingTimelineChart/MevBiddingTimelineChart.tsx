@@ -257,6 +257,7 @@ export function MevBiddingTimelineChart({
             animation={true}
             animationDuration={150}
             height="100%"
+            syncGroup="slot-time"
           />
         </div>
       )}

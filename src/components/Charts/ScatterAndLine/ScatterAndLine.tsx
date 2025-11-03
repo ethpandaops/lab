@@ -7,6 +7,7 @@ import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/compon
 import { CanvasRenderer } from 'echarts/renderers';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
+import { useSharedCrosshairs } from '@/hooks/useSharedCrosshairs';
 import type { ScatterAndLineChartProps } from './ScatterAndLine.types';
 
 // Get data visualization colors once at module level
@@ -71,8 +72,12 @@ export function ScatterAndLineChart({
   yAxisFormatter,
   animation = false,
   animationDuration = 150,
+  syncGroup,
 }: ScatterAndLineChartProps): JSX.Element {
   const themeColors = useThemeColors();
+
+  // Get callback ref for crosshair sync
+  const chartRef = useSharedCrosshairs({ syncGroup });
 
   const option = useMemo(() => {
     // Auto-assign colors from categorical palette for multi-series data
@@ -309,6 +314,7 @@ export function ScatterAndLineChart({
   return (
     <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
       <ReactEChartsCore
+        ref={chartRef}
         echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
