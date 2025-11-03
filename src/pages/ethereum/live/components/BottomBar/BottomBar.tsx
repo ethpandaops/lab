@@ -10,6 +10,7 @@ function BottomBarComponent({
   blockVersion,
   blobCount: _blobCount,
   dataColumnBlobCount,
+  currentSlot,
   currentTime,
   deduplicatedBlobData,
   visibleContinentalPropagationData,
@@ -29,16 +30,18 @@ function BottomBarComponent({
 
   return (
     <>
-      {/* Desktop Layout - Grid */}
-      <div className="hidden h-full grid-cols-12 gap-4 border-t border-border bg-background px-4 py-3 md:grid">
-        {/* Columns 1-8: Data Availability Section */}
-        <div className="col-span-8 h-full">
+      {/* Desktop Layout - Equal three-column grid */}
+      <div className="hidden h-full grid-cols-3 lg:grid">
+        {/* Column 1: First Seen / Data Columns */}
+        <div className="h-full border-r border-border">
           {showBlobAvailability && (
             <BlobDataAvailability
+              key={`first-seen-${currentSlot}`}
               currentTime={currentTime}
               deduplicatedBlobData={deduplicatedBlobData}
               visibleContinentalPropagationData={visibleContinentalPropagationData}
               maxTime={12000}
+              variant="first-seen-only"
             />
           )}
 
@@ -52,14 +55,34 @@ function BottomBarComponent({
           )}
 
           {!showBlobAvailability && !showDataColumnAvailability && (
-            <div className="flex h-full items-center justify-center rounded-sm bg-surface p-4">
-              <p className="text-sm text-muted">Data availability visualization unavailable for this block version</p>
+            <div className="flex h-full items-center justify-center p-4">
+              <p className="text-sm text-muted">Data unavailable</p>
             </div>
           )}
         </div>
 
-        {/* Columns 9-12: Attestation Arrivals */}
-        <div className="col-span-4 h-full">
+        {/* Column 2: Continental Propagation */}
+        <div className="h-full border-r border-border">
+          {showBlobAvailability && (
+            <BlobDataAvailability
+              key={`continental-${currentSlot}`}
+              currentTime={currentTime}
+              deduplicatedBlobData={deduplicatedBlobData}
+              visibleContinentalPropagationData={visibleContinentalPropagationData}
+              maxTime={12000}
+              variant="continental-only"
+            />
+          )}
+
+          {!showBlobAvailability && (
+            <div className="flex h-full items-center justify-center p-4">
+              <p className="text-sm text-muted">Propagation unavailable</p>
+            </div>
+          )}
+        </div>
+
+        {/* Column 3: Attestation Arrivals */}
+        <div className="h-full">
           <AttestationArrivals
             currentTime={currentTime}
             attestationChartValues={attestationChartValues}
@@ -70,7 +93,7 @@ function BottomBarComponent({
       </div>
 
       {/* Mobile Layout - Tabbed */}
-      <div className="flex h-full flex-col bg-background md:hidden md:border-t md:border-border">
+      <div className="flex h-full flex-col bg-background md:border-t md:border-border lg:hidden">
         <TabGroup selectedIndex={selectedTab} onChange={setSelectedTab} className="flex min-h-0 flex-1 flex-col">
           <TabList className="flex shrink-0 border-y border-border bg-surface/50">
             {showBlobAvailability && (
@@ -112,6 +135,7 @@ function BottomBarComponent({
             {showBlobAvailability && (
               <TabPanel className="h-full">
                 <BlobDataAvailability
+                  key={`mobile-both-${currentSlot}`}
                   currentTime={currentTime}
                   deduplicatedBlobData={deduplicatedBlobData}
                   visibleContinentalPropagationData={visibleContinentalPropagationData}
@@ -148,6 +172,7 @@ function BottomBarComponent({
 const arePropsEqual = (prevProps: BottomBarProps, nextProps: BottomBarProps): boolean => {
   return (
     prevProps.blockVersion === nextProps.blockVersion &&
+    prevProps.currentSlot === nextProps.currentSlot &&
     prevProps.currentTime === nextProps.currentTime &&
     prevProps.deduplicatedBlobData === nextProps.deduplicatedBlobData &&
     prevProps.visibleContinentalPropagationData === nextProps.visibleContinentalPropagationData &&

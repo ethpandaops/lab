@@ -4,6 +4,7 @@ export interface BottomBarProps {
   blockVersion?: string;
   blobCount: number;
   dataColumnBlobCount: number;
+  currentSlot: number;
   currentTime: number; // milliseconds from slot start (0-12000)
   deduplicatedBlobData: Array<{ blobId: string; time: number; color?: string }>;
   visibleContinentalPropagationData: ContinentalPropagationSeries[];

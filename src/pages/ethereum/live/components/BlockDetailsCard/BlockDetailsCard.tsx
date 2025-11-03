@@ -1,5 +1,4 @@
 import { type JSX, memo } from 'react';
-import { Card } from '@/components/Layout/Card';
 import { SlotProgressTimeline } from '@/components/Ethereum/SlotProgressTimeline';
 import type { BlockDetailsCardProps } from './BlockDetailsCard.types';
 
@@ -9,9 +8,9 @@ function BlockDetailsCardComponent({
   slotProgressPhases,
 }: BlockDetailsCardProps): JSX.Element {
   return (
-    <Card className="h-full p-3 md:h-44 md:p-4">
+    <div className="h-full">
       <SlotProgressTimeline phases={slotProgressPhases} mode="live" currentTime={currentTime} showStats={true} />
-    </Card>
+    </div>
   );
 }
 

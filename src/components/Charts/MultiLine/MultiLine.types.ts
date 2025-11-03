@@ -206,6 +206,19 @@ export interface MultiLineChartProps {
    */
   showLegend?: boolean;
   /**
+   * Position of the legend
+   * - 'top': Show legend above the chart
+   * - 'bottom': Show legend below the chart
+   * @default 'top'
+   */
+  legendPosition?: 'top' | 'bottom';
+  /**
+   * Use native ECharts legend instead of custom interactive buttons
+   * When true, renders a simpler built-in ECharts legend
+   * @default false
+   */
+  useNativeLegend?: boolean;
+  /**
    * Wrap chart in a card container with title and subtitle
    * @default false
    */
