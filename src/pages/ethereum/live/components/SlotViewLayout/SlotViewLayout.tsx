@@ -100,6 +100,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
   });
 
   // Reset refs when slot changes
+  // IMPORTANT: Create NEW array instances so components see them as changed
   if (currentSlot !== lastSlotRef.current) {
     mapIndexRef.current = -1;
     visibleMapPointsRef.current = [];
@@ -110,6 +111,26 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
     attestationChartValuesRef.current = [];
     lastChartTimeRef.current = -1;
     lastSlotRef.current = currentSlot;
+
+    // Create NEW arrays for the stable reference object
+    // This ensures components receive different array references and can detect the reset
+    const emptyMapPoints: typeof sortedMapPoints = [];
+    const emptyBlobData: typeof deduplicatedBlobTimeline = [];
+    const emptyContinentalData: typeof sortedContinentalSeries = [];
+    const emptyAttestationValues: (number | null)[] = [];
+
+    timeFilteredDataRef.current.visibleMapPoints = emptyMapPoints;
+    timeFilteredDataRef.current.attestationCount = 0;
+    timeFilteredDataRef.current.attestationPercentage = 0;
+    timeFilteredDataRef.current.deduplicatedBlobData = emptyBlobData;
+    timeFilteredDataRef.current.visibleContinentalPropagationData = emptyContinentalData;
+    timeFilteredDataRef.current.attestationChartValues = emptyAttestationValues;
+
+    // Store these empty arrays in refs so useEffect can detect they need updating
+    visibleMapPointsRef.current = emptyMapPoints;
+    deduplicatedBlobDataRef.current = emptyBlobData;
+    visibleContinentalPropagationDataRef.current = emptyContinentalData;
+    attestationChartValuesRef.current = emptyAttestationValues;
   }
 
   // Update timeFilteredDataRef in place - no new objects, no re-renders
