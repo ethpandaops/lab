@@ -219,36 +219,31 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
 
   return (
     <>
-      {/* Desktop Layout */}
-      <div className="hidden h-screen flex-col overflow-hidden md:flex">
-        {/* Main Content Area - 67% height */}
-        <div className="grid h-[67vh] grid-cols-12 gap-4 p-4">
-          {/* Columns 1-9: Main Content */}
-          <div className="col-span-9 flex h-full flex-col gap-4 overflow-hidden">
-            {/* Block Details Card */}
-            <div className="shrink-0">
-              <BlockDetailsCard
-                data={slotData.blockDetails}
-                currentTime={currentTime}
-                slotProgressPhases={slotProgressPhases}
-              />
-            </div>
+      {/* Desktop Layout - Clean, no-gap design */}
+      <div className="hidden h-screen flex-col overflow-hidden bg-background lg:flex">
+        {/* Top Section - Slot Progress */}
+        <div className="shrink-0 border-b border-border bg-surface px-6 py-4">
+          <BlockDetailsCard
+            data={slotData.blockDetails}
+            currentTime={currentTime}
+            slotProgressPhases={slotProgressPhases}
+          />
+        </div>
 
-            {/* Map Section - takes all remaining vertical space */}
-            <div className="min-h-0 flex-1 overflow-hidden">
-              <div className="h-full w-full">
-                <Map2DChart
-                  points={timeFilteredData.visibleMapPoints}
-                  height="100%"
-                  pointSizeMultiplier={1.2}
-                  resetKey={currentSlot}
-                />
-              </div>
-            </div>
+        {/* Main Content Area */}
+        <div className="grid min-h-0 flex-1 grid-cols-12">
+          {/* Left: Map (9 columns) */}
+          <div className="col-span-9 overflow-hidden border-r border-border bg-background">
+            <Map2DChart
+              points={timeFilteredData.visibleMapPoints}
+              height="100%"
+              pointSizeMultiplier={1.2}
+              resetKey={currentSlot}
+            />
           </div>
 
-          {/* Columns 10-12: Sidebar - flex column constrained to parent height */}
-          <div className="col-span-3 flex h-full flex-col overflow-hidden">
+          {/* Right: Sidebar (3 columns) */}
+          <div className="col-span-3 overflow-hidden bg-surface">
             <Sidebar
               currentSlot={currentSlot}
               phases={slotData.sidebarPhases}
@@ -265,12 +260,13 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
           </div>
         </div>
 
-        {/* Bottom Bar - 29% height */}
-        <div className="h-[29vh] min-h-0">
+        {/* Bottom Section - Charts */}
+        <div className="h-[22vh] shrink-0 border-t border-border bg-surface">
           <BottomBar
             blockVersion={slotData.blockDetails?.blockVersion}
             blobCount={slotData.blobCount}
             dataColumnBlobCount={slotData.dataColumnBlobCount}
+            currentSlot={currentSlot}
             currentTime={currentTime}
             deduplicatedBlobData={timeFilteredData.deduplicatedBlobData}
             visibleContinentalPropagationData={timeFilteredData.visibleContinentalPropagationData}
@@ -283,7 +279,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
       </div>
 
       {/* Mobile Layout - Vertical Stack */}
-      <div className="flex h-[calc(100vh-65px)] flex-col overflow-hidden md:hidden">
+      <div className="flex h-[calc(100vh-65px)] flex-col overflow-hidden lg:hidden">
         {/* Mobile Slot Header - 60px */}
         <div className="h-[60px] shrink-0">
           <MobileSlotHeader
@@ -309,9 +305,9 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
           />
         </div>
 
-        {/* Slim Timeline - 95px */}
-        <div className="h-[95px] shrink-0 overflow-hidden border-b border-border bg-surface">
-          <ScrollingTimeline items={slotData.sidebarItems} currentTime={currentTime} autoScroll={true} height="95px" />
+        {/* Slim Timeline - Takes remaining space after other fixed elements */}
+        <div className="min-h-0 flex-1 overflow-hidden border-b border-border bg-surface">
+          <ScrollingTimeline items={slotData.sidebarItems} currentTime={currentTime} autoScroll={true} height="100%" />
         </div>
 
         {/* Map - 264px (reclaimed space from tick labels) */}
@@ -324,12 +320,13 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
           />
         </div>
 
-        {/* Bottom Bar - Remaining space (approx 349px) */}
-        <div className="min-h-0 flex-1">
+        {/* Bottom Bar - 25vh */}
+        <div className="h-[25vh] shrink-0">
           <BottomBar
             blockVersion={slotData.blockDetails?.blockVersion}
             blobCount={slotData.blobCount}
             dataColumnBlobCount={slotData.dataColumnBlobCount}
+            currentSlot={currentSlot}
             currentTime={currentTime}
             deduplicatedBlobData={timeFilteredData.deduplicatedBlobData}
             visibleContinentalPropagationData={timeFilteredData.visibleContinentalPropagationData}

@@ -63,6 +63,11 @@ export interface BlobDataAvailabilityProps {
    */
   maxTime?: number;
   /**
+   * Which chart variant to display
+   * @default 'both' - shows both charts side-by-side
+   */
+  variant?: 'both' | 'first-seen-only' | 'continental-only';
+  /**
    * Optional className for styling
    */
   className?: string;

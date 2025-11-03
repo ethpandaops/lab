@@ -34,8 +34,8 @@ function SidebarComponent({
   const epoch = Math.floor(currentSlot / SLOTS_PER_EPOCH);
 
   return (
-    <div className={clsx('flex h-full flex-col overflow-hidden rounded-sm border border-border bg-surface', className)}>
-      {/* Slot Timeline section - seamlessly connected */}
+    <div className={clsx('flex h-full flex-col overflow-hidden', className)}>
+      {/* Slot Timeline section */}
       <div className="shrink-0 border-b border-border p-4">
         {/* Header with Slot number and Epoch subtitle */}
         <div className="mb-3">
@@ -60,7 +60,7 @@ function SidebarComponent({
         />
       </div>
 
-      {/* Scrolling Timeline - fills remaining space with scroll - seamlessly connected */}
+      {/* Scrolling Timeline - fills remaining space with scroll */}
       <ScrollingTimeline
         items={items}
         currentTime={currentTime}

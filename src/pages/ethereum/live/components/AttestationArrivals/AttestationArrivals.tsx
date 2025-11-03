@@ -23,7 +23,7 @@ function AttestationArrivalsComponent({
   const intervalChartData = useMemo(() => {
     // Create labels for 0-12s in 50ms chunks
     const timePoints = Array.from({ length: 241 }, (_, i) => i * 50);
-    const labels = timePoints.map(time => `${(time / 1000).toFixed(1)}s`);
+    const labels = timePoints.map(time => `${Math.round(time / 1000)}s`);
 
     // Calculate interval to show labels at 0s, 4s, 8s, 12s
     // 4s = 80 data points (4000ms / 50ms), so show every 80th label
@@ -35,22 +35,25 @@ function AttestationArrivalsComponent({
   return (
     <div className={clsx('flex h-full flex-col', className)}>
       {/* Attestation Arrivals Chart - takes full height */}
-      <div className="h-full bg-background md:rounded-sm md:border md:border-border md:bg-surface md:p-2">
-        <LineChart
-          data={intervalChartData.values}
-          labels={intervalChartData.labels}
-          title="ATTESTATION ARRIVALS"
-          titleFontSize={13}
-          titleLeft={16}
-          titleTop={12}
-          height="100%"
-          smooth={false}
-          showArea={true}
-          yMax={maxCount}
-          connectNulls={false}
-          animationDuration={0}
-          xAxisLabelInterval={intervalChartData.labelInterval}
-        />
+      <div className="flex h-full flex-col bg-surface p-3">
+        <div className="mb-2 shrink-0">
+          <h3 className="text-sm font-semibold text-foreground uppercase">Attestation Arrivals</h3>
+        </div>
+        <div className="min-h-0 flex-1">
+          <LineChart
+            data={intervalChartData.values}
+            labels={intervalChartData.labels}
+            xAxisTitle="Slot Time (s)"
+            yAxisTitle="Count"
+            height="100%"
+            smooth={false}
+            showArea={true}
+            yMax={maxCount}
+            connectNulls={false}
+            animationDuration={0}
+            xAxisLabelInterval={intervalChartData.labelInterval}
+          />
+        </div>
       </div>
     </div>
   );
