@@ -6,6 +6,11 @@ export interface BlockValueDataPoint {
   x: number;
   /** Block value in ETH */
   value: number;
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }
 
 /**
@@ -20,6 +25,11 @@ export interface BlockValueXAxisConfig {
   max?: number;
   /** Optional formatter for axis labels */
   formatter?: (value: number | string) => string;
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }
 
 /**
@@ -50,4 +60,9 @@ export interface BlockValueChartProps {
     /** The epoch number to calculate relative slots from */
     epoch: number;
   };
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }

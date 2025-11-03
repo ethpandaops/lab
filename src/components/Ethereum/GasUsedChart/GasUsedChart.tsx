@@ -49,6 +49,7 @@ export function GasUsedChart({
   inModal = false,
   modalSize = 'full',
   relativeSlots,
+  syncGroup,
 }: GasUsedChartProps): React.JSX.Element {
   const { series, avgGasUsed, hasGasLimit, minX } = useMemo(() => {
     if (data.length === 0) {
@@ -120,6 +121,7 @@ export function GasUsedChart({
           enableDataZoom={true}
           animationDuration={300}
           relativeSlots={relativeSlots}
+          syncGroup={syncGroup}
         />
       )}
     </PopoutCard>

@@ -68,6 +68,7 @@ export function TopEntitiesChart({
   modalSize = 'full',
   emptyMessage = 'No data available',
   relativeSlots,
+  syncGroup,
 }: TopEntitiesChartProps): React.JSX.Element {
   const { topEntities, series, minX, maxX, totalCount } = useMemo(() => {
     if (data.length === 0) {
@@ -179,6 +180,7 @@ export function TopEntitiesChart({
           enableDataZoom={true}
           animationDuration={300}
           relativeSlots={relativeSlots}
+          syncGroup={syncGroup}
         />
       )}
     </PopoutCard>
