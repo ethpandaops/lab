@@ -1,19 +1,21 @@
 import { EpochArt } from '@/components/Ethereum/EpochArt';
-import { getRelativeTime } from '@/utils/time';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
+import clsx from 'clsx';
 import type { EpochHeaderProps } from './EpochHeader.types';
 
 /**
  * Unified epoch header - everything in a single card
  */
-export function EpochHeader({ epoch, stats, timestamp }: EpochHeaderProps): React.JSX.Element {
-  const participationPercent = (stats.participationRate * 100).toFixed(2);
-  const avgBlockSeconds = stats.averageBlockFirstSeenTime ? stats.averageBlockFirstSeenTime / 1000 : null;
-
+export function EpochHeader({ epoch, stats, timestamp, p95BlockArrivalTime }: EpochHeaderProps): React.JSX.Element {
   return (
     <div className="rounded-sm border border-border bg-surface p-6">
       {/* Header with art */}
-      <div className="mb-6 flex items-center justify-between gap-6">
+      <div className="mb-6 flex items-center gap-6">
+        {/* EpochArt - smaller, on the left */}
+        <div className="shrink-0">
+          <EpochArt width={120} height={120} epochNumber={epoch} filledSlots={stats.canonicalBlockCount} />
+        </div>
+
         <div>
           <h1 className="text-4xl font-bold tracking-tight text-foreground">Epoch {epoch}</h1>
           <div className="mt-2">
@@ -33,76 +35,67 @@ export function EpochHeader({ epoch, stats, timestamp }: EpochHeaderProps): Reac
             </Timestamp>
           </div>
         </div>
-
-        {/* EpochArt - smaller */}
-        <div className="shrink-0">
-          <EpochArt width={120} height={120} epochNumber={epoch} filledSlots={stats.canonicalBlockCount} />
-        </div>
       </div>
 
-      {/* Stats Grid - single row, all stats side by side */}
-      <div className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7">
-        {/* Age */}
-        <div>
-          <dt className="text-xs font-medium text-muted">Age</dt>
-          <dd className="mt-1 text-base/7 font-semibold text-foreground">{getRelativeTime(timestamp)}</dd>
-        </div>
-        {/* Blocks */}
-        <div>
+      {/* Stat panels */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="rounded-sm border border-border bg-background p-4">
           <dt className="text-xs font-medium text-muted">Blocks</dt>
-          <dd className="mt-1 text-base/7 font-semibold text-foreground">
+          <dd
+            className={clsx(
+              'mt-1 text-base/7 font-semibold',
+              stats.canonicalBlockCount === 32 ? 'text-success' : 'text-foreground'
+            )}
+          >
             {stats.canonicalBlockCount} / 32
-            {stats.canonicalBlockCount === 32 && <span className="ml-1 text-xs text-success">✓</span>}
           </dd>
         </div>
 
-        {/* Avg Block Seen */}
-        {avgBlockSeconds !== null && (
-          <div>
-            <dt className="text-xs font-medium text-muted">Avg Block Seen</dt>
-            <dd
-              className={`mt-1 text-base/7 font-semibold tabular-nums ${
-                avgBlockSeconds < 0.5 ? 'text-success' : avgBlockSeconds > 1.0 ? 'text-warning' : 'text-foreground'
-              }`}
-            >
-              {avgBlockSeconds.toFixed(2)}s
-            </dd>
-          </div>
-        )}
-
-        {/* Participation Rate */}
-        <div>
-          <dt className="text-xs font-medium text-muted">Participation</dt>
+        <div className="rounded-sm border border-border bg-background p-4">
+          <dt className="text-xs font-medium text-muted">P95 Block Arrival</dt>
           <dd
-            className={`mt-1 text-base/7 font-semibold tabular-nums ${
+            className={clsx(
+              'mt-1 text-base/7 font-semibold tabular-nums',
+              p95BlockArrivalTime !== null && p95BlockArrivalTime !== undefined
+                ? p95BlockArrivalTime < 0.5
+                  ? 'text-success'
+                  : p95BlockArrivalTime > 1.0
+                    ? 'text-warning'
+                    : 'text-foreground'
+                : 'text-foreground'
+            )}
+          >
+            {p95BlockArrivalTime !== null && p95BlockArrivalTime !== undefined
+              ? `${p95BlockArrivalTime.toFixed(2)}s`
+              : '-'}
+          </dd>
+        </div>
+
+        <div className="rounded-sm border border-border bg-background p-4">
+          <dt className="text-xs font-medium text-muted">Attestation Participation</dt>
+          <dd
+            className={clsx(
+              'mt-1 text-base/7 font-semibold tabular-nums',
               stats.participationRate >= 0.99
                 ? 'text-success'
                 : stats.participationRate < 0.95
                   ? 'text-warning'
                   : 'text-foreground'
-            }`}
+            )}
           >
-            {participationPercent}%
+            {(stats.participationRate * 100).toFixed(2)}%
           </dd>
         </div>
 
-        {/* Missed Attestations */}
-        <div>
+        <div className="rounded-sm border border-border bg-background p-4">
           <dt className="text-xs font-medium text-muted">Missed Attestations</dt>
           <dd
-            className={`mt-1 text-base/7 font-semibold tabular-nums ${
+            className={clsx(
+              'mt-1 text-base/7 font-semibold tabular-nums',
               stats.missedAttestations > 1000 ? 'text-warning' : 'text-foreground'
-            }`}
+            )}
           >
             {stats.missedAttestations.toLocaleString()}
-          </dd>
-        </div>
-
-        {/* Missed Attestations Percentage */}
-        <div>
-          <dt className="text-xs font-medium text-muted">Missed %</dt>
-          <dd className="mt-1 text-base/7 font-semibold text-foreground tabular-nums">
-            {((stats.missedAttestations / 1000000) * 100).toFixed(3)}%
           </dd>
         </div>
       </div>

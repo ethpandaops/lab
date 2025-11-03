@@ -1,7 +1,8 @@
 import { type JSX, useState, useCallback, useEffect } from 'react';
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { ClipboardDocumentIcon, CheckIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
+import { Tab } from '@/components/Navigation/Tab';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useInterval } from '@/hooks/useInterval';
@@ -131,17 +132,8 @@ function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.E
       <TabGroup>
         <TabList className="flex gap-2 border-b border-border">
           {tabs.map(tab => (
-            <Tab
-              key={tab.name}
-              className={({ selected }) =>
-                clsx(
-                  'px-4 py-2.5 text-sm/6 font-medium transition-colors focus:outline-hidden',
-                  selected ? 'border-b-2 border-primary text-foreground' : 'text-muted hover:text-foreground'
-                )
-              }
-            >
+            <Tab key={tab.name} badge={tab.count}>
               {tab.name}
-              <span className="text-2xs/3 ml-2 rounded-xs bg-background px-1.5 py-0.5 font-semibold">{tab.count}</span>
             </Tab>
           ))}
         </TabList>
