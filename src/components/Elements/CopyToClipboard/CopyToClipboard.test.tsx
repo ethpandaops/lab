@@ -1,7 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { NotificationProvider } from '@/providers/NotificationProvider';
 import { CopyToClipboard } from './CopyToClipboard';
+
+// Helper to render with NotificationProvider
+const renderWithProvider = (ui: React.ReactElement) => {
+  return render(<NotificationProvider>{ui}</NotificationProvider>);
+};
 
 // Mock ClipboardItem
 global.ClipboardItem = class ClipboardItem {
@@ -34,13 +40,13 @@ describe('CopyToClipboard', () => {
   });
 
   it('renders default clipboard icon button', () => {
-    render(<CopyToClipboard content="test" />);
+    renderWithProvider(<CopyToClipboard content="test" />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
     expect(button).toBeInTheDocument();
   });
 
   it('renders custom children when provided', () => {
-    render(
+    renderWithProvider(
       <CopyToClipboard content="test">
         <button type="button">Custom Button</button>
       </CopyToClipboard>
@@ -52,7 +58,7 @@ describe('CopyToClipboard', () => {
   it.skip('copies text content to clipboard on click', async () => {
     const user = userEvent.setup();
 
-    render(<CopyToClipboard content="Hello World" />);
+    renderWithProvider(<CopyToClipboard content="Hello World" />);
 
     // Verify notification is NOT visible initially
     expect(screen.queryByText(/copied to clipboard!/i)).not.toBeInTheDocument();
@@ -74,7 +80,7 @@ describe('CopyToClipboard', () => {
     const user = userEvent.setup();
     const blob = new Blob(['test'], { type: 'text/plain' });
 
-    render(<CopyToClipboard content={blob} />);
+    renderWithProvider(<CopyToClipboard content={blob} />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
 
     await user.click(button);
@@ -96,7 +102,7 @@ describe('CopyToClipboard', () => {
     mockWriteText.mockResolvedValue(undefined);
     const user = userEvent.setup();
 
-    render(<CopyToClipboard content="test" />);
+    renderWithProvider(<CopyToClipboard content="test" />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
 
     await user.click(button);
@@ -110,7 +116,7 @@ describe('CopyToClipboard', () => {
     mockWriteText.mockResolvedValue(undefined);
     const user = userEvent.setup();
 
-    render(<CopyToClipboard content="test" successMessage="Custom success!" />);
+    renderWithProvider(<CopyToClipboard content="test" successMessage="Custom success!" />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
 
     await user.click(button);
@@ -124,7 +130,7 @@ describe('CopyToClipboard', () => {
     mockWriteText.mockRejectedValue(new Error('Copy failed'));
     const user = userEvent.setup();
 
-    render(<CopyToClipboard content="test" />);
+    renderWithProvider(<CopyToClipboard content="test" />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
 
     await user.click(button);
@@ -138,7 +144,7 @@ describe('CopyToClipboard', () => {
     mockWriteText.mockRejectedValue(new Error('Copy failed'));
     const user = userEvent.setup();
 
-    render(<CopyToClipboard content="test" errorMessage="Custom error!" />);
+    renderWithProvider(<CopyToClipboard content="test" errorMessage="Custom error!" />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
 
     await user.click(button);
@@ -153,7 +159,7 @@ describe('CopyToClipboard', () => {
     const onSuccess = vi.fn();
     const user = userEvent.setup();
 
-    render(<CopyToClipboard content="test" onSuccess={onSuccess} />);
+    renderWithProvider(<CopyToClipboard content="test" onSuccess={onSuccess} />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
 
     await user.click(button);
@@ -169,7 +175,7 @@ describe('CopyToClipboard', () => {
     const onError = vi.fn();
     const user = userEvent.setup();
 
-    render(<CopyToClipboard content="test" onError={onError} />);
+    renderWithProvider(<CopyToClipboard content="test" onError={onError} />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
 
     await user.click(button);
@@ -183,7 +189,7 @@ describe('CopyToClipboard', () => {
     mockWriteText.mockResolvedValue(undefined);
     const user = userEvent.setup();
 
-    render(<CopyToClipboard content="test" disabled />);
+    renderWithProvider(<CopyToClipboard content="test" disabled />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
 
     await user.click(button);
@@ -192,13 +198,13 @@ describe('CopyToClipboard', () => {
   });
 
   it('applies custom className to default button', () => {
-    render(<CopyToClipboard content="test" className="custom-class" />);
+    renderWithProvider(<CopyToClipboard content="test" className="custom-class" />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
     expect(button).toHaveClass('custom-class');
   });
 
   it('uses custom aria-label when provided', () => {
-    render(<CopyToClipboard content="test" ariaLabel="Copy this text" />);
+    renderWithProvider(<CopyToClipboard content="test" ariaLabel="Copy this text" />);
     const button = screen.getByRole('button', { name: /copy this text/i });
     expect(button).toBeInTheDocument();
   });
@@ -208,7 +214,7 @@ describe('CopyToClipboard', () => {
     const user = userEvent.setup();
     const asyncContent = vi.fn().mockResolvedValue('Async content');
 
-    render(<CopyToClipboard content={asyncContent} />);
+    renderWithProvider(<CopyToClipboard content={asyncContent} />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
 
     await user.click(button);
@@ -229,7 +235,7 @@ describe('CopyToClipboard', () => {
     const blob = new Blob(['async test'], { type: 'text/plain' });
     const asyncContent = vi.fn().mockResolvedValue(blob);
 
-    render(<CopyToClipboard content={asyncContent} />);
+    renderWithProvider(<CopyToClipboard content={asyncContent} />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
 
     await user.click(button);
@@ -253,7 +259,7 @@ describe('CopyToClipboard', () => {
     const asyncContent = vi.fn().mockRejectedValue(error);
     const user = userEvent.setup();
 
-    render(<CopyToClipboard content={asyncContent} />);
+    renderWithProvider(<CopyToClipboard content={asyncContent} />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
 
     await user.click(button);
