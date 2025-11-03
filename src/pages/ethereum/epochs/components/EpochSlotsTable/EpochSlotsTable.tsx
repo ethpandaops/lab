@@ -37,14 +37,6 @@ export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
   }, [slots]);
 
   /**
-   * Get the epoch number from the first slot
-   */
-  const epoch = useMemo(() => {
-    if (slots.length === 0) return 0;
-    return Math.floor(slots[0].slot / 32);
-  }, [slots]);
-
-  /**
    * Table column definitions
    */
   const columns: Column<SlotData>[] = useMemo(
