@@ -5,14 +5,30 @@ import { resolveCssColorToHex } from './color';
 const cache: { colors: ReturnType<typeof computeDataVizColors> | null } = { colors: null };
 
 // Watch for theme changes on <html> element and invalidate cache
+// Only invalidate when theme classes (dark/star) change, not for other class modifications
 if (typeof document !== 'undefined') {
+  let previousTheme = getCurrentTheme();
+
   const observer = new MutationObserver(() => {
-    cache.colors = null; // Invalidate cache when html class changes
+    const currentTheme = getCurrentTheme();
+    if (currentTheme !== previousTheme) {
+      cache.colors = null; // Invalidate cache only when theme actually changes
+      previousTheme = currentTheme;
+    }
   });
   observer.observe(document.documentElement, {
     attributes: true,
     attributeFilter: ['class'],
   });
+}
+
+// Helper to get current theme (same logic as useThemeColors)
+function getCurrentTheme(): 'light' | 'dark' | 'star' {
+  if (typeof document === 'undefined') return 'light';
+  const classList = document.documentElement.classList;
+  if (classList.contains('star')) return 'star';
+  if (classList.contains('dark')) return 'dark';
+  return 'light';
 }
 
 /**
@@ -98,6 +114,14 @@ function computeDataVizColors(): {
     PERFORMANCE_TIME_COLORS,
     CHART_CATEGORICAL_COLORS,
   };
+}
+
+/**
+ * Invalidate the data viz colors cache (for testing)
+ * @internal
+ */
+export function invalidateDataVizColorsCache(): void {
+  cache.colors = null;
 }
 
 /**

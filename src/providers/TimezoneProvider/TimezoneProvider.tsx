@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, type JSX, type ReactNode } from 'react';
+import { useState, useCallback, useEffect, useMemo, type JSX, type ReactNode } from 'react';
 import { TimezoneContext } from '@/contexts/TimezoneContext';
 import type { TimezoneMode } from '@/contexts/TimezoneContext';
 
@@ -35,7 +35,7 @@ export function TimezoneProvider({ children }: TimezoneProviderProps): JSX.Eleme
     setTimezoneState(newTimezone);
   }, []);
 
-  return (
-    <TimezoneContext.Provider value={{ timezone, toggleTimezone, setTimezone }}>{children}</TimezoneContext.Provider>
-  );
+  const value = useMemo(() => ({ timezone, toggleTimezone, setTimezone }), [timezone, toggleTimezone, setTimezone]);
+
+  return <TimezoneContext.Provider value={value}>{children}</TimezoneContext.Provider>;
 }

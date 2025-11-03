@@ -1,6 +1,6 @@
-import { type JSX, useState } from 'react';
+import { type JSX } from 'react';
 import { ClipboardDocumentIcon } from '@heroicons/react/24/outline';
-import { Notification } from '@/components/Overlays/Notification';
+import { useNotification } from '@/hooks/useNotification';
 import type { CopyToClipboardProps } from './CopyToClipboard.types';
 
 /**
@@ -66,8 +66,7 @@ export function CopyToClipboard({
   onError,
   disabled = false,
 }: CopyToClipboardProps): JSX.Element {
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
-  const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const { showSuccess, showError } = useNotification();
 
   /**
    * Handle copy to clipboard
@@ -100,7 +99,7 @@ export function CopyToClipboard({
       }
 
       // Show success notification
-      setShowSuccessNotification(true);
+      showSuccess(successMessage);
 
       // Call success callback if provided
       if (onSuccess) {
@@ -110,7 +109,7 @@ export function CopyToClipboard({
       console.error('Failed to copy to clipboard:', error);
 
       // Show error notification
-      setShowErrorNotification(true);
+      showError(errorMessage);
 
       // Call error callback if provided
       if (onError) {
@@ -122,50 +121,25 @@ export function CopyToClipboard({
   // Determine if children is a render function
   const isRenderFunction = typeof children === 'function';
 
+  if (children) {
+    if (isRenderFunction) {
+      // Render function pattern - pass onClick handler
+      return <>{children({ onClick: handleCopy })}</>;
+    }
+    // Static children - wrap with clickable div
+    return <div onClick={handleCopy}>{children}</div>;
+  }
+
+  // Default clipboard icon button
   return (
-    <>
-      {children ? (
-        isRenderFunction ? (
-          // Render function pattern - pass onClick handler
-          <>{children({ onClick: handleCopy })}</>
-        ) : (
-          // Static children - wrap with clickable div
-          <div onClick={handleCopy}>{children}</div>
-        )
-      ) : (
-        // Default clipboard icon button
-        <button
-          type="button"
-          onClick={handleCopy}
-          disabled={disabled}
-          className={`group rounded-sm p-1 transition-colors hover:bg-muted/20 focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
-          aria-label={ariaLabel}
-        >
-          <ClipboardDocumentIcon className="size-5 text-muted transition-colors group-hover:text-foreground dark:text-muted dark:group-hover:text-foreground" />
-        </button>
-      )}
-
-      {/* Success notification */}
-      <Notification
-        open={showSuccessNotification}
-        onClose={() => setShowSuccessNotification(false)}
-        variant="success"
-        position="top-center"
-        duration={3000}
-      >
-        {successMessage}
-      </Notification>
-
-      {/* Error notification */}
-      <Notification
-        open={showErrorNotification}
-        onClose={() => setShowErrorNotification(false)}
-        variant="danger"
-        position="top-center"
-        duration={3000}
-      >
-        {errorMessage}
-      </Notification>
-    </>
+    <button
+      type="button"
+      onClick={handleCopy}
+      disabled={disabled}
+      className={`group rounded-sm p-1 transition-colors hover:bg-muted/20 focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      aria-label={ariaLabel}
+    >
+      <ClipboardDocumentIcon className="size-5 text-muted transition-colors group-hover:text-foreground dark:text-muted dark:group-hover:text-foreground" />
+    </button>
   );
 }

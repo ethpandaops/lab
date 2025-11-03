@@ -1,5 +1,4 @@
 import { useNavigate } from '@tanstack/react-router';
-import { useMemo } from 'react';
 
 import { Alert } from '@/components/Feedback/Alert';
 import { Container } from '@/components/Layout/Container';
@@ -28,36 +27,21 @@ export function IndexPage(): React.JSX.Element {
   const navigate = useNavigate();
   const { epochs, missedAttestationsByEntity, isLoading, error, currentEpoch } = useEpochsData();
 
-  // Calculate epoch range from all epochs data
-  const epochRange = useMemo(() => {
-    if (epochs.length === 0) {
-      return undefined;
-    }
-    const epochNumbers = epochs.map(e => e.epoch).sort((a, b) => a - b);
+  const tableData = epochs.map(epoch => {
+    const isCurrent = epoch.epoch === currentEpoch;
+    // For current epoch, show "-" for missed blocks since it's incomplete
+    const missedBlocks = isCurrent ? null : epoch.missedBlockCount;
+
     return {
-      min: epochNumbers[0],
-      max: epochNumbers[epochNumbers.length - 1],
+      epoch: epoch.epoch,
+      timestamp: epoch.epochStartDateTime,
+      blocks: `${epoch.canonicalBlockCount}/${epoch.canonicalBlockCount + epoch.missedBlockCount}`,
+      missedBlocks,
+      participation: `${(epoch.participationRate * 100).toFixed(2)}%`,
+      participationValue: epoch.participationRate,
+      isCurrent,
     };
-  }, [epochs]);
-
-  // Format table data - show all 10 epochs
-  const tableData = useMemo(() => {
-    return epochs.map(epoch => {
-      const isCurrent = epoch.epoch === currentEpoch;
-      // For current epoch, show "-" for missed blocks since it's incomplete
-      const missedBlocks = isCurrent ? null : epoch.missedBlockCount;
-
-      return {
-        epoch: epoch.epoch,
-        timestamp: epoch.epochStartDateTime,
-        blocks: `${epoch.canonicalBlockCount}/${epoch.canonicalBlockCount + epoch.missedBlockCount}`,
-        missedBlocks,
-        participation: `${(epoch.participationRate * 100).toFixed(2)}%`,
-        participationValue: epoch.participationRate,
-        isCurrent,
-      };
-    });
-  }, [epochs, currentEpoch]);
+  });
 
   // Handle row click navigation
   const handleRowClick = (row: (typeof tableData)[0]): void => {
@@ -152,7 +136,11 @@ export function IndexPage(): React.JSX.Element {
         <h2 className="mb-4 text-xl font-semibold text-foreground">Metrics</h2>
         <TopEntitiesChart
           data={missedAttestationsByEntity.map(m => ({ x: m.epoch, entity: m.entity, count: m.count }))}
-          xAxis={{ name: 'Epoch', min: epochRange?.min, max: epochRange?.max }}
+          xAxis={{
+            name: 'Epoch',
+            min: epochs.length > 0 ? Math.min(...epochs.map(e => e.epoch)) : undefined,
+            max: epochs.length > 0 ? Math.max(...epochs.map(e => e.epoch)) : undefined,
+          }}
           yAxis={{ name: 'Missed' }}
           title="Offline Validators"
           topN={10}
