@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useRouter, useNavigate } from '@tanstack/react-router';
+import { useRouter, useNavigate, useSearch } from '@tanstack/react-router';
 
 /**
  * Hook that automatically redirects to a specified path when the network search parameter changes.
@@ -23,7 +23,11 @@ import { useRouter, useNavigate } from '@tanstack/react-router';
 export function useNetworkChangeRedirect(redirectPath?: string): void {
   const router = useRouter();
   const navigate = useNavigate({ from: '/' });
-  const previousNetworkRef = useRef<string | undefined>(undefined);
+  const search = useSearch({ strict: false });
+
+  // Initialize with current network from URL to avoid false detection on first render
+  const currentNetworkFromUrl = (search as Record<string, unknown>)?.network as string | undefined;
+  const previousNetworkRef = useRef<string | undefined>(currentNetworkFromUrl);
 
   useEffect(() => {
     // Early return if not opted in
@@ -42,15 +46,12 @@ export function useNetworkChangeRedirect(redirectPath?: string): void {
         const previousNetwork = previousNetworkRef.current;
         previousNetworkRef.current = currentNetwork;
 
-        // Only redirect if we had a previous network (skip initial mount)
-        if (previousNetwork !== undefined) {
-          // Navigate to parent path, preserving the new network param
-          navigate({
-            to: redirectPath,
-            search: { network: currentNetwork },
-            replace: true, // Use replace to prevent back button issues
-          });
-        }
+        // Navigate to parent path, preserving the new network param
+        navigate({
+          to: redirectPath,
+          search: { network: currentNetwork },
+          replace: true, // Use replace to prevent back button issues
+        });
       }
     });
 

@@ -9,10 +9,12 @@ const mockRouter = {
   navigate: mockNavigate,
   subscribe: mockSubscribe,
 };
+const mockSearch = {};
 
 vi.mock('@tanstack/react-router', () => ({
   useRouter: () => mockRouter,
   useNavigate: () => mockNavigate,
+  useSearch: () => mockSearch,
 }));
 
 describe('useNetworkChangeRedirect', () => {
@@ -43,9 +45,12 @@ describe('useNetworkChangeRedirect', () => {
       return unsubscribe;
     });
 
+    // Mock that we're already on a page with network=mainnet
+    mockSearch.network = 'mainnet';
+
     renderHook(() => useNetworkChangeRedirect('/ethereum/slots'));
 
-    // Simulate initial navigation with network param
+    // Simulate initial navigation with same network param
     subscribedCallback?.({
       toLocation: {
         search: { network: 'mainnet' },
@@ -53,6 +58,9 @@ describe('useNetworkChangeRedirect', () => {
     });
 
     expect(mockNavigate).not.toHaveBeenCalled();
+
+    // Clean up
+    delete mockSearch.network;
   });
 
   it('should navigate when network changes from one value to another', () => {
