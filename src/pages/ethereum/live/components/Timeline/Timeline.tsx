@@ -1,5 +1,4 @@
-import type { JSX } from 'react';
-import { memo, useCallback } from 'react';
+import { type JSX, memo, useCallback } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, PlayIcon, PauseIcon } from '@heroicons/react/24/solid';
 import { SlotTimeline } from '@/components/Ethereum/SlotTimeline';
 import type { TimelineProps } from './Timeline.types';
