@@ -169,13 +169,15 @@ export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
           const timeInSeconds = row.blockFirstSeenTime / 1000;
           let colorClass = 'text-muted';
 
-          // Color coding based on time
-          if (timeInSeconds >= 4) {
-            colorClass = 'text-danger'; // Red after 4s
-          } else if (timeInSeconds >= 3) {
-            colorClass = 'text-warning'; // Slightly red after 3s (using warning which is orangish-red)
-          } else if (timeInSeconds >= 2) {
-            colorClass = 'text-orange-500'; // Orange between 2-3s
+          // Color coding based on time thresholds
+          if (timeInSeconds < 2.5) {
+            colorClass = 'text-success'; // Green before 2.5s
+          } else if (timeInSeconds < 3.25) {
+            colorClass = 'text-warning'; // Orange 2.5s-3.25s
+          } else if (timeInSeconds < 4) {
+            colorClass = 'text-orange-700'; // Darker orange 3.25s-4s
+          } else {
+            colorClass = 'text-danger'; // Red 4s+
           }
 
           return <span className={colorClass}>{timeInSeconds.toFixed(3)}s</span>;
