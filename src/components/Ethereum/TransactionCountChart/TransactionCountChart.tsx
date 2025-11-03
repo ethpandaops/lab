@@ -45,6 +45,7 @@ export function TransactionCountChart({
   inModal = false,
   modalSize = 'full',
   relativeSlots,
+  syncGroup,
 }: TransactionCountChartProps): React.JSX.Element {
   const { series, avgTxs, minX } = useMemo(() => {
     if (data.length === 0) {
@@ -96,6 +97,7 @@ export function TransactionCountChart({
           enableDataZoom={true}
           animationDuration={300}
           relativeSlots={relativeSlots}
+          syncGroup={syncGroup}
         />
       )}
     </PopoutCard>

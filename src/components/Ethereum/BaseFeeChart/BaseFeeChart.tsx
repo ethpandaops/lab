@@ -44,6 +44,7 @@ export function BaseFeeChart({
   inModal = false,
   modalSize = 'full',
   relativeSlots,
+  syncGroup,
 }: BaseFeeChartProps): React.JSX.Element {
   const { series, avgBaseFee, minX } = useMemo(() => {
     if (data.length === 0) {
@@ -94,6 +95,7 @@ export function BaseFeeChart({
           enableDataZoom={true}
           animationDuration={300}
           relativeSlots={relativeSlots}
+          syncGroup={syncGroup}
         />
       )}
     </PopoutCard>

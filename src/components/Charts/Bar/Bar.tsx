@@ -236,8 +236,8 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
         echarts={echarts}
         option={option}
         style={{ height: _height, width: '100%', minHeight: _height }}
-        notMerge={true}
-        lazyUpdate={false}
+        notMerge={false}
+        lazyUpdate={true}
       />
     </div>
   );

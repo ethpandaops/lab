@@ -1,4 +1,4 @@
-import { useState, type JSX } from 'react';
+import { useState, type JSX, memo } from 'react';
 import clsx from 'clsx';
 import type { SlotTimelineProps } from './SlotTimeline.types';
 
@@ -20,7 +20,7 @@ import type { SlotTimelineProps } from './SlotTimeline.types';
  * <SlotTimeline phases={phases} currentTime={5.5} />
  * ```
  */
-export function SlotTimeline({
+function SlotTimelineComponent({
   phases,
   currentTime,
   slotDuration,
@@ -238,3 +238,21 @@ export function SlotTimeline({
     </div>
   );
 }
+
+// Custom comparison function to prevent re-renders when data hasn't changed
+const arePropsEqual = (prevProps: SlotTimelineProps, nextProps: SlotTimelineProps): boolean => {
+  return (
+    prevProps.phases === nextProps.phases &&
+    prevProps.currentTime === nextProps.currentTime &&
+    prevProps.slotDuration === nextProps.slotDuration &&
+    prevProps.showTimeLabels === nextProps.showTimeLabels &&
+    prevProps.showPhaseLabels === nextProps.showPhaseLabels &&
+    prevProps.showInlineLabels === nextProps.showInlineLabels &&
+    prevProps.showCurrentTime === nextProps.showCurrentTime &&
+    prevProps.showTimeCutovers === nextProps.showTimeCutovers &&
+    prevProps.height === nextProps.height &&
+    prevProps.onTimeClick === nextProps.onTimeClick
+  );
+};
+
+export const SlotTimeline = memo(SlotTimelineComponent, arePropsEqual);

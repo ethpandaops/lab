@@ -1,36 +1,12 @@
 import { EpochArt } from '@/components/Ethereum/EpochArt';
+import { getRelativeTime } from '@/utils/time';
+import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { EpochHeaderProps } from './EpochHeader.types';
-
-/**
- * Format a Unix timestamp as relative time
- */
-function formatRelativeTime(unixSeconds: number): string {
-  const now = Date.now();
-  const timestamp = unixSeconds * 1000;
-  const diffMs = now - timestamp;
-  const diffSeconds = Math.floor(diffMs / 1000);
-  const diffMinutes = Math.floor(diffSeconds / 60);
-  const diffHours = Math.floor(diffMinutes / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffSeconds < 60) {
-    return `${diffSeconds}s ago`;
-  }
-  if (diffMinutes < 60) {
-    return `${diffMinutes}m ago`;
-  }
-  if (diffHours < 24) {
-    return `${diffHours}h ago`;
-  }
-  return `${diffDays}d ago`;
-}
 
 /**
  * Unified epoch header - everything in a single card
  */
 export function EpochHeader({ epoch, stats, timestamp }: EpochHeaderProps): React.JSX.Element {
-  const date = new Date(timestamp * 1000);
-  const relativeTime = formatRelativeTime(timestamp);
   const participationPercent = (stats.participationRate * 100).toFixed(2);
   const avgBlockSeconds = stats.averageBlockFirstSeenTime ? stats.averageBlockFirstSeenTime / 1000 : null;
 
@@ -40,9 +16,22 @@ export function EpochHeader({ epoch, stats, timestamp }: EpochHeaderProps): Reac
       <div className="mb-6 flex items-center justify-between gap-6">
         <div>
           <h1 className="text-4xl font-bold tracking-tight text-foreground">Epoch {epoch}</h1>
-          <p className="mt-2 text-sm text-muted">
-            {date.toLocaleString()} · {relativeTime}
-          </p>
+          <div className="mt-2">
+            <Timestamp timestamp={timestamp} format="custom" className="text-sm text-muted">
+              {ts =>
+                new Date(ts * 1000).toLocaleString('en-CA', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  hour12: false,
+                  timeZoneName: 'short',
+                })
+              }
+            </Timestamp>
+          </div>
         </div>
 
         {/* EpochArt - smaller */}
@@ -53,6 +42,11 @@ export function EpochHeader({ epoch, stats, timestamp }: EpochHeaderProps): Reac
 
       {/* Stats Grid - single row, all stats side by side */}
       <div className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7">
+        {/* Age */}
+        <div>
+          <dt className="text-xs font-medium text-muted">Age</dt>
+          <dd className="mt-1 text-base/7 font-semibold text-foreground">{getRelativeTime(timestamp)}</dd>
+        </div>
         {/* Blocks */}
         <div>
           <dt className="text-xs font-medium text-muted">Blocks</dt>

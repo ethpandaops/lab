@@ -109,6 +109,7 @@ export function AttestationArrivalsChart({
             xAxisLabelInterval={labelInterval}
             xAxisTitle="Time from Slot Start (s)"
             yAxisTitle="Attestation Count"
+            syncGroup="slot-time"
           />
         </div>
       )}

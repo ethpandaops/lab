@@ -37,10 +37,15 @@ export function Map2DChart({
   const chartRef = useRef<ReactECharts | null>(null);
   const allSeenPointsRef = useRef<Map<string, PointData>>(new Map());
   const previousResetKeyRef = useRef(resetKey);
+  const previousPointsLengthRef = useRef(0);
 
   // Memoize derived values
   const computedPointColor = pointColor || themeColors.primary;
   const computedForegroundColor = themeColors.foreground;
+
+  // Memoize style and opts objects to prevent ReactECharts from seeing new props every render
+  const chartStyle = useMemo(() => ({ height, width: '100%', minHeight: height }), [height]);
+  const chartOpts = useMemo(() => ({ renderer: 'canvas' as const }), []);
 
   // Load and register world map on mount
   useEffect(() => {
@@ -118,6 +123,12 @@ export function Map2DChart({
     if (isReset) {
       previousResetKeyRef.current = resetKey;
       allSeenPointsRef.current.clear();
+      previousPointsLengthRef.current = 0;
+    }
+
+    // Early exit: if points array length hasn't changed and we're not resetting, skip
+    if (!isReset && points.length === previousPointsLengthRef.current) {
+      return;
     }
 
     // Add all current points to the set of seen points (accumulate over time)
@@ -135,34 +146,31 @@ export function Map2DChart({
       }
     });
 
-    // Update chart if we have new points or just reset
-    if (hasNewPoints || isReset) {
-      const allPoints = Array.from(allSeenPointsRef.current.values());
-      const pointData = allPoints.map(point => ({
-        name: point.name,
-        value: [...point.coords, point.value || 1],
-      }));
+    // Only update if we have new points or just reset
+    if (!hasNewPoints && !isReset) return;
 
-      const currentOption = chart.getOption();
+    // Update our tracking ref
+    previousPointsLengthRef.current = points.length;
 
-      if (!currentOption || !currentOption.series) {
-        return;
-      }
+    // Build point data array once
+    const allPoints = Array.from(allSeenPointsRef.current.values());
+    const pointData = allPoints.map(point => ({
+      name: point.name,
+      value: [...point.coords, point.value || 1],
+    }));
 
-      const series = currentOption.series as Array<Record<string, unknown>>;
-      const scatterSeriesIndex = series.findIndex(s => s.type === 'scatter');
+    // Use cached scatter series index (routes don't change after init)
+    const scatterSeriesIndex = routes.length > 0 ? 1 : 0;
 
-      if (scatterSeriesIndex !== -1) {
-        // Rebuild complete scatter series with new data using shared config
-        chart.setOption(
-          {
-            series: [createScatterSeries(pointData)],
-          },
-          { replaceMerge: ['series'] }
-        );
-      }
+    // Build minimal series update array
+    const seriesUpdate: (Record<string, unknown> | null)[] = [];
+    for (let i = 0; i <= scatterSeriesIndex; i++) {
+      seriesUpdate.push(i === scatterSeriesIndex ? { data: pointData } : null);
     }
-  }, [points, mapLoaded, resetKey, createScatterSeries]);
+
+    // Update chart with lazy update enabled for better performance
+    chart.setOption({ series: seriesUpdate }, { notMerge: false, lazyUpdate: true });
+  }, [points, mapLoaded, resetKey, routes.length]);
 
   // Prepare initial options - only calculated once on mount
   // We update data via setOption in useEffect, so option should never recalculate
@@ -278,20 +286,8 @@ export function Map2DChart({
       },
       series,
     };
-  }, [
-    mapLoaded,
-    routes,
-    showEffect,
-    lineColor,
-    themeColors.primary,
-    themeColors.surface,
-    themeColors.border,
-    themeColors.foreground,
-    themeColors.muted,
-    title,
-    roam,
-    createScatterSeries,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapLoaded]); // Only recalculate when map loads - after that we update via setOption
 
   // Don't render until map is loaded
   if (!mapLoaded) {
@@ -307,12 +303,10 @@ export function Map2DChart({
       <ReactECharts
         ref={chartRef}
         option={option}
-        style={{ height, width: '100%', minHeight: height }}
+        style={chartStyle}
         notMerge={false}
         lazyUpdate={true}
-        opts={{
-          renderer: 'canvas', // Explicitly use canvas for best performance
-        }}
+        opts={chartOpts}
       />
     </div>
   );

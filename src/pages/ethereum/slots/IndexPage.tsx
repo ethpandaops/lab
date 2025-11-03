@@ -7,7 +7,7 @@ import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
 import { Slot } from '@/components/Ethereum/Slot';
 import { useInfiniteSlotsData, type SlotData } from './hooks';
-import { getRelativeTime, formatTimestamp } from '@/utils/time';
+import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
 import { formatSlot } from '@/utils';
 import { Epoch } from '@/components/Ethereum/Epoch';
@@ -158,20 +158,21 @@ export function IndexPage(): JSX.Element {
       {
         header: 'Timestamp',
         accessor: row =>
-          row.timestamp > 0
-            ? formatTimestamp(row.timestamp, {
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-              })
-            : '-',
+          row.timestamp > 0 ? (
+            <Timestamp timestamp={row.timestamp} format="short" className="text-xs text-muted" />
+          ) : (
+            '-'
+          ),
         cellClassName: 'text-muted text-xs',
       },
       {
         header: 'Relative Time',
-        accessor: row => (row.timestamp > 0 ? getRelativeTime(row.timestamp) : '-'),
+        accessor: row =>
+          row.timestamp > 0 ? (
+            <Timestamp timestamp={row.timestamp} format="relative" className="text-xs text-muted" />
+          ) : (
+            '-'
+          ),
         cellClassName: 'text-muted text-xs',
       },
       {

@@ -6,6 +6,7 @@ export const Route = createFileRoute('/ethereum/entities/$entity')({
   component: DetailPage,
   beforeLoad: ({ params }) => ({
     getBreadcrumb: () => ({ label: params.entity }),
+    redirectOnNetworkChange: '/ethereum/entities',
   }),
   head: ctx => ({
     meta: [

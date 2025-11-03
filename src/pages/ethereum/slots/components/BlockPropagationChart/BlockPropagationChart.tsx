@@ -139,8 +139,10 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
           yAxis2Min={0}
           yAxis2Max={100}
           tooltipFormatter={tooltipFormatter}
+          tooltipTrigger="axis"
           showLegend={true}
           legendPosition="bottom"
+          syncGroup="slot-time"
         />
       )}
     </PopoutCard>

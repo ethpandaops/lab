@@ -5,7 +5,8 @@ import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { MapPinIcon, ServerIcon } from '@heroicons/react/20/solid';
 import { Badge } from '@/components/Elements/Badge';
 import type { UserCardProps } from './UserCard.types';
-import { getClassificationBadgeClasses, getRelativeTime, getCountryFlag } from '@/utils';
+import { getClassificationBadgeClasses, getCountryFlag } from '@/utils';
+import { Timestamp } from '@/components/DataDisplay/Timestamp';
 
 export function UserCard({
   username,
@@ -63,7 +64,7 @@ export function UserCard({
           <svg viewBox="0 0 2 2" className="size-0.5 fill-current">
             <circle r={1} cx={1} cy={1} />
           </svg>
-          <span>{getRelativeTime(lastSeen)}</span>
+          <Timestamp timestamp={lastSeen} format="relative" disableModal />
         </div>
         {(clientVersion || hasClients) && (
           <div className="mt-2 flex items-center gap-2">

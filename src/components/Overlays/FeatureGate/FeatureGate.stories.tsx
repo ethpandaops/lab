@@ -68,7 +68,7 @@ const mockConfigDisabled = {
   ],
   features: [
     {
-      path: '/ethereum/data-availability/das-custody',
+      path: '/ethereum/data-availability/custody',
       disabled_networks: ['mainnet'],
     },
   ],
@@ -109,7 +109,7 @@ export const Default: Story = {
     const rootRoute = createRootRoute();
     const featureRoute = createRoute({
       getParentRoute: () => rootRoute,
-      path: '/ethereum/data-availability/das-custody',
+      path: '/ethereum/data-availability/custody',
       component: () => (
         <FeatureGate>
           <div className="flex min-h-dvh items-center justify-center bg-background">
@@ -126,7 +126,7 @@ export const Default: Story = {
     const router = createRouter({
       routeTree,
       history: createMemoryHistory({
-        initialEntries: ['/ethereum/data-availability/das-custody?network=mainnet'],
+        initialEntries: ['/ethereum/data-availability/custody?network=mainnet'],
       }),
     });
 

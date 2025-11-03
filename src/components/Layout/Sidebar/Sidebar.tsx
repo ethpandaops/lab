@@ -24,9 +24,7 @@ const ethereumConsensusPages: NavItem[] = [
 
 const ethereumExecutionPages: NavItem[] = [];
 
-const ethereumDataAvailabilityPages: NavItem[] = [
-  { name: 'DAS Custody', to: '/ethereum/data-availability/das-custody' },
-];
+const ethereumDataAvailabilityPages: NavItem[] = [{ name: 'Custody', to: '/ethereum/data-availability/custody' }];
 
 const xatuPages: NavItem[] = [
   { name: 'Contributors', to: '/xatu/contributors' },

@@ -65,9 +65,9 @@ export const DeepHierarchy: Story = {
         },
       },
       {
-        pathname: '/ethereum/data-availability/das-custody',
+        pathname: '/ethereum/data-availability/custody',
         context: {
-          getBreadcrumb: () => ({ label: 'DAS Custody' }),
+          getBreadcrumb: () => ({ label: 'Custody' }),
         },
       },
     ]);
@@ -179,9 +179,9 @@ export const LongLabels: Story = {
         },
       },
       {
-        pathname: '/ethereum/data-availability/das-custody',
+        pathname: '/ethereum/data-availability/custody',
         context: {
-          getBreadcrumb: () => ({ label: 'DAS Custody Analysis Dashboard' }),
+          getBreadcrumb: () => ({ label: 'Custody Analysis Dashboard' }),
         },
       },
     ]);

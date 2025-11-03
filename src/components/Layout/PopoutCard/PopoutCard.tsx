@@ -273,7 +273,7 @@ export function PopoutCard({
                         <button
                           type="button"
                           disabled={isDownloading}
-                          className="group rounded-sm p-1 transition-colors hover:bg-muted/20 focus:ring-3 focus:ring-primary/50 focus:outline-hidden disabled:opacity-50"
+                          className="group rounded-sm p-1 transition-colors hover:bg-muted/20 focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary/50 disabled:opacity-50"
                           aria-label="Export options"
                         >
                           <EllipsisVerticalIcon className="size-5 text-muted transition-colors group-hover:text-foreground dark:text-muted dark:group-hover:text-foreground" />
@@ -303,7 +303,7 @@ export function PopoutCard({
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(true)}
-                    className="group rounded-sm p-1 transition-colors hover:bg-muted/20 focus:ring-3 focus:ring-primary/50 focus:outline-hidden"
+                    className="group rounded-sm p-1 transition-colors hover:bg-muted/20 focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary/50"
                     aria-label={`Open ${title} in modal`}
                   >
                     <ArrowsPointingOutIcon className="size-5 text-muted transition-colors group-hover:text-foreground dark:text-muted dark:group-hover:text-foreground" />
@@ -341,7 +341,7 @@ export function PopoutCard({
                     <button
                       type="button"
                       disabled={isDownloading}
-                      className="group shrink-0 rounded-sm p-1 transition-colors hover:bg-muted/20 focus:ring-3 focus:ring-primary/50 focus:outline-hidden disabled:opacity-50"
+                      className="group shrink-0 rounded-sm p-1 transition-colors hover:bg-muted/20 focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary/50 disabled:opacity-50"
                       aria-label="Export options"
                     >
                       <EllipsisVerticalIcon className="size-5 text-muted transition-colors group-hover:text-foreground dark:text-muted dark:group-hover:text-foreground" />

@@ -19,6 +19,8 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
 import { formatEpoch } from '@/utils';
 import { weiToEth } from '@/utils/ethereum';
+import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
+import { Route } from '@/routes/ethereum/epochs/$epoch';
 
 import { EpochHeader, EpochSlotsTable } from './components';
 import { useEpochDetailData } from './hooks';
@@ -35,6 +37,10 @@ import { useEpochDetailData } from './hooks';
  */
 export function DetailPage(): React.JSX.Element {
   const params = useParams({ from: '/ethereum/epochs/$epoch' });
+  const context = Route.useRouteContext();
+
+  // Redirect to epochs index when network changes
+  useNetworkChangeRedirect(context.redirectOnNetworkChange);
 
   // Parse and validate epoch parameter
   const epoch = useMemo(() => {
@@ -112,6 +118,7 @@ export function DetailPage(): React.JSX.Element {
             xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="blob-count-chart"
             relativeSlots={{ epoch }}
+            syncGroup="slot-number"
           />
           <GasUsedChart
             data={data.blockProductionTimeSeries
@@ -120,6 +127,7 @@ export function DetailPage(): React.JSX.Element {
             xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="gas-chart"
             relativeSlots={{ epoch }}
+            syncGroup="slot-number"
           />
           <TransactionCountChart
             data={data.blockProductionTimeSeries
@@ -128,6 +136,7 @@ export function DetailPage(): React.JSX.Element {
             xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="transaction-count-chart"
             relativeSlots={{ epoch }}
+            syncGroup="slot-number"
           />
           <BaseFeeChart
             data={data.blockProductionTimeSeries
@@ -136,6 +145,7 @@ export function DetailPage(): React.JSX.Element {
             xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="base-fee-chart"
             relativeSlots={{ epoch }}
+            syncGroup="slot-number"
           />
           <BlockSizeChart
             data={data.blockSizeTimeSeries.map(d => ({
@@ -148,6 +158,7 @@ export function DetailPage(): React.JSX.Element {
             xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="block-size-chart"
             relativeSlots={{ epoch }}
+            syncGroup="slot-number"
           />
           <BlockArrivalTimesChart
             data={data.blockArrivalTimeSeries.map(d => ({
@@ -161,6 +172,7 @@ export function DetailPage(): React.JSX.Element {
             xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="block-arrival-times-chart"
             relativeSlots={{ epoch }}
+            syncGroup="slot-number"
           />
         </div>
       </div>
@@ -179,6 +191,7 @@ export function DetailPage(): React.JSX.Element {
             xAxis={{ name: 'Slot', min: startSlot, max: endSlot }}
             anchorId="block-value-chart"
             relativeSlots={{ epoch }}
+            syncGroup="slot-number"
           />
           <MevBuilderDistributionChart data={data.mevTimeSeries} anchorId="mev-builder-distribution-chart" />
           <MevRelayDistributionChart data={data.mevTimeSeries} anchorId="mev-relay-distribution-chart" />
@@ -199,6 +212,7 @@ export function DetailPage(): React.JSX.Element {
           anchorId="missed-attestations-chart"
           emptyMessage="No offline validators detected in this epoch"
           relativeSlots={{ epoch }}
+          syncGroup="slot-number"
         />
       </div>
 

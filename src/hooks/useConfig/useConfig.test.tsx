@@ -47,7 +47,7 @@ describe('useConfig', () => {
         disabled_networks: [],
       },
       {
-        path: '/ethereum/das-custody',
+        path: '/ethereum/data-availability/custody',
         disabled_networks: ['mainnet'],
       },
     ],
@@ -456,7 +456,9 @@ describe('useConfig', () => {
 
       const features = result.current.data?.features;
       expect(features?.find(f => f.path === '/ethereum/live')?.disabled_networks).toEqual([]);
-      expect(features?.find(f => f.path === '/ethereum/das-custody')?.disabled_networks).toEqual(['mainnet']);
+      expect(features?.find(f => f.path === '/ethereum/data-availability/custody')?.disabled_networks).toEqual([
+        'mainnet',
+      ]);
     });
   });
 

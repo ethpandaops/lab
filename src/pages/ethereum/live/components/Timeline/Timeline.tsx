@@ -1,5 +1,4 @@
-import type { JSX } from 'react';
-import { memo } from 'react';
+import { type JSX, memo, useCallback } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, PlayIcon, PauseIcon } from '@heroicons/react/24/solid';
 import { SlotTimeline } from '@/components/Ethereum/SlotTimeline';
 import type { TimelineProps } from './Timeline.types';
@@ -22,6 +21,21 @@ function TimelineComponent({
   isLive = false,
   ariaLabel = 'Slot View Timeline',
 }: TimelineProps): JSX.Element {
+  // Memoize the timeline click handler to prevent SlotTimeline re-renders
+  const handleSlotTimelineClick = useCallback(
+    (time: number) => {
+      // Pause playback if currently playing
+      if (isPlaying && onPlayPause) {
+        onPlayPause();
+      }
+      // Seek to the clicked/dragged time
+      if (onTimeClick) {
+        onTimeClick(time);
+      }
+    },
+    [isPlaying, onPlayPause, onTimeClick]
+  );
+
   return (
     <div className="w-full">
       {/* Header with Live indicator, controls, and current time */}
@@ -40,7 +54,7 @@ function TimelineComponent({
           <button
             type="button"
             onClick={onBackward}
-            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-muted focus:ring-3 focus:ring-primary focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-muted focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Go backward"
             disabled={!onBackward}
           >
@@ -51,7 +65,7 @@ function TimelineComponent({
           <button
             type="button"
             onClick={onPlayPause}
-            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-muted focus:ring-3 focus:ring-primary focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-muted focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={isPlaying ? 'Pause' : 'Play'}
             disabled={!onPlayPause}
           >
@@ -62,7 +76,7 @@ function TimelineComponent({
           <button
             type="button"
             onClick={onForward}
-            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-muted focus:ring-3 focus:ring-primary focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-muted focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Go forward"
             disabled={!onForward}
           >
@@ -86,19 +100,25 @@ function TimelineComponent({
         showTimeCutovers={true}
         ariaLabel={ariaLabel}
         height={48}
-        onTimeClick={time => {
-          // Pause playback if currently playing
-          if (isPlaying && onPlayPause) {
-            onPlayPause();
-          }
-          // Seek to the clicked/dragged time
-          if (onTimeClick) {
-            onTimeClick(time);
-          }
-        }}
+        onTimeClick={handleSlotTimelineClick}
       />
     </div>
   );
 }
 
-export const Timeline = memo(TimelineComponent);
+// Custom comparison function to prevent re-renders when data hasn't changed
+const arePropsEqual = (prevProps: TimelineProps, nextProps: TimelineProps): boolean => {
+  return (
+    prevProps.phases === nextProps.phases &&
+    prevProps.currentTime === nextProps.currentTime &&
+    prevProps.slotDuration === nextProps.slotDuration &&
+    prevProps.isPlaying === nextProps.isPlaying &&
+    prevProps.isLive === nextProps.isLive &&
+    prevProps.onPlayPause === nextProps.onPlayPause &&
+    prevProps.onBackward === nextProps.onBackward &&
+    prevProps.onForward === nextProps.onForward &&
+    prevProps.onTimeClick === nextProps.onTimeClick
+  );
+};
+
+export const Timeline = memo(TimelineComponent, arePropsEqual);

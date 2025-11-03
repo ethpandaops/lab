@@ -45,6 +45,7 @@ export function BlobCountChart({
   inModal = false,
   modalSize = 'full',
   relativeSlots,
+  syncGroup,
 }: BlobCountChartProps): React.JSX.Element {
   const { series, totalBlobs, minX } = useMemo(() => {
     if (data.length === 0) {
@@ -96,6 +97,7 @@ export function BlobCountChart({
           enableDataZoom={true}
           animationDuration={300}
           relativeSlots={relativeSlots}
+          syncGroup={syncGroup}
         />
       )}
     </PopoutCard>

@@ -1,4 +1,4 @@
-import { type JSX, useMemo, forwardRef } from 'react';
+import { type JSX, useMemo, forwardRef, useCallback } from 'react';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { LineChart as EChartsLine } from 'echarts/charts';
@@ -7,6 +7,7 @@ import { CanvasRenderer } from 'echarts/renderers';
 import { hexToRgba, resolveCssColorToHex } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
+import { useSharedCrosshairs } from '@/hooks/useSharedCrosshairs';
 import type { LineChartProps } from './Line.types';
 
 // Get data visualization colors once at module level
@@ -48,10 +49,30 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
     xAxisLabelInterval = 'auto',
     xAxisTitle,
     yAxisTitle,
+    syncGroup,
   },
   ref
 ): JSX.Element {
   const themeColors = useThemeColors();
+
+  // Get callback ref for crosshair sync
+  const syncRef = useSharedCrosshairs({ syncGroup });
+
+  // Combine refs: forward parent ref and sync ref
+  const combinedRef = useCallback(
+    (node: ReactEChartsCore | null) => {
+      // Call sync ref
+      syncRef(node);
+
+      // Forward to parent ref
+      if (typeof ref === 'function') {
+        ref(node);
+      } else if (ref) {
+        ref.current = node;
+      }
+    },
+    [ref, syncRef]
+  );
 
   // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
   const convertedColor = color ? resolveCssColorToHex(color) : undefined;
@@ -166,14 +187,23 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
               }
             : undefined,
           emphasis: {
+            focus: 'series' as const,
+            showSymbol: true,
+            symbolSize: 8,
             lineStyle: {
               width: 4,
+            },
+            itemStyle: {
+              color: convertedColor || CHART_CATEGORICAL_COLORS[0],
+              borderColor: themeColors.background,
+              borderWidth: 2,
             },
           },
         },
       ],
       tooltip: {
         trigger: 'axis',
+        triggerOn: 'mousemove' as const,
         backgroundColor: themeColors.background,
         borderColor: themeColors.border,
         borderWidth: 1,
@@ -187,6 +217,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
             color: themeColors.muted,
             type: 'dashed',
           },
+          snap: true,
         },
       },
     }),
@@ -217,14 +248,14 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
   );
 
   return (
-    <div className={height === '100%' ? 'h-full w-full' : 'w-full'} style={{ pointerEvents: 'none' }}>
+    <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
       <ReactEChartsCore
-        ref={ref}
+        ref={combinedRef}
         echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
-        notMerge={true}
-        lazyUpdate={false}
+        notMerge={false}
+        lazyUpdate={true}
       />
     </div>
   );

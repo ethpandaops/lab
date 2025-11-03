@@ -45,6 +45,7 @@ export function BlockArrivalTimesChart({
   inModal = false,
   modalSize = 'full',
   relativeSlots,
+  syncGroup,
 }: BlockArrivalTimesChartProps): React.JSX.Element {
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
@@ -169,6 +170,7 @@ export function BlockArrivalTimesChart({
             enableDataZoom={true}
             animationDuration={300}
             relativeSlots={relativeSlots}
+            syncGroup={syncGroup}
           />
         </>
       )}

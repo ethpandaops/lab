@@ -59,6 +59,7 @@ export function BlockSizeChart({
   inModal = false,
   modalSize = 'full',
   relativeSlots,
+  syncGroup,
 }: BlockSizeChartProps): React.JSX.Element {
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
@@ -148,6 +149,7 @@ export function BlockSizeChart({
           enableDataZoom={true}
           animationDuration={300}
           relativeSlots={relativeSlots}
+          syncGroup={syncGroup}
         />
       )}
     </PopoutCard>
