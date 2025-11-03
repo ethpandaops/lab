@@ -24,7 +24,15 @@ import type { ChartDownloadResult, UseChartDownloadOptions } from './useChartDow
  * ```
  */
 export function useChartDownload(): ChartDownloadResult {
-  const { theme } = useTheme();
+  // useTheme is optional - it may not be available in test environments or outside ThemeProvider
+  let theme: 'light' | 'dark' = 'dark';
+  try {
+    const themeContext = useTheme();
+    theme = themeContext.theme;
+  } catch {
+    // ThemeProvider not available - default to dark theme
+    theme = 'dark';
+  }
 
   /**
    * Get the background color based on current theme
