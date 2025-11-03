@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import { EpochArt } from '@/components/Ethereum/EpochArt';
-import { Timestamp } from '@/components/DataDisplay/Timestamp';
+import { formatTimestamp, getRelativeTime } from '@/utils/time';
 import type { EpochHeaderProps } from './EpochHeader.types';
 
 /**
@@ -29,8 +29,15 @@ export function EpochHeader({ epoch, stats, timestamp }: EpochHeaderProps): Reac
           <div>
             <h1 className="text-4xl font-bold tracking-tight text-foreground">Epoch {epoch}</h1>
             <p className="mt-2 text-sm text-muted">
-              <Timestamp timestamp={timestamp} format="long" disableModal /> ·{' '}
-              <Timestamp timestamp={timestamp} format="relative" disableModal />
+              {formatTimestamp(timestamp, {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}{' '}
+              · {getRelativeTime(timestamp)}
             </p>
           </div>
 
