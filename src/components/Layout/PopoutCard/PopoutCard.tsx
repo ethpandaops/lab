@@ -1,4 +1,4 @@
-import { type JSX, useState, useRef, useMemo } from 'react';
+import { type JSX, useState, useRef } from 'react';
 import {
   ArrowsPointingOutIcon,
   ArrowDownTrayIcon,
@@ -98,15 +98,10 @@ export function PopoutCard({
   const isRenderFunction = typeof children === 'function';
 
   // Render content based on whether it's in modal or card
-  // Memoize to prevent re-creating React elements on every PopoutCard render
-  const cardContent = useMemo(
-    () => (isRenderFunction ? children({ inModal: false }) : children),
-    [children, isRenderFunction]
-  );
-  const modalContent = useMemo(
-    () => (isRenderFunction ? children({ inModal: true }) : children),
-    [children, isRenderFunction]
-  );
+  // Don't memoize - React's reconciliation handles this efficiently
+  // Memoizing on children function reference causes issues when parent re-renders
+  const cardContent = isRenderFunction ? children({ inModal: false }) : children;
+  const modalContent = isRenderFunction ? children({ inModal: true }) : children;
 
   // Title element (may be wrapped with ScrollAnchor)
   const titleElement = (

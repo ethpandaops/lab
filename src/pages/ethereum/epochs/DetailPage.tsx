@@ -1,5 +1,4 @@
 import { useParams } from '@tanstack/react-router';
-import { useMemo } from 'react';
 
 import { Alert } from '@/components/Feedback/Alert';
 import { BaseFeeChart } from '@/components/Ethereum/BaseFeeChart';
@@ -43,13 +42,8 @@ export function DetailPage(): React.JSX.Element {
   useNetworkChangeRedirect(context.redirectOnNetworkChange);
 
   // Parse and validate epoch parameter
-  const epoch = useMemo(() => {
-    const parsed = parseInt(params.epoch, 10);
-    if (isNaN(parsed) || parsed < 0) {
-      return null;
-    }
-    return parsed;
-  }, [params.epoch]);
+  const parsed = parseInt(params.epoch, 10);
+  const epoch = isNaN(parsed) || parsed < 0 ? null : parsed;
 
   // Fetch data for this epoch
   const { data, isLoading, error } = useEpochDetailData(epoch ?? 0);
@@ -98,7 +92,6 @@ export function DetailPage(): React.JSX.Element {
     );
   }
 
-  // Calculate epoch slot boundaries (32 slots per epoch)
   const startSlot = epoch * 32;
   const endSlot = startSlot + 31;
 
