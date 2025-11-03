@@ -9,6 +9,7 @@ import { Table } from '@/components/Lists/Table';
 
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { TopEntitiesChart } from '@/components/Ethereum/TopEntitiesChart';
+import { Timestamp } from '@/components/DataDisplay/Timestamp';
 
 import { useEpochsData } from './hooks';
 
@@ -63,8 +64,7 @@ export function IndexPage(): React.JSX.Element {
 
       return {
         epoch: epoch.epoch,
-        timestamp: new Date(epoch.epochStartDateTime * 1000).toLocaleString(),
-        relativeTime: formatRelativeTime(epoch.epochStartDateTime),
+        timestamp: epoch.epochStartDateTime,
         blocks: `${epoch.canonicalBlockCount}/${epoch.canonicalBlockCount + epoch.missedBlockCount}`,
         missedBlocks,
         participation: `${(epoch.participationRate * 100).toFixed(2)}%`,
@@ -119,11 +119,11 @@ export function IndexPage(): React.JSX.Element {
             },
             {
               header: 'Start Time',
-              accessor: 'timestamp',
+              accessor: row => <Timestamp timestamp={row.timestamp} format="short" />,
             },
             {
               header: 'Relative Time',
-              accessor: 'relativeTime',
+              accessor: row => <Timestamp timestamp={row.timestamp} format="relative" />,
             },
             {
               header: 'Blocks',
@@ -177,28 +177,4 @@ export function IndexPage(): React.JSX.Element {
       </div>
     </Container>
   );
-}
-
-/**
- * Format a Unix timestamp as relative time (e.g., "2 minutes ago", "1 hour ago")
- */
-function formatRelativeTime(unixSeconds: number): string {
-  const now = Date.now();
-  const timestamp = unixSeconds * 1000;
-  const diffMs = now - timestamp;
-  const diffSeconds = Math.floor(diffMs / 1000);
-  const diffMinutes = Math.floor(diffSeconds / 60);
-  const diffHours = Math.floor(diffMinutes / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffSeconds < 60) {
-    return `${diffSeconds}s ago`;
-  }
-  if (diffMinutes < 60) {
-    return `${diffMinutes}m ago`;
-  }
-  if (diffHours < 24) {
-    return `${diffHours}h ago`;
-  }
-  return `${diffDays}d ago`;
 }

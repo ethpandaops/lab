@@ -200,26 +200,42 @@ export function DetailPage(): React.JSX.Element {
             xAxis={slotXAxis}
             anchorId="blob-count-chart"
             relativeSlots={relativeSlots}
+            syncGroup="slot-number"
           />
-          <GasUsedChart data={gasUsedData} xAxis={slotXAxis} anchorId="gas-chart" relativeSlots={relativeSlots} />
+          <GasUsedChart
+            data={gasUsedData}
+            xAxis={slotXAxis}
+            anchorId="gas-chart"
+            relativeSlots={relativeSlots}
+            syncGroup="slot-number"
+          />
           <TransactionCountChart
             data={transactionCountData}
             xAxis={slotXAxis}
             anchorId="transaction-count-chart"
             relativeSlots={relativeSlots}
+            syncGroup="slot-number"
           />
-          <BaseFeeChart data={baseFeeData} xAxis={slotXAxis} anchorId="base-fee-chart" relativeSlots={relativeSlots} />
+          <BaseFeeChart
+            data={baseFeeData}
+            xAxis={slotXAxis}
+            anchorId="base-fee-chart"
+            relativeSlots={relativeSlots}
+            syncGroup="slot-number"
+          />
           <BlockSizeChart
             data={blockSizeData}
             xAxis={slotXAxis}
             anchorId="block-size-chart"
             relativeSlots={relativeSlots}
+            syncGroup="slot-number"
           />
           <BlockArrivalTimesChart
             data={blockArrivalData}
             xAxis={slotXAxis}
             anchorId="block-arrival-times-chart"
             relativeSlots={relativeSlots}
+            syncGroup="slot-number"
           />
         </div>
       </div>
@@ -236,6 +252,7 @@ export function DetailPage(): React.JSX.Element {
             xAxis={slotXAxis}
             anchorId="block-value-chart"
             relativeSlots={relativeSlots}
+            syncGroup="slot-number"
           />
           <MevBuilderDistributionChart data={data.mevTimeSeries} anchorId="mev-builder-distribution-chart" />
           <MevRelayDistributionChart data={data.mevTimeSeries} anchorId="mev-relay-distribution-chart" />
@@ -256,6 +273,7 @@ export function DetailPage(): React.JSX.Element {
           anchorId="missed-attestations-chart"
           emptyMessage="No offline validators detected in this epoch"
           relativeSlots={relativeSlots}
+          syncGroup="slot-number"
         />
       </div>
 

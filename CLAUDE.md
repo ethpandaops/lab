@@ -417,6 +417,12 @@ decorators: [
 ## Charts
 - When plotting data in a "slot time" chart, you must use seconds instead of milliseconds, and you should round the tick to the nearest second (unless told otherwise.)
 
+### Shared Crosshairs
+Charts sharing the same x-axis can synchronize tooltips and crosshairs using the `syncGroup` prop:
+- Use `syncGroup="slot-time"` for charts with slot time x-axis (0-12s)
+- Use `syncGroup="slot-number"` for charts with slot number x-axis
+- Omit `syncGroup` for independent charts
+
 ## Slot & Epoch Display
 
 **Never use locale formatting** (no commas) - slots/epochs are blockchain identifiers.

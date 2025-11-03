@@ -5,6 +5,7 @@ import {
   ClipboardDocumentIcon,
   EllipsisVerticalIcon,
 } from '@heroicons/react/24/outline';
+import { clsx } from 'clsx';
 import { Card } from '@/components/Layout/Card';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
@@ -186,7 +187,7 @@ export function PopoutCard({
   };
 
   /**
-   * Handle copy to clipboard with toast notification
+   * Handle copy to clipboard - returns a Blob for CopyToClipboard component
    */
   const handleCopyToClipboard = async (): Promise<Blob> => {
     // Use modal content if modal is open, otherwise use card
@@ -238,9 +239,9 @@ export function PopoutCard({
 
   return (
     <>
-      <div ref={cardRef}>
+      <div ref={cardRef} className="h-full">
         <Card
-          className={className}
+          className={clsx('flex h-full flex-col', className)}
           header={
             <div className="flex w-full items-center justify-between gap-4">
               <div className="min-w-0 flex-1 space-y-1">

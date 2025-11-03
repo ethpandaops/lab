@@ -16,6 +16,11 @@ export interface BlockArrivalDataPoint {
   p90: number | null;
   /** Maximum arrival time (ms from slot start) */
   max: number | null;
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }
 
 /**
@@ -30,6 +35,11 @@ export interface XAxisConfig {
   max?: number;
   /** Custom formatter */
   formatter?: (value: string | number) => string;
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }
 
 /**
@@ -54,4 +64,9 @@ export interface BlockArrivalTimesChartProps {
   modalSize?: PopoutCardProps['modalSize'];
   /** Optional relative slot display config */
   relativeSlots?: { epoch: number };
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }

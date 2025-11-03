@@ -8,6 +8,11 @@ export interface GasUsedDataPoint {
   gasUsed: number;
   /** Gas limit (optional) */
   gasLimit?: number;
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }
 
 /**
@@ -22,6 +27,11 @@ export interface GasUsedXAxisConfig {
   max?: number;
   /** Optional formatter for axis labels */
   formatter?: (value: number | string) => string;
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }
 
 /**
@@ -54,4 +64,9 @@ export interface GasUsedChartProps {
     /** The epoch number to calculate relative slots from */
     epoch: number;
   };
+  /**
+   * Sync group identifier for shared crosshairs
+   * Charts with the same syncGroup will have synchronized tooltips and axis pointers
+   */
+  syncGroup?: string;
 }

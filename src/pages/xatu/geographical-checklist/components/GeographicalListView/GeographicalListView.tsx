@@ -5,7 +5,8 @@ import { Table } from '@/components/Lists/Table';
 import type { GeographicalListViewProps } from './GeographicalListView.types';
 import type { Column } from '@/components/Lists/Table/Table.types';
 import type { ProcessedNode } from '../../hooks/useGeographicalData/useGeographicalData.types';
-import { getClassificationBadgeClasses, getRelativeTime } from '@/utils';
+import { getClassificationBadgeClasses } from '@/utils';
+import { Timestamp } from '@/components/DataDisplay/Timestamp';
 
 export function GeographicalListView({ continents, isLoading }: GeographicalListViewProps): JSX.Element {
   if (isLoading) {
@@ -69,7 +70,8 @@ export function GeographicalListView({ continents, isLoading }: GeographicalList
     },
     {
       header: 'Last Seen',
-      accessor: node => getRelativeTime(node.last_seen_date_time),
+      accessor: node =>
+        node.last_seen_date_time ? <Timestamp timestamp={node.last_seen_date_time} format="relative" /> : '-',
       cellClassName: 'text-muted',
     },
   ];

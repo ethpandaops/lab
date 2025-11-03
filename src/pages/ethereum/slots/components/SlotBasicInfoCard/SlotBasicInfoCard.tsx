@@ -5,7 +5,7 @@ import { Slot } from '@/components/Ethereum/Slot';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { BlockArt } from '@/components/Ethereum/BlockArt';
 import { formatGasWithPercentage } from '@/utils';
-import { formatTimestamp, getRelativeTime } from '@/utils/time';
+import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { SlotBasicInfoCardProps } from './SlotBasicInfoCard.types';
 
 /**
@@ -101,11 +101,13 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
             <div className="col-span-2">
               <dt className="text-xs font-medium text-muted">Slot Time</dt>
               <dd className="mt-1 text-sm text-foreground">
-                {blockHead?.slot_start_date_time
-                  ? formatTimestamp(blockHead.slot_start_date_time)
-                  : blockProposer?.slot_start_date_time
-                    ? formatTimestamp(blockProposer.slot_start_date_time)
-                    : 'N/A'}
+                {blockHead?.slot_start_date_time ? (
+                  <Timestamp timestamp={blockHead.slot_start_date_time} format="short" />
+                ) : blockProposer?.slot_start_date_time ? (
+                  <Timestamp timestamp={blockProposer.slot_start_date_time} format="short" />
+                ) : (
+                  'N/A'
+                )}
               </dd>
             </div>
 
@@ -113,11 +115,13 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
             <div className="col-span-2 sm:col-span-1">
               <dt className="text-xs font-medium text-muted">Age</dt>
               <dd className="mt-1 text-sm text-foreground">
-                {blockHead?.slot_start_date_time
-                  ? getRelativeTime(blockHead.slot_start_date_time)
-                  : blockProposer?.slot_start_date_time
-                    ? getRelativeTime(blockProposer.slot_start_date_time)
-                    : 'N/A'}
+                {blockHead?.slot_start_date_time ? (
+                  <Timestamp timestamp={blockHead.slot_start_date_time} format="relative" />
+                ) : blockProposer?.slot_start_date_time ? (
+                  <Timestamp timestamp={blockProposer.slot_start_date_time} format="relative" />
+                ) : (
+                  'N/A'
+                )}
               </dd>
             </div>
 
@@ -125,14 +129,11 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
             <div className="col-span-2 sm:col-span-1">
               <dt className="text-xs font-medium text-muted">Epoch Start</dt>
               <dd className="mt-1 text-sm text-foreground">
-                {blockHead?.epoch_start_date_time
-                  ? formatTimestamp(blockHead.epoch_start_date_time, {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })
-                  : 'N/A'}
+                {blockHead?.epoch_start_date_time ? (
+                  <Timestamp timestamp={blockHead.epoch_start_date_time} format="short" />
+                ) : (
+                  'N/A'
+                )}
               </dd>
             </div>
 

@@ -46,6 +46,7 @@ export function BlockValueChart({
   inModal = false,
   modalSize = 'full',
   relativeSlots,
+  syncGroup,
 }: BlockValueChartProps): React.JSX.Element {
   const { series, avgBlockValue, totalValue, minX } = useMemo(() => {
     if (data.length === 0) {
@@ -97,11 +98,11 @@ export function BlockValueChart({
             valueDecimals: 3, // Show 3 decimals for ETH precision
           }}
           height={isInModal ? 600 : chartHeight}
-          grid={{ left: 60 }}
           showLegend={false}
           enableDataZoom={true}
           animationDuration={300}
           relativeSlots={relativeSlots}
+          syncGroup={syncGroup}
         />
       )}
     </PopoutCard>
