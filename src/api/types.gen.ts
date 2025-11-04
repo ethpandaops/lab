@@ -874,6 +874,10 @@ export type FctBlockDataColumnSidecarFirstSeenByNode = {
    */
   node_id?: string;
   /**
+   * The number of rows (blobs) in the data column sidecar
+   */
+  row_count?: number;
+  /**
    * The time from slot start for the client to see the data column
    */
   seen_slot_start_diff?: number;
@@ -12504,6 +12508,46 @@ export type FctBlockDataColumnSidecarFirstSeenByNodeServiceListData = {
      * The time from slot start for the client to see the data column (filter: not_in_values) (comma-separated list)
      */
     seen_slot_start_diff_not_in_values?: string;
+    /**
+     * The number of rows (blobs) in the data column sidecar (filter: eq)
+     */
+    row_count_eq?: number;
+    /**
+     * The number of rows (blobs) in the data column sidecar (filter: ne)
+     */
+    row_count_ne?: number;
+    /**
+     * The number of rows (blobs) in the data column sidecar (filter: lt)
+     */
+    row_count_lt?: number;
+    /**
+     * The number of rows (blobs) in the data column sidecar (filter: lte)
+     */
+    row_count_lte?: number;
+    /**
+     * The number of rows (blobs) in the data column sidecar (filter: gt)
+     */
+    row_count_gt?: number;
+    /**
+     * The number of rows (blobs) in the data column sidecar (filter: gte)
+     */
+    row_count_gte?: number;
+    /**
+     * The number of rows (blobs) in the data column sidecar (filter: between_min)
+     */
+    row_count_between_min?: number;
+    /**
+     * The number of rows (blobs) in the data column sidecar (filter: between_max_value)
+     */
+    row_count_between_max_value?: number;
+    /**
+     * The number of rows (blobs) in the data column sidecar (filter: in_values) (comma-separated list)
+     */
+    row_count_in_values?: string;
+    /**
+     * The number of rows (blobs) in the data column sidecar (filter: not_in_values) (comma-separated list)
+     */
+    row_count_not_in_values?: string;
     /**
      * Username of the node (filter: eq)
      */
