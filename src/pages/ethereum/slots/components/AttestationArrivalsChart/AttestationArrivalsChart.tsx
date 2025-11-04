@@ -1,64 +1,124 @@
 import { type JSX, useMemo } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { LineChart } from '@/components/Charts/Line';
+import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { AttestationArrivalsChartProps } from './AttestationArrivalsChart.types';
+import type { SeriesData } from '@/components/Charts/MultiLine/MultiLine.types';
 
 /**
- * AttestationArrivalsChart - Visualizes attestation arrival rate over the slot window
+ * AttestationArrivalsChart - Visualizes attestation arrival rate by block root voted for
  *
- * Shows when attestations were received throughout the 12-second slot, distributed
- * in 50ms chunks. Helps identify validator participation timing and network health.
+ * Shows attestations grouped by the block root they voted for over the slot timeline.
+ * Each line represents attestations voting for a different block, showing when they arrived.
  *
  * @example
  * ```tsx
  * <AttestationArrivalsChart
- *   attestationData={[
- *     { chunk_slot_start_diff: 0, attestation_count: 5 },
- *     { chunk_slot_start_diff: 50, attestation_count: 12 },
- *     ...
- *   ]}
+ *   attestationData={attestations}
+ *   currentSlot={12345}
+ *   votedForBlocks={blocks}
  *   totalExpectedValidators={512}
  * />
  * ```
  */
 export function AttestationArrivalsChart({
   attestationData,
+  currentSlot,
+  votedForBlocks,
   totalExpectedValidators,
 }: AttestationArrivalsChartProps): JSX.Element {
-  // Transform data into 241 time points (0ms, 50ms, 100ms, ... 12000ms)
-  const { labels, values, totalReceived, maxCount } = useMemo(() => {
+  // Create a map of block_root -> slot for quick lookup
+  const blockSlotMap = useMemo(() => {
+    const map = new Map<string, number>();
+    votedForBlocks.forEach(block => {
+      if (block.block_root && block.slot !== undefined) {
+        map.set(block.block_root, block.slot);
+      }
+    });
+    return map;
+  }, [votedForBlocks]);
+
+  // Group attestations by block_root and time chunk
+  const { series, labels, totalReceived } = useMemo(() => {
     // Create array of all possible time points (0-12000ms in 50ms increments = 241 points)
     const timePoints = Array.from({ length: 241 }, (_, i) => i * 50);
 
-    // Create a map of chunk_slot_start_diff to attestation_count
-    const dataMap = new Map<number, number>();
+    // Group by block_root, then by time
+    const blockGroups = new Map<string, Map<number, number>>();
+
+    let total = 0;
+
     attestationData.forEach(point => {
-      dataMap.set(point.chunk_slot_start_diff, point.attestation_count);
+      const blockRoot = point.block_root;
+      if (!blockRoot) return;
+
+      const time = point.chunk_slot_start_diff ?? 0;
+      const count = point.attestation_count ?? 0;
+      total += count;
+
+      // Get or create the time map for this block root
+      let timeMap = blockGroups.get(blockRoot);
+      if (!timeMap) {
+        timeMap = new Map<number, number>();
+        blockGroups.set(blockRoot, timeMap);
+      }
+
+      // Set the count for this time point
+      timeMap.set(time, count);
     });
 
-    // Build the values array with 0 for missing data points
-    const chartValues = timePoints.map(time => dataMap.get(time) ?? 0);
+    // Create labels for time axis, but only show every second (every 20th point)
+    // Empty string for points we don't want to show labels for
+    const timeLabels = timePoints.map((time, index) => {
+      // Show label every 1000ms (20 points * 50ms = 1000ms)
+      if (index % 20 === 0) {
+        return (time / 1000).toFixed(0);
+      }
+      return '';
+    });
 
-    // Calculate total attestations received
-    const total = chartValues.reduce((sum, count) => sum + count, 0);
+    // Create series for each block root
+    const chartSeries: SeriesData[] = [];
 
-    // Find max count for y-axis scaling
-    const max = Math.max(...chartValues, 1);
+    blockGroups.forEach((timeMap, blockRoot) => {
+      // Get the slot for this block
+      const blockSlot = blockSlotMap.get(blockRoot) ?? currentSlot;
+      const distance = currentSlot - blockSlot;
 
-    // Create labels for time axis (0.0s, 0.05s, ... 12.0s)
-    const chartLabels = timePoints.map(time => `${(time / 1000).toFixed(1)}s`);
+      // Create data array aligned with timePoints, fill with 0 for missing data
+      const data = timePoints.map(time => timeMap.get(time) ?? 0);
+
+      // Create a label for this series
+      const label = distance === 0 ? 'Current Block (HEAD)' : `Slot ${blockSlot} (-${distance})`;
+
+      chartSeries.push({
+        name: label,
+        data,
+        showArea: true,
+        smooth: false,
+      });
+    });
+
+    // Sort series so current block is first, then by distance (ascending)
+    chartSeries.sort((a, b) => {
+      const aIsCurrent = a.name.includes('Current');
+      const bIsCurrent = b.name.includes('Current');
+      if (aIsCurrent && !bIsCurrent) return -1;
+      if (!aIsCurrent && bIsCurrent) return 1;
+
+      // Extract distance from name for sorting
+      const getDistance = (name: string): number => {
+        const match = name.match(/-(\d+)\)/);
+        return match ? parseInt(match[1], 10) : 0;
+      };
+      return getDistance(a.name) - getDistance(b.name);
+    });
 
     return {
-      labels: chartLabels,
-      values: chartValues,
+      series: chartSeries,
+      labels: timeLabels,
       totalReceived: total,
-      maxCount: max,
     };
-  }, [attestationData]);
-
-  // Calculate label interval to show labels at 0s, 4s, 8s, 12s
-  // 4s = 80 data points (4000ms / 50ms), so show every 80th label
-  const labelInterval = 79; // Skip 79, show every 80th (indices: 0, 80, 160, 240)
+  }, [attestationData, currentSlot, blockSlotMap]);
 
   // Format participation message
   const participationMessage = useMemo(() => {
@@ -70,9 +130,9 @@ export function AttestationArrivalsChart({
   }, [totalReceived, totalExpectedValidators]);
 
   // Handle empty data
-  if (attestationData.length === 0) {
+  if (attestationData.length === 0 || series.length === 0) {
     return (
-      <PopoutCard title="Attestation Arrivals" anchorId="attestation-arrivals" modalSize="xl">
+      <PopoutCard title="Attestation Arrivals by Block Vote" anchorId="attestation-arrivals" modalSize="xl">
         {({ inModal }) => (
           <div
             className={
@@ -90,26 +150,35 @@ export function AttestationArrivalsChart({
 
   return (
     <PopoutCard
-      title="Attestation Arrivals"
+      title="Attestation Arrivals by Block Vote"
       anchorId="attestation-arrivals"
       subtitle={participationMessage}
-      modalSize="xl"
+      modalSize="fullscreen"
+      modalDescription="Shows when attestations arrived during the slot, grouped by which block they voted for. Each line represents votes for a different block at varying distances from the current slot."
     >
       {({ inModal }) => (
-        <div className={inModal ? 'h-96' : 'h-64'}>
-          <LineChart
-            data={values}
-            labels={labels}
+        <div className={inModal ? 'h-[calc(100vh-12rem)]' : 'h-80'}>
+          <MultiLineChart
+            series={series}
+            xAxis={{
+              type: 'category',
+              labels,
+              name: 'Slot Time (s)',
+            }}
+            yAxis={{
+              name: 'Attestation Count',
+            }}
             height="100%"
-            smooth={false}
-            showArea={true}
-            yMax={maxCount}
-            connectNulls={false}
             animationDuration={150}
-            xAxisLabelInterval={labelInterval}
-            xAxisTitle="Time from Slot Start (s)"
-            yAxisTitle="Attestation Count"
+            showLegend
+            useNativeLegend
             syncGroup="slot-time"
+            grid={{
+              top: 40,
+              right: 20,
+              bottom: 60,
+              left: 60,
+            }}
           />
         </div>
       )}

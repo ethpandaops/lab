@@ -68,6 +68,7 @@ export function PopoutCard({
   className,
   anchorId,
   allowContentOverflow = false,
+  noPadding = false,
   enableDownload = true,
   downloadFilename,
   appendMetadataToDownload = true,
@@ -124,7 +125,12 @@ export function PopoutCard({
   const metadataNetwork = downloadMetadataNetwork || currentNetwork?.display_name || '';
   const metadataFooter =
     appendMetadataToDownload && showMetadata ? (
-      <div className="-mx-6 mt-4 -mb-5 grid grid-cols-12 gap-4 border-t border-border bg-muted/5 px-6 py-3">
+      <div
+        className={clsx(
+          'grid grid-cols-12 gap-4 border-t border-border bg-muted/5 px-6 py-3',
+          noPadding ? 'mb-0' : '-mx-6 -mb-5'
+        )}
+      >
         <div className="col-span-9 space-y-1">
           <p className="text-xs font-medium text-foreground">{metadataTitle}</p>
           <p className="text-xs text-muted">{metadataSubtitle}</p>
@@ -241,7 +247,7 @@ export function PopoutCard({
     <>
       <div ref={cardRef} className="h-full">
         <Card
-          className={clsx('flex h-full flex-col', className)}
+          className={clsx('flex h-full flex-col', noPadding && '[&>div:last-child]:p-0', className)}
           header={
             <div className="flex w-full items-center justify-between gap-4">
               <div className="min-w-0 flex-1 space-y-1">
@@ -321,6 +327,7 @@ export function PopoutCard({
         allowContentOverflow={true}
         panelRef={modalContentRef}
         hideCloseButton={showModalLogo}
+        noPadding={noPadding}
         title={
           <div className="flex w-full items-center justify-between gap-4">
             <span className="truncate">{title}</span>
@@ -370,7 +377,7 @@ export function PopoutCard({
       >
         {modalDescriptionPosition === 'above' && descriptionBox && <div className="mb-4">{descriptionBox}</div>}
         {modalContent}
-        {modalDescriptionPosition === 'below' && descriptionBox && <div className="mt-4">{descriptionBox}</div>}
+        {modalDescriptionPosition === 'below' && descriptionBox && <div>{descriptionBox}</div>}
         {metadataFooter}
       </Dialog>
     </>

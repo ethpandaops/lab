@@ -5,6 +5,12 @@ export const SECONDS_PER_SLOT = 12;
 export const SLOTS_PER_EPOCH = 32;
 
 /**
+ * Attestation deadline in milliseconds (duration of block propagation phase).
+ * Blocks should be propagated within this time for validators to attest.
+ */
+export const ATTESTATION_DEADLINE_MS = 4000;
+
+/**
  * Represents a phase within a beacon chain slot
  */
 export interface SlotPhase {
@@ -31,7 +37,7 @@ export interface SlotPhase {
 export const DEFAULT_BEACON_SLOT_PHASES: SlotPhase[] = [
   {
     label: 'Block',
-    duration: 4000,
+    duration: ATTESTATION_DEADLINE_MS,
     className: 'bg-cyan-500',
     textClassName: 'text-cyan-200 font-bold',
     description: 'Proposer broadcasts block',
