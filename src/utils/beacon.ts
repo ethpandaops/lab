@@ -152,3 +152,79 @@ export function isEpochAtOrAfter(currentEpoch: number, forkEpoch?: number): bool
   }
   return currentEpoch >= forkEpoch;
 }
+
+/**
+ * Beacon chain fork version identifiers
+ */
+export type ForkVersion = 'phase0' | 'altair' | 'bellatrix' | 'capella' | 'deneb' | 'electra' | 'fulu';
+
+/**
+ * Metadata for a beacon chain fork
+ */
+export interface ForkMetadata {
+  /** Fork version identifier */
+  version: ForkVersion;
+  /** Display name */
+  name: string;
+  /** Emoji icon representing the fork */
+  emoji: string;
+  /** Tailwind color classes for the fork label */
+  color: string;
+  /** Description of what the fork represents */
+  description: string;
+}
+
+/**
+ * Fork metadata constants for all beacon chain forks
+ */
+export const FORK_METADATA: Record<ForkVersion, ForkMetadata> = {
+  phase0: {
+    version: 'phase0',
+    name: 'Phase 0',
+    emoji: '🚀',
+    color: 'bg-gray-100 text-gray-700 dark:bg-gray-400/10 dark:text-gray-400',
+    description: 'Genesis - Beacon chain launch',
+  },
+  altair: {
+    version: 'altair',
+    name: 'Altair',
+    emoji: '🦅',
+    color: 'bg-sky-100 text-sky-700 dark:bg-sky-400/10 dark:text-sky-400',
+    description: 'First beacon chain upgrade - Light client support',
+  },
+  bellatrix: {
+    version: 'bellatrix',
+    name: 'Bellatrix',
+    emoji: '🐼',
+    color: 'bg-slate-100 text-slate-700 dark:bg-slate-400/10 dark:text-slate-400',
+    description: 'The Merge - Transition to proof-of-stake',
+  },
+  capella: {
+    version: 'capella',
+    name: 'Capella',
+    emoji: '🐋',
+    color: 'bg-blue-100 text-blue-700 dark:bg-blue-400/10 dark:text-blue-400',
+    description: 'Shanghai/Capella - Validator withdrawals enabled',
+  },
+  deneb: {
+    version: 'deneb',
+    name: 'Deneb',
+    emoji: '🐡',
+    color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-400/10 dark:text-indigo-400',
+    description: 'Cancun/Deneb - Proto-danksharding (EIP-4844)',
+  },
+  electra: {
+    version: 'electra',
+    name: 'Electra',
+    emoji: '🦒',
+    color: 'bg-violet-100 text-violet-700 dark:bg-violet-400/10 dark:text-violet-400',
+    description: 'Electra upgrade - MaxEB and other improvements',
+  },
+  fulu: {
+    version: 'fulu',
+    name: 'Fulu',
+    emoji: '🦓',
+    color: 'bg-pink-100 text-pink-700 dark:bg-pink-400/10 dark:text-pink-400',
+    description: 'Future upgrade - PeerDAS and more',
+  },
+} as const;
