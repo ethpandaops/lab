@@ -1,5 +1,6 @@
 import { type JSX, memo, useState } from 'react';
 import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import clsx from 'clsx';
 import { Tab } from '@/components/Navigation/Tab';
 import { BlobDataAvailability } from '../BlobDataAvailability';
 import { DataColumnDataAvailability } from '../DataColumnDataAvailability';
@@ -10,6 +11,7 @@ function BottomBarComponent({
   blockVersion,
   blobCount: _blobCount,
   dataColumnBlobCount,
+  dataColumnFirstSeenData,
   currentSlot,
   currentTime,
   deduplicatedBlobData,
@@ -30,10 +32,10 @@ function BottomBarComponent({
 
   return (
     <>
-      {/* Desktop Layout - Equal three-column grid */}
+      {/* Desktop Layout - Three-column grid */}
       <div className="hidden h-full grid-cols-3 lg:grid">
-        {/* Column 1: First Seen / Data Columns */}
-        <div className="h-full border-r border-border">
+        {/* Column 1: First Seen / Data Columns (spans 2 columns for PeerDAS) */}
+        <div className={clsx('h-full border-r border-border', showDataColumnAvailability && 'col-span-2')}>
           {showBlobAvailability && (
             <BlobDataAvailability
               key={`first-seen-${currentSlot}`}
@@ -49,7 +51,7 @@ function BottomBarComponent({
             <DataColumnDataAvailability
               blobCount={dataColumnBlobCount}
               currentTime={currentTime}
-              firstSeenData={[]}
+              firstSeenData={dataColumnFirstSeenData}
               maxTime={12000}
             />
           )}
@@ -61,9 +63,9 @@ function BottomBarComponent({
           )}
         </div>
 
-        {/* Column 2: Continental Propagation */}
-        <div className="h-full border-r border-border">
-          {showBlobAvailability && (
+        {/* Column 2: Continental Propagation (only shown for blobs) */}
+        {showBlobAvailability && (
+          <div className="h-full border-r border-border">
             <BlobDataAvailability
               key={`continental-${currentSlot}`}
               currentTime={currentTime}
@@ -72,14 +74,8 @@ function BottomBarComponent({
               maxTime={12000}
               variant="continental-only"
             />
-          )}
-
-          {!showBlobAvailability && (
-            <div className="flex h-full items-center justify-center p-4">
-              <p className="text-sm text-muted">Propagation unavailable</p>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Column 3: Attestation Arrivals */}
         <div className="h-full">
@@ -117,7 +113,7 @@ function BottomBarComponent({
                 <DataColumnDataAvailability
                   blobCount={dataColumnBlobCount}
                   currentTime={currentTime}
-                  firstSeenData={[]}
+                  firstSeenData={dataColumnFirstSeenData}
                   maxTime={12000}
                 />
               </TabPanel>
@@ -143,6 +139,8 @@ const arePropsEqual = (prevProps: BottomBarProps, nextProps: BottomBarProps): bo
     prevProps.blockVersion === nextProps.blockVersion &&
     prevProps.currentSlot === nextProps.currentSlot &&
     prevProps.currentTime === nextProps.currentTime &&
+    prevProps.dataColumnBlobCount === nextProps.dataColumnBlobCount &&
+    prevProps.dataColumnFirstSeenData === nextProps.dataColumnFirstSeenData &&
     prevProps.deduplicatedBlobData === nextProps.deduplicatedBlobData &&
     prevProps.visibleContinentalPropagationData === nextProps.visibleContinentalPropagationData &&
     prevProps.attestationChartValues === nextProps.attestationChartValues &&

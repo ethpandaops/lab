@@ -111,4 +111,21 @@ export interface HeatmapChartProps {
    * Whether to defer chart updates to next animation frame for better performance
    * @default true
    */
+  /**
+   * Custom grid configuration for chart positioning
+   * Allows overriding default margins (top, right, bottom, left)
+   */
+  grid?: {
+    top?: number | string;
+    right?: number | string;
+    bottom?: number | string;
+    left?: number | string;
+    containLabel?: boolean;
+  };
+  /**
+   * Whether to disable hover emphasis on cells
+   * When false, hovering highlights the entire column
+   * @default true
+   */
+  emphasisDisabled?: boolean;
 }

@@ -8,6 +8,7 @@ import {
   fctBlockBlobCountServiceListOptions,
   fctBlockFirstSeenByNodeServiceListOptions,
   fctBlockBlobFirstSeenByNodeServiceListOptions,
+  fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions,
   fctAttestationFirstSeenChunked50MsServiceListOptions,
   intBeaconCommitteeHeadServiceListOptions,
   fctMevBidHighestValueByBuilderChunked50MsServiceListOptions,
@@ -18,14 +19,15 @@ import { useBlockDetailsData } from '../useBlockDetailsData';
 import { useMapData } from '../useMapData';
 import { useSidebarData } from '../useSidebarData';
 import { useBlobAvailabilityData } from '../useBlobAvailabilityData';
+import { useDataColumnAvailabilityData } from '../useDataColumnAvailabilityData';
 import { useAttestationData } from '../useAttestationData';
 import type { SlotViewData } from './useSlotViewData.types';
 
 // Stable empty arrays to prevent infinite re-renders
 const EMPTY_BLOCK_FIRST_SEEN: never[] = [];
 const EMPTY_BLOB_FIRST_SEEN: never[] = [];
+const EMPTY_DATA_COLUMN_FIRST_SEEN: never[] = [];
 const EMPTY_ATTESTATION: never[] = [];
-const EMPTY_DATA_COLUMN: never[] = [];
 
 export function useSlotViewData(currentSlot: number): SlotViewData {
   const { currentNetwork } = useNetwork();
@@ -130,6 +132,21 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     },
   });
 
+  // API Query 6b: Data Column Sidecar First Seen by Node (List)
+  const dataColumnFirstSeenQuery = useQuery({
+    ...fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions({
+      query: {
+        slot_start_date_time_eq: slotStartDateTime,
+        page_size: 10000,
+      },
+    }),
+    enabled: slotStartDateTime > 0,
+    retry: (failureCount, error) => {
+      if (error && typeof error === 'object' && 'status' in error && error.status === 404) return false;
+      return failureCount < 3;
+    },
+  });
+
   // API Query 7: Attestation Chunked 50ms (List)
   const attestationQuery = useQuery({
     ...fctAttestationFirstSeenChunked50MsServiceListOptions({
@@ -212,6 +229,11 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       errorList.push({ endpoint: 'fct_block_first_seen_by_node', error: blockFirstSeenQuery.error as Error });
     if (blobFirstSeenQuery.error)
       errorList.push({ endpoint: 'fct_block_blob_first_seen_by_node', error: blobFirstSeenQuery.error as Error });
+    if (dataColumnFirstSeenQuery.error)
+      errorList.push({
+        endpoint: 'fct_block_data_column_sidecar_first_seen_by_node',
+        error: dataColumnFirstSeenQuery.error as Error,
+      });
     if (attestationQuery.error)
       errorList.push({ endpoint: 'fct_attestation_first_seen_chunked_50ms', error: attestationQuery.error as Error });
     if (mevBiddingQuery.error)
@@ -229,6 +251,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     blobCountQuery.error,
     blockFirstSeenQuery.error,
     blobFirstSeenQuery.error,
+    dataColumnFirstSeenQuery.error,
     attestationQuery.error,
     mevBiddingQuery.error,
     relayBidsQuery.error,
@@ -256,6 +279,10 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     availabilityRateData: blobAvailabilityRateData,
     continentalPropagationData: blobContinentalPropagationData,
   } = useBlobAvailabilityData(blobFirstSeenQuery.data?.fct_block_blob_first_seen_by_node ?? EMPTY_BLOB_FIRST_SEEN);
+
+  const { firstSeenData: dataColumnFirstSeenData, blobCount: dataColumnBlobCount } = useDataColumnAvailabilityData(
+    dataColumnFirstSeenQuery.data?.fct_block_data_column_sidecar_first_seen_by_node ?? EMPTY_DATA_COLUMN_FIRST_SEEN
+  );
 
   // Calculate total expected validators from committee data
   const totalExpectedValidators = useMemo(() => {
@@ -316,8 +343,8 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       blobFirstSeenData,
       blobAvailabilityRateData,
       blobContinentalPropagationData,
-      dataColumnBlobCount: 0, // Placeholder - no API data yet
-      dataColumnFirstSeenData: EMPTY_DATA_COLUMN, // Placeholder - no API data yet
+      dataColumnBlobCount,
+      dataColumnFirstSeenData,
       attestationData,
       attestationTotalExpected,
       attestationActualCount,
@@ -335,6 +362,8 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       blobFirstSeenData,
       blobAvailabilityRateData,
       blobContinentalPropagationData,
+      dataColumnBlobCount,
+      dataColumnFirstSeenData,
       attestationData,
       attestationTotalExpected,
       attestationActualCount,

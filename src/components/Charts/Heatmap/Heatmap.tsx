@@ -46,6 +46,8 @@ export function HeatmapChart({
   tooltipFormatter,
   xAxisShowOnlyMinMax = false,
   yAxisShowOnlyMinMax = false,
+  grid,
+  emphasisDisabled = true,
 }: HeatmapChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
 
@@ -68,7 +70,7 @@ export function HeatmapChart({
           top: 8,
         }
       : undefined,
-    grid: {
+    grid: grid ?? {
       top: title ? 40 : 16,
       right: showVisualMap ? 90 : 16,
       bottom: 28,
@@ -174,9 +176,10 @@ export function HeatmapChart({
             borderWidth: 1,
           }),
         },
-        // ECharts has built-in hover effects; only customize if needed
+        // ECharts hover effects: 'self' highlights single cell, 'series' highlights column
         emphasis: {
-          focus: 'self' as const,
+          disabled: emphasisDisabled,
+          focus: emphasisDisabled ? 'none' : ('series' as const),
         },
       },
     ],
@@ -200,7 +203,7 @@ export function HeatmapChart({
   };
 
   return (
-    <div className="w-full">
+    <div className="h-full w-full">
       <ReactEChartsCore
         echarts={echarts}
         option={option}
