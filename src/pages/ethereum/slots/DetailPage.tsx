@@ -151,9 +151,8 @@ export function DetailPage(): JSX.Element {
     meta_client_geo_continent_code: item.meta_client_geo_continent_code,
   }));
 
-  // Calculate distinct client counts for block and blob nodes
+  // Calculate distinct client count for block nodes
   const distinctBlockClients = new Set(data.blockPropagation.map(item => item.meta_client_name).filter(Boolean)).size;
-  const distinctBlobClients = new Set(data.blobPropagation.map(item => item.meta_client_name).filter(Boolean)).size;
 
   // Calculate performance metrics
   const firstBlockSeen =
@@ -245,54 +244,6 @@ export function DetailPage(): JSX.Element {
             {/* Overview Tab - Clean, card-based layout with key metrics */}
             <TabPanel>
               <div className="space-y-6">
-                {/* Network Propagation */}
-                {blockPropagationData.length > 0 && (
-                  <Card>
-                    <div className="mb-4">
-                      <h3 className="text-lg font-semibold text-foreground">Network Propagation</h3>
-                      <p className="text-sm text-muted">Nodes that received block/blob data</p>
-                    </div>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                      <MiniStat label="Block Nodes" value={distinctBlockClients.toLocaleString()} />
-                      {blobPropagationData.length > 0 && (
-                        <MiniStat label="Blob Nodes" value={distinctBlobClients.toLocaleString()} />
-                      )}
-                    </div>
-                  </Card>
-                )}
-
-                {/* MEV Activity */}
-                {(data.blockMev[0]?.value || data.relayBids.length > 0 || data.builderBids.length > 0) && (
-                  <Card>
-                    <div className="mb-4">
-                      <h3 className="text-lg font-semibold text-foreground">MEV Activity</h3>
-                      <p className="text-sm text-muted">Block builder and relay participation</p>
-                    </div>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                      {data.blockMev[0]?.value && data.blockMev[0].value !== '0' && (
-                        <MiniStat
-                          label="MEV Value"
-                          value={`${(Number(data.blockMev[0].value) / 1e18).toFixed(4)} ETH`}
-                        />
-                      )}
-                      {data.relayBids.length > 0 && (
-                        <MiniStat
-                          label="Relays"
-                          value={data.relayBids.length.toString()}
-                          secondaryText="Submitted bids"
-                        />
-                      )}
-                      {data.builderBids.length > 0 && (
-                        <MiniStat
-                          label="Builders"
-                          value={data.builderBids.length.toString()}
-                          secondaryText="Submitted bids"
-                        />
-                      )}
-                    </div>
-                  </Card>
-                )}
-
                 {/* Performance Metrics */}
                 <Card>
                   <div className="mb-4">
@@ -360,6 +311,51 @@ export function DetailPage(): JSX.Element {
                     )}
                   </div>
                 </Card>
+
+                {/* Network Propagation */}
+                {blockPropagationData.length > 0 && (
+                  <Card>
+                    <div className="mb-4">
+                      <h3 className="text-lg font-semibold text-foreground">Network Propagation</h3>
+                      <p className="text-sm text-muted">Nodes that received block data</p>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                      <MiniStat label="Block Nodes" value={distinctBlockClients.toLocaleString()} />
+                    </div>
+                  </Card>
+                )}
+
+                {/* MEV Activity */}
+                {(data.blockMev[0]?.value || data.relayBids.length > 0 || data.builderBids.length > 0) && (
+                  <Card>
+                    <div className="mb-4">
+                      <h3 className="text-lg font-semibold text-foreground">MEV Activity</h3>
+                      <p className="text-sm text-muted">Block builder and relay participation</p>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                      {data.blockMev[0]?.value && data.blockMev[0].value !== '0' && (
+                        <MiniStat
+                          label="MEV Value"
+                          value={`${(Number(data.blockMev[0].value) / 1e18).toFixed(4)} ETH`}
+                        />
+                      )}
+                      {data.relayBids.length > 0 && (
+                        <MiniStat
+                          label="Relays"
+                          value={data.relayBids.length.toString()}
+                          secondaryText="Submitted bids"
+                        />
+                      )}
+                      {data.builderBids.length > 0 && (
+                        <MiniStat
+                          label="Builders"
+                          value={data.builderBids.length.toString()}
+                          secondaryText="Submitted bids"
+                        />
+                      )}
+                    </div>
+                  </Card>
+                )}
               </div>
             </TabPanel>
 
