@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import {
   fctAttestationLivenessByEntityHeadServiceListOptions,
   fctBlockProposerEntityServiceListOptions,
+  fctBlockHeadServiceListOptions,
   fctBlockBlobCountHeadServiceListOptions,
   fctAttestationCorrectnessHeadServiceListOptions,
   fctBlockFirstSeenByNodeServiceListOptions,
@@ -12,6 +13,7 @@ import {
 import type {
   FctAttestationLivenessByEntityHead,
   FctBlockProposerEntity,
+  FctBlockHead,
   FctBlockBlobCountHead,
   FctAttestationCorrectnessHead,
   FctBlockFirstSeenByNode,
@@ -119,42 +121,56 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
   // Use both time range (gte/lte) and in_values for precise filtering
   const supplementalResults = useQueries({
     queries: [
-      // 3. Blob counts for specific slots
+      // 3. Block head data for specific slots (proposer index, block root, etc.)
+      {
+        ...fctBlockHeadServiceListOptions({
+          query: {
+            slot_start_date_time_gte: blockProposerTimeRange?.minTime,
+            slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
+            slot_start_date_time_in_values: blockProposerTimeRange?.slotStartDateTimeInValues,
+            page_size: 1000,
+          },
+        }),
+        enabled: !!currentNetwork && !!blockProposerTimeRange,
+        refetchInterval: false,
+        refetchOnWindowFocus: false,
+      },
+      // 4. Blob counts for specific slots
       {
         ...fctBlockBlobCountHeadServiceListOptions({
           query: {
             slot_start_date_time_gte: blockProposerTimeRange?.minTime,
             slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
             slot_start_date_time_in_values: blockProposerTimeRange?.slotStartDateTimeInValues,
-            page_size: 100,
+            page_size: 1000,
           },
         }),
         enabled: !!currentNetwork && !!blockProposerTimeRange,
         refetchInterval: false,
         refetchOnWindowFocus: false,
       },
-      // 4. Attestation correctness for specific slots
+      // 5. Attestation correctness for specific slots
       {
         ...fctAttestationCorrectnessHeadServiceListOptions({
           query: {
             slot_start_date_time_gte: blockProposerTimeRange?.minTime,
             slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
             slot_start_date_time_in_values: blockProposerTimeRange?.slotStartDateTimeInValues,
-            page_size: 100,
+            page_size: 1000,
           },
         }),
         enabled: !!currentNetwork && !!blockProposerTimeRange,
         refetchInterval: false,
         refetchOnWindowFocus: false,
       },
-      // 5. Block first seen for specific slots
+      // 6. Block first seen for specific slots
       {
         ...fctBlockFirstSeenByNodeServiceListOptions({
           query: {
             slot_start_date_time_gte: blockProposerTimeRange?.minTime,
             slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
             slot_start_date_time_in_values: blockProposerTimeRange?.slotStartDateTimeInValues,
-            page_size: 500,
+            page_size: 5000,
             order_by: 'slot asc, seen_slot_start_diff asc',
           },
         }),
@@ -162,14 +178,14 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
         refetchInterval: false,
         refetchOnWindowFocus: false,
       },
-      // 6. Canonical blocks for specific slots
+      // 7. Canonical blocks for specific slots
       {
         ...intBlockCanonicalServiceListOptions({
           query: {
             slot_start_date_time_gte: blockProposerTimeRange?.minTime,
             slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
             slot_start_date_time_in_values: blockProposerTimeRange?.slotStartDateTimeInValues,
-            page_size: 100,
+            page_size: 1000,
           },
         }),
         enabled: !!currentNetwork && !!blockProposerTimeRange,
@@ -194,6 +210,7 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
     const [
       attestation12hResult,
       blockProposer12hResult,
+      blockHeadResult,
       blobCountResult,
       attestationCorrectnessResult,
       blockFirstSeenResult,
@@ -210,6 +227,7 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
         ?.fct_block_proposer_entity ?? [];
 
     // Supplemental slot data for block proposals table
+    const blockHeadData = (blockHeadResult?.data as { fct_block_head?: FctBlockHead[] })?.fct_block_head ?? [];
     const blobCountData =
       (blobCountResult?.data as { fct_block_blob_count_head?: FctBlockBlobCountHead[] })?.fct_block_blob_count_head ??
       [];
@@ -361,6 +379,17 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
 
     // Build detailed slot data for blocks proposed by entity
     // Create maps for efficient lookups
+    const blockHeadMap = new Map<number, { blockRoot: string | null; proposerIndex: number | null }>(
+      blockHeadData
+        .filter((b: FctBlockHead) => b.slot !== undefined)
+        .map((b: FctBlockHead) => [
+          b.slot!,
+          {
+            blockRoot: b.block_root ?? null,
+            proposerIndex: b.proposer_index ?? null,
+          },
+        ])
+    );
     const blobCountMap = new Map<number, number>(
       blobCountData
         .filter((b: FctBlockBlobCountHead) => b.slot !== undefined)
@@ -402,6 +431,7 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
     const slots: SlotData[] = blockProposer12hData.map(block => {
       const slot = block.slot ?? 0;
       const slotStartDateTime = block.slot_start_date_time ?? 0;
+      const blockHead = blockHeadMap.get(slot) ?? { blockRoot: null, proposerIndex: null };
       const attestation: { head: number; other: number; max: number } = attestationMap.get(slot) ?? {
         head: 0,
         other: 0,
@@ -414,8 +444,8 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
       return {
         slot,
         slotStartDateTime,
-        blockRoot: null, // Not available in FctBlockProposerEntity
-        proposerIndex: null, // Not available in FctBlockProposerEntity
+        blockRoot: blockHead.blockRoot,
+        proposerIndex: blockHead.proposerIndex,
         proposerEntity: entity,
         blobCount,
         status: isCanonical ? 'canonical' : 'proposed',
