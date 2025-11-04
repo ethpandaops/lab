@@ -3,11 +3,18 @@ import { clsx } from 'clsx';
 import type { NetworkIconProps } from './NetworkIcon.types';
 
 /**
+ * Network icon type definitions
+ */
+type ImageIcon = { type: 'img'; content: string; lightContent?: string };
+type EmojiIcon = { type: 'emoji'; content: string };
+type NetworkIcon = ImageIcon | EmojiIcon;
+
+/**
  * Network icon mapping - emojis and custom icons per network
  * Icons are defined without classNames so they can be applied dynamically
  * Mainnet uses theme-specific logos: dark grayscale for light mode, colorful for dark/star modes
  */
-const NETWORK_ICONS: Record<string, { type: 'img' | 'emoji'; content: string | JSX.Element; lightContent?: string }> = {
+const NETWORK_ICONS: Record<string, NetworkIcon> = {
   mainnet: { type: 'img', content: '/images/ethereum-dark.svg', lightContent: '/images/ethereum-light.svg' },
   holesky: { type: 'emoji', content: '🦊' },
   sepolia: { type: 'emoji', content: '🐬' },
@@ -49,7 +56,7 @@ export function NetworkIcon({ networkName, className }: NetworkIconProps): JSX.E
         />
         {/* Dark/star mode: colorful logo */}
         <img
-          src={icon.content as string}
+          src={icon.content}
           alt="Ethereum"
           className={clsx('hidden dark:block star:block', className || 'size-6')}
           aria-hidden="true"
