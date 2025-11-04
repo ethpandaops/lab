@@ -1,6 +1,6 @@
 import { useParams } from '@tanstack/react-router';
 import { useMemo } from 'react';
-import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
 
 import { Alert } from '@/components/Feedback/Alert';
 import { BaseFeeChart } from '@/components/Ethereum/BaseFeeChart';
@@ -18,6 +18,7 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Tab } from '@/components/Navigation/Tab';
+import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { formatEpoch } from '@/utils';
 import { weiToEth } from '@/utils/ethereum';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
@@ -145,12 +146,12 @@ export function DetailPage(): React.JSX.Element {
       {/* Tabbed Content */}
       <div className="mt-8">
         <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
-          <TabList className="flex gap-2 border-b border-border">
+          <ScrollableTabs>
             <Tab hash="slots">Slots</Tab>
             <Tab hash="blocks">Blocks</Tab>
             <Tab hash="validators">Validators</Tab>
             <Tab hash="mev">MEV</Tab>
-          </TabList>
+          </ScrollableTabs>
 
           <TabPanels className="mt-6">
             {/* Slots Tab */}

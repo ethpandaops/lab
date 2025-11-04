@@ -1,12 +1,13 @@
 import { type JSX } from 'react';
 import { useParams } from '@tanstack/react-router';
-import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Card } from '@/components/Layout/Card';
 import { Tab } from '@/components/Navigation/Tab';
+import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { SLOTS_PER_EPOCH, slotToTimestamp } from '@/utils/beacon';
 import { formatEpoch } from '@/utils';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
@@ -241,14 +242,14 @@ export function DetailPage(): JSX.Element {
       {/* Tabbed Content */}
       <div className="mt-8">
         <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
-          <TabList className="flex gap-2 border-b border-border">
+          <ScrollableTabs>
             <Tab hash="overview">Overview</Tab>
             <Tab hash="block">Block</Tab>
             <Tab hash="attestations">Attestations</Tab>
             <Tab hash="propagation">Propagation</Tab>
             <Tab hash="execution">Execution</Tab>
             {hasMevData && <Tab hash="mev">MEV</Tab>}
-          </TabList>
+          </ScrollableTabs>
 
           <TabPanels className="mt-6">
             {/* Overview Tab - Clean, card-based layout with key metrics */}

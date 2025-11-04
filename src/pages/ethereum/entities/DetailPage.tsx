@@ -1,12 +1,13 @@
 import { useParams } from '@tanstack/react-router';
 import { useMemo } from 'react';
-import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
 
 import { Alert } from '@/components/Feedback/Alert';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Tab } from '@/components/Navigation/Tab';
+import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
 import { useHashTabs } from '@/hooks/useHashTabs';
 import { Route } from '@/routes/ethereum/entities/$entity';
@@ -110,11 +111,11 @@ export function DetailPage(): React.JSX.Element {
       {/* Tabs */}
       <div className="mt-6">
         <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
-          <TabList className="flex gap-2 border-b border-border">
+          <ScrollableTabs>
             <Tab hash="recent">Recent</Tab>
             <Tab hash="attestations">Attestations</Tab>
             <Tab hash="blocks">Blocks</Tab>
-          </TabList>
+          </ScrollableTabs>
 
           <TabPanels className="mt-6">
             {/* Recent Tab */}
