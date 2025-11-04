@@ -20,15 +20,16 @@ import type { RecentActivityTableProps } from './RecentActivityTable.types';
  * - Blocks proposed
  *
  * Rows are clickable and navigate to the epoch detail page.
+ * Shows most recent 100 epochs.
  */
 export function RecentActivityTable({ epochs }: RecentActivityTableProps): JSX.Element {
   const navigate = useNavigate();
 
   /**
-   * Sort epochs by epoch number descending (most recent first) and limit to 5
+   * Sort epochs by epoch number descending (most recent first)
    */
   const sortedEpochs = useMemo((): EntityEpochData[] => {
-    return [...epochs].sort((a, b) => b.epoch - a.epoch).slice(0, 5);
+    return [...epochs].sort((a, b) => b.epoch - a.epoch);
   }, [epochs]);
 
   /**
@@ -88,6 +89,9 @@ export function RecentActivityTable({ epochs }: RecentActivityTableProps): JSX.E
   const getRowKey = (row: EntityEpochData): number => row.epoch;
 
   return (
-    <Table data={sortedEpochs} columns={columns} variant="nested" onRowClick={handleRowClick} getRowKey={getRowKey} />
+    <div className="space-y-4">
+      {/* Table */}
+      <Table data={sortedEpochs} columns={columns} variant="nested" onRowClick={handleRowClick} getRowKey={getRowKey} />
+    </div>
   );
 }

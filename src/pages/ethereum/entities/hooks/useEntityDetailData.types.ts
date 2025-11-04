@@ -42,6 +42,10 @@ export interface EntityDetailData {
   stats: EntityStats;
   /** Time series data aggregated by epoch */
   epochData: EntityEpochData[];
+  /** Raw block proposal data (12h) */
+  blockProposer12hData: import('@/api/types.gen').FctBlockProposerEntity[];
+  /** Detailed slot data for blocks proposed by entity */
+  slots: import('../../epochs/hooks/useEpochDetailData.types').SlotData[];
 }
 
 /**

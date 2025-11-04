@@ -41,10 +41,11 @@ export function BlockProposalChart({ data }: BlockProposalChartProps): React.JSX
         data: chartData,
         showSymbol: false,
         color: themeColors.primary,
-        step: 'middle' as const, // Step chart for integer count data - transition between epochs
+        step: 'end' as const, // Count data measured at each epoch
         showArea: true,
-        areaOpacity: 1, // 100% opacity, no gradient
-        lineWidth: 0, // No border line when using solid fill
+        areaStyle: {
+          opacity: 0.3,
+        },
       },
     ];
 
@@ -61,7 +62,7 @@ export function BlockProposalChart({ data }: BlockProposalChartProps): React.JSX
   }
 
   return (
-    <PopoutCard title="Proposals" subtitle="Last 12h" modalSize="full">
+    <PopoutCard title="Proposals" subtitle="Last 12h" modalSize="full" anchorId="block-proposal-chart">
       {({ inModal }) => (
         <MultiLineChart
           series={series}
@@ -76,7 +77,7 @@ export function BlockProposalChart({ data }: BlockProposalChartProps): React.JSX
             min: 0,
             minInterval: 1, // Always prevent decimals for count data
           }}
-          height={inModal ? 600 : 400}
+          height={inModal ? 600 : 300}
           showLegend={false}
           enableDataZoom={true}
           animationDuration={300}

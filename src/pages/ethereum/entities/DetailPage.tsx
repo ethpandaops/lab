@@ -1,21 +1,18 @@
 import { useParams } from '@tanstack/react-router';
 import { useMemo } from 'react';
+import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 
 import { Alert } from '@/components/Feedback/Alert';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
-import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
+import { Tab } from '@/components/Navigation/Tab';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
+import { useHashTabs } from '@/hooks/useHashTabs';
 import { Route } from '@/routes/ethereum/entities/$entity';
 
-import {
-  AttestationRateChart,
-  AttestationVolumeChart,
-  BlockProposalChart,
-  EntityBasicInfoCard,
-  RecentActivityTable,
-} from './components';
+import { AttestationRateChart, AttestationVolumeChart, EntityBasicInfoCard, RecentActivityTable } from './components';
+import { EpochSlotsTable } from '../epochs/components';
 import { useEntityDetailData } from './hooks';
 
 /**
@@ -48,6 +45,13 @@ export function DetailPage(): React.JSX.Element {
 
   // Fetch data for this entity
   const { data, isLoading, error } = useEntityDetailData(entityName ?? '');
+
+  // Hash-based tab routing
+  const { selectedIndex, onChange } = useHashTabs([
+    { hash: 'recent', anchors: ['recent-activity'] },
+    { hash: 'attestations', anchors: ['attestation-rate-chart', 'attestation-volume-chart'] },
+    { hash: 'blocks', anchors: ['block-proposals'] },
+  ]);
 
   // Handle invalid entity
   if (entityName === null) {
@@ -95,39 +99,48 @@ export function DetailPage(): React.JSX.Element {
 
   return (
     <Container>
-      {/* Basic Info Card */}
+      {/* Header */}
+      <Header title={entityName} description="Validator entity analysis and metrics" />
+
+      {/* Overview - Always visible */}
       <div className="mt-6">
-        <ScrollAnchor id="entity-overview">
-          <h2 className="mb-4 text-xl font-semibold text-foreground">Entity Overview</h2>
-        </ScrollAnchor>
         <EntityBasicInfoCard stats={data.stats} />
       </div>
 
-      {/* Recent Activity */}
-      <div className="mt-8">
-        <ScrollAnchor id="recent-activity">
-          <h2 className="mb-4 text-xl font-semibold text-foreground">Recent Activity</h2>
-        </ScrollAnchor>
-        <RecentActivityTable epochs={data.epochData} />
-      </div>
+      {/* Tabs */}
+      <div className="mt-6">
+        <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
+          <TabList className="flex gap-2 border-b border-border">
+            <Tab hash="recent">Recent</Tab>
+            <Tab hash="attestations">Attestations</Tab>
+            <Tab hash="blocks">Blocks</Tab>
+          </TabList>
 
-      {/* Attestation Metrics - Grid Layout */}
-      <div className="mt-8">
-        <ScrollAnchor id="attestation-metrics">
-          <h2 className="mb-4 text-xl font-semibold text-foreground">Attestation Metrics</h2>
-        </ScrollAnchor>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <AttestationRateChart data={data.epochData} />
-          <AttestationVolumeChart data={data.epochData} />
-        </div>
-      </div>
+          <TabPanels className="mt-6">
+            {/* Recent Tab */}
+            <TabPanel>
+              <RecentActivityTable epochs={data.epochData} />
+            </TabPanel>
 
-      {/* Block Proposals */}
-      <div className="mt-8">
-        <ScrollAnchor id="block-proposals">
-          <h2 className="mb-4 text-xl font-semibold text-foreground">Block Proposals</h2>
-        </ScrollAnchor>
-        <BlockProposalChart data={data.epochData} />
+            {/* Attestations Tab */}
+            <TabPanel>
+              <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+                <AttestationRateChart data={data.epochData} />
+                <AttestationVolumeChart data={data.epochData} />
+              </div>
+            </TabPanel>
+
+            {/* Blocks Tab */}
+            <TabPanel>
+              <EpochSlotsTable
+                slots={data.slots}
+                showSlotInEpoch={false}
+                enableRealtimeHighlighting={false}
+                sortOrder="desc"
+              />
+            </TabPanel>
+          </TabPanels>
+        </TabGroup>
       </div>
     </Container>
   );

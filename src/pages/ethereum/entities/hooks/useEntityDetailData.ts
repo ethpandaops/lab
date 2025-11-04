@@ -7,7 +7,6 @@ import {
   fctBlockHeadServiceListOptions,
   fctBlockBlobCountHeadServiceListOptions,
   fctAttestationCorrectnessHeadServiceListOptions,
-  fctBlockFirstSeenByNodeServiceListOptions,
   intBlockCanonicalServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import type {
@@ -16,7 +15,6 @@ import type {
   FctBlockHead,
   FctBlockBlobCountHead,
   FctAttestationCorrectnessHead,
-  FctBlockFirstSeenByNode,
   IntBlockCanonical,
 } from '@/api/types.gen';
 import { useBeaconClock } from '@/hooks/useBeaconClock';
@@ -163,22 +161,7 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
         refetchInterval: false,
         refetchOnWindowFocus: false,
       },
-      // 6. Block first seen for specific slots
-      {
-        ...fctBlockFirstSeenByNodeServiceListOptions({
-          query: {
-            slot_start_date_time_gte: blockProposerTimeRange?.minTime,
-            slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
-            slot_start_date_time_in_values: blockProposerTimeRange?.slotStartDateTimeInValues,
-            page_size: 5000,
-            order_by: 'slot asc, seen_slot_start_diff asc',
-          },
-        }),
-        enabled: !!currentNetwork && !!blockProposerTimeRange,
-        refetchInterval: false,
-        refetchOnWindowFocus: false,
-      },
-      // 7. Canonical blocks for specific slots
+      // 6. Canonical blocks for specific slots
       {
         ...intBlockCanonicalServiceListOptions({
           query: {
@@ -213,7 +196,6 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
       blockHeadResult,
       blobCountResult,
       attestationCorrectnessResult,
-      blockFirstSeenResult,
       blockCanonicalResult,
     ] = results;
 
@@ -234,9 +216,6 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
     const attestationCorrectnessData =
       (attestationCorrectnessResult?.data as { fct_attestation_correctness_head?: FctAttestationCorrectnessHead[] })
         ?.fct_attestation_correctness_head ?? [];
-    const blockFirstSeenData =
-      (blockFirstSeenResult?.data as { fct_block_first_seen_by_node?: FctBlockFirstSeenByNode[] })
-        ?.fct_block_first_seen_by_node ?? [];
     const blockCanonicalData =
       (blockCanonicalResult?.data as { int_block_canonical?: IntBlockCanonical[] })?.int_block_canonical ?? [];
 
@@ -413,19 +392,6 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
       blockCanonicalData.map((b: IntBlockCanonical) => b.slot).filter((s): s is number => s !== undefined)
     );
 
-    // Calculate earliest block first seen time per slot
-    const blockFirstSeenMap = new Map<number, number>();
-    blockFirstSeenData.forEach((record: FctBlockFirstSeenByNode) => {
-      const slot = record.slot;
-      const seenTime = record.seen_slot_start_diff;
-      if (slot !== undefined && seenTime !== undefined && seenTime !== null) {
-        const currentMin = blockFirstSeenMap.get(slot);
-        if (currentMin === undefined || seenTime < currentMin) {
-          blockFirstSeenMap.set(slot, seenTime);
-        }
-      }
-    });
-
     // Build slot data for each block proposed by entity
     // Server already returns them sorted desc and limited to 10
     const slots: SlotData[] = blockProposer12hData.map(block => {
@@ -438,7 +404,6 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
         max: 0,
       };
       const blobCount: number = blobCountMap.get(slot) ?? 0;
-      const blockFirstSeenTime = blockFirstSeenMap.get(slot) ?? null;
       const isCanonical = canonicalSlots.has(slot);
 
       return {
@@ -452,7 +417,7 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
         attestationHead: attestation.head,
         attestationOther: attestation.other,
         attestationMax: attestation.max,
-        blockFirstSeenTime,
+        blockFirstSeenTime: null,
       };
     });
 
