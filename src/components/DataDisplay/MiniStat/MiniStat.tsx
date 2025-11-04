@@ -46,7 +46,7 @@ export function MiniStat({
     showGauge && percentage !== undefined ? color || getHealthColor(percentage, themeColors) : undefined;
 
   // Render circular gauge SVG
-  const renderCircularGauge = () => {
+  const renderCircularGauge = (): JSX.Element | null => {
     if (!showGauge || percentage === undefined) return null;
 
     const size = 40;

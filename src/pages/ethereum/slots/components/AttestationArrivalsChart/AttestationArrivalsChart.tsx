@@ -106,7 +106,7 @@ export function AttestationArrivalsChart({
       if (!aIsCurrent && bIsCurrent) return 1;
 
       // Extract distance from name for sorting
-      const getDistance = (name: string) => {
+      const getDistance = (name: string): number => {
         const match = name.match(/-(\d+)\)/);
         return match ? parseInt(match[1], 10) : 0;
       };
