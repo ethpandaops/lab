@@ -36,7 +36,7 @@ export interface SlotViewData {
   blobAvailabilityRateData: DataAvailabilityRatePoint[];
   blobContinentalPropagationData: ContinentalPropagationSeries[];
 
-  // Data column availability (PeerDAS) - placeholder
+  // Data column availability (PeerDAS)
   dataColumnBlobCount: number;
   dataColumnFirstSeenData: Array<{ columnId: number; time: number; color?: string }>;
 

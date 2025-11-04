@@ -93,46 +93,48 @@ function DataColumnDataAvailabilityComponent({
   }, [firstSeenData, blobCount, effectiveCurrentTime]);
 
   return (
-    <div className={clsx('rounded-sm border border-border bg-surface p-2', className)}>
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="font-mono text-sm font-semibold text-foreground">Data Column Availability</h3>
-        <div className="flex flex-col items-end gap-1">
-          <span className={clsx('font-mono text-xs font-medium', isDataAvailable ? 'text-success' : 'text-danger')}>
+    <div className={clsx('flex h-full flex-col bg-surface', className)}>
+      <div className="flex shrink-0 items-center justify-between px-3 py-1">
+        <h3 className="text-xs font-semibold text-foreground uppercase">Data Column Availability</h3>
+        <div className="flex items-center gap-3">
+          <span className={clsx('text-xs font-medium', isDataAvailable ? 'text-success' : 'text-danger')}>
             {isDataAvailable ? '✓' : '✗'} Data available
           </span>
-          <span className="font-mono text-xs text-muted">{onTimeColumnCount} columns published on time</span>
+          <span className="text-xs text-muted">{onTimeColumnCount} on time</span>
         </div>
       </div>
-      <HeatmapChart
-        data={heatmapData}
-        xLabels={xLabels}
-        yLabels={yLabels}
-        title="First Seen At"
-        xAxisTitle="Data Columns"
-        yAxisTitle="Blobs"
-        xAxisShowOnlyMinMax={true}
-        yAxisShowOnlyMinMax={true}
-        height={240}
-        min={0}
-        max={maxTime}
-        visualMapType="piecewise"
-        piecewisePieces={[
-          { min: 0, max: 1000, color: PERFORMANCE_TIME_COLORS.excellent, label: '0-1s' },
-          { min: 1000, max: 2000, color: PERFORMANCE_TIME_COLORS.good, label: '1-2s' },
-          { min: 2000, max: 3000, color: PERFORMANCE_TIME_COLORS.fair, label: '2-3s' },
-          { min: 3000, max: 4000, color: PERFORMANCE_TIME_COLORS.slow, label: '3-4s' },
-          { min: 4000, color: PERFORMANCE_TIME_COLORS.poor, label: '>4s' },
-        ]}
-        showLabel={false}
-        showVisualMap={true}
-        animationDuration={0}
-        formatValue={(value: number) => `${value.toFixed(0)}ms`}
-        showCellBorders={true}
-        tooltipFormatter={(params, xLabels, yLabels) => {
-          const [x, y, value] = params.value;
-          return `<strong>Data Column:</strong> ${xLabels[x]}<br/><strong>Blob:</strong> ${yLabels[y]}<br/><strong>First Seen:</strong> ${value.toFixed(0)}ms`;
-        }}
-      />
+      <div className="min-h-0 flex-1">
+        <HeatmapChart
+          data={heatmapData}
+          xLabels={xLabels}
+          yLabels={yLabels}
+          yAxisTitle="Blobs"
+          height="100%"
+          min={0}
+          max={maxTime}
+          visualMapType="piecewise"
+          piecewisePieces={[
+            { min: 0, max: 1000, color: PERFORMANCE_TIME_COLORS.excellent, label: '0-1s' },
+            { min: 1000, max: 2000, color: PERFORMANCE_TIME_COLORS.good, label: '1-2s' },
+            { min: 2000, max: 3000, color: PERFORMANCE_TIME_COLORS.fair, label: '2-3s' },
+            { min: 3000, max: 4000, color: PERFORMANCE_TIME_COLORS.slow, label: '3-4s' },
+            { min: 4000, color: PERFORMANCE_TIME_COLORS.poor, label: '>4s' },
+          ]}
+          showVisualMap={true}
+          animationDuration={0}
+          emphasisDisabled={false}
+          tooltipFormatter={(params, xLabels, yLabels) => {
+            const [x, y, value] = params.value;
+            return `<strong>Data Column:</strong> ${xLabels[x]}<br/><strong>Blob:</strong> ${yLabels[y]}<br/><strong>First Seen:</strong> ${value.toFixed(0)}ms`;
+          }}
+          grid={{
+            top: 5,
+            right: 85,
+            bottom: 30,
+            left: 32,
+          }}
+        />
+      </div>
     </div>
   );
 }
