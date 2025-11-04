@@ -5,9 +5,10 @@ import type { NetworkIconProps } from './NetworkIcon.types';
 /**
  * Network icon mapping - emojis and custom icons per network
  * Icons are defined without classNames so they can be applied dynamically
+ * Mainnet uses theme-specific logos: dark grayscale for light mode, colorful for dark/star modes
  */
-const NETWORK_ICONS: Record<string, { type: 'img' | 'emoji'; content: string | JSX.Element }> = {
-  mainnet: { type: 'img', content: '/images/ethereum.svg' },
+const NETWORK_ICONS: Record<string, { type: 'img' | 'emoji'; content: string | JSX.Element; lightContent?: string }> = {
+  mainnet: { type: 'img', content: '/images/ethereum-dark.svg', lightContent: '/images/ethereum-light.svg' },
   holesky: { type: 'emoji', content: '🦊' },
   sepolia: { type: 'emoji', content: '🐬' },
   hoodi: { type: 'emoji', content: '🦚' },
@@ -17,7 +18,7 @@ const NETWORK_ICONS: Record<string, { type: 'img' | 'emoji'; content: string | J
  * NetworkIcon component displays an icon for a given network.
  *
  * Shows network-specific icons:
- * - Mainnet: Ethereum logo
+ * - Mainnet: Ethereum logo (theme-aware: dark grayscale in light mode, colorful in dark/star modes)
  * - Holesky: 🦊
  * - Sepolia: 🐬
  * - Hoodi: 🦚
@@ -35,10 +36,25 @@ const NETWORK_ICONS: Record<string, { type: 'img' | 'emoji'; content: string | J
 export function NetworkIcon({ networkName, className }: NetworkIconProps): JSX.Element {
   const icon = NETWORK_ICONS[networkName];
 
-  // Mainnet: render img with className
+  // Mainnet: render img with theme-specific source
   if (icon?.type === 'img') {
     return (
-      <img src={icon.content as string} alt="Ethereum" className={clsx(className || 'size-6')} aria-hidden="true" />
+      <>
+        {/* Light mode: dark grayscale logo */}
+        <img
+          src={icon.lightContent || icon.content}
+          alt="Ethereum"
+          className={clsx('dark:hidden', className || 'size-6')}
+          aria-hidden="true"
+        />
+        {/* Dark/star mode: colorful logo */}
+        <img
+          src={icon.content as string}
+          alt="Ethereum"
+          className={clsx('hidden dark:block', className || 'size-6')}
+          aria-hidden="true"
+        />
+      </>
     );
   }
 
