@@ -91,70 +91,81 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
     ],
   });
 
-  // Extract slots from block proposals for supplemental queries
-  const blockProposerSlots = useMemo(() => {
+  // Extract time range from block proposals for supplemental queries
+  const blockProposerTimeRange = useMemo(() => {
     const blockProposerResult = primaryResults[1];
-    if (!blockProposerResult?.data) return [];
+    if (!blockProposerResult?.data) return null;
     const blockProposerData =
       (blockProposerResult.data as { fct_block_proposer_entity?: FctBlockProposerEntity[] })
         ?.fct_block_proposer_entity ?? [];
-    return blockProposerData.map(b => b.slot).filter((s): s is number => s !== undefined);
+
+    if (blockProposerData.length === 0) return null;
+
+    // Find earliest and latest slot_start_date_time
+    const times = blockProposerData.map(b => b.slot_start_date_time).filter((t): t is number => t !== undefined);
+
+    if (times.length === 0) return null;
+
+    const minTime = Math.min(...times);
+    const maxTime = Math.max(...times);
+
+    return { minTime, maxTime };
   }, [primaryResults]);
 
-  // Convert slots array to comma-separated string for API
-  const slotInValues = useMemo(() => {
-    return blockProposerSlots.length > 0 ? blockProposerSlots.join(',') : '';
-  }, [blockProposerSlots]);
-
-  // STEP 2: Fetch supplemental data for the specific slots (dependent queries)
+  // STEP 2: Fetch supplemental data for the time range (dependent queries)
   const supplementalResults = useQueries({
     queries: [
-      // 3. Blob counts for specific slots
+      // 3. Blob counts for time range
       {
         ...fctBlockBlobCountHeadServiceListOptions({
           query: {
-            slot_in_values: slotInValues,
+            slot_start_date_time_gte: blockProposerTimeRange?.minTime,
+            slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
             page_size: 100,
           },
         }),
-        enabled: !!currentNetwork && slotInValues.length > 0,
+        enabled: !!currentNetwork && !!blockProposerTimeRange,
         refetchInterval: false,
         refetchOnWindowFocus: false,
       },
-      // 4. Attestation correctness for specific slots
+      // 4. Attestation correctness for time range
       {
         ...fctAttestationCorrectnessHeadServiceListOptions({
           query: {
-            slot_in_values: slotInValues,
+            slot_start_date_time_gte: blockProposerTimeRange?.minTime,
+            slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
             page_size: 100,
           },
         }),
-        enabled: !!currentNetwork && slotInValues.length > 0,
+        enabled: !!currentNetwork && !!blockProposerTimeRange,
         refetchInterval: false,
         refetchOnWindowFocus: false,
       },
-      // 5. Block first seen for specific slots
+      // 5. Block first seen for time range
       {
         ...fctBlockFirstSeenByNodeServiceListOptions({
           query: {
-            slot_in_values: slotInValues,
+            slot_start_date_time_gte: blockProposerTimeRange?.minTime,
+            slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
             page_size: 500,
             order_by: 'slot asc, seen_slot_start_diff asc',
           },
         }),
-        enabled: !!currentNetwork && slotInValues.length > 0,
+        enabled: !!currentNetwork && !!blockProposerTimeRange,
         refetchInterval: false,
         refetchOnWindowFocus: false,
       },
-      // 6. Canonical blocks for specific slots
+      // 6. Canonical blocks for time range
+      // Only query canonical status for blocks old enough to be finalized (not recent blocks)
       {
         ...intBlockCanonicalServiceListOptions({
           query: {
-            slot_in_values: slotInValues,
+            slot_start_date_time_gte: blockProposerTimeRange?.minTime,
+            slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
             page_size: 100,
           },
         }),
-        enabled: !!currentNetwork && slotInValues.length > 0,
+        enabled: !!currentNetwork && !!blockProposerTimeRange,
         refetchInterval: false,
         refetchOnWindowFocus: false,
       },
