@@ -68,20 +68,19 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
   const primaryResults = useQueries({
     queries: [
       // 1. 12h attestation liveness data (for charts, stats, and recent epochs table)
-      // 12h = 3600 slots, request enough to cover all epochs with data
       {
         ...fctAttestationLivenessByEntityHeadServiceListOptions({
           query: {
             entity_eq: entity,
             slot_start_date_time_gte: twelveHoursAgo,
-            page_size: 5000,
+            page_size: 10000,
           },
         }),
         enabled: !!currentNetwork && !!entity && twelveHoursAgo > 0,
         refetchInterval: false,
         refetchOnWindowFocus: false,
       },
-      // 2. 12h block proposals (for charts and recent epochs table)
+      // 2. 12h block proposals by entity (for charts and recent epochs table)
       {
         ...fctBlockProposerEntityServiceListOptions({
           query: {
@@ -111,7 +110,7 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
     ],
   });
 
-  // Extract time range from block proposals for supplemental queries
+  // STEP 2: Extract time range and slot list from recent block proposals for supplemental queries
   const blockProposerTimeRange = useMemo(() => {
     const blockProposerResult = primaryResults[2];
     if (!blockProposerResult?.data) return null;
