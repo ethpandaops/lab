@@ -71,6 +71,7 @@ export function Dialog({
   footer,
   className = '',
   allowContentOverflow = false,
+  noPadding = false,
   panelRef,
   hideCloseButton = false,
 }: DialogProps): JSX.Element {
@@ -142,7 +143,7 @@ export function Dialog({
               )}
 
               {/* Content */}
-              <div className={clsx('px-6 py-5', size === 'fullscreen' && 'flex-1 overflow-auto')}>
+              <div className={clsx(noPadding ? 'p-0' : 'px-6 py-5', size === 'fullscreen' && 'flex-1 overflow-auto')}>
                 {!title && !showCloseButton && description && (
                   <Description className="mb-4 text-sm text-muted dark:text-muted">{description}</Description>
                 )}

@@ -129,7 +129,7 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
         <ScatterAndLineChart
           scatterSeries={scatterSeries}
           lineSeries={lineSeries}
-          xAxisTitle="Time from Slot Start (s)"
+          xAxisTitle="Slot Time (s)"
           yAxisTitle="Node Index"
           yAxis2Title="Cumulative %"
           height={inModal ? 384 : 288}

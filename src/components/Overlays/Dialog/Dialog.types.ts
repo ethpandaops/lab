@@ -44,6 +44,10 @@ export interface DialogProps {
    */
   allowContentOverflow?: boolean;
   /**
+   * Remove padding from dialog content area (useful for tables, full-width components). Default: false
+   */
+  noPadding?: boolean;
+  /**
    * Ref to the dialog panel element (for screenshot capture)
    */
   panelRef?: Ref<HTMLDivElement>;

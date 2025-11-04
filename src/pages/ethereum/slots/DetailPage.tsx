@@ -1,31 +1,39 @@
 import { type JSX } from 'react';
 import { useParams } from '@tanstack/react-router';
+import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
-import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
-import { SLOTS_PER_EPOCH } from '@/utils/beacon';
+import { Card } from '@/components/Layout/Card';
+import { Tab } from '@/components/Navigation/Tab';
+import { SLOTS_PER_EPOCH, slotToTimestamp } from '@/utils/beacon';
 import { formatEpoch } from '@/utils';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
+import { useHashTabs } from '@/hooks/useHashTabs';
+import { useNetwork } from '@/hooks/useNetwork';
 import { Route } from '@/routes/ethereum/slots/$slot';
 import { useSlotDetailData } from './hooks/useSlotDetailData';
+import { useAllAttestationVotes } from './hooks/useAllAttestationVotes';
 import { SlotBasicInfoCard } from './components/SlotBasicInfoCard';
 import { AttestationArrivalsChart } from './components/AttestationArrivalsChart';
-import { AttestationParticipationCard } from './components/AttestationParticipationCard';
-import { AttestationHeadCorrectnessCard } from './components/AttestationHeadCorrectnessCard';
+import { AttestationVotesBreakdownTable } from './components/AttestationVotesBreakdownTable';
 import { AttestationsByEntity } from '@/components/Ethereum/AttestationsByEntity';
 import { BlockPropagationChart } from './components/BlockPropagationChart';
 import { BlobPropagationChart } from './components/BlobPropagationChart';
 import { MevBiddingTimelineChart } from './components/MevBiddingTimelineChart';
 import { PreparedBlocksComparisonChart } from './components/PreparedBlocksComparisonChart';
-import { BlockSizeEfficiencyChart } from './components/BlockSizeEfficiencyChart';
 import { RelayDistributionChart } from './components/RelayDistributionChart';
 import { BuilderCompetitionChart } from './components/BuilderCompetitionChart';
+import { MiniStat } from '@/components/DataDisplay/MiniStat';
+import { CopyToClipboard } from '@/components/Elements/CopyToClipboard';
+import { ForkLabel } from '@/components/Ethereum/ForkLabel';
+import { formatGasToMillions, ATTESTATION_DEADLINE_MS } from '@/utils';
+import type { ForkVersion } from '@/utils/beacon';
 
 /**
  * Detail page for a specific slot.
- * Shows comprehensive slot data including block info, attestations, propagation, and more.
+ * Shows comprehensive slot data organized in tabs: Overview, Attestations, Propagation, Execution, and MEV.
  */
 export function DetailPage(): JSX.Element {
   const { slot: slotParam } = useParams({ from: '/ethereum/slots/$slot' });
@@ -40,8 +48,28 @@ export function DetailPage(): JSX.Element {
   // Calculate epoch from slot
   const epoch = Math.floor(slot / SLOTS_PER_EPOCH);
 
+  // Get current network
+  const { currentNetwork } = useNetwork();
+
   // Fetch all slot data
   const { data, isLoading, error } = useSlotDetailData(slot);
+
+  // Fetch ALL attestation votes (with pagination)
+  const slotTimestamp = currentNetwork ? slotToTimestamp(slot, currentNetwork.genesis_time) : 0;
+  const { data: allAttestationVotes, isLoading: attestationVotesLoading } = useAllAttestationVotes(
+    slotTimestamp,
+    !!currentNetwork && slotTimestamp > 0
+  );
+
+  // Hash-based tab routing
+  const { selectedIndex, onChange } = useHashTabs([
+    { hash: 'overview' },
+    { hash: 'block' },
+    { hash: 'attestations', anchors: ['missed-attestations'] },
+    { hash: 'propagation' },
+    { hash: 'execution' },
+    { hash: 'mev' },
+  ]);
 
   // Validate slot number
   if (isNaN(slot) || slot < 0) {
@@ -105,11 +133,8 @@ export function DetailPage(): JSX.Element {
   // This is more accurate than summing committee validators (which would double-count)
   const totalExpectedValidators = data.attestationCorrectness[0]?.votes_max ?? 0;
 
-  // Transform attestation data for chart
-  const attestationData = data.attestations.map(item => ({
-    chunk_slot_start_diff: item.chunk_slot_start_diff ?? 0,
-    attestation_count: item.attestation_count ?? 0,
-  }));
+  // Attestation data for chart (keep full data with block_root)
+  const attestationData = data.attestations;
 
   // Transform block propagation data for chart
   const blockPropagationData = data.blockPropagation.map(item => ({
@@ -126,13 +151,39 @@ export function DetailPage(): JSX.Element {
     meta_client_geo_continent_code: item.meta_client_geo_continent_code,
   }));
 
-  // Transform attestation correctness data for chart
-  const attestationCorrectnessData =
-    data.attestationCorrectness.length > 0
+  // Calculate distinct client counts for block and blob nodes
+  const distinctBlockClients = new Set(data.blockPropagation.map(item => item.meta_client_name).filter(Boolean)).size;
+  const distinctBlobClients = new Set(data.blobPropagation.map(item => item.meta_client_name).filter(Boolean)).size;
+
+  // Calculate performance metrics
+  const firstBlockSeen =
+    data.blockPropagation.length > 0
+      ? Math.min(...data.blockPropagation.map(node => node.seen_slot_start_diff ?? Infinity))
+      : null;
+
+  const formatFirstSeen = (ms: number | null): string => {
+    if (ms === null || ms === Infinity) return 'N/A';
+    return `${(ms / 1000).toFixed(2)}s`;
+  };
+
+  const attestationCorrectness = data.attestationCorrectness[0];
+  const attestationStats =
+    attestationCorrectness &&
+    attestationCorrectness.votes_max !== undefined &&
+    attestationCorrectness.votes_max > 0 &&
+    attestationCorrectness.votes_head !== null &&
+    attestationCorrectness.votes_head !== undefined &&
+    attestationCorrectness.votes_other !== null &&
+    attestationCorrectness.votes_other !== undefined
       ? {
-          votes_head: data.attestationCorrectness[0].votes_head ?? 0,
-          votes_max: data.attestationCorrectness[0].votes_max ?? 0,
-          votes_other: data.attestationCorrectness[0].votes_other ?? 0,
+          totalVotes: attestationCorrectness.votes_head + attestationCorrectness.votes_other,
+          votesHead: attestationCorrectness.votes_head,
+          votesMax: attestationCorrectness.votes_max,
+          participationPercentage:
+            ((attestationCorrectness.votes_head + attestationCorrectness.votes_other) /
+              attestationCorrectness.votes_max) *
+            100,
+          headPercentage: (attestationCorrectness.votes_head / attestationCorrectness.votes_max) * 100,
         }
       : null;
 
@@ -167,90 +218,623 @@ export function DetailPage(): JSX.Element {
         }
       : undefined;
 
+  // Check if MEV data exists
+  const hasMevData =
+    mevBiddingData.length > 0 ||
+    data.relayBids.length > 0 ||
+    data.builderBids.length > 0 ||
+    data.preparedBlocks.length > 0;
+
   return (
     <Container>
-      <div className="space-y-6">
-        <SlotBasicInfoCard slot={slot} epoch={epoch} data={data} />
+      <SlotBasicInfoCard slot={slot} epoch={epoch} data={data} />
 
-        {/* Attestations Section */}
-        <ScrollAnchor id="attestations">
-          <Header size="xs" title="Attestations" showAccent={false} />
-        </ScrollAnchor>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="lg:col-span-2">
-            <AttestationArrivalsChart
-              attestationData={attestationData}
-              totalExpectedValidators={totalExpectedValidators}
-            />
-          </div>
-          <AttestationParticipationCard correctnessData={attestationCorrectnessData} />
-          <AttestationHeadCorrectnessCard correctnessData={attestationCorrectnessData} />
-          <div className="lg:col-span-2">
-            <AttestationsByEntity
-              data={data.missedAttestations}
-              title="Missed Attestations by Entity"
-              subtitle={missedAttestationsSubtitle}
-              anchorId="missed-attestations"
-              emptyMessage="No missed attestations for this slot"
-            />
-          </div>
-        </div>
+      {/* Tabbed Content */}
+      <div className="mt-8">
+        <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
+          <TabList className="flex gap-2 border-b border-border">
+            <Tab hash="overview">Overview</Tab>
+            <Tab hash="block">Block</Tab>
+            <Tab hash="attestations">Attestations</Tab>
+            <Tab hash="propagation">Propagation</Tab>
+            <Tab hash="execution">Execution</Tab>
+            {hasMevData && <Tab hash="mev">MEV</Tab>}
+          </TabList>
 
-        {/* Propagation Section */}
-        <ScrollAnchor id="propagation">
-          <Header size="xs" title="Propagation" showAccent={false} />
-        </ScrollAnchor>
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <BlockPropagationChart blockPropagationData={blockPropagationData} />
-          <BlobPropagationChart blobPropagationData={blobPropagationData} />
-        </div>
+          <TabPanels className="mt-6">
+            {/* Overview Tab - Clean, card-based layout with key metrics */}
+            <TabPanel>
+              <div className="space-y-6">
+                {/* Network Propagation */}
+                {blockPropagationData.length > 0 && (
+                  <Card>
+                    <div className="mb-4">
+                      <h3 className="text-lg font-semibold text-foreground">Network Propagation</h3>
+                      <p className="text-sm text-muted">Nodes that received block/blob data</p>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                      <MiniStat label="Block Nodes" value={distinctBlockClients.toLocaleString()} />
+                      {blobPropagationData.length > 0 && (
+                        <MiniStat label="Blob Nodes" value={distinctBlobClients.toLocaleString()} />
+                      )}
+                    </div>
+                  </Card>
+                )}
 
-        {/* Execution Section */}
-        <ScrollAnchor id="execution">
-          <Header size="xs" title="Execution" showAccent={false} />
-        </ScrollAnchor>
-        <div className="grid grid-cols-1 gap-6">
-          <BlockSizeEfficiencyChart blockHead={data.blockHead[0]} />
-        </div>
+                {/* MEV Activity */}
+                {(data.blockMev[0]?.value || data.relayBids.length > 0 || data.builderBids.length > 0) && (
+                  <Card>
+                    <div className="mb-4">
+                      <h3 className="text-lg font-semibold text-foreground">MEV Activity</h3>
+                      <p className="text-sm text-muted">Block builder and relay participation</p>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                      {data.blockMev[0]?.value && data.blockMev[0].value !== '0' && (
+                        <MiniStat
+                          label="MEV Value"
+                          value={`${(Number(data.blockMev[0].value) / 1e18).toFixed(4)} ETH`}
+                        />
+                      )}
+                      {data.relayBids.length > 0 && (
+                        <MiniStat
+                          label="Relays"
+                          value={data.relayBids.length.toString()}
+                          secondaryText="Submitted bids"
+                        />
+                      )}
+                      {data.builderBids.length > 0 && (
+                        <MiniStat
+                          label="Builders"
+                          value={data.builderBids.length.toString()}
+                          secondaryText="Submitted bids"
+                        />
+                      )}
+                    </div>
+                  </Card>
+                )}
 
-        {/* MEV Section - Only show if there's MEV data */}
-        {(mevBiddingData.length > 0 ||
-          data.relayBids.length > 0 ||
-          data.builderBids.length > 0 ||
-          data.preparedBlocks.length > 0) && (
-          <>
-            <ScrollAnchor id="mev">
-              <Header size="xs" title="MEV" showAccent={false} />
-            </ScrollAnchor>
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              {mevBiddingData.length > 0 && (
-                <div className="lg:col-span-2">
-                  <MevBiddingTimelineChart
-                    biddingData={mevBiddingData}
-                    winningMevValue={winningMevValue}
-                    winningBuilder={winningBuilder}
-                  />
+                {/* Performance Metrics */}
+                <Card>
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold text-foreground">Performance Metrics</h3>
+                    <p className="text-sm text-muted">Block timing and attestation statistics</p>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {/* Block First Seen At */}
+                    {firstBlockSeen !== null && firstBlockSeen !== Infinity && (
+                      <MiniStat
+                        label="Block First Seen At"
+                        value={formatFirstSeen(firstBlockSeen)}
+                        percentage={Math.min((firstBlockSeen / ATTESTATION_DEADLINE_MS) * 100, 100)}
+                        showGauge
+                        color="var(--color-success)"
+                      />
+                    )}
+
+                    {/* Gas Used */}
+                    {data.blockHead[0] &&
+                      data.blockHead[0].execution_payload_gas_used !== null &&
+                      data.blockHead[0].execution_payload_gas_used !== undefined &&
+                      data.blockHead[0].execution_payload_gas_limit !== null &&
+                      data.blockHead[0].execution_payload_gas_limit !== undefined &&
+                      data.blockHead[0].execution_payload_gas_limit > 0 && (
+                        <MiniStat
+                          label="Gas Used"
+                          value={formatGasToMillions(data.blockHead[0].execution_payload_gas_used)}
+                          secondaryText={`/ ${formatGasToMillions(data.blockHead[0].execution_payload_gas_limit, 0)}`}
+                          percentage={
+                            (data.blockHead[0].execution_payload_gas_used /
+                              data.blockHead[0].execution_payload_gas_limit) *
+                            100
+                          }
+                          showGauge
+                          color={
+                            (data.blockHead[0].execution_payload_gas_used /
+                              data.blockHead[0].execution_payload_gas_limit) *
+                              100 >
+                            90
+                              ? 'var(--color-danger)'
+                              : 'var(--color-success)'
+                          }
+                        />
+                      )}
+
+                    {/* Attestation Stats */}
+                    {attestationStats && (
+                      <>
+                        <MiniStat
+                          label="Participation"
+                          value={attestationStats.totalVotes.toLocaleString()}
+                          secondaryText={`/ ${attestationStats.votesMax.toLocaleString()} validators`}
+                          percentage={attestationStats.participationPercentage}
+                          showGauge
+                        />
+                        <MiniStat
+                          label="Block Votes"
+                          value={attestationStats.votesHead.toLocaleString()}
+                          secondaryText={`/ ${attestationStats.votesMax.toLocaleString()} validators`}
+                          percentage={attestationStats.headPercentage}
+                          showGauge
+                        />
+                      </>
+                    )}
+                  </div>
+                </Card>
+              </div>
+            </TabPanel>
+
+            {/* Block Tab - All block data in two-column layout */}
+            <TabPanel>
+              <Card>
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-foreground">Block Data</h3>
+                  <p className="text-sm text-muted">Complete block information from beacon and execution layers</p>
                 </div>
-              )}
-              {data.relayBids.length > 0 && (
-                <RelayDistributionChart relayData={data.relayBids} winningRelay={winningRelay} />
-              )}
-              {data.builderBids.length > 0 && (
-                <BuilderCompetitionChart builderData={data.builderBids} winningBuilder={winningBuilder} />
-              )}
-              {data.preparedBlocks.length > 0 && (
-                <div className="lg:col-span-2">
-                  <PreparedBlocksComparisonChart
-                    preparedBlocks={data.preparedBlocks}
-                    proposedBlock={proposedBlock}
-                    winningBidTimestamp={winningBidTimestamp}
-                    slotStartTime={data.blockHead[0]?.slot_start_date_time}
-                  />
+                {data.blockHead[0] ? (
+                  <dl className="grid grid-cols-1 gap-x-8 gap-y-4 lg:grid-cols-2">
+                    {/* Beacon Block Section */}
+                    <div className="col-span-1 lg:col-span-2">
+                      <h4 className="mb-4 border-b border-border pb-2 text-sm font-semibold text-foreground">
+                        Beacon Block
+                      </h4>
+                    </div>
+
+                    {data.blockHead[0].block_root && (
+                      <>
+                        <dt className="text-sm font-medium text-muted">Block Root</dt>
+                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                          <span className="flex-1">{data.blockHead[0].block_root}</span>
+                          <CopyToClipboard content={data.blockHead[0].block_root} />
+                        </dd>
+                      </>
+                    )}
+
+                    {data.blockHead[0].parent_root && (
+                      <>
+                        <dt className="text-sm font-medium text-muted">Parent Root</dt>
+                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                          <span className="flex-1">{data.blockHead[0].parent_root}</span>
+                          <CopyToClipboard content={data.blockHead[0].parent_root} />
+                        </dd>
+                      </>
+                    )}
+
+                    {data.blockHead[0].state_root && (
+                      <>
+                        <dt className="text-sm font-medium text-muted">State Root</dt>
+                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                          <span className="flex-1">{data.blockHead[0].state_root}</span>
+                          <CopyToClipboard content={data.blockHead[0].state_root} />
+                        </dd>
+                      </>
+                    )}
+
+                    {data.blockHead[0].block_version && (
+                      <>
+                        <dt className="text-sm font-medium text-muted">Block Version (Fork)</dt>
+                        <dd className="flex items-center gap-2 text-sm text-foreground">
+                          <span className="flex-1">
+                            <ForkLabel fork={data.blockHead[0].block_version as ForkVersion} size="sm" />
+                          </span>
+                          <CopyToClipboard content={data.blockHead[0].block_version} />
+                        </dd>
+                      </>
+                    )}
+
+                    {data.blockHead[0].proposer_index !== undefined && data.blockHead[0].proposer_index !== null && (
+                      <>
+                        <dt className="text-sm font-medium text-muted">Proposer Index</dt>
+                        <dd className="flex items-center gap-2 text-sm text-foreground">
+                          <span className="flex-1">{data.blockHead[0].proposer_index.toLocaleString()}</span>
+                          <CopyToClipboard content={data.blockHead[0].proposer_index.toString()} />
+                        </dd>
+                      </>
+                    )}
+
+                    {data.blockHead[0].block_total_bytes !== undefined &&
+                      data.blockHead[0].block_total_bytes !== null && (
+                        <>
+                          <dt className="text-sm font-medium text-muted">Block Total Bytes</dt>
+                          <dd className="flex items-center gap-2 text-sm text-foreground">
+                            <span className="flex-1">{data.blockHead[0].block_total_bytes.toLocaleString()}</span>
+                            <CopyToClipboard content={data.blockHead[0].block_total_bytes.toString()} />
+                          </dd>
+                        </>
+                      )}
+
+                    {data.blockHead[0].block_total_bytes_compressed !== undefined &&
+                      data.blockHead[0].block_total_bytes_compressed !== null && (
+                        <>
+                          <dt className="text-sm font-medium text-muted">Block Total Bytes (Compressed)</dt>
+                          <dd className="flex items-center gap-2 text-sm text-foreground">
+                            <span className="flex-1">
+                              {data.blockHead[0].block_total_bytes_compressed.toLocaleString()}
+                            </span>
+                            <CopyToClipboard content={data.blockHead[0].block_total_bytes_compressed.toString()} />
+                          </dd>
+                        </>
+                      )}
+
+                    {/* Execution Payload Section */}
+                    <div className="col-span-1 mt-6 lg:col-span-2">
+                      <h4 className="mb-4 border-b border-border pb-2 text-sm font-semibold text-foreground">
+                        Execution Payload
+                      </h4>
+                    </div>
+
+                    {data.blockHead[0].execution_payload_block_hash && (
+                      <>
+                        <dt className="text-sm font-medium text-muted">Execution Block Hash</dt>
+                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                          <span className="flex-1">{data.blockHead[0].execution_payload_block_hash}</span>
+                          <CopyToClipboard content={data.blockHead[0].execution_payload_block_hash} />
+                        </dd>
+                      </>
+                    )}
+
+                    {data.blockHead[0].execution_payload_block_number !== undefined &&
+                      data.blockHead[0].execution_payload_block_number !== null && (
+                        <>
+                          <dt className="text-sm font-medium text-muted">Execution Block Number</dt>
+                          <dd className="flex items-center gap-2 text-sm text-foreground">
+                            <span className="flex-1">
+                              {data.blockHead[0].execution_payload_block_number.toLocaleString()}
+                            </span>
+                            <CopyToClipboard content={data.blockHead[0].execution_payload_block_number.toString()} />
+                          </dd>
+                        </>
+                      )}
+
+                    {data.blockHead[0].execution_payload_parent_hash && (
+                      <>
+                        <dt className="text-sm font-medium text-muted">Execution Parent Hash</dt>
+                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                          <span className="flex-1">{data.blockHead[0].execution_payload_parent_hash}</span>
+                          <CopyToClipboard content={data.blockHead[0].execution_payload_parent_hash} />
+                        </dd>
+                      </>
+                    )}
+
+                    {data.blockHead[0].execution_payload_state_root && (
+                      <>
+                        <dt className="text-sm font-medium text-muted">Execution State Root</dt>
+                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                          <span className="flex-1">{data.blockHead[0].execution_payload_state_root}</span>
+                          <CopyToClipboard content={data.blockHead[0].execution_payload_state_root} />
+                        </dd>
+                      </>
+                    )}
+
+                    {data.blockHead[0].execution_payload_fee_recipient && (
+                      <>
+                        <dt className="text-sm font-medium text-muted">Fee Recipient</dt>
+                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                          <span className="flex-1">{data.blockHead[0].execution_payload_fee_recipient}</span>
+                          <CopyToClipboard content={data.blockHead[0].execution_payload_fee_recipient} />
+                        </dd>
+                      </>
+                    )}
+
+                    {data.blockHead[0].execution_payload_gas_limit !== undefined &&
+                      data.blockHead[0].execution_payload_gas_limit !== null && (
+                        <>
+                          <dt className="text-sm font-medium text-muted">Gas Limit</dt>
+                          <dd className="flex items-center gap-2 text-sm text-foreground">
+                            <span className="flex-1">
+                              {data.blockHead[0].execution_payload_gas_limit.toLocaleString()}
+                            </span>
+                            <CopyToClipboard content={data.blockHead[0].execution_payload_gas_limit.toString()} />
+                          </dd>
+                        </>
+                      )}
+
+                    {data.blockHead[0].execution_payload_gas_used !== undefined &&
+                      data.blockHead[0].execution_payload_gas_used !== null && (
+                        <>
+                          <dt className="text-sm font-medium text-muted">Gas Used</dt>
+                          <dd className="flex items-center gap-2 text-sm text-foreground">
+                            <span className="flex-1">
+                              {data.blockHead[0].execution_payload_gas_used.toLocaleString()}
+                            </span>
+                            <CopyToClipboard content={data.blockHead[0].execution_payload_gas_used.toString()} />
+                          </dd>
+                        </>
+                      )}
+
+                    {data.blockHead[0].execution_payload_base_fee_per_gas && (
+                      <>
+                        <dt className="text-sm font-medium text-muted">Base Fee Per Gas</dt>
+                        <dd className="flex items-center gap-2 text-sm text-foreground">
+                          <span className="flex-1">
+                            {data.blockHead[0].execution_payload_base_fee_per_gas} wei (
+                            {(Number(data.blockHead[0].execution_payload_base_fee_per_gas) / 1e9).toFixed(2)} Gwei)
+                          </span>
+                          <CopyToClipboard content={data.blockHead[0].execution_payload_base_fee_per_gas} />
+                        </dd>
+                      </>
+                    )}
+
+                    {data.blockHead[0].execution_payload_transactions_count !== undefined &&
+                      data.blockHead[0].execution_payload_transactions_count !== null && (
+                        <>
+                          <dt className="text-sm font-medium text-muted">Transaction Count</dt>
+                          <dd className="flex items-center gap-2 text-sm text-foreground">
+                            <span className="flex-1">
+                              {data.blockHead[0].execution_payload_transactions_count.toLocaleString()}
+                            </span>
+                            <CopyToClipboard
+                              content={data.blockHead[0].execution_payload_transactions_count.toString()}
+                            />
+                          </dd>
+                        </>
+                      )}
+
+                    {data.blockHead[0].execution_payload_transactions_total_bytes !== undefined &&
+                      data.blockHead[0].execution_payload_transactions_total_bytes !== null && (
+                        <>
+                          <dt className="text-sm font-medium text-muted">Transactions Total Bytes</dt>
+                          <dd className="flex items-center gap-2 text-sm text-foreground">
+                            <span className="flex-1">
+                              {data.blockHead[0].execution_payload_transactions_total_bytes.toLocaleString()}
+                            </span>
+                            <CopyToClipboard
+                              content={data.blockHead[0].execution_payload_transactions_total_bytes.toString()}
+                            />
+                          </dd>
+                        </>
+                      )}
+
+                    {data.blockHead[0].execution_payload_transactions_total_bytes_compressed !== undefined &&
+                      data.blockHead[0].execution_payload_transactions_total_bytes_compressed !== null && (
+                        <>
+                          <dt className="text-sm font-medium text-muted">Transactions Total Bytes (Compressed)</dt>
+                          <dd className="flex items-center gap-2 text-sm text-foreground">
+                            <span className="flex-1">
+                              {data.blockHead[0].execution_payload_transactions_total_bytes_compressed.toLocaleString()}
+                            </span>
+                            <CopyToClipboard
+                              content={data.blockHead[0].execution_payload_transactions_total_bytes_compressed.toString()}
+                            />
+                          </dd>
+                        </>
+                      )}
+
+                    {data.blockHead[0].execution_payload_blob_gas_used !== undefined &&
+                      data.blockHead[0].execution_payload_blob_gas_used !== null && (
+                        <>
+                          <dt className="text-sm font-medium text-muted">Blob Gas Used</dt>
+                          <dd className="flex items-center gap-2 text-sm text-foreground">
+                            <span className="flex-1">
+                              {data.blockHead[0].execution_payload_blob_gas_used.toLocaleString()}
+                            </span>
+                            <CopyToClipboard content={data.blockHead[0].execution_payload_blob_gas_used.toString()} />
+                          </dd>
+                        </>
+                      )}
+
+                    {data.blockHead[0].execution_payload_excess_blob_gas !== undefined &&
+                      data.blockHead[0].execution_payload_excess_blob_gas !== null && (
+                        <>
+                          <dt className="text-sm font-medium text-muted">Excess Blob Gas</dt>
+                          <dd className="flex items-center gap-2 text-sm text-foreground">
+                            <span className="flex-1">
+                              {data.blockHead[0].execution_payload_excess_blob_gas.toLocaleString()}
+                            </span>
+                            <CopyToClipboard content={data.blockHead[0].execution_payload_excess_blob_gas.toString()} />
+                          </dd>
+                        </>
+                      )}
+
+                    {/* ETH1 Data Section */}
+                    <div className="col-span-1 mt-6 lg:col-span-2">
+                      <h4 className="mb-4 border-b border-border pb-2 text-sm font-semibold text-foreground">
+                        ETH1 Data
+                      </h4>
+                    </div>
+
+                    {data.blockHead[0].eth1_data_block_hash && (
+                      <>
+                        <dt className="text-sm font-medium text-muted">ETH1 Block Hash</dt>
+                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                          <span className="flex-1">{data.blockHead[0].eth1_data_block_hash}</span>
+                          <CopyToClipboard content={data.blockHead[0].eth1_data_block_hash} />
+                        </dd>
+                      </>
+                    )}
+
+                    {data.blockHead[0].eth1_data_deposit_root && (
+                      <>
+                        <dt className="text-sm font-medium text-muted">ETH1 Deposit Root</dt>
+                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                          <span className="flex-1">{data.blockHead[0].eth1_data_deposit_root}</span>
+                          <CopyToClipboard content={data.blockHead[0].eth1_data_deposit_root} />
+                        </dd>
+                      </>
+                    )}
+                  </dl>
+                ) : (
+                  <p className="text-sm text-muted">No block data available</p>
+                )}
+              </Card>
+            </TabPanel>
+
+            {/* Attestations Tab */}
+            <TabPanel>
+              <div className="space-y-6">
+                <AttestationVotesBreakdownTable
+                  attestationData={allAttestationVotes}
+                  currentSlot={slot}
+                  votedForBlocks={data.votedForBlocks}
+                  expectedValidatorCount={data.committees.reduce(
+                    (sum, committee) => sum + (committee.validators?.length ?? 0),
+                    0
+                  )}
+                  isLoading={attestationVotesLoading}
+                />
+                <AttestationArrivalsChart
+                  attestationData={attestationData}
+                  currentSlot={slot}
+                  votedForBlocks={data.votedForBlocks}
+                  totalExpectedValidators={totalExpectedValidators}
+                />
+                <AttestationsByEntity
+                  data={data.missedAttestations}
+                  title="Missed Attestations by Entity"
+                  subtitle={missedAttestationsSubtitle}
+                  anchorId="missed-attestations"
+                  emptyMessage="No missed attestations for this slot"
+                />
+              </div>
+            </TabPanel>
+
+            {/* Propagation Tab */}
+            <TabPanel>
+              <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+                <BlockPropagationChart blockPropagationData={blockPropagationData} />
+                <BlobPropagationChart blobPropagationData={blobPropagationData} />
+              </div>
+            </TabPanel>
+
+            {/* Execution Tab - Comprehensive execution layer data */}
+            <TabPanel>
+              <div className="space-y-6">
+                {data.blockHead[0] && (
+                  <>
+                    {/* Transaction & Gas Metrics */}
+                    <Card>
+                      <div className="mb-4">
+                        <h3 className="text-lg font-semibold text-foreground">Transactions & Gas</h3>
+                        <p className="text-sm text-muted">Block execution metrics</p>
+                      </div>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        {data.blockHead[0].execution_payload_transactions_count !== null &&
+                          data.blockHead[0].execution_payload_transactions_count !== undefined && (
+                            <MiniStat
+                              label="Transactions"
+                              value={data.blockHead[0].execution_payload_transactions_count.toLocaleString()}
+                            />
+                          )}
+
+                        {data.blockHead[0].execution_payload_gas_used !== null &&
+                          data.blockHead[0].execution_payload_gas_used !== undefined &&
+                          data.blockHead[0].execution_payload_gas_limit !== null &&
+                          data.blockHead[0].execution_payload_gas_limit !== undefined &&
+                          data.blockHead[0].execution_payload_gas_limit > 0 && (
+                            <MiniStat
+                              label="Gas Used"
+                              value={formatGasToMillions(data.blockHead[0].execution_payload_gas_used)}
+                              secondaryText={`/ ${formatGasToMillions(data.blockHead[0].execution_payload_gas_limit, 0)}`}
+                              percentage={
+                                (data.blockHead[0].execution_payload_gas_used /
+                                  data.blockHead[0].execution_payload_gas_limit) *
+                                100
+                              }
+                              showGauge
+                              color={
+                                (data.blockHead[0].execution_payload_gas_used /
+                                  data.blockHead[0].execution_payload_gas_limit) *
+                                  100 >
+                                90
+                                  ? 'var(--color-danger)'
+                                  : 'var(--color-success)'
+                              }
+                            />
+                          )}
+
+                        {data.blockHead[0].execution_payload_base_fee_per_gas && (
+                          <MiniStat
+                            label="Base Fee"
+                            value={`${(Number(data.blockHead[0].execution_payload_base_fee_per_gas) / 1e9).toFixed(2)} Gwei`}
+                          />
+                        )}
+
+                        {data.blockHead[0].execution_payload_transactions_total_bytes !== null &&
+                          data.blockHead[0].execution_payload_transactions_total_bytes !== undefined && (
+                            <MiniStat
+                              label="Total Bytes"
+                              value={
+                                data.blockHead[0].execution_payload_transactions_total_bytes < 1024 * 1024
+                                  ? `${(data.blockHead[0].execution_payload_transactions_total_bytes / 1024).toFixed(2)} KB`
+                                  : `${(data.blockHead[0].execution_payload_transactions_total_bytes / (1024 * 1024)).toFixed(2)} MB`
+                              }
+                            />
+                          )}
+                      </div>
+                    </Card>
+
+                    {/* Blob Metrics */}
+                    {(data.blockHead[0].execution_payload_blob_gas_used !== null ||
+                      data.blockHead[0].execution_payload_excess_blob_gas !== null ||
+                      (data.blobCount[0] && data.blobCount[0].blob_count)) && (
+                      <Card>
+                        <div className="mb-4">
+                          <h3 className="text-lg font-semibold text-foreground">Blob Data</h3>
+                          <p className="text-sm text-muted">EIP-4844 blob gas metrics</p>
+                        </div>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                          {data.blobCount[0] &&
+                            data.blobCount[0].blob_count !== undefined &&
+                            data.blobCount[0].blob_count !== null && (
+                              <MiniStat label="Blob Count" value={data.blobCount[0].blob_count.toString()} />
+                            )}
+
+                          {data.blockHead[0].execution_payload_blob_gas_used !== null &&
+                            data.blockHead[0].execution_payload_blob_gas_used !== undefined && (
+                              <MiniStat
+                                label="Blob Gas Used"
+                                value={`${(data.blockHead[0].execution_payload_blob_gas_used / 1e6).toFixed(2)}M`}
+                              />
+                            )}
+
+                          {data.blockHead[0].execution_payload_excess_blob_gas !== null &&
+                            data.blockHead[0].execution_payload_excess_blob_gas !== undefined && (
+                              <MiniStat
+                                label="Excess Blob Gas"
+                                value={`${(data.blockHead[0].execution_payload_excess_blob_gas / 1e6).toFixed(2)}M`}
+                              />
+                            )}
+                        </div>
+                      </Card>
+                    )}
+                  </>
+                )}
+              </div>
+            </TabPanel>
+
+            {/* MEV Tab - Only included if there's MEV data */}
+            {hasMevData && (
+              <TabPanel>
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                  {mevBiddingData.length > 0 && (
+                    <div className="lg:col-span-2">
+                      <MevBiddingTimelineChart
+                        biddingData={mevBiddingData}
+                        winningMevValue={winningMevValue}
+                        winningBuilder={winningBuilder}
+                      />
+                    </div>
+                  )}
+                  {data.relayBids.length > 0 && (
+                    <RelayDistributionChart relayData={data.relayBids} winningRelay={winningRelay} />
+                  )}
+                  {data.builderBids.length > 0 && (
+                    <BuilderCompetitionChart builderData={data.builderBids} winningBuilder={winningBuilder} />
+                  )}
+                  {data.preparedBlocks.length > 0 && (
+                    <div className="lg:col-span-2">
+                      <PreparedBlocksComparisonChart
+                        preparedBlocks={data.preparedBlocks}
+                        proposedBlock={proposedBlock}
+                        winningBidTimestamp={winningBidTimestamp}
+                        slotStartTime={data.blockHead[0]?.slot_start_date_time}
+                      />
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </>
-        )}
+              </TabPanel>
+            )}
+          </TabPanels>
+        </TabGroup>
       </div>
     </Container>
   );

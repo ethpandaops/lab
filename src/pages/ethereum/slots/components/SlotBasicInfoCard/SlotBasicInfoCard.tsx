@@ -3,10 +3,12 @@ import { Card } from '@/components/Layout/Card';
 import { Badge } from '@/components/Elements/Badge';
 import { Slot } from '@/components/Ethereum/Slot';
 import { Epoch } from '@/components/Ethereum/Epoch';
+import { Entity } from '@/components/Ethereum/Entity';
 import { BlockArt } from '@/components/Ethereum/BlockArt';
-import { formatGasWithPercentage } from '@/utils';
+import { ForkLabel } from '@/components/Ethereum/ForkLabel';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { SlotBasicInfoCardProps } from './SlotBasicInfoCard.types';
+import type { ForkVersion } from '@/utils/beacon';
 
 /**
  * Displays basic information about a slot in a card layout.
@@ -18,6 +20,14 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
   const blockMev = data.blockMev[0];
   const blobCount = data.blobCount[0];
   const proposerEntity = data.proposerEntity[0];
+
+  // Calculate blob count from blob propagation data if blobCount data is not available
+  const actualBlobCount =
+    blobCount?.blob_count !== undefined && blobCount?.blob_count !== null
+      ? blobCount.blob_count
+      : data.blobPropagation.length > 0
+        ? Math.max(...data.blobPropagation.map(b => (b.blob_index ?? -1) + 1))
+        : 0;
 
   // Determine if block was seen by monitoring infrastructure
   const wasBlockSeen = !!blockHead;
@@ -47,26 +57,26 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
     return `${root.slice(0, 10)}...${root.slice(-8)}`;
   };
 
-  // Format MEV value
-  const formatMevValue = (value?: number | string | null): string => {
-    if (!value) return 'N/A';
-    const ethValue = typeof value === 'string' ? parseFloat(value) : value;
-    return `${(ethValue / 1e18).toFixed(4)} ETH`;
+  // Format MEV value (value is in wei as a string)
+  const formatMevValue = (value?: string | null): string => {
+    if (!value || value === '0') return 'N/A';
+    try {
+      const weiValue = BigInt(value);
+      const ethValue = Number(weiValue) / 1e18;
+      return `${ethValue.toFixed(4)} ETH`;
+    } catch {
+      return 'N/A';
+    }
   };
-
-  // Create beaconcha.in link for proposer
-  const getBeaconchainLink = (validatorIndex?: number): string | null => {
-    if (!validatorIndex) return null;
-    return `https://beaconcha.in/validator/${validatorIndex}`;
-  };
-
-  const proposerLink = getBeaconchainLink(blockProposer?.proposer_validator_index);
 
   return (
     <Card
       header={
         <div className="flex items-center justify-between">
-          <h2 className="text-lg/7 font-semibold text-foreground">Slot Information</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg/7 font-semibold text-foreground">Slot Information</h2>
+            {blockHead?.block_version && <ForkLabel fork={blockHead.block_version as ForkVersion} size="sm" />}
+          </div>
           <div className="flex items-center gap-2">
             <Badge color={wasBlockSeen ? 'green' : 'red'} variant="border">
               {wasBlockSeen ? 'Block Seen' : 'Block Not Seen'}
@@ -79,126 +89,110 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
       }
     >
       <div className="flex flex-col gap-6 lg:flex-row">
-        <div className="flex-1">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3 lg:grid-cols-4">
-            {/* Slot Number */}
-            <div>
-              <dt className="text-xs font-medium text-muted">Slot</dt>
-              <dd className="mt-1 text-base/7 font-semibold text-foreground">
-                <Slot slot={slot} noLink />
-              </dd>
-            </div>
+        <div className="flex-1 space-y-6">
+          {/* Basic Information Section */}
+          <div>
+            <h3 className="mb-3 text-sm font-semibold text-foreground">Basic Information</h3>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3 lg:grid-cols-4">
+              {/* Slot Number */}
+              <div>
+                <dt className="text-xs font-medium text-muted">Slot</dt>
+                <dd className="mt-1 text-base/7 font-semibold text-foreground">
+                  <Slot slot={slot} noLink />
+                </dd>
+              </div>
 
-            {/* Epoch */}
-            <div>
-              <dt className="text-xs font-medium text-muted">Epoch</dt>
-              <dd className="mt-1 text-base/7 font-semibold text-foreground">
-                <Epoch epoch={epoch} />
-              </dd>
-            </div>
+              {/* Epoch */}
+              <div>
+                <dt className="text-xs font-medium text-muted">Epoch</dt>
+                <dd className="mt-1 text-base/7 font-semibold text-foreground">
+                  <Epoch epoch={epoch} />
+                </dd>
+              </div>
 
-            {/* Slot Timestamp */}
-            <div className="col-span-2">
-              <dt className="text-xs font-medium text-muted">Slot Time</dt>
-              <dd className="mt-1 text-sm text-foreground">
-                {blockHead?.slot_start_date_time ? (
-                  <Timestamp timestamp={blockHead.slot_start_date_time} format="short" />
-                ) : blockProposer?.slot_start_date_time ? (
-                  <Timestamp timestamp={blockProposer.slot_start_date_time} format="short" />
-                ) : (
-                  'N/A'
-                )}
-              </dd>
-            </div>
+              {/* Execution Block Number */}
+              <div>
+                <dt className="text-xs font-medium text-muted">Execution Block</dt>
+                <dd className="mt-1 text-base/7 font-semibold text-foreground">
+                  {blockHead?.execution_payload_block_number ?? 'N/A'}
+                </dd>
+              </div>
 
-            {/* Relative Time */}
-            <div className="col-span-2 sm:col-span-1">
-              <dt className="text-xs font-medium text-muted">Age</dt>
-              <dd className="mt-1 text-sm text-foreground">
-                {blockHead?.slot_start_date_time ? (
-                  <Timestamp timestamp={blockHead.slot_start_date_time} format="relative" />
-                ) : blockProposer?.slot_start_date_time ? (
-                  <Timestamp timestamp={blockProposer.slot_start_date_time} format="relative" />
-                ) : (
-                  'N/A'
-                )}
-              </dd>
-            </div>
+              {/* Blob Count */}
+              <div>
+                <dt className="text-xs font-medium text-muted">Blobs</dt>
+                <dd className="mt-1 text-base/7 font-semibold text-foreground">{actualBlobCount}</dd>
+              </div>
 
-            {/* Epoch Timestamp */}
-            <div className="col-span-2 sm:col-span-1">
-              <dt className="text-xs font-medium text-muted">Epoch Start</dt>
-              <dd className="mt-1 text-sm text-foreground">
-                {blockHead?.epoch_start_date_time ? (
-                  <Timestamp timestamp={blockHead.epoch_start_date_time} format="short" />
-                ) : (
-                  'N/A'
-                )}
-              </dd>
-            </div>
+              {/* Slot Timestamp */}
+              <div className="col-span-2">
+                <dt className="text-xs font-medium text-muted">Slot Time</dt>
+                <dd className="mt-1 text-sm text-foreground">
+                  {blockHead?.slot_start_date_time ? (
+                    <Timestamp timestamp={blockHead.slot_start_date_time} format="short" />
+                  ) : blockProposer?.slot_start_date_time ? (
+                    <Timestamp timestamp={blockProposer.slot_start_date_time} format="short" />
+                  ) : (
+                    'N/A'
+                  )}
+                </dd>
+              </div>
 
-            {/* Proposer Index */}
-            <div className="col-span-2">
-              <dt className="text-xs font-medium text-muted">Proposer</dt>
-              <dd className="mt-1 text-sm text-foreground">
-                {blockProposer?.proposer_validator_index !== undefined ? (
-                  <>
-                    {proposerLink ? (
-                      <a
-                        href={proposerLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                      >
-                        Validator {blockProposer.proposer_validator_index}
-                      </a>
-                    ) : (
-                      `Validator ${blockProposer.proposer_validator_index}`
+              {/* Relative Time */}
+              <div className="col-span-2 sm:col-span-1">
+                <dt className="text-xs font-medium text-muted">Age</dt>
+                <dd className="mt-1 text-sm text-foreground">
+                  {blockHead?.slot_start_date_time ? (
+                    <Timestamp timestamp={blockHead.slot_start_date_time} format="relative" />
+                  ) : blockProposer?.slot_start_date_time ? (
+                    <Timestamp timestamp={blockProposer.slot_start_date_time} format="relative" />
+                  ) : (
+                    'N/A'
+                  )}
+                </dd>
+              </div>
+
+              {/* Epoch Timestamp */}
+              <div className="col-span-2 sm:col-span-1">
+                <dt className="text-xs font-medium text-muted">Epoch Start</dt>
+                <dd className="mt-1 text-sm text-foreground">
+                  {blockHead?.epoch_start_date_time ? (
+                    <Timestamp timestamp={blockHead.epoch_start_date_time} format="short" />
+                  ) : (
+                    'N/A'
+                  )}
+                </dd>
+              </div>
+            </div>
+          </div>
+
+          {/* Block Details Section */}
+          <div>
+            <h3 className="mb-3 text-sm font-semibold text-foreground">Block Details</h3>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3 lg:grid-cols-4">
+              {/* Proposer Entity */}
+              <div className="col-span-2">
+                <dt className="text-xs font-medium text-muted">Proposer</dt>
+                <dd className="mt-1 text-sm text-foreground">
+                  <Entity entity={proposerEntity?.entity} />
+                  {blockProposer?.proposer_validator_index !== undefined &&
+                    blockProposer.proposer_validator_index !== null && (
+                      <span className="ml-2 text-muted">(Validator {blockProposer.proposer_validator_index})</span>
                     )}
-                    {proposerEntity?.entity && <span className="ml-2 text-muted">({proposerEntity.entity})</span>}
-                  </>
-                ) : (
-                  'N/A'
-                )}
-              </dd>
-            </div>
+                </dd>
+              </div>
 
-            {/* Block Root */}
-            <div className="col-span-2">
-              <dt className="text-xs font-medium text-muted">Block Root</dt>
-              <dd className="mt-1 font-mono text-xs text-foreground">{formatBlockRoot(blockHead?.block_root)}</dd>
-            </div>
+              {/* MEV Value */}
+              <div className="col-span-2">
+                <dt className="text-xs font-medium text-muted">MEV Value</dt>
+                <dd className="mt-1 text-base/7 font-semibold text-foreground">{formatMevValue(blockMev?.value)}</dd>
+              </div>
 
-            {/* Execution Block Number */}
-            <div>
-              <dt className="text-xs font-medium text-muted">Execution Block</dt>
-              <dd className="mt-1 text-base/7 font-semibold text-foreground">
-                {blockHead?.execution_payload_block_number ?? 'N/A'}
-              </dd>
-            </div>
-
-            {/* Blob Count */}
-            <div>
-              <dt className="text-xs font-medium text-muted">Blobs</dt>
-              <dd className="mt-1 text-base/7 font-semibold text-foreground">
-                {blobCount?.blob_count !== undefined && blobCount?.blob_count !== null
-                  ? `${blobCount.blob_count}`
-                  : '0'}
-              </dd>
-            </div>
-
-            {/* MEV Value */}
-            <div className="col-span-2 sm:col-span-1">
-              <dt className="text-xs font-medium text-muted">MEV Value</dt>
-              <dd className="mt-1 text-base/7 font-semibold text-foreground">{formatMevValue(blockMev?.value)}</dd>
-            </div>
-
-            {/* Gas Used / Limit */}
-            <div className="col-span-2 sm:col-span-3 lg:col-span-1">
-              <dt className="text-xs font-medium text-muted">Gas Used / Limit</dt>
-              <dd className="mt-1 text-sm text-foreground">
-                {formatGasWithPercentage(blockHead?.execution_payload_gas_used, blockHead?.execution_payload_gas_limit)}
-              </dd>
+              {/* Block Root */}
+              <div className="col-span-2 sm:col-span-3 lg:col-span-4">
+                <dt className="text-xs font-medium text-muted">Block Root</dt>
+                <dd className="mt-1 font-mono text-xs text-foreground">{formatBlockRoot(blockHead?.block_root)}</dd>
+              </div>
             </div>
           </div>
         </div>

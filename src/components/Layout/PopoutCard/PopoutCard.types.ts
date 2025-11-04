@@ -74,6 +74,10 @@ export interface PopoutCardProps {
    */
   allowContentOverflow?: boolean;
   /**
+   * Remove padding from card content area (useful for tables, full-width components). Default: false
+   */
+  noPadding?: boolean;
+  /**
    * Enable download functionality with built-in button. Default: true
    */
   enableDownload?: boolean;
