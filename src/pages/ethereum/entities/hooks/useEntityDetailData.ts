@@ -109,18 +109,23 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
     const minTime = Math.min(...times);
     const maxTime = Math.max(...times);
 
-    return { minTime, maxTime };
+    // Create comma-separated list of slot_start_date_time values for precise filtering
+    const slotStartDateTimeInValues = times.join(',');
+
+    return { minTime, maxTime, slotStartDateTimeInValues };
   }, [primaryResults]);
 
-  // STEP 2: Fetch supplemental data for the time range (dependent queries)
+  // STEP 2: Fetch supplemental data for specific slots (dependent queries)
+  // Use both time range (gte/lte) and in_values for precise filtering
   const supplementalResults = useQueries({
     queries: [
-      // 3. Blob counts for time range
+      // 3. Blob counts for specific slots
       {
         ...fctBlockBlobCountHeadServiceListOptions({
           query: {
             slot_start_date_time_gte: blockProposerTimeRange?.minTime,
             slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
+            slot_start_date_time_in_values: blockProposerTimeRange?.slotStartDateTimeInValues,
             page_size: 100,
           },
         }),
@@ -128,12 +133,13 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
         refetchInterval: false,
         refetchOnWindowFocus: false,
       },
-      // 4. Attestation correctness for time range
+      // 4. Attestation correctness for specific slots
       {
         ...fctAttestationCorrectnessHeadServiceListOptions({
           query: {
             slot_start_date_time_gte: blockProposerTimeRange?.minTime,
             slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
+            slot_start_date_time_in_values: blockProposerTimeRange?.slotStartDateTimeInValues,
             page_size: 100,
           },
         }),
@@ -141,12 +147,13 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
         refetchInterval: false,
         refetchOnWindowFocus: false,
       },
-      // 5. Block first seen for time range
+      // 5. Block first seen for specific slots
       {
         ...fctBlockFirstSeenByNodeServiceListOptions({
           query: {
             slot_start_date_time_gte: blockProposerTimeRange?.minTime,
             slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
+            slot_start_date_time_in_values: blockProposerTimeRange?.slotStartDateTimeInValues,
             page_size: 500,
             order_by: 'slot asc, seen_slot_start_diff asc',
           },
@@ -155,13 +162,13 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
         refetchInterval: false,
         refetchOnWindowFocus: false,
       },
-      // 6. Canonical blocks for time range
-      // Only query canonical status for blocks old enough to be finalized (not recent blocks)
+      // 6. Canonical blocks for specific slots
       {
         ...intBlockCanonicalServiceListOptions({
           query: {
             slot_start_date_time_gte: blockProposerTimeRange?.minTime,
             slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
+            slot_start_date_time_in_values: blockProposerTimeRange?.slotStartDateTimeInValues,
             page_size: 100,
           },
         }),
