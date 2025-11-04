@@ -21,6 +21,7 @@ import { AttestationVotesBreakdownTable } from './components/AttestationVotesBre
 import { AttestationsByEntity } from '@/components/Ethereum/AttestationsByEntity';
 import { BlockPropagationChart } from './components/BlockPropagationChart';
 import { BlobPropagationChart } from './components/BlobPropagationChart';
+import { BlobDataColumnSpreadChart } from './components/BlobDataColumnSpreadChart';
 import { MevBiddingTimelineChart } from './components/MevBiddingTimelineChart';
 import { PreparedBlocksComparisonChart } from './components/PreparedBlocksComparisonChart';
 import { RelayDistributionChart } from './components/RelayDistributionChart';
@@ -143,13 +144,22 @@ export function DetailPage(): JSX.Element {
     meta_client_geo_continent_code: item.meta_client_geo_continent_code,
   }));
 
-  // Transform blob propagation data for chart
-  const blobPropagationData = data.blobPropagation.map(item => ({
-    blob_index: item.blob_index ?? 0,
-    seen_slot_start_diff: item.seen_slot_start_diff ?? 0,
-    node_id: item.node_id ?? '',
-    meta_client_geo_continent_code: item.meta_client_geo_continent_code,
-  }));
+  // Transform blob/data column propagation data for chart
+  // For Fulu+, use data column data; for pre-Fulu, use blob data
+  const blobPropagationData =
+    data.dataColumnPropagation.length > 0
+      ? data.dataColumnPropagation.map(item => ({
+          column_index: item.column_index ?? 0,
+          seen_slot_start_diff: item.seen_slot_start_diff ?? 0,
+          node_id: item.node_id ?? '',
+          meta_client_geo_continent_code: item.meta_client_geo_continent_code,
+        }))
+      : data.blobPropagation.map(item => ({
+          blob_index: item.blob_index ?? 0,
+          seen_slot_start_diff: item.seen_slot_start_diff ?? 0,
+          node_id: item.node_id ?? '',
+          meta_client_geo_continent_code: item.meta_client_geo_continent_code,
+        }));
 
   // Calculate distinct client count for block nodes
   const distinctBlockClients = new Set(data.blockPropagation.map(item => item.meta_client_name).filter(Boolean)).size;
@@ -685,9 +695,22 @@ export function DetailPage(): JSX.Element {
 
             {/* Propagation Tab */}
             <TabPanel>
-              <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-                <BlockPropagationChart blockPropagationData={blockPropagationData} />
-                <BlobPropagationChart blobPropagationData={blobPropagationData} />
+              <div className="space-y-6">
+                {/* Check if we have data columns (Fulu+) - if so, make blob/data column chart full width */}
+                {data.dataColumnPropagation.length > 0 ? (
+                  <>
+                    <BlockPropagationChart blockPropagationData={blockPropagationData} />
+                    <BlobPropagationChart blobPropagationData={blobPropagationData} />
+                  </>
+                ) : (
+                  <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+                    <BlockPropagationChart blockPropagationData={blockPropagationData} />
+                    <BlobPropagationChart blobPropagationData={blobPropagationData} />
+                  </div>
+                )}
+                {blobPropagationData.length > 0 && (
+                  <BlobDataColumnSpreadChart blobPropagationData={blobPropagationData} slot={slot} />
+                )}
               </div>
             </TabPanel>
 

@@ -1,3 +1,5 @@
+import type { Network } from '@/hooks/useConfig';
+
 /**
  * Beacon chain timing constants
  */
@@ -231,6 +233,43 @@ export const FORK_METADATA: Record<ForkVersion, ForkMetadata> = {
     name: 'Fulu',
     emoji: '🦓',
     color: 'bg-pink-100 text-pink-700 dark:bg-pink-400/10 dark:text-pink-400',
-    description: 'Future upgrade - PeerDAS and more',
+    description: 'Fulu - PeerDAS and more',
   },
 } as const;
+
+/**
+ * Determine the active fork for a given slot based on network fork schedule
+ *
+ * @param slot - Slot number
+ * @param network - Network configuration containing fork schedule
+ * @returns The active fork version for the slot
+ *
+ * @example
+ * ```tsx
+ * const fork = getForkForSlot(10000000, network);
+ * // Returns 'deneb' if slot falls within Deneb fork range
+ * ```
+ */
+export function getForkForSlot(slot: number, network: Network | null): ForkVersion {
+  if (!network) {
+    return 'electra';
+  }
+
+  const epoch = slotToEpoch(slot);
+  const { forks } = network;
+
+  // Check forks in reverse chronological order (newest to oldest)
+  // Note: The config only has 'electra' and 'fusaka' in consensus forks currently
+  // We map 'fusaka' to 'fulu' for consistency with our ForkVersion type
+  if (forks.consensus.fusaka && epoch >= forks.consensus.fusaka.epoch) {
+    return 'fulu';
+  }
+
+  if (forks.consensus.electra && epoch >= forks.consensus.electra.epoch) {
+    return 'electra';
+  }
+
+  // If no specific fork found, return 'deneb' as it's the current mainnet fork
+  // In a full implementation, this should check all historical forks
+  return 'deneb';
+}

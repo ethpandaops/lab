@@ -1,13 +1,18 @@
 /**
- * Blob propagation data point from the first seen by node API endpoint
+ * Blob or data column propagation data point from the first seen by node API endpoint
+ * Pre-Fulu uses blob_index, Fulu+ uses column_index
  */
 export interface BlobPropagationDataPoint {
   /**
-   * Blob index (0-5, typically 0-3)
+   * Blob index (pre-Fulu: 0-5, typically 0-3)
    */
-  blob_index: number;
+  blob_index?: number;
   /**
-   * Milliseconds from slot start when node first saw the blob
+   * Data column index (Fulu+: 0-127)
+   */
+  column_index?: number;
+  /**
+   * Milliseconds from slot start when node first saw the blob/data column
    */
   seen_slot_start_diff: number;
   /**

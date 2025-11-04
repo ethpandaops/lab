@@ -6,6 +6,7 @@ import {
   fctBlockBlobCountServiceListOptions,
   fctBlockFirstSeenByNodeServiceListOptions,
   fctBlockBlobFirstSeenByNodeServiceListOptions,
+  fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions,
   fctAttestationFirstSeenChunked50MsServiceListOptions,
   fctAttestationCorrectnessHeadServiceListOptions,
   fctAttestationLivenessByEntityHeadServiceListOptions,
@@ -18,7 +19,7 @@ import {
   fctBlockProposerEntityServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { slotToTimestamp } from '@/utils/beacon';
+import { slotToTimestamp, getForkForSlot } from '@/utils/beacon';
 import type {
   FctBlockHead,
   FctBlockProposer,
@@ -26,6 +27,7 @@ import type {
   FctBlockBlobCount,
   FctBlockFirstSeenByNode,
   FctBlockBlobFirstSeenByNode,
+  FctBlockDataColumnSidecarFirstSeenByNode,
   FctAttestationFirstSeenChunked50Ms,
   FctAttestationCorrectnessHead,
   FctAttestationLivenessByEntityHead,
@@ -50,6 +52,7 @@ export interface SlotDetailData {
   blobCount: FctBlockBlobCount[];
   blockPropagation: FctBlockFirstSeenByNode[];
   blobPropagation: FctBlockBlobFirstSeenByNode[];
+  dataColumnPropagation: FctBlockDataColumnSidecarFirstSeenByNode[];
   attestations: FctAttestationFirstSeenChunked50Ms[];
   attestationCorrectness: FctAttestationCorrectnessHead[];
   attestationLiveness: FctAttestationLivenessByEntityHead[];
@@ -99,6 +102,10 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
   // Convert slot to timestamp for querying
   const slotTimestamp = currentNetwork ? slotToTimestamp(slot, currentNetwork.genesis_time) : 0;
 
+  // Determine if this is a Fulu+ slot (needs data column data instead of blob data)
+  const forkVersion = getForkForSlot(slot, currentNetwork);
+  const isFuluOrLater = forkVersion === 'fulu';
+
   const queries = useQueries({
     queries: [
       // Block head data
@@ -147,7 +154,7 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
         }),
         enabled: !!currentNetwork && slotTimestamp > 0,
       },
-      // Blob propagation data
+      // Blob propagation data (pre-Fulu)
       {
         ...fctBlockBlobFirstSeenByNodeServiceListOptions({
           query: {
@@ -155,7 +162,17 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
             page_size: 10000,
           },
         }),
-        enabled: !!currentNetwork && slotTimestamp > 0,
+        enabled: !!currentNetwork && slotTimestamp > 0 && !isFuluOrLater,
+      },
+      // Data column propagation data (Fulu+)
+      {
+        ...fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions({
+          query: {
+            slot_start_date_time_eq: slotTimestamp,
+            page_size: 10000,
+          },
+        }),
+        enabled: !!currentNetwork && slotTimestamp > 0 && isFuluOrLater,
       },
       // Attestation data
       {
@@ -284,7 +301,7 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
 
   // Process attestation liveness data to get top 10 missed attestations
   const attestationLivenessData: FctAttestationLivenessByEntityHead[] =
-    queries[15].data?.fct_attestation_liveness_by_entity_head ?? [];
+    queries[16].data?.fct_attestation_liveness_by_entity_head ?? [];
 
   // Filter to only missed attestations and sort by count
   const missedAttestations: MissedAttestationEntity[] = attestationLivenessData
@@ -304,18 +321,19 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
     blobCount: queries[3].data?.fct_block_blob_count ?? [],
     blockPropagation: queries[4].data?.fct_block_first_seen_by_node ?? [],
     blobPropagation: queries[5].data?.fct_block_blob_first_seen_by_node ?? [],
-    attestations: queries[6].data?.fct_attestation_first_seen_chunked_50ms ?? [],
-    attestationCorrectness: queries[7].data?.fct_attestation_correctness_head ?? [],
-    attestationAttested: queries[8].data?.int_attestation_attested_head ?? [],
+    dataColumnPropagation: queries[6].data?.fct_block_data_column_sidecar_first_seen_by_node ?? [],
+    attestations: queries[7].data?.fct_attestation_first_seen_chunked_50ms ?? [],
+    attestationCorrectness: queries[8].data?.fct_attestation_correctness_head ?? [],
+    attestationAttested: queries[9].data?.int_attestation_attested_head ?? [],
     attestationLiveness: attestationLivenessData,
     missedAttestations,
-    mevBidding: queries[9].data?.fct_mev_bid_highest_value_by_builder_chunked_50ms ?? [],
-    committees: queries[10].data?.int_beacon_committee_head ?? [],
-    preparedBlocks: queries[11].data?.fct_prepared_block ?? [],
-    relayBids: queries[12].data?.fct_mev_bid_count_by_relay ?? [],
-    builderBids: queries[13].data?.fct_mev_bid_count_by_builder ?? [],
-    proposerEntity: queries[14].data?.fct_block_proposer_entity ?? [],
-    votedForBlocks: queries[16].data?.fct_block_head ?? [],
+    mevBidding: queries[10].data?.fct_mev_bid_highest_value_by_builder_chunked_50ms ?? [],
+    committees: queries[11].data?.int_beacon_committee_head ?? [],
+    preparedBlocks: queries[12].data?.fct_prepared_block ?? [],
+    relayBids: queries[13].data?.fct_mev_bid_count_by_relay ?? [],
+    builderBids: queries[14].data?.fct_mev_bid_count_by_builder ?? [],
+    proposerEntity: queries[15].data?.fct_block_proposer_entity ?? [],
+    votedForBlocks: queries[17].data?.fct_block_head ?? [],
   };
 
   // Extract raw API data for SlotProgressTimeline (arrays -> first element)

@@ -4,13 +4,13 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import type { MiniStatProps } from './MiniStat.types';
 
 /**
- * MiniStat - A compact stat display with optional gauge and percentage
+ * MiniStat - A compact stat display with optional gauge, icon, and percentage
  *
  * Designed to fit inline with other information rows.
- * Can show a vertical gauge bar with percentage, or just display values without gauge.
+ * Can show a circular gauge with percentage, an icon indicator, or just display values.
  *
  * Layout variants:
- * - With secondary text: Label on top, optional gauge + value + secondary text below
+ * - With secondary text: Label on top, optional gauge/icon + value + secondary text below
  * - Without secondary text: Label and value in 2 rows
  *
  * @example
@@ -24,7 +24,15 @@ import type { MiniStatProps } from './MiniStat.types';
  *   showGauge
  * />
  *
- * // Without gauge (just values)
+ * // With icon indicator
+ * <MiniStat
+ *   label="Spread"
+ *   value="0.234s"
+ *   icon={<CheckCircleIcon className="size-5" />}
+ *   color="var(--color-success)"
+ * />
+ *
+ * // Without gauge or icon (just values)
  * <MiniStat
  *   label="First Seen"
  *   value="0.25s"
@@ -38,12 +46,24 @@ export function MiniStat({
   percentage,
   color,
   showGauge = false,
+  icon,
 }: MiniStatProps): JSX.Element {
   const themeColors = useThemeColors();
 
   // Determine color based on percentage if not provided (only when gauge is shown)
   const gaugeColor =
     showGauge && percentage !== undefined ? color || getHealthColor(percentage, themeColors) : undefined;
+
+  // Render icon indicator
+  const renderIcon = (): JSX.Element | null => {
+    if (!icon) return null;
+
+    return (
+      <div className="shrink-0" style={{ color }}>
+        {icon}
+      </div>
+    );
+  };
 
   // Render circular gauge SVG
   const renderCircularGauge = (): JSX.Element | null => {
@@ -95,6 +115,7 @@ export function MiniStat({
     return (
       <div className="flex items-center gap-2">
         {renderCircularGauge()}
+        {renderIcon()}
 
         {/* Stats content - 2 rows */}
         <div className="flex-1">
@@ -111,9 +132,10 @@ export function MiniStat({
       {/* Label */}
       <dt className="text-xs font-medium text-muted">{label}</dt>
 
-      {/* Content with gauge on left, stats on right */}
+      {/* Content with gauge/icon on left, stats on right */}
       <dd className="mt-0.5 flex items-center gap-2">
         {renderCircularGauge()}
+        {renderIcon()}
 
         {/* Stats content */}
         <div className="flex-1">

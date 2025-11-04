@@ -153,7 +153,7 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
               </div>
 
               {/* Epoch Timestamp */}
-              <div className="col-span-2 sm:col-span-1">
+              <div className="col-span-2">
                 <dt className="text-xs font-medium text-muted">Epoch Start</dt>
                 <dd className="mt-1 text-sm text-foreground">
                   {blockHead?.epoch_start_date_time ? (

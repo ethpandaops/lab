@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 export interface MiniStatProps {
   /**
    * The label/name of the metric
@@ -21,7 +23,7 @@ export interface MiniStatProps {
   percentage?: number;
 
   /**
-   * Optional color for the gauge and percentage badge
+   * Optional color for the gauge, percentage badge, or icon
    * Defaults to theme-based color based on percentage
    */
   color?: string;
@@ -31,4 +33,10 @@ export interface MiniStatProps {
    * Default: false
    */
   showGauge?: boolean;
+
+  /**
+   * Optional icon to display instead of gauge
+   * Use this for status indicators without percentages
+   */
+  icon?: ReactNode;
 }

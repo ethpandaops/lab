@@ -15,7 +15,7 @@ const sizeClasses = {
   sm: 'w-96', // 384px - 24rem
   md: 'w-[28rem]', // 448px
   lg: 'w-[32rem]', // 512px
-  xl: 'w-[42rem]', // 672px
+  xl: 'w-[56rem]', // 896px (increased from 672px for wider aspect ratio)
   full: 'w-[80rem]', // 1280px
   fullscreen: 'w-screen h-screen', // Full viewport
 };
