@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { type JSX, useMemo } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Table } from '@/components/Lists/Table';
 import { Slot } from '@/components/Ethereum/Slot';
@@ -15,7 +15,7 @@ export function AttestationVotesBreakdownTable({
   votedForBlocks,
   expectedValidatorCount,
   isLoading = false,
-}: AttestationVotesBreakdownTableProps): React.JSX.Element {
+}: AttestationVotesBreakdownTableProps): JSX.Element {
   // Create a map of block_root -> block data for quick lookup
   const blockDataMap = useMemo(() => {
     const map = new Map<string, FctBlockHead>();
