@@ -178,13 +178,6 @@ export function IndexPage(): React.JSX.Element {
           ]}
           onRowClick={handleRowClick}
         />
-
-        <div className="mt-4 text-sm text-muted">
-          <p>
-            Showing data from the last finalized epoch. Click on an entity to view detailed performance analytics and
-            historical data.
-          </p>
-        </div>
       </div>
     </Container>
   );
