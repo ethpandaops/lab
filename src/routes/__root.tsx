@@ -104,7 +104,11 @@ function MobileHeader({
         </Link>
       </div>
       <div className="flex items-center gap-3">
-        {currentNetwork && <NetworkIcon networkName={currentNetwork.name} className="size-6" />}
+        {currentNetwork && (
+          <span title={currentNetwork.display_name} className="cursor-default">
+            <NetworkIcon networkName={currentNetwork.name} className="size-6" />
+          </span>
+        )}
         <ThemeToggle />
       </div>
     </div>
