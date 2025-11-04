@@ -180,13 +180,11 @@ export function BlobDataColumnSpreadChart({ blobPropagationData, slot }: BlobDat
 
   const subtitle = `Time from when first ${itemType} became available to when last ${itemType} became available`;
 
+  // Capitalize title properly - "Blob Spread" or "Data Column Spread"
+  const title = itemType === 'data column' ? 'Data Column Spread' : 'Blob Spread';
+
   return (
-    <PopoutCard
-      title={`${itemType.charAt(0).toUpperCase() + itemType.slice(1)} Spread`}
-      subtitle={subtitle}
-      anchorId="blob-datacolumn-spread-chart"
-      modalSize="xl"
-    >
+    <PopoutCard title={title} subtitle={subtitle} anchorId="blob-datacolumn-spread-chart" modalSize="xl">
       {({ inModal }) => {
         // Determine spread quality: fast <500ms, medium 500ms-1s, large >1s
         const spreadColor = overallSpread
