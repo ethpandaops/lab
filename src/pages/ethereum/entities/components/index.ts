@@ -12,3 +12,6 @@ export type { BlockProposalChartProps } from './BlockProposalChart';
 
 export { RecentActivityTable } from './RecentActivityTable';
 export type { RecentActivityTableProps } from './RecentActivityTable';
+
+export { BlockProposalsTable } from './BlockProposalsTable';
+export type { BlockProposalsTableProps } from './BlockProposalsTable';

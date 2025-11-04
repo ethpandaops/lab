@@ -25,34 +25,46 @@ import type { EpochSlotsTableProps } from './EpochSlotsTable.types';
  *
  * Rows are clickable and navigate to the slot detail page.
  */
-export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
+export function EpochSlotsTable({
+  slots,
+  showSlotInEpoch = true,
+  enableRealtimeHighlighting = true,
+  sortOrder = 'asc',
+}: EpochSlotsTableProps): JSX.Element {
   const navigate = useNavigate();
   const { slot: currentSlot } = useBeaconClock();
 
+  // Disable real-time features for historical views (prevents re-renders every 12s)
+  const effectiveCurrentSlot = enableRealtimeHighlighting ? currentSlot : Number.MAX_SAFE_INTEGER;
+
   /**
-   * Sort slots by slot number ascending (oldest first)
+   * Sort slots by slot number
    */
   const sortedSlots = useMemo((): SlotData[] => {
-    return [...slots].sort((a, b) => a.slot - b.slot);
-  }, [slots]);
+    return [...slots].sort((a, b) => (sortOrder === 'asc' ? a.slot - b.slot : b.slot - a.slot));
+  }, [slots, sortOrder]);
 
   /**
    * Table column definitions
    */
   const columns: Column<SlotData>[] = useMemo(
     () => [
-      {
-        header: 'Slot in Epoch',
-        accessor: row => {
-          const slotInEpoch = (row.slot % 32) + 1;
-          return <span className="text-muted">{slotInEpoch}/32</span>;
-        },
-      },
+      ...(showSlotInEpoch
+        ? [
+            {
+              header: 'Slot in Epoch',
+              accessor: (row: SlotData) => {
+                const slotInEpoch = (row.slot % 32) + 1;
+                return <span className="text-muted">{slotInEpoch}/32</span>;
+              },
+            },
+          ]
+        : []),
       {
         header: 'Slot',
         accessor: row => {
-          const isCurrent = row.slot === currentSlot;
-          const isFuture = row.slot > currentSlot;
+          const isCurrent = row.slot === effectiveCurrentSlot;
+          const isFuture = row.slot > effectiveCurrentSlot;
 
           return (
             <div className="flex items-center gap-2">
@@ -98,7 +110,7 @@ export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
       {
         header: 'Status',
         accessor: row => {
-          const isFuture = row.slot > currentSlot;
+          const isFuture = row.slot > effectiveCurrentSlot;
 
           // Future slots should show as "Scheduled" regardless of API status
           if (isFuture) {
@@ -159,32 +171,8 @@ export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
           return <span className={colorClass}>{participation.toFixed(2)}%</span>;
         },
       },
-      {
-        header: 'Block First Seen',
-        accessor: row => {
-          if (row.blockFirstSeenTime === null) {
-            return <span className="text-muted">-</span>;
-          }
-
-          const timeInSeconds = row.blockFirstSeenTime / 1000;
-          let colorClass = 'text-muted';
-
-          // Color coding based on time thresholds
-          if (timeInSeconds < 2.5) {
-            colorClass = 'text-success'; // Green before 2.5s
-          } else if (timeInSeconds < 3.25) {
-            colorClass = 'text-warning'; // Orange 2.5s-3.25s
-          } else if (timeInSeconds < 4) {
-            colorClass = 'text-orange-700'; // Darker orange 3.25s-4s
-          } else {
-            colorClass = 'text-danger'; // Red 4s+
-          }
-
-          return <span className={colorClass}>{timeInSeconds.toFixed(3)}s</span>;
-        },
-      },
     ],
-    [currentSlot]
+    [effectiveCurrentSlot, showSlotInEpoch]
   );
 
   /**
@@ -203,8 +191,8 @@ export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
    * Apply visual styling based on slot timing relative to current slot
    */
   const getRowClassName = (row: SlotData): string => {
-    const isCurrent = row.slot === currentSlot;
-    const isFuture = row.slot > currentSlot;
+    const isCurrent = row.slot === effectiveCurrentSlot;
+    const isFuture = row.slot > effectiveCurrentSlot;
 
     return clsx({
       // Current slot - highlighted with accent color

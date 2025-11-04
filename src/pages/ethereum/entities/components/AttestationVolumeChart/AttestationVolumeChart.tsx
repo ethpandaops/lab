@@ -64,7 +64,7 @@ export function AttestationVolumeChart({ data }: AttestationVolumeChartProps): R
   }
 
   return (
-    <PopoutCard title="Attestation Liveness" subtitle="Last 12h" modalSize="full">
+    <PopoutCard title="Attestation Liveness" subtitle="Last 12h" modalSize="full" anchorId="attestation-volume-chart">
       {({ inModal }) => (
         <MultiLineChart
           series={series}
