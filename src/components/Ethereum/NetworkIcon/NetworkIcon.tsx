@@ -44,14 +44,14 @@ export function NetworkIcon({ networkName, className }: NetworkIconProps): JSX.E
         <img
           src={icon.lightContent || icon.content}
           alt="Ethereum"
-          className={clsx('dark:hidden', className || 'size-6')}
+          className={clsx('dark:hidden star:hidden', className || 'size-6')}
           aria-hidden="true"
         />
         {/* Dark/star mode: colorful logo */}
         <img
           src={icon.content as string}
           alt="Ethereum"
-          className={clsx('hidden dark:block', className || 'size-6')}
+          className={clsx('hidden dark:block star:block', className || 'size-6')}
           aria-hidden="true"
         />
       </>
