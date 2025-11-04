@@ -32,9 +32,16 @@ import type { SlotData } from '../../epochs/hooks/useEpochDetailData.types';
 /**
  * Hook to fetch comprehensive data for a single entity
  *
- * Queries:
- * - fct_attestation_liveness_by_entity_head: 12 hours of attestation data
- * - fct_block_proposer_entity: 12 hours of block proposal data
+ * Primary queries:
+ * - fct_attestation_liveness_by_entity_head: 12 hours of attestation data (for charts, stats, and recent epochs table)
+ * - fct_block_proposer_entity: 12 hours of block proposal data (for charts and recent epochs table)
+ * - fct_block_proposer_entity: Most recent 10 block proposals (for block proposals table)
+ *
+ * Supplemental queries (for block proposals table detail):
+ * - fct_block_head: Block head data (proposer index, block root)
+ * - fct_block_blob_count_head: Blob counts
+ * - fct_attestation_correctness_head: Attestation correctness
+ * - int_block_canonical: Canonical status
  *
  * Charts and statistics both use last 12 hours only.
  * The most recent epoch is excluded from charts as it's still in progress.
@@ -60,7 +67,7 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
   // STEP 1: Fetch attestation liveness and block proposals (12h)
   const primaryResults = useQueries({
     queries: [
-      // 1. 12h attestation liveness data (for charts and stats)
+      // 1. 12h attestation liveness data (for charts, stats, and recent epochs table)
       // 12h = 3600 slots, request enough to cover all epochs with data
       {
         ...fctAttestationLivenessByEntityHeadServiceListOptions({
@@ -74,7 +81,20 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
         refetchInterval: false,
         refetchOnWindowFocus: false,
       },
-      // 2. Most recent 10 block proposals from last 12h (server-side ordered)
+      // 2. 12h block proposals (for charts and recent epochs table)
+      {
+        ...fctBlockProposerEntityServiceListOptions({
+          query: {
+            entity_eq: entity,
+            slot_start_date_time_gte: twelveHoursAgo,
+            page_size: 5000,
+          },
+        }),
+        enabled: !!currentNetwork && !!entity && twelveHoursAgo > 0,
+        refetchInterval: false,
+        refetchOnWindowFocus: false,
+      },
+      // 3. Most recent 10 block proposals for block proposals table
       {
         ...fctBlockProposerEntityServiceListOptions({
           query: {
@@ -93,7 +113,7 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
 
   // Extract time range from block proposals for supplemental queries
   const blockProposerTimeRange = useMemo(() => {
-    const blockProposerResult = primaryResults[1];
+    const blockProposerResult = primaryResults[2];
     if (!blockProposerResult?.data) return null;
     const blockProposerData =
       (blockProposerResult.data as { fct_block_proposer_entity?: FctBlockProposerEntity[] })
@@ -193,19 +213,24 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
     const [
       attestation12hResult,
       blockProposer12hResult,
+      blockProposerRecentResult,
       blockHeadResult,
       blobCountResult,
       attestationCorrectnessResult,
       blockCanonicalResult,
     ] = results;
 
-    // 12h data (used for both charts and stats)
+    // 12h data (used for both charts, stats, and recent epochs table)
     const attestation12hData =
       (attestation12hResult?.data as { fct_attestation_liveness_by_entity_head?: FctAttestationLivenessByEntityHead[] })
         ?.fct_attestation_liveness_by_entity_head ?? [];
 
     const blockProposer12hData =
       (blockProposer12hResult?.data as { fct_block_proposer_entity?: FctBlockProposerEntity[] })
+        ?.fct_block_proposer_entity ?? [];
+
+    const blockProposerRecentData =
+      (blockProposerRecentResult?.data as { fct_block_proposer_entity?: FctBlockProposerEntity[] })
         ?.fct_block_proposer_entity ?? [];
 
     // Supplemental slot data for block proposals table
@@ -256,7 +281,7 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
       }
     });
 
-    // Group block proposer data by epoch for 12h time series
+    // Group block proposer data by epoch for 12h time series (using _entity table)
     const epochBlockMap = new Map<number, { count: number; lastSlot: number }>();
 
     blockProposer12hData.forEach((record: FctBlockProposerEntity) => {
@@ -277,12 +302,13 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
 
     // Build time series data
     const allEpochs = new Set([...epochAttestationMap.keys(), ...epochBlockMap.keys()]);
-    const sortedEpochs = Array.from(allEpochs).sort((a, b) => a - b);
+    const sortedEpochs = Array.from(allEpochs).sort((a, b) => b - a); // Sort descending (most recent first)
 
-    // Filter out the most recent epoch (still in progress)
-    const maxEpoch = sortedEpochs.length > 0 ? sortedEpochs[sortedEpochs.length - 1] : 0;
+    // Filter out the most recent epoch (still in progress) and limit to last 10 completed epochs
+    const maxEpoch = sortedEpochs.length > 0 ? sortedEpochs[0] : 0;
     const epochData: EntityEpochData[] = sortedEpochs
       .filter(epoch => epoch !== maxEpoch)
+      .slice(0, 10) // Take only the 10 most recent completed epochs
       .map(epoch => {
         const attestationStats = epochAttestationMap.get(epoch) ?? {
           totalAttestations: 0,
@@ -325,7 +351,7 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
     // Estimate validator count (average attestations per epoch)
     const validatorCount = epochData.length > 0 ? Math.round(total12h / epochData.length) : 0;
 
-    // Count blocks proposed (12h)
+    // Count blocks proposed (12h) - using _entity data
     const blocksProposed12h = blockProposer12hData.length;
 
     // Find last active slot
@@ -392,9 +418,9 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
       blockCanonicalData.map((b: IntBlockCanonical) => b.slot).filter((s): s is number => s !== undefined)
     );
 
-    // Build slot data for each block proposed by entity
+    // Build slot data for each block proposed by entity (using recent 10 from entity table)
     // Server already returns them sorted desc and limited to 10
-    const slots: SlotData[] = blockProposer12hData.map(block => {
+    const slots: SlotData[] = blockProposerRecentData.map(block => {
       const slot = block.slot ?? 0;
       const slotStartDateTime = block.slot_start_date_time ?? 0;
       const blockHead = blockHeadMap.get(slot) ?? { blockRoot: null, proposerIndex: null };
@@ -424,7 +450,7 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
     return {
       stats,
       epochData,
-      blockProposer12hData,
+      blockProposer12hData: blockProposer12hData,
       slots,
     };
   }, [results, isLoading, error, currentNetwork, entity]);

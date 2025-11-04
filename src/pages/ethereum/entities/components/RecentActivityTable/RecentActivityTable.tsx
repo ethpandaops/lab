@@ -14,13 +14,13 @@ import type { RecentActivityTableProps } from './RecentActivityTable.types';
  *
  * Shows:
  * - Epoch number (clickable link to epoch detail)
- * - Attested count
- * - Missed count
+ * - Attestations attested count
+ * - Attestations missed count
  * - Attestation rate percentage
- * - Blocks proposed
+ * - Block proposals count
  *
  * Rows are clickable and navigate to the epoch detail page.
- * Shows most recent 100 epochs.
+ * Shows most recent 10 completed epochs (excludes current epoch in progress).
  */
 export function RecentActivityTable({ epochs }: RecentActivityTableProps): JSX.Element {
   const navigate = useNavigate();
@@ -47,20 +47,20 @@ export function RecentActivityTable({ epochs }: RecentActivityTableProps): JSX.E
         cellClassName: 'text-foreground',
       },
       {
-        header: 'Attested',
+        header: 'Attestations Attested',
         accessor: row => (
           <span className="text-success">{(row.totalAttestations - row.missedAttestations).toLocaleString()}</span>
         ),
       },
       {
-        header: 'Missed',
+        header: 'Attestations Missed',
         accessor: row => {
           const colorClass = row.missedAttestations > 0 ? 'text-danger' : 'text-muted';
           return <span className={colorClass}>{row.missedAttestations.toLocaleString()}</span>;
         },
       },
       {
-        header: 'Rate',
+        header: 'Attestation Rate',
         accessor: row => {
           const rate = row.rate * 100;
           const colorClass = rate >= 99 ? 'text-success' : rate < 95 ? 'text-warning' : 'text-muted';
@@ -69,7 +69,7 @@ export function RecentActivityTable({ epochs }: RecentActivityTableProps): JSX.E
         },
       },
       {
-        header: 'Proposals',
+        header: 'Block Proposals',
         accessor: row => <span className="text-muted">{row.blocksProposed}</span>,
       },
     ],
