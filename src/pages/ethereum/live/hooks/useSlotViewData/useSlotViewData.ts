@@ -28,7 +28,6 @@ const EMPTY_BLOCK_FIRST_SEEN: never[] = [];
 const EMPTY_BLOB_FIRST_SEEN: never[] = [];
 const EMPTY_DATA_COLUMN_FIRST_SEEN: never[] = [];
 const EMPTY_ATTESTATION: never[] = [];
-const EMPTY_DATA_COLUMN: never[] = [];
 
 export function useSlotViewData(currentSlot: number): SlotViewData {
   const { currentNetwork } = useNetwork();
