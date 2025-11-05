@@ -12,7 +12,7 @@
 
 /* Main calendar container */
 .react-datepicker {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
