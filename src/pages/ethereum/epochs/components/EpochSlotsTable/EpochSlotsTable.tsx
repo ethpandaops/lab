@@ -141,7 +141,7 @@ export function EpochSlotsTable({
         accessor: row => <span className="text-muted">{row.blobCount}</span>,
       },
       {
-        header: 'Attestation Head',
+        header: 'Attestations',
         accessor: row => (
           <span className="text-muted">
             {row.attestationHead} / {row.attestationMax}
