@@ -25,7 +25,7 @@ export function Table<T = unknown>({
     return (
       <div className="overflow-x-auto">
         <div className="inline-block min-w-full align-middle">
-          <div className="overflow-hidden rounded-sm border border-border">
+          <div className="overflow-hidden">
             <table className="min-w-full divide-y divide-border">
               <thead className="bg-surface">
                 <tr>

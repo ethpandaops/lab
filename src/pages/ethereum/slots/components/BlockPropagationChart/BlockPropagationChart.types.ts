@@ -15,6 +15,26 @@ export interface BlockPropagationDataPoint {
    * @optional
    */
   meta_client_geo_continent_code?: string;
+  /**
+   * City name of the node location
+   * @optional
+   */
+  meta_client_geo_city?: string;
+  /**
+   * Country name of the node location
+   * @optional
+   */
+  meta_client_geo_country?: string;
+  /**
+   * Classification of the node (e.g., "individual", "corporate", "internal", "unclassified")
+   * @optional
+   */
+  classification?: string;
+  /**
+   * Username of the node
+   * @optional
+   */
+  username?: string;
 }
 
 /**

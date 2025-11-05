@@ -150,7 +150,7 @@ export function BlobDataColumnSpreadChart({ blobPropagationData, slot }: BlobDat
     const sortedBuckets = Array.from(spreadBuckets.entries()).sort((a, b) => a[0] - b[0]);
 
     const data = sortedBuckets.map(([, count]) => count);
-    const labels = sortedBuckets.map(([bucket]) => `${bucket}ms`);
+    const labels = sortedBuckets.map(([bucket]) => `${bucket}-${bucket + bucketSize}ms`);
 
     return { barData: data, barLabels: labels, bucketSize };
   }, [blobPropagationData]);

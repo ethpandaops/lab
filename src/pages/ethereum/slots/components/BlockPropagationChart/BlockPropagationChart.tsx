@@ -29,13 +29,26 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
   const { CONTINENT_COLORS } = getDataVizColors();
 
   // Process data into scatter and line series
-  const { scatterSeries, lineSeries } = useMemo(() => {
+  const { scatterSeries, lineSeries, nodeMetadata } = useMemo(() => {
     if (blockPropagationData.length === 0) {
-      return { scatterSeries: [], lineSeries: [] };
+      return { scatterSeries: [], lineSeries: [], nodeMetadata: new Map() };
     }
 
     // Sort data by time for proper cumulative calculation
     const sortedData = [...blockPropagationData].sort((a, b) => a.seen_slot_start_diff - b.seen_slot_start_diff);
+
+    // Store metadata for each node index
+    const metadata = new Map<
+      number,
+      {
+        nodeId: string;
+        continent: string;
+        city?: string;
+        country?: string;
+        classification?: string;
+        username?: string;
+      }
+    >();
 
     // Group data by continent for scatter series
     const continentGroups = new Map<string, Array<[number, number]>>();
@@ -46,6 +59,16 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
       }
       // X = time in seconds, Y = node index
       continentGroups.get(continent)!.push([point.seen_slot_start_diff / 1000, index]);
+
+      // Store metadata for this node index
+      metadata.set(index, {
+        nodeId: point.node_id,
+        continent,
+        city: point.meta_client_geo_city,
+        country: point.meta_client_geo_country,
+        classification: point.classification,
+        username: point.username,
+      });
     });
 
     // Calculate cumulative distribution for line chart
@@ -77,22 +100,63 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
       },
     ];
 
-    return { scatterSeries: scatter, lineSeries: line };
+    return { scatterSeries: scatter, lineSeries: line, nodeMetadata: metadata };
   }, [blockPropagationData, themeColors, CONTINENT_COLORS]);
 
   // Custom tooltip formatter
   const tooltipFormatter = useMemo(
     () => (params: TooltipFormatterParams) => {
-      const param = params as TooltipFormatterParam;
-      const data = param.data as [number, number] | undefined;
-      if (!data) return '';
-      if (param.componentSubType === 'scatter') {
-        return `${param.seriesName ?? 'Unknown'}<br/>Time: ${data[0].toFixed(3)}s`;
-      } else {
-        return `Cumulative: ${data[1].toFixed(1)}%<br/>Time: ${data[0].toFixed(3)}s`;
-      }
+      // Handle both single param and array of params
+      const paramsArray = Array.isArray(params) ? params : [params];
+      if (paramsArray.length === 0) return '';
+
+      // Get timestamp from first param
+      const firstParam = paramsArray[0] as TooltipFormatterParam;
+      const firstData = firstParam.data as [number, number] | undefined;
+      if (!firstData) return '';
+
+      const timestamp = firstData[0].toFixed(3);
+      let tooltip = `<strong>Time: ${timestamp}s</strong><br/>`;
+
+      // Add info for each series at this point
+      paramsArray.forEach(param => {
+        const p = param as TooltipFormatterParam;
+        const data = p.data as [number, number] | undefined;
+        if (!data) return;
+
+        if (p.componentSubType === 'scatter') {
+          const nodeIndex = Math.round(data[1]); // Y-axis is node index
+          const metadata = nodeMetadata.get(nodeIndex);
+
+          if (metadata) {
+            // Build location string (City, Country or just Country)
+            const location =
+              metadata.city && metadata.country
+                ? `${metadata.city}, ${metadata.country}`
+                : metadata.country || metadata.continent;
+
+            tooltip += `${p.marker} <strong>${metadata.nodeId}</strong><br/>`;
+            if (metadata.username) {
+              tooltip += `&nbsp;&nbsp;&nbsp;&nbsp;Username: ${metadata.username}<br/>`;
+            }
+            if (location) {
+              tooltip += `&nbsp;&nbsp;&nbsp;&nbsp;Location: ${location}<br/>`;
+            }
+            if (metadata.classification) {
+              tooltip += `&nbsp;&nbsp;&nbsp;&nbsp;Classification: ${metadata.classification}<br/>`;
+            }
+          } else {
+            // Fallback if metadata not found
+            tooltip += `${p.marker} Node Index: ${nodeIndex}<br/>`;
+          }
+        } else {
+          tooltip += `${p.marker} Cumulative: ${data[1].toFixed(1)}%<br/>`;
+        }
+      });
+
+      return tooltip;
     },
-    []
+    [nodeMetadata]
   );
 
   // Calculate average propagation time for header
