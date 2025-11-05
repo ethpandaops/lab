@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import type { TabConfig, UseHashTabsReturn } from './useHashTabs.types';
 
 /**
@@ -47,23 +47,26 @@ export function useHashTabs(tabs: TabConfig[]): UseHashTabsReturn {
     return 0;
   };
 
-  const [selectedIndex, setSelectedIndex] = useState(getInitialTab);
+  const [selectedIndex, setSelectedIndex] = useState(() => getInitialTab());
 
   /**
    * Scroll to anchor if present in URL
    */
-  const scrollToAnchor = (hash: string, tabIndex: number): void => {
-    const currentTab = tabs[tabIndex];
-    if (currentTab?.anchors?.includes(hash)) {
-      // Use setTimeout to ensure tab content is rendered before scrolling
-      setTimeout(() => {
-        const element = document.getElementById(hash);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 100);
-    }
-  };
+  const scrollToAnchor = useCallback(
+    (hash: string, tabIndex: number): void => {
+      const currentTab = tabs[tabIndex];
+      if (currentTab?.anchors?.includes(hash)) {
+        // Use setTimeout to ensure tab content is rendered before scrolling
+        setTimeout(() => {
+          const element = document.getElementById(hash);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 100);
+      }
+    },
+    [tabs]
+  );
 
   /**
    * Handle initial anchor scroll on mount
@@ -73,26 +76,38 @@ export function useHashTabs(tabs: TabConfig[]): UseHashTabsReturn {
     if (hash) {
       scrollToAnchor(hash, selectedIndex);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [scrollToAnchor, selectedIndex]);
 
   /**
-   * Handle hash changes (browser back/forward)
+   * Handle hash changes (browser back/forward and link clicks)
    */
   useEffect(() => {
     const handleHashChange = (): void => {
-      const newIndex = getInitialTab();
-      setSelectedIndex(newIndex);
-
-      // After tab switch, scroll to anchor if present
       const hash = window.location.hash.replace('#', '');
-      scrollToAnchor(hash, newIndex);
+      if (!hash) {
+        setSelectedIndex(0);
+        return;
+      }
+
+      // First check if it's a direct tab hash
+      const directIndex = tabs.findIndex(tab => tab.hash === hash);
+      if (directIndex >= 0) {
+        setSelectedIndex(directIndex);
+        return;
+      }
+
+      // Check if it's an anchor within a tab
+      const anchorIndex = tabs.findIndex(tab => tab.anchors?.includes(hash));
+      if (anchorIndex >= 0) {
+        setSelectedIndex(anchorIndex);
+        scrollToAnchor(hash, anchorIndex);
+        return;
+      }
     };
 
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [tabs, scrollToAnchor]);
 
   /**
    * Update hash when tab changes
