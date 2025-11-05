@@ -78,17 +78,23 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
             <h2 className="text-lg/7 font-semibold text-foreground">Slot Information</h2>
             {blockHead?.block_version && <ForkLabel fork={blockHead.block_version as ForkVersion} size="sm" />}
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <BlockExplorerLink type="beaconchain" slot={slot} />
-            <BlockExplorerLink type="dora" slot={slot} />
-            <BlockExplorerLink type="tracoor" slot={slot} blockRoot={blockHead?.block_root} />
-            <BlockExplorerLink type="etherscan" blockNumber={blockHead?.execution_payload_block_number} />
-            <Badge color={wasBlockSeen ? 'green' : 'red'} variant="border">
-              {wasBlockSeen ? 'Block Seen' : 'Block Not Seen'}
-            </Badge>
-            <Badge color={status.color} variant="border">
-              {status.label}
-            </Badge>
+          <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
+            {/* Explorer Links */}
+            <div className="flex flex-wrap items-center gap-2">
+              <BlockExplorerLink type="beaconchain" slot={slot} />
+              <BlockExplorerLink type="dora" slot={slot} />
+              <BlockExplorerLink type="tracoor" slot={slot} blockRoot={blockHead?.block_root} />
+              <BlockExplorerLink type="etherscan" blockNumber={blockHead?.execution_payload_block_number} />
+            </div>
+            {/* Status Badges */}
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge color={wasBlockSeen ? 'green' : 'red'} variant="border">
+                {wasBlockSeen ? 'Block Seen' : 'Block Not Seen'}
+              </Badge>
+              <Badge color={status.color} variant="border">
+                {status.label}
+              </Badge>
+            </div>
           </div>
         </div>
       </div>
