@@ -50,6 +50,9 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
     xAxisTitle,
     yAxisTitle,
     syncGroup,
+    showGridlines = true,
+    showYAxisLine = false,
+    tooltipFormatter,
   },
   ref
 ): JSX.Element {
@@ -129,6 +132,8 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
       yAxis: {
         type: 'value',
         max: yMax,
+        min: 0,
+        interval: yMax ? Math.ceil(yMax / 5) : undefined, // Force exactly 5 intervals
         name: yAxisTitle,
         nameLocation: 'middle',
         nameGap: 50,
@@ -137,12 +142,16 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           fontSize: 12,
         },
         axisLine: {
-          show: false,
+          show: showYAxisLine,
+          lineStyle: {
+            color: themeColors.border,
+          },
         },
         axisTick: {
           show: false,
         },
         splitLine: {
+          show: showGridlines,
           lineStyle: {
             color: themeColors.border,
             type: 'dashed',
@@ -211,6 +220,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           color: themeColors.foreground,
           fontSize: 12,
         },
+        formatter: tooltipFormatter,
         axisPointer: {
           type: 'line',
           lineStyle: {
@@ -240,6 +250,9 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
       xAxisLabelInterval,
       xAxisTitle,
       yAxisTitle,
+      showGridlines,
+      showYAxisLine,
+      tooltipFormatter,
       themeColors.foreground,
       themeColors.border,
       themeColors.muted,

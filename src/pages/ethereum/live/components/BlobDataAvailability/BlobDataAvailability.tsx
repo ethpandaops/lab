@@ -145,7 +145,7 @@ function BlobDataAvailabilityComponent({
           <div className="min-h-0 flex-1">
             <MultiLineChart
               series={continentalLineSeries}
-              xAxis={{ type: 'value', name: 'Slot Time (s)', min: 0, max: maxTime }}
+              xAxis={{ type: 'value', name: 'Slot Time (s)', min: 0, max: maxTime / 1000 }}
               yAxis={{ name: 'Complete (%)', max: 100 }}
               height="100%"
               showLegend={true}
@@ -161,7 +161,7 @@ function BlobDataAvailabilityComponent({
       <div className={clsx('h-full bg-background lg:hidden', className)}>
         <MultiLineChart
           series={continentalLineSeries}
-          xAxis={{ type: 'value', name: 'Slot Time (s)', min: 0, max: maxTime }}
+          xAxis={{ type: 'value', name: 'Slot Time (s)', min: 0, max: maxTime / 1000 }}
           yAxis={{ name: 'Complete (%)', max: 100 }}
           height="100%"
           showLegend={true}

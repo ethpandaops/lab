@@ -100,4 +100,19 @@ export interface LineChartProps {
    * Charts with the same syncGroup will have synchronized tooltips and axis pointers
    */
   syncGroup?: string;
+  /**
+   * Show horizontal gridlines on Y-axis
+   * @default true
+   */
+  showGridlines?: boolean;
+  /**
+   * Show Y-axis line
+   * @default false
+   */
+  showYAxisLine?: boolean;
+  /**
+   * Custom tooltip formatter function
+   * Receives params array with { dataIndex, value, name } for each series
+   */
+  tooltipFormatter?: (params: { dataIndex: number; value: number | null; name: string }[]) => string;
 }

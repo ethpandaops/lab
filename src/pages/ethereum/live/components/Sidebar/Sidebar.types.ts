@@ -1,9 +1,12 @@
 import type { SlotPhase } from '@/utils/beacon';
 import type { TimelineItem } from '@/components/Lists/ScrollingTimeline/ScrollingTimeline.types';
+import type { ForkInfo } from '@/utils/forks';
 
 export interface SidebarProps {
   /** Current slot number */
   currentSlot: number;
+  /** Active fork information from wallclock */
+  activeFork?: ForkInfo | null;
   /** Array of phases that make up the slot */
   phases: SlotPhase[];
   /** Current time position in milliseconds (0 to total duration) */

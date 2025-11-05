@@ -1,6 +1,8 @@
 import type { ContinentalPropagationSeries } from '../BlobDataAvailability/BlobDataAvailability.types';
+import type { ForkInfo } from '@/utils/forks';
 
 export interface BottomBarProps {
+  activeFork: ForkInfo | null;
   blockVersion?: string;
   blobCount: number;
   dataColumnBlobCount: number;
