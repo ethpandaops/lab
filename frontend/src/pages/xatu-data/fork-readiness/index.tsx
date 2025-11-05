@@ -150,10 +150,11 @@ function ForkReadiness() {
     return (
       availableForks
         .map(fork => {
-          const knownClientNames = Object.keys(fork.data.min_client_versions || {});
+          const minClientVersions = fork.data?.min_client_versions || {};
+          const knownClientNames = Object.keys(minClientVersions);
 
           // Process known clients
-          const knownClientReadiness = Object.entries(fork.data.min_client_versions || {})
+          const knownClientReadiness = Object.entries(minClientVersions)
             .map(([clientName, minVersion]) => {
               const clientNodes = nodes.filter(n => n.consensus_client === clientName);
               const readyNodes = clientNodes.filter(n => {
