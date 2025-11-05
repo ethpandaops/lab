@@ -284,7 +284,6 @@ export function BlobPropagationChart({ blobPropagationData }: BlobPropagationCha
               height={inModal ? 500 : 300}
               showLegend={true}
               enableDataZoom={true}
-              animationDuration={300}
             />
           ) : (
             <div className={inModal ? 'h-96' : 'h-72'}>

@@ -118,7 +118,6 @@ export function GasUsedChart({
           height={isInModal ? 600 : chartHeight}
           showLegend={shouldShowLegend}
           enableDataZoom={true}
-          animationDuration={300}
           relativeSlots={relativeSlots}
           syncGroup={syncGroup}
         />

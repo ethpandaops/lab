@@ -72,9 +72,9 @@ export function HeatmapChart({
       : undefined,
     grid: grid ?? {
       top: title ? 40 : 16,
-      right: showVisualMap ? 90 : 16,
-      bottom: 28,
-      left: 64,
+      right: showVisualMap ? 90 : 24,
+      bottom: 50,
+      left: 60,
     },
     xAxis: {
       type: 'category',
@@ -91,9 +91,13 @@ export function HeatmapChart({
         show: false,
       },
       axisLine: {
+        show: true,
         lineStyle: {
           color: themeColors.border,
         },
+      },
+      splitLine: {
+        show: false,
       },
       axisLabel: {
         color: themeColors.muted,
@@ -116,9 +120,13 @@ export function HeatmapChart({
         show: false,
       },
       axisLine: {
+        show: true,
         lineStyle: {
           color: themeColors.border,
         },
+      },
+      splitLine: {
+        show: false,
       },
       axisLabel: {
         color: themeColors.muted,

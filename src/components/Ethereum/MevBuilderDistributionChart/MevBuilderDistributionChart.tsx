@@ -102,7 +102,6 @@ export function MevBuilderDistributionChart({
           orientation="horizontal"
           axisName="Blocks"
           showLabel={false}
-          animationDuration={300}
         />
       )}
     </PopoutCard>

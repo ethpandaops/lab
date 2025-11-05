@@ -110,7 +110,7 @@ export function DataColumnLatencyChart({ username, nodes }: DataColumnLatencyCha
         name: 'Slot',
         min: minSlot,
         max: maxSlot,
-        formatter: (value: number | string) => Number(value).toLocaleString(),
+        formatter: (value: number | string) => formatSlot(Number(value)),
       }}
       yAxis={{
         name: 'Latency (ms)',

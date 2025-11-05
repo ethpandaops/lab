@@ -55,6 +55,7 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
     height: _height = 400,
     color,
     max,
+    splitNumber = 5,
     barWidth = '60%',
     showLabel = true,
     labelPosition,
@@ -103,8 +104,12 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
         fontSize: 12,
       },
       max,
+      splitNumber,
       axisLine: {
-        show: false,
+        show: true,
+        lineStyle: {
+          color: themeColors.border,
+        },
       },
       axisTick: {
         show: false,
@@ -114,10 +119,7 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
         fontSize: 11,
       },
       splitLine: {
-        lineStyle: {
-          color: themeColors.border,
-          type: 'dashed' as const,
-        },
+        show: false,
       },
     };
 
@@ -125,6 +127,7 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
       type: 'category' as const,
       data: labels,
       axisLine: {
+        show: true,
         lineStyle: {
           color: themeColors.border,
         },
@@ -137,14 +140,17 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
         fontSize: 11,
         interval: categoryLabelInterval,
       },
+      splitLine: {
+        show: false,
+      },
     };
 
     // Calculate grid padding based on orientation and axis names
     const gridPadding = {
-      top: title ? 52 : 10,
-      right: isHorizontal && axisName ? 50 : 20,
-      bottom: !isHorizontal && axisName ? 50 : 30,
-      left: isHorizontal && axisName ? 60 : 20,
+      top: title ? 52 : 16,
+      right: isHorizontal && axisName ? 50 : 24,
+      bottom: !isHorizontal && axisName ? 60 : 50,
+      left: isHorizontal && axisName ? 60 : 60,
     };
 
     return {
@@ -215,6 +221,7 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
     orientation,
     color,
     max,
+    splitNumber,
     barWidth,
     showLabel,
     labelPosition,

@@ -89,10 +89,10 @@ export function ScatterAndLineChart({
       animation,
       animationDuration,
       grid: {
-        top: 20,
-        right: yAxis2Title ? 80 : 24,
-        bottom: showLegend && legendPosition === 'bottom' ? 80 : 48,
-        left: 64,
+        left: 60,
+        right: yAxis2Title ? 80 : 24, // Extra space for secondary y-axis if present
+        top: 16,
+        bottom: showLegend && legendPosition === 'bottom' ? 80 : 50, // Space for legend if present
       },
       xAxis: {
         type: 'value' as const,
@@ -107,6 +107,7 @@ export function ScatterAndLineChart({
         max: xMax,
         interval: xInterval,
         axisLine: {
+          show: true,
           lineStyle: {
             color: themeColors.border,
           },
@@ -117,10 +118,7 @@ export function ScatterAndLineChart({
           formatter: xAxisFormatter,
         },
         splitLine: {
-          lineStyle: {
-            color: themeColors.border,
-            type: 'dashed' as const,
-          },
+          show: false,
         },
       },
       yAxis: [
@@ -137,7 +135,10 @@ export function ScatterAndLineChart({
           min: yMin,
           max: yMax,
           axisLine: {
-            show: false,
+            show: true,
+            lineStyle: {
+              color: themeColors.border,
+            },
           },
           axisTick: {
             show: false,
@@ -148,10 +149,7 @@ export function ScatterAndLineChart({
             formatter: yAxisFormatter,
           },
           splitLine: {
-            lineStyle: {
-              color: themeColors.border,
-              type: 'dashed' as const,
-            },
+            show: false,
           },
         },
         // Secondary Y-axis (right) - only if yAxis2Title is provided
@@ -169,7 +167,10 @@ export function ScatterAndLineChart({
                 min: yAxis2Min,
                 max: yAxis2Max,
                 axisLine: {
-                  show: false,
+                  show: true,
+                  lineStyle: {
+                    color: themeColors.border,
+                  },
                 },
                 axisTick: {
                   show: false,

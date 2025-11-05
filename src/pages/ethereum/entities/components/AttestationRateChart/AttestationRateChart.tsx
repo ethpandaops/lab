@@ -74,9 +74,7 @@ export function AttestationRateChart({ data }: AttestationRateChartProps): React
             max: 100,
           }}
           height={inModal ? 600 : 400}
-          showLegend={false}
           enableDataZoom={true}
-          animationDuration={300}
         />
       )}
     </PopoutCard>

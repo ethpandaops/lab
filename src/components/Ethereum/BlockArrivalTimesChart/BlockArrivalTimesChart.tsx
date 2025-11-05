@@ -168,7 +168,6 @@ export function BlockArrivalTimesChart({
             height={isInModal ? 600 : chartHeight}
             showLegend={true}
             enableDataZoom={true}
-            animationDuration={300}
             relativeSlots={relativeSlots}
             syncGroup={syncGroup}
           />

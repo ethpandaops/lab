@@ -127,13 +127,10 @@ export function BoxPlot({
         : undefined,
       legend: legendConfig,
       grid: {
+        left: 60,
+        right: 24,
         top: title ? 40 : 16,
-        right: undefined,
-        bottom: xAxisTitle ? 50 : 30,
-        left: yAxisTitle ? 65 : 10,
-        // ECharts v6: use outerBounds instead of deprecated containLabel
-        outerBoundsMode: 'same' as const,
-        outerBoundsContain: 'axisLabel' as const,
+        bottom: 50,
       },
       xAxis: {
         type: 'category' as const,
@@ -146,6 +143,7 @@ export function BoxPlot({
           fontSize: 12,
         },
         axisLine: {
+          show: true,
           lineStyle: {
             color: themeColors.border,
           },
@@ -156,6 +154,9 @@ export function BoxPlot({
         axisLabel: {
           color: themeColors.muted,
           fontSize: 11,
+        },
+        splitLine: {
+          show: false,
         },
       },
       yAxis: {
@@ -169,17 +170,18 @@ export function BoxPlot({
         },
         min: yMin,
         max: yMax,
+        splitNumber: 5,
         axisLine: {
-          show: false,
+          show: true,
+          lineStyle: {
+            color: themeColors.border,
+          },
         },
         axisTick: {
           show: false,
         },
         splitLine: {
-          lineStyle: {
-            color: themeColors.border,
-            type: 'dashed' as const,
-          },
+          show: false,
         },
         axisLabel: {
           color: themeColors.muted,

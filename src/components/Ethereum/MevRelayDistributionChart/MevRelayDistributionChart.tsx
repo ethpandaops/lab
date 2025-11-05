@@ -105,7 +105,6 @@ export function MevRelayDistributionChart({
           orientation="horizontal"
           axisName={countAxisName}
           showLabel={false}
-          animationDuration={300}
         />
       )}
     </PopoutCard>

@@ -241,7 +241,7 @@ export function MevBiddingTimelineChart({
           <ScatterAndLineChart
             lineSeries={lineSeries}
             scatterSeries={scatterSeries}
-            xAxisTitle="Time (seconds)"
+            xAxisTitle="Slot Time (s)"
             yAxisTitle="MEV Value (ETH)"
             xMin={-8000}
             xMax={4000}

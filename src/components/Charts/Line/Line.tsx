@@ -50,9 +50,6 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
     xAxisTitle,
     yAxisTitle,
     syncGroup,
-    showGridlines = true,
-    showYAxisLine = false,
-    tooltipFormatter,
   },
   ref
 ): JSX.Element {
@@ -99,12 +96,10 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           }
         : undefined,
       grid: {
-        // ECharts 6 automatically handles label overflow prevention
-        // Use minimal padding and let ECharts handle the rest
+        left: 60,
+        right: 24,
         top: title ? 40 : 16,
-        right: 16,
-        bottom: xAxisTitle ? 50 : 30,
-        left: yAxisTitle ? 60 : 16,
+        bottom: 50,
       },
       xAxis: {
         type: 'category',
@@ -119,6 +114,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           fontSize: 12,
         },
         axisLine: {
+          show: true,
           lineStyle: {
             color: themeColors.border,
           },
@@ -128,12 +124,13 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           fontSize: 12,
           interval: xAxisLabelInterval,
         },
+        splitLine: {
+          show: false,
+        },
       },
       yAxis: {
         type: 'value',
         max: yMax,
-        min: 0,
-        interval: yMax ? Math.ceil(yMax / 5) : undefined, // Force exactly 5 intervals
         name: yAxisTitle,
         nameLocation: 'middle',
         nameGap: 50,
@@ -142,7 +139,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           fontSize: 12,
         },
         axisLine: {
-          show: showYAxisLine,
+          show: true,
           lineStyle: {
             color: themeColors.border,
           },
@@ -151,11 +148,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           show: false,
         },
         splitLine: {
-          show: showGridlines,
-          lineStyle: {
-            color: themeColors.border,
-            type: 'dashed',
-          },
+          show: false,
         },
         axisLabel: {
           color: themeColors.muted,
@@ -220,7 +213,6 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           color: themeColors.foreground,
           fontSize: 12,
         },
-        formatter: tooltipFormatter,
         axisPointer: {
           type: 'line',
           lineStyle: {
@@ -250,9 +242,6 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
       xAxisLabelInterval,
       xAxisTitle,
       yAxisTitle,
-      showGridlines,
-      showYAxisLine,
-      tooltipFormatter,
       themeColors.foreground,
       themeColors.border,
       themeColors.muted,
