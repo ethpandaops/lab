@@ -1,6 +1,5 @@
 import type { JSX } from 'react';
 import { useMemo } from 'react';
-import { useNavigate } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { Badge } from '@/components/Elements/Badge';
 import { Slot } from '@/components/Ethereum/Slot';
@@ -15,15 +14,15 @@ import type { EpochSlotsTableProps } from './EpochSlotsTable.types';
  * Display all slots in an epoch with comprehensive metrics
  *
  * Shows:
- * - Slot number (clickable link to slot detail)
- * - Timestamp and relative time
+ * - Slot number with slot-in-epoch subtext (clickable link to slot detail)
+ * - Relative timestamp
  * - Proposer details (index and entity)
  * - Block status (canonical, missed)
  * - Blob count
  * - Attestation metrics (head correct count, participation %)
- * - Block first seen time (ms from slot start)
  *
- * Rows are clickable and navigate to the slot detail page.
+ * Users can click on slot numbers to navigate to slot detail pages.
+ * Timestamp component has interactive popup for more details.
  */
 export function EpochSlotsTable({
   slots,
@@ -31,7 +30,6 @@ export function EpochSlotsTable({
   enableRealtimeHighlighting = true,
   sortOrder = 'asc',
 }: EpochSlotsTableProps): JSX.Element {
-  const navigate = useNavigate();
   const { slot: currentSlot } = useBeaconClock();
 
   // Disable real-time features for historical views (prevents re-renders every 12s)
@@ -49,38 +47,31 @@ export function EpochSlotsTable({
    */
   const columns: Column<SlotData>[] = useMemo(
     () => [
-      ...(showSlotInEpoch
-        ? [
-            {
-              header: 'Slot in Epoch',
-              accessor: (row: SlotData) => {
-                const slotInEpoch = (row.slot % 32) + 1;
-                return <span className="text-muted">{slotInEpoch}/32</span>;
-              },
-            },
-          ]
-        : []),
       {
         header: 'Slot',
         accessor: row => {
           const isCurrent = row.slot === effectiveCurrentSlot;
           const isFuture = row.slot > effectiveCurrentSlot;
+          const slotInEpoch = (row.slot % 32) + 1;
 
           return (
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-foreground">
-                <Slot slot={row.slot} />
-              </span>
-              {isCurrent && (
-                <Badge color="blue" variant="flat" className="text-xs">
-                  Now
-                </Badge>
-              )}
-              {isFuture && (
-                <Badge color="gray" variant="border" className="text-xs">
-                  Scheduled
-                </Badge>
-              )}
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-foreground">
+                  <Slot slot={row.slot} />
+                </span>
+                {isCurrent && (
+                  <Badge color="blue" variant="flat" className="text-xs">
+                    Now
+                  </Badge>
+                )}
+                {isFuture && (
+                  <Badge color="gray" variant="border" className="text-xs">
+                    Scheduled
+                  </Badge>
+                )}
+              </div>
+              {showSlotInEpoch && <div className="text-xs text-muted">{slotInEpoch}/32</div>}
             </div>
           );
         },
@@ -89,13 +80,8 @@ export function EpochSlotsTable({
       {
         header: 'Timestamp',
         accessor: row => (
-          <div>
-            <div className="text-muted">
-              <Timestamp timestamp={row.slotStartDateTime} format="short" />
-            </div>
-            <div className="text-sm text-muted">
-              <Timestamp timestamp={row.slotStartDateTime} format="relative" />
-            </div>
+          <div className="text-sm text-muted">
+            <Timestamp timestamp={row.slotStartDateTime} format="relative" />
           </div>
         ),
       },
@@ -155,7 +141,7 @@ export function EpochSlotsTable({
         accessor: row => <span className="text-muted">{row.blobCount}</span>,
       },
       {
-        header: 'Attestation Head',
+        header: 'Attestations',
         accessor: row => (
           <span className="text-muted">
             {row.attestationHead} / {row.attestationMax}
@@ -174,13 +160,6 @@ export function EpochSlotsTable({
     ],
     [effectiveCurrentSlot, showSlotInEpoch]
   );
-
-  /**
-   * Handle row click - navigate to slot detail page
-   */
-  const handleRowClick = (row: SlotData): void => {
-    navigate({ to: '/ethereum/slots/$slot', params: { slot: row.slot.toString() } });
-  };
 
   /**
    * Generate unique key for each row
@@ -208,7 +187,6 @@ export function EpochSlotsTable({
       data={sortedSlots}
       columns={columns}
       variant="nested"
-      onRowClick={handleRowClick}
       getRowKey={getRowKey}
       getRowClassName={getRowClassName}
     />
