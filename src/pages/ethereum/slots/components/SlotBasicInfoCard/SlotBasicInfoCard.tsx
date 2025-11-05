@@ -6,8 +6,7 @@ import { Entity } from '@/components/Ethereum/Entity';
 import { BlockArt } from '@/components/Ethereum/BlockArt';
 import { ForkLabel } from '@/components/Ethereum/ForkLabel';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
-import { BeaconchainLink } from '@/components/Ethereum/BeaconchainLink';
-import { EtherscanLink } from '@/components/Ethereum/EtherscanLink';
+import { BlockExplorerLink } from '@/components/Ethereum/BlockExplorerLink';
 import type { SlotBasicInfoCardProps } from './SlotBasicInfoCard.types';
 import type { ForkVersion } from '@/utils/beacon';
 
@@ -80,8 +79,10 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
             {blockHead?.block_version && <ForkLabel fork={blockHead.block_version as ForkVersion} size="sm" />}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <BeaconchainLink slot={slot} />
-            <EtherscanLink blockNumber={blockHead?.execution_payload_block_number} />
+            <BlockExplorerLink type="beaconchain" slot={slot} />
+            <BlockExplorerLink type="dora" slot={slot} />
+            <BlockExplorerLink type="tracoor" slot={slot} blockRoot={blockHead?.block_root} />
+            <BlockExplorerLink type="etherscan" blockNumber={blockHead?.execution_payload_block_number} />
             <Badge color={wasBlockSeen ? 'green' : 'red'} variant="border">
               {wasBlockSeen ? 'Block Seen' : 'Block Not Seen'}
             </Badge>

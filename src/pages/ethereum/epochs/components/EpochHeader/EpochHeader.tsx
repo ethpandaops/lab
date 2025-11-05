@@ -1,6 +1,6 @@
 import { EpochArt } from '@/components/Ethereum/EpochArt';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
-import { BeaconchainLink } from '@/components/Ethereum/BeaconchainLink';
+import { BlockExplorerLink } from '@/components/Ethereum/BlockExplorerLink';
 import clsx from 'clsx';
 import type { EpochHeaderProps } from './EpochHeader.types';
 
@@ -40,8 +40,10 @@ export function EpochHeader({ epoch, stats, timestamp, p95BlockArrivalTime }: Ep
             </div>
           </div>
 
-          <div className="flex items-center">
-            <BeaconchainLink epoch={epoch} />
+          <div className="flex flex-wrap items-center gap-2">
+            <BlockExplorerLink type="beaconchain" epoch={epoch} />
+            <BlockExplorerLink type="dora" epoch={epoch} />
+            <BlockExplorerLink type="tracoor" epoch={epoch} />
           </div>
         </div>
       </div>
