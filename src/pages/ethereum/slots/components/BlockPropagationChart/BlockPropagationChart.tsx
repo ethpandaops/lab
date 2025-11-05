@@ -29,13 +29,16 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
   const { CONTINENT_COLORS } = getDataVizColors();
 
   // Process data into scatter and line series
-  const { scatterSeries, lineSeries } = useMemo(() => {
+  const { scatterSeries, lineSeries, nodeMetadata } = useMemo(() => {
     if (blockPropagationData.length === 0) {
-      return { scatterSeries: [], lineSeries: [] };
+      return { scatterSeries: [], lineSeries: [], nodeMetadata: new Map() };
     }
 
     // Sort data by time for proper cumulative calculation
     const sortedData = [...blockPropagationData].sort((a, b) => a.seen_slot_start_diff - b.seen_slot_start_diff);
+
+    // Store metadata for each node index
+    const metadata = new Map<number, { nodeId: string; continent: string }>();
 
     // Group data by continent for scatter series
     const continentGroups = new Map<string, Array<[number, number]>>();
@@ -46,6 +49,12 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
       }
       // X = time in seconds, Y = node index
       continentGroups.get(continent)!.push([point.seen_slot_start_diff / 1000, index]);
+
+      // Store metadata for this node index
+      metadata.set(index, {
+        nodeId: point.node_id,
+        continent,
+      });
     });
 
     // Calculate cumulative distribution for line chart
@@ -77,7 +86,7 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
       },
     ];
 
-    return { scatterSeries: scatter, lineSeries: line };
+    return { scatterSeries: scatter, lineSeries: line, nodeMetadata: metadata };
   }, [blockPropagationData, themeColors, CONTINENT_COLORS]);
 
   // Custom tooltip formatter
@@ -102,7 +111,15 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
         if (!data) return;
 
         if (p.componentSubType === 'scatter') {
-          tooltip += `${p.marker} ${p.seriesName ?? 'Unknown'}<br/>`;
+          const nodeIndex = Math.round(data[1]); // Y-axis is node index
+          const metadata = nodeMetadata.get(nodeIndex);
+
+          // Show continent as series label, but include node ID and continent in details
+          tooltip += `${p.marker} Node Index: ${nodeIndex}<br/>`;
+          if (metadata) {
+            tooltip += `&nbsp;&nbsp;&nbsp;&nbsp;Node: ${metadata.nodeId}<br/>`;
+            tooltip += `&nbsp;&nbsp;&nbsp;&nbsp;Continent: ${metadata.continent}<br/>`;
+          }
         } else {
           tooltip += `${p.marker} Cumulative: ${data[1].toFixed(1)}%<br/>`;
         }
@@ -110,7 +127,7 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
 
       return tooltip;
     },
-    []
+    [nodeMetadata]
   );
 
   // Calculate average propagation time for header
