@@ -1,6 +1,7 @@
-import { type JSX } from 'react';
-import { useParams } from '@tanstack/react-router';
+import { type JSX, useEffect } from 'react';
+import { useParams, useNavigate } from '@tanstack/react-router';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
@@ -8,6 +9,7 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Card } from '@/components/Layout/Card';
 import { Tab } from '@/components/Navigation/Tab';
 import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
+import { Button } from '@/components/Elements/Button';
 import { SLOTS_PER_EPOCH, slotToTimestamp } from '@/utils/beacon';
 import { formatEpoch } from '@/utils';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
@@ -40,6 +42,7 @@ import type { ForkVersion } from '@/utils/beacon';
 export function DetailPage(): JSX.Element {
   const { slot: slotParam } = useParams({ from: '/ethereum/slots/$slot' });
   const context = Route.useRouteContext();
+  const navigate = useNavigate();
 
   // Redirect to slots index when network changes
   useNetworkChangeRedirect(context.redirectOnNetworkChange);
@@ -52,6 +55,31 @@ export function DetailPage(): JSX.Element {
 
   // Get current network
   const { currentNetwork } = useNetwork();
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      // Only handle arrow keys if not in an input/textarea
+      if (
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement ||
+        event.target instanceof HTMLSelectElement
+      ) {
+        return;
+      }
+
+      if (event.key === 'ArrowLeft' && slot > 0) {
+        event.preventDefault();
+        navigate({ to: '/ethereum/slots/$slot', params: { slot: String(slot - 1) } });
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        navigate({ to: '/ethereum/slots/$slot', params: { slot: String(slot + 1) } });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [slot, navigate]);
 
   // Fetch all slot data
   const { data, isLoading, error } = useSlotDetailData(slot);
@@ -237,6 +265,32 @@ export function DetailPage(): JSX.Element {
 
   return (
     <Container>
+      {/* Navigation Controls */}
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <Button
+          variant="secondary"
+          size="sm"
+          rounded="sm"
+          leadingIcon={<ChevronLeftIcon />}
+          disabled={slot === 0}
+          onClick={() => navigate({ to: '/ethereum/slots/$slot', params: { slot: String(slot - 1) } })}
+          aria-label="Previous slot"
+        >
+          Previous
+        </Button>
+        <div className="flex-1" />
+        <Button
+          variant="secondary"
+          size="sm"
+          rounded="sm"
+          trailingIcon={<ChevronRightIcon />}
+          onClick={() => navigate({ to: '/ethereum/slots/$slot', params: { slot: String(slot + 1) } })}
+          aria-label="Next slot"
+        >
+          Next
+        </Button>
+      </div>
+
       <SlotBasicInfoCard slot={slot} epoch={epoch} data={data} />
 
       {/* Tabbed Content */}

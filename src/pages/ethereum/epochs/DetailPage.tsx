@@ -1,6 +1,7 @@
-import { useParams } from '@tanstack/react-router';
-import { useMemo } from 'react';
+import { useParams, useNavigate } from '@tanstack/react-router';
+import { useMemo, useEffect } from 'react';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 import { Alert } from '@/components/Feedback/Alert';
 import { BaseFeeChart } from '@/components/Ethereum/BaseFeeChart';
@@ -17,6 +18,7 @@ import { TransactionCountChart } from '@/components/Ethereum/TransactionCountCha
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
+import { Button } from '@/components/Elements/Button';
 import { Tab } from '@/components/Navigation/Tab';
 import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { formatEpoch } from '@/utils';
@@ -41,6 +43,7 @@ import { useEpochDetailData } from './hooks';
 export function DetailPage(): React.JSX.Element {
   const params = useParams({ from: '/ethereum/epochs/$epoch' });
   const context = Route.useRouteContext();
+  const navigate = useNavigate();
 
   // Redirect to epochs index when network changes
   useNetworkChangeRedirect(context.redirectOnNetworkChange);
@@ -51,6 +54,33 @@ export function DetailPage(): React.JSX.Element {
 
   // Fetch data for this epoch
   const { data, isLoading, error } = useEpochDetailData(epoch ?? 0);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (epoch === null) return;
+
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      // Only handle arrow keys if not in an input/textarea
+      if (
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement ||
+        event.target instanceof HTMLSelectElement
+      ) {
+        return;
+      }
+
+      if (event.key === 'ArrowLeft' && epoch > 0) {
+        event.preventDefault();
+        navigate({ to: '/ethereum/epochs/$epoch', params: { epoch: String(epoch - 1) } });
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        navigate({ to: '/ethereum/epochs/$epoch', params: { epoch: String(epoch + 1) } });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [epoch, navigate]);
 
   // Hash-based tab routing
   const { selectedIndex, onChange } = useHashTabs([
@@ -135,6 +165,32 @@ export function DetailPage(): React.JSX.Element {
 
   return (
     <Container>
+      {/* Navigation Controls */}
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <Button
+          variant="secondary"
+          size="sm"
+          rounded="sm"
+          leadingIcon={<ChevronLeftIcon />}
+          disabled={epoch === 0}
+          onClick={() => navigate({ to: '/ethereum/epochs/$epoch', params: { epoch: String(epoch - 1) } })}
+          aria-label="Previous epoch"
+        >
+          Previous
+        </Button>
+        <div className="flex-1" />
+        <Button
+          variant="secondary"
+          size="sm"
+          rounded="sm"
+          trailingIcon={<ChevronRightIcon />}
+          onClick={() => navigate({ to: '/ethereum/epochs/$epoch', params: { epoch: String(epoch + 1) } })}
+          aria-label="Next epoch"
+        >
+          Next
+        </Button>
+      </div>
+
       {/* Unified Header with all stats integrated */}
       <EpochHeader
         epoch={epoch}
