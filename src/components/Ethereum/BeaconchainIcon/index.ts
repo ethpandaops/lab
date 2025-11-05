@@ -1,1 +1,0 @@
-export { BeaconchainIcon } from './BeaconchainIcon';
