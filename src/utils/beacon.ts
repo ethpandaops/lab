@@ -1,4 +1,5 @@
 import type { Network } from '@/hooks/useConfig';
+import { getActiveFork } from './forks';
 
 /**
  * Beacon chain timing constants
@@ -164,7 +165,7 @@ export function isEpochAtOrAfter(currentEpoch: number, forkEpoch?: number): bool
 /**
  * Beacon chain fork version identifiers
  */
-export type ForkVersion = 'phase0' | 'altair' | 'bellatrix' | 'capella' | 'deneb' | 'electra' | 'fulu';
+export type ForkVersion = 'phase0' | 'altair' | 'bellatrix' | 'capella' | 'deneb' | 'electra' | 'fulu' | 'glaos';
 
 /**
  * Metadata for a beacon chain fork
@@ -180,6 +181,10 @@ export interface ForkMetadata {
   color: string;
   /** Description of what the fork represents */
   description: string;
+  /** Execution layer fork name (if applicable) */
+  executionName?: string;
+  /** Combined consensus + execution name (e.g., "dencun" for deneb + cancun) */
+  combinedName?: string;
 }
 
 /**
@@ -191,49 +196,68 @@ export const FORK_METADATA: Record<ForkVersion, ForkMetadata> = {
     name: 'Phase 0',
     emoji: '🚀',
     color: 'bg-gray-100 text-gray-700 dark:bg-gray-400/10 dark:text-gray-400',
-    description: 'Genesis - Beacon chain launch',
+    description: 'Beacon chain genesis - Launched proof-of-stake consensus layer with validator staking',
   },
   altair: {
     version: 'altair',
     name: 'Altair',
     emoji: '🦅',
     color: 'bg-sky-100 text-sky-700 dark:bg-sky-400/10 dark:text-sky-400',
-    description: 'First beacon chain upgrade - Light client support',
+    description: 'First upgrade - Introduced sync committees for light client support and increased penalties',
   },
   bellatrix: {
     version: 'bellatrix',
     name: 'Bellatrix',
     emoji: '🐼',
     color: 'bg-slate-100 text-slate-700 dark:bg-slate-400/10 dark:text-slate-400',
-    description: 'The Merge - Transition to proof-of-stake',
+    description: 'The Merge - Transitioned Ethereum from proof-of-work to proof-of-stake consensus',
+    executionName: 'paris',
+    combinedName: 'merge',
   },
   capella: {
     version: 'capella',
     name: 'Capella',
-    emoji: '🐋',
+    emoji: '🦉',
     color: 'bg-blue-100 text-blue-700 dark:bg-blue-400/10 dark:text-blue-400',
-    description: 'Shanghai/Capella - Validator withdrawals enabled',
+    description: 'Shapella - Enabled validator withdrawals after 2+ years of staking (EIP-4895)',
+    executionName: 'shanghai',
+    combinedName: 'shapella',
   },
   deneb: {
     version: 'deneb',
     name: 'Deneb',
     emoji: '🐡',
     color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-400/10 dark:text-indigo-400',
-    description: 'Cancun/Deneb - Proto-danksharding (EIP-4844)',
+    description: 'Dencun - Introduced proto-danksharding with blob transactions, reducing L2 fees by ~90% (EIP-4844)',
+    executionName: 'cancun',
+    combinedName: 'dencun',
   },
   electra: {
     version: 'electra',
     name: 'Electra',
     emoji: '🦒',
     color: 'bg-violet-100 text-violet-700 dark:bg-violet-400/10 dark:text-violet-400',
-    description: 'Electra upgrade - MaxEB and other improvements',
+    description:
+      'Pectra - Increased max validator balance to 2048 ETH, enabling consolidation and compounding (EIP-7251)',
+    executionName: 'prague',
+    combinedName: 'pectra',
   },
   fulu: {
     version: 'fulu',
     name: 'Fulu',
     emoji: '🦓',
     color: 'bg-pink-100 text-pink-700 dark:bg-pink-400/10 dark:text-pink-400',
-    description: 'Fulu - PeerDAS and more',
+    description:
+      'Fusaka - Implements PeerDAS for up to 8x blob throughput scaling and introduces blob parameter-only forks (EIP-7594)',
+    executionName: 'osaka',
+    combinedName: 'fusaka',
+  },
+  glaos: {
+    version: 'glaos',
+    name: 'Glaos',
+    emoji: '🐋',
+    color: 'bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-400',
+    description: 'Future consensus layer upgrade - Seventh CL fork with features to be determined',
   },
 } as const;
 
@@ -256,20 +280,7 @@ export function getForkForSlot(slot: number, network: Network | null): ForkVersi
   }
 
   const epoch = slotToEpoch(slot);
-  const { forks } = network;
+  const activeFork = getActiveFork(network, epoch);
 
-  // Check forks in reverse chronological order (newest to oldest)
-  // Note: The config only has 'electra' and 'fusaka' in consensus forks currently
-  // We map 'fusaka' to 'fulu' for consistency with our ForkVersion type
-  if (forks.consensus.fusaka && epoch >= forks.consensus.fusaka.epoch) {
-    return 'fulu';
-  }
-
-  if (forks.consensus.electra && epoch >= forks.consensus.electra.epoch) {
-    return 'electra';
-  }
-
-  // If no specific fork found, return 'deneb' as it's the current mainnet fork
-  // In a full implementation, this should check all historical forks
-  return 'deneb';
+  return activeFork?.name ?? 'phase0';
 }

@@ -14,7 +14,14 @@ export interface Fork {
 }
 
 export interface ConsensusForks {
+  phase0?: Fork;
+  altair?: Fork;
+  bellatrix?: Fork;
+  capella?: Fork;
+  deneb?: Fork;
   electra?: Fork;
+  fulu?: Fork;
+  glaos?: Fork;
   fusaka?: Fork;
 }
 

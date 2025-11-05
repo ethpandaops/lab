@@ -20,6 +20,7 @@ const ethereumConsensusPages: NavItem[] = [
   { name: 'Epochs', to: '/ethereum/epochs' },
   { name: 'Slots', to: '/ethereum/slots' },
   { name: 'Entities', to: '/ethereum/entities' },
+  { name: 'Forks', to: '/ethereum/forks' },
 ];
 
 const ethereumExecutionPages: NavItem[] = [];
