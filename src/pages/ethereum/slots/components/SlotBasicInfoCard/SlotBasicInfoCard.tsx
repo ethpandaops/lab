@@ -1,4 +1,6 @@
 import { type JSX } from 'react';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 import { Badge } from '@/components/Elements/Badge';
 import { Slot } from '@/components/Ethereum/Slot';
 import { Epoch } from '@/components/Ethereum/Epoch';
@@ -7,6 +9,11 @@ import { BlockArt } from '@/components/Ethereum/BlockArt';
 import { ForkLabel } from '@/components/Ethereum/ForkLabel';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { BlockExplorerLink } from '@/components/Ethereum/BlockExplorerLink';
+import { BeaconchainIcon } from '@/components/Ethereum/BeaconchainIcon';
+import { DoraIcon } from '@/components/Ethereum/DoraIcon';
+import { TracoorIcon } from '@/components/Ethereum/TracoorIcon';
+import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
+import { useNetwork } from '@/hooks/useNetwork';
 import type { SlotBasicInfoCardProps } from './SlotBasicInfoCard.types';
 import type { ForkVersion } from '@/utils/beacon';
 
@@ -15,6 +22,7 @@ import type { ForkVersion } from '@/utils/beacon';
  * Shows key metrics like slot number, epoch, proposer, status, block root, etc.
  */
 export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps): JSX.Element {
+  const { currentNetwork } = useNetwork();
   const blockHead = data.blockHead[0];
   const blockProposer = data.blockProposer[0];
   const blockMev = data.blockMev[0];
@@ -69,24 +77,94 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
     }
   };
 
+  // Build explorer links data
+  const serviceUrls = currentNetwork?.service_urls;
+  const explorerLinks = [
+    {
+      type: 'beaconchain' as const,
+      url: serviceUrls?.beaconExplorer ? `${serviceUrls.beaconExplorer}/slot/${slot}` : null,
+      icon: BeaconchainIcon,
+      label: 'Beaconcha.in',
+    },
+    {
+      type: 'dora' as const,
+      url: serviceUrls?.dora ? `${serviceUrls.dora}/slot/${slot}` : null,
+      icon: DoraIcon,
+      label: 'Dora',
+    },
+    {
+      type: 'tracoor' as const,
+      url: serviceUrls?.tracoor
+        ? `${serviceUrls.tracoor}/beacon_block?beaconBlockSlot=${slot}${blockHead?.block_root ? `&beaconBlockBlockRoot=${blockHead.block_root}` : ''}`
+        : null,
+      icon: TracoorIcon,
+      label: 'Tracoor',
+    },
+    {
+      type: 'etherscan' as const,
+      url:
+        serviceUrls?.explorer && blockHead?.execution_payload_block_number
+          ? `${serviceUrls.explorer}/block/${blockHead.execution_payload_block_number}`
+          : null,
+      icon: EtherscanIcon,
+      label: 'Etherscan',
+    },
+  ].filter(link => link.url !== null);
+
   return (
     <div className="overflow-hidden rounded-sm border border-border bg-surface">
       {/* Tight header section - no padding, integrated into card */}
       <div className="border-b border-border bg-background px-6 py-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg/7 font-semibold text-foreground">Slot Information</h2>
-            {blockHead?.block_version && <ForkLabel fork={blockHead.block_version as ForkVersion} size="sm" />}
-          </div>
-          <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
-            {/* Explorer Links */}
-            <div className="flex flex-wrap items-center gap-2">
-              <BlockExplorerLink type="beaconchain" slot={slot} />
-              <BlockExplorerLink type="dora" slot={slot} />
-              <BlockExplorerLink type="tracoor" slot={slot} blockRoot={blockHead?.block_root} />
-              <BlockExplorerLink type="etherscan" blockNumber={blockHead?.execution_payload_block_number} />
-            </div>
-            {/* Status Badges */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg/7 font-semibold text-foreground">Slot Information</h2>
+          {explorerLinks.length > 0 && (
+            <>
+              {/* Desktop: Show icons directly */}
+              <div className="hidden items-center gap-2 sm:flex">
+                {explorerLinks.map(link => (
+                  <a
+                    key={link.type}
+                    href={link.url!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block opacity-70 transition-opacity hover:opacity-100"
+                    aria-label={link.label}
+                  >
+                    <link.icon className="h-5 w-5" />
+                  </a>
+                ))}
+              </div>
+              {/* Mobile: Show dropdown menu */}
+              <Menu as="div" className="relative sm:hidden">
+                <MenuButton className="inline-flex items-center rounded-sm p-1 opacity-70 transition-opacity hover:opacity-100">
+                  <EllipsisVerticalIcon className="h-5 w-5" aria-hidden="true" />
+                </MenuButton>
+                <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-sm border border-border bg-surface shadow-lg focus:outline-none">
+                  {explorerLinks.map(link => (
+                    <MenuItem key={link.type}>
+                      <a
+                        href={link.url!}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-background"
+                      >
+                        <link.icon className="h-4 w-4" />
+                        {link.label}
+                      </a>
+                    </MenuItem>
+                  ))}
+                </MenuItems>
+              </Menu>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Card content */}
+      <div className="p-6">
+        <div className="flex flex-col gap-6 lg:flex-row">
+          <div className="flex-1 space-y-6">
+            {/* Status Section */}
             <div className="flex flex-wrap items-center gap-2">
               <Badge color={wasBlockSeen ? 'green' : 'red'} variant="border">
                 {wasBlockSeen ? 'Block Seen' : 'Block Not Seen'}
@@ -95,14 +173,7 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
                 {status.label}
               </Badge>
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Card content */}
-      <div className="p-6">
-        <div className="flex flex-col gap-6 lg:flex-row">
-          <div className="flex-1 space-y-6">
             {/* Basic Information Section */}
             <div>
               <h3 className="mb-3 text-sm font-semibold text-foreground">Basic Information</h3>
@@ -122,6 +193,16 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
                     <Epoch epoch={epoch} />
                   </dd>
                 </div>
+
+                {/* Block Version */}
+                {blockHead?.block_version && (
+                  <div>
+                    <dt className="text-xs font-medium text-muted">Fork</dt>
+                    <dd className="mt-1 text-base/7 font-semibold text-foreground">
+                      <ForkLabel fork={blockHead.block_version as ForkVersion} size="sm" />
+                    </dd>
+                  </div>
+                )}
 
                 {/* Execution Block Number */}
                 <div>
