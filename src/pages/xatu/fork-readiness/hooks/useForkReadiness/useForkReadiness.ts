@@ -30,7 +30,8 @@ function getAllForks(network: Network): Array<{
     if (fork) {
       // Convert MinClientVersions to Record<string, string>
       const minVersions: Record<string, string> = {};
-      for (const [client, version] of Object.entries(fork.min_client_versions)) {
+      const minClientVersions = fork.min_client_versions || {};
+      for (const [client, version] of Object.entries(minClientVersions)) {
         if (typeof version === 'string') {
           minVersions[client] = version;
         }
