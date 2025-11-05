@@ -8,7 +8,6 @@ import { Entity } from '@/components/Ethereum/Entity';
 import { BlockArt } from '@/components/Ethereum/BlockArt';
 import { ForkLabel } from '@/components/Ethereum/ForkLabel';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
-import { BlockExplorerLink } from '@/components/Ethereum/BlockExplorerLink';
 import { BeaconchainIcon } from '@/components/Ethereum/BeaconchainIcon';
 import { DoraIcon } from '@/components/Ethereum/DoraIcon';
 import { TracoorIcon } from '@/components/Ethereum/TracoorIcon';
