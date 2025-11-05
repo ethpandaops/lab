@@ -16,6 +16,20 @@ export const FORK_ORDER: readonly ForkVersion[] = [
   'glaos',
 ] as const;
 
+/**
+ * Map of fork versions to their display names.
+ */
+export const FORK_DISPLAY_NAMES: Record<ForkVersion, string> = {
+  phase0: 'Phase 0',
+  altair: 'Altair',
+  bellatrix: 'Bellatrix',
+  capella: 'Capella',
+  deneb: 'Deneb',
+  electra: 'Electra',
+  fulu: 'Fulu',
+  glaos: 'Glaos',
+};
+
 export type ForkName = ForkVersion;
 
 export interface ForkInfo {
