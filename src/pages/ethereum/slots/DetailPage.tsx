@@ -278,7 +278,7 @@ export function DetailPage(): JSX.Element {
         >
           Previous
         </Button>
-        <div className="text-sm text-muted">Use ← → arrow keys to navigate</div>
+        <div className="flex-1" />
         <Button
           variant="secondary"
           size="sm"
