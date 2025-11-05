@@ -267,7 +267,7 @@ export function PopoutCard({
                   <img src="/images/ethpandaops.png" alt="ethPandaOps" className="h-10 w-auto" />
                 </div>
               ) : (
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex shrink-0 items-start gap-2">
                   {enableDownload && (
                     <Dropdown
                       trigger={

@@ -153,7 +153,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                     )}
 
                     {filteredEthereumDataAvailabilityPages.length > 0 && (
-                      <ListSection title="Data Availability" nested>
+                      <ListSection title="Data Availability" nested className="mt-4">
                         {filteredEthereumDataAvailabilityPages.map(page => (
                           <ListItem key={page.to}>
                             <Link
@@ -260,7 +260,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                 )}
 
                 {filteredEthereumDataAvailabilityPages.length > 0 && (
-                  <ListSection title="Data Availability" nested>
+                  <ListSection title="Data Availability" nested className="mt-2">
                     {filteredEthereumDataAvailabilityPages.map(page => (
                       <ListItem key={page.to}>
                         <Link
