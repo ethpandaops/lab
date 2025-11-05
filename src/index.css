@@ -11,10 +11,6 @@
 
 /* Fonts */
 @import '@fontsource-variable/space-grotesk';
-@import '@fontsource/space-mono/400.css';
-@import '@fontsource/space-mono/400-italic.css';
-@import '@fontsource/space-mono/700.css';
-@import '@fontsource/space-mono/700-italic.css';
 
 @import 'tailwindcss';
 
@@ -283,7 +279,7 @@
     background-color: var(--color-aurora-blue-950);
   }
 
-  /* Apply Space Grotesk for body text and Space Mono for code */
+  /* Apply Space Grotesk for all text */
   body {
     font-family: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
     color: var(--foreground-value);
@@ -294,7 +290,7 @@
   pre,
   kbd,
   samp {
-    font-family: 'Space Mono', ui-monospace, monospace;
+    font-family: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
   }
 
   /* Global focus styles - use primary color */

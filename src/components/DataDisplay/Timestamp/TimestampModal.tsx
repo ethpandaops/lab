@@ -293,14 +293,14 @@ function TimestampRow({ label, value, onCopy, isCopied, badge, isLive }: Timesta
         </div>
         {badge && !isLive && (
           <div className="mt-1">
-            <span className="text-2xs/3 inline-block rounded-xs bg-accent/10 px-1.5 py-0.5 font-mono font-medium text-accent">
+            <span className="text-2xs/3 inline-block rounded-xs bg-accent/10 px-1.5 py-0.5 font-medium text-accent">
               {badge}
             </span>
           </div>
         )}
       </td>
       <td className="py-3 pr-4 pl-8">
-        <div className="font-mono text-sm/5 break-all text-muted">{value}</div>
+        <div className="text-sm/5 break-all text-muted">{value}</div>
       </td>
       <td className="w-16 px-4 py-3 text-right">
         <div
@@ -346,7 +346,7 @@ function ClickableTimestampRow({ label, timestamp, context, onOpenModal }: Click
         <span className="text-xs/5 font-medium text-muted">{label}</span>
       </td>
       <td className="py-3 pr-4 pl-8">
-        <div className="font-mono text-sm/5 break-all text-primary underline decoration-dotted underline-offset-4">
+        <div className="text-sm/5 break-all text-primary underline decoration-dotted underline-offset-4">
           {formattedTime}
         </div>
       </td>
@@ -376,7 +376,7 @@ function LinkableRow({ label, onCopy, isCopied, children }: LinkableRowProps): J
         <span className="text-xs/5 font-medium text-muted">{label}</span>
       </td>
       <td className="py-3 pr-4 pl-8">
-        <div className="font-mono text-sm/5 text-foreground">{children}</div>
+        <div className="text-sm/5 text-foreground">{children}</div>
       </td>
       <td className="w-16 px-4 py-3 text-right">
         <button

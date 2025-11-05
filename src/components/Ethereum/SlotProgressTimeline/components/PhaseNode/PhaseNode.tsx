@@ -113,7 +113,7 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
         {phase.id !== 'attesting' && (
           <span
             className={clsx(
-              'font-mono transition-colors duration-300',
+              'transition-colors duration-300',
               status === 'pending' && 'text-muted opacity-50',
               status === 'active' && 'text-foreground',
               status === 'completed' && 'text-muted'

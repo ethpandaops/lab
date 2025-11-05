@@ -30,7 +30,7 @@ function MobileSlotHeaderComponent({
           <Link
             to="/ethereum/slots/$slot"
             params={{ slot: currentSlot.toString() }}
-            className="font-mono text-lg font-bold text-foreground hover:text-primary"
+            className="text-lg font-bold text-foreground hover:text-primary"
           >
             <Slot slot={currentSlot} noLink />
           </Link>

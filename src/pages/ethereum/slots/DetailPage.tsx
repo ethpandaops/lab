@@ -389,7 +389,7 @@ export function DetailPage(): JSX.Element {
                     {data.blockHead[0].block_root && (
                       <>
                         <dt className="text-sm font-medium text-muted">Block Root</dt>
-                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                        <dd className="flex items-center gap-2 text-sm break-all text-foreground">
                           <span className="flex-1">{data.blockHead[0].block_root}</span>
                           <CopyToClipboard content={data.blockHead[0].block_root} />
                         </dd>
@@ -399,7 +399,7 @@ export function DetailPage(): JSX.Element {
                     {data.blockHead[0].parent_root && (
                       <>
                         <dt className="text-sm font-medium text-muted">Parent Root</dt>
-                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                        <dd className="flex items-center gap-2 text-sm break-all text-foreground">
                           <span className="flex-1">{data.blockHead[0].parent_root}</span>
                           <CopyToClipboard content={data.blockHead[0].parent_root} />
                         </dd>
@@ -409,7 +409,7 @@ export function DetailPage(): JSX.Element {
                     {data.blockHead[0].state_root && (
                       <>
                         <dt className="text-sm font-medium text-muted">State Root</dt>
-                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                        <dd className="flex items-center gap-2 text-sm break-all text-foreground">
                           <span className="flex-1">{data.blockHead[0].state_root}</span>
                           <CopyToClipboard content={data.blockHead[0].state_root} />
                         </dd>
@@ -472,7 +472,7 @@ export function DetailPage(): JSX.Element {
                     {data.blockHead[0].execution_payload_block_hash && (
                       <>
                         <dt className="text-sm font-medium text-muted">Execution Block Hash</dt>
-                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                        <dd className="flex items-center gap-2 text-sm break-all text-foreground">
                           <span className="flex-1">{data.blockHead[0].execution_payload_block_hash}</span>
                           <CopyToClipboard content={data.blockHead[0].execution_payload_block_hash} />
                         </dd>
@@ -495,7 +495,7 @@ export function DetailPage(): JSX.Element {
                     {data.blockHead[0].execution_payload_parent_hash && (
                       <>
                         <dt className="text-sm font-medium text-muted">Execution Parent Hash</dt>
-                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                        <dd className="flex items-center gap-2 text-sm break-all text-foreground">
                           <span className="flex-1">{data.blockHead[0].execution_payload_parent_hash}</span>
                           <CopyToClipboard content={data.blockHead[0].execution_payload_parent_hash} />
                         </dd>
@@ -505,7 +505,7 @@ export function DetailPage(): JSX.Element {
                     {data.blockHead[0].execution_payload_state_root && (
                       <>
                         <dt className="text-sm font-medium text-muted">Execution State Root</dt>
-                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                        <dd className="flex items-center gap-2 text-sm break-all text-foreground">
                           <span className="flex-1">{data.blockHead[0].execution_payload_state_root}</span>
                           <CopyToClipboard content={data.blockHead[0].execution_payload_state_root} />
                         </dd>
@@ -515,7 +515,7 @@ export function DetailPage(): JSX.Element {
                     {data.blockHead[0].execution_payload_fee_recipient && (
                       <>
                         <dt className="text-sm font-medium text-muted">Fee Recipient</dt>
-                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                        <dd className="flex items-center gap-2 text-sm break-all text-foreground">
                           <span className="flex-1">{data.blockHead[0].execution_payload_fee_recipient}</span>
                           <CopyToClipboard content={data.blockHead[0].execution_payload_fee_recipient} />
                         </dd>
@@ -642,7 +642,7 @@ export function DetailPage(): JSX.Element {
                     {data.blockHead[0].eth1_data_block_hash && (
                       <>
                         <dt className="text-sm font-medium text-muted">ETH1 Block Hash</dt>
-                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                        <dd className="flex items-center gap-2 text-sm break-all text-foreground">
                           <span className="flex-1">{data.blockHead[0].eth1_data_block_hash}</span>
                           <CopyToClipboard content={data.blockHead[0].eth1_data_block_hash} />
                         </dd>
@@ -652,7 +652,7 @@ export function DetailPage(): JSX.Element {
                     {data.blockHead[0].eth1_data_deposit_root && (
                       <>
                         <dt className="text-sm font-medium text-muted">ETH1 Deposit Root</dt>
-                        <dd className="flex items-center gap-2 font-mono text-sm break-all text-foreground">
+                        <dd className="flex items-center gap-2 text-sm break-all text-foreground">
                           <span className="flex-1">{data.blockHead[0].eth1_data_deposit_root}</span>
                           <CopyToClipboard content={data.blockHead[0].eth1_data_deposit_root} />
                         </dd>

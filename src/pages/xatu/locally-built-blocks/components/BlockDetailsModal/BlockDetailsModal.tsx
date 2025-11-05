@@ -218,7 +218,7 @@ function SlotCard({ slotGroup }: { slotGroup: SlotGroup }): JSX.Element {
 
   const title = (
     <div className="flex items-center gap-4">
-      <span className="font-mono text-sm font-medium text-foreground">
+      <span className="text-sm font-medium text-foreground">
         Slot <Slot slot={slot} />
       </span>
       <div className="flex items-center gap-3 text-xs text-muted">
@@ -235,8 +235,8 @@ function SlotCard({ slotGroup }: { slotGroup: SlotGroup }): JSX.Element {
         {nodes.map((nodeGroup, index) => (
           <div key={nodeGroup.nodeName} className="rounded-lg border border-border bg-background/30 p-3">
             <div className="mb-2 flex items-center gap-2 text-xs">
-              <span className="font-mono text-muted">#{index + 1}</span>
-              <span className="flex-1 truncate font-mono text-sm text-foreground">{nodeGroup.nodeName}</span>
+              <span className="text-muted">#{index + 1}</span>
+              <span className="flex-1 truncate text-sm text-foreground">{nodeGroup.nodeName}</span>
             </div>
             <BlockDetails
               block={nodeGroup.representativeBlock}
@@ -263,8 +263,8 @@ function NodeCard({ nodeGroup, index }: { nodeGroup: NodeGroup; index: number })
 
   const title = (
     <div className="flex items-center gap-4">
-      <span className="font-mono text-xs text-muted">#{index + 1}</span>
-      <span className="flex-1 truncate font-mono text-sm">{nodeName}</span>
+      <span className="text-xs text-muted">#{index + 1}</span>
+      <span className="flex-1 truncate text-sm">{nodeName}</span>
       <div className="flex items-center gap-3 text-xs text-muted">
         {blocks.length > 1 && (
           <>
@@ -322,39 +322,35 @@ function BlockDetails({
 
         <div>
           <div className="text-xs text-muted">Block Number</div>
-          <div className="font-mono text-sm text-foreground">
+          <div className="text-sm text-foreground">
             {block.execution_payload_block_number?.toLocaleString() || 'N/A'}
           </div>
         </div>
 
         <div>
           <div className="text-xs text-muted">Block Version</div>
-          <div className="font-mono text-sm text-foreground">{block.block_version || 'N/A'}</div>
+          <div className="text-sm text-foreground">{block.block_version || 'N/A'}</div>
         </div>
 
         <div>
           <div className="text-xs text-muted">Block Size</div>
-          <div className="font-mono text-sm text-foreground">{formatBytes(block.block_total_bytes)}</div>
-          <div className="font-mono text-xs text-muted">
-            {formatBytes(block.block_total_bytes_compressed)} compressed
-          </div>
+          <div className="text-sm text-foreground">{formatBytes(block.block_total_bytes)}</div>
+          <div className="text-xs text-muted">{formatBytes(block.block_total_bytes_compressed)} compressed</div>
         </div>
 
         <div>
           <div className="text-xs text-muted">Transactions</div>
-          <div className="font-mono text-sm text-foreground">{block.execution_payload_transactions_count || 0}</div>
-          <div className="font-mono text-xs text-muted">
-            {formatBytes(block.execution_payload_transactions_total_bytes)}
-          </div>
+          <div className="text-sm text-foreground">{block.execution_payload_transactions_count || 0}</div>
+          <div className="text-xs text-muted">{formatBytes(block.execution_payload_transactions_total_bytes)}</div>
         </div>
 
         <div>
           <div className="text-xs text-muted">Gas Used / Limit</div>
-          <div className="font-mono text-sm text-foreground">
+          <div className="text-sm text-foreground">
             {block.execution_payload_gas_used?.toLocaleString() || 0} /{' '}
             {block.execution_payload_gas_limit?.toLocaleString() || 0}
           </div>
-          <div className="font-mono text-xs text-muted">
+          <div className="text-xs text-muted">
             {formatPercent(block.execution_payload_gas_used, block.execution_payload_gas_limit)} used
           </div>
         </div>
@@ -366,13 +362,13 @@ function BlockDetails({
 
         <div>
           <div className="text-xs text-muted">Node</div>
-          <div className="font-mono text-sm text-foreground">{block.meta_client_name || 'Unknown'}</div>
-          <div className="font-mono text-xs text-muted">{block.meta_client_version || 'N/A'}</div>
+          <div className="text-sm text-foreground">{block.meta_client_name || 'Unknown'}</div>
+          <div className="text-xs text-muted">{block.meta_client_version || 'N/A'}</div>
         </div>
 
         <div>
           <div className="text-xs text-muted">Implementation</div>
-          <div className="font-mono text-sm text-foreground">{block.meta_client_implementation || 'N/A'}</div>
+          <div className="text-sm text-foreground">{block.meta_client_implementation || 'N/A'}</div>
         </div>
 
         <div>
@@ -380,8 +376,8 @@ function BlockDetails({
           <div className="flex items-center gap-2">
             {consensusClient && <ClientLogo client={consensusClient} size={20} />}
             <div>
-              <div className="font-mono text-sm text-foreground">{consensusClient || 'Unknown'}</div>
-              <div className="font-mono text-xs text-muted">{block.meta_consensus_version || 'N/A'}</div>
+              <div className="text-sm text-foreground">{consensusClient || 'Unknown'}</div>
+              <div className="text-xs text-muted">{block.meta_consensus_version || 'N/A'}</div>
             </div>
           </div>
         </div>
@@ -390,13 +386,13 @@ function BlockDetails({
           <div className="text-xs text-muted">Execution</div>
           <div className="flex items-center gap-2">
             {executionClient && <ClientLogo client={executionClient} size={20} />}
-            <div className="font-mono text-sm text-foreground">{executionClient || 'Unknown'}</div>
+            <div className="text-sm text-foreground">{executionClient || 'Unknown'}</div>
           </div>
         </div>
 
         <div>
           <div className="text-xs text-muted">Location</div>
-          <div className="font-mono text-sm text-foreground">
+          <div className="text-sm text-foreground">
             {block.meta_client_geo_city || 'Unknown'}, {block.meta_client_geo_country_code || 'N/A'}
           </div>
         </div>
@@ -408,12 +404,12 @@ function BlockDetails({
 
         <div>
           <div className="text-xs text-muted">Execution Value</div>
-          <div className="font-mono text-sm text-foreground">{formatEth(block.execution_payload_value)}</div>
+          <div className="text-sm text-foreground">{formatEth(block.execution_payload_value)}</div>
         </div>
 
         <div>
           <div className="text-xs text-muted">Consensus Value</div>
-          <div className="font-mono text-sm text-foreground">{formatEth(block.consensus_payload_value)}</div>
+          <div className="text-sm text-foreground">{formatEth(block.consensus_payload_value)}</div>
         </div>
 
         <div className="mt-4 rounded-sm bg-background p-3">

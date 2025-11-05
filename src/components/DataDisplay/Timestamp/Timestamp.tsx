@@ -101,7 +101,7 @@ export function Timestamp({
         onClick={handleClick}
         disabled={disableModal}
         className={clsx(
-          'inline-flex items-center font-mono text-sm/5',
+          'inline-flex items-center text-sm/5',
           !disableModal && 'cursor-pointer underline decoration-dotted underline-offset-4 hover:text-primary',
           disableModal && 'cursor-default',
           className

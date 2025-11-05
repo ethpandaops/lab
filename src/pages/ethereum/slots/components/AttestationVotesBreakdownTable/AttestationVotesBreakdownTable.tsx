@@ -125,7 +125,7 @@ export function AttestationVotesBreakdownTable({
                   return <span className="text-muted italic">No vote</span>;
                 }
                 return (
-                  <span className="font-mono text-xs">
+                  <span className="text-xs">
                     {group.blockRoot.slice(0, 10)}...{group.blockRoot.slice(-8)}
                   </span>
                 );
