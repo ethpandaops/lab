@@ -24,7 +24,7 @@ export interface Forks {
 
 export interface ServiceUrls {
   beaconExplorer?: string; // Beaconcha.in URL
-  etherscan?: string; // Etherscan URL
+  explorer?: string; // Execution layer explorer (Etherscan, etc.)
   dora?: string; // Dora block explorer URL
   tracoor?: string; // Tracoor block explorer URL
   forkmon?: string; // Forkmon URL

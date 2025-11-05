@@ -33,7 +33,7 @@ export function BlockExplorerLink({
       }
 
       case 'etherscan': {
-        const baseUrl = serviceUrls.etherscan;
+        const baseUrl = serviceUrls.explorer;
         if (!baseUrl || blockNumber === undefined) return null;
         return `${baseUrl}/block/${blockNumber}`;
       }
