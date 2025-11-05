@@ -40,7 +40,7 @@ function SidebarComponent({
         {/* Header with Slot number and Epoch subtitle */}
         <div className="mb-3">
           <h2 className="text-2xl font-bold text-foreground">
-            <span className="font-mono">{formatSlot(currentSlot)}</span>
+            <span>{formatSlot(currentSlot)}</span>
           </h2>
           <p className="text-xs text-muted">Epoch {formatEpoch(epoch)}</p>
         </div>

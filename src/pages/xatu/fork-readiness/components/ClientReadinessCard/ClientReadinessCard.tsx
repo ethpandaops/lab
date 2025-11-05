@@ -48,14 +48,12 @@ export function ClientReadinessCard({ data }: ClientReadinessCardProps): JSX.Ele
               <Link
                 to="/xatu/contributors/$id"
                 params={{ id: node.username }}
-                className="min-w-0 flex-1 truncate pr-8 font-mono text-primary hover:underline"
+                className="min-w-0 flex-1 truncate pr-8 text-primary hover:underline"
               >
                 {formatNodeName(node.nodeName)}
               </Link>
             ) : (
-              <span className="min-w-0 flex-1 truncate pr-8 font-mono text-foreground">
-                {formatNodeName(node.nodeName)}
-              </span>
+              <span className="min-w-0 flex-1 truncate pr-8 text-foreground">{formatNodeName(node.nodeName)}</span>
             )}
             <span className="shrink-0">
               <Badge color={node.isReady ? 'green' : 'red'} variant="flat">
