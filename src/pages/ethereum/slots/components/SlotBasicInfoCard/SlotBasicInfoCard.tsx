@@ -191,7 +191,7 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
               {/* Block Root */}
               <div className="col-span-2 sm:col-span-3 lg:col-span-4">
                 <dt className="text-xs font-medium text-muted">Block Root</dt>
-                <dd className="mt-1 font-mono text-xs text-foreground">{formatBlockRoot(blockHead?.block_root)}</dd>
+                <dd className="mt-1 text-xs text-foreground">{formatBlockRoot(blockHead?.block_root)}</dd>
               </div>
             </div>
           </div>

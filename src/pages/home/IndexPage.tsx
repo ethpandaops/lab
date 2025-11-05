@@ -44,7 +44,7 @@ export function IndexPage(): JSX.Element {
               >
                 <div className="flex flex-col gap-4">
                   <BeakerIcon className="size-10 text-primary transition-transform duration-300 group-hover:scale-110" />
-                  <h3 className="font-mono text-xl font-semibold tracking-tight text-foreground">Ethereum Live</h3>
+                  <h3 className="text-xl font-semibold tracking-tight text-foreground">Ethereum Live</h3>
                   <p className="text-base/relaxed text-muted">
                     Visualize beacon chain slots and block proposals in real-time
                   </p>
@@ -61,7 +61,7 @@ export function IndexPage(): JSX.Element {
               >
                 <div className="flex flex-col gap-4">
                   <UserGroupIcon className="size-10 text-primary transition-transform duration-300 group-hover:scale-110" />
-                  <h3 className="font-mono text-xl font-semibold tracking-tight text-foreground">Xatu Contributoors</h3>
+                  <h3 className="text-xl font-semibold tracking-tight text-foreground">Xatu Contributoors</h3>
                   <p className="text-base/relaxed text-muted">Explore the contributors to the Xatu project</p>
                 </div>
               </Card>

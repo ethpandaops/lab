@@ -60,7 +60,7 @@ export function SelectMenu<T>({
             {selectedOption?.icon && (
               <span className="flex size-5 shrink-0 items-center justify-center">{selectedOption.icon}</span>
             )}
-            <span className={clsx('block font-mono text-foreground', expandToFit ? 'whitespace-nowrap' : 'truncate')}>
+            <span className={clsx('block text-foreground', expandToFit ? 'whitespace-nowrap' : 'truncate')}>
               {selectedOption?.label ?? placeholder}
             </span>
           </span>
@@ -81,7 +81,7 @@ export function SelectMenu<T>({
             <ListboxOption
               key={index}
               value={option.value}
-              className="relative cursor-pointer py-2 pr-9 pl-3 font-mono text-foreground transition-colors select-none data-focus:bg-primary/10 data-focus:text-primary data-selected:text-primary"
+              className="relative cursor-pointer py-2 pr-9 pl-3 text-foreground transition-colors select-none data-focus:bg-primary/10 data-focus:text-primary data-selected:text-primary"
             >
               <span className="flex items-center gap-2">
                 {option.icon && <span className="flex size-5 shrink-0 items-center justify-center">{option.icon}</span>}

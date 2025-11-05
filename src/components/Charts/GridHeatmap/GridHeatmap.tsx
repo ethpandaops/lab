@@ -145,7 +145,7 @@ export function GridHeatmap<T = unknown>({
                   className={clsx(
                     labelWidth[cellSize],
                     textSize[cellSize],
-                    'shrink-0 truncate pr-2 text-left font-mono text-muted transition-colors',
+                    'shrink-0 truncate pr-2 text-left text-muted transition-colors',
                     onRowClick ? 'cursor-pointer hover:text-accent' : 'cursor-default',
                     hoveredRow === row.identifier && 'font-bold text-accent'
                   )}

@@ -389,27 +389,27 @@ export const WithModalDescriptionAndTable: Story = {
           <tbody className="divide-y divide-border">
             <tr>
               <td className="py-3 text-muted">1</td>
-              <td className="py-3 font-mono text-xs text-foreground">0x1234...5678</td>
+              <td className="py-3 text-xs text-foreground">0x1234...5678</td>
               <td className="py-3 text-right font-semibold text-success">99.8%</td>
             </tr>
             <tr>
               <td className="py-3 text-muted">2</td>
-              <td className="py-3 font-mono text-xs text-foreground">0x8765...4321</td>
+              <td className="py-3 text-xs text-foreground">0x8765...4321</td>
               <td className="py-3 text-right font-semibold text-success">99.6%</td>
             </tr>
             <tr>
               <td className="py-3 text-muted">3</td>
-              <td className="py-3 font-mono text-xs text-foreground">0xabcd...efgh</td>
+              <td className="py-3 text-xs text-foreground">0xabcd...efgh</td>
               <td className="py-3 text-right font-semibold text-success">99.5%</td>
             </tr>
             <tr>
               <td className="py-3 text-muted">4</td>
-              <td className="py-3 font-mono text-xs text-foreground">0xfedc...hgba</td>
+              <td className="py-3 text-xs text-foreground">0xfedc...hgba</td>
               <td className="py-3 text-right font-semibold text-success">99.3%</td>
             </tr>
             <tr>
               <td className="py-3 text-muted">5</td>
-              <td className="py-3 font-mono text-xs text-foreground">0x9876...0123</td>
+              <td className="py-3 text-xs text-foreground">0x9876...0123</td>
               <td className="py-3 text-right font-semibold text-success">99.1%</td>
             </tr>
           </tbody>
