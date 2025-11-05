@@ -83,14 +83,32 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
   // Custom tooltip formatter
   const tooltipFormatter = useMemo(
     () => (params: TooltipFormatterParams) => {
-      const param = params as TooltipFormatterParam;
-      const data = param.data as [number, number] | undefined;
-      if (!data) return '';
-      if (param.componentSubType === 'scatter') {
-        return `${param.seriesName ?? 'Unknown'}<br/>Time: ${data[0].toFixed(3)}s`;
-      } else {
-        return `Cumulative: ${data[1].toFixed(1)}%<br/>Time: ${data[0].toFixed(3)}s`;
-      }
+      // Handle both single param and array of params
+      const paramsArray = Array.isArray(params) ? params : [params];
+      if (paramsArray.length === 0) return '';
+
+      // Get timestamp from first param
+      const firstParam = paramsArray[0] as TooltipFormatterParam;
+      const firstData = firstParam.data as [number, number] | undefined;
+      if (!firstData) return '';
+
+      const timestamp = firstData[0].toFixed(3);
+      let tooltip = `<strong>Time: ${timestamp}s</strong><br/>`;
+
+      // Add info for each series at this point
+      paramsArray.forEach(param => {
+        const p = param as TooltipFormatterParam;
+        const data = p.data as [number, number] | undefined;
+        if (!data) return;
+
+        if (p.componentSubType === 'scatter') {
+          tooltip += `${p.marker} ${p.seriesName ?? 'Unknown'}<br/>`;
+        } else {
+          tooltip += `${p.marker} Cumulative: ${data[1].toFixed(1)}%<br/>`;
+        }
+      });
+
+      return tooltip;
     },
     []
   );

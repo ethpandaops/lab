@@ -50,12 +50,43 @@ export function useHashTabs(tabs: TabConfig[]): UseHashTabsReturn {
   const [selectedIndex, setSelectedIndex] = useState(getInitialTab);
 
   /**
+   * Scroll to anchor if present in URL
+   */
+  const scrollToAnchor = (hash: string, tabIndex: number): void => {
+    const currentTab = tabs[tabIndex];
+    if (currentTab?.anchors?.includes(hash)) {
+      // Use setTimeout to ensure tab content is rendered before scrolling
+      setTimeout(() => {
+        const element = document.getElementById(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  };
+
+  /**
+   * Handle initial anchor scroll on mount
+   */
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+      scrollToAnchor(hash, selectedIndex);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /**
    * Handle hash changes (browser back/forward)
    */
   useEffect(() => {
     const handleHashChange = (): void => {
       const newIndex = getInitialTab();
       setSelectedIndex(newIndex);
+
+      // After tab switch, scroll to anchor if present
+      const hash = window.location.hash.replace('#', '');
+      scrollToAnchor(hash, newIndex);
     };
 
     window.addEventListener('hashchange', handleHashChange);

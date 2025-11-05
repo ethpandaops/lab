@@ -17,7 +17,7 @@ const sizeClasses = {
   lg: 'w-[32rem]', // 512px
   xl: 'w-[56rem]', // 896px (increased from 672px for wider aspect ratio)
   full: 'w-[80rem]', // 1280px
-  fullscreen: 'w-screen h-screen', // Full viewport
+  fullscreen: 'w-[90vw] max-h-[90vh]', // 90% of viewport
 };
 
 /**
@@ -92,9 +92,7 @@ export function Dialog({
         </TransitionChild>
 
         {/* Dialog container */}
-        <div
-          className={clsx('fixed inset-0 flex w-screen items-center justify-center', size !== 'fullscreen' && 'p-4')}
-        >
+        <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
           <TransitionChild
             as={Fragment}
             enter="ease-out duration-300"
@@ -107,11 +105,10 @@ export function Dialog({
             <DialogPanel
               ref={panelRef}
               className={clsx(
-                'divide-y divide-border bg-surface',
-                size !== 'fullscreen' &&
-                  'rounded-sm shadow-xl dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
-                size === 'fullscreen' && 'flex flex-col',
-                allowContentOverflow ? 'overflow-visible' : 'overflow-hidden',
+                'divide-y divide-border rounded-sm bg-surface shadow-xl dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
+                size === 'fullscreen' && 'flex flex-col overflow-auto',
+                allowContentOverflow && size !== 'fullscreen' ? 'overflow-visible' : undefined,
+                !allowContentOverflow && size !== 'fullscreen' ? 'overflow-hidden' : undefined,
                 sizeClasses[size],
                 className
               )}
@@ -129,7 +126,7 @@ export function Dialog({
                       <Description className="text-sm leading-5 text-muted dark:text-muted">{description}</Description>
                     )}
                   </div>
-                  {showCloseButton && size !== 'fullscreen' && !hideCloseButton && (
+                  {showCloseButton && !hideCloseButton && (
                     <button
                       type="button"
                       onClick={onClose}
