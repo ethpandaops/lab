@@ -171,6 +171,9 @@ export function DetailPage(): JSX.Element {
     seen_slot_start_diff: item.seen_slot_start_diff ?? 0,
     node_id: item.node_id ?? '',
     meta_client_geo_continent_code: item.meta_client_geo_continent_code,
+    meta_client_geo_city: item.meta_client_geo_city,
+    meta_client_geo_country: item.meta_client_geo_country,
+    classification: item.classification,
   }));
 
   // Transform blob/data column propagation data for chart
