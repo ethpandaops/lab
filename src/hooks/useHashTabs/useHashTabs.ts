@@ -57,26 +57,27 @@ export function useHashTabs(tabs: TabConfig[]): UseHashTabsReturn {
       const currentTab = tabs[tabIndex];
       if (currentTab?.anchors?.includes(hash)) {
         // Use setTimeout to ensure tab content is rendered before scrolling
+        // Increased timeout for initial page loads where tab content needs to render
         setTimeout(() => {
           const element = document.getElementById(hash);
           if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
-        }, 100);
+        }, 200);
       }
     },
     [tabs]
   );
 
   /**
-   * Handle initial anchor scroll on mount
+   * Handle anchor scroll when selectedIndex changes (including initial mount)
    */
   useEffect(() => {
     const hash = window.location.hash.replace('#', '');
     if (hash) {
       scrollToAnchor(hash, selectedIndex);
     }
-  }, [scrollToAnchor, selectedIndex]);
+  }, [selectedIndex, scrollToAnchor]);
 
   /**
    * Handle hash changes (browser back/forward and link clicks)
