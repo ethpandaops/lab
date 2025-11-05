@@ -67,7 +67,7 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
         city: point.meta_client_geo_city,
         country: point.meta_client_geo_country,
         classification: point.classification,
-        username: point.meta_client_name,
+        username: point.username,
       });
     });
 
