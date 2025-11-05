@@ -173,12 +173,6 @@ export function AttestationArrivalsChart({
             showLegend
             useNativeLegend
             syncGroup="slot-time"
-            grid={{
-              top: 40,
-              right: 20,
-              bottom: 60,
-              left: 60,
-            }}
           />
         </div>
       )}

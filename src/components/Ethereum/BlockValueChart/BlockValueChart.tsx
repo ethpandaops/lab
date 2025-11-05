@@ -98,9 +98,7 @@ export function BlockValueChart({
             valueDecimals: 3, // Show 3 decimals for ETH precision
           }}
           height={isInModal ? 600 : chartHeight}
-          showLegend={false}
           enableDataZoom={true}
-          animationDuration={300}
           relativeSlots={relativeSlots}
           syncGroup={syncGroup}
         />

@@ -81,7 +81,6 @@ export function AttestationVolumeChart({ data }: AttestationVolumeChartProps): R
           height={inModal ? 600 : 400}
           showLegend={true}
           enableDataZoom={true}
-          animationDuration={300}
         />
       )}
     </PopoutCard>

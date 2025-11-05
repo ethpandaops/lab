@@ -72,6 +72,11 @@ export interface BarChartProps {
    */
   max?: number;
   /**
+   * Number of segments to split the value axis into (ensures even intervals)
+   * @default 5
+   */
+  splitNumber?: number;
+  /**
    * Bar width as percentage
    * @default '60%'
    */

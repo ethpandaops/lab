@@ -258,16 +258,16 @@ export function MultiLineChart({
       nameTextStyle: { color: themeColors.muted },
       data: xAxis.type === 'category' ? xAxis.labels : undefined,
       boundaryGap: xAxis.type === 'category',
-      axisLine: { lineStyle: { color: themeColors.border } },
+      axisLine: {
+        show: true,
+        lineStyle: { color: themeColors.border },
+      },
       axisLabel: {
         color: themeColors.muted,
         formatter: xAxis.formatter || (relativeSlots ? (value: number) => formatSlotLabel(value) : undefined),
       },
       splitLine: {
-        lineStyle: {
-          color: themeColors.border,
-          opacity: 0.3,
-        },
+        show: false,
       },
       min: xAxis.type === 'value' ? xAxis.min : undefined,
       max: xAxis.type === 'value' ? xAxis.max : undefined,
@@ -280,13 +280,13 @@ export function MultiLineChart({
       nameLocation: 'middle' as const,
       nameGap: yAxis?.name ? 35 : 0,
       nameTextStyle: { color: themeColors.muted },
-      axisLine: { show: false },
+      axisLine: {
+        show: true,
+        lineStyle: { color: themeColors.border },
+      },
       axisTick: { show: false },
       splitLine: {
-        lineStyle: {
-          color: themeColors.border,
-          type: 'dashed' as const,
-        },
+        show: false,
       },
       axisLabel: {
         color: themeColors.muted,
@@ -399,18 +399,12 @@ export function MultiLineChart({
       return baseConfig;
     });
 
-    // Calculate grid padding
-    // Title is always rendered by component, never by ECharts
-    // ECharts v6: grid now handles label containment by default with explicit padding
-    const gridConfig = {
-      top: grid?.top ?? 16,
-      right: grid?.right ?? 24,
-      bottom:
-        grid?.bottom ?? (useNativeLegend && showLegend && legendPosition === 'bottom' ? 65 : xAxis.name ? 30 : 24),
-      left: grid?.left ?? (yAxis?.name ? 24 : 8),
-      // ECharts v6: use outerBounds instead of deprecated containLabel
-      outerBoundsMode: 'same' as const,
-      outerBoundsContain: 'axisLabel' as const,
+    // Calculate grid padding - just basic padding, let ECharts handle the rest
+    const gridConfig = grid ?? {
+      left: 60,
+      right: 24,
+      top: 16,
+      bottom: useNativeLegend && showLegend && legendPosition === 'bottom' ? 90 : 50,
     };
 
     // Create default smart tooltip formatter

@@ -61,8 +61,6 @@ export function TransactionCountChart({
         step: 'middle' as const,
         showArea: true,
         areaOpacity: 0.3,
-        lineWidth: 2,
-        showSymbol: false,
       },
     ];
 
@@ -95,7 +93,6 @@ export function TransactionCountChart({
           height={isInModal ? 600 : chartHeight}
           showLegend={false}
           enableDataZoom={true}
-          animationDuration={300}
           relativeSlots={relativeSlots}
           syncGroup={syncGroup}
         />

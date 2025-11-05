@@ -70,9 +70,6 @@ export function MevAdoptionChart({
           labels={['MEV-Boost', 'Locally Built']}
           height={isInModal ? 600 : chartHeight}
           axisName="Blocks"
-          showLabel={true}
-          labelPosition="top"
-          animationDuration={300}
         />
       )}
     </PopoutCard>

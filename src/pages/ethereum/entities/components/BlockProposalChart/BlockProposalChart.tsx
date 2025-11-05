@@ -78,9 +78,7 @@ export function BlockProposalChart({ data }: BlockProposalChartProps): React.JSX
             minInterval: 1, // Always prevent decimals for count data
           }}
           height={inModal ? 600 : 300}
-          showLegend={false}
           enableDataZoom={true}
-          animationDuration={300}
         />
       )}
     </PopoutCard>

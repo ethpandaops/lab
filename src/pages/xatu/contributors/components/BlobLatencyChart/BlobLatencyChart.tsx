@@ -71,7 +71,7 @@ export function BlobLatencyChart({ username }: BlobLatencyChartProps): JSX.Eleme
         name: 'Slot',
         min: minSlot,
         max: maxSlot,
-        formatter: (value: number | string) => Number(value).toLocaleString(),
+        formatter: (value: number | string) => formatSlot(Number(value)),
       }}
       yAxis={{
         name: 'Latency (ms)',

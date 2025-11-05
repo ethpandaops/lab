@@ -91,9 +91,7 @@ export function BaseFeeChart({
             valueDecimals: 2, // Show decimals for Gwei
           }}
           height={isInModal ? 600 : chartHeight}
-          showLegend={false}
           enableDataZoom={true}
-          animationDuration={300}
           relativeSlots={relativeSlots}
           syncGroup={syncGroup}
         />

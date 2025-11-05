@@ -96,12 +96,10 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           }
         : undefined,
       grid: {
-        // ECharts 6 automatically handles label overflow prevention
-        // Use minimal padding and let ECharts handle the rest
+        left: 60,
+        right: 24,
         top: title ? 40 : 16,
-        right: 16,
-        bottom: xAxisTitle ? 50 : 30,
-        left: yAxisTitle ? 60 : 16,
+        bottom: 50,
       },
       xAxis: {
         type: 'category',
@@ -116,6 +114,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           fontSize: 12,
         },
         axisLine: {
+          show: true,
           lineStyle: {
             color: themeColors.border,
           },
@@ -124,6 +123,9 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           color: themeColors.muted,
           fontSize: 12,
           interval: xAxisLabelInterval,
+        },
+        splitLine: {
+          show: false,
         },
       },
       yAxis: {
@@ -137,16 +139,16 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           fontSize: 12,
         },
         axisLine: {
-          show: false,
+          show: true,
+          lineStyle: {
+            color: themeColors.border,
+          },
         },
         axisTick: {
           show: false,
         },
         splitLine: {
-          lineStyle: {
-            color: themeColors.border,
-            type: 'dashed',
-          },
+          show: false,
         },
         axisLabel: {
           color: themeColors.muted,
