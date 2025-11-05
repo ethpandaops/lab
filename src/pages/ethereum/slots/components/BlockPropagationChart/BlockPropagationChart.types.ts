@@ -30,6 +30,11 @@ export interface BlockPropagationDataPoint {
    * @optional
    */
   classification?: string;
+  /**
+   * Name/username of the client
+   * @optional
+   */
+  meta_client_name?: string;
 }
 
 /**

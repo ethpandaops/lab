@@ -46,6 +46,7 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
         city?: string;
         country?: string;
         classification?: string;
+        username?: string;
       }
     >();
 
@@ -66,6 +67,7 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
         city: point.meta_client_geo_city,
         country: point.meta_client_geo_country,
         classification: point.classification,
+        username: point.meta_client_name,
       });
     });
 
@@ -134,6 +136,9 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
                 : metadata.country || metadata.continent;
 
             tooltip += `${p.marker} <strong>${metadata.nodeId}</strong><br/>`;
+            if (metadata.username) {
+              tooltip += `&nbsp;&nbsp;&nbsp;&nbsp;Username: ${metadata.username}<br/>`;
+            }
             if (location) {
               tooltip += `&nbsp;&nbsp;&nbsp;&nbsp;Location: ${location}<br/>`;
             }

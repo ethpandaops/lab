@@ -173,6 +173,7 @@ export function DetailPage(): JSX.Element {
     meta_client_geo_continent_code: item.meta_client_geo_continent_code,
     meta_client_geo_city: item.meta_client_geo_city,
     meta_client_geo_country: item.meta_client_geo_country,
+    meta_client_name: item.meta_client_name,
     classification: item.classification,
   }));
 
