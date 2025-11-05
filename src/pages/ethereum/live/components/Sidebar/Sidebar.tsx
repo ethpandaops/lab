@@ -2,8 +2,9 @@ import { type JSX, memo } from 'react';
 import clsx from 'clsx';
 import { Timeline } from '@/pages/ethereum/live/components/Timeline';
 import { ScrollingTimeline } from '@/components/Lists/ScrollingTimeline';
+import { Slot } from '@/components/Ethereum/Slot';
+import { Epoch } from '@/components/Ethereum/Epoch';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
-import { formatSlot, formatEpoch } from '@/utils';
 import type { SidebarProps } from './Sidebar.types';
 
 /**
@@ -15,6 +16,7 @@ import type { SidebarProps } from './Sidebar.types';
  */
 function SidebarComponent({
   currentSlot,
+  activeFork,
   phases,
   currentTime,
   slotDuration,
@@ -38,11 +40,21 @@ function SidebarComponent({
       {/* Slot Timeline section */}
       <div className="shrink-0 border-b border-border p-4">
         {/* Header with Slot number and Epoch subtitle */}
-        <div className="mb-3">
-          <h2 className="text-2xl font-bold text-foreground">
-            <span>{formatSlot(currentSlot)}</span>
-          </h2>
-          <p className="text-xs text-muted">Epoch {formatEpoch(epoch)}</p>
+        <div className="mb-3 flex items-center gap-3">
+          <div className="flex-1">
+            <h2 className="text-2xl font-bold text-foreground">
+              Slot <Slot slot={currentSlot} />
+            </h2>
+            <p className="text-xs text-muted">
+              Epoch <Epoch epoch={epoch} />
+            </p>
+          </div>
+          {activeFork && (
+            <div className="flex flex-col items-center gap-0.5" style={{ color: activeFork.color }}>
+              <span className="text-2xl leading-none">{activeFork.emoji}</span>
+              <span className="text-[10px] leading-none font-medium">{activeFork.displayName}</span>
+            </div>
+          )}
         </div>
 
         {/* Timeline */}
@@ -76,6 +88,7 @@ function SidebarComponent({
 const arePropsEqual = (prevProps: SidebarProps, nextProps: SidebarProps): boolean => {
   return (
     prevProps.currentSlot === nextProps.currentSlot &&
+    prevProps.activeFork?.name === nextProps.activeFork?.name &&
     prevProps.phases === nextProps.phases &&
     prevProps.currentTime === nextProps.currentTime &&
     prevProps.slotDuration === nextProps.slotDuration &&

@@ -8,7 +8,8 @@ import { AttestationArrivals } from '../AttestationArrivals';
 import type { BottomBarProps } from './BottomBar.types';
 
 function BottomBarComponent({
-  blockVersion,
+  activeFork,
+  blockVersion: _blockVersion,
   blobCount: _blobCount,
   dataColumnBlobCount,
   dataColumnFirstSeenData,
@@ -23,12 +24,16 @@ function BottomBarComponent({
 }: BottomBarProps): JSX.Element {
   const [selectedTab, setSelectedTab] = useState(0);
 
-  // Detect block version to choose availability component
-  const version = blockVersion?.toLowerCase() ?? '';
+  // Determine which availability component to show based on active fork
+  // This uses wallclock time (current epoch) to avoid fetching data before deciding which view to show
+  const forkName = activeFork?.name ?? '';
 
   // Determine which availability component to show
-  const showBlobAvailability = version.includes('deneb') || version.includes('electra') || !version;
-  const showDataColumnAvailability = version.includes('fulu');
+  // Fulu and later: show PeerDAS data column availability
+  // Deneb and Electra: show blob availability
+  // Earlier forks: show neither
+  const showBlobAvailability = forkName === 'deneb' || forkName === 'electra';
+  const showDataColumnAvailability = forkName === 'fulu' || forkName === 'glaos';
 
   return (
     <>
@@ -136,6 +141,7 @@ function BottomBarComponent({
 // Custom comparison function to prevent re-renders when data hasn't changed
 const arePropsEqual = (prevProps: BottomBarProps, nextProps: BottomBarProps): boolean => {
   return (
+    prevProps.activeFork?.name === nextProps.activeFork?.name &&
     prevProps.blockVersion === nextProps.blockVersion &&
     prevProps.currentSlot === nextProps.currentSlot &&
     prevProps.currentTime === nextProps.currentTime &&

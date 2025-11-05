@@ -174,8 +174,8 @@ export function ScrollingTimeline({
     <div
       ref={containerRef}
       className={clsx(
-        'overflow-x-hidden overflow-y-auto rounded-sm bg-background dark:bg-surface',
-        'scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border dark:scrollbar-thumb-border',
+        'overflow-x-hidden overflow-y-auto rounded-sm bg-surface',
+        'scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border',
         !height && 'flex-1',
         className
       )}
@@ -183,7 +183,7 @@ export function ScrollingTimeline({
     >
       <div className="relative">
         {/* Vertical timeline line */}
-        <div className="absolute top-0 left-14 h-full w-px bg-border dark:bg-surface" />
+        <div className="absolute top-0 left-14 h-full w-px bg-border" />
 
         {/* Timeline items */}
         <div className="space-y-0">

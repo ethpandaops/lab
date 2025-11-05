@@ -1,5 +1,6 @@
 import { type JSX, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useSlotPlayerState, useSlotPlayerProgress, useSlotPlayerActions } from '@/hooks/useSlotPlayer';
+import { useForks } from '@/hooks/useForks';
 import { Map2DChart } from '@/components/Charts/Map2D';
 import { Sidebar } from '../Sidebar';
 import { MobileSlotHeader } from '../MobileSlotHeader';
@@ -31,6 +32,9 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
   const { currentSlot, isPlaying } = useSlotPlayerState();
   const { slotProgress } = useSlotPlayerProgress();
   const actions = useSlotPlayerActions();
+
+  // Get active fork based on wallclock (current slot's epoch)
+  const { activeFork } = useForks();
 
   // Memoize the onTimeClick handler to prevent Sidebar re-renders
   const handleTimeClick = useCallback((timeMs: number) => actions.seekToTime(timeMs), [actions]);
@@ -246,6 +250,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
           <div className="col-span-3 overflow-hidden bg-surface">
             <Sidebar
               currentSlot={currentSlot}
+              activeFork={activeFork}
               phases={slotData.sidebarPhases}
               currentTime={currentTime}
               slotDuration={12000}
@@ -263,6 +268,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
         {/* Bottom Section - Charts */}
         <div className="h-[22vh] shrink-0 border-t border-border bg-surface">
           <BottomBar
+            activeFork={activeFork}
             blockVersion={slotData.blockDetails?.blockVersion}
             blobCount={slotData.blobCount}
             dataColumnBlobCount={slotData.dataColumnBlobCount}
@@ -285,6 +291,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
         <div className="h-[60px] shrink-0">
           <MobileSlotHeader
             currentSlot={currentSlot}
+            activeFork={activeFork}
             isPlaying={isPlaying}
             onPlayPause={actions.toggle}
             onBackward={actions.previousSlot}
@@ -324,6 +331,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
         {/* Bottom Bar - 25vh */}
         <div className="h-[25vh] shrink-0">
           <BottomBar
+            activeFork={activeFork}
             blockVersion={slotData.blockDetails?.blockVersion}
             blobCount={slotData.blobCount}
             dataColumnBlobCount={slotData.dataColumnBlobCount}

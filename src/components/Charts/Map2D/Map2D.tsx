@@ -83,13 +83,13 @@ export function Map2DChart({
       },
       itemStyle: {
         color: computedPointColor,
-        opacity: 0.85,
-        shadowBlur: 3,
+        opacity: 0.95,
+        shadowBlur: 5,
         shadowColor: computedPointColor,
         shadowOffsetX: 0,
         shadowOffsetY: 0,
-        borderWidth: 0,
-        borderColor: 'transparent',
+        borderWidth: 1,
+        borderColor: `${computedForegroundColor}20`,
       },
       emphasis: {
         scale: 1.4,
@@ -269,13 +269,13 @@ export function Map2DChart({
         center: [20, 20], // Center slightly towards Europe
         zoom: 1.2, // Balanced zoom level
         itemStyle: {
-          areaColor: `${themeColors.muted}15`, // 15 = ~8% opacity in hex
-          borderColor: `${themeColors.border}30`, // 30 = ~19% opacity in hex
-          borderWidth: 0.5,
+          areaColor: `${themeColors.muted}25`, // Increased opacity for better visibility
+          borderColor: `${themeColors.border}80`, // Much more visible borders
+          borderWidth: 1, // Thicker borders for better definition
         },
         emphasis: {
           itemStyle: {
-            areaColor: `${themeColors.muted}30`, // Slightly more visible on hover
+            areaColor: `${themeColors.muted}40`, // More visible on hover
           },
           label: {
             show: false,
