@@ -23,6 +23,7 @@ import { AttestationArrivalsChart } from './components/AttestationArrivalsChart'
 import { AttestationVotesBreakdownTable } from './components/AttestationVotesBreakdownTable';
 import { AttestationsByEntity } from '@/components/Ethereum/AttestationsByEntity';
 import { BlockPropagationChart } from './components/BlockPropagationChart';
+import { BlockClassificationCDFChart } from './components/BlockClassificationCDFChart';
 import { BlobPropagationChart } from './components/BlobPropagationChart';
 import { BlobDataColumnSpreadChart } from './components/BlobDataColumnSpreadChart';
 import { MevBiddingTimelineChart } from './components/MevBiddingTimelineChart';
@@ -766,6 +767,9 @@ export function DetailPage(): JSX.Element {
                     <BlockPropagationChart blockPropagationData={blockPropagationData} />
                     <BlobPropagationChart blobPropagationData={blobPropagationData} />
                   </div>
+                )}
+                {blockPropagationData.length > 0 && (
+                  <BlockClassificationCDFChart blockPropagationData={blockPropagationData} />
                 )}
                 {blobPropagationData.length > 0 && (
                   <BlobDataColumnSpreadChart blobPropagationData={blobPropagationData} slot={slot} />
