@@ -24,7 +24,7 @@ import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { formatEpoch } from '@/utils';
 import { weiToEth } from '@/utils/ethereum';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
-import { useHashTabs } from '@/hooks/useHashTabs';
+import { useTabState } from '@/hooks/useTabState';
 import { Route } from '@/routes/ethereum/epochs/$epoch';
 
 import { EpochHeader, EpochSlotsTable } from './components';
@@ -82,11 +82,11 @@ export function DetailPage(): React.JSX.Element {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [epoch, navigate]);
 
-  // Hash-based tab routing
-  const { selectedIndex, onChange } = useHashTabs([
-    { hash: 'slots' },
+  // Tab state management with URL search params
+  const { selectedIndex, onChange } = useTabState([
+    { id: 'slots' },
     {
-      hash: 'blocks',
+      id: 'blocks',
       anchors: [
         'blob-count-chart',
         'gas-chart',
@@ -96,9 +96,9 @@ export function DetailPage(): React.JSX.Element {
         'block-arrival-times-chart',
       ],
     },
-    { hash: 'validators', anchors: ['missed-attestations-chart'] },
+    { id: 'validators', anchors: ['missed-attestations-chart'] },
     {
-      hash: 'mev',
+      id: 'mev',
       anchors: [
         'mev-adoption-chart',
         'block-value-chart',
@@ -203,10 +203,10 @@ export function DetailPage(): React.JSX.Element {
       <div className="mt-8">
         <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
           <ScrollableTabs>
-            <Tab hash="slots">Slots</Tab>
-            <Tab hash="blocks">Blocks</Tab>
-            <Tab hash="validators">Validators</Tab>
-            <Tab hash="mev">MEV</Tab>
+            <Tab>Slots</Tab>
+            <Tab>Blocks</Tab>
+            <Tab>Validators</Tab>
+            <Tab>MEV</Tab>
           </ScrollableTabs>
 
           <TabPanels className="mt-6">
