@@ -43,3 +43,44 @@ export function getClassificationLabel(classification: string): string {
       return 'Unclassified';
   }
 }
+
+/**
+ * Get the description for a contributor classification
+ *
+ * @param classification - The classification type
+ * @returns Description of the classification
+ */
+export function getClassificationDescription(classification: string): string {
+  switch (classification) {
+    case 'individual':
+      return 'Public contributors (likely home stakers)';
+    case 'corporate':
+      return 'Public contributors (likely running in datacenters)';
+    case 'internal':
+      return 'Nodes run by the ethPandaOps team in datacenters';
+    default:
+      return 'Nodes with unknown classification';
+  }
+}
+
+/**
+ * Classification descriptions map with all known classifications
+ */
+export const CLASSIFICATION_DESCRIPTIONS: Record<string, { label: string; description: string }> = {
+  individual: {
+    label: 'Individual',
+    description: 'Public contributors (likely home stakers)',
+  },
+  corporate: {
+    label: 'Corporate',
+    description: 'Public contributors (likely running in datacenters)',
+  },
+  internal: {
+    label: 'Internal (ethPandaOps)',
+    description: 'Nodes run by the ethPandaOps team in datacenters',
+  },
+  unclassified: {
+    label: 'Unclassified',
+    description: 'Nodes with unknown classification',
+  },
+};
