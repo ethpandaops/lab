@@ -30,6 +30,8 @@ function MobileSlotHeaderComponent({
         <div className="flex flex-col">
           <Link
             to="/ethereum/slots/$slot"
+            preload="viewport"
+            preloadDelay={100}
             params={{ slot: currentSlot.toString() }}
             className="text-lg font-bold text-foreground hover:text-primary"
           >
@@ -37,6 +39,8 @@ function MobileSlotHeaderComponent({
           </Link>
           <Link
             to="/ethereum/epochs/$epoch"
+            preload="viewport"
+            preloadDelay={100}
             params={{ epoch: epoch.toString() }}
             className="text-xs text-muted hover:text-primary"
           >

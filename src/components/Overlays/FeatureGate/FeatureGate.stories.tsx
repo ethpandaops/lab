@@ -128,6 +128,7 @@ export const Default: Story = {
       history: createMemoryHistory({
         initialEntries: ['/ethereum/data-availability/custody?network=mainnet'],
       }),
+      defaultPendingMinMs: 0,
     });
 
     return (
