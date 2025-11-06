@@ -9,7 +9,7 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Tab } from '@/components/Navigation/Tab';
 import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
-import { useHashTabs } from '@/hooks/useHashTabs';
+import { useTabState } from '@/hooks/useTabState';
 import { Route } from '@/routes/ethereum/entities/$entity';
 
 import { AttestationRateChart, AttestationVolumeChart, EntityBasicInfoCard, RecentActivityTable } from './components';
@@ -47,11 +47,11 @@ export function DetailPage(): React.JSX.Element {
   // Fetch data for this entity
   const { data, isLoading, error } = useEntityDetailData(entityName ?? '');
 
-  // Hash-based tab routing
-  const { selectedIndex, onChange } = useHashTabs([
-    { hash: 'recent', anchors: ['recent-activity'] },
-    { hash: 'attestations', anchors: ['attestation-rate-chart', 'attestation-volume-chart'] },
-    { hash: 'blocks', anchors: ['block-proposals'] },
+  // Tab state management with URL search params
+  const { selectedIndex, onChange } = useTabState([
+    { id: 'recent', anchors: ['recent-activity'] },
+    { id: 'attestations', anchors: ['attestation-rate-chart', 'attestation-volume-chart'] },
+    { id: 'blocks', anchors: ['block-proposals'] },
   ]);
 
   // Handle invalid entity
@@ -112,9 +112,9 @@ export function DetailPage(): React.JSX.Element {
       <div className="mt-6">
         <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
           <ScrollableTabs>
-            <Tab hash="recent">Recent</Tab>
-            <Tab hash="attestations">Attestations</Tab>
-            <Tab hash="blocks">Blocks</Tab>
+            <Tab>Recent</Tab>
+            <Tab>Attestations</Tab>
+            <Tab>Blocks</Tab>
           </ScrollableTabs>
 
           <TabPanels className="mt-6">

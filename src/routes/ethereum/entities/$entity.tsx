@@ -1,9 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router';
-
+import { z } from 'zod';
 import { DetailPage } from '@/pages/ethereum/entities';
+
+const entitySearchSchema = z.object({
+  tab: z.enum(['recent', 'attestations', 'blocks']).default('recent'),
+});
 
 export const Route = createFileRoute('/ethereum/entities/$entity')({
   component: DetailPage,
+  validateSearch: entitySearchSchema,
   beforeLoad: ({ params }) => ({
     getBreadcrumb: () => ({ label: params.entity }),
     redirectOnNetworkChange: '/ethereum/entities',

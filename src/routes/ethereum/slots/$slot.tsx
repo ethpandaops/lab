@@ -1,8 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { z } from 'zod';
 import { DetailPage } from '@/pages/ethereum/slots';
+
+const slotSearchSchema = z.object({
+  tab: z.enum(['overview', 'block', 'attestations', 'propagation', 'execution', 'mev']).default('overview'),
+});
 
 export const Route = createFileRoute('/ethereum/slots/$slot')({
   component: DetailPage,
+  validateSearch: slotSearchSchema,
   beforeLoad: ({ params }) => ({
     getBreadcrumb: () => ({ label: params.slot }),
     redirectOnNetworkChange: '/ethereum/slots',

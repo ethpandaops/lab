@@ -13,7 +13,7 @@ import { Button } from '@/components/Elements/Button';
 import { SLOTS_PER_EPOCH, slotToTimestamp } from '@/utils/beacon';
 import { formatEpoch } from '@/utils';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
-import { useHashTabs } from '@/hooks/useHashTabs';
+import { useTabState } from '@/hooks/useTabState';
 import { useNetwork } from '@/hooks/useNetwork';
 import { Route } from '@/routes/ethereum/slots/$slot';
 import { useSlotDetailData } from './hooks/useSlotDetailData';
@@ -91,14 +91,14 @@ export function DetailPage(): JSX.Element {
     !!currentNetwork && slotTimestamp > 0
   );
 
-  // Hash-based tab routing
-  const { selectedIndex, onChange } = useHashTabs([
-    { hash: 'overview' },
-    { hash: 'block' },
-    { hash: 'attestations', anchors: ['missed-attestations'] },
-    { hash: 'propagation' },
-    { hash: 'execution' },
-    { hash: 'mev' },
+  // Tab state management with URL search params
+  const { selectedIndex, onChange } = useTabState([
+    { id: 'overview' },
+    { id: 'block' },
+    { id: 'attestations', anchors: ['missed-attestations'] },
+    { id: 'propagation' },
+    { id: 'execution' },
+    { id: 'mev' },
   ]);
 
   // Validate slot number
@@ -301,12 +301,12 @@ export function DetailPage(): JSX.Element {
       <div className="mt-8">
         <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
           <ScrollableTabs>
-            <Tab hash="overview">Overview</Tab>
-            <Tab hash="block">Block</Tab>
-            <Tab hash="attestations">Attestations</Tab>
-            <Tab hash="propagation">Propagation</Tab>
-            <Tab hash="execution">Execution</Tab>
-            {hasMevData && <Tab hash="mev">MEV</Tab>}
+            <Tab>Overview</Tab>
+            <Tab>Block</Tab>
+            <Tab>Attestations</Tab>
+            <Tab>Propagation</Tab>
+            <Tab>Execution</Tab>
+            {hasMevData && <Tab>MEV</Tab>}
           </ScrollableTabs>
 
           <TabPanels className="mt-6">

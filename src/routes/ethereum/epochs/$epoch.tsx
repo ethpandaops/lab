@@ -1,9 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router';
-
+import { z } from 'zod';
 import { DetailPage } from '@/pages/ethereum/epochs';
+
+const epochSearchSchema = z.object({
+  tab: z.enum(['slots', 'blocks', 'validators', 'mev']).default('slots'),
+});
 
 export const Route = createFileRoute('/ethereum/epochs/$epoch')({
   component: DetailPage,
+  validateSearch: epochSearchSchema,
   beforeLoad: ({ params }) => ({
     getBreadcrumb: () => ({ label: params.epoch }),
     redirectOnNetworkChange: '/ethereum/epochs',
