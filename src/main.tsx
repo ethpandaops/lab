@@ -16,6 +16,9 @@ const router = createRouter({
   defaultErrorComponent: FatalError,
   defaultNotFoundComponent: NotFound,
   scrollRestoration: true,
+  defaultPendingMinMs: 0, // https://github.com/TanStack/router/discussions/1765#discussioncomment-10046260
+  defaultPreload: 'intent', // preload on hover/touch
+  defaultPreloadDelay: 50, // wait 50ms before preloading (prevents accidental hovers)
 });
 
 // Register the router instance for type safety

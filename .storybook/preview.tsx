@@ -110,6 +110,7 @@ const preview: Preview = {
         history: createMemoryHistory({
           initialEntries: [initialUrl + searchString],
         }),
+        defaultPendingMinMs: 0,
       });
 
       return (

@@ -122,6 +122,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                           <ListItem key={page.to}>
                             <Link
                               to={page.to}
+                              preload="viewport"
+                              preloadDelay={100}
                               className="group flex gap-x-3 rounded-lg px-2.5 py-2 text-base font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary lg:py-1.5 lg:text-sm/6"
                               activeProps={{
                                 className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
@@ -140,6 +142,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                           <ListItem key={page.to}>
                             <Link
                               to={page.to}
+                              preload="viewport"
+                              preloadDelay={100}
                               className="group flex gap-x-3 rounded-lg px-2.5 py-2 text-base font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary lg:py-1.5 lg:text-sm/6"
                               activeProps={{
                                 className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
@@ -158,6 +162,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                           <ListItem key={page.to}>
                             <Link
                               to={page.to}
+                              preload="viewport"
+                              preloadDelay={100}
                               className="group flex gap-x-3 rounded-lg px-2.5 py-2 text-base font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary lg:py-1.5 lg:text-sm/6"
                               activeProps={{
                                 className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
@@ -178,6 +184,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                         <ListItem key={page.to}>
                           <Link
                             to={page.to}
+                            preload="viewport"
+                            preloadDelay={100}
                             className="group flex gap-x-3 rounded-lg px-2.5 py-2 text-base font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary lg:py-1.5 lg:text-sm/6"
                             activeProps={{
                               className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
@@ -229,6 +237,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                       <ListItem key={page.to}>
                         <Link
                           to={page.to}
+                          preload="viewport"
+                          preloadDelay={100}
                           className="group flex gap-x-3 px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
                           activeProps={{
                             className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
@@ -247,6 +257,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                       <ListItem key={page.to}>
                         <Link
                           to={page.to}
+                          preload="viewport"
+                          preloadDelay={100}
                           className="group flex gap-x-3 px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
                           activeProps={{
                             className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
@@ -265,6 +277,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                       <ListItem key={page.to}>
                         <Link
                           to={page.to}
+                          preload="viewport"
+                          preloadDelay={100}
                           className="group flex gap-x-3 px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
                           activeProps={{
                             className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
@@ -285,6 +299,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                     <ListItem key={page.to}>
                       <Link
                         to={page.to}
+                        preload="viewport"
+                        preloadDelay={100}
                         className="group flex gap-x-3 px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
                         activeProps={{
                           className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
