@@ -143,7 +143,7 @@ export function IndexPage(): React.JSX.Element {
           }}
           yAxis={{ name: 'Missed' }}
           title="Offline Validators"
-          topN={10}
+          topN={Infinity}
           anchorId="offline-validators-chart"
           emptyMessage="No offline validators detected in these epochs"
         />

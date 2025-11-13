@@ -163,12 +163,13 @@ export function useEpochsData(): UseEpochsDataReturn {
 
       livenessData.forEach((record: FctAttestationLivenessByEntityHead) => {
         const entity = record.entity ?? 'Unknown';
+        const count = record.attestation_count ?? 0;
         if (!entityMap.has(entity)) {
           entityMap.set(entity, new Map());
         }
         const epochMap = entityMap.get(entity)!;
         const currentCount = epochMap.get(epoch) ?? 0;
-        epochMap.set(epoch, currentCount + 1);
+        epochMap.set(epoch, currentCount + count);
       });
     });
 

@@ -20,12 +20,13 @@ import type { TopEntitiesChartProps } from './TopEntitiesChart.types';
  *
  * Features:
  * - Automatically ranks entities by total metric value
- * - Selects top N entities for display
+ * - Selects top N entities for display (or all entities if topN is Infinity)
  * - Fills in missing data points with 0 across the full x-axis range
  * - Shows total metric count in subtitle
  * - Handles empty data gracefully
+ * - Scrollable legend when showing all entities
  *
- * @example Missed attestations by slot
+ * @example Missed attestations by slot (top 10)
  * ```tsx
  * <TopEntitiesChart
  *   data={missedAttestations.map(m => ({
@@ -37,6 +38,21 @@ import type { TopEntitiesChartProps } from './TopEntitiesChart.types';
  *   yAxis={{ name: 'Missed Attestations' }}
  *   title="Offline Validators"
  *   topN={10}
+ * />
+ * ```
+ *
+ * @example All entities (scrollable)
+ * ```tsx
+ * <TopEntitiesChart
+ *   data={missedAttestations.map(m => ({
+ *     x: m.slot,
+ *     entity: m.validatorName,
+ *     count: m.missedCount
+ *   }))}
+ *   xAxis={{ name: 'Slot' }}
+ *   yAxis={{ name: 'Missed Attestations' }}
+ *   title="Offline Validators"
+ *   topN={Infinity}
  * />
  * ```
  *
@@ -82,11 +98,12 @@ export function TopEntitiesChart({
       entityTotals.set(record.entity, current + record.count);
     });
 
-    // Get top N entities by total count
-    const topEntities = Array.from(entityTotals.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, topN)
-      .map(([entity]) => entity);
+    // Get top N entities by total count (or all if topN is Infinity)
+    const sortedEntities = Array.from(entityTotals.entries()).sort((a, b) => b[1] - a[1]);
+    const topEntities =
+      topN === Infinity
+        ? sortedEntities.map(([entity]) => entity)
+        : sortedEntities.slice(0, topN).map(([entity]) => entity);
 
     if (topEntities.length === 0) {
       return { topEntities: [], series: [], minX: 0, maxX: 0, totalCount: 0 };
