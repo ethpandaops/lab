@@ -120,17 +120,28 @@ function RootComponent(): JSX.Element {
   const [isAppleWatch, setIsAppleWatch] = useState(false);
   const router = useRouter();
 
-  // Detect Apple Watch screen size (312-416px wide across all models)
+  // Detect Apple Watch using multiple heuristics
+  // Apple Watch reports as iPhone but has distinctive screen dimensions
   useEffect(() => {
-    const checkScreenSize = (): void => {
-      setIsAppleWatch(window.innerWidth <= 416);
+    const checkIsAppleWatch = (): void => {
+      const isIOS = /iPhone/.test(navigator.userAgent);
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+
+      // Apple Watch specific dimensions (all models: 312-416px wide, 340-502px tall)
+      // Exclude iPhone dimensions which start at 375px wide minimum (iPhone SE)
+      const isWatchWidth = screenWidth >= 312 && screenWidth <= 416;
+      const isWatchHeight = screenHeight >= 340 && screenHeight <= 502;
+      const isTooSmallForPhone = screenWidth < 375; // iPhones are 375px+ wide
+
+      setIsAppleWatch(isIOS && isWatchWidth && isWatchHeight && isTooSmallForPhone);
     };
 
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
+    checkIsAppleWatch();
+    window.addEventListener('resize', checkIsAppleWatch);
 
     return () => {
-      window.removeEventListener('resize', checkScreenSize);
+      window.removeEventListener('resize', checkIsAppleWatch);
     };
   }, []);
 
