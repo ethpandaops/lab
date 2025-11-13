@@ -201,7 +201,7 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
           id: 'accepted',
           label: 'Accepted',
           icon: LockClosedIcon,
-          color: 'primary',
+          color: 'success',
           timestamp: acceptanceTime,
           description: 'Block achieved acceptance',
           stats: `This block achieved acceptance at ${acceptanceSeconds}s`,

@@ -12,6 +12,7 @@ import type { PhaseNodeProps } from '../../SlotProgressTimeline.types';
  */
 export function PhaseNode({ phase, status, showStats = true, onClick, className }: PhaseNodeProps): JSX.Element {
   const Icon = phase.icon;
+  const isSuccess = phase.color === 'success';
 
   return (
     <div className={clsx('flex flex-col items-center justify-start gap-2', className)}>
@@ -26,12 +27,16 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
           status === 'pending' && ['bg-surface text-muted', !onClick && 'cursor-default'],
           // Active state
           status === 'active' && [
-            'bg-primary/10 text-primary',
+            isSuccess ? 'bg-success/10 text-success' : 'bg-primary/10 text-primary',
             onClick && 'cursor-pointer',
             !onClick && 'cursor-default',
           ],
           // Completed state
-          status === 'completed' && ['bg-surface text-muted', onClick && 'cursor-pointer', !onClick && 'cursor-default']
+          status === 'completed' && [
+            isSuccess ? 'bg-success/10 text-success' : 'bg-surface text-muted',
+            onClick && 'cursor-pointer',
+            !onClick && 'cursor-default',
+          ]
         )}
         title={phase.description}
         aria-label={`${phase.label}: ${status}`}
@@ -58,8 +63,8 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
           className={clsx(
             'text-center font-mono text-[10px] leading-tight',
             status === 'pending' && 'text-muted/50',
-            status === 'active' && 'text-primary',
-            status === 'completed' && 'text-muted/70'
+            status === 'active' && (isSuccess ? 'text-success' : 'text-primary'),
+            status === 'completed' && (isSuccess ? 'text-success/70' : 'text-muted/70')
           )}
         >
           {phase.id !== 'attesting' && phase.timestamp !== undefined
