@@ -265,10 +265,10 @@
   }
 
   html.star {
-    /* Star mode - aurora borealis with pink and purple */
+    /* Star mode - aurora borealis with cyan and purple (no pink gradient) */
     --primary-value: var(--color-aurora-cyan-400);
     --secondary-value: var(--color-aurora-purple-600);
-    --accent-value: var(--color-aurora-pink-500);
+    --accent-value: var(--color-aurora-cyan-300);
     --background-value: var(--color-aurora-blue-950);
     --surface-value: #0a1428;
     --foreground-value: var(--color-aurora-cyan-50);
