@@ -52,16 +52,83 @@ function BlobDataAvailabilityComponent({
 
   // Prepare Continental Propagation data for MultiLineChart
   // Convert time from milliseconds to seconds for display
+  // Densify data with regular intervals for better tooltip interaction
   const continentalLineSeries = useMemo(() => {
     const defaultColors = Object.values(CONTINENT_COLORS);
+    const intervalMs = 50; // Add data points every 50ms for smooth tooltip
 
-    return visibleContinentalPropagationData.map((continent, idx) => ({
-      name: continent.continent,
-      data: continent.data.map(point => [point.time / 1000, point.percentage] as [number, number]),
-      color: continent.color || defaultColors[idx % defaultColors.length],
-      step: 'end' as const,
-    }));
+    // Find the actual maximum time from the visible data (not maxTime which is the full slot)
+    const actualMaxTime = Math.max(
+      0,
+      ...visibleContinentalPropagationData.flatMap(continent => continent.data.map(point => point.time))
+    );
+
+    return visibleContinentalPropagationData.map((continent, idx) => {
+      const originalData = continent.data;
+      if (originalData.length === 0) {
+        return {
+          name: continent.continent,
+          data: [],
+          color: continent.color || defaultColors[idx % defaultColors.length],
+          step: 'end' as const,
+        };
+      }
+
+      // Create densified data with regular intervals
+      const densifiedData: [number, number][] = [];
+
+      // Start from 0 and go up to the actual max time in the visible data
+      const startTime = 0;
+      const endTime = actualMaxTime;
+
+      // Generate points at regular intervals
+      for (let time = startTime; time <= endTime; time += intervalMs) {
+        // Find the appropriate value for this time (step function)
+        // Use the value from the last data point that occurred before or at this time
+        const applicablePoint = originalData.filter(p => p.time <= time).sort((a, b) => b.time - a.time)[0];
+
+        const currentValue = applicablePoint?.percentage ?? 0;
+        densifiedData.push([time / 1000, currentValue]);
+      }
+
+      return {
+        name: continent.continent,
+        data: densifiedData,
+        color: continent.color || defaultColors[idx % defaultColors.length],
+        step: 'end' as const,
+      };
+    });
   }, [visibleContinentalPropagationData, CONTINENT_COLORS]);
+
+  // Tooltip formatter for continental propagation chart
+  // Shows slot time with 2 decimal places (e.g., "4.45s")
+  const continentalTooltipFormatter = (params: unknown): string => {
+    const dataPoints = Array.isArray(params) ? params : [params];
+    let html = '';
+
+    // Add time header with 2 decimal places
+    if (dataPoints.length > 0 && dataPoints[0]) {
+      const firstPoint = dataPoints[0] as { axisValue?: number };
+      if (firstPoint.axisValue !== undefined) {
+        html += `<div style="margin-bottom: 4px; font-weight: 600;">${firstPoint.axisValue.toFixed(2)}s</div>`;
+      }
+    }
+
+    // Add each series
+    dataPoints.forEach(point => {
+      const p = point as { marker?: string; seriesName?: string; value?: [number, number] };
+      if (p.marker && p.seriesName !== undefined && p.value) {
+        const percentage = p.value[1];
+        html += `<div style="display: flex; align-items: center; gap: 8px;">`;
+        html += p.marker;
+        html += `<span>${p.seriesName}:</span>`;
+        html += `<span style="font-weight: 600; margin-left: auto;">${percentage.toFixed(1)}%</span>`;
+        html += `</div>`;
+      }
+    });
+
+    return html;
+  };
 
   // Render based on variant
   if (variant === 'first-seen-only') {
@@ -100,9 +167,9 @@ function BlobDataAvailabilityComponent({
             xAxis={{ type: 'value', name: 'Slot Time (s)', min: 0, max: maxTime / 1000 }}
             yAxis={{ name: 'Complete (%)', max: 100 }}
             height="100%"
-            showLegend={true}
-            legendPosition="bottom"
-            useNativeLegend={true}
+            showLegend={false}
+            tooltipTrigger="axis"
+            tooltipFormatter={continentalTooltipFormatter}
             animationDuration={0}
           />
         </div>
@@ -146,9 +213,9 @@ function BlobDataAvailabilityComponent({
               xAxis={{ type: 'value', name: 'Slot Time (s)', min: 0, max: maxTime / 1000 }}
               yAxis={{ name: 'Complete (%)', max: 100 }}
               height="100%"
-              showLegend={true}
-              legendPosition="bottom"
-              useNativeLegend={true}
+              showLegend={false}
+              tooltipTrigger="axis"
+              tooltipFormatter={continentalTooltipFormatter}
               animationDuration={0}
             />
           </div>
@@ -162,9 +229,9 @@ function BlobDataAvailabilityComponent({
           xAxis={{ type: 'value', name: 'Slot Time (s)', min: 0, max: maxTime / 1000 }}
           yAxis={{ name: 'Complete (%)', max: 100 }}
           height="100%"
-          showLegend={true}
-          legendPosition="bottom"
-          useNativeLegend={true}
+          showLegend={false}
+          tooltipTrigger="axis"
+          tooltipFormatter={continentalTooltipFormatter}
           animationDuration={0}
         />
       </div>
