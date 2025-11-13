@@ -70,7 +70,7 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
         id: 'builders',
         label: 'Builders',
         icon: CubeIcon,
-        color: 'accent',
+        color: 'secondary',
         timestamp: 0, // Always start at slot start
         description: 'MEV builders bidding phase',
         stats: builderCount > 0 ? `${builderCount} builder${builderCount > 1 ? 's' : ''}` : undefined,
@@ -90,7 +90,7 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
         id: 'proposing',
         label: 'Proposing',
         icon: UserIcon,
-        color: 'primary',
+        color: 'secondary',
         timestamp: firstBlockSeenTime,
         description: isMissed ? 'Block was never proposed' : 'Block proposed to network',
         stats: undefined,
@@ -100,7 +100,7 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
         id: 'attesting',
         label: 'Attesting',
         icon: CheckCircleIcon,
-        color: 'warning',
+        color: 'secondary',
         timestamp: firstBlockSeenTime !== undefined ? firstBlockSeenTime + 50 : undefined,
         duration:
           firstBlockSeenTime !== undefined && acceptanceTime !== undefined
@@ -114,7 +114,7 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
         id: 'accepted',
         label: 'Accepted',
         icon: LockClosedIcon,
-        color: 'success',
+        color: 'secondary',
         timestamp: acceptanceTime,
         description: 'Block achieved acceptance',
         stats: acceptanceTime !== undefined ? `>66%` : undefined,
