@@ -96,7 +96,7 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
       </button>
 
       {/* Phase label, time, and stats */}
-      <div className="flex flex-col items-center justify-start gap-0.5">
+      <div className="flex flex-col items-center justify-start gap-1">
         <span
           className={clsx(
             'text-center font-medium transition-colors duration-300',
@@ -110,39 +110,39 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
         </span>
 
         {/* Time badge - shows when phase occurred */}
-        {phase.id !== 'attesting' && (
-          <span
-            className={clsx(
-              'transition-colors duration-300',
-              status === 'pending' && 'text-muted opacity-50',
-              status === 'active' && 'text-foreground',
-              status === 'completed' && 'text-muted'
-            )}
-            style={{
-              fontSize: '11px',
-              ...(status === 'active' ? { color: phaseColor } : {}),
-            }}
-          >
-            {phase.timestamp !== undefined
-              ? phase.timestamp < 0
-                ? `${Math.abs(phase.timestamp / 1000).toFixed(1)}s early`
-                : `${(phase.timestamp / 1000).toFixed(1)}s`
-              : '—'}
-          </span>
-        )}
-
-        {/* Stats - always reserve space to prevent height changes */}
         <span
           className={clsx(
-            'transition-colors duration-300',
+            'text-center transition-colors duration-300',
             status === 'pending' && 'text-muted opacity-50',
             status === 'active' && 'text-foreground',
             status === 'completed' && 'text-muted',
             // Reserve space even when empty
-            'min-h-[0.5rem]'
+            'min-h-[13px]'
           )}
           style={{
-            fontSize: '8px',
+            fontSize: '11px',
+            ...(status === 'active' ? { color: phaseColor } : {}),
+          }}
+        >
+          {phase.id !== 'attesting' && phase.timestamp !== undefined
+            ? phase.timestamp < 0
+              ? `${Math.abs(phase.timestamp / 1000).toFixed(1)}s early`
+              : `${(phase.timestamp / 1000).toFixed(1)}s`
+            : '\u00A0'}
+        </span>
+
+        {/* Stats - always reserve space to prevent height changes */}
+        <span
+          className={clsx(
+            'text-center transition-colors duration-300',
+            status === 'pending' && 'text-muted opacity-50',
+            status === 'active' && 'text-foreground',
+            status === 'completed' && 'text-muted',
+            // Reserve space even when empty
+            'min-h-[10px]'
+          )}
+          style={{
+            fontSize: '9px',
             ...(status === 'active' ? { color: phaseColor } : {}),
           }}
         >

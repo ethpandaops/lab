@@ -94,7 +94,7 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
         color: 'primary',
         timestamp: firstBlockSeenTime,
         description: isMissed ? 'Block was never proposed' : 'Block proposed to network',
-        stats: blockMev?.builder_pubkey ? 'External' : firstBlockSeenTime !== undefined ? 'Local' : undefined,
+        stats: blockMev ? 'External' : firstBlockSeenTime !== undefined ? 'Local' : undefined,
       },
       // Phase 4: Attesting - starts 50ms after Proposing
       {

@@ -123,8 +123,7 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
 
     // Phase 3: Proposing
     if (firstBlockSeenTime !== undefined) {
-      const builderPubkey = blockMev?.builder_pubkey;
-      const builderName = builderPubkey ? 'external builder' : 'local build';
+      const builderName = blockMev ? 'external builder' : 'local build';
 
       phasesList.push({
         id: 'proposing',
