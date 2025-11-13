@@ -112,7 +112,7 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
           id: 'relaying',
           label: 'Relaying',
           icon: ArrowPathIcon,
-          color: 'primary',
+          color: 'secondary',
           timestamp: buildersEndTime,
           description: 'Block relay phase',
           stats: `${relayCount} relay${relayCount !== 1 ? 's' : ''} involved`,
@@ -123,16 +123,14 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
 
     // Phase 3: Proposing
     if (firstBlockSeenTime !== undefined) {
-      const builderName = blockMev ? 'external builder' : 'local build';
-
       phasesList.push({
         id: 'proposing',
         label: 'Proposing',
         icon: UserIcon,
-        color: 'secondary',
+        color: 'primary',
         timestamp: firstBlockSeenTime,
         description: 'Block proposed to network',
-        stats: `Built via ${builderName}`,
+        stats: undefined,
         isCompleted: true,
       });
     }
@@ -146,7 +144,7 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
         id: 'gossiping',
         label: 'Gossiping',
         icon: ChatBubbleBottomCenterTextIcon,
-        color: 'success',
+        color: 'secondary',
         timestamp: firstBlockSeenTime,
         duration: gossipDuration,
         description: 'Block propagating to network',
@@ -187,7 +185,7 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
         id: 'attesting',
         label: 'Attesting',
         icon: CheckCircleIcon,
-        color: 'primary',
+        color: 'warning',
         timestamp: firstAttestationTime,
         duration: attestingDuration,
         description: 'Validators attesting to block',

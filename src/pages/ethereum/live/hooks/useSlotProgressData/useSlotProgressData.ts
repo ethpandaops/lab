@@ -18,8 +18,7 @@ import type { SlotProgressRawData, UseSlotProgressDataReturn } from './useSlotPr
  */
 export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgressDataReturn {
   const phases = useMemo<PhaseData[]>(() => {
-    const { blockHead, blockProposer, blockMev, blockPropagation, attestations, committees, mevBidding, relayBids } =
-      rawData;
+    const { blockHead, blockProposer, blockPropagation, attestations, committees, mevBidding, relayBids } = rawData;
 
     // Calculate total expected validators from committee data
     const totalExpectedValidators = committees.reduce((sum, committee) => {
@@ -71,7 +70,7 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
         id: 'builders',
         label: 'Builders',
         icon: CubeIcon,
-        color: 'primary',
+        color: 'accent',
         timestamp: 0, // Always start at slot start
         description: 'MEV builders bidding phase',
         stats: builderCount > 0 ? `${builderCount} builder${builderCount > 1 ? 's' : ''}` : undefined,
@@ -81,7 +80,7 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
         id: 'relaying',
         label: 'Relaying',
         icon: ArrowPathIcon,
-        color: 'primary',
+        color: 'secondary',
         timestamp: winningBidTime,
         description: 'Winning MEV bid selected',
         stats: relayCount > 0 ? `${relayCount} relay${relayCount !== 1 ? 's' : ''}` : undefined,
@@ -94,14 +93,14 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
         color: 'primary',
         timestamp: firstBlockSeenTime,
         description: isMissed ? 'Block was never proposed' : 'Block proposed to network',
-        stats: blockMev ? 'External' : firstBlockSeenTime !== undefined ? 'Local' : undefined,
+        stats: undefined,
       },
       // Phase 4: Attesting - starts 50ms after Proposing
       {
         id: 'attesting',
         label: 'Attesting',
         icon: CheckCircleIcon,
-        color: 'primary',
+        color: 'warning',
         timestamp: firstBlockSeenTime !== undefined ? firstBlockSeenTime + 50 : undefined,
         duration:
           firstBlockSeenTime !== undefined && acceptanceTime !== undefined
@@ -115,7 +114,7 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
         id: 'accepted',
         label: 'Accepted',
         icon: LockClosedIcon,
-        color: 'primary',
+        color: 'success',
         timestamp: acceptanceTime,
         description: 'Block achieved acceptance',
         stats: acceptanceTime !== undefined ? `>66%` : undefined,
