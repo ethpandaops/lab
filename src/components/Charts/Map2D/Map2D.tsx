@@ -287,7 +287,7 @@ function Map2DChartComponent({
       series,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapLoaded, routes, showEffect, lineColor, title]); // Recalculate when key props change
+  }, [mapLoaded]); // Only recalculate when map loads - after that we update via setOption
 
   // Don't render until map is loaded
   if (!mapLoaded) {
