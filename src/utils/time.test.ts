@@ -177,17 +177,17 @@ describe('getRelativeTime', () => {
 
 describe('formatTimestamp', () => {
   it('should format timestamp with default options', () => {
-    // Jan 1, 2021 00:00:00 GMT
-    const timestamp = 1609459200;
+    // Jan 15, 2021 12:00:00 GMT (midday to avoid timezone edge cases)
+    const timestamp = 1610712000;
     const result = formatTimestamp(timestamp);
     // Result will vary by timezone, so just check it's a non-empty string with expected parts
     expect(result).toMatch(/Jan/);
-    expect(result).toMatch(/1/);
+    expect(result).toMatch(/15/);
     expect(result).toMatch(/2021/);
   });
 
   it('should format timestamp with custom options', () => {
-    const timestamp = 1609459200;
+    const timestamp = 1610712000; // Jan 15, 2021 12:00:00 GMT
     const result = formatTimestamp(timestamp, {
       dateStyle: 'short',
       timeStyle: 'short',
@@ -198,19 +198,19 @@ describe('formatTimestamp', () => {
   });
 
   it('should format timestamp with only date', () => {
-    const timestamp = 1609459200;
+    const timestamp = 1610712000; // Jan 15, 2021 12:00:00 GMT
     const result = formatTimestamp(timestamp, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
     expect(result).toMatch(/January/);
-    expect(result).toMatch(/1/);
+    expect(result).toMatch(/15/);
     expect(result).toMatch(/2021/);
   });
 
   it('should format timestamp with only time', () => {
-    const timestamp = 1609459200;
+    const timestamp = 1610712000; // Jan 15, 2021 12:00:00 GMT
     const result = formatTimestamp(timestamp, {
       hour: '2-digit',
       minute: '2-digit',
@@ -221,21 +221,21 @@ describe('formatTimestamp', () => {
   });
 
   it('should handle zero timestamp (epoch)', () => {
-    const timestamp = 0;
+    const timestamp = 43200; // Jan 1, 1970 12:00:00 GMT (midday to avoid timezone edge cases)
     const result = formatTimestamp(timestamp);
     expect(result).toMatch(/1970/);
   });
 
   it('should handle recent timestamp', () => {
-    // Nov 1, 2023
-    const timestamp = 1698796800;
+    // Nov 1, 2023 12:00:00 GMT (midday to avoid timezone edge cases)
+    const timestamp = 1698840000;
     const result = formatTimestamp(timestamp);
     expect(result).toMatch(/Nov/);
     expect(result).toMatch(/2023/);
   });
 
   it('should handle timestamp with specific locale format', () => {
-    const timestamp = 1609459200;
+    const timestamp = 1610712000; // Jan 15, 2021 12:00:00 GMT (Friday)
     const result = formatTimestamp(timestamp, {
       weekday: 'long',
       year: 'numeric',
@@ -244,12 +244,12 @@ describe('formatTimestamp', () => {
     });
     expect(result).toMatch(/Friday/);
     expect(result).toMatch(/January/);
-    expect(result).toMatch(/1/);
+    expect(result).toMatch(/15/);
     expect(result).toMatch(/2021/);
   });
 
   it('should format with short month name', () => {
-    const timestamp = 1609459200;
+    const timestamp = 1610712000; // Jan 15, 2021 12:00:00 GMT
     const result = formatTimestamp(timestamp, {
       month: 'short',
       day: 'numeric',
@@ -259,7 +259,7 @@ describe('formatTimestamp', () => {
   });
 
   it('should format with numeric month', () => {
-    const timestamp = 1609459200;
+    const timestamp = 1610712000; // Jan 15, 2021 12:00:00 GMT
     const result = formatTimestamp(timestamp, {
       month: 'numeric',
       day: 'numeric',
@@ -270,8 +270,8 @@ describe('formatTimestamp', () => {
   });
 
   it('should handle far future timestamp', () => {
-    // Jan 1, 2030
-    const timestamp = 1893456000;
+    // Jan 15, 2030 12:00:00 GMT (midday to avoid timezone edge cases)
+    const timestamp = 1894680000;
     const result = formatTimestamp(timestamp);
     expect(result).toMatch(/2030/);
   });
