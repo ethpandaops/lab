@@ -129,7 +129,7 @@ function SlotTimelineComponent({
         <div
           className={clsx(
             'relative flex overflow-hidden rounded-sm border border-border',
-            onTimeClick && 'cursor-pointer touch-none select-none',
+            onTimeClick && 'cursor-col-resize touch-none select-none',
             isDragging && 'cursor-grabbing'
           )}
           style={{ height: `${height}px` }}

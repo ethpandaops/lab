@@ -41,22 +41,22 @@ export const DEFAULT_BEACON_SLOT_PHASES: SlotPhase[] = [
   {
     label: 'Block',
     duration: ATTESTATION_DEADLINE_MS,
-    className: 'bg-cyan-500',
-    textClassName: 'text-cyan-200 font-bold',
+    className: 'bg-surface border-b-4 border-b-cyan-500/50',
+    textClassName: 'text-cyan-600 dark:text-cyan-400 font-bold',
     description: 'Proposer broadcasts block',
   },
   {
     label: 'Attestations',
     duration: 4000,
-    className: 'bg-green-500',
-    textClassName: 'text-green-200 font-bold',
+    className: 'bg-surface border-b-4 border-b-green-500/50',
+    textClassName: 'text-green-600 dark:text-green-400 font-bold',
     description: 'Validators attest to block',
   },
   {
     label: 'Aggregations',
     duration: 4000,
-    className: 'bg-amber-500',
-    textClassName: 'text-amber-200 font-bold',
+    className: 'bg-surface border-b-4 border-b-amber-500/50',
+    textClassName: 'text-amber-600 dark:text-amber-400 font-bold',
     description: 'Attestations aggregated',
   },
 ];
