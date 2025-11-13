@@ -6,8 +6,6 @@ export interface AttestationDataPoint {
 }
 
 export interface AttestationArrivalsProps {
-  /** Current time in milliseconds from slot start (0-12000) */
-  currentTime: number;
   /** Pre-computed chart values (241 data points, null for future times) */
   attestationChartValues: (number | null)[];
   /** Total number of expected attestations (for percentage calculation) */

@@ -33,12 +33,6 @@ export interface DataColumnDataAvailabilityProps {
    */
   firstSeenData?: DataColumnFirstSeenPoint[];
   /**
-   * Current time in milliseconds from slot start (0-12000)
-   * Only data up to this time will be rendered
-   * @default maxTime (shows all data)
-   */
-  currentTime?: number;
-  /**
    * Maximum time value for color scale (in milliseconds)
    * @default 12000
    */

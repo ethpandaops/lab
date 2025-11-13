@@ -8,7 +8,6 @@ export interface BottomBarProps {
   dataColumnBlobCount: number;
   dataColumnFirstSeenData: Array<{ columnId: number; time: number; color?: string }>;
   currentSlot: number;
-  currentTime: number; // milliseconds from slot start (0-12000)
   deduplicatedBlobData: Array<{ blobId: string; time: number; color?: string }>;
   visibleContinentalPropagationData: ContinentalPropagationSeries[];
   attestationChartValues: (number | null)[];

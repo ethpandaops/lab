@@ -73,8 +73,7 @@ const fullColumnData = generateColumnData(128);
 export const Default: Story = {
   args: {
     blobCount: 6,
-    currentTime: 4000,
-    firstSeenData: fullColumnData,
+    firstSeenData: fullColumnData.filter(point => point.time <= 4000),
   },
 };
 
@@ -138,7 +137,10 @@ export const Interactive: Story = {
             className="w-20 rounded-sm border border-border bg-surface px-2 py-1 text-sm text-foreground"
           />
         </div>
-        <DataColumnDataAvailability blobCount={blobCount} currentTime={currentTime} firstSeenData={fullColumnData} />
+        <DataColumnDataAvailability
+          blobCount={blobCount}
+          firstSeenData={fullColumnData.filter(point => point.time <= currentTime)}
+        />
       </div>
     );
   },
@@ -201,8 +203,7 @@ export const EarlyPhase: Story = {
   name: 'Early Phase (2000ms)',
   args: {
     blobCount: 6,
-    currentTime: 2000,
-    firstSeenData: fullColumnData,
+    firstSeenData: fullColumnData.filter(point => point.time <= 2000),
   },
 };
 
@@ -213,7 +214,6 @@ export const CompletePhase: Story = {
   name: 'Complete Phase (12000ms)',
   args: {
     blobCount: 6,
-    currentTime: 12000,
     firstSeenData: fullColumnData,
   },
 };

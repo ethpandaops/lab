@@ -14,7 +14,6 @@ function BottomBarComponent({
   dataColumnBlobCount,
   dataColumnFirstSeenData,
   currentSlot,
-  currentTime,
   deduplicatedBlobData,
   visibleContinentalPropagationData,
   attestationChartValues,
@@ -44,7 +43,6 @@ function BottomBarComponent({
           {showBlobAvailability && (
             <BlobDataAvailability
               key={`first-seen-${currentSlot}`}
-              currentTime={currentTime}
               deduplicatedBlobData={deduplicatedBlobData}
               visibleContinentalPropagationData={visibleContinentalPropagationData}
               maxTime={12000}
@@ -55,7 +53,6 @@ function BottomBarComponent({
           {showDataColumnAvailability && (
             <DataColumnDataAvailability
               blobCount={dataColumnBlobCount}
-              currentTime={currentTime}
               firstSeenData={dataColumnFirstSeenData}
               maxTime={12000}
             />
@@ -73,7 +70,6 @@ function BottomBarComponent({
           <div className="h-full border-r border-border">
             <BlobDataAvailability
               key={`continental-${currentSlot}`}
-              currentTime={currentTime}
               deduplicatedBlobData={deduplicatedBlobData}
               visibleContinentalPropagationData={visibleContinentalPropagationData}
               maxTime={12000}
@@ -85,7 +81,6 @@ function BottomBarComponent({
         {/* Column 3: Attestation Arrivals */}
         <div className="h-full">
           <AttestationArrivals
-            currentTime={currentTime}
             attestationChartValues={attestationChartValues}
             totalExpected={attestationTotalExpected}
             maxCount={attestationMaxCount}
@@ -106,7 +101,6 @@ function BottomBarComponent({
               <TabPanel className="h-full">
                 <BlobDataAvailability
                   key={`mobile-both-${currentSlot}`}
-                  currentTime={currentTime}
                   deduplicatedBlobData={deduplicatedBlobData}
                   visibleContinentalPropagationData={visibleContinentalPropagationData}
                   maxTime={12000}
@@ -117,7 +111,6 @@ function BottomBarComponent({
               <TabPanel className="h-full">
                 <DataColumnDataAvailability
                   blobCount={dataColumnBlobCount}
-                  currentTime={currentTime}
                   firstSeenData={dataColumnFirstSeenData}
                   maxTime={12000}
                 />
@@ -125,7 +118,6 @@ function BottomBarComponent({
             )}
             <TabPanel className="h-full">
               <AttestationArrivals
-                currentTime={currentTime}
                 attestationChartValues={attestationChartValues}
                 totalExpected={attestationTotalExpected}
                 maxCount={attestationMaxCount}
@@ -144,7 +136,6 @@ const arePropsEqual = (prevProps: BottomBarProps, nextProps: BottomBarProps): bo
     prevProps.activeFork?.name === nextProps.activeFork?.name &&
     prevProps.blockVersion === nextProps.blockVersion &&
     prevProps.currentSlot === nextProps.currentSlot &&
-    prevProps.currentTime === nextProps.currentTime &&
     prevProps.dataColumnBlobCount === nextProps.dataColumnBlobCount &&
     prevProps.dataColumnFirstSeenData === nextProps.dataColumnFirstSeenData &&
     prevProps.deduplicatedBlobData === nextProps.deduplicatedBlobData &&

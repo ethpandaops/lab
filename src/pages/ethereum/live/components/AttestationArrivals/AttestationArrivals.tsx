@@ -13,7 +13,6 @@ import type { AttestationArrivalsProps } from './AttestationArrivals.types';
  * Charts only render data up to the current slot time, simulating live progression.
  */
 function AttestationArrivalsComponent({
-  currentTime: _currentTime,
   attestationChartValues,
   totalExpected: _totalExpected,
   maxCount,
