@@ -59,7 +59,8 @@ export function BlockArt({
   }, [finalPrimaryColor, finalAccentColor, finalGlowColor]);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    const container = containerRef.current;
+    if (!container) return;
 
     // Reset cleanup flag on mount
     isCleanedUpRef.current = false;
@@ -125,8 +126,8 @@ export function BlockArt({
 
       p.setup = () => {
         // Clean up any existing canvases in the container before creating new one
-        if (containerRef.current) {
-          const existingCanvases = containerRef.current.querySelectorAll('canvas');
+        if (container) {
+          const existingCanvases = container.querySelectorAll('canvas');
           existingCanvases.forEach(canvas => canvas.remove());
         }
 
@@ -186,7 +187,7 @@ export function BlockArt({
     };
 
     // Create p5 instance with container ref for proper cleanup
-    const instance = new p5(sketch, containerRef.current);
+    const instance = new p5(sketch, container);
     p5InstanceRef.current = instance;
 
     // Cleanup on unmount
@@ -202,8 +203,8 @@ export function BlockArt({
       }
 
       // Extra cleanup: manually remove any remaining canvases
-      if (containerRef.current) {
-        const canvases = containerRef.current.querySelectorAll('canvas');
+      if (container) {
+        const canvases = container.querySelectorAll('canvas');
         canvases.forEach(canvas => canvas.remove());
       }
     };

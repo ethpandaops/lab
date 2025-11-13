@@ -19,7 +19,7 @@ import { SharedCrosshairsContext } from '@/contexts/SharedCrosshairsContext';
  * }
  * ```
  */
-export function useSharedCrosshairs({ syncGroup }: { syncGroup?: string }) {
+export function useSharedCrosshairs({ syncGroup }: { syncGroup?: string }): (node: ReactEChartsCore | null) => void {
   const context = useContext(SharedCrosshairsContext);
 
   const chartRef = useCallback(
