@@ -96,7 +96,7 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
         id: 'builders',
         label: 'Builders',
         icon: CubeIcon,
-        color: 'accent',
+        color: 'primary',
         timestamp: earliestBidTime,
         duration: buildersEndTime - earliestBidTime,
         description: 'Block builders bidding phase',
@@ -123,17 +123,14 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
 
     // Phase 3: Proposing
     if (firstBlockSeenTime !== undefined) {
-      const builderPubkey = blockMev?.builder_pubkey;
-      const builderName = builderPubkey ? 'external builder' : 'local build';
-
       phasesList.push({
         id: 'proposing',
         label: 'Proposing',
         icon: UserIcon,
-        color: 'secondary',
+        color: 'primary',
         timestamp: firstBlockSeenTime,
         description: 'Block proposed to network',
-        stats: `Built via ${builderName}`,
+        stats: undefined,
         isCompleted: true,
       });
     }
@@ -147,7 +144,7 @@ export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgre
         id: 'gossiping',
         label: 'Gossiping',
         icon: ChatBubbleBottomCenterTextIcon,
-        color: 'success',
+        color: 'primary',
         timestamp: firstBlockSeenTime,
         duration: gossipDuration,
         description: 'Block propagating to network',
