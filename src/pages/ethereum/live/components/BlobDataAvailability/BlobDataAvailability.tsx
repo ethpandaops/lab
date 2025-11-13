@@ -63,12 +63,27 @@ function BlobDataAvailabilityComponent({
       ...visibleContinentalPropagationData.flatMap(continent => continent.data.map(point => point.time))
     );
 
+    // If there's no data at all, return empty series
+    if (actualMaxTime === 0) {
+      return visibleContinentalPropagationData.map((continent, idx) => ({
+        name: continent.continent,
+        data: [],
+        color: continent.color || defaultColors[idx % defaultColors.length],
+        step: 'end' as const,
+      }));
+    }
+
     return visibleContinentalPropagationData.map((continent, idx) => {
       const originalData = continent.data;
       if (originalData.length === 0) {
+        // For this specific continent, create zero-value points up to actualMaxTime
+        const densifiedData: [number, number][] = [];
+        for (let time = 0; time <= actualMaxTime; time += intervalMs) {
+          densifiedData.push([time / 1000, 0]);
+        }
         return {
           name: continent.continent,
-          data: [],
+          data: densifiedData,
           color: continent.color || defaultColors[idx % defaultColors.length],
           step: 'end' as const,
         };
