@@ -411,7 +411,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
     >
       <>
         <div className="hidden h-screen flex-col overflow-hidden bg-background lg:flex">
-          <div className="shrink-0 border-b border-border bg-surface px-6 py-4">
+          <div className="shrink-0 border-b border-border bg-surface px-6 py-2">
             <LiveBlockDetailsCard data={slotData.blockDetails} slotProgressPhases={slotProgressPhases} />
           </div>
 
