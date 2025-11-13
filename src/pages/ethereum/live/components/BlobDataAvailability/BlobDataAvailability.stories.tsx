@@ -147,9 +147,11 @@ export const Interactive: Story = {
           <span className="text-sm text-muted">Current time: {Math.round(currentTime / 1000)}s</span>
         </div>
         <BlobDataAvailability
-          currentTime={currentTime}
-          deduplicatedBlobData={sampleFirstSeenData}
-          visibleContinentalPropagationData={allContinentsPropagationData}
+          deduplicatedBlobData={sampleFirstSeenData.filter(point => point.time <= currentTime)}
+          visibleContinentalPropagationData={allContinentsPropagationData.map(continent => ({
+            ...continent,
+            data: continent.data.filter(point => point.time <= currentTime),
+          }))}
         />
       </div>
     );

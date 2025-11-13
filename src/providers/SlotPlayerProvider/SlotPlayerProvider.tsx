@@ -18,6 +18,8 @@ import type {
   SlotPlayerMetaContextValue,
 } from '@/contexts/SlotPlayerContext';
 
+const PROGRESS_EMIT_STEP_MS = 50;
+
 /**
  * Provider for slot player functionality.
  *
@@ -398,10 +400,23 @@ export function SlotPlayerProvider({
    */
   const [slotProgress, setSlotProgress] = useState<number>(0);
   const slotProgressRef = useRef<number>(0);
-  const setSlotProgressSafe = useCallback((value: number) => {
-    slotProgressRef.current = value;
-    setSlotProgress(prev => (prev === value ? prev : value));
-  }, []);
+  const lastProgressBucketRef = useRef<number>(-1);
+  const setSlotProgressSafe = useCallback(
+    (value: number) => {
+      slotProgressRef.current = value;
+      const nextBucket = Math.min(
+        Math.floor(value / PROGRESS_EMIT_STEP_MS),
+        Math.floor(slotDuration / PROGRESS_EMIT_STEP_MS)
+      );
+      if (lastProgressBucketRef.current === nextBucket) {
+        return;
+      }
+      lastProgressBucketRef.current = nextBucket;
+      const quantizedValue = Math.min(slotDuration, nextBucket * PROGRESS_EMIT_STEP_MS);
+      setSlotProgress(prev => (prev === quantizedValue ? prev : quantizedValue));
+    },
+    [slotDuration]
+  );
 
   const animationFrameRef = useRef<number | null>(null);
   const isPlayingRef = useRef(isPlaying);

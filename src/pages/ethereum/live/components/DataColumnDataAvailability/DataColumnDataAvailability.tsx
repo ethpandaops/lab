@@ -25,15 +25,15 @@ import { getDataVizColors } from '@/utils/dataVizColors';
  *    - Shows green checkmark if >= 64 columns received, red cross otherwise
  * 2. On-time count: "n columns published on time" - counts columns arriving < 4000ms
  *
- * Both indicators respect currentTime and only count visible columns.
+ * Both indicators respect the provided dataset and only count the visible columns.
  *
- * Only renders data up to the current slot time, simulating live progression.
+ * Only renders the data that has been provided, so pass in records filtered to the
+ * desired slot time to simulate live progression.
  *
  * @example
  * ```tsx
  * <DataColumnDataAvailability
  *   blobCount={6}
- *   currentTime={4500}
  *   firstSeenData={[
  *     { columnId: 0, time: 1200 },
  *     { columnId: 1, time: 1300 },
@@ -44,37 +44,29 @@ import { getDataVizColors } from '@/utils/dataVizColors';
 function DataColumnDataAvailabilityComponent({
   blobCount,
   firstSeenData = [],
-  currentTime,
   maxTime = 12000,
   className,
 }: DataColumnDataAvailabilityProps): JSX.Element {
   const { PERFORMANCE_TIME_COLORS } = getDataVizColors();
-  // Default currentTime to maxTime to show all data if not specified
-  const effectiveCurrentTime = currentTime ?? maxTime;
 
   // Calculate on-time columns (< 4000ms deadline)
   const onTimeColumnCount = useMemo(() => {
-    const visibleData = firstSeenData.filter(point => point.time <= effectiveCurrentTime);
-    return visibleData.filter(point => point.time < 4000).length;
-  }, [firstSeenData, effectiveCurrentTime]);
+    return firstSeenData.filter(point => point.time < 4000).length;
+  }, [firstSeenData]);
 
   // Calculate data availability (need >= 64 columns arriving before 4000ms deadline)
   const isDataAvailable = useMemo(() => {
-    const visibleData = firstSeenData.filter(point => point.time <= effectiveCurrentTime);
-    const validColumns = visibleData.filter(point => point.time < 4000);
-    return validColumns.length >= 64;
-  }, [firstSeenData, effectiveCurrentTime]);
+    return onTimeColumnCount >= 64;
+  }, [onTimeColumnCount]);
 
   // Prepare heatmap data for HeatmapChart component
   const { heatmapData, xLabels, yLabels } = useMemo(() => {
     // Filter data to only show events that have happened
-    const visibleData = firstSeenData.filter(point => point.time <= effectiveCurrentTime);
-
     // Transform data to heatmap format: [[x, y, value], ...]
     // Each blob row shows the same column data (columns are independent of blobs)
     const data: [number, number, number][] = [];
     for (let blobId = 0; blobId < blobCount; blobId++) {
-      visibleData.forEach(point => {
+      firstSeenData.forEach(point => {
         data.push([point.columnId, blobId, point.time]);
       });
     }
@@ -90,7 +82,7 @@ function DataColumnDataAvailabilityComponent({
       xLabels: columns,
       yLabels: blobs,
     };
-  }, [firstSeenData, blobCount, effectiveCurrentTime]);
+  }, [firstSeenData, blobCount]);
 
   return (
     <div className={clsx('flex h-full flex-col bg-surface', className)}>

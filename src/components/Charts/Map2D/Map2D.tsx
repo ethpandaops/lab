@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { memo, useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
 import type { Map2DChartProps, PointData } from './Map2D.types';
@@ -20,7 +20,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
  * />
  * ```
  */
-export function Map2DChart({
+function Map2DChartComponent({
   routes = [],
   points = [],
   title,
@@ -311,3 +311,20 @@ export function Map2DChart({
     </div>
   );
 }
+
+const arePropsEqual = (prevProps: Map2DChartProps, nextProps: Map2DChartProps): boolean => {
+  return (
+    prevProps.routes === nextProps.routes &&
+    prevProps.points === nextProps.points &&
+    prevProps.title === nextProps.title &&
+    prevProps.height === nextProps.height &&
+    prevProps.showEffect === nextProps.showEffect &&
+    prevProps.lineColor === nextProps.lineColor &&
+    prevProps.pointColor === nextProps.pointColor &&
+    prevProps.pointSizeMultiplier === nextProps.pointSizeMultiplier &&
+    prevProps.roam === nextProps.roam &&
+    prevProps.resetKey === nextProps.resetKey
+  );
+};
+
+export const Map2DChart = memo(Map2DChartComponent, arePropsEqual);

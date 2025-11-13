@@ -14,10 +14,9 @@ import type { SlotProgressRawData, UseSlotProgressDataReturn } from './useSlotPr
  * 5. Accepted - Block acceptance phase (66% threshold)
  *
  * @param rawData - Raw API data from useSlotViewData
- * @param currentTime - Current time in milliseconds from slot start (0-12000) for live mode
  * @returns Phase data, status flags, and loading state
  */
-export function useSlotProgressData(rawData: SlotProgressRawData, currentTime?: number): UseSlotProgressDataReturn {
+export function useSlotProgressData(rawData: SlotProgressRawData): UseSlotProgressDataReturn {
   const phases = useMemo<PhaseData[]>(() => {
     const { blockHead, blockProposer, blockMev, blockPropagation, attestations, committees, mevBidding, relayBids } =
       rawData;
@@ -123,54 +122,8 @@ export function useSlotProgressData(rawData: SlotProgressRawData, currentTime?: 
       },
     ];
 
-    // Calculate isActive and isCompleted for each phase based on currentTime
-    if (currentTime !== undefined) {
-      // First pass: Calculate normal state based on timestamps
-      for (let i = 0; i < allPhases.length; i++) {
-        const phase = allPhases[i];
-        const nextPhase = allPhases[i + 1];
-
-        const phaseStart = phase.timestamp ?? Infinity;
-        const phaseEnd = phase.duration !== undefined ? phaseStart + phase.duration : nextPhase?.timestamp;
-
-        if (currentTime < phaseStart) {
-          // Phase hasn't started yet
-          phase.isActive = false;
-          phase.isCompleted = false;
-        } else if (phaseEnd !== undefined && currentTime >= phaseEnd) {
-          // Phase has completed
-          phase.isActive = false;
-          phase.isCompleted = true;
-        } else {
-          // Phase is currently active
-          phase.isActive = true;
-          phase.isCompleted = false;
-        }
-      }
-
-      // Second pass: Enforce sequential activation
-      // If a later phase is active/completed, all earlier phases must be completed
-      let lastActiveOrCompletedIndex = -1;
-      for (let i = allPhases.length - 1; i >= 0; i--) {
-        if (allPhases[i].isActive || allPhases[i].isCompleted) {
-          lastActiveOrCompletedIndex = i;
-          break;
-        }
-      }
-
-      // Mark all phases before the last active/completed phase as completed
-      if (lastActiveOrCompletedIndex > 0) {
-        for (let i = 0; i < lastActiveOrCompletedIndex; i++) {
-          if (!allPhases[i].isActive && !allPhases[i].isCompleted) {
-            allPhases[i].isCompleted = true;
-            allPhases[i].isActive = false;
-          }
-        }
-      }
-    }
-
     return allPhases;
-  }, [rawData, currentTime]);
+  }, [rawData]);
 
   // Compute status flags
   const { isMissed, isOrphaned, isAccepted, isLoading } = useMemo(() => {
