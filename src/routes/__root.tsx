@@ -120,10 +120,10 @@ function RootComponent(): JSX.Element {
   const [isAppleWatch, setIsAppleWatch] = useState(false);
   const router = useRouter();
 
-  // Detect Apple Watch screen size (typically 136-205px wide)
+  // Detect Apple Watch screen size (312-416px wide across all models)
   useEffect(() => {
     const checkScreenSize = (): void => {
-      setIsAppleWatch(window.innerWidth <= 205);
+      setIsAppleWatch(window.innerWidth <= 416);
     };
 
     checkScreenSize();
