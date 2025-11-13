@@ -41,9 +41,10 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
 
       {/* Phase label and time */}
       <div className="flex flex-col items-center justify-start gap-0.5">
+        {/* Label - always rendered with fixed line height */}
         <span
           className={clsx(
-            'text-center text-[11px] font-medium',
+            'text-center text-[11px] leading-tight font-medium',
             status === 'pending' && 'text-muted/50',
             status === 'active' && 'text-foreground',
             status === 'completed' && 'text-muted'
@@ -52,10 +53,10 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
           {phase.label}
         </span>
 
-        {/* Time badge */}
+        {/* Time badge - always rendered with fixed line height */}
         <span
           className={clsx(
-            'text-center font-mono text-[10px]',
+            'text-center font-mono text-[10px] leading-tight',
             status === 'pending' && 'text-muted/50',
             status === 'active' && 'text-primary',
             status === 'completed' && 'text-muted/70'
@@ -68,19 +69,19 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
             : '\u00A0'}
         </span>
 
-        {/* Stats */}
-        {showStats && phase.stats && (
-          <span
-            className={clsx(
-              'text-center text-[9px]',
-              status === 'pending' && 'text-muted/50',
-              status === 'active' && 'text-muted',
-              status === 'completed' && 'text-muted/70'
-            )}
-          >
-            {phase.stats}
-          </span>
-        )}
+        {/* Stats - always rendered with fixed line height, hidden with opacity when empty */}
+        <span
+          className={clsx(
+            'text-center text-[9px] leading-tight',
+            status === 'pending' && 'text-muted/50',
+            status === 'active' && 'text-muted',
+            status === 'completed' && 'text-muted/70',
+            // Hide with opacity when no stats, but maintain layout space
+            !showStats || !phase.stats ? 'opacity-0' : 'opacity-100'
+          )}
+        >
+          {showStats && phase.stats ? phase.stats : '\u00A0'}
+        </span>
       </div>
     </div>
   );
