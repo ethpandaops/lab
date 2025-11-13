@@ -23,4 +23,7 @@ export interface TimeFilteredData {
 
   // Attestation chart data for AttestationArrivals (pre-computed chart values)
   attestationChartValues: (number | null)[];
+
+  // Data column availability (pre-filtered by time)
+  dataColumnFirstSeenData: Array<{ columnId: number; time: number; color?: string }>;
 }

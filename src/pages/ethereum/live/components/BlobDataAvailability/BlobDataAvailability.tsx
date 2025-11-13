@@ -20,7 +20,6 @@ import { getDataVizColors } from '@/utils/dataVizColors';
  * @example
  * ```tsx
  * <BlobDataAvailability
- *   currentTime={4500}
  *   firstSeenData={[{ time: 1420, blobId: '0', color: '#06b6d4' }]}
  *   availabilityRateData={[{ time: 0, nodes: 0 }, { time: 1000, nodes: 25 }]}
  *   continentalPropagationData={[
@@ -33,7 +32,6 @@ import { getDataVizColors } from '@/utils/dataVizColors';
 function BlobDataAvailabilityComponent({
   deduplicatedBlobData,
   visibleContinentalPropagationData,
-  currentTime: _currentTime,
   maxTime = 12000,
   variant = 'both',
   className,
@@ -177,7 +175,6 @@ function BlobDataAvailabilityComponent({
 // Custom comparison function to prevent re-renders when data hasn't changed
 const arePropsEqual = (prevProps: BlobDataAvailabilityProps, nextProps: BlobDataAvailabilityProps): boolean => {
   return (
-    prevProps.currentTime === nextProps.currentTime &&
     prevProps.deduplicatedBlobData === nextProps.deduplicatedBlobData &&
     prevProps.visibleContinentalPropagationData === nextProps.visibleContinentalPropagationData &&
     prevProps.maxTime === nextProps.maxTime

@@ -44,19 +44,13 @@ export interface ContinentalPropagationSeries {
 
 export interface BlobDataAvailabilityProps {
   /**
-   * Pre-computed and deduplicated blob data (already filtered to currentTime)
+   * Pre-computed and deduplicated blob data (already filtered to the active slot time)
    */
   deduplicatedBlobData: Array<{ blobId: string; time: number; color?: string }>;
   /**
-   * Pre-computed continental propagation data (already filtered to currentTime)
+   * Pre-computed continental propagation data (already filtered to the active slot time)
    */
   visibleContinentalPropagationData: ContinentalPropagationSeries[];
-  /**
-   * Current time in milliseconds from slot start (0-12000)
-   * Only data up to this time will be rendered
-   * @default maxTime (shows all data)
-   */
-  currentTime?: number;
   /**
    * Maximum time value for x-axis (in milliseconds)
    * @default 12000
