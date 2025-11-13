@@ -168,6 +168,9 @@ export function useTabState(tabs: TabConfig[]): UseTabStateReturn {
     // Check if current hash is an anchor within the NEW tab
     const hashBelongsToNewTab = newTab.anchors?.includes(currentHash);
 
+    // Store current scroll position before navigation
+    const scrollY = window.scrollY;
+
     if (hashBelongsToNewTab) {
       // Keep the anchor and scroll to it
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-restricted-syntax
@@ -186,6 +189,12 @@ export function useTabState(tabs: TabConfig[]): UseTabStateReturn {
         search: (prev: any) => ({ ...prev, tab: newTab.id }),
         replace: true,
         hash: undefined,
+      });
+
+      // Restore scroll position after navigation to prevent scroll to top
+      // This prevents the jarring scroll behavior on both desktop and mobile
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollY);
       });
     }
   };
