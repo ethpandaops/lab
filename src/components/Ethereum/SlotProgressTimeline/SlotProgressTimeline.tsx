@@ -155,8 +155,8 @@ export function SlotProgressTimeline({
   return (
     <div className={clsx('w-full', className)}>
       {/* Desktop: Horizontal layout */}
-      <div className="hidden h-32 md:block">
-        <div className="flex h-full w-full items-center px-4">
+      <div className="hidden md:block">
+        <div className="flex w-full items-center px-4 py-2">
           {enrichedPhases.map((phase, index) => {
             const status = phase.isActive ? 'active' : phase.isCompleted ? 'completed' : 'pending';
             const hasConnection = index < enrichedPhases.length - 1;

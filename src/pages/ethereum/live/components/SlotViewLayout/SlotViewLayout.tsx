@@ -226,7 +226,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
       {/* Desktop Layout - Clean, no-gap design */}
       <div className="hidden h-screen flex-col overflow-hidden bg-background lg:flex">
         {/* Top Section - Slot Progress */}
-        <div className="shrink-0 border-b border-border bg-surface px-6 py-4">
+        <div className="shrink-0 border-b border-border bg-surface px-6 py-2">
           <BlockDetailsCard
             data={slotData.blockDetails}
             currentTime={currentTime}

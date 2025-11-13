@@ -47,7 +47,7 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
   const phaseColor = getCSSVar(phase.color);
 
   return (
-    <div className={clsx('flex h-32 w-20 flex-col items-center gap-2', className)}>
+    <div className={clsx('flex w-20 flex-col items-center justify-center gap-2', className)}>
       {/* Circular icon container */}
       <button
         type="button"
@@ -96,7 +96,7 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
       </button>
 
       {/* Phase label, time, and stats */}
-      <div className="flex min-h-16 flex-col items-center justify-start gap-0.5">
+      <div className="flex flex-col items-center justify-start gap-0.5">
         <span
           className={clsx(
             'text-center font-medium transition-colors duration-300',
