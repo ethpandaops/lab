@@ -2,10 +2,15 @@ import type { JSX } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { IndexPage } from '@/pages/ethereum/live';
 import { SlotPlayerProvider } from '@/providers/SlotPlayerProvider';
+import { useNetwork } from '@/hooks/useNetwork';
 
 function LivePage(): JSX.Element {
+  const { currentNetwork } = useNetwork();
+
+  // Force remount when network changes to get fresh data for the new network
   return (
     <SlotPlayerProvider
+      key={currentNetwork?.name}
       tables={['fct_block_head', 'fct_block_first_seen_by_node', 'fct_attestation_first_seen_chunked_50ms']}
       initialPlaying={true}
     >
