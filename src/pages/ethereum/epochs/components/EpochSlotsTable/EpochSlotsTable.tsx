@@ -7,6 +7,9 @@ import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { useBeaconClock } from '@/hooks/useBeaconClock';
+import { useTablesBounds } from '@/hooks/useBounds';
+import { useNetwork } from '@/hooks/useNetwork';
+import { timestampToSlot } from '@/utils/beacon';
 import type { SlotData } from '../../hooks/useEpochDetailData.types';
 import type { EpochSlotsTableProps } from './EpochSlotsTable.types';
 
@@ -17,9 +20,16 @@ import type { EpochSlotsTableProps } from './EpochSlotsTable.types';
  * - Slot number with slot-in-epoch subtext (clickable link to slot detail)
  * - Relative timestamp
  * - Proposer details (index and entity)
- * - Block status (canonical, missed)
+ * - Block status (canonical, proposed, missed, pending, scheduled)
  * - Blob count
  * - Attestation metrics (head correct count, participation %)
+ *
+ * Status determination:
+ * - Canonical: Slot appears in canonical chain (int_block_canonical)
+ * - Proposed: Slot appears in head chain but not canonical (fct_block_head)
+ * - Missed: Slot is missing from both chains AND datasources have processed beyond this slot
+ * - Pending: Slot appears to be missing but datasources haven't processed it yet
+ * - Scheduled: Future slot (beyond current beacon clock slot)
  *
  * Users can click on slot numbers to navigate to slot detail pages.
  * Timestamp component has interactive popup for more details.
@@ -31,9 +41,25 @@ export function EpochSlotsTable({
   sortOrder = 'asc',
 }: EpochSlotsTableProps): JSX.Element {
   const { slot: currentSlot } = useBeaconClock();
+  const { currentNetwork } = useNetwork();
+
+  // Fetch bounds for block tables to determine if we can confidently mark slots as missed
+  // Use both int_block_canonical and fct_block_head since status is determined by presence in either
+  const { data: boundsData } = useTablesBounds(['int_block_canonical', 'fct_block_head']);
 
   // Disable real-time features for historical views (prevents re-renders every 12s)
   const effectiveCurrentSlot = enableRealtimeHighlighting ? currentSlot : Number.MAX_SAFE_INTEGER;
+
+  // Determine the maximum slot we've processed in our datasources
+  // Use minOfMaxes to get the earliest ending point across both tables
+  // This ensures we only mark slots as missed if BOTH tables have processed beyond that slot
+  // Bounds are returned as Unix timestamps, so convert to slot number
+  const maxProcessedSlot = useMemo(() => {
+    if (!boundsData?.aggregate.minOfMaxes || !currentNetwork) {
+      return undefined;
+    }
+    return timestampToSlot(boundsData.aggregate.minOfMaxes, currentNetwork.genesis_time);
+  }, [boundsData?.aggregate.minOfMaxes, currentNetwork]);
 
   /**
    * Sort slots by slot number
@@ -122,13 +148,27 @@ export function EpochSlotsTable({
               </Badge>
             );
           }
+
+          // Only show "Missed" if we're confident the datasource has processed this slot
+          // If maxProcessedSlot is undefined or the slot hasn't been processed yet, show "Pending"
           if (row.status === 'missed') {
+            const hasBeenProcessed = maxProcessedSlot !== undefined && row.slot <= maxProcessedSlot;
+
+            if (!hasBeenProcessed) {
+              return (
+                <Badge color="gray" variant="border">
+                  Pending
+                </Badge>
+              );
+            }
+
             return (
               <Badge color="yellow" variant="border">
                 Missed
               </Badge>
             );
           }
+
           return (
             <Badge color="gray" variant="border">
               {row.status}
@@ -158,7 +198,7 @@ export function EpochSlotsTable({
         },
       },
     ],
-    [effectiveCurrentSlot, showSlotInEpoch]
+    [effectiveCurrentSlot, showSlotInEpoch, maxProcessedSlot]
   );
 
   /**
