@@ -731,10 +731,7 @@ export function DetailPage(): JSX.Element {
                   attestationData={allAttestationVotes}
                   currentSlot={slot}
                   votedForBlocks={data.votedForBlocks}
-                  expectedValidatorCount={data.committees.reduce(
-                    (sum, committee) => sum + (committee.validators?.length ?? 0),
-                    0
-                  )}
+                  expectedValidatorCount={totalExpectedValidators}
                   isLoading={attestationVotesLoading}
                 />
                 <AttestationArrivalsChart
