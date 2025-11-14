@@ -58,6 +58,14 @@ export interface HeatmapChartProps {
    */
   showCellBorders?: boolean;
   /**
+   * Border configuration for individual control over borders
+   * Use this for directional borders (e.g., only left/right for column separation)
+   */
+  cellBorderConfig?: {
+    borderColor?: string;
+    borderWidth?: number | [number, number, number, number]; // [top, right, bottom, left]
+  };
+  /**
    * X-axis title
    */
   xAxisTitle?: string;

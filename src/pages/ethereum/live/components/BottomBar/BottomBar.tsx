@@ -51,11 +51,7 @@ function BottomBarComponent({
           )}
 
           {showDataColumnAvailability && (
-            <DataColumnDataAvailability
-              blobCount={dataColumnBlobCount}
-              firstSeenData={dataColumnFirstSeenData}
-              maxTime={12000}
-            />
+            <DataColumnDataAvailability blobCount={dataColumnBlobCount} firstSeenData={dataColumnFirstSeenData} />
           )}
 
           {!showBlobAvailability && !showDataColumnAvailability && (
@@ -109,11 +105,7 @@ function BottomBarComponent({
             )}
             {showDataColumnAvailability && (
               <TabPanel className="h-full">
-                <DataColumnDataAvailability
-                  blobCount={dataColumnBlobCount}
-                  firstSeenData={dataColumnFirstSeenData}
-                  maxTime={12000}
-                />
+                <DataColumnDataAvailability blobCount={dataColumnBlobCount} firstSeenData={dataColumnFirstSeenData} />
               </TabPanel>
             )}
             <TabPanel className="h-full">

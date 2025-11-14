@@ -34,7 +34,7 @@ export interface DataColumnDataAvailabilityProps {
   firstSeenData?: DataColumnFirstSeenPoint[];
   /**
    * Maximum time value for color scale (in milliseconds)
-   * @default 12000
+   * @default 4000
    */
   maxTime?: number;
   /**

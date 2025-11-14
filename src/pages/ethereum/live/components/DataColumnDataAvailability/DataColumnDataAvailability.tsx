@@ -11,12 +11,10 @@ import { getDataVizColors } from '@/utils/dataVizColors';
  * Displays a heatmap showing when each data column was first seen:
  * - X-axis: 128 data columns (0-127)
  * - Y-axis: Blobs (shows range "0 → n" when >6 blobs, individual labels otherwise)
- * - Cell color: Time when column was first seen with 4000ms deadline
- *   - 0-1000ms: Green (very early)
- *   - 1000-2000ms: Lime (early)
- *   - 2000-3000ms: Yellow (on time)
- *   - 3000-4000ms: Orange (cutting it close)
- *   - >4000ms: Red (missed deadline)
+ * - Cell color: Continuous gradient based on time when column was first seen
+ *   - Green (0ms) → Yellow (2000ms) → Red (4000ms)
+ *   - 1px spacing between columns for better visibility
+ *   - 4000ms deadline for "on time" determination
  * - Each row shows the same column data (columns are independent of blobs)
  * - Fixed height of 400px regardless of blob count
  *
@@ -44,7 +42,7 @@ import { getDataVizColors } from '@/utils/dataVizColors';
 function DataColumnDataAvailabilityComponent({
   blobCount,
   firstSeenData = [],
-  maxTime = 12000,
+  maxTime = 4000,
   className,
 }: DataColumnDataAvailabilityProps): JSX.Element {
   const { PERFORMANCE_TIME_COLORS } = getDataVizColors();
@@ -104,15 +102,16 @@ function DataColumnDataAvailabilityComponent({
           height="100%"
           min={0}
           max={maxTime}
-          visualMapType="piecewise"
-          piecewisePieces={[
-            { min: 0, max: 1000, color: PERFORMANCE_TIME_COLORS.excellent, label: '0-1s' },
-            { min: 1000, max: 2000, color: PERFORMANCE_TIME_COLORS.good, label: '1-2s' },
-            { min: 2000, max: 3000, color: PERFORMANCE_TIME_COLORS.fair, label: '2-3s' },
-            { min: 3000, max: 4000, color: PERFORMANCE_TIME_COLORS.slow, label: '3-4s' },
-            { min: 4000, color: PERFORMANCE_TIME_COLORS.poor, label: '>4s' },
+          visualMapType="continuous"
+          colorGradient={[
+            PERFORMANCE_TIME_COLORS.excellent,
+            PERFORMANCE_TIME_COLORS.good,
+            PERFORMANCE_TIME_COLORS.fair,
+            PERFORMANCE_TIME_COLORS.slow,
+            PERFORMANCE_TIME_COLORS.poor,
           ]}
           showVisualMap={true}
+          showCellBorders={true}
           animationDuration={0}
           emphasisDisabled={false}
           tooltipFormatter={(params, xLabels, yLabels) => {
