@@ -39,6 +39,11 @@ export interface ServiceUrls {
   ethstats?: string; // Ethstats URL
 }
 
+export interface BlobScheduleItem {
+  epoch: number;
+  max_blobs_per_block: number;
+}
+
 export interface Network {
   name: string;
   display_name: string;
@@ -47,6 +52,7 @@ export interface Network {
   genesis_delay: number;
   forks: Forks;
   service_urls?: ServiceUrls;
+  blob_schedule?: BlobScheduleItem[];
 }
 
 export interface Feature {
