@@ -3,6 +3,7 @@ import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { useForks } from '@/hooks/useForks';
 import { useBeaconClock } from '@/hooks/useBeaconClock';
+import { useNetwork } from '@/hooks/useNetwork';
 import { ForksTimeline } from './components/ForksTimeline';
 import { ForksHeader } from './components/ForksHeader';
 
@@ -12,10 +13,12 @@ import { ForksHeader } from './components/ForksHeader';
  * Shows:
  * - Currently active fork and next upcoming fork
  * - Timeline of all forks
+ * - Blob schedule changes
  */
 export function IndexPage(): React.JSX.Element {
   const { allForks, activeFork, nextFork, isLoading } = useForks();
   const { epoch: currentEpoch } = useBeaconClock();
+  const { currentNetwork } = useNetwork();
 
   if (isLoading) {
     return (
@@ -34,8 +37,8 @@ export function IndexPage(): React.JSX.Element {
         {/* Header with current and next fork */}
         <ForksHeader activeFork={activeFork} nextFork={nextFork} currentEpoch={currentEpoch} allForks={allForks} />
 
-        {/* Timeline of all forks */}
-        <ForksTimeline forks={allForks} currentEpoch={currentEpoch} />
+        {/* Timeline of all forks and blob schedule */}
+        <ForksTimeline forks={allForks} currentEpoch={currentEpoch} blobSchedule={currentNetwork?.blob_schedule} />
       </div>
     </Container>
   );
