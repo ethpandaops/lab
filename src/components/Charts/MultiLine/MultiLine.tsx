@@ -76,6 +76,7 @@ export function MultiLineChart({
   enableDataZoom = false,
   tooltipFormatter,
   tooltipTrigger = 'axis',
+  tooltipMode = 'default',
   connectNulls = false,
   animationDuration = 300,
   grid,
@@ -436,27 +437,75 @@ export function MultiLineChart({
             }
 
             // Add each series - apply smart decimal formatting to y values
-            dataPoints.forEach(point => {
-              const p = point as {
-                marker?: string;
-                seriesName?: string;
-                value?: number | [number, number];
-              };
+            if (tooltipMode === 'compact') {
+              // Compact mode: Filter out zero values and show top 10 with summary (like Grafana)
+              const nonZeroPoints = dataPoints
+                .map(point => {
+                  const p = point as {
+                    marker?: string;
+                    seriesName?: string;
+                    value?: number | [number, number];
+                  };
+                  const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+                  return { ...p, yValue };
+                })
+                .filter(
+                  p =>
+                    p.marker &&
+                    p.seriesName !== undefined &&
+                    p.yValue !== undefined &&
+                    p.yValue !== null &&
+                    p.yValue !== 0
+                )
+                .sort((a, b) => (b.yValue ?? 0) - (a.yValue ?? 0)); // Sort by value descending
 
-              if (p.marker && p.seriesName !== undefined) {
-                // Extract y value
-                const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+              const maxVisible = 10;
+              const visiblePoints = nonZeroPoints.slice(0, maxVisible);
+              const hiddenPoints = nonZeroPoints.slice(maxVisible);
 
-                if (yValue !== undefined && yValue !== null) {
-                  const formattedValue = formatSmartDecimal(yValue, effectiveValueDecimals);
-                  html += `<div style="display: flex; align-items: center; gap: 8px;">`;
-                  html += p.marker;
-                  html += `<span>${p.seriesName}:</span>`;
-                  html += `<span style="font-weight: 600; margin-left: auto;">${formattedValue}</span>`;
-                  html += `</div>`;
-                }
+              // Show top series
+              visiblePoints.forEach(p => {
+                const formattedValue = formatSmartDecimal(p.yValue!, effectiveValueDecimals);
+                html += `<div style="display: flex; align-items: center; gap: 8px;">`;
+                html += p.marker;
+                html += `<span>${p.seriesName}:</span>`;
+                html += `<span style="font-weight: 600; margin-left: auto;">${formattedValue}</span>`;
+                html += `</div>`;
+              });
+
+              // Add summary for remaining series
+              if (hiddenPoints.length > 0) {
+                const totalHidden = hiddenPoints.reduce((sum, p) => sum + (p.yValue ?? 0), 0);
+                const formattedTotal = formatSmartDecimal(totalHidden, effectiveValueDecimals);
+                html += `<div style="display: flex; align-items: center; gap: 8px; margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(128, 128, 128, 0.2);">`;
+                html += `<span style="color: rgba(128, 128, 128, 0.8); font-size: 11px;">+${hiddenPoints.length} more:</span>`;
+                html += `<span style="font-weight: 600; margin-left: auto; font-size: 11px;">${formattedTotal}</span>`;
+                html += `</div>`;
               }
-            });
+            } else {
+              // Default mode: Show all series (including zero values)
+              dataPoints.forEach(point => {
+                const p = point as {
+                  marker?: string;
+                  seriesName?: string;
+                  value?: number | [number, number];
+                };
+
+                if (p.marker && p.seriesName !== undefined) {
+                  // Extract y value
+                  const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+
+                  if (yValue !== undefined && yValue !== null) {
+                    const formattedValue = formatSmartDecimal(yValue, effectiveValueDecimals);
+                    html += `<div style="display: flex; align-items: center; gap: 8px;">`;
+                    html += p.marker;
+                    html += `<span>${p.seriesName}:</span>`;
+                    html += `<span style="font-weight: 600; margin-left: auto;">${formattedValue}</span>`;
+                    html += `</div>`;
+                  }
+                }
+              });
+            }
 
             return html;
           }
@@ -544,6 +593,7 @@ export function MultiLineChart({
     grid,
     tooltipFormatter,
     tooltipTrigger,
+    tooltipMode,
     enableDataZoom,
     connectNulls,
     extendedPalette,
@@ -652,45 +702,50 @@ export function MultiLineChart({
 
       {/* Interactive Legend Controls - Top */}
       {showLegend && !useNativeLegend && series.length > 1 && legendPosition === 'top' && (
-        <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-border pb-4">
-          <span className="text-sm/6 font-medium text-muted">Series:</span>
-          {series
-            .filter(s => !enableAggregateToggle || s.name !== aggregateSeriesName)
-            .map(s => {
-              const isVisible = visibleSeries.has(s.name);
-              const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
-              return (
-                <button
-                  key={s.name}
-                  onClick={() => toggleSeries(s.name)}
-                  className={`flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs/5 transition-colors ${
-                    isVisible
-                      ? 'bg-surface-hover text-foreground'
-                      : 'hover:bg-surface-hover/50 bg-surface/50 text-muted/50'
-                  }`}
-                >
-                  <span
-                    className="h-2 w-2 rounded-full"
-                    style={{
-                      backgroundColor: isVisible ? seriesColor : 'transparent',
-                      border: `2px solid ${seriesColor}`,
-                    }}
-                  />
-                  <span className="font-medium">{s.name}</span>
-                </button>
-              );
-            })}
-          {/* Aggregate Toggle Button - aligned right in same row */}
-          {enableAggregateToggle && (
-            <button
-              onClick={() => setShowAggregate(!showAggregate)}
-              className={`ml-auto rounded-sm px-2 py-1 text-xs/5 transition-colors ${
-                showAggregate ? 'bg-muted/20 text-foreground' : 'text-muted hover:bg-muted/10'
-              }`}
-            >
-              {showAggregate ? '✓' : '○'} {aggregateSeriesName}
-            </button>
-          )}
+        <div className="mb-4 border-b border-border pb-4">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-sm/6 font-medium text-muted">Series:</span>
+            {enableAggregateToggle && (
+              <button
+                onClick={() => setShowAggregate(!showAggregate)}
+                className={`rounded-sm px-2 py-1 text-xs/5 transition-colors ${
+                  showAggregate ? 'bg-muted/20 text-foreground' : 'text-muted hover:bg-muted/10'
+                }`}
+              >
+                {showAggregate ? '✓' : '○'} {aggregateSeriesName}
+              </button>
+            )}
+          </div>
+          <div className="max-h-[200px] overflow-y-auto">
+            <div className="flex flex-wrap items-center gap-2">
+              {series
+                .filter(s => !enableAggregateToggle || s.name !== aggregateSeriesName)
+                .map(s => {
+                  const isVisible = visibleSeries.has(s.name);
+                  const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
+                  return (
+                    <button
+                      key={s.name}
+                      onClick={() => toggleSeries(s.name)}
+                      className={`flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs/5 transition-colors ${
+                        isVisible
+                          ? 'bg-surface-hover text-foreground'
+                          : 'hover:bg-surface-hover/50 bg-surface/50 text-muted/50'
+                      }`}
+                    >
+                      <span
+                        className="h-2 w-2 rounded-full"
+                        style={{
+                          backgroundColor: isVisible ? seriesColor : 'transparent',
+                          border: `2px solid ${seriesColor}`,
+                        }}
+                      />
+                      <span className="font-medium">{s.name}</span>
+                    </button>
+                  );
+                })}
+            </div>
+          </div>
         </div>
       )}
 
@@ -719,45 +774,50 @@ export function MultiLineChart({
 
       {/* Interactive Legend Controls - Bottom */}
       {showLegend && !useNativeLegend && series.length > 1 && legendPosition === 'bottom' && (
-        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
-          <span className="text-sm/6 font-medium text-muted">Series:</span>
-          {series
-            .filter(s => !enableAggregateToggle || s.name !== aggregateSeriesName)
-            .map(s => {
-              const isVisible = visibleSeries.has(s.name);
-              const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
-              return (
-                <button
-                  key={s.name}
-                  onClick={() => toggleSeries(s.name)}
-                  className={`flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs/5 transition-colors ${
-                    isVisible
-                      ? 'bg-surface-hover text-foreground'
-                      : 'hover:bg-surface-hover/50 bg-surface/50 text-muted/50'
-                  }`}
-                >
-                  <span
-                    className="h-2 w-2 rounded-full"
-                    style={{
-                      backgroundColor: isVisible ? seriesColor : 'transparent',
-                      border: `2px solid ${seriesColor}`,
-                    }}
-                  />
-                  <span className="font-medium">{s.name}</span>
-                </button>
-              );
-            })}
-          {/* Aggregate Toggle Button - aligned right in same row */}
-          {enableAggregateToggle && (
-            <button
-              onClick={() => setShowAggregate(!showAggregate)}
-              className={`ml-auto rounded-sm px-2 py-1 text-xs/5 transition-colors ${
-                showAggregate ? 'bg-muted/20 text-foreground' : 'text-muted hover:bg-muted/10'
-              }`}
-            >
-              {showAggregate ? '✓' : '○'} {aggregateSeriesName}
-            </button>
-          )}
+        <div className="mt-4 border-t border-border pt-4">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-sm/6 font-medium text-muted">Series:</span>
+            {enableAggregateToggle && (
+              <button
+                onClick={() => setShowAggregate(!showAggregate)}
+                className={`rounded-sm px-2 py-1 text-xs/5 transition-colors ${
+                  showAggregate ? 'bg-muted/20 text-foreground' : 'text-muted hover:bg-muted/10'
+                }`}
+              >
+                {showAggregate ? '✓' : '○'} {aggregateSeriesName}
+              </button>
+            )}
+          </div>
+          <div className="max-h-[200px] overflow-y-auto">
+            <div className="flex flex-wrap items-center gap-2">
+              {series
+                .filter(s => !enableAggregateToggle || s.name !== aggregateSeriesName)
+                .map(s => {
+                  const isVisible = visibleSeries.has(s.name);
+                  const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
+                  return (
+                    <button
+                      key={s.name}
+                      onClick={() => toggleSeries(s.name)}
+                      className={`flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs/5 transition-colors ${
+                        isVisible
+                          ? 'bg-surface-hover text-foreground'
+                          : 'hover:bg-surface-hover/50 bg-surface/50 text-muted/50'
+                      }`}
+                    >
+                      <span
+                        className="h-2 w-2 rounded-full"
+                        style={{
+                          backgroundColor: isVisible ? seriesColor : 'transparent',
+                          border: `2px solid ${seriesColor}`,
+                        }}
+                      />
+                      <span className="font-medium">{s.name}</span>
+                    </button>
+                  );
+                })}
+            </div>
+          </div>
         </div>
       )}
     </>
