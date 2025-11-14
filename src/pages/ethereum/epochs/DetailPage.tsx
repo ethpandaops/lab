@@ -23,6 +23,7 @@ import { Tab } from '@/components/Navigation/Tab';
 import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { formatEpoch } from '@/utils';
 import { weiToEth } from '@/utils/ethereum';
+import { useBeaconClock } from '@/hooks/useBeaconClock';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
 import { useTabState } from '@/hooks/useTabState';
 import { Route } from '@/routes/ethereum/epochs/$epoch';
@@ -52,8 +53,12 @@ export function DetailPage(): React.JSX.Element {
   const parsed = parseInt(params.epoch, 10);
   const epoch = isNaN(parsed) || parsed < 0 ? null : parsed;
 
+  // Determine if this is the current epoch (for auto-refetch)
+  const { epoch: currentEpoch } = useBeaconClock();
+  const isLiveEpoch = epoch !== null && epoch === currentEpoch;
+
   // Fetch data for this epoch
-  const { data, isLoading, error } = useEpochDetailData(epoch ?? 0);
+  const { data, isLoading, error } = useEpochDetailData(epoch ?? 0, isLiveEpoch);
 
   // Keyboard navigation
   useEffect(() => {

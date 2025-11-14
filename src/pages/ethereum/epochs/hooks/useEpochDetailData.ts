@@ -13,7 +13,7 @@ import {
   intBlockCanonicalServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { epochToTimestamp, getEpochSlotRange, slotToTimestamp } from '@/utils/beacon';
+import { epochToTimestamp, getEpochSlotRange, slotToTimestamp, SECONDS_PER_SLOT } from '@/utils/beacon';
 
 import type {
   EpochDetailData,
@@ -35,14 +35,22 @@ import type {
  * - Block first seen times
  * - Attestation liveness by entity
  *
+ * For live epochs (current epoch), data is automatically refetched every 12 seconds
+ * to capture new blocks and attestations as they arrive.
+ *
  * @param epoch - Epoch number
+ * @param isLive - Whether this is the current epoch (enables auto-refetch)
  * @returns Comprehensive epoch data including slots, stats, and missed attestations
  */
-export function useEpochDetailData(epoch: number): UseEpochDetailDataReturn {
+export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetailDataReturn {
   const { currentNetwork } = useNetwork();
 
   const epochStartTime = currentNetwork ? epochToTimestamp(epoch, currentNetwork.genesis_time) : 0;
   const { firstSlot, lastSlot } = getEpochSlotRange(epoch);
+
+  // For live epochs, refetch every slot (12 seconds) to capture new data as it arrives
+  // For historical epochs, disable auto-refetch (false)
+  const refetchInterval = isLive ? SECONDS_PER_SLOT * 1000 : false;
 
   // Fetch data for all slots in the epoch using range queries (9 total queries)
   const results = useQueries({
@@ -58,6 +66,7 @@ export function useEpochDetailData(epoch: number): UseEpochDetailDataReturn {
           },
         }),
         enabled: !!currentNetwork && firstSlot >= 0,
+        refetchInterval,
       },
       // 2. Blob counts
       {
@@ -69,6 +78,7 @@ export function useEpochDetailData(epoch: number): UseEpochDetailDataReturn {
           },
         }),
         enabled: !!currentNetwork && firstSlot >= 0,
+        refetchInterval,
       },
       // 3. Attestation correctness
       {
@@ -80,6 +90,7 @@ export function useEpochDetailData(epoch: number): UseEpochDetailDataReturn {
           },
         }),
         enabled: !!currentNetwork && firstSlot >= 0,
+        refetchInterval,
       },
       // 4. Proposer entities
       {
@@ -91,6 +102,7 @@ export function useEpochDetailData(epoch: number): UseEpochDetailDataReturn {
           },
         }),
         enabled: !!currentNetwork && firstSlot >= 0,
+        refetchInterval,
       },
       // 5. Block first seen by nodes (get all, will filter to earliest per slot)
       {
@@ -103,6 +115,7 @@ export function useEpochDetailData(epoch: number): UseEpochDetailDataReturn {
           },
         }),
         enabled: !!currentNetwork && firstSlot >= 0,
+        refetchInterval,
       },
       // 6. Attestation liveness by entity (only missed)
       {
@@ -115,6 +128,7 @@ export function useEpochDetailData(epoch: number): UseEpochDetailDataReturn {
           },
         }),
         enabled: !!currentNetwork && firstSlot >= 0,
+        refetchInterval,
       },
       // 7. MEV data
       {
@@ -126,6 +140,7 @@ export function useEpochDetailData(epoch: number): UseEpochDetailDataReturn {
           },
         }),
         enabled: !!currentNetwork && firstSlot >= 0,
+        refetchInterval,
       },
       // 8. Block head data (for gas, transactions, base fee)
       {
@@ -137,6 +152,7 @@ export function useEpochDetailData(epoch: number): UseEpochDetailDataReturn {
           },
         }),
         enabled: !!currentNetwork && firstSlot >= 0,
+        refetchInterval,
       },
       // 9. Canonical blocks (for determining canonical vs proposed status)
       {
@@ -150,6 +166,7 @@ export function useEpochDetailData(epoch: number): UseEpochDetailDataReturn {
           },
         }),
         enabled: !!currentNetwork && firstSlot >= 0,
+        refetchInterval,
       },
     ],
   });

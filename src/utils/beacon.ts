@@ -78,6 +78,22 @@ export function slotToTimestamp(slot: number, genesisTime: number): number {
 }
 
 /**
+ * Convert Unix timestamp to slot number
+ *
+ * @param timestamp - Unix timestamp in seconds
+ * @param genesisTime - Genesis time in Unix seconds
+ * @returns Beacon chain slot number
+ *
+ * @example
+ * ```tsx
+ * timestampToSlot(1606825223, 1606824023) // Returns 100
+ * ```
+ */
+export function timestampToSlot(timestamp: number, genesisTime: number): number {
+  return Math.floor((timestamp - genesisTime) / SECONDS_PER_SLOT);
+}
+
+/**
  * Convert slot number to epoch number
  *
  * @param slot - Slot number
