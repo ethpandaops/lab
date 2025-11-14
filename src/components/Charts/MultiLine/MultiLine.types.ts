@@ -240,6 +240,13 @@ export interface MultiLineChartProps {
    */
   tooltipTrigger?: 'axis' | 'item';
   /**
+   * Tooltip display mode for handling many series
+   * - 'default': Show all series (including zero values)
+   * - 'compact': Hide zero values and show top 10 with "+N more" summary (like Grafana)
+   * @default 'default'
+   */
+  tooltipMode?: 'default' | 'compact';
+  /**
    * Connect null data points with line
    * @default false
    */

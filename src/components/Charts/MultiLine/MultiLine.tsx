@@ -76,6 +76,7 @@ export function MultiLineChart({
   enableDataZoom = false,
   tooltipFormatter,
   tooltipTrigger = 'axis',
+  tooltipMode = 'default',
   connectNulls = false,
   animationDuration = 300,
   grid,
@@ -436,50 +437,74 @@ export function MultiLineChart({
             }
 
             // Add each series - apply smart decimal formatting to y values
-            // Filter out series with zero values to keep tooltip concise
-            // Limit to top 10 series by value (like Grafana) with a summary for the rest
-            const nonZeroPoints = dataPoints
-              .map(point => {
+            if (tooltipMode === 'compact') {
+              // Compact mode: Filter out zero values and show top 10 with summary (like Grafana)
+              const nonZeroPoints = dataPoints
+                .map(point => {
+                  const p = point as {
+                    marker?: string;
+                    seriesName?: string;
+                    value?: number | [number, number];
+                  };
+                  const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+                  return { ...p, yValue };
+                })
+                .filter(
+                  p =>
+                    p.marker &&
+                    p.seriesName !== undefined &&
+                    p.yValue !== undefined &&
+                    p.yValue !== null &&
+                    p.yValue !== 0
+                )
+                .sort((a, b) => (b.yValue ?? 0) - (a.yValue ?? 0)); // Sort by value descending
+
+              const maxVisible = 10;
+              const visiblePoints = nonZeroPoints.slice(0, maxVisible);
+              const hiddenPoints = nonZeroPoints.slice(maxVisible);
+
+              // Show top series
+              visiblePoints.forEach(p => {
+                const formattedValue = formatSmartDecimal(p.yValue!, effectiveValueDecimals);
+                html += `<div style="display: flex; align-items: center; gap: 8px;">`;
+                html += p.marker;
+                html += `<span>${p.seriesName}:</span>`;
+                html += `<span style="font-weight: 600; margin-left: auto;">${formattedValue}</span>`;
+                html += `</div>`;
+              });
+
+              // Add summary for remaining series
+              if (hiddenPoints.length > 0) {
+                const totalHidden = hiddenPoints.reduce((sum, p) => sum + (p.yValue ?? 0), 0);
+                const formattedTotal = formatSmartDecimal(totalHidden, effectiveValueDecimals);
+                html += `<div style="display: flex; align-items: center; gap: 8px; margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(128, 128, 128, 0.2);">`;
+                html += `<span style="color: rgba(128, 128, 128, 0.8); font-size: 11px;">+${hiddenPoints.length} more:</span>`;
+                html += `<span style="font-weight: 600; margin-left: auto; font-size: 11px;">${formattedTotal}</span>`;
+                html += `</div>`;
+              }
+            } else {
+              // Default mode: Show all series (including zero values)
+              dataPoints.forEach(point => {
                 const p = point as {
                   marker?: string;
                   seriesName?: string;
                   value?: number | [number, number];
                 };
-                const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
-                return { ...p, yValue };
-              })
-              .filter(
-                p =>
-                  p.marker &&
-                  p.seriesName !== undefined &&
-                  p.yValue !== undefined &&
-                  p.yValue !== null &&
-                  p.yValue !== 0
-              )
-              .sort((a, b) => (b.yValue ?? 0) - (a.yValue ?? 0)); // Sort by value descending
 
-            const maxVisible = 10;
-            const visiblePoints = nonZeroPoints.slice(0, maxVisible);
-            const hiddenPoints = nonZeroPoints.slice(maxVisible);
+                if (p.marker && p.seriesName !== undefined) {
+                  // Extract y value
+                  const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
 
-            // Show top series
-            visiblePoints.forEach(p => {
-              const formattedValue = formatSmartDecimal(p.yValue!, effectiveValueDecimals);
-              html += `<div style="display: flex; align-items: center; gap: 8px;">`;
-              html += p.marker;
-              html += `<span>${p.seriesName}:</span>`;
-              html += `<span style="font-weight: 600; margin-left: auto;">${formattedValue}</span>`;
-              html += `</div>`;
-            });
-
-            // Add summary for remaining series
-            if (hiddenPoints.length > 0) {
-              const totalHidden = hiddenPoints.reduce((sum, p) => sum + (p.yValue ?? 0), 0);
-              const formattedTotal = formatSmartDecimal(totalHidden, effectiveValueDecimals);
-              html += `<div style="display: flex; align-items: center; gap: 8px; margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(128, 128, 128, 0.2);">`;
-              html += `<span style="color: rgba(128, 128, 128, 0.8); font-size: 11px;">+${hiddenPoints.length} more:</span>`;
-              html += `<span style="font-weight: 600; margin-left: auto; font-size: 11px;">${formattedTotal}</span>`;
-              html += `</div>`;
+                  if (yValue !== undefined && yValue !== null) {
+                    const formattedValue = formatSmartDecimal(yValue, effectiveValueDecimals);
+                    html += `<div style="display: flex; align-items: center; gap: 8px;">`;
+                    html += p.marker;
+                    html += `<span>${p.seriesName}:</span>`;
+                    html += `<span style="font-weight: 600; margin-left: auto;">${formattedValue}</span>`;
+                    html += `</div>`;
+                  }
+                }
+              });
             }
 
             return html;
@@ -568,6 +593,7 @@ export function MultiLineChart({
     grid,
     tooltipFormatter,
     tooltipTrigger,
+    tooltipMode,
     enableDataZoom,
     connectNulls,
     extendedPalette,

@@ -195,6 +195,7 @@ export function TopEntitiesChart({
           height={isInModal ? 600 : chartHeight}
           showLegend={true}
           enableDataZoom={true}
+          tooltipMode="compact"
           relativeSlots={relativeSlots}
           syncGroup={syncGroup}
         />
