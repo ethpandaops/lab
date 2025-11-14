@@ -39,6 +39,7 @@ export function HeatmapChart({
   animationDuration = 300,
   formatValue,
   showCellBorders = false,
+  cellBorderConfig,
   xAxisTitle,
   yAxisTitle,
   visualMapType = 'continuous',
@@ -152,7 +153,7 @@ export function HeatmapChart({
             type: 'continuous',
             min: min ?? Math.min(...data.map(d => d[2])),
             max: max ?? Math.max(...data.map(d => d[2])),
-            calculable: true,
+            calculable: false,
             orient: 'vertical',
             right: 10,
             top: 'center',
@@ -164,6 +165,9 @@ export function HeatmapChart({
               color: themeColors.foreground,
               fontSize: 12,
             },
+            text: ['4s', '0s'],
+            itemWidth: 15,
+            itemHeight: 100,
           },
     series: [
       {
@@ -180,14 +184,21 @@ export function HeatmapChart({
         },
         itemStyle: {
           ...(showCellBorders && {
-            borderColor: themeColors.border,
-            borderWidth: 1,
+            borderColor: themeColors.background,
+            borderWidth: 2,
+          }),
+          ...(cellBorderConfig && {
+            borderColor: cellBorderConfig.borderColor ?? themeColors.background,
+            borderWidth: cellBorderConfig.borderWidth ?? 2,
           }),
         },
-        // ECharts hover effects: 'self' highlights single cell, 'series' highlights column
+        // ECharts hover effects: subtle highlight on hover
         emphasis: {
           disabled: emphasisDisabled,
-          focus: emphasisDisabled ? 'none' : ('series' as const),
+          itemStyle: {
+            borderColor: themeColors.foreground,
+            borderWidth: 2,
+          },
         },
       },
     ],
