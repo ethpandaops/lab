@@ -47,7 +47,7 @@ export function ForksHeader({ activeFork, nextFork, allForks }: ForksHeaderProps
   useEffect(() => {
     if (!nextFork || !currentNetwork?.genesis_time) return;
 
-    const updateCountdown = () => {
+    const updateCountdown = (): void => {
       const secondsUntilFork = calculateSecondsUntilFork();
 
       setCountdown({
