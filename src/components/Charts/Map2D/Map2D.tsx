@@ -47,24 +47,66 @@ function Map2DChartComponent({
   const chartStyle = useMemo(() => ({ height, width: '100%', minHeight: height }), [height]);
   const chartOpts = useMemo(() => ({ renderer: 'canvas' as const }), []);
 
-  // Load and register world map on mount
+  // Load and register world map on mount - retry every 5s on failure
   useEffect(() => {
+    const controller = new AbortController();
+    let timeoutId: ReturnType<typeof setTimeout>;
+
     const loadWorldMap = async (): Promise<void> => {
       try {
-        // Fetch world map GeoJSON from local public directory
-        const response = await fetch('/data/maps/world.json');
+        // Fetch with timeout (10 seconds)
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          timeoutId = setTimeout(() => reject(new Error('Map load timeout')), 10000);
+        });
+
+        const fetchPromise = fetch('/data/maps/world.json', {
+          signal: controller.signal,
+        });
+
+        const response = await Promise.race([fetchPromise, timeoutPromise]);
+        clearTimeout(timeoutId);
+
+        // Validate HTTP response
+        if (!response.ok) {
+          throw new Error(`Failed to load map: HTTP ${response.status} ${response.statusText}`);
+        }
+
+        // Parse and validate JSON
         const worldGeoJson = await response.json();
+
+        if (!worldGeoJson || typeof worldGeoJson !== 'object') {
+          throw new Error('Invalid map data: malformed GeoJSON');
+        }
 
         // Register the map with echarts
         echarts.registerMap('world', worldGeoJson);
         setMapLoaded(true);
       } catch (error) {
-        console.error('Failed to load world map:', error);
-        setMapLoaded(false);
+        clearTimeout(timeoutId);
+
+        // Don't retry if aborted (component unmounted)
+        if (error instanceof Error && error.name === 'AbortError') {
+          return;
+        }
+
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error loading map';
+        console.error('Failed to load world map:', errorMessage, '- retrying in 5s...');
+
+        // Retry every 5 seconds indefinitely
+        timeoutId = setTimeout(() => {
+          if (!controller.signal.aborted) {
+            loadWorldMap();
+          }
+        }, 5000);
       }
     };
 
     loadWorldMap();
+
+    return () => {
+      controller.abort();
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   // Create a memoized function to generate scatter series config
@@ -135,8 +177,14 @@ function Map2DChartComponent({
     // Filter out points without valid coordinates
     let hasNewPoints = false;
     points.forEach(point => {
-      // Skip points without valid coordinates
-      if (!point.coords || point.coords.length < 2 || point.coords[0] == null || point.coords[1] == null) {
+      // Skip points without valid coordinates or "null island" [0, 0] fallback coords
+      if (
+        !point.coords ||
+        point.coords.length < 2 ||
+        point.coords[0] == null ||
+        point.coords[1] == null ||
+        (point.coords[0] === 0 && point.coords[1] === 0) // Reject [0, 0] null island
+      ) {
         return;
       }
       const key = `${point.coords[0]},${point.coords[1]}`;
@@ -289,17 +337,9 @@ function Map2DChartComponent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapLoaded]); // Only recalculate when map loads - after that we update via setOption
 
-  // Don't render until map is loaded
-  if (!mapLoaded) {
-    return (
-      <div className="flex w-full items-center justify-center" style={{ height }}>
-        <div className="text-foreground">Loading map...</div>
-      </div>
-    );
-  }
-
+  // Always render the map container
   return (
-    <div className="h-full w-full">
+    <div className="relative h-full w-full">
       <ReactECharts
         ref={chartRef}
         option={option}
@@ -308,6 +348,9 @@ function Map2DChartComponent({
         lazyUpdate={true}
         opts={chartOpts}
       />
+      <div className="pointer-events-none absolute bottom-2 left-2 rounded bg-surface/90 px-2 py-1 text-xs text-muted backdrop-blur-sm">
+        Data from nodes contributing to Xatu • Not representative of actual Ethereum network distribution
+      </div>
     </div>
   );
 }
