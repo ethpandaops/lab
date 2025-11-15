@@ -48,6 +48,10 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
   const epochStartTime = currentNetwork ? epochToTimestamp(epoch, currentNetwork.genesis_time) : 0;
   const { firstSlot, lastSlot } = getEpochSlotRange(epoch);
 
+  // Calculate slot start date time range for filtering (API uses timestamps)
+  const firstSlotTime = currentNetwork ? currentNetwork.genesis_time + firstSlot * 12 : 0;
+  const lastSlotTime = currentNetwork ? currentNetwork.genesis_time + lastSlot * 12 : 0;
+
   // For live epochs, refetch every slot (12 seconds) to capture new data as it arrives
   // For historical epochs, disable auto-refetch (false)
   const refetchInterval = isLive ? SECONDS_PER_SLOT * 1000 : false;
@@ -117,17 +121,17 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
         enabled: !!currentNetwork && firstSlot >= 0,
         refetchInterval,
       },
-      // 6. Attestation liveness by entity (only missed)
+      // 6. Attestation liveness by entity (API now has separate attestation_count and missed_count fields)
+      // Note: API limits page_size to 10,000 max
       {
         ...fctAttestationLivenessByEntityHeadServiceListOptions({
           query: {
-            slot_gte: firstSlot,
-            slot_lte: lastSlot,
-            status_eq: 'missed',
+            slot_start_date_time_gte: firstSlotTime,
+            slot_start_date_time_lte: lastSlotTime,
             page_size: 10000,
           },
         }),
-        enabled: !!currentNetwork && firstSlot >= 0,
+        enabled: !!currentNetwork && firstSlotTime > 0,
         refetchInterval,
       },
       // 7. MEV data
@@ -317,11 +321,11 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
 
     // Process missed attestations by entity
     const missedAttestationsByEntity: SlotMissedAttestationEntity[] = attestationLivenessData
-      .filter(record => record.status?.toLowerCase() === 'missed')
+      .filter(record => (record.missed_count ?? 0) > 0)
       .map(record => ({
         slot: record.slot ?? 0,
         entity: record.entity ?? 'unknown',
-        count: record.attestation_count ?? 0,
+        count: record.missed_count ?? 0,
       }));
 
     // Calculate top 10 entities by total missed attestations

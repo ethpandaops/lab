@@ -31,20 +31,33 @@ export function useEpochsData(): UseEpochsDataReturn {
   const { currentNetwork } = useNetwork();
   const { epoch: currentEpoch } = useBeaconClock();
 
-  // Generate array of last 10 epochs with their slot ranges
+  // Generate array of last 10 epochs with their slot ranges and timestamps
   const epochs = useMemo(() => {
-    const result: Array<{ epoch: number; firstSlot: number; lastSlot: number }> = [];
+    if (!currentNetwork) return [];
+    const result: Array<{
+      epoch: number;
+      firstSlot: number;
+      lastSlot: number;
+      firstSlotTime: number;
+      lastSlotTime: number;
+    }> = [];
     for (let i = 0; i < 10; i++) {
       const epoch = Math.max(0, currentEpoch - i);
       const { firstSlot, lastSlot } = getEpochSlotRange(epoch);
-      result.push({ epoch, firstSlot, lastSlot });
+      result.push({
+        epoch,
+        firstSlot,
+        lastSlot,
+        firstSlotTime: currentNetwork.genesis_time + firstSlot * 12,
+        lastSlotTime: currentNetwork.genesis_time + lastSlot * 12,
+      });
     }
     return result;
-  }, [currentEpoch]);
+  }, [currentEpoch, currentNetwork]);
 
   // Query block proposer, attestation, and liveness data for all epochs in parallel
   const results = useQueries({
-    queries: epochs.flatMap(({ firstSlot, lastSlot }) => [
+    queries: epochs.flatMap(({ firstSlot, lastSlot, firstSlotTime, lastSlotTime }) => [
       // Block proposer data
       {
         ...fctBlockProposerHeadServiceListOptions({
@@ -67,17 +80,17 @@ export function useEpochsData(): UseEpochsDataReturn {
         }),
         enabled: !!currentNetwork && firstSlot >= 0,
       },
-      // Missed attestations by entity
+      // Attestation liveness by entity (API now has separate attestation_count and missed_count fields)
+      // Note: API limits page_size to 10,000 max (querying 10 epochs may exceed this)
       {
         ...fctAttestationLivenessByEntityHeadServiceListOptions({
           query: {
-            slot_gte: firstSlot,
-            slot_lte: lastSlot,
-            status_eq: 'missed',
+            slot_start_date_time_gte: firstSlotTime,
+            slot_start_date_time_lte: lastSlotTime,
             page_size: 10000,
           },
         }),
-        enabled: !!currentNetwork && firstSlot >= 0,
+        enabled: !!currentNetwork && firstSlotTime > 0,
       },
     ]),
   });
@@ -163,13 +176,17 @@ export function useEpochsData(): UseEpochsDataReturn {
 
       livenessData.forEach((record: FctAttestationLivenessByEntityHead) => {
         const entity = record.entity ?? 'Unknown';
-        const count = record.attestation_count ?? 0;
-        if (!entityMap.has(entity)) {
-          entityMap.set(entity, new Map());
+        const missedCount = record.missed_count ?? 0;
+
+        // Only include records with missed attestations
+        if (missedCount > 0) {
+          if (!entityMap.has(entity)) {
+            entityMap.set(entity, new Map());
+          }
+          const epochMap = entityMap.get(entity)!;
+          const currentCount = epochMap.get(epoch) ?? 0;
+          epochMap.set(epoch, currentCount + missedCount);
         }
-        const epochMap = entityMap.get(entity)!;
-        const currentCount = epochMap.get(epoch) ?? 0;
-        epochMap.set(epoch, currentCount + count);
       });
     });
 

@@ -44,19 +44,29 @@ export function useEntitiesData(): UseEntitiesDataReturn {
     return epochToTimestamp(lastFinalizedEpoch, currentNetwork.genesis_time);
   }, [currentNetwork, lastFinalizedEpoch]);
 
+  // Get slot start date time range for filtering (API now uses timestamps instead of slot numbers)
+  const { firstSlotTime, lastSlotTime } = useMemo(() => {
+    if (!currentNetwork) return { firstSlotTime: 0, lastSlotTime: 0 };
+    return {
+      firstSlotTime: currentNetwork.genesis_time + firstSlot * 12,
+      lastSlotTime: currentNetwork.genesis_time + lastSlot * 12,
+    };
+  }, [currentNetwork, firstSlot, lastSlot]);
+
   // Fetch attestation liveness and block proposer data in parallel
   const results = useQueries({
     queries: [
       // All attestation liveness data for the last finalized epoch
+      // Note: API limits page_size to 10,000 max (1 epoch may exceed this)
       {
         ...fctAttestationLivenessByEntityHeadServiceListOptions({
           query: {
-            slot_gte: firstSlot,
-            slot_lte: lastSlot,
+            slot_start_date_time_gte: firstSlotTime,
+            slot_start_date_time_lte: lastSlotTime,
             page_size: 10000,
           },
         }),
-        enabled: !!currentNetwork && firstSlot >= 0,
+        enabled: !!currentNetwork && firstSlotTime > 0,
         refetchInterval: false,
         refetchOnWindowFocus: false,
       },
@@ -106,8 +116,8 @@ export function useEntitiesData(): UseEntitiesDataReturn {
 
     attestationData.forEach((record: FctAttestationLivenessByEntityHead) => {
       const entity = record.entity ?? 'Unknown';
-      const count = record.attestation_count ?? 0;
-      const isMissed = record.status?.toLowerCase() === 'missed';
+      const attestationCount = record.attestation_count ?? 0;
+      const missedCount = record.missed_count ?? 0;
 
       if (!entityMap.has(entity)) {
         entityMap.set(entity, {
@@ -120,14 +130,11 @@ export function useEntitiesData(): UseEntitiesDataReturn {
       const entityData = entityMap.get(entity)!;
 
       // Count attestations
-      if (isMissed) {
-        entityData.missedAttestations += count;
-      } else {
-        entityData.totalAttestations += count;
-      }
+      entityData.totalAttestations += attestationCount;
+      entityData.missedAttestations += missedCount;
 
-      // Validator count = total unique attestations (each validator attests once per epoch)
-      entityData.validatorCount += count;
+      // Validator count = total attestations (successful + missed, each validator attests once per epoch)
+      entityData.validatorCount += attestationCount + missedCount;
     });
 
     // Group block proposer data by entity

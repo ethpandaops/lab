@@ -10,6 +10,20 @@ export const zAdminCbtIncremental = z.object({
   updated_date_time: z.optional(z.coerce.bigint()),
 });
 
+export const zDimBlockCanonical = z.object({
+  beacon_block_root: z.optional(z.union([z.string(), z.null()])),
+  beacon_block_version: z.optional(z.union([z.string(), z.null()])),
+  beacon_parent_root: z.optional(z.union([z.string(), z.null()])),
+  beacon_state_root: z.optional(z.union([z.string(), z.null()])),
+  block_date_time: z.optional(z.int()),
+  block_number: z.optional(z.int()),
+  epoch: z.optional(z.union([z.int(), z.null()])),
+  epoch_start_date_time: z.optional(z.union([z.int(), z.null()])),
+  execution_block_hash: z.optional(z.string()),
+  slot: z.optional(z.union([z.int(), z.null()])),
+  slot_start_date_time: z.optional(z.union([z.int(), z.null()])),
+});
+
 export const zDimNode = z.object({
   attributes: z.optional(z.record(z.string(), z.string())),
   groups: z.optional(z.array(z.string())),
@@ -127,9 +141,9 @@ export const zFctAttestationLivenessByEntityHead = z.object({
   entity: z.optional(z.string()),
   epoch: z.optional(z.int()),
   epoch_start_date_time: z.optional(z.int()),
+  missed_count: z.optional(z.int()),
   slot: z.optional(z.int()),
   slot_start_date_time: z.optional(z.int()),
-  status: z.optional(z.string()),
   updated_date_time: z.optional(z.int()),
 });
 
@@ -637,6 +651,13 @@ export const zFctPreparedBlock = z.object({
  */
 export const zGetAdminCbtIncrementalResponse = z.object({
   item: z.optional(zAdminCbtIncremental),
+});
+
+/**
+ * Response for getting a single dim_block_canonical record
+ */
+export const zGetDimBlockCanonicalResponse = z.object({
+  item: z.optional(zDimBlockCanonical),
 });
 
 /**
@@ -1169,6 +1190,14 @@ export const zListAdminCbtIncrementalResponse = z.object({
 });
 
 /**
+ * Response for listing dim_block_canonical records
+ */
+export const zListDimBlockCanonicalResponse = z.object({
+  dim_block_canonical: z.optional(z.array(zDimBlockCanonical)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
  * Response for listing dim_node records
  */
 export const zListDimNodeResponse = z.object({
@@ -1597,6 +1626,16 @@ export const zAdminCbtIncrementalServiceListData = z.object({
       position_between_max_value: z.optional(z.int()),
       position_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
       position_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      interval_eq: z.optional(z.int()),
+      interval_ne: z.optional(z.int()),
+      interval_lt: z.optional(z.int()),
+      interval_lte: z.optional(z.int()),
+      interval_gt: z.optional(z.int()),
+      interval_gte: z.optional(z.int()),
+      interval_between_min: z.optional(z.int()),
+      interval_between_max_value: z.optional(z.int()),
+      interval_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      interval_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
       updated_date_time_eq: z.optional(z.coerce.bigint()),
       updated_date_time_ne: z.optional(z.coerce.bigint()),
       updated_date_time_lt: z.optional(z.coerce.bigint()),
@@ -1616,16 +1655,6 @@ export const zAdminCbtIncrementalServiceListData = z.object({
       table_not_like: z.optional(z.string()),
       table_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
       table_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      interval_eq: z.optional(z.int()),
-      interval_ne: z.optional(z.int()),
-      interval_lt: z.optional(z.int()),
-      interval_lte: z.optional(z.int()),
-      interval_gt: z.optional(z.int()),
-      interval_gte: z.optional(z.int()),
-      interval_between_min: z.optional(z.int()),
-      interval_between_max_value: z.optional(z.int()),
-      interval_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
-      interval_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
       page_size: z.optional(z.int()),
       page_token: z.optional(z.string()),
       order_by: z.optional(z.string()),
@@ -1650,6 +1679,141 @@ export const zAdminCbtIncrementalServiceGetData = z.object({
  * OK
  */
 export const zAdminCbtIncrementalServiceGetResponse = zGetAdminCbtIncrementalResponse;
+
+export const zDimBlockCanonicalServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      block_number_eq: z.optional(z.int()),
+      block_number_ne: z.optional(z.int()),
+      block_number_lt: z.optional(z.int()),
+      block_number_lte: z.optional(z.int()),
+      block_number_gt: z.optional(z.int()),
+      block_number_gte: z.optional(z.int()),
+      block_number_between_min: z.optional(z.int()),
+      block_number_between_max_value: z.optional(z.int()),
+      block_number_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_number_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      execution_block_hash_eq: z.optional(z.string()),
+      execution_block_hash_ne: z.optional(z.string()),
+      execution_block_hash_contains: z.optional(z.string()),
+      execution_block_hash_starts_with: z.optional(z.string()),
+      execution_block_hash_ends_with: z.optional(z.string()),
+      execution_block_hash_like: z.optional(z.string()),
+      execution_block_hash_not_like: z.optional(z.string()),
+      execution_block_hash_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      execution_block_hash_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_date_time_eq: z.optional(z.int()),
+      block_date_time_ne: z.optional(z.int()),
+      block_date_time_lt: z.optional(z.int()),
+      block_date_time_lte: z.optional(z.int()),
+      block_date_time_gt: z.optional(z.int()),
+      block_date_time_gte: z.optional(z.int()),
+      block_date_time_between_min: z.optional(z.int()),
+      block_date_time_between_max_value: z.optional(z.int()),
+      block_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_eq: z.optional(z.int()),
+      slot_ne: z.optional(z.int()),
+      slot_lt: z.optional(z.int()),
+      slot_lte: z.optional(z.int()),
+      slot_gt: z.optional(z.int()),
+      slot_gte: z.optional(z.int()),
+      slot_between_min: z.optional(z.int()),
+      slot_between_max_value: z.optional(z.int()),
+      slot_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_start_date_time_eq: z.optional(z.int()),
+      slot_start_date_time_ne: z.optional(z.int()),
+      slot_start_date_time_lt: z.optional(z.int()),
+      slot_start_date_time_lte: z.optional(z.int()),
+      slot_start_date_time_gt: z.optional(z.int()),
+      slot_start_date_time_gte: z.optional(z.int()),
+      slot_start_date_time_between_min: z.optional(z.int()),
+      slot_start_date_time_between_max_value: z.optional(z.int()),
+      slot_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_eq: z.optional(z.int()),
+      epoch_ne: z.optional(z.int()),
+      epoch_lt: z.optional(z.int()),
+      epoch_lte: z.optional(z.int()),
+      epoch_gt: z.optional(z.int()),
+      epoch_gte: z.optional(z.int()),
+      epoch_between_min: z.optional(z.int()),
+      epoch_between_max_value: z.optional(z.int()),
+      epoch_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_eq: z.optional(z.int()),
+      epoch_start_date_time_ne: z.optional(z.int()),
+      epoch_start_date_time_lt: z.optional(z.int()),
+      epoch_start_date_time_lte: z.optional(z.int()),
+      epoch_start_date_time_gt: z.optional(z.int()),
+      epoch_start_date_time_gte: z.optional(z.int()),
+      epoch_start_date_time_between_min: z.optional(z.int()),
+      epoch_start_date_time_between_max_value: z.optional(z.int()),
+      epoch_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      beacon_block_version_eq: z.optional(z.string()),
+      beacon_block_version_ne: z.optional(z.string()),
+      beacon_block_version_contains: z.optional(z.string()),
+      beacon_block_version_starts_with: z.optional(z.string()),
+      beacon_block_version_ends_with: z.optional(z.string()),
+      beacon_block_version_like: z.optional(z.string()),
+      beacon_block_version_not_like: z.optional(z.string()),
+      beacon_block_version_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      beacon_block_version_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      beacon_block_root_eq: z.optional(z.string()),
+      beacon_block_root_ne: z.optional(z.string()),
+      beacon_block_root_contains: z.optional(z.string()),
+      beacon_block_root_starts_with: z.optional(z.string()),
+      beacon_block_root_ends_with: z.optional(z.string()),
+      beacon_block_root_like: z.optional(z.string()),
+      beacon_block_root_not_like: z.optional(z.string()),
+      beacon_block_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      beacon_block_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      beacon_parent_root_eq: z.optional(z.string()),
+      beacon_parent_root_ne: z.optional(z.string()),
+      beacon_parent_root_contains: z.optional(z.string()),
+      beacon_parent_root_starts_with: z.optional(z.string()),
+      beacon_parent_root_ends_with: z.optional(z.string()),
+      beacon_parent_root_like: z.optional(z.string()),
+      beacon_parent_root_not_like: z.optional(z.string()),
+      beacon_parent_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      beacon_parent_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      beacon_state_root_eq: z.optional(z.string()),
+      beacon_state_root_ne: z.optional(z.string()),
+      beacon_state_root_contains: z.optional(z.string()),
+      beacon_state_root_starts_with: z.optional(z.string()),
+      beacon_state_root_ends_with: z.optional(z.string()),
+      beacon_state_root_like: z.optional(z.string()),
+      beacon_state_root_not_like: z.optional(z.string()),
+      beacon_state_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      beacon_state_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zDimBlockCanonicalServiceListResponse = zListDimBlockCanonicalResponse;
+
+export const zDimBlockCanonicalServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    block_number: z.int(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zDimBlockCanonicalServiceGetResponse = zGetDimBlockCanonicalResponse;
 
 export const zDimNodeServiceListData = z.object({
   body: z.optional(z.never()),
@@ -2777,15 +2941,6 @@ export const zFctAttestationLivenessByEntityHeadServiceListData = z.object({
       entity_not_like: z.optional(z.string()),
       entity_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
       entity_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      status_eq: z.optional(z.string()),
-      status_ne: z.optional(z.string()),
-      status_contains: z.optional(z.string()),
-      status_starts_with: z.optional(z.string()),
-      status_ends_with: z.optional(z.string()),
-      status_like: z.optional(z.string()),
-      status_not_like: z.optional(z.string()),
-      status_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      status_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
       updated_date_time_eq: z.optional(z.int()),
       updated_date_time_ne: z.optional(z.int()),
       updated_date_time_lt: z.optional(z.int()),
@@ -2836,6 +2991,16 @@ export const zFctAttestationLivenessByEntityHeadServiceListData = z.object({
       attestation_count_between_max_value: z.optional(z.int()),
       attestation_count_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
       attestation_count_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      missed_count_eq: z.optional(z.int()),
+      missed_count_ne: z.optional(z.int()),
+      missed_count_lt: z.optional(z.int()),
+      missed_count_lte: z.optional(z.int()),
+      missed_count_gt: z.optional(z.int()),
+      missed_count_gte: z.optional(z.int()),
+      missed_count_between_min: z.optional(z.int()),
+      missed_count_between_max_value: z.optional(z.int()),
+      missed_count_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      missed_count_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
       page_size: z.optional(z.int()),
       page_token: z.optional(z.string()),
       order_by: z.optional(z.string()),
