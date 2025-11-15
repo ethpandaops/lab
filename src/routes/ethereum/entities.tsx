@@ -22,7 +22,6 @@ export const Route = createFileRoute('/ethereum/entities')({
         content:
           'Explore Ethereum validator entities. View entity attestation performance, block proposals, and activity.',
       },
-      { property: 'og:image', content: '/images/ethereum/entities.png' },
       { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/entities` },
       { name: 'twitter:title', content: `Entities | ${import.meta.env.VITE_BASE_TITLE}` },
       {
@@ -30,7 +29,6 @@ export const Route = createFileRoute('/ethereum/entities')({
         content:
           'Explore Ethereum validator entities. View entity attestation performance, block proposals, and activity.',
       },
-      { name: 'twitter:image', content: '/images/ethereum/entities.png' },
     ],
   }),
 });

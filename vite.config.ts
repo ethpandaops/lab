@@ -5,6 +5,7 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import path from 'path';
 import { generateHeadPlugin } from './vite-plugins/generate-head-plugin';
+import { validateRouteImages } from './vite-plugin-validate-route-images';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -14,6 +15,7 @@ export default defineConfig({
     'import.meta.env.VITE_BASE_URL': JSON.stringify('https://lab2.ethpandaops.io'),
   },
   plugins: [
+    validateRouteImages(),
     tanstackRouter({
       routesDirectory: './src/routes',
       generatedRouteTree: './src/routeTree.gen.ts',

@@ -24,19 +24,11 @@ export const Route = createFileRoute('/ethereum/forks')({
         property: 'og:description',
         content: 'View Ethereum consensus layer fork history and upcoming network upgrades',
       },
-      {
-        property: 'og:image',
-        content: '/images/ethereum/forks.png',
-      },
       { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/forks` },
       { name: 'twitter:title', content: `Forks | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         name: 'twitter:description',
         content: 'View Ethereum consensus layer fork history and upcoming network upgrades',
-      },
-      {
-        name: 'twitter:image',
-        content: '/images/ethereum/forks.png',
       },
     ],
   }),
