@@ -309,7 +309,7 @@ export function DetailPage(): JSX.Element {
         <h2 className="mb-6 text-2xl/8 font-bold text-foreground">Propagation Latency Metrics</h2>
         <p className="mb-6 text-muted">
           Real-time propagation latency for blocks, blobs, attestations, and head events observed by this
-          contributor&apos;s nodes. Use the controls below to navigate through historical data.
+          contributor&apos;s nodes. Metrics update live as each slot progresses.
         </p>
 
         <div className="mb-6">
