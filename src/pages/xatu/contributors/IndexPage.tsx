@@ -1,6 +1,7 @@
 import { type JSX, useCallback } from 'react';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
+import { Alert } from '@/components/Feedback/Alert';
 import { UserCard } from './components/UserCard';
 import { UserCardSkeleton } from './components/UserCardSkeleton';
 import { useContributorsData, getDisplayVersion, type Contributor } from './hooks';
@@ -40,7 +41,51 @@ export function IndexPage(): JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title="Contributoors" description="Active node operators in the last 24 hours" />
+        <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+          <Header
+            title="Contributoors"
+            description="Active node operators in the last 24 hours"
+            className="lg:flex-1"
+          />
+
+          <Alert
+            variant="info"
+            accentBorder
+            icon={null}
+            description={
+              <div className="flex items-center gap-4">
+                <img
+                  src="/images/panda-pleading.png"
+                  alt="Contributoor Panda"
+                  className="hidden h-12 shrink-0 xl:block"
+                />
+                <p className="flex-1">
+                  Help optimize Ethereum! Run{' '}
+                  <a
+                    href="https://ethpandaops.io/posts/contributoor-beacon-node-companion/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium underline hover:no-underline"
+                  >
+                    Contributoor
+                  </a>{' '}
+                  alongside your beacon node to share valuable network data.{' '}
+                  <a
+                    href="https://ethpandaops.io/contribute-data/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium underline hover:no-underline"
+                  >
+                    Apply to contribute
+                  </a>
+                  .
+                </p>
+              </div>
+            }
+            className="lg:w-[500px] lg:shrink-0 xl:w-[600px]"
+          />
+        </div>
+
         <div className="mb-12">
           <h2 className="mb-6 text-xl/7 font-semibold text-foreground">Public Contributors</h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
@@ -65,7 +110,50 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      <Header title="Contributoors" description={`Active node operators in the last 24 hours (${totalCount})`} />
+      <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+        <Header
+          title="Contributoors"
+          description={`Active node operators in the last 24 hours (${totalCount})`}
+          className="lg:flex-1"
+        />
+
+        <Alert
+          variant="info"
+          accentBorder
+          icon={null}
+          description={
+            <div className="flex items-center gap-4">
+              <img
+                src="/images/panda-pleading.png"
+                alt="Contributoor Panda"
+                className="hidden h-12 shrink-0 xl:block"
+              />
+              <p className="flex-1">
+                Help optimize Ethereum! Run{' '}
+                <a
+                  href="https://ethpandaops.io/posts/contributoor-beacon-node-companion/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium underline hover:no-underline"
+                >
+                  Contributoor
+                </a>{' '}
+                alongside your beacon node to share valuable network data.{' '}
+                <a
+                  href="https://ethpandaops.io/contribute-data/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium underline hover:no-underline"
+                >
+                  Apply to contribute
+                </a>
+                .
+              </p>
+            </div>
+          }
+          className="lg:w-[500px] lg:shrink-0 xl:w-[600px]"
+        />
+      </div>
 
       {renderContributorSection('Public Contributors', publicContributors)}
       {renderContributorSection('Corporate Contributors', corporateContributors)}
