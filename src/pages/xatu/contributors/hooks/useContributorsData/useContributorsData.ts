@@ -118,7 +118,7 @@ export function useContributorsData(): UseContributorsDataReturn {
   });
 
   const isLoading = pubLoading || corpLoading || ethLoading;
-  const error = pubError || corpError || ethError;
+  const error = (pubError || corpError || ethError) as Error | null;
 
   // Memoize processed contributor lists to avoid reprocessing on every render
   const publicContributors = useMemo(

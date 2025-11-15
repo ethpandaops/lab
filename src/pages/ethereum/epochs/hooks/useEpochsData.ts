@@ -31,33 +31,20 @@ export function useEpochsData(): UseEpochsDataReturn {
   const { currentNetwork } = useNetwork();
   const { epoch: currentEpoch } = useBeaconClock();
 
-  // Generate array of last 10 epochs with their slot ranges and timestamps
+  // Generate array of last 10 epochs with their slot ranges
   const epochs = useMemo(() => {
-    if (!currentNetwork) return [];
-    const result: Array<{
-      epoch: number;
-      firstSlot: number;
-      lastSlot: number;
-      firstSlotTime: number;
-      lastSlotTime: number;
-    }> = [];
+    const result: Array<{ epoch: number; firstSlot: number; lastSlot: number }> = [];
     for (let i = 0; i < 10; i++) {
       const epoch = Math.max(0, currentEpoch - i);
       const { firstSlot, lastSlot } = getEpochSlotRange(epoch);
-      result.push({
-        epoch,
-        firstSlot,
-        lastSlot,
-        firstSlotTime: currentNetwork.genesis_time + firstSlot * 12,
-        lastSlotTime: currentNetwork.genesis_time + lastSlot * 12,
-      });
+      result.push({ epoch, firstSlot, lastSlot });
     }
     return result;
-  }, [currentEpoch, currentNetwork]);
+  }, [currentEpoch]);
 
   // Query block proposer, attestation, and liveness data for all epochs in parallel
   const results = useQueries({
-    queries: epochs.flatMap(({ firstSlot, lastSlot, firstSlotTime, lastSlotTime }) => [
+    queries: epochs.flatMap(({ firstSlot, lastSlot }) => [
       // Block proposer data
       {
         ...fctBlockProposerHeadServiceListOptions({
@@ -80,18 +67,17 @@ export function useEpochsData(): UseEpochsDataReturn {
         }),
         enabled: !!currentNetwork && firstSlot >= 0,
       },
-      // Attestation liveness by entity (API now has separate attestation_count and missed_count fields)
-      // Filter server-side for records with missed attestations only
+      // Attestation liveness by entity - filter server-side for missed attestations only
       {
         ...fctAttestationLivenessByEntityHeadServiceListOptions({
           query: {
-            slot_start_date_time_gte: firstSlotTime,
-            slot_start_date_time_lte: lastSlotTime,
+            slot_gte: firstSlot,
+            slot_lte: lastSlot,
             missed_count_gt: 0,
             page_size: 10000,
           },
         }),
-        enabled: !!currentNetwork && firstSlotTime > 0,
+        enabled: !!currentNetwork && firstSlot >= 0,
       },
     ]),
   });

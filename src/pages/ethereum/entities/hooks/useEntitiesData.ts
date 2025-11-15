@@ -44,29 +44,19 @@ export function useEntitiesData(): UseEntitiesDataReturn {
     return epochToTimestamp(lastFinalizedEpoch, currentNetwork.genesis_time);
   }, [currentNetwork, lastFinalizedEpoch]);
 
-  // Get slot start date time range for filtering (API now uses timestamps instead of slot numbers)
-  const { firstSlotTime, lastSlotTime } = useMemo(() => {
-    if (!currentNetwork) return { firstSlotTime: 0, lastSlotTime: 0 };
-    return {
-      firstSlotTime: currentNetwork.genesis_time + firstSlot * 12,
-      lastSlotTime: currentNetwork.genesis_time + lastSlot * 12,
-    };
-  }, [currentNetwork, firstSlot, lastSlot]);
-
   // Fetch attestation liveness and block proposer data in parallel
   const results = useQueries({
     queries: [
       // All attestation liveness data for the last finalized epoch
-      // Note: API limits page_size to 10,000 max (1 epoch may exceed this)
       {
         ...fctAttestationLivenessByEntityHeadServiceListOptions({
           query: {
-            slot_start_date_time_gte: firstSlotTime,
-            slot_start_date_time_lte: lastSlotTime,
+            slot_gte: firstSlot,
+            slot_lte: lastSlot,
             page_size: 10000,
           },
         }),
-        enabled: !!currentNetwork && firstSlotTime > 0,
+        enabled: !!currentNetwork && firstSlot >= 0,
         refetchInterval: false,
         refetchOnWindowFocus: false,
       },
