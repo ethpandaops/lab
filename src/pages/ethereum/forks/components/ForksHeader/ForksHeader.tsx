@@ -47,7 +47,7 @@ export function ForksHeader({ activeFork, nextFork, allForks }: ForksHeaderProps
   useEffect(() => {
     if (!nextFork || !currentNetwork?.genesis_time) return;
 
-    const interval = setInterval(() => {
+    const updateCountdown = () => {
       const secondsUntilFork = calculateSecondsUntilFork();
 
       setCountdown({
@@ -56,7 +56,12 @@ export function ForksHeader({ activeFork, nextFork, allForks }: ForksHeaderProps
         minutes: Math.floor((secondsUntilFork % 3600) / 60),
         seconds: Math.floor(secondsUntilFork % 60),
       });
-    }, 1000);
+    };
+
+    // Update immediately when data is available
+    updateCountdown();
+
+    const interval = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -231,7 +236,22 @@ export function ForksHeader({ activeFork, nextFork, allForks }: ForksHeaderProps
             <div className="flex items-center justify-center gap-4">
               <div className="text-center">
                 <div className="h-12 w-16 animate-pulse rounded bg-muted/20"></div>
-                <div className="mt-1 text-xs tracking-wider text-muted uppercase">loading</div>
+                <div className="mt-1 text-xs tracking-wider text-muted uppercase">Days</div>
+              </div>
+              <div className="text-2xl text-muted">:</div>
+              <div className="text-center">
+                <div className="h-12 w-16 animate-pulse rounded bg-muted/20"></div>
+                <div className="mt-1 text-xs tracking-wider text-muted uppercase">Hours</div>
+              </div>
+              <div className="text-2xl text-muted">:</div>
+              <div className="text-center">
+                <div className="h-12 w-16 animate-pulse rounded bg-muted/20"></div>
+                <div className="mt-1 text-xs tracking-wider text-muted uppercase">Minutes</div>
+              </div>
+              <div className="text-2xl text-muted">:</div>
+              <div className="text-center">
+                <div className="h-12 w-16 animate-pulse rounded bg-muted/20"></div>
+                <div className="mt-1 text-xs tracking-wider text-muted uppercase">Seconds</div>
               </div>
             </div>
           </div>
