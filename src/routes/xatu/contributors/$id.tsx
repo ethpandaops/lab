@@ -33,11 +33,11 @@ export const Route = createFileRoute('/xatu/contributors/$id')({
       { property: 'og:type', content: 'website' },
       { property: 'og:title', content: `${ctx.params.id} | ${import.meta.env.VITE_BASE_TITLE}` },
       { property: 'og:description', content: 'Detailed contribution metrics and live network performance data' },
-      { property: 'og:image', content: '/images/experiments/contributors.png' },
+      { property: 'og:image', content: '/images/xatu/contributors.png' },
       { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/xatu/contributors/${ctx.params.id}` },
       { name: 'twitter:title', content: `${ctx.params.id} | ${import.meta.env.VITE_BASE_TITLE}` },
       { name: 'twitter:description', content: 'Detailed contribution metrics and live network performance data' },
-      { name: 'twitter:image', content: '/images/experiments/contributors.png' },
+      { name: 'twitter:image', content: '/images/xatu/contributors.png' },
     ],
   }),
 });
