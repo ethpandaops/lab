@@ -62,7 +62,21 @@ export function getNetworkForks(network: Network, currentEpoch?: number): ForkIn
   for (const forkName of FORK_ORDER) {
     const fork = network.forks.consensus[forkName];
     const metadata = FORK_METADATA[forkName];
-    if (fork && metadata) {
+
+    // Always include phase0 as the genesis fork at epoch 0, even if not in config
+    if (forkName === 'phase0' && !fork && metadata) {
+      forks.push({
+        name: forkName,
+        displayName: metadata.name,
+        emoji: metadata.emoji,
+        color: metadata.color,
+        description: metadata.description,
+        epoch: 0,
+        isActive: currentEpoch !== undefined ? currentEpoch >= 0 : false,
+        executionName: metadata.executionName,
+        combinedName: metadata.combinedName,
+      });
+    } else if (fork && metadata) {
       forks.push({
         name: forkName,
         displayName: metadata.name,

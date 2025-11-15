@@ -105,7 +105,7 @@ describe('forks utilities', () => {
       expect(fork?.epoch).toBe(400);
     });
 
-    it('should return null if epoch is before genesis', () => {
+    it('should return phase0 even if not in config (genesis fork always exists)', () => {
       const networkWithNoGenesisFork: Network = {
         ...mockNetwork,
         forks: {
@@ -116,7 +116,9 @@ describe('forks utilities', () => {
       };
 
       const fork = getActiveFork(networkWithNoGenesisFork, 0);
-      expect(fork).toBeNull();
+      expect(fork).not.toBeNull();
+      expect(fork?.name).toBe('phase0');
+      expect(fork?.epoch).toBe(0);
     });
   });
 

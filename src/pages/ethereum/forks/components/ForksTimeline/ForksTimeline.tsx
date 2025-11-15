@@ -1,5 +1,6 @@
 import { Card } from '@/components/Layout/Card';
 import { Epoch } from '@/components/Ethereum/Epoch';
+import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 import type { ForkInfo } from '@/utils/forks';
 import type { BlobScheduleItem } from '@/hooks/useConfig';
@@ -9,12 +10,18 @@ interface ForksTimelineProps {
   forks: ForkInfo[];
   currentEpoch: number;
   blobSchedule?: BlobScheduleItem[];
+  genesisTime?: number;
 }
 
 /**
  * Timeline visualization of all network forks and blob schedule changes
  */
-export function ForksTimeline({ forks, currentEpoch, blobSchedule = [] }: ForksTimelineProps): React.JSX.Element {
+export function ForksTimeline({
+  forks,
+  currentEpoch,
+  blobSchedule = [],
+  genesisTime,
+}: ForksTimelineProps): React.JSX.Element {
   return (
     <Card>
       <div className="p-6">
@@ -102,63 +109,74 @@ export function ForksTimeline({ forks, currentEpoch, blobSchedule = [] }: ForksT
                         </div>
 
                         {/* Status info */}
-                        {!isActive ? (
-                          (() => {
-                            const epochsUntil = fork.epoch - currentEpoch;
-                            const daysUntil = Math.floor((epochsUntil * 32 * 12) / 86400);
+                        {!isActive
+                          ? (() => {
+                              const epochsUntil = fork.epoch - currentEpoch;
+                              const daysUntil = Math.floor((epochsUntil * 32 * 12) / 86400);
 
-                            if (daysUntil < 1) {
-                              return <p className="text-xs text-muted">Activates soon</p>;
-                            } else if (daysUntil < 60) {
-                              return <p className="text-xs text-muted">Activates in {daysUntil} days</p>;
-                            } else if (daysUntil < 730) {
-                              const months = Math.floor(daysUntil / 30);
-                              return <p className="text-xs text-muted">Activates in {months} months</p>;
-                            } else {
-                              const years = Math.floor(daysUntil / 365);
-                              const remainingMonths = Math.floor((daysUntil % 365) / 30);
-                              return (
-                                <p className="text-xs text-muted">
-                                  Activates in {years}y {remainingMonths > 0 ? `${remainingMonths}m` : ''}
-                                </p>
-                              );
-                            }
-                          })()
-                        ) : forkIndex > 0 ? (
-                          (() => {
-                            const prevFork = forks[forkIndex - 1];
-                            const epochsSincePrev = fork.epoch - prevFork.epoch;
-                            const daysSincePrev = Math.floor((epochsSincePrev * 32 * 12) / 86400);
+                              if (daysUntil < 1) {
+                                return <p className="text-xs text-muted">Activates soon</p>;
+                              } else if (daysUntil < 60) {
+                                return <p className="text-xs text-muted">Activates in {daysUntil} days</p>;
+                              } else if (daysUntil < 730) {
+                                const months = Math.floor(daysUntil / 30);
+                                return <p className="text-xs text-muted">Activates in {months} months</p>;
+                              } else {
+                                const years = Math.floor(daysUntil / 365);
+                                const remainingMonths = Math.floor((daysUntil % 365) / 30);
+                                return (
+                                  <p className="text-xs text-muted">
+                                    Activates in {years}y {remainingMonths > 0 ? `${remainingMonths}m` : ''}
+                                  </p>
+                                );
+                              }
+                            })()
+                          : fork.name === 'phase0' && genesisTime
+                            ? (() => {
+                                return (
+                                  <p className="text-xs text-muted">
+                                    <Timestamp timestamp={genesisTime} format="custom">
+                                      {ts => {
+                                        const date = new Date(ts * 1000);
+                                        return date.toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+                                      }}
+                                    </Timestamp>
+                                  </p>
+                                );
+                              })()
+                            : forkIndex > 0
+                              ? (() => {
+                                  const prevFork = forks[forkIndex - 1];
+                                  const epochsSincePrev = fork.epoch - prevFork.epoch;
+                                  const daysSincePrev = Math.floor((epochsSincePrev * 32 * 12) / 86400);
 
-                            if (daysSincePrev === 0) {
-                              return <p className="text-xs text-muted">Activated at genesis</p>;
-                            } else if (daysSincePrev < 60) {
-                              return (
-                                <p className="text-xs text-muted">
-                                  Activated {daysSincePrev} days after {prevFork.displayName}
-                                </p>
-                              );
-                            } else if (daysSincePrev < 730) {
-                              const months = Math.floor(daysSincePrev / 30);
-                              return (
-                                <p className="text-xs text-muted">
-                                  Activated {months} months after {prevFork.displayName}
-                                </p>
-                              );
-                            } else {
-                              const years = Math.floor(daysSincePrev / 365);
-                              const remainingMonths = Math.floor((daysSincePrev % 365) / 30);
-                              return (
-                                <p className="text-xs text-muted">
-                                  Activated {years}y {remainingMonths > 0 ? `${remainingMonths}m` : ''} after{' '}
-                                  {prevFork.displayName}
-                                </p>
-                              );
-                            }
-                          })()
-                        ) : forkIndex === 0 && !isCurrentFork ? (
-                          <p className="text-xs text-muted">Genesis fork</p>
-                        ) : null}
+                                  if (daysSincePrev === 0) {
+                                    return <p className="text-xs text-muted">Activated at genesis</p>;
+                                  } else if (daysSincePrev < 60) {
+                                    return (
+                                      <p className="text-xs text-muted">
+                                        Activated {daysSincePrev} days after {prevFork.displayName}
+                                      </p>
+                                    );
+                                  } else if (daysSincePrev < 730) {
+                                    const months = Math.floor(daysSincePrev / 30);
+                                    return (
+                                      <p className="text-xs text-muted">
+                                        Activated {months} months after {prevFork.displayName}
+                                      </p>
+                                    );
+                                  } else {
+                                    const years = Math.floor(daysSincePrev / 365);
+                                    const remainingMonths = Math.floor((daysSincePrev % 365) / 30);
+                                    return (
+                                      <p className="text-xs text-muted">
+                                        Activated {years}y {remainingMonths > 0 ? `${remainingMonths}m` : ''} after{' '}
+                                        {prevFork.displayName}
+                                      </p>
+                                    );
+                                  }
+                                })()
+                              : null}
                       </div>
                     </div>
                   </div>
