@@ -99,7 +99,7 @@ function MobileHeader({
           <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:-translate-y-2 group-[[aria-pressed=true]]:-rotate-45" />
         </button>
         <Link to="/" className="flex items-center gap-2">
-          <img alt="Lab Logo" src="/images/lab.png" className="size-8" />
+          <img alt="Lab Logo" src="/images/lab.png" className="h-8 w-auto" />
           <span className="font-sans text-xl font-bold text-foreground">The Lab</span>
         </Link>
       </div>

@@ -210,7 +210,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
           {/* Logo and Theme Toggle */}
           <div className="flex h-16 shrink-0 items-center justify-between border-b border-border/50">
             <Link to="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
-              <img alt="Lab Logo" src="/images/lab.png" className="size-10" />
+              <img alt="Lab Logo" src="/images/lab.png" className="h-10 w-auto" />
               <div className="flex flex-col justify-center">
                 <span className="font-sans text-2xl font-bold text-foreground">The Lab</span>
                 <span className="-mt-1 text-[12px] text-muted">lab.ethpandaops.io</span>
