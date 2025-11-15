@@ -38,7 +38,12 @@ export function IndexPage(): React.JSX.Element {
         <ForksHeader activeFork={activeFork} nextFork={nextFork} currentEpoch={currentEpoch} allForks={allForks} />
 
         {/* Timeline of all forks and blob schedule */}
-        <ForksTimeline forks={allForks} currentEpoch={currentEpoch} blobSchedule={currentNetwork?.blob_schedule} />
+        <ForksTimeline
+          forks={allForks}
+          currentEpoch={currentEpoch}
+          blobSchedule={currentNetwork?.blob_schedule}
+          genesisTime={currentNetwork?.genesis_time}
+        />
       </div>
     </Container>
   );

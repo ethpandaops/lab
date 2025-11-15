@@ -212,7 +212,8 @@ export const FORK_METADATA: Record<ForkVersion, ForkMetadata> = {
     name: 'Phase 0',
     emoji: '🚀',
     color: 'bg-gray-100 text-gray-700 dark:bg-gray-400/10 dark:text-gray-400',
-    description: 'Beacon chain genesis - Launched proof-of-stake consensus layer with validator staking',
+    description:
+      'Genesis fork - Launched the beacon chain proof-of-stake consensus layer at epoch 0 with validator staking',
   },
   altair: {
     version: 'altair',
