@@ -3,7 +3,6 @@ import { useNavigate } from '@tanstack/react-router';
 import { Alert } from '@/components/Feedback/Alert';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
-import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Table } from '@/components/Lists/Table';
 
 import { Epoch } from '@/components/Ethereum/Epoch';
@@ -11,6 +10,7 @@ import { TopEntitiesChart } from '@/components/Ethereum/TopEntitiesChart';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 
 import { useEpochsData } from './hooks';
+import { EpochsSkeleton } from './components/EpochsSkeleton';
 
 /**
  * Epochs list page - displays the last 5 recent epochs
@@ -55,7 +55,7 @@ export function IndexPage(): React.JSX.Element {
     return (
       <Container>
         <Header title="Epochs" description="Explore Ethereum beacon chain epochs and their attestation data" />
-        <LoadingContainer className="h-96" />
+        <EpochsSkeleton />
       </Container>
     );
   }

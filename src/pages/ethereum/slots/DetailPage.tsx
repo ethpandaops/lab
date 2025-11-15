@@ -5,7 +5,6 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
-import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Card } from '@/components/Layout/Card';
 import { Tab } from '@/components/Navigation/Tab';
 import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
@@ -35,6 +34,7 @@ import { CopyToClipboard } from '@/components/Elements/CopyToClipboard';
 import { ForkLabel } from '@/components/Ethereum/ForkLabel';
 import { formatGasToMillions, ATTESTATION_DEADLINE_MS } from '@/utils';
 import type { ForkVersion } from '@/utils/beacon';
+import { SlotDetailSkeleton } from './components/SlotDetailSkeleton';
 
 /**
  * Detail page for a specific slot.
@@ -120,18 +120,7 @@ export function DetailPage(): JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title={`Slot ${slot}`} description={`Epoch ${formatEpoch(epoch)}`} />
-        <div className="space-y-6">
-          {/* Basic info skeleton */}
-          <LoadingContainer className="h-64 rounded-sm" />
-
-          {/* Chart grid skeleton */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
-            <LoadingContainer className="col-span-1 h-96 rounded-sm lg:col-span-2" />
-            <LoadingContainer className="col-span-1 h-96 rounded-sm" />
-            <LoadingContainer className="col-span-1 h-96 rounded-sm lg:col-span-2" />
-          </div>
-        </div>
+        <SlotDetailSkeleton slot={slot} epoch={epoch} />
       </Container>
     );
   }
