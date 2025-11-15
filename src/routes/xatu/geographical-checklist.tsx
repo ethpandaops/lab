@@ -26,7 +26,7 @@ export const Route = createFileRoute('/xatu/geographical-checklist')({
       },
       {
         property: 'og:image',
-        content: '/images/experiments/geographical-checklist.png',
+        content: '/images/xatu/geographical-checklist.png',
       },
       { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/xatu/geographical-checklist` },
       { name: 'twitter:title', content: `Geographical Checklist | ${import.meta.env.VITE_BASE_TITLE}` },
@@ -37,7 +37,7 @@ export const Route = createFileRoute('/xatu/geographical-checklist')({
       },
       {
         name: 'twitter:image',
-        content: '/images/experiments/geographical-checklist.png',
+        content: '/images/xatu/geographical-checklist.png',
       },
     ],
   }),

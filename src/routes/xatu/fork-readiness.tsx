@@ -24,7 +24,7 @@ export const Route = createFileRoute('/xatu/fork-readiness')({
       },
       {
         property: 'og:image',
-        content: '/images/experiments/fork-readiness.png',
+        content: '/images/xatu/fork-readiness.png',
       },
       { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/xatu/fork-readiness` },
       { name: 'twitter:title', content: `Fork Readiness | ${import.meta.env.VITE_BASE_TITLE}` },
@@ -34,7 +34,7 @@ export const Route = createFileRoute('/xatu/fork-readiness')({
       },
       {
         name: 'twitter:image',
-        content: '/images/experiments/fork-readiness.png',
+        content: '/images/xatu/fork-readiness.png',
       },
     ],
   }),
