@@ -26,7 +26,7 @@ export const Route = createFileRoute('/xatu/contributors')({
       },
       {
         property: 'og:image',
-        content: '/images/experiments/contributors.png',
+        content: '/images/xatu/contributors.png',
       },
       { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/xatu/contributors` },
       { name: 'twitter:title', content: `Contributors | ${import.meta.env.VITE_BASE_TITLE}` },
@@ -36,7 +36,7 @@ export const Route = createFileRoute('/xatu/contributors')({
       },
       {
         name: 'twitter:image',
-        content: '/images/experiments/contributors.png',
+        content: '/images/xatu/contributors.png',
       },
     ],
   }),
