@@ -767,7 +767,7 @@ export function MultiLineChart({
             minHeight: typeof _height === 'number' && !(showLegend && series.length > 1) ? _height + 52 : _height,
             pointerEvents: 'auto',
           }}
-          notMerge={false}
+          notMerge={true}
           opts={{ renderer: 'canvas' }}
         />
       </div>
