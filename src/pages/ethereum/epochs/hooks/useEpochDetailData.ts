@@ -123,6 +123,7 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
           query: {
             slot_gte: firstSlot,
             slot_lte: lastSlot,
+            missed_count_gt: 0,
             page_size: 10000,
           },
         }),
@@ -315,13 +316,12 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
     };
 
     // Process missed attestations by entity
-    const missedAttestationsByEntity: SlotMissedAttestationEntity[] = attestationLivenessData
-      .filter(record => (record.missed_count ?? 0) > 0)
-      .map(record => ({
-        slot: record.slot ?? 0,
-        entity: record.entity ?? 'unknown',
-        count: record.missed_count ?? 0,
-      }));
+    // Note: API query already filters for missed_count > 0
+    const missedAttestationsByEntity: SlotMissedAttestationEntity[] = attestationLivenessData.map(record => ({
+      slot: record.slot ?? 0,
+      entity: record.entity ?? 'unknown',
+      count: record.missed_count ?? 0,
+    }));
 
     // Calculate top 10 entities by total missed attestations
     const entityTotals = new Map<string, number>();
