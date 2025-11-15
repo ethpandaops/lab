@@ -302,4 +302,11 @@ export interface MultiLineChartProps {
    * Charts with the same syncGroup will have synchronized tooltips and axis pointers
    */
   syncGroup?: string;
+  /**
+   * Whether to merge or replace chart options on update
+   * When true, completely replaces chart options (recommended for toggling series)
+   * When false, merges new options with existing chart state (better performance for frequent updates)
+   * @default true
+   */
+  notMerge?: boolean;
 }

@@ -186,6 +186,7 @@ function BlobDataAvailabilityComponent({
             tooltipTrigger="axis"
             tooltipFormatter={continentalTooltipFormatter}
             animationDuration={0}
+            notMerge={false}
           />
         </div>
       </div>
@@ -232,6 +233,7 @@ function BlobDataAvailabilityComponent({
               tooltipTrigger="axis"
               tooltipFormatter={continentalTooltipFormatter}
               animationDuration={0}
+              notMerge={false}
             />
           </div>
         </div>
@@ -248,6 +250,7 @@ function BlobDataAvailabilityComponent({
           tooltipTrigger="axis"
           tooltipFormatter={continentalTooltipFormatter}
           animationDuration={0}
+          notMerge={false}
         />
       </div>
     </>
