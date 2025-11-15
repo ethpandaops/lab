@@ -5,12 +5,12 @@ import { Alert } from '@/components/Feedback/Alert';
 import { Input } from '@/components/Forms/Input';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
-import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Table } from '@/components/Lists/Table';
 import { useBeaconClock } from '@/hooks/useBeaconClock';
 import { formatEpoch } from '@/utils';
 
 import { useEntitiesData } from './hooks';
+import { EntitiesSkeleton } from './components/EntitiesSkeleton';
 
 /**
  * Entities list page - displays Ethereum validator entities
@@ -87,7 +87,7 @@ export function IndexPage(): React.JSX.Element {
           title="Entities"
           description="Track validator entities and their performance on the Ethereum beacon chain"
         />
-        <LoadingContainer className="h-96" />
+        <EntitiesSkeleton />
       </Container>
     );
   }

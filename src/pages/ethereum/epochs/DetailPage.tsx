@@ -17,7 +17,6 @@ import { TopEntitiesChart } from '@/components/Ethereum/TopEntitiesChart';
 import { TransactionCountChart } from '@/components/Ethereum/TransactionCountChart';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
-import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Button } from '@/components/Elements/Button';
 import { Tab } from '@/components/Navigation/Tab';
 import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
@@ -28,7 +27,7 @@ import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
 import { useTabState } from '@/hooks/useTabState';
 import { Route } from '@/routes/ethereum/epochs/$epoch';
 
-import { EpochHeader, EpochSlotsTable } from './components';
+import { EpochHeader, EpochSlotsTable, EpochDetailSkeleton } from './components';
 import { useEpochDetailData } from './hooks';
 
 /**
@@ -135,8 +134,7 @@ export function DetailPage(): React.JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title={`Epoch ${formatEpoch(epoch)}`} description="Loading epoch data..." />
-        <LoadingContainer className="h-96" />
+        <EpochDetailSkeleton epoch={epoch} />
       </Container>
     );
   }
