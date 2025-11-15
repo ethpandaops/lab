@@ -246,7 +246,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         itemProp: 'description',
         content: 'Platform for exploring Ethereum data and network statistics.',
       },
-      { itemProp: 'image', content: '/images/header.png' },
+      { itemProp: 'image', content: `${import.meta.env.VITE_BASE_URL}/images/header.png` },
 
       // Twitter Card markup
       { name: 'twitter:card', content: 'summary_large_image' },
@@ -258,7 +258,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'Platform for exploring Ethereum data and network statistics.',
       },
       { name: 'twitter:site', content: '@ethpandaops' },
-      { name: 'twitter:image', content: '/images/header.png' },
+      { name: 'twitter:image', content: `${import.meta.env.VITE_BASE_URL}/images/header.png` },
       { name: 'twitter:image:alt', content: import.meta.env.VITE_BASE_TITLE },
 
       // Open Graph markup (Facebook)
@@ -269,7 +269,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         property: 'og:description',
         content: 'Platform for exploring Ethereum data and network statistics.',
       },
-      { property: 'og:image', content: '/images/header.png' },
+      { property: 'og:image', content: `${import.meta.env.VITE_BASE_URL}/images/header.png` },
       { property: 'og:locale', content: 'en_US' },
       { property: 'og:site_name', content: import.meta.env.VITE_BASE_TITLE },
     ],

@@ -21,7 +21,7 @@ export const Route = createFileRoute('/')({
       },
       {
         property: 'og:image',
-        content: '/images/header.png',
+        content: `${import.meta.env.VITE_BASE_URL}/images/header.png`,
       },
       { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/` },
       { name: 'twitter:title', content: import.meta.env.VITE_BASE_TITLE },
@@ -31,7 +31,7 @@ export const Route = createFileRoute('/')({
       },
       {
         name: 'twitter:image',
-        content: '/images/header.png',
+        content: `${import.meta.env.VITE_BASE_URL}/images/header.png`,
       },
     ],
   }),
