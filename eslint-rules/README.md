@@ -18,6 +18,46 @@ Lab uses a **two-tier color architecture** defined in `src/index.css`:
 
 ## Rules
 
+### `lab/validate-route-images`
+
+Validates that all images referenced in route meta tags (og:image, twitter:image) actually exist in the public directory.
+
+**❌ Incorrect:**
+```tsx
+// In src/routes/xatu/contributors.tsx
+export const Route = createFileRoute('/xatu/contributors')({
+  head: () => ({
+    meta: [
+      { property: 'og:image', content: '/images/missing/file.png' }, // ❌ File doesn't exist
+      { name: 'twitter:image', content: '/images/experiments/contributors.png' }, // ❌ Wrong section
+    ],
+  }),
+});
+```
+
+**✅ Correct:**
+```tsx
+// In src/routes/xatu/contributors.tsx
+export const Route = createFileRoute('/xatu/contributors')({
+  head: () => ({
+    meta: [
+      { property: 'og:image', content: '/images/xatu/contributors.png' }, // ✅ File exists
+      { name: 'twitter:image', content: '/images/xatu/contributors.png' }, // ✅ Correct path
+    ],
+  }),
+});
+```
+
+**Image Path Convention:**
+- Images should be placed at: `public/images/[section]/[page-name].png`
+- Referenced as: `/images/[section]/[page-name].png`
+- Example: `public/images/xatu/contributors.png` → `/images/xatu/contributors.png`
+
+**When to create images:**
+- Every page should have a feature image for social sharing (og:image, twitter:image)
+- Images should be PNG format
+- Follow the section-based directory structure
+
 ### `lab/no-hardcoded-colors`
 
 Bans hardcoded color values (hex, RGB, HSL, named colors) in Tailwind className strings and React inline styles.
@@ -133,6 +173,7 @@ These rules are configured in `eslint.config.js`:
     lab: customRules,
   },
   rules: {
+    'lab/validate-route-images': 'error',
     'lab/no-hardcoded-colors': 'error',
     'lab/no-primitive-color-scales': 'error',
   },
