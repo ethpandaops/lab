@@ -81,12 +81,13 @@ export function useEpochsData(): UseEpochsDataReturn {
         enabled: !!currentNetwork && firstSlot >= 0,
       },
       // Attestation liveness by entity (API now has separate attestation_count and missed_count fields)
-      // Note: API limits page_size to 10,000 max (querying 10 epochs may exceed this)
+      // Filter server-side for records with missed attestations only
       {
         ...fctAttestationLivenessByEntityHeadServiceListOptions({
           query: {
             slot_start_date_time_gte: firstSlotTime,
             slot_start_date_time_lte: lastSlotTime,
+            missed_count_gt: 0,
             page_size: 10000,
           },
         }),
@@ -178,15 +179,13 @@ export function useEpochsData(): UseEpochsDataReturn {
         const entity = record.entity ?? 'Unknown';
         const missedCount = record.missed_count ?? 0;
 
-        // Only include records with missed attestations
-        if (missedCount > 0) {
-          if (!entityMap.has(entity)) {
-            entityMap.set(entity, new Map());
-          }
-          const epochMap = entityMap.get(entity)!;
-          const currentCount = epochMap.get(epoch) ?? 0;
-          epochMap.set(epoch, currentCount + missedCount);
+        // Server already filters for missed_count > 0, but we validate here too
+        if (!entityMap.has(entity)) {
+          entityMap.set(entity, new Map());
         }
+        const epochMap = entityMap.get(entity)!;
+        const currentCount = epochMap.get(epoch) ?? 0;
+        epochMap.set(epoch, currentCount + missedCount);
       });
     });
 
