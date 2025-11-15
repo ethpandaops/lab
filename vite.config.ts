@@ -50,5 +50,22 @@ export default defineConfig({
     commonjsOptions: {
       transformMixedEsModules: true, // Handle packages with mixed ESM/CommonJS
     },
+    rollupOptions: {
+      output: {
+        // Generate fresh random hashes on every build to bust cache completely
+        chunkFileNames: () => {
+          const randomHash = Math.random().toString(36).substring(2, 10);
+          return `assets/[name]-${randomHash}.js`;
+        },
+        entryFileNames: () => {
+          const randomHash = Math.random().toString(36).substring(2, 10);
+          return `assets/[name]-${randomHash}.js`;
+        },
+        assetFileNames: () => {
+          const randomHash = Math.random().toString(36).substring(2, 10);
+          return `assets/[name]-${randomHash}.[ext]`;
+        },
+      },
+    },
   },
 });
