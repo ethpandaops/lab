@@ -11,7 +11,7 @@
  *   seed={12345}
  *   showOverlay
  *   overlayTitle="Welcome to The Lab"
- *   overlaySubtitle="Experimental Ethereum data visualizations"
+ *   overlaySubtitle="Ethereum data visualizations"
  * />
  * ```
  */

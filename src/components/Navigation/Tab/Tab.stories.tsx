@@ -125,7 +125,7 @@ export const CustomBadges: Story = {
     <TabGroup>
       <TabList className="flex gap-2 border-b border-border">
         <Tab badge={<span className="text-success">New</span>}>Features</Tab>
-        <Tab badge={<span className="text-warning">Beta</span>}>Experiments</Tab>
+        <Tab badge={<span className="text-warning">Beta</span>}>Beta</Tab>
         <Tab>Stable</Tab>
       </TabList>
       <TabPanels className="mt-4">
@@ -135,9 +135,7 @@ export const CustomBadges: Story = {
           </div>
         </TabPanel>
         <TabPanel>
-          <div className="rounded-sm border border-border bg-background p-4 text-sm text-foreground">
-            Experimental features
-          </div>
+          <div className="rounded-sm border border-border bg-background p-4 text-sm text-foreground">Beta features</div>
         </TabPanel>
         <TabPanel>
           <div className="rounded-sm border border-border bg-background p-4 text-sm text-foreground">
