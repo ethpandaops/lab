@@ -86,6 +86,7 @@ export function MultiLineChart({
   enableSeriesFilter = false,
   relativeSlots,
   syncGroup,
+  notMerge = true,
 }: MultiLineChartProps): React.JSX.Element {
   // Get callback ref for crosshair sync
   const chartRef = useSharedCrosshairs({ syncGroup });
@@ -767,7 +768,7 @@ export function MultiLineChart({
             minHeight: typeof _height === 'number' && !(showLegend && series.length > 1) ? _height + 52 : _height,
             pointerEvents: 'auto',
           }}
-          notMerge={true}
+          notMerge={notMerge}
           opts={{ renderer: 'canvas' }}
         />
       </div>
