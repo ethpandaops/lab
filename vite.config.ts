@@ -50,5 +50,27 @@ export default defineConfig({
     commonjsOptions: {
       transformMixedEsModules: true, // Handle packages with mixed ESM/CommonJS
     },
+    rollupOptions: {
+      output: {
+        // Generate fresh random hashes on every build to bust cache completely
+        chunkFileNames: () => {
+          const randomHash = Math.random().toString(36).substring(2, 10);
+          return `assets/[name]-${randomHash}.js`;
+        },
+        entryFileNames: () => {
+          const randomHash = Math.random().toString(36).substring(2, 10);
+          return `assets/[name]-${randomHash}.js`;
+        },
+        assetFileNames: assetInfo => {
+          // Keep fonts stable for caching (they never change)
+          if (assetInfo.name?.match(/\.(woff2?|ttf|eot|otf)$/)) {
+            return 'assets/[name]-[hash].[ext]';
+          }
+          // Random hash for everything else
+          const randomHash = Math.random().toString(36).substring(2, 10);
+          return `assets/[name]-${randomHash}.[ext]`;
+        },
+      },
+    },
   },
 });
