@@ -14,14 +14,14 @@ export const Route = createFileRoute('/experiments')({
       },
       {
         name: 'description',
-        content: 'Explore experimental visualizations and data analysis tools for Ethereum and Xatu networks.',
+        content: 'Explore visualizations and data analysis tools for Ethereum and Xatu networks.',
       },
       { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/experiments` },
       { property: 'og:type', content: 'website' },
       { property: 'og:title', content: `Experiments | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         property: 'og:description',
-        content: 'Explore experimental visualizations and data analysis tools for Ethereum and Xatu networks.',
+        content: 'Explore visualizations and data analysis tools for Ethereum and Xatu networks.',
       },
       {
         property: 'og:image',
@@ -31,7 +31,7 @@ export const Route = createFileRoute('/experiments')({
       { name: 'twitter:title', content: `Experiments | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         name: 'twitter:description',
-        content: 'Explore experimental visualizations and data analysis tools for Ethereum and Xatu networks.',
+        content: 'Explore visualizations and data analysis tools for Ethereum and Xatu networks.',
       },
       {
         name: 'twitter:image',

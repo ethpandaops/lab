@@ -136,8 +136,8 @@ export const Collapsible: Story = {
           </a>
         </ListItem>
         <ListItem>
-          <a href="#experimental" className="block px-2.5 py-1.5 text-sm font-semibold text-muted hover:text-primary">
-            Experimental
+          <a href="#beta" className="block px-2.5 py-1.5 text-sm font-semibold text-muted hover:text-primary">
+            Beta
           </a>
         </ListItem>
       </ListSection>

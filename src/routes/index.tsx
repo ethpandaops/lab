@@ -10,14 +10,14 @@ export const Route = createFileRoute('/')({
       },
       {
         name: 'description',
-        content: 'Experimental platform for exploring Ethereum data and network statistics.',
+        content: 'Platform for exploring Ethereum data and network statistics.',
       },
       { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/` },
       { property: 'og:type', content: 'website' },
       { property: 'og:title', content: import.meta.env.VITE_BASE_TITLE },
       {
         property: 'og:description',
-        content: 'Experimental platform for exploring Ethereum data and network statistics.',
+        content: 'Platform for exploring Ethereum data and network statistics.',
       },
       {
         property: 'og:image',
@@ -27,7 +27,7 @@ export const Route = createFileRoute('/')({
       { name: 'twitter:title', content: import.meta.env.VITE_BASE_TITLE },
       {
         name: 'twitter:description',
-        content: 'Experimental platform for exploring Ethereum data and network statistics.',
+        content: 'Platform for exploring Ethereum data and network statistics.',
       },
       {
         name: 'twitter:image',

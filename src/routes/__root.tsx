@@ -238,13 +238,13 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         name: 'viewport',
         content: 'width=device-width, initial-scale=1.0, maximum-scale=5.0',
       },
-      { name: 'description', content: 'Experimental platform for exploring Ethereum data and network statistics.' },
+      { name: 'description', content: 'Platform for exploring Ethereum data and network statistics.' },
 
       // Schema.org (For Google+)
       { itemProp: 'name', content: import.meta.env.VITE_BASE_TITLE },
       {
         itemProp: 'description',
-        content: 'Experimental platform for exploring Ethereum data and network statistics.',
+        content: 'Platform for exploring Ethereum data and network statistics.',
       },
       { itemProp: 'image', content: '/images/header.png' },
 
@@ -255,7 +255,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       { name: 'twitter:title', content: import.meta.env.VITE_BASE_TITLE },
       {
         name: 'twitter:description',
-        content: 'Experimental platform for exploring Ethereum data and network statistics.',
+        content: 'Platform for exploring Ethereum data and network statistics.',
       },
       { name: 'twitter:site', content: '@ethpandaops' },
       { name: 'twitter:image', content: '/images/header.png' },
@@ -267,7 +267,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       { property: 'og:title', content: import.meta.env.VITE_BASE_TITLE },
       {
         property: 'og:description',
-        content: 'Experimental platform for exploring Ethereum data and network statistics.',
+        content: 'Platform for exploring Ethereum data and network statistics.',
       },
       { property: 'og:image', content: '/images/header.png' },
       { property: 'og:locale', content: 'en_US' },
