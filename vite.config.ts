@@ -61,7 +61,12 @@ export default defineConfig({
           const randomHash = Math.random().toString(36).substring(2, 10);
           return `assets/[name]-${randomHash}.js`;
         },
-        assetFileNames: () => {
+        assetFileNames: assetInfo => {
+          // Keep fonts stable for caching (they never change)
+          if (assetInfo.name?.match(/\.(woff2?|ttf|eot|otf)$/)) {
+            return 'assets/[name]-[hash].[ext]';
+          }
+          // Random hash for everything else
           const randomHash = Math.random().toString(36).substring(2, 10);
           return `assets/[name]-${randomHash}.[ext]`;
         },
