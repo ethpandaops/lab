@@ -24,7 +24,7 @@ export const Route = createFileRoute('/ethereum/slots/')({
       },
       {
         property: 'og:image',
-        content: '/images/ethereum/slots.png',
+        content: `${import.meta.env.VITE_BASE_URL}/images/ethereum/slots.png`,
       },
       { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/slots` },
       { name: 'twitter:title', content: `Slots | ${import.meta.env.VITE_BASE_TITLE}` },
@@ -34,7 +34,7 @@ export const Route = createFileRoute('/ethereum/slots/')({
       },
       {
         name: 'twitter:image',
-        content: '/images/ethereum/slots.png',
+        content: `${import.meta.env.VITE_BASE_URL}/images/ethereum/slots.png`,
       },
     ],
   }),

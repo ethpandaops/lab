@@ -29,7 +29,7 @@ export const Route = createFileRoute('/ethereum/epochs/$epoch')({
         content:
           'Detailed analysis of a beacon chain epoch including attestations, block proposals, and validator performance across all slots.',
       },
-      { property: 'og:image', content: '/images/ethereum/epochs.png' },
+      { property: 'og:image', content: `${import.meta.env.VITE_BASE_URL}/images/ethereum/epochs.png` },
       { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/epochs/${ctx.params.epoch}` },
       { name: 'twitter:title', content: `Epoch ${ctx.params.epoch} | ${import.meta.env.VITE_BASE_TITLE}` },
       {
@@ -37,7 +37,7 @@ export const Route = createFileRoute('/ethereum/epochs/$epoch')({
         content:
           'Detailed analysis of a beacon chain epoch including attestations, block proposals, and validator performance across all slots.',
       },
-      { name: 'twitter:image', content: '/images/ethereum/epochs.png' },
+      { name: 'twitter:image', content: `${import.meta.env.VITE_BASE_URL}/images/ethereum/epochs.png` },
     ],
   }),
 });
