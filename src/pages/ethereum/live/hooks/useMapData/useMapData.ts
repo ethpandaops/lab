@@ -20,23 +20,32 @@ export function useMapData(nodes: FctBlockFirstSeenByNode[]): MapPointWithTiming
     });
 
     // Convert to PointData format with timing information
-    return Array.from(cityGroups.entries()).map(([, cityNodes]) => {
-      const node = cityNodes[0];
-      const name = node.meta_client_geo_city
-        ? `${node.meta_client_geo_city}, ${node.meta_client_geo_country}`
-        : (node.meta_client_geo_country ?? 'Unknown');
+    return Array.from(cityGroups.entries())
+      .map(([, cityNodes]) => {
+        const node = cityNodes[0];
+        const name = node.meta_client_geo_city
+          ? `${node.meta_client_geo_city}, ${node.meta_client_geo_country}`
+          : (node.meta_client_geo_country ?? 'Unknown');
 
-      // Find the earliest seen time for this city group
-      const earliestSeenTime = Math.min(
-        ...cityNodes.map(n => n.seen_slot_start_diff ?? Infinity).filter(time => time !== Infinity)
-      );
+        // Find the earliest seen time for this city group
+        const earliestSeenTime = Math.min(
+          ...cityNodes.map(n => n.seen_slot_start_diff ?? Infinity).filter(time => time !== Infinity)
+        );
 
-      return {
-        name,
-        coords: [node.meta_client_geo_longitude ?? 0, node.meta_client_geo_latitude ?? 0] as [number, number],
-        value: cityNodes.length, // Number of nodes at this location
-        earliestSeenTime: earliestSeenTime === Infinity ? 0 : earliestSeenTime,
-      };
-    });
+        // Get coordinates - return null if invalid
+        const lon = node.meta_client_geo_longitude;
+        const lat = node.meta_client_geo_latitude;
+
+        return {
+          name,
+          coords: [lon ?? null, lat ?? null] as [number | null, number | null],
+          value: cityNodes.length, // Number of nodes at this location
+          earliestSeenTime: earliestSeenTime === Infinity ? 0 : earliestSeenTime,
+        };
+      })
+      .filter(point => {
+        // Filter out points with invalid coordinates or null island [0, 0]
+        return point.coords[0] != null && point.coords[1] != null && !(point.coords[0] === 0 && point.coords[1] === 0);
+      }) as MapPointWithTiming[];
   }, [nodes]);
 }

@@ -18,7 +18,7 @@ function TimelineComponent({
   onBackward,
   onForward,
   onTimeClick,
-  isLive = false,
+  isLive: _isLive = false,
   ariaLabel = 'Slot View Timeline',
 }: TimelineProps): JSX.Element {
   // Memoize the timeline click handler to prevent SlotTimeline re-renders
@@ -38,17 +38,9 @@ function TimelineComponent({
 
   return (
     <div className="w-full">
-      {/* Header with Live indicator, controls, and current time */}
+      {/* Header with controls and current time */}
       <div className="mb-4 flex items-center gap-6">
-        {/* Left: Live indicator */}
-        {isLive && (
-          <div className="flex items-center gap-2">
-            <div className="size-2 animate-pulse rounded-sm bg-success" />
-            <span className="text-sm text-success">Live</span>
-          </div>
-        )}
-
-        {/* Center: Playback controls */}
+        {/* Playback controls */}
         <div className="flex shrink-0 items-center gap-2">
           {/* Backward button */}
           <button

@@ -42,15 +42,17 @@ export function useSidebarData({
     const allItems: TimelineItem[] = [];
 
     // 2. Block seen in locations - Group by city and take earliest
-    const cityFirstSeen = new Map<string, { timestamp: number; country: string }>();
+    const cityFirstSeen = new Map<string, { timestamp: number; location: string }>();
     blockNodes.forEach(node => {
-      const city = node.meta_client_geo_city ?? 'Unknown';
+      const city = node.meta_client_geo_city;
       const country = node.meta_client_geo_country ?? 'Unknown';
       const timestamp = node.seen_slot_start_diff ?? 0;
 
-      const key = `${city}, ${country}`;
-      if (!cityFirstSeen.has(key) || timestamp < cityFirstSeen.get(key)!.timestamp) {
-        cityFirstSeen.set(key, { timestamp, country });
+      // Format location: "City, Country" or just "Country" if city is missing
+      const location = city ? `${city}, ${country}` : country;
+
+      if (!cityFirstSeen.has(location) || timestamp < cityFirstSeen.get(location)!.timestamp) {
+        cityFirstSeen.set(location, { timestamp, location });
       }
     });
 
