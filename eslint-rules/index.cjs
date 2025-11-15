@@ -11,5 +11,6 @@ module.exports = {
   rules: {
     'no-hardcoded-colors': require('./no-hardcoded-colors.cjs'),
     'no-primitive-color-scales': require('./no-primitive-color-scales.cjs'),
+    'validate-route-images': require('./validate-route-images.cjs'),
   },
 };

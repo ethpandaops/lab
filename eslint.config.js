@@ -118,6 +118,8 @@ export default tseslint.config(
       'lab/no-hardcoded-colors': 'error',
       // Ban primitive color scales (terracotta-*, sand-*, neutral-*, aurora-*)
       'lab/no-primitive-color-scales': 'error',
+      // Validate route images exist
+      'lab/validate-route-images': 'error',
     },
   },
   storybook.configs['flat/recommended'],
