@@ -168,8 +168,15 @@ function Map2DChartComponent({
       previousPointsLengthRef.current = 0;
     }
 
-    // Early exit: if points array length hasn't changed and we're not resetting, skip
-    if (!isReset && points.length === previousPointsLengthRef.current) {
+    // If points array is empty, clear accumulated points (slot ended)
+    const isClearing = points.length === 0 && allSeenPointsRef.current.size > 0;
+    if (isClearing) {
+      allSeenPointsRef.current.clear();
+      previousPointsLengthRef.current = 0;
+    }
+
+    // Early exit: if points array length hasn't changed and we're not resetting or clearing, skip
+    if (!isReset && !isClearing && points.length === previousPointsLengthRef.current) {
       return;
     }
 
@@ -194,8 +201,8 @@ function Map2DChartComponent({
       }
     });
 
-    // Only update if we have new points or just reset
-    if (!hasNewPoints && !isReset) return;
+    // Only update if we have new points, just reset, or clearing
+    if (!hasNewPoints && !isReset && !isClearing) return;
 
     // Update our tracking ref
     previousPointsLengthRef.current = points.length;
