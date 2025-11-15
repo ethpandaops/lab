@@ -106,8 +106,8 @@ export function useEntitiesData(): UseEntitiesDataReturn {
 
     attestationData.forEach((record: FctAttestationLivenessByEntityHead) => {
       const entity = record.entity ?? 'Unknown';
-      const count = record.attestation_count ?? 0;
-      const isMissed = record.status?.toLowerCase() === 'missed';
+      const attestationCount = record.attestation_count ?? 0;
+      const missedCount = record.missed_count ?? 0;
 
       if (!entityMap.has(entity)) {
         entityMap.set(entity, {
@@ -120,14 +120,11 @@ export function useEntitiesData(): UseEntitiesDataReturn {
       const entityData = entityMap.get(entity)!;
 
       // Count attestations
-      if (isMissed) {
-        entityData.missedAttestations += count;
-      } else {
-        entityData.totalAttestations += count;
-      }
+      entityData.totalAttestations += attestationCount;
+      entityData.missedAttestations += missedCount;
 
-      // Validator count = total unique attestations (each validator attests once per epoch)
-      entityData.validatorCount += count;
+      // Validator count = total attestations (successful + missed, each validator attests once per epoch)
+      entityData.validatorCount += attestationCount + missedCount;
     });
 
     // Group block proposer data by entity

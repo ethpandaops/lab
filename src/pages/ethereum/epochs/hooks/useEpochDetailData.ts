@@ -117,13 +117,12 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
         enabled: !!currentNetwork && firstSlot >= 0,
         refetchInterval,
       },
-      // 6. Attestation liveness by entity (only missed)
+      // 6. Attestation liveness by entity
       {
         ...fctAttestationLivenessByEntityHeadServiceListOptions({
           query: {
             slot_gte: firstSlot,
             slot_lte: lastSlot,
-            status_eq: 'missed',
             page_size: 10000,
           },
         }),
@@ -317,11 +316,11 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
 
     // Process missed attestations by entity
     const missedAttestationsByEntity: SlotMissedAttestationEntity[] = attestationLivenessData
-      .filter(record => record.status?.toLowerCase() === 'missed')
+      .filter(record => (record.missed_count ?? 0) > 0)
       .map(record => ({
         slot: record.slot ?? 0,
         entity: record.entity ?? 'unknown',
-        count: record.attestation_count ?? 0,
+        count: record.missed_count ?? 0,
       }));
 
     // Calculate top 10 entities by total missed attestations

@@ -9,6 +9,12 @@ import type {
   AdminCbtIncrementalServiceListData,
   AdminCbtIncrementalServiceListErrors,
   AdminCbtIncrementalServiceListResponses,
+  DimBlockCanonicalServiceGetData,
+  DimBlockCanonicalServiceGetErrors,
+  DimBlockCanonicalServiceGetResponses,
+  DimBlockCanonicalServiceListData,
+  DimBlockCanonicalServiceListErrors,
+  DimBlockCanonicalServiceListResponses,
   DimNodeServiceGetData,
   DimNodeServiceGetErrors,
   DimNodeServiceGetResponses,
@@ -309,6 +315,10 @@ import {
   zAdminCbtIncrementalServiceGetResponse,
   zAdminCbtIncrementalServiceListData,
   zAdminCbtIncrementalServiceListResponse,
+  zDimBlockCanonicalServiceGetData,
+  zDimBlockCanonicalServiceGetResponse,
+  zDimBlockCanonicalServiceListData,
+  zDimBlockCanonicalServiceListResponse,
   zDimNodeServiceGetData,
   zDimNodeServiceGetResponse,
   zDimNodeServiceListData,
@@ -537,12 +547,8 @@ export const adminCbtIncrementalServiceList = <ThrowOnError extends boolean = fa
     AdminCbtIncrementalServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zAdminCbtIncrementalServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zAdminCbtIncrementalServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zAdminCbtIncrementalServiceListData.parseAsync(data),
+    responseValidator: async data => await zAdminCbtIncrementalServiceListResponse.parseAsync(data),
     url: '/api/v1/admin_cbt_incremental',
     ...options,
   });
@@ -561,13 +567,49 @@ export const adminCbtIncrementalServiceGet = <ThrowOnError extends boolean = fal
     AdminCbtIncrementalServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zAdminCbtIncrementalServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zAdminCbtIncrementalServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zAdminCbtIncrementalServiceGetData.parseAsync(data),
+    responseValidator: async data => await zAdminCbtIncrementalServiceGetResponse.parseAsync(data),
     url: '/api/v1/admin_cbt_incremental/{database}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimBlockCanonicalServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<DimBlockCanonicalServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    DimBlockCanonicalServiceListResponses,
+    DimBlockCanonicalServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zDimBlockCanonicalServiceListData.parseAsync(data),
+    responseValidator: async data => await zDimBlockCanonicalServiceListResponse.parseAsync(data),
+    url: '/api/v1/dim_block_canonical',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const dimBlockCanonicalServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<DimBlockCanonicalServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    DimBlockCanonicalServiceGetResponses,
+    DimBlockCanonicalServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zDimBlockCanonicalServiceGetData.parseAsync(data),
+    responseValidator: async data => await zDimBlockCanonicalServiceGetResponse.parseAsync(data),
+    url: '/api/v1/dim_block_canonical/{block_number}',
     ...options,
   });
 };
@@ -581,12 +623,8 @@ export const dimNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<DimNodeServiceListData, ThrowOnError>
 ) => {
   return (options?.client ?? client).get<DimNodeServiceListResponses, DimNodeServiceListErrors, ThrowOnError>({
-    requestValidator: async data => {
-      return await zDimNodeServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zDimNodeServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zDimNodeServiceListData.parseAsync(data),
+    responseValidator: async data => await zDimNodeServiceListResponse.parseAsync(data),
     url: '/api/v1/dim_node',
     ...options,
   });
@@ -601,12 +639,8 @@ export const dimNodeServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<DimNodeServiceGetData, ThrowOnError>
 ) => {
   return (options.client ?? client).get<DimNodeServiceGetResponses, DimNodeServiceGetErrors, ThrowOnError>({
-    requestValidator: async data => {
-      return await zDimNodeServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zDimNodeServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zDimNodeServiceGetData.parseAsync(data),
+    responseValidator: async data => await zDimNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/dim_node/{validator_index}',
     ...options,
   });
@@ -625,12 +659,8 @@ export const fctAddressAccessChunked10000ServiceList = <ThrowOnError extends boo
     FctAddressAccessChunked10000ServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAddressAccessChunked10000ServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAddressAccessChunked10000ServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAddressAccessChunked10000ServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAddressAccessChunked10000ServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_address_access_chunked_10000',
     ...options,
   });
@@ -649,12 +679,8 @@ export const fctAddressAccessChunked10000ServiceGet = <ThrowOnError extends bool
     FctAddressAccessChunked10000ServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAddressAccessChunked10000ServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAddressAccessChunked10000ServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAddressAccessChunked10000ServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAddressAccessChunked10000ServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_address_access_chunked_10000/{chunk_start_block_number}',
     ...options,
   });
@@ -673,12 +699,8 @@ export const fctAddressAccessTotalServiceList = <ThrowOnError extends boolean = 
     FctAddressAccessTotalServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAddressAccessTotalServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAddressAccessTotalServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAddressAccessTotalServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAddressAccessTotalServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_address_access_total',
     ...options,
   });
@@ -697,12 +719,8 @@ export const fctAddressAccessTotalServiceGet = <ThrowOnError extends boolean = f
     FctAddressAccessTotalServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAddressAccessTotalServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAddressAccessTotalServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAddressAccessTotalServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAddressAccessTotalServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_address_access_total/{updated_date_time}',
     ...options,
   });
@@ -721,12 +739,8 @@ export const fctAddressStorageSlotChunked10000ServiceList = <ThrowOnError extend
     FctAddressStorageSlotChunked10000ServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAddressStorageSlotChunked10000ServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAddressStorageSlotChunked10000ServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAddressStorageSlotChunked10000ServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAddressStorageSlotChunked10000ServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_address_storage_slot_chunked_10000',
     ...options,
   });
@@ -745,12 +759,8 @@ export const fctAddressStorageSlotChunked10000ServiceGet = <ThrowOnError extends
     FctAddressStorageSlotChunked10000ServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAddressStorageSlotChunked10000ServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAddressStorageSlotChunked10000ServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAddressStorageSlotChunked10000ServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAddressStorageSlotChunked10000ServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_address_storage_slot_chunked_10000/{chunk_start_block_number}',
     ...options,
   });
@@ -769,12 +779,9 @@ export const fctAddressStorageSlotExpiredTop100ByContractServiceList = <ThrowOnE
     FctAddressStorageSlotExpiredTop100ByContractServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAddressStorageSlotExpiredTop100ByContractServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAddressStorageSlotExpiredTop100ByContractServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAddressStorageSlotExpiredTop100ByContractServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAddressStorageSlotExpiredTop100ByContractServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_address_storage_slot_expired_top_100_by_contract',
     ...options,
   });
@@ -793,12 +800,9 @@ export const fctAddressStorageSlotExpiredTop100ByContractServiceGet = <ThrowOnEr
     FctAddressStorageSlotExpiredTop100ByContractServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAddressStorageSlotExpiredTop100ByContractServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAddressStorageSlotExpiredTop100ByContractServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAddressStorageSlotExpiredTop100ByContractServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAddressStorageSlotExpiredTop100ByContractServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_address_storage_slot_expired_top_100_by_contract/{rank}',
     ...options,
   });
@@ -817,12 +821,8 @@ export const fctAddressStorageSlotTop100ByContractServiceList = <ThrowOnError ex
     FctAddressStorageSlotTop100ByContractServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAddressStorageSlotTop100ByContractServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAddressStorageSlotTop100ByContractServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAddressStorageSlotTop100ByContractServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAddressStorageSlotTop100ByContractServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_address_storage_slot_top_100_by_contract',
     ...options,
   });
@@ -841,12 +841,8 @@ export const fctAddressStorageSlotTop100ByContractServiceGet = <ThrowOnError ext
     FctAddressStorageSlotTop100ByContractServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAddressStorageSlotTop100ByContractServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAddressStorageSlotTop100ByContractServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAddressStorageSlotTop100ByContractServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAddressStorageSlotTop100ByContractServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_address_storage_slot_top_100_by_contract/{rank}',
     ...options,
   });
@@ -865,12 +861,8 @@ export const fctAddressStorageSlotTotalServiceList = <ThrowOnError extends boole
     FctAddressStorageSlotTotalServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAddressStorageSlotTotalServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAddressStorageSlotTotalServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAddressStorageSlotTotalServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAddressStorageSlotTotalServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_address_storage_slot_total',
     ...options,
   });
@@ -889,12 +881,8 @@ export const fctAddressStorageSlotTotalServiceGet = <ThrowOnError extends boolea
     FctAddressStorageSlotTotalServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAddressStorageSlotTotalServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAddressStorageSlotTotalServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAddressStorageSlotTotalServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAddressStorageSlotTotalServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_address_storage_slot_total/{updated_date_time}',
     ...options,
   });
@@ -913,12 +901,10 @@ export const fctAttestationCorrectnessByValidatorCanonicalServiceList = <ThrowOn
     FctAttestationCorrectnessByValidatorCanonicalServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAttestationCorrectnessByValidatorCanonicalServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAttestationCorrectnessByValidatorCanonicalServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data =>
+      await zFctAttestationCorrectnessByValidatorCanonicalServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationCorrectnessByValidatorCanonicalServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_correctness_by_validator_canonical',
     ...options,
   });
@@ -937,12 +923,9 @@ export const fctAttestationCorrectnessByValidatorCanonicalServiceGet = <ThrowOnE
     FctAttestationCorrectnessByValidatorCanonicalServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAttestationCorrectnessByValidatorCanonicalServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAttestationCorrectnessByValidatorCanonicalServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAttestationCorrectnessByValidatorCanonicalServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationCorrectnessByValidatorCanonicalServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_correctness_by_validator_canonical/{slot_start_date_time}',
     ...options,
   });
@@ -961,12 +944,9 @@ export const fctAttestationCorrectnessByValidatorHeadServiceList = <ThrowOnError
     FctAttestationCorrectnessByValidatorHeadServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAttestationCorrectnessByValidatorHeadServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAttestationCorrectnessByValidatorHeadServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAttestationCorrectnessByValidatorHeadServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationCorrectnessByValidatorHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_correctness_by_validator_head',
     ...options,
   });
@@ -985,12 +965,8 @@ export const fctAttestationCorrectnessByValidatorHeadServiceGet = <ThrowOnError 
     FctAttestationCorrectnessByValidatorHeadServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAttestationCorrectnessByValidatorHeadServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAttestationCorrectnessByValidatorHeadServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAttestationCorrectnessByValidatorHeadServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationCorrectnessByValidatorHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_correctness_by_validator_head/{slot_start_date_time}',
     ...options,
   });
@@ -1009,12 +985,8 @@ export const fctAttestationCorrectnessCanonicalServiceList = <ThrowOnError exten
     FctAttestationCorrectnessCanonicalServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAttestationCorrectnessCanonicalServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAttestationCorrectnessCanonicalServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAttestationCorrectnessCanonicalServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationCorrectnessCanonicalServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_correctness_canonical',
     ...options,
   });
@@ -1033,12 +1005,8 @@ export const fctAttestationCorrectnessCanonicalServiceGet = <ThrowOnError extend
     FctAttestationCorrectnessCanonicalServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAttestationCorrectnessCanonicalServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAttestationCorrectnessCanonicalServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAttestationCorrectnessCanonicalServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationCorrectnessCanonicalServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_correctness_canonical/{slot_start_date_time}',
     ...options,
   });
@@ -1057,12 +1025,8 @@ export const fctAttestationCorrectnessHeadServiceList = <ThrowOnError extends bo
     FctAttestationCorrectnessHeadServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAttestationCorrectnessHeadServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAttestationCorrectnessHeadServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAttestationCorrectnessHeadServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationCorrectnessHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_correctness_head',
     ...options,
   });
@@ -1081,12 +1045,8 @@ export const fctAttestationCorrectnessHeadServiceGet = <ThrowOnError extends boo
     FctAttestationCorrectnessHeadServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAttestationCorrectnessHeadServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAttestationCorrectnessHeadServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAttestationCorrectnessHeadServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationCorrectnessHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_correctness_head/{slot_start_date_time}',
     ...options,
   });
@@ -1105,12 +1065,8 @@ export const fctAttestationFirstSeenChunked50MsServiceList = <ThrowOnError exten
     FctAttestationFirstSeenChunked50MsServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAttestationFirstSeenChunked50MsServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAttestationFirstSeenChunked50MsServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAttestationFirstSeenChunked50MsServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationFirstSeenChunked50MsServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_first_seen_chunked_50ms',
     ...options,
   });
@@ -1129,12 +1085,8 @@ export const fctAttestationFirstSeenChunked50MsServiceGet = <ThrowOnError extend
     FctAttestationFirstSeenChunked50MsServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAttestationFirstSeenChunked50MsServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAttestationFirstSeenChunked50MsServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAttestationFirstSeenChunked50MsServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationFirstSeenChunked50MsServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_first_seen_chunked_50ms/{slot_start_date_time}',
     ...options,
   });
@@ -1153,12 +1105,8 @@ export const fctAttestationLivenessByEntityHeadServiceList = <ThrowOnError exten
     FctAttestationLivenessByEntityHeadServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAttestationLivenessByEntityHeadServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAttestationLivenessByEntityHeadServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAttestationLivenessByEntityHeadServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationLivenessByEntityHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_liveness_by_entity_head',
     ...options,
   });
@@ -1177,12 +1125,8 @@ export const fctAttestationLivenessByEntityHeadServiceGet = <ThrowOnError extend
     FctAttestationLivenessByEntityHeadServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAttestationLivenessByEntityHeadServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAttestationLivenessByEntityHeadServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAttestationLivenessByEntityHeadServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationLivenessByEntityHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_liveness_by_entity_head/{slot_start_date_time}',
     ...options,
   });
@@ -1201,12 +1145,8 @@ export const fctAttestationObservationByNodeServiceList = <ThrowOnError extends 
     FctAttestationObservationByNodeServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAttestationObservationByNodeServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAttestationObservationByNodeServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAttestationObservationByNodeServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationObservationByNodeServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_observation_by_node',
     ...options,
   });
@@ -1225,12 +1165,8 @@ export const fctAttestationObservationByNodeServiceGet = <ThrowOnError extends b
     FctAttestationObservationByNodeServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctAttestationObservationByNodeServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctAttestationObservationByNodeServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctAttestationObservationByNodeServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationObservationByNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_observation_by_node/{slot_start_date_time}',
     ...options,
   });
@@ -1245,12 +1181,8 @@ export const fctBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockServiceListData, ThrowOnError>
 ) => {
   return (options?.client ?? client).get<FctBlockServiceListResponses, FctBlockServiceListErrors, ThrowOnError>({
-    requestValidator: async data => {
-      return await zFctBlockServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block',
     ...options,
   });
@@ -1265,12 +1197,8 @@ export const fctBlockServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctBlockServiceGetData, ThrowOnError>
 ) => {
   return (options.client ?? client).get<FctBlockServiceGetResponses, FctBlockServiceGetErrors, ThrowOnError>({
-    requestValidator: async data => {
-      return await zFctBlockServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block/{slot_start_date_time}',
     ...options,
   });
@@ -1289,12 +1217,8 @@ export const fctBlockBlobCountServiceList = <ThrowOnError extends boolean = fals
     FctBlockBlobCountServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockBlobCountServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockBlobCountServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockBlobCountServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockBlobCountServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_blob_count',
     ...options,
   });
@@ -1313,12 +1237,8 @@ export const fctBlockBlobCountServiceGet = <ThrowOnError extends boolean = false
     FctBlockBlobCountServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockBlobCountServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockBlobCountServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockBlobCountServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockBlobCountServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_blob_count/{slot_start_date_time}',
     ...options,
   });
@@ -1337,12 +1257,8 @@ export const fctBlockBlobCountHeadServiceList = <ThrowOnError extends boolean = 
     FctBlockBlobCountHeadServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockBlobCountHeadServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockBlobCountHeadServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockBlobCountHeadServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockBlobCountHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_blob_count_head',
     ...options,
   });
@@ -1361,12 +1277,8 @@ export const fctBlockBlobCountHeadServiceGet = <ThrowOnError extends boolean = f
     FctBlockBlobCountHeadServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockBlobCountHeadServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockBlobCountHeadServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockBlobCountHeadServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockBlobCountHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_blob_count_head/{slot_start_date_time}',
     ...options,
   });
@@ -1385,12 +1297,8 @@ export const fctBlockBlobFirstSeenByNodeServiceList = <ThrowOnError extends bool
     FctBlockBlobFirstSeenByNodeServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockBlobFirstSeenByNodeServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockBlobFirstSeenByNodeServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockBlobFirstSeenByNodeServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockBlobFirstSeenByNodeServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_blob_first_seen_by_node',
     ...options,
   });
@@ -1409,12 +1317,8 @@ export const fctBlockBlobFirstSeenByNodeServiceGet = <ThrowOnError extends boole
     FctBlockBlobFirstSeenByNodeServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockBlobFirstSeenByNodeServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockBlobFirstSeenByNodeServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockBlobFirstSeenByNodeServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockBlobFirstSeenByNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_blob_first_seen_by_node/{slot_start_date_time}',
     ...options,
   });
@@ -1433,12 +1337,9 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeServiceList = <ThrowOnError
     FctBlockDataColumnSidecarFirstSeenByNodeServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockDataColumnSidecarFirstSeenByNodeServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockDataColumnSidecarFirstSeenByNodeServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockDataColumnSidecarFirstSeenByNodeServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockDataColumnSidecarFirstSeenByNodeServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node',
     ...options,
   });
@@ -1457,12 +1358,8 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGet = <ThrowOnError 
     FctBlockDataColumnSidecarFirstSeenByNodeServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node/{slot_start_date_time}',
     ...options,
   });
@@ -1481,12 +1378,8 @@ export const fctBlockFirstSeenByNodeServiceList = <ThrowOnError extends boolean 
     FctBlockFirstSeenByNodeServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockFirstSeenByNodeServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockFirstSeenByNodeServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockFirstSeenByNodeServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFirstSeenByNodeServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_first_seen_by_node',
     ...options,
   });
@@ -1505,12 +1398,8 @@ export const fctBlockFirstSeenByNodeServiceGet = <ThrowOnError extends boolean =
     FctBlockFirstSeenByNodeServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockFirstSeenByNodeServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockFirstSeenByNodeServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockFirstSeenByNodeServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFirstSeenByNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_first_seen_by_node/{slot_start_date_time}',
     ...options,
   });
@@ -1526,12 +1415,8 @@ export const fctBlockHeadServiceList = <ThrowOnError extends boolean = false>(
 ) => {
   return (options?.client ?? client).get<FctBlockHeadServiceListResponses, FctBlockHeadServiceListErrors, ThrowOnError>(
     {
-      requestValidator: async data => {
-        return await zFctBlockHeadServiceListData.parseAsync(data);
-      },
-      responseValidator: async data => {
-        return await zFctBlockHeadServiceListResponse.parseAsync(data);
-      },
+      requestValidator: async data => await zFctBlockHeadServiceListData.parseAsync(data),
+      responseValidator: async data => await zFctBlockHeadServiceListResponse.parseAsync(data),
       url: '/api/v1/fct_block_head',
       ...options,
     }
@@ -1547,12 +1432,8 @@ export const fctBlockHeadServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctBlockHeadServiceGetData, ThrowOnError>
 ) => {
   return (options.client ?? client).get<FctBlockHeadServiceGetResponses, FctBlockHeadServiceGetErrors, ThrowOnError>({
-    requestValidator: async data => {
-      return await zFctBlockHeadServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockHeadServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockHeadServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_head/{slot_start_date_time}',
     ...options,
   });
@@ -1567,12 +1448,8 @@ export const fctBlockMevServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockMevServiceListData, ThrowOnError>
 ) => {
   return (options?.client ?? client).get<FctBlockMevServiceListResponses, FctBlockMevServiceListErrors, ThrowOnError>({
-    requestValidator: async data => {
-      return await zFctBlockMevServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockMevServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockMevServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockMevServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_mev',
     ...options,
   });
@@ -1587,12 +1464,8 @@ export const fctBlockMevServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctBlockMevServiceGetData, ThrowOnError>
 ) => {
   return (options.client ?? client).get<FctBlockMevServiceGetResponses, FctBlockMevServiceGetErrors, ThrowOnError>({
-    requestValidator: async data => {
-      return await zFctBlockMevServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockMevServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockMevServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockMevServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_mev/{slot_start_date_time}',
     ...options,
   });
@@ -1611,12 +1484,8 @@ export const fctBlockMevHeadServiceList = <ThrowOnError extends boolean = false>
     FctBlockMevHeadServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockMevHeadServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockMevHeadServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockMevHeadServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockMevHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_mev_head',
     ...options,
   });
@@ -1635,12 +1504,8 @@ export const fctBlockMevHeadServiceGet = <ThrowOnError extends boolean = false>(
     FctBlockMevHeadServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockMevHeadServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockMevHeadServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockMevHeadServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockMevHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_mev_head/{slot_start_date_time}',
     ...options,
   });
@@ -1659,12 +1524,8 @@ export const fctBlockProposerServiceList = <ThrowOnError extends boolean = false
     FctBlockProposerServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockProposerServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockProposerServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockProposerServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposerServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer',
     ...options,
   });
@@ -1683,12 +1544,8 @@ export const fctBlockProposerServiceGet = <ThrowOnError extends boolean = false>
     FctBlockProposerServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockProposerServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockProposerServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockProposerServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposerServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer/{slot_start_date_time}',
     ...options,
   });
@@ -1707,12 +1564,8 @@ export const fctBlockProposerEntityServiceList = <ThrowOnError extends boolean =
     FctBlockProposerEntityServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockProposerEntityServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockProposerEntityServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockProposerEntityServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposerEntityServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer_entity',
     ...options,
   });
@@ -1731,12 +1584,8 @@ export const fctBlockProposerEntityServiceGet = <ThrowOnError extends boolean = 
     FctBlockProposerEntityServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockProposerEntityServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockProposerEntityServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockProposerEntityServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposerEntityServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer_entity/{slot_start_date_time}',
     ...options,
   });
@@ -1755,12 +1604,8 @@ export const fctBlockProposerHeadServiceList = <ThrowOnError extends boolean = f
     FctBlockProposerHeadServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockProposerHeadServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockProposerHeadServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockProposerHeadServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposerHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer_head',
     ...options,
   });
@@ -1779,12 +1624,8 @@ export const fctBlockProposerHeadServiceGet = <ThrowOnError extends boolean = fa
     FctBlockProposerHeadServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctBlockProposerHeadServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctBlockProposerHeadServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctBlockProposerHeadServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposerHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer_head/{slot_start_date_time}',
     ...options,
   });
@@ -1803,12 +1644,8 @@ export const fctDataColumnAvailabilityByEpochServiceList = <ThrowOnError extends
     FctDataColumnAvailabilityByEpochServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctDataColumnAvailabilityByEpochServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctDataColumnAvailabilityByEpochServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctDataColumnAvailabilityByEpochServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnAvailabilityByEpochServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_by_epoch',
     ...options,
   });
@@ -1827,12 +1664,8 @@ export const fctDataColumnAvailabilityByEpochServiceGet = <ThrowOnError extends 
     FctDataColumnAvailabilityByEpochServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctDataColumnAvailabilityByEpochServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctDataColumnAvailabilityByEpochServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctDataColumnAvailabilityByEpochServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnAvailabilityByEpochServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_by_epoch/{epoch_start_date_time}',
     ...options,
   });
@@ -1851,12 +1684,8 @@ export const fctDataColumnAvailabilityBySlotServiceList = <ThrowOnError extends 
     FctDataColumnAvailabilityBySlotServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctDataColumnAvailabilityBySlotServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctDataColumnAvailabilityBySlotServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctDataColumnAvailabilityBySlotServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnAvailabilityBySlotServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_by_slot',
     ...options,
   });
@@ -1875,12 +1704,8 @@ export const fctDataColumnAvailabilityBySlotServiceGet = <ThrowOnError extends b
     FctDataColumnAvailabilityBySlotServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctDataColumnAvailabilityBySlotServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctDataColumnAvailabilityBySlotServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctDataColumnAvailabilityBySlotServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnAvailabilityBySlotServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_by_slot/{slot_start_date_time}',
     ...options,
   });
@@ -1899,12 +1724,8 @@ export const fctDataColumnAvailabilityBySlotBlobServiceList = <ThrowOnError exte
     FctDataColumnAvailabilityBySlotBlobServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctDataColumnAvailabilityBySlotBlobServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctDataColumnAvailabilityBySlotBlobServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctDataColumnAvailabilityBySlotBlobServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnAvailabilityBySlotBlobServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_by_slot_blob',
     ...options,
   });
@@ -1923,12 +1744,8 @@ export const fctDataColumnAvailabilityBySlotBlobServiceGet = <ThrowOnError exten
     FctDataColumnAvailabilityBySlotBlobServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctDataColumnAvailabilityBySlotBlobServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctDataColumnAvailabilityBySlotBlobServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctDataColumnAvailabilityBySlotBlobServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnAvailabilityBySlotBlobServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_by_slot_blob/{slot_start_date_time}',
     ...options,
   });
@@ -1947,12 +1764,8 @@ export const fctDataColumnAvailabilityDailyServiceList = <ThrowOnError extends b
     FctDataColumnAvailabilityDailyServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctDataColumnAvailabilityDailyServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctDataColumnAvailabilityDailyServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctDataColumnAvailabilityDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnAvailabilityDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_daily',
     ...options,
   });
@@ -1971,12 +1784,8 @@ export const fctDataColumnAvailabilityDailyServiceGet = <ThrowOnError extends bo
     FctDataColumnAvailabilityDailyServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctDataColumnAvailabilityDailyServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctDataColumnAvailabilityDailyServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctDataColumnAvailabilityDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnAvailabilityDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_daily/{date}',
     ...options,
   });
@@ -1995,12 +1804,8 @@ export const fctDataColumnAvailabilityHourlyServiceList = <ThrowOnError extends 
     FctDataColumnAvailabilityHourlyServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctDataColumnAvailabilityHourlyServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctDataColumnAvailabilityHourlyServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctDataColumnAvailabilityHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnAvailabilityHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_hourly',
     ...options,
   });
@@ -2019,12 +1824,8 @@ export const fctDataColumnAvailabilityHourlyServiceGet = <ThrowOnError extends b
     FctDataColumnAvailabilityHourlyServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctDataColumnAvailabilityHourlyServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctDataColumnAvailabilityHourlyServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctDataColumnAvailabilityHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnAvailabilityHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_hourly/{hour_start_date_time}',
     ...options,
   });
@@ -2043,12 +1844,8 @@ export const fctHeadFirstSeenByNodeServiceList = <ThrowOnError extends boolean =
     FctHeadFirstSeenByNodeServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctHeadFirstSeenByNodeServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctHeadFirstSeenByNodeServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctHeadFirstSeenByNodeServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctHeadFirstSeenByNodeServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_head_first_seen_by_node',
     ...options,
   });
@@ -2067,12 +1864,8 @@ export const fctHeadFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = 
     FctHeadFirstSeenByNodeServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctHeadFirstSeenByNodeServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctHeadFirstSeenByNodeServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctHeadFirstSeenByNodeServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctHeadFirstSeenByNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_head_first_seen_by_node/{slot_start_date_time}',
     ...options,
   });
@@ -2091,12 +1884,8 @@ export const fctMevBidCountByBuilderServiceList = <ThrowOnError extends boolean 
     FctMevBidCountByBuilderServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctMevBidCountByBuilderServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctMevBidCountByBuilderServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctMevBidCountByBuilderServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctMevBidCountByBuilderServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_mev_bid_count_by_builder',
     ...options,
   });
@@ -2115,12 +1904,8 @@ export const fctMevBidCountByBuilderServiceGet = <ThrowOnError extends boolean =
     FctMevBidCountByBuilderServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctMevBidCountByBuilderServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctMevBidCountByBuilderServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctMevBidCountByBuilderServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctMevBidCountByBuilderServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_mev_bid_count_by_builder/{slot_start_date_time}',
     ...options,
   });
@@ -2139,12 +1924,8 @@ export const fctMevBidCountByRelayServiceList = <ThrowOnError extends boolean = 
     FctMevBidCountByRelayServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctMevBidCountByRelayServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctMevBidCountByRelayServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctMevBidCountByRelayServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctMevBidCountByRelayServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_mev_bid_count_by_relay',
     ...options,
   });
@@ -2163,12 +1944,8 @@ export const fctMevBidCountByRelayServiceGet = <ThrowOnError extends boolean = f
     FctMevBidCountByRelayServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctMevBidCountByRelayServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctMevBidCountByRelayServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctMevBidCountByRelayServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctMevBidCountByRelayServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_mev_bid_count_by_relay/{slot_start_date_time}',
     ...options,
   });
@@ -2187,12 +1964,9 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceList = <ThrowOnErro
     FctMevBidHighestValueByBuilderChunked50MsServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctMevBidHighestValueByBuilderChunked50MsServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctMevBidHighestValueByBuilderChunked50MsServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctMevBidHighestValueByBuilderChunked50MsServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctMevBidHighestValueByBuilderChunked50MsServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_mev_bid_highest_value_by_builder_chunked_50ms',
     ...options,
   });
@@ -2211,12 +1985,9 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceGet = <ThrowOnError
     FctMevBidHighestValueByBuilderChunked50MsServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctMevBidHighestValueByBuilderChunked50MsServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctMevBidHighestValueByBuilderChunked50MsServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctMevBidHighestValueByBuilderChunked50MsServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctMevBidHighestValueByBuilderChunked50MsServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_mev_bid_highest_value_by_builder_chunked_50ms/{slot_start_date_time}',
     ...options,
   });
@@ -2235,12 +2006,8 @@ export const fctNodeActiveLast24hServiceList = <ThrowOnError extends boolean = f
     FctNodeActiveLast24hServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctNodeActiveLast24hServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctNodeActiveLast24hServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctNodeActiveLast24hServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeActiveLast24hServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_node_active_last_24h',
     ...options,
   });
@@ -2259,12 +2026,8 @@ export const fctNodeActiveLast24hServiceGet = <ThrowOnError extends boolean = fa
     FctNodeActiveLast24hServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctNodeActiveLast24hServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctNodeActiveLast24hServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctNodeActiveLast24hServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeActiveLast24hServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_node_active_last_24h/{meta_client_name}',
     ...options,
   });
@@ -2283,12 +2046,8 @@ export const fctPreparedBlockServiceList = <ThrowOnError extends boolean = false
     FctPreparedBlockServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctPreparedBlockServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctPreparedBlockServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctPreparedBlockServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPreparedBlockServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_prepared_block',
     ...options,
   });
@@ -2307,12 +2066,8 @@ export const fctPreparedBlockServiceGet = <ThrowOnError extends boolean = false>
     FctPreparedBlockServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zFctPreparedBlockServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctPreparedBlockServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zFctPreparedBlockServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPreparedBlockServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_prepared_block/{slot_start_date_time}',
     ...options,
   });
@@ -2331,12 +2086,8 @@ export const intAddressFirstAccessServiceList = <ThrowOnError extends boolean = 
     IntAddressFirstAccessServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntAddressFirstAccessServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntAddressFirstAccessServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntAddressFirstAccessServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntAddressFirstAccessServiceListResponse.parseAsync(data),
     url: '/api/v1/int_address_first_access',
     ...options,
   });
@@ -2355,12 +2106,8 @@ export const intAddressFirstAccessServiceGet = <ThrowOnError extends boolean = f
     IntAddressFirstAccessServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntAddressFirstAccessServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntAddressFirstAccessServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntAddressFirstAccessServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntAddressFirstAccessServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_address_first_access/{address}',
     ...options,
   });
@@ -2379,12 +2126,8 @@ export const intAddressLastAccessServiceList = <ThrowOnError extends boolean = f
     IntAddressLastAccessServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntAddressLastAccessServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntAddressLastAccessServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntAddressLastAccessServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntAddressLastAccessServiceListResponse.parseAsync(data),
     url: '/api/v1/int_address_last_access',
     ...options,
   });
@@ -2403,12 +2146,8 @@ export const intAddressLastAccessServiceGet = <ThrowOnError extends boolean = fa
     IntAddressLastAccessServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntAddressLastAccessServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntAddressLastAccessServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntAddressLastAccessServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntAddressLastAccessServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_address_last_access/{address}',
     ...options,
   });
@@ -2427,12 +2166,8 @@ export const intAddressStorageSlotFirstAccessServiceList = <ThrowOnError extends
     IntAddressStorageSlotFirstAccessServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntAddressStorageSlotFirstAccessServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntAddressStorageSlotFirstAccessServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntAddressStorageSlotFirstAccessServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntAddressStorageSlotFirstAccessServiceListResponse.parseAsync(data),
     url: '/api/v1/int_address_storage_slot_first_access',
     ...options,
   });
@@ -2451,12 +2186,8 @@ export const intAddressStorageSlotFirstAccessServiceGet = <ThrowOnError extends 
     IntAddressStorageSlotFirstAccessServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntAddressStorageSlotFirstAccessServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntAddressStorageSlotFirstAccessServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntAddressStorageSlotFirstAccessServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntAddressStorageSlotFirstAccessServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_address_storage_slot_first_access/{address}',
     ...options,
   });
@@ -2475,12 +2206,8 @@ export const intAddressStorageSlotLastAccessServiceList = <ThrowOnError extends 
     IntAddressStorageSlotLastAccessServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntAddressStorageSlotLastAccessServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntAddressStorageSlotLastAccessServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntAddressStorageSlotLastAccessServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntAddressStorageSlotLastAccessServiceListResponse.parseAsync(data),
     url: '/api/v1/int_address_storage_slot_last_access',
     ...options,
   });
@@ -2499,12 +2226,8 @@ export const intAddressStorageSlotLastAccessServiceGet = <ThrowOnError extends b
     IntAddressStorageSlotLastAccessServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntAddressStorageSlotLastAccessServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntAddressStorageSlotLastAccessServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntAddressStorageSlotLastAccessServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntAddressStorageSlotLastAccessServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_address_storage_slot_last_access/{address}',
     ...options,
   });
@@ -2523,12 +2246,8 @@ export const intAttestationAttestedCanonicalServiceList = <ThrowOnError extends 
     IntAttestationAttestedCanonicalServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntAttestationAttestedCanonicalServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntAttestationAttestedCanonicalServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntAttestationAttestedCanonicalServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntAttestationAttestedCanonicalServiceListResponse.parseAsync(data),
     url: '/api/v1/int_attestation_attested_canonical',
     ...options,
   });
@@ -2547,12 +2266,8 @@ export const intAttestationAttestedCanonicalServiceGet = <ThrowOnError extends b
     IntAttestationAttestedCanonicalServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntAttestationAttestedCanonicalServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntAttestationAttestedCanonicalServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntAttestationAttestedCanonicalServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntAttestationAttestedCanonicalServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_attestation_attested_canonical/{slot_start_date_time}',
     ...options,
   });
@@ -2571,12 +2286,8 @@ export const intAttestationAttestedHeadServiceList = <ThrowOnError extends boole
     IntAttestationAttestedHeadServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntAttestationAttestedHeadServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntAttestationAttestedHeadServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntAttestationAttestedHeadServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntAttestationAttestedHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/int_attestation_attested_head',
     ...options,
   });
@@ -2595,12 +2306,8 @@ export const intAttestationAttestedHeadServiceGet = <ThrowOnError extends boolea
     IntAttestationAttestedHeadServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntAttestationAttestedHeadServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntAttestationAttestedHeadServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntAttestationAttestedHeadServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntAttestationAttestedHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_attestation_attested_head/{slot_start_date_time}',
     ...options,
   });
@@ -2619,12 +2326,8 @@ export const intAttestationFirstSeenServiceList = <ThrowOnError extends boolean 
     IntAttestationFirstSeenServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntAttestationFirstSeenServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntAttestationFirstSeenServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntAttestationFirstSeenServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntAttestationFirstSeenServiceListResponse.parseAsync(data),
     url: '/api/v1/int_attestation_first_seen',
     ...options,
   });
@@ -2643,12 +2346,8 @@ export const intAttestationFirstSeenServiceGet = <ThrowOnError extends boolean =
     IntAttestationFirstSeenServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntAttestationFirstSeenServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntAttestationFirstSeenServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntAttestationFirstSeenServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntAttestationFirstSeenServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_attestation_first_seen/{slot_start_date_time}',
     ...options,
   });
@@ -2667,12 +2366,8 @@ export const intBeaconCommitteeHeadServiceList = <ThrowOnError extends boolean =
     IntBeaconCommitteeHeadServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntBeaconCommitteeHeadServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntBeaconCommitteeHeadServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntBeaconCommitteeHeadServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntBeaconCommitteeHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/int_beacon_committee_head',
     ...options,
   });
@@ -2691,12 +2386,8 @@ export const intBeaconCommitteeHeadServiceGet = <ThrowOnError extends boolean = 
     IntBeaconCommitteeHeadServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntBeaconCommitteeHeadServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntBeaconCommitteeHeadServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntBeaconCommitteeHeadServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntBeaconCommitteeHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_beacon_committee_head/{slot_start_date_time}',
     ...options,
   });
@@ -2715,12 +2406,8 @@ export const intBlockBlobCountCanonicalServiceList = <ThrowOnError extends boole
     IntBlockBlobCountCanonicalServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntBlockBlobCountCanonicalServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntBlockBlobCountCanonicalServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntBlockBlobCountCanonicalServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntBlockBlobCountCanonicalServiceListResponse.parseAsync(data),
     url: '/api/v1/int_block_blob_count_canonical',
     ...options,
   });
@@ -2739,12 +2426,8 @@ export const intBlockBlobCountCanonicalServiceGet = <ThrowOnError extends boolea
     IntBlockBlobCountCanonicalServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntBlockBlobCountCanonicalServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntBlockBlobCountCanonicalServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntBlockBlobCountCanonicalServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntBlockBlobCountCanonicalServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_block_blob_count_canonical/{slot_start_date_time}',
     ...options,
   });
@@ -2763,12 +2446,8 @@ export const intBlockCanonicalServiceList = <ThrowOnError extends boolean = fals
     IntBlockCanonicalServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntBlockCanonicalServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntBlockCanonicalServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntBlockCanonicalServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntBlockCanonicalServiceListResponse.parseAsync(data),
     url: '/api/v1/int_block_canonical',
     ...options,
   });
@@ -2787,12 +2466,8 @@ export const intBlockCanonicalServiceGet = <ThrowOnError extends boolean = false
     IntBlockCanonicalServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntBlockCanonicalServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntBlockCanonicalServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntBlockCanonicalServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntBlockCanonicalServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_block_canonical/{slot_start_date_time}',
     ...options,
   });
@@ -2811,12 +2486,8 @@ export const intBlockMevCanonicalServiceList = <ThrowOnError extends boolean = f
     IntBlockMevCanonicalServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntBlockMevCanonicalServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntBlockMevCanonicalServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntBlockMevCanonicalServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntBlockMevCanonicalServiceListResponse.parseAsync(data),
     url: '/api/v1/int_block_mev_canonical',
     ...options,
   });
@@ -2835,12 +2506,8 @@ export const intBlockMevCanonicalServiceGet = <ThrowOnError extends boolean = fa
     IntBlockMevCanonicalServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntBlockMevCanonicalServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntBlockMevCanonicalServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntBlockMevCanonicalServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntBlockMevCanonicalServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_block_mev_canonical/{slot_start_date_time}',
     ...options,
   });
@@ -2859,12 +2526,8 @@ export const intBlockProposerCanonicalServiceList = <ThrowOnError extends boolea
     IntBlockProposerCanonicalServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntBlockProposerCanonicalServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntBlockProposerCanonicalServiceListResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntBlockProposerCanonicalServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntBlockProposerCanonicalServiceListResponse.parseAsync(data),
     url: '/api/v1/int_block_proposer_canonical',
     ...options,
   });
@@ -2883,12 +2546,8 @@ export const intBlockProposerCanonicalServiceGet = <ThrowOnError extends boolean
     IntBlockProposerCanonicalServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => {
-      return await zIntBlockProposerCanonicalServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zIntBlockProposerCanonicalServiceGetResponse.parseAsync(data);
-    },
+    requestValidator: async data => await zIntBlockProposerCanonicalServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntBlockProposerCanonicalServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_block_proposer_canonical/{slot_start_date_time}',
     ...options,
   });

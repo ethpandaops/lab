@@ -256,8 +256,8 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
     attestation12hData.forEach((record: FctAttestationLivenessByEntityHead) => {
       const slot = record.slot ?? 0;
       const epoch = slotToEpoch(slot);
-      const count = record.attestation_count ?? 0;
-      const isMissed = record.status?.toLowerCase() === 'missed';
+      const attestationCount = record.attestation_count ?? 0;
+      const missedCount = record.missed_count ?? 0;
 
       if (!epochAttestationMap.has(epoch)) {
         epochAttestationMap.set(epoch, {
@@ -269,11 +269,8 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
 
       const epochData = epochAttestationMap.get(epoch)!;
 
-      if (isMissed) {
-        epochData.missedAttestations += count;
-      } else {
-        epochData.totalAttestations += count;
-      }
+      epochData.totalAttestations += attestationCount;
+      epochData.missedAttestations += missedCount;
 
       if (slot > epochData.lastSlot) {
         epochData.lastSlot = slot;
@@ -334,14 +331,11 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
     let missedAttestations12h = 0;
 
     attestation12hData.forEach((record: FctAttestationLivenessByEntityHead) => {
-      const count = record.attestation_count ?? 0;
-      const isMissed = record.status?.toLowerCase() === 'missed';
+      const attestationCount = record.attestation_count ?? 0;
+      const missedCount = record.missed_count ?? 0;
 
-      if (isMissed) {
-        missedAttestations12h += count;
-      } else {
-        totalAttestations12h += count;
-      }
+      totalAttestations12h += attestationCount;
+      missedAttestations12h += missedCount;
     });
 
     const total12h = totalAttestations12h + missedAttestations12h;

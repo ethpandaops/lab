@@ -303,14 +303,14 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
   const attestationLivenessData: FctAttestationLivenessByEntityHead[] =
     queries[16].data?.fct_attestation_liveness_by_entity_head ?? [];
 
-  // Filter to only missed attestations and sort by count
+  // Sort by missed_count and get top 10
   const missedAttestations: MissedAttestationEntity[] = attestationLivenessData
-    .filter(record => record.status?.toLowerCase() === 'missed')
-    .sort((a, b) => (b.attestation_count ?? 0) - (a.attestation_count ?? 0))
+    .filter(record => (record.missed_count ?? 0) > 0)
+    .sort((a, b) => (b.missed_count ?? 0) - (a.missed_count ?? 0))
     .slice(0, 10)
     .map(record => ({
       entity: record.entity ?? 'unknown',
-      count: record.attestation_count ?? 0,
+      count: record.missed_count ?? 0,
     }));
 
   // Combine all data

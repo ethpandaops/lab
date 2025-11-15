@@ -6,6 +6,8 @@ import { client } from '../client.gen';
 import {
   adminCbtIncrementalServiceGet,
   adminCbtIncrementalServiceList,
+  dimBlockCanonicalServiceGet,
+  dimBlockCanonicalServiceList,
   dimNodeServiceGet,
   dimNodeServiceList,
   fctAddressAccessChunked10000ServiceGet,
@@ -108,105 +110,311 @@ import {
 } from '../sdk.gen';
 import type {
   AdminCbtIncrementalServiceGetData,
+  AdminCbtIncrementalServiceGetError,
+  AdminCbtIncrementalServiceGetResponse,
   AdminCbtIncrementalServiceListData,
+  AdminCbtIncrementalServiceListError,
+  AdminCbtIncrementalServiceListResponse,
+  DimBlockCanonicalServiceGetData,
+  DimBlockCanonicalServiceGetError,
+  DimBlockCanonicalServiceGetResponse,
+  DimBlockCanonicalServiceListData,
+  DimBlockCanonicalServiceListError,
+  DimBlockCanonicalServiceListResponse,
   DimNodeServiceGetData,
+  DimNodeServiceGetError,
+  DimNodeServiceGetResponse,
   DimNodeServiceListData,
+  DimNodeServiceListError,
+  DimNodeServiceListResponse,
   FctAddressAccessChunked10000ServiceGetData,
+  FctAddressAccessChunked10000ServiceGetError,
+  FctAddressAccessChunked10000ServiceGetResponse,
   FctAddressAccessChunked10000ServiceListData,
+  FctAddressAccessChunked10000ServiceListError,
+  FctAddressAccessChunked10000ServiceListResponse,
   FctAddressAccessTotalServiceGetData,
+  FctAddressAccessTotalServiceGetError,
+  FctAddressAccessTotalServiceGetResponse,
   FctAddressAccessTotalServiceListData,
+  FctAddressAccessTotalServiceListError,
+  FctAddressAccessTotalServiceListResponse,
   FctAddressStorageSlotChunked10000ServiceGetData,
+  FctAddressStorageSlotChunked10000ServiceGetError,
+  FctAddressStorageSlotChunked10000ServiceGetResponse,
   FctAddressStorageSlotChunked10000ServiceListData,
+  FctAddressStorageSlotChunked10000ServiceListError,
+  FctAddressStorageSlotChunked10000ServiceListResponse,
   FctAddressStorageSlotExpiredTop100ByContractServiceGetData,
+  FctAddressStorageSlotExpiredTop100ByContractServiceGetError,
+  FctAddressStorageSlotExpiredTop100ByContractServiceGetResponse,
   FctAddressStorageSlotExpiredTop100ByContractServiceListData,
+  FctAddressStorageSlotExpiredTop100ByContractServiceListError,
+  FctAddressStorageSlotExpiredTop100ByContractServiceListResponse,
   FctAddressStorageSlotTop100ByContractServiceGetData,
+  FctAddressStorageSlotTop100ByContractServiceGetError,
+  FctAddressStorageSlotTop100ByContractServiceGetResponse,
   FctAddressStorageSlotTop100ByContractServiceListData,
+  FctAddressStorageSlotTop100ByContractServiceListError,
+  FctAddressStorageSlotTop100ByContractServiceListResponse,
   FctAddressStorageSlotTotalServiceGetData,
+  FctAddressStorageSlotTotalServiceGetError,
+  FctAddressStorageSlotTotalServiceGetResponse,
   FctAddressStorageSlotTotalServiceListData,
+  FctAddressStorageSlotTotalServiceListError,
+  FctAddressStorageSlotTotalServiceListResponse,
   FctAttestationCorrectnessByValidatorCanonicalServiceGetData,
+  FctAttestationCorrectnessByValidatorCanonicalServiceGetError,
+  FctAttestationCorrectnessByValidatorCanonicalServiceGetResponse,
   FctAttestationCorrectnessByValidatorCanonicalServiceListData,
+  FctAttestationCorrectnessByValidatorCanonicalServiceListError,
+  FctAttestationCorrectnessByValidatorCanonicalServiceListResponse,
   FctAttestationCorrectnessByValidatorHeadServiceGetData,
+  FctAttestationCorrectnessByValidatorHeadServiceGetError,
+  FctAttestationCorrectnessByValidatorHeadServiceGetResponse,
   FctAttestationCorrectnessByValidatorHeadServiceListData,
+  FctAttestationCorrectnessByValidatorHeadServiceListError,
+  FctAttestationCorrectnessByValidatorHeadServiceListResponse,
   FctAttestationCorrectnessCanonicalServiceGetData,
+  FctAttestationCorrectnessCanonicalServiceGetError,
+  FctAttestationCorrectnessCanonicalServiceGetResponse,
   FctAttestationCorrectnessCanonicalServiceListData,
+  FctAttestationCorrectnessCanonicalServiceListError,
+  FctAttestationCorrectnessCanonicalServiceListResponse,
   FctAttestationCorrectnessHeadServiceGetData,
+  FctAttestationCorrectnessHeadServiceGetError,
+  FctAttestationCorrectnessHeadServiceGetResponse,
   FctAttestationCorrectnessHeadServiceListData,
+  FctAttestationCorrectnessHeadServiceListError,
+  FctAttestationCorrectnessHeadServiceListResponse,
   FctAttestationFirstSeenChunked50MsServiceGetData,
+  FctAttestationFirstSeenChunked50MsServiceGetError,
+  FctAttestationFirstSeenChunked50MsServiceGetResponse,
   FctAttestationFirstSeenChunked50MsServiceListData,
+  FctAttestationFirstSeenChunked50MsServiceListError,
+  FctAttestationFirstSeenChunked50MsServiceListResponse,
   FctAttestationLivenessByEntityHeadServiceGetData,
+  FctAttestationLivenessByEntityHeadServiceGetError,
+  FctAttestationLivenessByEntityHeadServiceGetResponse,
   FctAttestationLivenessByEntityHeadServiceListData,
+  FctAttestationLivenessByEntityHeadServiceListError,
+  FctAttestationLivenessByEntityHeadServiceListResponse,
   FctAttestationObservationByNodeServiceGetData,
+  FctAttestationObservationByNodeServiceGetError,
+  FctAttestationObservationByNodeServiceGetResponse,
   FctAttestationObservationByNodeServiceListData,
+  FctAttestationObservationByNodeServiceListError,
+  FctAttestationObservationByNodeServiceListResponse,
   FctBlockBlobCountHeadServiceGetData,
+  FctBlockBlobCountHeadServiceGetError,
+  FctBlockBlobCountHeadServiceGetResponse,
   FctBlockBlobCountHeadServiceListData,
+  FctBlockBlobCountHeadServiceListError,
+  FctBlockBlobCountHeadServiceListResponse,
   FctBlockBlobCountServiceGetData,
+  FctBlockBlobCountServiceGetError,
+  FctBlockBlobCountServiceGetResponse,
   FctBlockBlobCountServiceListData,
+  FctBlockBlobCountServiceListError,
+  FctBlockBlobCountServiceListResponse,
   FctBlockBlobFirstSeenByNodeServiceGetData,
+  FctBlockBlobFirstSeenByNodeServiceGetError,
+  FctBlockBlobFirstSeenByNodeServiceGetResponse,
   FctBlockBlobFirstSeenByNodeServiceListData,
+  FctBlockBlobFirstSeenByNodeServiceListError,
+  FctBlockBlobFirstSeenByNodeServiceListResponse,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData,
+  FctBlockDataColumnSidecarFirstSeenByNodeServiceGetError,
+  FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceListData,
+  FctBlockDataColumnSidecarFirstSeenByNodeServiceListError,
+  FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponse,
   FctBlockFirstSeenByNodeServiceGetData,
+  FctBlockFirstSeenByNodeServiceGetError,
+  FctBlockFirstSeenByNodeServiceGetResponse,
   FctBlockFirstSeenByNodeServiceListData,
+  FctBlockFirstSeenByNodeServiceListError,
+  FctBlockFirstSeenByNodeServiceListResponse,
   FctBlockHeadServiceGetData,
+  FctBlockHeadServiceGetError,
+  FctBlockHeadServiceGetResponse,
   FctBlockHeadServiceListData,
+  FctBlockHeadServiceListError,
+  FctBlockHeadServiceListResponse,
   FctBlockMevHeadServiceGetData,
+  FctBlockMevHeadServiceGetError,
+  FctBlockMevHeadServiceGetResponse,
   FctBlockMevHeadServiceListData,
+  FctBlockMevHeadServiceListError,
+  FctBlockMevHeadServiceListResponse,
   FctBlockMevServiceGetData,
+  FctBlockMevServiceGetError,
+  FctBlockMevServiceGetResponse,
   FctBlockMevServiceListData,
+  FctBlockMevServiceListError,
+  FctBlockMevServiceListResponse,
   FctBlockProposerEntityServiceGetData,
+  FctBlockProposerEntityServiceGetError,
+  FctBlockProposerEntityServiceGetResponse,
   FctBlockProposerEntityServiceListData,
+  FctBlockProposerEntityServiceListError,
+  FctBlockProposerEntityServiceListResponse,
   FctBlockProposerHeadServiceGetData,
+  FctBlockProposerHeadServiceGetError,
+  FctBlockProposerHeadServiceGetResponse,
   FctBlockProposerHeadServiceListData,
+  FctBlockProposerHeadServiceListError,
+  FctBlockProposerHeadServiceListResponse,
   FctBlockProposerServiceGetData,
+  FctBlockProposerServiceGetError,
+  FctBlockProposerServiceGetResponse,
   FctBlockProposerServiceListData,
+  FctBlockProposerServiceListError,
+  FctBlockProposerServiceListResponse,
   FctBlockServiceGetData,
+  FctBlockServiceGetError,
+  FctBlockServiceGetResponse,
   FctBlockServiceListData,
+  FctBlockServiceListError,
+  FctBlockServiceListResponse,
   FctDataColumnAvailabilityByEpochServiceGetData,
+  FctDataColumnAvailabilityByEpochServiceGetError,
+  FctDataColumnAvailabilityByEpochServiceGetResponse,
   FctDataColumnAvailabilityByEpochServiceListData,
+  FctDataColumnAvailabilityByEpochServiceListError,
+  FctDataColumnAvailabilityByEpochServiceListResponse,
   FctDataColumnAvailabilityBySlotBlobServiceGetData,
+  FctDataColumnAvailabilityBySlotBlobServiceGetError,
+  FctDataColumnAvailabilityBySlotBlobServiceGetResponse,
   FctDataColumnAvailabilityBySlotBlobServiceListData,
+  FctDataColumnAvailabilityBySlotBlobServiceListError,
+  FctDataColumnAvailabilityBySlotBlobServiceListResponse,
   FctDataColumnAvailabilityBySlotServiceGetData,
+  FctDataColumnAvailabilityBySlotServiceGetError,
+  FctDataColumnAvailabilityBySlotServiceGetResponse,
   FctDataColumnAvailabilityBySlotServiceListData,
+  FctDataColumnAvailabilityBySlotServiceListError,
+  FctDataColumnAvailabilityBySlotServiceListResponse,
   FctDataColumnAvailabilityDailyServiceGetData,
+  FctDataColumnAvailabilityDailyServiceGetError,
+  FctDataColumnAvailabilityDailyServiceGetResponse,
   FctDataColumnAvailabilityDailyServiceListData,
+  FctDataColumnAvailabilityDailyServiceListError,
+  FctDataColumnAvailabilityDailyServiceListResponse,
   FctDataColumnAvailabilityHourlyServiceGetData,
+  FctDataColumnAvailabilityHourlyServiceGetError,
+  FctDataColumnAvailabilityHourlyServiceGetResponse,
   FctDataColumnAvailabilityHourlyServiceListData,
+  FctDataColumnAvailabilityHourlyServiceListError,
+  FctDataColumnAvailabilityHourlyServiceListResponse,
   FctHeadFirstSeenByNodeServiceGetData,
+  FctHeadFirstSeenByNodeServiceGetError,
+  FctHeadFirstSeenByNodeServiceGetResponse,
   FctHeadFirstSeenByNodeServiceListData,
+  FctHeadFirstSeenByNodeServiceListError,
+  FctHeadFirstSeenByNodeServiceListResponse,
   FctMevBidCountByBuilderServiceGetData,
+  FctMevBidCountByBuilderServiceGetError,
+  FctMevBidCountByBuilderServiceGetResponse,
   FctMevBidCountByBuilderServiceListData,
+  FctMevBidCountByBuilderServiceListError,
+  FctMevBidCountByBuilderServiceListResponse,
   FctMevBidCountByRelayServiceGetData,
+  FctMevBidCountByRelayServiceGetError,
+  FctMevBidCountByRelayServiceGetResponse,
   FctMevBidCountByRelayServiceListData,
+  FctMevBidCountByRelayServiceListError,
+  FctMevBidCountByRelayServiceListResponse,
   FctMevBidHighestValueByBuilderChunked50MsServiceGetData,
+  FctMevBidHighestValueByBuilderChunked50MsServiceGetError,
+  FctMevBidHighestValueByBuilderChunked50MsServiceGetResponse,
   FctMevBidHighestValueByBuilderChunked50MsServiceListData,
+  FctMevBidHighestValueByBuilderChunked50MsServiceListError,
+  FctMevBidHighestValueByBuilderChunked50MsServiceListResponse,
   FctNodeActiveLast24hServiceGetData,
+  FctNodeActiveLast24hServiceGetError,
+  FctNodeActiveLast24hServiceGetResponse,
   FctNodeActiveLast24hServiceListData,
+  FctNodeActiveLast24hServiceListError,
+  FctNodeActiveLast24hServiceListResponse,
   FctPreparedBlockServiceGetData,
+  FctPreparedBlockServiceGetError,
+  FctPreparedBlockServiceGetResponse,
   FctPreparedBlockServiceListData,
+  FctPreparedBlockServiceListError,
+  FctPreparedBlockServiceListResponse,
   IntAddressFirstAccessServiceGetData,
+  IntAddressFirstAccessServiceGetError,
+  IntAddressFirstAccessServiceGetResponse,
   IntAddressFirstAccessServiceListData,
+  IntAddressFirstAccessServiceListError,
+  IntAddressFirstAccessServiceListResponse,
   IntAddressLastAccessServiceGetData,
+  IntAddressLastAccessServiceGetError,
+  IntAddressLastAccessServiceGetResponse,
   IntAddressLastAccessServiceListData,
+  IntAddressLastAccessServiceListError,
+  IntAddressLastAccessServiceListResponse,
   IntAddressStorageSlotFirstAccessServiceGetData,
+  IntAddressStorageSlotFirstAccessServiceGetError,
+  IntAddressStorageSlotFirstAccessServiceGetResponse,
   IntAddressStorageSlotFirstAccessServiceListData,
+  IntAddressStorageSlotFirstAccessServiceListError,
+  IntAddressStorageSlotFirstAccessServiceListResponse,
   IntAddressStorageSlotLastAccessServiceGetData,
+  IntAddressStorageSlotLastAccessServiceGetError,
+  IntAddressStorageSlotLastAccessServiceGetResponse,
   IntAddressStorageSlotLastAccessServiceListData,
+  IntAddressStorageSlotLastAccessServiceListError,
+  IntAddressStorageSlotLastAccessServiceListResponse,
   IntAttestationAttestedCanonicalServiceGetData,
+  IntAttestationAttestedCanonicalServiceGetError,
+  IntAttestationAttestedCanonicalServiceGetResponse,
   IntAttestationAttestedCanonicalServiceListData,
+  IntAttestationAttestedCanonicalServiceListError,
+  IntAttestationAttestedCanonicalServiceListResponse,
   IntAttestationAttestedHeadServiceGetData,
+  IntAttestationAttestedHeadServiceGetError,
+  IntAttestationAttestedHeadServiceGetResponse,
   IntAttestationAttestedHeadServiceListData,
+  IntAttestationAttestedHeadServiceListError,
+  IntAttestationAttestedHeadServiceListResponse,
   IntAttestationFirstSeenServiceGetData,
+  IntAttestationFirstSeenServiceGetError,
+  IntAttestationFirstSeenServiceGetResponse,
   IntAttestationFirstSeenServiceListData,
+  IntAttestationFirstSeenServiceListError,
+  IntAttestationFirstSeenServiceListResponse,
   IntBeaconCommitteeHeadServiceGetData,
+  IntBeaconCommitteeHeadServiceGetError,
+  IntBeaconCommitteeHeadServiceGetResponse,
   IntBeaconCommitteeHeadServiceListData,
+  IntBeaconCommitteeHeadServiceListError,
+  IntBeaconCommitteeHeadServiceListResponse,
   IntBlockBlobCountCanonicalServiceGetData,
+  IntBlockBlobCountCanonicalServiceGetError,
+  IntBlockBlobCountCanonicalServiceGetResponse,
   IntBlockBlobCountCanonicalServiceListData,
+  IntBlockBlobCountCanonicalServiceListError,
+  IntBlockBlobCountCanonicalServiceListResponse,
   IntBlockCanonicalServiceGetData,
+  IntBlockCanonicalServiceGetError,
+  IntBlockCanonicalServiceGetResponse,
   IntBlockCanonicalServiceListData,
+  IntBlockCanonicalServiceListError,
+  IntBlockCanonicalServiceListResponse,
   IntBlockMevCanonicalServiceGetData,
+  IntBlockMevCanonicalServiceGetError,
+  IntBlockMevCanonicalServiceGetResponse,
   IntBlockMevCanonicalServiceListData,
+  IntBlockMevCanonicalServiceListError,
+  IntBlockMevCanonicalServiceListResponse,
   IntBlockProposerCanonicalServiceGetData,
+  IntBlockProposerCanonicalServiceGetError,
+  IntBlockProposerCanonicalServiceGetResponse,
   IntBlockProposerCanonicalServiceListData,
+  IntBlockProposerCanonicalServiceListError,
+  IntBlockProposerCanonicalServiceListResponse,
 } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
@@ -256,8 +464,13 @@ export const adminCbtIncrementalServiceListQueryKey = (options?: Options<AdminCb
  *
  * Retrieve paginated results with optional filtering
  */
-export const adminCbtIncrementalServiceListOptions = (options?: Options<AdminCbtIncrementalServiceListData>) => {
-  return queryOptions({
+export const adminCbtIncrementalServiceListOptions = (options?: Options<AdminCbtIncrementalServiceListData>) =>
+  queryOptions<
+    AdminCbtIncrementalServiceListResponse,
+    AdminCbtIncrementalServiceListError,
+    AdminCbtIncrementalServiceListResponse,
+    ReturnType<typeof adminCbtIncrementalServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await adminCbtIncrementalServiceList({
         ...options,
@@ -269,7 +482,6 @@ export const adminCbtIncrementalServiceListOptions = (options?: Options<AdminCbt
     },
     queryKey: adminCbtIncrementalServiceListQueryKey(options),
   });
-};
 
 export const adminCbtIncrementalServiceGetQueryKey = (options: Options<AdminCbtIncrementalServiceGetData>) =>
   createQueryKey('adminCbtIncrementalServiceGet', options);
@@ -279,8 +491,13 @@ export const adminCbtIncrementalServiceGetQueryKey = (options: Options<AdminCbtI
  *
  * Retrieve a single record by database
  */
-export const adminCbtIncrementalServiceGetOptions = (options: Options<AdminCbtIncrementalServiceGetData>) => {
-  return queryOptions({
+export const adminCbtIncrementalServiceGetOptions = (options: Options<AdminCbtIncrementalServiceGetData>) =>
+  queryOptions<
+    AdminCbtIncrementalServiceGetResponse,
+    AdminCbtIncrementalServiceGetError,
+    AdminCbtIncrementalServiceGetResponse,
+    ReturnType<typeof adminCbtIncrementalServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await adminCbtIncrementalServiceGet({
         ...options,
@@ -292,7 +509,60 @@ export const adminCbtIncrementalServiceGetOptions = (options: Options<AdminCbtIn
     },
     queryKey: adminCbtIncrementalServiceGetQueryKey(options),
   });
-};
+
+export const dimBlockCanonicalServiceListQueryKey = (options?: Options<DimBlockCanonicalServiceListData>) =>
+  createQueryKey('dimBlockCanonicalServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimBlockCanonicalServiceListOptions = (options?: Options<DimBlockCanonicalServiceListData>) =>
+  queryOptions<
+    DimBlockCanonicalServiceListResponse,
+    DimBlockCanonicalServiceListError,
+    DimBlockCanonicalServiceListResponse,
+    ReturnType<typeof dimBlockCanonicalServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimBlockCanonicalServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimBlockCanonicalServiceListQueryKey(options),
+  });
+
+export const dimBlockCanonicalServiceGetQueryKey = (options: Options<DimBlockCanonicalServiceGetData>) =>
+  createQueryKey('dimBlockCanonicalServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const dimBlockCanonicalServiceGetOptions = (options: Options<DimBlockCanonicalServiceGetData>) =>
+  queryOptions<
+    DimBlockCanonicalServiceGetResponse,
+    DimBlockCanonicalServiceGetError,
+    DimBlockCanonicalServiceGetResponse,
+    ReturnType<typeof dimBlockCanonicalServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimBlockCanonicalServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimBlockCanonicalServiceGetQueryKey(options),
+  });
 
 export const dimNodeServiceListQueryKey = (options?: Options<DimNodeServiceListData>) =>
   createQueryKey('dimNodeServiceList', options);
@@ -302,8 +572,13 @@ export const dimNodeServiceListQueryKey = (options?: Options<DimNodeServiceListD
  *
  * Retrieve paginated results with optional filtering
  */
-export const dimNodeServiceListOptions = (options?: Options<DimNodeServiceListData>) => {
-  return queryOptions({
+export const dimNodeServiceListOptions = (options?: Options<DimNodeServiceListData>) =>
+  queryOptions<
+    DimNodeServiceListResponse,
+    DimNodeServiceListError,
+    DimNodeServiceListResponse,
+    ReturnType<typeof dimNodeServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await dimNodeServiceList({
         ...options,
@@ -315,7 +590,6 @@ export const dimNodeServiceListOptions = (options?: Options<DimNodeServiceListDa
     },
     queryKey: dimNodeServiceListQueryKey(options),
   });
-};
 
 export const dimNodeServiceGetQueryKey = (options: Options<DimNodeServiceGetData>) =>
   createQueryKey('dimNodeServiceGet', options);
@@ -325,8 +599,13 @@ export const dimNodeServiceGetQueryKey = (options: Options<DimNodeServiceGetData
  *
  * Retrieve a single record by validator_index
  */
-export const dimNodeServiceGetOptions = (options: Options<DimNodeServiceGetData>) => {
-  return queryOptions({
+export const dimNodeServiceGetOptions = (options: Options<DimNodeServiceGetData>) =>
+  queryOptions<
+    DimNodeServiceGetResponse,
+    DimNodeServiceGetError,
+    DimNodeServiceGetResponse,
+    ReturnType<typeof dimNodeServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await dimNodeServiceGet({
         ...options,
@@ -338,7 +617,6 @@ export const dimNodeServiceGetOptions = (options: Options<DimNodeServiceGetData>
     },
     queryKey: dimNodeServiceGetQueryKey(options),
   });
-};
 
 export const fctAddressAccessChunked10000ServiceListQueryKey = (
   options?: Options<FctAddressAccessChunked10000ServiceListData>
@@ -351,8 +629,13 @@ export const fctAddressAccessChunked10000ServiceListQueryKey = (
  */
 export const fctAddressAccessChunked10000ServiceListOptions = (
   options?: Options<FctAddressAccessChunked10000ServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAddressAccessChunked10000ServiceListResponse,
+    FctAddressAccessChunked10000ServiceListError,
+    FctAddressAccessChunked10000ServiceListResponse,
+    ReturnType<typeof fctAddressAccessChunked10000ServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAddressAccessChunked10000ServiceList({
         ...options,
@@ -364,7 +647,6 @@ export const fctAddressAccessChunked10000ServiceListOptions = (
     },
     queryKey: fctAddressAccessChunked10000ServiceListQueryKey(options),
   });
-};
 
 export const fctAddressAccessChunked10000ServiceGetQueryKey = (
   options: Options<FctAddressAccessChunked10000ServiceGetData>
@@ -377,8 +659,13 @@ export const fctAddressAccessChunked10000ServiceGetQueryKey = (
  */
 export const fctAddressAccessChunked10000ServiceGetOptions = (
   options: Options<FctAddressAccessChunked10000ServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAddressAccessChunked10000ServiceGetResponse,
+    FctAddressAccessChunked10000ServiceGetError,
+    FctAddressAccessChunked10000ServiceGetResponse,
+    ReturnType<typeof fctAddressAccessChunked10000ServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAddressAccessChunked10000ServiceGet({
         ...options,
@@ -390,7 +677,6 @@ export const fctAddressAccessChunked10000ServiceGetOptions = (
     },
     queryKey: fctAddressAccessChunked10000ServiceGetQueryKey(options),
   });
-};
 
 export const fctAddressAccessTotalServiceListQueryKey = (options?: Options<FctAddressAccessTotalServiceListData>) =>
   createQueryKey('fctAddressAccessTotalServiceList', options);
@@ -400,8 +686,13 @@ export const fctAddressAccessTotalServiceListQueryKey = (options?: Options<FctAd
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctAddressAccessTotalServiceListOptions = (options?: Options<FctAddressAccessTotalServiceListData>) => {
-  return queryOptions({
+export const fctAddressAccessTotalServiceListOptions = (options?: Options<FctAddressAccessTotalServiceListData>) =>
+  queryOptions<
+    FctAddressAccessTotalServiceListResponse,
+    FctAddressAccessTotalServiceListError,
+    FctAddressAccessTotalServiceListResponse,
+    ReturnType<typeof fctAddressAccessTotalServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAddressAccessTotalServiceList({
         ...options,
@@ -413,7 +704,6 @@ export const fctAddressAccessTotalServiceListOptions = (options?: Options<FctAdd
     },
     queryKey: fctAddressAccessTotalServiceListQueryKey(options),
   });
-};
 
 export const fctAddressAccessTotalServiceGetQueryKey = (options: Options<FctAddressAccessTotalServiceGetData>) =>
   createQueryKey('fctAddressAccessTotalServiceGet', options);
@@ -423,8 +713,13 @@ export const fctAddressAccessTotalServiceGetQueryKey = (options: Options<FctAddr
  *
  * Retrieve a single record by updated_date_time
  */
-export const fctAddressAccessTotalServiceGetOptions = (options: Options<FctAddressAccessTotalServiceGetData>) => {
-  return queryOptions({
+export const fctAddressAccessTotalServiceGetOptions = (options: Options<FctAddressAccessTotalServiceGetData>) =>
+  queryOptions<
+    FctAddressAccessTotalServiceGetResponse,
+    FctAddressAccessTotalServiceGetError,
+    FctAddressAccessTotalServiceGetResponse,
+    ReturnType<typeof fctAddressAccessTotalServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAddressAccessTotalServiceGet({
         ...options,
@@ -436,7 +731,6 @@ export const fctAddressAccessTotalServiceGetOptions = (options: Options<FctAddre
     },
     queryKey: fctAddressAccessTotalServiceGetQueryKey(options),
   });
-};
 
 export const fctAddressStorageSlotChunked10000ServiceListQueryKey = (
   options?: Options<FctAddressStorageSlotChunked10000ServiceListData>
@@ -449,8 +743,13 @@ export const fctAddressStorageSlotChunked10000ServiceListQueryKey = (
  */
 export const fctAddressStorageSlotChunked10000ServiceListOptions = (
   options?: Options<FctAddressStorageSlotChunked10000ServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAddressStorageSlotChunked10000ServiceListResponse,
+    FctAddressStorageSlotChunked10000ServiceListError,
+    FctAddressStorageSlotChunked10000ServiceListResponse,
+    ReturnType<typeof fctAddressStorageSlotChunked10000ServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAddressStorageSlotChunked10000ServiceList({
         ...options,
@@ -462,7 +761,6 @@ export const fctAddressStorageSlotChunked10000ServiceListOptions = (
     },
     queryKey: fctAddressStorageSlotChunked10000ServiceListQueryKey(options),
   });
-};
 
 export const fctAddressStorageSlotChunked10000ServiceGetQueryKey = (
   options: Options<FctAddressStorageSlotChunked10000ServiceGetData>
@@ -475,8 +773,13 @@ export const fctAddressStorageSlotChunked10000ServiceGetQueryKey = (
  */
 export const fctAddressStorageSlotChunked10000ServiceGetOptions = (
   options: Options<FctAddressStorageSlotChunked10000ServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAddressStorageSlotChunked10000ServiceGetResponse,
+    FctAddressStorageSlotChunked10000ServiceGetError,
+    FctAddressStorageSlotChunked10000ServiceGetResponse,
+    ReturnType<typeof fctAddressStorageSlotChunked10000ServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAddressStorageSlotChunked10000ServiceGet({
         ...options,
@@ -488,7 +791,6 @@ export const fctAddressStorageSlotChunked10000ServiceGetOptions = (
     },
     queryKey: fctAddressStorageSlotChunked10000ServiceGetQueryKey(options),
   });
-};
 
 export const fctAddressStorageSlotExpiredTop100ByContractServiceListQueryKey = (
   options?: Options<FctAddressStorageSlotExpiredTop100ByContractServiceListData>
@@ -501,8 +803,13 @@ export const fctAddressStorageSlotExpiredTop100ByContractServiceListQueryKey = (
  */
 export const fctAddressStorageSlotExpiredTop100ByContractServiceListOptions = (
   options?: Options<FctAddressStorageSlotExpiredTop100ByContractServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAddressStorageSlotExpiredTop100ByContractServiceListResponse,
+    FctAddressStorageSlotExpiredTop100ByContractServiceListError,
+    FctAddressStorageSlotExpiredTop100ByContractServiceListResponse,
+    ReturnType<typeof fctAddressStorageSlotExpiredTop100ByContractServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAddressStorageSlotExpiredTop100ByContractServiceList({
         ...options,
@@ -514,7 +821,6 @@ export const fctAddressStorageSlotExpiredTop100ByContractServiceListOptions = (
     },
     queryKey: fctAddressStorageSlotExpiredTop100ByContractServiceListQueryKey(options),
   });
-};
 
 export const fctAddressStorageSlotExpiredTop100ByContractServiceGetQueryKey = (
   options: Options<FctAddressStorageSlotExpiredTop100ByContractServiceGetData>
@@ -527,8 +833,13 @@ export const fctAddressStorageSlotExpiredTop100ByContractServiceGetQueryKey = (
  */
 export const fctAddressStorageSlotExpiredTop100ByContractServiceGetOptions = (
   options: Options<FctAddressStorageSlotExpiredTop100ByContractServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAddressStorageSlotExpiredTop100ByContractServiceGetResponse,
+    FctAddressStorageSlotExpiredTop100ByContractServiceGetError,
+    FctAddressStorageSlotExpiredTop100ByContractServiceGetResponse,
+    ReturnType<typeof fctAddressStorageSlotExpiredTop100ByContractServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAddressStorageSlotExpiredTop100ByContractServiceGet({
         ...options,
@@ -540,7 +851,6 @@ export const fctAddressStorageSlotExpiredTop100ByContractServiceGetOptions = (
     },
     queryKey: fctAddressStorageSlotExpiredTop100ByContractServiceGetQueryKey(options),
   });
-};
 
 export const fctAddressStorageSlotTop100ByContractServiceListQueryKey = (
   options?: Options<FctAddressStorageSlotTop100ByContractServiceListData>
@@ -553,8 +863,13 @@ export const fctAddressStorageSlotTop100ByContractServiceListQueryKey = (
  */
 export const fctAddressStorageSlotTop100ByContractServiceListOptions = (
   options?: Options<FctAddressStorageSlotTop100ByContractServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAddressStorageSlotTop100ByContractServiceListResponse,
+    FctAddressStorageSlotTop100ByContractServiceListError,
+    FctAddressStorageSlotTop100ByContractServiceListResponse,
+    ReturnType<typeof fctAddressStorageSlotTop100ByContractServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAddressStorageSlotTop100ByContractServiceList({
         ...options,
@@ -566,7 +881,6 @@ export const fctAddressStorageSlotTop100ByContractServiceListOptions = (
     },
     queryKey: fctAddressStorageSlotTop100ByContractServiceListQueryKey(options),
   });
-};
 
 export const fctAddressStorageSlotTop100ByContractServiceGetQueryKey = (
   options: Options<FctAddressStorageSlotTop100ByContractServiceGetData>
@@ -579,8 +893,13 @@ export const fctAddressStorageSlotTop100ByContractServiceGetQueryKey = (
  */
 export const fctAddressStorageSlotTop100ByContractServiceGetOptions = (
   options: Options<FctAddressStorageSlotTop100ByContractServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAddressStorageSlotTop100ByContractServiceGetResponse,
+    FctAddressStorageSlotTop100ByContractServiceGetError,
+    FctAddressStorageSlotTop100ByContractServiceGetResponse,
+    ReturnType<typeof fctAddressStorageSlotTop100ByContractServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAddressStorageSlotTop100ByContractServiceGet({
         ...options,
@@ -592,7 +911,6 @@ export const fctAddressStorageSlotTop100ByContractServiceGetOptions = (
     },
     queryKey: fctAddressStorageSlotTop100ByContractServiceGetQueryKey(options),
   });
-};
 
 export const fctAddressStorageSlotTotalServiceListQueryKey = (
   options?: Options<FctAddressStorageSlotTotalServiceListData>
@@ -605,8 +923,13 @@ export const fctAddressStorageSlotTotalServiceListQueryKey = (
  */
 export const fctAddressStorageSlotTotalServiceListOptions = (
   options?: Options<FctAddressStorageSlotTotalServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAddressStorageSlotTotalServiceListResponse,
+    FctAddressStorageSlotTotalServiceListError,
+    FctAddressStorageSlotTotalServiceListResponse,
+    ReturnType<typeof fctAddressStorageSlotTotalServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAddressStorageSlotTotalServiceList({
         ...options,
@@ -618,7 +941,6 @@ export const fctAddressStorageSlotTotalServiceListOptions = (
     },
     queryKey: fctAddressStorageSlotTotalServiceListQueryKey(options),
   });
-};
 
 export const fctAddressStorageSlotTotalServiceGetQueryKey = (
   options: Options<FctAddressStorageSlotTotalServiceGetData>
@@ -631,8 +953,13 @@ export const fctAddressStorageSlotTotalServiceGetQueryKey = (
  */
 export const fctAddressStorageSlotTotalServiceGetOptions = (
   options: Options<FctAddressStorageSlotTotalServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAddressStorageSlotTotalServiceGetResponse,
+    FctAddressStorageSlotTotalServiceGetError,
+    FctAddressStorageSlotTotalServiceGetResponse,
+    ReturnType<typeof fctAddressStorageSlotTotalServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAddressStorageSlotTotalServiceGet({
         ...options,
@@ -644,7 +971,6 @@ export const fctAddressStorageSlotTotalServiceGetOptions = (
     },
     queryKey: fctAddressStorageSlotTotalServiceGetQueryKey(options),
   });
-};
 
 export const fctAttestationCorrectnessByValidatorCanonicalServiceListQueryKey = (
   options?: Options<FctAttestationCorrectnessByValidatorCanonicalServiceListData>
@@ -657,8 +983,13 @@ export const fctAttestationCorrectnessByValidatorCanonicalServiceListQueryKey = 
  */
 export const fctAttestationCorrectnessByValidatorCanonicalServiceListOptions = (
   options?: Options<FctAttestationCorrectnessByValidatorCanonicalServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAttestationCorrectnessByValidatorCanonicalServiceListResponse,
+    FctAttestationCorrectnessByValidatorCanonicalServiceListError,
+    FctAttestationCorrectnessByValidatorCanonicalServiceListResponse,
+    ReturnType<typeof fctAttestationCorrectnessByValidatorCanonicalServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAttestationCorrectnessByValidatorCanonicalServiceList({
         ...options,
@@ -670,7 +1001,6 @@ export const fctAttestationCorrectnessByValidatorCanonicalServiceListOptions = (
     },
     queryKey: fctAttestationCorrectnessByValidatorCanonicalServiceListQueryKey(options),
   });
-};
 
 export const fctAttestationCorrectnessByValidatorCanonicalServiceGetQueryKey = (
   options: Options<FctAttestationCorrectnessByValidatorCanonicalServiceGetData>
@@ -683,8 +1013,13 @@ export const fctAttestationCorrectnessByValidatorCanonicalServiceGetQueryKey = (
  */
 export const fctAttestationCorrectnessByValidatorCanonicalServiceGetOptions = (
   options: Options<FctAttestationCorrectnessByValidatorCanonicalServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAttestationCorrectnessByValidatorCanonicalServiceGetResponse,
+    FctAttestationCorrectnessByValidatorCanonicalServiceGetError,
+    FctAttestationCorrectnessByValidatorCanonicalServiceGetResponse,
+    ReturnType<typeof fctAttestationCorrectnessByValidatorCanonicalServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAttestationCorrectnessByValidatorCanonicalServiceGet({
         ...options,
@@ -696,7 +1031,6 @@ export const fctAttestationCorrectnessByValidatorCanonicalServiceGetOptions = (
     },
     queryKey: fctAttestationCorrectnessByValidatorCanonicalServiceGetQueryKey(options),
   });
-};
 
 export const fctAttestationCorrectnessByValidatorHeadServiceListQueryKey = (
   options?: Options<FctAttestationCorrectnessByValidatorHeadServiceListData>
@@ -709,8 +1043,13 @@ export const fctAttestationCorrectnessByValidatorHeadServiceListQueryKey = (
  */
 export const fctAttestationCorrectnessByValidatorHeadServiceListOptions = (
   options?: Options<FctAttestationCorrectnessByValidatorHeadServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAttestationCorrectnessByValidatorHeadServiceListResponse,
+    FctAttestationCorrectnessByValidatorHeadServiceListError,
+    FctAttestationCorrectnessByValidatorHeadServiceListResponse,
+    ReturnType<typeof fctAttestationCorrectnessByValidatorHeadServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAttestationCorrectnessByValidatorHeadServiceList({
         ...options,
@@ -722,7 +1061,6 @@ export const fctAttestationCorrectnessByValidatorHeadServiceListOptions = (
     },
     queryKey: fctAttestationCorrectnessByValidatorHeadServiceListQueryKey(options),
   });
-};
 
 export const fctAttestationCorrectnessByValidatorHeadServiceGetQueryKey = (
   options: Options<FctAttestationCorrectnessByValidatorHeadServiceGetData>
@@ -735,8 +1073,13 @@ export const fctAttestationCorrectnessByValidatorHeadServiceGetQueryKey = (
  */
 export const fctAttestationCorrectnessByValidatorHeadServiceGetOptions = (
   options: Options<FctAttestationCorrectnessByValidatorHeadServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAttestationCorrectnessByValidatorHeadServiceGetResponse,
+    FctAttestationCorrectnessByValidatorHeadServiceGetError,
+    FctAttestationCorrectnessByValidatorHeadServiceGetResponse,
+    ReturnType<typeof fctAttestationCorrectnessByValidatorHeadServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAttestationCorrectnessByValidatorHeadServiceGet({
         ...options,
@@ -748,7 +1091,6 @@ export const fctAttestationCorrectnessByValidatorHeadServiceGetOptions = (
     },
     queryKey: fctAttestationCorrectnessByValidatorHeadServiceGetQueryKey(options),
   });
-};
 
 export const fctAttestationCorrectnessCanonicalServiceListQueryKey = (
   options?: Options<FctAttestationCorrectnessCanonicalServiceListData>
@@ -761,8 +1103,13 @@ export const fctAttestationCorrectnessCanonicalServiceListQueryKey = (
  */
 export const fctAttestationCorrectnessCanonicalServiceListOptions = (
   options?: Options<FctAttestationCorrectnessCanonicalServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAttestationCorrectnessCanonicalServiceListResponse,
+    FctAttestationCorrectnessCanonicalServiceListError,
+    FctAttestationCorrectnessCanonicalServiceListResponse,
+    ReturnType<typeof fctAttestationCorrectnessCanonicalServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAttestationCorrectnessCanonicalServiceList({
         ...options,
@@ -774,7 +1121,6 @@ export const fctAttestationCorrectnessCanonicalServiceListOptions = (
     },
     queryKey: fctAttestationCorrectnessCanonicalServiceListQueryKey(options),
   });
-};
 
 export const fctAttestationCorrectnessCanonicalServiceGetQueryKey = (
   options: Options<FctAttestationCorrectnessCanonicalServiceGetData>
@@ -787,8 +1133,13 @@ export const fctAttestationCorrectnessCanonicalServiceGetQueryKey = (
  */
 export const fctAttestationCorrectnessCanonicalServiceGetOptions = (
   options: Options<FctAttestationCorrectnessCanonicalServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAttestationCorrectnessCanonicalServiceGetResponse,
+    FctAttestationCorrectnessCanonicalServiceGetError,
+    FctAttestationCorrectnessCanonicalServiceGetResponse,
+    ReturnType<typeof fctAttestationCorrectnessCanonicalServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAttestationCorrectnessCanonicalServiceGet({
         ...options,
@@ -800,7 +1151,6 @@ export const fctAttestationCorrectnessCanonicalServiceGetOptions = (
     },
     queryKey: fctAttestationCorrectnessCanonicalServiceGetQueryKey(options),
   });
-};
 
 export const fctAttestationCorrectnessHeadServiceListQueryKey = (
   options?: Options<FctAttestationCorrectnessHeadServiceListData>
@@ -813,8 +1163,13 @@ export const fctAttestationCorrectnessHeadServiceListQueryKey = (
  */
 export const fctAttestationCorrectnessHeadServiceListOptions = (
   options?: Options<FctAttestationCorrectnessHeadServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAttestationCorrectnessHeadServiceListResponse,
+    FctAttestationCorrectnessHeadServiceListError,
+    FctAttestationCorrectnessHeadServiceListResponse,
+    ReturnType<typeof fctAttestationCorrectnessHeadServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAttestationCorrectnessHeadServiceList({
         ...options,
@@ -826,7 +1181,6 @@ export const fctAttestationCorrectnessHeadServiceListOptions = (
     },
     queryKey: fctAttestationCorrectnessHeadServiceListQueryKey(options),
   });
-};
 
 export const fctAttestationCorrectnessHeadServiceGetQueryKey = (
   options: Options<FctAttestationCorrectnessHeadServiceGetData>
@@ -839,8 +1193,13 @@ export const fctAttestationCorrectnessHeadServiceGetQueryKey = (
  */
 export const fctAttestationCorrectnessHeadServiceGetOptions = (
   options: Options<FctAttestationCorrectnessHeadServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAttestationCorrectnessHeadServiceGetResponse,
+    FctAttestationCorrectnessHeadServiceGetError,
+    FctAttestationCorrectnessHeadServiceGetResponse,
+    ReturnType<typeof fctAttestationCorrectnessHeadServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAttestationCorrectnessHeadServiceGet({
         ...options,
@@ -852,7 +1211,6 @@ export const fctAttestationCorrectnessHeadServiceGetOptions = (
     },
     queryKey: fctAttestationCorrectnessHeadServiceGetQueryKey(options),
   });
-};
 
 export const fctAttestationFirstSeenChunked50MsServiceListQueryKey = (
   options?: Options<FctAttestationFirstSeenChunked50MsServiceListData>
@@ -865,8 +1223,13 @@ export const fctAttestationFirstSeenChunked50MsServiceListQueryKey = (
  */
 export const fctAttestationFirstSeenChunked50MsServiceListOptions = (
   options?: Options<FctAttestationFirstSeenChunked50MsServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAttestationFirstSeenChunked50MsServiceListResponse,
+    FctAttestationFirstSeenChunked50MsServiceListError,
+    FctAttestationFirstSeenChunked50MsServiceListResponse,
+    ReturnType<typeof fctAttestationFirstSeenChunked50MsServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAttestationFirstSeenChunked50MsServiceList({
         ...options,
@@ -878,7 +1241,6 @@ export const fctAttestationFirstSeenChunked50MsServiceListOptions = (
     },
     queryKey: fctAttestationFirstSeenChunked50MsServiceListQueryKey(options),
   });
-};
 
 export const fctAttestationFirstSeenChunked50MsServiceGetQueryKey = (
   options: Options<FctAttestationFirstSeenChunked50MsServiceGetData>
@@ -891,8 +1253,13 @@ export const fctAttestationFirstSeenChunked50MsServiceGetQueryKey = (
  */
 export const fctAttestationFirstSeenChunked50MsServiceGetOptions = (
   options: Options<FctAttestationFirstSeenChunked50MsServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAttestationFirstSeenChunked50MsServiceGetResponse,
+    FctAttestationFirstSeenChunked50MsServiceGetError,
+    FctAttestationFirstSeenChunked50MsServiceGetResponse,
+    ReturnType<typeof fctAttestationFirstSeenChunked50MsServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAttestationFirstSeenChunked50MsServiceGet({
         ...options,
@@ -904,7 +1271,6 @@ export const fctAttestationFirstSeenChunked50MsServiceGetOptions = (
     },
     queryKey: fctAttestationFirstSeenChunked50MsServiceGetQueryKey(options),
   });
-};
 
 export const fctAttestationLivenessByEntityHeadServiceListQueryKey = (
   options?: Options<FctAttestationLivenessByEntityHeadServiceListData>
@@ -917,8 +1283,13 @@ export const fctAttestationLivenessByEntityHeadServiceListQueryKey = (
  */
 export const fctAttestationLivenessByEntityHeadServiceListOptions = (
   options?: Options<FctAttestationLivenessByEntityHeadServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAttestationLivenessByEntityHeadServiceListResponse,
+    FctAttestationLivenessByEntityHeadServiceListError,
+    FctAttestationLivenessByEntityHeadServiceListResponse,
+    ReturnType<typeof fctAttestationLivenessByEntityHeadServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAttestationLivenessByEntityHeadServiceList({
         ...options,
@@ -930,7 +1301,6 @@ export const fctAttestationLivenessByEntityHeadServiceListOptions = (
     },
     queryKey: fctAttestationLivenessByEntityHeadServiceListQueryKey(options),
   });
-};
 
 export const fctAttestationLivenessByEntityHeadServiceGetQueryKey = (
   options: Options<FctAttestationLivenessByEntityHeadServiceGetData>
@@ -943,8 +1313,13 @@ export const fctAttestationLivenessByEntityHeadServiceGetQueryKey = (
  */
 export const fctAttestationLivenessByEntityHeadServiceGetOptions = (
   options: Options<FctAttestationLivenessByEntityHeadServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAttestationLivenessByEntityHeadServiceGetResponse,
+    FctAttestationLivenessByEntityHeadServiceGetError,
+    FctAttestationLivenessByEntityHeadServiceGetResponse,
+    ReturnType<typeof fctAttestationLivenessByEntityHeadServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAttestationLivenessByEntityHeadServiceGet({
         ...options,
@@ -956,7 +1331,6 @@ export const fctAttestationLivenessByEntityHeadServiceGetOptions = (
     },
     queryKey: fctAttestationLivenessByEntityHeadServiceGetQueryKey(options),
   });
-};
 
 export const fctAttestationObservationByNodeServiceListQueryKey = (
   options?: Options<FctAttestationObservationByNodeServiceListData>
@@ -969,8 +1343,13 @@ export const fctAttestationObservationByNodeServiceListQueryKey = (
  */
 export const fctAttestationObservationByNodeServiceListOptions = (
   options?: Options<FctAttestationObservationByNodeServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAttestationObservationByNodeServiceListResponse,
+    FctAttestationObservationByNodeServiceListError,
+    FctAttestationObservationByNodeServiceListResponse,
+    ReturnType<typeof fctAttestationObservationByNodeServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAttestationObservationByNodeServiceList({
         ...options,
@@ -982,7 +1361,6 @@ export const fctAttestationObservationByNodeServiceListOptions = (
     },
     queryKey: fctAttestationObservationByNodeServiceListQueryKey(options),
   });
-};
 
 export const fctAttestationObservationByNodeServiceGetQueryKey = (
   options: Options<FctAttestationObservationByNodeServiceGetData>
@@ -995,8 +1373,13 @@ export const fctAttestationObservationByNodeServiceGetQueryKey = (
  */
 export const fctAttestationObservationByNodeServiceGetOptions = (
   options: Options<FctAttestationObservationByNodeServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctAttestationObservationByNodeServiceGetResponse,
+    FctAttestationObservationByNodeServiceGetError,
+    FctAttestationObservationByNodeServiceGetResponse,
+    ReturnType<typeof fctAttestationObservationByNodeServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctAttestationObservationByNodeServiceGet({
         ...options,
@@ -1008,7 +1391,6 @@ export const fctAttestationObservationByNodeServiceGetOptions = (
     },
     queryKey: fctAttestationObservationByNodeServiceGetQueryKey(options),
   });
-};
 
 export const fctBlockServiceListQueryKey = (options?: Options<FctBlockServiceListData>) =>
   createQueryKey('fctBlockServiceList', options);
@@ -1018,8 +1400,13 @@ export const fctBlockServiceListQueryKey = (options?: Options<FctBlockServiceLis
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockServiceListOptions = (options?: Options<FctBlockServiceListData>) => {
-  return queryOptions({
+export const fctBlockServiceListOptions = (options?: Options<FctBlockServiceListData>) =>
+  queryOptions<
+    FctBlockServiceListResponse,
+    FctBlockServiceListError,
+    FctBlockServiceListResponse,
+    ReturnType<typeof fctBlockServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockServiceList({
         ...options,
@@ -1031,7 +1418,6 @@ export const fctBlockServiceListOptions = (options?: Options<FctBlockServiceList
     },
     queryKey: fctBlockServiceListQueryKey(options),
   });
-};
 
 export const fctBlockServiceGetQueryKey = (options: Options<FctBlockServiceGetData>) =>
   createQueryKey('fctBlockServiceGet', options);
@@ -1041,8 +1427,13 @@ export const fctBlockServiceGetQueryKey = (options: Options<FctBlockServiceGetDa
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockServiceGetOptions = (options: Options<FctBlockServiceGetData>) => {
-  return queryOptions({
+export const fctBlockServiceGetOptions = (options: Options<FctBlockServiceGetData>) =>
+  queryOptions<
+    FctBlockServiceGetResponse,
+    FctBlockServiceGetError,
+    FctBlockServiceGetResponse,
+    ReturnType<typeof fctBlockServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockServiceGet({
         ...options,
@@ -1054,7 +1445,6 @@ export const fctBlockServiceGetOptions = (options: Options<FctBlockServiceGetDat
     },
     queryKey: fctBlockServiceGetQueryKey(options),
   });
-};
 
 export const fctBlockBlobCountServiceListQueryKey = (options?: Options<FctBlockBlobCountServiceListData>) =>
   createQueryKey('fctBlockBlobCountServiceList', options);
@@ -1064,8 +1454,13 @@ export const fctBlockBlobCountServiceListQueryKey = (options?: Options<FctBlockB
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockBlobCountServiceListOptions = (options?: Options<FctBlockBlobCountServiceListData>) => {
-  return queryOptions({
+export const fctBlockBlobCountServiceListOptions = (options?: Options<FctBlockBlobCountServiceListData>) =>
+  queryOptions<
+    FctBlockBlobCountServiceListResponse,
+    FctBlockBlobCountServiceListError,
+    FctBlockBlobCountServiceListResponse,
+    ReturnType<typeof fctBlockBlobCountServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockBlobCountServiceList({
         ...options,
@@ -1077,7 +1472,6 @@ export const fctBlockBlobCountServiceListOptions = (options?: Options<FctBlockBl
     },
     queryKey: fctBlockBlobCountServiceListQueryKey(options),
   });
-};
 
 export const fctBlockBlobCountServiceGetQueryKey = (options: Options<FctBlockBlobCountServiceGetData>) =>
   createQueryKey('fctBlockBlobCountServiceGet', options);
@@ -1087,8 +1481,13 @@ export const fctBlockBlobCountServiceGetQueryKey = (options: Options<FctBlockBlo
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockBlobCountServiceGetOptions = (options: Options<FctBlockBlobCountServiceGetData>) => {
-  return queryOptions({
+export const fctBlockBlobCountServiceGetOptions = (options: Options<FctBlockBlobCountServiceGetData>) =>
+  queryOptions<
+    FctBlockBlobCountServiceGetResponse,
+    FctBlockBlobCountServiceGetError,
+    FctBlockBlobCountServiceGetResponse,
+    ReturnType<typeof fctBlockBlobCountServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockBlobCountServiceGet({
         ...options,
@@ -1100,7 +1499,6 @@ export const fctBlockBlobCountServiceGetOptions = (options: Options<FctBlockBlob
     },
     queryKey: fctBlockBlobCountServiceGetQueryKey(options),
   });
-};
 
 export const fctBlockBlobCountHeadServiceListQueryKey = (options?: Options<FctBlockBlobCountHeadServiceListData>) =>
   createQueryKey('fctBlockBlobCountHeadServiceList', options);
@@ -1110,8 +1508,13 @@ export const fctBlockBlobCountHeadServiceListQueryKey = (options?: Options<FctBl
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockBlobCountHeadServiceListOptions = (options?: Options<FctBlockBlobCountHeadServiceListData>) => {
-  return queryOptions({
+export const fctBlockBlobCountHeadServiceListOptions = (options?: Options<FctBlockBlobCountHeadServiceListData>) =>
+  queryOptions<
+    FctBlockBlobCountHeadServiceListResponse,
+    FctBlockBlobCountHeadServiceListError,
+    FctBlockBlobCountHeadServiceListResponse,
+    ReturnType<typeof fctBlockBlobCountHeadServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockBlobCountHeadServiceList({
         ...options,
@@ -1123,7 +1526,6 @@ export const fctBlockBlobCountHeadServiceListOptions = (options?: Options<FctBlo
     },
     queryKey: fctBlockBlobCountHeadServiceListQueryKey(options),
   });
-};
 
 export const fctBlockBlobCountHeadServiceGetQueryKey = (options: Options<FctBlockBlobCountHeadServiceGetData>) =>
   createQueryKey('fctBlockBlobCountHeadServiceGet', options);
@@ -1133,8 +1535,13 @@ export const fctBlockBlobCountHeadServiceGetQueryKey = (options: Options<FctBloc
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockBlobCountHeadServiceGetOptions = (options: Options<FctBlockBlobCountHeadServiceGetData>) => {
-  return queryOptions({
+export const fctBlockBlobCountHeadServiceGetOptions = (options: Options<FctBlockBlobCountHeadServiceGetData>) =>
+  queryOptions<
+    FctBlockBlobCountHeadServiceGetResponse,
+    FctBlockBlobCountHeadServiceGetError,
+    FctBlockBlobCountHeadServiceGetResponse,
+    ReturnType<typeof fctBlockBlobCountHeadServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockBlobCountHeadServiceGet({
         ...options,
@@ -1146,7 +1553,6 @@ export const fctBlockBlobCountHeadServiceGetOptions = (options: Options<FctBlock
     },
     queryKey: fctBlockBlobCountHeadServiceGetQueryKey(options),
   });
-};
 
 export const fctBlockBlobFirstSeenByNodeServiceListQueryKey = (
   options?: Options<FctBlockBlobFirstSeenByNodeServiceListData>
@@ -1159,8 +1565,13 @@ export const fctBlockBlobFirstSeenByNodeServiceListQueryKey = (
  */
 export const fctBlockBlobFirstSeenByNodeServiceListOptions = (
   options?: Options<FctBlockBlobFirstSeenByNodeServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctBlockBlobFirstSeenByNodeServiceListResponse,
+    FctBlockBlobFirstSeenByNodeServiceListError,
+    FctBlockBlobFirstSeenByNodeServiceListResponse,
+    ReturnType<typeof fctBlockBlobFirstSeenByNodeServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockBlobFirstSeenByNodeServiceList({
         ...options,
@@ -1172,7 +1583,6 @@ export const fctBlockBlobFirstSeenByNodeServiceListOptions = (
     },
     queryKey: fctBlockBlobFirstSeenByNodeServiceListQueryKey(options),
   });
-};
 
 export const fctBlockBlobFirstSeenByNodeServiceGetQueryKey = (
   options: Options<FctBlockBlobFirstSeenByNodeServiceGetData>
@@ -1185,8 +1595,13 @@ export const fctBlockBlobFirstSeenByNodeServiceGetQueryKey = (
  */
 export const fctBlockBlobFirstSeenByNodeServiceGetOptions = (
   options: Options<FctBlockBlobFirstSeenByNodeServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctBlockBlobFirstSeenByNodeServiceGetResponse,
+    FctBlockBlobFirstSeenByNodeServiceGetError,
+    FctBlockBlobFirstSeenByNodeServiceGetResponse,
+    ReturnType<typeof fctBlockBlobFirstSeenByNodeServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockBlobFirstSeenByNodeServiceGet({
         ...options,
@@ -1198,7 +1613,6 @@ export const fctBlockBlobFirstSeenByNodeServiceGetOptions = (
     },
     queryKey: fctBlockBlobFirstSeenByNodeServiceGetQueryKey(options),
   });
-};
 
 export const fctBlockDataColumnSidecarFirstSeenByNodeServiceListQueryKey = (
   options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceListData>
@@ -1211,8 +1625,13 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeServiceListQueryKey = (
  */
 export const fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions = (
   options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponse,
+    FctBlockDataColumnSidecarFirstSeenByNodeServiceListError,
+    FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponse,
+    ReturnType<typeof fctBlockDataColumnSidecarFirstSeenByNodeServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockDataColumnSidecarFirstSeenByNodeServiceList({
         ...options,
@@ -1224,7 +1643,6 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions = (
     },
     queryKey: fctBlockDataColumnSidecarFirstSeenByNodeServiceListQueryKey(options),
   });
-};
 
 export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGetQueryKey = (
   options: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData>
@@ -1237,8 +1655,13 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGetQueryKey = (
  */
 export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGetOptions = (
   options: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse,
+    FctBlockDataColumnSidecarFirstSeenByNodeServiceGetError,
+    FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse,
+    ReturnType<typeof fctBlockDataColumnSidecarFirstSeenByNodeServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockDataColumnSidecarFirstSeenByNodeServiceGet({
         ...options,
@@ -1250,7 +1673,6 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGetOptions = (
     },
     queryKey: fctBlockDataColumnSidecarFirstSeenByNodeServiceGetQueryKey(options),
   });
-};
 
 export const fctBlockFirstSeenByNodeServiceListQueryKey = (options?: Options<FctBlockFirstSeenByNodeServiceListData>) =>
   createQueryKey('fctBlockFirstSeenByNodeServiceList', options);
@@ -1260,10 +1682,13 @@ export const fctBlockFirstSeenByNodeServiceListQueryKey = (options?: Options<Fct
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockFirstSeenByNodeServiceListOptions = (
-  options?: Options<FctBlockFirstSeenByNodeServiceListData>
-) => {
-  return queryOptions({
+export const fctBlockFirstSeenByNodeServiceListOptions = (options?: Options<FctBlockFirstSeenByNodeServiceListData>) =>
+  queryOptions<
+    FctBlockFirstSeenByNodeServiceListResponse,
+    FctBlockFirstSeenByNodeServiceListError,
+    FctBlockFirstSeenByNodeServiceListResponse,
+    ReturnType<typeof fctBlockFirstSeenByNodeServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockFirstSeenByNodeServiceList({
         ...options,
@@ -1275,7 +1700,6 @@ export const fctBlockFirstSeenByNodeServiceListOptions = (
     },
     queryKey: fctBlockFirstSeenByNodeServiceListQueryKey(options),
   });
-};
 
 export const fctBlockFirstSeenByNodeServiceGetQueryKey = (options: Options<FctBlockFirstSeenByNodeServiceGetData>) =>
   createQueryKey('fctBlockFirstSeenByNodeServiceGet', options);
@@ -1285,8 +1709,13 @@ export const fctBlockFirstSeenByNodeServiceGetQueryKey = (options: Options<FctBl
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockFirstSeenByNodeServiceGetOptions = (options: Options<FctBlockFirstSeenByNodeServiceGetData>) => {
-  return queryOptions({
+export const fctBlockFirstSeenByNodeServiceGetOptions = (options: Options<FctBlockFirstSeenByNodeServiceGetData>) =>
+  queryOptions<
+    FctBlockFirstSeenByNodeServiceGetResponse,
+    FctBlockFirstSeenByNodeServiceGetError,
+    FctBlockFirstSeenByNodeServiceGetResponse,
+    ReturnType<typeof fctBlockFirstSeenByNodeServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockFirstSeenByNodeServiceGet({
         ...options,
@@ -1298,7 +1727,6 @@ export const fctBlockFirstSeenByNodeServiceGetOptions = (options: Options<FctBlo
     },
     queryKey: fctBlockFirstSeenByNodeServiceGetQueryKey(options),
   });
-};
 
 export const fctBlockHeadServiceListQueryKey = (options?: Options<FctBlockHeadServiceListData>) =>
   createQueryKey('fctBlockHeadServiceList', options);
@@ -1308,8 +1736,13 @@ export const fctBlockHeadServiceListQueryKey = (options?: Options<FctBlockHeadSe
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockHeadServiceListOptions = (options?: Options<FctBlockHeadServiceListData>) => {
-  return queryOptions({
+export const fctBlockHeadServiceListOptions = (options?: Options<FctBlockHeadServiceListData>) =>
+  queryOptions<
+    FctBlockHeadServiceListResponse,
+    FctBlockHeadServiceListError,
+    FctBlockHeadServiceListResponse,
+    ReturnType<typeof fctBlockHeadServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockHeadServiceList({
         ...options,
@@ -1321,7 +1754,6 @@ export const fctBlockHeadServiceListOptions = (options?: Options<FctBlockHeadSer
     },
     queryKey: fctBlockHeadServiceListQueryKey(options),
   });
-};
 
 export const fctBlockHeadServiceGetQueryKey = (options: Options<FctBlockHeadServiceGetData>) =>
   createQueryKey('fctBlockHeadServiceGet', options);
@@ -1331,8 +1763,13 @@ export const fctBlockHeadServiceGetQueryKey = (options: Options<FctBlockHeadServ
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockHeadServiceGetOptions = (options: Options<FctBlockHeadServiceGetData>) => {
-  return queryOptions({
+export const fctBlockHeadServiceGetOptions = (options: Options<FctBlockHeadServiceGetData>) =>
+  queryOptions<
+    FctBlockHeadServiceGetResponse,
+    FctBlockHeadServiceGetError,
+    FctBlockHeadServiceGetResponse,
+    ReturnType<typeof fctBlockHeadServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockHeadServiceGet({
         ...options,
@@ -1344,7 +1781,6 @@ export const fctBlockHeadServiceGetOptions = (options: Options<FctBlockHeadServi
     },
     queryKey: fctBlockHeadServiceGetQueryKey(options),
   });
-};
 
 export const fctBlockMevServiceListQueryKey = (options?: Options<FctBlockMevServiceListData>) =>
   createQueryKey('fctBlockMevServiceList', options);
@@ -1354,8 +1790,13 @@ export const fctBlockMevServiceListQueryKey = (options?: Options<FctBlockMevServ
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockMevServiceListOptions = (options?: Options<FctBlockMevServiceListData>) => {
-  return queryOptions({
+export const fctBlockMevServiceListOptions = (options?: Options<FctBlockMevServiceListData>) =>
+  queryOptions<
+    FctBlockMevServiceListResponse,
+    FctBlockMevServiceListError,
+    FctBlockMevServiceListResponse,
+    ReturnType<typeof fctBlockMevServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockMevServiceList({
         ...options,
@@ -1367,7 +1808,6 @@ export const fctBlockMevServiceListOptions = (options?: Options<FctBlockMevServi
     },
     queryKey: fctBlockMevServiceListQueryKey(options),
   });
-};
 
 export const fctBlockMevServiceGetQueryKey = (options: Options<FctBlockMevServiceGetData>) =>
   createQueryKey('fctBlockMevServiceGet', options);
@@ -1377,8 +1817,13 @@ export const fctBlockMevServiceGetQueryKey = (options: Options<FctBlockMevServic
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockMevServiceGetOptions = (options: Options<FctBlockMevServiceGetData>) => {
-  return queryOptions({
+export const fctBlockMevServiceGetOptions = (options: Options<FctBlockMevServiceGetData>) =>
+  queryOptions<
+    FctBlockMevServiceGetResponse,
+    FctBlockMevServiceGetError,
+    FctBlockMevServiceGetResponse,
+    ReturnType<typeof fctBlockMevServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockMevServiceGet({
         ...options,
@@ -1390,7 +1835,6 @@ export const fctBlockMevServiceGetOptions = (options: Options<FctBlockMevService
     },
     queryKey: fctBlockMevServiceGetQueryKey(options),
   });
-};
 
 export const fctBlockMevHeadServiceListQueryKey = (options?: Options<FctBlockMevHeadServiceListData>) =>
   createQueryKey('fctBlockMevHeadServiceList', options);
@@ -1400,8 +1844,13 @@ export const fctBlockMevHeadServiceListQueryKey = (options?: Options<FctBlockMev
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockMevHeadServiceListOptions = (options?: Options<FctBlockMevHeadServiceListData>) => {
-  return queryOptions({
+export const fctBlockMevHeadServiceListOptions = (options?: Options<FctBlockMevHeadServiceListData>) =>
+  queryOptions<
+    FctBlockMevHeadServiceListResponse,
+    FctBlockMevHeadServiceListError,
+    FctBlockMevHeadServiceListResponse,
+    ReturnType<typeof fctBlockMevHeadServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockMevHeadServiceList({
         ...options,
@@ -1413,7 +1862,6 @@ export const fctBlockMevHeadServiceListOptions = (options?: Options<FctBlockMevH
     },
     queryKey: fctBlockMevHeadServiceListQueryKey(options),
   });
-};
 
 export const fctBlockMevHeadServiceGetQueryKey = (options: Options<FctBlockMevHeadServiceGetData>) =>
   createQueryKey('fctBlockMevHeadServiceGet', options);
@@ -1423,8 +1871,13 @@ export const fctBlockMevHeadServiceGetQueryKey = (options: Options<FctBlockMevHe
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockMevHeadServiceGetOptions = (options: Options<FctBlockMevHeadServiceGetData>) => {
-  return queryOptions({
+export const fctBlockMevHeadServiceGetOptions = (options: Options<FctBlockMevHeadServiceGetData>) =>
+  queryOptions<
+    FctBlockMevHeadServiceGetResponse,
+    FctBlockMevHeadServiceGetError,
+    FctBlockMevHeadServiceGetResponse,
+    ReturnType<typeof fctBlockMevHeadServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockMevHeadServiceGet({
         ...options,
@@ -1436,7 +1889,6 @@ export const fctBlockMevHeadServiceGetOptions = (options: Options<FctBlockMevHea
     },
     queryKey: fctBlockMevHeadServiceGetQueryKey(options),
   });
-};
 
 export const fctBlockProposerServiceListQueryKey = (options?: Options<FctBlockProposerServiceListData>) =>
   createQueryKey('fctBlockProposerServiceList', options);
@@ -1446,8 +1898,13 @@ export const fctBlockProposerServiceListQueryKey = (options?: Options<FctBlockPr
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockProposerServiceListOptions = (options?: Options<FctBlockProposerServiceListData>) => {
-  return queryOptions({
+export const fctBlockProposerServiceListOptions = (options?: Options<FctBlockProposerServiceListData>) =>
+  queryOptions<
+    FctBlockProposerServiceListResponse,
+    FctBlockProposerServiceListError,
+    FctBlockProposerServiceListResponse,
+    ReturnType<typeof fctBlockProposerServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockProposerServiceList({
         ...options,
@@ -1459,7 +1916,6 @@ export const fctBlockProposerServiceListOptions = (options?: Options<FctBlockPro
     },
     queryKey: fctBlockProposerServiceListQueryKey(options),
   });
-};
 
 export const fctBlockProposerServiceGetQueryKey = (options: Options<FctBlockProposerServiceGetData>) =>
   createQueryKey('fctBlockProposerServiceGet', options);
@@ -1469,8 +1925,13 @@ export const fctBlockProposerServiceGetQueryKey = (options: Options<FctBlockProp
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockProposerServiceGetOptions = (options: Options<FctBlockProposerServiceGetData>) => {
-  return queryOptions({
+export const fctBlockProposerServiceGetOptions = (options: Options<FctBlockProposerServiceGetData>) =>
+  queryOptions<
+    FctBlockProposerServiceGetResponse,
+    FctBlockProposerServiceGetError,
+    FctBlockProposerServiceGetResponse,
+    ReturnType<typeof fctBlockProposerServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockProposerServiceGet({
         ...options,
@@ -1482,7 +1943,6 @@ export const fctBlockProposerServiceGetOptions = (options: Options<FctBlockPropo
     },
     queryKey: fctBlockProposerServiceGetQueryKey(options),
   });
-};
 
 export const fctBlockProposerEntityServiceListQueryKey = (options?: Options<FctBlockProposerEntityServiceListData>) =>
   createQueryKey('fctBlockProposerEntityServiceList', options);
@@ -1492,8 +1952,13 @@ export const fctBlockProposerEntityServiceListQueryKey = (options?: Options<FctB
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockProposerEntityServiceListOptions = (options?: Options<FctBlockProposerEntityServiceListData>) => {
-  return queryOptions({
+export const fctBlockProposerEntityServiceListOptions = (options?: Options<FctBlockProposerEntityServiceListData>) =>
+  queryOptions<
+    FctBlockProposerEntityServiceListResponse,
+    FctBlockProposerEntityServiceListError,
+    FctBlockProposerEntityServiceListResponse,
+    ReturnType<typeof fctBlockProposerEntityServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockProposerEntityServiceList({
         ...options,
@@ -1505,7 +1970,6 @@ export const fctBlockProposerEntityServiceListOptions = (options?: Options<FctBl
     },
     queryKey: fctBlockProposerEntityServiceListQueryKey(options),
   });
-};
 
 export const fctBlockProposerEntityServiceGetQueryKey = (options: Options<FctBlockProposerEntityServiceGetData>) =>
   createQueryKey('fctBlockProposerEntityServiceGet', options);
@@ -1515,8 +1979,13 @@ export const fctBlockProposerEntityServiceGetQueryKey = (options: Options<FctBlo
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockProposerEntityServiceGetOptions = (options: Options<FctBlockProposerEntityServiceGetData>) => {
-  return queryOptions({
+export const fctBlockProposerEntityServiceGetOptions = (options: Options<FctBlockProposerEntityServiceGetData>) =>
+  queryOptions<
+    FctBlockProposerEntityServiceGetResponse,
+    FctBlockProposerEntityServiceGetError,
+    FctBlockProposerEntityServiceGetResponse,
+    ReturnType<typeof fctBlockProposerEntityServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockProposerEntityServiceGet({
         ...options,
@@ -1528,7 +1997,6 @@ export const fctBlockProposerEntityServiceGetOptions = (options: Options<FctBloc
     },
     queryKey: fctBlockProposerEntityServiceGetQueryKey(options),
   });
-};
 
 export const fctBlockProposerHeadServiceListQueryKey = (options?: Options<FctBlockProposerHeadServiceListData>) =>
   createQueryKey('fctBlockProposerHeadServiceList', options);
@@ -1538,8 +2006,13 @@ export const fctBlockProposerHeadServiceListQueryKey = (options?: Options<FctBlo
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockProposerHeadServiceListOptions = (options?: Options<FctBlockProposerHeadServiceListData>) => {
-  return queryOptions({
+export const fctBlockProposerHeadServiceListOptions = (options?: Options<FctBlockProposerHeadServiceListData>) =>
+  queryOptions<
+    FctBlockProposerHeadServiceListResponse,
+    FctBlockProposerHeadServiceListError,
+    FctBlockProposerHeadServiceListResponse,
+    ReturnType<typeof fctBlockProposerHeadServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockProposerHeadServiceList({
         ...options,
@@ -1551,7 +2024,6 @@ export const fctBlockProposerHeadServiceListOptions = (options?: Options<FctBloc
     },
     queryKey: fctBlockProposerHeadServiceListQueryKey(options),
   });
-};
 
 export const fctBlockProposerHeadServiceGetQueryKey = (options: Options<FctBlockProposerHeadServiceGetData>) =>
   createQueryKey('fctBlockProposerHeadServiceGet', options);
@@ -1561,8 +2033,13 @@ export const fctBlockProposerHeadServiceGetQueryKey = (options: Options<FctBlock
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockProposerHeadServiceGetOptions = (options: Options<FctBlockProposerHeadServiceGetData>) => {
-  return queryOptions({
+export const fctBlockProposerHeadServiceGetOptions = (options: Options<FctBlockProposerHeadServiceGetData>) =>
+  queryOptions<
+    FctBlockProposerHeadServiceGetResponse,
+    FctBlockProposerHeadServiceGetError,
+    FctBlockProposerHeadServiceGetResponse,
+    ReturnType<typeof fctBlockProposerHeadServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctBlockProposerHeadServiceGet({
         ...options,
@@ -1574,7 +2051,6 @@ export const fctBlockProposerHeadServiceGetOptions = (options: Options<FctBlockP
     },
     queryKey: fctBlockProposerHeadServiceGetQueryKey(options),
   });
-};
 
 export const fctDataColumnAvailabilityByEpochServiceListQueryKey = (
   options?: Options<FctDataColumnAvailabilityByEpochServiceListData>
@@ -1587,8 +2063,13 @@ export const fctDataColumnAvailabilityByEpochServiceListQueryKey = (
  */
 export const fctDataColumnAvailabilityByEpochServiceListOptions = (
   options?: Options<FctDataColumnAvailabilityByEpochServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctDataColumnAvailabilityByEpochServiceListResponse,
+    FctDataColumnAvailabilityByEpochServiceListError,
+    FctDataColumnAvailabilityByEpochServiceListResponse,
+    ReturnType<typeof fctDataColumnAvailabilityByEpochServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctDataColumnAvailabilityByEpochServiceList({
         ...options,
@@ -1600,7 +2081,6 @@ export const fctDataColumnAvailabilityByEpochServiceListOptions = (
     },
     queryKey: fctDataColumnAvailabilityByEpochServiceListQueryKey(options),
   });
-};
 
 export const fctDataColumnAvailabilityByEpochServiceGetQueryKey = (
   options: Options<FctDataColumnAvailabilityByEpochServiceGetData>
@@ -1613,8 +2093,13 @@ export const fctDataColumnAvailabilityByEpochServiceGetQueryKey = (
  */
 export const fctDataColumnAvailabilityByEpochServiceGetOptions = (
   options: Options<FctDataColumnAvailabilityByEpochServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctDataColumnAvailabilityByEpochServiceGetResponse,
+    FctDataColumnAvailabilityByEpochServiceGetError,
+    FctDataColumnAvailabilityByEpochServiceGetResponse,
+    ReturnType<typeof fctDataColumnAvailabilityByEpochServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctDataColumnAvailabilityByEpochServiceGet({
         ...options,
@@ -1626,7 +2111,6 @@ export const fctDataColumnAvailabilityByEpochServiceGetOptions = (
     },
     queryKey: fctDataColumnAvailabilityByEpochServiceGetQueryKey(options),
   });
-};
 
 export const fctDataColumnAvailabilityBySlotServiceListQueryKey = (
   options?: Options<FctDataColumnAvailabilityBySlotServiceListData>
@@ -1639,8 +2123,13 @@ export const fctDataColumnAvailabilityBySlotServiceListQueryKey = (
  */
 export const fctDataColumnAvailabilityBySlotServiceListOptions = (
   options?: Options<FctDataColumnAvailabilityBySlotServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctDataColumnAvailabilityBySlotServiceListResponse,
+    FctDataColumnAvailabilityBySlotServiceListError,
+    FctDataColumnAvailabilityBySlotServiceListResponse,
+    ReturnType<typeof fctDataColumnAvailabilityBySlotServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctDataColumnAvailabilityBySlotServiceList({
         ...options,
@@ -1652,7 +2141,6 @@ export const fctDataColumnAvailabilityBySlotServiceListOptions = (
     },
     queryKey: fctDataColumnAvailabilityBySlotServiceListQueryKey(options),
   });
-};
 
 export const fctDataColumnAvailabilityBySlotServiceGetQueryKey = (
   options: Options<FctDataColumnAvailabilityBySlotServiceGetData>
@@ -1665,8 +2153,13 @@ export const fctDataColumnAvailabilityBySlotServiceGetQueryKey = (
  */
 export const fctDataColumnAvailabilityBySlotServiceGetOptions = (
   options: Options<FctDataColumnAvailabilityBySlotServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctDataColumnAvailabilityBySlotServiceGetResponse,
+    FctDataColumnAvailabilityBySlotServiceGetError,
+    FctDataColumnAvailabilityBySlotServiceGetResponse,
+    ReturnType<typeof fctDataColumnAvailabilityBySlotServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctDataColumnAvailabilityBySlotServiceGet({
         ...options,
@@ -1678,7 +2171,6 @@ export const fctDataColumnAvailabilityBySlotServiceGetOptions = (
     },
     queryKey: fctDataColumnAvailabilityBySlotServiceGetQueryKey(options),
   });
-};
 
 export const fctDataColumnAvailabilityBySlotBlobServiceListQueryKey = (
   options?: Options<FctDataColumnAvailabilityBySlotBlobServiceListData>
@@ -1691,8 +2183,13 @@ export const fctDataColumnAvailabilityBySlotBlobServiceListQueryKey = (
  */
 export const fctDataColumnAvailabilityBySlotBlobServiceListOptions = (
   options?: Options<FctDataColumnAvailabilityBySlotBlobServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctDataColumnAvailabilityBySlotBlobServiceListResponse,
+    FctDataColumnAvailabilityBySlotBlobServiceListError,
+    FctDataColumnAvailabilityBySlotBlobServiceListResponse,
+    ReturnType<typeof fctDataColumnAvailabilityBySlotBlobServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctDataColumnAvailabilityBySlotBlobServiceList({
         ...options,
@@ -1704,7 +2201,6 @@ export const fctDataColumnAvailabilityBySlotBlobServiceListOptions = (
     },
     queryKey: fctDataColumnAvailabilityBySlotBlobServiceListQueryKey(options),
   });
-};
 
 export const fctDataColumnAvailabilityBySlotBlobServiceGetQueryKey = (
   options: Options<FctDataColumnAvailabilityBySlotBlobServiceGetData>
@@ -1717,8 +2213,13 @@ export const fctDataColumnAvailabilityBySlotBlobServiceGetQueryKey = (
  */
 export const fctDataColumnAvailabilityBySlotBlobServiceGetOptions = (
   options: Options<FctDataColumnAvailabilityBySlotBlobServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctDataColumnAvailabilityBySlotBlobServiceGetResponse,
+    FctDataColumnAvailabilityBySlotBlobServiceGetError,
+    FctDataColumnAvailabilityBySlotBlobServiceGetResponse,
+    ReturnType<typeof fctDataColumnAvailabilityBySlotBlobServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctDataColumnAvailabilityBySlotBlobServiceGet({
         ...options,
@@ -1730,7 +2231,6 @@ export const fctDataColumnAvailabilityBySlotBlobServiceGetOptions = (
     },
     queryKey: fctDataColumnAvailabilityBySlotBlobServiceGetQueryKey(options),
   });
-};
 
 export const fctDataColumnAvailabilityDailyServiceListQueryKey = (
   options?: Options<FctDataColumnAvailabilityDailyServiceListData>
@@ -1743,8 +2243,13 @@ export const fctDataColumnAvailabilityDailyServiceListQueryKey = (
  */
 export const fctDataColumnAvailabilityDailyServiceListOptions = (
   options?: Options<FctDataColumnAvailabilityDailyServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctDataColumnAvailabilityDailyServiceListResponse,
+    FctDataColumnAvailabilityDailyServiceListError,
+    FctDataColumnAvailabilityDailyServiceListResponse,
+    ReturnType<typeof fctDataColumnAvailabilityDailyServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctDataColumnAvailabilityDailyServiceList({
         ...options,
@@ -1756,7 +2261,6 @@ export const fctDataColumnAvailabilityDailyServiceListOptions = (
     },
     queryKey: fctDataColumnAvailabilityDailyServiceListQueryKey(options),
   });
-};
 
 export const fctDataColumnAvailabilityDailyServiceGetQueryKey = (
   options: Options<FctDataColumnAvailabilityDailyServiceGetData>
@@ -1769,8 +2273,13 @@ export const fctDataColumnAvailabilityDailyServiceGetQueryKey = (
  */
 export const fctDataColumnAvailabilityDailyServiceGetOptions = (
   options: Options<FctDataColumnAvailabilityDailyServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctDataColumnAvailabilityDailyServiceGetResponse,
+    FctDataColumnAvailabilityDailyServiceGetError,
+    FctDataColumnAvailabilityDailyServiceGetResponse,
+    ReturnType<typeof fctDataColumnAvailabilityDailyServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctDataColumnAvailabilityDailyServiceGet({
         ...options,
@@ -1782,7 +2291,6 @@ export const fctDataColumnAvailabilityDailyServiceGetOptions = (
     },
     queryKey: fctDataColumnAvailabilityDailyServiceGetQueryKey(options),
   });
-};
 
 export const fctDataColumnAvailabilityHourlyServiceListQueryKey = (
   options?: Options<FctDataColumnAvailabilityHourlyServiceListData>
@@ -1795,8 +2303,13 @@ export const fctDataColumnAvailabilityHourlyServiceListQueryKey = (
  */
 export const fctDataColumnAvailabilityHourlyServiceListOptions = (
   options?: Options<FctDataColumnAvailabilityHourlyServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctDataColumnAvailabilityHourlyServiceListResponse,
+    FctDataColumnAvailabilityHourlyServiceListError,
+    FctDataColumnAvailabilityHourlyServiceListResponse,
+    ReturnType<typeof fctDataColumnAvailabilityHourlyServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctDataColumnAvailabilityHourlyServiceList({
         ...options,
@@ -1808,7 +2321,6 @@ export const fctDataColumnAvailabilityHourlyServiceListOptions = (
     },
     queryKey: fctDataColumnAvailabilityHourlyServiceListQueryKey(options),
   });
-};
 
 export const fctDataColumnAvailabilityHourlyServiceGetQueryKey = (
   options: Options<FctDataColumnAvailabilityHourlyServiceGetData>
@@ -1821,8 +2333,13 @@ export const fctDataColumnAvailabilityHourlyServiceGetQueryKey = (
  */
 export const fctDataColumnAvailabilityHourlyServiceGetOptions = (
   options: Options<FctDataColumnAvailabilityHourlyServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctDataColumnAvailabilityHourlyServiceGetResponse,
+    FctDataColumnAvailabilityHourlyServiceGetError,
+    FctDataColumnAvailabilityHourlyServiceGetResponse,
+    ReturnType<typeof fctDataColumnAvailabilityHourlyServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctDataColumnAvailabilityHourlyServiceGet({
         ...options,
@@ -1834,7 +2351,6 @@ export const fctDataColumnAvailabilityHourlyServiceGetOptions = (
     },
     queryKey: fctDataColumnAvailabilityHourlyServiceGetQueryKey(options),
   });
-};
 
 export const fctHeadFirstSeenByNodeServiceListQueryKey = (options?: Options<FctHeadFirstSeenByNodeServiceListData>) =>
   createQueryKey('fctHeadFirstSeenByNodeServiceList', options);
@@ -1844,8 +2360,13 @@ export const fctHeadFirstSeenByNodeServiceListQueryKey = (options?: Options<FctH
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctHeadFirstSeenByNodeServiceListOptions = (options?: Options<FctHeadFirstSeenByNodeServiceListData>) => {
-  return queryOptions({
+export const fctHeadFirstSeenByNodeServiceListOptions = (options?: Options<FctHeadFirstSeenByNodeServiceListData>) =>
+  queryOptions<
+    FctHeadFirstSeenByNodeServiceListResponse,
+    FctHeadFirstSeenByNodeServiceListError,
+    FctHeadFirstSeenByNodeServiceListResponse,
+    ReturnType<typeof fctHeadFirstSeenByNodeServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctHeadFirstSeenByNodeServiceList({
         ...options,
@@ -1857,7 +2378,6 @@ export const fctHeadFirstSeenByNodeServiceListOptions = (options?: Options<FctHe
     },
     queryKey: fctHeadFirstSeenByNodeServiceListQueryKey(options),
   });
-};
 
 export const fctHeadFirstSeenByNodeServiceGetQueryKey = (options: Options<FctHeadFirstSeenByNodeServiceGetData>) =>
   createQueryKey('fctHeadFirstSeenByNodeServiceGet', options);
@@ -1867,8 +2387,13 @@ export const fctHeadFirstSeenByNodeServiceGetQueryKey = (options: Options<FctHea
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctHeadFirstSeenByNodeServiceGetOptions = (options: Options<FctHeadFirstSeenByNodeServiceGetData>) => {
-  return queryOptions({
+export const fctHeadFirstSeenByNodeServiceGetOptions = (options: Options<FctHeadFirstSeenByNodeServiceGetData>) =>
+  queryOptions<
+    FctHeadFirstSeenByNodeServiceGetResponse,
+    FctHeadFirstSeenByNodeServiceGetError,
+    FctHeadFirstSeenByNodeServiceGetResponse,
+    ReturnType<typeof fctHeadFirstSeenByNodeServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctHeadFirstSeenByNodeServiceGet({
         ...options,
@@ -1880,7 +2405,6 @@ export const fctHeadFirstSeenByNodeServiceGetOptions = (options: Options<FctHead
     },
     queryKey: fctHeadFirstSeenByNodeServiceGetQueryKey(options),
   });
-};
 
 export const fctMevBidCountByBuilderServiceListQueryKey = (options?: Options<FctMevBidCountByBuilderServiceListData>) =>
   createQueryKey('fctMevBidCountByBuilderServiceList', options);
@@ -1890,10 +2414,13 @@ export const fctMevBidCountByBuilderServiceListQueryKey = (options?: Options<Fct
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctMevBidCountByBuilderServiceListOptions = (
-  options?: Options<FctMevBidCountByBuilderServiceListData>
-) => {
-  return queryOptions({
+export const fctMevBidCountByBuilderServiceListOptions = (options?: Options<FctMevBidCountByBuilderServiceListData>) =>
+  queryOptions<
+    FctMevBidCountByBuilderServiceListResponse,
+    FctMevBidCountByBuilderServiceListError,
+    FctMevBidCountByBuilderServiceListResponse,
+    ReturnType<typeof fctMevBidCountByBuilderServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctMevBidCountByBuilderServiceList({
         ...options,
@@ -1905,7 +2432,6 @@ export const fctMevBidCountByBuilderServiceListOptions = (
     },
     queryKey: fctMevBidCountByBuilderServiceListQueryKey(options),
   });
-};
 
 export const fctMevBidCountByBuilderServiceGetQueryKey = (options: Options<FctMevBidCountByBuilderServiceGetData>) =>
   createQueryKey('fctMevBidCountByBuilderServiceGet', options);
@@ -1915,8 +2441,13 @@ export const fctMevBidCountByBuilderServiceGetQueryKey = (options: Options<FctMe
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctMevBidCountByBuilderServiceGetOptions = (options: Options<FctMevBidCountByBuilderServiceGetData>) => {
-  return queryOptions({
+export const fctMevBidCountByBuilderServiceGetOptions = (options: Options<FctMevBidCountByBuilderServiceGetData>) =>
+  queryOptions<
+    FctMevBidCountByBuilderServiceGetResponse,
+    FctMevBidCountByBuilderServiceGetError,
+    FctMevBidCountByBuilderServiceGetResponse,
+    ReturnType<typeof fctMevBidCountByBuilderServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctMevBidCountByBuilderServiceGet({
         ...options,
@@ -1928,7 +2459,6 @@ export const fctMevBidCountByBuilderServiceGetOptions = (options: Options<FctMev
     },
     queryKey: fctMevBidCountByBuilderServiceGetQueryKey(options),
   });
-};
 
 export const fctMevBidCountByRelayServiceListQueryKey = (options?: Options<FctMevBidCountByRelayServiceListData>) =>
   createQueryKey('fctMevBidCountByRelayServiceList', options);
@@ -1938,8 +2468,13 @@ export const fctMevBidCountByRelayServiceListQueryKey = (options?: Options<FctMe
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctMevBidCountByRelayServiceListOptions = (options?: Options<FctMevBidCountByRelayServiceListData>) => {
-  return queryOptions({
+export const fctMevBidCountByRelayServiceListOptions = (options?: Options<FctMevBidCountByRelayServiceListData>) =>
+  queryOptions<
+    FctMevBidCountByRelayServiceListResponse,
+    FctMevBidCountByRelayServiceListError,
+    FctMevBidCountByRelayServiceListResponse,
+    ReturnType<typeof fctMevBidCountByRelayServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctMevBidCountByRelayServiceList({
         ...options,
@@ -1951,7 +2486,6 @@ export const fctMevBidCountByRelayServiceListOptions = (options?: Options<FctMev
     },
     queryKey: fctMevBidCountByRelayServiceListQueryKey(options),
   });
-};
 
 export const fctMevBidCountByRelayServiceGetQueryKey = (options: Options<FctMevBidCountByRelayServiceGetData>) =>
   createQueryKey('fctMevBidCountByRelayServiceGet', options);
@@ -1961,8 +2495,13 @@ export const fctMevBidCountByRelayServiceGetQueryKey = (options: Options<FctMevB
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctMevBidCountByRelayServiceGetOptions = (options: Options<FctMevBidCountByRelayServiceGetData>) => {
-  return queryOptions({
+export const fctMevBidCountByRelayServiceGetOptions = (options: Options<FctMevBidCountByRelayServiceGetData>) =>
+  queryOptions<
+    FctMevBidCountByRelayServiceGetResponse,
+    FctMevBidCountByRelayServiceGetError,
+    FctMevBidCountByRelayServiceGetResponse,
+    ReturnType<typeof fctMevBidCountByRelayServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctMevBidCountByRelayServiceGet({
         ...options,
@@ -1974,7 +2513,6 @@ export const fctMevBidCountByRelayServiceGetOptions = (options: Options<FctMevBi
     },
     queryKey: fctMevBidCountByRelayServiceGetQueryKey(options),
   });
-};
 
 export const fctMevBidHighestValueByBuilderChunked50MsServiceListQueryKey = (
   options?: Options<FctMevBidHighestValueByBuilderChunked50MsServiceListData>
@@ -1987,8 +2525,13 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceListQueryKey = (
  */
 export const fctMevBidHighestValueByBuilderChunked50MsServiceListOptions = (
   options?: Options<FctMevBidHighestValueByBuilderChunked50MsServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctMevBidHighestValueByBuilderChunked50MsServiceListResponse,
+    FctMevBidHighestValueByBuilderChunked50MsServiceListError,
+    FctMevBidHighestValueByBuilderChunked50MsServiceListResponse,
+    ReturnType<typeof fctMevBidHighestValueByBuilderChunked50MsServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctMevBidHighestValueByBuilderChunked50MsServiceList({
         ...options,
@@ -2000,7 +2543,6 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceListOptions = (
     },
     queryKey: fctMevBidHighestValueByBuilderChunked50MsServiceListQueryKey(options),
   });
-};
 
 export const fctMevBidHighestValueByBuilderChunked50MsServiceGetQueryKey = (
   options: Options<FctMevBidHighestValueByBuilderChunked50MsServiceGetData>
@@ -2013,8 +2555,13 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceGetQueryKey = (
  */
 export const fctMevBidHighestValueByBuilderChunked50MsServiceGetOptions = (
   options: Options<FctMevBidHighestValueByBuilderChunked50MsServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    FctMevBidHighestValueByBuilderChunked50MsServiceGetResponse,
+    FctMevBidHighestValueByBuilderChunked50MsServiceGetError,
+    FctMevBidHighestValueByBuilderChunked50MsServiceGetResponse,
+    ReturnType<typeof fctMevBidHighestValueByBuilderChunked50MsServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctMevBidHighestValueByBuilderChunked50MsServiceGet({
         ...options,
@@ -2026,7 +2573,6 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceGetOptions = (
     },
     queryKey: fctMevBidHighestValueByBuilderChunked50MsServiceGetQueryKey(options),
   });
-};
 
 export const fctNodeActiveLast24hServiceListQueryKey = (options?: Options<FctNodeActiveLast24hServiceListData>) =>
   createQueryKey('fctNodeActiveLast24hServiceList', options);
@@ -2036,8 +2582,13 @@ export const fctNodeActiveLast24hServiceListQueryKey = (options?: Options<FctNod
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctNodeActiveLast24hServiceListOptions = (options?: Options<FctNodeActiveLast24hServiceListData>) => {
-  return queryOptions({
+export const fctNodeActiveLast24hServiceListOptions = (options?: Options<FctNodeActiveLast24hServiceListData>) =>
+  queryOptions<
+    FctNodeActiveLast24hServiceListResponse,
+    FctNodeActiveLast24hServiceListError,
+    FctNodeActiveLast24hServiceListResponse,
+    ReturnType<typeof fctNodeActiveLast24hServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctNodeActiveLast24hServiceList({
         ...options,
@@ -2049,7 +2600,6 @@ export const fctNodeActiveLast24hServiceListOptions = (options?: Options<FctNode
     },
     queryKey: fctNodeActiveLast24hServiceListQueryKey(options),
   });
-};
 
 export const fctNodeActiveLast24hServiceGetQueryKey = (options: Options<FctNodeActiveLast24hServiceGetData>) =>
   createQueryKey('fctNodeActiveLast24hServiceGet', options);
@@ -2059,8 +2609,13 @@ export const fctNodeActiveLast24hServiceGetQueryKey = (options: Options<FctNodeA
  *
  * Retrieve a single record by meta_client_name
  */
-export const fctNodeActiveLast24hServiceGetOptions = (options: Options<FctNodeActiveLast24hServiceGetData>) => {
-  return queryOptions({
+export const fctNodeActiveLast24hServiceGetOptions = (options: Options<FctNodeActiveLast24hServiceGetData>) =>
+  queryOptions<
+    FctNodeActiveLast24hServiceGetResponse,
+    FctNodeActiveLast24hServiceGetError,
+    FctNodeActiveLast24hServiceGetResponse,
+    ReturnType<typeof fctNodeActiveLast24hServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctNodeActiveLast24hServiceGet({
         ...options,
@@ -2072,7 +2627,6 @@ export const fctNodeActiveLast24hServiceGetOptions = (options: Options<FctNodeAc
     },
     queryKey: fctNodeActiveLast24hServiceGetQueryKey(options),
   });
-};
 
 export const fctPreparedBlockServiceListQueryKey = (options?: Options<FctPreparedBlockServiceListData>) =>
   createQueryKey('fctPreparedBlockServiceList', options);
@@ -2082,8 +2636,13 @@ export const fctPreparedBlockServiceListQueryKey = (options?: Options<FctPrepare
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctPreparedBlockServiceListOptions = (options?: Options<FctPreparedBlockServiceListData>) => {
-  return queryOptions({
+export const fctPreparedBlockServiceListOptions = (options?: Options<FctPreparedBlockServiceListData>) =>
+  queryOptions<
+    FctPreparedBlockServiceListResponse,
+    FctPreparedBlockServiceListError,
+    FctPreparedBlockServiceListResponse,
+    ReturnType<typeof fctPreparedBlockServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctPreparedBlockServiceList({
         ...options,
@@ -2095,7 +2654,6 @@ export const fctPreparedBlockServiceListOptions = (options?: Options<FctPrepared
     },
     queryKey: fctPreparedBlockServiceListQueryKey(options),
   });
-};
 
 export const fctPreparedBlockServiceGetQueryKey = (options: Options<FctPreparedBlockServiceGetData>) =>
   createQueryKey('fctPreparedBlockServiceGet', options);
@@ -2105,8 +2663,13 @@ export const fctPreparedBlockServiceGetQueryKey = (options: Options<FctPreparedB
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctPreparedBlockServiceGetOptions = (options: Options<FctPreparedBlockServiceGetData>) => {
-  return queryOptions({
+export const fctPreparedBlockServiceGetOptions = (options: Options<FctPreparedBlockServiceGetData>) =>
+  queryOptions<
+    FctPreparedBlockServiceGetResponse,
+    FctPreparedBlockServiceGetError,
+    FctPreparedBlockServiceGetResponse,
+    ReturnType<typeof fctPreparedBlockServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await fctPreparedBlockServiceGet({
         ...options,
@@ -2118,7 +2681,6 @@ export const fctPreparedBlockServiceGetOptions = (options: Options<FctPreparedBl
     },
     queryKey: fctPreparedBlockServiceGetQueryKey(options),
   });
-};
 
 export const intAddressFirstAccessServiceListQueryKey = (options?: Options<IntAddressFirstAccessServiceListData>) =>
   createQueryKey('intAddressFirstAccessServiceList', options);
@@ -2128,8 +2690,13 @@ export const intAddressFirstAccessServiceListQueryKey = (options?: Options<IntAd
  *
  * Retrieve paginated results with optional filtering
  */
-export const intAddressFirstAccessServiceListOptions = (options?: Options<IntAddressFirstAccessServiceListData>) => {
-  return queryOptions({
+export const intAddressFirstAccessServiceListOptions = (options?: Options<IntAddressFirstAccessServiceListData>) =>
+  queryOptions<
+    IntAddressFirstAccessServiceListResponse,
+    IntAddressFirstAccessServiceListError,
+    IntAddressFirstAccessServiceListResponse,
+    ReturnType<typeof intAddressFirstAccessServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intAddressFirstAccessServiceList({
         ...options,
@@ -2141,7 +2708,6 @@ export const intAddressFirstAccessServiceListOptions = (options?: Options<IntAdd
     },
     queryKey: intAddressFirstAccessServiceListQueryKey(options),
   });
-};
 
 export const intAddressFirstAccessServiceGetQueryKey = (options: Options<IntAddressFirstAccessServiceGetData>) =>
   createQueryKey('intAddressFirstAccessServiceGet', options);
@@ -2151,8 +2717,13 @@ export const intAddressFirstAccessServiceGetQueryKey = (options: Options<IntAddr
  *
  * Retrieve a single record by address
  */
-export const intAddressFirstAccessServiceGetOptions = (options: Options<IntAddressFirstAccessServiceGetData>) => {
-  return queryOptions({
+export const intAddressFirstAccessServiceGetOptions = (options: Options<IntAddressFirstAccessServiceGetData>) =>
+  queryOptions<
+    IntAddressFirstAccessServiceGetResponse,
+    IntAddressFirstAccessServiceGetError,
+    IntAddressFirstAccessServiceGetResponse,
+    ReturnType<typeof intAddressFirstAccessServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intAddressFirstAccessServiceGet({
         ...options,
@@ -2164,7 +2735,6 @@ export const intAddressFirstAccessServiceGetOptions = (options: Options<IntAddre
     },
     queryKey: intAddressFirstAccessServiceGetQueryKey(options),
   });
-};
 
 export const intAddressLastAccessServiceListQueryKey = (options?: Options<IntAddressLastAccessServiceListData>) =>
   createQueryKey('intAddressLastAccessServiceList', options);
@@ -2174,8 +2744,13 @@ export const intAddressLastAccessServiceListQueryKey = (options?: Options<IntAdd
  *
  * Retrieve paginated results with optional filtering
  */
-export const intAddressLastAccessServiceListOptions = (options?: Options<IntAddressLastAccessServiceListData>) => {
-  return queryOptions({
+export const intAddressLastAccessServiceListOptions = (options?: Options<IntAddressLastAccessServiceListData>) =>
+  queryOptions<
+    IntAddressLastAccessServiceListResponse,
+    IntAddressLastAccessServiceListError,
+    IntAddressLastAccessServiceListResponse,
+    ReturnType<typeof intAddressLastAccessServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intAddressLastAccessServiceList({
         ...options,
@@ -2187,7 +2762,6 @@ export const intAddressLastAccessServiceListOptions = (options?: Options<IntAddr
     },
     queryKey: intAddressLastAccessServiceListQueryKey(options),
   });
-};
 
 export const intAddressLastAccessServiceGetQueryKey = (options: Options<IntAddressLastAccessServiceGetData>) =>
   createQueryKey('intAddressLastAccessServiceGet', options);
@@ -2197,8 +2771,13 @@ export const intAddressLastAccessServiceGetQueryKey = (options: Options<IntAddre
  *
  * Retrieve a single record by address
  */
-export const intAddressLastAccessServiceGetOptions = (options: Options<IntAddressLastAccessServiceGetData>) => {
-  return queryOptions({
+export const intAddressLastAccessServiceGetOptions = (options: Options<IntAddressLastAccessServiceGetData>) =>
+  queryOptions<
+    IntAddressLastAccessServiceGetResponse,
+    IntAddressLastAccessServiceGetError,
+    IntAddressLastAccessServiceGetResponse,
+    ReturnType<typeof intAddressLastAccessServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intAddressLastAccessServiceGet({
         ...options,
@@ -2210,7 +2789,6 @@ export const intAddressLastAccessServiceGetOptions = (options: Options<IntAddres
     },
     queryKey: intAddressLastAccessServiceGetQueryKey(options),
   });
-};
 
 export const intAddressStorageSlotFirstAccessServiceListQueryKey = (
   options?: Options<IntAddressStorageSlotFirstAccessServiceListData>
@@ -2223,8 +2801,13 @@ export const intAddressStorageSlotFirstAccessServiceListQueryKey = (
  */
 export const intAddressStorageSlotFirstAccessServiceListOptions = (
   options?: Options<IntAddressStorageSlotFirstAccessServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    IntAddressStorageSlotFirstAccessServiceListResponse,
+    IntAddressStorageSlotFirstAccessServiceListError,
+    IntAddressStorageSlotFirstAccessServiceListResponse,
+    ReturnType<typeof intAddressStorageSlotFirstAccessServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intAddressStorageSlotFirstAccessServiceList({
         ...options,
@@ -2236,7 +2819,6 @@ export const intAddressStorageSlotFirstAccessServiceListOptions = (
     },
     queryKey: intAddressStorageSlotFirstAccessServiceListQueryKey(options),
   });
-};
 
 export const intAddressStorageSlotFirstAccessServiceGetQueryKey = (
   options: Options<IntAddressStorageSlotFirstAccessServiceGetData>
@@ -2249,8 +2831,13 @@ export const intAddressStorageSlotFirstAccessServiceGetQueryKey = (
  */
 export const intAddressStorageSlotFirstAccessServiceGetOptions = (
   options: Options<IntAddressStorageSlotFirstAccessServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    IntAddressStorageSlotFirstAccessServiceGetResponse,
+    IntAddressStorageSlotFirstAccessServiceGetError,
+    IntAddressStorageSlotFirstAccessServiceGetResponse,
+    ReturnType<typeof intAddressStorageSlotFirstAccessServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intAddressStorageSlotFirstAccessServiceGet({
         ...options,
@@ -2262,7 +2849,6 @@ export const intAddressStorageSlotFirstAccessServiceGetOptions = (
     },
     queryKey: intAddressStorageSlotFirstAccessServiceGetQueryKey(options),
   });
-};
 
 export const intAddressStorageSlotLastAccessServiceListQueryKey = (
   options?: Options<IntAddressStorageSlotLastAccessServiceListData>
@@ -2275,8 +2861,13 @@ export const intAddressStorageSlotLastAccessServiceListQueryKey = (
  */
 export const intAddressStorageSlotLastAccessServiceListOptions = (
   options?: Options<IntAddressStorageSlotLastAccessServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    IntAddressStorageSlotLastAccessServiceListResponse,
+    IntAddressStorageSlotLastAccessServiceListError,
+    IntAddressStorageSlotLastAccessServiceListResponse,
+    ReturnType<typeof intAddressStorageSlotLastAccessServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intAddressStorageSlotLastAccessServiceList({
         ...options,
@@ -2288,7 +2879,6 @@ export const intAddressStorageSlotLastAccessServiceListOptions = (
     },
     queryKey: intAddressStorageSlotLastAccessServiceListQueryKey(options),
   });
-};
 
 export const intAddressStorageSlotLastAccessServiceGetQueryKey = (
   options: Options<IntAddressStorageSlotLastAccessServiceGetData>
@@ -2301,8 +2891,13 @@ export const intAddressStorageSlotLastAccessServiceGetQueryKey = (
  */
 export const intAddressStorageSlotLastAccessServiceGetOptions = (
   options: Options<IntAddressStorageSlotLastAccessServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    IntAddressStorageSlotLastAccessServiceGetResponse,
+    IntAddressStorageSlotLastAccessServiceGetError,
+    IntAddressStorageSlotLastAccessServiceGetResponse,
+    ReturnType<typeof intAddressStorageSlotLastAccessServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intAddressStorageSlotLastAccessServiceGet({
         ...options,
@@ -2314,7 +2909,6 @@ export const intAddressStorageSlotLastAccessServiceGetOptions = (
     },
     queryKey: intAddressStorageSlotLastAccessServiceGetQueryKey(options),
   });
-};
 
 export const intAttestationAttestedCanonicalServiceListQueryKey = (
   options?: Options<IntAttestationAttestedCanonicalServiceListData>
@@ -2327,8 +2921,13 @@ export const intAttestationAttestedCanonicalServiceListQueryKey = (
  */
 export const intAttestationAttestedCanonicalServiceListOptions = (
   options?: Options<IntAttestationAttestedCanonicalServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    IntAttestationAttestedCanonicalServiceListResponse,
+    IntAttestationAttestedCanonicalServiceListError,
+    IntAttestationAttestedCanonicalServiceListResponse,
+    ReturnType<typeof intAttestationAttestedCanonicalServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intAttestationAttestedCanonicalServiceList({
         ...options,
@@ -2340,7 +2939,6 @@ export const intAttestationAttestedCanonicalServiceListOptions = (
     },
     queryKey: intAttestationAttestedCanonicalServiceListQueryKey(options),
   });
-};
 
 export const intAttestationAttestedCanonicalServiceGetQueryKey = (
   options: Options<IntAttestationAttestedCanonicalServiceGetData>
@@ -2353,8 +2951,13 @@ export const intAttestationAttestedCanonicalServiceGetQueryKey = (
  */
 export const intAttestationAttestedCanonicalServiceGetOptions = (
   options: Options<IntAttestationAttestedCanonicalServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    IntAttestationAttestedCanonicalServiceGetResponse,
+    IntAttestationAttestedCanonicalServiceGetError,
+    IntAttestationAttestedCanonicalServiceGetResponse,
+    ReturnType<typeof intAttestationAttestedCanonicalServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intAttestationAttestedCanonicalServiceGet({
         ...options,
@@ -2366,7 +2969,6 @@ export const intAttestationAttestedCanonicalServiceGetOptions = (
     },
     queryKey: intAttestationAttestedCanonicalServiceGetQueryKey(options),
   });
-};
 
 export const intAttestationAttestedHeadServiceListQueryKey = (
   options?: Options<IntAttestationAttestedHeadServiceListData>
@@ -2379,8 +2981,13 @@ export const intAttestationAttestedHeadServiceListQueryKey = (
  */
 export const intAttestationAttestedHeadServiceListOptions = (
   options?: Options<IntAttestationAttestedHeadServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    IntAttestationAttestedHeadServiceListResponse,
+    IntAttestationAttestedHeadServiceListError,
+    IntAttestationAttestedHeadServiceListResponse,
+    ReturnType<typeof intAttestationAttestedHeadServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intAttestationAttestedHeadServiceList({
         ...options,
@@ -2392,7 +2999,6 @@ export const intAttestationAttestedHeadServiceListOptions = (
     },
     queryKey: intAttestationAttestedHeadServiceListQueryKey(options),
   });
-};
 
 export const intAttestationAttestedHeadServiceGetQueryKey = (
   options: Options<IntAttestationAttestedHeadServiceGetData>
@@ -2405,8 +3011,13 @@ export const intAttestationAttestedHeadServiceGetQueryKey = (
  */
 export const intAttestationAttestedHeadServiceGetOptions = (
   options: Options<IntAttestationAttestedHeadServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    IntAttestationAttestedHeadServiceGetResponse,
+    IntAttestationAttestedHeadServiceGetError,
+    IntAttestationAttestedHeadServiceGetResponse,
+    ReturnType<typeof intAttestationAttestedHeadServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intAttestationAttestedHeadServiceGet({
         ...options,
@@ -2418,7 +3029,6 @@ export const intAttestationAttestedHeadServiceGetOptions = (
     },
     queryKey: intAttestationAttestedHeadServiceGetQueryKey(options),
   });
-};
 
 export const intAttestationFirstSeenServiceListQueryKey = (options?: Options<IntAttestationFirstSeenServiceListData>) =>
   createQueryKey('intAttestationFirstSeenServiceList', options);
@@ -2428,10 +3038,13 @@ export const intAttestationFirstSeenServiceListQueryKey = (options?: Options<Int
  *
  * Retrieve paginated results with optional filtering
  */
-export const intAttestationFirstSeenServiceListOptions = (
-  options?: Options<IntAttestationFirstSeenServiceListData>
-) => {
-  return queryOptions({
+export const intAttestationFirstSeenServiceListOptions = (options?: Options<IntAttestationFirstSeenServiceListData>) =>
+  queryOptions<
+    IntAttestationFirstSeenServiceListResponse,
+    IntAttestationFirstSeenServiceListError,
+    IntAttestationFirstSeenServiceListResponse,
+    ReturnType<typeof intAttestationFirstSeenServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intAttestationFirstSeenServiceList({
         ...options,
@@ -2443,7 +3056,6 @@ export const intAttestationFirstSeenServiceListOptions = (
     },
     queryKey: intAttestationFirstSeenServiceListQueryKey(options),
   });
-};
 
 export const intAttestationFirstSeenServiceGetQueryKey = (options: Options<IntAttestationFirstSeenServiceGetData>) =>
   createQueryKey('intAttestationFirstSeenServiceGet', options);
@@ -2453,8 +3065,13 @@ export const intAttestationFirstSeenServiceGetQueryKey = (options: Options<IntAt
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intAttestationFirstSeenServiceGetOptions = (options: Options<IntAttestationFirstSeenServiceGetData>) => {
-  return queryOptions({
+export const intAttestationFirstSeenServiceGetOptions = (options: Options<IntAttestationFirstSeenServiceGetData>) =>
+  queryOptions<
+    IntAttestationFirstSeenServiceGetResponse,
+    IntAttestationFirstSeenServiceGetError,
+    IntAttestationFirstSeenServiceGetResponse,
+    ReturnType<typeof intAttestationFirstSeenServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intAttestationFirstSeenServiceGet({
         ...options,
@@ -2466,7 +3083,6 @@ export const intAttestationFirstSeenServiceGetOptions = (options: Options<IntAtt
     },
     queryKey: intAttestationFirstSeenServiceGetQueryKey(options),
   });
-};
 
 export const intBeaconCommitteeHeadServiceListQueryKey = (options?: Options<IntBeaconCommitteeHeadServiceListData>) =>
   createQueryKey('intBeaconCommitteeHeadServiceList', options);
@@ -2476,8 +3092,13 @@ export const intBeaconCommitteeHeadServiceListQueryKey = (options?: Options<IntB
  *
  * Retrieve paginated results with optional filtering
  */
-export const intBeaconCommitteeHeadServiceListOptions = (options?: Options<IntBeaconCommitteeHeadServiceListData>) => {
-  return queryOptions({
+export const intBeaconCommitteeHeadServiceListOptions = (options?: Options<IntBeaconCommitteeHeadServiceListData>) =>
+  queryOptions<
+    IntBeaconCommitteeHeadServiceListResponse,
+    IntBeaconCommitteeHeadServiceListError,
+    IntBeaconCommitteeHeadServiceListResponse,
+    ReturnType<typeof intBeaconCommitteeHeadServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intBeaconCommitteeHeadServiceList({
         ...options,
@@ -2489,7 +3110,6 @@ export const intBeaconCommitteeHeadServiceListOptions = (options?: Options<IntBe
     },
     queryKey: intBeaconCommitteeHeadServiceListQueryKey(options),
   });
-};
 
 export const intBeaconCommitteeHeadServiceGetQueryKey = (options: Options<IntBeaconCommitteeHeadServiceGetData>) =>
   createQueryKey('intBeaconCommitteeHeadServiceGet', options);
@@ -2499,8 +3119,13 @@ export const intBeaconCommitteeHeadServiceGetQueryKey = (options: Options<IntBea
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intBeaconCommitteeHeadServiceGetOptions = (options: Options<IntBeaconCommitteeHeadServiceGetData>) => {
-  return queryOptions({
+export const intBeaconCommitteeHeadServiceGetOptions = (options: Options<IntBeaconCommitteeHeadServiceGetData>) =>
+  queryOptions<
+    IntBeaconCommitteeHeadServiceGetResponse,
+    IntBeaconCommitteeHeadServiceGetError,
+    IntBeaconCommitteeHeadServiceGetResponse,
+    ReturnType<typeof intBeaconCommitteeHeadServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intBeaconCommitteeHeadServiceGet({
         ...options,
@@ -2512,7 +3137,6 @@ export const intBeaconCommitteeHeadServiceGetOptions = (options: Options<IntBeac
     },
     queryKey: intBeaconCommitteeHeadServiceGetQueryKey(options),
   });
-};
 
 export const intBlockBlobCountCanonicalServiceListQueryKey = (
   options?: Options<IntBlockBlobCountCanonicalServiceListData>
@@ -2525,8 +3149,13 @@ export const intBlockBlobCountCanonicalServiceListQueryKey = (
  */
 export const intBlockBlobCountCanonicalServiceListOptions = (
   options?: Options<IntBlockBlobCountCanonicalServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    IntBlockBlobCountCanonicalServiceListResponse,
+    IntBlockBlobCountCanonicalServiceListError,
+    IntBlockBlobCountCanonicalServiceListResponse,
+    ReturnType<typeof intBlockBlobCountCanonicalServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intBlockBlobCountCanonicalServiceList({
         ...options,
@@ -2538,7 +3167,6 @@ export const intBlockBlobCountCanonicalServiceListOptions = (
     },
     queryKey: intBlockBlobCountCanonicalServiceListQueryKey(options),
   });
-};
 
 export const intBlockBlobCountCanonicalServiceGetQueryKey = (
   options: Options<IntBlockBlobCountCanonicalServiceGetData>
@@ -2551,8 +3179,13 @@ export const intBlockBlobCountCanonicalServiceGetQueryKey = (
  */
 export const intBlockBlobCountCanonicalServiceGetOptions = (
   options: Options<IntBlockBlobCountCanonicalServiceGetData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    IntBlockBlobCountCanonicalServiceGetResponse,
+    IntBlockBlobCountCanonicalServiceGetError,
+    IntBlockBlobCountCanonicalServiceGetResponse,
+    ReturnType<typeof intBlockBlobCountCanonicalServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intBlockBlobCountCanonicalServiceGet({
         ...options,
@@ -2564,7 +3197,6 @@ export const intBlockBlobCountCanonicalServiceGetOptions = (
     },
     queryKey: intBlockBlobCountCanonicalServiceGetQueryKey(options),
   });
-};
 
 export const intBlockCanonicalServiceListQueryKey = (options?: Options<IntBlockCanonicalServiceListData>) =>
   createQueryKey('intBlockCanonicalServiceList', options);
@@ -2574,8 +3206,13 @@ export const intBlockCanonicalServiceListQueryKey = (options?: Options<IntBlockC
  *
  * Retrieve paginated results with optional filtering
  */
-export const intBlockCanonicalServiceListOptions = (options?: Options<IntBlockCanonicalServiceListData>) => {
-  return queryOptions({
+export const intBlockCanonicalServiceListOptions = (options?: Options<IntBlockCanonicalServiceListData>) =>
+  queryOptions<
+    IntBlockCanonicalServiceListResponse,
+    IntBlockCanonicalServiceListError,
+    IntBlockCanonicalServiceListResponse,
+    ReturnType<typeof intBlockCanonicalServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intBlockCanonicalServiceList({
         ...options,
@@ -2587,7 +3224,6 @@ export const intBlockCanonicalServiceListOptions = (options?: Options<IntBlockCa
     },
     queryKey: intBlockCanonicalServiceListQueryKey(options),
   });
-};
 
 export const intBlockCanonicalServiceGetQueryKey = (options: Options<IntBlockCanonicalServiceGetData>) =>
   createQueryKey('intBlockCanonicalServiceGet', options);
@@ -2597,8 +3233,13 @@ export const intBlockCanonicalServiceGetQueryKey = (options: Options<IntBlockCan
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intBlockCanonicalServiceGetOptions = (options: Options<IntBlockCanonicalServiceGetData>) => {
-  return queryOptions({
+export const intBlockCanonicalServiceGetOptions = (options: Options<IntBlockCanonicalServiceGetData>) =>
+  queryOptions<
+    IntBlockCanonicalServiceGetResponse,
+    IntBlockCanonicalServiceGetError,
+    IntBlockCanonicalServiceGetResponse,
+    ReturnType<typeof intBlockCanonicalServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intBlockCanonicalServiceGet({
         ...options,
@@ -2610,7 +3251,6 @@ export const intBlockCanonicalServiceGetOptions = (options: Options<IntBlockCano
     },
     queryKey: intBlockCanonicalServiceGetQueryKey(options),
   });
-};
 
 export const intBlockMevCanonicalServiceListQueryKey = (options?: Options<IntBlockMevCanonicalServiceListData>) =>
   createQueryKey('intBlockMevCanonicalServiceList', options);
@@ -2620,8 +3260,13 @@ export const intBlockMevCanonicalServiceListQueryKey = (options?: Options<IntBlo
  *
  * Retrieve paginated results with optional filtering
  */
-export const intBlockMevCanonicalServiceListOptions = (options?: Options<IntBlockMevCanonicalServiceListData>) => {
-  return queryOptions({
+export const intBlockMevCanonicalServiceListOptions = (options?: Options<IntBlockMevCanonicalServiceListData>) =>
+  queryOptions<
+    IntBlockMevCanonicalServiceListResponse,
+    IntBlockMevCanonicalServiceListError,
+    IntBlockMevCanonicalServiceListResponse,
+    ReturnType<typeof intBlockMevCanonicalServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intBlockMevCanonicalServiceList({
         ...options,
@@ -2633,7 +3278,6 @@ export const intBlockMevCanonicalServiceListOptions = (options?: Options<IntBloc
     },
     queryKey: intBlockMevCanonicalServiceListQueryKey(options),
   });
-};
 
 export const intBlockMevCanonicalServiceGetQueryKey = (options: Options<IntBlockMevCanonicalServiceGetData>) =>
   createQueryKey('intBlockMevCanonicalServiceGet', options);
@@ -2643,8 +3287,13 @@ export const intBlockMevCanonicalServiceGetQueryKey = (options: Options<IntBlock
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intBlockMevCanonicalServiceGetOptions = (options: Options<IntBlockMevCanonicalServiceGetData>) => {
-  return queryOptions({
+export const intBlockMevCanonicalServiceGetOptions = (options: Options<IntBlockMevCanonicalServiceGetData>) =>
+  queryOptions<
+    IntBlockMevCanonicalServiceGetResponse,
+    IntBlockMevCanonicalServiceGetError,
+    IntBlockMevCanonicalServiceGetResponse,
+    ReturnType<typeof intBlockMevCanonicalServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intBlockMevCanonicalServiceGet({
         ...options,
@@ -2656,7 +3305,6 @@ export const intBlockMevCanonicalServiceGetOptions = (options: Options<IntBlockM
     },
     queryKey: intBlockMevCanonicalServiceGetQueryKey(options),
   });
-};
 
 export const intBlockProposerCanonicalServiceListQueryKey = (
   options?: Options<IntBlockProposerCanonicalServiceListData>
@@ -2669,8 +3317,13 @@ export const intBlockProposerCanonicalServiceListQueryKey = (
  */
 export const intBlockProposerCanonicalServiceListOptions = (
   options?: Options<IntBlockProposerCanonicalServiceListData>
-) => {
-  return queryOptions({
+) =>
+  queryOptions<
+    IntBlockProposerCanonicalServiceListResponse,
+    IntBlockProposerCanonicalServiceListError,
+    IntBlockProposerCanonicalServiceListResponse,
+    ReturnType<typeof intBlockProposerCanonicalServiceListQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intBlockProposerCanonicalServiceList({
         ...options,
@@ -2682,7 +3335,6 @@ export const intBlockProposerCanonicalServiceListOptions = (
     },
     queryKey: intBlockProposerCanonicalServiceListQueryKey(options),
   });
-};
 
 export const intBlockProposerCanonicalServiceGetQueryKey = (
   options: Options<IntBlockProposerCanonicalServiceGetData>
@@ -2693,10 +3345,13 @@ export const intBlockProposerCanonicalServiceGetQueryKey = (
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intBlockProposerCanonicalServiceGetOptions = (
-  options: Options<IntBlockProposerCanonicalServiceGetData>
-) => {
-  return queryOptions({
+export const intBlockProposerCanonicalServiceGetOptions = (options: Options<IntBlockProposerCanonicalServiceGetData>) =>
+  queryOptions<
+    IntBlockProposerCanonicalServiceGetResponse,
+    IntBlockProposerCanonicalServiceGetError,
+    IntBlockProposerCanonicalServiceGetResponse,
+    ReturnType<typeof intBlockProposerCanonicalServiceGetQueryKey>
+  >({
     queryFn: async ({ queryKey, signal }) => {
       const { data } = await intBlockProposerCanonicalServiceGet({
         ...options,
@@ -2708,4 +3363,3 @@ export const intBlockProposerCanonicalServiceGetOptions = (
     },
     queryKey: intBlockProposerCanonicalServiceGetQueryKey(options),
   });
-};

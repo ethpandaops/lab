@@ -67,13 +67,13 @@ export function useEpochsData(): UseEpochsDataReturn {
         }),
         enabled: !!currentNetwork && firstSlot >= 0,
       },
-      // Missed attestations by entity
+      // Attestation liveness by entity - filter server-side for missed attestations only
       {
         ...fctAttestationLivenessByEntityHeadServiceListOptions({
           query: {
             slot_gte: firstSlot,
             slot_lte: lastSlot,
-            status_eq: 'missed',
+            missed_count_gt: 0,
             page_size: 10000,
           },
         }),
@@ -163,13 +163,15 @@ export function useEpochsData(): UseEpochsDataReturn {
 
       livenessData.forEach((record: FctAttestationLivenessByEntityHead) => {
         const entity = record.entity ?? 'Unknown';
-        const count = record.attestation_count ?? 0;
+        const missedCount = record.missed_count ?? 0;
+
+        // Server already filters for missed_count > 0, but we validate here too
         if (!entityMap.has(entity)) {
           entityMap.set(entity, new Map());
         }
         const epochMap = entityMap.get(entity)!;
         const currentCount = epochMap.get(epoch) ?? 0;
-        epochMap.set(epoch, currentCount + count);
+        epochMap.set(epoch, currentCount + missedCount);
       });
     });
 

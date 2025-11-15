@@ -24,6 +24,53 @@ export type AdminCbtIncremental = {
   updated_date_time?: number;
 };
 
+export type DimBlockCanonical = {
+  /**
+   * The root hash of the beacon block
+   */
+  beacon_block_root?: string | null;
+  /**
+   * The version of the beacon block
+   */
+  beacon_block_version?: string | null;
+  /**
+   * The root hash of the parent beacon block
+   */
+  beacon_parent_root?: string | null;
+  /**
+   * The root hash of the beacon state at this block
+   */
+  beacon_state_root?: string | null;
+  /**
+   * The execution block date and time
+   */
+  block_date_time?: number;
+  /**
+   * The execution block number
+   */
+  block_number?: number;
+  /**
+   * The epoch number of the beacon block
+   */
+  epoch?: number | null;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number | null;
+  /**
+   * The hash of the execution block
+   */
+  execution_block_hash?: string;
+  /**
+   * The slot number of the beacon block
+   */
+  slot?: number | null;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number | null;
+};
+
 export type DimNode = {
   /**
    * Additional attributes of the node
@@ -368,7 +415,7 @@ export type FctAttestationFirstSeenChunked50Ms = {
 
 export type FctAttestationLivenessByEntityHead = {
   /**
-   * Number of attestations for this entity/status combination
+   * Number of attestations for this entity
    */
   attestation_count?: number;
   /**
@@ -384,6 +431,10 @@ export type FctAttestationLivenessByEntityHead = {
    */
   epoch_start_date_time?: number;
   /**
+   * Number of missed attestations for this entity
+   */
+  missed_count?: number;
+  /**
    * The slot number
    */
   slot?: number;
@@ -391,10 +442,6 @@ export type FctAttestationLivenessByEntityHead = {
    * The wall clock time when the slot started
    */
   slot_start_date_time?: number;
-  /**
-   * Attestation status: attested or missed
-   */
-  status?: string;
   /**
    * Timestamp when the record was last updated
    */
@@ -2189,6 +2236,13 @@ export type GetAdminCbtIncrementalResponse = {
 };
 
 /**
+ * Response for getting a single dim_block_canonical record
+ */
+export type GetDimBlockCanonicalResponse = {
+  item?: DimBlockCanonical;
+};
+
+/**
  * Response for getting a single dim_node record
  */
 export type GetDimNodeResponse = {
@@ -3133,6 +3187,20 @@ export type ListAdminCbtIncrementalResponse = {
 };
 
 /**
+ * Response for listing dim_block_canonical records
+ */
+export type ListDimBlockCanonicalResponse = {
+  /**
+   * The list of dim_block_canonical.
+   */
+  dim_block_canonical?: Array<DimBlockCanonical>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing dim_node records
  */
 export type ListDimNodeResponse = {
@@ -3917,6 +3985,46 @@ export type AdminCbtIncrementalServiceListData = {
      */
     position_not_in_values?: string;
     /**
+     * The size of the interval processed (filter: eq)
+     */
+    interval_eq?: number;
+    /**
+     * The size of the interval processed (filter: ne)
+     */
+    interval_ne?: number;
+    /**
+     * The size of the interval processed (filter: lt)
+     */
+    interval_lt?: number;
+    /**
+     * The size of the interval processed (filter: lte)
+     */
+    interval_lte?: number;
+    /**
+     * The size of the interval processed (filter: gt)
+     */
+    interval_gt?: number;
+    /**
+     * The size of the interval processed (filter: gte)
+     */
+    interval_gte?: number;
+    /**
+     * The size of the interval processed (filter: between_min)
+     */
+    interval_between_min?: number;
+    /**
+     * The size of the interval processed (filter: between_max_value)
+     */
+    interval_between_max_value?: number;
+    /**
+     * The size of the interval processed (filter: in_values) (comma-separated list)
+     */
+    interval_in_values?: string;
+    /**
+     * The size of the interval processed (filter: not_in_values) (comma-separated list)
+     */
+    interval_not_in_values?: string;
+    /**
      * updated_date_time (filter: eq)
      */
     updated_date_time_eq?: number;
@@ -3993,46 +4101,6 @@ export type AdminCbtIncrementalServiceListData = {
      */
     table_not_in_values?: string;
     /**
-     * The size of the interval processed (filter: eq)
-     */
-    interval_eq?: number;
-    /**
-     * The size of the interval processed (filter: ne)
-     */
-    interval_ne?: number;
-    /**
-     * The size of the interval processed (filter: lt)
-     */
-    interval_lt?: number;
-    /**
-     * The size of the interval processed (filter: lte)
-     */
-    interval_lte?: number;
-    /**
-     * The size of the interval processed (filter: gt)
-     */
-    interval_gt?: number;
-    /**
-     * The size of the interval processed (filter: gte)
-     */
-    interval_gte?: number;
-    /**
-     * The size of the interval processed (filter: between_min)
-     */
-    interval_between_min?: number;
-    /**
-     * The size of the interval processed (filter: between_max_value)
-     */
-    interval_between_max_value?: number;
-    /**
-     * The size of the interval processed (filter: in_values) (comma-separated list)
-     */
-    interval_in_values?: string;
-    /**
-     * The size of the interval processed (filter: not_in_values) (comma-separated list)
-     */
-    interval_not_in_values?: string;
-    /**
      * The maximum number of admin_cbt_incremental to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
@@ -4099,6 +4167,498 @@ export type AdminCbtIncrementalServiceGetResponses = {
 
 export type AdminCbtIncrementalServiceGetResponse =
   AdminCbtIncrementalServiceGetResponses[keyof AdminCbtIncrementalServiceGetResponses];
+
+export type DimBlockCanonicalServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The execution block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The execution block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The execution block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The execution block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The execution block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The execution block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The execution block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The execution block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The execution block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The execution block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The hash of the execution block (filter: eq)
+     */
+    execution_block_hash_eq?: string;
+    /**
+     * The hash of the execution block (filter: ne)
+     */
+    execution_block_hash_ne?: string;
+    /**
+     * The hash of the execution block (filter: contains)
+     */
+    execution_block_hash_contains?: string;
+    /**
+     * The hash of the execution block (filter: starts_with)
+     */
+    execution_block_hash_starts_with?: string;
+    /**
+     * The hash of the execution block (filter: ends_with)
+     */
+    execution_block_hash_ends_with?: string;
+    /**
+     * The hash of the execution block (filter: like)
+     */
+    execution_block_hash_like?: string;
+    /**
+     * The hash of the execution block (filter: not_like)
+     */
+    execution_block_hash_not_like?: string;
+    /**
+     * The hash of the execution block (filter: in_values) (comma-separated list)
+     */
+    execution_block_hash_in_values?: string;
+    /**
+     * The hash of the execution block (filter: not_in_values) (comma-separated list)
+     */
+    execution_block_hash_not_in_values?: string;
+    /**
+     * The execution block date and time (filter: eq)
+     */
+    block_date_time_eq?: number;
+    /**
+     * The execution block date and time (filter: ne)
+     */
+    block_date_time_ne?: number;
+    /**
+     * The execution block date and time (filter: lt)
+     */
+    block_date_time_lt?: number;
+    /**
+     * The execution block date and time (filter: lte)
+     */
+    block_date_time_lte?: number;
+    /**
+     * The execution block date and time (filter: gt)
+     */
+    block_date_time_gt?: number;
+    /**
+     * The execution block date and time (filter: gte)
+     */
+    block_date_time_gte?: number;
+    /**
+     * The execution block date and time (filter: between_min)
+     */
+    block_date_time_between_min?: number;
+    /**
+     * The execution block date and time (filter: between_max_value)
+     */
+    block_date_time_between_max_value?: number;
+    /**
+     * The execution block date and time (filter: in_values) (comma-separated list)
+     */
+    block_date_time_in_values?: string;
+    /**
+     * The execution block date and time (filter: not_in_values) (comma-separated list)
+     */
+    block_date_time_not_in_values?: string;
+    /**
+     * The slot number of the beacon block (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot number of the beacon block (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot number of the beacon block (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot number of the beacon block (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot number of the beacon block (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot number of the beacon block (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot number of the beacon block (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot number of the beacon block (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot number of the beacon block (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot number of the beacon block (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * The epoch number of the beacon block (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number of the beacon block (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number of the beacon block (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number of the beacon block (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number of the beacon block (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number of the beacon block (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number of the beacon block (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number of the beacon block (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number of the beacon block (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number of the beacon block (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * The version of the beacon block (filter: eq)
+     */
+    beacon_block_version_eq?: string;
+    /**
+     * The version of the beacon block (filter: ne)
+     */
+    beacon_block_version_ne?: string;
+    /**
+     * The version of the beacon block (filter: contains)
+     */
+    beacon_block_version_contains?: string;
+    /**
+     * The version of the beacon block (filter: starts_with)
+     */
+    beacon_block_version_starts_with?: string;
+    /**
+     * The version of the beacon block (filter: ends_with)
+     */
+    beacon_block_version_ends_with?: string;
+    /**
+     * The version of the beacon block (filter: like)
+     */
+    beacon_block_version_like?: string;
+    /**
+     * The version of the beacon block (filter: not_like)
+     */
+    beacon_block_version_not_like?: string;
+    /**
+     * The version of the beacon block (filter: in_values) (comma-separated list)
+     */
+    beacon_block_version_in_values?: string;
+    /**
+     * The version of the beacon block (filter: not_in_values) (comma-separated list)
+     */
+    beacon_block_version_not_in_values?: string;
+    /**
+     * The root hash of the beacon block (filter: eq)
+     */
+    beacon_block_root_eq?: string;
+    /**
+     * The root hash of the beacon block (filter: ne)
+     */
+    beacon_block_root_ne?: string;
+    /**
+     * The root hash of the beacon block (filter: contains)
+     */
+    beacon_block_root_contains?: string;
+    /**
+     * The root hash of the beacon block (filter: starts_with)
+     */
+    beacon_block_root_starts_with?: string;
+    /**
+     * The root hash of the beacon block (filter: ends_with)
+     */
+    beacon_block_root_ends_with?: string;
+    /**
+     * The root hash of the beacon block (filter: like)
+     */
+    beacon_block_root_like?: string;
+    /**
+     * The root hash of the beacon block (filter: not_like)
+     */
+    beacon_block_root_not_like?: string;
+    /**
+     * The root hash of the beacon block (filter: in_values) (comma-separated list)
+     */
+    beacon_block_root_in_values?: string;
+    /**
+     * The root hash of the beacon block (filter: not_in_values) (comma-separated list)
+     */
+    beacon_block_root_not_in_values?: string;
+    /**
+     * The root hash of the parent beacon block (filter: eq)
+     */
+    beacon_parent_root_eq?: string;
+    /**
+     * The root hash of the parent beacon block (filter: ne)
+     */
+    beacon_parent_root_ne?: string;
+    /**
+     * The root hash of the parent beacon block (filter: contains)
+     */
+    beacon_parent_root_contains?: string;
+    /**
+     * The root hash of the parent beacon block (filter: starts_with)
+     */
+    beacon_parent_root_starts_with?: string;
+    /**
+     * The root hash of the parent beacon block (filter: ends_with)
+     */
+    beacon_parent_root_ends_with?: string;
+    /**
+     * The root hash of the parent beacon block (filter: like)
+     */
+    beacon_parent_root_like?: string;
+    /**
+     * The root hash of the parent beacon block (filter: not_like)
+     */
+    beacon_parent_root_not_like?: string;
+    /**
+     * The root hash of the parent beacon block (filter: in_values) (comma-separated list)
+     */
+    beacon_parent_root_in_values?: string;
+    /**
+     * The root hash of the parent beacon block (filter: not_in_values) (comma-separated list)
+     */
+    beacon_parent_root_not_in_values?: string;
+    /**
+     * The root hash of the beacon state at this block (filter: eq)
+     */
+    beacon_state_root_eq?: string;
+    /**
+     * The root hash of the beacon state at this block (filter: ne)
+     */
+    beacon_state_root_ne?: string;
+    /**
+     * The root hash of the beacon state at this block (filter: contains)
+     */
+    beacon_state_root_contains?: string;
+    /**
+     * The root hash of the beacon state at this block (filter: starts_with)
+     */
+    beacon_state_root_starts_with?: string;
+    /**
+     * The root hash of the beacon state at this block (filter: ends_with)
+     */
+    beacon_state_root_ends_with?: string;
+    /**
+     * The root hash of the beacon state at this block (filter: like)
+     */
+    beacon_state_root_like?: string;
+    /**
+     * The root hash of the beacon state at this block (filter: not_like)
+     */
+    beacon_state_root_not_like?: string;
+    /**
+     * The root hash of the beacon state at this block (filter: in_values) (comma-separated list)
+     */
+    beacon_state_root_in_values?: string;
+    /**
+     * The root hash of the beacon state at this block (filter: not_in_values) (comma-separated list)
+     */
+    beacon_state_root_not_in_values?: string;
+    /**
+     * The maximum number of dim_block_canonical to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListDimBlockCanonical` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/dim_block_canonical';
+};
+
+export type DimBlockCanonicalServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimBlockCanonicalServiceListError =
+  DimBlockCanonicalServiceListErrors[keyof DimBlockCanonicalServiceListErrors];
+
+export type DimBlockCanonicalServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListDimBlockCanonicalResponse;
+};
+
+export type DimBlockCanonicalServiceListResponse =
+  DimBlockCanonicalServiceListResponses[keyof DimBlockCanonicalServiceListResponses];
+
+export type DimBlockCanonicalServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The execution block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/dim_block_canonical/{block_number}';
+};
+
+export type DimBlockCanonicalServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimBlockCanonicalServiceGetError =
+  DimBlockCanonicalServiceGetErrors[keyof DimBlockCanonicalServiceGetErrors];
+
+export type DimBlockCanonicalServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetDimBlockCanonicalResponse;
+};
+
+export type DimBlockCanonicalServiceGetResponse =
+  DimBlockCanonicalServiceGetResponses[keyof DimBlockCanonicalServiceGetResponses];
 
 export type DimNodeServiceListData = {
   body?: never;
@@ -7977,42 +8537,6 @@ export type FctAttestationLivenessByEntityHeadServiceListData = {
      */
     entity_not_in_values?: string;
     /**
-     * Attestation status: attested or missed (filter: eq)
-     */
-    status_eq?: string;
-    /**
-     * Attestation status: attested or missed (filter: ne)
-     */
-    status_ne?: string;
-    /**
-     * Attestation status: attested or missed (filter: contains)
-     */
-    status_contains?: string;
-    /**
-     * Attestation status: attested or missed (filter: starts_with)
-     */
-    status_starts_with?: string;
-    /**
-     * Attestation status: attested or missed (filter: ends_with)
-     */
-    status_ends_with?: string;
-    /**
-     * Attestation status: attested or missed (filter: like)
-     */
-    status_like?: string;
-    /**
-     * Attestation status: attested or missed (filter: not_like)
-     */
-    status_not_like?: string;
-    /**
-     * Attestation status: attested or missed (filter: in_values) (comma-separated list)
-     */
-    status_in_values?: string;
-    /**
-     * Attestation status: attested or missed (filter: not_in_values) (comma-separated list)
-     */
-    status_not_in_values?: string;
-    /**
      * Timestamp when the record was last updated (filter: eq)
      */
     updated_date_time_eq?: number;
@@ -8173,45 +8697,85 @@ export type FctAttestationLivenessByEntityHeadServiceListData = {
      */
     epoch_start_date_time_not_in_values?: string;
     /**
-     * Number of attestations for this entity/status combination (filter: eq)
+     * Number of attestations for this entity (filter: eq)
      */
     attestation_count_eq?: number;
     /**
-     * Number of attestations for this entity/status combination (filter: ne)
+     * Number of attestations for this entity (filter: ne)
      */
     attestation_count_ne?: number;
     /**
-     * Number of attestations for this entity/status combination (filter: lt)
+     * Number of attestations for this entity (filter: lt)
      */
     attestation_count_lt?: number;
     /**
-     * Number of attestations for this entity/status combination (filter: lte)
+     * Number of attestations for this entity (filter: lte)
      */
     attestation_count_lte?: number;
     /**
-     * Number of attestations for this entity/status combination (filter: gt)
+     * Number of attestations for this entity (filter: gt)
      */
     attestation_count_gt?: number;
     /**
-     * Number of attestations for this entity/status combination (filter: gte)
+     * Number of attestations for this entity (filter: gte)
      */
     attestation_count_gte?: number;
     /**
-     * Number of attestations for this entity/status combination (filter: between_min)
+     * Number of attestations for this entity (filter: between_min)
      */
     attestation_count_between_min?: number;
     /**
-     * Number of attestations for this entity/status combination (filter: between_max_value)
+     * Number of attestations for this entity (filter: between_max_value)
      */
     attestation_count_between_max_value?: number;
     /**
-     * Number of attestations for this entity/status combination (filter: in_values) (comma-separated list)
+     * Number of attestations for this entity (filter: in_values) (comma-separated list)
      */
     attestation_count_in_values?: string;
     /**
-     * Number of attestations for this entity/status combination (filter: not_in_values) (comma-separated list)
+     * Number of attestations for this entity (filter: not_in_values) (comma-separated list)
      */
     attestation_count_not_in_values?: string;
+    /**
+     * Number of missed attestations for this entity (filter: eq)
+     */
+    missed_count_eq?: number;
+    /**
+     * Number of missed attestations for this entity (filter: ne)
+     */
+    missed_count_ne?: number;
+    /**
+     * Number of missed attestations for this entity (filter: lt)
+     */
+    missed_count_lt?: number;
+    /**
+     * Number of missed attestations for this entity (filter: lte)
+     */
+    missed_count_lte?: number;
+    /**
+     * Number of missed attestations for this entity (filter: gt)
+     */
+    missed_count_gt?: number;
+    /**
+     * Number of missed attestations for this entity (filter: gte)
+     */
+    missed_count_gte?: number;
+    /**
+     * Number of missed attestations for this entity (filter: between_min)
+     */
+    missed_count_between_min?: number;
+    /**
+     * Number of missed attestations for this entity (filter: between_max_value)
+     */
+    missed_count_between_max_value?: number;
+    /**
+     * Number of missed attestations for this entity (filter: in_values) (comma-separated list)
+     */
+    missed_count_in_values?: string;
+    /**
+     * Number of missed attestations for this entity (filter: not_in_values) (comma-separated list)
+     */
+    missed_count_not_in_values?: string;
     /**
      * The maximum number of fct_attestation_liveness_by_entity_head to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
