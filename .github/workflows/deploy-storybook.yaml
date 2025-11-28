@@ -3,8 +3,7 @@ name: Deploy Storybook to GitHub Pages
 on:
   push:
     branches:
-      # - master
-      - 'release/**'
+      - master
 
 permissions:
   contents: read
