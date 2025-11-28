@@ -1,0 +1,1 @@
+export { TracoorIcon } from './TracoorIcon';

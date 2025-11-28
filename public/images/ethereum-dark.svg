@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 115 182" fill="none">
+  <!-- Bottom facets -->
+  <path fill="rgb(200,178,245)" stroke="rgb(52,65,192)" stroke-width="1.5" d="M57.5 181v-45.16L1.64 103.17z"/>
+  <path fill="rgb(238,203,192)" stroke="rgb(52,65,192)" stroke-width="1.5" d="M57.69 181v-45.16l55.87-32.67z"/>
+  
+  <!-- Middle facets -->
+  <path fill="rgb(135,169,240)" stroke="rgb(52,65,192)" stroke-width="1.5" d="M57.51 124.62V66.98L1 92.28z"/>
+  <path fill="rgb(202,179,245)" stroke="rgb(52,65,192)" stroke-width="1.5" d="M57.69 124.62V66.98l56.51 25.3z"/>
+  
+  <!-- Top facets -->
+  <path fill="rgb(238,203,192)" stroke="rgb(52,65,192)" stroke-width="1.5" d="M1 92.28L57.5 1v65.98z"/>
+  <path fill="rgb(184,251,246)" stroke="rgb(52,65,192)" stroke-width="1.5" d="M114.2 92.28L57.69 1v65.98z"/>
+</svg>

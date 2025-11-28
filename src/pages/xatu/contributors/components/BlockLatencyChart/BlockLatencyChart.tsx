@@ -1,0 +1,114 @@
+import { type JSX } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { fctBlockFirstSeenByNodeServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import { LoadingContainer } from '@/components/Layout/LoadingContainer';
+import { MultiLineChart } from '@/components/Charts/MultiLine';
+import { formatSlot } from '@/utils';
+import { useLatencyChartSeries } from '../../hooks/useLatencyChartData';
+import { useSlotWindowQuery } from '../../hooks/useSlotWindowQuery';
+import { useNetwork } from '@/hooks/useNetwork';
+
+export interface BlockLatencyChartProps {
+  username: string;
+}
+
+/**
+ * Line chart showing block propagation latency for a contributor's nodes.
+ *
+ * Displays `seen_slot_start_diff` (ms) from FctBlockFirstSeenByNode over slots.
+ * Each data point represents when a block was first observed by the contributor's
+ * nodes relative to slot start time.
+ *
+ * Lower latency = faster block propagation = better network positioning.
+ *
+ * @param username - Contributor username to filter data
+ */
+export function BlockLatencyChart({ username }: BlockLatencyChartProps): JSX.Element {
+  const queryRange = useSlotWindowQuery(20);
+  const { currentNetwork } = useNetwork();
+
+  const { data, isLoading, error } = useQuery({
+    ...fctBlockFirstSeenByNodeServiceListOptions({
+      query: {
+        username_eq: username,
+        slot_start_date_time_gte: queryRange?.slot_start_date_time_gte,
+        slot_start_date_time_lte: queryRange?.slot_start_date_time_lte,
+        page_size: 10000,
+        order_by: 'slot_start_date_time ASC',
+      },
+    }),
+    enabled: !!queryRange && !!currentNetwork,
+    placeholderData: previousData => previousData,
+  });
+
+  const { series, minSlot, maxSlot, dataCount } = useLatencyChartSeries(data, 'fct_block_first_seen_by_node');
+
+  // Only show loading skeleton on initial load, not on refetch
+  if (isLoading) {
+    return <LoadingContainer className="h-[400px]" />;
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-sm border border-danger/20 bg-danger/10 p-4 text-danger">
+        Error loading block data: {error.message}
+      </div>
+    );
+  }
+
+  if (dataCount === 0) {
+    return (
+      <div className="flex h-[400px] items-center justify-center rounded-sm border border-border bg-surface text-muted">
+        No block data available for this time range
+      </div>
+    );
+  }
+
+  return (
+    <MultiLineChart
+      series={series}
+      xAxis={{
+        type: 'value',
+        name: 'Slot',
+        min: minSlot,
+        max: maxSlot,
+        formatter: (value: number | string) => formatSlot(Number(value)),
+      }}
+      yAxis={{
+        name: 'Latency (ms)',
+      }}
+      height={300}
+      showLegend={series.length > 1 && series.length <= 5}
+      enableSeriesFilter={series.length > 5}
+      enableDataZoom={true}
+      enableAggregateToggle={true}
+      tooltipTrigger={series.length > 5 ? 'item' : 'axis'}
+      tooltipFormatter={(params: unknown) => {
+        // Handle item-based tooltip (when >5 series)
+        if (series.length > 5) {
+          const param = params as { data: [number, number]; color: string; seriesName: string };
+          if (!param || !param.data) return '';
+          const slot = param.data[0];
+          const latency = param.data[1];
+          let html = `<strong>Slot:</strong> ${formatSlot(slot)}<br/>`;
+          html += `<span style="color:${param.color}">●</span> <strong>${param.seriesName}</strong><br/>`;
+          html += `<div style="padding-left: 12px; line-height: 1.6;">`;
+          html += `Latency: <strong>${latency.toFixed(0)}ms</strong>`;
+          html += `</div>`;
+          return html;
+        }
+
+        // Handle axis-based tooltip (when ≤5 series)
+        if (!params || !Array.isArray(params) || params.length === 0) return '';
+        const firstParam = params[0] as { axisValue: number };
+        const slot = firstParam.axisValue;
+        let html = `<strong>Slot:</strong> ${formatSlot(slot)}<br/>`;
+        params.forEach((param: { data: [number, number]; color: string; seriesName: string }) => {
+          const latency = param.data[1];
+          html += `<span style="color:${param.color}">●</span> ${param.seriesName}: ${latency.toFixed(0)}ms<br/>`;
+        });
+        return html;
+      }}
+    />
+  );
+}

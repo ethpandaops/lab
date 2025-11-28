@@ -1,0 +1,172 @@
+import { useMemo } from 'react';
+import type { SeriesData } from '@/components/Charts/MultiLine';
+import { useThemeColors } from '@/hooks/useThemeColors';
+
+// Stable color palette for node visualization
+const NODE_COLORS = ['#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'] as const;
+
+/**
+ * Generate a unique series name from node_id and implementation
+ *
+ * Uses the full node_id to guarantee uniqueness across all nodes.
+ *
+ * @param nodeId - The unique node identifier
+ * @param implementation - The consensus client implementation name
+ * @returns A unique series name
+ */
+function generateSeriesName(nodeId: string, implementation: string): string {
+  // Use full node_id to guarantee uniqueness
+  // Format: "implementation - node_id"
+  return `${implementation} - ${nodeId}`;
+}
+
+/**
+ * Generic data point with slot and latency information
+ * Matches the shape of API response items (all fields optional)
+ */
+interface LatencyDataPoint {
+  slot?: number | null;
+  seen_slot_start_diff?: number | null;
+  node_id?: string | null;
+  meta_consensus_implementation?: string | null;
+}
+
+/**
+ * Result from useLatencyChartSeries hook
+ */
+export interface LatencyChartSeriesResult {
+  /** Processed series data ready for MultiLineChart */
+  series: SeriesData[];
+  /** Minimum slot for x-axis */
+  minSlot: number;
+  /** Maximum slot for x-axis */
+  maxSlot: number;
+  /** Data count (number of observations) */
+  dataCount: number;
+}
+
+/**
+ * Hook for processing latency chart data into series format
+ *
+ * Consolidates common data processing logic used by all latency charts:
+ * - BlockLatencyChart
+ * - BlobLatencyChart
+ * - HeadLatencyChart
+ * - AttestationLatencyChart
+ *
+ * @param data - Raw API response data
+ * @param dataKey - Key to access the data array in the response
+ * @returns Processed chart data with series, axis ranges, and observation count
+ */
+export function useLatencyChartSeries(data: unknown, dataKey: string): LatencyChartSeriesResult {
+  const colors = useThemeColors();
+
+  // Process data into series format for MultiLineChart
+  const { series, minSlot, maxSlot, dataCount } = useMemo(() => {
+    const items = ((data as Record<string, unknown>)?.[dataKey] ?? []) as LatencyDataPoint[];
+    const nodeSlotMap = new Map<string, Map<number, { sum: number; count: number }>>();
+    const nodeImplementationMap = new Map<string, string>();
+    const aggregateMap = new Map<number, { sum: number; count: number }>();
+    let minSlotValue = Infinity;
+    let maxSlotValue = -Infinity;
+
+    // Aggregate data per node per slot
+    // Track min/max slots during this loop to avoid second iteration
+    items.forEach(item => {
+      if (item.slot == null || item.seen_slot_start_diff == null || !item.node_id) return;
+
+      const nodeId = item.node_id;
+      const implementation = item.meta_consensus_implementation || 'unknown';
+      const slot = item.slot;
+
+      // Track min/max slots
+      if (slot < minSlotValue) minSlotValue = slot;
+      if (slot > maxSlotValue) maxSlotValue = slot;
+
+      // Track consensus implementation for this node
+      if (!nodeImplementationMap.has(nodeId)) {
+        nodeImplementationMap.set(nodeId, implementation);
+      }
+
+      // Add to per-node data with per-slot aggregation
+      if (!nodeSlotMap.has(nodeId)) {
+        nodeSlotMap.set(nodeId, new Map());
+      }
+      const slotMap = nodeSlotMap.get(nodeId)!;
+      const existing = slotMap.get(slot) ?? { sum: 0, count: 0 };
+      existing.sum += item.seen_slot_start_diff;
+      existing.count += 1;
+      slotMap.set(slot, existing);
+
+      // Add to aggregate data
+      const aggExisting = aggregateMap.get(slot) ?? { sum: 0, count: 0 };
+      aggExisting.sum += item.seen_slot_start_diff;
+      aggExisting.count += 1;
+      aggregateMap.set(slot, aggExisting);
+    });
+
+    // Create stable color mapping based on sorted node IDs
+    const allNodeIds = Array.from(nodeSlotMap.keys()).sort();
+    const extendedPalette = [colors.primary, ...NODE_COLORS];
+
+    // Build series array for MultiLineChart
+    const seriesData: SeriesData[] = [];
+
+    // Add per-node series
+    allNodeIds.forEach((nodeId, index) => {
+      const slotMap = nodeSlotMap.get(nodeId)!;
+      const chartData: Array<[number, number]> = Array.from(slotMap.entries())
+        .map(([slot, { sum, count }]) => [slot, sum / count] as [number, number])
+        .sort((a, b) => a[0] - b[0]);
+
+      const implementation = nodeImplementationMap.get(nodeId) || 'unknown';
+
+      seriesData.push({
+        name: generateSeriesName(nodeId, implementation),
+        data: chartData,
+        color: extendedPalette[index % extendedPalette.length],
+        showSymbol: true,
+        symbolSize: 2,
+        lineWidth: 2,
+        emphasis: {
+          focus: 'series',
+          symbolSize: 6,
+        },
+      });
+    });
+
+    // Add aggregate series (average) - always include, component will handle visibility
+    const avgData: Array<[number, number]> = Array.from(aggregateMap.entries())
+      .map(([slot, { sum, count }]) => [slot, sum / count] as [number, number])
+      .sort((a, b) => a[0] - b[0]);
+
+    if (avgData.length > 0) {
+      seriesData.push({
+        name: 'Average',
+        data: avgData,
+        color: colors.muted,
+        lineStyle: 'dashed',
+        lineWidth: 3,
+        showSymbol: false,
+      });
+    }
+
+    // Calculate axis range from tracked min/max (avoid expensive flatMap + spread)
+    const calculatedMinSlot = minSlotValue !== Infinity ? minSlotValue - 1 : 0;
+    const calculatedMaxSlot = maxSlotValue !== -Infinity ? maxSlotValue + 1 : 0;
+
+    return {
+      series: seriesData,
+      minSlot: calculatedMinSlot,
+      maxSlot: calculatedMaxSlot,
+      dataCount: items.length,
+    };
+  }, [data, dataKey, colors]);
+
+  return {
+    series,
+    minSlot,
+    maxSlot,
+    dataCount,
+  };
+}

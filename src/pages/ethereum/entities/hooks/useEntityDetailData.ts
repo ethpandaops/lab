@@ -1,0 +1,456 @@
+import { useQueries } from '@tanstack/react-query';
+import { useMemo } from 'react';
+
+import {
+  fctAttestationLivenessByEntityHeadServiceListOptions,
+  fctBlockProposerEntityServiceListOptions,
+  fctBlockHeadServiceListOptions,
+  fctBlockBlobCountHeadServiceListOptions,
+  fctAttestationCorrectnessHeadServiceListOptions,
+  intBlockCanonicalServiceListOptions,
+} from '@/api/@tanstack/react-query.gen';
+import type {
+  FctAttestationLivenessByEntityHead,
+  FctBlockProposerEntity,
+  FctBlockHead,
+  FctBlockBlobCountHead,
+  FctAttestationCorrectnessHead,
+  IntBlockCanonical,
+} from '@/api/types.gen';
+import { useBeaconClock } from '@/hooks/useBeaconClock';
+import { useNetwork } from '@/hooks/useNetwork';
+import { slotToEpoch, epochToTimestamp, slotToTimestamp } from '@/utils/beacon';
+
+import type {
+  EntityDetailData,
+  EntityStats,
+  EntityEpochData,
+  UseEntityDetailDataReturn,
+} from './useEntityDetailData.types';
+import type { SlotData } from '../../epochs/hooks/useEpochDetailData.types';
+
+/**
+ * Hook to fetch comprehensive data for a single entity
+ *
+ * Primary queries:
+ * - fct_attestation_liveness_by_entity_head: 12 hours of attestation data (for charts, stats, and recent epochs table)
+ * - fct_block_proposer_entity: 12 hours of block proposal data (for charts and recent epochs table)
+ * - fct_block_proposer_entity: Most recent 10 block proposals (for block proposals table)
+ *
+ * Supplemental queries (for block proposals table detail):
+ * - fct_block_head: Block head data (proposer index, block root)
+ * - fct_block_blob_count_head: Blob counts
+ * - fct_attestation_correctness_head: Attestation correctness
+ * - int_block_canonical: Canonical status
+ *
+ * Charts and statistics both use last 12 hours only.
+ * The most recent epoch is excluded from charts as it's still in progress.
+ *
+ * @param entity - Entity name
+ * @returns Comprehensive entity data including stats and time series (12h)
+ */
+export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
+  const { currentNetwork } = useNetwork();
+  const { slot: currentSlot } = useBeaconClock();
+
+  // Calculate time range - memoized to prevent refetch on every slot change
+  // Only recalculate when half-day boundary changes
+  const halfDayBoundary = useMemo(() => Math.floor(currentSlot / (12 * 60 * 5)), [currentSlot]);
+
+  const twelveHoursAgo = useMemo(() => {
+    if (!currentNetwork) return 0;
+    const slotsIn12Hours = 12 * 60 * 5;
+    return slotToTimestamp(Math.max(0, currentSlot - slotsIn12Hours), currentNetwork.genesis_time);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- currentSlot intentionally excluded to prevent refetch on every slot change
+  }, [currentNetwork, halfDayBoundary]);
+
+  // STEP 1: Fetch attestation liveness and block proposals (12h)
+  const primaryResults = useQueries({
+    queries: [
+      // 1. 12h attestation liveness data (for charts, stats, and recent epochs table)
+      {
+        ...fctAttestationLivenessByEntityHeadServiceListOptions({
+          query: {
+            entity_eq: entity,
+            slot_start_date_time_gte: twelveHoursAgo,
+            page_size: 10000,
+          },
+        }),
+        enabled: !!currentNetwork && !!entity && twelveHoursAgo > 0,
+        refetchInterval: false,
+        refetchOnWindowFocus: false,
+      },
+      // 2. 12h block proposals by entity (for charts and recent epochs table)
+      {
+        ...fctBlockProposerEntityServiceListOptions({
+          query: {
+            entity_eq: entity,
+            slot_start_date_time_gte: twelveHoursAgo,
+            page_size: 5000,
+          },
+        }),
+        enabled: !!currentNetwork && !!entity && twelveHoursAgo > 0,
+        refetchInterval: false,
+        refetchOnWindowFocus: false,
+      },
+      // 3. Most recent 10 block proposals for block proposals table
+      {
+        ...fctBlockProposerEntityServiceListOptions({
+          query: {
+            entity_eq: entity,
+            slot_start_date_time_gte: twelveHoursAgo,
+            page_size: 10,
+            order_by: 'slot desc',
+          },
+        }),
+        enabled: !!currentNetwork && !!entity && twelveHoursAgo > 0,
+        refetchInterval: false,
+        refetchOnWindowFocus: false,
+      },
+    ],
+  });
+
+  // STEP 2: Extract time range and slot list from recent block proposals for supplemental queries
+  const blockProposerTimeRange = useMemo(() => {
+    const blockProposerResult = primaryResults[2];
+    if (!blockProposerResult?.data) return null;
+    const blockProposerData =
+      (blockProposerResult.data as { fct_block_proposer_entity?: FctBlockProposerEntity[] })
+        ?.fct_block_proposer_entity ?? [];
+
+    if (blockProposerData.length === 0) return null;
+
+    // Find earliest and latest slot_start_date_time
+    const times = blockProposerData.map(b => b.slot_start_date_time).filter((t): t is number => t !== undefined);
+
+    if (times.length === 0) return null;
+
+    const minTime = Math.min(...times);
+    const maxTime = Math.max(...times);
+
+    // Create comma-separated list of slot_start_date_time values for precise filtering
+    const slotStartDateTimeInValues = times.join(',');
+
+    return { minTime, maxTime, slotStartDateTimeInValues };
+  }, [primaryResults]);
+
+  // STEP 2: Fetch supplemental data for specific slots (dependent queries)
+  // Use both time range (gte/lte) and in_values for precise filtering
+  const supplementalResults = useQueries({
+    queries: [
+      // 3. Block head data for specific slots (proposer index, block root, etc.)
+      {
+        ...fctBlockHeadServiceListOptions({
+          query: {
+            slot_start_date_time_gte: blockProposerTimeRange?.minTime,
+            slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
+            slot_start_date_time_in_values: blockProposerTimeRange?.slotStartDateTimeInValues,
+            page_size: 1000,
+          },
+        }),
+        enabled: !!currentNetwork && !!blockProposerTimeRange,
+        refetchInterval: false,
+        refetchOnWindowFocus: false,
+      },
+      // 4. Blob counts for specific slots
+      {
+        ...fctBlockBlobCountHeadServiceListOptions({
+          query: {
+            slot_start_date_time_gte: blockProposerTimeRange?.minTime,
+            slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
+            slot_start_date_time_in_values: blockProposerTimeRange?.slotStartDateTimeInValues,
+            page_size: 1000,
+          },
+        }),
+        enabled: !!currentNetwork && !!blockProposerTimeRange,
+        refetchInterval: false,
+        refetchOnWindowFocus: false,
+      },
+      // 5. Attestation correctness for specific slots
+      {
+        ...fctAttestationCorrectnessHeadServiceListOptions({
+          query: {
+            slot_start_date_time_gte: blockProposerTimeRange?.minTime,
+            slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
+            slot_start_date_time_in_values: blockProposerTimeRange?.slotStartDateTimeInValues,
+            page_size: 1000,
+          },
+        }),
+        enabled: !!currentNetwork && !!blockProposerTimeRange,
+        refetchInterval: false,
+        refetchOnWindowFocus: false,
+      },
+      // 6. Canonical blocks for specific slots
+      {
+        ...intBlockCanonicalServiceListOptions({
+          query: {
+            slot_start_date_time_gte: blockProposerTimeRange?.minTime,
+            slot_start_date_time_lte: blockProposerTimeRange?.maxTime,
+            slot_start_date_time_in_values: blockProposerTimeRange?.slotStartDateTimeInValues,
+            page_size: 1000,
+          },
+        }),
+        enabled: !!currentNetwork && !!blockProposerTimeRange,
+        refetchInterval: false,
+        refetchOnWindowFocus: false,
+      },
+    ],
+  });
+
+  // Combine results (memoized to prevent dependency changes on every render)
+  const results = useMemo(() => [...primaryResults, ...supplementalResults], [primaryResults, supplementalResults]);
+
+  const isLoading = results.some(result => result.isLoading);
+  const error = results.find(result => result.error)?.error as Error | null;
+
+  // Process data
+  const data = useMemo<EntityDetailData | null>(() => {
+    if (isLoading || error || !currentNetwork) {
+      return null;
+    }
+
+    const [
+      attestation12hResult,
+      blockProposer12hResult,
+      blockProposerRecentResult,
+      blockHeadResult,
+      blobCountResult,
+      attestationCorrectnessResult,
+      blockCanonicalResult,
+    ] = results;
+
+    // 12h data (used for both charts, stats, and recent epochs table)
+    const attestation12hData =
+      (attestation12hResult?.data as { fct_attestation_liveness_by_entity_head?: FctAttestationLivenessByEntityHead[] })
+        ?.fct_attestation_liveness_by_entity_head ?? [];
+
+    const blockProposer12hData =
+      (blockProposer12hResult?.data as { fct_block_proposer_entity?: FctBlockProposerEntity[] })
+        ?.fct_block_proposer_entity ?? [];
+
+    const blockProposerRecentData =
+      (blockProposerRecentResult?.data as { fct_block_proposer_entity?: FctBlockProposerEntity[] })
+        ?.fct_block_proposer_entity ?? [];
+
+    // Supplemental slot data for block proposals table
+    const blockHeadData = (blockHeadResult?.data as { fct_block_head?: FctBlockHead[] })?.fct_block_head ?? [];
+    const blobCountData =
+      (blobCountResult?.data as { fct_block_blob_count_head?: FctBlockBlobCountHead[] })?.fct_block_blob_count_head ??
+      [];
+    const attestationCorrectnessData =
+      (attestationCorrectnessResult?.data as { fct_attestation_correctness_head?: FctAttestationCorrectnessHead[] })
+        ?.fct_attestation_correctness_head ?? [];
+    const blockCanonicalData =
+      (blockCanonicalResult?.data as { int_block_canonical?: IntBlockCanonical[] })?.int_block_canonical ?? [];
+
+    // Group attestation data by epoch for 12h time series
+    const epochAttestationMap = new Map<
+      number,
+      {
+        totalAttestations: number;
+        missedAttestations: number;
+        lastSlot: number;
+      }
+    >();
+
+    attestation12hData.forEach((record: FctAttestationLivenessByEntityHead) => {
+      const slot = record.slot ?? 0;
+      const epoch = slotToEpoch(slot);
+      const attestationCount = record.attestation_count ?? 0;
+      const missedCount = record.missed_count ?? 0;
+
+      if (!epochAttestationMap.has(epoch)) {
+        epochAttestationMap.set(epoch, {
+          totalAttestations: 0,
+          missedAttestations: 0,
+          lastSlot: slot,
+        });
+      }
+
+      const epochData = epochAttestationMap.get(epoch)!;
+
+      epochData.totalAttestations += attestationCount;
+      epochData.missedAttestations += missedCount;
+
+      if (slot > epochData.lastSlot) {
+        epochData.lastSlot = slot;
+      }
+    });
+
+    // Group block proposer data by epoch for 12h time series (using _entity table)
+    const epochBlockMap = new Map<number, { count: number; lastSlot: number }>();
+
+    blockProposer12hData.forEach((record: FctBlockProposerEntity) => {
+      const slot = record.slot ?? 0;
+      const epoch = slotToEpoch(slot);
+
+      if (!epochBlockMap.has(epoch)) {
+        epochBlockMap.set(epoch, { count: 0, lastSlot: slot });
+      }
+
+      const blockData = epochBlockMap.get(epoch)!;
+      blockData.count += 1;
+
+      if (slot > blockData.lastSlot) {
+        blockData.lastSlot = slot;
+      }
+    });
+
+    // Build time series data
+    const allEpochs = new Set([...epochAttestationMap.keys(), ...epochBlockMap.keys()]);
+    const sortedEpochs = Array.from(allEpochs).sort((a, b) => b - a); // Sort descending (most recent first)
+
+    // Filter out the most recent epoch (still in progress) and limit to last 10 completed epochs
+    const maxEpoch = sortedEpochs.length > 0 ? sortedEpochs[0] : 0;
+    const epochData: EntityEpochData[] = sortedEpochs
+      .filter(epoch => epoch !== maxEpoch)
+      .slice(0, 10) // Take only the 10 most recent completed epochs
+      .map(epoch => {
+        const attestationStats = epochAttestationMap.get(epoch) ?? {
+          totalAttestations: 0,
+          missedAttestations: 0,
+          lastSlot: 0,
+        };
+        const blockStats = epochBlockMap.get(epoch) ?? { count: 0, lastSlot: 0 };
+
+        const total = attestationStats.totalAttestations + attestationStats.missedAttestations;
+        const rate = total > 0 ? attestationStats.totalAttestations / total : 0;
+
+        return {
+          epoch,
+          epochStartDateTime: epochToTimestamp(epoch, currentNetwork.genesis_time),
+          totalAttestations: attestationStats.totalAttestations,
+          missedAttestations: attestationStats.missedAttestations,
+          rate,
+          blocksProposed: blockStats.count,
+        };
+      });
+
+    // Calculate 12h statistics
+    let totalAttestations12h = 0;
+    let missedAttestations12h = 0;
+
+    attestation12hData.forEach((record: FctAttestationLivenessByEntityHead) => {
+      const attestationCount = record.attestation_count ?? 0;
+      const missedCount = record.missed_count ?? 0;
+
+      totalAttestations12h += attestationCount;
+      missedAttestations12h += missedCount;
+    });
+
+    const total12h = totalAttestations12h + missedAttestations12h;
+    const rate12h = total12h > 0 ? totalAttestations12h / total12h : 0;
+
+    // Estimate validator count (average attestations per epoch)
+    const validatorCount = epochData.length > 0 ? Math.round(total12h / epochData.length) : 0;
+
+    // Count blocks proposed (12h) - using _entity data
+    const blocksProposed12h = blockProposer12hData.length;
+
+    // Find last active slot
+    let lastActiveSlot = 0;
+
+    attestation12hData.forEach((record: FctAttestationLivenessByEntityHead) => {
+      const slot = record.slot ?? 0;
+      if (slot > lastActiveSlot) {
+        lastActiveSlot = slot;
+      }
+    });
+
+    blockProposer12hData.forEach((record: FctBlockProposerEntity) => {
+      const slot = record.slot ?? 0;
+      if (slot > lastActiveSlot) {
+        lastActiveSlot = slot;
+      }
+    });
+
+    const lastActive = currentNetwork.genesis_time + lastActiveSlot * 12;
+
+    const stats: EntityStats = {
+      entity,
+      rate24h: rate12h,
+      validatorCount,
+      missedAttestations24h: missedAttestations12h,
+      blocksProposed24h: blocksProposed12h,
+      lastActive,
+    };
+
+    // Build detailed slot data for blocks proposed by entity
+    // Create maps for efficient lookups
+    const blockHeadMap = new Map<number, { blockRoot: string | null; proposerIndex: number | null }>(
+      blockHeadData
+        .filter((b: FctBlockHead) => b.slot !== undefined)
+        .map((b: FctBlockHead) => [
+          b.slot!,
+          {
+            blockRoot: b.block_root ?? null,
+            proposerIndex: b.proposer_index ?? null,
+          },
+        ])
+    );
+    const blobCountMap = new Map<number, number>(
+      blobCountData
+        .filter((b: FctBlockBlobCountHead) => b.slot !== undefined)
+        .map((b: FctBlockBlobCountHead) => [b.slot!, b.blob_count ?? 0])
+    );
+    const attestationMap = new Map<number, { head: number; other: number; max: number }>(
+      attestationCorrectnessData
+        .filter((a: FctAttestationCorrectnessHead) => a.slot !== undefined)
+        .map((a: FctAttestationCorrectnessHead) => [
+          a.slot!,
+          {
+            head: a.votes_head ?? 0,
+            other: a.votes_other ?? 0,
+            max: a.votes_max ?? 0,
+          },
+        ])
+    );
+
+    // Track canonical slots
+    const canonicalSlots = new Set(
+      blockCanonicalData.map((b: IntBlockCanonical) => b.slot).filter((s): s is number => s !== undefined)
+    );
+
+    // Build slot data for each block proposed by entity (using recent 10 from entity table)
+    // Server already returns them sorted desc and limited to 10
+    const slots: SlotData[] = blockProposerRecentData.map(block => {
+      const slot = block.slot ?? 0;
+      const slotStartDateTime = block.slot_start_date_time ?? 0;
+      const blockHead = blockHeadMap.get(slot) ?? { blockRoot: null, proposerIndex: null };
+      const attestation: { head: number; other: number; max: number } = attestationMap.get(slot) ?? {
+        head: 0,
+        other: 0,
+        max: 0,
+      };
+      const blobCount: number = blobCountMap.get(slot) ?? 0;
+      const isCanonical = canonicalSlots.has(slot);
+
+      return {
+        slot,
+        slotStartDateTime,
+        blockRoot: blockHead.blockRoot,
+        proposerIndex: blockHead.proposerIndex,
+        proposerEntity: entity,
+        blobCount,
+        status: isCanonical ? 'canonical' : 'proposed',
+        attestationHead: attestation.head,
+        attestationOther: attestation.other,
+        attestationMax: attestation.max,
+        blockFirstSeenTime: null,
+      };
+    });
+
+    return {
+      stats,
+      epochData,
+      blockProposer12hData: blockProposer12hData,
+      slots,
+    };
+  }, [results, isLoading, error, currentNetwork, entity]);
+
+  return {
+    data,
+    isLoading,
+    error,
+  };
+}

@@ -1,0 +1,327 @@
+/**
+ * Main CSS Entry Point
+ *
+ * Import order:
+ * 1. Fonts
+ * 2. Tailwind base
+ * 3. CSS Variables (dynamic theming)
+ * 4. Theme configuration (@theme directive)
+ * 5. Custom styles
+ */
+
+/* Fonts */
+@import '@fontsource-variable/space-grotesk';
+
+@import 'tailwindcss';
+
+/* Tailwind CSS v4 plugins via @plugin directive */
+@plugin "@tailwindcss/forms";
+
+/* Enable class-based dark mode and star mode */
+@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant star (&:where(.star, .star *));
+
+/* Two-Tier Token Architecture
+ *
+ * Tier 1: Primitive color scales (foundation)
+ * Tier 2: Semantic tokens (application layer)
+ */
+@theme inline {
+  /* ===== TIER 1: Primitive Color Scales ===== */
+
+  /* Terracotta - warm accent colors with balanced orange undertones */
+  --color-terracotta-50: #fdf7f3;
+  --color-terracotta-100: #faeee5;
+  --color-terracotta-200: #f4d9c8;
+  --color-terracotta-300: #ebbd9e;
+  --color-terracotta-400: #e09770;
+  --color-terracotta-500: #d77651;
+  --color-terracotta-600: #c95f3f;
+  --color-terracotta-700: #a74d35;
+  --color-terracotta-800: #874032;
+  --color-terracotta-900: #6e362c;
+  --color-terracotta-950: #3b1b16;
+
+  /* Sand - warm neutrals for light mode */
+  --color-sand-50: #f4f3ed;
+  --color-sand-100: #efeee5;
+  --color-sand-200: #dedbca;
+  --color-sand-300: #c9c3a8;
+  --color-sand-400: #b3a784;
+  --color-sand-500: #a3946c;
+  --color-sand-600: #968360;
+  --color-sand-700: #7d6b51;
+  --color-sand-800: #665846;
+  --color-sand-900: #54493a;
+  --color-sand-950: #2c251e;
+
+  /* Neutral - grayscale for dark mode */
+  --color-neutral-50: #f6f6f6;
+  --color-neutral-100: #e7e7e7;
+  --color-neutral-200: #d1d1d1;
+  --color-neutral-300: #b0b0b0;
+  --color-neutral-400: #888888;
+  --color-neutral-500: #6d6d6d;
+  --color-neutral-600: #5d5d5d;
+  --color-neutral-700: #4f4f4f;
+  --color-neutral-800: #454545;
+  --color-neutral-900: #3d3d3d;
+  --color-neutral-950: #1a1a1a;
+
+  /* Aurora - cyan/teal for northern lights effect */
+  --color-aurora-cyan-50: #e6ffff;
+  --color-aurora-cyan-100: #c0ffff;
+  --color-aurora-cyan-200: #80ffff;
+  --color-aurora-cyan-300: #4dffff;
+  --color-aurora-cyan-400: #1af7f7;
+  --color-aurora-cyan-500: #00d9d9;
+  --color-aurora-cyan-600: #00b8b8;
+  --color-aurora-cyan-700: #009999;
+  --color-aurora-cyan-800: #007373;
+  --color-aurora-cyan-900: #005252;
+  --color-aurora-cyan-950: #002d2d;
+
+  /* Aurora - green for classic aurora borealis */
+  --color-aurora-green-50: #e6fff5;
+  --color-aurora-green-100: #b3ffe0;
+  --color-aurora-green-200: #66ffcc;
+  --color-aurora-green-300: #33ffbb;
+  --color-aurora-green-400: #00ff99;
+  --color-aurora-green-500: #00e68a;
+  --color-aurora-green-600: #00cc77;
+  --color-aurora-green-700: #00b366;
+  --color-aurora-green-800: #008c4d;
+  --color-aurora-green-900: #006638;
+  --color-aurora-green-950: #004020;
+
+  /* Aurora - purple for mystical aurora effect */
+  --color-aurora-purple-50: #f5e6ff;
+  --color-aurora-purple-100: #e6c0ff;
+  --color-aurora-purple-200: #d199ff;
+  --color-aurora-purple-300: #bb66ff;
+  --color-aurora-purple-400: #a84dff;
+  --color-aurora-purple-500: #9333ff;
+  --color-aurora-purple-600: #7d00e6;
+  --color-aurora-purple-700: #6600cc;
+  --color-aurora-purple-800: #5200a3;
+  --color-aurora-purple-900: #3d0080;
+  --color-aurora-purple-950: #24004d;
+
+  /* Aurora - pink for vibrant aurora highlights */
+  --color-aurora-pink-50: #ffe6f5;
+  --color-aurora-pink-100: #ffc0e8;
+  --color-aurora-pink-200: #ff99db;
+  --color-aurora-pink-300: #ff66cc;
+  --color-aurora-pink-400: #ff4dc4;
+  --color-aurora-pink-500: #ff33bb;
+  --color-aurora-pink-600: #e600a3;
+  --color-aurora-pink-700: #cc008f;
+  --color-aurora-pink-800: #a3006b;
+  --color-aurora-pink-900: #7a0052;
+  --color-aurora-pink-950: #4d0033;
+
+  /* Aurora - deep blue for night sky background */
+  --color-aurora-blue-50: #e6f0ff;
+  --color-aurora-blue-100: #c0d9ff;
+  --color-aurora-blue-200: #99c2ff;
+  --color-aurora-blue-300: #4d94ff;
+  --color-aurora-blue-400: #1a75ff;
+  --color-aurora-blue-500: #0052cc;
+  --color-aurora-blue-600: #003d99;
+  --color-aurora-blue-700: #002966;
+  --color-aurora-blue-800: #001f4d;
+  --color-aurora-blue-900: #001433;
+  --color-aurora-blue-950: #000a1a;
+
+  /* ===== TIER 2: Semantic Tokens ===== */
+
+  /* Brand colors */
+  --color-primary: var(--primary-value);
+  --color-secondary: var(--secondary-value);
+  --color-accent: var(--accent-value);
+
+  /* Surface colors */
+  --color-background: var(--background-value);
+  --color-surface: var(--surface-value);
+  --color-foreground: var(--foreground-value);
+  --color-muted: var(--muted-value);
+  --color-border: var(--border-value);
+
+  /* State colors */
+  --color-success: var(--color-green-500);
+  --color-warning: var(--color-amber-500);
+  --color-danger: var(--color-red-500);
+
+  /* ===== Data Visualization Colors ===== */
+  /* These colors represent data categories, not UI elements.
+   * They remain constant across themes (light/dark/star).
+   * Use Tailwind's color palette for consistency. */
+
+  /* Blob index colors (0-5) for data availability visualization */
+  --color-blob-0: var(--color-cyan-500);
+  --color-blob-1: var(--color-pink-500);
+  --color-blob-2: var(--color-amber-500);
+  --color-blob-3: var(--color-green-500);
+  --color-blob-4: var(--color-violet-500);
+  --color-blob-5: var(--color-red-500);
+
+  /* Continent/Region color mappings for geographical visualizations */
+  --color-continent-af: var(--color-red-500);      /* Africa */
+  --color-continent-as: var(--color-amber-500);    /* Asia */
+  --color-continent-eu: var(--color-emerald-500);  /* Europe */
+  --color-continent-na: var(--color-blue-500);     /* North America */
+  --color-continent-oc: var(--color-cyan-500);     /* Oceania */
+  --color-continent-sa: var(--color-violet-500);   /* South America */
+  --color-continent-an: var(--color-slate-500);    /* Antarctica */
+
+  /* Performance time-based color gradient (fast → slow) */
+  --color-performance-excellent: var(--color-green-500);   /* 0-1s - very fast */
+  --color-performance-good: var(--color-lime-500);         /* 1-2s - fast */
+  --color-performance-fair: var(--color-yellow-500);       /* 2-3s - moderate */
+  --color-performance-slow: var(--color-orange-500);       /* 3-4s - slow */
+  --color-performance-poor: var(--color-red-500);          /* 4+s - very slow */
+
+  /* Categorical color palette for multi-series charts (0-14) */
+  --color-chart-0: var(--color-blue-500);
+  --color-chart-1: var(--color-emerald-500);
+  --color-chart-2: var(--color-amber-500);
+  --color-chart-3: var(--color-red-500);
+  --color-chart-4: var(--color-cyan-500);
+  --color-chart-5: var(--color-lime-500);
+  --color-chart-6: var(--color-orange-500);
+  --color-chart-7: var(--color-purple-500);
+  --color-chart-8: var(--color-pink-500);
+  --color-chart-9: var(--color-violet-500);
+  --color-chart-10: var(--color-teal-500);
+  --color-chart-11: var(--color-indigo-500);
+  --color-chart-12: var(--color-rose-500);
+  --color-chart-13: var(--color-fuchsia-500);
+  --color-chart-14: var(--color-sky-500);
+
+  /* Custom animations */
+  --animate-shimmer: shimmer 2s linear infinite;
+  --animate-fade-in: fade-in 0.8s ease-out forwards;
+  --animate-fade-in-delay: fade-in 0.8s ease-out 0.2s forwards;
+  --animate-fade-in-delay-2: fade-in 0.8s ease-out 0.4s forwards;
+  --animate-fade-in-delay-3: fade-in 0.8s ease-out 0.6s forwards;
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Semantic token mappings
+ *
+ * Maps semantic tokens to primitive color scales.
+ * Light mode uses warm sand/terracotta palette.
+ * Dark mode uses neutral grays with warm terracotta accents.
+ * Star mode uses aurora borealis colors.
+ */
+@layer base {
+  :root {
+    /* Light mode - warm earthy theme */
+    --primary-value: var(--color-terracotta-600);
+    --secondary-value: var(--color-sand-200);
+    --accent-value: var(--color-terracotta-500);
+    --background-value: var(--color-sand-100);
+    --surface-value: var(--color-sand-50);
+    --foreground-value: var(--color-sand-950);
+    --muted-value: var(--color-sand-600);
+    --border-value: var(--color-sand-300);
+
+    /* Set html background for overscroll */
+    background-color: var(--color-sand-100);
+  }
+
+  html.dark {
+    /* Dark mode - balanced neutral with warm terracotta accents */
+    --primary-value: var(--color-terracotta-400);
+    --secondary-value: var(--color-neutral-900);
+    --accent-value: var(--color-terracotta-300);
+    --background-value: var(--color-neutral-950);
+    --surface-value: #242424;
+    --foreground-value: var(--color-neutral-50);
+    --muted-value: var(--color-neutral-400);
+    --border-value: var(--color-neutral-800);
+
+    /* Set html background for overscroll */
+    background-color: var(--color-neutral-950);
+  }
+
+  html.star {
+    /* Star mode - aurora borealis with cyan and purple (no pink gradient) */
+    --primary-value: var(--color-aurora-cyan-400);
+    --secondary-value: var(--color-aurora-purple-600);
+    --accent-value: var(--color-aurora-cyan-300);
+    --background-value: var(--color-aurora-blue-950);
+    --surface-value: #0a1428;
+    --foreground-value: var(--color-aurora-cyan-50);
+    --muted-value: var(--color-aurora-cyan-700);
+    --border-value: #1a2847;
+
+    /* Set html background for overscroll */
+    background-color: var(--color-aurora-blue-950);
+  }
+
+  /* Apply Space Grotesk for all text */
+  body {
+    font-family: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+    color: var(--foreground-value);
+    background-color: var(--background-value);
+  }
+
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+  }
+
+  /* Global focus styles - use primary color */
+  /* Only apply to keyboard navigation (focus-visible) and exclude interactive elements that have custom focus styles */
+  *:focus-visible:not(button):not(a):not([role='button']):not(input):not(textarea):not(select) {
+    outline: 2px solid var(--primary-value);
+    outline-offset: 2px;
+  }
+
+  /* Remove default focus outline from buttons, links, and role=button elements */
+  button:focus-visible,
+  a:focus-visible,
+  [role='button']:focus-visible {
+    outline: none;
+  }
+
+  /* Initial state for fade-in animations - elements start invisible */
+  .animate-fade-in,
+  .animate-fade-in-delay,
+  .animate-fade-in-delay-2,
+  .animate-fade-in-delay-3 {
+    opacity: 0;
+  }
+
+  /* Hide scrollbars while maintaining scroll functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+}

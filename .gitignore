@@ -1,61 +1,42 @@
-# Test coverage
-coverage.out
-*.test
-
-# Local config
-api-config.yaml
-srv-config.yaml
-
-# State files
-backend/state/
-config.yaml
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Virtual Environment
-.env
-.venv
-env/
-venv/
-ENV/
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-*debug_bin*
-
-# OS
-.DS_Store
-Thumbs.db
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
 node_modules
-config.yaml
-.aider*
-docker-compose.override.yaml
+dist
+dist-ssr
+*.local
 
-deploy/local
+# production
+/build/frontend
+/build/stats.html
+storybook-static
 
-**/.claude/settings.local.json
+# Environment variables
+.env
+.env.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Playwright
+.playwright-mcp
+
+# Tanstack
+.tanstack
+
+# ESLint
+.eslintcache

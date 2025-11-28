@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "setup": "./conductor-setup.sh",
+    "run": "./conductor-run.sh",
+    "archive": ""
+  },
+  "runScriptMode": "nonconcurrent"
+}

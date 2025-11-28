@@ -1,0 +1,1 @@
+export { DoraIcon } from './DoraIcon';

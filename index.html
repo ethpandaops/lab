@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en" itemscope="" itemtype="http://schema.org/Webpage">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <style>
+      /* Critical CSS - Inline for instant rendering */
+      body:not(.react-loaded) * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body:not(.react-loaded) {
+        font-family: system-ui, -apple-system, sans-serif;
+        background: rgb(10, 18, 40);
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      body:not(.react-loaded) #loading-screen {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgb(10, 18, 40);
+        z-index: 50;
+      }
+    </style>
+    <script>
+      // Initialize theme before React mounts to prevent FOUC
+      (function () {
+        const theme = localStorage.getItem('theme');
+
+        // Handle explicit theme from localStorage
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else if (theme === 'star') {
+          document.documentElement.classList.add('star');
+        } else if (theme === 'light') {
+          // Light theme is default, no class needed
+        } else {
+          // No theme set, use system preference
+          const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+          }
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="loading-screen"></div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
