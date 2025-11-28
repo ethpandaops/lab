@@ -1,5 +1,7 @@
 import { Card } from '@/components/Layout/Card';
+import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { ForkInfo } from '@/utils/forks';
+import { epochToTimestamp } from '@/utils/beacon';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useState, useEffect } from 'react';
@@ -227,6 +229,12 @@ export function ForksHeader({ activeFork, nextFork, allForks }: ForksHeaderProps
           <div className="mb-2 text-xs font-medium tracking-wider text-accent uppercase">Next Upgrade</div>
           <h2 className="text-3xl font-bold text-foreground">{nextFork.displayName}</h2>
           <p className="mt-3 text-sm text-muted">{nextFork.description}</p>
+          {currentNetwork?.genesis_time && (
+            <div className="mt-4 text-base font-medium text-foreground">
+              Local Time:{' '}
+              <Timestamp timestamp={epochToTimestamp(nextFork.epoch, currentNetwork.genesis_time)} format="long" />
+            </div>
+          )}
         </div>
 
         {/* Countdown display */}
