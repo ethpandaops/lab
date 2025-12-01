@@ -61,7 +61,10 @@ const ethereumConsensusPages: NavItem[] = [
 
 const ethereumExecutionPages: NavItem[] = [];
 
-const ethereumDataAvailabilityPages: NavItem[] = [{ name: 'Custody', to: '/ethereum/data-availability/custody' }];
+const ethereumDataAvailabilityPages: NavItem[] = [
+  { name: 'Custody', to: '/ethereum/data-availability/custody' },
+  { name: 'Probes', to: '/ethereum/data-availability/probes' },
+];
 
 const xatuPages: NavItem[] = [
   { name: 'Contributors', to: '/xatu/contributors' },

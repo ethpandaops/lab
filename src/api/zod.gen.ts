@@ -10,6 +10,13 @@ export const zAdminCbtIncremental = z.object({
   updated_date_time: z.optional(z.coerce.bigint()),
 });
 
+export const zAdminCbtScheduled = z.object({
+  database: z.optional(z.string()),
+  start_date_time: z.optional(z.coerce.bigint()),
+  table: z.optional(z.string()),
+  updated_date_time: z.optional(z.coerce.bigint()),
+});
+
 export const zDimBlockCanonical = z.object({
   beacon_block_root: z.optional(z.union([z.string(), z.null()])),
   beacon_block_version: z.optional(z.union([z.string(), z.null()])),
@@ -654,6 +661,13 @@ export const zGetAdminCbtIncrementalResponse = z.object({
 });
 
 /**
+ * Response for getting a single admin_cbt_scheduled record
+ */
+export const zGetAdminCbtScheduledResponse = z.object({
+  item: z.optional(zAdminCbtScheduled),
+});
+
+/**
  * Response for getting a single dim_block_canonical record
  */
 export const zGetDimBlockCanonicalResponse = z.object({
@@ -1181,11 +1195,62 @@ export const zGetIntBlockProposerCanonicalResponse = z.object({
   item: z.optional(zIntBlockProposerCanonical),
 });
 
+export const zIntCustodyProbe = z.object({
+  classification: z.optional(z.string()),
+  column_indices: z.optional(z.array(z.int())),
+  error: z.optional(z.string()),
+  event_date_time: z.optional(z.coerce.bigint()),
+  meta_client_geo_autonomous_system_number: z.optional(z.union([z.int(), z.null()])),
+  meta_client_geo_autonomous_system_organization: z.optional(z.union([z.string(), z.null()])),
+  meta_client_geo_city: z.optional(z.string()),
+  meta_client_geo_continent_code: z.optional(z.string()),
+  meta_client_geo_country: z.optional(z.string()),
+  meta_client_geo_country_code: z.optional(z.string()),
+  meta_client_geo_latitude: z.optional(z.union([z.number(), z.null()])),
+  meta_client_geo_longitude: z.optional(z.union([z.number(), z.null()])),
+  meta_client_implementation: z.optional(z.string()),
+  meta_client_os: z.optional(z.string()),
+  meta_client_version: z.optional(z.string()),
+  meta_peer_geo_autonomous_system_number: z.optional(z.union([z.int(), z.null()])),
+  meta_peer_geo_autonomous_system_organization: z.optional(z.union([z.string(), z.null()])),
+  meta_peer_geo_city: z.optional(z.string()),
+  meta_peer_geo_continent_code: z.optional(z.string()),
+  meta_peer_geo_country: z.optional(z.string()),
+  meta_peer_geo_country_code: z.optional(z.string()),
+  meta_peer_geo_latitude: z.optional(z.union([z.number(), z.null()])),
+  meta_peer_geo_longitude: z.optional(z.union([z.number(), z.null()])),
+  meta_peer_implementation: z.optional(z.string()),
+  meta_peer_platform: z.optional(z.string()),
+  meta_peer_version: z.optional(z.string()),
+  node_id: z.optional(z.string()),
+  peer_id_unique_key: z.optional(z.coerce.bigint()),
+  response_time_ms: z.optional(z.int()),
+  result: z.optional(z.string()),
+  slots: z.optional(z.array(z.int())),
+  updated_date_time: z.optional(z.int()),
+  username: z.optional(z.string()),
+});
+
+/**
+ * Response for getting a single int_custody_probe record
+ */
+export const zGetIntCustodyProbeResponse = z.object({
+  item: z.optional(zIntCustodyProbe),
+});
+
 /**
  * Response for listing admin_cbt_incremental records
  */
 export const zListAdminCbtIncrementalResponse = z.object({
   admin_cbt_incremental: z.optional(z.array(zAdminCbtIncremental)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing admin_cbt_scheduled records
+ */
+export const zListAdminCbtScheduledResponse = z.object({
+  admin_cbt_scheduled: z.optional(z.array(zAdminCbtScheduled)),
   next_page_token: z.optional(z.string()),
 });
 
@@ -1594,6 +1659,14 @@ export const zListIntBlockProposerCanonicalResponse = z.object({
 });
 
 /**
+ * Response for listing int_custody_probe records
+ */
+export const zListIntCustodyProbeResponse = z.object({
+  int_custody_probe: z.optional(z.array(zIntCustodyProbe)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
  * The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).
  */
 export const zStatus = z.object({
@@ -1679,6 +1752,74 @@ export const zAdminCbtIncrementalServiceGetData = z.object({
  * OK
  */
 export const zAdminCbtIncrementalServiceGetResponse = zGetAdminCbtIncrementalResponse;
+
+export const zAdminCbtScheduledServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      database_eq: z.optional(z.string()),
+      database_ne: z.optional(z.string()),
+      database_contains: z.optional(z.string()),
+      database_starts_with: z.optional(z.string()),
+      database_ends_with: z.optional(z.string()),
+      database_like: z.optional(z.string()),
+      database_not_like: z.optional(z.string()),
+      database_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      database_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      updated_date_time_eq: z.optional(z.coerce.bigint()),
+      updated_date_time_ne: z.optional(z.coerce.bigint()),
+      updated_date_time_lt: z.optional(z.coerce.bigint()),
+      updated_date_time_lte: z.optional(z.coerce.bigint()),
+      updated_date_time_gt: z.optional(z.coerce.bigint()),
+      updated_date_time_gte: z.optional(z.coerce.bigint()),
+      updated_date_time_between_min: z.optional(z.coerce.bigint()),
+      updated_date_time_between_max_value: z.optional(z.coerce.bigint()),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      table_eq: z.optional(z.string()),
+      table_ne: z.optional(z.string()),
+      table_contains: z.optional(z.string()),
+      table_starts_with: z.optional(z.string()),
+      table_ends_with: z.optional(z.string()),
+      table_like: z.optional(z.string()),
+      table_not_like: z.optional(z.string()),
+      table_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      table_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      start_date_time_eq: z.optional(z.coerce.bigint()),
+      start_date_time_ne: z.optional(z.coerce.bigint()),
+      start_date_time_lt: z.optional(z.coerce.bigint()),
+      start_date_time_lte: z.optional(z.coerce.bigint()),
+      start_date_time_gt: z.optional(z.coerce.bigint()),
+      start_date_time_gte: z.optional(z.coerce.bigint()),
+      start_date_time_between_min: z.optional(z.coerce.bigint()),
+      start_date_time_between_max_value: z.optional(z.coerce.bigint()),
+      start_date_time_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zAdminCbtScheduledServiceListResponse = zListAdminCbtScheduledResponse;
+
+export const zAdminCbtScheduledServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    database: z.string(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zAdminCbtScheduledServiceGetResponse = zGetAdminCbtScheduledResponse;
 
 export const zDimBlockCanonicalServiceListData = z.object({
   body: z.optional(z.never()),
@@ -9295,3 +9436,294 @@ export const zIntBlockProposerCanonicalServiceGetData = z.object({
  * OK
  */
 export const zIntBlockProposerCanonicalServiceGetResponse = zGetIntBlockProposerCanonicalResponse;
+
+export const zIntCustodyProbeServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      event_date_time_eq: z.optional(z.coerce.bigint()),
+      event_date_time_ne: z.optional(z.coerce.bigint()),
+      event_date_time_lt: z.optional(z.coerce.bigint()),
+      event_date_time_lte: z.optional(z.coerce.bigint()),
+      event_date_time_gt: z.optional(z.coerce.bigint()),
+      event_date_time_gte: z.optional(z.coerce.bigint()),
+      event_date_time_between_min: z.optional(z.coerce.bigint()),
+      event_date_time_between_max_value: z.optional(z.coerce.bigint()),
+      event_date_time_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      event_date_time_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      peer_id_unique_key_eq: z.optional(z.coerce.bigint()),
+      peer_id_unique_key_ne: z.optional(z.coerce.bigint()),
+      peer_id_unique_key_lt: z.optional(z.coerce.bigint()),
+      peer_id_unique_key_lte: z.optional(z.coerce.bigint()),
+      peer_id_unique_key_gt: z.optional(z.coerce.bigint()),
+      peer_id_unique_key_gte: z.optional(z.coerce.bigint()),
+      peer_id_unique_key_between_min: z.optional(z.coerce.bigint()),
+      peer_id_unique_key_between_max_value: z.optional(z.coerce.bigint()),
+      peer_id_unique_key_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      peer_id_unique_key_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      result_eq: z.optional(z.string()),
+      result_ne: z.optional(z.string()),
+      result_contains: z.optional(z.string()),
+      result_starts_with: z.optional(z.string()),
+      result_ends_with: z.optional(z.string()),
+      result_like: z.optional(z.string()),
+      result_not_like: z.optional(z.string()),
+      result_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      result_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      error_eq: z.optional(z.string()),
+      error_ne: z.optional(z.string()),
+      error_contains: z.optional(z.string()),
+      error_starts_with: z.optional(z.string()),
+      error_ends_with: z.optional(z.string()),
+      error_like: z.optional(z.string()),
+      error_not_like: z.optional(z.string()),
+      error_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      error_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      updated_date_time_eq: z.optional(z.int()),
+      updated_date_time_ne: z.optional(z.int()),
+      updated_date_time_lt: z.optional(z.int()),
+      updated_date_time_lte: z.optional(z.int()),
+      updated_date_time_gt: z.optional(z.int()),
+      updated_date_time_gte: z.optional(z.int()),
+      updated_date_time_between_min: z.optional(z.int()),
+      updated_date_time_between_max_value: z.optional(z.int()),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slots: z.optional(z.array(z.int())),
+      column_indices: z.optional(z.array(z.int())),
+      response_time_ms_eq: z.optional(z.int()),
+      response_time_ms_ne: z.optional(z.int()),
+      response_time_ms_lt: z.optional(z.int()),
+      response_time_ms_lte: z.optional(z.int()),
+      response_time_ms_gt: z.optional(z.int()),
+      response_time_ms_gte: z.optional(z.int()),
+      response_time_ms_between_min: z.optional(z.int()),
+      response_time_ms_between_max_value: z.optional(z.int()),
+      response_time_ms_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      response_time_ms_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      username_eq: z.optional(z.string()),
+      username_ne: z.optional(z.string()),
+      username_contains: z.optional(z.string()),
+      username_starts_with: z.optional(z.string()),
+      username_ends_with: z.optional(z.string()),
+      username_like: z.optional(z.string()),
+      username_not_like: z.optional(z.string()),
+      username_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      username_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      node_id_eq: z.optional(z.string()),
+      node_id_ne: z.optional(z.string()),
+      node_id_contains: z.optional(z.string()),
+      node_id_starts_with: z.optional(z.string()),
+      node_id_ends_with: z.optional(z.string()),
+      node_id_like: z.optional(z.string()),
+      node_id_not_like: z.optional(z.string()),
+      node_id_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      node_id_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      classification_eq: z.optional(z.string()),
+      classification_ne: z.optional(z.string()),
+      classification_contains: z.optional(z.string()),
+      classification_starts_with: z.optional(z.string()),
+      classification_ends_with: z.optional(z.string()),
+      classification_like: z.optional(z.string()),
+      classification_not_like: z.optional(z.string()),
+      classification_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      classification_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_version_eq: z.optional(z.string()),
+      meta_client_version_ne: z.optional(z.string()),
+      meta_client_version_contains: z.optional(z.string()),
+      meta_client_version_starts_with: z.optional(z.string()),
+      meta_client_version_ends_with: z.optional(z.string()),
+      meta_client_version_like: z.optional(z.string()),
+      meta_client_version_not_like: z.optional(z.string()),
+      meta_client_version_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_version_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_implementation_eq: z.optional(z.string()),
+      meta_client_implementation_ne: z.optional(z.string()),
+      meta_client_implementation_contains: z.optional(z.string()),
+      meta_client_implementation_starts_with: z.optional(z.string()),
+      meta_client_implementation_ends_with: z.optional(z.string()),
+      meta_client_implementation_like: z.optional(z.string()),
+      meta_client_implementation_not_like: z.optional(z.string()),
+      meta_client_implementation_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_implementation_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_os_eq: z.optional(z.string()),
+      meta_client_os_ne: z.optional(z.string()),
+      meta_client_os_contains: z.optional(z.string()),
+      meta_client_os_starts_with: z.optional(z.string()),
+      meta_client_os_ends_with: z.optional(z.string()),
+      meta_client_os_like: z.optional(z.string()),
+      meta_client_os_not_like: z.optional(z.string()),
+      meta_client_os_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_os_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_city_eq: z.optional(z.string()),
+      meta_client_geo_city_ne: z.optional(z.string()),
+      meta_client_geo_city_contains: z.optional(z.string()),
+      meta_client_geo_city_starts_with: z.optional(z.string()),
+      meta_client_geo_city_ends_with: z.optional(z.string()),
+      meta_client_geo_city_like: z.optional(z.string()),
+      meta_client_geo_city_not_like: z.optional(z.string()),
+      meta_client_geo_city_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_city_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_country_eq: z.optional(z.string()),
+      meta_client_geo_country_ne: z.optional(z.string()),
+      meta_client_geo_country_contains: z.optional(z.string()),
+      meta_client_geo_country_starts_with: z.optional(z.string()),
+      meta_client_geo_country_ends_with: z.optional(z.string()),
+      meta_client_geo_country_like: z.optional(z.string()),
+      meta_client_geo_country_not_like: z.optional(z.string()),
+      meta_client_geo_country_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_country_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_country_code_eq: z.optional(z.string()),
+      meta_client_geo_country_code_ne: z.optional(z.string()),
+      meta_client_geo_country_code_contains: z.optional(z.string()),
+      meta_client_geo_country_code_starts_with: z.optional(z.string()),
+      meta_client_geo_country_code_ends_with: z.optional(z.string()),
+      meta_client_geo_country_code_like: z.optional(z.string()),
+      meta_client_geo_country_code_not_like: z.optional(z.string()),
+      meta_client_geo_country_code_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_country_code_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_continent_code_eq: z.optional(z.string()),
+      meta_client_geo_continent_code_ne: z.optional(z.string()),
+      meta_client_geo_continent_code_contains: z.optional(z.string()),
+      meta_client_geo_continent_code_starts_with: z.optional(z.string()),
+      meta_client_geo_continent_code_ends_with: z.optional(z.string()),
+      meta_client_geo_continent_code_like: z.optional(z.string()),
+      meta_client_geo_continent_code_not_like: z.optional(z.string()),
+      meta_client_geo_continent_code_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_continent_code_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_longitude_value: z.optional(z.number()),
+      meta_client_geo_latitude_value: z.optional(z.number()),
+      meta_client_geo_autonomous_system_number_eq: z.optional(z.int()),
+      meta_client_geo_autonomous_system_number_ne: z.optional(z.int()),
+      meta_client_geo_autonomous_system_number_lt: z.optional(z.int()),
+      meta_client_geo_autonomous_system_number_lte: z.optional(z.int()),
+      meta_client_geo_autonomous_system_number_gt: z.optional(z.int()),
+      meta_client_geo_autonomous_system_number_gte: z.optional(z.int()),
+      meta_client_geo_autonomous_system_number_between_min: z.optional(z.int()),
+      meta_client_geo_autonomous_system_number_between_max_value: z.optional(z.int()),
+      meta_client_geo_autonomous_system_number_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      meta_client_geo_autonomous_system_number_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      meta_client_geo_autonomous_system_organization_eq: z.optional(z.string()),
+      meta_client_geo_autonomous_system_organization_ne: z.optional(z.string()),
+      meta_client_geo_autonomous_system_organization_contains: z.optional(z.string()),
+      meta_client_geo_autonomous_system_organization_starts_with: z.optional(z.string()),
+      meta_client_geo_autonomous_system_organization_ends_with: z.optional(z.string()),
+      meta_client_geo_autonomous_system_organization_like: z.optional(z.string()),
+      meta_client_geo_autonomous_system_organization_not_like: z.optional(z.string()),
+      meta_client_geo_autonomous_system_organization_in_values: z.optional(
+        z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))
+      ),
+      meta_client_geo_autonomous_system_organization_not_in_values: z.optional(
+        z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))
+      ),
+      meta_peer_implementation_eq: z.optional(z.string()),
+      meta_peer_implementation_ne: z.optional(z.string()),
+      meta_peer_implementation_contains: z.optional(z.string()),
+      meta_peer_implementation_starts_with: z.optional(z.string()),
+      meta_peer_implementation_ends_with: z.optional(z.string()),
+      meta_peer_implementation_like: z.optional(z.string()),
+      meta_peer_implementation_not_like: z.optional(z.string()),
+      meta_peer_implementation_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_peer_implementation_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_peer_version_eq: z.optional(z.string()),
+      meta_peer_version_ne: z.optional(z.string()),
+      meta_peer_version_contains: z.optional(z.string()),
+      meta_peer_version_starts_with: z.optional(z.string()),
+      meta_peer_version_ends_with: z.optional(z.string()),
+      meta_peer_version_like: z.optional(z.string()),
+      meta_peer_version_not_like: z.optional(z.string()),
+      meta_peer_version_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_peer_version_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_peer_platform_eq: z.optional(z.string()),
+      meta_peer_platform_ne: z.optional(z.string()),
+      meta_peer_platform_contains: z.optional(z.string()),
+      meta_peer_platform_starts_with: z.optional(z.string()),
+      meta_peer_platform_ends_with: z.optional(z.string()),
+      meta_peer_platform_like: z.optional(z.string()),
+      meta_peer_platform_not_like: z.optional(z.string()),
+      meta_peer_platform_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_peer_platform_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_peer_geo_city_eq: z.optional(z.string()),
+      meta_peer_geo_city_ne: z.optional(z.string()),
+      meta_peer_geo_city_contains: z.optional(z.string()),
+      meta_peer_geo_city_starts_with: z.optional(z.string()),
+      meta_peer_geo_city_ends_with: z.optional(z.string()),
+      meta_peer_geo_city_like: z.optional(z.string()),
+      meta_peer_geo_city_not_like: z.optional(z.string()),
+      meta_peer_geo_city_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_peer_geo_city_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_peer_geo_country_eq: z.optional(z.string()),
+      meta_peer_geo_country_ne: z.optional(z.string()),
+      meta_peer_geo_country_contains: z.optional(z.string()),
+      meta_peer_geo_country_starts_with: z.optional(z.string()),
+      meta_peer_geo_country_ends_with: z.optional(z.string()),
+      meta_peer_geo_country_like: z.optional(z.string()),
+      meta_peer_geo_country_not_like: z.optional(z.string()),
+      meta_peer_geo_country_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_peer_geo_country_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_peer_geo_country_code_eq: z.optional(z.string()),
+      meta_peer_geo_country_code_ne: z.optional(z.string()),
+      meta_peer_geo_country_code_contains: z.optional(z.string()),
+      meta_peer_geo_country_code_starts_with: z.optional(z.string()),
+      meta_peer_geo_country_code_ends_with: z.optional(z.string()),
+      meta_peer_geo_country_code_like: z.optional(z.string()),
+      meta_peer_geo_country_code_not_like: z.optional(z.string()),
+      meta_peer_geo_country_code_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_peer_geo_country_code_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_peer_geo_continent_code_eq: z.optional(z.string()),
+      meta_peer_geo_continent_code_ne: z.optional(z.string()),
+      meta_peer_geo_continent_code_contains: z.optional(z.string()),
+      meta_peer_geo_continent_code_starts_with: z.optional(z.string()),
+      meta_peer_geo_continent_code_ends_with: z.optional(z.string()),
+      meta_peer_geo_continent_code_like: z.optional(z.string()),
+      meta_peer_geo_continent_code_not_like: z.optional(z.string()),
+      meta_peer_geo_continent_code_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_peer_geo_continent_code_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_peer_geo_longitude_value: z.optional(z.number()),
+      meta_peer_geo_latitude_value: z.optional(z.number()),
+      meta_peer_geo_autonomous_system_number_eq: z.optional(z.int()),
+      meta_peer_geo_autonomous_system_number_ne: z.optional(z.int()),
+      meta_peer_geo_autonomous_system_number_lt: z.optional(z.int()),
+      meta_peer_geo_autonomous_system_number_lte: z.optional(z.int()),
+      meta_peer_geo_autonomous_system_number_gt: z.optional(z.int()),
+      meta_peer_geo_autonomous_system_number_gte: z.optional(z.int()),
+      meta_peer_geo_autonomous_system_number_between_min: z.optional(z.int()),
+      meta_peer_geo_autonomous_system_number_between_max_value: z.optional(z.int()),
+      meta_peer_geo_autonomous_system_number_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      meta_peer_geo_autonomous_system_number_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      meta_peer_geo_autonomous_system_organization_eq: z.optional(z.string()),
+      meta_peer_geo_autonomous_system_organization_ne: z.optional(z.string()),
+      meta_peer_geo_autonomous_system_organization_contains: z.optional(z.string()),
+      meta_peer_geo_autonomous_system_organization_starts_with: z.optional(z.string()),
+      meta_peer_geo_autonomous_system_organization_ends_with: z.optional(z.string()),
+      meta_peer_geo_autonomous_system_organization_like: z.optional(z.string()),
+      meta_peer_geo_autonomous_system_organization_not_like: z.optional(z.string()),
+      meta_peer_geo_autonomous_system_organization_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_peer_geo_autonomous_system_organization_not_in_values: z.optional(
+        z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))
+      ),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntCustodyProbeServiceListResponse = zListIntCustodyProbeResponse;
+
+export const zIntCustodyProbeServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    event_date_time: z.coerce.bigint(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntCustodyProbeServiceGetResponse = zGetIntCustodyProbeResponse;
