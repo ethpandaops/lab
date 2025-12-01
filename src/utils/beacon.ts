@@ -265,7 +265,7 @@ export const FORK_METADATA: Record<ForkVersion, ForkMetadata> = {
     emoji: '🦓',
     color: 'bg-pink-100 text-pink-700 dark:bg-pink-400/10 dark:text-pink-400',
     description:
-      'Fusaka - Implements PeerDAS for up to 8x blob throughput scaling and introduces blob parameter-only forks (EIP-7594)',
+      'Fusaka - Implements PeerDAS for up to 8x blob throughput scaling (EIP-7594) and introduces blob parameter-only forks (EIP-7892)',
     executionName: 'osaka',
     combinedName: 'fusaka',
   },
