@@ -41,6 +41,13 @@ export interface DataAvailabilityRow {
 export type DataAvailabilityGranularity = 'window' | 'day' | 'hour' | 'epoch' | 'slot';
 
 /**
+ * View mode for data availability visualization
+ * - 'percentage': Traditional success rate (successCount / totalCount) - sensitive to outliers
+ * - 'threshold': Count-based view showing gradient based on successCount vs threshold - robust to outliers
+ */
+export type ViewMode = 'percentage' | 'threshold';
+
+/**
  * Callback when a cell is clicked
  */
 export interface CellClickHandler {
@@ -69,6 +76,10 @@ export interface DataAvailabilityHeatmapProps {
   granularity: DataAvailabilityGranularity;
   /** Filter settings */
   filters: import('./DataAvailabilityFilterPanel.types').DataAvailabilityFilters;
+  /** View mode: 'percentage' (default) or 'threshold' */
+  viewMode?: ViewMode;
+  /** Threshold value for threshold mode (default: 30 for mainnet, 10 for others) */
+  threshold?: number;
   /** Optional: Selected column index to highlight */
   selectedColumnIndex?: number;
   /** Callback when a cell is clicked */
@@ -97,6 +108,10 @@ export interface DataAvailabilityCellProps {
   data: DataAvailabilityCellData;
   /** Granularity level (determines response time label) */
   granularity?: DataAvailabilityGranularity;
+  /** View mode: 'percentage' or 'threshold' */
+  viewMode?: ViewMode;
+  /** Threshold value for threshold mode */
+  threshold?: number;
   /** Whether this cell is in the selected column */
   isSelected?: boolean;
   /** Whether this cell is highlighted (hover preview) */
@@ -117,6 +132,10 @@ export interface DataAvailabilityCellProps {
 export interface DataAvailabilityLegendProps {
   /** Granularity level for contextual labels (unused, kept for compatibility) */
   granularity?: DataAvailabilityGranularity;
+  /** View mode: 'percentage' or 'threshold' */
+  viewMode?: ViewMode;
+  /** Threshold value for threshold mode (for display in legend) */
+  threshold?: number;
   /** Optional: Custom class name */
   className?: string;
 }

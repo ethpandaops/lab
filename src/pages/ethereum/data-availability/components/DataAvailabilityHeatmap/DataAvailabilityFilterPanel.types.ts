@@ -1,3 +1,5 @@
+import type { ViewMode } from './DataAvailabilityHeatmap.types';
+
 export interface DataAvailabilityFilters {
   /** Selected column subnet groups (0-31, 32-63, 64-95, 96-127) */
   columnGroups: Set<number>;
@@ -16,4 +18,10 @@ export interface DataAvailabilityFilterPanelProps {
   onFiltersChange: (filters: DataAvailabilityFilters) => void;
   /** Whether to show the panel open by default */
   defaultOpen?: boolean;
+  /** Current view mode */
+  viewMode?: ViewMode;
+  /** Threshold value for threshold mode */
+  threshold?: number;
+  /** Callback when threshold changes */
+  onThresholdChange?: (threshold: number) => void;
 }

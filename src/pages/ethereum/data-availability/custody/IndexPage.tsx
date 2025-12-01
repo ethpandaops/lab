@@ -10,10 +10,15 @@ import { DataAvailabilityHeatmap } from '@/pages/ethereum/data-availability/comp
 import { DataAvailabilityFilterPanel } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel';
 import { DataAvailabilityLegend } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityLegend';
 import { DataAvailabilitySkeleton } from '@/pages/ethereum/data-availability/components/DataAvailabilitySkeleton';
+import { ViewModeToggle } from '@/pages/ethereum/data-availability/components/ViewModeToggle';
 import { TimezoneToggle } from '@/components/Elements/TimezoneToggle';
-import type { DataAvailabilityGranularity } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
+import type {
+  DataAvailabilityGranularity,
+  ViewMode,
+} from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
 import type { DataAvailabilityFilters } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel.types';
 import { useTimezone } from '@/hooks/useTimezone';
+import { useNetwork } from '@/hooks/useNetwork';
 import { formatEpoch } from '@/utils';
 import {
   fctDataColumnAvailabilityDailyServiceListOptions,
@@ -38,7 +43,7 @@ import {
 } from '@/pages/ethereum/data-availability/utils/data-availability-transform';
 import { fetchAllPages } from '@/utils/api-pagination';
 import type { CustodySearch } from './IndexPage.types';
-import { validateSearchParamHierarchy } from './IndexPage.types';
+import { validateSearchParamHierarchy, getDefaultThreshold } from './IndexPage.types';
 
 /**
  * Drill-down level state - each level maintains parent context for breadcrumbs
@@ -148,9 +153,19 @@ export function IndexPage(): JSX.Element {
   // Timezone preference
   const { timezone } = useTimezone();
 
+  // Network for default threshold
+  const { currentNetwork } = useNetwork();
+
   // Derive drill-down state from URL
   const currentLevel = deriveCurrentLevel(search);
   const selectedColumnIndex = search.column;
+
+  // View mode from URL (default to 'threshold' since it's more robust)
+  const viewMode: ViewMode = search.mode ?? 'threshold';
+
+  // Threshold from URL or network default
+  const defaultThreshold = getDefaultThreshold(currentNetwork?.name);
+  const threshold = search.threshold ?? defaultThreshold;
 
   // Filter state
   const [filters, setFilters] = useState<DataAvailabilityFilters>({
@@ -441,6 +456,32 @@ export function IndexPage(): JSX.Element {
   };
 
   /**
+   * Handle view mode change
+   * Updates URL search params to switch between percentage and threshold modes
+   */
+  const handleViewModeChange = (mode: ViewMode): void => {
+    navigate({
+      search: prev => ({
+        ...prev,
+        mode,
+      }),
+    });
+  };
+
+  /**
+   * Handle threshold change
+   * Updates URL search params with new threshold value
+   */
+  const handleThresholdChange = (newThreshold: number): void => {
+    navigate({
+      search: prev => ({
+        ...prev,
+        threshold: newThreshold,
+      }),
+    });
+  };
+
+  /**
    * Build breadcrumb path - shows full drill-down hierarchy
    */
   const breadcrumbs = useMemo(() => {
@@ -651,7 +692,7 @@ export function IndexPage(): JSX.Element {
         description="PeerDAS data availability visualization showing column custody across validators"
       />
 
-      {/* Breadcrumb navigation and timezone toggle */}
+      {/* Breadcrumb navigation and controls */}
       <div className="mb-6 flex items-center justify-between gap-4">
         {/* Breadcrumbs - always visible */}
         <nav className="flex items-center gap-2 text-sm/6">
@@ -673,8 +714,11 @@ export function IndexPage(): JSX.Element {
           ))}
         </nav>
 
-        {/* Timezone toggle - always visible */}
-        <TimezoneToggle size="compact" />
+        {/* View mode toggle and timezone toggle */}
+        <div className="flex items-center gap-4">
+          <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
+          <TimezoneToggle size="compact" />
+        </div>
       </div>
 
       {/* Loading state */}
@@ -718,10 +762,17 @@ export function IndexPage(): JSX.Element {
               {/* Filters and Legend on same line */}
               <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-start">
                 <div className="w-full lg:flex-[2]">
-                  <DataAvailabilityFilterPanel filters={filters} onFiltersChange={setFilters} defaultOpen={false} />
+                  <DataAvailabilityFilterPanel
+                    filters={filters}
+                    onFiltersChange={setFilters}
+                    defaultOpen={false}
+                    viewMode={viewMode}
+                    threshold={threshold}
+                    onThresholdChange={handleThresholdChange}
+                  />
                 </div>
                 <div className="w-full lg:flex-1">
-                  <DataAvailabilityLegend granularity={granularity} />
+                  <DataAvailabilityLegend granularity={granularity} viewMode={viewMode} threshold={threshold} />
                 </div>
               </div>
 
@@ -731,6 +782,8 @@ export function IndexPage(): JSX.Element {
                   rows={rows}
                   granularity={granularity}
                   filters={filters}
+                  viewMode={viewMode}
+                  threshold={threshold}
                   selectedColumnIndex={selectedColumnIndex}
                   onCellClick={handleCellClick}
                   onRowClick={currentLevel.type !== 'slot' ? handleRowClick : undefined}

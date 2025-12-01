@@ -8,15 +8,20 @@ import type { DataAvailabilityFilterPanelProps } from './DataAvailabilityFilterP
 /**
  * Filter panel for data availability heatmap
  * Allows filtering by column subnet groups, availability threshold, and observation count
+ * Shows different controls based on view mode (percentage vs threshold)
  */
 export const DataAvailabilityFilterPanel = ({
   filters,
   onFiltersChange,
   defaultOpen = false,
+  viewMode = 'percentage',
+  threshold,
+  onThresholdChange,
 }: DataAvailabilityFilterPanelProps): React.JSX.Element => {
   const [minAvailability, setMinAvailability] = useState(filters.minAvailability);
   const [maxAvailability, setMaxAvailability] = useState(filters.maxAvailability);
   const [minObservationCount, setMinObservationCount] = useState(filters.minObservationCount);
+  const [localThreshold, setLocalThreshold] = useState(threshold ?? 30);
 
   /**
    * Handle column group checkbox toggle
@@ -46,6 +51,14 @@ export const DataAvailabilityFilterPanel = ({
   const handleMinObservationCountChange = (count: number): void => {
     setMinObservationCount(count);
     onFiltersChange({ ...filters, minObservationCount: count });
+  };
+
+  /**
+   * Handle threshold change for threshold mode
+   */
+  const handleThresholdChange = (value: number): void => {
+    setLocalThreshold(value);
+    onThresholdChange?.(value);
   };
 
   /**
@@ -82,46 +95,72 @@ export const DataAvailabilityFilterPanel = ({
     },
   ];
 
+  // Determine grid columns based on view mode
+  const gridCols = viewMode === 'threshold' ? 'md:grid-cols-3' : 'md:grid-cols-3';
+
   return (
     <Disclosure title="Filters" defaultOpen={defaultOpen}>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className={`grid grid-cols-1 gap-6 ${gridCols}`}>
         {/* Column subnet groups */}
         <div>
-          <h4 className="mb-3 text-sm font-medium text-foreground">Column Subnets</h4>
-          <CheckboxGroup legend="" srOnlyLegend options={columnGroupOptions} variant="simple" className="text-sm" />
+          <h4 className="mb-3 text-sm/6 font-medium text-foreground">Column Groups</h4>
+          <CheckboxGroup legend="" srOnlyLegend options={columnGroupOptions} variant="simple" className="text-sm/6" />
         </div>
 
-        {/* Availability threshold */}
-        <div>
-          <h4 className="mb-3 text-sm font-medium text-foreground">Availability Range</h4>
-          <div className="space-y-3">
-            <RangeInput
-              id="min-availability"
-              label="Min"
-              value={minAvailability}
-              min={0}
-              max={100}
-              step={5}
-              suffix="%"
-              onChange={value => handleAvailabilityChange(value, maxAvailability)}
-            />
-            <RangeInput
-              id="max-availability"
-              label="Max"
-              value={maxAvailability}
-              min={0}
-              max={100}
-              step={5}
-              suffix="%"
-              onChange={value => handleAvailabilityChange(minAvailability, value)}
-            />
+        {/* Threshold slider - only shown in threshold mode */}
+        {viewMode === 'threshold' && (
+          <div>
+            <h4 className="mb-3 text-sm/6 font-medium text-foreground">Observation Threshold</h4>
+            <div className="space-y-3">
+              <RangeInput
+                id="threshold"
+                label="Min observations"
+                value={localThreshold}
+                min={1}
+                max={200}
+                step={5}
+                onChange={handleThresholdChange}
+              />
+              <p className="text-xs/4 text-muted">
+                Columns with {'>='} {localThreshold} successful observations are considered available
+              </p>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Availability range - only shown in percentage mode */}
+        {viewMode === 'percentage' && (
+          <div>
+            <h4 className="mb-3 text-sm/6 font-medium text-foreground">Availability Range</h4>
+            <div className="space-y-3">
+              <RangeInput
+                id="min-availability"
+                label="Min"
+                value={minAvailability}
+                min={0}
+                max={100}
+                step={5}
+                suffix="%"
+                onChange={value => handleAvailabilityChange(value, maxAvailability)}
+              />
+              <RangeInput
+                id="max-availability"
+                label="Max"
+                value={maxAvailability}
+                min={0}
+                max={100}
+                step={5}
+                suffix="%"
+                onChange={value => handleAvailabilityChange(minAvailability, value)}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Min observation count */}
         <div>
-          <h4 className="mb-3 text-sm font-medium text-foreground">Minimum Observations</h4>
-          <Input size="sm" label="Hide cells with fewer than:" labelClassName="text-xs text-muted font-normal">
+          <h4 className="mb-3 text-sm/6 font-medium text-foreground">Minimum Observations</h4>
+          <Input size="sm" label="Hide cells with fewer than:" labelClassName="text-xs/4 text-muted font-normal">
             <Input.Field
               type="number"
               id="min-observation-count"

@@ -1,6 +1,30 @@
 import { z } from 'zod';
 
 /**
+ * View mode for data availability visualization
+ * - 'percentage': Traditional success rate (successCount / totalCount)
+ * - 'threshold': Count-based view showing if successCount meets threshold
+ */
+export type ViewMode = 'percentage' | 'threshold';
+
+/**
+ * Default observation thresholds by network
+ * Mainnet has more validators/observers, so needs higher threshold
+ */
+export const DEFAULT_THRESHOLDS: Record<string, number> = {
+  mainnet: 30,
+  default: 10,
+};
+
+/**
+ * Get default threshold for a network
+ */
+export function getDefaultThreshold(networkName: string | undefined): number {
+  if (!networkName) return DEFAULT_THRESHOLDS.default;
+  return DEFAULT_THRESHOLDS[networkName] ?? DEFAULT_THRESHOLDS.default;
+}
+
+/**
  * Zod schema for custody search parameters
  * Validates hierarchical drill-down state in URL
  */
@@ -19,6 +43,12 @@ export const custodySearchSchema = z.object({
 
   // Column index selection (0-127)
   column: z.coerce.number().min(0).max(127).optional(),
+
+  // View mode: 'percentage' (default) or 'threshold'
+  mode: z.enum(['percentage', 'threshold']).optional(),
+
+  // Custom threshold for threshold mode (overrides network default)
+  threshold: z.coerce.number().min(1).optional(),
 });
 
 /**

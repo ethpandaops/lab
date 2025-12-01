@@ -5,6 +5,7 @@ export type {
   DataAvailabilityCellData,
   DataAvailabilityRow,
   DataAvailabilityGranularity,
+  ViewMode,
   DataAvailabilityHeatmapProps,
   DataAvailabilityCellProps,
   DataAvailabilityLegendProps,
