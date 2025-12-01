@@ -4,6 +4,59 @@ import type { EChartsInstance } from 'echarts-for-react';
 import { resolveCssColorToHex } from '@/utils/color';
 import type { ChartDownloadResult, UseChartDownloadOptions } from './useChartDownload.types';
 
+/** Options for html-to-image toPng function */
+interface ToPngOptions {
+  pixelRatio?: number;
+  backgroundColor?: string;
+  cacheBust?: boolean;
+}
+
+/**
+ * Detect if running on Safari browser
+ * Safari has known issues with html-to-image due to stricter security model
+ * on foreignObject SVG tag
+ */
+function isSafari(): boolean {
+  return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+}
+
+/**
+ * Safari-compatible wrapper for html-to-image's toPng
+ * Safari sometimes produces blank images on the first attempt due to timing/rendering issues.
+ * This wrapper calls toPng multiple times on Safari to ensure a valid image is captured.
+ *
+ * @see https://github.com/bubkoo/html-to-image/issues/461
+ * @see https://github.com/bubkoo/html-to-image/issues/361
+ */
+async function toPngWithSafariFix(element: HTMLElement, options1: ToPngOptions): Promise<string> {
+  if (!isSafari()) {
+    return toPng(element, options1);
+  }
+
+  // Safari workaround: call toPng multiple times
+  // The first calls "warm up" the rendering, and the final call usually succeeds
+  const maxAttempts = 3;
+  let result = '';
+
+  for (let i = 0; i < maxAttempts; i++) {
+    result = await toPng(element, options1);
+
+    // Check if we got a valid image (not just a blank/minimal data URL)
+    // A blank PNG is typically very small (< 1KB), while real content is larger
+    if (result.length > 1000) {
+      return result;
+    }
+
+    // Small delay between attempts to allow Safari to properly render
+    if (i < maxAttempts - 1) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+
+  // Return the last result even if potentially blank
+  return result;
+}
+
 /**
  * Hook for downloading ECharts charts with custom header and optional watermark
  *
@@ -161,7 +214,8 @@ export function useChartDownload(): ChartDownloadResult {
       const bgColor = backgroundColor ?? getBackgroundColor();
 
       // Capture the HTML element as an image
-      const elementDataUrl = await toPng(element, {
+      // Uses Safari-compatible wrapper that retries on blank images
+      const elementDataUrl = await toPngWithSafariFix(element, {
         pixelRatio,
         backgroundColor: bgColor,
         cacheBust: true,
