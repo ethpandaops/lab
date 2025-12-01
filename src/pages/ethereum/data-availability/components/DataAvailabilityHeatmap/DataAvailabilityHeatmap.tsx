@@ -13,6 +13,7 @@ import type { DataAvailabilityHeatmapProps, DataAvailabilityCellData } from './D
  * - Cell rendering (DataAvailabilityCell with granularity-aware tooltips)
  * - Legend display
  * - Response time labeling
+ * - View mode support (percentage vs threshold)
  *
  * Supports hierarchical drill-down from days → hours → epochs → slots → blobs.
  */
@@ -20,6 +21,8 @@ export const DataAvailabilityHeatmap = ({
   rows,
   granularity,
   filters,
+  viewMode = 'percentage',
+  threshold = 30,
   selectedColumnIndex,
   onCellClick,
   onRowClick,
@@ -93,8 +96,20 @@ export const DataAvailabilityHeatmap = ({
       onRowClick={onRowClick}
       onClearColumnSelection={onClearColumnSelection}
       onBack={onBack}
-      renderCell={(cellData, props) => <DataAvailabilityCell data={cellData} granularity={granularity} {...props} />}
-      renderHeader={showLegend ? () => <DataAvailabilityLegend granularity={granularity} /> : undefined}
+      renderCell={(cellData, props) => (
+        <DataAvailabilityCell
+          data={cellData}
+          granularity={granularity}
+          viewMode={viewMode}
+          threshold={threshold}
+          {...props}
+        />
+      )}
+      renderHeader={
+        showLegend
+          ? () => <DataAvailabilityLegend granularity={granularity} viewMode={viewMode} threshold={threshold} />
+          : undefined
+      }
       className={className}
     />
   );
