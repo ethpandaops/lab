@@ -224,6 +224,18 @@
       transform: translateY(0);
     }
   }
+
+  /* Gentle fade-in animation for new items */
+  --animate-highlight-new: highlight-new 0.5s ease-out;
+
+  @keyframes highlight-new {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
 }
 
 /* Semantic token mappings

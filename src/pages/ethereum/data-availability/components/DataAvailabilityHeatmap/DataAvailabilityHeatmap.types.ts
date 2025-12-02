@@ -64,7 +64,7 @@ export interface RowClickHandler {
 /**
  * Cell size variants
  */
-export type CellSize = '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type CellSize = '3xs' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 /**
  * Props for the DataAvailabilityHeatmap component
@@ -90,6 +90,8 @@ export interface DataAvailabilityHeatmapProps {
   showColumnHeader?: boolean;
   /** Optional: Show legend */
   showLegend?: boolean;
+  /** Optional: Show axis titles (default: true) */
+  showAxisTitles?: boolean;
   /** Optional: Custom class name */
   className?: string;
 }
@@ -132,4 +134,6 @@ export interface DataAvailabilityLegendProps {
   threshold?: number;
   /** Optional: Custom class name */
   className?: string;
+  /** Optional: Layout orientation (default: 'vertical') */
+  orientation?: 'vertical' | 'horizontal';
 }

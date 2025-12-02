@@ -1,4 +1,4 @@
-import { type JSX, useState, useMemo, useCallback } from 'react';
+import { type JSX, useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   CheckCircleIcon,
@@ -12,6 +12,7 @@ import {
   MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 import { Link } from '@tanstack/react-router';
+import clsx from 'clsx';
 import { intCustodyProbeServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { IntCustodyProbe } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
@@ -98,21 +99,19 @@ function ResultIcon({ result }: { result?: string }): JSX.Element {
 }
 
 /**
- * Single probe event row - readable English format focused on peer details
+ * Probe event row - client logo prominent with two-line details
  */
-function ProbeEventRow({ probe, onClick }: { probe: IntCustodyProbe; onClick: () => void }): JSX.Element {
-  const isSuccess = probe.result === 'success';
-  const isFailure = probe.result === 'failure';
+function ProbeEventRow({
+  probe,
+  onClick,
+  isNew,
+}: {
+  probe: IntCustodyProbe;
+  onClick: () => void;
+  isNew?: boolean;
+}): JSX.Element {
   const slot = probe.slots?.[0];
   const columnsCount = probe.column_indices?.length ?? 0;
-
-  // Response time color coding
-  const responseTimeColor =
-    probe.response_time_ms && probe.response_time_ms < 500
-      ? 'text-green-500'
-      : probe.response_time_ms && probe.response_time_ms < 1000
-        ? 'text-yellow-500'
-        : 'text-red-500';
 
   // Peer details
   const peerClient = probe.meta_peer_implementation || 'Unknown';
@@ -123,53 +122,41 @@ function ProbeEventRow({ probe, onClick }: { probe: IntCustodyProbe; onClick: ()
     <button
       type="button"
       onClick={onClick}
-      className="group flex w-full items-center gap-1.5 rounded-xs px-2 py-1.5 text-left text-xs transition-colors hover:bg-muted/50"
+      className={clsx(
+        'group flex w-full items-start gap-2 rounded-xs px-2 py-1.5 text-left transition-all hover:bg-muted/50',
+        isNew && 'animate-highlight-new'
+      )}
     >
-      {/* Result icon */}
-      <ResultIcon result={probe.result} />
+      {/* Left: Client logo (spans both rows) */}
+      <ClientLogo client={peerClient} size={28} />
 
-      {/* Readable sentence: "Slot X (N cols) fetched from Lighthouse in Germany" */}
-      <span className="text-muted">Slot</span>
-      <span className="font-mono font-medium text-foreground">{slot !== undefined ? formatSlot(slot) : '?'}</span>
-      <span className="text-muted">
-        ({columnsCount} col{columnsCount !== 1 ? 's' : ''})
-      </span>
+      {/* Right: Two rows of details */}
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        {/* Row 1: Client name, country, result */}
+        <div className="flex w-full items-center gap-1.5 text-xs">
+          <span className="font-medium text-foreground">{peerClient}</span>
+          <span className="text-muted">·</span>
+          {peerFlag && <span>{peerFlag}</span>}
+          <span className="text-muted">{peerCountry}</span>
+          <div className="flex-1" />
+          <ResultIcon result={probe.result} />
+        </div>
 
-      {isSuccess ? (
-        <span className="text-muted">fetched from</span>
-      ) : isFailure ? (
-        <span className="text-red-400">failed from</span>
-      ) : (
-        <span className="text-yellow-500">missing from</span>
-      )}
-
-      {/* Peer info - emphasized */}
-      <div className="flex items-center gap-1">
-        <ClientLogo client={peerClient} size={16} />
-        <span className="font-medium text-foreground">{peerClient}</span>
+        {/* Row 2: Slot, columns, time */}
+        <div className="flex w-full items-center gap-1.5 text-[10px] text-muted">
+          <span>Slot</span>
+          <span className="font-mono">{slot !== undefined ? formatSlot(slot) : '?'}</span>
+          <span>·</span>
+          <span>{columnsCount} cols</span>
+          <div className="flex-1" />
+          <Timestamp
+            timestamp={probe.probe_date_time ?? 0}
+            format="relative"
+            className="!p-0 text-[10px] !text-muted"
+            disableModal
+          />
+        </div>
       </div>
-
-      <span className="text-muted">in</span>
-      <span className="flex items-center gap-1">
-        {peerFlag && <span>{peerFlag}</span>}
-        <span className="text-foreground">{peerCountry}</span>
-      </span>
-
-      {/* Spacer */}
-      <div className="flex-1" />
-
-      {/* Response time */}
-      {isSuccess && probe.response_time_ms !== undefined && (
-        <span className={`font-mono text-[10px] ${responseTimeColor}`}>{probe.response_time_ms}ms</span>
-      )}
-
-      {/* Timestamp */}
-      <Timestamp
-        timestamp={probe.probe_date_time ?? 0}
-        format="relative"
-        className="!p-0 text-[10px] !text-muted group-hover:!text-foreground"
-        disableModal
-      />
     </button>
   );
 }
@@ -203,17 +190,26 @@ function CopyableBadge({ value, label }: { value: string | number; label?: strin
   );
 }
 
+/** Generate a unique key for a probe */
+function getProbeKey(probe: IntCustodyProbe): string {
+  return `${probe.probe_date_time}-${probe.peer_id_unique_key}-${probe.slots?.join(',')}-${probe.column_indices?.join(',')}`;
+}
+
 /**
  * Live probe events component showing recent probes relevant to the current view
  */
 export function LiveProbeEvents({
   context,
-  maxEvents = 5,
-  pollInterval = 30000,
+  maxEvents = 30,
+  pollInterval = 60000,
   probesLinkParams,
 }: LiveProbeEventsProps): JSX.Element | null {
   const { currentNetwork } = useNetwork();
   const [selectedProbe, setSelectedProbe] = useState<IntCustodyProbe | null>(null);
+
+  // Track known probe keys to detect new items
+  const knownProbeKeysRef = useRef<Set<string>>(new Set());
+  const [newProbeKeys, setNewProbeKeys] = useState<Set<string>>(new Set());
 
   // Build query parameters based on context
   const queryParams = useMemo(() => buildQueryParams(context), [context]);
@@ -233,6 +229,34 @@ export function LiveProbeEvents({
   });
 
   const probes = data?.int_custody_probe ?? [];
+
+  // Detect new probes and update tracking
+  useEffect(() => {
+    if (!isFetched || probes.length === 0) return;
+
+    const currentKeys = new Set(probes.map(getProbeKey));
+    const newKeys = new Set<string>();
+
+    // Find keys that weren't in our known set
+    currentKeys.forEach(key => {
+      if (!knownProbeKeysRef.current.has(key)) {
+        newKeys.add(key);
+      }
+    });
+
+    // Only trigger animation if we had previous data (not initial load)
+    if (knownProbeKeysRef.current.size > 0 && newKeys.size > 0) {
+      setNewProbeKeys(newKeys);
+      // Clear the "new" state after animation completes
+      const timer = setTimeout(() => setNewProbeKeys(new Set()), 1000);
+      // Update known keys
+      knownProbeKeysRef.current = currentKeys;
+      return () => clearTimeout(timer);
+    }
+
+    // Update known keys
+    knownProbeKeysRef.current = currentKeys;
+  }, [probes, isFetched]);
 
   // Handle probe click
   const handleProbeClick = useCallback((probe: IntCustodyProbe) => {
@@ -266,9 +290,9 @@ export function LiveProbeEvents({
 
   return (
     <>
-      <div className="rounded-xs border border-border/50 bg-surface/50">
+      <div className="flex max-h-[32rem] flex-col rounded-xs border border-border/50 bg-surface/50">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border/50 px-3 py-2">
+        <div className="flex shrink-0 items-center justify-between border-b border-border/50 px-3 py-2">
           <div className="flex items-center gap-2">
             <SignalIcon className="size-4 text-accent" />
             <span className="text-xs font-medium text-foreground">Live Probes</span>
@@ -277,7 +301,7 @@ export function LiveProbeEvents({
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 text-[10px] text-muted">
               <span className="size-1.5 animate-pulse rounded-full bg-green-500" />
-              <span>every 30s</span>
+              <span>every 60s</span>
             </div>
             {probesLinkParams && (
               <Link
@@ -292,16 +316,18 @@ export function LiveProbeEvents({
           </div>
         </div>
 
-        {/* Events list */}
-        <div className="divide-y divide-border/30">
+        {/* Events list - scrollable */}
+        <div className="min-h-0 flex-1 overflow-y-auto">
           {isLoading && !isFetched ? (
             // Loading skeleton - only on initial load, not refetches
             <div className="space-y-1 p-2">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-2 px-2 py-1.5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-2 px-2 py-1">
                   <div className="size-4 animate-pulse rounded-full bg-muted/50" />
-                  <div className="h-3 flex-1 animate-pulse rounded-xs bg-muted/50" />
-                  <div className="h-3 w-12 animate-pulse rounded-xs bg-muted/50" />
+                  <div className="h-3 w-16 animate-pulse rounded-xs bg-muted/50" />
+                  <div className="h-3 w-8 animate-pulse rounded-xs bg-muted/50" />
+                  <div className="flex-1" />
+                  <div className="h-3 w-10 animate-pulse rounded-xs bg-muted/50" />
                 </div>
               ))}
             </div>
@@ -311,13 +337,17 @@ export function LiveProbeEvents({
           ) : (
             // Event rows
             <div className="p-1">
-              {probes.map((probe, index) => (
-                <ProbeEventRow
-                  key={`${probe.probe_date_time}-${probe.peer_id_unique_key}-${index}`}
-                  probe={probe}
-                  onClick={() => handleProbeClick(probe)}
-                />
-              ))}
+              {probes.map(probe => {
+                const key = getProbeKey(probe);
+                return (
+                  <ProbeEventRow
+                    key={key}
+                    probe={probe}
+                    onClick={() => handleProbeClick(probe)}
+                    isNew={newProbeKeys.has(key)}
+                  />
+                );
+              })}
             </div>
           )}
         </div>

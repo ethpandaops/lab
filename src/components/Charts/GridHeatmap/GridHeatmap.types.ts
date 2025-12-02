@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 /**
  * Cell size variants for the grid
  */
-export type GridCellSize = '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type GridCellSize = '3xs' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 /**
  * Generic cell data structure - columnIndex + arbitrary data payload
@@ -63,6 +63,10 @@ export interface GridHeatmapProps<T = unknown> {
   renderHeader?: () => ReactNode;
   /** Optional: Render function for column labels */
   renderColumnLabel?: (columnIndex: number, isHovered: boolean, isSelected: boolean) => ReactNode;
+  /** Optional: X-axis title (displayed below column indices) */
+  xAxisTitle?: string;
+  /** Optional: Y-axis title (displayed vertically on the left) */
+  yAxisTitle?: string;
   /** Optional: Custom class name */
   className?: string;
 }

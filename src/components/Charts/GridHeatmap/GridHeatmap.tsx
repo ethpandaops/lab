@@ -33,6 +33,8 @@ export function GridHeatmap<T = unknown>({
   renderCell,
   renderHeader,
   renderColumnLabel,
+  xAxisTitle,
+  yAxisTitle,
   className,
 }: GridHeatmapProps<T>): React.JSX.Element {
   // Track hover states for preview
@@ -48,8 +50,9 @@ export function GridHeatmap<T = unknown>({
     [rows]
   );
 
-  // Get size-specific classes - using fixed widths for alignment
+  // Cell sizing - 3xs uses flexible sizing to fill container, others use fixed sizes
   const cellSizeClass: Record<GridCellSize, string> = {
+    '3xs': 'aspect-square', // Responsive - height matches width, actual width set by grid
     '2xs': 'size-[9px]', // 9px - compact
     xs: 'size-2.5', // 10px
     sm: 'size-3', // 12px
@@ -59,15 +62,17 @@ export function GridHeatmap<T = unknown>({
   };
 
   const labelWidth: Record<GridCellSize, string> = {
-    '2xs': 'w-24', // 96px - room for "Epoch 12345" labels
-    xs: 'w-24', // 96px
-    sm: 'w-28',
-    md: 'w-32',
-    lg: 'w-36',
-    xl: 'w-40',
+    '3xs': 'w-20', // 80px - compact
+    '2xs': 'w-20', // 80px
+    xs: 'w-20',
+    sm: 'w-24',
+    md: 'w-28',
+    lg: 'w-32',
+    xl: 'w-36',
   };
 
   const textSize: Record<GridCellSize, string> = {
+    '3xs': 'text-[10px]/3', // 10px - compact
     '2xs': 'text-xs/4', // 12px - readable
     xs: 'text-xs/4',
     sm: 'text-sm/5',
@@ -75,6 +80,31 @@ export function GridHeatmap<T = unknown>({
     lg: 'text-base/7',
     xl: 'text-base/8',
   };
+
+  // Gap between cells for visual separation
+  const cellGap: Record<GridCellSize, string> = {
+    '3xs': 'gap-px', // 1px gap for heatmap look
+    '2xs': 'gap-px', // 1px
+    xs: 'gap-px',
+    sm: 'gap-px',
+    md: 'gap-0.5',
+    lg: 'gap-0.5',
+    xl: 'gap-1',
+  };
+
+  // Container style for cells - 3xs uses CSS grid to fill available space
+  const cellContainerClass: Record<GridCellSize, string> = {
+    '3xs': 'grid flex-1', // CSS grid, fills remaining space
+    '2xs': 'flex',
+    xs: 'flex',
+    sm: 'flex',
+    md: 'flex',
+    lg: 'flex',
+    xl: 'flex',
+  };
+
+  // For 3xs, calculate grid columns based on actual column count
+  const gridStyle = cellSize === '3xs' ? { gridTemplateColumns: `repeat(${columnIndices.length}, 1fr)` } : undefined;
 
   // Default column label renderer
   const defaultRenderColumnLabel = (colIndex: number, isHovered: boolean): React.JSX.Element => {
@@ -104,73 +134,100 @@ export function GridHeatmap<T = unknown>({
       {/* Header content (legend, filters, etc.) */}
       {renderHeader?.()}
 
-      {/* Grid */}
-      <div>
-        {/* Rows */}
-        <div className="flex flex-col gap-0.5">
-          {rows.map(row => (
-            <div key={row.identifier} className="flex items-center">
-              {/* Row label - fixed width for alignment */}
-              <button
-                type="button"
-                onClick={() => onRowClick?.(row.identifier)}
-                onMouseEnter={() => setHoveredRow(row.identifier)}
-                onMouseLeave={() => setHoveredRow(null)}
-                className={clsx(
-                  labelWidth[cellSize],
-                  textSize[cellSize],
-                  'shrink-0 truncate pr-2 text-right text-muted transition-colors',
-                  onRowClick ? 'cursor-pointer hover:text-accent' : 'cursor-default',
-                  hoveredRow === row.identifier && 'font-bold text-accent'
-                )}
-                title={row.label}
-              >
-                {row.label}
-              </button>
+      {/* Grid with optional Y-axis title */}
+      <div className="flex">
+        {/* Y-axis title - vertical text on the left */}
+        {yAxisTitle && (
+          <div className="flex shrink-0 items-center justify-center pr-1">
+            <span
+              className="text-[10px] font-medium tracking-wider text-muted uppercase"
+              style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+            >
+              {yAxisTitle}
+            </span>
+          </div>
+        )}
 
-              {/* Cells with small gap for visual separation */}
-              <div className="flex gap-px">
-                {row.cells.map(cell => {
-                  const isHighlighted = hoveredColumn === cell.columnIndex || hoveredRow === row.identifier;
+        {/* Main grid area */}
+        <div className="flex-1">
+          {/* Rows */}
+          <div className="flex flex-col gap-0.5">
+            {rows.map(row => (
+              <div key={row.identifier} className="flex items-center">
+                {/* Row label - fixed width for alignment */}
+                <button
+                  type="button"
+                  onClick={() => onRowClick?.(row.identifier)}
+                  onMouseEnter={() => setHoveredRow(row.identifier)}
+                  onMouseLeave={() => setHoveredRow(null)}
+                  className={clsx(
+                    labelWidth[cellSize],
+                    textSize[cellSize],
+                    'shrink-0 truncate pr-2 text-right text-muted transition-colors',
+                    onRowClick ? 'cursor-pointer hover:text-accent' : 'cursor-default',
+                    hoveredRow === row.identifier && 'font-bold text-accent'
+                  )}
+                  title={row.label}
+                >
+                  {row.label}
+                </button>
+
+                {/* Cells with size-appropriate gap for visual separation */}
+                <div className={clsx(cellContainerClass[cellSize], cellGap[cellSize])} style={gridStyle}>
+                  {row.cells.map(cell => {
+                    const isHighlighted = hoveredColumn === cell.columnIndex || hoveredRow === row.identifier;
+
+                    return (
+                      <div key={`${row.identifier}-${cell.columnIndex}`}>
+                        {renderCell(cell.data, {
+                          isSelected: false,
+                          isHighlighted,
+                          isDimmed: false,
+                          size: cellSize,
+                        })}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Column header at bottom */}
+          {showColumnHeader && (
+            <div className="mt-1 flex items-center">
+              {/* Spacer for row labels */}
+              <div className={clsx(labelWidth[cellSize], 'shrink-0')} />
+
+              {/* Column indices - matching cell gap */}
+              <div className={clsx(cellContainerClass[cellSize], cellGap[cellSize])} style={gridStyle}>
+                {columnIndices.map(colIndex => {
+                  const isHovered = hoveredColumn === colIndex;
 
                   return (
-                    <div key={`${row.identifier}-${cell.columnIndex}`}>
-                      {renderCell(cell.data, {
-                        isSelected: false,
-                        isHighlighted,
-                        isDimmed: false,
-                        size: cellSize,
-                      })}
+                    <div key={colIndex}>
+                      {renderColumnLabel
+                        ? renderColumnLabel(colIndex, isHovered, false)
+                        : defaultRenderColumnLabel(colIndex, isHovered)}
                     </div>
                   );
                 })}
               </div>
             </div>
-          ))}
-        </div>
+          )}
 
-        {/* Column header at bottom */}
-        {showColumnHeader && (
-          <div className="mt-1 flex items-center">
-            {/* Spacer for row labels */}
-            <div className={clsx(labelWidth[cellSize], 'shrink-0')} />
-
-            {/* Column indices - matching cell gap */}
-            <div className="flex gap-px">
-              {columnIndices.map(colIndex => {
-                const isHovered = hoveredColumn === colIndex;
-
-                return (
-                  <div key={colIndex}>
-                    {renderColumnLabel
-                      ? renderColumnLabel(colIndex, isHovered, false)
-                      : defaultRenderColumnLabel(colIndex, isHovered)}
-                  </div>
-                );
-              })}
+          {/* X-axis title - below column indices */}
+          {xAxisTitle && (
+            <div className="mt-2 flex items-center">
+              {/* Spacer for row labels + y-axis title */}
+              <div className={clsx(labelWidth[cellSize], 'shrink-0')} />
+              {/* Title centered over columns */}
+              <div className="flex-1 text-center text-[10px] font-medium tracking-wider text-muted uppercase">
+                {xAxisTitle}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Back button */}

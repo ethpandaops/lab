@@ -47,7 +47,7 @@ describe('transformDailyToRows', () => {
 
     expect(result).toHaveLength(2); // 2 unique dates
     expect(result[0].identifier).toBe('2024-01-15'); // Sorted descending
-    expect(result[0].label).toBe('Jan 15');
+    expect(result[0].label).toBe('January 15');
     expect(result[0].cells).toHaveLength(128); // All 128 columns
     expect(result[0].cells[0].availability).toBe(0.955);
     expect(result[0].cells[0].successCount).toBe(100);

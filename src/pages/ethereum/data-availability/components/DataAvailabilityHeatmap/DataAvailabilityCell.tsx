@@ -50,6 +50,7 @@ const getThresholdColor = (successCount: number, threshold: number, hasData: boo
  */
 const getSizeClass = (size: CellSize): string => {
   const sizes: Record<CellSize, string> = {
+    '3xs': 'aspect-square w-full', // Responsive - fills grid cell
     '2xs': 'size-[9px]', // 9px - compact
     xs: 'size-2.5', // 10px
     sm: 'size-3', // 12px

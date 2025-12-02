@@ -90,7 +90,7 @@ export function transformDailyToRows(
         identifier: date,
         label: new Date(date).toLocaleDateString(
           'en-US',
-          timezone === 'UTC' ? { month: 'short', day: 'numeric', timeZone: 'UTC' } : { month: 'short', day: 'numeric' }
+          timezone === 'UTC' ? { month: 'long', day: 'numeric', timeZone: 'UTC' } : { month: 'long', day: 'numeric' }
         ),
         cells: ensureAllColumns(cells, date),
       };
@@ -122,20 +122,16 @@ export function transformHourlyToRows(
   return Array.from(byHour.entries())
     .sort((a, b) => a[0] - b[0])
     .map(([hourStart, items]) => {
-      const hourLabel = new Date(hourStart * 1000).toLocaleTimeString(
+      const date = new Date(hourStart * 1000);
+      const dateLabel = date.toLocaleDateString(
+        'en-US',
+        timezone === 'UTC' ? { month: 'short', day: 'numeric', timeZone: 'UTC' } : { month: 'short', day: 'numeric' }
+      );
+      const timeLabel = date.toLocaleTimeString(
         'en-US',
         timezone === 'UTC'
-          ? {
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false,
-              timeZone: 'UTC',
-            }
-          : {
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false,
-            }
+          ? { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }
+          : { hour: '2-digit', minute: '2-digit', hour12: false }
       );
       const identifier = String(hourStart);
       const cells = items
@@ -151,7 +147,7 @@ export function transformHourlyToRows(
 
       return {
         identifier,
-        label: hourLabel,
+        label: `${dateLabel} ${timeLabel}`,
         cells: ensureAllColumns(cells, identifier),
       };
     });

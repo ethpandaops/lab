@@ -61,16 +61,13 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
       {/* CONNECTION (Center) */}
       <div className="flex flex-1 flex-col items-center justify-center gap-4">
         {/* Request Flow (Top) */}
-        <div className="text-muted-foreground/50 flex w-full items-center gap-3">
-          <div className="h-px flex-1 bg-border/50" />
-          <div className="text-muted-foreground flex items-center gap-2 text-xs">
-            <span className="text-[10px] font-medium tracking-wider uppercase">Request</span>
-            <ArrowLongRightIcon className="size-4" />
-            <span className="font-mono font-medium text-foreground">
-              {slotsCount}×{columnsCount}
-            </span>
-          </div>
-          <div className="h-px flex-1 bg-border/50" />
+        <div className="flex w-full flex-col items-center gap-0.5">
+          <span className="font-mono text-xs font-medium text-foreground">
+            {slotsCount} {slotsCount === 1 ? 'Slot' : 'Slots'} × {columnsCount}{' '}
+            {columnsCount === 1 ? 'Column' : 'Columns'}
+          </span>
+          <ArrowLongRightIcon className="size-5 text-muted" />
+          <span className="text-[10px] font-medium tracking-wider text-muted uppercase">Request</span>
         </div>
 
         {/* Central Status Node */}
@@ -94,14 +91,10 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
         </div>
 
         {/* Response Flow (Bottom) */}
-        <div className="text-muted-foreground/50 flex w-full items-center gap-3">
-          <div className="h-px flex-1 bg-border/50" />
-          <div className="text-muted-foreground flex items-center gap-2 text-xs">
-            <span className="text-[10px] font-medium tracking-wider uppercase">Payload</span>
-            <ArrowLongLeftIcon className="size-4" />
-            <span className="font-mono font-medium text-foreground">{sizeDisplay}</span>
-          </div>
-          <div className="h-px flex-1 bg-border/50" />
+        <div className="flex w-full flex-col items-center gap-0.5">
+          <span className="text-[10px] font-medium tracking-wider text-muted uppercase">Response</span>
+          <ArrowLongLeftIcon className="size-5 text-muted" />
+          <span className="font-mono text-xs font-medium text-foreground">{sizeDisplay}</span>
         </div>
       </div>
 

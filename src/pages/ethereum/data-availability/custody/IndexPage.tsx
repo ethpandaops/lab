@@ -7,6 +7,8 @@ import { DataAvailabilityLegend } from '@/pages/ethereum/data-availability/compo
 import { DataAvailabilitySkeleton } from '@/pages/ethereum/data-availability/components/DataAvailabilitySkeleton';
 import { ViewModeToggle } from '@/pages/ethereum/data-availability/components/ViewModeToggle';
 import { TimezoneToggle } from '@/components/Elements/TimezoneToggle';
+import { GitHubIcon } from '@/components/Elements/Icons';
+import { InfoBox } from '@/components/Feedback/InfoBox';
 import { LiveProbeEvents } from './components/LiveProbeEvents';
 import type { ProbeFilterContext } from './components/LiveProbeEvents';
 import type {
@@ -185,8 +187,8 @@ export function IndexPage(): JSX.Element {
     });
   }, [hasPerformedInitialNav, search, forkViewLoading, forkBasedParams, navigate]);
 
-  // View mode from URL (default to 'threshold' since it's more robust)
-  const viewMode: ViewMode = search.mode ?? 'threshold';
+  // View mode from URL (default to 'percentage')
+  const viewMode: ViewMode = search.mode ?? 'percentage';
 
   // Threshold from URL or network default
   const defaultThreshold = getDefaultThreshold(currentNetwork?.name);
@@ -485,14 +487,21 @@ export function IndexPage(): JSX.Element {
 
   /**
    * Build breadcrumb path - shows full drill-down hierarchy
+   * Preserves mode and threshold settings across navigation
    */
   const breadcrumbs = useMemo(() => {
+    // Settings to preserve across navigation
+    const preservedSettings = {
+      ...(search.mode && { mode: search.mode }),
+      ...(search.threshold && { threshold: search.threshold }),
+    };
+
     const crumbs: Array<{ label: string; onClick: () => void }> = [
       {
         label: `Window (${WINDOW_DAYS} days)`,
         onClick: () => {
           navigate({
-            search: {},
+            search: { ...preservedSettings },
             replace: true,
           });
         },
@@ -512,7 +521,7 @@ export function IndexPage(): JSX.Element {
         label: `Day: ${new Date(currentLevel.date).toLocaleDateString('en-US', timezone === 'UTC' ? { timeZone: 'UTC' } : {})}`,
         onClick: () =>
           navigate({
-            search: { date: currentLevel.date },
+            search: { ...preservedSettings, date: currentLevel.date },
             replace: true,
           }),
       });
@@ -524,7 +533,7 @@ export function IndexPage(): JSX.Element {
         label: `Hour: ${new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString('en-US', timezone === 'UTC' ? { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' } : { hour: '2-digit', minute: '2-digit', hour12: false })}`,
         onClick: () =>
           navigate({
-            search: { date: currentLevel.date, hour: currentLevel.hourStartDateTime },
+            search: { ...preservedSettings, date: currentLevel.date, hour: currentLevel.hourStartDateTime },
             replace: true,
           }),
       });
@@ -537,6 +546,7 @@ export function IndexPage(): JSX.Element {
         onClick: () =>
           navigate({
             search: {
+              ...preservedSettings,
               date: currentLevel.date,
               hour: currentLevel.hourStartDateTime,
               epoch: currentLevel.epoch,
@@ -553,6 +563,7 @@ export function IndexPage(): JSX.Element {
         onClick: () =>
           navigate({
             search: {
+              ...preservedSettings,
               date: currentLevel.date,
               hour: currentLevel.hourStartDateTime,
               epoch: currentLevel.epoch,
@@ -564,7 +575,7 @@ export function IndexPage(): JSX.Element {
     }
 
     return crumbs;
-  }, [currentLevel, navigate, timezone]);
+  }, [currentLevel, navigate, timezone, search.mode, search.threshold]);
 
   // Calculate time range for View Probes link (must be before early returns)
   const probesLinkParams = useMemo(() => {
@@ -631,91 +642,98 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      {/* Top panel: Heatmap controls + Live Probes (50/50 on desktop) */}
-      <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {/* Left: Unified heatmap control panel */}
-        <div className="rounded-xs border border-border/50 bg-surface/50 p-3">
-          {/* Description */}
-          <p className="mb-2.5 text-xs text-muted">
-            <span className="font-medium text-foreground">Live custody monitoring for PeerDAS.</span> Verifies peers are
-            storing claimed data columns. Powered by{' '}
-            <a
-              href="https://github.com/ethpandaops/dasmon"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-accent hover:underline"
-            >
-              dasmon
-            </a>
-            .
-          </p>
+      {/* Page Header */}
+      <InfoBox className="mb-6">
+        <p>
+          <span className="font-medium text-foreground">
+            PeerDAS transforms Ethereum&apos;s data availability layer.
+          </span>{' '}
+          Instead of every node storing every blob, data is erasure coded with 2x redundancy and split into 128 columns.
+          Each node commits to storing a subset based on its identity and validator balance. 64 distinct columns are
+          required to reconstruct the full blob matrix, enabling dramatic scalability improvements.
+        </p>
+        <p>
+          This dashboard answers a critical question:{' '}
+          <span className="italic">are peers actually storing the data they claim?</span>
+        </p>
+        <p>
+          To answer this question we continuously sample other nodes in the network, validate their responses against
+          KZG commitments, and piece this all together tobuild a real-time picture of custody compliance.
+        </p>
+      </InfoBox>
 
-          {/* Divider */}
-          <div className="mb-2.5 border-t border-border/30" />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
+        {/* Main Content: Heatmap (3/4 width) */}
+        <div className="lg:col-span-3">
+          <div className="bg-card text-card-foreground overflow-hidden rounded-lg border border-border shadow-sm">
+            {/* Toolbar */}
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border p-4">
+              {/* Breadcrumbs */}
+              <nav className="flex items-center gap-2 text-sm">
+                {breadcrumbs.map((crumb, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    {index > 0 && <span className="text-muted-foreground">/</span>}
+                    <button
+                      type="button"
+                      onClick={crumb.onClick}
+                      className={
+                        index === breadcrumbs.length - 1
+                          ? 'font-semibold text-foreground'
+                          : 'text-muted-foreground transition-colors hover:text-foreground'
+                      }
+                    >
+                      {crumb.label}
+                    </button>
+                  </div>
+                ))}
+              </nav>
 
-          {/* Header row: Breadcrumbs + Controls */}
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            {/* Breadcrumbs */}
-            <nav className="flex items-center gap-1.5 text-sm/5">
-              {breadcrumbs.map((crumb, index) => (
-                <div key={index} className="flex items-center gap-1.5">
-                  {index > 0 && <span className="text-muted">/</span>}
-                  <button
-                    type="button"
-                    onClick={crumb.onClick}
-                    className={
-                      index === breadcrumbs.length - 1
-                        ? 'font-medium text-foreground'
-                        : 'text-accent transition-colors hover:text-accent/80'
-                    }
-                  >
-                    {crumb.label}
-                  </button>
-                </div>
-              ))}
-            </nav>
+              {/* Controls */}
+              <div className="flex items-center gap-2">
+                <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
+                <TimezoneToggle size="compact" />
+              </div>
+            </div>
 
-            {/* Controls */}
-            <div className="flex items-center gap-2">
-              <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
-              <TimezoneToggle size="compact" />
+            {/* Legend Strip */}
+            <div className="border-b border-border bg-muted/30 px-4 py-2">
+              <DataAvailabilityLegend
+                granularity={granularity}
+                viewMode={viewMode}
+                threshold={threshold}
+                orientation="horizontal"
+              />
+            </div>
+
+            {/* Heatmap Area */}
+            <div className="p-4">
+              {isLoading || (forkViewLoading && !hasPerformedInitialNav && currentLevel.type === 'window') ? (
+                <DataAvailabilitySkeleton />
+              ) : (
+                <DataAvailabilityHeatmap
+                  rows={rows}
+                  granularity={granularity}
+                  filters={filters}
+                  viewMode={viewMode}
+                  threshold={threshold}
+                  onRowClick={currentLevel.type !== 'slot' ? handleRowClick : undefined}
+                  onBack={breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2].onClick : undefined}
+                  cellSize="3xs"
+                  showColumnHeader
+                  showLegend={false}
+                />
+              )}
             </div>
           </div>
-
-          {/* Divider */}
-          <div className="my-2.5 border-t border-border/30" />
-
-          {/* Legend - inline */}
-          <DataAvailabilityLegend granularity={granularity} viewMode={viewMode} threshold={threshold} />
         </div>
 
-        {/* Right: Live Probe Events */}
-        <LiveProbeEvents
-          context={probeFilterContext}
-          maxEvents={5}
-          pollInterval={30000}
-          probesLinkParams={probesLinkParams}
-        />
+        {/* Sidebar: Live Probes (1/4 width) */}
+        <div className="lg:col-span-1">
+          <div className="sticky top-4 space-y-4">
+            <LiveProbeEvents context={probeFilterContext} probesLinkParams={probesLinkParams} />
+          </div>
+        </div>
       </div>
-
-      {/* Loading state - show while determining initial view OR while loading data */}
-      {isLoading || (forkViewLoading && !hasPerformedInitialNav && currentLevel.type === 'window') ? (
-        <DataAvailabilitySkeleton />
-      ) : (
-        /* Heatmap view */
-        <DataAvailabilityHeatmap
-          rows={rows}
-          granularity={granularity}
-          filters={filters}
-          viewMode={viewMode}
-          threshold={threshold}
-          onRowClick={currentLevel.type !== 'slot' ? handleRowClick : undefined}
-          onBack={breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2].onClick : undefined}
-          cellSize="2xs"
-          showColumnHeader
-          showLegend={false}
-        />
-      )}
     </Container>
   );
 }

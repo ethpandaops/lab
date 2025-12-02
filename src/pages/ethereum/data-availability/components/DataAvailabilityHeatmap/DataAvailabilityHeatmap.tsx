@@ -17,6 +17,24 @@ import type { DataAvailabilityHeatmapProps, DataAvailabilityCellData } from './D
  *
  * Supports hierarchical drill-down from days → hours → epochs → slots → blobs.
  */
+/**
+ * Get Y-axis title based on granularity level
+ */
+const getYAxisTitle = (granularity: DataAvailabilityHeatmapProps['granularity']): string => {
+  switch (granularity) {
+    case 'window':
+      return 'Day';
+    case 'day':
+      return 'Hour';
+    case 'hour':
+      return 'Epoch';
+    case 'epoch':
+      return 'Slot';
+    case 'slot':
+      return 'Blob';
+  }
+};
+
 export const DataAvailabilityHeatmap = ({
   rows,
   granularity,
@@ -28,6 +46,7 @@ export const DataAvailabilityHeatmap = ({
   cellSize = '2xs',
   showColumnHeader = true,
   showLegend = true,
+  showAxisTitles = true,
   className,
 }: DataAvailabilityHeatmapProps): React.JSX.Element => {
   /**
@@ -90,6 +109,8 @@ export const DataAvailabilityHeatmap = ({
       showColumnHeader={showColumnHeader}
       onRowClick={onRowClick}
       onBack={onBack}
+      xAxisTitle={showAxisTitles ? 'Data Column' : undefined}
+      yAxisTitle={showAxisTitles ? getYAxisTitle(granularity) : undefined}
       renderCell={(cellData, props) => (
         <DataAvailabilityCell
           data={cellData}
