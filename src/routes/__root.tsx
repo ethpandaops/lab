@@ -35,10 +35,11 @@ interface MyRouterContext {
   };
 }
 
-// Define search params schema for network selection and embed mode
+// Define search params schema for network selection, embed mode, and theme override
 const rootSearchSchema = z.object({
   network: z.string().optional(),
   embed: z.boolean().optional(),
+  theme: z.enum(['light', 'dark', 'star']).optional(),
 });
 
 export type RootSearch = z.infer<typeof rootSearchSchema>;
@@ -121,7 +122,7 @@ function RootComponent(): JSX.Element {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAppleWatch, setIsAppleWatch] = useState(false);
   const router = useRouter();
-  const { embed } = useSearch({ from: '__root__' });
+  const { embed, theme: themeOverride } = useSearch({ from: '__root__' });
 
   // Detect Apple Watch using multiple heuristics
   // Apple Watch reports as iPhone but has distinctive screen dimensions
@@ -176,7 +177,7 @@ function RootComponent(): JSX.Element {
   if (isAppleWatch) {
     return (
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
+        <ThemeProvider themeOverride={themeOverride}>
           <div className="flex min-h-dvh items-center justify-center bg-background p-4">
             <span
               className="text-center"
@@ -196,14 +197,23 @@ function RootComponent(): JSX.Element {
   if (embed) {
     return (
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
+        <ThemeProvider themeOverride={themeOverride}>
           <NotificationProvider>
             <TimezoneProvider>
               <ConfigGate>
                 <NetworkProvider>
                   <SharedCrosshairsProvider>
                     <HeadContent />
-                    <main className="min-h-dvh bg-background">
+                    <main className="relative min-h-dvh bg-background">
+                      {/* ethPandaOps logo watermark */}
+                      <a
+                        href="https://lab.ethpandaops.io"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute top-4 right-4 z-50 opacity-60 transition-opacity hover:opacity-100"
+                      >
+                        <img src="/images/ethpandaops-logo-64.png" alt="ethPandaOps" className="h-8 w-auto" />
+                      </a>
                       <FeatureGate>
                         <Outlet />
                       </FeatureGate>
@@ -220,7 +230,7 @@ function RootComponent(): JSX.Element {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
+      <ThemeProvider themeOverride={themeOverride}>
         <NotificationProvider>
           <TimezoneProvider>
             <ConfigGate>
