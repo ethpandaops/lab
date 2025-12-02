@@ -40,6 +40,8 @@ import { Route as EthereumSlotsSlotRouteImport } from './routes/ethereum/slots/$
 import { Route as EthereumEpochsEpochRouteImport } from './routes/ethereum/epochs/$epoch'
 import { Route as EthereumEntitiesEntityRouteImport } from './routes/ethereum/entities/$entity'
 import { Route as EthereumDataAvailabilityCustodyRouteImport } from './routes/ethereum/data-availability/custody'
+import { Route as BeaconSlotLiveRouteImport } from './routes/beacon/slot/live'
+import { Route as BeaconBlockProductionLiveRouteImport } from './routes/beacon/block-production/live'
 import { Route as EthereumDataAvailabilityCustodyIndexRouteImport } from './routes/ethereum/data-availability/custody/index'
 
 const XatuRoute = XatuRouteImport.update({
@@ -203,6 +205,17 @@ const EthereumDataAvailabilityCustodyRoute =
     path: '/custody',
     getParentRoute: () => EthereumDataAvailabilityRoute,
   } as any)
+const BeaconSlotLiveRoute = BeaconSlotLiveRouteImport.update({
+  id: '/beacon/slot/live',
+  path: '/beacon/slot/live',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BeaconBlockProductionLiveRoute =
+  BeaconBlockProductionLiveRouteImport.update({
+    id: '/beacon/block-production/live',
+    path: '/beacon/block-production/live',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const EthereumDataAvailabilityCustodyIndexRoute =
   EthereumDataAvailabilityCustodyIndexRouteImport.update({
     id: '/',
@@ -232,6 +245,8 @@ export interface FileRoutesByFullPath {
   '/xatu/locally-built-blocks': typeof XatuLocallyBuiltBlocksRoute
   '/experiments/': typeof ExperimentsIndexRoute
   '/xatu-data': typeof XatuDataIndexRoute
+  '/beacon/block-production/live': typeof BeaconBlockProductionLiveRoute
+  '/beacon/slot/live': typeof BeaconSlotLiveRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyRouteWithChildren
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
@@ -260,6 +275,8 @@ export interface FileRoutesByTo {
   '/xatu/locally-built-blocks': typeof XatuLocallyBuiltBlocksRoute
   '/experiments': typeof ExperimentsIndexRoute
   '/xatu-data': typeof XatuDataIndexRoute
+  '/beacon/block-production/live': typeof BeaconBlockProductionLiveRoute
+  '/beacon/slot/live': typeof BeaconSlotLiveRoute
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
@@ -294,6 +311,8 @@ export interface FileRoutesById {
   '/xatu/locally-built-blocks': typeof XatuLocallyBuiltBlocksRoute
   '/experiments/': typeof ExperimentsIndexRoute
   '/xatu-data/': typeof XatuDataIndexRoute
+  '/beacon/block-production/live': typeof BeaconBlockProductionLiveRoute
+  '/beacon/slot/live': typeof BeaconSlotLiveRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyRouteWithChildren
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
@@ -330,6 +349,8 @@ export interface FileRouteTypes {
     | '/xatu/locally-built-blocks'
     | '/experiments/'
     | '/xatu-data'
+    | '/beacon/block-production/live'
+    | '/beacon/slot/live'
     | '/ethereum/data-availability/custody'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
@@ -358,6 +379,8 @@ export interface FileRouteTypes {
     | '/xatu/locally-built-blocks'
     | '/experiments'
     | '/xatu-data'
+    | '/beacon/block-production/live'
+    | '/beacon/slot/live'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
     | '/ethereum/slots/$slot'
@@ -391,6 +414,8 @@ export interface FileRouteTypes {
     | '/xatu/locally-built-blocks'
     | '/experiments/'
     | '/xatu-data/'
+    | '/beacon/block-production/live'
+    | '/beacon/slot/live'
     | '/ethereum/data-availability/custody'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
@@ -413,6 +438,8 @@ export interface RootRouteChildren {
   XatuDataForkReadinessRoute: typeof XatuDataForkReadinessRoute
   XatuDataGeographicalChecklistRoute: typeof XatuDataGeographicalChecklistRoute
   XatuDataIndexRoute: typeof XatuDataIndexRoute
+  BeaconBlockProductionLiveRoute: typeof BeaconBlockProductionLiveRoute
+  BeaconSlotLiveRoute: typeof BeaconSlotLiveRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -634,6 +661,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumDataAvailabilityCustodyRouteImport
       parentRoute: typeof EthereumDataAvailabilityRoute
     }
+    '/beacon/slot/live': {
+      id: '/beacon/slot/live'
+      path: '/beacon/slot/live'
+      fullPath: '/beacon/slot/live'
+      preLoaderRoute: typeof BeaconSlotLiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/beacon/block-production/live': {
+      id: '/beacon/block-production/live'
+      path: '/beacon/block-production/live'
+      fullPath: '/beacon/block-production/live'
+      preLoaderRoute: typeof BeaconBlockProductionLiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ethereum/data-availability/custody/': {
       id: '/ethereum/data-availability/custody/'
       path: '/'
@@ -803,6 +844,8 @@ const rootRouteChildren: RootRouteChildren = {
   XatuDataForkReadinessRoute: XatuDataForkReadinessRoute,
   XatuDataGeographicalChecklistRoute: XatuDataGeographicalChecklistRoute,
   XatuDataIndexRoute: XatuDataIndexRoute,
+  BeaconBlockProductionLiveRoute: BeaconBlockProductionLiveRoute,
+  BeaconSlotLiveRoute: BeaconSlotLiveRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
