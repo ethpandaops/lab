@@ -15,6 +15,12 @@ import type {
   AdminCbtScheduledServiceListData,
   AdminCbtScheduledServiceListErrors,
   AdminCbtScheduledServiceListResponses,
+  DimBlockBlobSubmitterServiceGetData,
+  DimBlockBlobSubmitterServiceGetErrors,
+  DimBlockBlobSubmitterServiceGetResponses,
+  DimBlockBlobSubmitterServiceListData,
+  DimBlockBlobSubmitterServiceListErrors,
+  DimBlockBlobSubmitterServiceListResponses,
   DimBlockCanonicalServiceGetData,
   DimBlockCanonicalServiceGetErrors,
   DimBlockCanonicalServiceGetResponses,
@@ -331,6 +337,10 @@ import {
   zAdminCbtScheduledServiceGetResponse,
   zAdminCbtScheduledServiceListData,
   zAdminCbtScheduledServiceListResponse,
+  zDimBlockBlobSubmitterServiceGetData,
+  zDimBlockBlobSubmitterServiceGetResponse,
+  zDimBlockBlobSubmitterServiceListData,
+  zDimBlockBlobSubmitterServiceListResponse,
   zDimBlockCanonicalServiceGetData,
   zDimBlockCanonicalServiceGetResponse,
   zDimBlockCanonicalServiceListData,
@@ -630,6 +640,46 @@ export const adminCbtScheduledServiceGet = <ThrowOnError extends boolean = false
     requestValidator: async data => await zAdminCbtScheduledServiceGetData.parseAsync(data),
     responseValidator: async data => await zAdminCbtScheduledServiceGetResponse.parseAsync(data),
     url: '/api/v1/admin_cbt_scheduled/{database}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimBlockBlobSubmitterServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<DimBlockBlobSubmitterServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    DimBlockBlobSubmitterServiceListResponses,
+    DimBlockBlobSubmitterServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zDimBlockBlobSubmitterServiceListData.parseAsync(data),
+    responseValidator: async data => await zDimBlockBlobSubmitterServiceListResponse.parseAsync(data),
+    url: '/api/v1/dim_block_blob_submitter',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const dimBlockBlobSubmitterServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<DimBlockBlobSubmitterServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    DimBlockBlobSubmitterServiceGetResponses,
+    DimBlockBlobSubmitterServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zDimBlockBlobSubmitterServiceGetData.parseAsync(data),
+    responseValidator: async data => await zDimBlockBlobSubmitterServiceGetResponse.parseAsync(data),
+    url: '/api/v1/dim_block_blob_submitter/{block_number}',
     ...options,
   });
 };

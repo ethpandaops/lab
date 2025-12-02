@@ -8,6 +8,8 @@ import {
   adminCbtIncrementalServiceList,
   adminCbtScheduledServiceGet,
   adminCbtScheduledServiceList,
+  dimBlockBlobSubmitterServiceGet,
+  dimBlockBlobSubmitterServiceList,
   dimBlockCanonicalServiceGet,
   dimBlockCanonicalServiceList,
   dimNodeServiceGet,
@@ -125,6 +127,12 @@ import type {
   AdminCbtScheduledServiceListData,
   AdminCbtScheduledServiceListError,
   AdminCbtScheduledServiceListResponse,
+  DimBlockBlobSubmitterServiceGetData,
+  DimBlockBlobSubmitterServiceGetError,
+  DimBlockBlobSubmitterServiceGetResponse,
+  DimBlockBlobSubmitterServiceListData,
+  DimBlockBlobSubmitterServiceListError,
+  DimBlockBlobSubmitterServiceListResponse,
   DimBlockCanonicalServiceGetData,
   DimBlockCanonicalServiceGetError,
   DimBlockCanonicalServiceGetResponse,
@@ -578,6 +586,60 @@ export const adminCbtScheduledServiceGetOptions = (options: Options<AdminCbtSche
       return data;
     },
     queryKey: adminCbtScheduledServiceGetQueryKey(options),
+  });
+
+export const dimBlockBlobSubmitterServiceListQueryKey = (options?: Options<DimBlockBlobSubmitterServiceListData>) =>
+  createQueryKey('dimBlockBlobSubmitterServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimBlockBlobSubmitterServiceListOptions = (options?: Options<DimBlockBlobSubmitterServiceListData>) =>
+  queryOptions<
+    DimBlockBlobSubmitterServiceListResponse,
+    DimBlockBlobSubmitterServiceListError,
+    DimBlockBlobSubmitterServiceListResponse,
+    ReturnType<typeof dimBlockBlobSubmitterServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimBlockBlobSubmitterServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimBlockBlobSubmitterServiceListQueryKey(options),
+  });
+
+export const dimBlockBlobSubmitterServiceGetQueryKey = (options: Options<DimBlockBlobSubmitterServiceGetData>) =>
+  createQueryKey('dimBlockBlobSubmitterServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const dimBlockBlobSubmitterServiceGetOptions = (options: Options<DimBlockBlobSubmitterServiceGetData>) =>
+  queryOptions<
+    DimBlockBlobSubmitterServiceGetResponse,
+    DimBlockBlobSubmitterServiceGetError,
+    DimBlockBlobSubmitterServiceGetResponse,
+    ReturnType<typeof dimBlockBlobSubmitterServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimBlockBlobSubmitterServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimBlockBlobSubmitterServiceGetQueryKey(options),
   });
 
 export const dimBlockCanonicalServiceListQueryKey = (options?: Options<DimBlockCanonicalServiceListData>) =>

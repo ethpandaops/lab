@@ -17,6 +17,14 @@ export const zAdminCbtScheduled = z.object({
   updated_date_time: z.optional(z.coerce.bigint()),
 });
 
+export const zDimBlockBlobSubmitter = z.object({
+  address: z.optional(z.string()),
+  block_number: z.optional(z.int()),
+  name: z.optional(z.union([z.string(), z.null()])),
+  transaction_hash: z.optional(z.string()),
+  updated_date_time: z.optional(z.int()),
+});
+
 export const zDimBlockCanonical = z.object({
   beacon_block_root: z.optional(z.union([z.string(), z.null()])),
   beacon_block_version: z.optional(z.union([z.string(), z.null()])),
@@ -668,6 +676,13 @@ export const zGetAdminCbtScheduledResponse = z.object({
 });
 
 /**
+ * Response for getting a single dim_block_blob_submitter record
+ */
+export const zGetDimBlockBlobSubmitterResponse = z.object({
+  item: z.optional(zDimBlockBlobSubmitter),
+});
+
+/**
  * Response for getting a single dim_block_canonical record
  */
 export const zGetDimBlockCanonicalResponse = z.object({
@@ -1223,7 +1238,7 @@ export const zIntCustodyProbe = z.object({
   meta_peer_version: z.optional(z.string()),
   node_id: z.optional(z.string()),
   peer_id_unique_key: z.optional(z.coerce.bigint()),
-  probe_date_time: z.optional(z.coerce.bigint()),
+  probe_date_time: z.optional(z.int()),
   response_time_ms: z.optional(z.int()),
   result: z.optional(z.string()),
   slots: z.optional(z.array(z.int())),
@@ -1251,6 +1266,14 @@ export const zListAdminCbtIncrementalResponse = z.object({
  */
 export const zListAdminCbtScheduledResponse = z.object({
   admin_cbt_scheduled: z.optional(z.array(zAdminCbtScheduled)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing dim_block_blob_submitter records
+ */
+export const zListDimBlockBlobSubmitterResponse = z.object({
+  dim_block_blob_submitter: z.optional(z.array(zDimBlockBlobSubmitter)),
   next_page_token: z.optional(z.string()),
 });
 
@@ -1821,6 +1844,83 @@ export const zAdminCbtScheduledServiceGetData = z.object({
  */
 export const zAdminCbtScheduledServiceGetResponse = zGetAdminCbtScheduledResponse;
 
+export const zDimBlockBlobSubmitterServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      block_number_eq: z.optional(z.int()),
+      block_number_ne: z.optional(z.int()),
+      block_number_lt: z.optional(z.int()),
+      block_number_lte: z.optional(z.int()),
+      block_number_gt: z.optional(z.int()),
+      block_number_gte: z.optional(z.int()),
+      block_number_between_min: z.optional(z.int()),
+      block_number_between_max_value: z.optional(z.int()),
+      block_number_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_number_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      transaction_hash_eq: z.optional(z.string()),
+      transaction_hash_ne: z.optional(z.string()),
+      transaction_hash_contains: z.optional(z.string()),
+      transaction_hash_starts_with: z.optional(z.string()),
+      transaction_hash_ends_with: z.optional(z.string()),
+      transaction_hash_like: z.optional(z.string()),
+      transaction_hash_not_like: z.optional(z.string()),
+      transaction_hash_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      transaction_hash_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      updated_date_time_eq: z.optional(z.int()),
+      updated_date_time_ne: z.optional(z.int()),
+      updated_date_time_lt: z.optional(z.int()),
+      updated_date_time_lte: z.optional(z.int()),
+      updated_date_time_gt: z.optional(z.int()),
+      updated_date_time_gte: z.optional(z.int()),
+      updated_date_time_between_min: z.optional(z.int()),
+      updated_date_time_between_max_value: z.optional(z.int()),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      address_eq: z.optional(z.string()),
+      address_ne: z.optional(z.string()),
+      address_contains: z.optional(z.string()),
+      address_starts_with: z.optional(z.string()),
+      address_ends_with: z.optional(z.string()),
+      address_like: z.optional(z.string()),
+      address_not_like: z.optional(z.string()),
+      address_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      address_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      name_eq: z.optional(z.string()),
+      name_ne: z.optional(z.string()),
+      name_contains: z.optional(z.string()),
+      name_starts_with: z.optional(z.string()),
+      name_ends_with: z.optional(z.string()),
+      name_like: z.optional(z.string()),
+      name_not_like: z.optional(z.string()),
+      name_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      name_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zDimBlockBlobSubmitterServiceListResponse = zListDimBlockBlobSubmitterResponse;
+
+export const zDimBlockBlobSubmitterServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    block_number: z.int(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zDimBlockBlobSubmitterServiceGetResponse = zGetDimBlockBlobSubmitterResponse;
+
 export const zDimBlockCanonicalServiceListData = z.object({
   body: z.optional(z.never()),
   path: z.optional(z.never()),
@@ -1990,8 +2090,22 @@ export const zDimNodeServiceListData = z.object({
       name_not_like: z.optional(z.string()),
       name_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
       name_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      groups: z.optional(z.array(z.string())),
-      tags: z.optional(z.array(z.string())),
+      groups_has: z.optional(z.string()),
+      groups_has_all_values: z.optional(z.array(z.string())),
+      groups_has_any_values: z.optional(z.array(z.string())),
+      groups_length_eq: z.optional(z.int()),
+      groups_length_gt: z.optional(z.int()),
+      groups_length_gte: z.optional(z.int()),
+      groups_length_lt: z.optional(z.int()),
+      groups_length_lte: z.optional(z.int()),
+      tags_has: z.optional(z.string()),
+      tags_has_all_values: z.optional(z.array(z.string())),
+      tags_has_any_values: z.optional(z.array(z.string())),
+      tags_length_eq: z.optional(z.int()),
+      tags_length_gt: z.optional(z.int()),
+      tags_length_gte: z.optional(z.int()),
+      tags_length_lt: z.optional(z.int()),
+      tags_length_lte: z.optional(z.int()),
       attributes_key_value_key: z.optional(z.string()),
       attributes_key_value_value_filter_eq: z.optional(z.string()),
       attributes_key_value_value_filter_ne: z.optional(z.string()),
@@ -5070,7 +5184,14 @@ export const zFctBlockMevServiceListData = z.object({
       earliest_bid_date_time_between_max_value: z.optional(z.coerce.bigint()),
       earliest_bid_date_time_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
       earliest_bid_date_time_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      relay_names: z.optional(z.array(z.string())),
+      relay_names_has: z.optional(z.string()),
+      relay_names_has_all_values: z.optional(z.array(z.string())),
+      relay_names_has_any_values: z.optional(z.array(z.string())),
+      relay_names_length_eq: z.optional(z.int()),
+      relay_names_length_gt: z.optional(z.int()),
+      relay_names_length_gte: z.optional(z.int()),
+      relay_names_length_lt: z.optional(z.int()),
+      relay_names_length_lte: z.optional(z.int()),
       parent_hash_eq: z.optional(z.string()),
       parent_hash_ne: z.optional(z.string()),
       parent_hash_contains: z.optional(z.string()),
@@ -5273,7 +5394,14 @@ export const zFctBlockMevHeadServiceListData = z.object({
       earliest_bid_date_time_between_max_value: z.optional(z.coerce.bigint()),
       earliest_bid_date_time_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
       earliest_bid_date_time_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      relay_names: z.optional(z.array(z.string())),
+      relay_names_has: z.optional(z.string()),
+      relay_names_has_all_values: z.optional(z.array(z.string())),
+      relay_names_has_any_values: z.optional(z.array(z.string())),
+      relay_names_length_eq: z.optional(z.int()),
+      relay_names_length_gt: z.optional(z.int()),
+      relay_names_length_gte: z.optional(z.int()),
+      relay_names_length_lt: z.optional(z.int()),
+      relay_names_length_lte: z.optional(z.int()),
       parent_hash_eq: z.optional(z.string()),
       parent_hash_ne: z.optional(z.string()),
       parent_hash_contains: z.optional(z.string()),
@@ -7339,7 +7467,14 @@ export const zFctMevBidHighestValueByBuilderChunked50MsServiceListData = z.objec
       earliest_bid_date_time_between_max_value: z.optional(z.coerce.bigint()),
       earliest_bid_date_time_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
       earliest_bid_date_time_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      relay_names: z.optional(z.array(z.string())),
+      relay_names_has: z.optional(z.string()),
+      relay_names_has_all_values: z.optional(z.array(z.string())),
+      relay_names_has_any_values: z.optional(z.array(z.string())),
+      relay_names_length_eq: z.optional(z.int()),
+      relay_names_length_gt: z.optional(z.int()),
+      relay_names_length_gte: z.optional(z.int()),
+      relay_names_length_lt: z.optional(z.int()),
+      relay_names_length_lte: z.optional(z.int()),
       block_hash_eq: z.optional(z.string()),
       block_hash_ne: z.optional(z.string()),
       block_hash_contains: z.optional(z.string()),
@@ -8717,7 +8852,14 @@ export const zIntBeaconCommitteeHeadServiceListData = z.object({
       epoch_start_date_time_between_max_value: z.optional(z.int()),
       epoch_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
       epoch_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
-      validators: z.optional(z.array(z.int())),
+      validators_has: z.optional(z.int()),
+      validators_has_all_values: z.optional(z.array(z.int())),
+      validators_has_any_values: z.optional(z.array(z.int())),
+      validators_length_eq: z.optional(z.int()),
+      validators_length_gt: z.optional(z.int()),
+      validators_length_gte: z.optional(z.int()),
+      validators_length_lt: z.optional(z.int()),
+      validators_length_lte: z.optional(z.int()),
       page_size: z.optional(z.int()),
       page_token: z.optional(z.string()),
       order_by: z.optional(z.string()),
@@ -9209,7 +9351,14 @@ export const zIntBlockMevCanonicalServiceListData = z.object({
       earliest_bid_date_time_between_max_value: z.optional(z.coerce.bigint()),
       earliest_bid_date_time_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
       earliest_bid_date_time_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      relay_names: z.optional(z.array(z.string())),
+      relay_names_has: z.optional(z.string()),
+      relay_names_has_all_values: z.optional(z.array(z.string())),
+      relay_names_has_any_values: z.optional(z.array(z.string())),
+      relay_names_length_eq: z.optional(z.int()),
+      relay_names_length_gt: z.optional(z.int()),
+      relay_names_length_gte: z.optional(z.int()),
+      relay_names_length_lt: z.optional(z.int()),
+      relay_names_length_lte: z.optional(z.int()),
       parent_hash_eq: z.optional(z.string()),
       parent_hash_ne: z.optional(z.string()),
       parent_hash_contains: z.optional(z.string()),
@@ -9442,16 +9591,16 @@ export const zIntCustodyProbeServiceListData = z.object({
   path: z.optional(z.never()),
   query: z.optional(
     z.object({
-      probe_date_time_eq: z.optional(z.coerce.bigint()),
-      probe_date_time_ne: z.optional(z.coerce.bigint()),
-      probe_date_time_lt: z.optional(z.coerce.bigint()),
-      probe_date_time_lte: z.optional(z.coerce.bigint()),
-      probe_date_time_gt: z.optional(z.coerce.bigint()),
-      probe_date_time_gte: z.optional(z.coerce.bigint()),
-      probe_date_time_between_min: z.optional(z.coerce.bigint()),
-      probe_date_time_between_max_value: z.optional(z.coerce.bigint()),
-      probe_date_time_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      probe_date_time_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      probe_date_time_eq: z.optional(z.int()),
+      probe_date_time_ne: z.optional(z.int()),
+      probe_date_time_lt: z.optional(z.int()),
+      probe_date_time_lte: z.optional(z.int()),
+      probe_date_time_gt: z.optional(z.int()),
+      probe_date_time_gte: z.optional(z.int()),
+      probe_date_time_between_min: z.optional(z.int()),
+      probe_date_time_between_max_value: z.optional(z.int()),
+      probe_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      probe_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
       peer_id_unique_key_eq: z.optional(z.coerce.bigint()),
       peer_id_unique_key_ne: z.optional(z.coerce.bigint()),
       peer_id_unique_key_lt: z.optional(z.coerce.bigint()),
@@ -9490,8 +9639,22 @@ export const zIntCustodyProbeServiceListData = z.object({
       updated_date_time_between_max_value: z.optional(z.int()),
       updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
       updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
-      slots: z.optional(z.array(z.int())),
-      column_indices: z.optional(z.array(z.int())),
+      slots_has: z.optional(z.int()),
+      slots_has_all_values: z.optional(z.array(z.int())),
+      slots_has_any_values: z.optional(z.array(z.int())),
+      slots_length_eq: z.optional(z.int()),
+      slots_length_gt: z.optional(z.int()),
+      slots_length_gte: z.optional(z.int()),
+      slots_length_lt: z.optional(z.int()),
+      slots_length_lte: z.optional(z.int()),
+      column_indices_has: z.optional(z.int()),
+      column_indices_has_all_values: z.optional(z.array(z.int())),
+      column_indices_has_any_values: z.optional(z.array(z.int())),
+      column_indices_length_eq: z.optional(z.int()),
+      column_indices_length_gt: z.optional(z.int()),
+      column_indices_length_gte: z.optional(z.int()),
+      column_indices_length_lt: z.optional(z.int()),
+      column_indices_length_lte: z.optional(z.int()),
       response_time_ms_eq: z.optional(z.int()),
       response_time_ms_ne: z.optional(z.int()),
       response_time_ms_lt: z.optional(z.int()),
@@ -9718,7 +9881,7 @@ export const zIntCustodyProbeServiceListResponse = zListIntCustodyProbeResponse;
 export const zIntCustodyProbeServiceGetData = z.object({
   body: z.optional(z.never()),
   path: z.object({
-    probe_date_time: z.coerce.bigint(),
+    probe_date_time: z.int(),
   }),
   query: z.optional(z.never()),
 });
