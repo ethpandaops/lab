@@ -15,7 +15,7 @@ import { epochToTimestamp } from '@/utils/beacon';
  * - 172800: Simulate 2 days after fork (shows hour view)
  * - 432000: Simulate 5 days after fork (shows window view)
  */
-export const FORK_TIME_OVERRIDE_SECONDS: number | null = 432000;
+export const FORK_TIME_OVERRIDE_SECONDS: number | null = null;
 
 /**
  * Time thresholds for view selection (in seconds)
