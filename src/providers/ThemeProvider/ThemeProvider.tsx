@@ -3,6 +3,8 @@ import { ThemeContext, type Theme } from '@/contexts/ThemeContext';
 
 interface ThemeProviderProps {
   children: React.ReactNode;
+  /** Force a specific theme via URL param - overrides user preference and localStorage */
+  themeOverride?: Theme;
 }
 
 function getSystemTheme(): Theme {
@@ -19,8 +21,11 @@ function getInitialTheme(): Theme {
   return getSystemTheme();
 }
 
-export function ThemeProvider({ children }: ThemeProviderProps): JSX.Element {
+export function ThemeProvider({ children, themeOverride }: ThemeProviderProps): JSX.Element {
   const [theme, setThemeState] = useState<Theme>(getInitialTheme);
+
+  // Determine effective theme - URL override takes precedence
+  const effectiveTheme = themeOverride ?? theme;
 
   // Apply theme to document
   useEffect(() => {
@@ -28,15 +33,17 @@ export function ThemeProvider({ children }: ThemeProviderProps): JSX.Element {
     // Remove all theme classes first
     root.classList.remove('dark', 'star');
     // Add the current theme class if not light
-    if (theme === 'dark') {
+    if (effectiveTheme === 'dark') {
       root.classList.add('dark');
-    } else if (theme === 'star') {
+    } else if (effectiveTheme === 'star') {
       root.classList.add('star');
     }
-  }, [theme]);
+  }, [effectiveTheme]);
 
-  // Listen for system theme changes (only if no localStorage override)
+  // Listen for system theme changes (only if no localStorage override and no URL override)
   useEffect(() => {
+    if (themeOverride) return; // URL override active, don't listen to system changes
+
     const stored = localStorage.getItem('theme');
     if (stored) return; // User has explicit preference
 
@@ -47,7 +54,7 @@ export function ThemeProvider({ children }: ThemeProviderProps): JSX.Element {
 
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
+  }, [themeOverride]);
 
   const setTheme = useCallback((newTheme: Theme): void => {
     setThemeState(newTheme);
@@ -66,7 +73,11 @@ export function ThemeProvider({ children }: ThemeProviderProps): JSX.Element {
     setThemeState(getSystemTheme());
   }, []);
 
-  const value = useMemo(() => ({ theme, setTheme, clearTheme }), [theme, setTheme, clearTheme]);
+  // Expose effective theme (with override applied) to consumers
+  const value = useMemo(
+    () => ({ theme: effectiveTheme, setTheme, clearTheme }),
+    [effectiveTheme, setTheme, clearTheme]
+  );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
