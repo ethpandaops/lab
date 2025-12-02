@@ -49,6 +49,7 @@ declare global {
   interface Window {
     __CONFIG__?: Config;
     __BOUNDS__?: Record<string, Bounds>;
+    __VERSION__?: string;
   }
 }
 
@@ -118,11 +119,22 @@ function MobileHeader({
   );
 }
 
+const SIDEBAR_COLLAPSED_KEY = 'lab-sidebar-collapsed';
+
 function RootComponent(): JSX.Element {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true';
+  });
   const [isAppleWatch, setIsAppleWatch] = useState(false);
   const router = useRouter();
   const { embed, theme: themeOverride } = useSearch({ from: '__root__' });
+
+  // Persist sidebar collapsed state
+  useEffect(() => {
+    localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(sidebarCollapsed));
+  }, [sidebarCollapsed]);
 
   // Detect Apple Watch using multiple heuristics
   // Apple Watch reports as iPhone but has distinctive screen dimensions
@@ -239,13 +251,20 @@ function RootComponent(): JSX.Element {
                   <HeadContent />
                   <div className="bg-background">
                     {/* Sidebar (mobile + desktop) */}
-                    <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+                    <Sidebar
+                      sidebarOpen={sidebarOpen}
+                      setSidebarOpen={setSidebarOpen}
+                      collapsed={sidebarCollapsed}
+                      setCollapsed={setSidebarCollapsed}
+                    />
 
                     {/* Mobile header */}
                     <MobileHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
                     {/* Main content */}
-                    <main className="bg-background pt-[65px] lg:min-h-dvh lg:pt-0 lg:pl-72">
+                    <main
+                      className={`bg-background pt-[65px] transition-all duration-200 lg:min-h-dvh lg:pt-0 ${sidebarCollapsed ? 'lg:pl-14' : 'lg:pl-56'}`}
+                    >
                       <FeatureGate>
                         <Breadcrumb />
                         <Outlet />
