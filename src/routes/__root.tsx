@@ -5,6 +5,7 @@ import {
   HeadContent,
   Link,
   useRouter,
+  useSearch,
   retainSearchParams,
 } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -34,9 +35,10 @@ interface MyRouterContext {
   };
 }
 
-// Define search params schema for network selection
+// Define search params schema for network selection and embed mode
 const rootSearchSchema = z.object({
   network: z.string().optional(),
+  embed: z.boolean().optional(),
 });
 
 export type RootSearch = z.infer<typeof rootSearchSchema>;
@@ -119,6 +121,7 @@ function RootComponent(): JSX.Element {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAppleWatch, setIsAppleWatch] = useState(false);
   const router = useRouter();
+  const { embed } = useSearch({ from: '__root__' });
 
   // Detect Apple Watch using multiple heuristics
   // Apple Watch reports as iPhone but has distinctive screen dimensions
@@ -184,6 +187,32 @@ function RootComponent(): JSX.Element {
               🤡
             </span>
           </div>
+        </ThemeProvider>
+      </QueryClientProvider>
+    );
+  }
+
+  // Embed mode: minimal layout without sidebar, header, or breadcrumb
+  if (embed) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <NotificationProvider>
+            <TimezoneProvider>
+              <ConfigGate>
+                <NetworkProvider>
+                  <SharedCrosshairsProvider>
+                    <HeadContent />
+                    <main className="min-h-dvh bg-background">
+                      <FeatureGate>
+                        <Outlet />
+                      </FeatureGate>
+                    </main>
+                  </SharedCrosshairsProvider>
+                </NetworkProvider>
+              </ConfigGate>
+            </TimezoneProvider>
+          </NotificationProvider>
         </ThemeProvider>
       </QueryClientProvider>
     );
