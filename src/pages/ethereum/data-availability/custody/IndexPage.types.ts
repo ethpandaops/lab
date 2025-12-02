@@ -10,10 +10,11 @@ export type ViewMode = 'percentage' | 'threshold';
 /**
  * Default observation thresholds by network
  * Mainnet has more validators/observers, so needs higher threshold
+ * Testnets use lower threshold due to less traffic
  */
 export const DEFAULT_THRESHOLDS: Record<string, number> = {
   mainnet: 30,
-  default: 10,
+  default: 3,
 };
 
 /**

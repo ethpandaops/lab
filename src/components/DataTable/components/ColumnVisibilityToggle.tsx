@@ -1,5 +1,5 @@
 import { type JSX } from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { Menu, MenuButton, MenuItems } from '@headlessui/react';
 import { ChevronDownIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/20/solid';
 import clsx from 'clsx';
 import type { Table } from '@tanstack/react-table';
@@ -64,21 +64,21 @@ export function ColumnVisibilityToggle<TData>({ table }: ColumnVisibilityToggleP
           {/* Column toggles */}
           <div className="max-h-[300px] overflow-y-auto">
             {hideableColumns.map(column => (
-              <MenuItem key={column.id} as="div">
+              <div key={column.id}>
                 <label
                   className={clsx(
                     'flex cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors',
                     'hover:bg-primary/10 hover:text-primary'
                   )}
                 >
-                  <Checkbox checked={column.getIsVisible()} onChange={column.getToggleVisibilityHandler()} rounded />
+                  <Checkbox checked={column.getIsVisible()} onChange={column.toggleVisibility} rounded />
                   <span className="truncate select-none">
                     {typeof column.columnDef.header === 'string'
                       ? column.columnDef.header
                       : column.id.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                   </span>
                 </label>
-              </MenuItem>
+              </div>
             ))}
           </div>
         </div>

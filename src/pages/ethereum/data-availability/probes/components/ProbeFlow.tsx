@@ -1,0 +1,129 @@
+import { type JSX } from 'react';
+import {
+  CheckCircleIcon,
+  XCircleIcon,
+  QuestionMarkCircleIcon,
+  ArrowLongRightIcon,
+  ArrowLongLeftIcon,
+} from '@heroicons/react/24/solid';
+import { type IntCustodyProbe } from '@/api/types.gen';
+import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { getCountryFlag } from '@/utils/country';
+
+type ProbeFlowProps = {
+  probe: IntCustodyProbe;
+};
+
+export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
+  const isSuccess = probe.result === 'success';
+  const isFailure = probe.result === 'failure';
+
+  // Calculate total data requested
+  const slotsCount = probe.slots?.length ?? 0;
+  const columnsCount = probe.column_indices?.length ?? 0;
+  const cellsCount = slotsCount * columnsCount;
+  const cellSizeKiB = 2;
+  const totalSizeKiB = cellsCount * cellSizeKiB;
+  const totalSizeMiB = totalSizeKiB / 1024;
+  const sizeDisplay = totalSizeMiB >= 1 ? `${totalSizeMiB.toFixed(1)} MiB` : `${totalSizeKiB} KiB`;
+
+  // Get country codes for flags
+  const clientCountryCode = probe.meta_client_geo_country_code;
+  const peerCountryCode = probe.meta_peer_geo_country_code;
+
+  // Status colors
+  const statusColor = isSuccess ? 'text-green-500' : isFailure ? 'text-red-500' : 'text-yellow-500';
+  const statusBg = isSuccess ? 'bg-green-500/10' : isFailure ? 'bg-red-500/10' : 'bg-yellow-500/10';
+  const statusBorder = isSuccess ? 'border-green-500/20' : isFailure ? 'border-red-500/20' : 'border-yellow-500/20';
+
+  return (
+    <div className="flex items-center justify-between gap-8 px-4 py-6">
+      {/* PROBER (Left) */}
+      <div className="flex flex-col items-center gap-3">
+        <div className="relative">
+          <ClientLogo client={probe.meta_client_implementation || 'Unknown'} size={42} />
+          {clientCountryCode && (
+            <div className="absolute -right-2 -bottom-1 flex size-5 items-center justify-center rounded-full border border-background bg-surface text-xs shadow-sm">
+              {getCountryFlag(clientCountryCode)}
+            </div>
+          )}
+        </div>
+        <div className="text-center">
+          <div className="text-sm font-bold tracking-tight text-foreground">
+            {probe.meta_client_implementation || 'Prober'}
+          </div>
+          <div className="text-muted-foreground text-[10px] font-medium tracking-wider uppercase">
+            {probe.meta_client_geo_city || probe.meta_client_geo_country || 'Unknown'}
+          </div>
+        </div>
+      </div>
+
+      {/* CONNECTION (Center) */}
+      <div className="flex flex-1 flex-col items-center justify-center gap-4">
+        {/* Request Flow (Top) */}
+        <div className="text-muted-foreground/50 flex w-full items-center gap-3">
+          <div className="h-px flex-1 bg-border/50" />
+          <div className="text-muted-foreground flex items-center gap-2 text-xs">
+            <span className="text-[10px] font-medium tracking-wider uppercase">Request</span>
+            <ArrowLongRightIcon className="size-4" />
+            <span className="font-mono font-medium text-foreground">
+              {slotsCount}×{columnsCount}
+            </span>
+          </div>
+          <div className="h-px flex-1 bg-border/50" />
+        </div>
+
+        {/* Central Status Node */}
+        <div
+          className={`relative flex items-center gap-2 rounded-full border ${statusBorder} ${statusBg} px-4 py-1.5 shadow-sm backdrop-blur-sm`}
+        >
+          {isSuccess ? (
+            <CheckCircleIcon className={`size-4 ${statusColor}`} />
+          ) : isFailure ? (
+            <XCircleIcon className={`size-4 ${statusColor}`} />
+          ) : (
+            <QuestionMarkCircleIcon className={`size-4 ${statusColor}`} />
+          )}
+          <div className="flex items-center gap-2 leading-none">
+            <span className={`text-xs font-bold tracking-wider uppercase ${statusColor}`}>{probe.result}</span>
+            <div className="h-3 w-px bg-border/50" />
+            <span className="font-mono text-xs font-medium text-foreground">
+              {probe.response_time_ms ? `${probe.response_time_ms}ms` : '---'}
+            </span>
+          </div>
+        </div>
+
+        {/* Response Flow (Bottom) */}
+        <div className="text-muted-foreground/50 flex w-full items-center gap-3">
+          <div className="h-px flex-1 bg-border/50" />
+          <div className="text-muted-foreground flex items-center gap-2 text-xs">
+            <span className="text-[10px] font-medium tracking-wider uppercase">Payload</span>
+            <ArrowLongLeftIcon className="size-4" />
+            <span className="font-mono font-medium text-foreground">{sizeDisplay}</span>
+          </div>
+          <div className="h-px flex-1 bg-border/50" />
+        </div>
+      </div>
+
+      {/* PEER (Right) */}
+      <div className="flex flex-col items-center gap-3">
+        <div className="relative">
+          <ClientLogo client={probe.meta_peer_implementation || 'Unknown'} size={42} />
+          {peerCountryCode && (
+            <div className="absolute -right-2 -bottom-1 flex size-5 items-center justify-center rounded-full border border-background bg-surface text-xs shadow-sm">
+              {getCountryFlag(peerCountryCode)}
+            </div>
+          )}
+        </div>
+        <div className="text-center">
+          <div className="text-sm font-bold tracking-tight text-foreground">
+            {probe.meta_peer_implementation || 'Peer'}
+          </div>
+          <div className="text-muted-foreground text-[10px] font-medium tracking-wider uppercase">
+            {probe.meta_peer_geo_city || probe.meta_peer_geo_country || 'Unknown'}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

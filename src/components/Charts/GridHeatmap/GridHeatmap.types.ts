@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 /**
  * Cell size variants for the grid
  */
-export type GridCellSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type GridCellSize = '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 /**
  * Generic cell data structure - columnIndex + arbitrary data payload
@@ -49,18 +49,12 @@ export interface CellRenderProps {
 export interface GridHeatmapProps<T = unknown> {
   /** Rows of data to display */
   rows: GridRow<T>[];
-  /** Optional: Cell size (default: 'xs') */
+  /** Optional: Cell size (default: '2xs') */
   cellSize?: GridCellSize;
   /** Optional: Show column indices header (default: true) */
   showColumnHeader?: boolean;
-  /** Optional: Selected column index to highlight */
-  selectedColumn?: number;
-  /** Optional: Callback when a cell is clicked */
-  onCellClick?: (rowId: string, columnIndex: number, cellData: T) => void;
   /** Optional: Callback when a row label is clicked */
   onRowClick?: (rowId: string) => void;
-  /** Optional: Callback when column selection is cleared */
-  onClearColumnSelection?: () => void;
   /** Optional: Callback when back button is clicked */
   onBack?: () => void;
   /** Render function for individual cells */

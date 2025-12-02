@@ -23,12 +23,9 @@ export const DataAvailabilityHeatmap = ({
   filters,
   viewMode = 'percentage',
   threshold = 30,
-  selectedColumnIndex,
-  onCellClick,
   onRowClick,
-  onClearColumnSelection,
   onBack,
-  cellSize = 'xs',
+  cellSize = '2xs',
   showColumnHeader = true,
   showLegend = true,
   className,
@@ -91,10 +88,7 @@ export const DataAvailabilityHeatmap = ({
       rows={gridRows}
       cellSize={cellSize}
       showColumnHeader={showColumnHeader}
-      selectedColumn={selectedColumnIndex}
-      onCellClick={onCellClick}
       onRowClick={onRowClick}
-      onClearColumnSelection={onClearColumnSelection}
       onBack={onBack}
       renderCell={(cellData, props) => (
         <DataAvailabilityCell

@@ -15,8 +15,7 @@ import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/20/solid';
 import clsx from 'clsx';
 import type { DataTableProps, DataTableColumnMeta } from './DataTable.types';
 import { ColumnFilter } from './components/ColumnFilter';
-import { ColumnVisibilityToggle } from './components/ColumnVisibilityToggle';
-import { Pagination } from './components/Pagination';
+import { TableToolbar } from './components/TableToolbar';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Input } from '@/components/Forms/Input';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
@@ -48,10 +47,17 @@ export function DataTable<TData>({
   manualPagination = false,
   manualFiltering = false,
   manualSorting = false,
+  // For cursor-based pagination
+  hasNextPage,
   // Appearance
   emptyMessage = 'No data available',
   title,
   description,
+  // Toolbar options
+  hideGlobalFilter = false,
+  hideColumnVisibility = false,
+  // Pagination position
+  paginationPosition = 'bottom',
 }: DataTableProps<TData>): JSX.Element {
   // Internal state (used when not controlled)
   const [internalPagination, setInternalPagination] = useState<PaginationState>({
@@ -183,29 +189,38 @@ export function DataTable<TData>({
         </div>
       )}
 
-      {/* Toolbar */}
-      <div className="mb-4 flex flex-col gap-4 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        {/* Global search */}
-        <div className="flex-1 sm:max-w-xs">
-          <Input size="sm">
-            <Input.Leading>
-              <MagnifyingGlassIcon />
-            </Input.Leading>
-            <Input.Field
-              type="text"
-              value={globalFilter}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleGlobalFilterChange(e.target.value)}
-              placeholder="Search..."
-            />
-          </Input>
+      {/* Global search (if enabled) */}
+      {!hideGlobalFilter && (
+        <div className="mb-4 px-4 sm:px-6">
+          <div className="sm:max-w-xs">
+            <Input size="sm">
+              <Input.Leading>
+                <MagnifyingGlassIcon />
+              </Input.Leading>
+              <Input.Field
+                type="text"
+                value={globalFilter}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleGlobalFilterChange(e.target.value)}
+                placeholder="Search..."
+              />
+            </Input>
+          </div>
         </div>
+      )}
 
-        {/* Column visibility toggle */}
-        <ColumnVisibilityToggle table={table} />
-      </div>
-
-      {/* Table container */}
+      {/* Table container with unified toolbar */}
       <div className="overflow-hidden border-y border-border">
+        {/* Unified toolbar (top) - columns + pagination */}
+        {!isLoading &&
+          table.getRowModel().rows.length > 0 &&
+          (paginationPosition === 'top' || paginationPosition === 'both') && (
+            <TableToolbar
+              table={table}
+              hideColumnVisibility={hideColumnVisibility}
+              position="top"
+              hasNextPage={hasNextPage}
+            />
+          )}
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-border">
             {/* Table head */}
@@ -315,10 +330,19 @@ export function DataTable<TData>({
             </tbody>
           </table>
         </div>
-      </div>
 
-      {/* Pagination */}
-      {!isLoading && table.getRowModel().rows.length > 0 && <Pagination table={table} />}
+        {/* Unified toolbar (bottom) - columns + pagination */}
+        {!isLoading &&
+          table.getRowModel().rows.length > 0 &&
+          (paginationPosition === 'bottom' || paginationPosition === 'both') && (
+            <TableToolbar
+              table={table}
+              hideColumnVisibility={hideColumnVisibility}
+              position="bottom"
+              hasNextPage={hasNextPage}
+            />
+          )}
+      </div>
     </div>
   );
 }

@@ -9,7 +9,6 @@ import type { GridHeatmapProps, GridCellSize } from './GridHeatmap.types';
  *
  * Provides interactive grid functionality including:
  * - Row and column hover states
- * - Column selection/highlighting
  * - Configurable cell sizes
  * - Custom cell rendering via render prop
  * - Optional header content (filters, legend, etc.)
@@ -22,20 +21,14 @@ import type { GridHeatmapProps, GridCellSize } from './GridHeatmap.types';
  *   renderCell={(cellData, props) => (
  *     <CustomCell data={cellData} {...props} />
  *   )}
- *   onCellClick={(rowId, colIndex, cellData) => {
- *     console.log('Clicked:', rowId, colIndex, cellData);
- *   }}
  * />
  * ```
  */
 export function GridHeatmap<T = unknown>({
   rows,
-  cellSize = 'xs',
+  cellSize = '2xs',
   showColumnHeader = true,
-  selectedColumn,
-  onCellClick,
   onRowClick,
-  onClearColumnSelection,
   onBack,
   renderCell,
   renderHeader,
@@ -55,155 +48,129 @@ export function GridHeatmap<T = unknown>({
     [rows]
   );
 
-  // Get size-specific classes
+  // Get size-specific classes - using fixed widths for alignment
   const cellSizeClass: Record<GridCellSize, string> = {
-    xs: 'size-3',
-    sm: 'size-4',
-    md: 'size-6',
-    lg: 'size-8',
-    xl: 'size-10',
+    '2xs': 'size-[9px]', // 9px - compact
+    xs: 'size-2.5', // 10px
+    sm: 'size-3', // 12px
+    md: 'size-4', // 16px
+    lg: 'size-6', // 24px
+    xl: 'size-8', // 32px
   };
 
   const labelWidth: Record<GridCellSize, string> = {
-    xs: 'min-w-12',
-    sm: 'min-w-16',
-    md: 'min-w-20',
-    lg: 'min-w-24',
-    xl: 'min-w-28',
+    '2xs': 'w-24', // 96px - room for "Epoch 12345" labels
+    xs: 'w-24', // 96px
+    sm: 'w-28',
+    md: 'w-32',
+    lg: 'w-36',
+    xl: 'w-40',
   };
 
   const textSize: Record<GridCellSize, string> = {
-    xs: 'text-xs/3',
-    sm: 'text-xs/4',
+    '2xs': 'text-xs/4', // 12px - readable
+    xs: 'text-xs/4',
+    sm: 'text-sm/5',
     md: 'text-sm/6',
-    lg: 'text-sm/8',
-    xl: 'text-base/10',
+    lg: 'text-base/7',
+    xl: 'text-base/8',
   };
 
   // Default column label renderer
-  const defaultRenderColumnLabel = (colIndex: number, isHovered: boolean, isSelected: boolean): React.JSX.Element => {
+  const defaultRenderColumnLabel = (colIndex: number, isHovered: boolean): React.JSX.Element => {
     const displayIndex = colIndex + 1;
-    const showLabel = displayIndex % 10 === 0 || colIndex === columnIndices[columnIndices.length - 1] || isHovered;
+    const showLabel = displayIndex % 16 === 0 || colIndex === 0 || isHovered;
 
     return (
-      <button
+      <div
         key={colIndex}
-        type="button"
         onMouseEnter={() => setHoveredColumn(colIndex)}
         onMouseLeave={() => setHoveredColumn(null)}
         className={clsx(
           cellSizeClass[cellSize],
           textSize[cellSize],
           'text-center transition-colors',
-          isSelected
-            ? 'font-bold text-accent'
-            : isHovered
-              ? 'font-bold text-accent'
-              : 'text-muted hover:text-foreground'
+          isHovered ? 'font-bold text-accent' : 'text-muted'
         )}
         title={`Column ${displayIndex}`}
       >
         {showLabel ? displayIndex : ''}
-      </button>
+      </div>
     );
   };
 
   return (
-    <div className={clsx('flex flex-col gap-6', className)}>
-      {/* Selected column banner */}
-      {selectedColumn !== undefined && (
-        <div className="flex items-center gap-3 rounded-sm border border-accent/20 bg-accent/5 px-3 py-2">
-          <div className="flex grow items-center gap-2 text-xs/6">
-            <span className="text-muted">Viewing column:</span>
-            <span className="font-semibold text-accent">{selectedColumn + 1}</span>
-            <span className="text-muted">(other columns dimmed)</span>
-          </div>
-          {onClearColumnSelection && (
-            <Button variant="secondary" size="sm" onClick={onClearColumnSelection}>
-              Clear selection
-            </Button>
-          )}
-        </div>
-      )}
-
+    <div className={clsx('flex flex-col gap-4', className)}>
       {/* Header content (legend, filters, etc.) */}
       {renderHeader?.()}
 
       {/* Grid */}
       <div>
-        <div>
-          {/* Rows */}
-          <div className="flex flex-col gap-px">
-            {rows.map(row => (
-              <div key={row.identifier} className="flex gap-2">
-                {/* Row label */}
-                <button
-                  type="button"
-                  onClick={() => onRowClick?.(row.identifier)}
-                  onMouseEnter={() => setHoveredRow(row.identifier)}
-                  onMouseLeave={() => setHoveredRow(null)}
-                  className={clsx(
-                    labelWidth[cellSize],
-                    textSize[cellSize],
-                    'shrink-0 truncate pr-2 text-left text-muted transition-colors',
-                    onRowClick ? 'cursor-pointer hover:text-accent' : 'cursor-default',
-                    hoveredRow === row.identifier && 'font-bold text-accent'
-                  )}
-                  title={row.label}
-                >
-                  {row.label}
-                </button>
+        {/* Rows */}
+        <div className="flex flex-col gap-0.5">
+          {rows.map(row => (
+            <div key={row.identifier} className="flex items-center">
+              {/* Row label - fixed width for alignment */}
+              <button
+                type="button"
+                onClick={() => onRowClick?.(row.identifier)}
+                onMouseEnter={() => setHoveredRow(row.identifier)}
+                onMouseLeave={() => setHoveredRow(null)}
+                className={clsx(
+                  labelWidth[cellSize],
+                  textSize[cellSize],
+                  'shrink-0 truncate pr-2 text-right text-muted transition-colors',
+                  onRowClick ? 'cursor-pointer hover:text-accent' : 'cursor-default',
+                  hoveredRow === row.identifier && 'font-bold text-accent'
+                )}
+                title={row.label}
+              >
+                {row.label}
+              </button>
 
-                {/* Cells */}
-                <div className="flex gap-px">
-                  {row.cells.map(cell => {
-                    const isSelected = selectedColumn === cell.columnIndex;
-                    const isHighlighted = hoveredColumn === cell.columnIndex || hoveredRow === row.identifier;
-                    const isDimmed = selectedColumn !== undefined && selectedColumn !== cell.columnIndex;
-
-                    return (
-                      <div key={`${row.identifier}-${cell.columnIndex}`}>
-                        {renderCell(cell.data, {
-                          isSelected,
-                          isHighlighted,
-                          isDimmed,
-                          size: cellSize,
-                          onClick: onCellClick
-                            ? () => onCellClick(row.identifier, cell.columnIndex, cell.data)
-                            : undefined,
-                        })}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Column header at bottom */}
-          {showColumnHeader && (
-            <div className="mt-2 flex gap-px">
-              {/* Spacer for row labels */}
-              <div className={clsx(labelWidth[cellSize], 'shrink-0')} />
-
-              {/* Column indices */}
+              {/* Cells with small gap for visual separation */}
               <div className="flex gap-px">
-                {columnIndices.map(colIndex => {
-                  const isHovered = hoveredColumn === colIndex;
-                  const isSelected = selectedColumn === colIndex;
+                {row.cells.map(cell => {
+                  const isHighlighted = hoveredColumn === cell.columnIndex || hoveredRow === row.identifier;
 
                   return (
-                    <div key={colIndex}>
-                      {renderColumnLabel
-                        ? renderColumnLabel(colIndex, isHovered, isSelected)
-                        : defaultRenderColumnLabel(colIndex, isHovered, isSelected)}
+                    <div key={`${row.identifier}-${cell.columnIndex}`}>
+                      {renderCell(cell.data, {
+                        isSelected: false,
+                        isHighlighted,
+                        isDimmed: false,
+                        size: cellSize,
+                      })}
                     </div>
                   );
                 })}
               </div>
             </div>
-          )}
+          ))}
         </div>
+
+        {/* Column header at bottom */}
+        {showColumnHeader && (
+          <div className="mt-1 flex items-center">
+            {/* Spacer for row labels */}
+            <div className={clsx(labelWidth[cellSize], 'shrink-0')} />
+
+            {/* Column indices - matching cell gap */}
+            <div className="flex gap-px">
+              {columnIndices.map(colIndex => {
+                const isHovered = hoveredColumn === colIndex;
+
+                return (
+                  <div key={colIndex}>
+                    {renderColumnLabel
+                      ? renderColumnLabel(colIndex, isHovered, false)
+                      : defaultRenderColumnLabel(colIndex, isHovered)}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Back button */}

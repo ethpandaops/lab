@@ -1,17 +1,14 @@
 import { type JSX, useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearch, useNavigate } from '@tanstack/react-router';
-import { ChartBarIcon, TableCellsIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { Container } from '@/components/Layout/Container';
-import { Header } from '@/components/Layout/Header';
-import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { Stats } from '@/components/DataDisplay/Stats';
 import { DataAvailabilityHeatmap } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
-import { DataAvailabilityFilterPanel } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel';
 import { DataAvailabilityLegend } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityLegend';
 import { DataAvailabilitySkeleton } from '@/pages/ethereum/data-availability/components/DataAvailabilitySkeleton';
 import { ViewModeToggle } from '@/pages/ethereum/data-availability/components/ViewModeToggle';
 import { TimezoneToggle } from '@/components/Elements/TimezoneToggle';
+import { LiveProbeEvents } from './components/LiveProbeEvents';
+import type { ProbeFilterContext } from './components/LiveProbeEvents';
 import type {
   DataAvailabilityGranularity,
   ViewMode,
@@ -159,7 +156,6 @@ export function IndexPage(): JSX.Element {
 
   // Derive drill-down state from URL
   const currentLevel = deriveCurrentLevel(search);
-  const selectedColumnIndex = search.column;
 
   // Smart initial view based on fork timing
   const { searchParams: forkBasedParams, isLoading: forkViewLoading } = useForkBasedInitialView();
@@ -196,13 +192,16 @@ export function IndexPage(): JSX.Element {
   const defaultThreshold = getDefaultThreshold(currentNetwork?.name);
   const threshold = search.threshold ?? defaultThreshold;
 
-  // Filter state
-  const [filters, setFilters] = useState<DataAvailabilityFilters>({
-    columnGroups: new Set([0, 1, 2, 3]), // All groups selected by default
-    minAvailability: 0,
-    maxAvailability: 100,
-    minObservationCount: 0,
-  });
+  // Default filter state (all columns, no filtering)
+  const filters: DataAvailabilityFilters = useMemo(
+    () => ({
+      columnGroups: new Set([0, 1, 2, 3]),
+      minAvailability: 0,
+      maxAvailability: 100,
+      minObservationCount: 0,
+    }),
+    []
+  );
 
   // Window Level: Last 19 days of daily aggregated data
   const windowQuery = useQuery({
@@ -472,19 +471,6 @@ export function IndexPage(): JSX.Element {
   };
 
   /**
-   * Handle cell click to toggle column selection
-   * Updates URL search params to select/deselect column
-   */
-  const handleCellClick = (_identifier: string, columnIndex: number): void => {
-    navigate({
-      search: prev => ({
-        ...prev,
-        column: prev.column === columnIndex ? undefined : columnIndex,
-      }),
-    });
-  };
-
-  /**
    * Handle view mode change
    * Updates URL search params to switch between percentage and threshold modes
    */
@@ -493,19 +479,6 @@ export function IndexPage(): JSX.Element {
       search: prev => ({
         ...prev,
         mode,
-      }),
-    });
-  };
-
-  /**
-   * Handle threshold change
-   * Updates URL search params with new threshold value
-   */
-  const handleThresholdChange = (newThreshold: number): void => {
-    navigate({
-      search: prev => ({
-        ...prev,
-        threshold: newThreshold,
       }),
     });
   };
@@ -593,120 +566,62 @@ export function IndexPage(): JSX.Element {
     return crumbs;
   }, [currentLevel, navigate, timezone]);
 
-  /**
-   * Calculate summary statistics for the current view
-   */
-  const summaryStats = useMemo(() => {
-    if (!rows.length) {
-      return {
-        totalPeriods: 0,
-        activeColumns: 0,
-        avgAvailability: 0,
-        totalObservations: 0,
-        avgResponseTime: 0,
-      };
+  // Calculate time range for View Probes link (must be before early returns)
+  const probesLinkParams = useMemo(() => {
+    let timeStart: number | undefined;
+    let timeEnd: number | undefined;
+
+    if (currentLevel.type === 'day') {
+      timeStart = Math.floor(new Date(currentLevel.date).getTime() / 1000);
+      timeEnd = timeStart + SECONDS_PER_DAY;
+    } else if (currentLevel.type === 'hour' || currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
+      timeStart = currentLevel.hourStartDateTime;
+      timeEnd = timeStart + SECONDS_PER_HOUR;
     }
 
-    // Get unique columns that have data
-    const columnsWithData = new Set<number>();
-    let totalAvailability = 0;
-    let cellsWithData = 0;
-    let totalObservations = 0;
-    let totalResponseTime = 0;
-    let cellsWithResponseTime = 0;
-
-    for (const row of rows) {
-      for (const cell of row.cells) {
-        const hasData = (cell.totalCount ?? 0) > 0;
-        if (hasData) {
-          columnsWithData.add(cell.columnIndex);
-          totalAvailability += cell.availability;
-          cellsWithData++;
-          totalObservations += cell.totalCount ?? 0;
-          if (cell.avgResponseTimeMs !== undefined && cell.avgResponseTimeMs > 0) {
-            totalResponseTime += cell.avgResponseTimeMs;
-            cellsWithResponseTime++;
-          }
-        }
-      }
-    }
+    const hasTimeFilter = timeStart !== undefined && timeEnd !== undefined;
+    const hasSlotFilter = currentLevel.type === 'slot';
 
     return {
-      totalPeriods: rows.length,
-      activeColumns: columnsWithData.size,
-      avgAvailability: cellsWithData > 0 ? totalAvailability / cellsWithData : 0,
-      totalObservations,
-      avgResponseTime: cellsWithResponseTime > 0 ? totalResponseTime / cellsWithResponseTime : 0,
+      ...(hasSlotFilter && { slot: currentLevel.slot }),
+      ...(hasTimeFilter && !hasSlotFilter && { timeStart, timeEnd }),
     };
-  }, [rows]);
+  }, [currentLevel]);
 
-  /**
-   * Get period label based on granularity
-   */
-  const periodLabel = useMemo(() => {
-    switch (granularity) {
+  // Convert currentLevel to ProbeFilterContext for LiveProbeEvents
+  const probeFilterContext: ProbeFilterContext = useMemo(() => {
+    switch (currentLevel.type) {
       case 'window':
-        return 'Days';
+        return { type: 'window' };
       case 'day':
-        return 'Hours';
+        return { type: 'day', date: currentLevel.date };
       case 'hour':
-        return 'Epochs';
+        return {
+          type: 'hour',
+          date: currentLevel.date,
+          hourStartDateTime: currentLevel.hourStartDateTime,
+        };
       case 'epoch':
-        return 'Slots';
+        return {
+          type: 'epoch',
+          date: currentLevel.date,
+          hourStartDateTime: currentLevel.hourStartDateTime,
+          epoch: currentLevel.epoch,
+        };
       case 'slot':
-        return 'Blobs';
-      default:
-        return 'Periods';
+        return {
+          type: 'slot',
+          date: currentLevel.date,
+          hourStartDateTime: currentLevel.hourStartDateTime,
+          epoch: currentLevel.epoch,
+          slot: currentLevel.slot,
+        };
     }
-  }, [granularity]);
-
-  /**
-   * Get heatmap card title based on granularity
-   */
-  const heatmapTitle = useMemo(() => {
-    switch (granularity) {
-      case 'window':
-        return 'Column Availability Across Days';
-      case 'day':
-        return `Column Availability by Hour - ${currentLevel.type === 'day' ? currentLevel.date : ''}`;
-      case 'hour':
-        return 'Column Availability by Epoch';
-      case 'epoch':
-        return `Column Availability by Slot - Epoch ${currentLevel.type === 'epoch' ? formatEpoch(currentLevel.epoch) : ''}`;
-      case 'slot':
-        return `Column Availability by Blob - Slot ${currentLevel.type === 'slot' ? currentLevel.slot : ''}`;
-      default:
-        return 'Column Availability';
-    }
-  }, [granularity, currentLevel]);
-
-  /**
-   * Get heatmap card subtitle based on granularity
-   */
-  const heatmapSubtitle = useMemo(() => {
-    switch (granularity) {
-      case 'window':
-        return 'Click on any day to view hourly breakdown';
-      case 'day':
-        return 'Click on any hour to view epochs';
-      case 'hour':
-        return 'Click on any epoch to view slots';
-      case 'epoch':
-        return 'Click on any slot to view blobs';
-      case 'slot':
-        return 'Detailed blob-level availability data';
-      default:
-        return '';
-    }
-  }, [granularity]);
+  }, [currentLevel]);
 
   if (error) {
     return (
       <Container>
-        <Header
-          title="Custody"
-          description="PeerDAS data availability visualization showing column custody across validators"
-        />
         <div className="rounded-sm border border-danger/20 bg-danger/10 p-4 text-danger">
           Error loading data: {error instanceof Error ? error.message : 'Unknown error'}
         </div>
@@ -716,120 +631,90 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      <Header
-        title="Custody"
-        description="PeerDAS data availability visualization showing column custody across validators"
-      />
+      {/* Top panel: Heatmap controls + Live Probes (50/50 on desktop) */}
+      <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {/* Left: Unified heatmap control panel */}
+        <div className="rounded-xs border border-border/50 bg-surface/50 p-3">
+          {/* Description */}
+          <p className="mb-2.5 text-xs text-muted">
+            <span className="font-medium text-foreground">Live custody monitoring for PeerDAS.</span> Verifies peers are
+            storing claimed data columns. Powered by{' '}
+            <a
+              href="https://github.com/ethpandaops/dasmon"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-accent hover:underline"
+            >
+              dasmon
+            </a>
+            .
+          </p>
 
-      {/* Breadcrumb navigation and controls */}
-      <div className="mb-6 flex items-center justify-between gap-4">
-        {/* Breadcrumbs - always visible */}
-        <nav className="flex items-center gap-2 text-sm/6">
-          {breadcrumbs.map((crumb, index) => (
-            <div key={index} className="flex items-center gap-2">
-              {index > 0 && <span className="text-muted">/</span>}
-              <button
-                type="button"
-                onClick={crumb.onClick}
-                className={
-                  index === breadcrumbs.length - 1
-                    ? 'font-semibold text-foreground'
-                    : 'text-accent transition-colors hover:text-accent/80'
-                }
-              >
-                {crumb.label}
-              </button>
+          {/* Divider */}
+          <div className="mb-2.5 border-t border-border/30" />
+
+          {/* Header row: Breadcrumbs + Controls */}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            {/* Breadcrumbs */}
+            <nav className="flex items-center gap-1.5 text-sm/5">
+              {breadcrumbs.map((crumb, index) => (
+                <div key={index} className="flex items-center gap-1.5">
+                  {index > 0 && <span className="text-muted">/</span>}
+                  <button
+                    type="button"
+                    onClick={crumb.onClick}
+                    className={
+                      index === breadcrumbs.length - 1
+                        ? 'font-medium text-foreground'
+                        : 'text-accent transition-colors hover:text-accent/80'
+                    }
+                  >
+                    {crumb.label}
+                  </button>
+                </div>
+              ))}
+            </nav>
+
+            {/* Controls */}
+            <div className="flex items-center gap-2">
+              <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
+              <TimezoneToggle size="compact" />
             </div>
-          ))}
-        </nav>
+          </div>
 
-        {/* View mode toggle and timezone toggle */}
-        <div className="flex items-center gap-4">
-          <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
-          <TimezoneToggle size="compact" />
+          {/* Divider */}
+          <div className="my-2.5 border-t border-border/30" />
+
+          {/* Legend - inline */}
+          <DataAvailabilityLegend granularity={granularity} viewMode={viewMode} threshold={threshold} />
         </div>
+
+        {/* Right: Live Probe Events */}
+        <LiveProbeEvents
+          context={probeFilterContext}
+          maxEvents={5}
+          pollInterval={30000}
+          probesLinkParams={probesLinkParams}
+        />
       </div>
 
       {/* Loading state - show while determining initial view OR while loading data */}
       {isLoading || (forkViewLoading && !hasPerformedInitialNav && currentLevel.type === 'window') ? (
         <DataAvailabilitySkeleton />
       ) : (
-        <div className="space-y-6">
-          {/* Summary stats */}
-          <Stats
-            stats={[
-              {
-                id: 'periods',
-                name: periodLabel,
-                value: summaryStats.totalPeriods.toLocaleString(),
-                icon: ChartBarIcon,
-              },
-              {
-                id: 'columns',
-                name: 'Active Columns',
-                value: `${summaryStats.activeColumns} / ${TOTAL_COLUMNS}`,
-                icon: TableCellsIcon,
-              },
-              {
-                id: 'availability',
-                name: 'Avg Availability',
-                value: `${(summaryStats.avgAvailability * 100).toFixed(1)}%`,
-                icon: CheckCircleIcon,
-              },
-              {
-                id: 'response',
-                name: 'Avg Response Time',
-                value: summaryStats.avgResponseTime > 0 ? `${summaryStats.avgResponseTime.toFixed(0)}ms` : 'N/A',
-                icon: ClockIcon,
-              },
-            ]}
-          />
-
-          {/* Heatmap */}
-          <PopoutCard title={heatmapTitle} subtitle={heatmapSubtitle} modalSize="fullscreen" allowContentOverflow>
-            <div className="space-y-6">
-              {/* Filters and Legend on same line */}
-              <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-start">
-                <div className="w-full lg:flex-[2]">
-                  <DataAvailabilityFilterPanel
-                    filters={filters}
-                    onFiltersChange={setFilters}
-                    defaultOpen={false}
-                    viewMode={viewMode}
-                    threshold={threshold}
-                    onThresholdChange={handleThresholdChange}
-                  />
-                </div>
-                <div className="w-full lg:flex-1">
-                  <DataAvailabilityLegend granularity={granularity} viewMode={viewMode} threshold={threshold} />
-                </div>
-              </div>
-
-              {/* Heatmap with horizontal scroll */}
-              <div className="-mt-24 overflow-x-auto pt-24 pb-4">
-                <DataAvailabilityHeatmap
-                  rows={rows}
-                  granularity={granularity}
-                  filters={filters}
-                  viewMode={viewMode}
-                  threshold={threshold}
-                  selectedColumnIndex={selectedColumnIndex}
-                  onCellClick={handleCellClick}
-                  onRowClick={currentLevel.type !== 'slot' ? handleRowClick : undefined}
-                  onClearColumnSelection={() =>
-                    navigate({
-                      search: prev => ({ ...prev, column: undefined }),
-                    })
-                  }
-                  onBack={breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2].onClick : undefined}
-                  cellSize="xs"
-                  showColumnHeader
-                  showLegend={false}
-                />
-              </div>
-            </div>
-          </PopoutCard>
-        </div>
+        /* Heatmap view */
+        <DataAvailabilityHeatmap
+          rows={rows}
+          granularity={granularity}
+          filters={filters}
+          viewMode={viewMode}
+          threshold={threshold}
+          onRowClick={currentLevel.type !== 'slot' ? handleRowClick : undefined}
+          onBack={breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2].onClick : undefined}
+          cellSize="2xs"
+          showColumnHeader
+          showLegend={false}
+        />
       )}
     </Container>
   );

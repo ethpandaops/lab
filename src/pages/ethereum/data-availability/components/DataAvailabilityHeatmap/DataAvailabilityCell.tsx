@@ -49,12 +49,13 @@ const getThresholdColor = (successCount: number, threshold: number, hasData: boo
  * Gets the size class for the cell
  */
 const getSizeClass = (size: CellSize): string => {
-  const sizes = {
-    xs: 'size-3', // 12px (default)
-    sm: 'size-4', // 16px
-    md: 'size-6', // 24px
-    lg: 'size-8', // 32px
-    xl: 'size-10', // 40px
+  const sizes: Record<CellSize, string> = {
+    '2xs': 'size-[9px]', // 9px - compact
+    xs: 'size-2.5', // 10px
+    sm: 'size-3', // 12px
+    md: 'size-4', // 16px
+    lg: 'size-6', // 24px
+    xl: 'size-8', // 32px
   };
   return sizes[size];
 };
@@ -70,7 +71,7 @@ export const DataAvailabilityCell = ({
   isSelected = false,
   isHighlighted = false,
   isDimmed = false,
-  size = 'xs',
+  size = '2xs',
   onClick,
   showTooltip = true,
 }: DataAvailabilityCellProps): React.JSX.Element => {

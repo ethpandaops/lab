@@ -3216,10 +3216,6 @@ export type IntCustodyProbe = {
    */
   error?: string;
   /**
-   * Time bucket for grouped probes (3 second intervals)
-   */
-  event_date_time?: number;
-  /**
    * Autonomous system number of the client
    */
   meta_client_geo_autonomous_system_number?: number | null;
@@ -3315,6 +3311,10 @@ export type IntCustodyProbe = {
    * Unique key associated with the identifier of the peer
    */
   peer_id_unique_key?: number;
+  /**
+   * Time bucket for grouped probes (3 second intervals)
+   */
+  probe_date_time?: number;
   /**
    * Response time in milliseconds
    */
@@ -32428,43 +32428,43 @@ export type IntCustodyProbeServiceListData = {
     /**
      * Time bucket for grouped probes (3 second intervals) (filter: eq)
      */
-    event_date_time_eq?: number;
+    probe_date_time_eq?: number;
     /**
      * Time bucket for grouped probes (3 second intervals) (filter: ne)
      */
-    event_date_time_ne?: number;
+    probe_date_time_ne?: number;
     /**
      * Time bucket for grouped probes (3 second intervals) (filter: lt)
      */
-    event_date_time_lt?: number;
+    probe_date_time_lt?: number;
     /**
      * Time bucket for grouped probes (3 second intervals) (filter: lte)
      */
-    event_date_time_lte?: number;
+    probe_date_time_lte?: number;
     /**
      * Time bucket for grouped probes (3 second intervals) (filter: gt)
      */
-    event_date_time_gt?: number;
+    probe_date_time_gt?: number;
     /**
      * Time bucket for grouped probes (3 second intervals) (filter: gte)
      */
-    event_date_time_gte?: number;
+    probe_date_time_gte?: number;
     /**
      * Time bucket for grouped probes (3 second intervals) (filter: between_min)
      */
-    event_date_time_between_min?: number;
+    probe_date_time_between_min?: number;
     /**
      * Time bucket for grouped probes (3 second intervals) (filter: between_max_value)
      */
-    event_date_time_between_max_value?: number;
+    probe_date_time_between_max_value?: number;
     /**
      * Time bucket for grouped probes (3 second intervals) (filter: in_values) (comma-separated list)
      */
-    event_date_time_in_values?: string;
+    probe_date_time_in_values?: string;
     /**
      * Time bucket for grouped probes (3 second intervals) (filter: not_in_values) (comma-separated list)
      */
-    event_date_time_not_in_values?: string;
+    probe_date_time_not_in_values?: string;
     /**
      * Unique key associated with the identifier of the peer (filter: eq)
      */
@@ -33486,10 +33486,10 @@ export type IntCustodyProbeServiceGetData = {
     /**
      * Time bucket for grouped probes (3 second intervals)
      */
-    event_date_time: number;
+    probe_date_time: number;
   };
   query?: never;
-  url: '/api/v1/int_custody_probe/{event_date_time}';
+  url: '/api/v1/int_custody_probe/{probe_date_time}';
 };
 
 export type IntCustodyProbeServiceGetErrors = {

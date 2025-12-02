@@ -8,26 +8,54 @@ export const probesSearchSchema = z.object({
   // Pagination
   page: z.coerce.number().min(1).optional(),
   pageSize: z.coerce.number().min(1).max(100).optional(),
-
-  // Slot and epoch filters
-  slot: z.coerce.number().optional(),
-  epoch: z.coerce.number().optional(),
-
-  // Column index selection (0-127)
-  column: z.coerce.number().min(0).max(127).optional(),
-
-  // Result filter (success/failure/missing)
-  result: z.string().optional(),
-
-  // Client implementation filter
-  client: z.string().optional(),
-
-  // Country filter
-  country: z.string().optional(),
+  pageToken: z.string().optional(),
 
   // Sorting
   sortBy: z.string().optional(),
   sortOrder: z.enum(['asc', 'desc']).optional(),
+
+  // Result filter (success/failure/missing)
+  result: z.string().optional(),
+
+  // Client implementation filters
+  prober: z.string().optional(),
+  peer: z.string().optional(),
+
+  // Peer ID filter (stored as string to preserve BigInt precision)
+  peerId: z.coerce.string().optional(),
+
+  // Node ID filter (prober node identifier)
+  nodeId: z.string().optional(),
+
+  // Country filters
+  proberCountry: z.string().optional(),
+  peerCountry: z.string().optional(),
+
+  // City filters
+  proberCity: z.string().optional(),
+  peerCity: z.string().optional(),
+
+  // Version filters
+  proberVersion: z.string().optional(),
+  peerVersion: z.string().optional(),
+
+  // ASN filters
+  proberAsn: z.coerce.number().optional(),
+  peerAsn: z.coerce.number().optional(),
+
+  // Slot filter (filter by individual slot)
+  slot: z.coerce.number().optional(),
+
+  // Column filter (filter by individual column index)
+  column: z.coerce.number().optional(),
+
+  // Time range filters (Unix timestamps) - for linking from custody drill-down
+  timeStart: z.coerce.number().optional(),
+  timeEnd: z.coerce.number().optional(),
+
+  // Probe detail dialog - unique identifier is probe_date_time + peer_id_unique_key
+  probeTime: z.coerce.number().optional(),
+  probePeerId: z.coerce.number().optional(),
 });
 
 /**

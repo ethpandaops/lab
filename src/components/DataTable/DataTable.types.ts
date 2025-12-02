@@ -50,8 +50,15 @@ export interface DataTableProps<TData> {
   manualPagination?: boolean;
   manualFiltering?: boolean;
   manualSorting?: boolean;
+  // For cursor-based pagination (when total count is unknown)
+  hasNextPage?: boolean;
   // Appearance
   emptyMessage?: string;
   title?: string;
   description?: string;
+  // Toolbar options
+  hideGlobalFilter?: boolean;
+  hideColumnVisibility?: boolean;
+  // Pagination position
+  paginationPosition?: 'top' | 'bottom' | 'both';
 }

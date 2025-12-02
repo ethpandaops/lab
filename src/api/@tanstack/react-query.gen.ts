@@ -3467,7 +3467,7 @@ export const intCustodyProbeServiceGetQueryKey = (options: Options<IntCustodyPro
 /**
  * Get record
  *
- * Retrieve a single record by event_date_time
+ * Retrieve a single record by probe_date_time
  */
 export const intCustodyProbeServiceGetOptions = (options: Options<IntCustodyProbeServiceGetData>) =>
   queryOptions<

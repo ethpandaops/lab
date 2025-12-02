@@ -2636,7 +2636,7 @@ export const intCustodyProbeServiceList = <ThrowOnError extends boolean = false>
 /**
  * Get record
  *
- * Retrieve a single record by event_date_time
+ * Retrieve a single record by probe_date_time
  */
 export const intCustodyProbeServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntCustodyProbeServiceGetData, ThrowOnError>
@@ -2648,7 +2648,7 @@ export const intCustodyProbeServiceGet = <ThrowOnError extends boolean = false>(
   >({
     requestValidator: async data => await zIntCustodyProbeServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntCustodyProbeServiceGetResponse.parseAsync(data),
-    url: '/api/v1/int_custody_probe/{event_date_time}',
+    url: '/api/v1/int_custody_probe/{probe_date_time}',
     ...options,
   });
 };
