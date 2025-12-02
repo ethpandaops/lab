@@ -1,4 +1,4 @@
-import { type JSX, useState, useMemo } from 'react';
+import { type JSX, useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearch, useNavigate } from '@tanstack/react-router';
 import { ChartBarIcon, TableCellsIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
@@ -44,6 +44,7 @@ import {
 import { fetchAllPages } from '@/utils/api-pagination';
 import type { CustodySearch } from './IndexPage.types';
 import { validateSearchParamHierarchy, getDefaultThreshold } from './IndexPage.types';
+import { useForkBasedInitialView } from './hooks/useForkBasedInitialView';
 
 /**
  * Drill-down level state - each level maintains parent context for breadcrumbs
@@ -159,6 +160,34 @@ export function IndexPage(): JSX.Element {
   // Derive drill-down state from URL
   const currentLevel = deriveCurrentLevel(search);
   const selectedColumnIndex = search.column;
+
+  // Smart initial view based on fork timing
+  const { searchParams: forkBasedParams, isLoading: forkViewLoading } = useForkBasedInitialView();
+
+  // Track if we've performed the initial navigation
+  const [hasPerformedInitialNav, setHasPerformedInitialNav] = useState(false);
+
+  // Auto-navigate to fork-based view on initial load (no URL params)
+  useEffect(() => {
+    // Skip if:
+    // - Already performed initial nav
+    // - URL already has params (user navigated directly)
+    // - Still loading fork data
+    // - No fork-based params (window view or non-Fulu network)
+    const hasExistingParams =
+      search.date !== undefined || search.hour !== undefined || search.epoch !== undefined || search.slot !== undefined;
+
+    if (hasPerformedInitialNav || hasExistingParams || forkViewLoading || !forkBasedParams) {
+      return;
+    }
+
+    // Navigate to the recommended view
+    setHasPerformedInitialNav(true);
+    navigate({
+      search: forkBasedParams,
+      replace: true, // Don't add to history since this is auto-navigation
+    });
+  }, [hasPerformedInitialNav, search, forkViewLoading, forkBasedParams, navigate]);
 
   // View mode from URL (default to 'threshold' since it's more robust)
   const viewMode: ViewMode = search.mode ?? 'threshold';
@@ -721,8 +750,8 @@ export function IndexPage(): JSX.Element {
         </div>
       </div>
 
-      {/* Loading state */}
-      {isLoading ? (
+      {/* Loading state - show while determining initial view OR while loading data */}
+      {isLoading || (forkViewLoading && !hasPerformedInitialNav && currentLevel.type === 'window') ? (
         <DataAvailabilitySkeleton />
       ) : (
         <div className="space-y-6">
