@@ -65,19 +65,20 @@ export function NetworkIcon({ networkName, className }: NetworkIconProps): JSX.E
     );
   }
 
-  // Emoji icons: render span with className
+  // Emoji icons: render in a flex container for proper centering
+  // Use the className for sizing the container, and scale emoji to fit
   if (icon?.type === 'emoji') {
     return (
-      <span className={clsx(className || 'text-base')} aria-hidden="true">
-        {icon.content}
+      <span className={clsx('inline-flex items-center justify-center', className || 'size-6')} aria-hidden="true">
+        <span className="text-[1.1em] leading-none">{icon.content}</span>
       </span>
     );
   }
 
   // Fallback for unknown networks
   return (
-    <span className={clsx(className || 'text-base')} aria-hidden="true">
-      🧪
+    <span className={clsx('inline-flex items-center justify-center', className || 'size-6')} aria-hidden="true">
+      <span className="text-[1.1em] leading-none">🧪</span>
     </span>
   );
 }
