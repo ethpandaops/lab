@@ -5,6 +5,7 @@ import {
   HeadContent,
   Link,
   useRouter,
+  useSearch,
   retainSearchParams,
 } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -34,9 +35,11 @@ interface MyRouterContext {
   };
 }
 
-// Define search params schema for network selection
+// Define search params schema for network selection, embed mode, and theme override
 const rootSearchSchema = z.object({
   network: z.string().optional(),
+  embed: z.boolean().optional(),
+  theme: z.enum(['light', 'dark', 'star']).optional(),
 });
 
 export type RootSearch = z.infer<typeof rootSearchSchema>;
@@ -46,6 +49,7 @@ declare global {
   interface Window {
     __CONFIG__?: Config;
     __BOUNDS__?: Record<string, Bounds>;
+    __VERSION__?: string;
   }
 }
 
@@ -115,10 +119,22 @@ function MobileHeader({
   );
 }
 
+const SIDEBAR_COLLAPSED_KEY = 'lab-sidebar-collapsed';
+
 function RootComponent(): JSX.Element {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true';
+  });
   const [isAppleWatch, setIsAppleWatch] = useState(false);
   const router = useRouter();
+  const { embed, theme: themeOverride } = useSearch({ from: '__root__' });
+
+  // Persist sidebar collapsed state
+  useEffect(() => {
+    localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(sidebarCollapsed));
+  }, [sidebarCollapsed]);
 
   // Detect Apple Watch using multiple heuristics
   // Apple Watch reports as iPhone but has distinctive screen dimensions
@@ -173,7 +189,7 @@ function RootComponent(): JSX.Element {
   if (isAppleWatch) {
     return (
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
+        <ThemeProvider themeOverride={themeOverride}>
           <div className="flex min-h-dvh items-center justify-center bg-background p-4">
             <span
               className="text-center"
@@ -189,9 +205,44 @@ function RootComponent(): JSX.Element {
     );
   }
 
+  // Embed mode: minimal layout without sidebar, header, or breadcrumb
+  if (embed) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider themeOverride={themeOverride}>
+          <NotificationProvider>
+            <TimezoneProvider>
+              <ConfigGate>
+                <NetworkProvider>
+                  <SharedCrosshairsProvider>
+                    <HeadContent />
+                    <main className="relative min-h-dvh bg-background">
+                      {/* ethPandaOps logo watermark */}
+                      <a
+                        href="https://lab.ethpandaops.io"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute top-4 right-4 z-50 opacity-60 transition-opacity hover:opacity-100"
+                      >
+                        <img src="/images/ethpandaops-logo-64.png" alt="ethPandaOps" className="h-8 w-auto" />
+                      </a>
+                      <FeatureGate>
+                        <Outlet />
+                      </FeatureGate>
+                    </main>
+                  </SharedCrosshairsProvider>
+                </NetworkProvider>
+              </ConfigGate>
+            </TimezoneProvider>
+          </NotificationProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
+      <ThemeProvider themeOverride={themeOverride}>
         <NotificationProvider>
           <TimezoneProvider>
             <ConfigGate>
@@ -200,13 +251,20 @@ function RootComponent(): JSX.Element {
                   <HeadContent />
                   <div className="bg-background">
                     {/* Sidebar (mobile + desktop) */}
-                    <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+                    <Sidebar
+                      sidebarOpen={sidebarOpen}
+                      setSidebarOpen={setSidebarOpen}
+                      collapsed={sidebarCollapsed}
+                      setCollapsed={setSidebarCollapsed}
+                    />
 
                     {/* Mobile header */}
                     <MobileHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
                     {/* Main content */}
-                    <main className="bg-background pt-[65px] lg:min-h-dvh lg:pt-0 lg:pl-72">
+                    <main
+                      className={`bg-background pt-[65px] transition-all duration-200 lg:min-h-dvh lg:pt-0 ${sidebarCollapsed ? 'lg:pl-14' : 'lg:pl-56'}`}
+                    >
                       <FeatureGate>
                         <Breadcrumb />
                         <Outlet />
