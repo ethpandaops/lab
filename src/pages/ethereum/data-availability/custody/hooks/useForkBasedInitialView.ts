@@ -15,7 +15,7 @@ import { epochToTimestamp } from '@/utils/beacon';
  * - 172800: Simulate 2 days after fork (shows hour view)
  * - 432000: Simulate 5 days after fork (shows window view)
  */
-export const FORK_TIME_OVERRIDE_SECONDS: number | null = null;
+export const FORK_TIME_OVERRIDE_SECONDS: number | null = 432000;
 
 /**
  * Time thresholds for view selection (in seconds)
@@ -23,15 +23,17 @@ export const FORK_TIME_OVERRIDE_SECONDS: number | null = null;
 const THRESHOLDS = {
   /** Less than 1 hour since fork: show epoch view */
   EPOCH_VIEW: 3600,
-  /** Less than 5 days since fork: show hour view */
-  HOUR_VIEW: 432000,
+  /** Less than 24 hours since fork: show hour view */
+  HOUR_VIEW: 86400,
+  /** Less than 5 days since fork: show day view */
+  DAY_VIEW: 432000,
   // >= 5 days: window view (default)
 };
 
 /**
  * Possible initial view recommendations
  */
-type InitialViewType = 'window' | 'hour' | 'epoch';
+type InitialViewType = 'window' | 'day' | 'hour' | 'epoch';
 
 /**
  * Return type for the useForkBasedInitialView hook
@@ -54,8 +56,9 @@ export interface ForkBasedInitialView {
  * based on time elapsed since Fulu fork activation.
  *
  * This provides "smart" initial view selection:
- * - < 1 hour since fork: Show epoch view (most granular)
- * - < 5 days since fork: Show hour view (epochs within hour)
+ * - < 1 hour since fork: Show epoch view (slots within epoch)
+ * - < 24 hours since fork: Show hour view (epochs within hour)
+ * - < 5 days since fork: Show day view (hours within day)
  * - >= 5 days since fork: Show window view (default 19-day view)
  *
  * @example
@@ -137,9 +140,13 @@ export function useForkBasedInitialView(): ForkBasedInitialView {
       const latestEpoch = Math.floor((nowSeconds - currentNetwork.genesis_time) / (32 * 12));
       searchParams = { date: utcDate, hour: hourStartTimestamp, epoch: latestEpoch };
     } else if (secondsSinceFork < THRESHOLDS.HOUR_VIEW) {
-      // < 5 days: Show hour view of the latest hour
+      // < 24 hours: Show hour view of the latest hour
       recommendedView = 'hour';
       searchParams = { date: utcDate, hour: hourStartTimestamp };
+    } else if (secondsSinceFork < THRESHOLDS.DAY_VIEW) {
+      // < 5 days: Show day view of the latest day
+      recommendedView = 'day';
+      searchParams = { date: utcDate };
     } else {
       // >= 5 days: Show default window view
       recommendedView = 'window';
