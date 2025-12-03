@@ -1,4 +1,4 @@
-import { type JSX, useState, useMemo, useEffect } from 'react';
+import { type JSX, useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearch, useNavigate } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
@@ -10,6 +10,8 @@ import { TimezoneToggle } from '@/components/Elements/TimezoneToggle';
 import { InfoBox } from '@/components/Feedback/InfoBox';
 import { LiveProbeEvents } from './components/LiveProbeEvents';
 import type { ProbeFilterContext } from './components/LiveProbeEvents';
+import { CellProbeDialog } from './components/CellProbeDialog';
+import type { CellContext, TimeRangeContext } from './components/CellProbeDialog';
 import type {
   DataAvailabilityGranularity,
   ViewMode,
@@ -248,6 +250,11 @@ export function IndexPage(): JSX.Element {
     }),
     []
   );
+
+  // Cell probe dialog state
+  const [cellDialogOpen, setCellDialogOpen] = useState(false);
+  const [cellContext, setCellContext] = useState<CellContext | null>(null);
+  const [timeRangeContext, setTimeRangeContext] = useState<TimeRangeContext | null>(null);
 
   // Window Level: Last 19 days of daily aggregated data
   const windowQuery = useQuery({
@@ -532,6 +539,206 @@ export function IndexPage(): JSX.Element {
   };
 
   /**
+   * Handle cell click to show probe details for a specific row/column
+   * Opens a dialog with probes filtered by the time range and column
+   */
+  const handleCellClick = useCallback(
+    (rowIdentifier: string, columnIndex: number): void => {
+      // Find the row to get its label
+      const row = rows.find(r => r.identifier === rowIdentifier);
+      const rowLabel = row?.label ?? rowIdentifier;
+
+      // Build cell context
+      const cellCtx: CellContext = {
+        rowIdentifier,
+        columnIndex,
+        granularity,
+        rowLabel,
+      };
+
+      // Build time range context based on granularity
+      let timeRange: TimeRangeContext = {};
+
+      switch (currentLevel.type) {
+        case 'window': {
+          // Row is a date - filter by that day
+          const dayStart = Math.floor(new Date(rowIdentifier).getTime() / 1000);
+          timeRange = {
+            timeStart: dayStart,
+            timeEnd: dayStart + SECONDS_PER_DAY,
+          };
+          break;
+        }
+        case 'day': {
+          // Row is hour start timestamp - filter by that hour
+          const hourStart = Number(rowIdentifier);
+          timeRange = {
+            timeStart: hourStart,
+            timeEnd: hourStart + SECONDS_PER_HOUR,
+          };
+          break;
+        }
+        case 'hour': {
+          // Row is epoch number - filter by slots in that epoch
+          const epoch = Number(rowIdentifier);
+          const epochStartSlot = epoch * SLOTS_PER_EPOCH;
+          const slots = Array.from({ length: SLOTS_PER_EPOCH }, (_, i) => epochStartSlot + i);
+          // Use the hour's time range but filter by specific slots
+          timeRange = {
+            timeStart: currentLevel.hourStartDateTime,
+            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
+            slots,
+          };
+          break;
+        }
+        case 'epoch': {
+          // Row is slot number - filter by that specific slot
+          const slot = Number(rowIdentifier);
+          timeRange = {
+            slot,
+            timeStart: currentLevel.hourStartDateTime,
+            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
+          };
+          break;
+        }
+        case 'slot': {
+          // Row is blob index - use the slot from currentLevel
+          timeRange = {
+            slot: currentLevel.slot,
+            timeStart: currentLevel.hourStartDateTime,
+            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
+          };
+          break;
+        }
+      }
+
+      setCellContext(cellCtx);
+      setTimeRangeContext(timeRange);
+      setCellDialogOpen(true);
+    },
+    [rows, granularity, currentLevel]
+  );
+
+  /**
+   * Handle cell dialog close
+   */
+  const handleCellDialogClose = useCallback(() => {
+    setCellDialogOpen(false);
+  }, []);
+
+  /**
+   * Handle column click to show probe details for an entire column (all rows)
+   * Opens the same dialog but with column-only context (no row filtering)
+   */
+  const handleColumnClick = useCallback(
+    (columnIndex: number): void => {
+      // Build context label based on current drill-down level
+      let contextLabel: string;
+      switch (currentLevel.type) {
+        case 'window':
+          contextLabel = `Last ${WINDOW_DAYS} Days`;
+          break;
+        case 'day': {
+          const dateStr = new Date(currentLevel.date).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            ...(timezone === 'UTC' ? { timeZone: 'UTC' } : {}),
+          });
+          contextLabel = dateStr;
+          break;
+        }
+        case 'hour': {
+          const dateStr = new Date(currentLevel.date).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            ...(timezone === 'UTC' ? { timeZone: 'UTC' } : {}),
+          });
+          const timeStr = new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+            ...(timezone === 'UTC' ? { timeZone: 'UTC' } : {}),
+          });
+          contextLabel = `${dateStr} at ${timeStr}`;
+          break;
+        }
+        case 'epoch':
+          contextLabel = `Epoch ${formatEpoch(currentLevel.epoch)}`;
+          break;
+        case 'slot':
+          contextLabel = `Slot ${formatSlot(currentLevel.slot)}`;
+          break;
+      }
+
+      // Build cell context for column-only view
+      const cellCtx: CellContext = {
+        columnIndex,
+        granularity,
+        isColumnOnly: true,
+        contextLabel,
+      };
+
+      // Build time range context based on current view level (full range)
+      let timeRange: TimeRangeContext = {};
+      const now = Math.floor(Date.now() / 1000);
+
+      switch (currentLevel.type) {
+        case 'window': {
+          // Full 19-day window
+          timeRange = {
+            timeStart: now - WINDOW_DAYS * SECONDS_PER_DAY,
+            timeEnd: now,
+          };
+          break;
+        }
+        case 'day': {
+          // Full day
+          const dayStart = Math.floor(new Date(currentLevel.date).getTime() / 1000);
+          timeRange = {
+            timeStart: dayStart,
+            timeEnd: dayStart + SECONDS_PER_DAY,
+          };
+          break;
+        }
+        case 'hour': {
+          // Full hour
+          timeRange = {
+            timeStart: currentLevel.hourStartDateTime,
+            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
+          };
+          break;
+        }
+        case 'epoch': {
+          // All slots in the epoch
+          const epochStartSlot = currentLevel.epoch * SLOTS_PER_EPOCH;
+          const slots = Array.from({ length: SLOTS_PER_EPOCH }, (_, i) => epochStartSlot + i);
+          timeRange = {
+            timeStart: currentLevel.hourStartDateTime,
+            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
+            slots,
+          };
+          break;
+        }
+        case 'slot': {
+          // Just the slot
+          timeRange = {
+            slot: currentLevel.slot,
+            timeStart: currentLevel.hourStartDateTime,
+            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
+          };
+          break;
+        }
+      }
+
+      setCellContext(cellCtx);
+      setTimeRangeContext(timeRange);
+      setCellDialogOpen(true);
+    },
+    [granularity, currentLevel, timezone]
+  );
+
+  /**
    * Handle view mode change
    * Updates URL search params to switch between percentage and threshold modes
    */
@@ -790,6 +997,8 @@ export function IndexPage(): JSX.Element {
                   viewMode={viewMode}
                   threshold={threshold}
                   onRowClick={currentLevel.type !== 'slot' ? handleRowClick : undefined}
+                  onCellClick={handleCellClick}
+                  onColumnClick={handleColumnClick}
                   onBack={breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2].onClick : undefined}
                   cellSize="3xs"
                   showColumnHeader
@@ -807,6 +1016,14 @@ export function IndexPage(): JSX.Element {
           </div>
         </div>
       </div>
+
+      {/* Cell Probe Dialog */}
+      <CellProbeDialog
+        isOpen={cellDialogOpen}
+        onClose={handleCellDialogClose}
+        cellContext={cellContext}
+        timeRangeContext={timeRangeContext}
+      />
     </Container>
   );
 }

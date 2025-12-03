@@ -75,6 +75,10 @@ export interface GridHeatmapProps<T = unknown> {
   showColumnHeader?: boolean;
   /** Optional: Callback when a row label is clicked */
   onRowClick?: (rowId: string) => void;
+  /** Optional: Callback when a cell is clicked */
+  onCellClick?: (rowId: string, columnIndex: number) => void;
+  /** Optional: Callback when a column header is clicked */
+  onColumnClick?: (columnIndex: number) => void;
   /** Optional: Callback when back button is clicked */
   onBack?: () => void;
   /** Render function for individual cells */

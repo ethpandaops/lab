@@ -26,6 +26,8 @@ export const DataAvailabilityHeatmap = ({
   viewMode = 'percentage',
   threshold = 30,
   onRowClick,
+  onCellClick,
+  onColumnClick,
   onBack,
   cellSize = '2xs',
   showColumnHeader = true,
@@ -100,6 +102,8 @@ export const DataAvailabilityHeatmap = ({
       cellSize={cellSize}
       showColumnHeader={showColumnHeader}
       onRowClick={onRowClick}
+      onCellClick={onCellClick}
+      onColumnClick={onColumnClick}
       onBack={onBack}
       xAxisTitle={showAxisTitles ? 'Data Column' : undefined}
       renderRowLabel={renderRowLabel}

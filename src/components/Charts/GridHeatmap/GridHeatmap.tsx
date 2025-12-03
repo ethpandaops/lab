@@ -29,6 +29,8 @@ export function GridHeatmap<T = unknown>({
   cellSize = '2xs',
   showColumnHeader = true,
   onRowClick,
+  onCellClick,
+  onColumnClick,
   onBack,
   renderCell,
   renderHeader,
@@ -111,22 +113,27 @@ export function GridHeatmap<T = unknown>({
   const defaultRenderColumnLabel = (colIndex: number, isHovered: boolean): React.JSX.Element => {
     const displayIndex = colIndex + 1;
     const showLabel = displayIndex % 16 === 0 || colIndex === 0 || isHovered;
+    const isClickable = !!onColumnClick;
 
     return (
-      <div
+      <button
         key={colIndex}
+        type="button"
+        onClick={isClickable ? () => onColumnClick(colIndex) : undefined}
         onMouseEnter={() => setHoveredColumn(colIndex)}
         onMouseLeave={() => setHoveredColumn(null)}
+        disabled={!isClickable}
         className={clsx(
           cellSizeClass[cellSize],
           textSize[cellSize],
           'text-center transition-colors',
-          isHovered ? 'font-bold text-accent' : 'text-muted'
+          isHovered ? 'font-bold text-accent' : 'text-muted',
+          isClickable && 'cursor-pointer hover:text-accent'
         )}
-        title={`Column ${displayIndex}`}
+        title={isClickable ? `View probes for column ${displayIndex}` : `Column ${displayIndex}`}
       >
         {showLabel ? displayIndex : ''}
-      </div>
+      </button>
     );
   };
 
@@ -209,6 +216,7 @@ export function GridHeatmap<T = unknown>({
                             isHighlighted,
                             isDimmed: false,
                             size: cellSize,
+                            onClick: onCellClick ? () => onCellClick(row.identifier, cell.columnIndex) : undefined,
                           })}
                         </div>
                       );

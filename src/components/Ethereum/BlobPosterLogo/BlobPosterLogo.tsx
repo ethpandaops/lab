@@ -118,7 +118,7 @@ const SHORT_NAME_MAP: Record<string, string> = {
   'zksync era': 'ZKS',
   'zksync gateway': 'ZKGW',
   zora: 'ZORA',
-  unknown: '?',
+  unknown: 'UNKNOWN',
 };
 
 /**

@@ -1,5 +1,5 @@
 import { type JSX, useState, useMemo, useCallback, useRef, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import {
   CheckCircleIcon,
   XCircleIcon,
@@ -37,6 +37,9 @@ const SLOTS_PER_EPOCH = 32;
 /** Buffer in seconds to add around time ranges (2 minutes) */
 const TIME_BUFFER = 120;
 
+/** Round to nearest minute to stabilize query params and prevent flickering */
+const ROUND_INTERVAL = 60;
+
 /**
  * Build API query parameters based on the current drill-down context
  * Uses slot_start_date_time for time filtering (matches _by_slot table primary key)
@@ -47,7 +50,8 @@ function buildQueryParams(context: ProbeFilterContext): {
   slot_in_values?: string;
   slot_eq?: number;
 } {
-  const now = Math.floor(Date.now() / 1000);
+  // Round to nearest minute to prevent query key changes on every render
+  const now = Math.floor(Date.now() / 1000 / ROUND_INTERVAL) * ROUND_INTERVAL;
 
   switch (context.type) {
     case 'window':
@@ -219,7 +223,7 @@ export function LiveProbeEvents({
   const queryParams = useMemo(() => buildQueryParams(context), [context]);
 
   // Fetch probe data with polling
-  // Use isLoading only for initial load, not refetches (to avoid flickering)
+  // Use placeholderData to keep showing previous data during refetches (prevents flickering)
   const { data, isLoading, error, isFetched } = useQuery({
     ...intCustodyProbeOrderBySlotServiceListOptions({
       query: {
@@ -230,9 +234,10 @@ export function LiveProbeEvents({
     }),
     enabled: !!currentNetwork,
     refetchInterval: pollInterval,
+    placeholderData: keepPreviousData,
   });
 
-  const probes = data?.int_custody_probe_order_by_slot ?? [];
+  const probes = useMemo(() => data?.int_custody_probe_order_by_slot ?? [], [data]);
 
   // Detect new probes and update tracking
   useEffect(() => {

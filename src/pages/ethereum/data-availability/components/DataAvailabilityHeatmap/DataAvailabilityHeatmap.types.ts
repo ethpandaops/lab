@@ -55,6 +55,13 @@ export interface CellClickHandler {
 }
 
 /**
+ * Callback when a column header is clicked (to view all rows for that column)
+ */
+export interface ColumnClickHandler {
+  (columnIndex: number): void;
+}
+
+/**
  * Callback when a row label is clicked (to view all columns for that time period)
  */
 export interface RowClickHandler {
@@ -82,6 +89,10 @@ export interface DataAvailabilityHeatmapProps {
   threshold?: number;
   /** Callback when a row label is clicked */
   onRowClick?: RowClickHandler;
+  /** Callback when a cell is clicked */
+  onCellClick?: CellClickHandler;
+  /** Callback when a column header is clicked */
+  onColumnClick?: ColumnClickHandler;
   /** Optional: Callback when back button is clicked */
   onBack?: () => void;
   /** Optional: Cell size (default: '2xs' = 8px) */
