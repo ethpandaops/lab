@@ -38,9 +38,9 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
   const statusBorder = isSuccess ? 'border-green-500/20' : isFailure ? 'border-yellow-500/20' : 'border-red-500/20';
 
   return (
-    <div className="flex flex-col items-center gap-4 px-2 py-4 sm:flex-row sm:flex-nowrap sm:justify-center sm:gap-6 sm:px-4 sm:py-6">
-      {/* PROBER (Left on desktop, Top on mobile) */}
-      <div className="flex shrink-0 flex-col items-center gap-2">
+    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 px-2 py-4 sm:gap-6 sm:px-4 sm:py-6">
+      {/* PROBER (Left) */}
+      <div className="flex flex-col items-center gap-2 justify-self-end">
         <div className="relative">
           <ClientLogo client={probe.meta_client_implementation || 'Unknown'} size={44} className="sm:size-[52px]" />
           {clientCountryCode && (
@@ -53,18 +53,17 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
           <div className="text-sm font-bold tracking-tight text-foreground sm:text-base">
             {probe.meta_client_implementation || 'Prober'}
           </div>
-          <div className="max-w-[120px] truncate text-[10px] text-muted sm:max-w-none sm:text-xs">
-            {probe.meta_client_geo_city && probe.meta_client_geo_country
-              ? `${probe.meta_client_geo_city}, ${probe.meta_client_geo_country}`
-              : probe.meta_client_geo_city || probe.meta_client_geo_country || 'Unknown'}
-          </div>
+          {probe.meta_client_geo_city && (
+            <div className="text-[10px] text-muted sm:text-xs">{probe.meta_client_geo_city}</div>
+          )}
+          <div className="text-[10px] text-muted sm:text-xs">{probe.meta_client_geo_country || 'Unknown'}</div>
         </div>
       </div>
 
-      {/* CONNECTION (Center on desktop, Middle on mobile) */}
-      <div className="flex min-w-0 flex-col items-center justify-center gap-2 sm:gap-4">
-        {/* Request Flow (Top) - hidden on mobile, shown inline in status */}
-        <div className="hidden w-full flex-col items-center gap-0.5 sm:flex">
+      {/* CONNECTION (Center) */}
+      <div className="flex flex-col items-center justify-center gap-2 sm:gap-4">
+        {/* Request Flow (Top) - hidden on mobile */}
+        <div className="hidden flex-col items-center gap-0.5 sm:flex">
           <span className="font-mono text-xs font-medium text-foreground">
             {columnsCount} {columnsCount === 1 ? 'Column' : 'Columns'}
           </span>
@@ -99,15 +98,15 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
         </div>
 
         {/* Response Flow (Bottom) - hidden on mobile */}
-        <div className="hidden w-full flex-col items-center gap-0.5 sm:flex">
+        <div className="hidden flex-col items-center gap-0.5 sm:flex">
           <span className="text-[10px] font-medium tracking-wider text-muted uppercase">Response</span>
           <ArrowLongLeftIcon className="size-5 text-muted" />
           <span className="font-mono text-xs font-medium text-foreground">{sizeDisplay}</span>
         </div>
       </div>
 
-      {/* PEER (Right on desktop, Bottom on mobile) */}
-      <div className="flex shrink-0 flex-col items-center gap-2">
+      {/* PEER (Right) */}
+      <div className="flex flex-col items-center gap-2 justify-self-start">
         <div className="relative">
           <ClientLogo client={probe.meta_peer_implementation || 'Unknown'} size={44} className="sm:size-[52px]" />
           {peerCountryCode && (
@@ -120,11 +119,10 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
           <div className="text-sm font-bold tracking-tight text-foreground sm:text-base">
             {probe.meta_peer_implementation || 'Peer'}
           </div>
-          <div className="max-w-[120px] truncate text-[10px] text-muted sm:max-w-none sm:text-xs">
-            {probe.meta_peer_geo_city && probe.meta_peer_geo_country
-              ? `${probe.meta_peer_geo_city}, ${probe.meta_peer_geo_country}`
-              : probe.meta_peer_geo_city || probe.meta_peer_geo_country || 'Unknown'}
-          </div>
+          {probe.meta_peer_geo_city && (
+            <div className="text-[10px] text-muted sm:text-xs">{probe.meta_peer_geo_city}</div>
+          )}
+          <div className="text-[10px] text-muted sm:text-xs">{probe.meta_peer_geo_country || 'Unknown'}</div>
         </div>
       </div>
     </div>

@@ -247,8 +247,8 @@ export function ProbeDetailDialog({
                   {probe.result === 'success'
                     ? 'These blob publishers are being secured by this peer'
                     : probe.result === 'failure'
-                      ? 'Transient failure - probe did not complete'
-                      : 'This peer does not have this data'}
+                      ? 'Possible transient failure - probe did not complete'
+                      : "This peer doesn't appear to have this data"}
                 </span>
               </div>
               {/* Reassuring link - only show for failure/missing */}
@@ -292,6 +292,14 @@ export function ProbeDetailDialog({
                 ));
               })()}
             </div>
+          </div>
+        )}
+
+        {/* Error Section - show early for failure probes */}
+        {probe.error && (
+          <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3">
+            <h4 className="mb-2 text-[10px] font-bold tracking-wider text-red-400 uppercase">Error</h4>
+            <div className="font-mono text-[10px] text-red-300">{probe.error}</div>
           </div>
         )}
 
@@ -524,25 +532,17 @@ export function ProbeDetailDialog({
             </h4>
             <div className="max-h-32 overflow-y-auto rounded border border-border/50 bg-muted/30 p-2">
               <div className="flex flex-wrap gap-1">
-                {probe.column_indices.map(col => (
-                  <CopyableBadge
-                    key={col}
-                    value={col}
-                    label="Column"
-                    onDrillDown={onFilterClick ? () => handleFilterAndClose('column', col) : undefined}
-                  />
-                ))}
+                {[...probe.column_indices]
+                  .sort((a, b) => a - b)
+                  .map(col => (
+                    <CopyableBadge
+                      key={col}
+                      value={col}
+                      label="Column"
+                      onDrillDown={onFilterClick ? () => handleFilterAndClose('column', col) : undefined}
+                    />
+                  ))}
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Error Section */}
-        {probe.error && (
-          <div className="border-t border-border pt-4">
-            <h4 className="mb-2 text-[10px] font-bold tracking-wider text-red-400 uppercase">Error</h4>
-            <div className="rounded border border-red-500/20 bg-red-500/5 p-2 font-mono text-[10px] text-red-300">
-              {probe.error}
             </div>
           </div>
         )}

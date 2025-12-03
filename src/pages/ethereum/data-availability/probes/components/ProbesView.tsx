@@ -253,8 +253,8 @@ export function ProbesView({
           const ms = info.getValue();
           if (!ms) return <span className="text-muted">-</span>;
           let color = 'text-green-500';
-          if (ms > 500) color = 'text-yellow-500';
-          if (ms > 1000) color = 'text-red-500';
+          if (ms > 4000) color = 'text-yellow-500';
+          if (ms > 8000) color = 'text-red-500';
           return <span className={`font-mono text-xs ${color}`}>{ms}ms</span>;
         },
         enableSorting: true,

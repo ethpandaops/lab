@@ -103,6 +103,19 @@ export function IndexPage(): JSX.Element {
     return apiData?.int_custody_probe ?? [];
   }, [apiData]);
 
+  // Fetch specific probe for deep-linking (when probeTime and probePeerId are in URL)
+  const { data: deepLinkedProbeData } = useQuery({
+    ...intCustodyProbeServiceListOptions({
+      query: {
+        probe_date_time_gte: search.probeTime,
+        probe_date_time_lte: search.probeTime,
+        peer_id_unique_key_eq: search.probePeerId,
+        page_size: 1,
+      },
+    }),
+    enabled: !!currentNetwork && !!search.probeTime && !!search.probePeerId,
+  });
+
   // Store the next page token for pagination
   const nextPageToken = apiData?.next_page_token;
 
@@ -392,14 +405,21 @@ export function IndexPage(): JSX.Element {
   );
 
   // Find selected probe from URL params
+  // First try the deep-linked query result, then fall back to searching current page data
   const selectedProbe = useMemo(() => {
     if (!search.probeTime || !search.probePeerId) return null;
+
+    // Use deep-linked probe if available
+    const deepLinkedProbe = deepLinkedProbeData?.int_custody_probe?.[0];
+    if (deepLinkedProbe) return deepLinkedProbe;
+
+    // Fall back to searching in current page data
     return (
       data.find(
         probe => probe.probe_date_time === search.probeTime && probe.peer_id_unique_key === search.probePeerId
       ) ?? null
     );
-  }, [data, search.probeTime, search.probePeerId]);
+  }, [data, search.probeTime, search.probePeerId, deepLinkedProbeData]);
 
   return (
     <ProbesView
