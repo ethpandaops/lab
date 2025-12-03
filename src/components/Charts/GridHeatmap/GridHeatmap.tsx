@@ -110,10 +110,23 @@ export function GridHeatmap<T = unknown>({
   const gridStyle = cellSize === '3xs' ? { gridTemplateColumns: `repeat(${columnIndices.length}, 1fr)` } : undefined;
 
   // Default column label renderer - shows 0-127 (raw column indices)
-  // Labels at 0, 16, 32, etc. are always visible; others appear on hover
+  // Only 0 and 127 are persistent; others appear on hover
+  // Persistent labels fade out when a nearby column (within 2) is hovered
+  // For 3xs size, we use absolute positioning so text doesn't affect grid column width
   const defaultRenderColumnLabel = (colIndex: number, isHovered: boolean): React.JSX.Element => {
-    const isAlwaysVisible = colIndex % 16 === 0;
+    // Persistent labels: 0, 16, 32, 48, 64, 80, 96, 112, 127 (every 16 + endpoint)
+    const isPersistent = colIndex === 0 || colIndex === 127 || colIndex % 16 === 0;
     const isClickable = !!onColumnClick;
+    const is3xs = cellSize === '3xs';
+
+    // Check if a different column near this one is being hovered
+    const isNearbyColumnHovered =
+      hoveredColumn !== null && hoveredColumn !== colIndex && Math.abs(hoveredColumn - colIndex) <= 2;
+
+    // Visibility logic:
+    // - Persistent columns (0, 127): visible unless a nearby column is hovered (and this one isn't)
+    // - Non-persistent: only visible when hovered
+    const shouldShow = isPersistent ? isHovered || !isNearbyColumnHovered : isHovered;
 
     return (
       <div
@@ -131,17 +144,27 @@ export function GridHeatmap<T = unknown>({
         onMouseEnter={() => setHoveredColumn(colIndex)}
         onMouseLeave={() => setHoveredColumn(null)}
         className={clsx(
-          cellSizeClass[cellSize],
-          textSize[cellSize],
-          'text-center transition-all',
-          // Always visible labels (0, 16, 32, etc.) or hovered labels
-          isAlwaysVisible || isHovered ? 'opacity-100' : 'opacity-0 hover:opacity-100',
-          isHovered ? 'font-bold text-accent' : 'text-muted',
-          isClickable && 'cursor-pointer hover:text-accent'
+          // For 3xs, use relative positioning container; otherwise use cell size
+          is3xs ? 'relative h-3' : cellSizeClass[cellSize],
+          isClickable && 'cursor-pointer'
         )}
         title={isClickable ? `View probes for column ${colIndex}` : `Column ${colIndex}`}
       >
-        {colIndex}
+        {/* Label text - absolutely positioned for 3xs to not affect grid width */}
+        <span
+          className={clsx(
+            textSize[cellSize],
+            'whitespace-nowrap transition-all',
+            // For 3xs, absolutely position centered below the column
+            is3xs && 'absolute top-0 left-1/2 -translate-x-1/2',
+            // Visibility
+            shouldShow ? 'opacity-100' : 'opacity-0 hover:opacity-100',
+            isHovered ? 'font-bold text-accent' : 'text-muted',
+            isClickable && 'hover:text-accent'
+          )}
+        >
+          {colIndex}
+        </span>
       </div>
     );
   };
