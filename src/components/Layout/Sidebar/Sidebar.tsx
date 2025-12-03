@@ -131,7 +131,7 @@ function SidebarFooter({
             <XIcon className="size-4" />
           </a>
         </div>
-        {window.__VERSION__ && <span className="text-[10px] text-muted/60">v{window.__VERSION__}</span>}
+        {window.__VERSION__ && <span className="text-[10px] text-muted/60">{window.__VERSION__.version}</span>}
         <button
           type="button"
           onClick={onToggleCollapse}
@@ -354,7 +354,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
                       <XIcon className="size-5" />
                     </a>
                   </div>
-                  {window.__VERSION__ && <span className="text-xs text-muted/60">v{window.__VERSION__}</span>}
+                  {window.__VERSION__ && <span className="text-xs text-muted/60">{window.__VERSION__.version}</span>}
                 </div>
               </div>
             </div>

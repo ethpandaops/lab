@@ -49,7 +49,11 @@ declare global {
   interface Window {
     __CONFIG__?: Config;
     __BOUNDS__?: Record<string, Bounds>;
-    __VERSION__?: string;
+    __VERSION__?: {
+      version: string;
+      git_commit: string;
+      build_date: string;
+    };
   }
 }
 
