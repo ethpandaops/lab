@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-table';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
+import { Dialog } from '@/components/Overlays/Dialog';
 import { DataTable } from '@/components/DataTable';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { BlobPosterLogo } from '@/components/Ethereum/BlobPosterLogo';
@@ -18,7 +19,13 @@ import type { IntCustodyProbe } from '@/api/types.gen';
 import { FilterPanel, type FilterValues } from './FilterPanel';
 import { PeerIdAvatar } from './PeerIdAvatar';
 import { ProbeDetailDialog } from './ProbeDetailDialog';
-import { CheckCircleIcon, XCircleIcon, QuestionMarkCircleIcon, EyeIcon } from '@heroicons/react/24/outline';
+import {
+  CheckCircleIcon,
+  XCircleIcon,
+  QuestionMarkCircleIcon,
+  EyeIcon,
+  InformationCircleIcon,
+} from '@heroicons/react/24/outline';
 
 // Use generated type directly
 type CustodyProbe = IntCustodyProbe;
@@ -121,6 +128,9 @@ export function ProbesView({
 }: ProbesViewProps): JSX.Element {
   // Dialog is open when a probe is selected
   const isDetailDialogOpen = selectedProbe !== null;
+
+  // Learn more dialog state
+  const [learnMoreOpen, setLearnMoreOpen] = useState(false);
 
   // Column visibility state - managed locally for proper toggling
   // Default order: Time, Result, Prober, Prober Country, Peer Client, Peer Country, PeerID, Slots, Blob Posters, Columns, Error
@@ -614,7 +624,7 @@ export function ProbesView({
 
   return (
     <Container>
-      <div className="mb-6">
+      <div className="mb-6 flex items-start justify-between gap-4">
         <Header
           title="Custody Probes"
           description={
@@ -630,8 +640,56 @@ export function ProbesView({
               </a>
             </>
           }
+          className="mb-0"
         />
+        <button
+          type="button"
+          onClick={() => setLearnMoreOpen(true)}
+          className="mt-1 inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-all hover:border-primary/50 hover:bg-primary/20"
+        >
+          <InformationCircleIcon className="size-4" />
+          Learn more
+        </button>
       </div>
+
+      {/* Learn More Dialog */}
+      <Dialog open={learnMoreOpen} onClose={() => setLearnMoreOpen(false)} title="About Custody Probes" size="lg">
+        <div className="space-y-4 text-sm leading-relaxed text-muted">
+          <p>
+            <span className="font-medium text-foreground">
+              Custody probes verify that peers are storing the data they claim.
+            </span>{' '}
+            Each probe samples a specific peer&apos;s custody of data columns, validating responses against KZG
+            commitments.
+          </p>
+          <p>
+            The prober (our node) requests data from a peer, and the result indicates whether the peer successfully
+            provided valid data for the requested columns.
+          </p>
+          <div className="rounded-sm border border-accent/20 bg-accent/5 p-3">
+            <p className="text-foreground">
+              <span className="font-medium">Result meanings:</span>
+            </p>
+            <ul className="mt-2 space-y-1 text-sm">
+              <li>
+                <span className="font-medium text-green-500">Success</span> - Peer provided valid data matching KZG
+                commitments
+              </li>
+              <li>
+                <span className="font-medium text-yellow-500">Failure</span> - Transient error (timeout, connection
+                issue)
+              </li>
+              <li>
+                <span className="font-medium text-red-500">Missing</span> - Peer responded but didn&apos;t have the data
+              </li>
+            </ul>
+          </div>
+          <p>
+            Use the filters to drill down into specific probers, peers, geographic regions, client implementations, or
+            time ranges to analyze custody behavior across the network.
+          </p>
+        </div>
+      </Dialog>
 
       {/* Filter panel */}
       <div className="mb-4">
