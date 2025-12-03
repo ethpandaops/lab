@@ -17,14 +17,10 @@ import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { useSlotPlayerMeta } from '@/hooks/useSlotPlayer';
 import { SlotPlayerControls } from './components/SlotPlayerControls';
 import { BlockLatencyChart } from './components/BlockLatencyChart';
-import { BlobLatencyChart } from './components/BlobLatencyChart';
 import { DataColumnLatencyChart } from './components/DataColumnLatencyChart';
 import { AttestationLatencyChart } from './components/AttestationLatencyChart';
 import { HeadLatencyChart } from './components/HeadLatencyChart';
 import { MetricsSkeleton } from './components/MetricsSkeleton';
-import { useBeaconClock } from '@/hooks/useBeaconClock';
-import { useNetwork } from '@/hooks/useNetwork';
-import { isEpochAtOrAfter } from '@/utils/beacon';
 
 // Node table columns (constant, defined once outside component)
 const nodeColumns: Column<FctNodeActiveLast24h>[] = [
@@ -99,10 +95,6 @@ export function DetailPage(): JSX.Element {
 
   // State for showing all nodes in the table
   const [showAllNodes, setShowAllNodes] = useState(false);
-
-  // Get current epoch for fork detection
-  const { epoch: currentEpoch } = useBeaconClock();
-  const { currentNetwork } = useNetwork();
 
   // Scroll to top when contributor ID changes
   useEffect(() => {
@@ -326,25 +318,14 @@ export function DetailPage(): JSX.Element {
             <BlockLatencyChart username={username} />
           </PopoutCard>
 
-          {isEpochAtOrAfter(currentEpoch, currentNetwork?.forks?.consensus?.fusaka?.epoch) ? (
-            <PopoutCard
-              title="Data Column Propagation"
-              subtitle="Time from slot start to first seen"
-              modalSize="full"
-              anchorId="data-column-latency"
-            >
-              <DataColumnLatencyChart username={username} nodes={nodes} />
-            </PopoutCard>
-          ) : (
-            <PopoutCard
-              title="Blob Propagation"
-              subtitle="Time from slot start to first seen"
-              modalSize="full"
-              anchorId="blob-latency"
-            >
-              <BlobLatencyChart username={username} />
-            </PopoutCard>
-          )}
+          <PopoutCard
+            title="Data Column Propagation"
+            subtitle="Time from slot start to first seen"
+            modalSize="full"
+            anchorId="data-column-latency"
+          >
+            <DataColumnLatencyChart username={username} nodes={nodes} />
+          </PopoutCard>
 
           <PopoutCard
             title="Head Events"
