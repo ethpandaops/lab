@@ -9,16 +9,13 @@ import {
   MagnifyingGlassIcon,
   ServerIcon,
   FunnelIcon,
-  EyeIcon,
 } from '@heroicons/react/24/outline';
 import { intCustodyProbeServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { IntCustodyProbe } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { Dialog } from '@/components/Overlays/Dialog';
-import { ClientLogo } from '@/components/Ethereum/ClientLogo';
-import { Timestamp } from '@/components/DataDisplay/Timestamp';
-import { getCountryFlag } from '@/utils/country';
-import { formatSlot, formatEpoch } from '@/utils';
+import { formatEpoch } from '@/utils';
+import { ProbeEventRow } from '@/pages/ethereum/data-availability/components/ProbeEventRow';
 import { ProbeDetailDialog } from '@/pages/ethereum/data-availability/probes/components/ProbeDetailDialog';
 import type { CellProbeDialogProps, CellContext } from './CellProbeDialog.types';
 
@@ -107,67 +104,6 @@ function buildContextDescription(cellContext: CellContext): string {
 }
 
 /**
- * Get result icon based on probe result
- */
-function ResultIcon({ result }: { result?: string }): JSX.Element {
-  if (result === 'success') {
-    return <CheckCircleIcon className="size-4 text-green-500" />;
-  }
-  if (result === 'failure') {
-    return <XCircleIcon className="size-4 text-red-500" />;
-  }
-  return <QuestionMarkCircleIcon className="size-4 text-yellow-500" />;
-}
-
-/**
- * Probe event row component
- */
-function ProbeEventRow({ probe, onClick }: { probe: IntCustodyProbe; onClick: () => void }): JSX.Element {
-  const slot = probe.slot;
-  const columnsCount = probe.column_indices?.length ?? 0;
-  const peerClient = probe.meta_peer_implementation || 'Unknown';
-  const peerCountry = probe.meta_peer_geo_country || 'Unknown';
-  const peerFlag = getCountryFlag(probe.meta_peer_geo_country_code);
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group flex w-full items-start gap-2 rounded-sm px-2 py-2 text-left transition-all hover:bg-muted/50"
-    >
-      <ClientLogo client={peerClient} size={28} />
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <div className="flex w-full items-center gap-1.5 text-xs">
-          <span className="font-medium text-foreground">{peerClient}</span>
-          <span className="text-muted">·</span>
-          {peerFlag && <span>{peerFlag}</span>}
-          <span className="text-muted">{peerCountry}</span>
-          <div className="flex-1" />
-          <ResultIcon result={probe.result} />
-        </div>
-        <div className="flex w-full items-center gap-1.5 text-[10px] text-muted">
-          <span>Slot</span>
-          <span className="font-mono">{slot !== undefined ? formatSlot(slot) : '?'}</span>
-          <span>·</span>
-          <span>{columnsCount} cols</span>
-          <div className="flex-1" />
-          <Timestamp
-            timestamp={probe.probe_date_time ?? 0}
-            format="relative"
-            className="!p-0 text-[10px] !text-muted"
-            disableModal
-          />
-        </div>
-      </div>
-      {/* Eye icon - always visible to indicate clickability */}
-      <div className="flex shrink-0 items-center self-center rounded-sm bg-accent/10 p-1.5 text-accent transition-all group-hover:bg-accent/20">
-        <EyeIcon className="size-4" />
-      </div>
-    </button>
-  );
-}
-
-/**
  * Quick filter button component - styled as standard buttons with color variants
  */
 function FilterButton({
@@ -186,19 +122,21 @@ function FilterButton({
     'inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold transition-all rounded-sm shadow-xs inset-ring inset-ring-border';
 
   // Default (inactive) state styles per variant
+  // failure = yellow (transient/one-off failure - less severe)
+  // missing = red (peer responded but didn't have the data - serious)
   const defaultStyles = {
     all: 'bg-surface text-foreground hover:bg-background',
     success: 'bg-surface text-green-600 hover:bg-green-500/10',
-    failure: 'bg-surface text-red-500 hover:bg-red-500/10',
-    missing: 'bg-surface text-yellow-600 hover:bg-yellow-500/10',
+    failure: 'bg-surface text-yellow-600 hover:bg-yellow-500/10',
+    missing: 'bg-surface text-red-500 hover:bg-red-500/10',
   };
 
   // Active state styles per variant
   const activeStyles = {
     all: 'bg-primary/10 text-primary inset-ring-primary/50',
     success: 'bg-green-500/20 text-green-600 inset-ring-green-500/50',
-    failure: 'bg-red-500/20 text-red-500 inset-ring-red-500/50',
-    missing: 'bg-yellow-500/20 text-yellow-600 inset-ring-yellow-500/50',
+    failure: 'bg-yellow-500/20 text-yellow-600 inset-ring-yellow-500/50',
+    missing: 'bg-red-500/20 text-red-500 inset-ring-red-500/50',
   };
 
   return (
@@ -417,6 +355,7 @@ export function CellProbeDialog({
                     key={`${probe.probe_date_time}-${probe.peer_id_unique_key}-${index}`}
                     probe={probe}
                     onClick={() => handleProbeClick(probe)}
+                    showViewIcon
                   />
                 ))}
               </div>

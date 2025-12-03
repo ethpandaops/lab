@@ -31,9 +31,11 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
   const peerCountryCode = probe.meta_peer_geo_country_code;
 
   // Status colors
-  const statusColor = isSuccess ? 'text-green-500' : isFailure ? 'text-red-500' : 'text-yellow-500';
-  const statusBg = isSuccess ? 'bg-green-500/10' : isFailure ? 'bg-red-500/10' : 'bg-yellow-500/10';
-  const statusBorder = isSuccess ? 'border-green-500/20' : isFailure ? 'border-red-500/20' : 'border-yellow-500/20';
+  // failure = yellow (transient/one-off failure - less severe)
+  // missing = red (peer responded but didn't have the data - serious)
+  const statusColor = isSuccess ? 'text-green-500' : isFailure ? 'text-yellow-500' : 'text-red-500';
+  const statusBg = isSuccess ? 'bg-green-500/10' : isFailure ? 'bg-yellow-500/10' : 'bg-red-500/10';
+  const statusBorder = isSuccess ? 'border-green-500/20' : isFailure ? 'border-yellow-500/20' : 'border-red-500/20';
 
   return (
     <div className="flex flex-col items-center gap-4 px-2 py-4 sm:flex-row sm:flex-nowrap sm:justify-center sm:gap-6 sm:px-4 sm:py-6">

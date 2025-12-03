@@ -215,12 +215,14 @@ export function ProbesView({
           const isSuccess = result === 'success';
           const isFailure = result === 'failure';
 
+          // failure = yellow (transient/one-off failure - less severe)
+          // missing = red (peer responded but didn't have the data - serious)
           const icon = isSuccess ? (
             <CheckCircleIcon className="size-5 text-green-500" />
           ) : isFailure ? (
-            <XCircleIcon className="size-5 text-red-500" />
+            <XCircleIcon className="size-5 text-yellow-500" />
           ) : (
-            <QuestionMarkCircleIcon className="size-5 text-yellow-500" />
+            <QuestionMarkCircleIcon className="size-5 text-red-500" />
           );
 
           return (
@@ -230,8 +232,8 @@ export function ProbesView({
                   isSuccess
                     ? 'bg-green-500/10 text-green-500'
                     : isFailure
-                      ? 'bg-red-500/10 text-red-500'
-                      : 'bg-yellow-500/10 text-yellow-500'
+                      ? 'bg-yellow-500/10 text-yellow-500'
+                      : 'bg-red-500/10 text-red-500'
                 }`}
               >
                 {icon}

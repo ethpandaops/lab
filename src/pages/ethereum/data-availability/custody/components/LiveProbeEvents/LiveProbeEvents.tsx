@@ -1,21 +1,11 @@
 import { type JSX, useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import {
-  CheckCircleIcon,
-  XCircleIcon,
-  QuestionMarkCircleIcon,
-  SignalIcon,
-  MagnifyingGlassIcon,
-} from '@heroicons/react/24/outline';
+import { SignalIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { Link } from '@tanstack/react-router';
-import clsx from 'clsx';
 import { intCustodyProbeOrderBySlotServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { IntCustodyProbeOrderBySlot, IntCustodyProbe } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { ClientLogo } from '@/components/Ethereum/ClientLogo';
-import { Timestamp } from '@/components/DataDisplay/Timestamp';
-import { getCountryFlag } from '@/utils/country';
-import { formatSlot } from '@/utils';
+import { ProbeEventRow } from '@/pages/ethereum/data-availability/components/ProbeEventRow';
 import { ProbeDetailDialog } from '@/pages/ethereum/data-availability/probes/components/ProbeDetailDialog';
 import type { LiveProbeEventsProps, ProbeFilterContext } from './LiveProbeEvents.types';
 
@@ -85,82 +75,6 @@ function buildQueryParams(context: ProbeFilterContext): {
         slot_eq: context.slot,
       };
   }
-}
-
-/**
- * Get result icon based on probe result
- */
-function ResultIcon({ result }: { result?: string }): JSX.Element {
-  if (result === 'success') {
-    return <CheckCircleIcon className="size-4 text-green-500" />;
-  }
-  if (result === 'failure') {
-    return <XCircleIcon className="size-4 text-red-500" />;
-  }
-  return <QuestionMarkCircleIcon className="size-4 text-yellow-500" />;
-}
-
-/**
- * Probe event row - client logo prominent with two-line details
- */
-function ProbeEventRow({
-  probe,
-  onClick,
-  isNew,
-}: {
-  probe: IntCustodyProbeOrderBySlot;
-  onClick: () => void;
-  isNew?: boolean;
-}): JSX.Element {
-  const slot = probe.slot;
-  const columnsCount = probe.column_indices?.length ?? 0;
-
-  // Peer details
-  const peerClient = probe.meta_peer_implementation || 'Unknown';
-  const peerCountry = probe.meta_peer_geo_country || 'Unknown';
-  const peerFlag = getCountryFlag(probe.meta_peer_geo_country_code);
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={clsx(
-        'group flex w-full items-start gap-2 rounded-xs px-2 py-1.5 text-left transition-all hover:bg-muted/50',
-        isNew && 'animate-highlight-new'
-      )}
-    >
-      {/* Left: Client logo (spans both rows) */}
-      <ClientLogo client={peerClient} size={28} />
-
-      {/* Right: Two rows of details */}
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        {/* Row 1: Client name, country, result */}
-        <div className="flex w-full items-center gap-1.5 text-xs">
-          <span className="font-medium text-foreground">{peerClient}</span>
-          <span className="text-muted">·</span>
-          {peerFlag && <span>{peerFlag}</span>}
-          <span className="text-muted">{peerCountry}</span>
-          <div className="flex-1" />
-          <ResultIcon result={probe.result} />
-        </div>
-
-        {/* Row 2: Slot, columns, time */}
-        <div className="flex w-full items-center gap-1.5 text-[10px] text-muted">
-          <span>Slot</span>
-          <span className="font-mono">{slot !== undefined ? formatSlot(slot) : '?'}</span>
-          <span>·</span>
-          <span>{columnsCount} cols</span>
-          <div className="flex-1" />
-          <Timestamp
-            timestamp={probe.probe_date_time ?? 0}
-            format="relative"
-            className="!p-0 text-[10px] !text-muted"
-            disableModal
-          />
-        </div>
-      </div>
-    </button>
-  );
 }
 
 /** Generate a unique key for a probe */
@@ -242,19 +156,19 @@ export function LiveProbeEvents({
     setSelectedProbe(null);
   }, []);
 
-  // Get context label for header
+  // Get context label for header subtitle
   const contextLabel = useMemo(() => {
     switch (context.type) {
       case 'window':
-        return 'last 24h';
+        return 'Last 24 hours';
       case 'day':
         return context.date;
       case 'hour':
-        return 'this hour';
+        return 'Current hour';
       case 'epoch':
-        return `epoch ${context.epoch}`;
+        return `Epoch ${context.epoch}`;
       case 'slot':
-        return `slot ${context.slot}`;
+        return `Slot ${context.slot}`;
     }
   }, [context]);
 
@@ -264,53 +178,55 @@ export function LiveProbeEvents({
 
   return (
     <>
-      <div className="flex max-h-[32rem] flex-col rounded-xs border border-border/50 bg-surface/50">
+      <div className="bg-card text-card-foreground flex max-h-[32rem] flex-col overflow-hidden rounded-lg border border-border shadow-sm">
         {/* Header */}
-        <div className="flex shrink-0 items-center justify-between border-b border-border/50 px-3 py-2">
-          <div className="flex items-center gap-2">
-            <SignalIcon className="size-4 text-accent" />
-            <span className="text-xs font-medium text-foreground">Live Probes</span>
-            <span className="text-[10px] text-muted">({contextLabel})</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 text-[10px] text-muted">
-              <span className="size-1.5 animate-pulse rounded-full bg-green-500" />
-              <span>every 60s</span>
+        <div className="border-b border-border bg-muted/20 px-4 py-3">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h2 className="text-lg font-semibold text-foreground">Recent Probes</h2>
+              <p className="truncate text-sm text-muted">{contextLabel}</p>
             </div>
-            {probesLinkParams && (
-              <Link
-                to="/ethereum/data-availability/probes"
-                search={probesLinkParams}
-                className="inline-flex items-center gap-1 rounded-xs border border-accent/50 bg-accent/10 px-1.5 py-0.5 text-[10px] font-medium text-accent transition-colors hover:bg-accent/20"
-              >
-                <MagnifyingGlassIcon className="size-3" />
-                View All
-              </Link>
-            )}
+            <div className="flex shrink-0 items-center gap-2">
+              {probesLinkParams && (
+                <Link
+                  to="/ethereum/data-availability/probes"
+                  search={probesLinkParams}
+                  className="flex items-center gap-1.5 rounded-sm border border-accent/30 bg-accent/10 px-2.5 py-1.5 text-xs font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
+                >
+                  <MagnifyingGlassIcon className="size-3.5" />
+                  View All
+                </Link>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Events list - scrollable */}
-        <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
           {isLoading && !isFetched ? (
             // Loading skeleton - only on initial load, not refetches
-            <div className="space-y-1 p-2">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-2 px-2 py-1">
-                  <div className="size-4 animate-pulse rounded-full bg-muted/50" />
-                  <div className="h-3 w-16 animate-pulse rounded-xs bg-muted/50" />
-                  <div className="h-3 w-8 animate-pulse rounded-xs bg-muted/50" />
-                  <div className="flex-1" />
-                  <div className="h-3 w-10 animate-pulse rounded-xs bg-muted/50" />
+            <div className="space-y-1">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-2.5 px-2 py-1.5">
+                  <div className="size-6 animate-pulse rounded-full bg-muted/30" />
+                  <div className="flex flex-1 flex-col gap-1">
+                    <div className="h-3 w-20 animate-pulse rounded-sm bg-muted/30" />
+                    <div className="h-2.5 w-28 animate-pulse rounded-sm bg-muted/30" />
+                  </div>
+                  <div className="size-4 animate-pulse rounded-full bg-muted/30" />
                 </div>
               ))}
             </div>
           ) : probes.length === 0 ? (
             // Empty state
-            <div className="px-3 py-4 text-center text-xs text-muted">No probe events found for {contextLabel}</div>
+            <div className="py-8 text-center">
+              <SignalIcon className="mx-auto mb-2 size-8 text-muted/50" />
+              <p className="text-sm text-muted">No probes found</p>
+              <p className="text-xs text-muted/70">{contextLabel}</p>
+            </div>
           ) : (
             // Event rows
-            <div className="p-1">
+            <div>
               {probes.map(probe => {
                 const key = getProbeKey(probe);
                 return (

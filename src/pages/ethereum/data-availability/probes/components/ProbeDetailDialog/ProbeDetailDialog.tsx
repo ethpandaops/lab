@@ -7,14 +7,9 @@ import {
   ListBulletIcon,
   LinkIcon,
   CheckIcon,
-  EyeIcon,
-  CubeIcon,
-  Squares2X2Icon,
-  FunnelIcon,
-  ArrowTopRightOnSquareIcon,
   MagnifyingGlassIcon,
-  CalendarDaysIcon,
   DocumentDuplicateIcon,
+  InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import type { IntCustodyProbe } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
@@ -23,8 +18,8 @@ import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { BlobPosterLogo } from '@/components/Ethereum/BlobPosterLogo';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { getCountryFlag } from '@/utils/country';
-import { slotToTimestamp, slotToEpoch } from '@/utils/beacon';
-import { formatSlot, formatEpoch } from '@/utils';
+import { slotToTimestamp } from '@/utils/beacon';
+import { formatSlot } from '@/utils';
 import { ProbeFlow } from '../ProbeFlow';
 
 export interface ProbeDetailDialogProps {
@@ -217,11 +212,13 @@ export function ProbeDetailDialog({
           <div
             className={clsx(
               'rounded-lg border p-4',
+              // failure = yellow (transient/one-off failure - less severe)
+              // missing = red (peer responded but didn't have the data - serious)
               probe.result === 'success'
                 ? 'border-green-500/30 bg-green-500/5'
                 : probe.result === 'failure'
-                  ? 'border-red-500/30 bg-red-500/5'
-                  : 'border-yellow-500/30 bg-yellow-500/5'
+                  ? 'border-yellow-500/30 bg-yellow-500/5'
+                  : 'border-red-500/30 bg-red-500/5'
             )}
           >
             {/* Status message */}
@@ -233,8 +230,8 @@ export function ProbeDetailDialog({
                     probe.result === 'success'
                       ? 'text-green-500'
                       : probe.result === 'failure'
-                        ? 'text-red-500'
-                        : 'text-yellow-500'
+                        ? 'text-yellow-500'
+                        : 'text-red-500'
                   )}
                 />
                 <span
@@ -243,15 +240,15 @@ export function ProbeDetailDialog({
                     probe.result === 'success'
                       ? 'text-green-600 dark:text-green-400'
                       : probe.result === 'failure'
-                        ? 'text-red-600 dark:text-red-400'
-                        : 'text-yellow-600 dark:text-yellow-400'
+                        ? 'text-yellow-600 dark:text-yellow-400'
+                        : 'text-red-600 dark:text-red-400'
                   )}
                 >
                   {probe.result === 'success'
                     ? 'These blob publishers are being secured by this peer'
                     : probe.result === 'failure'
-                      ? 'These blob publishers are NOT being secured by this peer'
-                      : 'Uncertain if these blob publishers are being secured by this peer'}
+                      ? 'Transient failure - probe did not complete'
+                      : 'This peer does not have this data'}
                 </span>
               </div>
               {/* Reassuring link - only show for failure/missing */}
@@ -298,153 +295,60 @@ export function ProbeDetailDialog({
           </div>
         )}
 
-        {/* Probe Details - Slot/Epoch info with links */}
-        {probe.slot !== undefined && probe.slot !== null && (
-          <div className="rounded-lg border border-border bg-surface p-4">
-            <h4 className="mb-3 flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
-              <CubeIcon className="size-4 text-primary" />
-              Probe Details
+        {/* About */}
+        {probe.slot !== undefined && probe.slot !== null && currentNetwork && probe.probe_date_time && (
+          <div>
+            <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
+              <InformationCircleIcon className="size-4 text-primary" />
+              About
             </h4>
+            <p className="text-sm text-muted">
+              {(() => {
+                const slotTimestamp = slotToTimestamp(probe.slot, currentNetwork.genesis_time);
+                const probeTimestamp = probe.probe_date_time;
+                const ageSeconds = probeTimestamp - slotTimestamp;
+                const ageDays = Math.floor(ageSeconds / 86400);
+                const ageHours = Math.floor((ageSeconds % 86400) / 3600);
+                const ageMinutes = Math.floor((ageSeconds % 3600) / 60);
 
-            {/* Stats row */}
-            <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-              <div>
-                <div className="text-[10px] font-medium tracking-wider text-muted uppercase">Slot</div>
-                <span className="font-mono text-base font-bold text-foreground sm:text-lg">
-                  {formatSlot(probe.slot)}
-                </span>
-              </div>
-              <div className="hidden h-6 w-px bg-border sm:block" />
-              <div>
-                <div className="text-[10px] font-medium tracking-wider text-muted uppercase">Epoch</div>
-                <span className="font-mono text-base font-bold text-foreground sm:text-lg">
-                  {formatEpoch(slotToEpoch(probe.slot))}
-                </span>
-              </div>
-              <div className="hidden h-6 w-px bg-border sm:block" />
-              <div>
-                <div className="text-[10px] font-medium tracking-wider text-muted uppercase">Columns</div>
-                <span className="font-mono text-base font-bold text-foreground sm:text-lg">
-                  {probe.column_indices?.length ?? 0}
-                </span>
-              </div>
-            </div>
+                let ageString: string;
+                if (ageDays > 0) {
+                  ageString = `${ageDays} day${ageDays === 1 ? '' : 's'}`;
+                } else if (ageHours > 0) {
+                  ageString = `${ageHours} hour${ageHours === 1 ? '' : 's'}`;
+                } else if (ageMinutes > 0) {
+                  ageString = `${ageMinutes} minute${ageMinutes === 1 ? '' : 's'}`;
+                } else {
+                  ageString = 'less than a minute';
+                }
 
-            {/* Slot age indicator */}
-            {currentNetwork && probe.probe_date_time && (
-              <div className="mt-3 flex items-center gap-2 rounded border border-border bg-background px-3 py-2 text-sm text-muted">
-                <CalendarDaysIcon className="size-4" />
-                <span>
-                  Requested data from a slot{' '}
-                  <span className="font-medium text-foreground">
-                    {(() => {
-                      const slotTimestamp = slotToTimestamp(probe.slot, currentNetwork.genesis_time);
-                      const probeTimestamp = probe.probe_date_time;
-                      const ageSeconds = probeTimestamp - slotTimestamp;
-                      const ageDays = Math.floor(ageSeconds / 86400);
-                      const ageHours = Math.floor((ageSeconds % 86400) / 3600);
-                      const ageMinutes = Math.floor((ageSeconds % 3600) / 60);
+                const peerCountry = probe.meta_peer_geo_country;
+                const peerClient = probe.meta_peer_implementation || 'unknown';
+                const columnCount = probe.column_indices?.length ?? 0;
 
-                      if (ageDays > 0) {
-                        return `${ageDays} day${ageDays === 1 ? '' : 's'}`;
-                      } else if (ageHours > 0) {
-                        return `${ageHours} hour${ageHours === 1 ? '' : 's'}`;
-                      } else if (ageMinutes > 0) {
-                        return `${ageMinutes} minute${ageMinutes === 1 ? '' : 's'}`;
-                      }
-                      return 'less than a minute';
-                    })()}
-                  </span>{' '}
-                  old at the time
-                </span>
-              </div>
-            )}
-
-            {/* Links section */}
-            <div className="mt-4 border-t border-border pt-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[10px] font-medium tracking-wider text-muted uppercase">Links</span>
-                <div className="flex flex-wrap gap-2">
-                  {/* Filter links */}
-                  {onFilterClick && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => handleFilterAndClose('slot', probe.slot!)}
-                        className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
-                      >
-                        <FunnelIcon className="size-3" />
-                        <span>Filter Slot</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleFilterAndClose('epoch', slotToEpoch(probe.slot!))}
-                        className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
-                      >
-                        <FunnelIcon className="size-3" />
-                        <span>Filter Epoch</span>
-                      </button>
-                      <div className="h-4 w-px bg-border" />
-                    </>
-                  )}
-
-                  {/* Deep dive links */}
-                  <Link
-                    to="/ethereum/slots/$slot"
-                    params={{ slot: String(probe.slot) }}
-                    className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
-                  >
-                    <CubeIcon className="size-3" />
-                    <span>Slot Deep Dive</span>
-                    <ArrowTopRightOnSquareIcon className="size-2.5 text-muted" />
-                  </Link>
-                  <Link
-                    to="/ethereum/epochs/$epoch"
-                    params={{ epoch: String(slotToEpoch(probe.slot)) }}
-                    className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
-                  >
-                    <Squares2X2Icon className="size-3" />
-                    <span>Epoch Deep Dive</span>
-                    <ArrowTopRightOnSquareIcon className="size-2.5 text-muted" />
-                  </Link>
-
-                  {/* Custody link */}
-                  {currentNetwork &&
-                    (() => {
-                      const slot = probe.slot!;
-                      const epoch = slotToEpoch(slot);
-                      const slotTimestamp = slotToTimestamp(slot, currentNetwork.genesis_time);
-                      return (
-                        <Link
-                          to="/ethereum/data-availability/custody"
-                          search={{
-                            slot,
-                            epoch,
-                            hour: Math.floor(slotTimestamp / 3600) * 3600,
-                            date: new Date(slotTimestamp * 1000).toISOString().split('T')[0],
-                          }}
-                          className="flex items-center gap-1 rounded border border-accent/30 bg-accent/10 px-2 py-1 text-[11px] font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
-                        >
-                          <EyeIcon className="size-3" />
-                          <span>View Custody</span>
-                          <ArrowTopRightOnSquareIcon className="size-2.5" />
-                        </Link>
-                      );
-                    })()}
-
-                  {/* Probes table link */}
-                  <Link
-                    to="/ethereum/data-availability/probes"
-                    search={{ slot: probe.slot }}
-                    className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
-                  >
-                    <MagnifyingGlassIcon className="size-3" />
-                    <span>All Slot Probes</span>
-                    <ArrowTopRightOnSquareIcon className="size-2.5 text-muted" />
-                  </Link>
-                </div>
-              </div>
-            </div>
+                return (
+                  <>
+                    We requested {columnCount} column{columnCount !== 1 && 's'} for{' '}
+                    <Link
+                      to="/ethereum/slots/$slot"
+                      params={{ slot: String(probe.slot) }}
+                      className="text-primary hover:underline"
+                    >
+                      slot {formatSlot(probe.slot)}
+                    </Link>{' '}
+                    from a {peerClient} node
+                    {peerCountry && (
+                      <>
+                        {' '}
+                        in {probe.meta_peer_geo_country_code && getCountryFlag(probe.meta_peer_geo_country_code)}{' '}
+                        {peerCountry}
+                      </>
+                    )}
+                    . The slot was {ageString} old at the time.
+                  </>
+                );
+              })()}
+            </p>
           </div>
         )}
 

@@ -1,4 +1,4 @@
-import { type JSX, useMemo, useCallback } from 'react';
+import { type JSX, useMemo, useCallback, useRef } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
@@ -17,9 +17,13 @@ export function IndexPage(): JSX.Element {
   const search = useSearch({ from: '/ethereum/data-availability/probes/' }) as ProbesSearch;
   const { currentNetwork } = useNetwork();
 
+  // Capture the initial probeTime from URL on mount (for deep-linking)
+  // This prevents time range recalculation when user clicks on rows to view details
+  const initialProbeTimeRef = useRef<number | undefined>(search.probeTime);
+
   // Calculate time range in seconds for the probe_date_time filter
   // Use URL params if provided, otherwise default to last 7 days
-  // If probeTime is specified (for deep-linking), ensure the time range includes it
+  // If probeTime was in URL on initial load (deep-linking), ensure the time range includes it
   const timeRange = useMemo(() => {
     const nowSeconds = Math.floor(Date.now() / 1000);
     const sevenDaysSeconds = 7 * 24 * 60 * 60;
@@ -31,13 +35,13 @@ export function IndexPage(): JSX.Element {
       };
     }
 
-    // If probeTime is in URL (deep-linking to a specific probe), ensure the time range includes it
-    if (search.probeTime !== undefined) {
+    // Only use initial probeTime for deep-linking (not when user clicks rows)
+    const initialProbeTime = initialProbeTimeRef.current;
+    if (initialProbeTime !== undefined) {
       // Extend range to include the probe time with a 1-day buffer on each side
-      const probeTime = search.probeTime;
       const oneDaySeconds = 24 * 60 * 60;
-      const rangeStart = Math.min(nowSeconds - sevenDaysSeconds, probeTime - oneDaySeconds);
-      const rangeEnd = Math.max(nowSeconds, probeTime + oneDaySeconds);
+      const rangeStart = Math.min(nowSeconds - sevenDaysSeconds, initialProbeTime - oneDaySeconds);
+      const rangeEnd = Math.max(nowSeconds, initialProbeTime + oneDaySeconds);
       return {
         start: rangeStart,
         end: rangeEnd,
@@ -49,7 +53,7 @@ export function IndexPage(): JSX.Element {
       start: nowSeconds - sevenDaysSeconds,
       end: nowSeconds,
     };
-  }, [search.timeStart, search.timeEnd, search.probeTime]);
+  }, [search.timeStart, search.timeEnd]);
 
   // Build order_by string for API
   const orderBy = useMemo(() => {
