@@ -44,6 +44,26 @@ export interface CellRenderProps {
 }
 
 /**
+ * Props passed to row label render function
+ */
+export interface RowLabelRenderProps {
+  /** Unique identifier for this row */
+  identifier: string;
+  /** Display label for the row */
+  label: string;
+  /** Whether this row is currently hovered */
+  isHovered: boolean;
+  /** Whether drill-down is enabled for this row */
+  canDrillDown: boolean;
+  /** Click handler for drill-down */
+  onDrillDown?: () => void;
+  /** Mouse enter handler */
+  onMouseEnter: () => void;
+  /** Mouse leave handler */
+  onMouseLeave: () => void;
+}
+
+/**
  * Props for the GridHeatmap component
  */
 export interface GridHeatmapProps<T = unknown> {
@@ -61,6 +81,8 @@ export interface GridHeatmapProps<T = unknown> {
   renderCell: (cellData: T, props: CellRenderProps) => ReactNode;
   /** Optional: Render function for header content (legend, filters, etc.) */
   renderHeader?: () => ReactNode;
+  /** Optional: Render function for row labels (for custom row label styling) */
+  renderRowLabel?: (props: RowLabelRenderProps) => ReactNode;
   /** Optional: Render function for column labels */
   renderColumnLabel?: (columnIndex: number, isHovered: boolean, isSelected: boolean) => ReactNode;
   /** Optional: X-axis title (displayed below column indices) */

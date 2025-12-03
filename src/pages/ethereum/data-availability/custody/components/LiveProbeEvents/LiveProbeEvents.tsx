@@ -40,7 +40,7 @@ const SLOTS_PER_EPOCH = 32;
 function buildQueryParams(context: ProbeFilterContext): {
   probe_date_time_gte?: number;
   probe_date_time_lte?: number;
-  slots?: number[];
+  slots_has_any_values?: number[];
 } {
   const now = Math.floor(Date.now() / 1000);
 
@@ -72,7 +72,7 @@ function buildQueryParams(context: ProbeFilterContext): {
       return {
         probe_date_time_gte: context.hourStartDateTime,
         probe_date_time_lte: context.hourStartDateTime + SECONDS_PER_HOUR,
-        slots,
+        slots_has_any_values: slots,
       };
     }
     case 'slot':
@@ -80,7 +80,7 @@ function buildQueryParams(context: ProbeFilterContext): {
       return {
         probe_date_time_gte: context.hourStartDateTime,
         probe_date_time_lte: context.hourStartDateTime + SECONDS_PER_HOUR,
-        slots: [context.slot],
+        slots_has_any_values: [context.slot],
       };
   }
 }

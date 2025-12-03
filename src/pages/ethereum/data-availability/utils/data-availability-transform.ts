@@ -90,7 +90,7 @@ export function transformDailyToRows(
         identifier: date,
         label: new Date(date).toLocaleDateString(
           'en-US',
-          timezone === 'UTC' ? { month: 'long', day: 'numeric', timeZone: 'UTC' } : { month: 'long', day: 'numeric' }
+          timezone === 'UTC' ? { month: 'short', day: 'numeric', timeZone: 'UTC' } : { month: 'short', day: 'numeric' }
         ),
         cells: ensureAllColumns(cells, date),
       };
@@ -123,10 +123,6 @@ export function transformHourlyToRows(
     .sort((a, b) => a[0] - b[0])
     .map(([hourStart, items]) => {
       const date = new Date(hourStart * 1000);
-      const dateLabel = date.toLocaleDateString(
-        'en-US',
-        timezone === 'UTC' ? { month: 'short', day: 'numeric', timeZone: 'UTC' } : { month: 'short', day: 'numeric' }
-      );
       const timeLabel = date.toLocaleTimeString(
         'en-US',
         timezone === 'UTC'
@@ -147,7 +143,7 @@ export function transformHourlyToRows(
 
       return {
         identifier,
-        label: `${dateLabel} ${timeLabel}`,
+        label: timeLabel,
         cells: ensureAllColumns(cells, identifier),
       };
     });
@@ -187,7 +183,7 @@ export function transformEpochsToRows(data: FctDataColumnAvailabilityByEpoch[] |
 
       return {
         identifier,
-        label: `Epoch ${epoch}`,
+        label: String(epoch),
         cells: ensureAllColumns(cells, identifier),
       };
     });
@@ -227,10 +223,38 @@ export function transformSlotsToRows(data: FctDataColumnAvailabilityBySlot[] | u
 
       return {
         identifier,
-        label: `Slot ${slot}`,
+        label: String(slot),
         cells: ensureAllColumns(cells, identifier),
       };
     });
+}
+
+/**
+ * Fake submitter names for blob data (temporary until API provides real data)
+ * Names should match the blob poster logo filenames (lowercase)
+ */
+const FAKE_SUBMITTERS = [
+  'arbitrum',
+  'optimism',
+  'base',
+  'linea',
+  'scroll',
+  'zksync',
+  'starknet',
+  'taiko',
+  'blast',
+  'world',
+];
+
+/**
+ * Get a deterministic fake submitter for a blob index (or null for ~25% of blobs)
+ * Uses blob index as seed for consistency across renders
+ */
+function getFakeSubmitter(blobIndex: number): string | null {
+  // ~25% of blobs have no known submitter
+  if (blobIndex % 4 === 3) return null;
+  // Deterministic selection based on blob index
+  return FAKE_SUBMITTERS[blobIndex % FAKE_SUBMITTERS.length];
 }
 
 /**
@@ -266,9 +290,13 @@ export function transformBlobsToRows(data: FctDataColumnAvailabilityBySlotBlob[]
           blobIndex,
         }));
 
+      // Add fake submitter to label (temporary until API provides real data)
+      const submitter = getFakeSubmitter(blobIndex);
+      const label = submitter ? `${blobIndex} · ${submitter}` : String(blobIndex);
+
       return {
         identifier,
-        label: `Blob ${blobIndex}`,
+        label,
         cells: ensureAllColumns(cells, identifier),
       };
     });

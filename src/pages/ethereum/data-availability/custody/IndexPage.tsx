@@ -7,7 +7,6 @@ import { DataAvailabilityLegend } from '@/pages/ethereum/data-availability/compo
 import { DataAvailabilitySkeleton } from '@/pages/ethereum/data-availability/components/DataAvailabilitySkeleton';
 import { ViewModeToggle } from '@/pages/ethereum/data-availability/components/ViewModeToggle';
 import { TimezoneToggle } from '@/components/Elements/TimezoneToggle';
-import { GitHubIcon } from '@/components/Elements/Icons';
 import { InfoBox } from '@/components/Feedback/InfoBox';
 import { LiveProbeEvents } from './components/LiveProbeEvents';
 import type { ProbeFilterContext } from './components/LiveProbeEvents';
@@ -18,7 +17,8 @@ import type {
 import type { DataAvailabilityFilters } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel.types';
 import { useTimezone } from '@/hooks/useTimezone';
 import { useNetwork } from '@/hooks/useNetwork';
-import { formatEpoch } from '@/utils';
+import { formatEpoch, formatSlot } from '@/utils';
+import { ChevronRightIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import {
   fctDataColumnAvailabilityDailyServiceListOptions,
   fctDataColumnAvailabilityHourlyServiceListOptions,
@@ -140,6 +140,49 @@ function deriveCurrentLevel(search: CustodySearch): DrillDownLevel {
   }
 
   return { type: 'window' };
+}
+
+/**
+ * Get a human-readable title for the current viewing level
+ * Main title = where you are, subtitle = what you're viewing
+ */
+function getLevelTitle(level: DrillDownLevel, timezone: 'UTC' | 'local'): { main: string; sub: string } {
+  const tzOptions = timezone === 'UTC' ? { timeZone: 'UTC' } : {};
+
+  switch (level.type) {
+    case 'window':
+      return { main: 'Custody Window', sub: `Viewing last ${WINDOW_DAYS} days by day` };
+    case 'day': {
+      const dateStr = new Date(level.date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+        ...tzOptions,
+      });
+      return { main: dateStr, sub: 'Viewing hours in this day' };
+    }
+    case 'hour': {
+      const dateStr = new Date(level.date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+        ...tzOptions,
+      });
+      const timeStr = new Date(level.hourStartDateTime * 1000).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        ...tzOptions,
+      });
+      return { main: `${dateStr} at ${timeStr}`, sub: 'Viewing epochs in this hour' };
+    }
+    case 'epoch':
+      return { main: `Epoch ${formatEpoch(level.epoch)}`, sub: 'Viewing slots in this epoch' };
+    case 'slot':
+      return { main: `Slot ${formatSlot(level.slot)}`, sub: 'Viewing blobs in this slot' };
+  }
 }
 
 /**
@@ -666,34 +709,48 @@ export function IndexPage(): JSX.Element {
         {/* Main Content: Heatmap (3/4 width) */}
         <div className="lg:col-span-3">
           <div className="bg-card text-card-foreground overflow-hidden rounded-lg border border-border shadow-sm">
-            {/* Toolbar */}
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border p-4">
-              {/* Breadcrumbs */}
-              <nav className="flex items-center gap-2 text-sm">
-                {breadcrumbs.map((crumb, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    {index > 0 && <span className="text-muted-foreground">/</span>}
-                    <button
-                      type="button"
-                      onClick={crumb.onClick}
-                      className={
-                        index === breadcrumbs.length - 1
-                          ? 'font-semibold text-foreground'
-                          : 'text-muted-foreground transition-colors hover:text-foreground'
-                      }
-                    >
-                      {crumb.label}
-                    </button>
-                  </div>
-                ))}
-              </nav>
+            {/* Header with Level Title */}
+            <div className="border-b border-border bg-muted/20 px-4 py-3">
+              <div className="flex items-start justify-between gap-4">
+                {/* Level Title */}
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">
+                    {getLevelTitle(currentLevel, timezone).main}
+                  </h2>
+                  <p className="text-sm text-muted">{getLevelTitle(currentLevel, timezone).sub}</p>
+                </div>
 
-              {/* Controls */}
-              <div className="flex items-center gap-2">
-                <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
-                <TimezoneToggle size="compact" />
+                {/* Controls */}
+                <div className="flex shrink-0 items-center gap-2">
+                  <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
+                  <TimezoneToggle size="compact" />
+                </div>
               </div>
             </div>
+
+            {/* Breadcrumb Navigation */}
+            {breadcrumbs.length > 1 && (
+              <div className="flex items-center gap-2 border-b border-border px-4 py-2">
+                <span className="text-xs font-medium tracking-wide text-muted uppercase">Navigate:</span>
+                <nav className="flex items-center gap-1 text-sm">
+                  {breadcrumbs.slice(0, -1).map((crumb, index) => (
+                    <div key={index} className="flex items-center">
+                      {index > 0 && <ChevronRightIcon className="mx-1 size-3 text-muted" />}
+                      <button
+                        type="button"
+                        onClick={crumb.onClick}
+                        className="group flex items-center gap-1 rounded-sm px-2 py-1 text-muted transition-all hover:bg-accent/10 hover:text-accent"
+                      >
+                        <ChevronUpIcon className="size-3 opacity-60 group-hover:opacity-100" />
+                        <span className="underline decoration-muted/50 underline-offset-2 group-hover:decoration-accent">
+                          {crumb.label}
+                        </span>
+                      </button>
+                    </div>
+                  ))}
+                </nav>
+              </div>
+            )}
 
             {/* Legend Strip */}
             <div className="border-b border-border bg-muted/30 px-4 py-2">

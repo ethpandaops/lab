@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { GridHeatmap } from '@/components/Charts/GridHeatmap';
-import type { GridRow } from '@/components/Charts/GridHeatmap';
+import type { GridRow, RowLabelRenderProps } from '@/components/Charts/GridHeatmap';
 import { DataAvailabilityCell } from './DataAvailabilityCell';
 import { DataAvailabilityLegend } from './DataAvailabilityLegend';
+import { DataAvailabilityRowLabel } from './DataAvailabilityRowLabel';
 import type { DataAvailabilityHeatmapProps, DataAvailabilityCellData } from './DataAvailabilityHeatmap.types';
 
 /**
@@ -14,27 +15,10 @@ import type { DataAvailabilityHeatmapProps, DataAvailabilityCellData } from './D
  * - Legend display
  * - Response time labeling
  * - View mode support (percentage vs threshold)
+ * - Purpose-built row labels with type icons and drill-down affordance
  *
  * Supports hierarchical drill-down from days → hours → epochs → slots → blobs.
  */
-/**
- * Get Y-axis title based on granularity level
- */
-const getYAxisTitle = (granularity: DataAvailabilityHeatmapProps['granularity']): string => {
-  switch (granularity) {
-    case 'window':
-      return 'Day';
-    case 'day':
-      return 'Hour';
-    case 'hour':
-      return 'Epoch';
-    case 'epoch':
-      return 'Slot';
-    case 'slot':
-      return 'Blob';
-  }
-};
-
 export const DataAvailabilityHeatmap = ({
   rows,
   granularity,
@@ -102,6 +86,14 @@ export const DataAvailabilityHeatmap = ({
     [filteredRows]
   );
 
+  /**
+   * Custom row label renderer with type icons and drill-down affordance
+   */
+  const renderRowLabel = useCallback(
+    (props: RowLabelRenderProps) => <DataAvailabilityRowLabel {...props} granularity={granularity} />,
+    [granularity]
+  );
+
   return (
     <GridHeatmap
       rows={gridRows}
@@ -110,7 +102,7 @@ export const DataAvailabilityHeatmap = ({
       onRowClick={onRowClick}
       onBack={onBack}
       xAxisTitle={showAxisTitles ? 'Data Column' : undefined}
-      yAxisTitle={showAxisTitles ? getYAxisTitle(granularity) : undefined}
+      renderRowLabel={renderRowLabel}
       renderCell={(cellData, props) => (
         <DataAvailabilityCell
           data={cellData}

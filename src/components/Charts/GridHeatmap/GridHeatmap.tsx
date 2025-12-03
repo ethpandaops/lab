@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
 import clsx from 'clsx';
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, MagnifyingGlassPlusIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/Elements/Button';
-import type { GridHeatmapProps, GridCellSize } from './GridHeatmap.types';
+import type { GridHeatmapProps, GridCellSize, RowLabelRenderProps } from './GridHeatmap.types';
 
 /**
  * Generic grid-based heatmap component with customizable cell rendering.
@@ -32,6 +32,7 @@ export function GridHeatmap<T = unknown>({
   onBack,
   renderCell,
   renderHeader,
+  renderRowLabel,
   renderColumnLabel,
   xAxisTitle,
   yAxisTitle,
@@ -62,13 +63,13 @@ export function GridHeatmap<T = unknown>({
   };
 
   const labelWidth: Record<GridCellSize, string> = {
-    '3xs': 'w-20', // 80px - compact
-    '2xs': 'w-20', // 80px
-    xs: 'w-20',
-    sm: 'w-24',
-    md: 'w-28',
-    lg: 'w-32',
-    xl: 'w-36',
+    '3xs': 'w-36', // 144px - enough for icon + badge + value + chevron
+    '2xs': 'w-36', // 144px
+    xs: 'w-36',
+    sm: 'w-40',
+    md: 'w-44',
+    lg: 'w-48',
+    xl: 'w-52',
   };
 
   const textSize: Record<GridCellSize, string> = {
@@ -152,45 +153,70 @@ export function GridHeatmap<T = unknown>({
         <div className="flex-1">
           {/* Rows */}
           <div className="flex flex-col gap-0.5">
-            {rows.map(row => (
-              <div key={row.identifier} className="flex items-center">
-                {/* Row label - fixed width for alignment */}
-                <button
-                  type="button"
-                  onClick={() => onRowClick?.(row.identifier)}
-                  onMouseEnter={() => setHoveredRow(row.identifier)}
-                  onMouseLeave={() => setHoveredRow(null)}
-                  className={clsx(
-                    labelWidth[cellSize],
-                    textSize[cellSize],
-                    'shrink-0 truncate pr-2 text-right text-muted transition-colors',
-                    onRowClick ? 'cursor-pointer hover:text-accent' : 'cursor-default',
-                    hoveredRow === row.identifier && 'font-bold text-accent'
+            {rows.map(row => {
+              const rowLabelProps: RowLabelRenderProps = {
+                identifier: row.identifier,
+                label: row.label,
+                isHovered: hoveredRow === row.identifier,
+                canDrillDown: !!onRowClick,
+                onDrillDown: onRowClick ? () => onRowClick(row.identifier) : undefined,
+                onMouseEnter: () => setHoveredRow(row.identifier),
+                onMouseLeave: () => setHoveredRow(null),
+              };
+
+              return (
+                <div key={row.identifier} className="flex items-center">
+                  {/* Row label - custom or default */}
+                  {renderRowLabel ? (
+                    <div className={clsx(labelWidth[cellSize], 'shrink-0')}>{renderRowLabel(rowLabelProps)}</div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={rowLabelProps.onDrillDown}
+                      onMouseEnter={rowLabelProps.onMouseEnter}
+                      onMouseLeave={rowLabelProps.onMouseLeave}
+                      className={clsx(
+                        labelWidth[cellSize],
+                        textSize[cellSize],
+                        'group flex shrink-0 items-center justify-end gap-1.5 truncate pr-2 text-right transition-colors',
+                        onRowClick ? 'cursor-pointer hover:text-accent' : 'cursor-default text-muted',
+                        hoveredRow === row.identifier ? 'font-bold text-accent' : 'text-muted'
+                      )}
+                      title={onRowClick ? 'Click to drill down' : row.label}
+                    >
+                      {/* Drill-down icon (only visible on hover if clickable) */}
+                      {onRowClick && (
+                        <MagnifyingGlassPlusIcon
+                          className={clsx(
+                            'size-3 shrink-0 opacity-0 transition-opacity group-hover:opacity-100',
+                            hoveredRow === row.identifier && 'opacity-100'
+                          )}
+                        />
+                      )}
+                      <span className="truncate">{row.label}</span>
+                    </button>
                   )}
-                  title={row.label}
-                >
-                  {row.label}
-                </button>
 
-                {/* Cells with size-appropriate gap for visual separation */}
-                <div className={clsx(cellContainerClass[cellSize], cellGap[cellSize])} style={gridStyle}>
-                  {row.cells.map(cell => {
-                    const isHighlighted = hoveredColumn === cell.columnIndex || hoveredRow === row.identifier;
+                  {/* Cells with size-appropriate gap for visual separation */}
+                  <div className={clsx(cellContainerClass[cellSize], cellGap[cellSize])} style={gridStyle}>
+                    {row.cells.map(cell => {
+                      const isHighlighted = hoveredColumn === cell.columnIndex || hoveredRow === row.identifier;
 
-                    return (
-                      <div key={`${row.identifier}-${cell.columnIndex}`}>
-                        {renderCell(cell.data, {
-                          isSelected: false,
-                          isHighlighted,
-                          isDimmed: false,
-                          size: cellSize,
-                        })}
-                      </div>
-                    );
-                  })}
+                      return (
+                        <div key={`${row.identifier}-${cell.columnIndex}`}>
+                          {renderCell(cell.data, {
+                            isSelected: false,
+                            isHighlighted,
+                            isDimmed: false,
+                            size: cellSize,
+                          })}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Column header at bottom */}
