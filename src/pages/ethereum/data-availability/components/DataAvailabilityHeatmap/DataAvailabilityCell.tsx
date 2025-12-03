@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import type { DataAvailabilityCellProps, CellSize } from './DataAvailabilityHeatmap.types';
 
@@ -77,6 +78,8 @@ export const DataAvailabilityCell = ({
   showTooltip = true,
 }: DataAvailabilityCellProps): React.JSX.Element => {
   const [showTooltipState, setShowTooltipState] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Check if this cell has actual data (not a placeholder)
   const hasData = (data.totalCount ?? 0) > 0;
@@ -101,9 +104,67 @@ export const DataAvailabilityCell = ({
 
   const sizeClass = getSizeClass(size);
 
+  // Update tooltip position when showing
+  useEffect(() => {
+    if (showTooltipState && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setTooltipPosition({
+        top: rect.top - 8, // 8px margin above the cell
+        left: rect.left + rect.width / 2,
+      });
+    }
+  }, [showTooltipState]);
+
+  const tooltipContent = (
+    <div
+      className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs bg-surface px-3 py-2 text-sm/6 whitespace-nowrap text-foreground shadow-lg"
+      style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
+    >
+      <div className="font-medium">Column {displayColumnIndex}</div>
+      {hasData ? (
+        viewMode === 'threshold' ? (
+          // Threshold mode tooltip
+          <>
+            <div className="text-muted">
+              {successCount} observations ({thresholdRatio >= 1 ? 'meets' : 'below'} threshold)
+            </div>
+            <div className="text-xs/4 text-muted">
+              {(thresholdRatio * 100).toFixed(0)}% of threshold ({threshold})
+            </div>
+            {data.avgResponseTimeMs !== undefined && data.avgResponseTimeMs > 0 && (
+              <div className="text-xs/4 text-muted">
+                {Math.round(data.avgResponseTimeMs)}ms {responseTimeLabel}
+              </div>
+            )}
+          </>
+        ) : (
+          // Percentage mode tooltip
+          <>
+            <div className="text-muted">{availabilityPercent}% successful probes</div>
+            {data.successCount !== undefined && data.totalCount !== undefined && (
+              <div className="text-xs/4 text-muted">
+                {data.successCount}/{data.totalCount} observations
+              </div>
+            )}
+            {data.avgResponseTimeMs !== undefined && data.avgResponseTimeMs > 0 && (
+              <div className="text-xs/4 text-muted">
+                {Math.round(data.avgResponseTimeMs)}ms {responseTimeLabel}
+              </div>
+            )}
+          </>
+        )
+      ) : (
+        <div className="text-xs/4 text-muted">No data</div>
+      )}
+      {/* Tooltip arrow */}
+      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-surface" />
+    </div>
+  );
+
   return (
-    <div className="relative">
+    <>
       <button
+        ref={buttonRef}
         type="button"
         onClick={onClick}
         onMouseEnter={() => showTooltip && setShowTooltipState(true)}
@@ -118,52 +179,11 @@ export const DataAvailabilityCell = ({
           onClick && 'cursor-pointer active:scale-95',
           !onClick && 'cursor-default'
         )}
-        aria-label={`Column ${displayColumnIndex}, ${availabilityPercent}% available`}
+        aria-label={`Column ${displayColumnIndex}, ${availabilityPercent}% successful probes`}
       />
 
-      {/* Tooltip */}
-      {showTooltip && showTooltipState && (
-        <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 rounded-xs bg-surface px-3 py-2 text-sm/6 whitespace-nowrap text-foreground shadow-xs">
-          <div className="font-medium">Column {displayColumnIndex}</div>
-          {hasData ? (
-            viewMode === 'threshold' ? (
-              // Threshold mode tooltip
-              <>
-                <div className="text-muted">
-                  {successCount} observations ({thresholdRatio >= 1 ? 'meets' : 'below'} threshold)
-                </div>
-                <div className="text-xs/4 text-muted">
-                  {(thresholdRatio * 100).toFixed(0)}% of threshold ({threshold})
-                </div>
-                {data.avgResponseTimeMs !== undefined && data.avgResponseTimeMs > 0 && (
-                  <div className="text-xs/4 text-muted">
-                    {Math.round(data.avgResponseTimeMs)}ms {responseTimeLabel}
-                  </div>
-                )}
-              </>
-            ) : (
-              // Percentage mode tooltip
-              <>
-                <div className="text-muted">{availabilityPercent}% available</div>
-                {data.successCount !== undefined && data.totalCount !== undefined && (
-                  <div className="text-xs/4 text-muted">
-                    {data.successCount}/{data.totalCount} observations
-                  </div>
-                )}
-                {data.avgResponseTimeMs !== undefined && data.avgResponseTimeMs > 0 && (
-                  <div className="text-xs/4 text-muted">
-                    {Math.round(data.avgResponseTimeMs)}ms {responseTimeLabel}
-                  </div>
-                )}
-              </>
-            )
-          ) : (
-            <div className="text-xs/4 text-muted">No data</div>
-          )}
-          {/* Tooltip arrow */}
-          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-surface" />
-        </div>
-      )}
-    </div>
+      {/* Tooltip rendered via portal to body */}
+      {showTooltip && showTooltipState && createPortal(tooltipContent, document.body)}
+    </>
   );
 };

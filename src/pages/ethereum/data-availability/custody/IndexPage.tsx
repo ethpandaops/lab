@@ -1014,7 +1014,7 @@ export function IndexPage(): JSX.Element {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
         {/* Main Content: Heatmap (3/4 width) */}
         <div className="lg:col-span-3">
-          <div className="bg-card text-card-foreground overflow-hidden rounded-lg border border-border shadow-sm">
+          <div className="bg-card text-card-foreground rounded-lg border border-border shadow-sm">
             {/* Header with Level Title */}
             <div className="border-b border-border bg-muted/20 px-4 py-3">
               <div className="flex items-start justify-between gap-4">
