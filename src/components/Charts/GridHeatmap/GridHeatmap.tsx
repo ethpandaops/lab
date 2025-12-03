@@ -64,9 +64,10 @@ export function GridHeatmap<T = unknown>({
     xl: 'size-8', // 32px
   };
 
+  // Label width - fixed sizes, container scrolls on mobile
   const labelWidth: Record<GridCellSize, string> = {
     '3xs': 'w-36', // 144px - enough for icon + badge + value + chevron
-    '2xs': 'w-36', // 144px
+    '2xs': 'w-36',
     xs: 'w-36',
     sm: 'w-40',
     md: 'w-44',
@@ -107,7 +108,9 @@ export function GridHeatmap<T = unknown>({
   };
 
   // For 3xs, calculate grid columns based on actual column count
-  const gridStyle = cellSize === '3xs' ? { gridTemplateColumns: `repeat(${columnIndices.length}, 1fr)` } : undefined;
+  // Use minmax to ensure cells have a minimum size for usability (6px min)
+  const gridStyle =
+    cellSize === '3xs' ? { gridTemplateColumns: `repeat(${columnIndices.length}, minmax(6px, 1fr))` } : undefined;
 
   // Default column label renderer - shows 0-127 (raw column indices)
   // Only 0 and 127 are persistent; others appear on hover
@@ -174,8 +177,8 @@ export function GridHeatmap<T = unknown>({
       {/* Header content (legend, filters, etc.) */}
       {renderHeader?.()}
 
-      {/* Grid with optional Y-axis title */}
-      <div className="flex">
+      {/* Grid with optional Y-axis title - scrollable on mobile */}
+      <div className="flex overflow-x-auto">
         {/* Y-axis title - vertical text on the left */}
         {yAxisTitle && (
           <div className="flex shrink-0 items-center justify-center pr-1">
@@ -188,8 +191,8 @@ export function GridHeatmap<T = unknown>({
           </div>
         )}
 
-        {/* Main grid area */}
-        <div className="flex-1">
+        {/* Main grid area - min-width ensures cells don't collapse too much */}
+        <div className="min-w-fit flex-1">
           {/* Rows */}
           <div className="flex flex-col gap-0.5">
             {rows.map(row => {

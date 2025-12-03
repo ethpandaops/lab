@@ -307,22 +307,26 @@ export function ProbeDetailDialog({
             </h4>
 
             {/* Stats row */}
-            <div className="flex items-center gap-6">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6">
               <div>
                 <div className="text-[10px] font-medium tracking-wider text-muted uppercase">Slot</div>
-                <span className="font-mono text-lg font-bold text-foreground">{formatSlot(probe.slot)}</span>
+                <span className="font-mono text-base font-bold text-foreground sm:text-lg">
+                  {formatSlot(probe.slot)}
+                </span>
               </div>
-              <div className="h-6 w-px bg-border" />
+              <div className="hidden h-6 w-px bg-border sm:block" />
               <div>
                 <div className="text-[10px] font-medium tracking-wider text-muted uppercase">Epoch</div>
-                <span className="font-mono text-lg font-bold text-foreground">
+                <span className="font-mono text-base font-bold text-foreground sm:text-lg">
                   {formatEpoch(slotToEpoch(probe.slot))}
                 </span>
               </div>
-              <div className="h-6 w-px bg-border" />
+              <div className="hidden h-6 w-px bg-border sm:block" />
               <div>
                 <div className="text-[10px] font-medium tracking-wider text-muted uppercase">Columns</div>
-                <span className="font-mono text-lg font-bold text-foreground">{probe.column_indices?.length ?? 0}</span>
+                <span className="font-mono text-base font-bold text-foreground sm:text-lg">
+                  {probe.column_indices?.length ?? 0}
+                </span>
               </div>
             </div>
 
@@ -452,8 +456,8 @@ export function ProbeDetailDialog({
             {onFilterClick && <span className="text-[10px] font-normal text-muted normal-case">(click to filter)</span>}
           </h4>
 
-          <div className="overflow-hidden rounded-lg border border-border">
-            <table className="w-full text-xs">
+          <div className="overflow-x-auto rounded-lg border border-border">
+            <table className="min-w-full text-xs">
               <thead className="bg-muted/50 font-medium text-muted uppercase">
                 <tr>
                   <th className="px-2 py-1 text-left">Attribute</th>

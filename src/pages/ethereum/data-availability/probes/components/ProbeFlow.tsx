@@ -36,22 +36,22 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
   const statusBorder = isSuccess ? 'border-green-500/20' : isFailure ? 'border-red-500/20' : 'border-yellow-500/20';
 
   return (
-    <div className="flex flex-nowrap items-center justify-center gap-6 px-4 py-6">
-      {/* PROBER (Left) */}
+    <div className="flex flex-col items-center gap-4 px-2 py-4 sm:flex-row sm:flex-nowrap sm:justify-center sm:gap-6 sm:px-4 sm:py-6">
+      {/* PROBER (Left on desktop, Top on mobile) */}
       <div className="flex shrink-0 flex-col items-center gap-2">
         <div className="relative">
-          <ClientLogo client={probe.meta_client_implementation || 'Unknown'} size={52} />
+          <ClientLogo client={probe.meta_client_implementation || 'Unknown'} size={44} className="sm:size-[52px]" />
           {clientCountryCode && (
-            <div className="absolute -right-2 -bottom-1 flex size-6 items-center justify-center rounded-full border border-background bg-surface text-sm shadow-sm">
+            <div className="absolute -right-2 -bottom-1 flex size-5 items-center justify-center rounded-full border border-background bg-surface text-xs shadow-xs sm:size-6 sm:text-sm">
               {getCountryFlag(clientCountryCode)}
             </div>
           )}
         </div>
         <div className="text-center">
-          <div className="text-base font-bold tracking-tight text-foreground">
+          <div className="text-sm font-bold tracking-tight text-foreground sm:text-base">
             {probe.meta_client_implementation || 'Prober'}
           </div>
-          <div className="text-xs text-muted">
+          <div className="max-w-[120px] truncate text-[10px] text-muted sm:max-w-none sm:text-xs">
             {probe.meta_client_geo_city && probe.meta_client_geo_country
               ? `${probe.meta_client_geo_city}, ${probe.meta_client_geo_country}`
               : probe.meta_client_geo_city || probe.meta_client_geo_country || 'Unknown'}
@@ -59,10 +59,10 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
         </div>
       </div>
 
-      {/* CONNECTION (Center) */}
-      <div className="flex min-w-0 flex-col items-center justify-center gap-4">
-        {/* Request Flow (Top) */}
-        <div className="flex w-full flex-col items-center gap-0.5">
+      {/* CONNECTION (Center on desktop, Middle on mobile) */}
+      <div className="flex min-w-0 flex-col items-center justify-center gap-2 sm:gap-4">
+        {/* Request Flow (Top) - hidden on mobile, shown inline in status */}
+        <div className="hidden w-full flex-col items-center gap-0.5 sm:flex">
           <span className="font-mono text-xs font-medium text-foreground">
             {columnsCount} {columnsCount === 1 ? 'Column' : 'Columns'}
           </span>
@@ -72,47 +72,53 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
 
         {/* Central Status Node */}
         <div
-          className={`relative flex items-center gap-2 rounded-full border ${statusBorder} ${statusBg} px-4 py-1.5 shadow-sm backdrop-blur-sm`}
+          className={`relative flex flex-col items-center gap-1.5 rounded-lg border px-3 py-2 shadow-xs backdrop-blur-sm sm:flex-row sm:gap-2 sm:rounded-full sm:px-4 sm:py-1.5 ${statusBorder} ${statusBg}`}
         >
-          {isSuccess ? (
-            <CheckCircleIcon className={`size-4 ${statusColor}`} />
-          ) : isFailure ? (
-            <XCircleIcon className={`size-4 ${statusColor}`} />
-          ) : (
-            <QuestionMarkCircleIcon className={`size-4 ${statusColor}`} />
-          )}
-          <div className="flex items-center gap-2 leading-none">
+          <div className="flex items-center gap-2">
+            {isSuccess ? (
+              <CheckCircleIcon className={`size-4 ${statusColor}`} />
+            ) : isFailure ? (
+              <XCircleIcon className={`size-4 ${statusColor}`} />
+            ) : (
+              <QuestionMarkCircleIcon className={`size-4 ${statusColor}`} />
+            )}
             <span className={`text-xs font-bold tracking-wider uppercase ${statusColor}`}>{probe.result}</span>
-            <div className="h-3 w-px bg-border/50" />
-            <span className="font-mono text-xs font-medium text-foreground">
+          </div>
+          <div className="flex items-center gap-2 leading-none">
+            <div className="hidden h-3 w-px bg-border/50 sm:block" />
+            <span className="font-mono text-[10px] font-medium text-foreground sm:text-xs">
               {probe.response_time_ms ? `${probe.response_time_ms}ms` : '---'}
+            </span>
+            <div className="h-3 w-px bg-border/50 sm:hidden" />
+            <span className="font-mono text-[10px] font-medium text-foreground sm:hidden">
+              {columnsCount} col{columnsCount !== 1 ? 's' : ''}
             </span>
           </div>
         </div>
 
-        {/* Response Flow (Bottom) */}
-        <div className="flex w-full flex-col items-center gap-0.5">
+        {/* Response Flow (Bottom) - hidden on mobile */}
+        <div className="hidden w-full flex-col items-center gap-0.5 sm:flex">
           <span className="text-[10px] font-medium tracking-wider text-muted uppercase">Response</span>
           <ArrowLongLeftIcon className="size-5 text-muted" />
           <span className="font-mono text-xs font-medium text-foreground">{sizeDisplay}</span>
         </div>
       </div>
 
-      {/* PEER (Right) */}
+      {/* PEER (Right on desktop, Bottom on mobile) */}
       <div className="flex shrink-0 flex-col items-center gap-2">
         <div className="relative">
-          <ClientLogo client={probe.meta_peer_implementation || 'Unknown'} size={52} />
+          <ClientLogo client={probe.meta_peer_implementation || 'Unknown'} size={44} className="sm:size-[52px]" />
           {peerCountryCode && (
-            <div className="absolute -right-2 -bottom-1 flex size-6 items-center justify-center rounded-full border border-background bg-surface text-sm shadow-sm">
+            <div className="absolute -right-2 -bottom-1 flex size-5 items-center justify-center rounded-full border border-background bg-surface text-xs shadow-xs sm:size-6 sm:text-sm">
               {getCountryFlag(peerCountryCode)}
             </div>
           )}
         </div>
         <div className="text-center">
-          <div className="text-base font-bold tracking-tight text-foreground">
+          <div className="text-sm font-bold tracking-tight text-foreground sm:text-base">
             {probe.meta_peer_implementation || 'Peer'}
           </div>
-          <div className="text-xs text-muted">
+          <div className="max-w-[120px] truncate text-[10px] text-muted sm:max-w-none sm:text-xs">
             {probe.meta_peer_geo_city && probe.meta_peer_geo_country
               ? `${probe.meta_peer_geo_city}, ${probe.meta_peer_geo_country}`
               : probe.meta_peer_geo_city || probe.meta_peer_geo_country || 'Unknown'}

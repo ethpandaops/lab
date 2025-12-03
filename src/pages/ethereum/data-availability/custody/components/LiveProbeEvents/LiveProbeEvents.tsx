@@ -5,24 +5,18 @@ import {
   XCircleIcon,
   QuestionMarkCircleIcon,
   SignalIcon,
-  ClockIcon,
-  ServerIcon,
-  CpuChipIcon,
-  ListBulletIcon,
   MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { intCustodyProbeOrderBySlotServiceListOptions } from '@/api/@tanstack/react-query.gen';
-import type { IntCustodyProbeOrderBySlot } from '@/api/types.gen';
+import type { IntCustodyProbeOrderBySlot, IntCustodyProbe } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
-import { Badge } from '@/components/Elements/Badge';
-import { Dialog } from '@/components/Overlays/Dialog';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { getCountryFlag } from '@/utils/country';
 import { formatSlot } from '@/utils';
-import { ProbeFlow } from '@/pages/ethereum/data-availability/probes/components/ProbeFlow';
+import { ProbeDetailDialog } from '@/pages/ethereum/data-availability/probes/components/ProbeDetailDialog';
 import type { LiveProbeEventsProps, ProbeFilterContext } from './LiveProbeEvents.types';
 
 /** Number of seconds in a day */
@@ -165,35 +159,6 @@ function ProbeEventRow({
           />
         </div>
       </div>
-    </button>
-  );
-}
-
-/**
- * Copyable badge for slots/columns in the detail dialog
- */
-function CopyableBadge({ value, label }: { value: string | number; label?: string }): JSX.Element {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = (e: React.MouseEvent): void => {
-    e.stopPropagation();
-    navigator.clipboard.writeText(String(value));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1000);
-  };
-
-  return (
-    <button
-      type="button"
-      onClick={handleCopy}
-      className={`inline-flex cursor-pointer items-center justify-center rounded-sm border px-1.5 py-0.5 font-mono text-[10px] transition-all ${
-        copied
-          ? 'border-green-500/30 bg-green-500/10 text-green-500'
-          : 'border-border bg-background text-foreground hover:border-primary/30 hover:bg-primary/10'
-      }`}
-      title={`Copy ${label || value}`}
-    >
-      {value}
     </button>
   );
 }
@@ -362,183 +327,12 @@ export function LiveProbeEvents({
         </div>
       </div>
 
-      {/* Probe Detail Dialog */}
-      <Dialog
-        open={selectedProbe !== null}
+      {/* Probe Detail Dialog - using shared component */}
+      <ProbeDetailDialog
+        probe={selectedProbe as IntCustodyProbe | null}
+        isOpen={selectedProbe !== null}
         onClose={handleCloseDialog}
-        title={
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <ServerIcon className="size-5 text-primary" />
-              <span>Probe Details</span>
-              {selectedProbe && (
-                <div className="ml-2 flex items-center gap-2">
-                  <Badge
-                    variant="flat"
-                    color={
-                      selectedProbe.result === 'success'
-                        ? 'green'
-                        : selectedProbe.result === 'failure'
-                          ? 'red'
-                          : 'yellow'
-                    }
-                    className="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase"
-                  >
-                    {selectedProbe.result}
-                  </Badge>
-                  <span className="font-mono text-xs text-muted">{selectedProbe.response_time_ms}ms</span>
-                </div>
-              )}
-            </div>
-            {selectedProbe && (
-              <div className="flex items-center gap-2 text-xs font-normal text-muted">
-                <ClockIcon className="size-3" />
-                <Timestamp
-                  timestamp={selectedProbe.probe_date_time ?? 0}
-                  format="long"
-                  disableModal
-                  className="!p-0 !text-muted"
-                />
-              </div>
-            )}
-          </div>
-        }
-        description="Complete information about this custody probe attempt"
-        size="xl"
-      >
-        {selectedProbe && (
-          <div className="space-y-4">
-            {/* Visual Flow */}
-            <ProbeFlow probe={selectedProbe} />
-
-            {/* Client Details Table */}
-            <div>
-              <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
-                <CpuChipIcon className="size-4 text-primary" />
-                Client Details
-              </h4>
-
-              <div className="overflow-hidden rounded-sm border border-border">
-                <table className="w-full text-xs">
-                  <thead className="bg-muted/50 font-medium text-muted uppercase">
-                    <tr>
-                      <th className="px-3 py-1.5 text-left">Attribute</th>
-                      <th className="px-3 py-1.5 text-left">Prober</th>
-                      <th className="px-3 py-1.5 text-left">Peer</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    <tr className="bg-surface/30">
-                      <td className="px-3 py-1.5 font-medium text-muted">Client</td>
-                      <td className="px-3 py-1.5">
-                        <div className="flex items-center gap-1.5">
-                          <ClientLogo client={selectedProbe.meta_client_implementation || 'Unknown'} size={16} />
-                          <span className="font-medium">{selectedProbe.meta_client_implementation || '-'}</span>
-                        </div>
-                      </td>
-                      <td className="px-3 py-1.5">
-                        <div className="flex items-center gap-1.5">
-                          <ClientLogo client={selectedProbe.meta_peer_implementation || 'Unknown'} size={16} />
-                          <span className="font-medium">{selectedProbe.meta_peer_implementation || '-'}</span>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-1.5 font-medium text-muted">Version</td>
-                      <td className="px-3 py-1.5 font-mono text-[10px]">{selectedProbe.meta_client_version || '-'}</td>
-                      <td className="px-3 py-1.5 font-mono text-[10px]">{selectedProbe.meta_peer_version || '-'}</td>
-                    </tr>
-                    <tr className="bg-surface/30">
-                      <td className="px-3 py-1.5 font-medium text-muted">Country</td>
-                      <td className="px-3 py-1.5">
-                        <div className="flex items-center gap-1.5">
-                          <span>{getCountryFlag(selectedProbe.meta_client_geo_country_code)}</span>
-                          <span>{selectedProbe.meta_client_geo_country || '-'}</span>
-                        </div>
-                      </td>
-                      <td className="px-3 py-1.5">
-                        <div className="flex items-center gap-1.5">
-                          <span>{getCountryFlag(selectedProbe.meta_peer_geo_country_code)}</span>
-                          <span>{selectedProbe.meta_peer_geo_country || '-'}</span>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-1.5 font-medium text-muted">City</td>
-                      <td className="px-3 py-1.5">{selectedProbe.meta_client_geo_city || '-'}</td>
-                      <td className="px-3 py-1.5">{selectedProbe.meta_peer_geo_city || '-'}</td>
-                    </tr>
-                    <tr className="bg-surface/30">
-                      <td className="px-3 py-1.5 font-medium text-muted">ASN</td>
-                      <td className="px-3 py-1.5 font-mono text-[10px]">
-                        {selectedProbe.meta_client_geo_autonomous_system_number
-                          ? `AS${selectedProbe.meta_client_geo_autonomous_system_number}`
-                          : '-'}
-                      </td>
-                      <td className="px-3 py-1.5 font-mono text-[10px]">
-                        {selectedProbe.meta_peer_geo_autonomous_system_number
-                          ? `AS${selectedProbe.meta_peer_geo_autonomous_system_number}`
-                          : '-'}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-1.5 font-medium text-muted">Peer ID</td>
-                      <td className="px-3 py-1.5 text-muted">-</td>
-                      <td className="px-3 py-1.5 font-mono text-[10px]">{selectedProbe.peer_id_unique_key || '-'}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Request Details */}
-            <div className="border-t border-border pt-4">
-              <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
-                <ListBulletIcon className="size-4 text-primary" />
-                Request Details
-              </h4>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <dt className="mb-1 flex justify-between text-[10px] font-medium tracking-wider text-muted uppercase">
-                    <span>Slot</span>
-                  </dt>
-                  <div className="rounded-sm border border-border/50 bg-muted/30 p-1.5">
-                    {selectedProbe.slot !== undefined && selectedProbe.slot !== null ? (
-                      <CopyableBadge value={selectedProbe.slot} label="Slot" />
-                    ) : (
-                      <span className="text-[10px] text-muted italic">None</span>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <dt className="mb-1 flex justify-between text-[10px] font-medium tracking-wider text-muted uppercase">
-                    <span>Columns</span>
-                    <span className="text-foreground">{selectedProbe.column_indices?.length || 0}</span>
-                  </dt>
-                  <div className="max-h-24 overflow-y-auto rounded-sm border border-border/50 bg-muted/30 p-1.5">
-                    <div className="flex flex-wrap gap-1">
-                      {selectedProbe.column_indices?.map(col => (
-                        <CopyableBadge key={col} value={col} label="Column" />
-                      )) || <span className="text-[10px] text-muted italic">None</span>}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Error Section */}
-              {selectedProbe.error && (
-                <div className="mt-4">
-                  <dt className="text-[10px] font-bold tracking-wider text-red-400 uppercase">Error</dt>
-                  <dd className="mt-1 rounded-sm border border-red-500/20 bg-red-500/5 p-2 font-mono text-[10px] text-red-300">
-                    {selectedProbe.error}
-                  </dd>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </Dialog>
+      />
     </>
   );
 }

@@ -19,21 +19,37 @@ export function IndexPage(): JSX.Element {
 
   // Calculate time range in seconds for the probe_date_time filter
   // Use URL params if provided, otherwise default to last 7 days
+  // If probeTime is specified (for deep-linking), ensure the time range includes it
   const timeRange = useMemo(() => {
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    const sevenDaysSeconds = 7 * 24 * 60 * 60;
+
     if (search.timeStart !== undefined && search.timeEnd !== undefined) {
       return {
         start: search.timeStart,
         end: search.timeEnd,
       };
     }
+
+    // If probeTime is in URL (deep-linking to a specific probe), ensure the time range includes it
+    if (search.probeTime !== undefined) {
+      // Extend range to include the probe time with a 1-day buffer on each side
+      const probeTime = search.probeTime;
+      const oneDaySeconds = 24 * 60 * 60;
+      const rangeStart = Math.min(nowSeconds - sevenDaysSeconds, probeTime - oneDaySeconds);
+      const rangeEnd = Math.max(nowSeconds, probeTime + oneDaySeconds);
+      return {
+        start: rangeStart,
+        end: rangeEnd,
+      };
+    }
+
     // Default: NOW - 7d to NOW for bounded query (helps ClickHouse early cutoff with ORDER BY)
-    const nowSeconds = Math.floor(Date.now() / 1000);
-    const sevenDaysSeconds = 7 * 24 * 60 * 60;
     return {
       start: nowSeconds - sevenDaysSeconds,
       end: nowSeconds,
     };
-  }, [search.timeStart, search.timeEnd]);
+  }, [search.timeStart, search.timeEnd, search.probeTime]);
 
   // Build order_by string for API
   const orderBy = useMemo(() => {
