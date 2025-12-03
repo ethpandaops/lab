@@ -1,0 +1,518 @@
+import { type JSX, useState, useCallback } from 'react';
+import { Link } from '@tanstack/react-router';
+import clsx from 'clsx';
+import {
+  ServerIcon,
+  CpuChipIcon,
+  ListBulletIcon,
+  LinkIcon,
+  CheckIcon,
+  EyeIcon,
+  CubeIcon,
+  Squares2X2Icon,
+  FunnelIcon,
+  ArrowTopRightOnSquareIcon,
+  MagnifyingGlassIcon,
+  CalendarDaysIcon,
+  DocumentDuplicateIcon,
+} from '@heroicons/react/24/outline';
+import type { IntCustodyProbe } from '@/api/types.gen';
+import { useNetwork } from '@/hooks/useNetwork';
+import { Dialog } from '@/components/Overlays/Dialog';
+import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { BlobPosterLogo } from '@/components/Ethereum/BlobPosterLogo';
+import { Timestamp } from '@/components/DataDisplay/Timestamp';
+import { getCountryFlag } from '@/utils/country';
+import { slotToTimestamp, slotToEpoch } from '@/utils/beacon';
+import { formatSlot, formatEpoch } from '@/utils';
+import { ProbeFlow } from '../ProbeFlow';
+
+export interface ProbeDetailDialogProps {
+  /** The probe to display */
+  probe: IntCustodyProbe | null;
+  /** Whether the dialog is open */
+  isOpen: boolean;
+  /** Called when the dialog should close */
+  onClose: () => void;
+  /** Optional callback when a filter is applied (closes dialog and filters) */
+  onFilterClick?: (field: string, value: string | number) => void;
+}
+
+/**
+ * Copyable badge component for column indices
+ */
+function CopyableBadge({
+  value,
+  label,
+  onDrillDown,
+}: {
+  value: string | number;
+  label?: string;
+  onDrillDown?: () => void;
+}): JSX.Element {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = (e: React.MouseEvent): void => {
+    e.stopPropagation();
+    e.preventDefault();
+    navigator.clipboard.writeText(String(value));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1000);
+  };
+
+  const handleClick = (e: React.MouseEvent): void => {
+    e.stopPropagation();
+    if (onDrillDown) {
+      onDrillDown();
+    }
+  };
+
+  return (
+    <span className="group relative inline-flex items-center gap-0.5">
+      <button
+        type="button"
+        onClick={onDrillDown ? handleClick : handleCopy}
+        className={clsx(
+          'inline-flex cursor-pointer items-center justify-center rounded border px-1.5 py-0.5 font-mono text-[10px] transition-all',
+          copied
+            ? 'border-green-500/30 bg-green-500/10 text-green-500'
+            : onDrillDown
+              ? 'border-border bg-background text-foreground hover:border-primary/30 hover:bg-primary/10 hover:text-primary'
+              : 'border-border bg-background text-foreground hover:border-primary/30 hover:bg-primary/10'
+        )}
+        title={onDrillDown ? `Filter by ${label || value}` : `Copy ${label || value}`}
+      >
+        {copied ? <CheckIcon className="mr-1 size-3" /> : null}
+        {value}
+      </button>
+    </span>
+  );
+}
+
+/**
+ * Shared probe detail dialog component
+ * Used by both ProbesView and CellProbeDialog for consistent probe details display
+ */
+export function ProbeDetailDialog({
+  probe,
+  isOpen,
+  onClose,
+  onFilterClick,
+}: ProbeDetailDialogProps): JSX.Element | null {
+  const { currentNetwork } = useNetwork();
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  // Handle copy link
+  const handleCopyLink = useCallback(() => {
+    navigator.clipboard.writeText(window.location.href);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  }, []);
+
+  // Handle filter and close
+  const handleFilterAndClose = useCallback(
+    (field: string, value: string | number) => {
+      if (onFilterClick) {
+        onFilterClick(field, value);
+      }
+      onClose();
+    },
+    [onFilterClick, onClose]
+  );
+
+  if (!probe) return null;
+
+  return (
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      title={
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <ServerIcon className="size-5 text-primary" />
+            <span>Probe Details</span>
+            {/* Copy Link button */}
+            <button
+              type="button"
+              onClick={handleCopyLink}
+              className={clsx(
+                'ml-auto flex items-center gap-1.5 rounded border px-2 py-1 text-xs transition-all',
+                linkCopied
+                  ? 'border-green-500/30 bg-green-500/10 text-green-500'
+                  : 'border-border bg-background text-muted hover:border-primary/30 hover:bg-primary/10 hover:text-primary'
+              )}
+              title="Copy link to this probe"
+            >
+              {linkCopied ? <CheckIcon className="size-3.5" /> : <LinkIcon className="size-3.5" />}
+              <span>{linkCopied ? 'Copied!' : 'Copy Link'}</span>
+            </button>
+          </div>
+          <Timestamp
+            timestamp={probe.probe_date_time ?? 0}
+            format="long"
+            disableModal
+            className="!p-0 text-xs !text-muted"
+          />
+        </div>
+      }
+      size="xl"
+    >
+      <div className="space-y-4">
+        {/* Visual Flow */}
+        <ProbeFlow probe={probe} />
+
+        {/* Blob Publishers Hero Section */}
+        {probe.blob_submitters && probe.blob_submitters.length > 0 && (
+          <div
+            className={clsx(
+              'rounded-lg border p-4',
+              probe.result === 'success'
+                ? 'border-green-500/30 bg-green-500/5'
+                : probe.result === 'failure'
+                  ? 'border-red-500/30 bg-red-500/5'
+                  : 'border-yellow-500/30 bg-yellow-500/5'
+            )}
+          >
+            {/* Status message */}
+            <div className="mb-3 flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <DocumentDuplicateIcon
+                  className={clsx(
+                    'size-5',
+                    probe.result === 'success'
+                      ? 'text-green-500'
+                      : probe.result === 'failure'
+                        ? 'text-red-500'
+                        : 'text-yellow-500'
+                  )}
+                />
+                <span
+                  className={clsx(
+                    'text-sm font-medium',
+                    probe.result === 'success'
+                      ? 'text-green-600 dark:text-green-400'
+                      : probe.result === 'failure'
+                        ? 'text-red-600 dark:text-red-400'
+                        : 'text-yellow-600 dark:text-yellow-400'
+                  )}
+                >
+                  {probe.result === 'success'
+                    ? 'These blob publishers are being secured by this peer'
+                    : probe.result === 'failure'
+                      ? 'These blob publishers are NOT being secured by this peer'
+                      : 'Uncertain if these blob publishers are being secured by this peer'}
+                </span>
+              </div>
+              {/* Reassuring link - always shown */}
+              {probe.slot !== undefined && (
+                <div className="flex items-center gap-1.5 text-xs text-muted">
+                  <span>This is just one probe.</span>
+                  <Link
+                    to="/ethereum/data-availability/probes"
+                    search={{ slot: probe.slot }}
+                    className="inline-flex items-center gap-1 text-primary transition-colors hover:text-primary/80 hover:underline"
+                  >
+                    <MagnifyingGlassIcon className="size-3" />
+                    <span>View all probes for this slot</span>
+                  </Link>
+                  <span>to see the full picture.</span>
+                </div>
+              )}
+            </div>
+
+            {/* Blob publishers grid */}
+            <div className="flex flex-wrap gap-3">
+              {(() => {
+                const countMap = new Map<string, number>();
+                for (const submitter of probe.blob_submitters) {
+                  countMap.set(submitter, (countMap.get(submitter) ?? 0) + 1);
+                }
+                const sorted = [...countMap.entries()].sort((a, b) => b[1] - a[1]);
+                return sorted.map(([poster, count]) => (
+                  <div
+                    key={poster}
+                    className="flex items-center gap-2 rounded border border-border bg-background px-3 py-2"
+                  >
+                    <BlobPosterLogo poster={poster} size={28} />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold text-foreground">{poster}</span>
+                      <span className="text-xs text-muted">
+                        {count} {count === 1 ? 'blob' : 'blobs'}
+                      </span>
+                    </div>
+                  </div>
+                ));
+              })()}
+            </div>
+          </div>
+        )}
+
+        {/* Probe Details - Slot/Epoch info with links */}
+        {probe.slot !== undefined && probe.slot !== null && (
+          <div className="rounded-lg border border-border bg-surface p-4">
+            <h4 className="mb-3 flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
+              <CubeIcon className="size-4 text-primary" />
+              Probe Details
+            </h4>
+
+            {/* Stats row */}
+            <div className="flex items-center gap-6">
+              <div>
+                <div className="text-[10px] font-medium tracking-wider text-muted uppercase">Slot</div>
+                <span className="font-mono text-lg font-bold text-foreground">{formatSlot(probe.slot)}</span>
+              </div>
+              <div className="h-6 w-px bg-border" />
+              <div>
+                <div className="text-[10px] font-medium tracking-wider text-muted uppercase">Epoch</div>
+                <span className="font-mono text-lg font-bold text-foreground">
+                  {formatEpoch(slotToEpoch(probe.slot))}
+                </span>
+              </div>
+              <div className="h-6 w-px bg-border" />
+              <div>
+                <div className="text-[10px] font-medium tracking-wider text-muted uppercase">Columns</div>
+                <span className="font-mono text-lg font-bold text-foreground">{probe.column_indices?.length ?? 0}</span>
+              </div>
+            </div>
+
+            {/* Slot age indicator */}
+            {currentNetwork && probe.probe_date_time && (
+              <div className="mt-3 flex items-center gap-2 rounded border border-border/50 bg-muted/30 px-3 py-2 text-sm text-muted">
+                <CalendarDaysIcon className="size-4" />
+                <span>
+                  Requested data from a slot{' '}
+                  <span className="font-medium text-foreground">
+                    {(() => {
+                      const slotTimestamp = slotToTimestamp(probe.slot, currentNetwork.genesis_time);
+                      const probeTimestamp = probe.probe_date_time;
+                      const ageSeconds = probeTimestamp - slotTimestamp;
+                      const ageDays = Math.floor(ageSeconds / 86400);
+                      const ageHours = Math.floor((ageSeconds % 86400) / 3600);
+                      const ageMinutes = Math.floor((ageSeconds % 3600) / 60);
+
+                      if (ageDays > 0) {
+                        return `${ageDays} day${ageDays === 1 ? '' : 's'}`;
+                      } else if (ageHours > 0) {
+                        return `${ageHours} hour${ageHours === 1 ? '' : 's'}`;
+                      } else if (ageMinutes > 0) {
+                        return `${ageMinutes} minute${ageMinutes === 1 ? '' : 's'}`;
+                      }
+                      return 'less than a minute';
+                    })()}
+                  </span>{' '}
+                  old at the time
+                </span>
+              </div>
+            )}
+
+            {/* Links section */}
+            <div className="mt-4 border-t border-border pt-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-medium tracking-wider text-muted uppercase">Links</span>
+                <div className="flex flex-wrap gap-2">
+                  {/* Filter links */}
+                  {onFilterClick && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleFilterAndClose('slot', probe.slot!)}
+                        className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
+                      >
+                        <FunnelIcon className="size-3" />
+                        <span>Filter Slot</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleFilterAndClose('epoch', slotToEpoch(probe.slot!))}
+                        className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
+                      >
+                        <FunnelIcon className="size-3" />
+                        <span>Filter Epoch</span>
+                      </button>
+                      <div className="h-4 w-px bg-border" />
+                    </>
+                  )}
+
+                  {/* Deep dive links */}
+                  <Link
+                    to="/ethereum/slots/$slot"
+                    params={{ slot: String(probe.slot) }}
+                    className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
+                  >
+                    <CubeIcon className="size-3" />
+                    <span>Slot Deep Dive</span>
+                    <ArrowTopRightOnSquareIcon className="size-2.5 text-muted" />
+                  </Link>
+                  <Link
+                    to="/ethereum/epochs/$epoch"
+                    params={{ epoch: String(slotToEpoch(probe.slot)) }}
+                    className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
+                  >
+                    <Squares2X2Icon className="size-3" />
+                    <span>Epoch Deep Dive</span>
+                    <ArrowTopRightOnSquareIcon className="size-2.5 text-muted" />
+                  </Link>
+
+                  {/* Custody link */}
+                  {currentNetwork &&
+                    (() => {
+                      const slot = probe.slot!;
+                      const epoch = slotToEpoch(slot);
+                      const slotTimestamp = slotToTimestamp(slot, currentNetwork.genesis_time);
+                      return (
+                        <Link
+                          to="/ethereum/data-availability/custody"
+                          search={{
+                            slot,
+                            epoch,
+                            hour: Math.floor(slotTimestamp / 3600) * 3600,
+                            date: new Date(slotTimestamp * 1000).toISOString().split('T')[0],
+                          }}
+                          className="flex items-center gap-1 rounded border border-accent/30 bg-accent/10 px-2 py-1 text-[11px] font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
+                        >
+                          <EyeIcon className="size-3" />
+                          <span>View Custody</span>
+                          <ArrowTopRightOnSquareIcon className="size-2.5" />
+                        </Link>
+                      );
+                    })()}
+
+                  {/* Probes table link */}
+                  <Link
+                    to="/ethereum/data-availability/probes"
+                    search={{ slot: probe.slot }}
+                    className="flex items-center gap-1 rounded border border-border bg-background px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
+                  >
+                    <MagnifyingGlassIcon className="size-3" />
+                    <span>All Slot Probes</span>
+                    <ArrowTopRightOnSquareIcon className="size-2.5 text-muted" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Client Details Table */}
+        <div>
+          <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
+            <CpuChipIcon className="size-4 text-primary" />
+            Client Details
+          </h4>
+
+          <div className="overflow-hidden rounded-lg border border-border">
+            <table className="w-full text-xs">
+              <thead className="bg-muted/50 font-medium text-muted uppercase">
+                <tr>
+                  <th className="px-2 py-1 text-left">Attribute</th>
+                  <th className="px-2 py-1 text-left">Prober</th>
+                  <th className="px-2 py-1 text-left">Peer</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                <tr className="bg-card/30">
+                  <td className="px-2 py-1 font-medium text-muted">Client</td>
+                  <td className="px-2 py-1">
+                    <div className="flex items-center gap-1.5">
+                      <ClientLogo client={probe.meta_client_implementation || 'Unknown'} size={16} />
+                      <span className="font-medium">{probe.meta_client_implementation || '-'}</span>
+                    </div>
+                  </td>
+                  <td className="px-2 py-1">
+                    <div className="flex items-center gap-1.5">
+                      <ClientLogo client={probe.meta_peer_implementation || 'Unknown'} size={16} />
+                      <span className="font-medium">{probe.meta_peer_implementation || '-'}</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-2 py-1 font-medium text-muted">Node ID</td>
+                  <td className="px-2 py-1 font-mono text-[10px]">{probe.node_id || '-'}</td>
+                  <td className="px-2 py-1 text-muted">-</td>
+                </tr>
+                <tr className="bg-card/30">
+                  <td className="px-2 py-1 font-medium text-muted">Version</td>
+                  <td className="px-2 py-1 font-mono text-[10px]">{probe.meta_client_version || '-'}</td>
+                  <td className="px-2 py-1 font-mono text-[10px]">{probe.meta_peer_version || '-'}</td>
+                </tr>
+                <tr>
+                  <td className="px-2 py-1 font-medium text-muted">Country</td>
+                  <td className="px-2 py-1">
+                    <div className="flex items-center gap-1.5">
+                      <span>{getCountryFlag(probe.meta_client_geo_country_code)}</span>
+                      <span>{probe.meta_client_geo_country || '-'}</span>
+                    </div>
+                  </td>
+                  <td className="px-2 py-1">
+                    <div className="flex items-center gap-1.5">
+                      <span>{getCountryFlag(probe.meta_peer_geo_country_code)}</span>
+                      <span>{probe.meta_peer_geo_country || '-'}</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr className="bg-card/30">
+                  <td className="px-2 py-1 font-medium text-muted">City</td>
+                  <td className="px-2 py-1">{probe.meta_client_geo_city || '-'}</td>
+                  <td className="px-2 py-1">{probe.meta_peer_geo_city || '-'}</td>
+                </tr>
+                <tr>
+                  <td className="px-2 py-1 font-medium text-muted">ASN</td>
+                  <td className="px-2 py-1 font-mono text-[10px]">
+                    {probe.meta_client_geo_autonomous_system_number
+                      ? `AS${probe.meta_client_geo_autonomous_system_number}`
+                      : '-'}
+                  </td>
+                  <td className="px-2 py-1 font-mono text-[10px]">
+                    {probe.meta_peer_geo_autonomous_system_number
+                      ? `AS${probe.meta_peer_geo_autonomous_system_number}`
+                      : '-'}
+                  </td>
+                </tr>
+                <tr className="bg-card/30">
+                  <td className="px-2 py-1 font-medium text-muted">Peer ID</td>
+                  <td className="px-2 py-1 text-muted">-</td>
+                  <td className="px-2 py-1 font-mono text-[10px]">{probe.peer_id_unique_key || '-'}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Probed Columns */}
+        {probe.column_indices && probe.column_indices.length > 0 && (
+          <div className="border-t border-border pt-4">
+            <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
+              <ListBulletIcon className="size-4 text-primary" />
+              Probed Columns
+              {onFilterClick && (
+                <span className="text-[10px] font-normal text-muted normal-case">(click to filter)</span>
+              )}
+            </h4>
+            <div className="max-h-32 overflow-y-auto rounded border border-border/50 bg-muted/30 p-2">
+              <div className="flex flex-wrap gap-1">
+                {probe.column_indices.map(col => (
+                  <CopyableBadge
+                    key={col}
+                    value={col}
+                    label="Column"
+                    onDrillDown={onFilterClick ? () => handleFilterAndClose('column', col) : undefined}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Error Section */}
+        {probe.error && (
+          <div className="border-t border-border pt-4">
+            <h4 className="mb-2 text-[10px] font-bold tracking-wider text-red-400 uppercase">Error</h4>
+            <div className="rounded border border-red-500/20 bg-red-500/5 p-2 font-mono text-[10px] text-red-300">
+              {probe.error}
+            </div>
+          </div>
+        )}
+      </div>
+    </Dialog>
+  );
+}
