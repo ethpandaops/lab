@@ -43,6 +43,7 @@ export function IndexPage(): React.JSX.Element {
           currentEpoch={currentEpoch}
           blobSchedule={currentNetwork?.blob_schedule}
           genesisTime={currentNetwork?.genesis_time}
+          network={currentNetwork ?? undefined}
         />
       </div>
     </Container>
