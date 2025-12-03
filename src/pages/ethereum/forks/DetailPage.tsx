@@ -305,6 +305,7 @@ function ForkDetailContent({
             currentEpoch={currentEpoch}
             isCurrentFork={isCurrentFork}
             network={currentNetwork}
+            genesisTime={currentNetwork?.genesis_time}
           />
         )}
 
@@ -666,6 +667,7 @@ interface BlobScheduleCardProps {
   currentEpoch: number;
   isCurrentFork: boolean;
   network?: ReturnType<typeof useNetwork>['currentNetwork'];
+  genesisTime?: number;
 }
 
 function BlobScheduleCard({
@@ -673,6 +675,7 @@ function BlobScheduleCard({
   currentEpoch,
   isCurrentFork,
   network,
+  genesisTime,
 }: BlobScheduleCardProps): React.JSX.Element {
   return (
     <Card>
@@ -705,24 +708,32 @@ function BlobScheduleCard({
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <div className="flex flex-col gap-y-2 sm:flex-row sm:items-start sm:justify-between sm:gap-x-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-x-3">
-                        <span className={clsx('text-sm font-medium', isActive ? 'text-foreground' : 'text-muted')}>
-                          {bpoSlug ? `${bpoSlug.toUpperCase()} - ` : ''}Max {item.max_blobs_per_block} blobs per block
-                        </span>
-                        {isCurrent && (
-                          <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent">
-                            Active
+                  <div className="flex flex-col gap-y-2">
+                    <div className="flex flex-col gap-y-2 sm:flex-row sm:items-start sm:justify-between sm:gap-x-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-x-3">
+                          <span className={clsx('text-sm font-medium', isActive ? 'text-foreground' : 'text-muted')}>
+                            {bpoSlug ? `${bpoSlug.toUpperCase()} - ` : ''}Max {item.max_blobs_per_block} blobs per block
                           </span>
-                        )}
+                          {isCurrent && (
+                            <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent">
+                              Active
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-x-2">
+                        <span className="text-xs text-muted">Epoch</span>
+                        <Epoch epoch={item.epoch} />
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-x-2">
-                      <span className="text-xs text-muted">Epoch</span>
-                      <Epoch epoch={item.epoch} />
-                    </div>
+                    {genesisTime && (
+                      <div className="text-xs text-muted">
+                        <Timestamp timestamp={epochToTimestamp(item.epoch, genesisTime)} format="relative" />
+                      </div>
+                    )}
                   </div>
                 </div>
               </>
