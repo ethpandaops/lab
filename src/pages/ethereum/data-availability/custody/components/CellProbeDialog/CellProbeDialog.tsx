@@ -14,7 +14,7 @@ import { intCustodyProbeServiceListOptions } from '@/api/@tanstack/react-query.g
 import type { IntCustodyProbe } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { Dialog } from '@/components/Overlays/Dialog';
-import { formatEpoch } from '@/utils';
+import { formatEpoch, formatSlot } from '@/utils';
 import { ProbeEventRow } from '@/pages/ethereum/data-availability/components/ProbeEventRow';
 import { ProbeDetailDialog } from '@/pages/ethereum/data-availability/probes/components/ProbeDetailDialog';
 import type { CellProbeDialogProps, CellContext } from './CellProbeDialog.types';

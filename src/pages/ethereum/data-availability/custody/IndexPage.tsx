@@ -7,7 +7,7 @@ import { DataAvailabilityLegend } from '@/pages/ethereum/data-availability/compo
 import { DataAvailabilitySkeleton } from '@/pages/ethereum/data-availability/components/DataAvailabilitySkeleton';
 import { ViewModeToggle } from '@/pages/ethereum/data-availability/components/ViewModeToggle';
 import { TimezoneToggle } from '@/components/Elements/TimezoneToggle';
-import { InfoBox } from '@/components/Feedback/InfoBox';
+import { Dialog } from '@/components/Overlays/Dialog';
 import { LiveProbeEvents } from './components/LiveProbeEvents';
 import type { ProbeFilterContext } from './components/LiveProbeEvents';
 import { CellProbeDialog } from './components/CellProbeDialog';
@@ -29,6 +29,7 @@ import {
   ClockIcon,
   CubeIcon,
   Square2StackIcon,
+  InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import {
   fctDataColumnAvailabilityDailyServiceListOptions,
@@ -264,6 +265,9 @@ export function IndexPage(): JSX.Element {
   const [cellDialogOpen, setCellDialogOpen] = useState(false);
   const [cellContext, setCellContext] = useState<CellContext | null>(null);
   const [timeRangeContext, setTimeRangeContext] = useState<TimeRangeContext | null>(null);
+
+  // Learn more dialog state
+  const [learnMoreOpen, setLearnMoreOpen] = useState(false);
 
   // Window Level: Last 19 days of daily aggregated data
   const windowQuery = useQuery({
@@ -950,25 +954,55 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      {/* Page Header */}
-      <InfoBox className="mb-6">
-        <p>
-          <span className="font-medium text-foreground">
-            PeerDAS transforms Ethereum&apos;s data availability layer.
-          </span>{' '}
-          Instead of every node storing every blob, data is erasure coded with 2x redundancy and split into 128 columns.
-          Each node commits to storing a subset based on its identity and validator balance. 64 distinct columns are
-          required to reconstruct the full blob matrix, enabling dramatic scalability improvements.
-        </p>
-        <p>
-          This dashboard answers a critical question:{' '}
-          <span className="italic">are peers actually storing the data they claim?</span>
-        </p>
-        <p>
-          To answer this question we continuously sample other nodes in the network, validate their responses against
-          KZG commitments, and piece this all together tobuild a real-time picture of custody compliance.
-        </p>
-      </InfoBox>
+      {/* Hero Section */}
+      <div className="relative mb-6 overflow-hidden rounded-lg border border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-accent/5">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+        <div className="relative px-5 py-4 sm:px-6 sm:py-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1">
+              <h2 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+                Custody Compliance Monitoring
+              </h2>
+              <p className="text-sm text-muted">Are peers actually storing the data they claim?</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setLearnMoreOpen(true)}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-all hover:border-primary/50 hover:bg-primary/20"
+            >
+              <InformationCircleIcon className="size-4" />
+              Learn more
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Learn More Dialog */}
+      <Dialog open={learnMoreOpen} onClose={() => setLearnMoreOpen(false)} title="About PeerDAS Custody" size="lg">
+        <div className="space-y-4 text-sm leading-relaxed text-muted">
+          <p>
+            <span className="font-medium text-foreground">
+              PeerDAS transforms Ethereum&apos;s data availability layer.
+            </span>{' '}
+            Instead of every node storing every blob, data is erasure coded with 2x redundancy and split into 128
+            columns. Each node commits to storing a subset based on its identity and validator balance.
+          </p>
+          <p>
+            64 distinct columns are required to reconstruct the full blob matrix, enabling dramatic scalability
+            improvements while maintaining the network&apos;s security guarantees.
+          </p>
+          <div className="rounded-sm border border-accent/20 bg-accent/5 p-3">
+            <p className="text-foreground">
+              <span className="font-medium">This dashboard answers a critical question:</span>{' '}
+              <span className="italic">are peers actually storing the data they claim?</span>
+            </p>
+          </div>
+          <p>
+            To answer this, we continuously sample nodes in the network, validate their responses against KZG
+            commitments, and build a real-time picture of custody compliance across all 128 columns.
+          </p>
+        </div>
+      </Dialog>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
         {/* Main Content: Heatmap (3/4 width) */}
