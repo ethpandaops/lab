@@ -147,7 +147,8 @@ export function ProbeDetailDialog({
       url.searchParams.set('probeTime', String(probe.probe_date_time));
     }
     if (probe.peer_id_unique_key !== undefined) {
-      url.searchParams.set('probePeerId', String(probe.peer_id_unique_key));
+      // Wrap in quotes so TanStack Router parses it as a string, not a number
+      url.searchParams.set('probePeerId', `"${probe.peer_id_unique_key}"`);
     }
 
     navigator.clipboard.writeText(url.toString());

@@ -2,6 +2,7 @@ import { type JSX, useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearch, useNavigate, Link } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
+import { Header } from '@/components/Layout/Header';
 import { DataAvailabilityHeatmap } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
 import { DataAvailabilityLegend } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityLegend';
 import { DataAvailabilitySkeleton } from '@/pages/ethereum/data-availability/components/DataAvailabilitySkeleton';
@@ -954,27 +955,21 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      {/* Hero Section */}
-      <div className="relative mb-6 overflow-hidden rounded-lg border border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-accent/5">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
-        <div className="relative px-5 py-4 sm:px-6 sm:py-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1">
-              <h2 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
-                Custody Compliance Monitoring
-              </h2>
-              <p className="text-sm text-muted">Are peers actually storing the data they claim?</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setLearnMoreOpen(true)}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-all hover:border-primary/50 hover:bg-primary/20"
-            >
-              <InformationCircleIcon className="size-4" />
-              Learn more
-            </button>
-          </div>
-        </div>
+      {/* Header with Learn More */}
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <Header
+          title="Custody Compliance"
+          description="Are peers actually storing the data they claim?"
+          className="mb-0"
+        />
+        <button
+          type="button"
+          onClick={() => setLearnMoreOpen(true)}
+          className="mt-1 inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-all hover:border-primary/50 hover:bg-primary/20"
+        >
+          <InformationCircleIcon className="size-4" />
+          Learn more
+        </button>
       </div>
 
       {/* Learn More Dialog */}

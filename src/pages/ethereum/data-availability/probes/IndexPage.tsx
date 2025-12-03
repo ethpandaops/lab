@@ -103,14 +103,15 @@ export function IndexPage(): JSX.Element {
     return apiData?.int_custody_probe ?? [];
   }, [apiData]);
 
-  // Fetch specific probe for deep-linking (when probeTime and probePeerId are in URL)
+  // Fetch probes for deep-linking (when probeTime and probePeerId are in URL)
+  // Note: We can't use peer_id_unique_key_eq because Int64 values lose precision in JavaScript.
+  // Instead, query by timestamp and filter client-side by comparing the (equally corrupted) string values.
   const { data: deepLinkedProbeData } = useQuery({
     ...intCustodyProbeServiceListOptions({
       query: {
         probe_date_time_gte: search.probeTime,
         probe_date_time_lte: search.probeTime,
-        peer_id_unique_key_eq: search.probePeerId,
-        page_size: 1,
+        page_size: 100, // Fetch enough to find the matching probe
       },
     }),
     enabled: !!currentNetwork && !!search.probeTime && !!search.probePeerId,
@@ -381,6 +382,7 @@ export function IndexPage(): JSX.Element {
   }, [navigate]);
 
   // Handle opening probe details - updates URL
+  // Note: peer_id_unique_key is wrapped in quotes so TanStack Router parses it as a string
   const handleProbeSelect = useCallback(
     (probe: IntCustodyProbe | null): void => {
       if (probe) {
@@ -388,7 +390,8 @@ export function IndexPage(): JSX.Element {
           search: prev => ({
             ...prev,
             probeTime: probe.probe_date_time,
-            probePeerId: probe.peer_id_unique_key,
+            // Wrap in quotes so it's parsed as a string, not a number
+            probePeerId: probe.peer_id_unique_key !== undefined ? `"${probe.peer_id_unique_key}"` : undefined,
           }),
         });
       } else {
@@ -406,18 +409,22 @@ export function IndexPage(): JSX.Element {
 
   // Find selected probe from URL params
   // First try the deep-linked query result, then fall back to searching current page data
+  // Note: peer_id is wrapped in quotes in the URL to preserve it as a string
   const selectedProbe = useMemo(() => {
     if (!search.probeTime || !search.probePeerId) return null;
 
-    // Use deep-linked probe if available
-    const deepLinkedProbe = deepLinkedProbeData?.int_custody_probe?.[0];
-    if (deepLinkedProbe) return deepLinkedProbe;
+    // Strip quotes from the URL param value
+    const peerId = search.probePeerId.replace(/^"|"$/g, '');
+
+    // Search in deep-linked probes first (compare peer_id as strings due to Int64 precision issues)
+    const deepLinkedProbes = deepLinkedProbeData?.int_custody_probe ?? [];
+    const matchedProbe = deepLinkedProbes.find(probe => String(probe.peer_id_unique_key) === peerId);
+    if (matchedProbe) return matchedProbe;
 
     // Fall back to searching in current page data
     return (
-      data.find(
-        probe => probe.probe_date_time === search.probeTime && probe.peer_id_unique_key === search.probePeerId
-      ) ?? null
+      data.find(probe => probe.probe_date_time === search.probeTime && String(probe.peer_id_unique_key) === peerId) ??
+      null
     );
   }, [data, search.probeTime, search.probePeerId, deepLinkedProbeData]);
 

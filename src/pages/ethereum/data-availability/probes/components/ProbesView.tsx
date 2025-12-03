@@ -171,7 +171,7 @@ export function ProbesView({
   }, [onProbeSelect]);
 
   // Define table columns - ordered by default visibility preference:
-  // Time, Result, Prober, Prober Country, Peer Client, Peer Country, PeerID, Slots, Columns, Error
+  // Slot, Time, Result, Prober, Prober Country, Peer Client, Peer Country, PeerID, Blob Posters, Columns, Latency, Error
   const columns = useMemo(
     () => [
       // Actions column (first for easy access)
@@ -191,6 +191,22 @@ export function ProbesView({
           </Button>
         ),
         meta: { enableHiding: false },
+      }),
+
+      // Slot - show single slot value (moved to front)
+      columnHelper.accessor('slot', {
+        header: 'Slot',
+        cell: info => {
+          const slot = info.getValue();
+          if (slot === undefined || slot === null) return <span className="text-muted">-</span>;
+          return (
+            <FilterableCell field="slot" value={slot} onFilterClick={onFilterClick} className="font-mono text-xs">
+              <span className="text-foreground">{slot}</span>
+            </FilterableCell>
+          );
+        },
+        enableSorting: true,
+        meta: { enableHiding: true },
       }),
 
       // Time (relative format) - probe_date_time is in seconds
@@ -243,36 +259,6 @@ export function ProbesView({
           );
         },
         enableSorting: true,
-        meta: { enableHiding: true },
-      }),
-
-      // Latency - right after Result
-      columnHelper.accessor('response_time_ms', {
-        header: 'Latency',
-        cell: info => {
-          const ms = info.getValue();
-          if (!ms) return <span className="text-muted">-</span>;
-          let color = 'text-green-500';
-          if (ms > 4000) color = 'text-yellow-500';
-          if (ms > 8000) color = 'text-red-500';
-          return <span className={`font-mono text-xs ${color}`}>{ms}ms</span>;
-        },
-        enableSorting: true,
-        meta: { enableHiding: true },
-      }),
-
-      // Error - next to Result/Latency
-      columnHelper.accessor('error', {
-        header: 'Error',
-        cell: info => {
-          const error = info.getValue();
-          if (!error) return <span className="text-muted">-</span>;
-          return (
-            <span className="text-[10px] text-red-400" title={error}>
-              {truncateHash(error, 20)}
-            </span>
-          );
-        },
         meta: { enableHiding: true },
       }),
 
@@ -365,22 +351,6 @@ export function ProbesView({
         meta: { enableHiding: true, cellClassName: 'text-center' },
       }),
 
-      // Slot - show single slot value
-      columnHelper.accessor('slot', {
-        header: 'Slot',
-        cell: info => {
-          const slot = info.getValue();
-          if (slot === undefined || slot === null) return <span className="text-muted">-</span>;
-          return (
-            <FilterableCell field="slot" value={slot} onFilterClick={onFilterClick} className="font-mono text-xs">
-              <span className="text-foreground">{slot}</span>
-            </FilterableCell>
-          );
-        },
-        enableSorting: true,
-        meta: { enableHiding: true },
-      }),
-
       // Blob Posters - show logos for blob submitters (top 4, ordered by count)
       columnHelper.accessor('blob_submitters', {
         header: 'Blob Posters',
@@ -432,6 +402,36 @@ export function ProbesView({
           );
         },
         enableSorting: false,
+        meta: { enableHiding: true },
+      }),
+
+      // Latency - moved to end
+      columnHelper.accessor('response_time_ms', {
+        header: 'Latency',
+        cell: info => {
+          const ms = info.getValue();
+          if (!ms) return <span className="text-muted">-</span>;
+          let color = 'text-green-500';
+          if (ms > 4000) color = 'text-yellow-500';
+          if (ms > 8000) color = 'text-red-500';
+          return <span className={`font-mono text-xs ${color}`}>{ms}ms</span>;
+        },
+        enableSorting: true,
+        meta: { enableHiding: true },
+      }),
+
+      // Error - moved to end
+      columnHelper.accessor('error', {
+        header: 'Error',
+        cell: info => {
+          const error = info.getValue();
+          if (!error) return <span className="text-muted">-</span>;
+          return (
+            <span className="text-[10px] text-red-400" title={error}>
+              {truncateHash(error, 20)}
+            </span>
+          );
+        },
         meta: { enableHiding: true },
       }),
 

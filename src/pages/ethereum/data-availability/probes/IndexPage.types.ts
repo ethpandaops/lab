@@ -57,8 +57,9 @@ export const probesSearchSchema = z.object({
   timeEnd: z.coerce.number().optional(),
 
   // Probe detail dialog - unique identifier is probe_date_time + peer_id_unique_key
+  // probePeerId is a string to preserve Int64 precision (JavaScript Number loses precision)
   probeTime: z.coerce.number().optional(),
-  probePeerId: z.coerce.number().optional(),
+  probePeerId: z.string().optional(),
 });
 
 /**
