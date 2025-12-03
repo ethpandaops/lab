@@ -8,7 +8,7 @@ import {
   ChevronRightIcon,
 } from '@heroicons/react/24/outline';
 import type { RowLabelRenderProps } from '@/components/Charts/GridHeatmap';
-import { BlobPosterLogo } from '@/components/Ethereum/BlobPosterLogo';
+import { BlobPosterLogo, getBlobPosterShortName } from '@/components/Ethereum/BlobPosterLogo';
 import type { DataAvailabilityGranularity } from './DataAvailabilityHeatmap.types';
 
 interface DataAvailabilityRowLabelProps extends RowLabelRenderProps {
@@ -136,17 +136,18 @@ export function DataAvailabilityRowLabel({
             {blobInfo.index}
           </span>
 
-          {/* Submitter logo and name */}
+          {/* Submitter logo and short name */}
           {blobInfo.submitter && (
             <>
               <BlobPosterLogo poster={blobInfo.submitter} size={14} className="shrink-0" />
               <span
                 className={clsx(
-                  'truncate text-[10px] capitalize transition-colors',
+                  'truncate font-mono text-[10px] transition-colors',
                   isHovered && canDrillDown ? 'text-accent' : 'text-muted'
                 )}
+                title={blobInfo.submitter}
               >
-                {blobInfo.submitter}
+                {getBlobPosterShortName(blobInfo.submitter)}
               </span>
             </>
           )}

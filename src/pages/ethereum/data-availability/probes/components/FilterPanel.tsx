@@ -1,9 +1,13 @@
 import { type JSX, useState } from 'react';
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
+import { clsx } from 'clsx';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { Button } from '@/components/Elements/Button';
 import { Input } from '@/components/Forms/Input';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
-import { FunnelIcon, XMarkIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+import { FunnelIcon, XMarkIcon, AdjustmentsHorizontalIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { ChevronUpDownIcon } from '@heroicons/react/16/solid';
+import { BlobPosterLogo, BLOB_POSTERS, BLOB_POSTER_DISPLAY_NAMES } from '@/components/Ethereum/BlobPosterLogo';
 
 export type FilterValues = {
   result?: string;
@@ -21,6 +25,7 @@ export type FilterValues = {
   peerAsn?: number;
   slot?: number;
   column?: number;
+  blobPosters?: string[];
 };
 
 type FilterPanelProps = {
@@ -56,6 +61,7 @@ function getFilterLabel(key: string): string {
     peerAsn: 'Peer ASN',
     slot: 'Slot',
     column: 'Column',
+    blobPosters: 'Blob Posters',
   };
   return labels[key] || key;
 }
@@ -69,13 +75,16 @@ function FilterChip({
   onRemove,
 }: {
   label: string;
-  value: string | number;
+  value: string | number | string[];
   onRemove: () => void;
 }): JSX.Element {
+  // Format display value for arrays
+  const displayValue = Array.isArray(value) ? `${value.length} selected` : value;
+
   return (
     <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs text-primary">
       <span className="font-medium">{label}:</span>
-      <span className="max-w-32 truncate">{value}</span>
+      <span className="max-w-32 truncate">{displayValue}</span>
       <button
         type="button"
         onClick={onRemove}
@@ -92,12 +101,18 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
   const [draftFilters, setDraftFilters] = useState<FilterValues>(filters);
 
   // Count active filters
-  const activeFilterCount = Object.values(filters).filter(v => v !== undefined && v !== '' && v !== null).length;
+  const activeFilterCount = Object.values(filters).filter(v => {
+    if (v === undefined || v === null || v === '') return false;
+    if (Array.isArray(v) && v.length === 0) return false;
+    return true;
+  }).length;
 
   // Get active filters as array for chips
-  const activeFilters = Object.entries(filters).filter(
-    ([, value]) => value !== undefined && value !== '' && value !== null
-  ) as [keyof FilterValues, string | number][];
+  const activeFilters = Object.entries(filters).filter(([, value]) => {
+    if (value === undefined || value === null || value === '') return false;
+    if (Array.isArray(value) && value.length === 0) return false;
+    return true;
+  }) as [keyof FilterValues, string | number | string[]][];
 
   const handleOpen = (): void => {
     setDraftFilters(filters);
@@ -119,7 +134,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
     onFiltersChange(newFilters);
   };
 
-  const updateDraft = (key: keyof FilterValues, value: string | number | undefined): void => {
+  const updateDraft = (key: keyof FilterValues, value: string | number | string[] | undefined): void => {
     setDraftFilters(prev => ({
       ...prev,
       [key]: value === '' ? undefined : value,
@@ -180,7 +195,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
       >
         <div className="space-y-4">
           {/* Top row: Result and Data filters */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-4 gap-4">
             <div>
               <h4 className="mb-2 text-xs font-semibold tracking-wider text-muted uppercase">Result</h4>
               <SelectMenu
@@ -215,6 +230,67 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   placeholder="Column index"
                 />
               </Input>
+            </div>
+            <div>
+              <h4 className="mb-2 text-xs font-semibold tracking-wider text-muted uppercase">Blob Posters</h4>
+              <Listbox
+                value={draftFilters.blobPosters ?? []}
+                onChange={(selected: string[]) =>
+                  updateDraft('blobPosters', selected.length > 0 ? selected : undefined)
+                }
+                multiple
+              >
+                <div className="relative">
+                  <ListboxButton className="relative w-full cursor-pointer border border-border bg-surface/50 py-2 pr-10 pl-3 text-left shadow-xs backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-surface/70">
+                    <span className="flex items-center gap-1">
+                      {(draftFilters.blobPosters ?? []).length > 0 ? (
+                        <>
+                          {(draftFilters.blobPosters ?? []).slice(0, 3).map(poster => (
+                            <BlobPosterLogo key={poster} poster={poster} size={16} />
+                          ))}
+                          {(draftFilters.blobPosters ?? []).length > 3 && (
+                            <span className="text-xs text-muted">+{(draftFilters.blobPosters ?? []).length - 3}</span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="text-sm text-muted">Select posters...</span>
+                      )}
+                    </span>
+                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                      <ChevronUpDownIcon aria-hidden="true" className="size-5 text-muted" />
+                    </span>
+                  </ListboxButton>
+                  <ListboxOptions
+                    transition
+                    className="absolute z-[9999] mt-1 max-h-60 w-full overflow-auto border border-border bg-surface shadow-lg backdrop-blur-xl data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0"
+                  >
+                    {BLOB_POSTERS.map(poster => {
+                      const displayName = BLOB_POSTER_DISPLAY_NAMES[poster] ?? poster;
+                      return (
+                        <ListboxOption
+                          key={poster}
+                          value={displayName}
+                          className="relative cursor-pointer py-1.5 pr-9 pl-3 text-foreground transition-colors select-none data-focus:bg-primary/10 data-focus:text-primary data-selected:bg-primary/5"
+                        >
+                          {({ selected }) => (
+                            <>
+                              <span className="flex items-center gap-2">
+                                <BlobPosterLogo poster={poster} size={16} />
+                                <span className={clsx('block truncate', selected && 'font-medium')}>{displayName}</span>
+                              </span>
+                              {selected && (
+                                <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-primary">
+                                  <CheckIcon className="size-4" />
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </ListboxOption>
+                      );
+                    })}
+                  </ListboxOptions>
+                </div>
+              </Listbox>
             </div>
           </div>
 

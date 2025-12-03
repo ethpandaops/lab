@@ -22,6 +22,7 @@ import { ChevronRightIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import {
   fctDataColumnAvailabilityDailyServiceListOptions,
   fctDataColumnAvailabilityHourlyServiceListOptions,
+  intCustodyProbeOrderBySlotServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import {
   fctDataColumnAvailabilityByEpochServiceList,
@@ -366,6 +367,21 @@ export function IndexPage(): JSX.Element {
     enabled: currentLevel.type === 'slot',
   });
 
+  // Fetch blob submitters for the slot (array index = blob index)
+  const blobSubmittersQuery = useQuery({
+    ...intCustodyProbeOrderBySlotServiceListOptions({
+      query: {
+        slot_eq: currentLevel.type === 'slot' ? currentLevel.slot : undefined,
+        page_size: 1,
+      },
+    }),
+    enabled: currentLevel.type === 'slot',
+  });
+  const blobSubmitters = useMemo(
+    () => blobSubmittersQuery.data?.int_custody_probe_order_by_slot?.[0]?.blob_submitters ?? [],
+    [blobSubmittersQuery.data]
+  );
+
   /**
    * Transform Window data (daily) to heatmap rows
    */
@@ -405,8 +421,8 @@ export function IndexPage(): JSX.Element {
    * Transform Slot data (blobs) to heatmap rows
    */
   const slotRows = useMemo(
-    () => transformBlobsToRows(slotQuery.data?.fct_data_column_availability_by_slot_blob),
-    [slotQuery.data]
+    () => transformBlobsToRows(slotQuery.data?.fct_data_column_availability_by_slot_blob, blobSubmitters),
+    [slotQuery.data, blobSubmitters]
   );
 
   // Determine current data based on level

@@ -70,8 +70,9 @@ export function IndexPage(): JSX.Element {
         ...(search.peerVersion && { meta_peer_version_eq: search.peerVersion }),
         ...(search.proberAsn && { meta_client_geo_autonomous_system_number_eq: search.proberAsn }),
         ...(search.peerAsn && { meta_peer_geo_autonomous_system_number_eq: search.peerAsn }),
-        ...(search.slot && { slots_has: search.slot }),
+        ...(search.slot && { slot_eq: search.slot }),
         ...(search.column && { column_indices_has: search.column }),
+        ...(search.blobPosters?.length && { blob_submitters_has_any_values: search.blobPosters }),
       },
     }),
     enabled: !!currentNetwork,
@@ -230,6 +231,12 @@ export function IndexPage(): JSX.Element {
         case 'column':
           newSearch.column = value as number;
           break;
+        case 'blob_submitters':
+          // Add to existing array or create new one
+          newSearch.blobPosters = [...(search.blobPosters ?? []), value as string].filter(
+            (v, i, a) => a.indexOf(v) === i // dedupe
+          );
+          break;
       }
 
       navigate({
@@ -239,7 +246,7 @@ export function IndexPage(): JSX.Element {
         }),
       });
     },
-    [navigate]
+    [navigate, search.blobPosters]
   );
 
   // Build current sorting state from URL
@@ -278,6 +285,7 @@ export function IndexPage(): JSX.Element {
       peerAsn: search.peerAsn,
       slot: search.slot,
       column: search.column,
+      blobPosters: search.blobPosters,
     }),
     [search]
   );
@@ -305,6 +313,7 @@ export function IndexPage(): JSX.Element {
           peerAsn: filters.peerAsn,
           slot: filters.slot,
           column: filters.column,
+          blobPosters: filters.blobPosters,
         }),
       });
     },
@@ -333,6 +342,7 @@ export function IndexPage(): JSX.Element {
         peerAsn: undefined,
         slot: undefined,
         column: undefined,
+        blobPosters: undefined,
       }),
     });
   }, [navigate]);

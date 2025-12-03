@@ -13,8 +13,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
-import { intCustodyProbeServiceListOptions } from '@/api/@tanstack/react-query.gen';
-import type { IntCustodyProbe } from '@/api/types.gen';
+import { intCustodyProbeOrderBySlotServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import type { IntCustodyProbeOrderBySlot } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { Badge } from '@/components/Elements/Badge';
@@ -34,53 +34,57 @@ const SECONDS_PER_HOUR = 3600;
 /** Number of slots per epoch */
 const SLOTS_PER_EPOCH = 32;
 
+/** Buffer in seconds to add around time ranges (2 minutes) */
+const TIME_BUFFER = 120;
+
 /**
  * Build API query parameters based on the current drill-down context
+ * Uses slot_start_date_time for time filtering (matches _by_slot table primary key)
  */
 function buildQueryParams(context: ProbeFilterContext): {
-  probe_date_time_gte?: number;
-  probe_date_time_lte?: number;
-  slots_has_any_values?: number[];
+  slot_start_date_time_gte?: number;
+  slot_start_date_time_lte?: number;
+  slot_in_values?: string;
+  slot_eq?: number;
 } {
   const now = Math.floor(Date.now() / 1000);
 
   switch (context.type) {
     case 'window':
-      // Last 24 hours for window view
+      // Last 24 hours for window view (with buffer)
       return {
-        probe_date_time_gte: now - SECONDS_PER_DAY,
-        probe_date_time_lte: now,
+        slot_start_date_time_gte: now - SECONDS_PER_DAY - TIME_BUFFER,
+        slot_start_date_time_lte: now + TIME_BUFFER,
       };
     case 'day': {
-      // Specific day
+      // Specific day (with buffer)
       const dayStart = Math.floor(new Date(context.date).getTime() / 1000);
       return {
-        probe_date_time_gte: dayStart,
-        probe_date_time_lte: dayStart + SECONDS_PER_DAY,
+        slot_start_date_time_gte: dayStart - TIME_BUFFER,
+        slot_start_date_time_lte: dayStart + SECONDS_PER_DAY + TIME_BUFFER,
       };
     }
     case 'hour':
-      // Specific hour
+      // Specific hour (with buffer)
       return {
-        probe_date_time_gte: context.hourStartDateTime,
-        probe_date_time_lte: context.hourStartDateTime + SECONDS_PER_HOUR,
+        slot_start_date_time_gte: context.hourStartDateTime - TIME_BUFFER,
+        slot_start_date_time_lte: context.hourStartDateTime + SECONDS_PER_HOUR + TIME_BUFFER,
       };
-    case 'epoch': {
-      // Specific epoch - filter by slots in that epoch
-      const firstSlot = context.epoch * SLOTS_PER_EPOCH;
-      const slots = Array.from({ length: SLOTS_PER_EPOCH }, (_, i) => firstSlot + i);
+    case 'epoch':
+      // Specific epoch - use hour time range with buffer, plus slot filter
       return {
-        probe_date_time_gte: context.hourStartDateTime,
-        probe_date_time_lte: context.hourStartDateTime + SECONDS_PER_HOUR,
-        slots_has_any_values: slots,
+        slot_start_date_time_gte: context.hourStartDateTime - TIME_BUFFER,
+        slot_start_date_time_lte: context.hourStartDateTime + SECONDS_PER_HOUR + TIME_BUFFER,
+        slot_in_values: Array.from({ length: SLOTS_PER_EPOCH }, (_, i) => context.epoch * SLOTS_PER_EPOCH + i).join(
+          ','
+        ),
       };
-    }
     case 'slot':
-      // Specific slot
+      // Specific slot - use hour time range with buffer, plus slot filter
       return {
-        probe_date_time_gte: context.hourStartDateTime,
-        probe_date_time_lte: context.hourStartDateTime + SECONDS_PER_HOUR,
-        slots_has_any_values: [context.slot],
+        slot_start_date_time_gte: context.hourStartDateTime - TIME_BUFFER,
+        slot_start_date_time_lte: context.hourStartDateTime + SECONDS_PER_HOUR + TIME_BUFFER,
+        slot_eq: context.slot,
       };
   }
 }
@@ -106,11 +110,11 @@ function ProbeEventRow({
   onClick,
   isNew,
 }: {
-  probe: IntCustodyProbe;
+  probe: IntCustodyProbeOrderBySlot;
   onClick: () => void;
   isNew?: boolean;
 }): JSX.Element {
-  const slot = probe.slots?.[0];
+  const slot = probe.slot;
   const columnsCount = probe.column_indices?.length ?? 0;
 
   // Peer details
@@ -191,8 +195,8 @@ function CopyableBadge({ value, label }: { value: string | number; label?: strin
 }
 
 /** Generate a unique key for a probe */
-function getProbeKey(probe: IntCustodyProbe): string {
-  return `${probe.probe_date_time}-${probe.peer_id_unique_key}-${probe.slots?.join(',')}-${probe.column_indices?.join(',')}`;
+function getProbeKey(probe: IntCustodyProbeOrderBySlot): string {
+  return `${probe.probe_date_time}-${probe.peer_id_unique_key}-${probe.slot}-${probe.column_indices?.join(',')}`;
 }
 
 /**
@@ -205,7 +209,7 @@ export function LiveProbeEvents({
   probesLinkParams,
 }: LiveProbeEventsProps): JSX.Element | null {
   const { currentNetwork } = useNetwork();
-  const [selectedProbe, setSelectedProbe] = useState<IntCustodyProbe | null>(null);
+  const [selectedProbe, setSelectedProbe] = useState<IntCustodyProbeOrderBySlot | null>(null);
 
   // Track known probe keys to detect new items
   const knownProbeKeysRef = useRef<Set<string>>(new Set());
@@ -217,7 +221,7 @@ export function LiveProbeEvents({
   // Fetch probe data with polling
   // Use isLoading only for initial load, not refetches (to avoid flickering)
   const { data, isLoading, error, isFetched } = useQuery({
-    ...intCustodyProbeServiceListOptions({
+    ...intCustodyProbeOrderBySlotServiceListOptions({
       query: {
         ...queryParams,
         page_size: maxEvents,
@@ -228,7 +232,7 @@ export function LiveProbeEvents({
     refetchInterval: pollInterval,
   });
 
-  const probes = data?.int_custody_probe ?? [];
+  const probes = data?.int_custody_probe_order_by_slot ?? [];
 
   // Detect new probes and update tracking
   useEffect(() => {
@@ -259,7 +263,7 @@ export function LiveProbeEvents({
   }, [probes, isFetched]);
 
   // Handle probe click
-  const handleProbeClick = useCallback((probe: IntCustodyProbe) => {
+  const handleProbeClick = useCallback((probe: IntCustodyProbeOrderBySlot) => {
     setSelectedProbe(probe);
   }, []);
 
@@ -492,15 +496,14 @@ export function LiveProbeEvents({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <dt className="mb-1 flex justify-between text-[10px] font-medium tracking-wider text-muted uppercase">
-                    <span>Slots</span>
-                    <span className="text-foreground">{selectedProbe.slots?.length || 0}</span>
+                    <span>Slot</span>
                   </dt>
-                  <div className="max-h-24 overflow-y-auto rounded-sm border border-border/50 bg-muted/30 p-1.5">
-                    <div className="flex flex-wrap gap-1">
-                      {selectedProbe.slots?.map(slot => <CopyableBadge key={slot} value={slot} label="Slot" />) || (
-                        <span className="text-[10px] text-muted italic">None</span>
-                      )}
-                    </div>
+                  <div className="rounded-sm border border-border/50 bg-muted/30 p-1.5">
+                    {selectedProbe.slot !== undefined && selectedProbe.slot !== null ? (
+                      <CopyableBadge value={selectedProbe.slot} label="Slot" />
+                    ) : (
+                      <span className="text-[10px] text-muted italic">None</span>
+                    )}
                   </div>
                 </div>
                 <div>

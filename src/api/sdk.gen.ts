@@ -321,6 +321,12 @@ import type {
   IntBlockProposerCanonicalServiceListData,
   IntBlockProposerCanonicalServiceListErrors,
   IntBlockProposerCanonicalServiceListResponses,
+  IntCustodyProbeOrderBySlotServiceGetData,
+  IntCustodyProbeOrderBySlotServiceGetErrors,
+  IntCustodyProbeOrderBySlotServiceGetResponses,
+  IntCustodyProbeOrderBySlotServiceListData,
+  IntCustodyProbeOrderBySlotServiceListErrors,
+  IntCustodyProbeOrderBySlotServiceListResponses,
   IntCustodyProbeServiceGetData,
   IntCustodyProbeServiceGetErrors,
   IntCustodyProbeServiceGetResponses,
@@ -541,6 +547,10 @@ import {
   zIntBlockProposerCanonicalServiceGetResponse,
   zIntBlockProposerCanonicalServiceListData,
   zIntBlockProposerCanonicalServiceListResponse,
+  zIntCustodyProbeOrderBySlotServiceGetData,
+  zIntCustodyProbeOrderBySlotServiceGetResponse,
+  zIntCustodyProbeOrderBySlotServiceListData,
+  zIntCustodyProbeOrderBySlotServiceListResponse,
   zIntCustodyProbeServiceGetData,
   zIntCustodyProbeServiceGetResponse,
   zIntCustodyProbeServiceListData,
@@ -2699,6 +2709,46 @@ export const intCustodyProbeServiceGet = <ThrowOnError extends boolean = false>(
     requestValidator: async data => await zIntCustodyProbeServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntCustodyProbeServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_custody_probe/{probe_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intCustodyProbeOrderBySlotServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntCustodyProbeOrderBySlotServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntCustodyProbeOrderBySlotServiceListResponses,
+    IntCustodyProbeOrderBySlotServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntCustodyProbeOrderBySlotServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntCustodyProbeOrderBySlotServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_custody_probe_order_by_slot',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intCustodyProbeOrderBySlotServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntCustodyProbeOrderBySlotServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntCustodyProbeOrderBySlotServiceGetResponses,
+    IntCustodyProbeOrderBySlotServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntCustodyProbeOrderBySlotServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntCustodyProbeOrderBySlotServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_custody_probe_order_by_slot/{slot_start_date_time}',
     ...options,
   });
 };

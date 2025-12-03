@@ -9,6 +9,7 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { DataTable } from '@/components/DataTable';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { BlobPosterLogo } from '@/components/Ethereum/BlobPosterLogo';
 import { Badge } from '@/components/Elements/Badge';
 import { Button } from '@/components/Elements/Button';
 import { Dialog } from '@/components/Overlays/Dialog';
@@ -245,7 +246,7 @@ export function ProbesView({
   const isDetailDialogOpen = selectedProbe !== null;
 
   // Column visibility state - managed locally for proper toggling
-  // Default order: Time, Result, Prober, Prober Country, Peer Client, Peer Country, PeerID, Slots, Columns, Error
+  // Default order: Time, Result, Prober, Prober Country, Peer Client, Peer Country, PeerID, Slots, Blob Posters, Columns, Error
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     // Default visible columns (in order of appearance)
     probe_date_time: true, // Time
@@ -255,7 +256,8 @@ export function ProbesView({
     meta_peer_implementation: true, // Peer Client
     meta_peer_geo_country: true, // Peer Country
     peer_id_unique_key: true, // PeerID
-    slots: true, // Slots
+    slot: true, // Slot
+    blob_submitters: true, // Blob Posters
     column_indices: true, // Columns
     error: true, // Error
     response_time_ms: true, // Latency
@@ -492,18 +494,50 @@ export function ProbesView({
         meta: { enableHiding: true, cellClassName: 'text-center' },
       }),
 
-      // Slots - show count and first slot if available
-      columnHelper.accessor('slots', {
-        header: 'Slots',
+      // Slot - show single slot value
+      columnHelper.accessor('slot', {
+        header: 'Slot',
         cell: info => {
-          const slots = info.getValue();
-          if (!slots?.length) return <span className="text-muted">-</span>;
-          const firstSlot = slots[0];
+          const slot = info.getValue();
+          if (slot === undefined || slot === null) return <span className="text-muted">-</span>;
           return (
-            <FilterableCell field="slot" value={firstSlot} onFilterClick={onFilterClick} className="font-mono text-xs">
-              <span className="text-foreground">{firstSlot}</span>
-              {slots.length > 1 && <span className="ml-1 text-muted">+{slots.length - 1}</span>}
+            <FilterableCell field="slot" value={slot} onFilterClick={onFilterClick} className="font-mono text-xs">
+              <span className="text-foreground">{slot}</span>
             </FilterableCell>
+          );
+        },
+        enableSorting: true,
+        meta: { enableHiding: true },
+      }),
+
+      // Blob Posters - show logos for blob submitters (top 4, ordered by count)
+      columnHelper.accessor('blob_submitters', {
+        header: 'Blob Posters',
+        cell: info => {
+          const submitters = info.getValue();
+          if (!submitters?.length) return <span className="text-muted">-</span>;
+
+          // Count occurrences and get unique posters sorted by count
+          const countMap = new Map<string, number>();
+          for (const submitter of submitters) {
+            countMap.set(submitter, (countMap.get(submitter) ?? 0) + 1);
+          }
+          const sortedPosters = [...countMap.entries()]
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 4)
+            .map(([name]) => name);
+
+          const hasMore = countMap.size > 4;
+
+          return (
+            <div className="flex items-center gap-1">
+              {sortedPosters.map(poster => (
+                <FilterableCell key={poster} field="blob_submitters" value={poster} onFilterClick={onFilterClick}>
+                  <BlobPosterLogo poster={poster} size={18} />
+                </FilterableCell>
+              ))}
+              {hasMore && <span className="text-[10px] text-muted">+{countMap.size - 4}</span>}
+            </div>
           );
         },
         enableSorting: false,
@@ -989,25 +1023,23 @@ export function ProbesView({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <dt className="text-muted-foreground mb-1 flex justify-between text-[10px] font-medium tracking-wider uppercase">
-                    <span>Slots</span>
-                    <span className="text-foreground">{selectedProbe.slots?.length || 0}</span>
+                    <span>Slot</span>
                   </dt>
-                  <div className="max-h-24 overflow-y-auto rounded border border-border/50 bg-muted/30 p-1.5">
-                    <div className="flex flex-wrap gap-1">
-                      {selectedProbe.slots?.map(slot => (
-                        <CopyableBadge
-                          key={slot}
-                          value={slot}
-                          label="Slot"
-                          onDrillDown={() => {
-                            if (onFilterClick) {
-                              onFilterClick('slot', slot);
-                              handleCloseDialog();
-                            }
-                          }}
-                        />
-                      )) || <span className="text-muted-foreground text-[10px] italic">None</span>}
-                    </div>
+                  <div className="rounded border border-border/50 bg-muted/30 p-1.5">
+                    {selectedProbe.slot !== undefined && selectedProbe.slot !== null ? (
+                      <CopyableBadge
+                        value={selectedProbe.slot}
+                        label="Slot"
+                        onDrillDown={() => {
+                          if (onFilterClick && selectedProbe.slot !== undefined) {
+                            onFilterClick('slot', selectedProbe.slot);
+                            handleCloseDialog();
+                          }
+                        }}
+                      />
+                    ) : (
+                      <span className="text-muted-foreground text-[10px] italic">None</span>
+                    )}
                   </div>
                 </div>
                 <div>

@@ -19,9 +19,9 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
   const isFailure = probe.result === 'failure';
 
   // Calculate total data requested
-  const slotsCount = probe.slots?.length ?? 0;
+  const hasSlot = probe.slot !== undefined && probe.slot !== null;
   const columnsCount = probe.column_indices?.length ?? 0;
-  const cellsCount = slotsCount * columnsCount;
+  const cellsCount = hasSlot ? columnsCount : 0;
   const cellSizeKiB = 2;
   const totalSizeKiB = cellsCount * cellSizeKiB;
   const totalSizeMiB = totalSizeKiB / 1024;
@@ -63,8 +63,7 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
         {/* Request Flow (Top) */}
         <div className="flex w-full flex-col items-center gap-0.5">
           <span className="font-mono text-xs font-medium text-foreground">
-            {slotsCount} {slotsCount === 1 ? 'Slot' : 'Slots'} × {columnsCount}{' '}
-            {columnsCount === 1 ? 'Column' : 'Columns'}
+            Slot {hasSlot ? probe.slot : '?'} × {columnsCount} {columnsCount === 1 ? 'Column' : 'Columns'}
           </span>
           <ArrowLongRightIcon className="size-5 text-muted" />
           <span className="text-[10px] font-medium tracking-wider text-muted uppercase">Request</span>

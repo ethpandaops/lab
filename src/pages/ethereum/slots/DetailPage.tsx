@@ -1,7 +1,8 @@
 import { type JSX, useEffect } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, ChevronRightIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
@@ -15,6 +16,7 @@ import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
 import { useTabState } from '@/hooks/useTabState';
 import { useNetwork } from '@/hooks/useNetwork';
 import { Route } from '@/routes/ethereum/slots/$slot';
+import { dimBlockBlobSubmitterServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { useSlotDetailData } from './hooks/useSlotDetailData';
 import { useAllAttestationVotes } from './hooks/useAllAttestationVotes';
 import { SlotBasicInfoCard } from './components/SlotBasicInfoCard';
@@ -32,6 +34,7 @@ import { BuilderCompetitionChart } from './components/BuilderCompetitionChart';
 import { MiniStat } from '@/components/DataDisplay/MiniStat';
 import { CopyToClipboard } from '@/components/Elements/CopyToClipboard';
 import { ForkLabel } from '@/components/Ethereum/ForkLabel';
+import { BlobPosterLogo } from '@/components/Ethereum/BlobPosterLogo';
 import { formatGasToMillions, ATTESTATION_DEADLINE_MS } from '@/utils';
 import type { ForkVersion } from '@/utils/beacon';
 import { SlotDetailSkeleton } from './components/SlotDetailSkeleton';
@@ -92,12 +95,25 @@ export function DetailPage(): JSX.Element {
     !!currentNetwork && slotTimestamp > 0
   );
 
+  // Fetch blob submitters (depends on execution block number from block head)
+  const executionBlockNumber = data?.blockHead[0]?.execution_payload_block_number;
+  const { data: blobSubmittersData } = useQuery({
+    ...dimBlockBlobSubmitterServiceListOptions({
+      query: {
+        block_number_eq: executionBlockNumber,
+      },
+    }),
+    enabled: !!executionBlockNumber,
+  });
+  const blobSubmitters = blobSubmittersData?.dim_block_blob_submitter ?? [];
+
   // Tab state management with URL search params
   const { selectedIndex, onChange } = useTabState([
     { id: 'overview' },
     { id: 'block' },
     { id: 'attestations', anchors: ['missed-attestations'] },
     { id: 'propagation' },
+    { id: 'blobs' },
     { id: 'execution' },
     { id: 'mev' },
   ]);
@@ -257,6 +273,10 @@ export function DetailPage(): JSX.Element {
     data.builderBids.length > 0 ||
     data.preparedBlocks.length > 0;
 
+  // Check if blob data exists (submitters or blob metrics)
+  const hasBlobData =
+    blobSubmitters.length > 0 || data.blobCount[0]?.blob_count || data.blockHead[0]?.execution_payload_blob_gas_used;
+
   return (
     <Container>
       {/* Navigation Controls */}
@@ -295,6 +315,7 @@ export function DetailPage(): JSX.Element {
             <Tab>Block</Tab>
             <Tab>Attestations</Tab>
             <Tab>Propagation</Tab>
+            {hasBlobData && <Tab>Blobs</Tab>}
             <Tab>Execution</Tab>
             {hasMevData && <Tab>MEV</Tab>}
           </ScrollableTabs>
@@ -763,6 +784,105 @@ export function DetailPage(): JSX.Element {
               </div>
             </TabPanel>
 
+            {/* Blobs Tab - Blob data and submitters */}
+            {hasBlobData && (
+              <TabPanel>
+                <div className="space-y-6">
+                  {/* Blob Metrics */}
+                  {(data.blockHead[0]?.execution_payload_blob_gas_used !== null ||
+                    data.blockHead[0]?.execution_payload_excess_blob_gas !== null ||
+                    (data.blobCount[0] && data.blobCount[0].blob_count)) && (
+                    <Card>
+                      <div className="mb-4">
+                        <h3 className="text-lg font-semibold text-foreground">Blob Metrics</h3>
+                        <p className="text-sm text-muted">EIP-4844 blob gas usage for this block</p>
+                      </div>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        {data.blobCount[0] &&
+                          data.blobCount[0].blob_count !== undefined &&
+                          data.blobCount[0].blob_count !== null && (
+                            <MiniStat label="Blob Count" value={data.blobCount[0].blob_count.toString()} />
+                          )}
+
+                        {data.blockHead[0]?.execution_payload_blob_gas_used !== null &&
+                          data.blockHead[0]?.execution_payload_blob_gas_used !== undefined && (
+                            <MiniStat
+                              label="Blob Gas Used"
+                              value={`${(data.blockHead[0].execution_payload_blob_gas_used / 1e6).toFixed(2)}M`}
+                            />
+                          )}
+
+                        {data.blockHead[0]?.execution_payload_excess_blob_gas !== null &&
+                          data.blockHead[0]?.execution_payload_excess_blob_gas !== undefined && (
+                            <MiniStat
+                              label="Excess Blob Gas"
+                              value={`${(data.blockHead[0].execution_payload_excess_blob_gas / 1e6).toFixed(2)}M`}
+                            />
+                          )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Blob Submitters */}
+                  {blobSubmitters.length > 0 && (
+                    <Card>
+                      <div className="mb-4">
+                        <h3 className="text-lg font-semibold text-foreground">Blob Submitters</h3>
+                        <p className="text-sm text-muted">
+                          {blobSubmitters.length} blob transaction{blobSubmitters.length !== 1 ? 's' : ''} in this block
+                        </p>
+                      </div>
+                      <div className="grid gap-3">
+                        {blobSubmitters.map((submitter, index) => (
+                          <div
+                            key={submitter.transaction_hash ?? index}
+                            className="flex items-center gap-4 rounded-sm border border-border bg-surface/50 p-4"
+                          >
+                            {/* Logo and Name */}
+                            <div className="flex items-center gap-3">
+                              {submitter.name && submitter.name !== 'Unknown' ? (
+                                <BlobPosterLogo poster={submitter.name} size={32} />
+                              ) : (
+                                <div className="flex size-8 items-center justify-center rounded-xs bg-muted/20">
+                                  <QuestionMarkCircleIcon className="size-5 text-muted" />
+                                </div>
+                              )}
+                              <div>
+                                <div className="font-medium text-foreground">{submitter.name ?? 'Unknown'}</div>
+                                <div className="text-xs text-muted">Tx Index: {submitter.transaction_index ?? '-'}</div>
+                              </div>
+                            </div>
+
+                            {/* Address and Tx Hash */}
+                            <div className="ml-auto flex flex-col items-end gap-1">
+                              {submitter.address && (
+                                <div className="flex items-center gap-2 text-xs">
+                                  <span className="text-muted">Address:</span>
+                                  <code className="font-mono text-foreground">
+                                    {submitter.address.slice(0, 10)}...{submitter.address.slice(-8)}
+                                  </code>
+                                  <CopyToClipboard content={submitter.address} />
+                                </div>
+                              )}
+                              {submitter.transaction_hash && (
+                                <div className="flex items-center gap-2 text-xs">
+                                  <span className="text-muted">Tx:</span>
+                                  <code className="font-mono text-foreground">
+                                    {submitter.transaction_hash.slice(0, 10)}...{submitter.transaction_hash.slice(-8)}
+                                  </code>
+                                  <CopyToClipboard content={submitter.transaction_hash} />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+                  )}
+                </div>
+              </TabPanel>
+            )}
+
             {/* Execution Tab - Comprehensive execution layer data */}
             <TabPanel>
               <div className="space-y-6">
@@ -829,41 +949,6 @@ export function DetailPage(): JSX.Element {
                           )}
                       </div>
                     </Card>
-
-                    {/* Blob Metrics */}
-                    {(data.blockHead[0].execution_payload_blob_gas_used !== null ||
-                      data.blockHead[0].execution_payload_excess_blob_gas !== null ||
-                      (data.blobCount[0] && data.blobCount[0].blob_count)) && (
-                      <Card>
-                        <div className="mb-4">
-                          <h3 className="text-lg font-semibold text-foreground">Blob Data</h3>
-                          <p className="text-sm text-muted">EIP-4844 blob gas metrics</p>
-                        </div>
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                          {data.blobCount[0] &&
-                            data.blobCount[0].blob_count !== undefined &&
-                            data.blobCount[0].blob_count !== null && (
-                              <MiniStat label="Blob Count" value={data.blobCount[0].blob_count.toString()} />
-                            )}
-
-                          {data.blockHead[0].execution_payload_blob_gas_used !== null &&
-                            data.blockHead[0].execution_payload_blob_gas_used !== undefined && (
-                              <MiniStat
-                                label="Blob Gas Used"
-                                value={`${(data.blockHead[0].execution_payload_blob_gas_used / 1e6).toFixed(2)}M`}
-                              />
-                            )}
-
-                          {data.blockHead[0].execution_payload_excess_blob_gas !== null &&
-                            data.blockHead[0].execution_payload_excess_blob_gas !== undefined && (
-                              <MiniStat
-                                label="Excess Blob Gas"
-                                value={`${(data.blockHead[0].execution_payload_excess_blob_gas / 1e6).toFixed(2)}M`}
-                              />
-                            )}
-                        </div>
-                      </Card>
-                    )}
                   </>
                 )}
               </div>

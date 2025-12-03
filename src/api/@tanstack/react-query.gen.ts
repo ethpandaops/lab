@@ -110,6 +110,8 @@ import {
   intBlockMevCanonicalServiceList,
   intBlockProposerCanonicalServiceGet,
   intBlockProposerCanonicalServiceList,
+  intCustodyProbeOrderBySlotServiceGet,
+  intCustodyProbeOrderBySlotServiceList,
   intCustodyProbeServiceGet,
   intCustodyProbeServiceList,
   type Options,
@@ -433,6 +435,12 @@ import type {
   IntBlockProposerCanonicalServiceListData,
   IntBlockProposerCanonicalServiceListError,
   IntBlockProposerCanonicalServiceListResponse,
+  IntCustodyProbeOrderBySlotServiceGetData,
+  IntCustodyProbeOrderBySlotServiceGetError,
+  IntCustodyProbeOrderBySlotServiceGetResponse,
+  IntCustodyProbeOrderBySlotServiceListData,
+  IntCustodyProbeOrderBySlotServiceListError,
+  IntCustodyProbeOrderBySlotServiceListResponse,
   IntCustodyProbeServiceGetData,
   IntCustodyProbeServiceGetError,
   IntCustodyProbeServiceGetResponse,
@@ -3548,4 +3556,64 @@ export const intCustodyProbeServiceGetOptions = (options: Options<IntCustodyProb
       return data;
     },
     queryKey: intCustodyProbeServiceGetQueryKey(options),
+  });
+
+export const intCustodyProbeOrderBySlotServiceListQueryKey = (
+  options?: Options<IntCustodyProbeOrderBySlotServiceListData>
+) => createQueryKey('intCustodyProbeOrderBySlotServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intCustodyProbeOrderBySlotServiceListOptions = (
+  options?: Options<IntCustodyProbeOrderBySlotServiceListData>
+) =>
+  queryOptions<
+    IntCustodyProbeOrderBySlotServiceListResponse,
+    IntCustodyProbeOrderBySlotServiceListError,
+    IntCustodyProbeOrderBySlotServiceListResponse,
+    ReturnType<typeof intCustodyProbeOrderBySlotServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intCustodyProbeOrderBySlotServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intCustodyProbeOrderBySlotServiceListQueryKey(options),
+  });
+
+export const intCustodyProbeOrderBySlotServiceGetQueryKey = (
+  options: Options<IntCustodyProbeOrderBySlotServiceGetData>
+) => createQueryKey('intCustodyProbeOrderBySlotServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intCustodyProbeOrderBySlotServiceGetOptions = (
+  options: Options<IntCustodyProbeOrderBySlotServiceGetData>
+) =>
+  queryOptions<
+    IntCustodyProbeOrderBySlotServiceGetResponse,
+    IntCustodyProbeOrderBySlotServiceGetError,
+    IntCustodyProbeOrderBySlotServiceGetResponse,
+    ReturnType<typeof intCustodyProbeOrderBySlotServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intCustodyProbeOrderBySlotServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intCustodyProbeOrderBySlotServiceGetQueryKey(options),
   });

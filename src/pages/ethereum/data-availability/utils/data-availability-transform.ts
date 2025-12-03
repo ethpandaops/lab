@@ -230,37 +230,14 @@ export function transformSlotsToRows(data: FctDataColumnAvailabilityBySlot[] | u
 }
 
 /**
- * Fake submitter names for blob data (temporary until API provides real data)
- * Names should match the blob poster logo filenames (lowercase)
- */
-const FAKE_SUBMITTERS = [
-  'arbitrum',
-  'optimism',
-  'base',
-  'linea',
-  'scroll',
-  'zksync',
-  'starknet',
-  'taiko',
-  'blast',
-  'world',
-];
-
-/**
- * Get a deterministic fake submitter for a blob index (or null for ~25% of blobs)
- * Uses blob index as seed for consistency across renders
- */
-function getFakeSubmitter(blobIndex: number): string | null {
-  // ~25% of blobs have no known submitter
-  if (blobIndex % 4 === 3) return null;
-  // Deterministic selection based on blob index
-  return FAKE_SUBMITTERS[blobIndex % FAKE_SUBMITTERS.length];
-}
-
-/**
  * Transform blob data to heatmap rows
+ * @param data - Blob availability data from API
+ * @param blobSubmitters - Optional array of blob submitter names where index = blob index
  */
-export function transformBlobsToRows(data: FctDataColumnAvailabilityBySlotBlob[] | undefined): DataAvailabilityRow[] {
+export function transformBlobsToRows(
+  data: FctDataColumnAvailabilityBySlotBlob[] | undefined,
+  blobSubmitters?: string[]
+): DataAvailabilityRow[] {
   if (!data) return [];
 
   // Group by blob_index
@@ -290,8 +267,8 @@ export function transformBlobsToRows(data: FctDataColumnAvailabilityBySlotBlob[]
           blobIndex,
         }));
 
-      // Add fake submitter to label (temporary until API provides real data)
-      const submitter = getFakeSubmitter(blobIndex);
+      // Get submitter name from the array (index = blob index)
+      const submitter = blobSubmitters?.[blobIndex];
       const label = submitter ? `${blobIndex} · ${submitter}` : String(blobIndex);
 
       return {

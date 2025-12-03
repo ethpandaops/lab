@@ -49,6 +49,9 @@ export const probesSearchSchema = z.object({
   // Column filter (filter by individual column index)
   column: z.coerce.number().optional(),
 
+  // Blob poster filter (filter by blob submitter names - multiselect)
+  blobPosters: z.array(z.string()).optional(),
+
   // Time range filters (Unix timestamps) - for linking from custody drill-down
   timeStart: z.coerce.number().optional(),
   timeEnd: z.coerce.number().optional(),
