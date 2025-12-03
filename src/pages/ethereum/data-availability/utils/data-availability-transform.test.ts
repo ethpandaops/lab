@@ -229,7 +229,7 @@ describe('transformEpochsToRows', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].identifier).toBe('100');
-    expect(result[0].label).toBe('Epoch 100');
+    expect(result[0].label).toBe('100');
     expect(result[0].cells).toHaveLength(128);
     expect(result[0].cells[0].availability).toBe(0.955);
   });
@@ -302,7 +302,7 @@ describe('transformSlotsToRows', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].identifier).toBe('3200');
-    expect(result[0].label).toBe('Slot 3200');
+    expect(result[0].label).toBe('3200');
     expect(result[0].cells).toHaveLength(128);
     expect(result[0].cells[0].availability).toBe(0.955);
     expect(result[0].cells[0].successCount).toBe(100);
@@ -377,10 +377,26 @@ describe('transformBlobsToRows', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].identifier).toBe('0');
-    expect(result[0].label).toBe('Blob 0');
+    expect(result[0].label).toBe('0 · UNKNOWN'); // No submitter provided, defaults to UNKNOWN
     expect(result[0].cells).toHaveLength(128);
     expect(result[0].cells[0].availability).toBe(0.955);
     expect(result[0].cells[0].blobIndex).toBe(0);
+  });
+
+  it('should include submitter name in label when provided', () => {
+    const blobData: FctDataColumnAvailabilityBySlotBlob[] = [
+      { blob_index: 0, column_index: 0, availability_pct: 95 },
+      { blob_index: 1, column_index: 0, availability_pct: 92 },
+      { blob_index: 2, column_index: 0, availability_pct: 88 },
+    ];
+    const blobSubmitters = ['base', 'optimism', 'Unknown'];
+
+    const result = transformBlobsToRows(blobData, blobSubmitters);
+
+    expect(result).toHaveLength(3);
+    expect(result[0].label).toBe('0 · base');
+    expect(result[1].label).toBe('1 · optimism');
+    expect(result[2].label).toBe('2 · Unknown');
   });
 
   it('should handle empty data', () => {
@@ -442,7 +458,7 @@ describe('transformBlobsToRows', () => {
     expect(result[0].cells[0].blobIndex).toBe(3);
   });
 
-  it('should handle multiple blobs', () => {
+  it('should handle multiple blobs without submitters', () => {
     const blobData: FctDataColumnAvailabilityBySlotBlob[] = [
       { blob_index: 0, column_index: 0, availability_pct: 90 },
       { blob_index: 0, column_index: 1, availability_pct: 92 },
@@ -454,9 +470,9 @@ describe('transformBlobsToRows', () => {
     const result = transformBlobsToRows(blobData);
 
     expect(result).toHaveLength(3);
-    expect(result[0].label).toBe('Blob 0');
-    expect(result[1].label).toBe('Blob 1');
-    expect(result[2].label).toBe('Blob 2');
+    expect(result[0].label).toBe('0 · UNKNOWN');
+    expect(result[1].label).toBe('1 · UNKNOWN');
+    expect(result[2].label).toBe('2 · UNKNOWN');
   });
 });
 

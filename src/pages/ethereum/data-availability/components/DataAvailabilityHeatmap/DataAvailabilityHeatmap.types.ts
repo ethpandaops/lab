@@ -55,6 +55,13 @@ export interface CellClickHandler {
 }
 
 /**
+ * Callback when a column header is clicked (to view all rows for that column)
+ */
+export interface ColumnClickHandler {
+  (columnIndex: number): void;
+}
+
+/**
  * Callback when a row label is clicked (to view all columns for that time period)
  */
 export interface RowClickHandler {
@@ -64,7 +71,7 @@ export interface RowClickHandler {
 /**
  * Cell size variants
  */
-export type CellSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type CellSize = '3xs' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 /**
  * Props for the DataAvailabilityHeatmap component
@@ -80,22 +87,22 @@ export interface DataAvailabilityHeatmapProps {
   viewMode?: ViewMode;
   /** Threshold value for threshold mode (default: 30 for mainnet, 10 for others) */
   threshold?: number;
-  /** Optional: Selected column index to highlight */
-  selectedColumnIndex?: number;
-  /** Callback when a cell is clicked */
-  onCellClick?: CellClickHandler;
   /** Callback when a row label is clicked */
   onRowClick?: RowClickHandler;
-  /** Callback when column selection is cleared */
-  onClearColumnSelection?: () => void;
+  /** Callback when a cell is clicked */
+  onCellClick?: CellClickHandler;
+  /** Callback when a column header is clicked */
+  onColumnClick?: ColumnClickHandler;
   /** Optional: Callback when back button is clicked */
   onBack?: () => void;
-  /** Optional: Cell size (default: 'xs' = 12px) */
+  /** Optional: Cell size (default: '2xs' = 8px) */
   cellSize?: CellSize;
   /** Optional: Show column indices header */
   showColumnHeader?: boolean;
   /** Optional: Show legend */
   showLegend?: boolean;
+  /** Optional: Show axis titles (default: true) */
+  showAxisTitles?: boolean;
   /** Optional: Custom class name */
   className?: string;
 }
@@ -138,4 +145,6 @@ export interface DataAvailabilityLegendProps {
   threshold?: number;
   /** Optional: Custom class name */
   className?: string;
+  /** Optional: Layout orientation (default: 'vertical') */
+  orientation?: 'vertical' | 'horizontal';
 }

@@ -29,6 +29,7 @@
     "@tailwindcss/vite": "4.1.17",
     "@tanstack/react-query": "5.90.8",
     "@tanstack/react-router": "1.135.2",
+    "@tanstack/react-table": "^8.21.3",
     "@tanstack/router-plugin": "1.135.2",
     "clsx": "2.1.1",
     "culori": "4.0.2",

@@ -6,9 +6,9 @@ export interface HeaderProps {
    */
   title: string;
   /**
-   * Optional description text below the title
+   * Optional description text or content below the title
    */
-  description?: string;
+  description?: React.ReactNode;
   /**
    * Whether to show the gradient accent bar
    * @default true

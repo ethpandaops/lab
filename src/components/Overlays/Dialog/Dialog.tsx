@@ -12,11 +12,11 @@ import clsx from 'clsx';
 import type { DialogProps } from './Dialog.types';
 
 const sizeClasses = {
-  sm: 'w-96', // 384px - 24rem
-  md: 'w-[28rem]', // 448px
-  lg: 'w-[32rem]', // 512px
-  xl: 'w-[56rem]', // 896px (increased from 672px for wider aspect ratio)
-  full: 'w-[80rem]', // 1280px
+  sm: 'w-full max-w-96', // 384px - 24rem, constrained by viewport
+  md: 'w-full max-w-[28rem]', // 448px
+  lg: 'w-full max-w-[32rem]', // 512px
+  xl: 'w-full max-w-[56rem]', // 896px (increased from 672px for wider aspect ratio)
+  full: 'w-full max-w-[80rem]', // 1280px
   fullscreen: 'w-[90vw] max-h-[90vh]', // 90% of viewport
 };
 
@@ -115,7 +115,7 @@ export function Dialog({
             >
               {/* Header */}
               {(title || showCloseButton) && (
-                <div className="flex items-start justify-between gap-4 px-6 py-5">
+                <div className="flex items-start justify-between gap-4 px-4 py-4 sm:px-6 sm:py-5">
                   <div className="min-w-0 flex-1 space-y-1.5">
                     {title && (
                       <DialogTitle className="text-lg leading-6 font-semibold text-foreground dark:text-foreground">
@@ -140,7 +140,13 @@ export function Dialog({
               )}
 
               {/* Content */}
-              <div className={clsx(noPadding ? 'p-0' : 'px-6 py-5', size === 'fullscreen' && 'flex-1 overflow-auto')}>
+              <div
+                className={clsx(
+                  noPadding ? 'p-0' : 'px-4 py-4 sm:px-6 sm:py-5',
+                  size === 'fullscreen' && 'flex-1 overflow-auto',
+                  size !== 'fullscreen' && 'max-h-[calc(100dvh-10rem)] overflow-y-auto'
+                )}
+              >
                 {!title && !showCloseButton && description && (
                   <Description className="mb-4 text-sm text-muted dark:text-muted">{description}</Description>
                 )}

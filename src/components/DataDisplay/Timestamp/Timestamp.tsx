@@ -94,16 +94,18 @@ export function Timestamp({
     setIsModalOpen(false);
   };
 
+  // When modal is disabled, render a span to avoid nested button issues
+  if (disableModal) {
+    return <span className={clsx('inline-flex items-center text-sm/5', className)}>{formattedTimestamp}</span>;
+  }
+
   return (
     <>
       <button
         type="button"
         onClick={handleClick}
-        disabled={disableModal}
         className={clsx(
-          'inline-flex items-center text-sm/5',
-          !disableModal && 'cursor-pointer underline decoration-dotted underline-offset-4 hover:text-primary',
-          disableModal && 'cursor-default',
+          'inline-flex cursor-pointer items-center text-sm/5 underline decoration-dotted underline-offset-4 hover:text-primary',
           className
         )}
         aria-label={`View timestamp details: ${formattedTimestamp}`}
@@ -111,7 +113,7 @@ export function Timestamp({
         {formattedTimestamp}
       </button>
 
-      {!disableModal && <TimestampModal open={isModalOpen} onClose={handleClose} timestamp={timestamp} />}
+      <TimestampModal open={isModalOpen} onClose={handleClose} timestamp={timestamp} />
     </>
   );
 }

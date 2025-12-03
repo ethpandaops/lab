@@ -19,7 +19,7 @@ export type CreateClientConfig<T extends ClientOptions = ClientOptions2> = (
 export const client = createClient(
   createClientConfig(
     createConfig<ClientOptions2>({
-      baseUrl: 'https://cbt-api-mainnet.analytics.production.platform.ethpandaops.io',
+      baseUrl: 'http://localhost:8092',
     })
   )
 );

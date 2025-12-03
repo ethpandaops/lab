@@ -6,6 +6,10 @@ import { client } from '../client.gen';
 import {
   adminCbtIncrementalServiceGet,
   adminCbtIncrementalServiceList,
+  adminCbtScheduledServiceGet,
+  adminCbtScheduledServiceList,
+  dimBlockBlobSubmitterServiceGet,
+  dimBlockBlobSubmitterServiceList,
   dimBlockCanonicalServiceGet,
   dimBlockCanonicalServiceList,
   dimNodeServiceGet,
@@ -106,6 +110,10 @@ import {
   intBlockMevCanonicalServiceList,
   intBlockProposerCanonicalServiceGet,
   intBlockProposerCanonicalServiceList,
+  intCustodyProbeOrderBySlotServiceGet,
+  intCustodyProbeOrderBySlotServiceList,
+  intCustodyProbeServiceGet,
+  intCustodyProbeServiceList,
   type Options,
 } from '../sdk.gen';
 import type {
@@ -115,6 +123,18 @@ import type {
   AdminCbtIncrementalServiceListData,
   AdminCbtIncrementalServiceListError,
   AdminCbtIncrementalServiceListResponse,
+  AdminCbtScheduledServiceGetData,
+  AdminCbtScheduledServiceGetError,
+  AdminCbtScheduledServiceGetResponse,
+  AdminCbtScheduledServiceListData,
+  AdminCbtScheduledServiceListError,
+  AdminCbtScheduledServiceListResponse,
+  DimBlockBlobSubmitterServiceGetData,
+  DimBlockBlobSubmitterServiceGetError,
+  DimBlockBlobSubmitterServiceGetResponse,
+  DimBlockBlobSubmitterServiceListData,
+  DimBlockBlobSubmitterServiceListError,
+  DimBlockBlobSubmitterServiceListResponse,
   DimBlockCanonicalServiceGetData,
   DimBlockCanonicalServiceGetError,
   DimBlockCanonicalServiceGetResponse,
@@ -415,6 +435,18 @@ import type {
   IntBlockProposerCanonicalServiceListData,
   IntBlockProposerCanonicalServiceListError,
   IntBlockProposerCanonicalServiceListResponse,
+  IntCustodyProbeOrderBySlotServiceGetData,
+  IntCustodyProbeOrderBySlotServiceGetError,
+  IntCustodyProbeOrderBySlotServiceGetResponse,
+  IntCustodyProbeOrderBySlotServiceListData,
+  IntCustodyProbeOrderBySlotServiceListError,
+  IntCustodyProbeOrderBySlotServiceListResponse,
+  IntCustodyProbeServiceGetData,
+  IntCustodyProbeServiceGetError,
+  IntCustodyProbeServiceGetResponse,
+  IntCustodyProbeServiceListData,
+  IntCustodyProbeServiceListError,
+  IntCustodyProbeServiceListResponse,
 } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
@@ -508,6 +540,114 @@ export const adminCbtIncrementalServiceGetOptions = (options: Options<AdminCbtIn
       return data;
     },
     queryKey: adminCbtIncrementalServiceGetQueryKey(options),
+  });
+
+export const adminCbtScheduledServiceListQueryKey = (options?: Options<AdminCbtScheduledServiceListData>) =>
+  createQueryKey('adminCbtScheduledServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const adminCbtScheduledServiceListOptions = (options?: Options<AdminCbtScheduledServiceListData>) =>
+  queryOptions<
+    AdminCbtScheduledServiceListResponse,
+    AdminCbtScheduledServiceListError,
+    AdminCbtScheduledServiceListResponse,
+    ReturnType<typeof adminCbtScheduledServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await adminCbtScheduledServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: adminCbtScheduledServiceListQueryKey(options),
+  });
+
+export const adminCbtScheduledServiceGetQueryKey = (options: Options<AdminCbtScheduledServiceGetData>) =>
+  createQueryKey('adminCbtScheduledServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by database
+ */
+export const adminCbtScheduledServiceGetOptions = (options: Options<AdminCbtScheduledServiceGetData>) =>
+  queryOptions<
+    AdminCbtScheduledServiceGetResponse,
+    AdminCbtScheduledServiceGetError,
+    AdminCbtScheduledServiceGetResponse,
+    ReturnType<typeof adminCbtScheduledServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await adminCbtScheduledServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: adminCbtScheduledServiceGetQueryKey(options),
+  });
+
+export const dimBlockBlobSubmitterServiceListQueryKey = (options?: Options<DimBlockBlobSubmitterServiceListData>) =>
+  createQueryKey('dimBlockBlobSubmitterServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimBlockBlobSubmitterServiceListOptions = (options?: Options<DimBlockBlobSubmitterServiceListData>) =>
+  queryOptions<
+    DimBlockBlobSubmitterServiceListResponse,
+    DimBlockBlobSubmitterServiceListError,
+    DimBlockBlobSubmitterServiceListResponse,
+    ReturnType<typeof dimBlockBlobSubmitterServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimBlockBlobSubmitterServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimBlockBlobSubmitterServiceListQueryKey(options),
+  });
+
+export const dimBlockBlobSubmitterServiceGetQueryKey = (options: Options<DimBlockBlobSubmitterServiceGetData>) =>
+  createQueryKey('dimBlockBlobSubmitterServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const dimBlockBlobSubmitterServiceGetOptions = (options: Options<DimBlockBlobSubmitterServiceGetData>) =>
+  queryOptions<
+    DimBlockBlobSubmitterServiceGetResponse,
+    DimBlockBlobSubmitterServiceGetError,
+    DimBlockBlobSubmitterServiceGetResponse,
+    ReturnType<typeof dimBlockBlobSubmitterServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimBlockBlobSubmitterServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimBlockBlobSubmitterServiceGetQueryKey(options),
   });
 
 export const dimBlockCanonicalServiceListQueryKey = (options?: Options<DimBlockCanonicalServiceListData>) =>
@@ -3362,4 +3502,118 @@ export const intBlockProposerCanonicalServiceGetOptions = (options: Options<IntB
       return data;
     },
     queryKey: intBlockProposerCanonicalServiceGetQueryKey(options),
+  });
+
+export const intCustodyProbeServiceListQueryKey = (options?: Options<IntCustodyProbeServiceListData>) =>
+  createQueryKey('intCustodyProbeServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intCustodyProbeServiceListOptions = (options?: Options<IntCustodyProbeServiceListData>) =>
+  queryOptions<
+    IntCustodyProbeServiceListResponse,
+    IntCustodyProbeServiceListError,
+    IntCustodyProbeServiceListResponse,
+    ReturnType<typeof intCustodyProbeServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intCustodyProbeServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intCustodyProbeServiceListQueryKey(options),
+  });
+
+export const intCustodyProbeServiceGetQueryKey = (options: Options<IntCustodyProbeServiceGetData>) =>
+  createQueryKey('intCustodyProbeServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by probe_date_time
+ */
+export const intCustodyProbeServiceGetOptions = (options: Options<IntCustodyProbeServiceGetData>) =>
+  queryOptions<
+    IntCustodyProbeServiceGetResponse,
+    IntCustodyProbeServiceGetError,
+    IntCustodyProbeServiceGetResponse,
+    ReturnType<typeof intCustodyProbeServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intCustodyProbeServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intCustodyProbeServiceGetQueryKey(options),
+  });
+
+export const intCustodyProbeOrderBySlotServiceListQueryKey = (
+  options?: Options<IntCustodyProbeOrderBySlotServiceListData>
+) => createQueryKey('intCustodyProbeOrderBySlotServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intCustodyProbeOrderBySlotServiceListOptions = (
+  options?: Options<IntCustodyProbeOrderBySlotServiceListData>
+) =>
+  queryOptions<
+    IntCustodyProbeOrderBySlotServiceListResponse,
+    IntCustodyProbeOrderBySlotServiceListError,
+    IntCustodyProbeOrderBySlotServiceListResponse,
+    ReturnType<typeof intCustodyProbeOrderBySlotServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intCustodyProbeOrderBySlotServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intCustodyProbeOrderBySlotServiceListQueryKey(options),
+  });
+
+export const intCustodyProbeOrderBySlotServiceGetQueryKey = (
+  options: Options<IntCustodyProbeOrderBySlotServiceGetData>
+) => createQueryKey('intCustodyProbeOrderBySlotServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intCustodyProbeOrderBySlotServiceGetOptions = (
+  options: Options<IntCustodyProbeOrderBySlotServiceGetData>
+) =>
+  queryOptions<
+    IntCustodyProbeOrderBySlotServiceGetResponse,
+    IntCustodyProbeOrderBySlotServiceGetError,
+    IntCustodyProbeOrderBySlotServiceGetResponse,
+    ReturnType<typeof intCustodyProbeOrderBySlotServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intCustodyProbeOrderBySlotServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intCustodyProbeOrderBySlotServiceGetQueryKey(options),
   });

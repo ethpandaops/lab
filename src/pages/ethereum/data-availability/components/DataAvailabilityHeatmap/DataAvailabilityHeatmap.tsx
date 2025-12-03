@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { GridHeatmap } from '@/components/Charts/GridHeatmap';
-import type { GridRow } from '@/components/Charts/GridHeatmap';
+import type { GridRow, RowLabelRenderProps } from '@/components/Charts/GridHeatmap';
 import { DataAvailabilityCell } from './DataAvailabilityCell';
 import { DataAvailabilityLegend } from './DataAvailabilityLegend';
+import { DataAvailabilityRowLabel } from './DataAvailabilityRowLabel';
 import type { DataAvailabilityHeatmapProps, DataAvailabilityCellData } from './DataAvailabilityHeatmap.types';
 
 /**
@@ -14,6 +15,7 @@ import type { DataAvailabilityHeatmapProps, DataAvailabilityCellData } from './D
  * - Legend display
  * - Response time labeling
  * - View mode support (percentage vs threshold)
+ * - Purpose-built row labels with type icons and drill-down affordance
  *
  * Supports hierarchical drill-down from days → hours → epochs → slots → blobs.
  */
@@ -23,14 +25,14 @@ export const DataAvailabilityHeatmap = ({
   filters,
   viewMode = 'percentage',
   threshold = 30,
-  selectedColumnIndex,
-  onCellClick,
   onRowClick,
-  onClearColumnSelection,
+  onCellClick,
+  onColumnClick,
   onBack,
-  cellSize = 'xs',
+  cellSize = '2xs',
   showColumnHeader = true,
   showLegend = true,
+  showAxisTitles = true,
   className,
 }: DataAvailabilityHeatmapProps): React.JSX.Element => {
   /**
@@ -86,16 +88,25 @@ export const DataAvailabilityHeatmap = ({
     [filteredRows]
   );
 
+  /**
+   * Custom row label renderer with type icons and drill-down affordance
+   */
+  const renderRowLabel = useCallback(
+    (props: RowLabelRenderProps) => <DataAvailabilityRowLabel {...props} granularity={granularity} />,
+    [granularity]
+  );
+
   return (
     <GridHeatmap
       rows={gridRows}
       cellSize={cellSize}
       showColumnHeader={showColumnHeader}
-      selectedColumn={selectedColumnIndex}
-      onCellClick={onCellClick}
       onRowClick={onRowClick}
-      onClearColumnSelection={onClearColumnSelection}
+      onCellClick={onCellClick}
+      onColumnClick={onColumnClick}
       onBack={onBack}
+      xAxisTitle={showAxisTitles ? 'Data Column' : undefined}
+      renderRowLabel={renderRowLabel}
       renderCell={(cellData, props) => (
         <DataAvailabilityCell
           data={cellData}

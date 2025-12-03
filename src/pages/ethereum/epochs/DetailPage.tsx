@@ -1,7 +1,7 @@
-import { useParams, useNavigate } from '@tanstack/react-router';
+import { useParams, useNavigate, Link } from '@tanstack/react-router';
 import { useMemo, useEffect } from 'react';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, ChevronRightIcon, EyeIcon } from '@heroicons/react/24/outline';
 
 import { Alert } from '@/components/Feedback/Alert';
 import { BaseFeeChart } from '@/components/Ethereum/BaseFeeChart';
@@ -182,6 +182,19 @@ export function DetailPage(): React.JSX.Element {
           Previous
         </Button>
         <div className="flex-1" />
+        <Link
+          to="/ethereum/data-availability/custody"
+          search={{
+            epoch,
+            hour: Math.floor(data.stats.epochStartDateTime / 3600) * 3600,
+            date: new Date(data.stats.epochStartDateTime * 1000).toISOString().split('T')[0],
+            slot: undefined,
+          }}
+          className="flex items-center gap-1.5 rounded-sm border border-accent/30 bg-accent/10 px-3 py-2 text-sm font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
+        >
+          <EyeIcon className="size-4" />
+          <span>View Custody</span>
+        </Link>
         <Button
           variant="secondary"
           size="sm"

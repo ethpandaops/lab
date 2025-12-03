@@ -10,11 +10,14 @@ export const DataAvailabilityLegend = ({
   viewMode = 'percentage',
   threshold = 30,
   className,
+  orientation = 'vertical',
 }: DataAvailabilityLegendProps): React.JSX.Element => {
+  const directionClass = orientation === 'vertical' ? 'flex-col gap-2' : 'flex-row items-center gap-4';
+
   if (viewMode === 'threshold') {
     // Threshold mode legend - shows observation count ranges relative to threshold
     return (
-      <div className={clsx('flex flex-col gap-2', className)}>
+      <div className={clsx('flex', directionClass, className)}>
         <div className="text-xs/4 text-muted">Observations (threshold: {threshold})</div>
         <div className="flex gap-1">
           <div className="flex grow items-center justify-center rounded-xs bg-warning/20 px-2 py-1">
@@ -50,7 +53,7 @@ export const DataAvailabilityLegend = ({
 
   // Percentage mode legend
   return (
-    <div className={clsx('flex flex-col gap-2', className)}>
+    <div className={clsx('flex', directionClass, className)}>
       <div className="text-xs/4 text-muted">Availability %</div>
       <div className="flex gap-1">
         <div className="flex grow items-center justify-center rounded-xs bg-danger/70 px-2 py-1">

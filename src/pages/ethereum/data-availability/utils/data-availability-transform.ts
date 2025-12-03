@@ -122,20 +122,12 @@ export function transformHourlyToRows(
   return Array.from(byHour.entries())
     .sort((a, b) => a[0] - b[0])
     .map(([hourStart, items]) => {
-      const hourLabel = new Date(hourStart * 1000).toLocaleTimeString(
+      const date = new Date(hourStart * 1000);
+      const timeLabel = date.toLocaleTimeString(
         'en-US',
         timezone === 'UTC'
-          ? {
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false,
-              timeZone: 'UTC',
-            }
-          : {
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false,
-            }
+          ? { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }
+          : { hour: '2-digit', minute: '2-digit', hour12: false }
       );
       const identifier = String(hourStart);
       const cells = items
@@ -151,7 +143,7 @@ export function transformHourlyToRows(
 
       return {
         identifier,
-        label: hourLabel,
+        label: timeLabel,
         cells: ensureAllColumns(cells, identifier),
       };
     });
@@ -191,7 +183,7 @@ export function transformEpochsToRows(data: FctDataColumnAvailabilityByEpoch[] |
 
       return {
         identifier,
-        label: `Epoch ${epoch}`,
+        label: String(epoch),
         cells: ensureAllColumns(cells, identifier),
       };
     });
@@ -231,7 +223,7 @@ export function transformSlotsToRows(data: FctDataColumnAvailabilityBySlot[] | u
 
       return {
         identifier,
-        label: `Slot ${slot}`,
+        label: String(slot),
         cells: ensureAllColumns(cells, identifier),
       };
     });
@@ -239,8 +231,13 @@ export function transformSlotsToRows(data: FctDataColumnAvailabilityBySlot[] | u
 
 /**
  * Transform blob data to heatmap rows
+ * @param data - Blob availability data from API
+ * @param blobSubmitters - Optional array of blob submitter names where index = blob index
  */
-export function transformBlobsToRows(data: FctDataColumnAvailabilityBySlotBlob[] | undefined): DataAvailabilityRow[] {
+export function transformBlobsToRows(
+  data: FctDataColumnAvailabilityBySlotBlob[] | undefined,
+  blobSubmitters?: string[]
+): DataAvailabilityRow[] {
   if (!data) return [];
 
   // Group by blob_index
@@ -270,9 +267,13 @@ export function transformBlobsToRows(data: FctDataColumnAvailabilityBySlotBlob[]
           blobIndex,
         }));
 
+      // Get submitter name from the array (index = blob index), default to UNKNOWN
+      const submitter = blobSubmitters?.[blobIndex] ?? 'UNKNOWN';
+      const label = `${blobIndex} · ${submitter}`;
+
       return {
         identifier,
-        label: `Blob ${blobIndex}`,
+        label,
         cells: ensureAllColumns(cells, identifier),
       };
     });

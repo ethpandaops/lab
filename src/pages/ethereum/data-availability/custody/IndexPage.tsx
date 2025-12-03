@@ -1,17 +1,18 @@
-import { type JSX, useState, useMemo, useEffect } from 'react';
+import { type JSX, useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useSearch, useNavigate } from '@tanstack/react-router';
-import { ChartBarIcon, TableCellsIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { useSearch, useNavigate, Link } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
-import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { Stats } from '@/components/DataDisplay/Stats';
 import { DataAvailabilityHeatmap } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
-import { DataAvailabilityFilterPanel } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel';
 import { DataAvailabilityLegend } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityLegend';
 import { DataAvailabilitySkeleton } from '@/pages/ethereum/data-availability/components/DataAvailabilitySkeleton';
 import { ViewModeToggle } from '@/pages/ethereum/data-availability/components/ViewModeToggle';
 import { TimezoneToggle } from '@/components/Elements/TimezoneToggle';
+import { Dialog } from '@/components/Overlays/Dialog';
+import { LiveProbeEvents } from './components/LiveProbeEvents';
+import type { ProbeFilterContext } from './components/LiveProbeEvents';
+import { CellProbeDialog } from './components/CellProbeDialog';
+import type { CellContext, TimeRangeContext } from './components/CellProbeDialog';
 import type {
   DataAvailabilityGranularity,
   ViewMode,
@@ -19,10 +20,22 @@ import type {
 import type { DataAvailabilityFilters } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel.types';
 import { useTimezone } from '@/hooks/useTimezone';
 import { useNetwork } from '@/hooks/useNetwork';
-import { formatEpoch } from '@/utils';
+import { formatEpoch, formatSlot } from '@/utils';
+import {
+  ChevronRightIcon,
+  ArrowLeftIcon,
+  ArrowTopRightOnSquareIcon,
+  Squares2X2Icon,
+  CalendarDaysIcon,
+  ClockIcon,
+  CubeIcon,
+  Square2StackIcon,
+  InformationCircleIcon,
+} from '@heroicons/react/24/outline';
 import {
   fctDataColumnAvailabilityDailyServiceListOptions,
   fctDataColumnAvailabilityHourlyServiceListOptions,
+  intCustodyProbeOrderBySlotServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import {
   fctDataColumnAvailabilityByEpochServiceList,
@@ -144,6 +157,49 @@ function deriveCurrentLevel(search: CustodySearch): DrillDownLevel {
 }
 
 /**
+ * Get a human-readable title for the current viewing level
+ * Main title = where you are, subtitle = what you're viewing
+ */
+function getLevelTitle(level: DrillDownLevel, timezone: 'UTC' | 'local'): { main: string; sub: string } {
+  const tzOptions = timezone === 'UTC' ? { timeZone: 'UTC' } : {};
+
+  switch (level.type) {
+    case 'window':
+      return { main: 'Custody Window', sub: `Viewing last ${WINDOW_DAYS} days by day` };
+    case 'day': {
+      const dateStr = new Date(level.date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+        ...tzOptions,
+      });
+      return { main: dateStr, sub: 'Viewing hours in this day' };
+    }
+    case 'hour': {
+      const dateStr = new Date(level.date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+        ...tzOptions,
+      });
+      const timeStr = new Date(level.hourStartDateTime * 1000).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        ...tzOptions,
+      });
+      return { main: `${dateStr} at ${timeStr}`, sub: 'Viewing epochs in this hour' };
+    }
+    case 'epoch':
+      return { main: `Epoch ${formatEpoch(level.epoch)}`, sub: 'Viewing slots in this epoch' };
+    case 'slot':
+      return { main: `Slot ${formatSlot(level.slot)}`, sub: 'Viewing blobs in this slot' };
+  }
+}
+
+/**
  * Custody page showing PeerDAS data availability across drill-down levels
  */
 export function IndexPage(): JSX.Element {
@@ -159,7 +215,6 @@ export function IndexPage(): JSX.Element {
 
   // Derive drill-down state from URL
   const currentLevel = deriveCurrentLevel(search);
-  const selectedColumnIndex = search.column;
 
   // Smart initial view based on fork timing
   const { searchParams: forkBasedParams, isLoading: forkViewLoading } = useForkBasedInitialView();
@@ -189,20 +244,31 @@ export function IndexPage(): JSX.Element {
     });
   }, [hasPerformedInitialNav, search, forkViewLoading, forkBasedParams, navigate]);
 
-  // View mode from URL (default to 'threshold' since it's more robust)
-  const viewMode: ViewMode = search.mode ?? 'threshold';
+  // View mode from URL (default to 'percentage')
+  const viewMode: ViewMode = search.mode ?? 'percentage';
 
   // Threshold from URL or network default
   const defaultThreshold = getDefaultThreshold(currentNetwork?.name);
   const threshold = search.threshold ?? defaultThreshold;
 
-  // Filter state
-  const [filters, setFilters] = useState<DataAvailabilityFilters>({
-    columnGroups: new Set([0, 1, 2, 3]), // All groups selected by default
-    minAvailability: 0,
-    maxAvailability: 100,
-    minObservationCount: 0,
-  });
+  // Default filter state (all columns, no filtering)
+  const filters: DataAvailabilityFilters = useMemo(
+    () => ({
+      columnGroups: new Set([0, 1, 2, 3]),
+      minAvailability: 0,
+      maxAvailability: 100,
+      minObservationCount: 0,
+    }),
+    []
+  );
+
+  // Cell probe dialog state
+  const [cellDialogOpen, setCellDialogOpen] = useState(false);
+  const [cellContext, setCellContext] = useState<CellContext | null>(null);
+  const [timeRangeContext, setTimeRangeContext] = useState<TimeRangeContext | null>(null);
+
+  // Learn more dialog state
+  const [learnMoreOpen, setLearnMoreOpen] = useState(false);
 
   // Window Level: Last 19 days of daily aggregated data
   const windowQuery = useQuery({
@@ -322,6 +388,21 @@ export function IndexPage(): JSX.Element {
     enabled: currentLevel.type === 'slot',
   });
 
+  // Fetch blob submitters for the slot (array index = blob index)
+  const blobSubmittersQuery = useQuery({
+    ...intCustodyProbeOrderBySlotServiceListOptions({
+      query: {
+        slot_eq: currentLevel.type === 'slot' ? currentLevel.slot : undefined,
+        page_size: 1,
+      },
+    }),
+    enabled: currentLevel.type === 'slot',
+  });
+  const blobSubmitters = useMemo(
+    () => blobSubmittersQuery.data?.int_custody_probe_order_by_slot?.[0]?.blob_submitters ?? [],
+    [blobSubmittersQuery.data]
+  );
+
   /**
    * Transform Window data (daily) to heatmap rows
    */
@@ -361,8 +442,8 @@ export function IndexPage(): JSX.Element {
    * Transform Slot data (blobs) to heatmap rows
    */
   const slotRows = useMemo(
-    () => transformBlobsToRows(slotQuery.data?.fct_data_column_availability_by_slot_blob),
-    [slotQuery.data]
+    () => transformBlobsToRows(slotQuery.data?.fct_data_column_availability_by_slot_blob, blobSubmitters),
+    [slotQuery.data, blobSubmitters]
   );
 
   // Determine current data based on level
@@ -472,17 +553,220 @@ export function IndexPage(): JSX.Element {
   };
 
   /**
-   * Handle cell click to toggle column selection
-   * Updates URL search params to select/deselect column
+   * Handle cell click to show probe details for a specific row/column
+   * Opens a dialog with probes filtered by the time range and column
    */
-  const handleCellClick = (_identifier: string, columnIndex: number): void => {
-    navigate({
-      search: prev => ({
-        ...prev,
-        column: prev.column === columnIndex ? undefined : columnIndex,
-      }),
-    });
-  };
+  const handleCellClick = useCallback(
+    (rowIdentifier: string, columnIndex: number): void => {
+      // Find the row to get its label
+      const row = rows.find(r => r.identifier === rowIdentifier);
+      const rowLabel = row?.label ?? rowIdentifier;
+
+      // Build parent context from currentLevel for full hierarchy display
+      const parentContext: CellContext['parentContext'] = {};
+      if (currentLevel.type !== 'window') {
+        parentContext.date = currentLevel.date;
+      }
+      if (currentLevel.type !== 'window' && currentLevel.type !== 'day') {
+        parentContext.hourStartDateTime = currentLevel.hourStartDateTime;
+      }
+      if (currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
+        parentContext.epoch = currentLevel.epoch;
+      }
+      if (currentLevel.type === 'slot') {
+        parentContext.slot = currentLevel.slot;
+      }
+
+      // Build cell context
+      const cellCtx: CellContext = {
+        rowIdentifier,
+        columnIndex,
+        granularity,
+        rowLabel,
+        parentContext,
+      };
+
+      // Build time range context based on granularity
+      let timeRange: TimeRangeContext = {};
+
+      switch (currentLevel.type) {
+        case 'window': {
+          // Row is a date - filter by that day
+          const dayStart = Math.floor(new Date(rowIdentifier).getTime() / 1000);
+          timeRange = {
+            timeStart: dayStart,
+            timeEnd: dayStart + SECONDS_PER_DAY,
+          };
+          break;
+        }
+        case 'day': {
+          // Row is hour start timestamp - filter by that hour
+          const hourStart = Number(rowIdentifier);
+          timeRange = {
+            timeStart: hourStart,
+            timeEnd: hourStart + SECONDS_PER_HOUR,
+          };
+          break;
+        }
+        case 'hour': {
+          // Row is epoch number - filter by slots in that epoch
+          const epoch = Number(rowIdentifier);
+          const epochStartSlot = epoch * SLOTS_PER_EPOCH;
+          const slots = Array.from({ length: SLOTS_PER_EPOCH }, (_, i) => epochStartSlot + i);
+          // Use the hour's time range but filter by specific slots
+          timeRange = {
+            timeStart: currentLevel.hourStartDateTime,
+            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
+            slots,
+          };
+          break;
+        }
+        case 'epoch': {
+          // Row is slot number - filter by that specific slot
+          const slot = Number(rowIdentifier);
+          timeRange = {
+            slot,
+            timeStart: currentLevel.hourStartDateTime,
+            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
+          };
+          break;
+        }
+        case 'slot': {
+          // Row is blob index - use the slot from currentLevel
+          timeRange = {
+            slot: currentLevel.slot,
+            timeStart: currentLevel.hourStartDateTime,
+            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
+          };
+          break;
+        }
+      }
+
+      setCellContext(cellCtx);
+      setTimeRangeContext(timeRange);
+      setCellDialogOpen(true);
+    },
+    [rows, granularity, currentLevel]
+  );
+
+  /**
+   * Handle cell dialog close
+   */
+  const handleCellDialogClose = useCallback(() => {
+    setCellDialogOpen(false);
+  }, []);
+
+  /**
+   * Handle column click to show probe details for an entire column (all rows)
+   * Opens the same dialog but with column-only context (no row filtering)
+   */
+  const handleColumnClick = useCallback(
+    (columnIndex: number): void => {
+      // Build context label based on current drill-down level
+      let contextLabel: string;
+      switch (currentLevel.type) {
+        case 'window':
+          contextLabel = `Last ${WINDOW_DAYS} Days`;
+          break;
+        case 'day': {
+          const dateStr = new Date(currentLevel.date).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            ...(timezone === 'UTC' ? { timeZone: 'UTC' } : {}),
+          });
+          contextLabel = dateStr;
+          break;
+        }
+        case 'hour': {
+          const dateStr = new Date(currentLevel.date).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            ...(timezone === 'UTC' ? { timeZone: 'UTC' } : {}),
+          });
+          const timeStr = new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+            ...(timezone === 'UTC' ? { timeZone: 'UTC' } : {}),
+          });
+          contextLabel = `${dateStr} at ${timeStr}`;
+          break;
+        }
+        case 'epoch':
+          contextLabel = `Epoch ${formatEpoch(currentLevel.epoch)}`;
+          break;
+        case 'slot':
+          contextLabel = `Slot ${formatSlot(currentLevel.slot)}`;
+          break;
+      }
+
+      // Build cell context for column-only view
+      const cellCtx: CellContext = {
+        columnIndex,
+        granularity,
+        isColumnOnly: true,
+        contextLabel,
+      };
+
+      // Build time range context based on current view level (full range)
+      let timeRange: TimeRangeContext = {};
+      const now = Math.floor(Date.now() / 1000);
+
+      switch (currentLevel.type) {
+        case 'window': {
+          // Full 19-day window
+          timeRange = {
+            timeStart: now - WINDOW_DAYS * SECONDS_PER_DAY,
+            timeEnd: now,
+          };
+          break;
+        }
+        case 'day': {
+          // Full day
+          const dayStart = Math.floor(new Date(currentLevel.date).getTime() / 1000);
+          timeRange = {
+            timeStart: dayStart,
+            timeEnd: dayStart + SECONDS_PER_DAY,
+          };
+          break;
+        }
+        case 'hour': {
+          // Full hour
+          timeRange = {
+            timeStart: currentLevel.hourStartDateTime,
+            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
+          };
+          break;
+        }
+        case 'epoch': {
+          // All slots in the epoch
+          const epochStartSlot = currentLevel.epoch * SLOTS_PER_EPOCH;
+          const slots = Array.from({ length: SLOTS_PER_EPOCH }, (_, i) => epochStartSlot + i);
+          timeRange = {
+            timeStart: currentLevel.hourStartDateTime,
+            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
+            slots,
+          };
+          break;
+        }
+        case 'slot': {
+          // Just the slot
+          timeRange = {
+            slot: currentLevel.slot,
+            timeStart: currentLevel.hourStartDateTime,
+            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
+          };
+          break;
+        }
+      }
+
+      setCellContext(cellCtx);
+      setTimeRangeContext(timeRange);
+      setCellDialogOpen(true);
+    },
+    [granularity, currentLevel, timezone]
+  );
 
   /**
    * Handle view mode change
@@ -498,28 +782,27 @@ export function IndexPage(): JSX.Element {
   };
 
   /**
-   * Handle threshold change
-   * Updates URL search params with new threshold value
-   */
-  const handleThresholdChange = (newThreshold: number): void => {
-    navigate({
-      search: prev => ({
-        ...prev,
-        threshold: newThreshold,
-      }),
-    });
-  };
-
-  /**
    * Build breadcrumb path - shows full drill-down hierarchy
+   * Preserves mode and threshold settings across navigation
    */
   const breadcrumbs = useMemo(() => {
-    const crumbs: Array<{ label: string; onClick: () => void }> = [
+    // Settings to preserve across navigation
+    const preservedSettings = {
+      ...(search.mode && { mode: search.mode }),
+      ...(search.threshold && { threshold: search.threshold }),
+    };
+
+    const crumbs: Array<{
+      label: string;
+      onClick: () => void;
+      icon: React.ComponentType<{ className?: string }>;
+    }> = [
       {
-        label: `Window (${WINDOW_DAYS} days)`,
+        label: `Window`,
+        icon: Squares2X2Icon,
         onClick: () => {
           navigate({
-            search: {},
+            search: { ...preservedSettings },
             replace: true,
           });
         },
@@ -536,10 +819,14 @@ export function IndexPage(): JSX.Element {
       currentLevel.type === 'slot'
     ) {
       crumbs.push({
-        label: `Day: ${new Date(currentLevel.date).toLocaleDateString('en-US', timezone === 'UTC' ? { timeZone: 'UTC' } : {})}`,
+        label: new Date(currentLevel.date).toLocaleDateString(
+          'en-US',
+          timezone === 'UTC' ? { month: 'short', day: 'numeric', timeZone: 'UTC' } : { month: 'short', day: 'numeric' }
+        ),
+        icon: CalendarDaysIcon,
         onClick: () =>
           navigate({
-            search: { date: currentLevel.date },
+            search: { ...preservedSettings, date: currentLevel.date },
             replace: true,
           }),
       });
@@ -548,10 +835,16 @@ export function IndexPage(): JSX.Element {
     // Add hour breadcrumb if we're at hour level or deeper
     if (currentLevel.type === 'hour' || currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
       crumbs.push({
-        label: `Hour: ${new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString('en-US', timezone === 'UTC' ? { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' } : { hour: '2-digit', minute: '2-digit', hour12: false })}`,
+        label: new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString(
+          'en-US',
+          timezone === 'UTC'
+            ? { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }
+            : { hour: '2-digit', minute: '2-digit', hour12: false }
+        ),
+        icon: ClockIcon,
         onClick: () =>
           navigate({
-            search: { date: currentLevel.date, hour: currentLevel.hourStartDateTime },
+            search: { ...preservedSettings, date: currentLevel.date, hour: currentLevel.hourStartDateTime },
             replace: true,
           }),
       });
@@ -560,10 +853,12 @@ export function IndexPage(): JSX.Element {
     // Add epoch breadcrumb if we're at epoch level or deeper
     if (currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
       crumbs.push({
-        label: `Epoch: ${formatEpoch(currentLevel.epoch)}`,
+        label: formatEpoch(currentLevel.epoch),
+        icon: CubeIcon,
         onClick: () =>
           navigate({
             search: {
+              ...preservedSettings,
               date: currentLevel.date,
               hour: currentLevel.hourStartDateTime,
               epoch: currentLevel.epoch,
@@ -576,10 +871,12 @@ export function IndexPage(): JSX.Element {
     // Add slot breadcrumb if we're at slot level
     if (currentLevel.type === 'slot') {
       crumbs.push({
-        label: `Slot: ${currentLevel.slot}`,
+        label: formatSlot(currentLevel.slot),
+        icon: Square2StackIcon,
         onClick: () =>
           navigate({
             search: {
+              ...preservedSettings,
               date: currentLevel.date,
               hour: currentLevel.hourStartDateTime,
               epoch: currentLevel.epoch,
@@ -591,122 +888,64 @@ export function IndexPage(): JSX.Element {
     }
 
     return crumbs;
-  }, [currentLevel, navigate, timezone]);
+  }, [currentLevel, navigate, timezone, search.mode, search.threshold]);
 
-  /**
-   * Calculate summary statistics for the current view
-   */
-  const summaryStats = useMemo(() => {
-    if (!rows.length) {
-      return {
-        totalPeriods: 0,
-        activeColumns: 0,
-        avgAvailability: 0,
-        totalObservations: 0,
-        avgResponseTime: 0,
-      };
+  // Calculate time range for View Probes link (must be before early returns)
+  const probesLinkParams = useMemo(() => {
+    let timeStart: number | undefined;
+    let timeEnd: number | undefined;
+
+    if (currentLevel.type === 'day') {
+      timeStart = Math.floor(new Date(currentLevel.date).getTime() / 1000);
+      timeEnd = timeStart + SECONDS_PER_DAY;
+    } else if (currentLevel.type === 'hour' || currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
+      timeStart = currentLevel.hourStartDateTime;
+      timeEnd = timeStart + SECONDS_PER_HOUR;
     }
 
-    // Get unique columns that have data
-    const columnsWithData = new Set<number>();
-    let totalAvailability = 0;
-    let cellsWithData = 0;
-    let totalObservations = 0;
-    let totalResponseTime = 0;
-    let cellsWithResponseTime = 0;
-
-    for (const row of rows) {
-      for (const cell of row.cells) {
-        const hasData = (cell.totalCount ?? 0) > 0;
-        if (hasData) {
-          columnsWithData.add(cell.columnIndex);
-          totalAvailability += cell.availability;
-          cellsWithData++;
-          totalObservations += cell.totalCount ?? 0;
-          if (cell.avgResponseTimeMs !== undefined && cell.avgResponseTimeMs > 0) {
-            totalResponseTime += cell.avgResponseTimeMs;
-            cellsWithResponseTime++;
-          }
-        }
-      }
-    }
+    const hasTimeFilter = timeStart !== undefined && timeEnd !== undefined;
+    const hasSlotFilter = currentLevel.type === 'slot';
 
     return {
-      totalPeriods: rows.length,
-      activeColumns: columnsWithData.size,
-      avgAvailability: cellsWithData > 0 ? totalAvailability / cellsWithData : 0,
-      totalObservations,
-      avgResponseTime: cellsWithResponseTime > 0 ? totalResponseTime / cellsWithResponseTime : 0,
+      ...(hasSlotFilter && { slot: currentLevel.slot }),
+      ...(hasTimeFilter && !hasSlotFilter && { timeStart, timeEnd }),
     };
-  }, [rows]);
+  }, [currentLevel]);
 
-  /**
-   * Get period label based on granularity
-   */
-  const periodLabel = useMemo(() => {
-    switch (granularity) {
+  // Convert currentLevel to ProbeFilterContext for LiveProbeEvents
+  const probeFilterContext: ProbeFilterContext = useMemo(() => {
+    switch (currentLevel.type) {
       case 'window':
-        return 'Days';
+        return { type: 'window' };
       case 'day':
-        return 'Hours';
+        return { type: 'day', date: currentLevel.date };
       case 'hour':
-        return 'Epochs';
+        return {
+          type: 'hour',
+          date: currentLevel.date,
+          hourStartDateTime: currentLevel.hourStartDateTime,
+        };
       case 'epoch':
-        return 'Slots';
+        return {
+          type: 'epoch',
+          date: currentLevel.date,
+          hourStartDateTime: currentLevel.hourStartDateTime,
+          epoch: currentLevel.epoch,
+        };
       case 'slot':
-        return 'Blobs';
-      default:
-        return 'Periods';
+        return {
+          type: 'slot',
+          date: currentLevel.date,
+          hourStartDateTime: currentLevel.hourStartDateTime,
+          epoch: currentLevel.epoch,
+          slot: currentLevel.slot,
+        };
     }
-  }, [granularity]);
-
-  /**
-   * Get heatmap card title based on granularity
-   */
-  const heatmapTitle = useMemo(() => {
-    switch (granularity) {
-      case 'window':
-        return 'Column Availability Across Days';
-      case 'day':
-        return `Column Availability by Hour - ${currentLevel.type === 'day' ? currentLevel.date : ''}`;
-      case 'hour':
-        return 'Column Availability by Epoch';
-      case 'epoch':
-        return `Column Availability by Slot - Epoch ${currentLevel.type === 'epoch' ? formatEpoch(currentLevel.epoch) : ''}`;
-      case 'slot':
-        return `Column Availability by Blob - Slot ${currentLevel.type === 'slot' ? currentLevel.slot : ''}`;
-      default:
-        return 'Column Availability';
-    }
-  }, [granularity, currentLevel]);
-
-  /**
-   * Get heatmap card subtitle based on granularity
-   */
-  const heatmapSubtitle = useMemo(() => {
-    switch (granularity) {
-      case 'window':
-        return 'Click on any day to view hourly breakdown';
-      case 'day':
-        return 'Click on any hour to view epochs';
-      case 'hour':
-        return 'Click on any epoch to view slots';
-      case 'epoch':
-        return 'Click on any slot to view blobs';
-      case 'slot':
-        return 'Detailed blob-level availability data';
-      default:
-        return '';
-    }
-  }, [granularity]);
+  }, [currentLevel]);
 
   if (error) {
     return (
       <Container>
-        <Header
-          title="Custody"
-          description="PeerDAS data availability visualization showing column custody across validators"
-        />
         <div className="rounded-sm border border-danger/20 bg-danger/10 p-4 text-danger">
           Error loading data: {error instanceof Error ? error.message : 'Unknown error'}
         </div>
@@ -716,121 +955,195 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      <Header
-        title="Custody"
-        description="PeerDAS data availability visualization showing column custody across validators"
-      />
-
-      {/* Breadcrumb navigation and controls */}
-      <div className="mb-6 flex items-center justify-between gap-4">
-        {/* Breadcrumbs - always visible */}
-        <nav className="flex items-center gap-2 text-sm/6">
-          {breadcrumbs.map((crumb, index) => (
-            <div key={index} className="flex items-center gap-2">
-              {index > 0 && <span className="text-muted">/</span>}
-              <button
-                type="button"
-                onClick={crumb.onClick}
-                className={
-                  index === breadcrumbs.length - 1
-                    ? 'font-semibold text-foreground'
-                    : 'text-accent transition-colors hover:text-accent/80'
-                }
+      {/* Header with Learn More */}
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <Header
+          title="Custody Compliance"
+          description={
+            <>
+              Are peers actually storing the data they claim? Powered by{' '}
+              <a
+                href="https://github.com/ethp2p/dasmon"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
               >
-                {crumb.label}
-              </button>
-            </div>
-          ))}
-        </nav>
-
-        {/* View mode toggle and timezone toggle */}
-        <div className="flex items-center gap-4">
-          <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
-          <TimezoneToggle size="compact" />
-        </div>
+                Dasmon
+              </a>
+            </>
+          }
+          className="mb-0"
+        />
+        <button
+          type="button"
+          onClick={() => setLearnMoreOpen(true)}
+          className="mt-1 inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-all hover:border-primary/50 hover:bg-primary/20"
+        >
+          <InformationCircleIcon className="size-4" />
+          Learn more
+        </button>
       </div>
 
-      {/* Loading state - show while determining initial view OR while loading data */}
-      {isLoading || (forkViewLoading && !hasPerformedInitialNav && currentLevel.type === 'window') ? (
-        <DataAvailabilitySkeleton />
-      ) : (
-        <div className="space-y-6">
-          {/* Summary stats */}
-          <Stats
-            stats={[
-              {
-                id: 'periods',
-                name: periodLabel,
-                value: summaryStats.totalPeriods.toLocaleString(),
-                icon: ChartBarIcon,
-              },
-              {
-                id: 'columns',
-                name: 'Active Columns',
-                value: `${summaryStats.activeColumns} / ${TOTAL_COLUMNS}`,
-                icon: TableCellsIcon,
-              },
-              {
-                id: 'availability',
-                name: 'Avg Availability',
-                value: `${(summaryStats.avgAvailability * 100).toFixed(1)}%`,
-                icon: CheckCircleIcon,
-              },
-              {
-                id: 'response',
-                name: 'Avg Response Time',
-                value: summaryStats.avgResponseTime > 0 ? `${summaryStats.avgResponseTime.toFixed(0)}ms` : 'N/A',
-                icon: ClockIcon,
-              },
-            ]}
-          />
+      {/* Learn More Dialog */}
+      <Dialog open={learnMoreOpen} onClose={() => setLearnMoreOpen(false)} title="About PeerDAS Custody" size="lg">
+        <div className="space-y-4 text-sm leading-relaxed text-muted">
+          <p>
+            <span className="font-medium text-foreground">
+              PeerDAS transforms Ethereum&apos;s data availability layer.
+            </span>{' '}
+            Instead of every node storing every blob, data is erasure coded with 2x redundancy and split into 128
+            columns. Each node commits to storing a subset based on its identity and validator balance.
+          </p>
+          <p>
+            64 distinct columns are required to reconstruct the full blob matrix, enabling dramatic scalability
+            improvements while maintaining the network&apos;s security guarantees.
+          </p>
+          <div className="rounded-sm border border-accent/20 bg-accent/5 p-3">
+            <p className="text-foreground">
+              <span className="font-medium">This dashboard answers a critical question:</span>{' '}
+              <span className="italic">are peers actually storing the data they claim?</span>
+            </p>
+          </div>
+          <p>
+            To answer this, we continuously sample nodes in the network, validate their responses against KZG
+            commitments, and build a real-time picture of custody compliance across all 128 columns.
+          </p>
+        </div>
+      </Dialog>
 
-          {/* Heatmap */}
-          <PopoutCard title={heatmapTitle} subtitle={heatmapSubtitle} modalSize="fullscreen" allowContentOverflow>
-            <div className="space-y-6">
-              {/* Filters and Legend on same line */}
-              <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-start">
-                <div className="w-full lg:flex-[2]">
-                  <DataAvailabilityFilterPanel
-                    filters={filters}
-                    onFiltersChange={setFilters}
-                    defaultOpen={false}
-                    viewMode={viewMode}
-                    threshold={threshold}
-                    onThresholdChange={handleThresholdChange}
-                  />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
+        {/* Main Content: Heatmap (3/4 width) */}
+        <div className="lg:col-span-3">
+          <div className="bg-card text-card-foreground overflow-hidden rounded-lg border border-border shadow-sm">
+            {/* Header with Level Title */}
+            <div className="border-b border-border bg-muted/20 px-4 py-3">
+              <div className="flex items-start justify-between gap-4">
+                {/* Level Title */}
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">
+                    {getLevelTitle(currentLevel, timezone).main}
+                  </h2>
+                  <p className="text-sm text-muted">{getLevelTitle(currentLevel, timezone).sub}</p>
                 </div>
-                <div className="w-full lg:flex-1">
-                  <DataAvailabilityLegend granularity={granularity} viewMode={viewMode} threshold={threshold} />
+
+                {/* Controls */}
+                <div className="flex shrink-0 items-center gap-2">
+                  {/* Detail page links */}
+                  {currentLevel.type === 'epoch' && (
+                    <Link
+                      to="/ethereum/epochs/$epoch"
+                      params={{ epoch: String(currentLevel.epoch) }}
+                      className="flex items-center gap-1.5 rounded-sm border border-accent/30 bg-accent/10 px-2.5 py-1.5 text-xs font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
+                    >
+                      <CubeIcon className="size-3.5" />
+                      <span>Epoch Deep Dive</span>
+                      <ArrowTopRightOnSquareIcon className="size-3" />
+                    </Link>
+                  )}
+                  {currentLevel.type === 'slot' && (
+                    <Link
+                      to="/ethereum/slots/$slot"
+                      params={{ slot: String(currentLevel.slot) }}
+                      className="flex items-center gap-1.5 rounded-sm border border-accent/30 bg-accent/10 px-2.5 py-1.5 text-xs font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
+                    >
+                      <Square2StackIcon className="size-3.5" />
+                      <span>Slot Deep Dive</span>
+                      <ArrowTopRightOnSquareIcon className="size-3" />
+                    </Link>
+                  )}
+                  <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
+                  <TimezoneToggle size="compact" />
                 </div>
               </div>
+            </div>
 
-              {/* Heatmap with horizontal scroll */}
-              <div className="-mt-24 overflow-x-auto pt-24 pb-4">
+            {/* Breadcrumb Navigation */}
+            {breadcrumbs.length > 1 && (
+              <div className="flex items-center gap-2 border-b border-border px-4 py-2">
+                <span className="text-xs font-medium tracking-wide text-muted uppercase">Navigate:</span>
+                <nav className="flex items-center gap-1 text-sm">
+                  {breadcrumbs.slice(0, -1).map((crumb, index) => {
+                    const Icon = crumb.icon;
+                    return (
+                      <div key={index} className="flex items-center">
+                        {index > 0 && <ChevronRightIcon className="mx-1 size-3 text-muted" />}
+                        <button
+                          type="button"
+                          onClick={crumb.onClick}
+                          className="group flex items-center gap-1.5 rounded-sm px-2 py-1 text-muted transition-all hover:bg-accent/10 hover:text-accent"
+                        >
+                          <Icon className="size-3.5 opacity-60 group-hover:opacity-100" />
+                          <span className="underline decoration-muted/50 underline-offset-2 group-hover:decoration-accent">
+                            {crumb.label}
+                          </span>
+                        </button>
+                      </div>
+                    );
+                  })}
+                </nav>
+
+                <div className="flex-1" />
+
+                {/* Back button */}
+                <button
+                  type="button"
+                  onClick={breadcrumbs[breadcrumbs.length - 2].onClick}
+                  className="group flex items-center gap-1.5 rounded-sm bg-muted/30 px-2.5 py-1.5 text-xs font-medium text-muted transition-all hover:bg-accent/10 hover:text-accent"
+                >
+                  <ArrowLeftIcon className="size-3.5" />
+                  <span>Back</span>
+                </button>
+              </div>
+            )}
+
+            {/* Legend Strip */}
+            <div className="border-b border-border bg-muted/30 px-4 py-2">
+              <DataAvailabilityLegend
+                granularity={granularity}
+                viewMode={viewMode}
+                threshold={threshold}
+                orientation="horizontal"
+              />
+            </div>
+
+            {/* Heatmap Area */}
+            <div className="p-4">
+              {isLoading || (forkViewLoading && !hasPerformedInitialNav && currentLevel.type === 'window') ? (
+                <DataAvailabilitySkeleton />
+              ) : (
                 <DataAvailabilityHeatmap
                   rows={rows}
                   granularity={granularity}
                   filters={filters}
                   viewMode={viewMode}
                   threshold={threshold}
-                  selectedColumnIndex={selectedColumnIndex}
-                  onCellClick={handleCellClick}
                   onRowClick={currentLevel.type !== 'slot' ? handleRowClick : undefined}
-                  onClearColumnSelection={() =>
-                    navigate({
-                      search: prev => ({ ...prev, column: undefined }),
-                    })
-                  }
-                  onBack={breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2].onClick : undefined}
-                  cellSize="xs"
+                  onCellClick={handleCellClick}
+                  onColumnClick={handleColumnClick}
+                  cellSize="3xs"
                   showColumnHeader
                   showLegend={false}
                 />
-              </div>
+              )}
             </div>
-          </PopoutCard>
+          </div>
         </div>
-      )}
+
+        {/* Sidebar: Live Probes (1/4 width) */}
+        <div className="lg:col-span-1">
+          <div className="sticky top-4 space-y-4">
+            <LiveProbeEvents context={probeFilterContext} probesLinkParams={probesLinkParams} />
+          </div>
+        </div>
+      </div>
+
+      {/* Cell Probe Dialog */}
+      <CellProbeDialog
+        isOpen={cellDialogOpen}
+        onClose={handleCellDialogClose}
+        cellContext={cellContext}
+        timeRangeContext={timeRangeContext}
+      />
     </Container>
   );
 }

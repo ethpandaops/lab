@@ -9,6 +9,18 @@ import type {
   AdminCbtIncrementalServiceListData,
   AdminCbtIncrementalServiceListErrors,
   AdminCbtIncrementalServiceListResponses,
+  AdminCbtScheduledServiceGetData,
+  AdminCbtScheduledServiceGetErrors,
+  AdminCbtScheduledServiceGetResponses,
+  AdminCbtScheduledServiceListData,
+  AdminCbtScheduledServiceListErrors,
+  AdminCbtScheduledServiceListResponses,
+  DimBlockBlobSubmitterServiceGetData,
+  DimBlockBlobSubmitterServiceGetErrors,
+  DimBlockBlobSubmitterServiceGetResponses,
+  DimBlockBlobSubmitterServiceListData,
+  DimBlockBlobSubmitterServiceListErrors,
+  DimBlockBlobSubmitterServiceListResponses,
   DimBlockCanonicalServiceGetData,
   DimBlockCanonicalServiceGetErrors,
   DimBlockCanonicalServiceGetResponses,
@@ -309,12 +321,32 @@ import type {
   IntBlockProposerCanonicalServiceListData,
   IntBlockProposerCanonicalServiceListErrors,
   IntBlockProposerCanonicalServiceListResponses,
+  IntCustodyProbeOrderBySlotServiceGetData,
+  IntCustodyProbeOrderBySlotServiceGetErrors,
+  IntCustodyProbeOrderBySlotServiceGetResponses,
+  IntCustodyProbeOrderBySlotServiceListData,
+  IntCustodyProbeOrderBySlotServiceListErrors,
+  IntCustodyProbeOrderBySlotServiceListResponses,
+  IntCustodyProbeServiceGetData,
+  IntCustodyProbeServiceGetErrors,
+  IntCustodyProbeServiceGetResponses,
+  IntCustodyProbeServiceListData,
+  IntCustodyProbeServiceListErrors,
+  IntCustodyProbeServiceListResponses,
 } from './types.gen';
 import {
   zAdminCbtIncrementalServiceGetData,
   zAdminCbtIncrementalServiceGetResponse,
   zAdminCbtIncrementalServiceListData,
   zAdminCbtIncrementalServiceListResponse,
+  zAdminCbtScheduledServiceGetData,
+  zAdminCbtScheduledServiceGetResponse,
+  zAdminCbtScheduledServiceListData,
+  zAdminCbtScheduledServiceListResponse,
+  zDimBlockBlobSubmitterServiceGetData,
+  zDimBlockBlobSubmitterServiceGetResponse,
+  zDimBlockBlobSubmitterServiceListData,
+  zDimBlockBlobSubmitterServiceListResponse,
   zDimBlockCanonicalServiceGetData,
   zDimBlockCanonicalServiceGetResponse,
   zDimBlockCanonicalServiceListData,
@@ -515,6 +547,14 @@ import {
   zIntBlockProposerCanonicalServiceGetResponse,
   zIntBlockProposerCanonicalServiceListData,
   zIntBlockProposerCanonicalServiceListResponse,
+  zIntCustodyProbeOrderBySlotServiceGetData,
+  zIntCustodyProbeOrderBySlotServiceGetResponse,
+  zIntCustodyProbeOrderBySlotServiceListData,
+  zIntCustodyProbeOrderBySlotServiceListResponse,
+  zIntCustodyProbeServiceGetData,
+  zIntCustodyProbeServiceGetResponse,
+  zIntCustodyProbeServiceListData,
+  zIntCustodyProbeServiceListResponse,
 } from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<
@@ -570,6 +610,86 @@ export const adminCbtIncrementalServiceGet = <ThrowOnError extends boolean = fal
     requestValidator: async data => await zAdminCbtIncrementalServiceGetData.parseAsync(data),
     responseValidator: async data => await zAdminCbtIncrementalServiceGetResponse.parseAsync(data),
     url: '/api/v1/admin_cbt_incremental/{database}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const adminCbtScheduledServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<AdminCbtScheduledServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    AdminCbtScheduledServiceListResponses,
+    AdminCbtScheduledServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zAdminCbtScheduledServiceListData.parseAsync(data),
+    responseValidator: async data => await zAdminCbtScheduledServiceListResponse.parseAsync(data),
+    url: '/api/v1/admin_cbt_scheduled',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by database
+ */
+export const adminCbtScheduledServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<AdminCbtScheduledServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    AdminCbtScheduledServiceGetResponses,
+    AdminCbtScheduledServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zAdminCbtScheduledServiceGetData.parseAsync(data),
+    responseValidator: async data => await zAdminCbtScheduledServiceGetResponse.parseAsync(data),
+    url: '/api/v1/admin_cbt_scheduled/{database}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimBlockBlobSubmitterServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<DimBlockBlobSubmitterServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    DimBlockBlobSubmitterServiceListResponses,
+    DimBlockBlobSubmitterServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zDimBlockBlobSubmitterServiceListData.parseAsync(data),
+    responseValidator: async data => await zDimBlockBlobSubmitterServiceListResponse.parseAsync(data),
+    url: '/api/v1/dim_block_blob_submitter',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const dimBlockBlobSubmitterServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<DimBlockBlobSubmitterServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    DimBlockBlobSubmitterServiceGetResponses,
+    DimBlockBlobSubmitterServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zDimBlockBlobSubmitterServiceGetData.parseAsync(data),
+    responseValidator: async data => await zDimBlockBlobSubmitterServiceGetResponse.parseAsync(data),
+    url: '/api/v1/dim_block_blob_submitter/{block_number}',
     ...options,
   });
 };
@@ -2549,6 +2669,86 @@ export const intBlockProposerCanonicalServiceGet = <ThrowOnError extends boolean
     requestValidator: async data => await zIntBlockProposerCanonicalServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntBlockProposerCanonicalServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_block_proposer_canonical/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intCustodyProbeServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntCustodyProbeServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntCustodyProbeServiceListResponses,
+    IntCustodyProbeServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntCustodyProbeServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntCustodyProbeServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_custody_probe',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by probe_date_time
+ */
+export const intCustodyProbeServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntCustodyProbeServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntCustodyProbeServiceGetResponses,
+    IntCustodyProbeServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntCustodyProbeServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntCustodyProbeServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_custody_probe/{probe_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intCustodyProbeOrderBySlotServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntCustodyProbeOrderBySlotServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntCustodyProbeOrderBySlotServiceListResponses,
+    IntCustodyProbeOrderBySlotServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntCustodyProbeOrderBySlotServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntCustodyProbeOrderBySlotServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_custody_probe_order_by_slot',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intCustodyProbeOrderBySlotServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntCustodyProbeOrderBySlotServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntCustodyProbeOrderBySlotServiceGetResponses,
+    IntCustodyProbeOrderBySlotServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntCustodyProbeOrderBySlotServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntCustodyProbeOrderBySlotServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_custody_probe_order_by_slot/{slot_start_date_time}',
     ...options,
   });
 };
