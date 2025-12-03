@@ -2,7 +2,7 @@ import type React from 'react';
 import { memo, useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
-import type { Map2DChartProps, PointData } from './Map2D.types';
+import type { Map2DChartProps, PointData, PointNodeData } from './Map2D.types';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
 /**
@@ -20,6 +20,12 @@ import { useThemeColors } from '@/hooks/useThemeColors';
  * />
  * ```
  */
+/** Hovered point data for the info panel */
+interface HoveredPointInfo {
+  name: string;
+  nodes: PointNodeData[];
+}
+
 function Map2DChartComponent({
   routes = [],
   points = [],
@@ -34,6 +40,7 @@ function Map2DChartComponent({
 }: Map2DChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [hoveredPoint, setHoveredPoint] = useState<HoveredPointInfo | null>(null);
   const chartRef = useRef<ReactECharts | null>(null);
   const allSeenPointsRef = useRef<Map<string, PointData>>(new Map());
   const previousResetKeyRef = useRef(resetKey);
@@ -212,6 +219,7 @@ function Map2DChartComponent({
     const pointData = allPoints.map(point => ({
       name: point.name,
       value: [...point.coords, point.value || 1],
+      nodes: point.nodes,
     }));
 
     // Use cached scatter series index (routes don't change after init)
@@ -280,30 +288,7 @@ function Map2DChartComponent({
       backgroundColor: 'transparent',
       animation: false, // Disable animation for progressive updates
       tooltip: {
-        show: true,
-        trigger: 'item',
-        backgroundColor: `${themeColors.surface}f0`, // f0 = ~94% opacity in hex
-        borderColor: themeColors.border,
-        borderWidth: 1,
-        textStyle: {
-          color: themeColors.foreground,
-        },
-        formatter: (params: Record<string, unknown>) => {
-          const seriesType = params.seriesType as string | undefined;
-          const data = params.data as Record<string, unknown> | undefined;
-          const name = params.name as string | undefined;
-
-          if (seriesType === 'scatter' && data) {
-            const pointName = (data.name as string) || 'Unknown';
-            const valueArray = data.value as number[] | undefined;
-            const value = valueArray?.[2] ?? (data.value as number) ?? 0;
-            return `<strong>${pointName}</strong><br/>Nodes: ${value}`;
-          }
-          if (seriesType === 'lines' && data) {
-            return (data.name as string) || 'Route';
-          }
-          return name || '';
-        },
+        show: false, // Disabled - using custom hover panel instead
       },
       title: title
         ? {
@@ -344,9 +329,103 @@ function Map2DChartComponent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapLoaded]); // Only recalculate when map loads - after that we update via setOption
 
+  // Handle chart events for hover panel
+  const onEvents = useMemo(
+    () => ({
+      mouseover: (params: {
+        componentType?: string;
+        seriesType?: string;
+        name?: string;
+        data?: { name?: string; nodes?: PointNodeData[] };
+      }) => {
+        // Handle scatter point hover (city-level)
+        if (params.componentType === 'series' && params.seriesType === 'scatter' && params.data) {
+          const { name, nodes } = params.data;
+          if (nodes && nodes.length > 0) {
+            setHoveredPoint({ name: name || 'Unknown', nodes });
+          }
+          return;
+        }
+
+        // Handle geo region hover (country-level)
+        if (params.componentType === 'geo' && params.name) {
+          const countryName = params.name;
+          // Aggregate all nodes from all points that match this country
+          const allPoints = Array.from(allSeenPointsRef.current.values());
+          const countryNodes: PointNodeData[] = [];
+
+          for (const point of allPoints) {
+            if (point.nodes) {
+              for (const node of point.nodes) {
+                if (node.country === countryName) {
+                  countryNodes.push(node);
+                }
+              }
+            }
+          }
+
+          if (countryNodes.length > 0) {
+            // Sort by timing
+            countryNodes.sort((a, b) => a.timing - b.timing);
+            setHoveredPoint({ name: countryName, nodes: countryNodes });
+          }
+        }
+      },
+      mouseout: (params: { componentType?: string; seriesType?: string }) => {
+        if ((params.componentType === 'series' && params.seriesType === 'scatter') || params.componentType === 'geo') {
+          setHoveredPoint(null);
+        }
+      },
+    }),
+    []
+  );
+
+  // Format timing value for display
+  const formatTiming = (timing: number): string => {
+    return timing >= 1000 ? `${(timing / 1000).toFixed(2)}s` : `${timing}ms`;
+  };
+
   // Always render the map container
   return (
     <div className="relative h-full w-full">
+      {/* Fixed hover panel at top */}
+      {hoveredPoint && (
+        <div className="pointer-events-none absolute top-3 left-1/2 z-10 -translate-x-1/2">
+          <div className="rounded-lg border border-border bg-surface/95 px-4 py-3 shadow-lg backdrop-blur-sm">
+            <div className="mb-2 border-b border-border pb-2 text-center">
+              <span className="text-sm font-semibold text-foreground">{hoveredPoint.name}</span>
+              <span className="ml-2 text-xs text-muted">({hoveredPoint.nodes.length} nodes)</span>
+            </div>
+            <div className="max-h-64 overflow-y-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-muted">
+                    <th className="pr-4 pb-1 text-left font-medium">Node ID</th>
+                    <th className="pr-4 pb-1 text-left font-medium">Username</th>
+                    <th className="pr-4 pb-1 text-left font-medium">Client</th>
+                    <th className="pb-1 text-right font-medium">Timing</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {hoveredPoint.nodes.map((node, idx) => (
+                    <tr key={`${node.nodeId}-${idx}`} className="text-foreground">
+                      <td className="max-w-[180px] truncate py-0.5 pr-4 font-mono text-[11px] opacity-80">
+                        {node.nodeId}
+                      </td>
+                      <td className="py-0.5 pr-4">{node.username || <span className="text-muted">—</span>}</td>
+                      <td className="py-0.5 pr-4 capitalize">{node.client || <span className="text-muted">—</span>}</td>
+                      <td className="py-0.5 text-right font-mono whitespace-nowrap opacity-80">
+                        {formatTiming(node.timing)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
       <ReactECharts
         ref={chartRef}
         option={option}
@@ -354,6 +433,7 @@ function Map2DChartComponent({
         notMerge={false}
         lazyUpdate={true}
         opts={chartOpts}
+        onEvents={onEvents}
       />
       <div className="pointer-events-none absolute bottom-2 left-2 rounded bg-surface/90 px-2 py-1 text-xs text-muted backdrop-blur-sm">
         Data from nodes contributing to Xatu • Not representative of actual Ethereum network distribution
