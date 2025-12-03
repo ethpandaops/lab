@@ -109,31 +109,40 @@ export function GridHeatmap<T = unknown>({
   // For 3xs, calculate grid columns based on actual column count
   const gridStyle = cellSize === '3xs' ? { gridTemplateColumns: `repeat(${columnIndices.length}, 1fr)` } : undefined;
 
-  // Default column label renderer
+  // Default column label renderer - shows 0-127 (raw column indices)
+  // Labels at 0, 16, 32, etc. are always visible; others appear on hover
   const defaultRenderColumnLabel = (colIndex: number, isHovered: boolean): React.JSX.Element => {
-    const displayIndex = colIndex + 1;
-    const showLabel = displayIndex % 16 === 0 || colIndex === 0 || isHovered;
+    const isAlwaysVisible = colIndex % 16 === 0;
     const isClickable = !!onColumnClick;
 
     return (
-      <button
+      <div
         key={colIndex}
-        type="button"
+        role={isClickable ? 'button' : undefined}
+        tabIndex={isClickable ? 0 : undefined}
         onClick={isClickable ? () => onColumnClick(colIndex) : undefined}
+        onKeyDown={
+          isClickable
+            ? e => {
+                if (e.key === 'Enter' || e.key === ' ') onColumnClick(colIndex);
+              }
+            : undefined
+        }
         onMouseEnter={() => setHoveredColumn(colIndex)}
         onMouseLeave={() => setHoveredColumn(null)}
-        disabled={!isClickable}
         className={clsx(
           cellSizeClass[cellSize],
           textSize[cellSize],
-          'text-center transition-colors',
+          'text-center transition-all',
+          // Always visible labels (0, 16, 32, etc.) or hovered labels
+          isAlwaysVisible || isHovered ? 'opacity-100' : 'opacity-0 hover:opacity-100',
           isHovered ? 'font-bold text-accent' : 'text-muted',
           isClickable && 'cursor-pointer hover:text-accent'
         )}
-        title={isClickable ? `View probes for column ${displayIndex}` : `Column ${displayIndex}`}
+        title={isClickable ? `View probes for column ${colIndex}` : `Column ${colIndex}`}
       >
-        {showLabel ? displayIndex : ''}
-      </button>
+        {colIndex}
+      </div>
     );
   };
 

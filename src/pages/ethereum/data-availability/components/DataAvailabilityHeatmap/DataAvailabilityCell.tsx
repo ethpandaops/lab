@@ -89,7 +89,8 @@ export const DataAvailabilityCell = ({
       : getPercentageColor(data.availability, hasData);
 
   const availabilityPercent = (data.availability * 100).toFixed(1);
-  const displayColumnIndex = data.columnIndex + 1;
+  // Use raw column index (0-127) to match column labels
+  const displayColumnIndex = data.columnIndex;
 
   // Determine response time label based on granularity
   // Slot/Blob levels use p50 (median), aggregated levels use avg p50
