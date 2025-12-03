@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { FctBlockFirstSeenByNode } from '@/api/types.gen';
-import type { PointData } from '@/components/Charts/Map/Map.types';
+import type { PointData, PointNodeData } from '@/components/Charts/Map2D/Map2D.types';
 
 export interface MapPointWithTiming extends PointData {
   earliestSeenTime: number; // Earliest seen_slot_start_diff for this city group
@@ -36,11 +36,23 @@ export function useMapData(nodes: FctBlockFirstSeenByNode[]): MapPointWithTiming
         const lon = node.meta_client_geo_longitude;
         const lat = node.meta_client_geo_latitude;
 
+        // Build node data for hover display, sorted by timing
+        const nodes: PointNodeData[] = cityNodes
+          .map(n => ({
+            nodeId: n.node_id ?? 'unknown',
+            username: n.username,
+            timing: n.seen_slot_start_diff ?? 0,
+            client: n.meta_consensus_implementation,
+            country: n.meta_client_geo_country,
+          }))
+          .sort((a, b) => a.timing - b.timing);
+
         return {
           name,
           coords: [lon ?? null, lat ?? null] as [number | null, number | null],
           value: cityNodes.length, // Number of nodes at this location
           earliestSeenTime: earliestSeenTime === Infinity ? 0 : earliestSeenTime,
+          nodes,
         };
       })
       .filter(point => {
