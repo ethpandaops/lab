@@ -90,6 +90,40 @@ function CopyableBadge({
 }
 
 /**
+ * Clickable cell value for filtering in the Client Details table
+ */
+function FilterableValue({
+  value,
+  displayValue,
+  field,
+  onFilter,
+  className,
+  children,
+}: {
+  value: string | number | undefined | null;
+  displayValue?: string;
+  field: string;
+  onFilter?: (field: string, value: string | number) => void;
+  className?: string;
+  children?: React.ReactNode;
+}): JSX.Element {
+  if (!value || !onFilter) {
+    return <span className={className}>{children || displayValue || value || '-'}</span>;
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => onFilter(field, value)}
+      className={clsx('cursor-pointer transition-colors hover:text-primary hover:underline', className)}
+      title={`Filter by ${displayValue || value}`}
+    >
+      {children || displayValue || value}
+    </button>
+  );
+}
+
+/**
  * Shared probe detail dialog component
  * Used by both ProbesView and CellProbeDialog for consistent probe details display
  */
@@ -102,12 +136,29 @@ export function ProbeDetailDialog({
   const { currentNetwork } = useNetwork();
   const [linkCopied, setLinkCopied] = useState(false);
 
-  // Handle copy link
+  // Handle copy link - construct a proper shareable URL to the probes page
   const handleCopyLink = useCallback(() => {
-    navigator.clipboard.writeText(window.location.href);
+    if (!probe) return;
+
+    // Build URL to probes page with probe identification params
+    const url = new URL('/ethereum/data-availability/probes/', window.location.origin);
+
+    // Include network param if not mainnet (mainnet is the default)
+    if (currentNetwork && currentNetwork.name !== 'mainnet') {
+      url.searchParams.set('network', currentNetwork.name);
+    }
+
+    if (probe.probe_date_time !== undefined) {
+      url.searchParams.set('probeTime', String(probe.probe_date_time));
+    }
+    if (probe.peer_id_unique_key !== undefined) {
+      url.searchParams.set('probePeerId', String(probe.peer_id_unique_key));
+    }
+
+    navigator.clipboard.writeText(url.toString());
     setLinkCopied(true);
     setTimeout(() => setLinkCopied(false), 2000);
-  }, []);
+  }, [probe, currentNetwork]);
 
   // Handle filter and close
   const handleFilterAndClose = useCallback(
@@ -203,8 +254,8 @@ export function ProbeDetailDialog({
                       : 'Uncertain if these blob publishers are being secured by this peer'}
                 </span>
               </div>
-              {/* Reassuring link - always shown */}
-              {probe.slot !== undefined && (
+              {/* Reassuring link - only show for failure/missing */}
+              {probe.slot !== undefined && probe.result !== 'success' && (
                 <div className="flex items-center gap-1.5 text-xs text-muted">
                   <span>This is just one probe.</span>
                   <Link
@@ -277,7 +328,7 @@ export function ProbeDetailDialog({
 
             {/* Slot age indicator */}
             {currentNetwork && probe.probe_date_time && (
-              <div className="mt-3 flex items-center gap-2 rounded border border-border/50 bg-muted/30 px-3 py-2 text-sm text-muted">
+              <div className="mt-3 flex items-center gap-2 rounded border border-border bg-background px-3 py-2 text-sm text-muted">
                 <CalendarDaysIcon className="size-4" />
                 <span>
                   Requested data from a slot{' '}
@@ -398,6 +449,7 @@ export function ProbeDetailDialog({
           <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
             <CpuChipIcon className="size-4 text-primary" />
             Client Details
+            {onFilterClick && <span className="text-[10px] font-normal text-muted normal-case">(click to filter)</span>}
           </h4>
 
           <div className="overflow-hidden rounded-lg border border-border">
@@ -415,63 +467,137 @@ export function ProbeDetailDialog({
                   <td className="px-2 py-1">
                     <div className="flex items-center gap-1.5">
                       <ClientLogo client={probe.meta_client_implementation || 'Unknown'} size={16} />
-                      <span className="font-medium">{probe.meta_client_implementation || '-'}</span>
+                      <FilterableValue
+                        value={probe.meta_client_implementation}
+                        field="meta_client_implementation"
+                        onFilter={onFilterClick ? handleFilterAndClose : undefined}
+                        className="font-medium"
+                      />
                     </div>
                   </td>
                   <td className="px-2 py-1">
                     <div className="flex items-center gap-1.5">
                       <ClientLogo client={probe.meta_peer_implementation || 'Unknown'} size={16} />
-                      <span className="font-medium">{probe.meta_peer_implementation || '-'}</span>
+                      <FilterableValue
+                        value={probe.meta_peer_implementation}
+                        field="meta_peer_implementation"
+                        onFilter={onFilterClick ? handleFilterAndClose : undefined}
+                        className="font-medium"
+                      />
                     </div>
                   </td>
                 </tr>
                 <tr>
                   <td className="px-2 py-1 font-medium text-muted">Node ID</td>
-                  <td className="px-2 py-1 font-mono text-[10px]">{probe.node_id || '-'}</td>
+                  <td className="px-2 py-1">
+                    <FilterableValue
+                      value={probe.node_id}
+                      field="node_id"
+                      onFilter={onFilterClick ? handleFilterAndClose : undefined}
+                      className="font-mono text-[10px]"
+                    />
+                  </td>
                   <td className="px-2 py-1 text-muted">-</td>
                 </tr>
                 <tr className="bg-card/30">
                   <td className="px-2 py-1 font-medium text-muted">Version</td>
-                  <td className="px-2 py-1 font-mono text-[10px]">{probe.meta_client_version || '-'}</td>
-                  <td className="px-2 py-1 font-mono text-[10px]">{probe.meta_peer_version || '-'}</td>
+                  <td className="px-2 py-1">
+                    <FilterableValue
+                      value={probe.meta_client_version}
+                      field="meta_client_version"
+                      onFilter={onFilterClick ? handleFilterAndClose : undefined}
+                      className="font-mono text-[10px]"
+                    />
+                  </td>
+                  <td className="px-2 py-1">
+                    <FilterableValue
+                      value={probe.meta_peer_version}
+                      field="meta_peer_version"
+                      onFilter={onFilterClick ? handleFilterAndClose : undefined}
+                      className="font-mono text-[10px]"
+                    />
+                  </td>
                 </tr>
                 <tr>
                   <td className="px-2 py-1 font-medium text-muted">Country</td>
                   <td className="px-2 py-1">
                     <div className="flex items-center gap-1.5">
                       <span>{getCountryFlag(probe.meta_client_geo_country_code)}</span>
-                      <span>{probe.meta_client_geo_country || '-'}</span>
+                      <FilterableValue
+                        value={probe.meta_client_geo_country}
+                        field="meta_client_geo_country"
+                        onFilter={onFilterClick ? handleFilterAndClose : undefined}
+                      />
                     </div>
                   </td>
                   <td className="px-2 py-1">
                     <div className="flex items-center gap-1.5">
                       <span>{getCountryFlag(probe.meta_peer_geo_country_code)}</span>
-                      <span>{probe.meta_peer_geo_country || '-'}</span>
+                      <FilterableValue
+                        value={probe.meta_peer_geo_country}
+                        field="meta_peer_geo_country"
+                        onFilter={onFilterClick ? handleFilterAndClose : undefined}
+                      />
                     </div>
                   </td>
                 </tr>
                 <tr className="bg-card/30">
                   <td className="px-2 py-1 font-medium text-muted">City</td>
-                  <td className="px-2 py-1">{probe.meta_client_geo_city || '-'}</td>
-                  <td className="px-2 py-1">{probe.meta_peer_geo_city || '-'}</td>
+                  <td className="px-2 py-1">
+                    <FilterableValue
+                      value={probe.meta_client_geo_city}
+                      field="meta_client_geo_city"
+                      onFilter={onFilterClick ? handleFilterAndClose : undefined}
+                    />
+                  </td>
+                  <td className="px-2 py-1">
+                    <FilterableValue
+                      value={probe.meta_peer_geo_city}
+                      field="meta_peer_geo_city"
+                      onFilter={onFilterClick ? handleFilterAndClose : undefined}
+                    />
+                  </td>
                 </tr>
                 <tr>
                   <td className="px-2 py-1 font-medium text-muted">ASN</td>
-                  <td className="px-2 py-1 font-mono text-[10px]">
-                    {probe.meta_client_geo_autonomous_system_number
-                      ? `AS${probe.meta_client_geo_autonomous_system_number}`
-                      : '-'}
+                  <td className="px-2 py-1">
+                    <FilterableValue
+                      value={probe.meta_client_geo_autonomous_system_number}
+                      displayValue={
+                        probe.meta_client_geo_autonomous_system_number
+                          ? `AS${probe.meta_client_geo_autonomous_system_number}`
+                          : undefined
+                      }
+                      field="meta_client_geo_autonomous_system_number"
+                      onFilter={onFilterClick ? handleFilterAndClose : undefined}
+                      className="font-mono text-[10px]"
+                    />
                   </td>
-                  <td className="px-2 py-1 font-mono text-[10px]">
-                    {probe.meta_peer_geo_autonomous_system_number
-                      ? `AS${probe.meta_peer_geo_autonomous_system_number}`
-                      : '-'}
+                  <td className="px-2 py-1">
+                    <FilterableValue
+                      value={probe.meta_peer_geo_autonomous_system_number}
+                      displayValue={
+                        probe.meta_peer_geo_autonomous_system_number
+                          ? `AS${probe.meta_peer_geo_autonomous_system_number}`
+                          : undefined
+                      }
+                      field="meta_peer_geo_autonomous_system_number"
+                      onFilter={onFilterClick ? handleFilterAndClose : undefined}
+                      className="font-mono text-[10px]"
+                    />
                   </td>
                 </tr>
                 <tr className="bg-card/30">
                   <td className="px-2 py-1 font-medium text-muted">Peer ID</td>
                   <td className="px-2 py-1 text-muted">-</td>
-                  <td className="px-2 py-1 font-mono text-[10px]">{probe.peer_id_unique_key || '-'}</td>
+                  <td className="px-2 py-1">
+                    <FilterableValue
+                      value={probe.peer_id_unique_key}
+                      field="peer_id_unique_key"
+                      onFilter={onFilterClick ? handleFilterAndClose : undefined}
+                      className="font-mono text-[10px]"
+                    />
+                  </td>
                 </tr>
               </tbody>
             </table>

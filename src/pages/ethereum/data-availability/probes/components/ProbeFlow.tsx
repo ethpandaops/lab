@@ -36,9 +36,9 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
   const statusBorder = isSuccess ? 'border-green-500/20' : isFailure ? 'border-red-500/20' : 'border-yellow-500/20';
 
   return (
-    <div className="flex items-center justify-center gap-6 px-4 py-6">
+    <div className="flex flex-nowrap items-center justify-center gap-6 px-4 py-6">
       {/* PROBER (Left) */}
-      <div className="flex flex-col items-center gap-2">
+      <div className="flex shrink-0 flex-col items-center gap-2">
         <div className="relative">
           <ClientLogo client={probe.meta_client_implementation || 'Unknown'} size={52} />
           {clientCountryCode && (
@@ -60,7 +60,7 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
       </div>
 
       {/* CONNECTION (Center) */}
-      <div className="flex flex-col items-center justify-center gap-4">
+      <div className="flex min-w-0 flex-col items-center justify-center gap-4">
         {/* Request Flow (Top) */}
         <div className="flex w-full flex-col items-center gap-0.5">
           <span className="font-mono text-xs font-medium text-foreground">
@@ -99,7 +99,7 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
       </div>
 
       {/* PEER (Right) */}
-      <div className="flex flex-col items-center gap-2">
+      <div className="flex shrink-0 flex-col items-center gap-2">
         <div className="relative">
           <ClientLogo client={probe.meta_peer_implementation || 'Unknown'} size={52} />
           {peerCountryCode && (
