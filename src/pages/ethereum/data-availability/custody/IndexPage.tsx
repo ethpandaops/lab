@@ -1,6 +1,6 @@
 import { type JSX, useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useSearch, useNavigate } from '@tanstack/react-router';
+import { useSearch, useNavigate, Link } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
 import { DataAvailabilityHeatmap } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
 import { DataAvailabilityLegend } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityLegend';
@@ -20,7 +20,16 @@ import type { DataAvailabilityFilters } from '@/pages/ethereum/data-availability
 import { useTimezone } from '@/hooks/useTimezone';
 import { useNetwork } from '@/hooks/useNetwork';
 import { formatEpoch, formatSlot } from '@/utils';
-import { ChevronRightIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import {
+  ChevronRightIcon,
+  ArrowLeftIcon,
+  ArrowTopRightOnSquareIcon,
+  Squares2X2Icon,
+  CalendarDaysIcon,
+  ClockIcon,
+  CubeIcon,
+  Square2StackIcon,
+} from '@heroicons/react/24/outline';
 import {
   fctDataColumnAvailabilityDailyServiceListOptions,
   fctDataColumnAvailabilityHourlyServiceListOptions,
@@ -548,12 +557,28 @@ export function IndexPage(): JSX.Element {
       const row = rows.find(r => r.identifier === rowIdentifier);
       const rowLabel = row?.label ?? rowIdentifier;
 
+      // Build parent context from currentLevel for full hierarchy display
+      const parentContext: CellContext['parentContext'] = {};
+      if (currentLevel.type !== 'window') {
+        parentContext.date = currentLevel.date;
+      }
+      if (currentLevel.type !== 'window' && currentLevel.type !== 'day') {
+        parentContext.hourStartDateTime = currentLevel.hourStartDateTime;
+      }
+      if (currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
+        parentContext.epoch = currentLevel.epoch;
+      }
+      if (currentLevel.type === 'slot') {
+        parentContext.slot = currentLevel.slot;
+      }
+
       // Build cell context
       const cellCtx: CellContext = {
         rowIdentifier,
         columnIndex,
         granularity,
         rowLabel,
+        parentContext,
       };
 
       // Build time range context based on granularity
@@ -762,9 +787,14 @@ export function IndexPage(): JSX.Element {
       ...(search.threshold && { threshold: search.threshold }),
     };
 
-    const crumbs: Array<{ label: string; onClick: () => void }> = [
+    const crumbs: Array<{
+      label: string;
+      onClick: () => void;
+      icon: React.ComponentType<{ className?: string }>;
+    }> = [
       {
-        label: `Window (${WINDOW_DAYS} days)`,
+        label: `Window`,
+        icon: Squares2X2Icon,
         onClick: () => {
           navigate({
             search: { ...preservedSettings },
@@ -784,7 +814,11 @@ export function IndexPage(): JSX.Element {
       currentLevel.type === 'slot'
     ) {
       crumbs.push({
-        label: `Day: ${new Date(currentLevel.date).toLocaleDateString('en-US', timezone === 'UTC' ? { timeZone: 'UTC' } : {})}`,
+        label: new Date(currentLevel.date).toLocaleDateString(
+          'en-US',
+          timezone === 'UTC' ? { month: 'short', day: 'numeric', timeZone: 'UTC' } : { month: 'short', day: 'numeric' }
+        ),
+        icon: CalendarDaysIcon,
         onClick: () =>
           navigate({
             search: { ...preservedSettings, date: currentLevel.date },
@@ -796,7 +830,13 @@ export function IndexPage(): JSX.Element {
     // Add hour breadcrumb if we're at hour level or deeper
     if (currentLevel.type === 'hour' || currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
       crumbs.push({
-        label: `Hour: ${new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString('en-US', timezone === 'UTC' ? { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' } : { hour: '2-digit', minute: '2-digit', hour12: false })}`,
+        label: new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString(
+          'en-US',
+          timezone === 'UTC'
+            ? { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }
+            : { hour: '2-digit', minute: '2-digit', hour12: false }
+        ),
+        icon: ClockIcon,
         onClick: () =>
           navigate({
             search: { ...preservedSettings, date: currentLevel.date, hour: currentLevel.hourStartDateTime },
@@ -808,7 +848,8 @@ export function IndexPage(): JSX.Element {
     // Add epoch breadcrumb if we're at epoch level or deeper
     if (currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
       crumbs.push({
-        label: `Epoch: ${formatEpoch(currentLevel.epoch)}`,
+        label: formatEpoch(currentLevel.epoch),
+        icon: CubeIcon,
         onClick: () =>
           navigate({
             search: {
@@ -825,7 +866,8 @@ export function IndexPage(): JSX.Element {
     // Add slot breadcrumb if we're at slot level
     if (currentLevel.type === 'slot') {
       crumbs.push({
-        label: `Slot: ${currentLevel.slot}`,
+        label: formatSlot(currentLevel.slot),
+        icon: Square2StackIcon,
         onClick: () =>
           navigate({
             search: {
@@ -945,6 +987,29 @@ export function IndexPage(): JSX.Element {
 
                 {/* Controls */}
                 <div className="flex shrink-0 items-center gap-2">
+                  {/* Detail page links */}
+                  {currentLevel.type === 'epoch' && (
+                    <Link
+                      to="/ethereum/epochs/$epoch"
+                      params={{ epoch: String(currentLevel.epoch) }}
+                      className="flex items-center gap-1.5 rounded-sm border border-accent/30 bg-accent/10 px-2.5 py-1.5 text-xs font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
+                    >
+                      <CubeIcon className="size-3.5" />
+                      <span>Epoch Deep Dive</span>
+                      <ArrowTopRightOnSquareIcon className="size-3" />
+                    </Link>
+                  )}
+                  {currentLevel.type === 'slot' && (
+                    <Link
+                      to="/ethereum/slots/$slot"
+                      params={{ slot: String(currentLevel.slot) }}
+                      className="flex items-center gap-1.5 rounded-sm border border-accent/30 bg-accent/10 px-2.5 py-1.5 text-xs font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
+                    >
+                      <Square2StackIcon className="size-3.5" />
+                      <span>Slot Deep Dive</span>
+                      <ArrowTopRightOnSquareIcon className="size-3" />
+                    </Link>
+                  )}
                   <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
                   <TimezoneToggle size="compact" />
                 </div>
@@ -956,22 +1021,37 @@ export function IndexPage(): JSX.Element {
               <div className="flex items-center gap-2 border-b border-border px-4 py-2">
                 <span className="text-xs font-medium tracking-wide text-muted uppercase">Navigate:</span>
                 <nav className="flex items-center gap-1 text-sm">
-                  {breadcrumbs.slice(0, -1).map((crumb, index) => (
-                    <div key={index} className="flex items-center">
-                      {index > 0 && <ChevronRightIcon className="mx-1 size-3 text-muted" />}
-                      <button
-                        type="button"
-                        onClick={crumb.onClick}
-                        className="group flex items-center gap-1 rounded-sm px-2 py-1 text-muted transition-all hover:bg-accent/10 hover:text-accent"
-                      >
-                        <ChevronUpIcon className="size-3 opacity-60 group-hover:opacity-100" />
-                        <span className="underline decoration-muted/50 underline-offset-2 group-hover:decoration-accent">
-                          {crumb.label}
-                        </span>
-                      </button>
-                    </div>
-                  ))}
+                  {breadcrumbs.slice(0, -1).map((crumb, index) => {
+                    const Icon = crumb.icon;
+                    return (
+                      <div key={index} className="flex items-center">
+                        {index > 0 && <ChevronRightIcon className="mx-1 size-3 text-muted" />}
+                        <button
+                          type="button"
+                          onClick={crumb.onClick}
+                          className="group flex items-center gap-1.5 rounded-sm px-2 py-1 text-muted transition-all hover:bg-accent/10 hover:text-accent"
+                        >
+                          <Icon className="size-3.5 opacity-60 group-hover:opacity-100" />
+                          <span className="underline decoration-muted/50 underline-offset-2 group-hover:decoration-accent">
+                            {crumb.label}
+                          </span>
+                        </button>
+                      </div>
+                    );
+                  })}
                 </nav>
+
+                <div className="flex-1" />
+
+                {/* Back button */}
+                <button
+                  type="button"
+                  onClick={breadcrumbs[breadcrumbs.length - 2].onClick}
+                  className="group flex items-center gap-1.5 rounded-sm bg-muted/30 px-2.5 py-1.5 text-xs font-medium text-muted transition-all hover:bg-accent/10 hover:text-accent"
+                >
+                  <ArrowLeftIcon className="size-3.5" />
+                  <span>Back</span>
+                </button>
               </div>
             )}
 
@@ -999,7 +1079,6 @@ export function IndexPage(): JSX.Element {
                   onRowClick={currentLevel.type !== 'slot' ? handleRowClick : undefined}
                   onCellClick={handleCellClick}
                   onColumnClick={handleColumnClick}
-                  onBack={breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2].onClick : undefined}
                   cellSize="3xs"
                   showColumnHeader
                   showLegend={false}

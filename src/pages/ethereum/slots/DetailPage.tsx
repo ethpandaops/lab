@@ -1,8 +1,8 @@
 import { type JSX, useEffect } from 'react';
-import { useParams, useNavigate } from '@tanstack/react-router';
+import { useParams, useNavigate, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
-import { ChevronLeftIcon, ChevronRightIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, ChevronRightIcon, QuestionMarkCircleIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
@@ -293,6 +293,25 @@ export function DetailPage(): JSX.Element {
           Previous
         </Button>
         <div className="flex-1" />
+        {currentNetwork &&
+          (() => {
+            const slotTimestamp = slotToTimestamp(slot, currentNetwork.genesis_time);
+            return (
+              <Link
+                to="/ethereum/data-availability/custody"
+                search={{
+                  slot,
+                  epoch,
+                  hour: Math.floor(slotTimestamp / 3600) * 3600,
+                  date: new Date(slotTimestamp * 1000).toISOString().split('T')[0],
+                }}
+                className="flex items-center gap-1.5 rounded-sm border border-accent/30 bg-accent/10 px-3 py-2 text-sm font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
+              >
+                <EyeIcon className="size-4" />
+                <span>View Custody</span>
+              </Link>
+            );
+          })()}
         <Button
           variant="secondary"
           size="sm"

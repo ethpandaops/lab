@@ -19,9 +19,8 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
   const isFailure = probe.result === 'failure';
 
   // Calculate total data requested
-  const hasSlot = probe.slot !== undefined && probe.slot !== null;
   const columnsCount = probe.column_indices?.length ?? 0;
-  const cellsCount = hasSlot ? columnsCount : 0;
+  const cellsCount = columnsCount;
   const cellSizeKiB = 2;
   const totalSizeKiB = cellsCount * cellSizeKiB;
   const totalSizeMiB = totalSizeKiB / 1024;
@@ -37,33 +36,35 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
   const statusBorder = isSuccess ? 'border-green-500/20' : isFailure ? 'border-red-500/20' : 'border-yellow-500/20';
 
   return (
-    <div className="flex items-center justify-between gap-8 px-4 py-6">
+    <div className="flex items-center justify-center gap-6 px-4 py-6">
       {/* PROBER (Left) */}
-      <div className="flex flex-col items-center gap-3">
+      <div className="flex flex-col items-center gap-2">
         <div className="relative">
-          <ClientLogo client={probe.meta_client_implementation || 'Unknown'} size={42} />
+          <ClientLogo client={probe.meta_client_implementation || 'Unknown'} size={52} />
           {clientCountryCode && (
-            <div className="absolute -right-2 -bottom-1 flex size-5 items-center justify-center rounded-full border border-background bg-surface text-xs shadow-sm">
+            <div className="absolute -right-2 -bottom-1 flex size-6 items-center justify-center rounded-full border border-background bg-surface text-sm shadow-sm">
               {getCountryFlag(clientCountryCode)}
             </div>
           )}
         </div>
         <div className="text-center">
-          <div className="text-sm font-bold tracking-tight text-foreground">
+          <div className="text-base font-bold tracking-tight text-foreground">
             {probe.meta_client_implementation || 'Prober'}
           </div>
-          <div className="text-muted-foreground text-[10px] font-medium tracking-wider uppercase">
-            {probe.meta_client_geo_city || probe.meta_client_geo_country || 'Unknown'}
+          <div className="text-xs text-muted">
+            {probe.meta_client_geo_city && probe.meta_client_geo_country
+              ? `${probe.meta_client_geo_city}, ${probe.meta_client_geo_country}`
+              : probe.meta_client_geo_city || probe.meta_client_geo_country || 'Unknown'}
           </div>
         </div>
       </div>
 
       {/* CONNECTION (Center) */}
-      <div className="flex flex-1 flex-col items-center justify-center gap-4">
+      <div className="flex flex-col items-center justify-center gap-4">
         {/* Request Flow (Top) */}
         <div className="flex w-full flex-col items-center gap-0.5">
           <span className="font-mono text-xs font-medium text-foreground">
-            Slot {hasSlot ? probe.slot : '?'} × {columnsCount} {columnsCount === 1 ? 'Column' : 'Columns'}
+            {columnsCount} {columnsCount === 1 ? 'Column' : 'Columns'}
           </span>
           <ArrowLongRightIcon className="size-5 text-muted" />
           <span className="text-[10px] font-medium tracking-wider text-muted uppercase">Request</span>
@@ -98,21 +99,23 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
       </div>
 
       {/* PEER (Right) */}
-      <div className="flex flex-col items-center gap-3">
+      <div className="flex flex-col items-center gap-2">
         <div className="relative">
-          <ClientLogo client={probe.meta_peer_implementation || 'Unknown'} size={42} />
+          <ClientLogo client={probe.meta_peer_implementation || 'Unknown'} size={52} />
           {peerCountryCode && (
-            <div className="absolute -right-2 -bottom-1 flex size-5 items-center justify-center rounded-full border border-background bg-surface text-xs shadow-sm">
+            <div className="absolute -right-2 -bottom-1 flex size-6 items-center justify-center rounded-full border border-background bg-surface text-sm shadow-sm">
               {getCountryFlag(peerCountryCode)}
             </div>
           )}
         </div>
         <div className="text-center">
-          <div className="text-sm font-bold tracking-tight text-foreground">
+          <div className="text-base font-bold tracking-tight text-foreground">
             {probe.meta_peer_implementation || 'Peer'}
           </div>
-          <div className="text-muted-foreground text-[10px] font-medium tracking-wider uppercase">
-            {probe.meta_peer_geo_city || probe.meta_peer_geo_country || 'Unknown'}
+          <div className="text-xs text-muted">
+            {probe.meta_peer_geo_city && probe.meta_peer_geo_country
+              ? `${probe.meta_peer_geo_city}, ${probe.meta_peer_geo_country}`
+              : probe.meta_peer_geo_city || probe.meta_peer_geo_country || 'Unknown'}
           </div>
         </div>
       </div>

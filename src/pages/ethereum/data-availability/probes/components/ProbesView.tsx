@@ -10,29 +10,15 @@ import { Header } from '@/components/Layout/Header';
 import { DataTable } from '@/components/DataTable';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { BlobPosterLogo } from '@/components/Ethereum/BlobPosterLogo';
-import { Badge } from '@/components/Elements/Badge';
 import { Button } from '@/components/Elements/Button';
-import { Dialog } from '@/components/Overlays/Dialog';
 import { Alert } from '@/components/Feedback/Alert';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { getCountryFlag } from '@/utils/country';
 import type { IntCustodyProbe } from '@/api/types.gen';
-import { ProbeFlow } from './ProbeFlow';
 import { FilterPanel, type FilterValues } from './FilterPanel';
 import { PeerIdAvatar } from './PeerIdAvatar';
-import {
-  CheckCircleIcon,
-  XCircleIcon,
-  QuestionMarkCircleIcon,
-  ClockIcon,
-  ServerIcon,
-  CpuChipIcon,
-  EyeIcon,
-  ListBulletIcon,
-  ClipboardDocumentIcon,
-  CheckIcon,
-  LinkIcon,
-} from '@heroicons/react/24/outline';
+import { ProbeDetailDialog } from './ProbeDetailDialog';
+import { CheckCircleIcon, XCircleIcon, QuestionMarkCircleIcon, EyeIcon } from '@heroicons/react/24/outline';
 
 // Use generated type directly
 type CustodyProbe = IntCustodyProbe;
@@ -92,112 +78,6 @@ function FilterableCell({
   );
 }
 
-/**
- * Copyable Badge Component - also supports drill-down filtering
- */
-function CopyableBadge({
-  value,
-  label,
-  className,
-  onDrillDown,
-}: {
-  value: string | number;
-  label?: string;
-  className?: string;
-  onDrillDown?: () => void;
-}): JSX.Element {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = (e: React.MouseEvent): void => {
-    e.stopPropagation();
-    e.preventDefault();
-    navigator.clipboard.writeText(String(value));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1000);
-  };
-
-  const handleClick = (e: React.MouseEvent): void => {
-    e.stopPropagation();
-    if (onDrillDown) {
-      onDrillDown();
-    }
-  };
-
-  return (
-    <span className={`group relative inline-flex items-center gap-0.5 ${className}`}>
-      <button
-        type="button"
-        onClick={onDrillDown ? handleClick : handleCopy}
-        className={`inline-flex cursor-pointer items-center justify-center rounded border px-1.5 py-0.5 font-mono text-[10px] transition-all ${
-          copied
-            ? 'border-green-500/30 bg-green-500/10 text-green-500'
-            : onDrillDown
-              ? 'border-border bg-background text-foreground hover:border-primary/30 hover:bg-primary/10 hover:text-primary'
-              : 'border-border bg-background text-foreground hover:border-primary/30 hover:bg-primary/10'
-        }`}
-        title={onDrillDown ? `Filter by ${label || value}` : `Copy ${label || value}`}
-      >
-        {copied ? <CheckIcon className="mr-1 size-3" /> : null}
-        {value}
-      </button>
-      {onDrillDown && (
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="inline-flex cursor-pointer items-center justify-center rounded border border-border bg-background px-1 py-0.5 font-mono text-[10px] text-muted opacity-0 transition-all group-hover:opacity-100 hover:bg-muted/50"
-          title={`Copy ${label || value}`}
-        >
-          <ClipboardDocumentIcon className="size-3" />
-        </button>
-      )}
-    </span>
-  );
-}
-
-/**
- * Clickable attribute cell for drill-down filtering in detail popup
- */
-function DrillDownCell({
-  field,
-  value,
-  displayValue,
-  onFilterClick,
-  onClose,
-  children,
-  mono = false,
-}: {
-  field: string;
-  value: string | number | undefined | null;
-  displayValue?: string;
-  onFilterClick?: (field: string, value: string | number) => void;
-  onClose?: () => void;
-  children?: React.ReactNode;
-  mono?: boolean;
-}): JSX.Element {
-  if (value === undefined || value === null || value === '') {
-    return <span className="text-muted">-</span>;
-  }
-
-  const handleClick = (e: React.MouseEvent): void => {
-    e.stopPropagation();
-    if (onFilterClick) {
-      onFilterClick(field, value);
-      onClose?.();
-    }
-  };
-
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className={`cursor-pointer text-left transition-colors hover:text-primary hover:underline ${mono ? 'font-mono text-[10px]' : ''}`}
-      title={`Filter by ${displayValue ?? value}`}
-    >
-      {children ?? <span>{displayValue ?? String(value)}</span>}
-    </button>
-  );
-}
-
 export type ProbesViewProps = {
   data: CustodyProbe[];
   isLoading: boolean;
@@ -239,9 +119,6 @@ export function ProbesView({
   selectedProbe,
   onProbeSelect,
 }: ProbesViewProps): JSX.Element {
-  // Link copy state
-  const [linkCopied, setLinkCopied] = useState(false);
-
   // Dialog is open when a probe is selected
   const isDetailDialogOpen = selectedProbe !== null;
 
@@ -291,15 +168,7 @@ export function ProbesView({
   // Handle dialog close
   const handleCloseDialog = useCallback((): void => {
     onProbeSelect(null);
-    setLinkCopied(false);
   }, [onProbeSelect]);
-
-  // Copy link to clipboard
-  const handleCopyLink = useCallback((): void => {
-    navigator.clipboard.writeText(window.location.href);
-    setLinkCopied(true);
-    setTimeout(() => setLinkCopied(false), 2000);
-  }, []);
 
   // Define table columns - ordered by default visibility preference:
   // Time, Result, Prober, Prober Country, Peer Client, Peer Country, PeerID, Slots, Columns, Error
@@ -718,7 +587,7 @@ export function ProbesView({
       <Container>
         <Header
           title="Custody Probes"
-          description="The ethPandaOps team runs probes into the network using Dasmon (https://github.com/ethp2p/dasmon) to monitor data availabililty. Probes are run on a regular basis to ensure the network is healthy and that the data is available."
+          description="Individual probe events showing custody verification attempts across the network."
         />
         <Alert
           variant="error"
@@ -734,7 +603,7 @@ export function ProbesView({
       <div className="mb-6">
         <Header
           title="Custody Probes"
-          description="Probes made by the ethPandaOps team into the network using Dasmon (https://github.com/ethp2p/dasmon) to monitor data availability sampling across PeerDAS."
+          description="Individual probe events showing custody verification attempts across the network."
         />
       </div>
 
@@ -771,315 +640,13 @@ export function ProbesView({
         />
       </div>
 
-      {/* Detail dialog */}
-      <Dialog
-        open={isDetailDialogOpen}
+      {/* Detail dialog - shared component */}
+      <ProbeDetailDialog
+        probe={selectedProbe}
+        isOpen={isDetailDialogOpen}
         onClose={handleCloseDialog}
-        title={
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <ServerIcon className="size-5 text-primary" />
-              <span>Probe Details</span>
-              {selectedProbe && (
-                <div className="ml-2 flex items-center gap-2">
-                  <Badge
-                    variant="flat"
-                    color={
-                      selectedProbe.result === 'success'
-                        ? 'green'
-                        : selectedProbe.result === 'failure'
-                          ? 'red'
-                          : 'yellow'
-                    }
-                    className="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase"
-                  >
-                    {selectedProbe.result}
-                  </Badge>
-                  <span className="text-muted-foreground font-mono text-xs">{selectedProbe.response_time_ms}ms</span>
-                </div>
-              )}
-              {/* Copy Link button */}
-              <button
-                type="button"
-                onClick={handleCopyLink}
-                className={`ml-auto flex items-center gap-1.5 rounded border px-2 py-1 text-xs transition-all ${
-                  linkCopied
-                    ? 'border-green-500/30 bg-green-500/10 text-green-500'
-                    : 'border-border bg-background text-muted hover:border-primary/30 hover:bg-primary/10 hover:text-primary'
-                }`}
-                title="Copy link to this probe"
-              >
-                {linkCopied ? <CheckIcon className="size-3.5" /> : <LinkIcon className="size-3.5" />}
-                <span>{linkCopied ? 'Copied!' : 'Copy Link'}</span>
-              </button>
-            </div>
-            {selectedProbe && (
-              <div className="text-muted-foreground flex items-center gap-2 text-xs font-normal">
-                <ClockIcon className="size-3" />
-                <Timestamp
-                  timestamp={selectedProbe.probe_date_time ?? 0}
-                  format="long"
-                  disableModal
-                  className="!text-muted-foreground !p-0"
-                />
-              </div>
-            )}
-          </div>
-        }
-        description="Complete information about this custody probe attempt"
-        size="xl"
-      >
-        {selectedProbe && (
-          <div className="space-y-4">
-            {/* Visual Flow */}
-            <ProbeFlow probe={selectedProbe} />
-
-            {/* Client Details Table */}
-            <div>
-              <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
-                <CpuChipIcon className="size-4 text-primary" />
-                Client Details
-                <span className="text-[10px] font-normal text-muted normal-case">(click any value to filter)</span>
-              </h4>
-
-              <div className="overflow-hidden rounded-lg border border-border">
-                <table className="w-full text-xs">
-                  <thead className="text-muted-foreground bg-muted/50 font-medium uppercase">
-                    <tr>
-                      <th className="px-3 py-1.5 text-left">Attribute</th>
-                      <th className="px-3 py-1.5 text-left">Prober</th>
-                      <th className="px-3 py-1.5 text-left">Peer</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    <tr className="bg-card/30">
-                      <td className="text-muted-foreground px-3 py-1.5 font-medium">Client</td>
-                      <td className="px-3 py-1.5">
-                        <DrillDownCell
-                          field="meta_client_implementation"
-                          value={selectedProbe.meta_client_implementation}
-                          onFilterClick={onFilterClick}
-                          onClose={handleCloseDialog}
-                        >
-                          <div className="flex items-center gap-1.5">
-                            <ClientLogo client={selectedProbe.meta_client_implementation || 'Unknown'} size={16} />
-                            <span className="font-medium">{selectedProbe.meta_client_implementation || '-'}</span>
-                          </div>
-                        </DrillDownCell>
-                      </td>
-                      <td className="px-3 py-1.5">
-                        <DrillDownCell
-                          field="meta_peer_implementation"
-                          value={selectedProbe.meta_peer_implementation}
-                          onFilterClick={onFilterClick}
-                          onClose={handleCloseDialog}
-                        >
-                          <div className="flex items-center gap-1.5">
-                            <ClientLogo client={selectedProbe.meta_peer_implementation || 'Unknown'} size={16} />
-                            <span className="font-medium">{selectedProbe.meta_peer_implementation || '-'}</span>
-                          </div>
-                        </DrillDownCell>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="text-muted-foreground px-3 py-1.5 font-medium">Node ID</td>
-                      <td className="px-3 py-1.5">
-                        <DrillDownCell
-                          field="node_id"
-                          value={selectedProbe.node_id}
-                          onFilterClick={onFilterClick}
-                          onClose={handleCloseDialog}
-                          mono
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-muted">-</td>
-                    </tr>
-                    <tr className="bg-card/30">
-                      <td className="text-muted-foreground px-3 py-1.5 font-medium">Version</td>
-                      <td className="px-3 py-1.5">
-                        <DrillDownCell
-                          field="meta_client_version"
-                          value={selectedProbe.meta_client_version}
-                          onFilterClick={onFilterClick}
-                          onClose={handleCloseDialog}
-                          mono
-                        />
-                      </td>
-                      <td className="px-3 py-1.5">
-                        <DrillDownCell
-                          field="meta_peer_version"
-                          value={selectedProbe.meta_peer_version}
-                          onFilterClick={onFilterClick}
-                          onClose={handleCloseDialog}
-                          mono
-                        />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="text-muted-foreground px-3 py-1.5 font-medium">Country</td>
-                      <td className="px-3 py-1.5">
-                        <DrillDownCell
-                          field="meta_client_geo_country"
-                          value={selectedProbe.meta_client_geo_country}
-                          onFilterClick={onFilterClick}
-                          onClose={handleCloseDialog}
-                        >
-                          <div className="flex items-center gap-1.5">
-                            <span>{getCountryFlag(selectedProbe.meta_client_geo_country_code)}</span>
-                            <span>{selectedProbe.meta_client_geo_country || '-'}</span>
-                          </div>
-                        </DrillDownCell>
-                      </td>
-                      <td className="px-3 py-1.5">
-                        <DrillDownCell
-                          field="meta_peer_geo_country"
-                          value={selectedProbe.meta_peer_geo_country}
-                          onFilterClick={onFilterClick}
-                          onClose={handleCloseDialog}
-                        >
-                          <div className="flex items-center gap-1.5">
-                            <span>{getCountryFlag(selectedProbe.meta_peer_geo_country_code)}</span>
-                            <span>{selectedProbe.meta_peer_geo_country || '-'}</span>
-                          </div>
-                        </DrillDownCell>
-                      </td>
-                    </tr>
-                    <tr className="bg-card/30">
-                      <td className="text-muted-foreground px-3 py-1.5 font-medium">City</td>
-                      <td className="px-3 py-1.5">
-                        <DrillDownCell
-                          field="meta_client_geo_city"
-                          value={selectedProbe.meta_client_geo_city}
-                          onFilterClick={onFilterClick}
-                          onClose={handleCloseDialog}
-                        />
-                      </td>
-                      <td className="px-3 py-1.5">
-                        <DrillDownCell
-                          field="meta_peer_geo_city"
-                          value={selectedProbe.meta_peer_geo_city}
-                          onFilterClick={onFilterClick}
-                          onClose={handleCloseDialog}
-                        />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="text-muted-foreground px-3 py-1.5 font-medium">ASN</td>
-                      <td className="px-3 py-1.5">
-                        <DrillDownCell
-                          field="meta_client_geo_autonomous_system_number"
-                          value={selectedProbe.meta_client_geo_autonomous_system_number}
-                          displayValue={
-                            selectedProbe.meta_client_geo_autonomous_system_number
-                              ? `AS${selectedProbe.meta_client_geo_autonomous_system_number}`
-                              : undefined
-                          }
-                          onFilterClick={onFilterClick}
-                          onClose={handleCloseDialog}
-                          mono
-                        />
-                      </td>
-                      <td className="px-3 py-1.5">
-                        <DrillDownCell
-                          field="meta_peer_geo_autonomous_system_number"
-                          value={selectedProbe.meta_peer_geo_autonomous_system_number}
-                          displayValue={
-                            selectedProbe.meta_peer_geo_autonomous_system_number
-                              ? `AS${selectedProbe.meta_peer_geo_autonomous_system_number}`
-                              : undefined
-                          }
-                          onFilterClick={onFilterClick}
-                          onClose={handleCloseDialog}
-                          mono
-                        />
-                      </td>
-                    </tr>
-                    <tr className="bg-card/30">
-                      <td className="text-muted-foreground px-3 py-1.5 font-medium">Peer ID</td>
-                      <td className="px-3 py-1.5 text-muted">-</td>
-                      <td className="px-3 py-1.5">
-                        <DrillDownCell
-                          field="peer_id_unique_key"
-                          value={selectedProbe.peer_id_unique_key}
-                          onFilterClick={onFilterClick}
-                          onClose={handleCloseDialog}
-                          mono
-                        />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Request Details */}
-            <div className="border-t border-border pt-4">
-              <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
-                <ListBulletIcon className="size-4 text-primary" />
-                Request Details
-                <span className="text-[10px] font-normal text-muted normal-case">(click any value to filter)</span>
-              </h4>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <dt className="text-muted-foreground mb-1 flex justify-between text-[10px] font-medium tracking-wider uppercase">
-                    <span>Slot</span>
-                  </dt>
-                  <div className="rounded border border-border/50 bg-muted/30 p-1.5">
-                    {selectedProbe.slot !== undefined && selectedProbe.slot !== null ? (
-                      <CopyableBadge
-                        value={selectedProbe.slot}
-                        label="Slot"
-                        onDrillDown={() => {
-                          if (onFilterClick && selectedProbe.slot !== undefined) {
-                            onFilterClick('slot', selectedProbe.slot);
-                            handleCloseDialog();
-                          }
-                        }}
-                      />
-                    ) : (
-                      <span className="text-muted-foreground text-[10px] italic">None</span>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground mb-1 flex justify-between text-[10px] font-medium tracking-wider uppercase">
-                    <span>Columns</span>
-                    <span className="text-foreground">{selectedProbe.column_indices?.length || 0}</span>
-                  </dt>
-                  <div className="max-h-24 overflow-y-auto rounded border border-border/50 bg-muted/30 p-1.5">
-                    <div className="flex flex-wrap gap-1">
-                      {selectedProbe.column_indices?.map(col => (
-                        <CopyableBadge
-                          key={col}
-                          value={col}
-                          label="Column"
-                          onDrillDown={() => {
-                            if (onFilterClick) {
-                              onFilterClick('column', col);
-                              handleCloseDialog();
-                            }
-                          }}
-                        />
-                      )) || <span className="text-muted-foreground text-[10px] italic">None</span>}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Error Section */}
-              {selectedProbe.error && (
-                <div className="mt-4">
-                  <dt className="text-[10px] font-bold tracking-wider text-red-400 uppercase">Error</dt>
-                  <dd className="mt-1 rounded border border-red-500/20 bg-red-500/5 p-2 font-mono text-[10px] text-red-300">
-                    {selectedProbe.error}
-                  </dd>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </Dialog>
+        onFilterClick={onFilterClick}
+      />
     </Container>
   );
 }

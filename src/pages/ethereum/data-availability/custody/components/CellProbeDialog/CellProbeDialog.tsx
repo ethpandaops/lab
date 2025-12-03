@@ -8,24 +8,18 @@ import {
   QuestionMarkCircleIcon,
   MagnifyingGlassIcon,
   ServerIcon,
-  ClockIcon,
-  CpuChipIcon,
-  ListBulletIcon,
   FunnelIcon,
-  LinkIcon,
-  CheckIcon,
   EyeIcon,
 } from '@heroicons/react/24/outline';
 import { intCustodyProbeServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { IntCustodyProbe } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { Dialog } from '@/components/Overlays/Dialog';
-import { Badge } from '@/components/Elements/Badge';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { getCountryFlag } from '@/utils/country';
 import { formatSlot, formatEpoch } from '@/utils';
-import { ProbeFlow } from '@/pages/ethereum/data-availability/probes/components/ProbeFlow';
+import { ProbeDetailDialog } from '@/pages/ethereum/data-availability/probes/components/ProbeDetailDialog';
 import type { CellProbeDialogProps, CellContext } from './CellProbeDialog.types';
 
 /**
@@ -40,34 +34,76 @@ const MAX_PROBES = 50;
 
 /**
  * Build a descriptive context string based on granularity and row data
+ * Includes full hierarchy context (slot, epoch, etc.) for clarity
  */
 function buildContextDescription(cellContext: CellContext): string {
-  const { granularity, rowIdentifier, rowLabel, isColumnOnly, contextLabel } = cellContext;
+  const { granularity, rowIdentifier, rowLabel, isColumnOnly, contextLabel, parentContext } = cellContext;
 
   // For column-only mode, use the provided context label (shows parent drill-down context)
   if (isColumnOnly && contextLabel) {
     return contextLabel;
   }
 
+  // Build context parts from parent context + current row
+  const parts: string[] = [];
+
   switch (granularity) {
     case 'window':
       // rowLabel is a formatted date like "Dec 3"
-      return `Day: ${rowLabel}`;
+      parts.push(rowLabel ?? rowIdentifier ?? 'Unknown');
+      break;
     case 'day':
-      // rowLabel is a time like "14:00 UTC"
-      return `Hour: ${rowLabel}`;
+      // rowLabel is a time like "14:00", add date from parent
+      if (parentContext?.date) {
+        const dateStr = new Date(parentContext.date).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          timeZone: 'UTC',
+        });
+        parts.push(dateStr);
+      }
+      parts.push(rowLabel ?? 'Unknown');
+      break;
     case 'hour':
-      // rowIdentifier is epoch number
-      return `Epoch ${formatEpoch(Number(rowIdentifier))}`;
+      // rowIdentifier is epoch number, add date/time from parent
+      if (parentContext?.date) {
+        const dateStr = new Date(parentContext.date).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          timeZone: 'UTC',
+        });
+        parts.push(dateStr);
+      }
+      if (parentContext?.hourStartDateTime) {
+        const timeStr = new Date(parentContext.hourStartDateTime * 1000).toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+          timeZone: 'UTC',
+        });
+        parts.push(timeStr);
+      }
+      parts.push(`Epoch ${formatEpoch(Number(rowIdentifier))}`);
+      break;
     case 'epoch':
-      // rowIdentifier is slot number
-      return `Slot ${formatSlot(Number(rowIdentifier))}`;
+      // rowIdentifier is slot number, add epoch from parent
+      if (parentContext?.epoch !== undefined) {
+        parts.push(`Epoch ${formatEpoch(parentContext.epoch)}`);
+      }
+      parts.push(`Slot ${formatSlot(Number(rowIdentifier))}`);
+      break;
     case 'slot':
-      // rowIdentifier is blob index, rowLabel has submitter info
-      return `Blob ${rowIdentifier} — ${rowLabel}`;
+      // rowIdentifier is blob index, add slot from parent
+      if (parentContext?.slot !== undefined) {
+        parts.push(`Slot ${formatSlot(parentContext.slot)}`);
+      }
+      parts.push(`Blob ${rowLabel}`);
+      break;
     default:
-      return rowLabel ?? 'Unknown';
+      parts.push(rowLabel ?? 'Unknown');
   }
+
+  return parts.join(' · ');
 }
 
 /**
@@ -192,7 +228,6 @@ export function CellProbeDialog({
   const { currentNetwork } = useNetwork();
   const [selectedProbe, setSelectedProbe] = useState<IntCustodyProbe | null>(null);
   const [resultFilter, setResultFilter] = useState<ResultFilter>('all');
-  const [linkCopied, setLinkCopied] = useState(false);
 
   // Build query params from context (includes server-side result filter)
   const queryParams = useMemo(() => {
@@ -269,54 +304,19 @@ export function CellProbeDialog({
   // Handle probe click
   const handleProbeClick = useCallback((probe: IntCustodyProbe) => {
     setSelectedProbe(probe);
-    setLinkCopied(false);
   }, []);
 
   // Handle detail close (go back to list)
   const handleDetailClose = useCallback(() => {
     setSelectedProbe(null);
-    setLinkCopied(false);
   }, []);
 
   // Handle full close
   const handleClose = useCallback(() => {
     setSelectedProbe(null);
     setResultFilter('all');
-    setLinkCopied(false);
     onClose();
   }, [onClose]);
-
-  // Build direct link to the probe in the probes page
-  const buildProbeLink = useCallback(
-    (probe: IntCustodyProbe): string => {
-      const baseUrl = window.location.origin;
-      const params = new URLSearchParams();
-
-      // Add network param to maintain network context
-      if (currentNetwork?.name) {
-        params.set('network', currentNetwork.name);
-      }
-
-      // Add probe identification params (probeTime only - probePeerId is not a supported filter)
-      if (probe.probe_date_time) params.set('probeTime', String(probe.probe_date_time));
-
-      // Add context filters so the probe shows in the list
-      if (probe.slot !== undefined) params.set('slot', String(probe.slot));
-      if (cellContext) params.set('column', String(cellContext.columnIndex));
-
-      return `${baseUrl}/ethereum/data-availability/probes?${params.toString()}`;
-    },
-    [cellContext, currentNetwork]
-  );
-
-  // Handle copy link
-  const handleCopyLink = useCallback(() => {
-    if (!selectedProbe) return;
-    const link = buildProbeLink(selectedProbe);
-    navigator.clipboard.writeText(link);
-    setLinkCopied(true);
-    setTimeout(() => setLinkCopied(false), 2000);
-  }, [selectedProbe, buildProbeLink]);
 
   // Get display column number (0-127, matching the data)
   const displayColumn = cellContext ? cellContext.columnIndex : 0;
@@ -338,7 +338,6 @@ export function CellProbeDialog({
             <div className="text-xs font-normal text-muted">{contextDescription}</div>
           </div>
         }
-        description={`Probe events that include column ${displayColumn} for ${contextDescription}`}
         size="lg"
       >
         <div className="flex flex-col gap-4">
@@ -426,194 +425,8 @@ export function CellProbeDialog({
         </div>
       </Dialog>
 
-      {/* Probe detail dialog */}
-      <Dialog
-        open={isOpen && selectedProbe !== null}
-        onClose={handleDetailClose}
-        title={
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <ServerIcon className="size-5 text-primary" />
-              <span>Probe Details</span>
-              {selectedProbe && (
-                <div className="ml-2 flex items-center gap-2">
-                  <Badge
-                    variant="flat"
-                    color={
-                      selectedProbe.result === 'success'
-                        ? 'green'
-                        : selectedProbe.result === 'failure'
-                          ? 'red'
-                          : 'yellow'
-                    }
-                    className="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase"
-                  >
-                    {selectedProbe.result}
-                  </Badge>
-                  <span className="font-mono text-xs text-muted">{selectedProbe.response_time_ms}ms</span>
-                </div>
-              )}
-              {/* Copy Link button */}
-              <button
-                type="button"
-                onClick={handleCopyLink}
-                className={clsx(
-                  'ml-auto flex items-center gap-1.5 rounded border px-2 py-1 text-xs transition-all',
-                  linkCopied
-                    ? 'border-green-500/30 bg-green-500/10 text-green-500'
-                    : 'border-border bg-background text-muted hover:border-primary/30 hover:bg-primary/10 hover:text-primary'
-                )}
-                title="Copy link to this probe on the Probes page"
-              >
-                {linkCopied ? <CheckIcon className="size-3.5" /> : <LinkIcon className="size-3.5" />}
-                <span>{linkCopied ? 'Copied!' : 'Copy Link'}</span>
-              </button>
-            </div>
-            {selectedProbe && (
-              <div className="flex items-center gap-2 text-xs font-normal text-muted">
-                <ClockIcon className="size-3" />
-                <Timestamp
-                  timestamp={selectedProbe.probe_date_time ?? 0}
-                  format="long"
-                  disableModal
-                  className="!p-0 !text-muted"
-                />
-              </div>
-            )}
-          </div>
-        }
-        description="Complete information about this custody probe attempt"
-        size="xl"
-      >
-        {selectedProbe && (
-          <div className="space-y-4">
-            {/* Visual Flow */}
-            <ProbeFlow probe={selectedProbe} />
-
-            {/* Client Details Table */}
-            <div>
-              <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
-                <CpuChipIcon className="size-4 text-primary" />
-                Client Details
-              </h4>
-
-              <div className="overflow-hidden rounded-xs border border-border">
-                <table className="w-full text-xs">
-                  <thead className="bg-muted/50 font-medium text-muted uppercase">
-                    <tr>
-                      <th className="px-3 py-1.5 text-left">Attribute</th>
-                      <th className="px-3 py-1.5 text-left">Prober</th>
-                      <th className="px-3 py-1.5 text-left">Peer</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    <tr className="bg-surface/30">
-                      <td className="px-3 py-1.5 font-medium text-muted">Client</td>
-                      <td className="px-3 py-1.5">
-                        <div className="flex items-center gap-1.5">
-                          <ClientLogo client={selectedProbe.meta_client_implementation || 'Unknown'} size={16} />
-                          <span className="font-medium">{selectedProbe.meta_client_implementation || '-'}</span>
-                        </div>
-                      </td>
-                      <td className="px-3 py-1.5">
-                        <div className="flex items-center gap-1.5">
-                          <ClientLogo client={selectedProbe.meta_peer_implementation || 'Unknown'} size={16} />
-                          <span className="font-medium">{selectedProbe.meta_peer_implementation || '-'}</span>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-1.5 font-medium text-muted">Version</td>
-                      <td className="px-3 py-1.5 font-mono text-[10px]">{selectedProbe.meta_client_version || '-'}</td>
-                      <td className="px-3 py-1.5 font-mono text-[10px]">{selectedProbe.meta_peer_version || '-'}</td>
-                    </tr>
-                    <tr className="bg-surface/30">
-                      <td className="px-3 py-1.5 font-medium text-muted">Country</td>
-                      <td className="px-3 py-1.5">
-                        <div className="flex items-center gap-1.5">
-                          <span>{getCountryFlag(selectedProbe.meta_client_geo_country_code)}</span>
-                          <span>{selectedProbe.meta_client_geo_country || '-'}</span>
-                        </div>
-                      </td>
-                      <td className="px-3 py-1.5">
-                        <div className="flex items-center gap-1.5">
-                          <span>{getCountryFlag(selectedProbe.meta_peer_geo_country_code)}</span>
-                          <span>{selectedProbe.meta_peer_geo_country || '-'}</span>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-1.5 font-medium text-muted">City</td>
-                      <td className="px-3 py-1.5">{selectedProbe.meta_client_geo_city || '-'}</td>
-                      <td className="px-3 py-1.5">{selectedProbe.meta_peer_geo_city || '-'}</td>
-                    </tr>
-                    <tr className="bg-surface/30">
-                      <td className="px-3 py-1.5 font-medium text-muted">ASN</td>
-                      <td className="px-3 py-1.5 font-mono text-[10px]">
-                        {selectedProbe.meta_client_geo_autonomous_system_number
-                          ? `AS${selectedProbe.meta_client_geo_autonomous_system_number}`
-                          : '-'}
-                      </td>
-                      <td className="px-3 py-1.5 font-mono text-[10px]">
-                        {selectedProbe.meta_peer_geo_autonomous_system_number
-                          ? `AS${selectedProbe.meta_peer_geo_autonomous_system_number}`
-                          : '-'}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-1.5 font-medium text-muted">Peer ID</td>
-                      <td className="px-3 py-1.5 text-muted">-</td>
-                      <td className="px-3 py-1.5 font-mono text-[10px]">{selectedProbe.peer_id_unique_key || '-'}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Columns */}
-            <div className="border-t border-border pt-4">
-              <div className="flex items-center gap-2">
-                <h4 className="flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
-                  <ListBulletIcon className="size-4 text-primary" />
-                  Columns
-                </h4>
-                <span className="text-xs text-muted">({selectedProbe.column_indices?.length || 0})</span>
-              </div>
-
-              <div className="mt-2 flex flex-wrap gap-1">
-                {selectedProbe.column_indices && selectedProbe.column_indices.length > 0 ? (
-                  selectedProbe.column_indices.map(col => (
-                    <Link
-                      key={col}
-                      to="/ethereum/data-availability/probes"
-                      search={{
-                        column: col,
-                        ...(selectedProbe.slot !== undefined ? { slot: selectedProbe.slot } : {}),
-                      }}
-                      className="inline-flex items-center justify-center rounded-xs border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] text-foreground transition-all hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
-                      title={`View all probes for column ${col}`}
-                    >
-                      {col}
-                    </Link>
-                  ))
-                ) : (
-                  <span className="text-xs text-muted italic">No columns</span>
-                )}
-              </div>
-
-              {/* Error Section */}
-              {selectedProbe.error && (
-                <div className="mt-4">
-                  <dt className="text-[10px] font-bold tracking-wider text-red-400 uppercase">Error</dt>
-                  <dd className="mt-1 rounded-xs border border-red-500/20 bg-red-500/5 p-2 font-mono text-[10px] text-red-300">
-                    {selectedProbe.error}
-                  </dd>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </Dialog>
+      {/* Probe detail dialog - shared component */}
+      <ProbeDetailDialog probe={selectedProbe} isOpen={isOpen && selectedProbe !== null} onClose={handleDetailClose} />
     </>
   );
 }

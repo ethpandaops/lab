@@ -1,6 +1,20 @@
 import type { DataAvailabilityGranularity } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
 
 /**
+ * Parent context from the drill-down hierarchy
+ */
+export interface ParentContext {
+  /** Date string (YYYY-MM-DD) - available at day level and below */
+  date?: string;
+  /** Hour start timestamp - available at hour level and below */
+  hourStartDateTime?: number;
+  /** Epoch number - available at epoch level and below */
+  epoch?: number;
+  /** Slot number - available at slot level */
+  slot?: number;
+}
+
+/**
  * Information about the clicked cell for probe filtering
  * Can be a specific cell (row + column) or just a column (when clicking column header)
  */
@@ -17,6 +31,8 @@ export interface CellContext {
   isColumnOnly?: boolean;
   /** Custom context label for display (used for column-only mode to show parent context) */
   contextLabel?: string;
+  /** Parent context from drill-down hierarchy */
+  parentContext?: ParentContext;
 }
 
 /**
