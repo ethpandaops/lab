@@ -959,7 +959,19 @@ export function IndexPage(): JSX.Element {
       <div className="mb-6 flex items-start justify-between gap-4">
         <Header
           title="Custody Compliance"
-          description="Are peers actually storing the data they claim?"
+          description={
+            <>
+              Are peers actually storing the data they claim? Powered by{' '}
+              <a
+                href="https://github.com/ethp2p/dasmon"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                Dasmon
+              </a>
+            </>
+          }
           className="mb-0"
         />
         <button

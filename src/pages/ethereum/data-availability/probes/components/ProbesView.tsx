@@ -589,7 +589,19 @@ export function ProbesView({
       <Container>
         <Header
           title="Custody Probes"
-          description="Individual probe events showing custody verification attempts across the network."
+          description={
+            <>
+              Individual probe events showing custody verification attempts across the network. Powered by{' '}
+              <a
+                href="https://github.com/ethp2p/dasmon"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                Dasmon
+              </a>
+            </>
+          }
         />
         <Alert
           variant="error"
@@ -605,7 +617,19 @@ export function ProbesView({
       <div className="mb-6">
         <Header
           title="Custody Probes"
-          description="Individual probe events showing custody verification attempts across the network."
+          description={
+            <>
+              Individual probe events showing custody verification attempts across the network. Powered by{' '}
+              <a
+                href="https://github.com/ethp2p/dasmon"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                Dasmon
+              </a>
+            </>
+          }
         />
       </div>
 

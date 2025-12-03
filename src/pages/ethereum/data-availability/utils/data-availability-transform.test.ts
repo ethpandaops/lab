@@ -47,7 +47,7 @@ describe('transformDailyToRows', () => {
 
     expect(result).toHaveLength(2); // 2 unique dates
     expect(result[0].identifier).toBe('2024-01-15'); // Sorted descending
-    expect(result[0].label).toBe('January 15');
+    expect(result[0].label).toBe('Jan 15');
     expect(result[0].cells).toHaveLength(128); // All 128 columns
     expect(result[0].cells[0].availability).toBe(0.955);
     expect(result[0].cells[0].successCount).toBe(100);
@@ -229,7 +229,7 @@ describe('transformEpochsToRows', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].identifier).toBe('100');
-    expect(result[0].label).toBe('Epoch 100');
+    expect(result[0].label).toBe('100');
     expect(result[0].cells).toHaveLength(128);
     expect(result[0].cells[0].availability).toBe(0.955);
   });
@@ -302,7 +302,7 @@ describe('transformSlotsToRows', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].identifier).toBe('3200');
-    expect(result[0].label).toBe('Slot 3200');
+    expect(result[0].label).toBe('3200');
     expect(result[0].cells).toHaveLength(128);
     expect(result[0].cells[0].availability).toBe(0.955);
     expect(result[0].cells[0].successCount).toBe(100);
@@ -377,7 +377,7 @@ describe('transformBlobsToRows', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].identifier).toBe('0');
-    expect(result[0].label).toBe('0'); // No submitter provided
+    expect(result[0].label).toBe('0 · UNKNOWN'); // No submitter provided, defaults to UNKNOWN
     expect(result[0].cells).toHaveLength(128);
     expect(result[0].cells[0].availability).toBe(0.955);
     expect(result[0].cells[0].blobIndex).toBe(0);
@@ -470,9 +470,9 @@ describe('transformBlobsToRows', () => {
     const result = transformBlobsToRows(blobData);
 
     expect(result).toHaveLength(3);
-    expect(result[0].label).toBe('0');
-    expect(result[1].label).toBe('1');
-    expect(result[2].label).toBe('2');
+    expect(result[0].label).toBe('0 · UNKNOWN');
+    expect(result[1].label).toBe('1 · UNKNOWN');
+    expect(result[2].label).toBe('2 · UNKNOWN');
   });
 });
 
