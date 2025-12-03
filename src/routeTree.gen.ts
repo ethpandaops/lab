@@ -37,6 +37,7 @@ import { Route as EthereumEpochsIndexRouteImport } from './routes/ethereum/epoch
 import { Route as EthereumEntitiesIndexRouteImport } from './routes/ethereum/entities/index'
 import { Route as XatuContributorsIdRouteImport } from './routes/xatu/contributors/$id'
 import { Route as EthereumSlotsSlotRouteImport } from './routes/ethereum/slots/$slot'
+import { Route as EthereumForksForkRouteImport } from './routes/ethereum/forks/$fork'
 import { Route as EthereumEpochsEpochRouteImport } from './routes/ethereum/epochs/$epoch'
 import { Route as EthereumEntitiesEntityRouteImport } from './routes/ethereum/entities/$entity'
 import { Route as EthereumDataAvailabilityCustodyRouteImport } from './routes/ethereum/data-availability/custody'
@@ -189,6 +190,11 @@ const EthereumSlotsSlotRoute = EthereumSlotsSlotRouteImport.update({
   path: '/$slot',
   getParentRoute: () => EthereumSlotsRoute,
 } as any)
+const EthereumForksForkRoute = EthereumForksForkRouteImport.update({
+  id: '/$fork',
+  path: '/$fork',
+  getParentRoute: () => EthereumForksRoute,
+} as any)
 const EthereumEpochsEpochRoute = EthereumEpochsEpochRouteImport.update({
   id: '/$epoch',
   path: '/$epoch',
@@ -250,6 +256,7 @@ export interface FileRoutesByFullPath {
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyRouteWithChildren
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
+  '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
   '/ethereum/entities/': typeof EthereumEntitiesIndexRoute
@@ -279,6 +286,7 @@ export interface FileRoutesByTo {
   '/beacon/slot/live': typeof BeaconSlotLiveRoute
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
+  '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
   '/ethereum/entities': typeof EthereumEntitiesIndexRoute
@@ -316,6 +324,7 @@ export interface FileRoutesById {
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyRouteWithChildren
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
+  '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
   '/ethereum/entities/': typeof EthereumEntitiesIndexRoute
@@ -354,6 +363,7 @@ export interface FileRouteTypes {
     | '/ethereum/data-availability/custody'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
+    | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
     | '/xatu/contributors/$id'
     | '/ethereum/entities/'
@@ -383,6 +393,7 @@ export interface FileRouteTypes {
     | '/beacon/slot/live'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
+    | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
     | '/xatu/contributors/$id'
     | '/ethereum/entities'
@@ -419,6 +430,7 @@ export interface FileRouteTypes {
     | '/ethereum/data-availability/custody'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
+    | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
     | '/xatu/contributors/$id'
     | '/ethereum/entities/'
@@ -640,6 +652,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumSlotsSlotRouteImport
       parentRoute: typeof EthereumSlotsRoute
     }
+    '/ethereum/forks/$fork': {
+      id: '/ethereum/forks/$fork'
+      path: '/$fork'
+      fullPath: '/ethereum/forks/$fork'
+      preLoaderRoute: typeof EthereumForksForkRouteImport
+      parentRoute: typeof EthereumForksRoute
+    }
     '/ethereum/epochs/$epoch': {
       id: '/ethereum/epochs/$epoch'
       path: '/$epoch'
@@ -743,10 +762,12 @@ const EthereumEpochsRouteWithChildren = EthereumEpochsRoute._addFileChildren(
 )
 
 interface EthereumForksRouteChildren {
+  EthereumForksForkRoute: typeof EthereumForksForkRoute
   EthereumForksIndexRoute: typeof EthereumForksIndexRoute
 }
 
 const EthereumForksRouteChildren: EthereumForksRouteChildren = {
+  EthereumForksForkRoute: EthereumForksForkRoute,
   EthereumForksIndexRoute: EthereumForksIndexRoute,
 }
 

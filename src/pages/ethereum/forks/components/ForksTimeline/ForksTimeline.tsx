@@ -1,9 +1,10 @@
+import { Link } from '@tanstack/react-router';
 import { Card } from '@/components/Layout/Card';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
-import type { ForkInfo } from '@/utils/forks';
-import type { BlobScheduleItem } from '@/hooks/useConfig';
+import { type ForkInfo, getForkSlug, getBPOSlugForBlobItem } from '@/utils/forks';
+import type { Network, BlobScheduleItem } from '@/hooks/useConfig';
 import clsx from 'clsx';
 
 interface ForksTimelineProps {
@@ -11,6 +12,7 @@ interface ForksTimelineProps {
   currentEpoch: number;
   blobSchedule?: BlobScheduleItem[];
   genesisTime?: number;
+  network?: Network;
 }
 
 /**
@@ -21,6 +23,7 @@ export function ForksTimeline({
   currentEpoch,
   blobSchedule = [],
   genesisTime,
+  network,
 }: ForksTimelineProps): React.JSX.Element {
   return (
     <Card>
@@ -76,23 +79,16 @@ export function ForksTimeline({
                     <div className="flex flex-col gap-y-3 sm:flex-row sm:items-start sm:justify-between sm:gap-x-4">
                       <div className="space-y-1">
                         <div className="flex items-center gap-x-3">
-                          {fork.combinedName ? (
-                            <a
-                              href={`https://ethereum.org/roadmap/${fork.combinedName}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={clsx(
-                                'text-lg font-semibold hover:underline',
-                                isActive ? 'text-foreground' : 'text-muted'
-                              )}
-                            >
-                              {fork.displayName}
-                            </a>
-                          ) : (
-                            <h4 className={clsx('text-lg font-semibold', isActive ? 'text-foreground' : 'text-muted')}>
-                              {fork.displayName}
-                            </h4>
-                          )}
+                          <Link
+                            to="/ethereum/forks/$fork"
+                            params={{ fork: getForkSlug(fork) }}
+                            className={clsx(
+                              'text-lg font-semibold hover:underline',
+                              isActive ? 'text-foreground' : 'text-muted'
+                            )}
+                          >
+                            {fork.displayName}
+                          </Link>
                           {isCurrentFork && (
                             <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
                               Current
@@ -216,14 +212,35 @@ export function ForksTimeline({
                             <div className="flex flex-col gap-y-2 sm:flex-row sm:items-start sm:justify-between sm:gap-x-4">
                               <div className="space-y-1">
                                 <div className="flex items-center gap-x-3">
-                                  <h4
-                                    className={clsx(
-                                      'text-sm font-medium',
-                                      isBlobActive ? 'text-foreground' : 'text-muted'
-                                    )}
-                                  >
-                                    Blob Limit Increase
-                                  </h4>
+                                  {(() => {
+                                    const bpoSlug = network
+                                      ? getBPOSlugForBlobItem(network, blobItem, currentEpoch)
+                                      : null;
+                                    if (bpoSlug) {
+                                      return (
+                                        <Link
+                                          to="/ethereum/forks/$fork"
+                                          params={{ fork: bpoSlug }}
+                                          className={clsx(
+                                            'text-sm font-medium hover:underline',
+                                            isBlobActive ? 'text-foreground' : 'text-muted'
+                                          )}
+                                        >
+                                          {bpoSlug.toUpperCase()} - Blob Limit Increase
+                                        </Link>
+                                      );
+                                    }
+                                    return (
+                                      <h4
+                                        className={clsx(
+                                          'text-sm font-medium',
+                                          isBlobActive ? 'text-foreground' : 'text-muted'
+                                        )}
+                                      >
+                                        Blob Limit Increase
+                                      </h4>
+                                    );
+                                  })()}
                                   {isCurrentBlob && (
                                     <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent">
                                       Active
