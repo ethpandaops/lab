@@ -8,7 +8,7 @@ import {
   LinkIcon,
   CheckIcon,
   MagnifyingGlassIcon,
-  DocumentDuplicateIcon,
+  ShieldCheckIcon,
   InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import type { IntCustodyProbe } from '@/api/types.gen';
@@ -210,48 +210,25 @@ export function ProbeDetailDialog({
 
         {/* Blob Publishers Hero Section */}
         {probe.blob_submitters && probe.blob_submitters.length > 0 && (
-          <div
-            className={clsx(
-              'rounded-lg border p-4',
-              // failure = yellow (transient/one-off failure - less severe)
-              // missing = red (peer responded but didn't have the data - serious)
-              probe.result === 'success'
-                ? 'border-green-500/30 bg-green-500/5'
-                : probe.result === 'failure'
-                  ? 'border-yellow-500/30 bg-yellow-500/5'
-                  : 'border-red-500/30 bg-red-500/5'
-            )}
-          >
+          <div className="flex flex-col gap-3">
             {/* Status message */}
-            <div className="mb-3 flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <DocumentDuplicateIcon
-                  className={clsx(
-                    'size-5',
-                    probe.result === 'success'
-                      ? 'text-green-500'
-                      : probe.result === 'failure'
-                        ? 'text-yellow-500'
-                        : 'text-red-500'
-                  )}
-                />
-                <span
-                  className={clsx(
-                    'text-sm font-medium',
-                    probe.result === 'success'
-                      ? 'text-green-600 dark:text-green-400'
-                      : probe.result === 'failure'
-                        ? 'text-yellow-600 dark:text-yellow-400'
-                        : 'text-red-600 dark:text-red-400'
-                  )}
-                >
-                  {probe.result === 'success'
-                    ? 'These blob publishers are being secured by this peer'
+            <div className="flex flex-col gap-0.5">
+              <span
+                className={clsx(
+                  'text-sm font-medium',
+                  probe.result === 'success'
+                    ? 'text-green-600 dark:text-green-400'
                     : probe.result === 'failure'
-                      ? 'Possible transient failure - probe did not complete'
-                      : "This peer doesn't appear to have this data"}
-                </span>
-              </div>
+                      ? 'text-yellow-600 dark:text-yellow-400'
+                      : 'text-red-600 dark:text-red-400'
+                )}
+              >
+                {probe.result === 'success'
+                  ? `This peer helps secure the blobs from slot ${formatSlot(probe.slot ?? 0)}`
+                  : probe.result === 'failure'
+                    ? 'Probe incomplete - peer may still have this data'
+                    : "This peer doesn't appear to have this data"}
+              </span>
               {/* Reassuring link - only show for failure/missing */}
               {probe.slot !== undefined && probe.result !== 'success' && (
                 <div className="flex items-center gap-1.5 text-xs text-muted">
@@ -270,7 +247,7 @@ export function ProbeDetailDialog({
             </div>
 
             {/* Blob publishers grid */}
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2">
               {(() => {
                 const countMap = new Map<string, number>();
                 for (const submitter of probe.blob_submitters) {
@@ -280,9 +257,29 @@ export function ProbeDetailDialog({
                 return sorted.map(([poster, count]) => (
                   <div
                     key={poster}
-                    className="flex items-center gap-2 rounded border border-border bg-background px-3 py-2"
+                    className={clsx(
+                      'relative flex items-center gap-2 rounded-lg border px-3 py-2',
+                      probe.result === 'success'
+                        ? 'border-green-500/30 bg-green-500/5'
+                        : probe.result === 'failure'
+                          ? 'border-yellow-500/30 bg-yellow-500/5'
+                          : 'border-red-500/30 bg-red-500/5'
+                    )}
                   >
-                    <BlobPosterLogo poster={poster} size={28} />
+                    {/* Logo with shield overlay */}
+                    <div className="relative">
+                      <BlobPosterLogo poster={poster} size={32} />
+                      <ShieldCheckIcon
+                        className={clsx(
+                          'absolute -right-1 -bottom-1 size-4 rounded-full bg-background',
+                          probe.result === 'success'
+                            ? 'text-green-500'
+                            : probe.result === 'failure'
+                              ? 'text-yellow-500'
+                              : 'text-red-500'
+                        )}
+                      />
+                    </div>
                     <div className="flex flex-col">
                       <span className="text-sm font-semibold text-foreground">{poster}</span>
                       <span className="text-xs text-muted">

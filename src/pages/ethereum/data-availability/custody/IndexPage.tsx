@@ -7,7 +7,6 @@ import { DataAvailabilityHeatmap } from '@/pages/ethereum/data-availability/comp
 import { DataAvailabilityLegend } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityLegend';
 import { DataAvailabilitySkeleton } from '@/pages/ethereum/data-availability/components/DataAvailabilitySkeleton';
 import { ViewModeToggle } from '@/pages/ethereum/data-availability/components/ViewModeToggle';
-import { TimezoneToggle } from '@/components/Elements/TimezoneToggle';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { LiveProbeEvents } from './components/LiveProbeEvents';
 import type { ProbeFilterContext } from './components/LiveProbeEvents';
@@ -18,7 +17,6 @@ import type {
   ViewMode,
 } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
 import type { DataAvailabilityFilters } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel.types';
-import { useTimezone } from '@/hooks/useTimezone';
 import { useNetwork } from '@/hooks/useNetwork';
 import { formatEpoch, formatSlot } from '@/utils';
 import { useFuluActivation } from './hooks/useFuluActivation';
@@ -42,13 +40,11 @@ import {
   fctDataColumnAvailabilityByEpochServiceList,
   fctDataColumnAvailabilityBySlotServiceList,
   fctDataColumnAvailabilityBySlotBlobServiceList,
-  fctBlockBlobCountServiceList,
 } from '@/api/sdk.gen';
 import type {
   FctDataColumnAvailabilityByEpoch,
   FctDataColumnAvailabilityBySlot,
   FctDataColumnAvailabilityBySlotBlob,
-  FctBlockBlobCount,
 } from '@/api/types.gen';
 import {
   transformDailyToRows,
@@ -161,43 +157,42 @@ function deriveCurrentLevel(search: CustodySearch): DrillDownLevel {
 /**
  * Get a human-readable title for the current viewing level
  * Main title = where you are, subtitle = what you're viewing
+ * All times are displayed in UTC
  */
-function getLevelTitle(level: DrillDownLevel, timezone: 'UTC' | 'local'): { main: string; sub: string } {
-  const tzOptions = timezone === 'UTC' ? { timeZone: 'UTC' } : {};
-
+function getLevelTitle(level: DrillDownLevel): { main: string; sub: string } {
   switch (level.type) {
     case 'window':
-      return { main: 'Custody Window', sub: `Viewing last ${WINDOW_DAYS} days by day` };
+      return { main: 'Custody Window', sub: `Last ${WINDOW_DAYS} days (UTC)` };
     case 'day': {
-      const dateStr = new Date(level.date).toLocaleDateString('en-US', {
+      const labelDate = new Date(level.date + 'T00:00:00Z');
+      const dateStr = labelDate.toLocaleDateString('en-US', {
         weekday: 'long',
         month: 'long',
         day: 'numeric',
         year: 'numeric',
-        ...tzOptions,
+        timeZone: 'UTC',
       });
-      return { main: dateStr, sub: 'Viewing hours in this day' };
+      return { main: dateStr, sub: 'Hours in this day (UTC)' };
     }
     case 'hour': {
-      const dateStr = new Date(level.date).toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'long',
+      const labelDate = new Date(level.date + 'T00:00:00Z');
+      const dateStr = labelDate.toLocaleDateString('en-US', {
+        month: 'short',
         day: 'numeric',
-        year: 'numeric',
-        ...tzOptions,
+        timeZone: 'UTC',
       });
       const timeStr = new Date(level.hourStartDateTime * 1000).toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false,
-        ...tzOptions,
+        timeZone: 'UTC',
       });
-      return { main: `${dateStr} at ${timeStr}`, sub: 'Viewing epochs in this hour' };
+      return { main: `${dateStr} at ${timeStr} UTC`, sub: 'Epochs in this hour' };
     }
     case 'epoch':
-      return { main: `Epoch ${formatEpoch(level.epoch)}`, sub: 'Viewing slots in this epoch' };
+      return { main: `Epoch ${formatEpoch(level.epoch)}`, sub: 'Slots in this epoch' };
     case 'slot':
-      return { main: `Slot ${formatSlot(level.slot)}`, sub: 'Viewing blobs in this slot' };
+      return { main: `Slot ${formatSlot(level.slot)}`, sub: 'Blobs in this slot' };
   }
 }
 
@@ -209,14 +204,14 @@ export function IndexPage(): JSX.Element {
   const navigate = useNavigate({ from: '/ethereum/data-availability/custody/' });
   const search = useSearch({ from: '/ethereum/data-availability/custody/' });
 
-  // Timezone preference
-  const { timezone } = useTimezone();
+  // Derive drill-down state from URL
+  const currentLevel = deriveCurrentLevel(search);
+
+  // All timestamps are displayed in UTC - data is aggregated by UTC boundaries
+  const timezone = 'UTC' as const;
 
   // Network for default threshold
   const { currentNetwork } = useNetwork();
-
-  // Derive drill-down state from URL
-  const currentLevel = deriveCurrentLevel(search);
 
   // View mode from URL (default to 'percentage')
   const viewMode: ViewMode = search.mode ?? 'percentage';
@@ -314,51 +309,33 @@ export function IndexPage(): JSX.Element {
   });
 
   // Epoch Level: Slots within a specific epoch (with pagination for safety)
-  // Also fetches blob counts to mark 0-blob slots as 100% available
   const epochQuery = useQuery({
     queryKey: ['epochData', currentLevel.type === 'epoch' ? currentLevel.epoch : null],
     queryFn: async ({ signal }) => {
       if (currentLevel.type !== 'epoch') {
-        return { fct_data_column_availability_by_slot: [], fct_block_blob_count: [] };
+        return { fct_data_column_availability_by_slot: [] };
       }
 
       // Calculate slot range for this epoch
       const firstSlot = currentLevel.epoch * SLOTS_PER_EPOCH;
       const lastSlot = (currentLevel.epoch + 1) * SLOTS_PER_EPOCH;
 
-      // Fetch slot availability data and blob counts in parallel
-      const [slotData, blobCountData] = await Promise.all([
-        fetchAllPages<FctDataColumnAvailabilityBySlot>(
-          fctDataColumnAvailabilityBySlotServiceList,
-          {
-            query: {
-              slot_gte: firstSlot,
-              slot_lt: lastSlot,
-              page_size: 10000,
-              order_by: 'slot asc',
-            },
+      const slotData = await fetchAllPages<FctDataColumnAvailabilityBySlot>(
+        fctDataColumnAvailabilityBySlotServiceList,
+        {
+          query: {
+            slot_gte: firstSlot,
+            slot_lt: lastSlot,
+            page_size: 10000,
+            order_by: 'slot asc',
           },
-          'fct_data_column_availability_by_slot',
-          signal
-        ),
-        fetchAllPages<FctBlockBlobCount>(
-          fctBlockBlobCountServiceList,
-          {
-            query: {
-              slot_gte: firstSlot,
-              slot_lt: lastSlot,
-              page_size: 100,
-              order_by: 'slot asc',
-            },
-          },
-          'fct_block_blob_count',
-          signal
-        ),
-      ]);
+        },
+        'fct_data_column_availability_by_slot',
+        signal
+      );
 
       return {
         fct_data_column_availability_by_slot: slotData,
-        fct_block_blob_count: blobCountData,
       };
     },
     enabled: currentLevel.type === 'epoch',
@@ -452,11 +429,7 @@ export function IndexPage(): JSX.Element {
    * Filters out slots before Fulu activation (PeerDAS didn't exist)
    */
   const epochRows = useMemo(() => {
-    // Pass blob counts so 0-blob slots are marked as 100% available
-    const rows = transformSlotsToRows(
-      epochQuery.data?.fct_data_column_availability_by_slot,
-      epochQuery.data?.fct_block_blob_count
-    );
+    const rows = transformSlotsToRows(epochQuery.data?.fct_data_column_availability_by_slot);
     if (!fuluActivation) return rows;
 
     // Filter out slots before Fulu activation (identifier is slot number as string)
@@ -687,35 +660,37 @@ export function IndexPage(): JSX.Element {
    */
   const handleColumnClick = useCallback(
     (columnIndex: number): void => {
-      // Build context label based on current drill-down level
+      // Build context label based on current drill-down level (all times UTC)
       let contextLabel: string;
       switch (currentLevel.type) {
         case 'window':
-          contextLabel = `Last ${WINDOW_DAYS} Days`;
+          contextLabel = `Last ${WINDOW_DAYS} Days (UTC)`;
           break;
         case 'day': {
-          const dateStr = new Date(currentLevel.date).toLocaleDateString('en-US', {
+          const labelDate = new Date(currentLevel.date + 'T00:00:00Z');
+          const dateStr = labelDate.toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric',
             year: 'numeric',
-            ...(timezone === 'UTC' ? { timeZone: 'UTC' } : {}),
+            timeZone: 'UTC',
           });
-          contextLabel = dateStr;
+          contextLabel = `${dateStr} (UTC)`;
           break;
         }
         case 'hour': {
-          const dateStr = new Date(currentLevel.date).toLocaleDateString('en-US', {
+          const labelDate = new Date(currentLevel.date + 'T00:00:00Z');
+          const dateStr = labelDate.toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric',
-            ...(timezone === 'UTC' ? { timeZone: 'UTC' } : {}),
+            timeZone: 'UTC',
           });
           const timeStr = new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString('en-US', {
             hour: '2-digit',
             minute: '2-digit',
             hour12: false,
-            ...(timezone === 'UTC' ? { timeZone: 'UTC' } : {}),
+            timeZone: 'UTC',
           });
-          contextLabel = `${dateStr} at ${timeStr}`;
+          contextLabel = `${dateStr} at ${timeStr} UTC`;
           break;
         }
         case 'epoch':
@@ -790,7 +765,7 @@ export function IndexPage(): JSX.Element {
       setTimeRangeContext(timeRange);
       setCellDialogOpen(true);
     },
-    [granularity, currentLevel, timezone]
+    [granularity, currentLevel]
   );
 
   /**
@@ -836,18 +811,20 @@ export function IndexPage(): JSX.Element {
 
     if (currentLevel.type === 'window') return crumbs;
 
-    // Add day breadcrumb if we're at day level or deeper
+    // Add day breadcrumb if we're at day level or deeper (all times UTC)
     if (
       currentLevel.type === 'day' ||
       currentLevel.type === 'hour' ||
       currentLevel.type === 'epoch' ||
       currentLevel.type === 'slot'
     ) {
+      const breadcrumbLabelDate = new Date(currentLevel.date + 'T00:00:00Z');
       crumbs.push({
-        label: new Date(currentLevel.date).toLocaleDateString(
-          'en-US',
-          timezone === 'UTC' ? { month: 'short', day: 'numeric', timeZone: 'UTC' } : { month: 'short', day: 'numeric' }
-        ),
+        label: breadcrumbLabelDate.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          timeZone: 'UTC',
+        }),
         icon: CalendarDaysIcon,
         onClick: () =>
           navigate({
@@ -860,12 +837,12 @@ export function IndexPage(): JSX.Element {
     // Add hour breadcrumb if we're at hour level or deeper
     if (currentLevel.type === 'hour' || currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
       crumbs.push({
-        label: new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString(
-          'en-US',
-          timezone === 'UTC'
-            ? { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }
-            : { hour: '2-digit', minute: '2-digit', hour12: false }
-        ),
+        label: new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+          timeZone: 'UTC',
+        }),
         icon: ClockIcon,
         onClick: () =>
           navigate({
@@ -913,7 +890,7 @@ export function IndexPage(): JSX.Element {
     }
 
     return crumbs;
-  }, [currentLevel, navigate, timezone, search.mode, search.threshold]);
+  }, [currentLevel, navigate, search.mode, search.threshold]);
 
   // Calculate time range for View Probes link (must be before early returns)
   const probesLinkParams = useMemo(() => {
@@ -1042,17 +1019,15 @@ export function IndexPage(): JSX.Element {
           <div className="bg-card text-card-foreground rounded-lg border border-border shadow-sm">
             {/* Header with Level Title */}
             <div className="border-b border-border bg-muted/20 px-4 py-3">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 {/* Level Title */}
-                <div>
-                  <h2 className="text-lg font-semibold text-foreground">
-                    {getLevelTitle(currentLevel, timezone).main}
-                  </h2>
-                  <p className="text-sm text-muted">{getLevelTitle(currentLevel, timezone).sub}</p>
+                <div className="min-w-0">
+                  <h2 className="text-lg font-semibold text-foreground">{getLevelTitle(currentLevel).main}</h2>
+                  <p className="text-sm text-muted">{getLevelTitle(currentLevel).sub}</p>
                 </div>
 
                 {/* Controls */}
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex shrink-0 flex-wrap items-center gap-2">
                   {/* Detail page links */}
                   {currentLevel.type === 'epoch' && (
                     <Link
@@ -1077,7 +1052,6 @@ export function IndexPage(): JSX.Element {
                     </Link>
                   )}
                   <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
-                  <TimezoneToggle size="compact" />
                 </div>
               </div>
             </div>
