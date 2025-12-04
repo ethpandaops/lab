@@ -162,213 +162,239 @@ export function AlgorithmicArt({
     themeColorsRef.current = artColors;
   }, [artColors]);
 
+  // Main effect for p5.js instance management
   useEffect(() => {
-    if (!containerRef.current) return;
+    const container = containerRef.current;
+    if (!container) return;
 
-    // Reset cleanup flag on mount
-    isCleanedUpRef.current = false;
+    // Track if cleanup has been called before we create the instance
+    let cancelled = false;
 
-    // Create the sketch
-    const sketch = (p: p5): void => {
-      const nodes: Node[] = [];
-      const particles: Particle[] = [];
-      const connectionDistance = 250; // Increased distance for more connections
-      const maxConnections = 15; // Each node connects to 15 others
-      const maxParticles = 50; // Limit particles to prevent memory issues
-      let frameCounter = 0;
+    // Use setTimeout(0) to defer p5 creation to next event loop tick
+    // This ensures any cleanup from React StrictMode's rapid unmount/remount completes first
+    const timeoutId = setTimeout(() => {
+      if (cancelled) return;
 
-      // Cache parsed colors to avoid parsing on every frame
-      let cachedColors = {
-        bgR: 0,
-        bgG: 0,
-        bgB: 0,
-        accentR: 0,
-        accentG: 0,
-        accentB: 0,
-        primaryR: 0,
-        primaryG: 0,
-        primaryB: 0,
-        mutedR: 0,
-        mutedG: 0,
-        mutedB: 0,
-      };
+      // Clean up any orphaned canvases from the container before creating new one
+      const existingCanvases = container.querySelectorAll('canvas');
+      existingCanvases.forEach(canvas => canvas.remove());
 
-      // Parse hex color helper
-      const parseColor = (hex: string): { r: number; g: number; b: number } => {
-        const clean = hex.replace('#', '');
-        return {
-          r: parseInt(clean.substring(0, 2), 16),
-          g: parseInt(clean.substring(2, 4), 16),
-          b: parseInt(clean.substring(4, 6), 16),
+      // Clean up local ref if it exists
+      if (p5InstanceRef.current) {
+        p5InstanceRef.current.noLoop();
+        p5InstanceRef.current.remove();
+        p5InstanceRef.current = null;
+      }
+
+      // Reset cleanup flag
+      isCleanedUpRef.current = false;
+
+      // Create the sketch
+      const sketch = (p: p5): void => {
+        const nodes: Node[] = [];
+        const particles: Particle[] = [];
+        const connectionDistance = 250;
+        const maxConnections = 15;
+        const maxParticles = 50;
+        let frameCounter = 0;
+
+        // Cache parsed colors to avoid parsing on every frame
+        let cachedColors = {
+          bgR: 0,
+          bgG: 0,
+          bgB: 0,
+          accentR: 0,
+          accentG: 0,
+          accentB: 0,
+          primaryR: 0,
+          primaryG: 0,
+          primaryB: 0,
+          mutedR: 0,
+          mutedG: 0,
+          mutedB: 0,
         };
-      };
 
-      // Update cached colors when theme changes
-      const updateCachedColors = (): void => {
-        const currentTheme = themeColorsRef.current;
-        if (!currentTheme) return;
-
-        const bg = parseColor(currentTheme.background);
-        const accent = parseColor(currentTheme.accent);
-        const primary = parseColor(currentTheme.primary);
-        const muted = parseColor(currentTheme.muted);
-
-        cachedColors = {
-          bgR: bg.r,
-          bgG: bg.g,
-          bgB: bg.b,
-          accentR: accent.r,
-          accentG: accent.g,
-          accentB: accent.b,
-          primaryR: primary.r,
-          primaryG: primary.g,
-          primaryB: primary.b,
-          mutedR: muted.r,
-          mutedG: muted.g,
-          mutedB: muted.b,
+        // Parse hex color helper
+        const parseColor = (hex: string): { r: number; g: number; b: number } => {
+          const clean = hex.replace('#', '');
+          return {
+            r: parseInt(clean.substring(0, 2), 16),
+            g: parseInt(clean.substring(2, 4), 16),
+            b: parseInt(clean.substring(4, 6), 16),
+          };
         };
-      };
 
-      /**
-       * Initialize or reinitialize nodes and connections
-       */
-      const initializeNodes = (canvasWidth: number): void => {
-        // Clear existing nodes and particles
-        nodes.length = 0;
-        particles.length = 0;
+        // Update cached colors when theme changes
+        const updateCachedColors = (): void => {
+          const currentTheme = themeColorsRef.current;
+          if (!currentTheme) return;
 
-        // Set seed for reproducibility
-        p.randomSeed(seed);
-        p.noiseSeed(seed);
+          const bg = parseColor(currentTheme.background);
+          const accent = parseColor(currentTheme.accent);
+          const primary = parseColor(currentTheme.primary);
+          const muted = parseColor(currentTheme.muted);
 
-        // Create nodes based on canvas area
-        const nodeCount = Math.floor((canvasWidth * height) / 15000); // Density based on area
-        for (let i = 0; i < nodeCount; i++) {
-          const radius = 3 + Math.random() * 4;
-          const node = new Node(Math.random() * canvasWidth, Math.random() * height, radius);
-          nodes.push(node);
-        }
+          cachedColors = {
+            bgR: bg.r,
+            bgG: bg.g,
+            bgB: bg.b,
+            accentR: accent.r,
+            accentG: accent.g,
+            accentB: accent.b,
+            primaryR: primary.r,
+            primaryG: primary.g,
+            primaryB: primary.b,
+            mutedR: muted.r,
+            mutedG: muted.g,
+            mutedB: muted.b,
+          };
+        };
 
-        // Establish connections - each node connects to its nearest neighbors
-        nodes.forEach(node => {
-          const nearby = nodes
-            .filter(other => other !== node && node.distanceTo(other) < connectionDistance)
-            .sort((a, b) => node.distanceTo(a) - node.distanceTo(b))
-            .slice(0, maxConnections);
+        /**
+         * Initialize or reinitialize nodes and connections
+         */
+        const initializeNodes = (canvasWidth: number): void => {
+          // Clear existing nodes and particles
+          nodes.length = 0;
+          particles.length = 0;
 
-          node.connections = nearby;
-        });
-      };
+          // Set seed for reproducibility
+          p.randomSeed(seed);
+          p.noiseSeed(seed);
 
-      p.setup = () => {
-        const canvasWidth = containerRef.current?.offsetWidth || 600;
-        p.createCanvas(canvasWidth, height);
-        p.frameRate(60);
-        p.loop(); // Ensure animation loop starts
+          // Create nodes based on canvas area
+          const nodeCount = Math.floor((canvasWidth * height) / 15000);
+          for (let i = 0; i < nodeCount; i++) {
+            const radius = 3 + Math.random() * 4;
+            const node = new Node(Math.random() * canvasWidth, Math.random() * height, radius);
+            nodes.push(node);
+          }
 
-        // Initialize cached colors
-        updateCachedColors();
+          // Establish connections - each node connects to its nearest neighbors
+          nodes.forEach(node => {
+            const nearby = nodes
+              .filter(other => other !== node && node.distanceTo(other) < connectionDistance)
+              .sort((a, b) => node.distanceTo(a) - node.distanceTo(b))
+              .slice(0, maxConnections);
 
-        // Initialize nodes and connections
-        initializeNodes(canvasWidth);
-      };
+            node.connections = nearby;
+          });
+        };
 
-      p.windowResized = () => {
-        if (containerRef.current) {
-          const canvasWidth = containerRef.current.offsetWidth;
+        p.setup = () => {
+          const canvasWidth = container.offsetWidth || 600;
+          p.createCanvas(canvasWidth, height);
+          p.frameRate(60);
+          p.loop();
+
+          // Initialize cached colors
+          updateCachedColors();
+
+          // Initialize nodes and connections
+          initializeNodes(canvasWidth);
+        };
+
+        p.windowResized = () => {
+          const canvasWidth = container.offsetWidth;
           p.resizeCanvas(canvasWidth, height);
 
           // Reinitialize nodes and particles with new dimensions
           initializeNodes(canvasWidth);
-        }
-      };
+        };
 
-      p.draw = () => {
-        // Stop drawing if component is cleaned up
-        if (isCleanedUpRef.current) {
-          p.noLoop();
-          return;
-        }
+        p.draw = () => {
+          // Stop drawing if component is cleaned up
+          if (isCleanedUpRef.current) {
+            p.noLoop();
+            return;
+          }
 
-        // Update cached colors if theme changed
-        const currentTheme = themeColorsRef.current;
-        if (!currentTheme) return;
+          // Update cached colors if theme changed
+          const currentTheme = themeColorsRef.current;
+          if (!currentTheme) return;
 
-        // Update colors cache (only parses if theme changed)
-        updateCachedColors();
+          // Update colors cache
+          updateCachedColors();
 
-        // Use cached background color
-        p.background(cachedColors.bgR, cachedColors.bgG, cachedColors.bgB, 255);
+          // Use cached background color
+          p.background(cachedColors.bgR, cachedColors.bgG, cachedColors.bgB, 255);
 
-        frameCounter += speed;
+          frameCounter += speed;
 
-        // Update nodes
-        nodes.forEach(node => {
-          node.update(p.width, p.height);
-        });
-
-        // Draw connections using cached accent color
-        nodes.forEach(node => {
-          node.connections.forEach(connected => {
-            const distance = node.distanceTo(connected);
-            const alpha = p.map(distance, 0, connectionDistance, 30, 5);
-
-            p.stroke(cachedColors.accentR, cachedColors.accentG, cachedColors.accentB, alpha);
-            p.strokeWeight(1);
-            p.line(node.x, node.y, connected.x, connected.y);
+          // Update nodes
+          nodes.forEach(node => {
+            node.update(p.width, p.height);
           });
-        });
 
-        // Spawn particles (with limit to prevent memory issues)
-        if (frameCounter % 20 === 0 && nodes.length > 0 && particles.length < maxParticles) {
-          const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
-          if (randomNode.connections.length > 0) {
-            const target = randomNode.connections[Math.floor(Math.random() * randomNode.connections.length)];
-            particles.push(new Particle(randomNode, target));
+          // Draw connections using cached accent color
+          nodes.forEach(node => {
+            node.connections.forEach(connected => {
+              const distance = node.distanceTo(connected);
+              const alpha = p.map(distance, 0, connectionDistance, 30, 5);
+
+              p.stroke(cachedColors.accentR, cachedColors.accentG, cachedColors.accentB, alpha);
+              p.strokeWeight(1);
+              p.line(node.x, node.y, connected.x, connected.y);
+            });
+          });
+
+          // Spawn particles (with limit to prevent memory issues)
+          if (frameCounter % 20 === 0 && nodes.length > 0 && particles.length < maxParticles) {
+            const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
+            if (randomNode.connections.length > 0) {
+              const target = randomNode.connections[Math.floor(Math.random() * randomNode.connections.length)];
+              particles.push(new Particle(randomNode, target));
+            }
           }
-        }
 
-        // Update and draw particles using cached primary color
-        for (let i = particles.length - 1; i >= 0; i--) {
-          const particle = particles[i];
-          const done = particle.update();
+          // Update and draw particles using cached primary color
+          for (let i = particles.length - 1; i >= 0; i--) {
+            const particle = particles[i];
+            const done = particle.update();
 
-          if (done) {
-            particles.splice(i, 1);
-          } else {
-            particle.display(p, cachedColors.primaryR, cachedColors.primaryG, cachedColors.primaryB);
+            if (done) {
+              particles.splice(i, 1);
+            } else {
+              particle.display(p, cachedColors.primaryR, cachedColors.primaryG, cachedColors.primaryB);
+            }
           }
-        }
 
-        // Draw nodes using cached colors (no color parsing!)
-        nodes.forEach((node, i) => {
-          // Alternate between primary, accent, and muted colors
-          if (i % 3 === 0) {
-            node.display(p, cachedColors.primaryR, cachedColors.primaryG, cachedColors.primaryB, 150);
-          } else if (i % 3 === 1) {
-            node.display(p, cachedColors.accentR, cachedColors.accentG, cachedColors.accentB, 150);
-          } else {
-            node.display(p, cachedColors.mutedR, cachedColors.mutedG, cachedColors.mutedB, 150);
-          }
-        });
+          // Draw nodes using cached colors
+          nodes.forEach((node, i) => {
+            // Alternate between primary, accent, and muted colors
+            if (i % 3 === 0) {
+              node.display(p, cachedColors.primaryR, cachedColors.primaryG, cachedColors.primaryB, 150);
+            } else if (i % 3 === 1) {
+              node.display(p, cachedColors.accentR, cachedColors.accentG, cachedColors.accentB, 150);
+            } else {
+              node.display(p, cachedColors.mutedR, cachedColors.mutedG, cachedColors.mutedB, 150);
+            }
+          });
+        };
       };
-    };
 
-    // Create p5 instance with container ref for proper cleanup
-    const instance = new p5(sketch, containerRef.current);
-    p5InstanceRef.current = instance;
+      // Create p5 instance
+      const instance = new p5(sketch, container);
+      p5InstanceRef.current = instance;
+    }, 0);
 
     // Cleanup on unmount
     return () => {
+      // Cancel pending creation if cleanup runs before setTimeout fires
+      cancelled = true;
+      clearTimeout(timeoutId);
+
       isCleanedUpRef.current = true;
 
       if (p5InstanceRef.current) {
-        // First stop the loop explicitly
         p5InstanceRef.current.noLoop();
-        // Then remove the canvas and cleanup
         p5InstanceRef.current.remove();
         p5InstanceRef.current = null;
       }
+
+      // Manually remove any canvases from the container
+      const canvases = container.querySelectorAll('canvas');
+      canvases.forEach(canvas => canvas.remove());
     };
   }, [height, seed, speed]);
 
