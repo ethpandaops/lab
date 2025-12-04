@@ -146,7 +146,7 @@ export function DataAvailabilityRowLabel({
 
       {/* Value - different layout for blobs with submitters */}
       {isBlob && blobInfo ? (
-        <div className="flex flex-1 items-center gap-1.5 overflow-hidden">
+        <div className="flex min-w-0 flex-1 items-center gap-1.5">
           {/* Blob index - fixed width for alignment */}
           <span
             className={clsx(
@@ -184,12 +184,16 @@ export function DataAvailabilityRowLabel({
         </span>
       )}
 
-      {/* Drill-down chevron */}
-      {effectiveCanDrillDown && (
+      {/* Drill-down chevron - reserve space for alignment except at blob level where drill-down is never possible */}
+      {!isBlob && (
         <ChevronRightIcon
           className={clsx(
             'size-3 shrink-0 transition-all',
-            isHovered ? 'translate-x-0.5 text-accent opacity-100' : 'text-muted opacity-40'
+            effectiveCanDrillDown
+              ? isHovered
+                ? 'translate-x-0.5 text-accent opacity-100'
+                : 'text-muted opacity-40'
+              : 'invisible'
           )}
         />
       )}

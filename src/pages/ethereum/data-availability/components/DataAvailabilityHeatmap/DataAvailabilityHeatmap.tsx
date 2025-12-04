@@ -73,7 +73,7 @@ export const DataAvailabilityHeatmap = ({
   }, [rows, filters]);
 
   /**
-   * Convert DA rows to generic grid format
+   * Convert DA rows to generic grid format, propagating disabled state to cells
    */
   const gridRows: GridRow<DataAvailabilityCellData>[] = useMemo(
     () =>
@@ -82,7 +82,10 @@ export const DataAvailabilityHeatmap = ({
         label: row.label,
         cells: row.cells.map(cell => ({
           columnIndex: cell.columnIndex,
-          data: cell,
+          data: {
+            ...cell,
+            rowDisabled: row.disabled ?? false,
+          },
         })),
       })),
     [filteredRows]

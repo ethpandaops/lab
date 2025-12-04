@@ -112,15 +112,22 @@ export function GridHeatmap<T = unknown>({
   const gridStyle =
     cellSize === '3xs' ? { gridTemplateColumns: `repeat(${columnIndices.length}, minmax(6px, 1fr))` } : undefined;
 
+  // Get first and last column indices for edge alignment
+  const firstColumnIndex = columnIndices.length > 0 ? columnIndices[0] : 0;
+  const lastColumnIndex = columnIndices.length > 0 ? columnIndices[columnIndices.length - 1] : 127;
+
   // Default column label renderer - shows 0-127 (raw column indices)
   // Only 0 and 127 are persistent; others appear on hover
   // Persistent labels fade out when a nearby column (within 2) is hovered
   // For 3xs size, we use absolute positioning so text doesn't affect grid column width
+  // Edge labels (first/last) are aligned to edges to prevent overflow
   const defaultRenderColumnLabel = (colIndex: number, isHovered: boolean): React.JSX.Element => {
     // Persistent labels: 0, 16, 32, 48, 64, 80, 96, 112, 127 (every 16 + endpoint)
     const isPersistent = colIndex === 0 || colIndex === 127 || colIndex % 16 === 0;
     const isClickable = !!onColumnClick;
     const is3xs = cellSize === '3xs';
+    const isFirstColumn = colIndex === firstColumnIndex;
+    const isLastColumn = colIndex === lastColumnIndex;
 
     // Check if a different column near this one is being hovered
     const isNearbyColumnHovered =
@@ -130,6 +137,14 @@ export function GridHeatmap<T = unknown>({
     // - Persistent columns (0, 127): visible unless a nearby column is hovered (and this one isn't)
     // - Non-persistent: only visible when hovered
     const shouldShow = isPersistent ? isHovered || !isNearbyColumnHovered : isHovered;
+
+    // Positioning for 3xs: first column left-aligned, last column right-aligned, others centered
+    const getPositionClass = () => {
+      if (!is3xs) return '';
+      if (isFirstColumn) return 'absolute top-0 left-0';
+      if (isLastColumn) return 'absolute top-0 right-0';
+      return 'absolute top-0 left-1/2 -translate-x-1/2';
+    };
 
     return (
       <div
@@ -158,8 +173,8 @@ export function GridHeatmap<T = unknown>({
           className={clsx(
             textSize[cellSize],
             'whitespace-nowrap transition-all',
-            // For 3xs, absolutely position centered below the column
-            is3xs && 'absolute top-0 left-1/2 -translate-x-1/2',
+            // For 3xs, position based on column location (edges vs center)
+            getPositionClass(),
             // Visibility
             shouldShow ? 'opacity-100' : 'opacity-0 hover:opacity-100',
             isHovered ? 'font-bold text-accent' : 'text-muted',
@@ -178,7 +193,7 @@ export function GridHeatmap<T = unknown>({
       {renderHeader?.()}
 
       {/* Grid with optional Y-axis title - scrollable on mobile */}
-      <div className="flex overflow-x-auto">
+      <div className="flex overflow-x-auto overflow-y-hidden">
         {/* Y-axis title - vertical text on the left */}
         {yAxisTitle && (
           <div className="flex shrink-0 items-center justify-center pr-1">
@@ -191,7 +206,7 @@ export function GridHeatmap<T = unknown>({
           </div>
         )}
 
-        {/* Main grid area - min-width ensures cells don't collapse too much */}
+        {/* Main grid area - min-w-fit ensures cells don't collapse too much */}
         <div className="min-w-fit flex-1">
           {/* Rows */}
           <div className="flex flex-col gap-0.5">
