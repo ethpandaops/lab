@@ -231,6 +231,10 @@ export function transformSlotsToRows(data: FctDataColumnAvailabilityBySlot[] | u
     .map(([slot, items]) => {
       const identifier = String(slot);
 
+      // Get blob count from the first item (same for all columns in a slot)
+      const blobCount = items[0]?.blob_count ?? 0;
+      const hasNoBlobs = blobCount === 0;
+
       const cells = items
         .sort((a, b) => (a.column_index ?? 0) - (b.column_index ?? 0))
         .map(item => ({
@@ -246,6 +250,8 @@ export function transformSlotsToRows(data: FctDataColumnAvailabilityBySlot[] | u
         identifier,
         label: String(slot),
         cells: ensureAllColumns(cells, identifier),
+        disabled: hasNoBlobs,
+        disabledReason: hasNoBlobs ? 'No blobs in this slot' : undefined,
       };
     });
 }

@@ -532,7 +532,13 @@ export function IndexPage(): JSX.Element {
         }
         break;
       }
-      case 'epoch':
+      case 'epoch': {
+        // Check if the slot has blobs before drilling down
+        const slotRow = epochRows.find(row => row.identifier === identifier);
+        if (slotRow?.disabled) {
+          // Slot has no blobs, don't drill down
+          return;
+        }
         // Drill to slot level
         navigate({
           search: prev => ({
@@ -544,6 +550,7 @@ export function IndexPage(): JSX.Element {
           }),
         });
         break;
+      }
       case 'slot':
         // Already at deepest level
         break;

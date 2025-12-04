@@ -46,6 +46,7 @@ export interface DataTableProps<TData> {
   // Row selection and actions
   onRowClick?: (row: TData) => void;
   getRowId?: (row: TData) => string;
+  getRowClassName?: (row: TData, rowId: string) => string | undefined;
   // Manual mode (server-side)
   manualPagination?: boolean;
   manualFiltering?: boolean;

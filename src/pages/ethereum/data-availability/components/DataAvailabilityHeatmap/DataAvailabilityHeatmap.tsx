@@ -89,11 +89,34 @@ export const DataAvailabilityHeatmap = ({
   );
 
   /**
+   * Create a lookup map for disabled rows
+   */
+  const disabledRowMap = useMemo(() => {
+    const map = new Map<string, { disabled: boolean; disabledReason?: string }>();
+    for (const row of rows) {
+      if (row.disabled) {
+        map.set(row.identifier, { disabled: true, disabledReason: row.disabledReason });
+      }
+    }
+    return map;
+  }, [rows]);
+
+  /**
    * Custom row label renderer with type icons and drill-down affordance
    */
   const renderRowLabel = useCallback(
-    (props: RowLabelRenderProps) => <DataAvailabilityRowLabel {...props} granularity={granularity} />,
-    [granularity]
+    (props: RowLabelRenderProps) => {
+      const disabledInfo = disabledRowMap.get(props.identifier);
+      return (
+        <DataAvailabilityRowLabel
+          {...props}
+          granularity={granularity}
+          disabled={disabledInfo?.disabled}
+          disabledReason={disabledInfo?.disabledReason}
+        />
+      );
+    },
+    [granularity, disabledRowMap]
   );
 
   return (

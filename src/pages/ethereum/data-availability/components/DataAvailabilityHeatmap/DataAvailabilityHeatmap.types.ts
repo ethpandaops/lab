@@ -28,6 +28,10 @@ export interface DataAvailabilityRow {
   label: string;
   /** Cell data for each column in this row */
   cells: DataAvailabilityCellData[];
+  /** Whether this row is disabled (e.g., slot with no blobs) */
+  disabled?: boolean;
+  /** Optional reason why the row is disabled (shown in tooltip) */
+  disabledReason?: string;
 }
 
 /**

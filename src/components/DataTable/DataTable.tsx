@@ -43,6 +43,7 @@ export function DataTable<TData>({
   // Row actions
   onRowClick,
   getRowId,
+  getRowClassName,
   // Manual mode
   manualPagination = false,
   manualFiltering = false,
@@ -235,6 +236,7 @@ export function DataTable<TData>({
                       <th
                         key={header.id}
                         scope="col"
+                        style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}
                         className={clsx(
                           'py-1.5 text-left text-xs font-semibold text-foreground',
                           headerIndex === 0 ? 'pr-2 pl-3' : 'px-2'
@@ -310,11 +312,16 @@ export function DataTable<TData>({
                   <tr
                     key={row.id}
                     onClick={() => onRowClick?.(row.original)}
-                    className={clsx('transition-colors', onRowClick && 'cursor-pointer hover:bg-background')}
+                    className={clsx(
+                      'transition-colors',
+                      onRowClick && 'cursor-pointer hover:bg-background',
+                      getRowClassName?.(row.original, row.id)
+                    )}
                   >
                     {row.getVisibleCells().map((cell, cellIndex) => (
                       <td
                         key={cell.id}
+                        style={{ width: cell.column.getSize() !== 150 ? cell.column.getSize() : undefined }}
                         className={clsx(
                           'py-1.5 text-xs whitespace-nowrap',
                           cellIndex === 0 ? 'pr-2 pl-3' : 'px-2',
