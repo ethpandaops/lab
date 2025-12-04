@@ -63,6 +63,13 @@ const getSizeClass = (size: CellSize): string => {
 };
 
 /**
+ * Gets the disabled cell color (for rows with no data, e.g., slots with no blobs)
+ */
+const getDisabledColor = (): string => {
+  return 'bg-muted/10';
+};
+
+/**
  * Individual cell in the data availability heatmap
  */
 export const DataAvailabilityCell = ({
@@ -81,13 +88,17 @@ export const DataAvailabilityCell = ({
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
 
+  // Check if the row is disabled (e.g., slot with no blobs)
+  const isRowDisabled = data.rowDisabled === true;
+
   // Check if this cell has actual data (not a placeholder)
   const hasData = (data.totalCount ?? 0) > 0;
   const successCount = data.successCount ?? 0;
 
-  // Get color based on view mode
-  const colorClass =
-    viewMode === 'threshold'
+  // Get color based on view mode - disabled rows always get disabled color
+  const colorClass = isRowDisabled
+    ? getDisabledColor()
+    : viewMode === 'threshold'
       ? getThresholdColor(successCount, threshold, hasData)
       : getPercentageColor(data.availability, hasData);
 
@@ -121,7 +132,9 @@ export const DataAvailabilityCell = ({
       style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
     >
       <div className="font-medium">Column {displayColumnIndex}</div>
-      {hasData ? (
+      {isRowDisabled ? (
+        <div className="text-xs/4 text-muted">No blobs in this slot</div>
+      ) : hasData ? (
         viewMode === 'threshold' ? (
           // Threshold mode tooltip
           <>

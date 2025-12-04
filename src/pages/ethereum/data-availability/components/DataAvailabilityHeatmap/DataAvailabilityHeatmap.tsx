@@ -73,7 +73,7 @@ export const DataAvailabilityHeatmap = ({
   }, [rows, filters]);
 
   /**
-   * Convert DA rows to generic grid format
+   * Convert DA rows to generic grid format, propagating disabled state to cells
    */
   const gridRows: GridRow<DataAvailabilityCellData>[] = useMemo(
     () =>
@@ -82,18 +82,44 @@ export const DataAvailabilityHeatmap = ({
         label: row.label,
         cells: row.cells.map(cell => ({
           columnIndex: cell.columnIndex,
-          data: cell,
+          data: {
+            ...cell,
+            rowDisabled: row.disabled ?? false,
+          },
         })),
       })),
     [filteredRows]
   );
 
   /**
+   * Create a lookup map for disabled rows
+   */
+  const disabledRowMap = useMemo(() => {
+    const map = new Map<string, { disabled: boolean; disabledReason?: string }>();
+    for (const row of rows) {
+      if (row.disabled) {
+        map.set(row.identifier, { disabled: true, disabledReason: row.disabledReason });
+      }
+    }
+    return map;
+  }, [rows]);
+
+  /**
    * Custom row label renderer with type icons and drill-down affordance
    */
   const renderRowLabel = useCallback(
-    (props: RowLabelRenderProps) => <DataAvailabilityRowLabel {...props} granularity={granularity} />,
-    [granularity]
+    (props: RowLabelRenderProps) => {
+      const disabledInfo = disabledRowMap.get(props.identifier);
+      return (
+        <DataAvailabilityRowLabel
+          {...props}
+          granularity={granularity}
+          disabled={disabledInfo?.disabled}
+          disabledReason={disabledInfo?.disabledReason}
+        />
+      );
+    },
+    [granularity, disabledRowMap]
   );
 
   return (

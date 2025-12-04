@@ -16,6 +16,8 @@ export interface DataAvailabilityCellData {
   avgResponseTimeMs?: number;
   /** Optional: Blob index (for slot-level view) */
   blobIndex?: number;
+  /** Optional: Whether the parent row is disabled (e.g., slot with no blobs) */
+  rowDisabled?: boolean;
 }
 
 /**
@@ -28,6 +30,10 @@ export interface DataAvailabilityRow {
   label: string;
   /** Cell data for each column in this row */
   cells: DataAvailabilityCellData[];
+  /** Whether this row is disabled (e.g., slot with no blobs) */
+  disabled?: boolean;
+  /** Optional reason why the row is disabled (shown in tooltip) */
+  disabledReason?: string;
 }
 
 /**

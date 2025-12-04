@@ -60,6 +60,9 @@ export const probesSearchSchema = z.object({
   // probePeerId is a string to preserve Int64 precision (JavaScript Number loses precision)
   probeTime: z.coerce.number().optional(),
   probePeerId: z.string().optional(),
+
+  // Live mode - streams new probes in real-time
+  isLive: z.coerce.boolean().optional(),
 });
 
 /**

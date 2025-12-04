@@ -43,6 +43,7 @@ export function DataTable<TData>({
   // Row actions
   onRowClick,
   getRowId,
+  getRowClassName,
   // Manual mode
   manualPagination = false,
   manualFiltering = false,
@@ -235,9 +236,10 @@ export function DataTable<TData>({
                       <th
                         key={header.id}
                         scope="col"
+                        style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}
                         className={clsx(
-                          'py-3.5 text-left text-sm font-semibold text-foreground',
-                          headerIndex === 0 ? 'pr-3 pl-4 sm:pl-6' : 'px-3'
+                          'py-1.5 text-left text-xs font-semibold text-foreground',
+                          headerIndex === 0 ? 'pr-2 pl-3' : 'px-2'
                         )}
                       >
                         <div className="flex flex-col gap-2">
@@ -310,14 +312,19 @@ export function DataTable<TData>({
                   <tr
                     key={row.id}
                     onClick={() => onRowClick?.(row.original)}
-                    className={clsx('transition-colors', onRowClick && 'cursor-pointer hover:bg-background')}
+                    className={clsx(
+                      'transition-colors',
+                      onRowClick && 'cursor-pointer hover:bg-background',
+                      getRowClassName?.(row.original, row.id)
+                    )}
                   >
                     {row.getVisibleCells().map((cell, cellIndex) => (
                       <td
                         key={cell.id}
+                        style={{ width: cell.column.getSize() !== 150 ? cell.column.getSize() : undefined }}
                         className={clsx(
-                          'py-4 text-sm whitespace-nowrap',
-                          cellIndex === 0 ? 'pr-3 pl-4 sm:pl-6' : 'px-3',
+                          'py-1.5 text-xs whitespace-nowrap',
+                          cellIndex === 0 ? 'pr-2 pl-3' : 'px-2',
                           (cell.column.columnDef.meta as DataTableColumnMeta | undefined)?.cellClassName || 'text-muted'
                         )}
                       >

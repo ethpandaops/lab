@@ -9,6 +9,7 @@ import { ProbesView } from './components/ProbesView';
 import type { FilterValues } from './components/FilterPanel';
 import type { ColumnFiltersState, SortingState } from '@tanstack/react-table';
 import type { IntCustodyProbe } from '@/api/types.gen';
+import { useLiveProbeStream } from './hooks';
 
 /**
  * Custody Probes page showing individual probe results
@@ -57,6 +58,9 @@ export function IndexPage(): JSX.Element {
     };
   }, [search.timeStart, search.timeEnd]);
 
+  // Check if live mode is enabled from URL (needed before query)
+  const isLive = search.isLive ?? false;
+
   // Build order_by string for API
   const orderBy = useMemo(() => {
     // Default to probe_date_time desc if no sort specified
@@ -66,6 +70,7 @@ export function IndexPage(): JSX.Element {
   }, [search.sortBy, search.sortOrder]);
 
   // Fetch data from the API with server-side filtering and sorting
+  // Disabled in live mode - live mode uses its own polling
   const {
     data: apiData,
     isLoading,
@@ -99,13 +104,51 @@ export function IndexPage(): JSX.Element {
         ...(search.blobPosters?.length && { blob_submitters_has_any_values: search.blobPosters }),
       },
     }),
-    enabled: !!currentNetwork && !!fuluActivation,
+    enabled: !!currentNetwork && !!fuluActivation && !isLive,
   });
 
-  // Use API data directly
-  const data = useMemo(() => {
+  // Build current filter values from URL for live mode hook
+  const currentFilterValues: FilterValues = useMemo(
+    () => ({
+      result: search.result,
+      prober: search.prober,
+      peer: search.peer,
+      peerId: search.peerId,
+      nodeId: search.nodeId,
+      proberCountry: search.proberCountry,
+      peerCountry: search.peerCountry,
+      proberCity: search.proberCity,
+      peerCity: search.peerCity,
+      proberVersion: search.proberVersion,
+      peerVersion: search.peerVersion,
+      proberAsn: search.proberAsn,
+      peerAsn: search.peerAsn,
+      slot: search.slot,
+      column: search.column,
+      blobPosters: search.blobPosters,
+    }),
+    [search]
+  );
+
+  // Live streaming mode - fetches on bounds change and animates items in
+  const {
+    displayedItems: liveItems,
+    newItemIdsRef,
+    hitPageLimitRef,
+    error: liveError,
+  } = useLiveProbeStream({
+    enabled: isLive && !!currentNetwork && !!fuluActivation,
+    filters: currentFilterValues,
+    fuluSlot: fuluActivation?.slot,
+  });
+
+  // Use API data directly (for non-live mode)
+  const paginatedData = useMemo(() => {
     return apiData?.int_custody_probe ?? [];
   }, [apiData]);
+
+  // Choose which data to display based on mode
+  const data = isLive ? liveItems : paginatedData;
 
   // Normalize probePeerId by stripping quotes (clipboard URLs have quotes, navigate() doesn't)
   const normalizedProbePeerId = useMemo(() => {
@@ -325,28 +368,18 @@ export function IndexPage(): JSX.Element {
     return filters;
   }, [search.result, search.prober, search.peer, search.peerId, search.proberCountry, search.peerCountry]);
 
-  // Build current filter values from URL for FilterPanel
-  const currentFilterValues: FilterValues = useMemo(
-    () => ({
-      result: search.result,
-      prober: search.prober,
-      peer: search.peer,
-      peerId: search.peerId,
-      nodeId: search.nodeId,
-      proberCountry: search.proberCountry,
-      peerCountry: search.peerCountry,
-      proberCity: search.proberCity,
-      peerCity: search.peerCity,
-      proberVersion: search.proberVersion,
-      peerVersion: search.peerVersion,
-      proberAsn: search.proberAsn,
-      peerAsn: search.peerAsn,
-      slot: search.slot,
-      column: search.column,
-      blobPosters: search.blobPosters,
-    }),
-    [search]
-  );
+  // Handle live mode toggle
+  const handleLiveModeToggle = useCallback((): void => {
+    navigate({
+      search: prev => ({
+        ...prev,
+        isLive: !prev.isLive,
+        // Reset pagination when toggling live mode
+        page: 1,
+        pageToken: undefined,
+      }),
+    });
+  }, [navigate]);
 
   // Handle filter panel changes
   const handleFiltersChange = useCallback(
@@ -446,8 +479,8 @@ export function IndexPage(): JSX.Element {
   return (
     <ProbesView
       data={data}
-      isLoading={isLoading}
-      error={error as Error | null}
+      isLoading={isLoading && !isLive}
+      error={isLive ? liveError : (error as Error | null)}
       pagination={{
         pageIndex: (search.page ?? 1) - 1,
         pageSize: search.pageSize ?? 25,
@@ -464,6 +497,11 @@ export function IndexPage(): JSX.Element {
       onClearFilters={handleClearFilters}
       selectedProbe={selectedProbe}
       onProbeSelect={handleProbeSelect}
+      // Live mode props
+      isLive={isLive}
+      onLiveModeToggle={handleLiveModeToggle}
+      newItemIdsRef={newItemIdsRef}
+      liveHitPageLimitRef={hitPageLimitRef}
     />
   );
 }

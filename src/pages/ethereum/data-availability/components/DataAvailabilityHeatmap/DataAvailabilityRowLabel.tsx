@@ -14,6 +14,10 @@ import type { DataAvailabilityGranularity } from './DataAvailabilityHeatmap.type
 interface DataAvailabilityRowLabelProps extends RowLabelRenderProps {
   /** Current granularity level - determines what type of data the row represents */
   granularity: DataAvailabilityGranularity;
+  /** Whether this row is disabled (e.g., slot with no blobs) */
+  disabled?: boolean;
+  /** Reason why the row is disabled (shown in tooltip) */
+  disabledReason?: string;
 }
 
 /**
@@ -83,6 +87,8 @@ export function DataAvailabilityRowLabel({
   onMouseEnter,
   onMouseLeave,
   granularity,
+  disabled,
+  disabledReason,
 }: DataAvailabilityRowLabelProps): React.JSX.Element {
   const Icon = getRowIcon(granularity);
   const typeLabel = getRowTypeLabel(granularity);
@@ -91,25 +97,40 @@ export function DataAvailabilityRowLabel({
   const isBlob = granularity === 'slot';
   const blobInfo = isBlob ? parseBlobLabel(label) : null;
 
+  // Disabled rows can't be drilled down into
+  const isDisabled = disabled === true;
+  const effectiveCanDrillDown = canDrillDown && !isDisabled;
+
+  // Build tooltip
+  let tooltip: string;
+  if (isDisabled && disabledReason) {
+    tooltip = `${typeLabel} ${label} - ${disabledReason}`;
+  } else if (effectiveCanDrillDown) {
+    tooltip = `Drill down into ${typeLabel} ${label}`;
+  } else {
+    tooltip = `${typeLabel} ${label}`;
+  }
+
   return (
     <button
       type="button"
-      onClick={onDrillDown}
+      onClick={effectiveCanDrillDown ? onDrillDown : undefined}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      disabled={!canDrillDown}
+      disabled={!effectiveCanDrillDown}
       className={clsx(
         'group flex h-full w-full items-center gap-1.5 pr-2 text-left transition-all',
-        canDrillDown ? 'cursor-pointer' : 'cursor-default',
-        isHovered && canDrillDown ? 'text-accent' : 'text-muted'
+        effectiveCanDrillDown ? 'cursor-pointer' : 'cursor-default',
+        isDisabled ? 'opacity-40' : '',
+        isHovered && effectiveCanDrillDown ? 'text-accent' : 'text-muted'
       )}
-      title={canDrillDown ? `Drill down into ${typeLabel} ${label}` : `${typeLabel} ${label}`}
+      title={tooltip}
     >
       {/* Type icon */}
       <Icon
         className={clsx(
           'size-3 shrink-0 transition-colors',
-          isHovered && canDrillDown ? 'text-accent' : 'text-muted/60'
+          isHovered && effectiveCanDrillDown ? 'text-accent' : 'text-muted/60'
         )}
       />
 
@@ -117,7 +138,7 @@ export function DataAvailabilityRowLabel({
       <span
         className={clsx(
           'w-8 shrink-0 rounded-xs px-1 py-px text-center text-[9px] font-medium tracking-wide uppercase transition-colors',
-          isHovered && canDrillDown ? 'bg-accent/20 text-accent' : 'bg-muted/20 text-muted'
+          isHovered && effectiveCanDrillDown ? 'bg-accent/20 text-accent' : 'bg-muted/20 text-muted'
         )}
       >
         {typeLabel}
@@ -125,12 +146,12 @@ export function DataAvailabilityRowLabel({
 
       {/* Value - different layout for blobs with submitters */}
       {isBlob && blobInfo ? (
-        <div className="flex flex-1 items-center gap-1.5 overflow-hidden">
+        <div className="flex min-w-0 flex-1 items-center gap-1.5">
           {/* Blob index - fixed width for alignment */}
           <span
             className={clsx(
               'w-4 shrink-0 text-center font-mono text-[11px] transition-colors',
-              isHovered && canDrillDown ? 'font-semibold text-accent' : 'text-foreground/80'
+              isHovered && effectiveCanDrillDown ? 'font-semibold text-accent' : 'text-foreground/80'
             )}
           >
             {blobInfo.index}
@@ -143,7 +164,7 @@ export function DataAvailabilityRowLabel({
               <span
                 className={clsx(
                   'truncate font-mono text-[10px] transition-colors',
-                  isHovered && canDrillDown ? 'text-accent' : 'text-muted'
+                  isHovered && effectiveCanDrillDown ? 'text-accent' : 'text-muted'
                 )}
                 title={blobInfo.submitter}
               >
@@ -156,19 +177,23 @@ export function DataAvailabilityRowLabel({
         <span
           className={clsx(
             'flex-1 truncate text-right font-mono text-[11px] transition-colors',
-            isHovered && canDrillDown ? 'font-semibold text-accent' : 'text-foreground/80'
+            isHovered && effectiveCanDrillDown ? 'font-semibold text-accent' : 'text-foreground/80'
           )}
         >
           {label}
         </span>
       )}
 
-      {/* Drill-down chevron */}
-      {canDrillDown && (
+      {/* Drill-down chevron - reserve space for alignment except at blob level where drill-down is never possible */}
+      {!isBlob && (
         <ChevronRightIcon
           className={clsx(
             'size-3 shrink-0 transition-all',
-            isHovered ? 'translate-x-0.5 text-accent opacity-100' : 'text-muted opacity-40'
+            effectiveCanDrillDown
+              ? isHovered
+                ? 'translate-x-0.5 text-accent opacity-100'
+                : 'text-muted opacity-40'
+              : 'invisible'
           )}
         />
       )}

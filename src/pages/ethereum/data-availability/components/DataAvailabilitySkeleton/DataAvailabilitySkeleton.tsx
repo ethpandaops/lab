@@ -2,90 +2,85 @@ import { type JSX } from 'react';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 
 /**
- * Loading skeleton for Custody page
- * Matches the structure of the actual page content with shimmer effects
+ * Total number of columns in PeerDAS
+ */
+const TOTAL_COLUMNS = 128;
+
+/**
+ * Number of rows to display in skeleton (representative sample)
+ */
+const SKELETON_ROWS = 12;
+
+/**
+ * Loading skeleton for Custody heatmap
+ * Matches the GridHeatmap structure with 128 columns and row labels
  */
 export function DataAvailabilitySkeleton(): JSX.Element {
-  return (
-    <div className="space-y-6">
-      {/* Breadcrumb skeleton */}
-      <div className="flex items-center gap-2">
-        <LoadingContainer className="h-5 w-32 rounded-sm" />
-        <LoadingContainer className="h-5 w-4 rounded-sm" />
-        <LoadingContainer className="h-5 w-24 rounded-sm" />
-      </div>
+  // CSS grid style matching the actual heatmap (128 columns, min 6px each)
+  const gridStyle = {
+    gridTemplateColumns: `repeat(${TOTAL_COLUMNS}, minmax(6px, 1fr))`,
+  };
 
-      {/* Stats row skeleton - 4 stat cards */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="overflow-hidden rounded-sm border border-border bg-surface p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 space-y-3">
-                <LoadingContainer className="h-4 w-20 rounded-sm" />
-                <LoadingContainer className="h-8 w-24 rounded-sm" />
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Grid with scrollable container */}
+      <div className="flex overflow-x-auto">
+        {/* Main grid area */}
+        <div className="min-w-fit flex-1">
+          {/* Rows */}
+          <div className="flex flex-col gap-0.5">
+            {Array.from({ length: SKELETON_ROWS }).map((_, rowIndex) => (
+              <div key={rowIndex} className="flex items-center">
+                {/* Row label skeleton - matches w-36 from GridHeatmap 3xs size */}
+                <div className="w-36 shrink-0 pr-2">
+                  <div className="flex items-center justify-end gap-1.5">
+                    {/* Icon placeholder */}
+                    <LoadingContainer className="size-3.5 rounded-xs" />
+                    {/* Label text placeholder */}
+                    <LoadingContainer className="h-3 w-16 rounded-xs" />
+                    {/* Chevron placeholder */}
+                    <LoadingContainer className="size-3 rounded-xs" />
+                  </div>
+                </div>
+
+                {/* Cells - CSS grid with 128 columns */}
+                <div className="grid flex-1 gap-px" style={gridStyle}>
+                  {Array.from({ length: TOTAL_COLUMNS }).map((_, colIndex) => (
+                    <LoadingContainer key={colIndex} className="aspect-square rounded-xs" />
+                  ))}
+                </div>
               </div>
-              <LoadingContainer className="size-12 rounded-sm" />
+            ))}
+          </div>
+
+          {/* Column header at bottom */}
+          <div className="mt-1 flex items-center">
+            {/* Spacer for row labels */}
+            <div className="w-36 shrink-0" />
+
+            {/* Column indices - sparse labels like actual heatmap (0, 16, 32, etc.) */}
+            <div className="grid flex-1 gap-px" style={gridStyle}>
+              {Array.from({ length: TOTAL_COLUMNS }).map((_, colIndex) => {
+                // Show skeleton for persistent labels: 0, 16, 32, 48, 64, 80, 96, 112, 127
+                const isPersistent = colIndex === 0 || colIndex === 127 || colIndex % 16 === 0;
+                return (
+                  <div key={colIndex} className="relative h-3">
+                    {isPersistent && (
+                      <LoadingContainer className="absolute top-0 left-1/2 h-3 w-4 -translate-x-1/2 rounded-xs" />
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Heatmap card skeleton */}
-      <div className="overflow-hidden rounded-sm border border-border bg-surface">
-        {/* Card header */}
-        <div className="border-b border-border p-6">
-          <LoadingContainer className="h-6 w-64 rounded-sm" />
-          <LoadingContainer className="mt-2 h-4 w-96 rounded-sm" />
-        </div>
-
-        {/* Card content */}
-        <div className="p-6">
-          <div className="space-y-6">
-            {/* Filters and Legend row */}
-            <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-start">
-              {/* Filter panel skeleton */}
-              <div className="w-full lg:flex-[2]">
-                <div className="space-y-3">
-                  <LoadingContainer className="h-5 w-32 rounded-sm" />
-                  <LoadingContainer className="h-10 w-full rounded-sm" />
-                </div>
-              </div>
-
-              {/* Legend skeleton */}
-              <div className="w-full lg:flex-1">
-                <div className="space-y-3">
-                  <LoadingContainer className="h-5 w-28 rounded-sm" />
-                  <div className="flex items-center gap-2">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <LoadingContainer key={i} className="h-4 w-16 rounded-sm" />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Heatmap grid skeleton */}
-            <div className="space-y-2">
-              {/* Column headers */}
-              <div className="flex gap-1">
-                {Array.from({ length: 20 }).map((_, i) => (
-                  <LoadingContainer key={i} className="size-3 rounded-sm" />
-                ))}
-              </div>
-
-              {/* Grid rows */}
-              {Array.from({ length: 12 }).map((_, rowIndex) => (
-                <div key={rowIndex} className="flex items-center gap-2">
-                  {/* Row label */}
-                  <LoadingContainer className="h-3 w-16 rounded-sm" />
-                  {/* Grid cells */}
-                  <div className="flex gap-1">
-                    {Array.from({ length: 20 }).map((_, colIndex) => (
-                      <LoadingContainer key={colIndex} className="size-3 rounded-sm" />
-                    ))}
-                  </div>
-                </div>
-              ))}
+          {/* X-axis title */}
+          <div className="mt-2 flex items-center">
+            {/* Spacer for row labels */}
+            <div className="w-36 shrink-0" />
+            {/* Title centered over columns */}
+            <div className="flex flex-1 justify-center">
+              <LoadingContainer className="h-3 w-20 rounded-xs" />
             </div>
           </div>
         </div>

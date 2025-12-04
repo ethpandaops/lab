@@ -1,4 +1,4 @@
-import { type JSX, useState, useMemo, useCallback } from 'react';
+import { type JSX, useState, useMemo, useCallback, type RefObject } from 'react';
 import {
   createColumnHelper,
   type VisibilityState,
@@ -17,6 +17,7 @@ import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { getCountryFlag } from '@/utils/country';
 import type { IntCustodyProbe } from '@/api/types.gen';
 import { FilterPanel, type FilterValues } from './FilterPanel';
+import { QuickFilters } from './QuickFilters';
 import { PeerIdAvatar } from './PeerIdAvatar';
 import { ProbeDetailDialog } from './ProbeDetailDialog';
 import {
@@ -25,6 +26,9 @@ import {
   QuestionMarkCircleIcon,
   EyeIcon,
   InformationCircleIcon,
+  PlayIcon,
+  PauseIcon,
+  SignalIcon,
 } from '@heroicons/react/24/outline';
 
 // Use generated type directly
@@ -107,6 +111,11 @@ export type ProbesViewProps = {
   // Controlled dialog state for URL-based linking
   selectedProbe: CustodyProbe | null;
   onProbeSelect: (probe: CustodyProbe | null) => void;
+  // Live mode props
+  isLive?: boolean;
+  onLiveModeToggle?: () => void;
+  newItemIdsRef?: RefObject<Set<string>>;
+  liveHitPageLimitRef?: RefObject<boolean>;
 };
 
 export function ProbesView({
@@ -125,6 +134,11 @@ export function ProbesView({
   onClearFilters,
   selectedProbe,
   onProbeSelect,
+  // Live mode
+  isLive = false,
+  onLiveModeToggle,
+  newItemIdsRef,
+  liveHitPageLimitRef: _liveHitPageLimitRef,
 }: ProbesViewProps): JSX.Element {
   // Dialog is open when a probe is selected
   const isDetailDialogOpen = selectedProbe !== null;
@@ -133,7 +147,6 @@ export function ProbesView({
   const [learnMoreOpen, setLearnMoreOpen] = useState(false);
 
   // Column visibility state - managed locally for proper toggling
-  // Default order: Time, Result, Prober, Prober Country, Peer Client, Peer Country, PeerID, Slots, Blob Posters, Columns, Error
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     // Default visible columns (in order of appearance)
     probe_date_time: true, // Time
@@ -142,20 +155,20 @@ export function ProbesView({
     meta_client_geo_country: true, // Prober Country
     meta_peer_implementation: true, // Peer Client
     meta_peer_geo_country: true, // Peer Country
-    peer_id_unique_key: true, // PeerID
+    meta_peer_geo_autonomous_system_number: true, // Peer ASN
     slot: true, // Slot
     blob_submitters: true, // Blob Posters
     column_indices: true, // Columns
-    error: true, // Error
     response_time_ms: true, // Latency
+    peer_id_unique_key: true, // PeerID (at end)
     // Default hidden columns
+    error: false,
     node_id: false,
     meta_client_version: false,
     meta_peer_version: false,
     meta_client_geo_city: false,
     meta_peer_geo_city: false,
     meta_client_geo_autonomous_system_number: false,
-    meta_peer_geo_autonomous_system_number: false,
     classification: false,
   });
 
@@ -180,6 +193,23 @@ export function ProbesView({
     onProbeSelect(null);
   }, [onProbeSelect]);
 
+  // Get stable row ID for animations and tracking
+  const getRowId = useCallback(
+    (probe: CustodyProbe): string => `${probe.probe_date_time}:${probe.peer_id_unique_key}`,
+    []
+  );
+
+  // Get row className for animation
+  const getRowClassName = useCallback(
+    (_probe: CustodyProbe, rowId: string): string | undefined => {
+      if (isLive && newItemIdsRef?.current?.has(rowId)) {
+        return 'animate-[row-new_0.3s_ease-out]';
+      }
+      return undefined;
+    },
+    [isLive, newItemIdsRef]
+  );
+
   // Define table columns - ordered by default visibility preference:
   // Slot, Time, Result, Prober, Prober Country, Peer Client, Peer Country, PeerID, Blob Posters, Columns, Latency, Error
   const columns = useMemo(
@@ -188,6 +218,7 @@ export function ProbesView({
       columnHelper.display({
         id: 'actions',
         header: '',
+        size: 40,
         cell: info => (
           <Button
             variant="soft"
@@ -196,8 +227,9 @@ export function ProbesView({
               e.stopPropagation();
               handleOpenDetails(info.row.original);
             }}
+            className="!p-1"
           >
-            <EyeIcon className="size-3.5" />
+            <EyeIcon className="size-3" />
           </Button>
         ),
         meta: { enableHiding: false },
@@ -206,6 +238,7 @@ export function ProbesView({
       // Slot - show single slot value (moved to front)
       columnHelper.accessor('slot', {
         header: 'Slot',
+        size: 90,
         cell: info => {
           const slot = info.getValue();
           if (slot === undefined || slot === null) return <span className="text-muted">-</span>;
@@ -222,6 +255,7 @@ export function ProbesView({
       // Time (relative format) - probe_date_time is in seconds
       columnHelper.accessor('probe_date_time', {
         header: 'Time',
+        size: 100,
         cell: info => {
           const value = info.getValue();
           if (!value) return <span className="text-muted">-</span>;
@@ -234,6 +268,7 @@ export function ProbesView({
       // Result - more prominent display
       columnHelper.accessor('result', {
         header: 'Result',
+        size: 90,
         cell: info => {
           const result = info.getValue();
           if (!result) return <span className="text-muted">-</span>;
@@ -244,17 +279,17 @@ export function ProbesView({
           // failure = yellow (transient/one-off failure - less severe)
           // missing = red (peer responded but didn't have the data - serious)
           const icon = isSuccess ? (
-            <CheckCircleIcon className="size-5 text-green-500" />
+            <CheckCircleIcon className="size-3.5 text-green-500" />
           ) : isFailure ? (
-            <XCircleIcon className="size-5 text-yellow-500" />
+            <XCircleIcon className="size-3.5 text-yellow-500" />
           ) : (
-            <QuestionMarkCircleIcon className="size-5 text-red-500" />
+            <QuestionMarkCircleIcon className="size-3.5 text-red-500" />
           );
 
           return (
             <FilterableCell field="result" value={result} onFilterClick={onFilterClick}>
               <div
-                className={`inline-flex items-center gap-1.5 rounded-sm px-2 py-1 ${
+                className={`inline-flex items-center gap-1 rounded-xs px-1.5 py-0.5 ${
                   isSuccess
                     ? 'bg-green-500/10 text-green-500'
                     : isFailure
@@ -263,7 +298,7 @@ export function ProbesView({
                 }`}
               >
                 {icon}
-                <span className="text-xs font-semibold tracking-wide uppercase">{result}</span>
+                <span className="text-[10px] font-semibold tracking-wide uppercase">{result}</span>
               </div>
             </FilterableCell>
           );
@@ -275,14 +310,15 @@ export function ProbesView({
       // Prober Implementation
       columnHelper.accessor('meta_client_implementation', {
         header: 'Prober',
+        size: 100,
         cell: info => {
           const client = info.getValue();
           if (!client) return <span className="text-muted">-</span>;
           return (
             <FilterableCell field="meta_client_implementation" value={client} onFilterClick={onFilterClick}>
-              <div className="flex items-center gap-2">
-                <ClientLogo client={client} size={20} />
-                <span className="text-sm font-medium">{client}</span>
+              <div className="flex items-center gap-1.5">
+                <ClientLogo client={client} size={16} />
+                <span className="font-medium">{client}</span>
               </div>
             </FilterableCell>
           );
@@ -293,6 +329,7 @@ export function ProbesView({
       // Prober Country
       columnHelper.accessor('meta_client_geo_country', {
         header: 'Prober Country',
+        size: 130,
         cell: info => {
           const country = info.getValue();
           const code = info.row.original.meta_client_geo_country_code;
@@ -311,14 +348,15 @@ export function ProbesView({
       // Peer Implementation (renamed to Peer Client)
       columnHelper.accessor('meta_peer_implementation', {
         header: 'Peer Client',
+        size: 100,
         cell: info => {
           const client = info.getValue();
           if (!client) return <span className="text-muted">-</span>;
           return (
             <FilterableCell field="meta_peer_implementation" value={client} onFilterClick={onFilterClick}>
-              <div className="flex items-center gap-2">
-                <ClientLogo client={client} size={20} />
-                <span className="text-sm font-medium">{client}</span>
+              <div className="flex items-center gap-1.5">
+                <ClientLogo client={client} size={16} />
+                <span className="font-medium">{client}</span>
               </div>
             </FilterableCell>
           );
@@ -329,6 +367,7 @@ export function ProbesView({
       // Peer Country
       columnHelper.accessor('meta_peer_geo_country', {
         header: 'Peer Country',
+        size: 130,
         cell: info => {
           const country = info.getValue();
           const code = info.row.original.meta_peer_geo_country_code;
@@ -344,26 +383,34 @@ export function ProbesView({
         meta: { enableHiding: true },
       }),
 
-      // Peer ID - with unique visual avatar (number shown in tooltip only)
-      columnHelper.accessor('peer_id_unique_key', {
-        header: 'Peer ID',
+      // Peer ASN
+      columnHelper.accessor('meta_peer_geo_autonomous_system_number', {
+        header: 'Peer ASN',
+        size: 120,
         cell: info => {
           const value = info.getValue();
+          const org = info.row.original.meta_peer_geo_autonomous_system_organization;
           if (!value) return <span className="text-muted">-</span>;
+          const displayText = org ? (org.length > 15 ? `${org.slice(0, 15)}…` : org) : `AS${value}`;
           return (
-            <FilterableCell field="peer_id_unique_key" value={value} onFilterClick={onFilterClick}>
-              <div className="flex items-center justify-center" title={`Peer ID: ${value}`}>
-                <PeerIdAvatar peerId={value} size={24} />
-              </div>
+            <FilterableCell
+              field="meta_peer_geo_autonomous_system_number"
+              value={value}
+              displayValue={org || `AS${value}`}
+              onFilterClick={onFilterClick}
+              className="text-[10px]"
+            >
+              <span title={`AS${value}${org ? ` - ${org}` : ''}`}>{displayText}</span>
             </FilterableCell>
           );
         },
-        meta: { enableHiding: true, cellClassName: 'text-center' },
+        meta: { enableHiding: true },
       }),
 
       // Blob Posters - show logos for blob submitters (top 4, ordered by count)
       columnHelper.accessor('blob_submitters', {
         header: 'Blob Posters',
+        size: 120,
         cell: info => {
           const submitters = info.getValue();
           if (!submitters?.length) return <span className="text-muted">-</span>;
@@ -381,7 +428,7 @@ export function ProbesView({
           const hasMore = countMap.size > 4;
 
           return (
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               {sortedPosters.map(poster => (
                 <FilterableCell
                   key={poster}
@@ -390,7 +437,7 @@ export function ProbesView({
                   onFilterClick={onFilterClick}
                   className="shrink-0"
                 >
-                  <BlobPosterLogo poster={poster} size={20} />
+                  <BlobPosterLogo poster={poster} size={16} />
                 </FilterableCell>
               ))}
               {hasMore && <span className="shrink-0 text-[10px] text-muted">+{countMap.size - 4}</span>}
@@ -403,7 +450,8 @@ export function ProbesView({
 
       // Columns - show count only
       columnHelper.accessor('column_indices', {
-        header: 'Columns',
+        header: 'Cols',
+        size: 50,
         cell: info => {
           const cols = info.getValue();
           if (!cols?.length) return <span className="text-muted">-</span>;
@@ -416,6 +464,7 @@ export function ProbesView({
       // Latency - moved to end
       columnHelper.accessor('response_time_ms', {
         header: 'Latency',
+        size: 70,
         cell: info => {
           const ms = info.getValue();
           if (!ms) return <span className="text-muted">-</span>;
@@ -428,9 +477,28 @@ export function ProbesView({
         meta: { enableHiding: true },
       }),
 
-      // Error - moved to end
+      // Peer ID - with unique visual avatar (number shown in tooltip only)
+      columnHelper.accessor('peer_id_unique_key', {
+        header: 'Peer ID',
+        size: 60,
+        cell: info => {
+          const value = info.getValue();
+          if (!value) return <span className="text-muted">-</span>;
+          return (
+            <FilterableCell field="peer_id_unique_key" value={value} onFilterClick={onFilterClick}>
+              <div className="flex items-center justify-center" title={`Peer ID: ${value}`}>
+                <PeerIdAvatar peerId={value} size={18} />
+              </div>
+            </FilterableCell>
+          );
+        },
+        meta: { enableHiding: true, cellClassName: 'text-center' },
+      }),
+
+      // Error - hidden by default
       columnHelper.accessor('error', {
         header: 'Error',
+        size: 80,
         cell: info => {
           const error = info.getValue();
           if (!error) return <span className="text-muted">-</span>;
@@ -538,37 +606,21 @@ export function ProbesView({
       // Prober ASN
       columnHelper.accessor('meta_client_geo_autonomous_system_number', {
         header: 'Prober ASN',
+        size: 120,
         cell: info => {
           const value = info.getValue();
+          const org = info.row.original.meta_client_geo_autonomous_system_organization;
+          if (!value) return <span className="text-muted">-</span>;
+          const displayText = org ? (org.length > 15 ? `${org.slice(0, 15)}…` : org) : `AS${value}`;
           return (
             <FilterableCell
               field="meta_client_geo_autonomous_system_number"
               value={value}
-              displayValue={value ? `AS${value}` : undefined}
+              displayValue={org || `AS${value}`}
               onFilterClick={onFilterClick}
-              className="font-mono text-[10px]"
+              className="text-[10px]"
             >
-              {value ? `AS${value}` : '-'}
-            </FilterableCell>
-          );
-        },
-        meta: { enableHiding: true },
-      }),
-
-      // Peer ASN
-      columnHelper.accessor('meta_peer_geo_autonomous_system_number', {
-        header: 'Peer ASN',
-        cell: info => {
-          const value = info.getValue();
-          return (
-            <FilterableCell
-              field="meta_peer_geo_autonomous_system_number"
-              value={value}
-              displayValue={value ? `AS${value}` : undefined}
-              onFilterClick={onFilterClick}
-              className="font-mono text-[10px]"
-            >
-              {value ? `AS${value}` : '-'}
+              <span title={`AS${value}${org ? ` - ${org}` : ''}`}>{displayText}</span>
             </FilterableCell>
           );
         },
@@ -640,15 +692,59 @@ export function ProbesView({
           }
           className="mb-0"
         />
-        <button
-          type="button"
-          onClick={() => setLearnMoreOpen(true)}
-          className="mt-1 inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-all hover:border-primary/50 hover:bg-primary/20"
-        >
-          <InformationCircleIcon className="size-4" />
-          Learn more
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          {/* Live mode toggle */}
+          {onLiveModeToggle && (
+            <button
+              type="button"
+              onClick={onLiveModeToggle}
+              className={`inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-sm font-medium transition-all ${
+                isLive
+                  ? 'border-green-500/50 bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                  : 'border-border bg-surface text-muted hover:border-primary/30 hover:text-foreground'
+              }`}
+            >
+              {isLive ? (
+                <>
+                  <span className="relative flex size-2">
+                    <span className="absolute inline-flex size-full animate-ping rounded-full bg-green-400 opacity-75" />
+                    <span className="relative inline-flex size-2 rounded-full bg-green-500" />
+                  </span>
+                  <PauseIcon className="size-4" />
+                  <span>Live</span>
+                </>
+              ) : (
+                <>
+                  <PlayIcon className="size-4" />
+                  <span>Go Live</span>
+                </>
+              )}
+            </button>
+          )}
+          {/* Learn more button */}
+          <button
+            type="button"
+            onClick={() => setLearnMoreOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-all hover:border-primary/50 hover:bg-primary/20"
+          >
+            <InformationCircleIcon className="size-4" />
+            Learn more
+          </button>
+        </div>
       </div>
+
+      {/* Live mode indicator bar */}
+      {isLive && (
+        <div className="mb-4 flex items-center rounded-sm border border-primary/30 bg-primary/10 px-4 py-2">
+          <div className="flex items-center gap-3">
+            <SignalIcon className="size-5 text-primary" />
+            <div>
+              <span className="text-sm font-medium text-primary">Live Mode Active</span>
+              <span className="ml-2 text-xs text-muted">Showing a sample of recent probes</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Learn More Dialog */}
       <Dialog open={learnMoreOpen} onClose={() => setLearnMoreOpen(false)} title="About Custody Probes" size="lg">
@@ -689,6 +785,11 @@ export function ProbesView({
         </div>
       </Dialog>
 
+      {/* Quick filters */}
+      <div className="mb-3">
+        <QuickFilters currentFilters={filters} onApplyPreset={onFiltersChange} onClearFilters={onClearFilters} />
+      </div>
+
       {/* Filter panel */}
       <div className="mb-4">
         <FilterPanel filters={filters} onFiltersChange={onFiltersChange} onClearAll={onClearFilters} />
@@ -696,30 +797,49 @@ export function ProbesView({
 
       {/* Data table */}
       <div className="overflow-hidden rounded-lg border border-border bg-surface">
-        <DataTable
-          data={data}
-          columns={columns}
-          isLoading={isLoading}
-          pageSize={pagination.pageSize}
-          pageIndex={pagination.pageIndex}
-          onPaginationChange={pagination.onPaginationChange}
-          columnVisibility={columnVisibility}
-          onColumnVisibilityChange={handleColumnVisibilityChange}
-          emptyMessage="No probe data available."
-          // Server-side controls
-          manualPagination={true}
-          manualFiltering={true}
-          manualSorting={true}
-          hasNextPage={hasNextPage}
-          sorting={sorting}
-          onSortingChange={onSortingChange}
-          columnFilters={columnFilters}
-          onColumnFiltersChange={onColumnFiltersChange}
-          // Hide global filter (we have custom filter panel)
-          hideGlobalFilter={true}
-          // Show pagination at top
-          paginationPosition="top"
-        />
+        {isLive ? (
+          // Live mode - simple table without pagination
+          <DataTable
+            data={data}
+            columns={columns}
+            isLoading={false}
+            pageSize={50}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={handleColumnVisibilityChange}
+            emptyMessage="Waiting for live data..."
+            manualPagination={false}
+            manualFiltering={true}
+            manualSorting={true}
+            getRowId={getRowId}
+            getRowClassName={getRowClassName}
+            hideGlobalFilter={true}
+            paginationPosition="top"
+          />
+        ) : (
+          // Normal mode - server-side pagination
+          <DataTable
+            data={data}
+            columns={columns}
+            isLoading={isLoading}
+            pageSize={pagination.pageSize}
+            pageIndex={pagination.pageIndex}
+            onPaginationChange={pagination.onPaginationChange}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={handleColumnVisibilityChange}
+            emptyMessage="No probe data available."
+            manualPagination={true}
+            manualFiltering={true}
+            manualSorting={true}
+            hasNextPage={hasNextPage}
+            sorting={sorting}
+            onSortingChange={onSortingChange}
+            columnFilters={columnFilters}
+            onColumnFiltersChange={onColumnFiltersChange}
+            getRowId={getRowId}
+            hideGlobalFilter={true}
+            paginationPosition="top"
+          />
+        )}
       </div>
 
       {/* Detail dialog - shared component */}
