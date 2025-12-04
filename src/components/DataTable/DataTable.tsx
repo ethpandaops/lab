@@ -236,8 +236,8 @@ export function DataTable<TData>({
                         key={header.id}
                         scope="col"
                         className={clsx(
-                          'py-3.5 text-left text-sm font-semibold text-foreground',
-                          headerIndex === 0 ? 'pr-3 pl-4 sm:pl-6' : 'px-3'
+                          'py-1.5 text-left text-xs font-semibold text-foreground',
+                          headerIndex === 0 ? 'pr-2 pl-3' : 'px-2'
                         )}
                       >
                         <div className="flex flex-col gap-2">
@@ -316,8 +316,8 @@ export function DataTable<TData>({
                       <td
                         key={cell.id}
                         className={clsx(
-                          'py-4 text-sm whitespace-nowrap',
-                          cellIndex === 0 ? 'pr-3 pl-4 sm:pl-6' : 'px-3',
+                          'py-1.5 text-xs whitespace-nowrap',
+                          cellIndex === 0 ? 'pr-2 pl-3' : 'px-2',
                           (cell.column.columnDef.meta as DataTableColumnMeta | undefined)?.cellClassName || 'text-muted'
                         )}
                       >

@@ -17,6 +17,7 @@ import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { getCountryFlag } from '@/utils/country';
 import type { IntCustodyProbe } from '@/api/types.gen';
 import { FilterPanel, type FilterValues } from './FilterPanel';
+import { QuickFilters } from './QuickFilters';
 import { PeerIdAvatar } from './PeerIdAvatar';
 import { ProbeDetailDialog } from './ProbeDetailDialog';
 import {
@@ -196,8 +197,9 @@ export function ProbesView({
               e.stopPropagation();
               handleOpenDetails(info.row.original);
             }}
+            className="!p-1"
           >
-            <EyeIcon className="size-3.5" />
+            <EyeIcon className="size-3" />
           </Button>
         ),
         meta: { enableHiding: false },
@@ -244,17 +246,17 @@ export function ProbesView({
           // failure = yellow (transient/one-off failure - less severe)
           // missing = red (peer responded but didn't have the data - serious)
           const icon = isSuccess ? (
-            <CheckCircleIcon className="size-5 text-green-500" />
+            <CheckCircleIcon className="size-3.5 text-green-500" />
           ) : isFailure ? (
-            <XCircleIcon className="size-5 text-yellow-500" />
+            <XCircleIcon className="size-3.5 text-yellow-500" />
           ) : (
-            <QuestionMarkCircleIcon className="size-5 text-red-500" />
+            <QuestionMarkCircleIcon className="size-3.5 text-red-500" />
           );
 
           return (
             <FilterableCell field="result" value={result} onFilterClick={onFilterClick}>
               <div
-                className={`inline-flex items-center gap-1.5 rounded-sm px-2 py-1 ${
+                className={`inline-flex items-center gap-1 rounded-xs px-1.5 py-0.5 ${
                   isSuccess
                     ? 'bg-green-500/10 text-green-500'
                     : isFailure
@@ -263,7 +265,7 @@ export function ProbesView({
                 }`}
               >
                 {icon}
-                <span className="text-xs font-semibold tracking-wide uppercase">{result}</span>
+                <span className="text-[10px] font-semibold tracking-wide uppercase">{result}</span>
               </div>
             </FilterableCell>
           );
@@ -280,9 +282,9 @@ export function ProbesView({
           if (!client) return <span className="text-muted">-</span>;
           return (
             <FilterableCell field="meta_client_implementation" value={client} onFilterClick={onFilterClick}>
-              <div className="flex items-center gap-2">
-                <ClientLogo client={client} size={20} />
-                <span className="text-sm font-medium">{client}</span>
+              <div className="flex items-center gap-1.5">
+                <ClientLogo client={client} size={16} />
+                <span className="font-medium">{client}</span>
               </div>
             </FilterableCell>
           );
@@ -316,9 +318,9 @@ export function ProbesView({
           if (!client) return <span className="text-muted">-</span>;
           return (
             <FilterableCell field="meta_peer_implementation" value={client} onFilterClick={onFilterClick}>
-              <div className="flex items-center gap-2">
-                <ClientLogo client={client} size={20} />
-                <span className="text-sm font-medium">{client}</span>
+              <div className="flex items-center gap-1.5">
+                <ClientLogo client={client} size={16} />
+                <span className="font-medium">{client}</span>
               </div>
             </FilterableCell>
           );
@@ -353,7 +355,7 @@ export function ProbesView({
           return (
             <FilterableCell field="peer_id_unique_key" value={value} onFilterClick={onFilterClick}>
               <div className="flex items-center justify-center" title={`Peer ID: ${value}`}>
-                <PeerIdAvatar peerId={value} size={24} />
+                <PeerIdAvatar peerId={value} size={18} />
               </div>
             </FilterableCell>
           );
@@ -381,7 +383,7 @@ export function ProbesView({
           const hasMore = countMap.size > 4;
 
           return (
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               {sortedPosters.map(poster => (
                 <FilterableCell
                   key={poster}
@@ -390,7 +392,7 @@ export function ProbesView({
                   onFilterClick={onFilterClick}
                   className="shrink-0"
                 >
-                  <BlobPosterLogo poster={poster} size={20} />
+                  <BlobPosterLogo poster={poster} size={16} />
                 </FilterableCell>
               ))}
               {hasMore && <span className="shrink-0 text-[10px] text-muted">+{countMap.size - 4}</span>}
@@ -688,6 +690,11 @@ export function ProbesView({
           </p>
         </div>
       </Dialog>
+
+      {/* Quick filters */}
+      <div className="mb-3">
+        <QuickFilters currentFilters={filters} onApplyPreset={onFiltersChange} onClearFilters={onClearFilters} />
+      </div>
 
       {/* Filter panel */}
       <div className="mb-4">
