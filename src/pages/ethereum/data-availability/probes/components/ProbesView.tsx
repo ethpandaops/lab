@@ -381,13 +381,19 @@ export function ProbesView({
           const hasMore = countMap.size > 4;
 
           return (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               {sortedPosters.map(poster => (
-                <FilterableCell key={poster} field="blob_submitters" value={poster} onFilterClick={onFilterClick}>
-                  <BlobPosterLogo poster={poster} size={18} />
+                <FilterableCell
+                  key={poster}
+                  field="blob_submitters"
+                  value={poster}
+                  onFilterClick={onFilterClick}
+                  className="shrink-0"
+                >
+                  <BlobPosterLogo poster={poster} size={20} />
                 </FilterableCell>
               ))}
-              {hasMore && <span className="text-[10px] text-muted">+{countMap.size - 4}</span>}
+              {hasMore && <span className="shrink-0 text-[10px] text-muted">+{countMap.size - 4}</span>}
             </div>
           );
         },
@@ -395,21 +401,13 @@ export function ProbesView({
         meta: { enableHiding: true },
       }),
 
-      // Columns - show count and sample if available
+      // Columns - show count only
       columnHelper.accessor('column_indices', {
         header: 'Columns',
         cell: info => {
           const cols = info.getValue();
           if (!cols?.length) return <span className="text-muted">-</span>;
-          // Show first 3 columns as preview
-          const preview = cols.slice(0, 3).join(', ');
-          const hasMore = cols.length > 3;
-          return (
-            <span className="font-mono text-xs">
-              <span className="text-foreground">{preview}</span>
-              {hasMore && <span className="text-muted">... ({cols.length})</span>}
-            </span>
-          );
+          return <span className="font-mono text-xs text-foreground">{cols.length}</span>;
         },
         enableSorting: false,
         meta: { enableHiding: true },

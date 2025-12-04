@@ -85,9 +85,9 @@ export function ProbeEventRow({ probe, onClick, isNew, showViewIcon }: ProbeEven
               <span>·</span>
               <div className="flex items-center gap-1">
                 {blobPosters.map(poster => (
-                  <BlobPosterLogo key={poster} poster={poster} size={14} />
+                  <BlobPosterLogo key={poster} poster={poster} size={16} className="shrink-0" />
                 ))}
-                {remainingCount > 0 && <span className="text-[9px] text-muted">+{remainingCount}</span>}
+                {remainingCount > 0 && <span className="shrink-0 text-[9px] text-muted">+{remainingCount}</span>}
               </div>
             </>
           )}

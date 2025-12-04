@@ -255,7 +255,7 @@ function AvailabilityCell({
         <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 rounded-sm bg-surface px-3 py-2 text-sm/6 whitespace-nowrap text-foreground shadow-sm">
           {data.hasData ? (
             <>
-              <div className="font-medium">{availabilityPercent}% available</div>
+              <div className="font-medium">{availabilityPercent}% successful probes</div>
               <div className="text-xs text-muted">
                 {data.successCount}/{data.totalCount} observations
               </div>

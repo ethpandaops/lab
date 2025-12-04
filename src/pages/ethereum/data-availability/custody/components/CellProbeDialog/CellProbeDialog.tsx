@@ -10,13 +10,14 @@ import {
   ServerIcon,
   FunnelIcon,
 } from '@heroicons/react/24/outline';
-import { intCustodyProbeServiceListOptions } from '@/api/@tanstack/react-query.gen';
-import type { IntCustodyProbe } from '@/api/types.gen';
+import { intCustodyProbeOrderBySlotServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import type { IntCustodyProbeOrderBySlot } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { formatEpoch, formatSlot } from '@/utils';
 import { ProbeEventRow } from '@/pages/ethereum/data-availability/components/ProbeEventRow';
 import { ProbeDetailDialog } from '@/pages/ethereum/data-availability/probes/components/ProbeDetailDialog';
+import { useFuluActivation } from '@/pages/ethereum/data-availability/custody/hooks/useFuluActivation';
 import type { CellProbeDialogProps, CellContext } from './CellProbeDialog.types';
 
 /**
@@ -164,26 +165,29 @@ export function CellProbeDialog({
   timeRangeContext,
 }: CellProbeDialogProps): JSX.Element | null {
   const { currentNetwork } = useNetwork();
-  const [selectedProbe, setSelectedProbe] = useState<IntCustodyProbe | null>(null);
+  const { fuluActivation } = useFuluActivation();
+  const [selectedProbe, setSelectedProbe] = useState<IntCustodyProbeOrderBySlot | null>(null);
   const [resultFilter, setResultFilter] = useState<ResultFilter>('all');
 
   // Build query params from context (includes server-side result filter)
   const queryParams = useMemo(() => {
-    if (!cellContext || !timeRangeContext) return null;
+    if (!cellContext || !timeRangeContext || !fuluActivation) return null;
 
     const params: Record<string, unknown> = {
       // Filter by column - uses column_indices_has (array contains)
       column_indices_has: cellContext.columnIndex,
       page_size: MAX_PROBES,
       order_by: 'probe_date_time desc',
+      // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
+      slot_gte: fuluActivation.slot,
     };
 
-    // Add time range filters
+    // Add time range filters using slot_start_date_time (matches _by_slot table partition key)
     if (timeRangeContext.timeStart !== undefined) {
-      params.probe_date_time_gte = timeRangeContext.timeStart;
+      params.slot_start_date_time_gte = timeRangeContext.timeStart;
     }
     if (timeRangeContext.timeEnd !== undefined) {
-      params.probe_date_time_lte = timeRangeContext.timeEnd;
+      params.slot_start_date_time_lte = timeRangeContext.timeEnd;
     }
 
     // Add slot filter if specific slot
@@ -202,18 +206,18 @@ export function CellProbeDialog({
     }
 
     return params;
-  }, [cellContext, timeRangeContext, resultFilter]);
+  }, [cellContext, timeRangeContext, resultFilter, fuluActivation]);
 
-  // Fetch probes
+  // Fetch probes using the _by_slot table (partitioned by slot_start_date_time)
   const { data, isLoading, error } = useQuery({
-    ...intCustodyProbeServiceListOptions({
+    ...intCustodyProbeOrderBySlotServiceListOptions({
       query: queryParams as Record<string, unknown>,
     }),
     enabled: isOpen && !!currentNetwork && !!queryParams,
     placeholderData: keepPreviousData,
   });
 
-  const probes = useMemo(() => data?.int_custody_probe ?? [], [data]);
+  const probes = useMemo(() => data?.int_custody_probe_order_by_slot ?? [], [data]);
 
   // Get the count from the response (server filtered)
   const probeCount = probes.length;
@@ -240,7 +244,7 @@ export function CellProbeDialog({
   }, [cellContext, timeRangeContext]);
 
   // Handle probe click
-  const handleProbeClick = useCallback((probe: IntCustodyProbe) => {
+  const handleProbeClick = useCallback((probe: IntCustodyProbeOrderBySlot) => {
     setSelectedProbe(probe);
   }, []);
 

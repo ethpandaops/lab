@@ -3,6 +3,7 @@ import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
 import { intCustodyProbeServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import { useFuluActivation } from '@/pages/ethereum/data-availability/custody/hooks/useFuluActivation';
 import type { ProbesSearch } from './IndexPage.types';
 import { ProbesView } from './components/ProbesView';
 import type { FilterValues } from './components/FilterPanel';
@@ -16,6 +17,7 @@ export function IndexPage(): JSX.Element {
   const navigate = useNavigate({ from: '/ethereum/data-availability/probes/' });
   const search = useSearch({ from: '/ethereum/data-availability/probes/' }) as ProbesSearch;
   const { currentNetwork } = useNetwork();
+  const { fuluActivation } = useFuluActivation();
 
   // Capture the initial probeTime from URL on mount (for deep-linking)
   // This prevents time range recalculation when user clicks on rows to view details
@@ -76,6 +78,8 @@ export function IndexPage(): JSX.Element {
         page_size: search.pageSize ?? 25,
         page_token: search.pageToken,
         order_by: orderBy,
+        // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
+        ...(fuluActivation && { slot_gte: fuluActivation.slot }),
         // Server-side filters
         ...(search.result && { result_eq: search.result }),
         ...(search.prober && { meta_client_implementation_eq: search.prober }),
@@ -95,7 +99,7 @@ export function IndexPage(): JSX.Element {
         ...(search.blobPosters?.length && { blob_submitters_has_any_values: search.blobPosters }),
       },
     }),
-    enabled: !!currentNetwork,
+    enabled: !!currentNetwork && !!fuluActivation,
   });
 
   // Use API data directly
@@ -103,7 +107,24 @@ export function IndexPage(): JSX.Element {
     return apiData?.int_custody_probe ?? [];
   }, [apiData]);
 
-  // Fetch probes for deep-linking (when probeTime and probePeerId are in URL)
+  // Normalize probePeerId by stripping quotes (clipboard URLs have quotes, navigate() doesn't)
+  const normalizedProbePeerId = useMemo(() => {
+    if (!search.probePeerId) return null;
+    return search.probePeerId.replace(/^"|"$/g, '');
+  }, [search.probePeerId]);
+
+  // Check if probe exists in current page data (to avoid unnecessary deep-link fetch)
+  const probeInCurrentData = useMemo(() => {
+    if (!search.probeTime || !normalizedProbePeerId) return null;
+    return (
+      data.find(
+        probe =>
+          probe.probe_date_time === search.probeTime && String(probe.peer_id_unique_key) === normalizedProbePeerId
+      ) ?? null
+    );
+  }, [data, search.probeTime, normalizedProbePeerId]);
+
+  // Fetch probes for deep-linking (when probeTime and probePeerId are in URL but NOT in current data)
   // Note: We can't use peer_id_unique_key_eq because Int64 values lose precision in JavaScript.
   // Instead, query by timestamp and filter client-side by comparing the (equally corrupted) string values.
   const { data: deepLinkedProbeData } = useQuery({
@@ -112,9 +133,12 @@ export function IndexPage(): JSX.Element {
         probe_date_time_gte: search.probeTime,
         probe_date_time_lte: search.probeTime,
         page_size: 100, // Fetch enough to find the matching probe
+        // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
+        ...(fuluActivation && { slot_gte: fuluActivation.slot }),
       },
     }),
-    enabled: !!currentNetwork && !!search.probeTime && !!search.probePeerId,
+    // Only fetch if probe is not already in current page data
+    enabled: !!currentNetwork && !!fuluActivation && !!search.probeTime && !!search.probePeerId && !probeInCurrentData,
   });
 
   // Store the next page token for pagination
@@ -382,7 +406,7 @@ export function IndexPage(): JSX.Element {
   }, [navigate]);
 
   // Handle opening probe details - updates URL
-  // Note: peer_id_unique_key is wrapped in quotes so TanStack Router parses it as a string
+  // Note: probePeerId is wrapped in quotes so TanStack Router preserves it as a string (not a number that loses Int64 precision)
   const handleProbeSelect = useCallback(
     (probe: IntCustodyProbe | null): void => {
       if (probe) {
@@ -390,7 +414,6 @@ export function IndexPage(): JSX.Element {
           search: prev => ({
             ...prev,
             probeTime: probe.probe_date_time,
-            // Wrap in quotes so it's parsed as a string, not a number
             probePeerId: probe.peer_id_unique_key !== undefined ? `"${probe.peer_id_unique_key}"` : undefined,
           }),
         });
@@ -408,25 +431,17 @@ export function IndexPage(): JSX.Element {
   );
 
   // Find selected probe from URL params
-  // First try the deep-linked query result, then fall back to searching current page data
-  // Note: peer_id is wrapped in quotes in the URL to preserve it as a string
+  // First check current page data, then fall back to deep-linked query result
   const selectedProbe = useMemo(() => {
-    if (!search.probeTime || !search.probePeerId) return null;
+    if (!search.probeTime || !normalizedProbePeerId) return null;
 
-    // Strip quotes from the URL param value
-    const peerId = search.probePeerId.replace(/^"|"$/g, '');
+    // Return probe from current page if found
+    if (probeInCurrentData) return probeInCurrentData;
 
-    // Search in deep-linked probes first (compare peer_id as strings due to Int64 precision issues)
+    // Fall back to deep-linked probes (compare peer_id as strings due to Int64 precision issues)
     const deepLinkedProbes = deepLinkedProbeData?.int_custody_probe ?? [];
-    const matchedProbe = deepLinkedProbes.find(probe => String(probe.peer_id_unique_key) === peerId);
-    if (matchedProbe) return matchedProbe;
-
-    // Fall back to searching in current page data
-    return (
-      data.find(probe => probe.probe_date_time === search.probeTime && String(probe.peer_id_unique_key) === peerId) ??
-      null
-    );
-  }, [data, search.probeTime, search.probePeerId, deepLinkedProbeData]);
+    return deepLinkedProbes.find(probe => String(probe.peer_id_unique_key) === normalizedProbePeerId) ?? null;
+  }, [search.probeTime, normalizedProbePeerId, probeInCurrentData, deepLinkedProbeData]);
 
   return (
     <ProbesView

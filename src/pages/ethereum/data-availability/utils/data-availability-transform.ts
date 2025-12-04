@@ -61,6 +61,10 @@ export function transformDailyToRows(
 ): DataAvailabilityRow[] {
   if (!data) return [];
 
+  // Get today's date for filtering future dates in local mode
+  const now = new Date();
+  const todayLocalStr = now.toLocaleDateString('en-CA'); // YYYY-MM-DD format in local timezone
+
   // Group by date
   const byDate = new Map<string, FctDataColumnAvailabilityDaily[]>();
   for (const item of data) {
@@ -72,29 +76,44 @@ export function transformDailyToRows(
   }
 
   // Convert to rows (sorted by date descending for most recent first)
-  return Array.from(byDate.entries())
-    .sort((a, b) => b[0].localeCompare(a[0]))
-    .map(([date, items]) => {
-      const cells = items
-        .sort((a, b) => (a.column_index ?? 0) - (b.column_index ?? 0))
-        .map(item => ({
-          identifier: date,
-          columnIndex: item.column_index ?? 0,
-          availability: (item.avg_availability_pct ?? 0) / 100,
-          successCount: item.total_success_count,
-          totalCount: item.total_probe_count,
-          avgResponseTimeMs: item.avg_p50_response_time_ms,
-        }));
+  const rows: DataAvailabilityRow[] = [];
 
-      return {
+  for (const [date, items] of Array.from(byDate.entries()).sort((a, b) => b[0].localeCompare(a[0]))) {
+    // For local timezone, use end-of-day UTC to determine the local date label.
+    // This shifts UTC dates forward for positive-offset timezones (e.g., AEDT).
+    // Example: UTC Dec 3 23:59:59 → AEDT Dec 4 10:59:59, so label shows "Dec 4"
+    const labelDate = timezone === 'UTC' ? new Date(date + 'T00:00:00Z') : new Date(date + 'T23:59:59Z');
+
+    // In local mode, skip dates that would show as future dates (e.g., "Dec 5" when today is Dec 4)
+    if (timezone === 'local') {
+      const shiftedLocalStr = labelDate.toLocaleDateString('en-CA');
+      if (shiftedLocalStr > todayLocalStr) {
+        continue;
+      }
+    }
+
+    const cells = items
+      .sort((a, b) => (a.column_index ?? 0) - (b.column_index ?? 0))
+      .map(item => ({
         identifier: date,
-        label: new Date(date).toLocaleDateString(
-          'en-US',
-          timezone === 'UTC' ? { month: 'short', day: 'numeric', timeZone: 'UTC' } : { month: 'short', day: 'numeric' }
-        ),
-        cells: ensureAllColumns(cells, date),
-      };
+        columnIndex: item.column_index ?? 0,
+        availability: (item.avg_availability_pct ?? 0) / 100,
+        successCount: item.total_success_count,
+        totalCount: item.total_probe_count,
+        avgResponseTimeMs: item.avg_p50_response_time_ms,
+      }));
+
+    rows.push({
+      identifier: date,
+      label: labelDate.toLocaleDateString(
+        'en-US',
+        timezone === 'UTC' ? { month: 'short', day: 'numeric', timeZone: 'UTC' } : { month: 'short', day: 'numeric' }
+      ),
+      cells: ensureAllColumns(cells, date),
     });
+  }
+
+  return rows;
 }
 
 /**
@@ -191,6 +210,7 @@ export function transformEpochsToRows(data: FctDataColumnAvailabilityByEpoch[] |
 
 /**
  * Transform slot data to heatmap rows
+ * @param data - Slot availability data from API
  */
 export function transformSlotsToRows(data: FctDataColumnAvailabilityBySlot[] | undefined): DataAvailabilityRow[] {
   if (!data) return [];
@@ -210,6 +230,7 @@ export function transformSlotsToRows(data: FctDataColumnAvailabilityBySlot[] | u
     .sort((a, b) => a[0] - b[0])
     .map(([slot, items]) => {
       const identifier = String(slot);
+
       const cells = items
         .sort((a, b) => (a.column_index ?? 0) - (b.column_index ?? 0))
         .map(item => ({

@@ -211,11 +211,13 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
                   </dd>
                 </div>
 
-                {/* Blob Count */}
-                <div>
-                  <dt className="text-xs font-medium text-muted">Blobs</dt>
-                  <dd className="mt-1 text-base/7 font-semibold text-foreground">{actualBlobCount}</dd>
-                </div>
+                {/* Blob Count - only show if there are blobs */}
+                {actualBlobCount > 0 && (
+                  <div>
+                    <dt className="text-xs font-medium text-muted">Blobs</dt>
+                    <dd className="mt-1 text-base/7 font-semibold text-foreground">{actualBlobCount}</dd>
+                  </div>
+                )}
 
                 {/* Slot Timestamp */}
                 <div className="col-span-2">

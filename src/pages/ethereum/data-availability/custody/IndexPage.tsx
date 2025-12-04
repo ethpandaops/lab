@@ -1,4 +1,4 @@
-import { type JSX, useState, useMemo, useEffect, useCallback } from 'react';
+import { type JSX, useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearch, useNavigate, Link } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
@@ -7,7 +7,6 @@ import { DataAvailabilityHeatmap } from '@/pages/ethereum/data-availability/comp
 import { DataAvailabilityLegend } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityLegend';
 import { DataAvailabilitySkeleton } from '@/pages/ethereum/data-availability/components/DataAvailabilitySkeleton';
 import { ViewModeToggle } from '@/pages/ethereum/data-availability/components/ViewModeToggle';
-import { TimezoneToggle } from '@/components/Elements/TimezoneToggle';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { LiveProbeEvents } from './components/LiveProbeEvents';
 import type { ProbeFilterContext } from './components/LiveProbeEvents';
@@ -18,9 +17,9 @@ import type {
   ViewMode,
 } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
 import type { DataAvailabilityFilters } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel.types';
-import { useTimezone } from '@/hooks/useTimezone';
 import { useNetwork } from '@/hooks/useNetwork';
 import { formatEpoch, formatSlot } from '@/utils';
+import { useFuluActivation } from './hooks/useFuluActivation';
 import {
   ChevronRightIcon,
   ArrowLeftIcon,
@@ -57,7 +56,6 @@ import {
 import { fetchAllPages } from '@/utils/api-pagination';
 import type { CustodySearch } from './IndexPage.types';
 import { validateSearchParamHierarchy, getDefaultThreshold } from './IndexPage.types';
-import { useForkBasedInitialView } from './hooks/useForkBasedInitialView';
 
 /**
  * Drill-down level state - each level maintains parent context for breadcrumbs
@@ -159,43 +157,42 @@ function deriveCurrentLevel(search: CustodySearch): DrillDownLevel {
 /**
  * Get a human-readable title for the current viewing level
  * Main title = where you are, subtitle = what you're viewing
+ * All times are displayed in UTC
  */
-function getLevelTitle(level: DrillDownLevel, timezone: 'UTC' | 'local'): { main: string; sub: string } {
-  const tzOptions = timezone === 'UTC' ? { timeZone: 'UTC' } : {};
-
+function getLevelTitle(level: DrillDownLevel): { main: string; sub: string } {
   switch (level.type) {
     case 'window':
-      return { main: 'Custody Window', sub: `Viewing last ${WINDOW_DAYS} days by day` };
+      return { main: 'Custody Window', sub: `Last ${WINDOW_DAYS} days (UTC)` };
     case 'day': {
-      const dateStr = new Date(level.date).toLocaleDateString('en-US', {
+      const labelDate = new Date(level.date + 'T00:00:00Z');
+      const dateStr = labelDate.toLocaleDateString('en-US', {
         weekday: 'long',
         month: 'long',
         day: 'numeric',
         year: 'numeric',
-        ...tzOptions,
+        timeZone: 'UTC',
       });
-      return { main: dateStr, sub: 'Viewing hours in this day' };
+      return { main: dateStr, sub: 'Hours in this day (UTC)' };
     }
     case 'hour': {
-      const dateStr = new Date(level.date).toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'long',
+      const labelDate = new Date(level.date + 'T00:00:00Z');
+      const dateStr = labelDate.toLocaleDateString('en-US', {
+        month: 'short',
         day: 'numeric',
-        year: 'numeric',
-        ...tzOptions,
+        timeZone: 'UTC',
       });
       const timeStr = new Date(level.hourStartDateTime * 1000).toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false,
-        ...tzOptions,
+        timeZone: 'UTC',
       });
-      return { main: `${dateStr} at ${timeStr}`, sub: 'Viewing epochs in this hour' };
+      return { main: `${dateStr} at ${timeStr} UTC`, sub: 'Epochs in this hour' };
     }
     case 'epoch':
-      return { main: `Epoch ${formatEpoch(level.epoch)}`, sub: 'Viewing slots in this epoch' };
+      return { main: `Epoch ${formatEpoch(level.epoch)}`, sub: 'Slots in this epoch' };
     case 'slot':
-      return { main: `Slot ${formatSlot(level.slot)}`, sub: 'Viewing blobs in this slot' };
+      return { main: `Slot ${formatSlot(level.slot)}`, sub: 'Blobs in this slot' };
   }
 }
 
@@ -207,42 +204,14 @@ export function IndexPage(): JSX.Element {
   const navigate = useNavigate({ from: '/ethereum/data-availability/custody/' });
   const search = useSearch({ from: '/ethereum/data-availability/custody/' });
 
-  // Timezone preference
-  const { timezone } = useTimezone();
-
-  // Network for default threshold
-  const { currentNetwork } = useNetwork();
-
   // Derive drill-down state from URL
   const currentLevel = deriveCurrentLevel(search);
 
-  // Smart initial view based on fork timing
-  const { searchParams: forkBasedParams, isLoading: forkViewLoading } = useForkBasedInitialView();
+  // All timestamps are displayed in UTC - data is aggregated by UTC boundaries
+  const timezone = 'UTC' as const;
 
-  // Track if we've performed the initial navigation
-  const [hasPerformedInitialNav, setHasPerformedInitialNav] = useState(false);
-
-  // Auto-navigate to fork-based view on initial load (no URL params)
-  useEffect(() => {
-    // Skip if:
-    // - Already performed initial nav
-    // - URL already has params (user navigated directly)
-    // - Still loading fork data
-    // - No fork-based params (window view or non-Fulu network)
-    const hasExistingParams =
-      search.date !== undefined || search.hour !== undefined || search.epoch !== undefined || search.slot !== undefined;
-
-    if (hasPerformedInitialNav || hasExistingParams || forkViewLoading || !forkBasedParams) {
-      return;
-    }
-
-    // Navigate to the recommended view
-    setHasPerformedInitialNav(true);
-    navigate({
-      search: forkBasedParams,
-      replace: true, // Don't add to history since this is auto-navigation
-    });
-  }, [hasPerformedInitialNav, search, forkViewLoading, forkBasedParams, navigate]);
+  // Network for default threshold
+  const { currentNetwork } = useNetwork();
 
   // View mode from URL (default to 'percentage')
   const viewMode: ViewMode = search.mode ?? 'percentage';
@@ -250,6 +219,10 @@ export function IndexPage(): JSX.Element {
   // Threshold from URL or network default
   const defaultThreshold = getDefaultThreshold(currentNetwork?.name);
   const threshold = search.threshold ?? defaultThreshold;
+
+  // Get Fulu activation info for filtering pre-fork data
+  // PeerDAS/data columns only exist after Fulu activation
+  const { fuluActivation } = useFuluActivation();
 
   // Default filter state (all columns, no filtering)
   const filters: DataAvailabilityFilters = useMemo(
@@ -339,13 +312,15 @@ export function IndexPage(): JSX.Element {
   const epochQuery = useQuery({
     queryKey: ['epochData', currentLevel.type === 'epoch' ? currentLevel.epoch : null],
     queryFn: async ({ signal }) => {
-      if (currentLevel.type !== 'epoch') return { fct_data_column_availability_by_slot: [] };
+      if (currentLevel.type !== 'epoch') {
+        return { fct_data_column_availability_by_slot: [] };
+      }
 
       // Calculate slot range for this epoch
       const firstSlot = currentLevel.epoch * SLOTS_PER_EPOCH;
       const lastSlot = (currentLevel.epoch + 1) * SLOTS_PER_EPOCH;
 
-      const data = await fetchAllPages<FctDataColumnAvailabilityBySlot>(
+      const slotData = await fetchAllPages<FctDataColumnAvailabilityBySlot>(
         fctDataColumnAvailabilityBySlotServiceList,
         {
           query: {
@@ -359,7 +334,9 @@ export function IndexPage(): JSX.Element {
         signal
       );
 
-      return { fct_data_column_availability_by_slot: data };
+      return {
+        fct_data_column_availability_by_slot: slotData,
+      };
     },
     enabled: currentLevel.type === 'epoch',
   });
@@ -394,9 +371,11 @@ export function IndexPage(): JSX.Element {
       query: {
         slot_eq: currentLevel.type === 'slot' ? currentLevel.slot : undefined,
         page_size: 1,
+        // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
+        ...(fuluActivation && { slot_gte: fuluActivation.slot }),
       },
     }),
-    enabled: currentLevel.type === 'slot',
+    enabled: currentLevel.type === 'slot' && !!fuluActivation,
   });
   const blobSubmitters = useMemo(
     () => blobSubmittersQuery.data?.int_custody_probe_order_by_slot?.[0]?.blob_submitters ?? [],
@@ -405,38 +384,57 @@ export function IndexPage(): JSX.Element {
 
   /**
    * Transform Window data (daily) to heatmap rows
+   * Filters out dates before Fulu activation (PeerDAS didn't exist)
    */
-  const windowRows = useMemo(
-    () => transformDailyToRows(windowQuery.data?.fct_data_column_availability_daily, timezone),
-    [windowQuery.data, timezone]
-  );
+  const windowRows = useMemo(() => {
+    const rows = transformDailyToRows(windowQuery.data?.fct_data_column_availability_daily, timezone);
+    if (!fuluActivation) return rows;
+
+    // Filter out dates before Fulu activation
+    // Use the activation date (the day containing the fork should be shown)
+    const fuluDate = new Date(fuluActivation.dateTime * 1000).toISOString().split('T')[0];
+    return rows.filter(row => row.identifier >= fuluDate);
+  }, [windowQuery.data, timezone, fuluActivation]);
 
   /**
    * Transform Day data (hourly) to heatmap rows
+   * Filters out hours before Fulu activation (PeerDAS didn't exist)
    */
-  const dayRows = useMemo(
-    () =>
-      currentLevel.type === 'day'
-        ? transformHourlyToRows(dayQuery.data?.fct_data_column_availability_hourly, timezone)
-        : [],
-    [dayQuery.data, currentLevel.type, timezone]
-  );
+  const dayRows = useMemo(() => {
+    if (currentLevel.type !== 'day') return [];
+
+    const rows = transformHourlyToRows(dayQuery.data?.fct_data_column_availability_hourly, timezone);
+    if (!fuluActivation) return rows;
+
+    // Round down to the start of the activation hour so we include partial hours
+    // e.g., if fork activated at 7:45, we want to show the 7:00 hour
+    const fuluHourStart = Math.floor(fuluActivation.dateTime / SECONDS_PER_HOUR) * SECONDS_PER_HOUR;
+    return rows.filter(row => Number(row.identifier) >= fuluHourStart);
+  }, [dayQuery.data, currentLevel.type, timezone, fuluActivation]);
 
   /**
    * Transform Hour data (epochs) to heatmap rows
+   * Filters out epochs before Fulu activation (PeerDAS didn't exist)
    */
-  const hourRows = useMemo(
-    () => transformEpochsToRows(hourQuery.data?.fct_data_column_availability_by_epoch),
-    [hourQuery.data]
-  );
+  const hourRows = useMemo(() => {
+    const rows = transformEpochsToRows(hourQuery.data?.fct_data_column_availability_by_epoch);
+    if (!fuluActivation) return rows;
+
+    // Filter out epochs before Fulu activation (identifier is epoch number as string)
+    return rows.filter(row => Number(row.identifier) >= fuluActivation.epoch);
+  }, [hourQuery.data, fuluActivation]);
 
   /**
    * Transform Epoch data (slots) to heatmap rows
+   * Filters out slots before Fulu activation (PeerDAS didn't exist)
    */
-  const epochRows = useMemo(
-    () => transformSlotsToRows(epochQuery.data?.fct_data_column_availability_by_slot),
-    [epochQuery.data]
-  );
+  const epochRows = useMemo(() => {
+    const rows = transformSlotsToRows(epochQuery.data?.fct_data_column_availability_by_slot);
+    if (!fuluActivation) return rows;
+
+    // Filter out slots before Fulu activation (identifier is slot number as string)
+    return rows.filter(row => Number(row.identifier) >= fuluActivation.slot);
+  }, [epochQuery.data, fuluActivation]);
 
   /**
    * Transform Slot data (blobs) to heatmap rows
@@ -662,35 +660,37 @@ export function IndexPage(): JSX.Element {
    */
   const handleColumnClick = useCallback(
     (columnIndex: number): void => {
-      // Build context label based on current drill-down level
+      // Build context label based on current drill-down level (all times UTC)
       let contextLabel: string;
       switch (currentLevel.type) {
         case 'window':
-          contextLabel = `Last ${WINDOW_DAYS} Days`;
+          contextLabel = `Last ${WINDOW_DAYS} Days (UTC)`;
           break;
         case 'day': {
-          const dateStr = new Date(currentLevel.date).toLocaleDateString('en-US', {
+          const labelDate = new Date(currentLevel.date + 'T00:00:00Z');
+          const dateStr = labelDate.toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric',
             year: 'numeric',
-            ...(timezone === 'UTC' ? { timeZone: 'UTC' } : {}),
+            timeZone: 'UTC',
           });
-          contextLabel = dateStr;
+          contextLabel = `${dateStr} (UTC)`;
           break;
         }
         case 'hour': {
-          const dateStr = new Date(currentLevel.date).toLocaleDateString('en-US', {
+          const labelDate = new Date(currentLevel.date + 'T00:00:00Z');
+          const dateStr = labelDate.toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric',
-            ...(timezone === 'UTC' ? { timeZone: 'UTC' } : {}),
+            timeZone: 'UTC',
           });
           const timeStr = new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString('en-US', {
             hour: '2-digit',
             minute: '2-digit',
             hour12: false,
-            ...(timezone === 'UTC' ? { timeZone: 'UTC' } : {}),
+            timeZone: 'UTC',
           });
-          contextLabel = `${dateStr} at ${timeStr}`;
+          contextLabel = `${dateStr} at ${timeStr} UTC`;
           break;
         }
         case 'epoch':
@@ -765,7 +765,7 @@ export function IndexPage(): JSX.Element {
       setTimeRangeContext(timeRange);
       setCellDialogOpen(true);
     },
-    [granularity, currentLevel, timezone]
+    [granularity, currentLevel]
   );
 
   /**
@@ -811,18 +811,20 @@ export function IndexPage(): JSX.Element {
 
     if (currentLevel.type === 'window') return crumbs;
 
-    // Add day breadcrumb if we're at day level or deeper
+    // Add day breadcrumb if we're at day level or deeper (all times UTC)
     if (
       currentLevel.type === 'day' ||
       currentLevel.type === 'hour' ||
       currentLevel.type === 'epoch' ||
       currentLevel.type === 'slot'
     ) {
+      const breadcrumbLabelDate = new Date(currentLevel.date + 'T00:00:00Z');
       crumbs.push({
-        label: new Date(currentLevel.date).toLocaleDateString(
-          'en-US',
-          timezone === 'UTC' ? { month: 'short', day: 'numeric', timeZone: 'UTC' } : { month: 'short', day: 'numeric' }
-        ),
+        label: breadcrumbLabelDate.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          timeZone: 'UTC',
+        }),
         icon: CalendarDaysIcon,
         onClick: () =>
           navigate({
@@ -835,12 +837,12 @@ export function IndexPage(): JSX.Element {
     // Add hour breadcrumb if we're at hour level or deeper
     if (currentLevel.type === 'hour' || currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
       crumbs.push({
-        label: new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString(
-          'en-US',
-          timezone === 'UTC'
-            ? { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }
-            : { hour: '2-digit', minute: '2-digit', hour12: false }
-        ),
+        label: new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+          timeZone: 'UTC',
+        }),
         icon: ClockIcon,
         onClick: () =>
           navigate({
@@ -888,7 +890,7 @@ export function IndexPage(): JSX.Element {
     }
 
     return crumbs;
-  }, [currentLevel, navigate, timezone, search.mode, search.threshold]);
+  }, [currentLevel, navigate, search.mode, search.threshold]);
 
   // Calculate time range for View Probes link (must be before early returns)
   const probesLinkParams = useMemo(() => {
@@ -1014,20 +1016,18 @@ export function IndexPage(): JSX.Element {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
         {/* Main Content: Heatmap (3/4 width) */}
         <div className="lg:col-span-3">
-          <div className="bg-card text-card-foreground overflow-hidden rounded-lg border border-border shadow-sm">
+          <div className="bg-card text-card-foreground rounded-lg border border-border shadow-sm">
             {/* Header with Level Title */}
             <div className="border-b border-border bg-muted/20 px-4 py-3">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 {/* Level Title */}
-                <div>
-                  <h2 className="text-lg font-semibold text-foreground">
-                    {getLevelTitle(currentLevel, timezone).main}
-                  </h2>
-                  <p className="text-sm text-muted">{getLevelTitle(currentLevel, timezone).sub}</p>
+                <div className="min-w-0">
+                  <h2 className="text-lg font-semibold text-foreground">{getLevelTitle(currentLevel).main}</h2>
+                  <p className="text-sm text-muted">{getLevelTitle(currentLevel).sub}</p>
                 </div>
 
                 {/* Controls */}
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex shrink-0 flex-wrap items-center gap-2">
                   {/* Detail page links */}
                   {currentLevel.type === 'epoch' && (
                     <Link
@@ -1052,7 +1052,6 @@ export function IndexPage(): JSX.Element {
                     </Link>
                   )}
                   <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
-                  <TimezoneToggle size="compact" />
                 </div>
               </div>
             </div>
@@ -1108,7 +1107,7 @@ export function IndexPage(): JSX.Element {
 
             {/* Heatmap Area */}
             <div className="p-4">
-              {isLoading || (forkViewLoading && !hasPerformedInitialNav && currentLevel.type === 'window') ? (
+              {isLoading ? (
                 <DataAvailabilitySkeleton />
               ) : (
                 <DataAvailabilityHeatmap
