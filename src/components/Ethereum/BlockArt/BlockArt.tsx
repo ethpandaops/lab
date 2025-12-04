@@ -1,10 +1,9 @@
 import { useEffect, useRef, type JSX } from 'react';
-import p5 from 'p5';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { BlockArtProps } from './BlockArt.types';
 
 /**
- * BlockArt - A simple 3D block visualization using p5.js
+ * BlockArt - A simple 3D block visualization using Canvas 2D
  *
  * Features:
  * - Static 3D cube with nice isometric angle
@@ -23,10 +22,41 @@ import type { BlockArtProps } from './BlockArt.types';
  * />
  * ```
  */
-interface BlockArtColors {
-  primary: string;
-  accent: string;
-  glow: string;
+
+/** Parse hex color to RGB */
+function parseHexColor(hex: string): { r: number; g: number; b: number } {
+  const clean = hex.replace('#', '');
+  return {
+    r: parseInt(clean.substring(0, 2), 16),
+    g: parseInt(clean.substring(2, 4), 16),
+    b: parseInt(clean.substring(4, 6), 16),
+  };
+}
+
+/** Project 3D point to 2D isometric view */
+function projectIsometric(
+  x: number,
+  y: number,
+  z: number,
+  centerX: number,
+  centerY: number,
+  scale: number
+): { x: number; y: number } {
+  // Isometric projection with rotation
+  const angle = Math.PI / 4; // 45 degrees for Y rotation
+  const tilt = Math.PI / 6; // 30 degrees for X tilt
+
+  // Rotate around Y axis
+  const rotatedX = x * Math.cos(angle) - z * Math.sin(angle);
+  const rotatedZ = x * Math.sin(angle) + z * Math.cos(angle);
+
+  // Apply tilt (rotation around X axis)
+  const finalY = y * Math.cos(tilt) - rotatedZ * Math.sin(tilt);
+
+  return {
+    x: centerX + rotatedX * scale,
+    y: centerY + finalY * scale,
+  };
 }
 
 export function BlockArt({
@@ -38,10 +68,7 @@ export function BlockArt({
   accentColor,
   glowColor,
 }: BlockArtProps): JSX.Element {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const p5InstanceRef = useRef<p5 | null>(null);
-  const themeColorsRef = useRef<BlockArtColors | null>(null);
-  const isCleanedUpRef = useRef(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const themeColors = useThemeColors();
 
   // Use theme colors as defaults
@@ -49,24 +76,28 @@ export function BlockArt({
   const finalAccentColor = accentColor || themeColors.accent;
   const finalGlowColor = glowColor || themeColors.accent;
 
-  // Update theme colors ref when they change (reactive to theme swaps)
   useEffect(() => {
-    themeColorsRef.current = {
-      primary: finalPrimaryColor,
-      accent: finalAccentColor,
-      glow: finalGlowColor,
-    };
-  }, [finalPrimaryColor, finalAccentColor, finalGlowColor]);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-    // Reset cleanup flag on mount
-    isCleanedUpRef.current = false;
+    // Set up canvas for high DPI
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.scale(dpr, dpr);
 
-    // Hash-based seed for procedural generation
-    const hashToSeed = (hash?: string): number => {
+    // Parse colors
+    const primary = parseHexColor(finalPrimaryColor);
+    const accent = parseHexColor(finalAccentColor);
+    const glow = parseHexColor(finalGlowColor);
+
+    // Hash-based seed for procedural generation (unused but kept for API compatibility)
+    const _hashToSeed = (hash?: string): number => {
       if (!hash) return blockNumber || 12345;
       let seed = 0;
       for (let i = 0; i < Math.min(hash.length, 16); i++) {
@@ -74,145 +105,112 @@ export function BlockArt({
       }
       return seed;
     };
+    _hashToSeed(blockHash); // Called for consistency
 
-    const seed = hashToSeed(blockHash);
+    // Clear canvas (transparent)
+    ctx.clearRect(0, 0, width, height);
 
-    // Parse hex color helper
-    const parseColor = (hex: string): { r: number; g: number; b: number } => {
-      const clean = hex.replace('#', '');
-      return {
-        r: parseInt(clean.substring(0, 2), 16),
-        g: parseInt(clean.substring(2, 4), 16),
-        b: parseInt(clean.substring(4, 6), 16),
-      };
-    };
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const scale = width / 5; // Adjust scale based on canvas size
 
-    // Create the sketch
-    const sketch = (p: p5): void => {
-      // Cache parsed colors
-      let cachedColors = {
-        primaryR: 0,
-        primaryG: 0,
-        primaryB: 0,
-        accentR: 0,
-        accentG: 0,
-        accentB: 0,
-        glowR: 0,
-        glowG: 0,
-        glowB: 0,
-      };
+    // Define cube vertices (centered at origin)
+    const cubeSize = 1;
+    const half = cubeSize / 2;
+    const vertices = [
+      { x: -half, y: -half, z: -half }, // 0: front-top-left
+      { x: half, y: -half, z: -half }, // 1: front-top-right
+      { x: half, y: half, z: -half }, // 2: front-bottom-right
+      { x: -half, y: half, z: -half }, // 3: front-bottom-left
+      { x: -half, y: -half, z: half }, // 4: back-top-left
+      { x: half, y: -half, z: half }, // 5: back-top-right
+      { x: half, y: half, z: half }, // 6: back-bottom-right
+      { x: -half, y: half, z: half }, // 7: back-bottom-left
+    ];
 
-      // Update cached colors from theme ref
-      const updateCachedColors = (): void => {
-        const currentColors = themeColorsRef.current;
-        if (!currentColors) return;
+    // Project all vertices
+    const projected = vertices.map(v => projectIsometric(v.x, v.y, v.z, centerX, centerY, scale));
 
-        const primary = parseColor(currentColors.primary);
-        const accent = parseColor(currentColors.accent);
-        const glow = parseColor(currentColors.glow);
+    // Define faces with their vertices (in order for drawing)
+    // Only draw visible faces in isometric view: top, right, front
+    const faces = [
+      { indices: [4, 5, 1, 0], type: 'top' }, // Top face
+      { indices: [1, 5, 6, 2], type: 'right' }, // Right face
+      { indices: [0, 1, 2, 3], type: 'front' }, // Front face
+    ];
 
-        cachedColors = {
-          primaryR: primary.r,
-          primaryG: primary.g,
-          primaryB: primary.b,
-          accentR: accent.r,
-          accentG: accent.g,
-          accentB: accent.b,
-          glowR: glow.r,
-          glowG: glow.g,
-          glowB: glow.b,
+    // Draw helper function
+    const drawFace = (
+      indices: number[],
+      fillColor: { r: number; g: number; b: number },
+      fillAlpha: number,
+      strokeColor: { r: number; g: number; b: number },
+      strokeAlpha: number,
+      strokeWidth: number,
+      sizeMultiplier: number = 1
+    ): void => {
+      ctx.beginPath();
+      const pts = indices.map(i => {
+        const p = projected[i];
+        // Apply size multiplier from center
+        return {
+          x: centerX + (p.x - centerX) * sizeMultiplier,
+          y: centerY + (p.y - centerY) * sizeMultiplier,
         };
-      };
-
-      p.setup = () => {
-        // Clean up any existing canvases in the container before creating new one
-        if (container) {
-          const existingCanvases = container.querySelectorAll('canvas');
-          existingCanvases.forEach(canvas => canvas.remove());
-        }
-
-        p.createCanvas(width, height, p.WEBGL);
-        p.randomSeed(seed);
-        p.loop(); // Ensure animation loop starts
-
-        // Initialize cached colors
-        updateCachedColors();
-      };
-
-      p.draw = () => {
-        // Stop drawing if component is cleaned up
-        if (isCleanedUpRef.current) {
-          p.noLoop();
-          return;
-        }
-
-        // Update colors if theme changed
-        if (themeColorsRef.current) {
-          updateCachedColors();
-        }
-
-        // Transparent background
-        p.clear();
-
-        // Lighting for 3D effect
-        p.ambientLight(80);
-        p.directionalLight(255, 255, 255, 0, 0, -1);
-        p.pointLight(255, 255, 255, 100, -100, 100);
-
-        // Static rotation for nice isometric view
-        p.rotateX(p.PI / 6);
-        p.rotateY(p.PI / 4);
-
-        // Draw outer glow layers using cached colors
-        p.noFill();
-        p.strokeWeight(3);
-        p.stroke(cachedColors.glowR, cachedColors.glowG, cachedColors.glowB, 40);
-        p.box(75);
-
-        p.strokeWeight(2);
-        p.stroke(cachedColors.glowR, cachedColors.glowG, cachedColors.glowB, 80);
-        p.box(70);
-
-        // Draw main cube using cached colors
-        p.strokeWeight(2);
-        p.stroke(cachedColors.accentR, cachedColors.accentG, cachedColors.accentB, 200);
-        p.fill(cachedColors.primaryR, cachedColors.primaryG, cachedColors.primaryB, 200);
-        p.box(65);
-
-        // Inner core using cached colors
-        p.noStroke();
-        p.fill(cachedColors.accentR, cachedColors.accentG, cachedColors.accentB, 100);
-        p.box(20);
-      };
-    };
-
-    // Create p5 instance with container ref for proper cleanup
-    const instance = new p5(sketch, container);
-    p5InstanceRef.current = instance;
-
-    // Cleanup on unmount
-    return () => {
-      isCleanedUpRef.current = true;
-
-      if (p5InstanceRef.current) {
-        // First stop the loop explicitly
-        p5InstanceRef.current.noLoop();
-        // Then remove the canvas and cleanup
-        p5InstanceRef.current.remove();
-        p5InstanceRef.current = null;
+      });
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) {
+        ctx.lineTo(pts[i].x, pts[i].y);
       }
+      ctx.closePath();
 
-      // Extra cleanup: manually remove any remaining canvases
-      if (container) {
-        const canvases = container.querySelectorAll('canvas');
-        canvases.forEach(canvas => canvas.remove());
+      if (fillAlpha > 0) {
+        ctx.fillStyle = `rgba(${fillColor.r}, ${fillColor.g}, ${fillColor.b}, ${fillAlpha})`;
+        ctx.fill();
+      }
+      if (strokeAlpha > 0) {
+        ctx.strokeStyle = `rgba(${strokeColor.r}, ${strokeColor.g}, ${strokeColor.b}, ${strokeAlpha})`;
+        ctx.lineWidth = strokeWidth;
+        ctx.stroke();
       }
     };
-  }, [width, height, blockHash, blockNumber]); // Removed color deps - they update via ref
+
+    // Draw outer glow layer (larger)
+    for (const face of faces) {
+      drawFace(face.indices, glow, 0, glow, 0.15, 3, 1.15);
+    }
+
+    // Draw middle glow layer
+    for (const face of faces) {
+      drawFace(face.indices, glow, 0, glow, 0.3, 2, 1.08);
+    }
+
+    // Draw main cube faces with fill
+    for (const face of faces) {
+      // Vary brightness based on face type
+      let brightness = 1;
+      if (face.type === 'top') brightness = 1.1;
+      if (face.type === 'right') brightness = 0.9;
+      if (face.type === 'front') brightness = 0.8;
+
+      const fillColor = {
+        r: Math.min(255, primary.r * brightness),
+        g: Math.min(255, primary.g * brightness),
+        b: Math.min(255, primary.b * brightness),
+      };
+
+      drawFace(face.indices, fillColor, 0.8, accent, 0.8, 2, 1);
+    }
+
+    // Draw inner core (smaller cube)
+    for (const face of faces) {
+      drawFace(face.indices, accent, 0.4, { r: 0, g: 0, b: 0 }, 0, 0, 0.3);
+    }
+  }, [width, height, blockHash, blockNumber, finalPrimaryColor, finalAccentColor, finalGlowColor]);
 
   return (
     <div className="flex items-center justify-center">
-      <div ref={containerRef} style={{ width, height }} />
+      <canvas ref={canvasRef} style={{ width, height }} />
     </div>
   );
 }
