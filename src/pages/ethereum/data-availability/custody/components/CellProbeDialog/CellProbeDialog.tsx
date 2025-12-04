@@ -14,6 +14,7 @@ import { intCustodyProbeOrderBySlotServiceListOptions } from '@/api/@tanstack/re
 import type { IntCustodyProbeOrderBySlot } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { Dialog } from '@/components/Overlays/Dialog';
+import { ScrollArea } from '@/components/Layout/ScrollArea';
 import { formatEpoch, formatSlot } from '@/utils';
 import { ProbeEventRow } from '@/pages/ethereum/data-availability/components/ProbeEventRow';
 import { ProbeDetailDialog } from '@/pages/ethereum/data-availability/probes/components/ProbeDetailDialog';
@@ -335,36 +336,38 @@ export function CellProbeDialog({
           </div>
 
           {/* Probe list */}
-          <div className="max-h-96 overflow-y-auto">
-            {isLoading ? (
-              <div className="space-y-2 p-2">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-2 px-2 py-1.5">
-                    <div className="size-7 animate-pulse rounded-full bg-muted/50" />
-                    <div className="flex flex-1 flex-col gap-1">
-                      <div className="h-3 w-24 animate-pulse rounded-xs bg-muted/50" />
-                      <div className="h-2 w-16 animate-pulse rounded-xs bg-muted/50" />
+          <ScrollArea className="h-96">
+            <div className="pr-3">
+              {isLoading ? (
+                <div className="space-y-2 p-2">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="flex items-center gap-2 px-2 py-1.5">
+                      <div className="size-7 animate-pulse rounded-full bg-muted/50" />
+                      <div className="flex flex-1 flex-col gap-1">
+                        <div className="h-3 w-24 animate-pulse rounded-xs bg-muted/50" />
+                        <div className="h-2 w-16 animate-pulse rounded-xs bg-muted/50" />
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : probes.length === 0 ? (
-              <div className="py-8 text-center text-sm text-muted">
-                No probes found for column {displayColumn} in this time period
-              </div>
-            ) : (
-              <div className="space-y-0.5">
-                {probes.map((probe, index) => (
-                  <ProbeEventRow
-                    key={`${probe.probe_date_time}-${probe.peer_id_unique_key}-${index}`}
-                    probe={probe}
-                    onClick={() => handleProbeClick(probe)}
-                    showViewIcon
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+                  ))}
+                </div>
+              ) : probes.length === 0 ? (
+                <div className="py-8 text-center text-sm text-muted">
+                  No probes found for column {displayColumn} in this time period
+                </div>
+              ) : (
+                <div className="space-y-0.5">
+                  {probes.map((probe, index) => (
+                    <ProbeEventRow
+                      key={`${probe.probe_date_time}-${probe.peer_id_unique_key}-${index}`}
+                      probe={probe}
+                      onClick={() => handleProbeClick(probe)}
+                      showViewIcon
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </ScrollArea>
         </div>
       </Dialog>
 

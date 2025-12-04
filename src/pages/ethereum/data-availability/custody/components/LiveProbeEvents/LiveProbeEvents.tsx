@@ -8,6 +8,7 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { ProbeEventRow } from '@/pages/ethereum/data-availability/components/ProbeEventRow';
 import { ProbeDetailDialog } from '@/pages/ethereum/data-availability/probes/components/ProbeDetailDialog';
 import { useFuluActivation } from '@/pages/ethereum/data-availability/custody/hooks/useFuluActivation';
+import { ScrollArea } from '@/components/Layout/ScrollArea';
 import type { LiveProbeEventsProps, ProbeFilterContext } from './LiveProbeEvents.types';
 
 /** Number of seconds in a day */
@@ -182,7 +183,7 @@ export function LiveProbeEvents({
 
   return (
     <>
-      <div className="bg-card text-card-foreground flex max-h-[32rem] flex-col overflow-hidden rounded-lg border border-border shadow-sm">
+      <div className="bg-card text-card-foreground h-[32rem] overflow-hidden rounded-lg border border-border shadow-sm">
         {/* Header */}
         <div className="border-b border-border bg-muted/20 px-4 py-3">
           <div className="flex items-start justify-between gap-4">
@@ -205,46 +206,48 @@ export function LiveProbeEvents({
           </div>
         </div>
 
-        {/* Events list - scrollable */}
-        <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
-          {isLoading && !isFetched ? (
-            // Loading skeleton - only on initial load, not refetches
-            <div className="space-y-1">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-2.5 px-2 py-1.5">
-                  <div className="size-6 animate-pulse rounded-full bg-muted/30" />
-                  <div className="flex flex-1 flex-col gap-1">
-                    <div className="h-3 w-20 animate-pulse rounded-sm bg-muted/30" />
-                    <div className="h-2.5 w-28 animate-pulse rounded-sm bg-muted/30" />
+        {/* Events list - scrollable (header is ~70px, so calc remaining height) */}
+        <ScrollArea className="h-[calc(32rem-70px)]">
+          <div className="px-2 py-2">
+            {isLoading && !isFetched ? (
+              // Loading skeleton - only on initial load, not refetches
+              <div className="space-y-1">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-2.5 px-2 py-1.5">
+                    <div className="size-6 animate-pulse rounded-full bg-muted/30" />
+                    <div className="flex flex-1 flex-col gap-1">
+                      <div className="h-3 w-20 animate-pulse rounded-sm bg-muted/30" />
+                      <div className="h-2.5 w-28 animate-pulse rounded-sm bg-muted/30" />
+                    </div>
+                    <div className="size-4 animate-pulse rounded-full bg-muted/30" />
                   </div>
-                  <div className="size-4 animate-pulse rounded-full bg-muted/30" />
-                </div>
-              ))}
-            </div>
-          ) : probes.length === 0 ? (
-            // Empty state
-            <div className="py-8 text-center">
-              <SignalIcon className="mx-auto mb-2 size-8 text-muted/50" />
-              <p className="text-sm text-muted">No probes found</p>
-              <p className="text-xs text-muted/70">{contextLabel}</p>
-            </div>
-          ) : (
-            // Event rows
-            <div>
-              {probes.map(probe => {
-                const key = getProbeKey(probe);
-                return (
-                  <ProbeEventRow
-                    key={key}
-                    probe={probe}
-                    onClick={() => handleProbeClick(probe)}
-                    isNew={newProbeKeys.has(key)}
-                  />
-                );
-              })}
-            </div>
-          )}
-        </div>
+                ))}
+              </div>
+            ) : probes.length === 0 ? (
+              // Empty state
+              <div className="py-8 text-center">
+                <SignalIcon className="mx-auto mb-2 size-8 text-muted/50" />
+                <p className="text-sm text-muted">No probes found</p>
+                <p className="text-xs text-muted/70">{contextLabel}</p>
+              </div>
+            ) : (
+              // Event rows
+              <div>
+                {probes.map(probe => {
+                  const key = getProbeKey(probe);
+                  return (
+                    <ProbeEventRow
+                      key={key}
+                      probe={probe}
+                      onClick={() => handleProbeClick(probe)}
+                      isNew={newProbeKeys.has(key)}
+                    />
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </ScrollArea>
       </div>
 
       {/* Probe Detail Dialog - using shared component */}
