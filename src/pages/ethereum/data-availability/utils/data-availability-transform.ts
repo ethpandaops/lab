@@ -5,6 +5,7 @@ import type {
   FctDataColumnAvailabilityByEpoch,
   FctDataColumnAvailabilityBySlot,
   FctDataColumnAvailabilityBySlotBlob,
+  FctBlockBlobCount,
 } from '@/api/types.gen';
 
 /**
@@ -191,9 +192,25 @@ export function transformEpochsToRows(data: FctDataColumnAvailabilityByEpoch[] |
 
 /**
  * Transform slot data to heatmap rows
+ * @param data - Slot availability data from API
+ * @param blobCounts - Optional blob count data per slot. Slots NOT in this list have 0 blobs and are marked as 100% available.
  */
-export function transformSlotsToRows(data: FctDataColumnAvailabilityBySlot[] | undefined): DataAvailabilityRow[] {
+export function transformSlotsToRows(
+  data: FctDataColumnAvailabilityBySlot[] | undefined,
+  blobCounts?: FctBlockBlobCount[]
+): DataAvailabilityRow[] {
   if (!data) return [];
+
+  // Build a set of slots that have blobs (slots not in this set have 0 blobs)
+  // fct_block_blob_count only returns records for slots WITH blobs
+  const slotsWithBlobs = new Set<number>();
+  if (blobCounts) {
+    for (const item of blobCounts) {
+      if (item.slot !== undefined && (item.blob_count ?? 0) > 0) {
+        slotsWithBlobs.add(item.slot);
+      }
+    }
+  }
 
   // Group by slot
   const bySlot = new Map<number, FctDataColumnAvailabilityBySlot[]>();
@@ -210,15 +227,20 @@ export function transformSlotsToRows(data: FctDataColumnAvailabilityBySlot[] | u
     .sort((a, b) => a[0] - b[0])
     .map(([slot, items]) => {
       const identifier = String(slot);
+
+      // Slot has 0 blobs if it's NOT in the slotsWithBlobs set (and we have blob count data)
+      const isZeroBlobSlot = blobCounts !== undefined && !slotsWithBlobs.has(slot);
+
       const cells = items
         .sort((a, b) => (a.column_index ?? 0) - (b.column_index ?? 0))
         .map(item => ({
           identifier,
           columnIndex: item.column_index ?? 0,
-          availability: (item.availability_pct ?? 0) / 100,
-          successCount: item.success_count,
-          totalCount: item.probe_count,
-          avgResponseTimeMs: item.p50_response_time_ms,
+          // 0-blob slots are 100% available (nothing to sample)
+          availability: isZeroBlobSlot ? 1 : (item.availability_pct ?? 0) / 100,
+          successCount: isZeroBlobSlot ? 0 : item.success_count,
+          totalCount: isZeroBlobSlot ? 0 : item.probe_count,
+          avgResponseTimeMs: isZeroBlobSlot ? undefined : item.p50_response_time_ms,
         }));
 
       return {

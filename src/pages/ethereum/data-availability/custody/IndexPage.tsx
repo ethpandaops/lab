@@ -1,4 +1,4 @@
-import { type JSX, useState, useMemo, useEffect, useCallback } from 'react';
+import { type JSX, useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearch, useNavigate, Link } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
@@ -21,6 +21,7 @@ import type { DataAvailabilityFilters } from '@/pages/ethereum/data-availability
 import { useTimezone } from '@/hooks/useTimezone';
 import { useNetwork } from '@/hooks/useNetwork';
 import { formatEpoch, formatSlot } from '@/utils';
+import { useFuluActivation } from './hooks/useFuluActivation';
 import {
   ChevronRightIcon,
   ArrowLeftIcon,
@@ -41,11 +42,13 @@ import {
   fctDataColumnAvailabilityByEpochServiceList,
   fctDataColumnAvailabilityBySlotServiceList,
   fctDataColumnAvailabilityBySlotBlobServiceList,
+  fctBlockBlobCountServiceList,
 } from '@/api/sdk.gen';
 import type {
   FctDataColumnAvailabilityByEpoch,
   FctDataColumnAvailabilityBySlot,
   FctDataColumnAvailabilityBySlotBlob,
+  FctBlockBlobCount,
 } from '@/api/types.gen';
 import {
   transformDailyToRows,
@@ -57,7 +60,6 @@ import {
 import { fetchAllPages } from '@/utils/api-pagination';
 import type { CustodySearch } from './IndexPage.types';
 import { validateSearchParamHierarchy, getDefaultThreshold } from './IndexPage.types';
-import { useForkBasedInitialView } from './hooks/useForkBasedInitialView';
 
 /**
  * Drill-down level state - each level maintains parent context for breadcrumbs
@@ -216,40 +218,16 @@ export function IndexPage(): JSX.Element {
   // Derive drill-down state from URL
   const currentLevel = deriveCurrentLevel(search);
 
-  // Smart initial view based on fork timing
-  const { searchParams: forkBasedParams, isLoading: forkViewLoading } = useForkBasedInitialView();
-
-  // Track if we've performed the initial navigation
-  const [hasPerformedInitialNav, setHasPerformedInitialNav] = useState(false);
-
-  // Auto-navigate to fork-based view on initial load (no URL params)
-  useEffect(() => {
-    // Skip if:
-    // - Already performed initial nav
-    // - URL already has params (user navigated directly)
-    // - Still loading fork data
-    // - No fork-based params (window view or non-Fulu network)
-    const hasExistingParams =
-      search.date !== undefined || search.hour !== undefined || search.epoch !== undefined || search.slot !== undefined;
-
-    if (hasPerformedInitialNav || hasExistingParams || forkViewLoading || !forkBasedParams) {
-      return;
-    }
-
-    // Navigate to the recommended view
-    setHasPerformedInitialNav(true);
-    navigate({
-      search: forkBasedParams,
-      replace: true, // Don't add to history since this is auto-navigation
-    });
-  }, [hasPerformedInitialNav, search, forkViewLoading, forkBasedParams, navigate]);
-
   // View mode from URL (default to 'percentage')
   const viewMode: ViewMode = search.mode ?? 'percentage';
 
   // Threshold from URL or network default
   const defaultThreshold = getDefaultThreshold(currentNetwork?.name);
   const threshold = search.threshold ?? defaultThreshold;
+
+  // Get Fulu activation info for filtering pre-fork data
+  // PeerDAS/data columns only exist after Fulu activation
+  const { fuluActivation } = useFuluActivation();
 
   // Default filter state (all columns, no filtering)
   const filters: DataAvailabilityFilters = useMemo(
@@ -336,30 +314,52 @@ export function IndexPage(): JSX.Element {
   });
 
   // Epoch Level: Slots within a specific epoch (with pagination for safety)
+  // Also fetches blob counts to mark 0-blob slots as 100% available
   const epochQuery = useQuery({
     queryKey: ['epochData', currentLevel.type === 'epoch' ? currentLevel.epoch : null],
     queryFn: async ({ signal }) => {
-      if (currentLevel.type !== 'epoch') return { fct_data_column_availability_by_slot: [] };
+      if (currentLevel.type !== 'epoch') {
+        return { fct_data_column_availability_by_slot: [], fct_block_blob_count: [] };
+      }
 
       // Calculate slot range for this epoch
       const firstSlot = currentLevel.epoch * SLOTS_PER_EPOCH;
       const lastSlot = (currentLevel.epoch + 1) * SLOTS_PER_EPOCH;
 
-      const data = await fetchAllPages<FctDataColumnAvailabilityBySlot>(
-        fctDataColumnAvailabilityBySlotServiceList,
-        {
-          query: {
-            slot_gte: firstSlot,
-            slot_lt: lastSlot,
-            page_size: 10000,
-            order_by: 'slot asc',
+      // Fetch slot availability data and blob counts in parallel
+      const [slotData, blobCountData] = await Promise.all([
+        fetchAllPages<FctDataColumnAvailabilityBySlot>(
+          fctDataColumnAvailabilityBySlotServiceList,
+          {
+            query: {
+              slot_gte: firstSlot,
+              slot_lt: lastSlot,
+              page_size: 10000,
+              order_by: 'slot asc',
+            },
           },
-        },
-        'fct_data_column_availability_by_slot',
-        signal
-      );
+          'fct_data_column_availability_by_slot',
+          signal
+        ),
+        fetchAllPages<FctBlockBlobCount>(
+          fctBlockBlobCountServiceList,
+          {
+            query: {
+              slot_gte: firstSlot,
+              slot_lt: lastSlot,
+              page_size: 100,
+              order_by: 'slot asc',
+            },
+          },
+          'fct_block_blob_count',
+          signal
+        ),
+      ]);
 
-      return { fct_data_column_availability_by_slot: data };
+      return {
+        fct_data_column_availability_by_slot: slotData,
+        fct_block_blob_count: blobCountData,
+      };
     },
     enabled: currentLevel.type === 'epoch',
   });
@@ -394,9 +394,11 @@ export function IndexPage(): JSX.Element {
       query: {
         slot_eq: currentLevel.type === 'slot' ? currentLevel.slot : undefined,
         page_size: 1,
+        // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
+        ...(fuluActivation && { slot_gte: fuluActivation.slot }),
       },
     }),
-    enabled: currentLevel.type === 'slot',
+    enabled: currentLevel.type === 'slot' && !!fuluActivation,
   });
   const blobSubmitters = useMemo(
     () => blobSubmittersQuery.data?.int_custody_probe_order_by_slot?.[0]?.blob_submitters ?? [],
@@ -405,38 +407,61 @@ export function IndexPage(): JSX.Element {
 
   /**
    * Transform Window data (daily) to heatmap rows
+   * Filters out dates before Fulu activation (PeerDAS didn't exist)
    */
-  const windowRows = useMemo(
-    () => transformDailyToRows(windowQuery.data?.fct_data_column_availability_daily, timezone),
-    [windowQuery.data, timezone]
-  );
+  const windowRows = useMemo(() => {
+    const rows = transformDailyToRows(windowQuery.data?.fct_data_column_availability_daily, timezone);
+    if (!fuluActivation) return rows;
+
+    // Filter out dates before Fulu activation
+    // Use the activation date (the day containing the fork should be shown)
+    const fuluDate = new Date(fuluActivation.dateTime * 1000).toISOString().split('T')[0];
+    return rows.filter(row => row.identifier >= fuluDate);
+  }, [windowQuery.data, timezone, fuluActivation]);
 
   /**
    * Transform Day data (hourly) to heatmap rows
+   * Filters out hours before Fulu activation (PeerDAS didn't exist)
    */
-  const dayRows = useMemo(
-    () =>
-      currentLevel.type === 'day'
-        ? transformHourlyToRows(dayQuery.data?.fct_data_column_availability_hourly, timezone)
-        : [],
-    [dayQuery.data, currentLevel.type, timezone]
-  );
+  const dayRows = useMemo(() => {
+    if (currentLevel.type !== 'day') return [];
+
+    const rows = transformHourlyToRows(dayQuery.data?.fct_data_column_availability_hourly, timezone);
+    if (!fuluActivation) return rows;
+
+    // Round down to the start of the activation hour so we include partial hours
+    // e.g., if fork activated at 7:45, we want to show the 7:00 hour
+    const fuluHourStart = Math.floor(fuluActivation.dateTime / SECONDS_PER_HOUR) * SECONDS_PER_HOUR;
+    return rows.filter(row => Number(row.identifier) >= fuluHourStart);
+  }, [dayQuery.data, currentLevel.type, timezone, fuluActivation]);
 
   /**
    * Transform Hour data (epochs) to heatmap rows
+   * Filters out epochs before Fulu activation (PeerDAS didn't exist)
    */
-  const hourRows = useMemo(
-    () => transformEpochsToRows(hourQuery.data?.fct_data_column_availability_by_epoch),
-    [hourQuery.data]
-  );
+  const hourRows = useMemo(() => {
+    const rows = transformEpochsToRows(hourQuery.data?.fct_data_column_availability_by_epoch);
+    if (!fuluActivation) return rows;
+
+    // Filter out epochs before Fulu activation (identifier is epoch number as string)
+    return rows.filter(row => Number(row.identifier) >= fuluActivation.epoch);
+  }, [hourQuery.data, fuluActivation]);
 
   /**
    * Transform Epoch data (slots) to heatmap rows
+   * Filters out slots before Fulu activation (PeerDAS didn't exist)
    */
-  const epochRows = useMemo(
-    () => transformSlotsToRows(epochQuery.data?.fct_data_column_availability_by_slot),
-    [epochQuery.data]
-  );
+  const epochRows = useMemo(() => {
+    // Pass blob counts so 0-blob slots are marked as 100% available
+    const rows = transformSlotsToRows(
+      epochQuery.data?.fct_data_column_availability_by_slot,
+      epochQuery.data?.fct_block_blob_count
+    );
+    if (!fuluActivation) return rows;
+
+    // Filter out slots before Fulu activation (identifier is slot number as string)
+    return rows.filter(row => Number(row.identifier) >= fuluActivation.slot);
+  }, [epochQuery.data, fuluActivation]);
 
   /**
    * Transform Slot data (blobs) to heatmap rows
@@ -1108,7 +1133,7 @@ export function IndexPage(): JSX.Element {
 
             {/* Heatmap Area */}
             <div className="p-4">
-              {isLoading || (forkViewLoading && !hasPerformedInitialNav && currentLevel.type === 'window') ? (
+              {isLoading ? (
                 <DataAvailabilitySkeleton />
               ) : (
                 <DataAvailabilityHeatmap

@@ -59,6 +59,11 @@ export interface ForkInfo {
 export function getNetworkForks(network: Network, currentEpoch?: number): ForkInfo[] {
   const forks: ForkInfo[] = [];
 
+  // Handle case where network.forks or network.forks.consensus is missing
+  if (!network?.forks?.consensus) {
+    return forks;
+  }
+
   for (const forkName of FORK_ORDER) {
     const fork = network.forks.consensus[forkName];
     const metadata = FORK_METADATA[forkName];

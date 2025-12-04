@@ -3,6 +3,7 @@ import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
 import { intCustodyProbeServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import { useFuluActivation } from '@/pages/ethereum/data-availability/custody/hooks/useFuluActivation';
 import type { ProbesSearch } from './IndexPage.types';
 import { ProbesView } from './components/ProbesView';
 import type { FilterValues } from './components/FilterPanel';
@@ -16,6 +17,7 @@ export function IndexPage(): JSX.Element {
   const navigate = useNavigate({ from: '/ethereum/data-availability/probes/' });
   const search = useSearch({ from: '/ethereum/data-availability/probes/' }) as ProbesSearch;
   const { currentNetwork } = useNetwork();
+  const { fuluActivation } = useFuluActivation();
 
   // Capture the initial probeTime from URL on mount (for deep-linking)
   // This prevents time range recalculation when user clicks on rows to view details
@@ -76,6 +78,8 @@ export function IndexPage(): JSX.Element {
         page_size: search.pageSize ?? 25,
         page_token: search.pageToken,
         order_by: orderBy,
+        // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
+        ...(fuluActivation && { slot_gte: fuluActivation.slot }),
         // Server-side filters
         ...(search.result && { result_eq: search.result }),
         ...(search.prober && { meta_client_implementation_eq: search.prober }),
@@ -95,7 +99,7 @@ export function IndexPage(): JSX.Element {
         ...(search.blobPosters?.length && { blob_submitters_has_any_values: search.blobPosters }),
       },
     }),
-    enabled: !!currentNetwork,
+    enabled: !!currentNetwork && !!fuluActivation,
   });
 
   // Use API data directly
@@ -129,10 +133,12 @@ export function IndexPage(): JSX.Element {
         probe_date_time_gte: search.probeTime,
         probe_date_time_lte: search.probeTime,
         page_size: 100, // Fetch enough to find the matching probe
+        // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
+        ...(fuluActivation && { slot_gte: fuluActivation.slot }),
       },
     }),
     // Only fetch if probe is not already in current page data
-    enabled: !!currentNetwork && !!search.probeTime && !!search.probePeerId && !probeInCurrentData,
+    enabled: !!currentNetwork && !!fuluActivation && !!search.probeTime && !!search.probePeerId && !probeInCurrentData,
   });
 
   // Store the next page token for pagination

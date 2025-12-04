@@ -7,6 +7,7 @@ import type { IntCustodyProbeOrderBySlot, IntCustodyProbe } from '@/api/types.ge
 import { useNetwork } from '@/hooks/useNetwork';
 import { ProbeEventRow } from '@/pages/ethereum/data-availability/components/ProbeEventRow';
 import { ProbeDetailDialog } from '@/pages/ethereum/data-availability/probes/components/ProbeDetailDialog';
+import { useFuluActivation } from '@/pages/ethereum/data-availability/custody/hooks/useFuluActivation';
 import type { LiveProbeEventsProps, ProbeFilterContext } from './LiveProbeEvents.types';
 
 /** Number of seconds in a day */
@@ -92,6 +93,7 @@ export function LiveProbeEvents({
   probesLinkParams,
 }: LiveProbeEventsProps): JSX.Element | null {
   const { currentNetwork } = useNetwork();
+  const { fuluActivation } = useFuluActivation();
   const [selectedProbe, setSelectedProbe] = useState<IntCustodyProbeOrderBySlot | null>(null);
 
   // Track known probe keys to detect new items
@@ -109,9 +111,11 @@ export function LiveProbeEvents({
         ...queryParams,
         page_size: maxEvents,
         order_by: 'probe_date_time desc',
+        // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
+        ...(fuluActivation && { slot_gte: fuluActivation.slot }),
       },
     }),
-    enabled: !!currentNetwork,
+    enabled: !!currentNetwork && !!fuluActivation,
     refetchInterval: pollInterval,
     placeholderData: keepPreviousData,
   });

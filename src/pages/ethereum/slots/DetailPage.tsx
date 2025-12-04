@@ -273,9 +273,10 @@ export function DetailPage(): JSX.Element {
     data.builderBids.length > 0 ||
     data.preparedBlocks.length > 0;
 
-  // Check if blob data exists (submitters or blob metrics)
-  const hasBlobData =
-    blobSubmitters.length > 0 || data.blobCount[0]?.blob_count || data.blockHead[0]?.execution_payload_blob_gas_used;
+  // Check if blob data exists (submitters or actual blobs)
+  // Only show Blobs tab if there are actual blobs, not just if the fields exist with 0 values
+  const blobCount = data.blobCount[0]?.blob_count ?? 0;
+  const hasBlobData = blobSubmitters.length > 0 || blobCount > 0;
 
   return (
     <Container>
@@ -807,24 +808,19 @@ export function DetailPage(): JSX.Element {
             {hasBlobData && (
               <TabPanel>
                 <div className="space-y-6">
-                  {/* Blob Metrics */}
-                  {(data.blockHead[0]?.execution_payload_blob_gas_used !== null ||
-                    data.blockHead[0]?.execution_payload_excess_blob_gas !== null ||
-                    (data.blobCount[0] && data.blobCount[0].blob_count)) && (
+                  {/* Blob Metrics - only show if there are actual blobs */}
+                  {blobCount > 0 && (
                     <Card>
                       <div className="mb-4">
                         <h3 className="text-lg font-semibold text-foreground">Blob Metrics</h3>
                         <p className="text-sm text-muted">EIP-4844 blob gas usage for this block</p>
                       </div>
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        {data.blobCount[0] &&
-                          data.blobCount[0].blob_count !== undefined &&
-                          data.blobCount[0].blob_count !== null && (
-                            <MiniStat label="Blob Count" value={data.blobCount[0].blob_count.toString()} />
-                          )}
+                        <MiniStat label="Blob Count" value={blobCount.toString()} />
 
                         {data.blockHead[0]?.execution_payload_blob_gas_used !== null &&
-                          data.blockHead[0]?.execution_payload_blob_gas_used !== undefined && (
+                          data.blockHead[0]?.execution_payload_blob_gas_used !== undefined &&
+                          data.blockHead[0].execution_payload_blob_gas_used > 0 && (
                             <MiniStat
                               label="Blob Gas Used"
                               value={`${(data.blockHead[0].execution_payload_blob_gas_used / 1e6).toFixed(2)}M`}
@@ -832,7 +828,8 @@ export function DetailPage(): JSX.Element {
                           )}
 
                         {data.blockHead[0]?.execution_payload_excess_blob_gas !== null &&
-                          data.blockHead[0]?.execution_payload_excess_blob_gas !== undefined && (
+                          data.blockHead[0]?.execution_payload_excess_blob_gas !== undefined &&
+                          data.blockHead[0].execution_payload_excess_blob_gas > 0 && (
                             <MiniStat
                               label="Excess Blob Gas"
                               value={`${(data.blockHead[0].execution_payload_excess_blob_gas / 1e6).toFixed(2)}M`}
@@ -848,7 +845,11 @@ export function DetailPage(): JSX.Element {
                       <div className="mb-4">
                         <h3 className="text-lg font-semibold text-foreground">Blob Submitters</h3>
                         <p className="text-sm text-muted">
-                          {blobSubmitters.length} blob transaction{blobSubmitters.length !== 1 ? 's' : ''} in this block
+                          {blobSubmitters.reduce((sum, s) => sum + (s.versioned_hashes?.length ?? 0), 0)} blob
+                          {blobSubmitters.reduce((sum, s) => sum + (s.versioned_hashes?.length ?? 0), 0) !== 1
+                            ? 's'
+                            : ''}{' '}
+                          across {blobSubmitters.length} transaction{blobSubmitters.length !== 1 ? 's' : ''}
                         </p>
                       </div>
                       <div className="grid gap-3">
@@ -868,7 +869,11 @@ export function DetailPage(): JSX.Element {
                               )}
                               <div>
                                 <div className="font-medium text-foreground">{submitter.name ?? 'Unknown'}</div>
-                                <div className="text-xs text-muted">Tx Index: {submitter.transaction_index ?? '-'}</div>
+                                <div className="text-xs text-muted">
+                                  {submitter.versioned_hashes?.length ?? 0} blob
+                                  {(submitter.versioned_hashes?.length ?? 0) !== 1 ? 's' : ''} · Tx Index:{' '}
+                                  {submitter.transaction_index ?? '-'}
+                                </div>
                               </div>
                             </div>
 
