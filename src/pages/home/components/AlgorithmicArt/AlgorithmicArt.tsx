@@ -139,8 +139,8 @@ export function AlgorithmicArt({
         nodes.push({
           x: initRandom() * canvasWidth,
           y: initRandom() * canvasHeight,
-          vx: (initRandom() - 0.5) * 0.5,
-          vy: (initRandom() - 0.5) * 0.5,
+          vx: (initRandom() - 0.5) * 0.15,
+          vy: (initRandom() - 0.5) * 0.15,
           radius: 3 + initRandom() * 4,
           pulsePhase: initRandom() * Math.PI * 2,
           connections: [],
@@ -239,7 +239,7 @@ export function AlgorithmicArt({
         node.x = Math.max(0, Math.min(canvasWidth, node.x));
         node.y = Math.max(0, Math.min(canvasHeight, node.y));
 
-        node.pulsePhase += 0.03;
+        node.pulsePhase += 0.01;
       }
 
       // Draw connections
@@ -261,7 +261,7 @@ export function AlgorithmicArt({
       }
 
       // Spawn particles
-      if (frameCounter % 12 === 0 && nodes.length > 0 && particles.length < maxParticles) {
+      if (frameCounter % 24 === 0 && nodes.length > 0 && particles.length < maxParticles) {
         const fromIdx = Math.floor(random() * nodes.length);
         const fromNode = nodes[fromIdx];
         if (fromNode.connections.length > 0) {
@@ -270,7 +270,7 @@ export function AlgorithmicArt({
             fromIdx,
             toIdx,
             progress: 0,
-            speed: 0.015 + random() * 0.025,
+            speed: 0.005 + random() * 0.01,
             size: 2 + random() * 3,
           });
         }
