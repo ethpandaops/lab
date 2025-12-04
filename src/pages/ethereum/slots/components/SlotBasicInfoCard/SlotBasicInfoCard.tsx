@@ -5,7 +5,6 @@ import { Badge } from '@/components/Elements/Badge';
 import { Slot } from '@/components/Ethereum/Slot';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { Entity } from '@/components/Ethereum/Entity';
-import { BlockArt } from '@/components/Ethereum/BlockArt';
 import { ForkLabel } from '@/components/Ethereum/ForkLabel';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { BeaconchainIcon } from '@/components/Ethereum/BeaconchainIcon';
@@ -290,14 +289,6 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
                 </div>
               </div>
             </div>
-          </div>
-          <div className="flex items-center justify-center lg:items-start">
-            <BlockArt
-              width={180}
-              height={180}
-              blockHash={blockHead?.block_root}
-              blockNumber={blockHead?.execution_payload_block_number ?? slot}
-            />
           </div>
         </div>
       </div>

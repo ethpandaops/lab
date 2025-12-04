@@ -1,4 +1,3 @@
-import { EpochArt } from '@/components/Ethereum/EpochArt';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { BlockExplorerLink } from '@/components/Ethereum/BlockExplorerLink';
 import clsx from 'clsx';
@@ -13,30 +12,23 @@ export function EpochHeader({ epoch, stats, timestamp, p95BlockArrivalTime }: Ep
       {/* Tight header section - no padding, integrated into card */}
       <div className="border-b border-border bg-background px-6 py-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-6">
-            {/* EpochArt - smaller, on the left */}
-            <div className="shrink-0">
-              <EpochArt width={80} height={80} epochNumber={epoch} filledSlots={stats.canonicalBlockCount} />
-            </div>
-
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight text-foreground">Epoch {epoch}</h1>
-              <div className="mt-1">
-                <Timestamp timestamp={timestamp} format="custom" className="text-sm text-muted">
-                  {ts =>
-                    new Date(ts * 1000).toLocaleString('en-CA', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                      hour12: false,
-                      timeZoneName: 'short',
-                    })
-                  }
-                </Timestamp>
-              </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Epoch {epoch}</h1>
+            <div className="mt-1">
+              <Timestamp timestamp={timestamp} format="custom" className="text-sm text-muted">
+                {ts =>
+                  new Date(ts * 1000).toLocaleString('en-CA', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false,
+                    timeZoneName: 'short',
+                  })
+                }
+              </Timestamp>
             </div>
           </div>
 
