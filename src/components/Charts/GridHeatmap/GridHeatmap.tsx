@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import clsx from 'clsx';
 import { ArrowLeftIcon, MagnifyingGlassPlusIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/Elements/Button';
+import { ScrollArea, ScrollBar } from '@/components/Layout/ScrollArea';
 import type { GridHeatmapProps, GridCellSize, RowLabelRenderProps } from './GridHeatmap.types';
 
 /**
@@ -193,126 +194,129 @@ export function GridHeatmap<T = unknown>({
       {renderHeader?.()}
 
       {/* Grid with optional Y-axis title - scrollable on mobile */}
-      <div className="flex overflow-x-auto overflow-y-hidden">
-        {/* Y-axis title - vertical text on the left */}
-        {yAxisTitle && (
-          <div className="flex shrink-0 items-center justify-center pr-1">
-            <span
-              className="text-[10px] font-medium tracking-wider text-muted uppercase"
-              style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
-            >
-              {yAxisTitle}
-            </span>
-          </div>
-        )}
+      <ScrollArea className="w-full" scrollHorizontalWithWheel>
+        <div className="flex">
+          {/* Y-axis title - vertical text on the left */}
+          {yAxisTitle && (
+            <div className="flex shrink-0 items-center justify-center pr-1">
+              <span
+                className="text-[10px] font-medium tracking-wider text-muted uppercase"
+                style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+              >
+                {yAxisTitle}
+              </span>
+            </div>
+          )}
 
-        {/* Main grid area - min-w-fit ensures cells don't collapse too much */}
-        <div className="min-w-fit flex-1">
-          {/* Rows */}
-          <div className="flex flex-col gap-0.5">
-            {rows.map(row => {
-              const rowLabelProps: RowLabelRenderProps = {
-                identifier: row.identifier,
-                label: row.label,
-                isHovered: hoveredRow === row.identifier,
-                canDrillDown: !!onRowClick,
-                onDrillDown: onRowClick ? () => onRowClick(row.identifier) : undefined,
-                onMouseEnter: () => setHoveredRow(row.identifier),
-                onMouseLeave: () => setHoveredRow(null),
-              };
+          {/* Main grid area - min-w-fit ensures cells don't collapse too much */}
+          <div className="min-w-fit flex-1">
+            {/* Rows */}
+            <div className="flex flex-col gap-0.5">
+              {rows.map(row => {
+                const rowLabelProps: RowLabelRenderProps = {
+                  identifier: row.identifier,
+                  label: row.label,
+                  isHovered: hoveredRow === row.identifier,
+                  canDrillDown: !!onRowClick,
+                  onDrillDown: onRowClick ? () => onRowClick(row.identifier) : undefined,
+                  onMouseEnter: () => setHoveredRow(row.identifier),
+                  onMouseLeave: () => setHoveredRow(null),
+                };
 
-              return (
-                <div key={row.identifier} className="flex items-center">
-                  {/* Row label - custom or default */}
-                  {renderRowLabel ? (
-                    <div className={clsx(labelWidth[cellSize], 'shrink-0')}>{renderRowLabel(rowLabelProps)}</div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={rowLabelProps.onDrillDown}
-                      onMouseEnter={rowLabelProps.onMouseEnter}
-                      onMouseLeave={rowLabelProps.onMouseLeave}
-                      className={clsx(
-                        labelWidth[cellSize],
-                        textSize[cellSize],
-                        'group flex shrink-0 items-center justify-end gap-1.5 truncate pr-2 text-right transition-colors',
-                        onRowClick ? 'cursor-pointer hover:text-accent' : 'cursor-default text-muted',
-                        hoveredRow === row.identifier ? 'font-bold text-accent' : 'text-muted'
-                      )}
-                      title={onRowClick ? 'Click to drill down' : row.label}
-                    >
-                      {/* Drill-down icon (only visible on hover if clickable) */}
-                      {onRowClick && (
-                        <MagnifyingGlassPlusIcon
-                          className={clsx(
-                            'size-3 shrink-0 opacity-0 transition-opacity group-hover:opacity-100',
-                            hoveredRow === row.identifier && 'opacity-100'
-                          )}
-                        />
-                      )}
-                      <span className="truncate">{row.label}</span>
-                    </button>
-                  )}
+                return (
+                  <div key={row.identifier} className="flex items-center">
+                    {/* Row label - custom or default */}
+                    {renderRowLabel ? (
+                      <div className={clsx(labelWidth[cellSize], 'shrink-0')}>{renderRowLabel(rowLabelProps)}</div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={rowLabelProps.onDrillDown}
+                        onMouseEnter={rowLabelProps.onMouseEnter}
+                        onMouseLeave={rowLabelProps.onMouseLeave}
+                        className={clsx(
+                          labelWidth[cellSize],
+                          textSize[cellSize],
+                          'group flex shrink-0 items-center justify-end gap-1.5 truncate pr-2 text-right transition-colors',
+                          onRowClick ? 'cursor-pointer hover:text-accent' : 'cursor-default text-muted',
+                          hoveredRow === row.identifier ? 'font-bold text-accent' : 'text-muted'
+                        )}
+                        title={onRowClick ? 'Click to drill down' : row.label}
+                      >
+                        {/* Drill-down icon (only visible on hover if clickable) */}
+                        {onRowClick && (
+                          <MagnifyingGlassPlusIcon
+                            className={clsx(
+                              'size-3 shrink-0 opacity-0 transition-opacity group-hover:opacity-100',
+                              hoveredRow === row.identifier && 'opacity-100'
+                            )}
+                          />
+                        )}
+                        <span className="truncate">{row.label}</span>
+                      </button>
+                    )}
 
-                  {/* Cells with size-appropriate gap for visual separation */}
-                  <div className={clsx(cellContainerClass[cellSize], cellGap[cellSize])} style={gridStyle}>
-                    {row.cells.map(cell => {
-                      const isHighlighted = hoveredColumn === cell.columnIndex || hoveredRow === row.identifier;
+                    {/* Cells with size-appropriate gap for visual separation */}
+                    <div className={clsx(cellContainerClass[cellSize], cellGap[cellSize])} style={gridStyle}>
+                      {row.cells.map(cell => {
+                        const isHighlighted = hoveredColumn === cell.columnIndex || hoveredRow === row.identifier;
 
-                      return (
-                        <div key={`${row.identifier}-${cell.columnIndex}`}>
-                          {renderCell(cell.data, {
-                            isSelected: false,
-                            isHighlighted,
-                            isDimmed: false,
-                            size: cellSize,
-                            onClick: onCellClick ? () => onCellClick(row.identifier, cell.columnIndex) : undefined,
-                          })}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Column header at bottom */}
-          {showColumnHeader && (
-            <div className="mt-1 flex items-center">
-              {/* Spacer for row labels */}
-              <div className={clsx(labelWidth[cellSize], 'shrink-0')} />
-
-              {/* Column indices - matching cell gap */}
-              <div className={clsx(cellContainerClass[cellSize], cellGap[cellSize])} style={gridStyle}>
-                {columnIndices.map(colIndex => {
-                  const isHovered = hoveredColumn === colIndex;
-
-                  return (
-                    <div key={colIndex}>
-                      {renderColumnLabel
-                        ? renderColumnLabel(colIndex, isHovered, false)
-                        : defaultRenderColumnLabel(colIndex, isHovered)}
+                        return (
+                          <div key={`${row.identifier}-${cell.columnIndex}`}>
+                            {renderCell(cell.data, {
+                              isSelected: false,
+                              isHighlighted,
+                              isDimmed: false,
+                              size: cellSize,
+                              onClick: onCellClick ? () => onCellClick(row.identifier, cell.columnIndex) : undefined,
+                            })}
+                          </div>
+                        );
+                      })}
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
+                );
+              })}
             </div>
-          )}
 
-          {/* X-axis title - below column indices */}
-          {xAxisTitle && (
-            <div className="mt-2 flex items-center">
-              {/* Spacer for row labels + y-axis title */}
-              <div className={clsx(labelWidth[cellSize], 'shrink-0')} />
-              {/* Title centered over columns */}
-              <div className="flex-1 text-center text-[10px] font-medium tracking-wider text-muted uppercase">
-                {xAxisTitle}
+            {/* Column header at bottom */}
+            {showColumnHeader && (
+              <div className="mt-1 flex items-center">
+                {/* Spacer for row labels */}
+                <div className={clsx(labelWidth[cellSize], 'shrink-0')} />
+
+                {/* Column indices - matching cell gap */}
+                <div className={clsx(cellContainerClass[cellSize], cellGap[cellSize])} style={gridStyle}>
+                  {columnIndices.map(colIndex => {
+                    const isHovered = hoveredColumn === colIndex;
+
+                    return (
+                      <div key={colIndex}>
+                        {renderColumnLabel
+                          ? renderColumnLabel(colIndex, isHovered, false)
+                          : defaultRenderColumnLabel(colIndex, isHovered)}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* X-axis title - below column indices */}
+            {xAxisTitle && (
+              <div className="mt-2 flex items-center">
+                {/* Spacer for row labels + y-axis title */}
+                <div className={clsx(labelWidth[cellSize], 'shrink-0')} />
+                {/* Title centered over columns */}
+                <div className="flex-1 text-center text-[10px] font-medium tracking-wider text-muted uppercase">
+                  {xAxisTitle}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
 
       {/* Back button */}
       {onBack && (

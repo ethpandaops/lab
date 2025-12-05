@@ -15,7 +15,7 @@
 @import 'tailwindcss';
 
 /* Tailwind CSS v4 plugins via @plugin directive */
-@plugin "@tailwindcss/forms";
+@plugin '@tailwindcss/forms';
 
 /* Enable class-based dark mode and star mode */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -166,20 +166,20 @@
   --color-blob-5: var(--color-red-500);
 
   /* Continent/Region color mappings for geographical visualizations */
-  --color-continent-af: var(--color-red-500);      /* Africa */
-  --color-continent-as: var(--color-amber-500);    /* Asia */
-  --color-continent-eu: var(--color-emerald-500);  /* Europe */
-  --color-continent-na: var(--color-blue-500);     /* North America */
-  --color-continent-oc: var(--color-cyan-500);     /* Oceania */
-  --color-continent-sa: var(--color-violet-500);   /* South America */
-  --color-continent-an: var(--color-slate-500);    /* Antarctica */
+  --color-continent-af: var(--color-red-500); /* Africa */
+  --color-continent-as: var(--color-amber-500); /* Asia */
+  --color-continent-eu: var(--color-emerald-500); /* Europe */
+  --color-continent-na: var(--color-blue-500); /* North America */
+  --color-continent-oc: var(--color-cyan-500); /* Oceania */
+  --color-continent-sa: var(--color-violet-500); /* South America */
+  --color-continent-an: var(--color-slate-500); /* Antarctica */
 
   /* Performance time-based color gradient (fast → slow) */
-  --color-performance-excellent: var(--color-green-500);   /* 0-1s - very fast */
-  --color-performance-good: var(--color-lime-500);         /* 1-2s - fast */
-  --color-performance-fair: var(--color-yellow-500);       /* 2-3s - moderate */
-  --color-performance-slow: var(--color-orange-500);       /* 3-4s - slow */
-  --color-performance-poor: var(--color-red-500);          /* 4+s - very slow */
+  --color-performance-excellent: var(--color-green-500); /* 0-1s - very fast */
+  --color-performance-good: var(--color-lime-500); /* 1-2s - fast */
+  --color-performance-fair: var(--color-yellow-500); /* 2-3s - moderate */
+  --color-performance-slow: var(--color-orange-500); /* 3-4s - slow */
+  --color-performance-poor: var(--color-red-500); /* 4+s - very slow */
 
   /* Categorical color palette for multi-series charts (0-14) */
   --color-chart-0: var(--color-blue-500);
