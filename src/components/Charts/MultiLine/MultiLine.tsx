@@ -315,6 +315,7 @@ export function MultiLineChart({
         connectNulls,
         showSymbol: s.showSymbol ?? false,
         symbolSize: s.symbolSize ?? 4,
+        stack: s.stack,
         lineStyle: {
           color: seriesColor,
           width: s.lineWidth ?? 2,
@@ -324,7 +325,7 @@ export function MultiLineChart({
           color: seriesColor,
         },
         // Add emphasis configuration for hover effects
-        // Auto-enable symbol display on hover for better interactivity (especially important for step charts)
+        // Use 'none' focus to prevent other series from fading (avoids flickering on stacked charts)
         emphasis: s.emphasis
           ? {
               focus: s.emphasis.focus,
@@ -335,13 +336,9 @@ export function MultiLineChart({
               ...(s.emphasis.symbolSize !== undefined ? { symbolSize: s.emphasis.symbolSize } : {}),
             }
           : {
-              focus: 'series' as const,
-              showSymbol: true,
-              symbolSize: 8,
+              focus: 'none' as const,
               itemStyle: {
                 color: seriesColor,
-                borderColor: themeColors.background,
-                borderWidth: 2,
               },
             },
         // Add label at the right side of the chart if requested
@@ -759,17 +756,19 @@ export function MultiLineChart({
                     <button
                       key={s.name}
                       onClick={() => toggleSeries(s.name)}
-                      className={`flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs/5 transition-colors ${
+                      className={`flex cursor-pointer items-center gap-1.5 rounded-sm border px-2 py-1 text-xs/5 transition-all ${
                         isVisible
-                          ? 'bg-surface-hover text-foreground'
-                          : 'hover:bg-surface-hover/50 bg-surface/50 text-muted/50'
+                          ? 'bg-surface-hover border-border text-foreground hover:border-primary/50 hover:bg-primary/10'
+                          : 'hover:bg-surface-hover/50 border-transparent bg-surface/50 text-muted/50 hover:border-border'
                       }`}
+                      title={isVisible ? `Click to hide ${s.name}` : `Click to show ${s.name}`}
                     >
                       <span
-                        className="h-2 w-2 rounded-full"
+                        className="h-2 w-2 rounded-full transition-colors"
                         style={{
                           backgroundColor: isVisible ? seriesColor : 'transparent',
                           border: `2px solid ${seriesColor}`,
+                          opacity: isVisible ? 1 : 0.5,
                         }}
                       />
                       <span className="font-medium">{s.name}</span>
@@ -831,17 +830,19 @@ export function MultiLineChart({
                     <button
                       key={s.name}
                       onClick={() => toggleSeries(s.name)}
-                      className={`flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs/5 transition-colors ${
+                      className={`flex cursor-pointer items-center gap-1.5 rounded-sm border px-2 py-1 text-xs/5 transition-all ${
                         isVisible
-                          ? 'bg-surface-hover text-foreground'
-                          : 'hover:bg-surface-hover/50 bg-surface/50 text-muted/50'
+                          ? 'bg-surface-hover border-border text-foreground hover:border-primary/50 hover:bg-primary/10'
+                          : 'hover:bg-surface-hover/50 border-transparent bg-surface/50 text-muted/50 hover:border-border'
                       }`}
+                      title={isVisible ? `Click to hide ${s.name}` : `Click to show ${s.name}`}
                     >
                       <span
-                        className="h-2 w-2 rounded-full"
+                        className="h-2 w-2 rounded-full transition-colors"
                         style={{
                           backgroundColor: isVisible ? seriesColor : 'transparent',
                           border: `2px solid ${seriesColor}`,
+                          opacity: isVisible ? 1 : 0.5,
                         }}
                       />
                       <span className="font-medium">{s.name}</span>

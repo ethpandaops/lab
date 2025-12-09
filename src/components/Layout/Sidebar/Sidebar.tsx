@@ -166,7 +166,7 @@ const ethereumDataAvailabilityPages: NavItem[] = [
 ];
 
 const ethereumExecutionPages: NavItem[] = [
-  { name: 'State Size', to: '/ethereum/execution/state-size', icon: ServerStackIcon },
+  { name: 'State Growth', to: '/ethereum/execution/state-growth', icon: ServerStackIcon },
 ];
 
 const xatuPages: NavItem[] = [
