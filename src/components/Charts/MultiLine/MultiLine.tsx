@@ -315,6 +315,7 @@ export function MultiLineChart({
         connectNulls,
         showSymbol: s.showSymbol ?? false,
         symbolSize: s.symbolSize ?? 4,
+        stack: s.stack,
         lineStyle: {
           color: seriesColor,
           width: s.lineWidth ?? 2,

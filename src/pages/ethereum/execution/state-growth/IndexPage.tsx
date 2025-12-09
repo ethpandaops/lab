@@ -1,8 +1,9 @@
-import { type JSX, useMemo } from 'react';
+import { type JSX, useMemo, useCallback } from 'react';
 import { Header } from '@/components/Layout/Header';
 import { Container } from '@/components/Layout/Container';
 import { Card } from '@/components/Layout/Card';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
+import { formatSmartDecimal } from '@/utils';
 import { useStateSizeData } from './hooks';
 import { StateSizeSkeleton } from './components';
 
@@ -31,42 +32,81 @@ export function IndexPage(): JSX.Element {
 
     return {
       labels,
+      totalValues: data.map(item => bytesToGB(item.total_bytes)),
       series: [
         {
-          name: 'Total State',
-          data: data.map(item => bytesToGB(item.total_bytes)),
-          showArea: true,
-        },
-        {
-          name: 'Account Data',
-          data: data.map(item => bytesToGB(item.account_bytes)),
-        },
-        {
-          name: 'Account Trie Nodes',
+          name: 'Accounts',
           data: data.map(item => bytesToGB(item.account_trienode_bytes)),
+          showArea: true,
+          stack: 'total',
         },
         {
-          name: 'Storage Data',
-          data: data.map(item => bytesToGB(item.storage_bytes)),
-        },
-        {
-          name: 'Storage Trie Nodes',
+          name: 'Storage Slots',
           data: data.map(item => bytesToGB(item.storage_trienode_bytes)),
+          showArea: true,
+          stack: 'total',
         },
         {
-          name: 'Contract Code',
+          name: 'Contract Codes',
           data: data.map(item => bytesToGB(item.contract_code_bytes)),
+          showArea: true,
+          stack: 'total',
         },
       ],
     };
   }, [data]);
 
+  const tooltipFormatter = useCallback(
+    (params: unknown): string => {
+      const dataPoints = Array.isArray(params) ? params : [params];
+      let html = '';
+
+      if (dataPoints.length > 0 && dataPoints[0]) {
+        const firstPoint = dataPoints[0] as { axisValue?: string; dataIndex?: number };
+        if (firstPoint.axisValue !== undefined) {
+          html += `<div style="margin-bottom: 4px; font-weight: 600;">${firstPoint.axisValue}</div>`;
+        }
+
+        // Add Total as the first item
+        if (chartData && firstPoint.dataIndex !== undefined) {
+          const totalValue = chartData.totalValues[firstPoint.dataIndex];
+          if (totalValue !== undefined) {
+            html += `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; padding-bottom: 4px; border-bottom: 1px solid rgba(128, 128, 128, 0.2);">`;
+            html += `<span style="font-weight: 500;">Total:</span>`;
+            html += `<span style="font-weight: 600; margin-left: auto;">${formatSmartDecimal(totalValue, 2)} GB</span>`;
+            html += `</div>`;
+          }
+        }
+      }
+
+      // Add each series
+      dataPoints.forEach(point => {
+        const p = point as {
+          marker?: string;
+          seriesName?: string;
+          value?: number | [number, number];
+        };
+
+        if (p.marker && p.seriesName !== undefined) {
+          const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+          if (yValue !== undefined && yValue !== null) {
+            html += `<div style="display: flex; align-items: center; gap: 8px;">`;
+            html += p.marker;
+            html += `<span>${p.seriesName}:</span>`;
+            html += `<span style="font-weight: 600; margin-left: auto;">${formatSmartDecimal(yValue, 2)} GB</span>`;
+            html += `</div>`;
+          }
+        }
+      });
+
+      return html;
+    },
+    [chartData]
+  );
+
   return (
     <Container>
-      <Header
-        title="State Growth"
-        description="Ethereum execution layer state growth over time, showing accounts, storage, and contract code"
-      />
+      <Header title="State Growth" description="Track Ethereum execution layer state growth over time" />
 
       {isLoading && <StateSizeSkeleton />}
 
@@ -86,7 +126,7 @@ export function IndexPage(): JSX.Element {
                 <p className="text-2xl font-bold text-foreground">{formatBytes(latestData.total_bytes)}</p>
               </Card>
               <Card className="p-4">
-                <p className="text-xs text-muted">Total Accounts</p>
+                <p className="text-xs text-muted">Accounts</p>
                 <p className="text-2xl font-bold text-foreground">{latestData.accounts.toLocaleString()}</p>
               </Card>
               <Card className="p-4">
@@ -115,11 +155,11 @@ export function IndexPage(): JSX.Element {
                 yAxis={{
                   name: 'Size (GB)',
                   min: 0,
-                  valueDecimals: 2,
                 }}
                 height={500}
                 showLegend={true}
                 enableDataZoom={true}
+                tooltipFormatter={tooltipFormatter}
               />
             </Card>
           )}
