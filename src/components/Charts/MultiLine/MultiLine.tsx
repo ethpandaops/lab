@@ -325,7 +325,7 @@ export function MultiLineChart({
           color: seriesColor,
         },
         // Add emphasis configuration for hover effects
-        // Auto-enable symbol display on hover for better interactivity (especially important for step charts)
+        // Use 'none' focus to prevent other series from fading (avoids flickering on stacked charts)
         emphasis: s.emphasis
           ? {
               focus: s.emphasis.focus,
@@ -336,13 +336,9 @@ export function MultiLineChart({
               ...(s.emphasis.symbolSize !== undefined ? { symbolSize: s.emphasis.symbolSize } : {}),
             }
           : {
-              focus: 'series' as const,
-              showSymbol: true,
-              symbolSize: 8,
+              focus: 'none' as const,
               itemStyle: {
                 color: seriesColor,
-                borderColor: themeColors.background,
-                borderWidth: 2,
               },
             },
         // Add label at the right side of the chart if requested
