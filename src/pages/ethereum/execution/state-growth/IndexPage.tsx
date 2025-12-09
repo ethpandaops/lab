@@ -18,7 +18,7 @@ function formatBytes(bytes: number): string {
 }
 
 /**
- * State Size page - Shows Ethereum execution layer state growth over time
+ * State Growth page - Shows Ethereum execution layer state growth over time
  */
 export function IndexPage(): JSX.Element {
   const { data, latestData, isLoading, error } = useStateSizeData();
@@ -64,8 +64,8 @@ export function IndexPage(): JSX.Element {
   return (
     <Container>
       <Header
-        title="State Size"
-        description="Ethereum execution layer state size growth over time, showing accounts, storage, and contract code"
+        title="State Growth"
+        description="Ethereum execution layer state growth over time, showing accounts, storage, and contract code"
       />
 
       {isLoading && <StateSizeSkeleton />}
@@ -104,7 +104,7 @@ export function IndexPage(): JSX.Element {
           {chartData && (
             <Card className="p-6">
               <MultiLineChart
-                title="State Size Over Time"
+                title="State Growth Over Time"
                 subtitle="Daily snapshot of Ethereum state components"
                 series={chartData.series}
                 xAxis={{
