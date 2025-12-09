@@ -402,11 +402,16 @@ export function MultiLineChart({
     });
 
     // Calculate grid padding - just basic padding, let ECharts handle the rest
+    // Add extra bottom padding for dataZoom slider when enabled
+    const baseBottom = 50;
+    const legendBottom = useNativeLegend && showLegend && legendPosition === 'bottom' ? 40 : 0;
+    const dataZoomBottom = enableDataZoom ? 40 : 0;
+
     const gridConfig = grid ?? {
       left: 60,
       right: 24,
       top: 16,
-      bottom: useNativeLegend && showLegend && legendPosition === 'bottom' ? 90 : 50,
+      bottom: baseBottom + legendBottom + dataZoomBottom,
     };
 
     // Create default smart tooltip formatter
@@ -573,9 +578,34 @@ export function MultiLineChart({
               type: 'inside' as const,
               xAxisIndex: 0,
               filterMode: 'none' as const,
-              zoomOnMouseWheel: false,
+              zoomOnMouseWheel: true,
               moveOnMouseWheel: false,
               moveOnMouseMove: true,
+            },
+            {
+              type: 'slider' as const,
+              xAxisIndex: 0,
+              filterMode: 'none' as const,
+              height: 20,
+              bottom: 10,
+              borderColor: themeColors.border,
+              backgroundColor: 'transparent',
+              fillerColor: hexToRgba(themeColors.primary, 0.2),
+              handleStyle: {
+                color: themeColors.primary,
+                borderColor: themeColors.primary,
+              },
+              textStyle: {
+                color: themeColors.muted,
+              },
+              dataBackground: {
+                lineStyle: { color: themeColors.border },
+                areaStyle: { color: themeColors.border, opacity: 0.1 },
+              },
+              selectedDataBackground: {
+                lineStyle: { color: themeColors.primary },
+                areaStyle: { color: themeColors.primary, opacity: 0.1 },
+              },
             },
           ]
         : undefined,
@@ -587,6 +617,7 @@ export function MultiLineChart({
     themeColors.muted,
     themeColors.surface,
     themeColors.background,
+    themeColors.primary,
     xAxis,
     yAxis,
     displayedSeries,

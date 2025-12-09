@@ -1,0 +1,1 @@
+export { useStateSizeData } from './useStateSizeData';

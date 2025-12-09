@@ -17,6 +17,7 @@ import {
   SignalIcon,
   CircleStackIcon,
   MagnifyingGlassIcon,
+  ServerStackIcon,
 } from '@heroicons/react/24/outline';
 import { NetworkSelect } from '@/components/Ethereum/NetworkSelect';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
@@ -164,6 +165,10 @@ const ethereumDataAvailabilityPages: NavItem[] = [
   { name: 'Probes', to: '/ethereum/data-availability/probes', icon: MagnifyingGlassIcon },
 ];
 
+const ethereumExecutionPages: NavItem[] = [
+  { name: 'State Size', to: '/ethereum/execution/state-size', icon: ServerStackIcon },
+];
+
 const xatuPages: NavItem[] = [
   { name: 'Contributors', to: '/xatu/contributors', icon: UserGroupIcon },
   { name: 'Geo Checklist', to: '/xatu/geographical-checklist', icon: MapIcon },
@@ -267,6 +272,11 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
     [config?.features, currentNetwork?.name]
   );
 
+  const filteredEthereumExecutionPages = useMemo(
+    () => ethereumExecutionPages.filter(page => isPageEnabled(page.to, config?.features, currentNetwork?.name)),
+    [config?.features, currentNetwork?.name]
+  );
+
   const filteredXatuPages = useMemo(
     () => xatuPages.filter(page => isPageEnabled(page.to, config?.features, currentNetwork?.name)),
     [config?.features, currentNetwork?.name]
@@ -311,6 +321,16 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
                           <SubsectionHeader title="Data Availability" collapsed={false} />
                           <div className="space-y-0.5">
                             {filteredEthereumDataAvailabilityPages.map(page => (
+                              <NavLink key={page.to} page={page} collapsed={false} />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {filteredEthereumExecutionPages.length > 0 && (
+                        <div>
+                          <SubsectionHeader title="Execution" collapsed={false} />
+                          <div className="space-y-0.5">
+                            {filteredEthereumExecutionPages.map(page => (
                               <NavLink key={page.to} page={page} collapsed={false} />
                             ))}
                           </div>
@@ -422,6 +442,16 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
                     <SubsectionHeader title="Data Availability" collapsed={collapsed} />
                     <div className={clsx(collapsed ? 'space-y-1' : 'space-y-0.5')}>
                       {filteredEthereumDataAvailabilityPages.map(page => (
+                        <NavLink key={page.to} page={page} collapsed={collapsed} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {filteredEthereumExecutionPages.length > 0 && (
+                  <div>
+                    <SubsectionHeader title="Execution" collapsed={collapsed} />
+                    <div className={clsx(collapsed ? 'space-y-1' : 'space-y-0.5')}>
+                      {filteredEthereumExecutionPages.map(page => (
                         <NavLink key={page.to} page={page} collapsed={collapsed} />
                       ))}
                     </div>
