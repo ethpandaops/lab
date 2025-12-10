@@ -5,7 +5,7 @@ import { Card } from '@/components/Layout/Card';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { formatSmartDecimal } from '@/utils';
 import { useStateSizeData } from './hooks';
-import { StateSizeSkeleton } from './components';
+import { StateSizeSkeleton, StateDeltaCards } from './components';
 
 /**
  * Format bytes to a human-readable string (GB/TB)
@@ -139,6 +139,9 @@ export function IndexPage(): JSX.Element {
               </Card>
             </div>
           )}
+
+          {/* State delta cards */}
+          {data && <StateDeltaCards data={data} />}
 
           {/* Main chart */}
           {chartData && (
