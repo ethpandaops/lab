@@ -2,8 +2,18 @@ import { type JSX, useState } from 'react';
 import { CubeIcon } from '@heroicons/react/24/outline';
 import type { ClientLogoProps } from './ClientLogo.types';
 
+/** Map client name aliases to canonical names */
+const CLIENT_ALIASES: Record<string, string> = {
+  'go-ethereum': 'geth',
+};
+
+function normalizeClientName(clientName: string): string {
+  const lower = clientName.toLowerCase();
+  return CLIENT_ALIASES[lower] ?? lower;
+}
+
 function getClientLogoUrl(clientName: string): string {
-  return `/images/external/clients/${clientName.toLowerCase()}.png`;
+  return `/images/external/clients/${normalizeClientName(clientName)}.png`;
 }
 
 export function ClientLogo({ client, size = 20, className = '' }: ClientLogoProps): JSX.Element {
