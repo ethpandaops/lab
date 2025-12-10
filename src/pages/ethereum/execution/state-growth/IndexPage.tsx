@@ -1,15 +1,19 @@
-import { type JSX, useMemo, useCallback } from 'react';
-import { Header } from '@/components/Layout/Header';
+import { type JSX, useMemo, useCallback, useState } from 'react';
+import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/solid';
+import clsx from 'clsx';
 import { Container } from '@/components/Layout/Container';
 import { Card } from '@/components/Layout/Card';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { formatSmartDecimal } from '@/utils';
-import { useStateSizeData } from './hooks';
-import { StateSizeSkeleton, StateDeltaCards } from './components';
+import { useStateSizeData, useStateDelta, type DeltaTimeframe } from './hooks';
+import { StateSizeSkeleton } from './components';
 
-/**
- * Format bytes to a human-readable string (GB/TB)
- */
+const TIMEFRAME_OPTIONS: { value: DeltaTimeframe; label: string }[] = [
+  { value: 'daily', label: '24h' },
+  { value: 'weekly', label: '7d' },
+  { value: 'monthly', label: '30d' },
+];
+
 function formatBytes(bytes: number): string {
   const gb = bytes / (1024 * 1024 * 1024);
   if (gb >= 1000) {
@@ -18,11 +22,26 @@ function formatBytes(bytes: number): string {
   return `${gb.toFixed(2)} GB`;
 }
 
-/**
- * State Growth page - Shows Ethereum execution layer state growth over time
- */
+function formatDeltaBytes(bytes: number): string {
+  const absBytes = Math.abs(bytes);
+  const sign = bytes >= 0 ? '+' : '-';
+
+  if (absBytes >= 1024 * 1024 * 1024) {
+    return `${sign}${(absBytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+  }
+  if (absBytes >= 1024 * 1024) {
+    return `${sign}${(absBytes / (1024 * 1024)).toFixed(2)} MB`;
+  }
+  if (absBytes >= 1024) {
+    return `${sign}${(absBytes / 1024).toFixed(2)} KB`;
+  }
+  return `${sign}${absBytes.toFixed(0)} B`;
+}
+
 export function IndexPage(): JSX.Element {
   const { data, latestData, isLoading, error } = useStateSizeData();
+  const [timeframe, setTimeframe] = useState<DeltaTimeframe>('daily');
+  const delta = useStateDelta(data, timeframe);
 
   const chartData = useMemo(() => {
     if (!data || data.length === 0) return null;
@@ -64,22 +83,20 @@ export function IndexPage(): JSX.Element {
       if (dataPoints.length > 0 && dataPoints[0]) {
         const firstPoint = dataPoints[0] as { axisValue?: string; dataIndex?: number };
         if (firstPoint.axisValue !== undefined) {
-          html += `<div style="margin-bottom: 4px; font-weight: 600;">${firstPoint.axisValue}</div>`;
+          html += `<div style="margin-bottom: 8px; font-weight: 600; font-size: 13px;">${firstPoint.axisValue}</div>`;
         }
 
-        // Add Total as the first item
         if (chartData && firstPoint.dataIndex !== undefined) {
           const totalValue = chartData.totalValues[firstPoint.dataIndex];
           if (totalValue !== undefined) {
-            html += `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; padding-bottom: 4px; border-bottom: 1px solid rgba(128, 128, 128, 0.2);">`;
+            html += `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(128, 128, 128, 0.2);">`;
             html += `<span style="font-weight: 500;">Total:</span>`;
-            html += `<span style="font-weight: 600; margin-left: auto;">${formatSmartDecimal(totalValue, 2)} GB</span>`;
+            html += `<span style="font-weight: 700; margin-left: auto; font-size: 14px;">${formatSmartDecimal(totalValue, 2)} GB</span>`;
             html += `</div>`;
           }
         }
       }
 
-      // Add each series
       dataPoints.forEach(point => {
         const p = point as {
           marker?: string;
@@ -90,10 +107,13 @@ export function IndexPage(): JSX.Element {
         if (p.marker && p.seriesName !== undefined) {
           const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
           if (yValue !== undefined && yValue !== null) {
-            html += `<div style="display: flex; align-items: center; gap: 8px;">`;
+            const total = chartData?.totalValues[(dataPoints[0] as { dataIndex?: number })?.dataIndex ?? 0] ?? 1;
+            const percentage = ((yValue / total) * 100).toFixed(1);
+            html += `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">`;
             html += p.marker;
             html += `<span>${p.seriesName}:</span>`;
-            html += `<span style="font-weight: 600; margin-left: auto;">${formatSmartDecimal(yValue, 2)} GB</span>`;
+            html += `<span style="margin-left: auto; opacity: 0.7;">${percentage}%</span>`;
+            html += `<span style="font-weight: 600; min-width: 70px; text-align: right;">${formatSmartDecimal(yValue, 2)} GB</span>`;
             html += `</div>`;
           }
         }
@@ -104,9 +124,39 @@ export function IndexPage(): JSX.Element {
     [chartData]
   );
 
+  const totalIsPositive = delta ? delta.total.delta >= 0 : true;
+  const TotalIcon = totalIsPositive ? ArrowTrendingUpIcon : ArrowTrendingDownIcon;
+
   return (
     <Container>
-      <Header title="State Growth" description="Track Ethereum execution layer state growth over time" />
+      {/* Header with title and global timeframe filter */}
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-4xl/tight font-bold text-foreground">State Growth</h1>
+          <p className="mt-1 text-muted">Track Ethereum execution layer state growth over time</p>
+        </div>
+
+        {/* Global timeframe toggle */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted">Compare:</span>
+          <div className="flex items-center gap-0.5 rounded-md border border-border bg-surface/50 p-0.5">
+            {TIMEFRAME_OPTIONS.map(option => (
+              <button
+                key={option.value}
+                onClick={() => setTimeframe(option.value)}
+                className={clsx(
+                  'rounded-xs px-3 py-1.5 text-xs font-medium transition-all',
+                  timeframe === option.value
+                    ? 'bg-primary text-white'
+                    : 'text-muted hover:bg-muted/10 hover:text-foreground'
+                )}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {isLoading && <StateSizeSkeleton />}
 
@@ -116,69 +166,188 @@ export function IndexPage(): JSX.Element {
         </Card>
       )}
 
-      {(chartData || latestData) && (
+      {chartData && latestData && delta && (
         <div className="space-y-6">
-          {/* Main content: Chart (left) + Stats sidebar (right) */}
-          <div className="flex flex-col gap-6 xl:flex-row">
-            {/* Chart - takes most of the width */}
-            {chartData && (
-              <Card className="min-w-0 flex-1 p-6">
-                <MultiLineChart
-                  title="State Growth Over Time"
-                  subtitle="Daily snapshot of Ethereum state components"
-                  series={chartData.series}
-                  xAxis={{
-                    type: 'category',
-                    labels: chartData.labels,
-                    name: 'Date',
-                  }}
-                  yAxis={{
-                    name: 'Size (GB)',
-                    min: 0,
-                  }}
-                  height={500}
-                  showLegend={true}
-                  enableDataZoom={true}
-                  tooltipFormatter={tooltipFormatter}
-                />
-              </Card>
-            )}
-
-            {/* Right sidebar - stacked stat cards */}
-            {latestData && (
-              <div className="flex w-full shrink-0 flex-col gap-4 xl:w-64">
-                {/* Total State Size - prominent */}
-                <Card className="p-4">
-                  <p className="text-xs text-muted">Total State Size</p>
-                  <p className="text-3xl font-bold text-foreground">{formatBytes(latestData.total_bytes)}</p>
-                </Card>
-
-                {/* Accounts */}
-                <Card className="p-4">
-                  <p className="text-xs text-muted">Accounts</p>
-                  <p className="text-xl font-bold text-foreground">{formatBytes(latestData.account_trienode_bytes)}</p>
-                  <p className="mt-1 text-sm text-muted">{latestData.accounts.toLocaleString()}</p>
-                </Card>
-
-                {/* Storage Slots */}
-                <Card className="p-4">
-                  <p className="text-xs text-muted">Storage Slots</p>
-                  <p className="text-xl font-bold text-foreground">{formatBytes(latestData.storage_trienode_bytes)}</p>
-                  <p className="mt-1 text-sm text-muted">{latestData.storages.toLocaleString()}</p>
-                </Card>
-
-                {/* Contract Codes */}
-                <Card className="p-4">
-                  <p className="text-xs text-muted">Contract Codes</p>
-                  <p className="text-xl font-bold text-foreground">{formatBytes(latestData.contract_code_bytes)}</p>
-                  <p className="mt-1 text-sm text-muted">{latestData.contract_codes.toLocaleString()}</p>
-                </Card>
+          {/* Hero: Total State Size */}
+          <div className="flex flex-col gap-1">
+            <p className="text-xs font-medium tracking-wider text-muted uppercase">Total State Size</p>
+            <div className="flex flex-wrap items-baseline gap-4">
+              <span className="text-5xl font-bold text-foreground tabular-nums">
+                {formatBytes(latestData.total_bytes)}
+              </span>
+              <div className="flex items-center gap-3">
+                <div
+                  className={clsx(
+                    'flex items-center gap-1.5 rounded-sm px-2 py-1',
+                    totalIsPositive ? 'bg-amber-500/10 text-amber-400' : 'bg-emerald-500/10 text-emerald-400'
+                  )}
+                >
+                  <TotalIcon className="size-4" />
+                  <span className="text-sm font-semibold tabular-nums">{formatDeltaBytes(delta.total.delta)}</span>
+                </div>
+                <span
+                  className={clsx(
+                    'text-sm font-medium tabular-nums',
+                    totalIsPositive ? 'text-amber-400' : 'text-emerald-400'
+                  )}
+                >
+                  {delta.total.percentChange >= 0 ? '+' : ''}
+                  {delta.total.percentChange.toFixed(3)}%
+                </span>
               </div>
-            )}
+            </div>
+            <p className="mt-1 text-xs text-muted">
+              Comparing {delta.previousDate} → {delta.currentDate}
+            </p>
           </div>
 
-          {/* State delta cards - bottom section */}
-          {data && <StateDeltaCards data={data} />}
+          {/* Metric Cards: Accounts, Storage Slots, Contract Codes */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {/* Accounts */}
+            <Card className="p-4">
+              <p className="text-xs font-medium tracking-wider text-muted uppercase">Accounts</p>
+              <p className="mt-1 text-2xl font-bold text-foreground tabular-nums">
+                {formatBytes(latestData.account_trienode_bytes)}
+              </p>
+              <p className="mt-0.5 text-sm text-muted tabular-nums">
+                {latestData.accounts.toLocaleString()}
+                <span
+                  className={clsx(
+                    'ml-1.5 text-xs',
+                    delta.accounts.count.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
+                  )}
+                >
+                  ({delta.accounts.count.delta >= 0 ? '+' : ''}
+                  {delta.accounts.count.delta.toLocaleString()})
+                </span>
+              </p>
+              <div className="mt-3 flex items-center gap-2">
+                <span
+                  className={clsx(
+                    'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
+                    delta.accounts.bytes.delta >= 0
+                      ? 'bg-amber-500/10 text-amber-400'
+                      : 'bg-emerald-500/10 text-emerald-400'
+                  )}
+                >
+                  {formatDeltaBytes(delta.accounts.bytes.delta)}
+                </span>
+                <span
+                  className={clsx(
+                    'text-xs font-medium tabular-nums',
+                    delta.accounts.bytes.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
+                  )}
+                >
+                  {delta.accounts.bytes.percentChange >= 0 ? '+' : ''}
+                  {delta.accounts.bytes.percentChange.toFixed(3)}%
+                </span>
+              </div>
+            </Card>
+
+            {/* Storage Slots */}
+            <Card className="p-4">
+              <p className="text-xs font-medium tracking-wider text-muted uppercase">Storage Slots</p>
+              <p className="mt-1 text-2xl font-bold text-foreground tabular-nums">
+                {formatBytes(latestData.storage_trienode_bytes)}
+              </p>
+              <p className="mt-0.5 text-sm text-muted tabular-nums">
+                {latestData.storages.toLocaleString()}
+                <span
+                  className={clsx(
+                    'ml-1.5 text-xs',
+                    delta.storage.count.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
+                  )}
+                >
+                  ({delta.storage.count.delta >= 0 ? '+' : ''}
+                  {delta.storage.count.delta.toLocaleString()})
+                </span>
+              </p>
+              <div className="mt-3 flex items-center gap-2">
+                <span
+                  className={clsx(
+                    'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
+                    delta.storage.bytes.delta >= 0
+                      ? 'bg-amber-500/10 text-amber-400'
+                      : 'bg-emerald-500/10 text-emerald-400'
+                  )}
+                >
+                  {formatDeltaBytes(delta.storage.bytes.delta)}
+                </span>
+                <span
+                  className={clsx(
+                    'text-xs font-medium tabular-nums',
+                    delta.storage.bytes.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
+                  )}
+                >
+                  {delta.storage.bytes.percentChange >= 0 ? '+' : ''}
+                  {delta.storage.bytes.percentChange.toFixed(3)}%
+                </span>
+              </div>
+            </Card>
+
+            {/* Contract Codes */}
+            <Card className="p-4">
+              <p className="text-xs font-medium tracking-wider text-muted uppercase">Contract Codes</p>
+              <p className="mt-1 text-2xl font-bold text-foreground tabular-nums">
+                {formatBytes(latestData.contract_code_bytes)}
+              </p>
+              <p className="mt-0.5 text-sm text-muted tabular-nums">
+                {latestData.contract_codes.toLocaleString()}
+                <span
+                  className={clsx(
+                    'ml-1.5 text-xs',
+                    delta.contractCodes.count.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
+                  )}
+                >
+                  ({delta.contractCodes.count.delta >= 0 ? '+' : ''}
+                  {delta.contractCodes.count.delta.toLocaleString()})
+                </span>
+              </p>
+              <div className="mt-3 flex items-center gap-2">
+                <span
+                  className={clsx(
+                    'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
+                    delta.contractCodes.bytes.delta >= 0
+                      ? 'bg-amber-500/10 text-amber-400'
+                      : 'bg-emerald-500/10 text-emerald-400'
+                  )}
+                >
+                  {formatDeltaBytes(delta.contractCodes.bytes.delta)}
+                </span>
+                <span
+                  className={clsx(
+                    'text-xs font-medium tabular-nums',
+                    delta.contractCodes.bytes.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
+                  )}
+                >
+                  {delta.contractCodes.bytes.percentChange >= 0 ? '+' : ''}
+                  {delta.contractCodes.bytes.percentChange.toFixed(3)}%
+                </span>
+              </div>
+            </Card>
+          </div>
+
+          {/* Main Chart */}
+          <Card className="p-6">
+            <MultiLineChart
+              title="Historical State Growth"
+              subtitle="Daily snapshot of Ethereum state components (stacked)"
+              series={chartData.series}
+              xAxis={{
+                type: 'category',
+                labels: chartData.labels,
+                name: 'Date',
+              }}
+              yAxis={{
+                name: 'Size (GB)',
+                min: 0,
+              }}
+              height={480}
+              showLegend={true}
+              enableDataZoom={true}
+              tooltipFormatter={tooltipFormatter}
+            />
+          </Card>
         </div>
       )}
     </Container>
