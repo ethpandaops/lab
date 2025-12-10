@@ -214,19 +214,7 @@ export function IndexPage(): JSX.Element {
                 <p className="mt-1 text-2xl font-bold text-foreground tabular-nums">
                   {formatBytes(latestData.account_trienode_bytes)}
                 </p>
-                <p className="mt-0.5 text-sm text-muted tabular-nums">
-                  {latestData.accounts.toLocaleString()}
-                  <span
-                    className={clsx(
-                      'ml-1.5 text-xs',
-                      delta.accounts.count.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
-                    )}
-                  >
-                    ({delta.accounts.count.delta >= 0 ? '+' : ''}
-                    {delta.accounts.count.delta.toLocaleString()})
-                  </span>
-                </p>
-                <div className="mt-3 flex items-center gap-2">
+                <div className="mt-2 flex items-center gap-2">
                   <span
                     className={clsx(
                       'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
@@ -247,6 +235,9 @@ export function IndexPage(): JSX.Element {
                     {delta.accounts.bytes.percentChange.toFixed(3)}%
                   </span>
                 </div>
+                <p className="mt-2 text-sm text-muted tabular-nums">
+                  Total Count: {latestData.accounts.toLocaleString()}
+                </p>
               </Card>
 
               {/* Storage Slots */}
@@ -255,19 +246,7 @@ export function IndexPage(): JSX.Element {
                 <p className="mt-1 text-2xl font-bold text-foreground tabular-nums">
                   {formatBytes(latestData.storage_trienode_bytes)}
                 </p>
-                <p className="mt-0.5 text-sm text-muted tabular-nums">
-                  {latestData.storages.toLocaleString()}
-                  <span
-                    className={clsx(
-                      'ml-1.5 text-xs',
-                      delta.storage.count.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
-                    )}
-                  >
-                    ({delta.storage.count.delta >= 0 ? '+' : ''}
-                    {delta.storage.count.delta.toLocaleString()})
-                  </span>
-                </p>
-                <div className="mt-3 flex items-center gap-2">
+                <div className="mt-2 flex items-center gap-2">
                   <span
                     className={clsx(
                       'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
@@ -288,6 +267,9 @@ export function IndexPage(): JSX.Element {
                     {delta.storage.bytes.percentChange.toFixed(3)}%
                   </span>
                 </div>
+                <p className="mt-2 text-sm text-muted tabular-nums">
+                  Total Count: {latestData.storages.toLocaleString()}
+                </p>
               </Card>
 
               {/* Contract Codes */}
@@ -296,19 +278,7 @@ export function IndexPage(): JSX.Element {
                 <p className="mt-1 text-2xl font-bold text-foreground tabular-nums">
                   {formatBytes(latestData.contract_code_bytes)}
                 </p>
-                <p className="mt-0.5 text-sm text-muted tabular-nums">
-                  {latestData.contract_codes.toLocaleString()}
-                  <span
-                    className={clsx(
-                      'ml-1.5 text-xs',
-                      delta.contractCodes.count.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
-                    )}
-                  >
-                    ({delta.contractCodes.count.delta >= 0 ? '+' : ''}
-                    {delta.contractCodes.count.delta.toLocaleString()})
-                  </span>
-                </p>
-                <div className="mt-3 flex items-center gap-2">
+                <div className="mt-2 flex items-center gap-2">
                   <span
                     className={clsx(
                       'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
@@ -329,6 +299,9 @@ export function IndexPage(): JSX.Element {
                     {delta.contractCodes.bytes.percentChange.toFixed(3)}%
                   </span>
                 </div>
+                <p className="mt-2 text-sm text-muted tabular-nums">
+                  Total Count: {latestData.contract_codes.toLocaleString()}
+                </p>
               </Card>
             </div>
           </div>
