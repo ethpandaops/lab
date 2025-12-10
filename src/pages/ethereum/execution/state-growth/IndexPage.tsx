@@ -12,6 +12,7 @@ const TIMEFRAME_OPTIONS: { value: DeltaTimeframe; label: string }[] = [
   { value: 'daily', label: '24h' },
   { value: 'weekly', label: '7d' },
   { value: 'monthly', label: '30d' },
+  { value: 'yearly', label: '1Y' },
 ];
 
 function formatBytes(bytes: number): string {

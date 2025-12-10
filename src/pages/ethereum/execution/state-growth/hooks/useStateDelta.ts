@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-export type DeltaTimeframe = 'daily' | 'weekly' | 'monthly';
+export type DeltaTimeframe = 'daily' | 'weekly' | 'monthly' | 'yearly';
 
 interface DeltaValue {
   current: number;
@@ -49,6 +49,8 @@ function getTimeframeDays(timeframe: DeltaTimeframe): number {
       return 7;
     case 'monthly':
       return 30;
+    case 'yearly':
+      return 365;
   }
 }
 
