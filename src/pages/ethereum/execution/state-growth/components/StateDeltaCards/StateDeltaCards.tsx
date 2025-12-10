@@ -117,17 +117,19 @@ export function StateDeltaCards({ data }: StateDeltaCardsProps): JSX.Element | n
 
   if (!delta) return null;
 
+  const isPositive = delta.total.delta >= 0;
+
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-foreground">State Growth</h3>
-        <div className="flex items-center gap-1 rounded-md border border-border bg-surface/50 p-0.5">
+    <Card className="p-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+        {/* Vertical timeframe toggle */}
+        <div className="flex shrink-0 flex-col gap-1 rounded-md border border-border bg-surface/50 p-1">
           {TIMEFRAME_OPTIONS.map(option => (
             <button
               key={option.value}
               onClick={() => setTimeframe(option.value)}
               className={clsx(
-                'rounded px-2.5 py-1 text-xs font-medium transition-all',
+                'rounded-xs px-3 py-1.5 text-xs font-medium transition-all',
                 timeframe === option.value
                   ? 'bg-primary text-white'
                   : 'text-muted hover:bg-muted/10 hover:text-foreground'
@@ -137,36 +139,49 @@ export function StateDeltaCards({ data }: StateDeltaCardsProps): JSX.Element | n
             </button>
           ))}
         </div>
-      </div>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <DeltaCard label="Total State" bytesDelta={delta.total.delta} bytesPercentChange={delta.total.percentChange} />
-        <DeltaCard
-          label="Accounts"
-          bytesDelta={delta.accounts.bytes.delta}
-          bytesPercentChange={delta.accounts.bytes.percentChange}
-          countDelta={delta.accounts.count.delta}
-          countPercentChange={delta.accounts.count.percentChange}
-        />
-        <DeltaCard
-          label="Storage Slots"
-          bytesDelta={delta.storage.bytes.delta}
-          bytesPercentChange={delta.storage.bytes.percentChange}
-          countDelta={delta.storage.count.delta}
-          countPercentChange={delta.storage.count.percentChange}
-        />
-        <DeltaCard
-          label="Contract Codes"
-          bytesDelta={delta.contractCodes.bytes.delta}
-          bytesPercentChange={delta.contractCodes.bytes.percentChange}
-          countDelta={delta.contractCodes.count.delta}
-          countPercentChange={delta.contractCodes.count.percentChange}
-        />
-      </div>
+        {/* Main content */}
+        <div className="min-w-0 flex-1 space-y-4">
+          {/* Total State Changes header */}
+          <div>
+            <div className="flex flex-wrap items-baseline gap-2">
+              <span className="text-sm font-medium text-foreground">Total State Changes:</span>
+              <span className="text-xl font-bold text-foreground">{formatDeltaBytes(delta.total.delta)}</span>
+              <span className={clsx('text-sm font-medium', isPositive ? 'text-warning' : 'text-success')}>
+                ({formatPercentage(delta.total.percentChange)})
+              </span>
+            </div>
+            <p className="mt-1 text-[10px] text-muted">
+              Comparing {delta.currentDate} vs {delta.previousDate}
+            </p>
+          </div>
 
-      <p className="text-[10px] text-muted">
-        Comparing {delta.currentDate} vs {delta.previousDate}
-      </p>
-    </div>
+          {/* Delta cards row */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <DeltaCard
+              label="Accounts"
+              bytesDelta={delta.accounts.bytes.delta}
+              bytesPercentChange={delta.accounts.bytes.percentChange}
+              countDelta={delta.accounts.count.delta}
+              countPercentChange={delta.accounts.count.percentChange}
+            />
+            <DeltaCard
+              label="Storage Slots"
+              bytesDelta={delta.storage.bytes.delta}
+              bytesPercentChange={delta.storage.bytes.percentChange}
+              countDelta={delta.storage.count.delta}
+              countPercentChange={delta.storage.count.percentChange}
+            />
+            <DeltaCard
+              label="Contract Codes"
+              bytesDelta={delta.contractCodes.bytes.delta}
+              bytesPercentChange={delta.contractCodes.bytes.percentChange}
+              countDelta={delta.contractCodes.count.delta}
+              countPercentChange={delta.contractCodes.count.percentChange}
+            />
+          </div>
+        </div>
+      </div>
+    </Card>
   );
 }

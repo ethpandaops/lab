@@ -118,57 +118,67 @@ export function IndexPage(): JSX.Element {
 
       {(chartData || latestData) && (
         <div className="space-y-6">
-          {/* Summary stats */}
-          {latestData && (
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-              <Card className="p-4">
-                <p className="text-xs text-muted">Total State Size</p>
-                <p className="text-2xl font-bold text-foreground">{formatBytes(latestData.total_bytes)}</p>
+          {/* Main content: Chart (left) + Stats sidebar (right) */}
+          <div className="flex flex-col gap-6 xl:flex-row">
+            {/* Chart - takes most of the width */}
+            {chartData && (
+              <Card className="min-w-0 flex-1 p-6">
+                <MultiLineChart
+                  title="State Growth Over Time"
+                  subtitle="Daily snapshot of Ethereum state components"
+                  series={chartData.series}
+                  xAxis={{
+                    type: 'category',
+                    labels: chartData.labels,
+                    name: 'Date',
+                  }}
+                  yAxis={{
+                    name: 'Size (GB)',
+                    min: 0,
+                  }}
+                  height={500}
+                  showLegend={true}
+                  enableDataZoom={true}
+                  tooltipFormatter={tooltipFormatter}
+                />
               </Card>
-              <Card className="p-4">
-                <p className="text-xs text-muted">Accounts</p>
-                <p className="text-2xl font-bold text-foreground">{latestData.accounts.toLocaleString()}</p>
-                <p className="mt-1 text-xs text-muted">{formatBytes(latestData.account_trienode_bytes)}</p>
-              </Card>
-              <Card className="p-4">
-                <p className="text-xs text-muted">Storage Slots</p>
-                <p className="text-2xl font-bold text-foreground">{latestData.storages.toLocaleString()}</p>
-                <p className="mt-1 text-xs text-muted">{formatBytes(latestData.storage_trienode_bytes)}</p>
-              </Card>
-              <Card className="p-4">
-                <p className="text-xs text-muted">Contract Codes</p>
-                <p className="text-2xl font-bold text-foreground">{latestData.contract_codes.toLocaleString()}</p>
-                <p className="mt-1 text-xs text-muted">{formatBytes(latestData.contract_code_bytes)}</p>
-              </Card>
-            </div>
-          )}
+            )}
 
-          {/* State delta cards */}
+            {/* Right sidebar - stacked stat cards */}
+            {latestData && (
+              <div className="flex w-full shrink-0 flex-col gap-4 xl:w-64">
+                {/* Total State Size - prominent */}
+                <Card className="p-4">
+                  <p className="text-xs text-muted">Total State Size</p>
+                  <p className="text-3xl font-bold text-foreground">{formatBytes(latestData.total_bytes)}</p>
+                </Card>
+
+                {/* Accounts */}
+                <Card className="p-4">
+                  <p className="text-xs text-muted">Accounts</p>
+                  <p className="text-xl font-bold text-foreground">{formatBytes(latestData.account_trienode_bytes)}</p>
+                  <p className="mt-1 text-sm text-muted">{latestData.accounts.toLocaleString()}</p>
+                </Card>
+
+                {/* Storage Slots */}
+                <Card className="p-4">
+                  <p className="text-xs text-muted">Storage Slots</p>
+                  <p className="text-xl font-bold text-foreground">{formatBytes(latestData.storage_trienode_bytes)}</p>
+                  <p className="mt-1 text-sm text-muted">{latestData.storages.toLocaleString()}</p>
+                </Card>
+
+                {/* Contract Codes */}
+                <Card className="p-4">
+                  <p className="text-xs text-muted">Contract Codes</p>
+                  <p className="text-xl font-bold text-foreground">{formatBytes(latestData.contract_code_bytes)}</p>
+                  <p className="mt-1 text-sm text-muted">{latestData.contract_codes.toLocaleString()}</p>
+                </Card>
+              </div>
+            )}
+          </div>
+
+          {/* State delta cards - bottom section */}
           {data && <StateDeltaCards data={data} />}
-
-          {/* Main chart */}
-          {chartData && (
-            <Card className="p-6">
-              <MultiLineChart
-                title="State Growth Over Time"
-                subtitle="Daily snapshot of Ethereum state components"
-                series={chartData.series}
-                xAxis={{
-                  type: 'category',
-                  labels: chartData.labels,
-                  name: 'Date',
-                }}
-                yAxis={{
-                  name: 'Size (GB)',
-                  min: 0,
-                }}
-                height={500}
-                showLegend={true}
-                enableDataZoom={true}
-                tooltipFormatter={tooltipFormatter}
-              />
-            </Card>
-          )}
         </div>
       )}
     </Container>
