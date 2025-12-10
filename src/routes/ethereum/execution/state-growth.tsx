@@ -4,7 +4,7 @@ import { IndexPage } from '@/pages/ethereum/execution/state-growth';
 export const Route = createFileRoute('/ethereum/execution/state-growth')({
   component: IndexPage,
   beforeLoad: () => ({
-    getBreadcrumb: () => ({ show: false }),
+    getBreadcrumb: () => ({ label: 'State Growth', clickable: false }),
   }),
   head: () => ({
     meta: [
