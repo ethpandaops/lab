@@ -162,21 +162,22 @@ export function IndexPage(): JSX.Element {
       {isLoading && <StateSizeSkeleton />}
 
       {error && (
-        <Card className="p-6">
+        <Card rounded className="p-6">
           <p className="text-danger">Failed to load state size data: {error.message}</p>
         </Card>
       )}
 
       {chartData && latestData && delta && (
         <div className="space-y-6">
-          {/* Hero: Total State Size */}
-          <div className="flex flex-col gap-1">
-            <p className="text-xs font-medium tracking-wider text-muted uppercase">Total State Size</p>
-            <div className="flex flex-wrap items-baseline gap-4">
-              <span className="text-5xl font-bold text-foreground tabular-nums">
+          {/* Stats Row: Total State Size + Metric Cards */}
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch lg:gap-12">
+            {/* Total State Size */}
+            <div className="flex shrink-0 flex-col justify-center">
+              <p className="text-xs font-medium tracking-wider text-muted uppercase">Total State Size</p>
+              <span className="mt-1 text-6xl font-bold text-foreground tabular-nums">
                 {formatBytes(latestData.total_bytes)}
               </span>
-              <div className="flex items-center gap-3">
+              <div className="mt-2 flex items-center gap-3">
                 <div
                   className={clsx(
                     'flex items-center gap-1.5 rounded-sm px-2 py-1',
@@ -196,140 +197,140 @@ export function IndexPage(): JSX.Element {
                   {delta.total.percentChange.toFixed(3)}%
                 </span>
               </div>
+              <p className="mt-1 text-xs text-muted">
+                Comparing {delta.previousDate} → {delta.currentDate}
+              </p>
             </div>
-            <p className="mt-1 text-xs text-muted">
-              Comparing {delta.previousDate} → {delta.currentDate}
-            </p>
-          </div>
 
-          {/* Metric Cards: Accounts, Storage Slots, Contract Codes */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {/* Accounts */}
-            <Card className="p-4">
-              <p className="text-xs font-medium tracking-wider text-muted uppercase">Accounts</p>
-              <p className="mt-1 text-2xl font-bold text-foreground tabular-nums">
-                {formatBytes(latestData.account_trienode_bytes)}
-              </p>
-              <p className="mt-0.5 text-sm text-muted tabular-nums">
-                {latestData.accounts.toLocaleString()}
-                <span
-                  className={clsx(
-                    'ml-1.5 text-xs',
-                    delta.accounts.count.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
-                  )}
-                >
-                  ({delta.accounts.count.delta >= 0 ? '+' : ''}
-                  {delta.accounts.count.delta.toLocaleString()})
-                </span>
-              </p>
-              <div className="mt-3 flex items-center gap-2">
-                <span
-                  className={clsx(
-                    'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
-                    delta.accounts.bytes.delta >= 0
-                      ? 'bg-amber-500/10 text-amber-400'
-                      : 'bg-emerald-500/10 text-emerald-400'
-                  )}
-                >
-                  {formatDeltaBytes(delta.accounts.bytes.delta)}
-                </span>
-                <span
-                  className={clsx(
-                    'text-xs font-medium tabular-nums',
-                    delta.accounts.bytes.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
-                  )}
-                >
-                  {delta.accounts.bytes.percentChange >= 0 ? '+' : ''}
-                  {delta.accounts.bytes.percentChange.toFixed(3)}%
-                </span>
-              </div>
-            </Card>
+            {/* Metric Cards: Accounts, Storage Slots, Contract Codes */}
+            <div className="grid min-w-0 flex-1 grid-cols-1 gap-4 sm:grid-cols-3">
+              {/* Accounts */}
+              <Card rounded className="p-4">
+                <p className="text-xs font-medium tracking-wider text-muted uppercase">Accounts</p>
+                <p className="mt-1 text-2xl font-bold text-foreground tabular-nums">
+                  {formatBytes(latestData.account_trienode_bytes)}
+                </p>
+                <p className="mt-0.5 text-sm text-muted tabular-nums">
+                  {latestData.accounts.toLocaleString()}
+                  <span
+                    className={clsx(
+                      'ml-1.5 text-xs',
+                      delta.accounts.count.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
+                    )}
+                  >
+                    ({delta.accounts.count.delta >= 0 ? '+' : ''}
+                    {delta.accounts.count.delta.toLocaleString()})
+                  </span>
+                </p>
+                <div className="mt-3 flex items-center gap-2">
+                  <span
+                    className={clsx(
+                      'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
+                      delta.accounts.bytes.delta >= 0
+                        ? 'bg-amber-500/10 text-amber-400'
+                        : 'bg-emerald-500/10 text-emerald-400'
+                    )}
+                  >
+                    {formatDeltaBytes(delta.accounts.bytes.delta)}
+                  </span>
+                  <span
+                    className={clsx(
+                      'text-xs font-medium tabular-nums',
+                      delta.accounts.bytes.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
+                    )}
+                  >
+                    {delta.accounts.bytes.percentChange >= 0 ? '+' : ''}
+                    {delta.accounts.bytes.percentChange.toFixed(3)}%
+                  </span>
+                </div>
+              </Card>
 
-            {/* Storage Slots */}
-            <Card className="p-4">
-              <p className="text-xs font-medium tracking-wider text-muted uppercase">Storage Slots</p>
-              <p className="mt-1 text-2xl font-bold text-foreground tabular-nums">
-                {formatBytes(latestData.storage_trienode_bytes)}
-              </p>
-              <p className="mt-0.5 text-sm text-muted tabular-nums">
-                {latestData.storages.toLocaleString()}
-                <span
-                  className={clsx(
-                    'ml-1.5 text-xs',
-                    delta.storage.count.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
-                  )}
-                >
-                  ({delta.storage.count.delta >= 0 ? '+' : ''}
-                  {delta.storage.count.delta.toLocaleString()})
-                </span>
-              </p>
-              <div className="mt-3 flex items-center gap-2">
-                <span
-                  className={clsx(
-                    'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
-                    delta.storage.bytes.delta >= 0
-                      ? 'bg-amber-500/10 text-amber-400'
-                      : 'bg-emerald-500/10 text-emerald-400'
-                  )}
-                >
-                  {formatDeltaBytes(delta.storage.bytes.delta)}
-                </span>
-                <span
-                  className={clsx(
-                    'text-xs font-medium tabular-nums',
-                    delta.storage.bytes.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
-                  )}
-                >
-                  {delta.storage.bytes.percentChange >= 0 ? '+' : ''}
-                  {delta.storage.bytes.percentChange.toFixed(3)}%
-                </span>
-              </div>
-            </Card>
+              {/* Storage Slots */}
+              <Card rounded className="p-4">
+                <p className="text-xs font-medium tracking-wider text-muted uppercase">Storage Slots</p>
+                <p className="mt-1 text-2xl font-bold text-foreground tabular-nums">
+                  {formatBytes(latestData.storage_trienode_bytes)}
+                </p>
+                <p className="mt-0.5 text-sm text-muted tabular-nums">
+                  {latestData.storages.toLocaleString()}
+                  <span
+                    className={clsx(
+                      'ml-1.5 text-xs',
+                      delta.storage.count.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
+                    )}
+                  >
+                    ({delta.storage.count.delta >= 0 ? '+' : ''}
+                    {delta.storage.count.delta.toLocaleString()})
+                  </span>
+                </p>
+                <div className="mt-3 flex items-center gap-2">
+                  <span
+                    className={clsx(
+                      'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
+                      delta.storage.bytes.delta >= 0
+                        ? 'bg-amber-500/10 text-amber-400'
+                        : 'bg-emerald-500/10 text-emerald-400'
+                    )}
+                  >
+                    {formatDeltaBytes(delta.storage.bytes.delta)}
+                  </span>
+                  <span
+                    className={clsx(
+                      'text-xs font-medium tabular-nums',
+                      delta.storage.bytes.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
+                    )}
+                  >
+                    {delta.storage.bytes.percentChange >= 0 ? '+' : ''}
+                    {delta.storage.bytes.percentChange.toFixed(3)}%
+                  </span>
+                </div>
+              </Card>
 
-            {/* Contract Codes */}
-            <Card className="p-4">
-              <p className="text-xs font-medium tracking-wider text-muted uppercase">Contract Codes</p>
-              <p className="mt-1 text-2xl font-bold text-foreground tabular-nums">
-                {formatBytes(latestData.contract_code_bytes)}
-              </p>
-              <p className="mt-0.5 text-sm text-muted tabular-nums">
-                {latestData.contract_codes.toLocaleString()}
-                <span
-                  className={clsx(
-                    'ml-1.5 text-xs',
-                    delta.contractCodes.count.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
-                  )}
-                >
-                  ({delta.contractCodes.count.delta >= 0 ? '+' : ''}
-                  {delta.contractCodes.count.delta.toLocaleString()})
-                </span>
-              </p>
-              <div className="mt-3 flex items-center gap-2">
-                <span
-                  className={clsx(
-                    'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
-                    delta.contractCodes.bytes.delta >= 0
-                      ? 'bg-amber-500/10 text-amber-400'
-                      : 'bg-emerald-500/10 text-emerald-400'
-                  )}
-                >
-                  {formatDeltaBytes(delta.contractCodes.bytes.delta)}
-                </span>
-                <span
-                  className={clsx(
-                    'text-xs font-medium tabular-nums',
-                    delta.contractCodes.bytes.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
-                  )}
-                >
-                  {delta.contractCodes.bytes.percentChange >= 0 ? '+' : ''}
-                  {delta.contractCodes.bytes.percentChange.toFixed(3)}%
-                </span>
-              </div>
-            </Card>
+              {/* Contract Codes */}
+              <Card rounded className="p-4">
+                <p className="text-xs font-medium tracking-wider text-muted uppercase">Contract Codes</p>
+                <p className="mt-1 text-2xl font-bold text-foreground tabular-nums">
+                  {formatBytes(latestData.contract_code_bytes)}
+                </p>
+                <p className="mt-0.5 text-sm text-muted tabular-nums">
+                  {latestData.contract_codes.toLocaleString()}
+                  <span
+                    className={clsx(
+                      'ml-1.5 text-xs',
+                      delta.contractCodes.count.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
+                    )}
+                  >
+                    ({delta.contractCodes.count.delta >= 0 ? '+' : ''}
+                    {delta.contractCodes.count.delta.toLocaleString()})
+                  </span>
+                </p>
+                <div className="mt-3 flex items-center gap-2">
+                  <span
+                    className={clsx(
+                      'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
+                      delta.contractCodes.bytes.delta >= 0
+                        ? 'bg-amber-500/10 text-amber-400'
+                        : 'bg-emerald-500/10 text-emerald-400'
+                    )}
+                  >
+                    {formatDeltaBytes(delta.contractCodes.bytes.delta)}
+                  </span>
+                  <span
+                    className={clsx(
+                      'text-xs font-medium tabular-nums',
+                      delta.contractCodes.bytes.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
+                    )}
+                  >
+                    {delta.contractCodes.bytes.percentChange >= 0 ? '+' : ''}
+                    {delta.contractCodes.bytes.percentChange.toFixed(3)}%
+                  </span>
+                </div>
+              </Card>
+            </div>
           </div>
 
           {/* Main Chart */}
-          <Card className="p-6">
+          <Card rounded className="p-6">
             <MultiLineChart
               title="Historical State Growth"
               subtitle="Daily snapshot of Ethereum state components (stacked)"
