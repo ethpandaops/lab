@@ -128,14 +128,17 @@ export function IndexPage(): JSX.Element {
               <Card className="p-4">
                 <p className="text-xs text-muted">Accounts</p>
                 <p className="text-2xl font-bold text-foreground">{latestData.accounts.toLocaleString()}</p>
+                <p className="mt-1 text-xs text-muted">{formatBytes(latestData.account_trienode_bytes)}</p>
               </Card>
               <Card className="p-4">
                 <p className="text-xs text-muted">Storage Slots</p>
                 <p className="text-2xl font-bold text-foreground">{latestData.storages.toLocaleString()}</p>
+                <p className="mt-1 text-xs text-muted">{formatBytes(latestData.storage_trienode_bytes)}</p>
               </Card>
               <Card className="p-4">
                 <p className="text-xs text-muted">Contract Codes</p>
                 <p className="text-2xl font-bold text-foreground">{latestData.contract_codes.toLocaleString()}</p>
+                <p className="mt-1 text-xs text-muted">{formatBytes(latestData.contract_code_bytes)}</p>
               </Card>
             </div>
           )}

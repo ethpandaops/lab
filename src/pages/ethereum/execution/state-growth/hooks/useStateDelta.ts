@@ -9,11 +9,16 @@ interface DeltaValue {
   percentChange: number;
 }
 
+interface BytesAndCountDelta {
+  bytes: DeltaValue;
+  count: DeltaValue;
+}
+
 export interface StateDelta {
   total: DeltaValue;
-  accounts: DeltaValue;
-  storage: DeltaValue;
-  contractCodes: DeltaValue;
+  accounts: BytesAndCountDelta;
+  storage: BytesAndCountDelta;
+  contractCodes: BytesAndCountDelta;
   currentDate: string;
   previousDate: string;
 }
@@ -25,6 +30,9 @@ interface NormalizedDataPoint {
   account_trienode_bytes: number;
   storage_trienode_bytes: number;
   contract_code_bytes: number;
+  accounts: number;
+  storages: number;
+  contract_codes: number;
 }
 
 function calculateDelta(current: number, previous: number): DeltaValue {
@@ -80,9 +88,18 @@ export function useStateDelta(data: NormalizedDataPoint[] | null, timeframe: Del
 
     return {
       total: calculateDelta(latestData.total_bytes, previousData.total_bytes),
-      accounts: calculateDelta(latestData.account_trienode_bytes, previousData.account_trienode_bytes),
-      storage: calculateDelta(latestData.storage_trienode_bytes, previousData.storage_trienode_bytes),
-      contractCodes: calculateDelta(latestData.contract_code_bytes, previousData.contract_code_bytes),
+      accounts: {
+        bytes: calculateDelta(latestData.account_trienode_bytes, previousData.account_trienode_bytes),
+        count: calculateDelta(latestData.accounts, previousData.accounts),
+      },
+      storage: {
+        bytes: calculateDelta(latestData.storage_trienode_bytes, previousData.storage_trienode_bytes),
+        count: calculateDelta(latestData.storages, previousData.storages),
+      },
+      contractCodes: {
+        bytes: calculateDelta(latestData.contract_code_bytes, previousData.contract_code_bytes),
+        count: calculateDelta(latestData.contract_codes, previousData.contract_codes),
+      },
       currentDate: latestData.dateLabel,
       previousDate: previousData.dateLabel,
     };

@@ -11,6 +11,9 @@ interface NormalizedDataPoint {
   account_trienode_bytes: number;
   storage_trienode_bytes: number;
   contract_code_bytes: number;
+  accounts: number;
+  storages: number;
+  contract_codes: number;
 }
 
 interface StateDeltaCardsProps {
@@ -50,29 +53,54 @@ function formatPercentage(percent: number): string {
   return `${sign}${percent.toFixed(2)}%`;
 }
 
-interface DeltaCardProps {
-  label: string;
-  delta: number;
-  percentChange: number;
+/**
+ * Format count delta with sign
+ */
+function formatCountDelta(count: number): string {
+  const sign = count >= 0 ? '+' : '';
+  return `${sign}${count.toLocaleString()}`;
 }
 
-function DeltaCard({ label, delta, percentChange }: DeltaCardProps): JSX.Element {
-  const isPositive = delta >= 0;
+interface DeltaCardProps {
+  label: string;
+  bytesDelta: number;
+  bytesPercentChange: number;
+  countDelta?: number;
+  countPercentChange?: number;
+}
+
+function DeltaCard({
+  label,
+  bytesDelta,
+  bytesPercentChange,
+  countDelta,
+  countPercentChange,
+}: DeltaCardProps): JSX.Element {
+  const isPositive = bytesDelta >= 0;
   const Icon = isPositive ? ArrowTrendingUpIcon : ArrowTrendingDownIcon;
+  const hasCount = countDelta !== undefined && countPercentChange !== undefined;
 
   return (
     <Card className="p-4">
       <div className="flex items-start justify-between">
-        <div>
+        <div className="min-w-0 flex-1">
           <p className="text-xs text-muted">{label}</p>
-          <p className="mt-1 text-xl font-bold text-foreground">{formatDeltaBytes(delta)}</p>
+          <p className="mt-1 text-xl font-bold text-foreground">{formatDeltaBytes(bytesDelta)}</p>
           <p className={clsx('mt-0.5 text-xs font-medium', isPositive ? 'text-warning' : 'text-success')}>
-            {formatPercentage(percentChange)}
+            {formatPercentage(bytesPercentChange)}
           </p>
+          {hasCount && (
+            <div className="mt-2 border-t border-border/50 pt-2">
+              <p className="text-sm font-semibold text-foreground">{formatCountDelta(countDelta)}</p>
+              <p className={clsx('text-[10px] font-medium', countDelta >= 0 ? 'text-warning' : 'text-success')}>
+                {formatPercentage(countPercentChange)} count
+              </p>
+            </div>
+          )}
         </div>
         <div
           className={clsx(
-            'rounded-full p-1.5',
+            'shrink-0 rounded-full p-1.5',
             isPositive ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
           )}
         >
@@ -112,13 +140,27 @@ export function StateDeltaCards({ data }: StateDeltaCardsProps): JSX.Element | n
       </div>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <DeltaCard label="Total State" delta={delta.total.delta} percentChange={delta.total.percentChange} />
-        <DeltaCard label="Accounts" delta={delta.accounts.delta} percentChange={delta.accounts.percentChange} />
-        <DeltaCard label="Storage Slots" delta={delta.storage.delta} percentChange={delta.storage.percentChange} />
+        <DeltaCard label="Total State" bytesDelta={delta.total.delta} bytesPercentChange={delta.total.percentChange} />
+        <DeltaCard
+          label="Accounts"
+          bytesDelta={delta.accounts.bytes.delta}
+          bytesPercentChange={delta.accounts.bytes.percentChange}
+          countDelta={delta.accounts.count.delta}
+          countPercentChange={delta.accounts.count.percentChange}
+        />
+        <DeltaCard
+          label="Storage Slots"
+          bytesDelta={delta.storage.bytes.delta}
+          bytesPercentChange={delta.storage.bytes.percentChange}
+          countDelta={delta.storage.count.delta}
+          countPercentChange={delta.storage.count.percentChange}
+        />
         <DeltaCard
           label="Contract Codes"
-          delta={delta.contractCodes.delta}
-          percentChange={delta.contractCodes.percentChange}
+          bytesDelta={delta.contractCodes.bytes.delta}
+          bytesPercentChange={delta.contractCodes.bytes.percentChange}
+          countDelta={delta.contractCodes.count.delta}
+          countPercentChange={delta.contractCodes.count.percentChange}
         />
       </div>
 
