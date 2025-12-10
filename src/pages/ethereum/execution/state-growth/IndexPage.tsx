@@ -138,24 +138,31 @@ export function IndexPage(): JSX.Element {
         </div>
 
         {/* Global timeframe toggle */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted">Compare:</span>
-          <div className="flex items-center gap-0.5 rounded-md border border-border bg-surface/50 p-0.5">
-            {TIMEFRAME_OPTIONS.map(option => (
-              <button
-                key={option.value}
-                onClick={() => setTimeframe(option.value)}
-                className={clsx(
-                  'rounded-xs px-3 py-1.5 text-xs font-medium transition-all',
-                  timeframe === option.value
-                    ? 'bg-primary text-white'
-                    : 'text-muted hover:bg-muted/10 hover:text-foreground'
-                )}
-              >
-                {option.label}
-              </button>
-            ))}
+        <div className="flex flex-col items-end gap-1">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted">Compare:</span>
+            <div className="flex items-center gap-0.5 rounded-md border border-border bg-surface/50 p-0.5">
+              {TIMEFRAME_OPTIONS.map(option => (
+                <button
+                  key={option.value}
+                  onClick={() => setTimeframe(option.value)}
+                  className={clsx(
+                    'rounded-xs px-3 py-1.5 text-xs font-medium transition-all',
+                    timeframe === option.value
+                      ? 'bg-primary text-white'
+                      : 'text-muted hover:bg-muted/10 hover:text-foreground'
+                  )}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
           </div>
+          {delta && (
+            <p className="text-xs text-muted">
+              {delta.previousDate} → {delta.currentDate}
+            </p>
+          )}
         </div>
       </div>
 
@@ -197,9 +204,6 @@ export function IndexPage(): JSX.Element {
                   {delta.total.percentChange.toFixed(3)}%
                 </span>
               </div>
-              <p className="mt-1 text-xs text-muted">
-                Comparing {delta.previousDate} → {delta.currentDate}
-              </p>
             </div>
 
             {/* Metric Cards: Accounts, Storage Slots, Contract Codes */}
