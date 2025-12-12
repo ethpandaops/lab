@@ -1,1 +1,2 @@
-// Hooks for state expiry data will be added here
+export { useStorageSlotStateDaily } from './useStorageSlotStateDaily';
+export type { StorageSlotDataPoint, UseStorageSlotStateDailyResult } from './useStorageSlotStateDaily';
