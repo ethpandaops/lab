@@ -18,6 +18,7 @@ import {
   CircleStackIcon,
   MagnifyingGlassIcon,
   ServerStackIcon,
+  ScissorsIcon,
 } from '@heroicons/react/24/outline';
 import { NetworkSelect } from '@/components/Ethereum/NetworkSelect';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
@@ -167,6 +168,7 @@ const ethereumDataAvailabilityPages: NavItem[] = [
 
 const ethereumExecutionPages: NavItem[] = [
   { name: 'State Growth', to: '/ethereum/execution/state-growth', icon: ServerStackIcon },
+  { name: 'State Expiry', to: '/ethereum/execution/state-expiry', icon: ScissorsIcon },
 ];
 
 const xatuPages: NavItem[] = [

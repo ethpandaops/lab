@@ -40,6 +40,7 @@ import { Route as XatuContributorsIdRouteImport } from './routes/xatu/contributo
 import { Route as EthereumSlotsSlotRouteImport } from './routes/ethereum/slots/$slot'
 import { Route as EthereumForksForkRouteImport } from './routes/ethereum/forks/$fork'
 import { Route as EthereumExecutionStateGrowthRouteImport } from './routes/ethereum/execution/state-growth'
+import { Route as EthereumExecutionStateExpiryRouteImport } from './routes/ethereum/execution/state-expiry'
 import { Route as EthereumEpochsEpochRouteImport } from './routes/ethereum/epochs/$epoch'
 import { Route as EthereumEntitiesEntityRouteImport } from './routes/ethereum/entities/$entity'
 import { Route as EthereumDataAvailabilityProbesRouteImport } from './routes/ethereum/data-availability/probes'
@@ -210,6 +211,12 @@ const EthereumExecutionStateGrowthRoute =
     path: '/state-growth',
     getParentRoute: () => EthereumExecutionRoute,
   } as any)
+const EthereumExecutionStateExpiryRoute =
+  EthereumExecutionStateExpiryRouteImport.update({
+    id: '/state-expiry',
+    path: '/state-expiry',
+    getParentRoute: () => EthereumExecutionRoute,
+  } as any)
 const EthereumEpochsEpochRoute = EthereumEpochsEpochRouteImport.update({
   id: '/$epoch',
   path: '/$epoch',
@@ -285,6 +292,7 @@ export interface FileRoutesByFullPath {
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesRouteWithChildren
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
+  '/ethereum/execution/state-expiry': typeof EthereumExecutionStateExpiryRoute
   '/ethereum/execution/state-growth': typeof EthereumExecutionStateGrowthRoute
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
@@ -318,6 +326,7 @@ export interface FileRoutesByTo {
   '/beacon/slot/live': typeof BeaconSlotLiveRoute
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
+  '/ethereum/execution/state-expiry': typeof EthereumExecutionStateExpiryRoute
   '/ethereum/execution/state-growth': typeof EthereumExecutionStateGrowthRoute
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
@@ -360,6 +369,7 @@ export interface FileRoutesById {
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesRouteWithChildren
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
+  '/ethereum/execution/state-expiry': typeof EthereumExecutionStateExpiryRoute
   '/ethereum/execution/state-growth': typeof EthereumExecutionStateGrowthRoute
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
@@ -403,6 +413,7 @@ export interface FileRouteTypes {
     | '/ethereum/data-availability/probes'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
+    | '/ethereum/execution/state-expiry'
     | '/ethereum/execution/state-growth'
     | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
@@ -436,6 +447,7 @@ export interface FileRouteTypes {
     | '/beacon/slot/live'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
+    | '/ethereum/execution/state-expiry'
     | '/ethereum/execution/state-growth'
     | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
@@ -477,6 +489,7 @@ export interface FileRouteTypes {
     | '/ethereum/data-availability/probes'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
+    | '/ethereum/execution/state-expiry'
     | '/ethereum/execution/state-growth'
     | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
@@ -722,6 +735,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumExecutionStateGrowthRouteImport
       parentRoute: typeof EthereumExecutionRoute
     }
+    '/ethereum/execution/state-expiry': {
+      id: '/ethereum/execution/state-expiry'
+      path: '/state-expiry'
+      fullPath: '/ethereum/execution/state-expiry'
+      preLoaderRoute: typeof EthereumExecutionStateExpiryRouteImport
+      parentRoute: typeof EthereumExecutionRoute
+    }
     '/ethereum/epochs/$epoch': {
       id: '/ethereum/epochs/$epoch'
       path: '/$epoch'
@@ -857,10 +877,12 @@ const EthereumEpochsRouteWithChildren = EthereumEpochsRoute._addFileChildren(
 )
 
 interface EthereumExecutionRouteChildren {
+  EthereumExecutionStateExpiryRoute: typeof EthereumExecutionStateExpiryRoute
   EthereumExecutionStateGrowthRoute: typeof EthereumExecutionStateGrowthRoute
 }
 
 const EthereumExecutionRouteChildren: EthereumExecutionRouteChildren = {
+  EthereumExecutionStateExpiryRoute: EthereumExecutionStateExpiryRoute,
   EthereumExecutionStateGrowthRoute: EthereumExecutionStateGrowthRoute,
 }
 
