@@ -151,8 +151,20 @@ export function DetailPage(): JSX.Element {
     );
   }
 
-  // No data state
-  if (!data || data.blockHead.length === 0) {
+  // Check if we have ANY useful data for this slot
+  // Even missed slots can have attestation data, committee info, etc.
+  const hasAnyData =
+    data &&
+    (data.blockHead.length > 0 ||
+      data.block.length > 0 ||
+      data.attestations.length > 0 ||
+      data.committees.length > 0 ||
+      data.blockPropagation.length > 0 ||
+      data.attestationCorrectness.length > 0 ||
+      data.missedAttestations.length > 0);
+
+  // No data state - only show when we have absolutely no data for this slot
+  if (!data || !hasAnyData) {
     return (
       <Container>
         <Header title={`Slot ${slot}`} description={`Epoch ${formatEpoch(epoch)}`} />
@@ -164,6 +176,13 @@ export function DetailPage(): JSX.Element {
       </Container>
     );
   }
+
+  // Determine if this is a missed slot (no block was proposed)
+  const isMissedSlot = data.blockHead.length === 0 && data.block.length === 0;
+
+  // Get the effective block data - prefer canonical (blockHead) but fall back to orphaned block
+  // Will be undefined for missed slots
+  const effectiveBlockData = data.blockHead[0] ?? data.block[0];
 
   // Get total expected validators from attestation correctness data
   // This is more accurate than summing committee validators (which would double-count)
@@ -262,7 +281,7 @@ export function DetailPage(): JSX.Element {
       ? {
           execution_payload_value: data.blockMev[0]?.value || '0',
           consensus_payload_value: '0', // MEV value already includes all components
-          execution_payload_gas_used: data.blockHead[0]?.execution_payload_gas_used || 0,
+          execution_payload_gas_used: effectiveBlockData?.execution_payload_gas_used || 0,
         }
       : undefined;
 
@@ -273,10 +292,8 @@ export function DetailPage(): JSX.Element {
     data.builderBids.length > 0 ||
     data.preparedBlocks.length > 0;
 
-  // Check if blob data exists (submitters or actual blobs)
-  // Only show Blobs tab if there are actual blobs, not just if the fields exist with 0 values
+  // Get blob count for display
   const blobCount = data.blobCount[0]?.blob_count ?? 0;
-  const hasBlobData = blobSubmitters.length > 0 || blobCount > 0;
 
   return (
     <Container>
@@ -325,7 +342,17 @@ export function DetailPage(): JSX.Element {
         </Button>
       </div>
 
-      <SlotBasicInfoCard slot={slot} epoch={epoch} data={data} />
+      {/* Orphaned/Reorged Block Alert */}
+      {!isMissedSlot && data.isOrphaned && (
+        <Alert
+          variant="warning"
+          title="Orphaned Block"
+          description="This block was proposed but later removed from the canonical chain due to a reorganization. The data shown is from the orphaned block."
+          className="mb-6"
+        />
+      )}
+
+      <SlotBasicInfoCard slot={slot} epoch={epoch} data={data} isMissedSlot={isMissedSlot} />
 
       {/* Tabbed Content */}
       <div className="mt-8">
@@ -335,9 +362,9 @@ export function DetailPage(): JSX.Element {
             <Tab>Block</Tab>
             <Tab>Attestations</Tab>
             <Tab>Propagation</Tab>
-            {hasBlobData && <Tab>Blobs</Tab>}
+            <Tab>Blobs</Tab>
             <Tab>Execution</Tab>
-            {hasMevData && <Tab>MEV</Tab>}
+            <Tab>MEV</Tab>
           </ScrollableTabs>
 
           <TabPanels className="mt-6">
@@ -363,25 +390,25 @@ export function DetailPage(): JSX.Element {
                     )}
 
                     {/* Gas Used */}
-                    {data.blockHead[0] &&
-                      data.blockHead[0].execution_payload_gas_used !== null &&
-                      data.blockHead[0].execution_payload_gas_used !== undefined &&
-                      data.blockHead[0].execution_payload_gas_limit !== null &&
-                      data.blockHead[0].execution_payload_gas_limit !== undefined &&
-                      data.blockHead[0].execution_payload_gas_limit > 0 && (
+                    {effectiveBlockData &&
+                      effectiveBlockData.execution_payload_gas_used !== null &&
+                      effectiveBlockData.execution_payload_gas_used !== undefined &&
+                      effectiveBlockData.execution_payload_gas_limit !== null &&
+                      effectiveBlockData.execution_payload_gas_limit !== undefined &&
+                      effectiveBlockData.execution_payload_gas_limit > 0 && (
                         <MiniStat
                           label="Gas Used"
-                          value={formatGasToMillions(data.blockHead[0].execution_payload_gas_used)}
-                          secondaryText={`/ ${formatGasToMillions(data.blockHead[0].execution_payload_gas_limit, 0)}`}
+                          value={formatGasToMillions(effectiveBlockData.execution_payload_gas_used)}
+                          secondaryText={`/ ${formatGasToMillions(effectiveBlockData.execution_payload_gas_limit, 0)}`}
                           percentage={
-                            (data.blockHead[0].execution_payload_gas_used /
-                              data.blockHead[0].execution_payload_gas_limit) *
+                            (effectiveBlockData.execution_payload_gas_used /
+                              effectiveBlockData.execution_payload_gas_limit) *
                             100
                           }
                           showGauge
                           color={
-                            (data.blockHead[0].execution_payload_gas_used /
-                              data.blockHead[0].execution_payload_gas_limit) *
+                            (effectiveBlockData.execution_payload_gas_used /
+                              effectiveBlockData.execution_payload_gas_limit) *
                               100 >
                             90
                               ? 'var(--color-danger)'
@@ -466,7 +493,7 @@ export function DetailPage(): JSX.Element {
                   <h3 className="text-lg font-semibold text-foreground">Block Data</h3>
                   <p className="text-sm text-muted">Complete block information from beacon and execution layers</p>
                 </div>
-                {data.blockHead[0] ? (
+                {effectiveBlockData ? (
                   <dl className="grid grid-cols-1 gap-x-8 gap-y-4 lg:grid-cols-2">
                     {/* Beacon Block Section */}
                     <div className="col-span-1 lg:col-span-2">
@@ -475,78 +502,78 @@ export function DetailPage(): JSX.Element {
                       </h4>
                     </div>
 
-                    {data.blockHead[0].block_root && (
+                    {effectiveBlockData.block_root && (
                       <>
                         <dt className="text-sm font-medium text-muted">Block Root</dt>
                         <dd className="flex items-center gap-2 text-sm break-all text-foreground">
-                          <span className="flex-1">{data.blockHead[0].block_root}</span>
-                          <CopyToClipboard content={data.blockHead[0].block_root} />
+                          <span className="flex-1">{effectiveBlockData.block_root}</span>
+                          <CopyToClipboard content={effectiveBlockData.block_root} />
                         </dd>
                       </>
                     )}
 
-                    {data.blockHead[0].parent_root && (
+                    {effectiveBlockData.parent_root && (
                       <>
                         <dt className="text-sm font-medium text-muted">Parent Root</dt>
                         <dd className="flex items-center gap-2 text-sm break-all text-foreground">
-                          <span className="flex-1">{data.blockHead[0].parent_root}</span>
-                          <CopyToClipboard content={data.blockHead[0].parent_root} />
+                          <span className="flex-1">{effectiveBlockData.parent_root}</span>
+                          <CopyToClipboard content={effectiveBlockData.parent_root} />
                         </dd>
                       </>
                     )}
 
-                    {data.blockHead[0].state_root && (
+                    {effectiveBlockData.state_root && (
                       <>
                         <dt className="text-sm font-medium text-muted">State Root</dt>
                         <dd className="flex items-center gap-2 text-sm break-all text-foreground">
-                          <span className="flex-1">{data.blockHead[0].state_root}</span>
-                          <CopyToClipboard content={data.blockHead[0].state_root} />
+                          <span className="flex-1">{effectiveBlockData.state_root}</span>
+                          <CopyToClipboard content={effectiveBlockData.state_root} />
                         </dd>
                       </>
                     )}
 
-                    {data.blockHead[0].block_version && (
+                    {effectiveBlockData.block_version && (
                       <>
                         <dt className="text-sm font-medium text-muted">Block Version (Fork)</dt>
                         <dd className="flex items-center gap-2 text-sm text-foreground">
                           <span className="flex-1">
-                            <ForkLabel fork={data.blockHead[0].block_version as ForkVersion} size="sm" />
+                            <ForkLabel fork={effectiveBlockData.block_version as ForkVersion} size="sm" />
                           </span>
-                          <CopyToClipboard content={data.blockHead[0].block_version} />
+                          <CopyToClipboard content={effectiveBlockData.block_version} />
                         </dd>
                       </>
                     )}
 
-                    {data.blockHead[0].proposer_index !== undefined && data.blockHead[0].proposer_index !== null && (
+                    {effectiveBlockData.proposer_index !== undefined && effectiveBlockData.proposer_index !== null && (
                       <>
                         <dt className="text-sm font-medium text-muted">Proposer Index</dt>
                         <dd className="flex items-center gap-2 text-sm text-foreground">
-                          <span className="flex-1">{data.blockHead[0].proposer_index.toLocaleString()}</span>
-                          <CopyToClipboard content={data.blockHead[0].proposer_index.toString()} />
+                          <span className="flex-1">{effectiveBlockData.proposer_index.toLocaleString()}</span>
+                          <CopyToClipboard content={effectiveBlockData.proposer_index.toString()} />
                         </dd>
                       </>
                     )}
 
-                    {data.blockHead[0].block_total_bytes !== undefined &&
-                      data.blockHead[0].block_total_bytes !== null && (
+                    {effectiveBlockData.block_total_bytes !== undefined &&
+                      effectiveBlockData.block_total_bytes !== null && (
                         <>
                           <dt className="text-sm font-medium text-muted">Block Total Bytes</dt>
                           <dd className="flex items-center gap-2 text-sm text-foreground">
-                            <span className="flex-1">{data.blockHead[0].block_total_bytes.toLocaleString()}</span>
-                            <CopyToClipboard content={data.blockHead[0].block_total_bytes.toString()} />
+                            <span className="flex-1">{effectiveBlockData.block_total_bytes.toLocaleString()}</span>
+                            <CopyToClipboard content={effectiveBlockData.block_total_bytes.toString()} />
                           </dd>
                         </>
                       )}
 
-                    {data.blockHead[0].block_total_bytes_compressed !== undefined &&
-                      data.blockHead[0].block_total_bytes_compressed !== null && (
+                    {effectiveBlockData.block_total_bytes_compressed !== undefined &&
+                      effectiveBlockData.block_total_bytes_compressed !== null && (
                         <>
                           <dt className="text-sm font-medium text-muted">Block Total Bytes (Compressed)</dt>
                           <dd className="flex items-center gap-2 text-sm text-foreground">
                             <span className="flex-1">
-                              {data.blockHead[0].block_total_bytes_compressed.toLocaleString()}
+                              {effectiveBlockData.block_total_bytes_compressed.toLocaleString()}
                             </span>
-                            <CopyToClipboard content={data.blockHead[0].block_total_bytes_compressed.toString()} />
+                            <CopyToClipboard content={effectiveBlockData.block_total_bytes_compressed.toString()} />
                           </dd>
                         </>
                       )}
@@ -558,165 +585,167 @@ export function DetailPage(): JSX.Element {
                       </h4>
                     </div>
 
-                    {data.blockHead[0].execution_payload_block_hash && (
+                    {effectiveBlockData.execution_payload_block_hash && (
                       <>
                         <dt className="text-sm font-medium text-muted">Execution Block Hash</dt>
                         <dd className="flex items-center gap-2 text-sm break-all text-foreground">
-                          <span className="flex-1">{data.blockHead[0].execution_payload_block_hash}</span>
-                          <CopyToClipboard content={data.blockHead[0].execution_payload_block_hash} />
+                          <span className="flex-1">{effectiveBlockData.execution_payload_block_hash}</span>
+                          <CopyToClipboard content={effectiveBlockData.execution_payload_block_hash} />
                         </dd>
                       </>
                     )}
 
-                    {data.blockHead[0].execution_payload_block_number !== undefined &&
-                      data.blockHead[0].execution_payload_block_number !== null && (
+                    {effectiveBlockData.execution_payload_block_number !== undefined &&
+                      effectiveBlockData.execution_payload_block_number !== null && (
                         <>
                           <dt className="text-sm font-medium text-muted">Execution Block Number</dt>
                           <dd className="flex items-center gap-2 text-sm text-foreground">
                             <span className="flex-1">
-                              {data.blockHead[0].execution_payload_block_number.toLocaleString()}
+                              {effectiveBlockData.execution_payload_block_number.toLocaleString()}
                             </span>
-                            <CopyToClipboard content={data.blockHead[0].execution_payload_block_number.toString()} />
+                            <CopyToClipboard content={effectiveBlockData.execution_payload_block_number.toString()} />
                           </dd>
                         </>
                       )}
 
-                    {data.blockHead[0].execution_payload_parent_hash && (
+                    {effectiveBlockData.execution_payload_parent_hash && (
                       <>
                         <dt className="text-sm font-medium text-muted">Execution Parent Hash</dt>
                         <dd className="flex items-center gap-2 text-sm break-all text-foreground">
-                          <span className="flex-1">{data.blockHead[0].execution_payload_parent_hash}</span>
-                          <CopyToClipboard content={data.blockHead[0].execution_payload_parent_hash} />
+                          <span className="flex-1">{effectiveBlockData.execution_payload_parent_hash}</span>
+                          <CopyToClipboard content={effectiveBlockData.execution_payload_parent_hash} />
                         </dd>
                       </>
                     )}
 
-                    {data.blockHead[0].execution_payload_state_root && (
+                    {effectiveBlockData.execution_payload_state_root && (
                       <>
                         <dt className="text-sm font-medium text-muted">Execution State Root</dt>
                         <dd className="flex items-center gap-2 text-sm break-all text-foreground">
-                          <span className="flex-1">{data.blockHead[0].execution_payload_state_root}</span>
-                          <CopyToClipboard content={data.blockHead[0].execution_payload_state_root} />
+                          <span className="flex-1">{effectiveBlockData.execution_payload_state_root}</span>
+                          <CopyToClipboard content={effectiveBlockData.execution_payload_state_root} />
                         </dd>
                       </>
                     )}
 
-                    {data.blockHead[0].execution_payload_fee_recipient && (
+                    {effectiveBlockData.execution_payload_fee_recipient && (
                       <>
                         <dt className="text-sm font-medium text-muted">Fee Recipient</dt>
                         <dd className="flex items-center gap-2 text-sm break-all text-foreground">
-                          <span className="flex-1">{data.blockHead[0].execution_payload_fee_recipient}</span>
-                          <CopyToClipboard content={data.blockHead[0].execution_payload_fee_recipient} />
+                          <span className="flex-1">{effectiveBlockData.execution_payload_fee_recipient}</span>
+                          <CopyToClipboard content={effectiveBlockData.execution_payload_fee_recipient} />
                         </dd>
                       </>
                     )}
 
-                    {data.blockHead[0].execution_payload_gas_limit !== undefined &&
-                      data.blockHead[0].execution_payload_gas_limit !== null && (
+                    {effectiveBlockData.execution_payload_gas_limit !== undefined &&
+                      effectiveBlockData.execution_payload_gas_limit !== null && (
                         <>
                           <dt className="text-sm font-medium text-muted">Gas Limit</dt>
                           <dd className="flex items-center gap-2 text-sm text-foreground">
                             <span className="flex-1">
-                              {data.blockHead[0].execution_payload_gas_limit.toLocaleString()}
+                              {effectiveBlockData.execution_payload_gas_limit.toLocaleString()}
                             </span>
-                            <CopyToClipboard content={data.blockHead[0].execution_payload_gas_limit.toString()} />
+                            <CopyToClipboard content={effectiveBlockData.execution_payload_gas_limit.toString()} />
                           </dd>
                         </>
                       )}
 
-                    {data.blockHead[0].execution_payload_gas_used !== undefined &&
-                      data.blockHead[0].execution_payload_gas_used !== null && (
+                    {effectiveBlockData.execution_payload_gas_used !== undefined &&
+                      effectiveBlockData.execution_payload_gas_used !== null && (
                         <>
                           <dt className="text-sm font-medium text-muted">Gas Used</dt>
                           <dd className="flex items-center gap-2 text-sm text-foreground">
                             <span className="flex-1">
-                              {data.blockHead[0].execution_payload_gas_used.toLocaleString()}
+                              {effectiveBlockData.execution_payload_gas_used.toLocaleString()}
                             </span>
-                            <CopyToClipboard content={data.blockHead[0].execution_payload_gas_used.toString()} />
+                            <CopyToClipboard content={effectiveBlockData.execution_payload_gas_used.toString()} />
                           </dd>
                         </>
                       )}
 
-                    {data.blockHead[0].execution_payload_base_fee_per_gas && (
+                    {effectiveBlockData.execution_payload_base_fee_per_gas && (
                       <>
                         <dt className="text-sm font-medium text-muted">Base Fee Per Gas</dt>
                         <dd className="flex items-center gap-2 text-sm text-foreground">
                           <span className="flex-1">
-                            {data.blockHead[0].execution_payload_base_fee_per_gas} wei (
-                            {(Number(data.blockHead[0].execution_payload_base_fee_per_gas) / 1e9).toFixed(2)} Gwei)
+                            {effectiveBlockData.execution_payload_base_fee_per_gas} wei (
+                            {(Number(effectiveBlockData.execution_payload_base_fee_per_gas) / 1e9).toFixed(2)} Gwei)
                           </span>
-                          <CopyToClipboard content={data.blockHead[0].execution_payload_base_fee_per_gas} />
+                          <CopyToClipboard content={effectiveBlockData.execution_payload_base_fee_per_gas} />
                         </dd>
                       </>
                     )}
 
-                    {data.blockHead[0].execution_payload_transactions_count !== undefined &&
-                      data.blockHead[0].execution_payload_transactions_count !== null && (
+                    {effectiveBlockData.execution_payload_transactions_count !== undefined &&
+                      effectiveBlockData.execution_payload_transactions_count !== null && (
                         <>
                           <dt className="text-sm font-medium text-muted">Transaction Count</dt>
                           <dd className="flex items-center gap-2 text-sm text-foreground">
                             <span className="flex-1">
-                              {data.blockHead[0].execution_payload_transactions_count.toLocaleString()}
+                              {effectiveBlockData.execution_payload_transactions_count.toLocaleString()}
                             </span>
                             <CopyToClipboard
-                              content={data.blockHead[0].execution_payload_transactions_count.toString()}
+                              content={effectiveBlockData.execution_payload_transactions_count.toString()}
                             />
                           </dd>
                         </>
                       )}
 
-                    {data.blockHead[0].execution_payload_transactions_total_bytes !== undefined &&
-                      data.blockHead[0].execution_payload_transactions_total_bytes !== null && (
+                    {effectiveBlockData.execution_payload_transactions_total_bytes !== undefined &&
+                      effectiveBlockData.execution_payload_transactions_total_bytes !== null && (
                         <>
                           <dt className="text-sm font-medium text-muted">Transactions Total Bytes</dt>
                           <dd className="flex items-center gap-2 text-sm text-foreground">
                             <span className="flex-1">
-                              {data.blockHead[0].execution_payload_transactions_total_bytes.toLocaleString()}
+                              {effectiveBlockData.execution_payload_transactions_total_bytes.toLocaleString()}
                             </span>
                             <CopyToClipboard
-                              content={data.blockHead[0].execution_payload_transactions_total_bytes.toString()}
+                              content={effectiveBlockData.execution_payload_transactions_total_bytes.toString()}
                             />
                           </dd>
                         </>
                       )}
 
-                    {data.blockHead[0].execution_payload_transactions_total_bytes_compressed !== undefined &&
-                      data.blockHead[0].execution_payload_transactions_total_bytes_compressed !== null && (
+                    {effectiveBlockData.execution_payload_transactions_total_bytes_compressed !== undefined &&
+                      effectiveBlockData.execution_payload_transactions_total_bytes_compressed !== null && (
                         <>
                           <dt className="text-sm font-medium text-muted">Transactions Total Bytes (Compressed)</dt>
                           <dd className="flex items-center gap-2 text-sm text-foreground">
                             <span className="flex-1">
-                              {data.blockHead[0].execution_payload_transactions_total_bytes_compressed.toLocaleString()}
+                              {effectiveBlockData.execution_payload_transactions_total_bytes_compressed.toLocaleString()}
                             </span>
                             <CopyToClipboard
-                              content={data.blockHead[0].execution_payload_transactions_total_bytes_compressed.toString()}
+                              content={effectiveBlockData.execution_payload_transactions_total_bytes_compressed.toString()}
                             />
                           </dd>
                         </>
                       )}
 
-                    {data.blockHead[0].execution_payload_blob_gas_used !== undefined &&
-                      data.blockHead[0].execution_payload_blob_gas_used !== null && (
+                    {effectiveBlockData.execution_payload_blob_gas_used !== undefined &&
+                      effectiveBlockData.execution_payload_blob_gas_used !== null && (
                         <>
                           <dt className="text-sm font-medium text-muted">Blob Gas Used</dt>
                           <dd className="flex items-center gap-2 text-sm text-foreground">
                             <span className="flex-1">
-                              {data.blockHead[0].execution_payload_blob_gas_used.toLocaleString()}
+                              {effectiveBlockData.execution_payload_blob_gas_used.toLocaleString()}
                             </span>
-                            <CopyToClipboard content={data.blockHead[0].execution_payload_blob_gas_used.toString()} />
+                            <CopyToClipboard content={effectiveBlockData.execution_payload_blob_gas_used.toString()} />
                           </dd>
                         </>
                       )}
 
-                    {data.blockHead[0].execution_payload_excess_blob_gas !== undefined &&
-                      data.blockHead[0].execution_payload_excess_blob_gas !== null && (
+                    {effectiveBlockData.execution_payload_excess_blob_gas !== undefined &&
+                      effectiveBlockData.execution_payload_excess_blob_gas !== null && (
                         <>
                           <dt className="text-sm font-medium text-muted">Excess Blob Gas</dt>
                           <dd className="flex items-center gap-2 text-sm text-foreground">
                             <span className="flex-1">
-                              {data.blockHead[0].execution_payload_excess_blob_gas.toLocaleString()}
+                              {effectiveBlockData.execution_payload_excess_blob_gas.toLocaleString()}
                             </span>
-                            <CopyToClipboard content={data.blockHead[0].execution_payload_excess_blob_gas.toString()} />
+                            <CopyToClipboard
+                              content={effectiveBlockData.execution_payload_excess_blob_gas.toString()}
+                            />
                           </dd>
                         </>
                       )}
@@ -728,28 +757,28 @@ export function DetailPage(): JSX.Element {
                       </h4>
                     </div>
 
-                    {data.blockHead[0].eth1_data_block_hash && (
+                    {effectiveBlockData.eth1_data_block_hash && (
                       <>
                         <dt className="text-sm font-medium text-muted">ETH1 Block Hash</dt>
                         <dd className="flex items-center gap-2 text-sm break-all text-foreground">
-                          <span className="flex-1">{data.blockHead[0].eth1_data_block_hash}</span>
-                          <CopyToClipboard content={data.blockHead[0].eth1_data_block_hash} />
+                          <span className="flex-1">{effectiveBlockData.eth1_data_block_hash}</span>
+                          <CopyToClipboard content={effectiveBlockData.eth1_data_block_hash} />
                         </dd>
                       </>
                     )}
 
-                    {data.blockHead[0].eth1_data_deposit_root && (
+                    {effectiveBlockData.eth1_data_deposit_root && (
                       <>
                         <dt className="text-sm font-medium text-muted">ETH1 Deposit Root</dt>
                         <dd className="flex items-center gap-2 text-sm break-all text-foreground">
-                          <span className="flex-1">{data.blockHead[0].eth1_data_deposit_root}</span>
-                          <CopyToClipboard content={data.blockHead[0].eth1_data_deposit_root} />
+                          <span className="flex-1">{effectiveBlockData.eth1_data_deposit_root}</span>
+                          <CopyToClipboard content={effectiveBlockData.eth1_data_deposit_root} />
                         </dd>
                       </>
                     )}
                   </dl>
                 ) : (
-                  <p className="text-sm text-muted">No block data available</p>
+                  <p className="text-sm text-muted">No block data available for this slot</p>
                 )}
               </Card>
             </TabPanel>
@@ -783,134 +812,158 @@ export function DetailPage(): JSX.Element {
             {/* Propagation Tab */}
             <TabPanel>
               <div className="space-y-6">
-                {/* Check if we have data columns (Fulu+) - if so, make blob/data column chart full width */}
-                {data.dataColumnPropagation.length > 0 ? (
-                  <>
-                    <BlockPropagationChart blockPropagationData={blockPropagationData} />
-                    <BlobPropagationChart blobPropagationData={blobPropagationData} />
-                  </>
+                {blockPropagationData.length === 0 && blobPropagationData.length === 0 ? (
+                  <Card>
+                    <div className="py-8 text-center">
+                      <p className="text-muted">No propagation data available for this slot</p>
+                    </div>
+                  </Card>
                 ) : (
-                  <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-                    <BlockPropagationChart blockPropagationData={blockPropagationData} />
-                    <BlobPropagationChart blobPropagationData={blobPropagationData} />
-                  </div>
-                )}
-                {blockPropagationData.length > 0 && (
-                  <BlockClassificationCDFChart blockPropagationData={blockPropagationData} />
-                )}
-                {blobPropagationData.length > 0 && (
-                  <BlobDataColumnSpreadChart blobPropagationData={blobPropagationData} slot={slot} />
+                  <>
+                    {/* Check if we have data columns (Fulu+) - if so, make blob/data column chart full width */}
+                    {data.dataColumnPropagation.length > 0 ? (
+                      <>
+                        <BlockPropagationChart blockPropagationData={blockPropagationData} />
+                        <BlobPropagationChart blobPropagationData={blobPropagationData} />
+                      </>
+                    ) : (
+                      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+                        <BlockPropagationChart blockPropagationData={blockPropagationData} />
+                        <BlobPropagationChart blobPropagationData={blobPropagationData} />
+                      </div>
+                    )}
+                    {blockPropagationData.length > 0 && (
+                      <BlockClassificationCDFChart blockPropagationData={blockPropagationData} />
+                    )}
+                    {blobPropagationData.length > 0 && (
+                      <BlobDataColumnSpreadChart blobPropagationData={blobPropagationData} slot={slot} />
+                    )}
+                  </>
                 )}
               </div>
             </TabPanel>
 
             {/* Blobs Tab - Blob data and submitters */}
-            {hasBlobData && (
-              <TabPanel>
-                <div className="space-y-6">
-                  {/* Blob Metrics - only show if there are actual blobs */}
-                  {blobCount > 0 && (
-                    <Card>
-                      <div className="mb-4">
-                        <h3 className="text-lg font-semibold text-foreground">Blob Metrics</h3>
-                        <p className="text-sm text-muted">EIP-4844 blob gas usage for this block</p>
-                      </div>
-                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <MiniStat label="Blob Count" value={blobCount.toString()} />
+            <TabPanel>
+              <div className="space-y-6">
+                {blobCount === 0 && blobSubmitters.length === 0 ? (
+                  <Card>
+                    <div className="py-8 text-center">
+                      <p className="text-muted">No blob data available for this slot</p>
+                    </div>
+                  </Card>
+                ) : (
+                  <>
+                    {/* Blob Metrics - only show if there are actual blobs */}
+                    {blobCount > 0 && (
+                      <Card>
+                        <div className="mb-4">
+                          <h3 className="text-lg font-semibold text-foreground">Blob Metrics</h3>
+                          <p className="text-sm text-muted">EIP-4844 blob gas usage for this block</p>
+                        </div>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                          <MiniStat label="Blob Count" value={blobCount.toString()} />
 
-                        {data.blockHead[0]?.execution_payload_blob_gas_used !== null &&
-                          data.blockHead[0]?.execution_payload_blob_gas_used !== undefined &&
-                          data.blockHead[0].execution_payload_blob_gas_used > 0 && (
-                            <MiniStat
-                              label="Blob Gas Used"
-                              value={`${(data.blockHead[0].execution_payload_blob_gas_used / 1e6).toFixed(2)}M`}
-                            />
-                          )}
+                          {effectiveBlockData?.execution_payload_blob_gas_used !== null &&
+                            effectiveBlockData?.execution_payload_blob_gas_used !== undefined &&
+                            effectiveBlockData.execution_payload_blob_gas_used > 0 && (
+                              <MiniStat
+                                label="Blob Gas Used"
+                                value={`${(effectiveBlockData.execution_payload_blob_gas_used / 1e6).toFixed(2)}M`}
+                              />
+                            )}
 
-                        {data.blockHead[0]?.execution_payload_excess_blob_gas !== null &&
-                          data.blockHead[0]?.execution_payload_excess_blob_gas !== undefined &&
-                          data.blockHead[0].execution_payload_excess_blob_gas > 0 && (
-                            <MiniStat
-                              label="Excess Blob Gas"
-                              value={`${(data.blockHead[0].execution_payload_excess_blob_gas / 1e6).toFixed(2)}M`}
-                            />
-                          )}
-                      </div>
-                    </Card>
-                  )}
+                          {effectiveBlockData?.execution_payload_excess_blob_gas !== null &&
+                            effectiveBlockData?.execution_payload_excess_blob_gas !== undefined &&
+                            effectiveBlockData.execution_payload_excess_blob_gas > 0 && (
+                              <MiniStat
+                                label="Excess Blob Gas"
+                                value={`${(effectiveBlockData.execution_payload_excess_blob_gas / 1e6).toFixed(2)}M`}
+                              />
+                            )}
+                        </div>
+                      </Card>
+                    )}
 
-                  {/* Blob Submitters */}
-                  {blobSubmitters.length > 0 && (
-                    <Card>
-                      <div className="mb-4">
-                        <h3 className="text-lg font-semibold text-foreground">Blob Submitters</h3>
-                        <p className="text-sm text-muted">
-                          {blobSubmitters.reduce((sum, s) => sum + (s.versioned_hashes?.length ?? 0), 0)} blob
-                          {blobSubmitters.reduce((sum, s) => sum + (s.versioned_hashes?.length ?? 0), 0) !== 1
-                            ? 's'
-                            : ''}{' '}
-                          across {blobSubmitters.length} transaction{blobSubmitters.length !== 1 ? 's' : ''}
-                        </p>
-                      </div>
-                      <div className="grid gap-3">
-                        {blobSubmitters.map((submitter, index) => (
-                          <div
-                            key={submitter.transaction_hash ?? index}
-                            className="flex items-center gap-4 rounded-sm border border-border bg-surface/50 p-4"
-                          >
-                            {/* Logo and Name */}
-                            <div className="flex items-center gap-3">
-                              {submitter.name && submitter.name !== 'Unknown' ? (
-                                <BlobPosterLogo poster={submitter.name} size={32} />
-                              ) : (
-                                <div className="flex size-8 items-center justify-center rounded-xs bg-muted/20">
-                                  <QuestionMarkCircleIcon className="size-5 text-muted" />
-                                </div>
-                              )}
-                              <div>
-                                <div className="font-medium text-foreground">{submitter.name ?? 'Unknown'}</div>
-                                <div className="text-xs text-muted">
-                                  {submitter.versioned_hashes?.length ?? 0} blob
-                                  {(submitter.versioned_hashes?.length ?? 0) !== 1 ? 's' : ''} · Tx Index:{' '}
-                                  {submitter.transaction_index ?? '-'}
+                    {/* Blob Submitters */}
+                    {blobSubmitters.length > 0 && (
+                      <Card>
+                        <div className="mb-4">
+                          <h3 className="text-lg font-semibold text-foreground">Blob Submitters</h3>
+                          <p className="text-sm text-muted">
+                            {blobSubmitters.reduce((sum, s) => sum + (s.versioned_hashes?.length ?? 0), 0)} blob
+                            {blobSubmitters.reduce((sum, s) => sum + (s.versioned_hashes?.length ?? 0), 0) !== 1
+                              ? 's'
+                              : ''}{' '}
+                            across {blobSubmitters.length} transaction{blobSubmitters.length !== 1 ? 's' : ''}
+                          </p>
+                        </div>
+                        <div className="grid gap-3">
+                          {blobSubmitters.map((submitter, index) => (
+                            <div
+                              key={submitter.transaction_hash ?? index}
+                              className="flex items-center gap-4 rounded-sm border border-border bg-surface/50 p-4"
+                            >
+                              {/* Logo and Name */}
+                              <div className="flex items-center gap-3">
+                                {submitter.name && submitter.name !== 'Unknown' ? (
+                                  <BlobPosterLogo poster={submitter.name} size={32} />
+                                ) : (
+                                  <div className="flex size-8 items-center justify-center rounded-xs bg-muted/20">
+                                    <QuestionMarkCircleIcon className="size-5 text-muted" />
+                                  </div>
+                                )}
+                                <div>
+                                  <div className="font-medium text-foreground">{submitter.name ?? 'Unknown'}</div>
+                                  <div className="text-xs text-muted">
+                                    {submitter.versioned_hashes?.length ?? 0} blob
+                                    {(submitter.versioned_hashes?.length ?? 0) !== 1 ? 's' : ''} · Tx Index:{' '}
+                                    {submitter.transaction_index ?? '-'}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
 
-                            {/* Address and Tx Hash */}
-                            <div className="ml-auto flex flex-col items-end gap-1">
-                              {submitter.address && (
-                                <div className="flex items-center gap-2 text-xs">
-                                  <span className="text-muted">Address:</span>
-                                  <code className="font-mono text-foreground">
-                                    {submitter.address.slice(0, 10)}...{submitter.address.slice(-8)}
-                                  </code>
-                                  <CopyToClipboard content={submitter.address} />
-                                </div>
-                              )}
-                              {submitter.transaction_hash && (
-                                <div className="flex items-center gap-2 text-xs">
-                                  <span className="text-muted">Tx:</span>
-                                  <code className="font-mono text-foreground">
-                                    {submitter.transaction_hash.slice(0, 10)}...{submitter.transaction_hash.slice(-8)}
-                                  </code>
-                                  <CopyToClipboard content={submitter.transaction_hash} />
-                                </div>
-                              )}
+                              {/* Address and Tx Hash */}
+                              <div className="ml-auto flex flex-col items-end gap-1">
+                                {submitter.address && (
+                                  <div className="flex items-center gap-2 text-xs">
+                                    <span className="text-muted">Address:</span>
+                                    <code className="font-mono text-foreground">
+                                      {submitter.address.slice(0, 10)}...{submitter.address.slice(-8)}
+                                    </code>
+                                    <CopyToClipboard content={submitter.address} />
+                                  </div>
+                                )}
+                                {submitter.transaction_hash && (
+                                  <div className="flex items-center gap-2 text-xs">
+                                    <span className="text-muted">Tx:</span>
+                                    <code className="font-mono text-foreground">
+                                      {submitter.transaction_hash.slice(0, 10)}...{submitter.transaction_hash.slice(-8)}
+                                    </code>
+                                    <CopyToClipboard content={submitter.transaction_hash} />
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    </Card>
-                  )}
-                </div>
-              </TabPanel>
-            )}
+                          ))}
+                        </div>
+                      </Card>
+                    )}
+                  </>
+                )}
+              </div>
+            </TabPanel>
 
             {/* Execution Tab - Comprehensive execution layer data */}
             <TabPanel>
               <div className="space-y-6">
-                {data.blockHead[0] && (
+                {!effectiveBlockData ? (
+                  <Card>
+                    <div className="py-8 text-center">
+                      <p className="text-muted">No execution data available for this slot</p>
+                    </div>
+                  </Card>
+                ) : (
                   <>
                     {/* Transaction & Gas Metrics */}
                     <Card>
@@ -919,32 +972,32 @@ export function DetailPage(): JSX.Element {
                         <p className="text-sm text-muted">Block execution metrics</p>
                       </div>
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        {data.blockHead[0].execution_payload_transactions_count !== null &&
-                          data.blockHead[0].execution_payload_transactions_count !== undefined && (
+                        {effectiveBlockData.execution_payload_transactions_count !== null &&
+                          effectiveBlockData.execution_payload_transactions_count !== undefined && (
                             <MiniStat
                               label="Transactions"
-                              value={data.blockHead[0].execution_payload_transactions_count.toLocaleString()}
+                              value={effectiveBlockData.execution_payload_transactions_count.toLocaleString()}
                             />
                           )}
 
-                        {data.blockHead[0].execution_payload_gas_used !== null &&
-                          data.blockHead[0].execution_payload_gas_used !== undefined &&
-                          data.blockHead[0].execution_payload_gas_limit !== null &&
-                          data.blockHead[0].execution_payload_gas_limit !== undefined &&
-                          data.blockHead[0].execution_payload_gas_limit > 0 && (
+                        {effectiveBlockData.execution_payload_gas_used !== null &&
+                          effectiveBlockData.execution_payload_gas_used !== undefined &&
+                          effectiveBlockData.execution_payload_gas_limit !== null &&
+                          effectiveBlockData.execution_payload_gas_limit !== undefined &&
+                          effectiveBlockData.execution_payload_gas_limit > 0 && (
                             <MiniStat
                               label="Gas Used"
-                              value={formatGasToMillions(data.blockHead[0].execution_payload_gas_used)}
-                              secondaryText={`/ ${formatGasToMillions(data.blockHead[0].execution_payload_gas_limit, 0)}`}
+                              value={formatGasToMillions(effectiveBlockData.execution_payload_gas_used)}
+                              secondaryText={`/ ${formatGasToMillions(effectiveBlockData.execution_payload_gas_limit, 0)}`}
                               percentage={
-                                (data.blockHead[0].execution_payload_gas_used /
-                                  data.blockHead[0].execution_payload_gas_limit) *
+                                (effectiveBlockData.execution_payload_gas_used /
+                                  effectiveBlockData.execution_payload_gas_limit) *
                                 100
                               }
                               showGauge
                               color={
-                                (data.blockHead[0].execution_payload_gas_used /
-                                  data.blockHead[0].execution_payload_gas_limit) *
+                                (effectiveBlockData.execution_payload_gas_used /
+                                  effectiveBlockData.execution_payload_gas_limit) *
                                   100 >
                                 90
                                   ? 'var(--color-danger)'
@@ -953,21 +1006,21 @@ export function DetailPage(): JSX.Element {
                             />
                           )}
 
-                        {data.blockHead[0].execution_payload_base_fee_per_gas && (
+                        {effectiveBlockData.execution_payload_base_fee_per_gas && (
                           <MiniStat
                             label="Base Fee"
-                            value={`${(Number(data.blockHead[0].execution_payload_base_fee_per_gas) / 1e9).toFixed(2)} Gwei`}
+                            value={`${(Number(effectiveBlockData.execution_payload_base_fee_per_gas) / 1e9).toFixed(2)} Gwei`}
                           />
                         )}
 
-                        {data.blockHead[0].execution_payload_transactions_total_bytes !== null &&
-                          data.blockHead[0].execution_payload_transactions_total_bytes !== undefined && (
+                        {effectiveBlockData.execution_payload_transactions_total_bytes !== null &&
+                          effectiveBlockData.execution_payload_transactions_total_bytes !== undefined && (
                             <MiniStat
                               label="Total Bytes"
                               value={
-                                data.blockHead[0].execution_payload_transactions_total_bytes < 1024 * 1024
-                                  ? `${(data.blockHead[0].execution_payload_transactions_total_bytes / 1024).toFixed(2)} KB`
-                                  : `${(data.blockHead[0].execution_payload_transactions_total_bytes / (1024 * 1024)).toFixed(2)} MB`
+                                effectiveBlockData.execution_payload_transactions_total_bytes < 1024 * 1024
+                                  ? `${(effectiveBlockData.execution_payload_transactions_total_bytes / 1024).toFixed(2)} KB`
+                                  : `${(effectiveBlockData.execution_payload_transactions_total_bytes / (1024 * 1024)).toFixed(2)} MB`
                               }
                             />
                           )}
@@ -978,9 +1031,15 @@ export function DetailPage(): JSX.Element {
               </div>
             </TabPanel>
 
-            {/* MEV Tab - Only included if there's MEV data */}
-            {hasMevData && (
-              <TabPanel>
+            {/* MEV Tab */}
+            <TabPanel>
+              {!hasMevData ? (
+                <Card>
+                  <div className="py-8 text-center">
+                    <p className="text-muted">No MEV data available for this slot</p>
+                  </div>
+                </Card>
+              ) : (
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                   {mevBiddingData.length > 0 && (
                     <div className="lg:col-span-2">
@@ -1003,13 +1062,13 @@ export function DetailPage(): JSX.Element {
                         preparedBlocks={data.preparedBlocks}
                         proposedBlock={proposedBlock}
                         winningBidTimestamp={winningBidTimestamp}
-                        slotStartTime={data.blockHead[0]?.slot_start_date_time}
+                        slotStartTime={effectiveBlockData?.slot_start_date_time}
                       />
                     </div>
                   )}
                 </div>
-              </TabPanel>
-            )}
+              )}
+            </TabPanel>
           </TabPanels>
         </TabGroup>
       </div>
