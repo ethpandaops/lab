@@ -11,10 +11,11 @@ import { getDataVizColors } from '@/utils/dataVizColors';
  * Displays a heatmap showing when each data column was first seen:
  * - X-axis: 128 data columns (0-127)
  * - Y-axis: Blobs (shows range "0 → n" when >6 blobs, individual labels otherwise)
- * - Cell color: Continuous gradient based on time when column was first seen
- *   - Green (0ms) → Yellow (2000ms) → Red (4000ms)
- *   - 1px spacing between columns for better visibility
+ * - Cell color: Non-linear gradient based on time when column was first seen
+ *   - Green (0-3s) → Yellow (3-3.5s) → Red (3.5-4s)
+ *   - Pure green for first 3 seconds, rapid transition to red in final second
  *   - 4000ms deadline for "on time" determination
+ *   - 1px spacing between columns for better visibility
  * - Each row shows the same column data (columns are independent of blobs)
  * - Fixed height of 400px regardless of blob count
  *
@@ -104,16 +105,21 @@ function DataColumnDataAvailabilityComponent({
           max={maxTime}
           visualMapType="continuous"
           colorGradient={[
+            // 0-3s (0-75%): Stay green - repeat to hold green longer
             PERFORMANCE_TIME_COLORS.excellent,
-            PERFORMANCE_TIME_COLORS.good,
+            PERFORMANCE_TIME_COLORS.excellent,
+            PERFORMANCE_TIME_COLORS.excellent,
+            PERFORMANCE_TIME_COLORS.excellent,
+            // 3-3.5s (75-87.5%): green → yellow
             PERFORMANCE_TIME_COLORS.fair,
-            PERFORMANCE_TIME_COLORS.slow,
+            // 3.5-4s (87.5-100%): yellow → red
             PERFORMANCE_TIME_COLORS.poor,
           ]}
           showVisualMap={true}
           showCellBorders={true}
           animationDuration={0}
           emphasisDisabled={false}
+          visualMapText={['4s', '0s']}
           tooltipFormatter={(params, xLabels, yLabels) => {
             const [x, y, value] = params.value;
             return `<strong>Data Column:</strong> ${xLabels[x]}<br/><strong>Blob:</strong> ${yLabels[y]}<br/><strong>First Seen:</strong> ${value.toFixed(0)}ms`;
