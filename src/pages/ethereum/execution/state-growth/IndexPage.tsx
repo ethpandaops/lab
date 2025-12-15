@@ -236,7 +236,7 @@ export function IndexPage(): JSX.Element {
                   </span>
                 </div>
                 <p className="mt-1.5 text-sm text-muted tabular-nums">
-                  Total Count: {latestData.accounts.toLocaleString()}
+                  Unique Accounts: {latestData.accounts.toLocaleString()}
                 </p>
               </Card>
 
@@ -268,7 +268,7 @@ export function IndexPage(): JSX.Element {
                   </span>
                 </div>
                 <p className="mt-1.5 text-sm text-muted tabular-nums">
-                  Total Count: {latestData.storages.toLocaleString()}
+                  Unique Slots: {latestData.storages.toLocaleString()}
                 </p>
               </Card>
 
@@ -300,7 +300,7 @@ export function IndexPage(): JSX.Element {
                   </span>
                 </div>
                 <p className="mt-1.5 text-sm text-muted tabular-nums">
-                  Total Count: {latestData.contract_codes.toLocaleString()}
+                  Unique Bytecodes: {latestData.contract_codes.toLocaleString()}
                 </p>
               </Card>
             </div>
