@@ -134,7 +134,9 @@ export function IndexPage(): JSX.Element {
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-4xl/tight font-bold text-foreground">State Growth</h1>
-          <p className="mt-1 text-muted">Track Ethereum execution layer state growth over time</p>
+          <p className="mt-1 text-muted">
+            Track Ethereum execution layer state growth over time (data extracted from go-ethereum node)
+          </p>
         </div>
 
         {/* Global timeframe toggle */}
