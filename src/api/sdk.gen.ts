@@ -129,6 +129,12 @@ import type {
   FctBlockDataColumnSidecarFirstSeenByNodeServiceListData,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceListErrors,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponses,
+  FctBlockDataColumnSidecarFirstSeenServiceGetData,
+  FctBlockDataColumnSidecarFirstSeenServiceGetErrors,
+  FctBlockDataColumnSidecarFirstSeenServiceGetResponses,
+  FctBlockDataColumnSidecarFirstSeenServiceListData,
+  FctBlockDataColumnSidecarFirstSeenServiceListErrors,
+  FctBlockDataColumnSidecarFirstSeenServiceListResponses,
   FctBlockFirstSeenByNodeServiceGetData,
   FctBlockFirstSeenByNodeServiceGetErrors,
   FctBlockFirstSeenByNodeServiceGetResponses,
@@ -551,6 +557,10 @@ import {
   zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse,
   zFctBlockDataColumnSidecarFirstSeenByNodeServiceListData,
   zFctBlockDataColumnSidecarFirstSeenByNodeServiceListResponse,
+  zFctBlockDataColumnSidecarFirstSeenServiceGetData,
+  zFctBlockDataColumnSidecarFirstSeenServiceGetResponse,
+  zFctBlockDataColumnSidecarFirstSeenServiceListData,
+  zFctBlockDataColumnSidecarFirstSeenServiceListResponse,
   zFctBlockFirstSeenByNodeServiceGetData,
   zFctBlockFirstSeenByNodeServiceGetResponse,
   zFctBlockFirstSeenByNodeServiceListData,
@@ -1620,6 +1630,46 @@ export const fctBlockBlobFirstSeenByNodeServiceGet = <ThrowOnError extends boole
     requestValidator: async data => await zFctBlockBlobFirstSeenByNodeServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockBlobFirstSeenByNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_blob_first_seen_by_node/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockDataColumnSidecarFirstSeenServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockDataColumnSidecarFirstSeenServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctBlockDataColumnSidecarFirstSeenServiceListResponses,
+    FctBlockDataColumnSidecarFirstSeenServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockDataColumnSidecarFirstSeenServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockDataColumnSidecarFirstSeenServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_data_column_sidecar_first_seen',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockDataColumnSidecarFirstSeenServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockDataColumnSidecarFirstSeenServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctBlockDataColumnSidecarFirstSeenServiceGetResponses,
+    FctBlockDataColumnSidecarFirstSeenServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockDataColumnSidecarFirstSeenServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockDataColumnSidecarFirstSeenServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_data_column_sidecar_first_seen/{slot_start_date_time}',
     ...options,
   });
 };
