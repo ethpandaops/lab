@@ -1884,10 +1884,6 @@ export type FctEngineGetBlobsByElClient = {
    */
   error_count?: number;
   /**
-   * Whether this observation is from a reference node (controlled fleet with 7870 in name)
-   */
-  is_reference_node?: boolean;
-  /**
    * Maximum duration of engine_getBlobs calls in milliseconds
    */
   max_duration_ms?: number;
@@ -1900,10 +1896,6 @@ export type FctEngineGetBlobsByElClient = {
    */
   median_duration_ms?: number;
   /**
-   * Consensus client implementation (e.g., lighthouse, prysm, teku)
-   */
-  meta_client_implementation?: string;
-  /**
    * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth)
    */
   meta_execution_implementation?: string;
@@ -1911,6 +1903,10 @@ export type FctEngineGetBlobsByElClient = {
    * Minimum duration of engine_getBlobs calls in milliseconds
    */
   min_duration_ms?: number;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
   /**
    * Number of observations for this EL client
    */
@@ -1987,10 +1983,6 @@ export type FctEngineGetBlobsBySlot = {
    */
   full_return_pct?: number | null;
   /**
-   * Whether this observation is from a reference node (controlled fleet with 7870 in name)
-   */
-  is_reference_node?: boolean;
-  /**
    * Maximum duration of engine_getBlobs calls in milliseconds
    */
   max_duration_ms?: number;
@@ -2006,6 +1998,10 @@ export type FctEngineGetBlobsBySlot = {
    * Minimum duration of engine_getBlobs calls in milliseconds
    */
   min_duration_ms?: number;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
   /**
    * Number of observations for this slot/block
    */
@@ -2082,9 +2078,9 @@ export type FctEngineGetBlobsDurationChunked50Ms = {
    */
   error_count?: number;
   /**
-   * Whether this observation is from a reference node (controlled fleet with 7870 in name)
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
    */
-  is_reference_node?: boolean;
+  node_class?: string;
   /**
    * Number of observations in this duration chunk
    */
@@ -2137,13 +2133,13 @@ export type FctEngineGetBlobsStatusDaily = {
    */
   error_count?: number;
   /**
-   * Whether this observation is from a reference node (controlled fleet with 7870 in name)
-   */
-  is_reference_node?: boolean;
-  /**
    * Maximum duration of engine_getBlobs calls in milliseconds
    */
   max_duration_ms?: number;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
   /**
    * Total number of observations in this day
    */
@@ -2200,13 +2196,13 @@ export type FctEngineGetBlobsStatusHourly = {
    */
   hour_start_date_time?: number;
   /**
-   * Whether this observation is from a reference node (controlled fleet with 7870 in name)
-   */
-  is_reference_node?: boolean;
-  /**
    * Maximum duration of engine_getBlobs calls in milliseconds
    */
   max_duration_ms?: number;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
   /**
    * Total number of observations in this hour
    */
@@ -2283,10 +2279,6 @@ export type FctEngineNewPayloadByElClient = {
    */
   invalid_count?: number;
   /**
-   * Whether this observation is from a reference node (controlled fleet with 7870 in name)
-   */
-  is_reference_node?: boolean;
-  /**
    * Maximum duration of engine_newPayload calls in milliseconds
    */
   max_duration_ms?: number;
@@ -2295,10 +2287,6 @@ export type FctEngineNewPayloadByElClient = {
    */
   median_duration_ms?: number;
   /**
-   * Consensus client implementation (e.g., lighthouse, prysm, teku)
-   */
-  meta_client_implementation?: string;
-  /**
    * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth)
    */
   meta_execution_implementation?: string;
@@ -2306,6 +2294,10 @@ export type FctEngineNewPayloadByElClient = {
    * Minimum duration of engine_newPayload calls in milliseconds
    */
   min_duration_ms?: number;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
   /**
    * Number of observations for this EL client
    */
@@ -2382,6 +2374,10 @@ export type FctEngineNewPayloadBySlot = {
    */
   epoch_start_date_time?: number;
   /**
+   * Number of observations with ERROR status
+   */
+  error_count?: number;
+  /**
    * Gas limit of the block
    */
   gas_limit?: number;
@@ -2398,10 +2394,6 @@ export type FctEngineNewPayloadBySlot = {
    */
   invalid_count?: number;
   /**
-   * Whether this observation is from a reference node (controlled fleet with 7870 in name)
-   */
-  is_reference_node?: boolean;
-  /**
    * Maximum duration of engine_newPayload calls in milliseconds
    */
   max_duration_ms?: number;
@@ -2413,6 +2405,10 @@ export type FctEngineNewPayloadBySlot = {
    * Minimum duration of engine_newPayload calls in milliseconds
    */
   min_duration_ms?: number;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
   /**
    * Number of observations for this slot/block
    */
@@ -2493,9 +2489,9 @@ export type FctEngineNewPayloadDurationChunked50Ms = {
    */
   invalid_count?: number;
   /**
-   * Whether this observation is from a reference node (controlled fleet with 7870 in name)
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
    */
-  is_reference_node?: boolean;
+  node_class?: string;
   /**
    * Number of observations in this duration chunk
    */
@@ -2548,13 +2544,13 @@ export type FctEngineNewPayloadStatusDaily = {
    */
   invalid_count?: number;
   /**
-   * Whether this observation is from a reference node (controlled fleet with 7870 in name)
-   */
-  is_reference_node?: boolean;
-  /**
    * Maximum duration of engine_newPayload calls in milliseconds
    */
   max_duration_ms?: number;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
   /**
    * Total number of observations in this day
    */
@@ -2611,13 +2607,13 @@ export type FctEngineNewPayloadStatusHourly = {
    */
   invalid_count?: number;
   /**
-   * Whether this observation is from a reference node (controlled fleet with 7870 in name)
-   */
-  is_reference_node?: boolean;
-  /**
    * Maximum duration of engine_newPayload calls in milliseconds
    */
   max_duration_ms?: number;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
   /**
    * Total number of observations in this hour
    */
@@ -3238,6 +3234,68 @@ export type FctPreparedBlock = {
   updated_date_time?: number;
 };
 
+export type FctStorageSlotState = {
+  /**
+   * Cumulative count of active storage slots at this block
+   */
+  active_slots?: number;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Change in effective bytes for this block
+   */
+  bytes_delta?: number;
+  /**
+   * Cumulative sum of effective bytes across all active slots at this block
+   */
+  effective_bytes?: number;
+  /**
+   * Change in active slots for this block (positive=activated, negative=deactivated)
+   */
+  slots_delta?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctStorageSlotStateWithExpiryBy6m = {
+  /**
+   * Cumulative count of active storage slots at this block (with 6-month expiry applied)
+   */
+  active_slots?: number;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Cumulative net bytes adjustment up to this block
+   */
+  cumulative_net_bytes?: number;
+  /**
+   * Cumulative net slot adjustment up to this block
+   */
+  cumulative_net_slots?: number;
+  /**
+   * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied)
+   */
+  effective_bytes?: number;
+  /**
+   * Net bytes adjustment this block (negative=expiry, positive=reactivation)
+   */
+  net_bytes_delta?: number;
+  /**
+   * Net slot adjustment this block (negative=expiry, positive=reactivation)
+   */
+  net_slots_delta?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 /**
  * Response for getting a single admin_cbt_incremental record
  */
@@ -3617,6 +3675,20 @@ export type GetFctPreparedBlockResponse = {
 };
 
 /**
+ * Response for getting a single fct_storage_slot_state record
+ */
+export type GetFctStorageSlotStateResponse = {
+  item?: FctStorageSlotState;
+};
+
+/**
+ * Response for getting a single fct_storage_slot_state_with_expiry_by_6m record
+ */
+export type GetFctStorageSlotStateWithExpiryBy6mResponse = {
+  item?: FctStorageSlotStateWithExpiryBy6m;
+};
+
+/**
  * Response for getting a single int_address_first_access record
  */
 export type GetIntAddressFirstAccessResponse = {
@@ -3719,6 +3791,48 @@ export type GetIntCustodyProbeResponse = {
  */
 export type GetIntExecutionBlockByDateResponse = {
   item?: IntExecutionBlockByDate;
+};
+
+/**
+ * Response for getting a single int_storage_slot_diff_by_address_slot record
+ */
+export type GetIntStorageSlotDiffByAddressSlotResponse = {
+  item?: IntStorageSlotDiffByAddressSlot;
+};
+
+/**
+ * Response for getting a single int_storage_slot_diff record
+ */
+export type GetIntStorageSlotDiffResponse = {
+  item?: IntStorageSlotDiff;
+};
+
+/**
+ * Response for getting a single int_storage_slot_expiry_by_6m record
+ */
+export type GetIntStorageSlotExpiryBy6mResponse = {
+  item?: IntStorageSlotExpiryBy6m;
+};
+
+/**
+ * Response for getting a single int_storage_slot_next_touch record
+ */
+export type GetIntStorageSlotNextTouchResponse = {
+  item?: IntStorageSlotNextTouch;
+};
+
+/**
+ * Response for getting a single int_storage_slot_reactivation_by_6m record
+ */
+export type GetIntStorageSlotReactivationBy6mResponse = {
+  item?: IntStorageSlotReactivationBy6m;
+};
+
+/**
+ * Response for getting a single int_storage_slot_read record
+ */
+export type GetIntStorageSlotReadResponse = {
+  item?: IntStorageSlotRead;
 };
 
 /**
@@ -4609,6 +4723,148 @@ export type IntExecutionBlockByDate = {
   updated_date_time?: number;
 };
 
+export type IntStorageSlotDiff = {
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Number of effective bytes in the first from_value of the block (0-32)
+   */
+  effective_bytes_from?: number;
+  /**
+   * Number of effective bytes in the last to_value of the block (0-32)
+   */
+  effective_bytes_to?: number;
+  /**
+   * The storage slot key
+   */
+  slot_key?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotDiffByAddressSlot = {
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Number of effective bytes in the first from_value of the block (0-32)
+   */
+  effective_bytes_from?: number;
+  /**
+   * Number of effective bytes in the last to_value of the block (0-32)
+   */
+  effective_bytes_to?: number;
+  /**
+   * The storage slot key
+   */
+  slot_key?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotExpiryBy6m = {
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this slot expiry is recorded (6 months after it was set)
+   */
+  block_number?: number;
+  /**
+   * Number of effective bytes that were set and are now being marked for expiry (0-32)
+   */
+  effective_bytes?: number;
+  /**
+   * The storage slot key
+   */
+  slot_key?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotNextTouch = {
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this slot was touched
+   */
+  block_number?: number;
+  /**
+   * The next block number where this slot was touched (NULL if no subsequent touch)
+   */
+  next_touch_block?: number | null;
+  /**
+   * The storage slot key
+   */
+  slot_key?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotReactivationBy6m = {
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity)
+   */
+  block_number?: number;
+  /**
+   * Number of effective bytes being reactivated (must match corresponding expiry record)
+   */
+  effective_bytes?: number;
+  /**
+   * The storage slot key
+   */
+  slot_key?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotRead = {
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * The storage slot key
+   */
+  slot_key?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 /**
  * Response for listing admin_cbt_incremental records
  */
@@ -5366,6 +5622,34 @@ export type ListFctPreparedBlockResponse = {
 };
 
 /**
+ * Response for listing fct_storage_slot_state records
+ */
+export type ListFctStorageSlotStateResponse = {
+  /**
+   * The list of fct_storage_slot_state.
+   */
+  fct_storage_slot_state?: Array<FctStorageSlotState>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_storage_slot_state_with_expiry_by_6m records
+ */
+export type ListFctStorageSlotStateWithExpiryBy6mResponse = {
+  /**
+   * The list of fct_storage_slot_state_with_expiry_by_6m.
+   */
+  fct_storage_slot_state_with_expiry_by_6m?: Array<FctStorageSlotStateWithExpiryBy6m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing int_address_first_access records
  */
 export type ListIntAddressFirstAccessResponse = {
@@ -5569,6 +5853,90 @@ export type ListIntExecutionBlockByDateResponse = {
    * The list of int_execution_block_by_date.
    */
   int_execution_block_by_date?: Array<IntExecutionBlockByDate>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_diff_by_address_slot records
+ */
+export type ListIntStorageSlotDiffByAddressSlotResponse = {
+  /**
+   * The list of int_storage_slot_diff_by_address_slot.
+   */
+  int_storage_slot_diff_by_address_slot?: Array<IntStorageSlotDiffByAddressSlot>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_diff records
+ */
+export type ListIntStorageSlotDiffResponse = {
+  /**
+   * The list of int_storage_slot_diff.
+   */
+  int_storage_slot_diff?: Array<IntStorageSlotDiff>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_expiry_by_6m records
+ */
+export type ListIntStorageSlotExpiryBy6mResponse = {
+  /**
+   * The list of int_storage_slot_expiry_by_6m.
+   */
+  int_storage_slot_expiry_by_6m?: Array<IntStorageSlotExpiryBy6m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_next_touch records
+ */
+export type ListIntStorageSlotNextTouchResponse = {
+  /**
+   * The list of int_storage_slot_next_touch.
+   */
+  int_storage_slot_next_touch?: Array<IntStorageSlotNextTouch>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_reactivation_by_6m records
+ */
+export type ListIntStorageSlotReactivationBy6mResponse = {
+  /**
+   * The list of int_storage_slot_reactivation_by_6m.
+   */
+  int_storage_slot_reactivation_by_6m?: Array<IntStorageSlotReactivationBy6m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_read records
+ */
+export type ListIntStorageSlotReadResponse = {
+  /**
+   * The list of int_storage_slot_read.
+   */
+  int_storage_slot_read?: Array<IntStorageSlotRead>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -24403,42 +24771,6 @@ export type FctEngineGetBlobsByElClientServiceListData = {
      */
     block_root_not_in_values?: string;
     /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: eq)
-     */
-    meta_client_implementation_eq?: string;
-    /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: ne)
-     */
-    meta_client_implementation_ne?: string;
-    /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: contains)
-     */
-    meta_client_implementation_contains?: string;
-    /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: starts_with)
-     */
-    meta_client_implementation_starts_with?: string;
-    /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: ends_with)
-     */
-    meta_client_implementation_ends_with?: string;
-    /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: like)
-     */
-    meta_client_implementation_like?: string;
-    /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: not_like)
-     */
-    meta_client_implementation_not_like?: string;
-    /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: in_values) (comma-separated list)
-     */
-    meta_client_implementation_in_values?: string;
-    /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: not_in_values) (comma-separated list)
-     */
-    meta_client_implementation_not_in_values?: string;
-    /**
      * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
      */
     meta_execution_implementation_eq?: string;
@@ -24475,13 +24807,41 @@ export type FctEngineGetBlobsByElClientServiceListData = {
      */
     meta_execution_implementation_not_in_values?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: eq)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
      */
-    is_reference_node_eq?: boolean;
+    node_class_eq?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: ne)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
      */
-    is_reference_node_ne?: boolean;
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
     /**
      * Timestamp when the record was last updated (filter: eq)
      */
@@ -25319,13 +25679,41 @@ export type FctEngineGetBlobsBySlotServiceListData = {
      */
     block_root_not_in_values?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: eq)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
      */
-    is_reference_node_eq?: boolean;
+    node_class_eq?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: ne)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
      */
-    is_reference_node_ne?: boolean;
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
     /**
      * Timestamp when the record was last updated (filter: eq)
      */
@@ -26247,13 +26635,41 @@ export type FctEngineGetBlobsDurationChunked50MsServiceListData = {
      */
     block_root_not_in_values?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: eq)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
      */
-    is_reference_node_eq?: boolean;
+    node_class_eq?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: ne)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
      */
-    is_reference_node_ne?: boolean;
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
     /**
      * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: eq)
      */
@@ -26763,13 +27179,41 @@ export type FctEngineGetBlobsStatusDailyServiceListData = {
      */
     day_start_date_not_in_values?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: eq)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
      */
-    is_reference_node_eq?: boolean;
+    node_class_eq?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: ne)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
      */
-    is_reference_node_ne?: boolean;
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
     /**
      * Timestamp when the record was last updated (filter: eq)
      */
@@ -27367,13 +27811,41 @@ export type FctEngineGetBlobsStatusHourlyServiceListData = {
      */
     hour_start_date_time_not_in_values?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: eq)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
      */
-    is_reference_node_eq?: boolean;
+    node_class_eq?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: ne)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
      */
-    is_reference_node_ne?: boolean;
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
     /**
      * Timestamp when the record was last updated (filter: eq)
      */
@@ -28007,42 +28479,6 @@ export type FctEngineNewPayloadByElClientServiceListData = {
      */
     block_hash_not_in_values?: string;
     /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: eq)
-     */
-    meta_client_implementation_eq?: string;
-    /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: ne)
-     */
-    meta_client_implementation_ne?: string;
-    /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: contains)
-     */
-    meta_client_implementation_contains?: string;
-    /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: starts_with)
-     */
-    meta_client_implementation_starts_with?: string;
-    /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: ends_with)
-     */
-    meta_client_implementation_ends_with?: string;
-    /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: like)
-     */
-    meta_client_implementation_like?: string;
-    /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: not_like)
-     */
-    meta_client_implementation_not_like?: string;
-    /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: in_values) (comma-separated list)
-     */
-    meta_client_implementation_in_values?: string;
-    /**
-     * Consensus client implementation (e.g., lighthouse, prysm, teku) (filter: not_in_values) (comma-separated list)
-     */
-    meta_client_implementation_not_in_values?: string;
-    /**
      * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
      */
     meta_execution_implementation_eq?: string;
@@ -28079,13 +28515,41 @@ export type FctEngineNewPayloadByElClientServiceListData = {
      */
     meta_execution_implementation_not_in_values?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: eq)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
      */
-    is_reference_node_eq?: boolean;
+    node_class_eq?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: ne)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
      */
-    is_reference_node_ne?: boolean;
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
     /**
      * Timestamp when the record was last updated (filter: eq)
      */
@@ -29075,13 +29539,41 @@ export type FctEngineNewPayloadBySlotServiceListData = {
      */
     block_hash_not_in_values?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: eq)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
      */
-    is_reference_node_eq?: boolean;
+    node_class_eq?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: ne)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
      */
-    is_reference_node_ne?: boolean;
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
     /**
      * Timestamp when the record was last updated (filter: eq)
      */
@@ -29799,6 +30291,46 @@ export type FctEngineNewPayloadBySlotServiceListData = {
      */
     invalid_block_hash_count_not_in_values?: string;
     /**
+     * Number of observations with ERROR status (filter: eq)
+     */
+    error_count_eq?: number;
+    /**
+     * Number of observations with ERROR status (filter: ne)
+     */
+    error_count_ne?: number;
+    /**
+     * Number of observations with ERROR status (filter: lt)
+     */
+    error_count_lt?: number;
+    /**
+     * Number of observations with ERROR status (filter: lte)
+     */
+    error_count_lte?: number;
+    /**
+     * Number of observations with ERROR status (filter: gt)
+     */
+    error_count_gt?: number;
+    /**
+     * Number of observations with ERROR status (filter: gte)
+     */
+    error_count_gte?: number;
+    /**
+     * Number of observations with ERROR status (filter: between_min)
+     */
+    error_count_between_min?: number;
+    /**
+     * Number of observations with ERROR status (filter: between_max_value)
+     */
+    error_count_between_max_value?: number;
+    /**
+     * Number of observations with ERROR status (filter: in_values) (comma-separated list)
+     */
+    error_count_in_values?: string;
+    /**
+     * Number of observations with ERROR status (filter: not_in_values) (comma-separated list)
+     */
+    error_count_not_in_values?: string;
+    /**
      * Filter valid_pct using value
      */
     valid_pct_value?: number;
@@ -30271,13 +30803,41 @@ export type FctEngineNewPayloadDurationChunked50MsServiceListData = {
      */
     block_hash_not_in_values?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: eq)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
      */
-    is_reference_node_eq?: boolean;
+    node_class_eq?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: ne)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
      */
-    is_reference_node_ne?: boolean;
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
     /**
      * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: eq)
      */
@@ -30707,13 +31267,41 @@ export type FctEngineNewPayloadStatusDailyServiceListData = {
      */
     day_start_date_not_in_values?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: eq)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
      */
-    is_reference_node_eq?: boolean;
+    node_class_eq?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: ne)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
      */
-    is_reference_node_ne?: boolean;
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
     /**
      * Timestamp when the record was last updated (filter: eq)
      */
@@ -31311,13 +31899,41 @@ export type FctEngineNewPayloadStatusHourlyServiceListData = {
      */
     hour_start_date_time_not_in_values?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: eq)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
      */
-    is_reference_node_eq?: boolean;
+    node_class_eq?: string;
     /**
-     * Whether this observation is from a reference node (controlled fleet with 7870 in name) (filter: ne)
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
      */
-    is_reference_node_ne?: boolean;
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
     /**
      * Timestamp when the record was last updated (filter: eq)
      */
@@ -37888,6 +38504,710 @@ export type FctPreparedBlockServiceGetResponses = {
 
 export type FctPreparedBlockServiceGetResponse =
   FctPreparedBlockServiceGetResponses[keyof FctPreparedBlockServiceGetResponses];
+
+export type FctStorageSlotStateServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: eq)
+     */
+    slots_delta_eq?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: ne)
+     */
+    slots_delta_ne?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: lt)
+     */
+    slots_delta_lt?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: lte)
+     */
+    slots_delta_lte?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: gt)
+     */
+    slots_delta_gt?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: gte)
+     */
+    slots_delta_gte?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: between_min)
+     */
+    slots_delta_between_min?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: between_max_value)
+     */
+    slots_delta_between_max_value?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: in_values) (comma-separated list)
+     */
+    slots_delta_in_values?: string;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: not_in_values) (comma-separated list)
+     */
+    slots_delta_not_in_values?: string;
+    /**
+     * Change in effective bytes for this block (filter: eq)
+     */
+    bytes_delta_eq?: number;
+    /**
+     * Change in effective bytes for this block (filter: ne)
+     */
+    bytes_delta_ne?: number;
+    /**
+     * Change in effective bytes for this block (filter: lt)
+     */
+    bytes_delta_lt?: number;
+    /**
+     * Change in effective bytes for this block (filter: lte)
+     */
+    bytes_delta_lte?: number;
+    /**
+     * Change in effective bytes for this block (filter: gt)
+     */
+    bytes_delta_gt?: number;
+    /**
+     * Change in effective bytes for this block (filter: gte)
+     */
+    bytes_delta_gte?: number;
+    /**
+     * Change in effective bytes for this block (filter: between_min)
+     */
+    bytes_delta_between_min?: number;
+    /**
+     * Change in effective bytes for this block (filter: between_max_value)
+     */
+    bytes_delta_between_max_value?: number;
+    /**
+     * Change in effective bytes for this block (filter: in_values) (comma-separated list)
+     */
+    bytes_delta_in_values?: string;
+    /**
+     * Change in effective bytes for this block (filter: not_in_values) (comma-separated list)
+     */
+    bytes_delta_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at this block (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at this block (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of fct_storage_slot_state to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctStorageSlotState` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_storage_slot_state';
+};
+
+export type FctStorageSlotStateServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotStateServiceListError =
+  FctStorageSlotStateServiceListErrors[keyof FctStorageSlotStateServiceListErrors];
+
+export type FctStorageSlotStateServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctStorageSlotStateResponse;
+};
+
+export type FctStorageSlotStateServiceListResponse =
+  FctStorageSlotStateServiceListResponses[keyof FctStorageSlotStateServiceListResponses];
+
+export type FctStorageSlotStateServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_storage_slot_state/{block_number}';
+};
+
+export type FctStorageSlotStateServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotStateServiceGetError =
+  FctStorageSlotStateServiceGetErrors[keyof FctStorageSlotStateServiceGetErrors];
+
+export type FctStorageSlotStateServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctStorageSlotStateResponse;
+};
+
+export type FctStorageSlotStateServiceGetResponse =
+  FctStorageSlotStateServiceGetResponses[keyof FctStorageSlotStateServiceGetResponses];
+
+export type FctStorageSlotStateWithExpiryBy6mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: eq)
+     */
+    net_slots_delta_eq?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: ne)
+     */
+    net_slots_delta_ne?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: lt)
+     */
+    net_slots_delta_lt?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: lte)
+     */
+    net_slots_delta_lte?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: gt)
+     */
+    net_slots_delta_gt?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: gte)
+     */
+    net_slots_delta_gte?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: between_min)
+     */
+    net_slots_delta_between_min?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: between_max_value)
+     */
+    net_slots_delta_between_max_value?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: in_values) (comma-separated list)
+     */
+    net_slots_delta_in_values?: string;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: not_in_values) (comma-separated list)
+     */
+    net_slots_delta_not_in_values?: string;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: eq)
+     */
+    net_bytes_delta_eq?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: ne)
+     */
+    net_bytes_delta_ne?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: lt)
+     */
+    net_bytes_delta_lt?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: lte)
+     */
+    net_bytes_delta_lte?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: gt)
+     */
+    net_bytes_delta_gt?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: gte)
+     */
+    net_bytes_delta_gte?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: between_min)
+     */
+    net_bytes_delta_between_min?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: between_max_value)
+     */
+    net_bytes_delta_between_max_value?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: in_values) (comma-separated list)
+     */
+    net_bytes_delta_in_values?: string;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: not_in_values) (comma-separated list)
+     */
+    net_bytes_delta_not_in_values?: string;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: eq)
+     */
+    cumulative_net_slots_eq?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: ne)
+     */
+    cumulative_net_slots_ne?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: lt)
+     */
+    cumulative_net_slots_lt?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: lte)
+     */
+    cumulative_net_slots_lte?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: gt)
+     */
+    cumulative_net_slots_gt?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: gte)
+     */
+    cumulative_net_slots_gte?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: between_min)
+     */
+    cumulative_net_slots_between_min?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: between_max_value)
+     */
+    cumulative_net_slots_between_max_value?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: in_values) (comma-separated list)
+     */
+    cumulative_net_slots_in_values?: string;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: not_in_values) (comma-separated list)
+     */
+    cumulative_net_slots_not_in_values?: string;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: eq)
+     */
+    cumulative_net_bytes_eq?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: ne)
+     */
+    cumulative_net_bytes_ne?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: lt)
+     */
+    cumulative_net_bytes_lt?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: lte)
+     */
+    cumulative_net_bytes_lte?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: gt)
+     */
+    cumulative_net_bytes_gt?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: gte)
+     */
+    cumulative_net_bytes_gte?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: between_min)
+     */
+    cumulative_net_bytes_between_min?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: between_max_value)
+     */
+    cumulative_net_bytes_between_max_value?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: in_values) (comma-separated list)
+     */
+    cumulative_net_bytes_in_values?: string;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: not_in_values) (comma-separated list)
+     */
+    cumulative_net_bytes_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of fct_storage_slot_state_with_expiry_by_6m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctStorageSlotStateWithExpiryBy6m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_storage_slot_state_with_expiry_by_6m';
+};
+
+export type FctStorageSlotStateWithExpiryBy6mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotStateWithExpiryBy6mServiceListError =
+  FctStorageSlotStateWithExpiryBy6mServiceListErrors[keyof FctStorageSlotStateWithExpiryBy6mServiceListErrors];
+
+export type FctStorageSlotStateWithExpiryBy6mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctStorageSlotStateWithExpiryBy6mResponse;
+};
+
+export type FctStorageSlotStateWithExpiryBy6mServiceListResponse =
+  FctStorageSlotStateWithExpiryBy6mServiceListResponses[keyof FctStorageSlotStateWithExpiryBy6mServiceListResponses];
+
+export type FctStorageSlotStateWithExpiryBy6mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_storage_slot_state_with_expiry_by_6m/{block_number}';
+};
+
+export type FctStorageSlotStateWithExpiryBy6mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotStateWithExpiryBy6mServiceGetError =
+  FctStorageSlotStateWithExpiryBy6mServiceGetErrors[keyof FctStorageSlotStateWithExpiryBy6mServiceGetErrors];
+
+export type FctStorageSlotStateWithExpiryBy6mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctStorageSlotStateWithExpiryBy6mResponse;
+};
+
+export type FctStorageSlotStateWithExpiryBy6mServiceGetResponse =
+  FctStorageSlotStateWithExpiryBy6mServiceGetResponses[keyof FctStorageSlotStateWithExpiryBy6mServiceGetResponses];
 
 export type IntAddressFirstAccessServiceListData = {
   body?: never;
@@ -46502,3 +47822,1627 @@ export type IntExecutionBlockByDateServiceGetResponses = {
 
 export type IntExecutionBlockByDateServiceGetResponse =
   IntExecutionBlockByDateServiceGetResponses[keyof IntExecutionBlockByDateServiceGetResponses];
+
+export type IntStorageSlotDiffServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The storage slot key (filter: eq)
+     */
+    slot_key_eq?: string;
+    /**
+     * The storage slot key (filter: ne)
+     */
+    slot_key_ne?: string;
+    /**
+     * The storage slot key (filter: contains)
+     */
+    slot_key_contains?: string;
+    /**
+     * The storage slot key (filter: starts_with)
+     */
+    slot_key_starts_with?: string;
+    /**
+     * The storage slot key (filter: ends_with)
+     */
+    slot_key_ends_with?: string;
+    /**
+     * The storage slot key (filter: like)
+     */
+    slot_key_like?: string;
+    /**
+     * The storage slot key (filter: not_like)
+     */
+    slot_key_not_like?: string;
+    /**
+     * The storage slot key (filter: in_values) (comma-separated list)
+     */
+    slot_key_in_values?: string;
+    /**
+     * The storage slot key (filter: not_in_values) (comma-separated list)
+     */
+    slot_key_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: eq)
+     */
+    effective_bytes_from_eq?: number;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: ne)
+     */
+    effective_bytes_from_ne?: number;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: lt)
+     */
+    effective_bytes_from_lt?: number;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: lte)
+     */
+    effective_bytes_from_lte?: number;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: gt)
+     */
+    effective_bytes_from_gt?: number;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: gte)
+     */
+    effective_bytes_from_gte?: number;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: between_min)
+     */
+    effective_bytes_from_between_min?: number;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: between_max_value)
+     */
+    effective_bytes_from_between_max_value?: number;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_from_in_values?: string;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_from_not_in_values?: string;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: eq)
+     */
+    effective_bytes_to_eq?: number;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: ne)
+     */
+    effective_bytes_to_ne?: number;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: lt)
+     */
+    effective_bytes_to_lt?: number;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: lte)
+     */
+    effective_bytes_to_lte?: number;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: gt)
+     */
+    effective_bytes_to_gt?: number;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: gte)
+     */
+    effective_bytes_to_gte?: number;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: between_min)
+     */
+    effective_bytes_to_between_min?: number;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: between_max_value)
+     */
+    effective_bytes_to_between_max_value?: number;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_to_in_values?: string;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_to_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_diff to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotDiff` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_diff';
+};
+
+export type IntStorageSlotDiffServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotDiffServiceListError =
+  IntStorageSlotDiffServiceListErrors[keyof IntStorageSlotDiffServiceListErrors];
+
+export type IntStorageSlotDiffServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotDiffResponse;
+};
+
+export type IntStorageSlotDiffServiceListResponse =
+  IntStorageSlotDiffServiceListResponses[keyof IntStorageSlotDiffServiceListResponses];
+
+export type IntStorageSlotDiffServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_diff/{block_number}';
+};
+
+export type IntStorageSlotDiffServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotDiffServiceGetError =
+  IntStorageSlotDiffServiceGetErrors[keyof IntStorageSlotDiffServiceGetErrors];
+
+export type IntStorageSlotDiffServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotDiffResponse;
+};
+
+export type IntStorageSlotDiffServiceGetResponse =
+  IntStorageSlotDiffServiceGetResponses[keyof IntStorageSlotDiffServiceGetResponses];
+
+export type IntStorageSlotDiffByAddressSlotServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The storage slot key (filter: eq)
+     */
+    slot_key_eq?: string;
+    /**
+     * The storage slot key (filter: ne)
+     */
+    slot_key_ne?: string;
+    /**
+     * The storage slot key (filter: contains)
+     */
+    slot_key_contains?: string;
+    /**
+     * The storage slot key (filter: starts_with)
+     */
+    slot_key_starts_with?: string;
+    /**
+     * The storage slot key (filter: ends_with)
+     */
+    slot_key_ends_with?: string;
+    /**
+     * The storage slot key (filter: like)
+     */
+    slot_key_like?: string;
+    /**
+     * The storage slot key (filter: not_like)
+     */
+    slot_key_not_like?: string;
+    /**
+     * The storage slot key (filter: in_values) (comma-separated list)
+     */
+    slot_key_in_values?: string;
+    /**
+     * The storage slot key (filter: not_in_values) (comma-separated list)
+     */
+    slot_key_not_in_values?: string;
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: eq)
+     */
+    effective_bytes_from_eq?: number;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: ne)
+     */
+    effective_bytes_from_ne?: number;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: lt)
+     */
+    effective_bytes_from_lt?: number;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: lte)
+     */
+    effective_bytes_from_lte?: number;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: gt)
+     */
+    effective_bytes_from_gt?: number;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: gte)
+     */
+    effective_bytes_from_gte?: number;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: between_min)
+     */
+    effective_bytes_from_between_min?: number;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: between_max_value)
+     */
+    effective_bytes_from_between_max_value?: number;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_from_in_values?: string;
+    /**
+     * Number of effective bytes in the first from_value of the block (0-32) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_from_not_in_values?: string;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: eq)
+     */
+    effective_bytes_to_eq?: number;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: ne)
+     */
+    effective_bytes_to_ne?: number;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: lt)
+     */
+    effective_bytes_to_lt?: number;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: lte)
+     */
+    effective_bytes_to_lte?: number;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: gt)
+     */
+    effective_bytes_to_gt?: number;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: gte)
+     */
+    effective_bytes_to_gte?: number;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: between_min)
+     */
+    effective_bytes_to_between_min?: number;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: between_max_value)
+     */
+    effective_bytes_to_between_max_value?: number;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_to_in_values?: string;
+    /**
+     * Number of effective bytes in the last to_value of the block (0-32) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_to_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_diff_by_address_slot to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotDiffByAddressSlot` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_diff_by_address_slot';
+};
+
+export type IntStorageSlotDiffByAddressSlotServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotDiffByAddressSlotServiceListError =
+  IntStorageSlotDiffByAddressSlotServiceListErrors[keyof IntStorageSlotDiffByAddressSlotServiceListErrors];
+
+export type IntStorageSlotDiffByAddressSlotServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotDiffByAddressSlotResponse;
+};
+
+export type IntStorageSlotDiffByAddressSlotServiceListResponse =
+  IntStorageSlotDiffByAddressSlotServiceListResponses[keyof IntStorageSlotDiffByAddressSlotServiceListResponses];
+
+export type IntStorageSlotDiffByAddressSlotServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The contract address
+     */
+    address: string;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_diff_by_address_slot/{address}';
+};
+
+export type IntStorageSlotDiffByAddressSlotServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotDiffByAddressSlotServiceGetError =
+  IntStorageSlotDiffByAddressSlotServiceGetErrors[keyof IntStorageSlotDiffByAddressSlotServiceGetErrors];
+
+export type IntStorageSlotDiffByAddressSlotServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotDiffByAddressSlotResponse;
+};
+
+export type IntStorageSlotDiffByAddressSlotServiceGetResponse =
+  IntStorageSlotDiffByAddressSlotServiceGetResponses[keyof IntStorageSlotDiffByAddressSlotServiceGetResponses];
+
+export type IntStorageSlotExpiryBy6mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this slot expiry is recorded (6 months after it was set) (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this slot expiry is recorded (6 months after it was set) (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this slot expiry is recorded (6 months after it was set) (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this slot expiry is recorded (6 months after it was set) (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this slot expiry is recorded (6 months after it was set) (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this slot expiry is recorded (6 months after it was set) (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this slot expiry is recorded (6 months after it was set) (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this slot expiry is recorded (6 months after it was set) (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this slot expiry is recorded (6 months after it was set) (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this slot expiry is recorded (6 months after it was set) (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The storage slot key (filter: eq)
+     */
+    slot_key_eq?: string;
+    /**
+     * The storage slot key (filter: ne)
+     */
+    slot_key_ne?: string;
+    /**
+     * The storage slot key (filter: contains)
+     */
+    slot_key_contains?: string;
+    /**
+     * The storage slot key (filter: starts_with)
+     */
+    slot_key_starts_with?: string;
+    /**
+     * The storage slot key (filter: ends_with)
+     */
+    slot_key_ends_with?: string;
+    /**
+     * The storage slot key (filter: like)
+     */
+    slot_key_like?: string;
+    /**
+     * The storage slot key (filter: not_like)
+     */
+    slot_key_not_like?: string;
+    /**
+     * The storage slot key (filter: in_values) (comma-separated list)
+     */
+    slot_key_in_values?: string;
+    /**
+     * The storage slot key (filter: not_in_values) (comma-separated list)
+     */
+    slot_key_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_expiry_by_6m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotExpiryBy6m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_expiry_by_6m';
+};
+
+export type IntStorageSlotExpiryBy6mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotExpiryBy6mServiceListError =
+  IntStorageSlotExpiryBy6mServiceListErrors[keyof IntStorageSlotExpiryBy6mServiceListErrors];
+
+export type IntStorageSlotExpiryBy6mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotExpiryBy6mResponse;
+};
+
+export type IntStorageSlotExpiryBy6mServiceListResponse =
+  IntStorageSlotExpiryBy6mServiceListResponses[keyof IntStorageSlotExpiryBy6mServiceListResponses];
+
+export type IntStorageSlotExpiryBy6mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this slot expiry is recorded (6 months after it was set)
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_expiry_by_6m/{block_number}';
+};
+
+export type IntStorageSlotExpiryBy6mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotExpiryBy6mServiceGetError =
+  IntStorageSlotExpiryBy6mServiceGetErrors[keyof IntStorageSlotExpiryBy6mServiceGetErrors];
+
+export type IntStorageSlotExpiryBy6mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotExpiryBy6mResponse;
+};
+
+export type IntStorageSlotExpiryBy6mServiceGetResponse =
+  IntStorageSlotExpiryBy6mServiceGetResponses[keyof IntStorageSlotExpiryBy6mServiceGetResponses];
+
+export type IntStorageSlotNextTouchServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this slot was touched (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this slot was touched (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this slot was touched (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this slot was touched (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this slot was touched (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this slot was touched (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this slot was touched (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this slot was touched (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this slot was touched (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this slot was touched (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The storage slot key (filter: eq)
+     */
+    slot_key_eq?: string;
+    /**
+     * The storage slot key (filter: ne)
+     */
+    slot_key_ne?: string;
+    /**
+     * The storage slot key (filter: contains)
+     */
+    slot_key_contains?: string;
+    /**
+     * The storage slot key (filter: starts_with)
+     */
+    slot_key_starts_with?: string;
+    /**
+     * The storage slot key (filter: ends_with)
+     */
+    slot_key_ends_with?: string;
+    /**
+     * The storage slot key (filter: like)
+     */
+    slot_key_like?: string;
+    /**
+     * The storage slot key (filter: not_like)
+     */
+    slot_key_not_like?: string;
+    /**
+     * The storage slot key (filter: in_values) (comma-separated list)
+     */
+    slot_key_in_values?: string;
+    /**
+     * The storage slot key (filter: not_in_values) (comma-separated list)
+     */
+    slot_key_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The next block number where this slot was touched (NULL if no subsequent touch) (filter: eq)
+     */
+    next_touch_block_eq?: number;
+    /**
+     * The next block number where this slot was touched (NULL if no subsequent touch) (filter: ne)
+     */
+    next_touch_block_ne?: number;
+    /**
+     * The next block number where this slot was touched (NULL if no subsequent touch) (filter: lt)
+     */
+    next_touch_block_lt?: number;
+    /**
+     * The next block number where this slot was touched (NULL if no subsequent touch) (filter: lte)
+     */
+    next_touch_block_lte?: number;
+    /**
+     * The next block number where this slot was touched (NULL if no subsequent touch) (filter: gt)
+     */
+    next_touch_block_gt?: number;
+    /**
+     * The next block number where this slot was touched (NULL if no subsequent touch) (filter: gte)
+     */
+    next_touch_block_gte?: number;
+    /**
+     * The next block number where this slot was touched (NULL if no subsequent touch) (filter: between_min)
+     */
+    next_touch_block_between_min?: number;
+    /**
+     * The next block number where this slot was touched (NULL if no subsequent touch) (filter: between_max_value)
+     */
+    next_touch_block_between_max_value?: number;
+    /**
+     * The next block number where this slot was touched (NULL if no subsequent touch) (filter: in_values) (comma-separated list)
+     */
+    next_touch_block_in_values?: string;
+    /**
+     * The next block number where this slot was touched (NULL if no subsequent touch) (filter: not_in_values) (comma-separated list)
+     */
+    next_touch_block_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_next_touch to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotNextTouch` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_next_touch';
+};
+
+export type IntStorageSlotNextTouchServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotNextTouchServiceListError =
+  IntStorageSlotNextTouchServiceListErrors[keyof IntStorageSlotNextTouchServiceListErrors];
+
+export type IntStorageSlotNextTouchServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotNextTouchResponse;
+};
+
+export type IntStorageSlotNextTouchServiceListResponse =
+  IntStorageSlotNextTouchServiceListResponses[keyof IntStorageSlotNextTouchServiceListResponses];
+
+export type IntStorageSlotNextTouchServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this slot was touched
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_next_touch/{block_number}';
+};
+
+export type IntStorageSlotNextTouchServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotNextTouchServiceGetError =
+  IntStorageSlotNextTouchServiceGetErrors[keyof IntStorageSlotNextTouchServiceGetErrors];
+
+export type IntStorageSlotNextTouchServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotNextTouchResponse;
+};
+
+export type IntStorageSlotNextTouchServiceGetResponse =
+  IntStorageSlotNextTouchServiceGetResponses[keyof IntStorageSlotNextTouchServiceGetResponses];
+
+export type IntStorageSlotReactivationBy6mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The storage slot key (filter: eq)
+     */
+    slot_key_eq?: string;
+    /**
+     * The storage slot key (filter: ne)
+     */
+    slot_key_ne?: string;
+    /**
+     * The storage slot key (filter: contains)
+     */
+    slot_key_contains?: string;
+    /**
+     * The storage slot key (filter: starts_with)
+     */
+    slot_key_starts_with?: string;
+    /**
+     * The storage slot key (filter: ends_with)
+     */
+    slot_key_ends_with?: string;
+    /**
+     * The storage slot key (filter: like)
+     */
+    slot_key_like?: string;
+    /**
+     * The storage slot key (filter: not_like)
+     */
+    slot_key_not_like?: string;
+    /**
+     * The storage slot key (filter: in_values) (comma-separated list)
+     */
+    slot_key_in_values?: string;
+    /**
+     * The storage slot key (filter: not_in_values) (comma-separated list)
+     */
+    slot_key_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_reactivation_by_6m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotReactivationBy6m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_reactivation_by_6m';
+};
+
+export type IntStorageSlotReactivationBy6mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotReactivationBy6mServiceListError =
+  IntStorageSlotReactivationBy6mServiceListErrors[keyof IntStorageSlotReactivationBy6mServiceListErrors];
+
+export type IntStorageSlotReactivationBy6mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotReactivationBy6mResponse;
+};
+
+export type IntStorageSlotReactivationBy6mServiceListResponse =
+  IntStorageSlotReactivationBy6mServiceListResponses[keyof IntStorageSlotReactivationBy6mServiceListResponses];
+
+export type IntStorageSlotReactivationBy6mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity)
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_reactivation_by_6m/{block_number}';
+};
+
+export type IntStorageSlotReactivationBy6mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotReactivationBy6mServiceGetError =
+  IntStorageSlotReactivationBy6mServiceGetErrors[keyof IntStorageSlotReactivationBy6mServiceGetErrors];
+
+export type IntStorageSlotReactivationBy6mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotReactivationBy6mResponse;
+};
+
+export type IntStorageSlotReactivationBy6mServiceGetResponse =
+  IntStorageSlotReactivationBy6mServiceGetResponses[keyof IntStorageSlotReactivationBy6mServiceGetResponses];
+
+export type IntStorageSlotReadServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The storage slot key (filter: eq)
+     */
+    slot_key_eq?: string;
+    /**
+     * The storage slot key (filter: ne)
+     */
+    slot_key_ne?: string;
+    /**
+     * The storage slot key (filter: contains)
+     */
+    slot_key_contains?: string;
+    /**
+     * The storage slot key (filter: starts_with)
+     */
+    slot_key_starts_with?: string;
+    /**
+     * The storage slot key (filter: ends_with)
+     */
+    slot_key_ends_with?: string;
+    /**
+     * The storage slot key (filter: like)
+     */
+    slot_key_like?: string;
+    /**
+     * The storage slot key (filter: not_like)
+     */
+    slot_key_not_like?: string;
+    /**
+     * The storage slot key (filter: in_values) (comma-separated list)
+     */
+    slot_key_in_values?: string;
+    /**
+     * The storage slot key (filter: not_in_values) (comma-separated list)
+     */
+    slot_key_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_read to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotRead` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_read';
+};
+
+export type IntStorageSlotReadServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotReadServiceListError =
+  IntStorageSlotReadServiceListErrors[keyof IntStorageSlotReadServiceListErrors];
+
+export type IntStorageSlotReadServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotReadResponse;
+};
+
+export type IntStorageSlotReadServiceListResponse =
+  IntStorageSlotReadServiceListResponses[keyof IntStorageSlotReadServiceListResponses];
+
+export type IntStorageSlotReadServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_read/{block_number}';
+};
+
+export type IntStorageSlotReadServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotReadServiceGetError =
+  IntStorageSlotReadServiceGetErrors[keyof IntStorageSlotReadServiceGetErrors];
+
+export type IntStorageSlotReadServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotReadResponse;
+};
+
+export type IntStorageSlotReadServiceGetResponse =
+  IntStorageSlotReadServiceGetResponses[keyof IntStorageSlotReadServiceGetResponses];

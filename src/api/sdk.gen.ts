@@ -327,6 +327,18 @@ import type {
   FctPreparedBlockServiceListData,
   FctPreparedBlockServiceListErrors,
   FctPreparedBlockServiceListResponses,
+  FctStorageSlotStateServiceGetData,
+  FctStorageSlotStateServiceGetErrors,
+  FctStorageSlotStateServiceGetResponses,
+  FctStorageSlotStateServiceListData,
+  FctStorageSlotStateServiceListErrors,
+  FctStorageSlotStateServiceListResponses,
+  FctStorageSlotStateWithExpiryBy6mServiceGetData,
+  FctStorageSlotStateWithExpiryBy6mServiceGetErrors,
+  FctStorageSlotStateWithExpiryBy6mServiceGetResponses,
+  FctStorageSlotStateWithExpiryBy6mServiceListData,
+  FctStorageSlotStateWithExpiryBy6mServiceListErrors,
+  FctStorageSlotStateWithExpiryBy6mServiceListResponses,
   IntAddressFirstAccessServiceGetData,
   IntAddressFirstAccessServiceGetErrors,
   IntAddressFirstAccessServiceGetResponses,
@@ -417,6 +429,42 @@ import type {
   IntExecutionBlockByDateServiceListData,
   IntExecutionBlockByDateServiceListErrors,
   IntExecutionBlockByDateServiceListResponses,
+  IntStorageSlotDiffByAddressSlotServiceGetData,
+  IntStorageSlotDiffByAddressSlotServiceGetErrors,
+  IntStorageSlotDiffByAddressSlotServiceGetResponses,
+  IntStorageSlotDiffByAddressSlotServiceListData,
+  IntStorageSlotDiffByAddressSlotServiceListErrors,
+  IntStorageSlotDiffByAddressSlotServiceListResponses,
+  IntStorageSlotDiffServiceGetData,
+  IntStorageSlotDiffServiceGetErrors,
+  IntStorageSlotDiffServiceGetResponses,
+  IntStorageSlotDiffServiceListData,
+  IntStorageSlotDiffServiceListErrors,
+  IntStorageSlotDiffServiceListResponses,
+  IntStorageSlotExpiryBy6mServiceGetData,
+  IntStorageSlotExpiryBy6mServiceGetErrors,
+  IntStorageSlotExpiryBy6mServiceGetResponses,
+  IntStorageSlotExpiryBy6mServiceListData,
+  IntStorageSlotExpiryBy6mServiceListErrors,
+  IntStorageSlotExpiryBy6mServiceListResponses,
+  IntStorageSlotNextTouchServiceGetData,
+  IntStorageSlotNextTouchServiceGetErrors,
+  IntStorageSlotNextTouchServiceGetResponses,
+  IntStorageSlotNextTouchServiceListData,
+  IntStorageSlotNextTouchServiceListErrors,
+  IntStorageSlotNextTouchServiceListResponses,
+  IntStorageSlotReactivationBy6mServiceGetData,
+  IntStorageSlotReactivationBy6mServiceGetErrors,
+  IntStorageSlotReactivationBy6mServiceGetResponses,
+  IntStorageSlotReactivationBy6mServiceListData,
+  IntStorageSlotReactivationBy6mServiceListErrors,
+  IntStorageSlotReactivationBy6mServiceListResponses,
+  IntStorageSlotReadServiceGetData,
+  IntStorageSlotReadServiceGetErrors,
+  IntStorageSlotReadServiceGetResponses,
+  IntStorageSlotReadServiceListData,
+  IntStorageSlotReadServiceListErrors,
+  IntStorageSlotReadServiceListResponses,
 } from './types.gen';
 import {
   zAdminCbtIncrementalServiceGetData,
@@ -635,6 +683,14 @@ import {
   zFctPreparedBlockServiceGetResponse,
   zFctPreparedBlockServiceListData,
   zFctPreparedBlockServiceListResponse,
+  zFctStorageSlotStateServiceGetData,
+  zFctStorageSlotStateServiceGetResponse,
+  zFctStorageSlotStateServiceListData,
+  zFctStorageSlotStateServiceListResponse,
+  zFctStorageSlotStateWithExpiryBy6mServiceGetData,
+  zFctStorageSlotStateWithExpiryBy6mServiceGetResponse,
+  zFctStorageSlotStateWithExpiryBy6mServiceListData,
+  zFctStorageSlotStateWithExpiryBy6mServiceListResponse,
   zIntAddressFirstAccessServiceGetData,
   zIntAddressFirstAccessServiceGetResponse,
   zIntAddressFirstAccessServiceListData,
@@ -695,6 +751,30 @@ import {
   zIntExecutionBlockByDateServiceGetResponse,
   zIntExecutionBlockByDateServiceListData,
   zIntExecutionBlockByDateServiceListResponse,
+  zIntStorageSlotDiffByAddressSlotServiceGetData,
+  zIntStorageSlotDiffByAddressSlotServiceGetResponse,
+  zIntStorageSlotDiffByAddressSlotServiceListData,
+  zIntStorageSlotDiffByAddressSlotServiceListResponse,
+  zIntStorageSlotDiffServiceGetData,
+  zIntStorageSlotDiffServiceGetResponse,
+  zIntStorageSlotDiffServiceListData,
+  zIntStorageSlotDiffServiceListResponse,
+  zIntStorageSlotExpiryBy6mServiceGetData,
+  zIntStorageSlotExpiryBy6mServiceGetResponse,
+  zIntStorageSlotExpiryBy6mServiceListData,
+  zIntStorageSlotExpiryBy6mServiceListResponse,
+  zIntStorageSlotNextTouchServiceGetData,
+  zIntStorageSlotNextTouchServiceGetResponse,
+  zIntStorageSlotNextTouchServiceListData,
+  zIntStorageSlotNextTouchServiceListResponse,
+  zIntStorageSlotReactivationBy6mServiceGetData,
+  zIntStorageSlotReactivationBy6mServiceGetResponse,
+  zIntStorageSlotReactivationBy6mServiceListData,
+  zIntStorageSlotReactivationBy6mServiceListResponse,
+  zIntStorageSlotReadServiceGetData,
+  zIntStorageSlotReadServiceGetResponse,
+  zIntStorageSlotReadServiceListData,
+  zIntStorageSlotReadServiceListResponse,
 } from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<
@@ -2858,6 +2938,86 @@ export const fctPreparedBlockServiceGet = <ThrowOnError extends boolean = false>
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctStorageSlotStateServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctStorageSlotStateServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctStorageSlotStateServiceListResponses,
+    FctStorageSlotStateServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctStorageSlotStateServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctStorageSlotStateServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_storage_slot_state',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const fctStorageSlotStateServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctStorageSlotStateServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctStorageSlotStateServiceGetResponses,
+    FctStorageSlotStateServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctStorageSlotStateServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctStorageSlotStateServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_storage_slot_state/{block_number}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctStorageSlotStateWithExpiryBy6mServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctStorageSlotStateWithExpiryBy6mServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctStorageSlotStateWithExpiryBy6mServiceListResponses,
+    FctStorageSlotStateWithExpiryBy6mServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctStorageSlotStateWithExpiryBy6mServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctStorageSlotStateWithExpiryBy6mServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_storage_slot_state_with_expiry_by_6m',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const fctStorageSlotStateWithExpiryBy6mServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctStorageSlotStateWithExpiryBy6mServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctStorageSlotStateWithExpiryBy6mServiceGetResponses,
+    FctStorageSlotStateWithExpiryBy6mServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctStorageSlotStateWithExpiryBy6mServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctStorageSlotStateWithExpiryBy6mServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_storage_slot_state_with_expiry_by_6m/{block_number}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const intAddressFirstAccessServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntAddressFirstAccessServiceListData, ThrowOnError>
 ) => {
@@ -3449,6 +3609,246 @@ export const intExecutionBlockByDateServiceGet = <ThrowOnError extends boolean =
     requestValidator: async data => await zIntExecutionBlockByDateServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntExecutionBlockByDateServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_execution_block_by_date/{block_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intStorageSlotDiffServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntStorageSlotDiffServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntStorageSlotDiffServiceListResponses,
+    IntStorageSlotDiffServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntStorageSlotDiffServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntStorageSlotDiffServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_storage_slot_diff',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intStorageSlotDiffServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntStorageSlotDiffServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntStorageSlotDiffServiceGetResponses,
+    IntStorageSlotDiffServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntStorageSlotDiffServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntStorageSlotDiffServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_storage_slot_diff/{block_number}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intStorageSlotDiffByAddressSlotServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntStorageSlotDiffByAddressSlotServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntStorageSlotDiffByAddressSlotServiceListResponses,
+    IntStorageSlotDiffByAddressSlotServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntStorageSlotDiffByAddressSlotServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntStorageSlotDiffByAddressSlotServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_storage_slot_diff_by_address_slot',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by address
+ */
+export const intStorageSlotDiffByAddressSlotServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntStorageSlotDiffByAddressSlotServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntStorageSlotDiffByAddressSlotServiceGetResponses,
+    IntStorageSlotDiffByAddressSlotServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntStorageSlotDiffByAddressSlotServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntStorageSlotDiffByAddressSlotServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_storage_slot_diff_by_address_slot/{address}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intStorageSlotExpiryBy6mServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntStorageSlotExpiryBy6mServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntStorageSlotExpiryBy6mServiceListResponses,
+    IntStorageSlotExpiryBy6mServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntStorageSlotExpiryBy6mServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntStorageSlotExpiryBy6mServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_storage_slot_expiry_by_6m',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intStorageSlotExpiryBy6mServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntStorageSlotExpiryBy6mServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntStorageSlotExpiryBy6mServiceGetResponses,
+    IntStorageSlotExpiryBy6mServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntStorageSlotExpiryBy6mServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntStorageSlotExpiryBy6mServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_storage_slot_expiry_by_6m/{block_number}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intStorageSlotNextTouchServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntStorageSlotNextTouchServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntStorageSlotNextTouchServiceListResponses,
+    IntStorageSlotNextTouchServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntStorageSlotNextTouchServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntStorageSlotNextTouchServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_storage_slot_next_touch',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intStorageSlotNextTouchServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntStorageSlotNextTouchServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntStorageSlotNextTouchServiceGetResponses,
+    IntStorageSlotNextTouchServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntStorageSlotNextTouchServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntStorageSlotNextTouchServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_storage_slot_next_touch/{block_number}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intStorageSlotReactivationBy6mServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntStorageSlotReactivationBy6mServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntStorageSlotReactivationBy6mServiceListResponses,
+    IntStorageSlotReactivationBy6mServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntStorageSlotReactivationBy6mServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntStorageSlotReactivationBy6mServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_storage_slot_reactivation_by_6m',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intStorageSlotReactivationBy6mServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntStorageSlotReactivationBy6mServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntStorageSlotReactivationBy6mServiceGetResponses,
+    IntStorageSlotReactivationBy6mServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntStorageSlotReactivationBy6mServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntStorageSlotReactivationBy6mServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_storage_slot_reactivation_by_6m/{block_number}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intStorageSlotReadServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntStorageSlotReadServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntStorageSlotReadServiceListResponses,
+    IntStorageSlotReadServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntStorageSlotReadServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntStorageSlotReadServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_storage_slot_read',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intStorageSlotReadServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntStorageSlotReadServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntStorageSlotReadServiceGetResponses,
+    IntStorageSlotReadServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntStorageSlotReadServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntStorageSlotReadServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_storage_slot_read/{block_number}',
     ...options,
   });
 };

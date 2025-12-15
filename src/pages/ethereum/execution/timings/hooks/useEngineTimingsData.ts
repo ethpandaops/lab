@@ -124,8 +124,8 @@ export function useEngineTimingsData({
   // For daily queries, generate date range values (last 7 days)
   const dailyDateValues = getDateRangeValues(7);
 
-  // Build is_reference_node filter if enabled
-  const refNodeFilter = referenceNodesOnly ? { is_reference_node_eq: true } : {};
+  // Build node_class filter if enabled
+  const refNodeFilter = referenceNodesOnly ? { node_class_eq: 'eip7870-block-builder' } : {};
 
   const queries = useQueries({
     queries: [
@@ -198,7 +198,7 @@ export function useEngineTimingsData({
               query: {
                 slot_start_date_time_gte: start,
                 slot_start_date_time_lte: end,
-                order_by: 'observation_count DESC',
+                order_by: 'slot_start_date_time DESC',
                 page_size: 1000,
                 ...refNodeFilter,
               },
@@ -297,7 +297,7 @@ export function useEngineTimingsData({
               query: {
                 slot_start_date_time_gte: start,
                 slot_start_date_time_lte: end,
-                order_by: 'observation_count DESC',
+                order_by: 'slot_start_date_time DESC',
                 page_size: 1000,
                 ...refNodeFilter,
               },
