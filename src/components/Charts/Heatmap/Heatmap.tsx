@@ -49,6 +49,7 @@ export function HeatmapChart({
   yAxisShowOnlyMinMax = false,
   grid,
   emphasisDisabled = true,
+  visualMapText,
 }: HeatmapChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
 
@@ -165,7 +166,7 @@ export function HeatmapChart({
               color: themeColors.foreground,
               fontSize: 12,
             },
-            text: ['4s', '0s'],
+            text: visualMapText ?? ['4s', '0s'],
             itemWidth: 15,
             itemHeight: 100,
           },
