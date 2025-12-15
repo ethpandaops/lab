@@ -55,13 +55,13 @@ export function IndexPage(): JSX.Element {
       totalValues: data.map(item => bytesToGB(item.total_bytes)),
       series: [
         {
-          name: 'Accounts',
+          name: 'Account Trie',
           data: data.map(item => bytesToGB(item.account_trienode_bytes)),
           showArea: true,
           stack: 'total',
         },
         {
-          name: 'Storage Slots',
+          name: 'Storage Tries',
           data: data.map(item => bytesToGB(item.storage_trienode_bytes)),
           showArea: true,
           stack: 'total',
@@ -208,11 +208,11 @@ export function IndexPage(): JSX.Element {
               </div>
             </div>
 
-            {/* Metric Cards: Accounts, Storage Slots, Contract Codes */}
+            {/* Metric Cards: Account Trie, Storage Tries, Contract Codes */}
             <div className="grid min-w-0 flex-1 grid-cols-1 gap-4 sm:grid-cols-3">
-              {/* Accounts */}
+              {/* Account Trie */}
               <Card rounded className="p-3">
-                <p className="text-xs font-medium tracking-wider text-muted uppercase">Accounts</p>
+                <p className="text-xs font-medium tracking-wider text-muted uppercase">Account Trie</p>
                 <p className="mt-0.5 text-2xl font-bold text-foreground tabular-nums">
                   {formatBytes(latestData.account_trienode_bytes)}
                 </p>
@@ -242,9 +242,9 @@ export function IndexPage(): JSX.Element {
                 </p>
               </Card>
 
-              {/* Storage Slots */}
+              {/* Storage Tries */}
               <Card rounded className="p-3">
-                <p className="text-xs font-medium tracking-wider text-muted uppercase">Storage Slots</p>
+                <p className="text-xs font-medium tracking-wider text-muted uppercase">Storage Tries</p>
                 <p className="mt-0.5 text-2xl font-bold text-foreground tabular-nums">
                   {formatBytes(latestData.storage_trienode_bytes)}
                 </p>
