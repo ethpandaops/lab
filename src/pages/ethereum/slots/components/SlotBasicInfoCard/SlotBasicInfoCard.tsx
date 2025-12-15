@@ -19,9 +19,11 @@ import type { ForkVersion } from '@/utils/beacon';
  * Displays basic information about a slot in a card layout.
  * Shows key metrics like slot number, epoch, proposer, status, block root, etc.
  */
-export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps): JSX.Element {
+export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: SlotBasicInfoCardProps): JSX.Element {
   const { currentNetwork } = useNetwork();
-  const blockHead = data.blockHead[0];
+  // Use canonical block head if available, otherwise fall back to orphaned block data
+  // Will be undefined for missed slots
+  const blockHead = data.blockHead[0] ?? data.block[0];
   const blockProposer = data.blockProposer[0];
   const blockMev = data.blockMev[0];
   const blobCount = data.blobCount[0];
@@ -39,7 +41,18 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
   const wasBlockSeen = !!blockHead;
 
   // Determine slot status from proposer data (which has canonical/orphaned/missed status)
+  // or from the isOrphaned/isMissedSlot flags
   const getSlotStatus = (): { label: string; color: 'green' | 'red' | 'yellow' } => {
+    // Check isMissedSlot prop first (no block data at all)
+    if (isMissedSlot) {
+      return { label: 'Missed', color: 'red' };
+    }
+
+    // Check isOrphaned flag (set when we have block data but no canonical blockHead)
+    if (data.isOrphaned) {
+      return { label: 'Orphaned', color: 'yellow' };
+    }
+
     const statusValue = blockProposer?.status?.toLowerCase();
 
     if (statusValue === 'canonical') {

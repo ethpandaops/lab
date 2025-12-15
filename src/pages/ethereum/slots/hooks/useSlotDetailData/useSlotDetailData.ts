@@ -1,6 +1,7 @@
 import { useQueries } from '@tanstack/react-query';
 import {
   fctBlockHeadServiceListOptions,
+  fctBlockServiceListOptions,
   fctBlockProposerServiceListOptions,
   fctBlockMevServiceListOptions,
   fctBlockBlobCountServiceListOptions,
@@ -21,6 +22,7 @@ import {
 import { useNetwork } from '@/hooks/useNetwork';
 import { slotToTimestamp, getForkForSlot } from '@/utils/beacon';
 import type {
+  FctBlock,
   FctBlockHead,
   FctBlockProposer,
   FctBlockMev,
@@ -47,6 +49,10 @@ export interface MissedAttestationEntity {
 
 export interface SlotDetailData {
   blockHead: FctBlockHead[];
+  /** All blocks for the slot (including orphaned/reorged blocks) */
+  block: FctBlock[];
+  /** Whether this slot data is for an orphaned (reorged) block */
+  isOrphaned: boolean;
   blockProposer: FctBlockProposer[];
   blockMev: FctBlockMev[];
   blobCount: FctBlockBlobCount[];
@@ -108,9 +114,18 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
 
   const queries = useQueries({
     queries: [
-      // Block head data
+      // Block head data (canonical blocks only)
       {
         ...fctBlockHeadServiceListOptions({
+          query: {
+            slot_start_date_time_eq: slotTimestamp,
+          },
+        }),
+        enabled: !!currentNetwork && slotTimestamp > 0,
+      },
+      // All block data (including orphaned/reorged blocks)
+      {
+        ...fctBlockServiceListOptions({
           query: {
             slot_start_date_time_eq: slotTimestamp,
           },
@@ -301,7 +316,7 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
 
   // Process attestation liveness data to get top 10 missed attestations
   const attestationLivenessData: FctAttestationLivenessByEntityHead[] =
-    queries[16].data?.fct_attestation_liveness_by_entity_head ?? [];
+    queries[17].data?.fct_attestation_liveness_by_entity_head ?? [];
 
   // Sort by missed_count and get top 10
   const missedAttestations: MissedAttestationEntity[] = attestationLivenessData
@@ -313,27 +328,59 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
       count: record.missed_count ?? 0,
     }));
 
+  // Get block data from both sources
+  const blockHeadData = queries[0].data?.fct_block_head ?? [];
+  const allBlockData = queries[1].data?.fct_block ?? [];
+
+  // Determine if this is an orphaned block:
+  // - No canonical block head exists, but we have block data from the all-blocks table
+  // - Or we have block data with status "orphaned"
+  const isOrphaned =
+    blockHeadData.length === 0 && allBlockData.length > 0 && allBlockData.some(b => b.status === 'orphaned');
+
   // Combine all data
+  // Query indices (0-indexed):
+  // 0: fct_block_head (canonical)
+  // 1: fct_block (all blocks including orphaned)
+  // 2: fct_block_proposer
+  // 3: fct_block_mev
+  // 4: fct_block_blob_count
+  // 5: fct_block_first_seen_by_node
+  // 6: fct_block_blob_first_seen_by_node (pre-Fulu)
+  // 7: fct_block_data_column_sidecar_first_seen_by_node (Fulu+)
+  // 8: fct_attestation_first_seen_chunked_50ms
+  // 9: fct_attestation_correctness_head
+  // 10: int_attestation_attested_head
+  // 11: fct_mev_bid_highest_value_by_builder_chunked_50ms
+  // 12: int_beacon_committee_head
+  // 13: fct_prepared_block
+  // 14: fct_mev_bid_count_by_relay
+  // 15: fct_mev_bid_count_by_builder
+  // 16: fct_block_proposer_entity
+  // 17: fct_attestation_liveness_by_entity_head
+  // 18: fct_block_head (voted-for blocks)
   const data: SlotDetailData = {
-    blockHead: queries[0].data?.fct_block_head ?? [],
-    blockProposer: queries[1].data?.fct_block_proposer ?? [],
-    blockMev: queries[2].data?.fct_block_mev ?? [],
-    blobCount: queries[3].data?.fct_block_blob_count ?? [],
-    blockPropagation: queries[4].data?.fct_block_first_seen_by_node ?? [],
-    blobPropagation: queries[5].data?.fct_block_blob_first_seen_by_node ?? [],
-    dataColumnPropagation: queries[6].data?.fct_block_data_column_sidecar_first_seen_by_node ?? [],
-    attestations: queries[7].data?.fct_attestation_first_seen_chunked_50ms ?? [],
-    attestationCorrectness: queries[8].data?.fct_attestation_correctness_head ?? [],
-    attestationAttested: queries[9].data?.int_attestation_attested_head ?? [],
+    blockHead: blockHeadData,
+    block: allBlockData,
+    isOrphaned,
+    blockProposer: queries[2].data?.fct_block_proposer ?? [],
+    blockMev: queries[3].data?.fct_block_mev ?? [],
+    blobCount: queries[4].data?.fct_block_blob_count ?? [],
+    blockPropagation: queries[5].data?.fct_block_first_seen_by_node ?? [],
+    blobPropagation: queries[6].data?.fct_block_blob_first_seen_by_node ?? [],
+    dataColumnPropagation: queries[7].data?.fct_block_data_column_sidecar_first_seen_by_node ?? [],
+    attestations: queries[8].data?.fct_attestation_first_seen_chunked_50ms ?? [],
+    attestationCorrectness: queries[9].data?.fct_attestation_correctness_head ?? [],
+    attestationAttested: queries[10].data?.int_attestation_attested_head ?? [],
     attestationLiveness: attestationLivenessData,
     missedAttestations,
-    mevBidding: queries[10].data?.fct_mev_bid_highest_value_by_builder_chunked_50ms ?? [],
-    committees: queries[11].data?.int_beacon_committee_head ?? [],
-    preparedBlocks: queries[12].data?.fct_prepared_block ?? [],
-    relayBids: queries[13].data?.fct_mev_bid_count_by_relay ?? [],
-    builderBids: queries[14].data?.fct_mev_bid_count_by_builder ?? [],
-    proposerEntity: queries[15].data?.fct_block_proposer_entity ?? [],
-    votedForBlocks: queries[17].data?.fct_block_head ?? [],
+    mevBidding: queries[11].data?.fct_mev_bid_highest_value_by_builder_chunked_50ms ?? [],
+    committees: queries[12].data?.int_beacon_committee_head ?? [],
+    preparedBlocks: queries[13].data?.fct_prepared_block ?? [],
+    relayBids: queries[14].data?.fct_mev_bid_count_by_relay ?? [],
+    builderBids: queries[15].data?.fct_mev_bid_count_by_builder ?? [],
+    proposerEntity: queries[16].data?.fct_block_proposer_entity ?? [],
+    votedForBlocks: queries[18].data?.fct_block_head ?? [],
   };
 
   // Extract raw API data for SlotProgressTimeline (arrays -> first element)
