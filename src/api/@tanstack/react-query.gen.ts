@@ -6,12 +6,8 @@ import { client } from '../client.gen';
 import {
   adminCbtIncrementalServiceGet,
   adminCbtIncrementalServiceList,
-  adminCbtScheduledServiceGet,
-  adminCbtScheduledServiceList,
   dimBlockBlobSubmitterServiceGet,
   dimBlockBlobSubmitterServiceList,
-  dimBlockCanonicalServiceGet,
-  dimBlockCanonicalServiceList,
   dimNodeServiceGet,
   dimNodeServiceList,
   fctAddressAccessChunked10000ServiceGet,
@@ -48,6 +44,8 @@ import {
   fctBlockBlobFirstSeenByNodeServiceList,
   fctBlockDataColumnSidecarFirstSeenByNodeServiceGet,
   fctBlockDataColumnSidecarFirstSeenByNodeServiceList,
+  fctBlockDataColumnSidecarFirstSeenServiceGet,
+  fctBlockDataColumnSidecarFirstSeenServiceList,
   fctBlockFirstSeenByNodeServiceGet,
   fctBlockFirstSeenByNodeServiceList,
   fctBlockHeadServiceGet,
@@ -74,6 +72,14 @@ import {
   fctDataColumnAvailabilityDailyServiceList,
   fctDataColumnAvailabilityHourlyServiceGet,
   fctDataColumnAvailabilityHourlyServiceList,
+  fctExecutionStateSizeDailyServiceGet,
+  fctExecutionStateSizeDailyServiceList,
+  fctExecutionStateSizeHourlyServiceGet,
+  fctExecutionStateSizeHourlyServiceList,
+  fctExecutionStateSizeMonthlyServiceGet,
+  fctExecutionStateSizeMonthlyServiceList,
+  fctExecutionStateSizeWeeklyServiceGet,
+  fctExecutionStateSizeWeeklyServiceList,
   fctHeadFirstSeenByNodeServiceGet,
   fctHeadFirstSeenByNodeServiceList,
   fctMevBidCountByBuilderServiceGet,
@@ -86,6 +92,10 @@ import {
   fctNodeActiveLast24hServiceList,
   fctPreparedBlockServiceGet,
   fctPreparedBlockServiceList,
+  fctStorageSlotStateServiceGet,
+  fctStorageSlotStateServiceList,
+  fctStorageSlotStateWithExpiryBy6mServiceGet,
+  fctStorageSlotStateWithExpiryBy6mServiceList,
   intAddressFirstAccessServiceGet,
   intAddressFirstAccessServiceList,
   intAddressLastAccessServiceGet,
@@ -114,6 +124,20 @@ import {
   intCustodyProbeOrderBySlotServiceList,
   intCustodyProbeServiceGet,
   intCustodyProbeServiceList,
+  intExecutionBlockByDateServiceGet,
+  intExecutionBlockByDateServiceList,
+  intStorageSlotDiffByAddressSlotServiceGet,
+  intStorageSlotDiffByAddressSlotServiceList,
+  intStorageSlotDiffServiceGet,
+  intStorageSlotDiffServiceList,
+  intStorageSlotExpiryBy6mServiceGet,
+  intStorageSlotExpiryBy6mServiceList,
+  intStorageSlotNextTouchServiceGet,
+  intStorageSlotNextTouchServiceList,
+  intStorageSlotReactivationBy6mServiceGet,
+  intStorageSlotReactivationBy6mServiceList,
+  intStorageSlotReadServiceGet,
+  intStorageSlotReadServiceList,
   type Options,
 } from '../sdk.gen';
 import type {
@@ -123,24 +147,12 @@ import type {
   AdminCbtIncrementalServiceListData,
   AdminCbtIncrementalServiceListError,
   AdminCbtIncrementalServiceListResponse,
-  AdminCbtScheduledServiceGetData,
-  AdminCbtScheduledServiceGetError,
-  AdminCbtScheduledServiceGetResponse,
-  AdminCbtScheduledServiceListData,
-  AdminCbtScheduledServiceListError,
-  AdminCbtScheduledServiceListResponse,
   DimBlockBlobSubmitterServiceGetData,
   DimBlockBlobSubmitterServiceGetError,
   DimBlockBlobSubmitterServiceGetResponse,
   DimBlockBlobSubmitterServiceListData,
   DimBlockBlobSubmitterServiceListError,
   DimBlockBlobSubmitterServiceListResponse,
-  DimBlockCanonicalServiceGetData,
-  DimBlockCanonicalServiceGetError,
-  DimBlockCanonicalServiceGetResponse,
-  DimBlockCanonicalServiceListData,
-  DimBlockCanonicalServiceListError,
-  DimBlockCanonicalServiceListResponse,
   DimNodeServiceGetData,
   DimNodeServiceGetError,
   DimNodeServiceGetResponse,
@@ -249,6 +261,12 @@ import type {
   FctBlockDataColumnSidecarFirstSeenByNodeServiceListData,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceListError,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponse,
+  FctBlockDataColumnSidecarFirstSeenServiceGetData,
+  FctBlockDataColumnSidecarFirstSeenServiceGetError,
+  FctBlockDataColumnSidecarFirstSeenServiceGetResponse,
+  FctBlockDataColumnSidecarFirstSeenServiceListData,
+  FctBlockDataColumnSidecarFirstSeenServiceListError,
+  FctBlockDataColumnSidecarFirstSeenServiceListResponse,
   FctBlockFirstSeenByNodeServiceGetData,
   FctBlockFirstSeenByNodeServiceGetError,
   FctBlockFirstSeenByNodeServiceGetResponse,
@@ -327,6 +345,30 @@ import type {
   FctDataColumnAvailabilityHourlyServiceListData,
   FctDataColumnAvailabilityHourlyServiceListError,
   FctDataColumnAvailabilityHourlyServiceListResponse,
+  FctExecutionStateSizeDailyServiceGetData,
+  FctExecutionStateSizeDailyServiceGetError,
+  FctExecutionStateSizeDailyServiceGetResponse,
+  FctExecutionStateSizeDailyServiceListData,
+  FctExecutionStateSizeDailyServiceListError,
+  FctExecutionStateSizeDailyServiceListResponse,
+  FctExecutionStateSizeHourlyServiceGetData,
+  FctExecutionStateSizeHourlyServiceGetError,
+  FctExecutionStateSizeHourlyServiceGetResponse,
+  FctExecutionStateSizeHourlyServiceListData,
+  FctExecutionStateSizeHourlyServiceListError,
+  FctExecutionStateSizeHourlyServiceListResponse,
+  FctExecutionStateSizeMonthlyServiceGetData,
+  FctExecutionStateSizeMonthlyServiceGetError,
+  FctExecutionStateSizeMonthlyServiceGetResponse,
+  FctExecutionStateSizeMonthlyServiceListData,
+  FctExecutionStateSizeMonthlyServiceListError,
+  FctExecutionStateSizeMonthlyServiceListResponse,
+  FctExecutionStateSizeWeeklyServiceGetData,
+  FctExecutionStateSizeWeeklyServiceGetError,
+  FctExecutionStateSizeWeeklyServiceGetResponse,
+  FctExecutionStateSizeWeeklyServiceListData,
+  FctExecutionStateSizeWeeklyServiceListError,
+  FctExecutionStateSizeWeeklyServiceListResponse,
   FctHeadFirstSeenByNodeServiceGetData,
   FctHeadFirstSeenByNodeServiceGetError,
   FctHeadFirstSeenByNodeServiceGetResponse,
@@ -363,6 +405,18 @@ import type {
   FctPreparedBlockServiceListData,
   FctPreparedBlockServiceListError,
   FctPreparedBlockServiceListResponse,
+  FctStorageSlotStateServiceGetData,
+  FctStorageSlotStateServiceGetError,
+  FctStorageSlotStateServiceGetResponse,
+  FctStorageSlotStateServiceListData,
+  FctStorageSlotStateServiceListError,
+  FctStorageSlotStateServiceListResponse,
+  FctStorageSlotStateWithExpiryBy6mServiceGetData,
+  FctStorageSlotStateWithExpiryBy6mServiceGetError,
+  FctStorageSlotStateWithExpiryBy6mServiceGetResponse,
+  FctStorageSlotStateWithExpiryBy6mServiceListData,
+  FctStorageSlotStateWithExpiryBy6mServiceListError,
+  FctStorageSlotStateWithExpiryBy6mServiceListResponse,
   IntAddressFirstAccessServiceGetData,
   IntAddressFirstAccessServiceGetError,
   IntAddressFirstAccessServiceGetResponse,
@@ -447,6 +501,48 @@ import type {
   IntCustodyProbeServiceListData,
   IntCustodyProbeServiceListError,
   IntCustodyProbeServiceListResponse,
+  IntExecutionBlockByDateServiceGetData,
+  IntExecutionBlockByDateServiceGetError,
+  IntExecutionBlockByDateServiceGetResponse,
+  IntExecutionBlockByDateServiceListData,
+  IntExecutionBlockByDateServiceListError,
+  IntExecutionBlockByDateServiceListResponse,
+  IntStorageSlotDiffByAddressSlotServiceGetData,
+  IntStorageSlotDiffByAddressSlotServiceGetError,
+  IntStorageSlotDiffByAddressSlotServiceGetResponse,
+  IntStorageSlotDiffByAddressSlotServiceListData,
+  IntStorageSlotDiffByAddressSlotServiceListError,
+  IntStorageSlotDiffByAddressSlotServiceListResponse,
+  IntStorageSlotDiffServiceGetData,
+  IntStorageSlotDiffServiceGetError,
+  IntStorageSlotDiffServiceGetResponse,
+  IntStorageSlotDiffServiceListData,
+  IntStorageSlotDiffServiceListError,
+  IntStorageSlotDiffServiceListResponse,
+  IntStorageSlotExpiryBy6mServiceGetData,
+  IntStorageSlotExpiryBy6mServiceGetError,
+  IntStorageSlotExpiryBy6mServiceGetResponse,
+  IntStorageSlotExpiryBy6mServiceListData,
+  IntStorageSlotExpiryBy6mServiceListError,
+  IntStorageSlotExpiryBy6mServiceListResponse,
+  IntStorageSlotNextTouchServiceGetData,
+  IntStorageSlotNextTouchServiceGetError,
+  IntStorageSlotNextTouchServiceGetResponse,
+  IntStorageSlotNextTouchServiceListData,
+  IntStorageSlotNextTouchServiceListError,
+  IntStorageSlotNextTouchServiceListResponse,
+  IntStorageSlotReactivationBy6mServiceGetData,
+  IntStorageSlotReactivationBy6mServiceGetError,
+  IntStorageSlotReactivationBy6mServiceGetResponse,
+  IntStorageSlotReactivationBy6mServiceListData,
+  IntStorageSlotReactivationBy6mServiceListError,
+  IntStorageSlotReactivationBy6mServiceListResponse,
+  IntStorageSlotReadServiceGetData,
+  IntStorageSlotReadServiceGetError,
+  IntStorageSlotReadServiceGetResponse,
+  IntStorageSlotReadServiceListData,
+  IntStorageSlotReadServiceListError,
+  IntStorageSlotReadServiceListResponse,
 } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
@@ -542,60 +638,6 @@ export const adminCbtIncrementalServiceGetOptions = (options: Options<AdminCbtIn
     queryKey: adminCbtIncrementalServiceGetQueryKey(options),
   });
 
-export const adminCbtScheduledServiceListQueryKey = (options?: Options<AdminCbtScheduledServiceListData>) =>
-  createQueryKey('adminCbtScheduledServiceList', options);
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const adminCbtScheduledServiceListOptions = (options?: Options<AdminCbtScheduledServiceListData>) =>
-  queryOptions<
-    AdminCbtScheduledServiceListResponse,
-    AdminCbtScheduledServiceListError,
-    AdminCbtScheduledServiceListResponse,
-    ReturnType<typeof adminCbtScheduledServiceListQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await adminCbtScheduledServiceList({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: adminCbtScheduledServiceListQueryKey(options),
-  });
-
-export const adminCbtScheduledServiceGetQueryKey = (options: Options<AdminCbtScheduledServiceGetData>) =>
-  createQueryKey('adminCbtScheduledServiceGet', options);
-
-/**
- * Get record
- *
- * Retrieve a single record by database
- */
-export const adminCbtScheduledServiceGetOptions = (options: Options<AdminCbtScheduledServiceGetData>) =>
-  queryOptions<
-    AdminCbtScheduledServiceGetResponse,
-    AdminCbtScheduledServiceGetError,
-    AdminCbtScheduledServiceGetResponse,
-    ReturnType<typeof adminCbtScheduledServiceGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await adminCbtScheduledServiceGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: adminCbtScheduledServiceGetQueryKey(options),
-  });
-
 export const dimBlockBlobSubmitterServiceListQueryKey = (options?: Options<DimBlockBlobSubmitterServiceListData>) =>
   createQueryKey('dimBlockBlobSubmitterServiceList', options);
 
@@ -648,60 +690,6 @@ export const dimBlockBlobSubmitterServiceGetOptions = (options: Options<DimBlock
       return data;
     },
     queryKey: dimBlockBlobSubmitterServiceGetQueryKey(options),
-  });
-
-export const dimBlockCanonicalServiceListQueryKey = (options?: Options<DimBlockCanonicalServiceListData>) =>
-  createQueryKey('dimBlockCanonicalServiceList', options);
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const dimBlockCanonicalServiceListOptions = (options?: Options<DimBlockCanonicalServiceListData>) =>
-  queryOptions<
-    DimBlockCanonicalServiceListResponse,
-    DimBlockCanonicalServiceListError,
-    DimBlockCanonicalServiceListResponse,
-    ReturnType<typeof dimBlockCanonicalServiceListQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await dimBlockCanonicalServiceList({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: dimBlockCanonicalServiceListQueryKey(options),
-  });
-
-export const dimBlockCanonicalServiceGetQueryKey = (options: Options<DimBlockCanonicalServiceGetData>) =>
-  createQueryKey('dimBlockCanonicalServiceGet', options);
-
-/**
- * Get record
- *
- * Retrieve a single record by block_number
- */
-export const dimBlockCanonicalServiceGetOptions = (options: Options<DimBlockCanonicalServiceGetData>) =>
-  queryOptions<
-    DimBlockCanonicalServiceGetResponse,
-    DimBlockCanonicalServiceGetError,
-    DimBlockCanonicalServiceGetResponse,
-    ReturnType<typeof dimBlockCanonicalServiceGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await dimBlockCanonicalServiceGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: dimBlockCanonicalServiceGetQueryKey(options),
   });
 
 export const dimNodeServiceListQueryKey = (options?: Options<DimNodeServiceListData>) =>
@@ -1754,6 +1742,66 @@ export const fctBlockBlobFirstSeenByNodeServiceGetOptions = (
     queryKey: fctBlockBlobFirstSeenByNodeServiceGetQueryKey(options),
   });
 
+export const fctBlockDataColumnSidecarFirstSeenServiceListQueryKey = (
+  options?: Options<FctBlockDataColumnSidecarFirstSeenServiceListData>
+) => createQueryKey('fctBlockDataColumnSidecarFirstSeenServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockDataColumnSidecarFirstSeenServiceListOptions = (
+  options?: Options<FctBlockDataColumnSidecarFirstSeenServiceListData>
+) =>
+  queryOptions<
+    FctBlockDataColumnSidecarFirstSeenServiceListResponse,
+    FctBlockDataColumnSidecarFirstSeenServiceListError,
+    FctBlockDataColumnSidecarFirstSeenServiceListResponse,
+    ReturnType<typeof fctBlockDataColumnSidecarFirstSeenServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockDataColumnSidecarFirstSeenServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockDataColumnSidecarFirstSeenServiceListQueryKey(options),
+  });
+
+export const fctBlockDataColumnSidecarFirstSeenServiceGetQueryKey = (
+  options: Options<FctBlockDataColumnSidecarFirstSeenServiceGetData>
+) => createQueryKey('fctBlockDataColumnSidecarFirstSeenServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockDataColumnSidecarFirstSeenServiceGetOptions = (
+  options: Options<FctBlockDataColumnSidecarFirstSeenServiceGetData>
+) =>
+  queryOptions<
+    FctBlockDataColumnSidecarFirstSeenServiceGetResponse,
+    FctBlockDataColumnSidecarFirstSeenServiceGetError,
+    FctBlockDataColumnSidecarFirstSeenServiceGetResponse,
+    ReturnType<typeof fctBlockDataColumnSidecarFirstSeenServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockDataColumnSidecarFirstSeenServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockDataColumnSidecarFirstSeenServiceGetQueryKey(options),
+  });
+
 export const fctBlockDataColumnSidecarFirstSeenByNodeServiceListQueryKey = (
   options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceListData>
 ) => createQueryKey('fctBlockDataColumnSidecarFirstSeenByNodeServiceList', options);
@@ -2492,6 +2540,246 @@ export const fctDataColumnAvailabilityHourlyServiceGetOptions = (
     queryKey: fctDataColumnAvailabilityHourlyServiceGetQueryKey(options),
   });
 
+export const fctExecutionStateSizeDailyServiceListQueryKey = (
+  options?: Options<FctExecutionStateSizeDailyServiceListData>
+) => createQueryKey('fctExecutionStateSizeDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctExecutionStateSizeDailyServiceListOptions = (
+  options?: Options<FctExecutionStateSizeDailyServiceListData>
+) =>
+  queryOptions<
+    FctExecutionStateSizeDailyServiceListResponse,
+    FctExecutionStateSizeDailyServiceListError,
+    FctExecutionStateSizeDailyServiceListResponse,
+    ReturnType<typeof fctExecutionStateSizeDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctExecutionStateSizeDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctExecutionStateSizeDailyServiceListQueryKey(options),
+  });
+
+export const fctExecutionStateSizeDailyServiceGetQueryKey = (
+  options: Options<FctExecutionStateSizeDailyServiceGetData>
+) => createQueryKey('fctExecutionStateSizeDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctExecutionStateSizeDailyServiceGetOptions = (
+  options: Options<FctExecutionStateSizeDailyServiceGetData>
+) =>
+  queryOptions<
+    FctExecutionStateSizeDailyServiceGetResponse,
+    FctExecutionStateSizeDailyServiceGetError,
+    FctExecutionStateSizeDailyServiceGetResponse,
+    ReturnType<typeof fctExecutionStateSizeDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctExecutionStateSizeDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctExecutionStateSizeDailyServiceGetQueryKey(options),
+  });
+
+export const fctExecutionStateSizeHourlyServiceListQueryKey = (
+  options?: Options<FctExecutionStateSizeHourlyServiceListData>
+) => createQueryKey('fctExecutionStateSizeHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctExecutionStateSizeHourlyServiceListOptions = (
+  options?: Options<FctExecutionStateSizeHourlyServiceListData>
+) =>
+  queryOptions<
+    FctExecutionStateSizeHourlyServiceListResponse,
+    FctExecutionStateSizeHourlyServiceListError,
+    FctExecutionStateSizeHourlyServiceListResponse,
+    ReturnType<typeof fctExecutionStateSizeHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctExecutionStateSizeHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctExecutionStateSizeHourlyServiceListQueryKey(options),
+  });
+
+export const fctExecutionStateSizeHourlyServiceGetQueryKey = (
+  options: Options<FctExecutionStateSizeHourlyServiceGetData>
+) => createQueryKey('fctExecutionStateSizeHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctExecutionStateSizeHourlyServiceGetOptions = (
+  options: Options<FctExecutionStateSizeHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctExecutionStateSizeHourlyServiceGetResponse,
+    FctExecutionStateSizeHourlyServiceGetError,
+    FctExecutionStateSizeHourlyServiceGetResponse,
+    ReturnType<typeof fctExecutionStateSizeHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctExecutionStateSizeHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctExecutionStateSizeHourlyServiceGetQueryKey(options),
+  });
+
+export const fctExecutionStateSizeMonthlyServiceListQueryKey = (
+  options?: Options<FctExecutionStateSizeMonthlyServiceListData>
+) => createQueryKey('fctExecutionStateSizeMonthlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctExecutionStateSizeMonthlyServiceListOptions = (
+  options?: Options<FctExecutionStateSizeMonthlyServiceListData>
+) =>
+  queryOptions<
+    FctExecutionStateSizeMonthlyServiceListResponse,
+    FctExecutionStateSizeMonthlyServiceListError,
+    FctExecutionStateSizeMonthlyServiceListResponse,
+    ReturnType<typeof fctExecutionStateSizeMonthlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctExecutionStateSizeMonthlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctExecutionStateSizeMonthlyServiceListQueryKey(options),
+  });
+
+export const fctExecutionStateSizeMonthlyServiceGetQueryKey = (
+  options: Options<FctExecutionStateSizeMonthlyServiceGetData>
+) => createQueryKey('fctExecutionStateSizeMonthlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by month_start_date
+ */
+export const fctExecutionStateSizeMonthlyServiceGetOptions = (
+  options: Options<FctExecutionStateSizeMonthlyServiceGetData>
+) =>
+  queryOptions<
+    FctExecutionStateSizeMonthlyServiceGetResponse,
+    FctExecutionStateSizeMonthlyServiceGetError,
+    FctExecutionStateSizeMonthlyServiceGetResponse,
+    ReturnType<typeof fctExecutionStateSizeMonthlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctExecutionStateSizeMonthlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctExecutionStateSizeMonthlyServiceGetQueryKey(options),
+  });
+
+export const fctExecutionStateSizeWeeklyServiceListQueryKey = (
+  options?: Options<FctExecutionStateSizeWeeklyServiceListData>
+) => createQueryKey('fctExecutionStateSizeWeeklyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctExecutionStateSizeWeeklyServiceListOptions = (
+  options?: Options<FctExecutionStateSizeWeeklyServiceListData>
+) =>
+  queryOptions<
+    FctExecutionStateSizeWeeklyServiceListResponse,
+    FctExecutionStateSizeWeeklyServiceListError,
+    FctExecutionStateSizeWeeklyServiceListResponse,
+    ReturnType<typeof fctExecutionStateSizeWeeklyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctExecutionStateSizeWeeklyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctExecutionStateSizeWeeklyServiceListQueryKey(options),
+  });
+
+export const fctExecutionStateSizeWeeklyServiceGetQueryKey = (
+  options: Options<FctExecutionStateSizeWeeklyServiceGetData>
+) => createQueryKey('fctExecutionStateSizeWeeklyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctExecutionStateSizeWeeklyServiceGetOptions = (
+  options: Options<FctExecutionStateSizeWeeklyServiceGetData>
+) =>
+  queryOptions<
+    FctExecutionStateSizeWeeklyServiceGetResponse,
+    FctExecutionStateSizeWeeklyServiceGetError,
+    FctExecutionStateSizeWeeklyServiceGetResponse,
+    ReturnType<typeof fctExecutionStateSizeWeeklyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctExecutionStateSizeWeeklyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctExecutionStateSizeWeeklyServiceGetQueryKey(options),
+  });
+
 export const fctHeadFirstSeenByNodeServiceListQueryKey = (options?: Options<FctHeadFirstSeenByNodeServiceListData>) =>
   createQueryKey('fctHeadFirstSeenByNodeServiceList', options);
 
@@ -2820,6 +3108,120 @@ export const fctPreparedBlockServiceGetOptions = (options: Options<FctPreparedBl
       return data;
     },
     queryKey: fctPreparedBlockServiceGetQueryKey(options),
+  });
+
+export const fctStorageSlotStateServiceListQueryKey = (options?: Options<FctStorageSlotStateServiceListData>) =>
+  createQueryKey('fctStorageSlotStateServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctStorageSlotStateServiceListOptions = (options?: Options<FctStorageSlotStateServiceListData>) =>
+  queryOptions<
+    FctStorageSlotStateServiceListResponse,
+    FctStorageSlotStateServiceListError,
+    FctStorageSlotStateServiceListResponse,
+    ReturnType<typeof fctStorageSlotStateServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctStorageSlotStateServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctStorageSlotStateServiceListQueryKey(options),
+  });
+
+export const fctStorageSlotStateServiceGetQueryKey = (options: Options<FctStorageSlotStateServiceGetData>) =>
+  createQueryKey('fctStorageSlotStateServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const fctStorageSlotStateServiceGetOptions = (options: Options<FctStorageSlotStateServiceGetData>) =>
+  queryOptions<
+    FctStorageSlotStateServiceGetResponse,
+    FctStorageSlotStateServiceGetError,
+    FctStorageSlotStateServiceGetResponse,
+    ReturnType<typeof fctStorageSlotStateServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctStorageSlotStateServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctStorageSlotStateServiceGetQueryKey(options),
+  });
+
+export const fctStorageSlotStateWithExpiryBy6mServiceListQueryKey = (
+  options?: Options<FctStorageSlotStateWithExpiryBy6mServiceListData>
+) => createQueryKey('fctStorageSlotStateWithExpiryBy6mServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctStorageSlotStateWithExpiryBy6mServiceListOptions = (
+  options?: Options<FctStorageSlotStateWithExpiryBy6mServiceListData>
+) =>
+  queryOptions<
+    FctStorageSlotStateWithExpiryBy6mServiceListResponse,
+    FctStorageSlotStateWithExpiryBy6mServiceListError,
+    FctStorageSlotStateWithExpiryBy6mServiceListResponse,
+    ReturnType<typeof fctStorageSlotStateWithExpiryBy6mServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctStorageSlotStateWithExpiryBy6mServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctStorageSlotStateWithExpiryBy6mServiceListQueryKey(options),
+  });
+
+export const fctStorageSlotStateWithExpiryBy6mServiceGetQueryKey = (
+  options: Options<FctStorageSlotStateWithExpiryBy6mServiceGetData>
+) => createQueryKey('fctStorageSlotStateWithExpiryBy6mServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const fctStorageSlotStateWithExpiryBy6mServiceGetOptions = (
+  options: Options<FctStorageSlotStateWithExpiryBy6mServiceGetData>
+) =>
+  queryOptions<
+    FctStorageSlotStateWithExpiryBy6mServiceGetResponse,
+    FctStorageSlotStateWithExpiryBy6mServiceGetError,
+    FctStorageSlotStateWithExpiryBy6mServiceGetResponse,
+    ReturnType<typeof fctStorageSlotStateWithExpiryBy6mServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctStorageSlotStateWithExpiryBy6mServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctStorageSlotStateWithExpiryBy6mServiceGetQueryKey(options),
   });
 
 export const intAddressFirstAccessServiceListQueryKey = (options?: Options<IntAddressFirstAccessServiceListData>) =>
@@ -3616,4 +4018,397 @@ export const intCustodyProbeOrderBySlotServiceGetOptions = (
       return data;
     },
     queryKey: intCustodyProbeOrderBySlotServiceGetQueryKey(options),
+  });
+
+export const intExecutionBlockByDateServiceListQueryKey = (options?: Options<IntExecutionBlockByDateServiceListData>) =>
+  createQueryKey('intExecutionBlockByDateServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intExecutionBlockByDateServiceListOptions = (options?: Options<IntExecutionBlockByDateServiceListData>) =>
+  queryOptions<
+    IntExecutionBlockByDateServiceListResponse,
+    IntExecutionBlockByDateServiceListError,
+    IntExecutionBlockByDateServiceListResponse,
+    ReturnType<typeof intExecutionBlockByDateServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intExecutionBlockByDateServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intExecutionBlockByDateServiceListQueryKey(options),
+  });
+
+export const intExecutionBlockByDateServiceGetQueryKey = (options: Options<IntExecutionBlockByDateServiceGetData>) =>
+  createQueryKey('intExecutionBlockByDateServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_date_time
+ */
+export const intExecutionBlockByDateServiceGetOptions = (options: Options<IntExecutionBlockByDateServiceGetData>) =>
+  queryOptions<
+    IntExecutionBlockByDateServiceGetResponse,
+    IntExecutionBlockByDateServiceGetError,
+    IntExecutionBlockByDateServiceGetResponse,
+    ReturnType<typeof intExecutionBlockByDateServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intExecutionBlockByDateServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intExecutionBlockByDateServiceGetQueryKey(options),
+  });
+
+export const intStorageSlotDiffServiceListQueryKey = (options?: Options<IntStorageSlotDiffServiceListData>) =>
+  createQueryKey('intStorageSlotDiffServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intStorageSlotDiffServiceListOptions = (options?: Options<IntStorageSlotDiffServiceListData>) =>
+  queryOptions<
+    IntStorageSlotDiffServiceListResponse,
+    IntStorageSlotDiffServiceListError,
+    IntStorageSlotDiffServiceListResponse,
+    ReturnType<typeof intStorageSlotDiffServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intStorageSlotDiffServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intStorageSlotDiffServiceListQueryKey(options),
+  });
+
+export const intStorageSlotDiffServiceGetQueryKey = (options: Options<IntStorageSlotDiffServiceGetData>) =>
+  createQueryKey('intStorageSlotDiffServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intStorageSlotDiffServiceGetOptions = (options: Options<IntStorageSlotDiffServiceGetData>) =>
+  queryOptions<
+    IntStorageSlotDiffServiceGetResponse,
+    IntStorageSlotDiffServiceGetError,
+    IntStorageSlotDiffServiceGetResponse,
+    ReturnType<typeof intStorageSlotDiffServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intStorageSlotDiffServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intStorageSlotDiffServiceGetQueryKey(options),
+  });
+
+export const intStorageSlotDiffByAddressSlotServiceListQueryKey = (
+  options?: Options<IntStorageSlotDiffByAddressSlotServiceListData>
+) => createQueryKey('intStorageSlotDiffByAddressSlotServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intStorageSlotDiffByAddressSlotServiceListOptions = (
+  options?: Options<IntStorageSlotDiffByAddressSlotServiceListData>
+) =>
+  queryOptions<
+    IntStorageSlotDiffByAddressSlotServiceListResponse,
+    IntStorageSlotDiffByAddressSlotServiceListError,
+    IntStorageSlotDiffByAddressSlotServiceListResponse,
+    ReturnType<typeof intStorageSlotDiffByAddressSlotServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intStorageSlotDiffByAddressSlotServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intStorageSlotDiffByAddressSlotServiceListQueryKey(options),
+  });
+
+export const intStorageSlotDiffByAddressSlotServiceGetQueryKey = (
+  options: Options<IntStorageSlotDiffByAddressSlotServiceGetData>
+) => createQueryKey('intStorageSlotDiffByAddressSlotServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by address
+ */
+export const intStorageSlotDiffByAddressSlotServiceGetOptions = (
+  options: Options<IntStorageSlotDiffByAddressSlotServiceGetData>
+) =>
+  queryOptions<
+    IntStorageSlotDiffByAddressSlotServiceGetResponse,
+    IntStorageSlotDiffByAddressSlotServiceGetError,
+    IntStorageSlotDiffByAddressSlotServiceGetResponse,
+    ReturnType<typeof intStorageSlotDiffByAddressSlotServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intStorageSlotDiffByAddressSlotServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intStorageSlotDiffByAddressSlotServiceGetQueryKey(options),
+  });
+
+export const intStorageSlotExpiryBy6mServiceListQueryKey = (
+  options?: Options<IntStorageSlotExpiryBy6mServiceListData>
+) => createQueryKey('intStorageSlotExpiryBy6mServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intStorageSlotExpiryBy6mServiceListOptions = (
+  options?: Options<IntStorageSlotExpiryBy6mServiceListData>
+) =>
+  queryOptions<
+    IntStorageSlotExpiryBy6mServiceListResponse,
+    IntStorageSlotExpiryBy6mServiceListError,
+    IntStorageSlotExpiryBy6mServiceListResponse,
+    ReturnType<typeof intStorageSlotExpiryBy6mServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intStorageSlotExpiryBy6mServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intStorageSlotExpiryBy6mServiceListQueryKey(options),
+  });
+
+export const intStorageSlotExpiryBy6mServiceGetQueryKey = (options: Options<IntStorageSlotExpiryBy6mServiceGetData>) =>
+  createQueryKey('intStorageSlotExpiryBy6mServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intStorageSlotExpiryBy6mServiceGetOptions = (options: Options<IntStorageSlotExpiryBy6mServiceGetData>) =>
+  queryOptions<
+    IntStorageSlotExpiryBy6mServiceGetResponse,
+    IntStorageSlotExpiryBy6mServiceGetError,
+    IntStorageSlotExpiryBy6mServiceGetResponse,
+    ReturnType<typeof intStorageSlotExpiryBy6mServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intStorageSlotExpiryBy6mServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intStorageSlotExpiryBy6mServiceGetQueryKey(options),
+  });
+
+export const intStorageSlotNextTouchServiceListQueryKey = (options?: Options<IntStorageSlotNextTouchServiceListData>) =>
+  createQueryKey('intStorageSlotNextTouchServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intStorageSlotNextTouchServiceListOptions = (options?: Options<IntStorageSlotNextTouchServiceListData>) =>
+  queryOptions<
+    IntStorageSlotNextTouchServiceListResponse,
+    IntStorageSlotNextTouchServiceListError,
+    IntStorageSlotNextTouchServiceListResponse,
+    ReturnType<typeof intStorageSlotNextTouchServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intStorageSlotNextTouchServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intStorageSlotNextTouchServiceListQueryKey(options),
+  });
+
+export const intStorageSlotNextTouchServiceGetQueryKey = (options: Options<IntStorageSlotNextTouchServiceGetData>) =>
+  createQueryKey('intStorageSlotNextTouchServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intStorageSlotNextTouchServiceGetOptions = (options: Options<IntStorageSlotNextTouchServiceGetData>) =>
+  queryOptions<
+    IntStorageSlotNextTouchServiceGetResponse,
+    IntStorageSlotNextTouchServiceGetError,
+    IntStorageSlotNextTouchServiceGetResponse,
+    ReturnType<typeof intStorageSlotNextTouchServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intStorageSlotNextTouchServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intStorageSlotNextTouchServiceGetQueryKey(options),
+  });
+
+export const intStorageSlotReactivationBy6mServiceListQueryKey = (
+  options?: Options<IntStorageSlotReactivationBy6mServiceListData>
+) => createQueryKey('intStorageSlotReactivationBy6mServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intStorageSlotReactivationBy6mServiceListOptions = (
+  options?: Options<IntStorageSlotReactivationBy6mServiceListData>
+) =>
+  queryOptions<
+    IntStorageSlotReactivationBy6mServiceListResponse,
+    IntStorageSlotReactivationBy6mServiceListError,
+    IntStorageSlotReactivationBy6mServiceListResponse,
+    ReturnType<typeof intStorageSlotReactivationBy6mServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intStorageSlotReactivationBy6mServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intStorageSlotReactivationBy6mServiceListQueryKey(options),
+  });
+
+export const intStorageSlotReactivationBy6mServiceGetQueryKey = (
+  options: Options<IntStorageSlotReactivationBy6mServiceGetData>
+) => createQueryKey('intStorageSlotReactivationBy6mServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intStorageSlotReactivationBy6mServiceGetOptions = (
+  options: Options<IntStorageSlotReactivationBy6mServiceGetData>
+) =>
+  queryOptions<
+    IntStorageSlotReactivationBy6mServiceGetResponse,
+    IntStorageSlotReactivationBy6mServiceGetError,
+    IntStorageSlotReactivationBy6mServiceGetResponse,
+    ReturnType<typeof intStorageSlotReactivationBy6mServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intStorageSlotReactivationBy6mServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intStorageSlotReactivationBy6mServiceGetQueryKey(options),
+  });
+
+export const intStorageSlotReadServiceListQueryKey = (options?: Options<IntStorageSlotReadServiceListData>) =>
+  createQueryKey('intStorageSlotReadServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intStorageSlotReadServiceListOptions = (options?: Options<IntStorageSlotReadServiceListData>) =>
+  queryOptions<
+    IntStorageSlotReadServiceListResponse,
+    IntStorageSlotReadServiceListError,
+    IntStorageSlotReadServiceListResponse,
+    ReturnType<typeof intStorageSlotReadServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intStorageSlotReadServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intStorageSlotReadServiceListQueryKey(options),
+  });
+
+export const intStorageSlotReadServiceGetQueryKey = (options: Options<IntStorageSlotReadServiceGetData>) =>
+  createQueryKey('intStorageSlotReadServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intStorageSlotReadServiceGetOptions = (options: Options<IntStorageSlotReadServiceGetData>) =>
+  queryOptions<
+    IntStorageSlotReadServiceGetResponse,
+    IntStorageSlotReadServiceGetError,
+    IntStorageSlotReadServiceGetResponse,
+    ReturnType<typeof intStorageSlotReadServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intStorageSlotReadServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intStorageSlotReadServiceGetQueryKey(options),
   });

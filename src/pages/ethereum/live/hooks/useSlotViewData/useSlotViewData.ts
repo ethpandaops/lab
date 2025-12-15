@@ -5,10 +5,10 @@ import {
   fctBlockHeadServiceListOptions,
   fctBlockProposerServiceListOptions,
   fctBlockMevServiceListOptions,
-  fctBlockBlobCountServiceListOptions,
+  fctBlockBlobCountHeadServiceListOptions,
   fctBlockFirstSeenByNodeServiceListOptions,
   fctBlockBlobFirstSeenByNodeServiceListOptions,
-  fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions,
+  fctBlockDataColumnSidecarFirstSeenServiceListOptions,
   fctAttestationFirstSeenChunked50MsServiceListOptions,
   intBeaconCommitteeHeadServiceListOptions,
   fctMevBidHighestValueByBuilderChunked50MsServiceListOptions,
@@ -87,9 +87,9 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     },
   });
 
-  // API Query 4: Blob Count
+  // API Query 4: Blob Count (using _head table for live data)
   const blobCountQuery = useQuery({
-    ...fctBlockBlobCountServiceListOptions({
+    ...fctBlockBlobCountHeadServiceListOptions({
       query: {
         slot_start_date_time_eq: slotStartDateTime,
         page_size: 1,
@@ -132,9 +132,9 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     },
   });
 
-  // API Query 6b: Data Column Sidecar First Seen by Node (List)
+  // API Query 6b: Data Column Sidecar First Seen (aggregated per column, not per node)
   const dataColumnFirstSeenQuery = useQuery({
-    ...fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions({
+    ...fctBlockDataColumnSidecarFirstSeenServiceListOptions({
       query: {
         slot_start_date_time_eq: slotStartDateTime,
         page_size: 10000,
@@ -231,7 +231,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       errorList.push({ endpoint: 'fct_block_blob_first_seen_by_node', error: blobFirstSeenQuery.error as Error });
     if (dataColumnFirstSeenQuery.error)
       errorList.push({
-        endpoint: 'fct_block_data_column_sidecar_first_seen_by_node',
+        endpoint: 'fct_block_data_column_sidecar_first_seen',
         error: dataColumnFirstSeenQuery.error as Error,
       });
     if (attestationQuery.error)
@@ -281,7 +281,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
   } = useBlobAvailabilityData(blobFirstSeenQuery.data?.fct_block_blob_first_seen_by_node ?? EMPTY_BLOB_FIRST_SEEN);
 
   const { firstSeenData: dataColumnFirstSeenData, blobCount: dataColumnBlobCount } = useDataColumnAvailabilityData(
-    dataColumnFirstSeenQuery.data?.fct_block_data_column_sidecar_first_seen_by_node ?? EMPTY_DATA_COLUMN_FIRST_SEEN
+    dataColumnFirstSeenQuery.data?.fct_block_data_column_sidecar_first_seen ?? EMPTY_DATA_COLUMN_FIRST_SEEN
   );
 
   // Calculate total expected validators from committee data
@@ -301,7 +301,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     totalExpectedValidators
   );
 
-  const blobCount = blobCountQuery.data?.fct_block_blob_count?.[0]?.blob_count ?? 0;
+  const blobCount = blobCountQuery.data?.fct_block_blob_count_head?.[0]?.blob_count ?? 0;
 
   // TODO: Fix attestation actual count
   // The chunked API returns 2x the correct count (double-counting issue)
