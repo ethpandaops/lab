@@ -9,6 +9,12 @@ import type {
   AdminCbtIncrementalServiceListData,
   AdminCbtIncrementalServiceListErrors,
   AdminCbtIncrementalServiceListResponses,
+  AdminCbtScheduledServiceGetData,
+  AdminCbtScheduledServiceGetErrors,
+  AdminCbtScheduledServiceGetResponses,
+  AdminCbtScheduledServiceListData,
+  AdminCbtScheduledServiceListErrors,
+  AdminCbtScheduledServiceListResponses,
   DimBlockBlobSubmitterServiceGetData,
   DimBlockBlobSubmitterServiceGetErrors,
   DimBlockBlobSubmitterServiceGetResponses,
@@ -207,6 +213,66 @@ import type {
   FctDataColumnAvailabilityHourlyServiceListData,
   FctDataColumnAvailabilityHourlyServiceListErrors,
   FctDataColumnAvailabilityHourlyServiceListResponses,
+  FctEngineGetBlobsByElClientServiceGetData,
+  FctEngineGetBlobsByElClientServiceGetErrors,
+  FctEngineGetBlobsByElClientServiceGetResponses,
+  FctEngineGetBlobsByElClientServiceListData,
+  FctEngineGetBlobsByElClientServiceListErrors,
+  FctEngineGetBlobsByElClientServiceListResponses,
+  FctEngineGetBlobsBySlotServiceGetData,
+  FctEngineGetBlobsBySlotServiceGetErrors,
+  FctEngineGetBlobsBySlotServiceGetResponses,
+  FctEngineGetBlobsBySlotServiceListData,
+  FctEngineGetBlobsBySlotServiceListErrors,
+  FctEngineGetBlobsBySlotServiceListResponses,
+  FctEngineGetBlobsDurationChunked50MsServiceGetData,
+  FctEngineGetBlobsDurationChunked50MsServiceGetErrors,
+  FctEngineGetBlobsDurationChunked50MsServiceGetResponses,
+  FctEngineGetBlobsDurationChunked50MsServiceListData,
+  FctEngineGetBlobsDurationChunked50MsServiceListErrors,
+  FctEngineGetBlobsDurationChunked50MsServiceListResponses,
+  FctEngineGetBlobsStatusDailyServiceGetData,
+  FctEngineGetBlobsStatusDailyServiceGetErrors,
+  FctEngineGetBlobsStatusDailyServiceGetResponses,
+  FctEngineGetBlobsStatusDailyServiceListData,
+  FctEngineGetBlobsStatusDailyServiceListErrors,
+  FctEngineGetBlobsStatusDailyServiceListResponses,
+  FctEngineGetBlobsStatusHourlyServiceGetData,
+  FctEngineGetBlobsStatusHourlyServiceGetErrors,
+  FctEngineGetBlobsStatusHourlyServiceGetResponses,
+  FctEngineGetBlobsStatusHourlyServiceListData,
+  FctEngineGetBlobsStatusHourlyServiceListErrors,
+  FctEngineGetBlobsStatusHourlyServiceListResponses,
+  FctEngineNewPayloadByElClientServiceGetData,
+  FctEngineNewPayloadByElClientServiceGetErrors,
+  FctEngineNewPayloadByElClientServiceGetResponses,
+  FctEngineNewPayloadByElClientServiceListData,
+  FctEngineNewPayloadByElClientServiceListErrors,
+  FctEngineNewPayloadByElClientServiceListResponses,
+  FctEngineNewPayloadBySlotServiceGetData,
+  FctEngineNewPayloadBySlotServiceGetErrors,
+  FctEngineNewPayloadBySlotServiceGetResponses,
+  FctEngineNewPayloadBySlotServiceListData,
+  FctEngineNewPayloadBySlotServiceListErrors,
+  FctEngineNewPayloadBySlotServiceListResponses,
+  FctEngineNewPayloadDurationChunked50MsServiceGetData,
+  FctEngineNewPayloadDurationChunked50MsServiceGetErrors,
+  FctEngineNewPayloadDurationChunked50MsServiceGetResponses,
+  FctEngineNewPayloadDurationChunked50MsServiceListData,
+  FctEngineNewPayloadDurationChunked50MsServiceListErrors,
+  FctEngineNewPayloadDurationChunked50MsServiceListResponses,
+  FctEngineNewPayloadStatusDailyServiceGetData,
+  FctEngineNewPayloadStatusDailyServiceGetErrors,
+  FctEngineNewPayloadStatusDailyServiceGetResponses,
+  FctEngineNewPayloadStatusDailyServiceListData,
+  FctEngineNewPayloadStatusDailyServiceListErrors,
+  FctEngineNewPayloadStatusDailyServiceListResponses,
+  FctEngineNewPayloadStatusHourlyServiceGetData,
+  FctEngineNewPayloadStatusHourlyServiceGetErrors,
+  FctEngineNewPayloadStatusHourlyServiceGetResponses,
+  FctEngineNewPayloadStatusHourlyServiceListData,
+  FctEngineNewPayloadStatusHourlyServiceListErrors,
+  FctEngineNewPayloadStatusHourlyServiceListResponses,
   FctExecutionStateSizeDailyServiceGetData,
   FctExecutionStateSizeDailyServiceGetErrors,
   FctExecutionStateSizeDailyServiceGetResponses,
@@ -411,6 +477,10 @@ import {
   zAdminCbtIncrementalServiceGetResponse,
   zAdminCbtIncrementalServiceListData,
   zAdminCbtIncrementalServiceListResponse,
+  zAdminCbtScheduledServiceGetData,
+  zAdminCbtScheduledServiceGetResponse,
+  zAdminCbtScheduledServiceListData,
+  zAdminCbtScheduledServiceListResponse,
   zDimBlockBlobSubmitterServiceGetData,
   zDimBlockBlobSubmitterServiceGetResponse,
   zDimBlockBlobSubmitterServiceListData,
@@ -543,6 +613,46 @@ import {
   zFctDataColumnAvailabilityHourlyServiceGetResponse,
   zFctDataColumnAvailabilityHourlyServiceListData,
   zFctDataColumnAvailabilityHourlyServiceListResponse,
+  zFctEngineGetBlobsByElClientServiceGetData,
+  zFctEngineGetBlobsByElClientServiceGetResponse,
+  zFctEngineGetBlobsByElClientServiceListData,
+  zFctEngineGetBlobsByElClientServiceListResponse,
+  zFctEngineGetBlobsBySlotServiceGetData,
+  zFctEngineGetBlobsBySlotServiceGetResponse,
+  zFctEngineGetBlobsBySlotServiceListData,
+  zFctEngineGetBlobsBySlotServiceListResponse,
+  zFctEngineGetBlobsDurationChunked50MsServiceGetData,
+  zFctEngineGetBlobsDurationChunked50MsServiceGetResponse,
+  zFctEngineGetBlobsDurationChunked50MsServiceListData,
+  zFctEngineGetBlobsDurationChunked50MsServiceListResponse,
+  zFctEngineGetBlobsStatusDailyServiceGetData,
+  zFctEngineGetBlobsStatusDailyServiceGetResponse,
+  zFctEngineGetBlobsStatusDailyServiceListData,
+  zFctEngineGetBlobsStatusDailyServiceListResponse,
+  zFctEngineGetBlobsStatusHourlyServiceGetData,
+  zFctEngineGetBlobsStatusHourlyServiceGetResponse,
+  zFctEngineGetBlobsStatusHourlyServiceListData,
+  zFctEngineGetBlobsStatusHourlyServiceListResponse,
+  zFctEngineNewPayloadByElClientServiceGetData,
+  zFctEngineNewPayloadByElClientServiceGetResponse,
+  zFctEngineNewPayloadByElClientServiceListData,
+  zFctEngineNewPayloadByElClientServiceListResponse,
+  zFctEngineNewPayloadBySlotServiceGetData,
+  zFctEngineNewPayloadBySlotServiceGetResponse,
+  zFctEngineNewPayloadBySlotServiceListData,
+  zFctEngineNewPayloadBySlotServiceListResponse,
+  zFctEngineNewPayloadDurationChunked50MsServiceGetData,
+  zFctEngineNewPayloadDurationChunked50MsServiceGetResponse,
+  zFctEngineNewPayloadDurationChunked50MsServiceListData,
+  zFctEngineNewPayloadDurationChunked50MsServiceListResponse,
+  zFctEngineNewPayloadStatusDailyServiceGetData,
+  zFctEngineNewPayloadStatusDailyServiceGetResponse,
+  zFctEngineNewPayloadStatusDailyServiceListData,
+  zFctEngineNewPayloadStatusDailyServiceListResponse,
+  zFctEngineNewPayloadStatusHourlyServiceGetData,
+  zFctEngineNewPayloadStatusHourlyServiceGetResponse,
+  zFctEngineNewPayloadStatusHourlyServiceListData,
+  zFctEngineNewPayloadStatusHourlyServiceListResponse,
   zFctExecutionStateSizeDailyServiceGetData,
   zFctExecutionStateSizeDailyServiceGetResponse,
   zFctExecutionStateSizeDailyServiceListData,
@@ -730,6 +840,46 @@ export const adminCbtIncrementalServiceGet = <ThrowOnError extends boolean = fal
     requestValidator: async data => await zAdminCbtIncrementalServiceGetData.parseAsync(data),
     responseValidator: async data => await zAdminCbtIncrementalServiceGetResponse.parseAsync(data),
     url: '/api/v1/admin_cbt_incremental/{database}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const adminCbtScheduledServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<AdminCbtScheduledServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    AdminCbtScheduledServiceListResponses,
+    AdminCbtScheduledServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zAdminCbtScheduledServiceListData.parseAsync(data),
+    responseValidator: async data => await zAdminCbtScheduledServiceListResponse.parseAsync(data),
+    url: '/api/v1/admin_cbt_scheduled',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by database
+ */
+export const adminCbtScheduledServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<AdminCbtScheduledServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    AdminCbtScheduledServiceGetResponses,
+    AdminCbtScheduledServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zAdminCbtScheduledServiceGetData.parseAsync(data),
+    responseValidator: async data => await zAdminCbtScheduledServiceGetResponse.parseAsync(data),
+    url: '/api/v1/admin_cbt_scheduled/{database}',
     ...options,
   });
 };
@@ -2027,6 +2177,406 @@ export const fctDataColumnAvailabilityHourlyServiceGet = <ThrowOnError extends b
     requestValidator: async data => await zFctDataColumnAvailabilityHourlyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctDataColumnAvailabilityHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_hourly/{hour_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineGetBlobsByElClientServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineGetBlobsByElClientServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctEngineGetBlobsByElClientServiceListResponses,
+    FctEngineGetBlobsByElClientServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsByElClientServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineGetBlobsByElClientServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_by_el_client',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctEngineGetBlobsByElClientServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineGetBlobsByElClientServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctEngineGetBlobsByElClientServiceGetResponses,
+    FctEngineGetBlobsByElClientServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsByElClientServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineGetBlobsByElClientServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_by_el_client/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineGetBlobsBySlotServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineGetBlobsBySlotServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctEngineGetBlobsBySlotServiceListResponses,
+    FctEngineGetBlobsBySlotServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsBySlotServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineGetBlobsBySlotServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_by_slot',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctEngineGetBlobsBySlotServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineGetBlobsBySlotServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctEngineGetBlobsBySlotServiceGetResponses,
+    FctEngineGetBlobsBySlotServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsBySlotServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineGetBlobsBySlotServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_by_slot/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineGetBlobsDurationChunked50MsServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineGetBlobsDurationChunked50MsServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctEngineGetBlobsDurationChunked50MsServiceListResponses,
+    FctEngineGetBlobsDurationChunked50MsServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsDurationChunked50MsServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineGetBlobsDurationChunked50MsServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_duration_chunked_50ms',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctEngineGetBlobsDurationChunked50MsServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineGetBlobsDurationChunked50MsServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctEngineGetBlobsDurationChunked50MsServiceGetResponses,
+    FctEngineGetBlobsDurationChunked50MsServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsDurationChunked50MsServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineGetBlobsDurationChunked50MsServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_duration_chunked_50ms/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineGetBlobsStatusDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineGetBlobsStatusDailyServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctEngineGetBlobsStatusDailyServiceListResponses,
+    FctEngineGetBlobsStatusDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsStatusDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineGetBlobsStatusDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_status_daily',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineGetBlobsStatusDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineGetBlobsStatusDailyServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctEngineGetBlobsStatusDailyServiceGetResponses,
+    FctEngineGetBlobsStatusDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsStatusDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineGetBlobsStatusDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_status_daily/{day_start_date}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineGetBlobsStatusHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineGetBlobsStatusHourlyServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctEngineGetBlobsStatusHourlyServiceListResponses,
+    FctEngineGetBlobsStatusHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsStatusHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineGetBlobsStatusHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_status_hourly',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineGetBlobsStatusHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineGetBlobsStatusHourlyServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctEngineGetBlobsStatusHourlyServiceGetResponses,
+    FctEngineGetBlobsStatusHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsStatusHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineGetBlobsStatusHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_status_hourly/{hour_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineNewPayloadByElClientServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadByElClientServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctEngineNewPayloadByElClientServiceListResponses,
+    FctEngineNewPayloadByElClientServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadByElClientServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadByElClientServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_by_el_client',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctEngineNewPayloadByElClientServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadByElClientServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctEngineNewPayloadByElClientServiceGetResponses,
+    FctEngineNewPayloadByElClientServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadByElClientServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadByElClientServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_by_el_client/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineNewPayloadBySlotServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadBySlotServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctEngineNewPayloadBySlotServiceListResponses,
+    FctEngineNewPayloadBySlotServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadBySlotServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadBySlotServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_by_slot',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctEngineNewPayloadBySlotServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadBySlotServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctEngineNewPayloadBySlotServiceGetResponses,
+    FctEngineNewPayloadBySlotServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadBySlotServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadBySlotServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_by_slot/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineNewPayloadDurationChunked50MsServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadDurationChunked50MsServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctEngineNewPayloadDurationChunked50MsServiceListResponses,
+    FctEngineNewPayloadDurationChunked50MsServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadDurationChunked50MsServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadDurationChunked50MsServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_duration_chunked_50ms',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctEngineNewPayloadDurationChunked50MsServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadDurationChunked50MsServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctEngineNewPayloadDurationChunked50MsServiceGetResponses,
+    FctEngineNewPayloadDurationChunked50MsServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadDurationChunked50MsServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadDurationChunked50MsServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_duration_chunked_50ms/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineNewPayloadStatusDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadStatusDailyServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctEngineNewPayloadStatusDailyServiceListResponses,
+    FctEngineNewPayloadStatusDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadStatusDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadStatusDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_status_daily',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadStatusDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadStatusDailyServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctEngineNewPayloadStatusDailyServiceGetResponses,
+    FctEngineNewPayloadStatusDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadStatusDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadStatusDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_status_daily/{day_start_date}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineNewPayloadStatusHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadStatusHourlyServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctEngineNewPayloadStatusHourlyServiceListResponses,
+    FctEngineNewPayloadStatusHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadStatusHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadStatusHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_status_hourly',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineNewPayloadStatusHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadStatusHourlyServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctEngineNewPayloadStatusHourlyServiceGetResponses,
+    FctEngineNewPayloadStatusHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadStatusHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadStatusHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_status_hourly/{hour_start_date_time}',
     ...options,
   });
 };

@@ -38,6 +38,8 @@ import { BlobPosterLogo } from '@/components/Ethereum/BlobPosterLogo';
 import { formatGasToMillions, ATTESTATION_DEADLINE_MS } from '@/utils';
 import type { ForkVersion } from '@/utils/beacon';
 import { SlotDetailSkeleton } from './components/SlotDetailSkeleton';
+import { EngineTimingsCard } from './components/EngineTimingsCard';
+import { useSlotEngineTimings } from './hooks/useSlotEngineTimings';
 
 /**
  * Detail page for a specific slot.
@@ -87,6 +89,12 @@ export function DetailPage(): JSX.Element {
 
   // Fetch all slot data
   const { data, isLoading, error } = useSlotDetailData(slot);
+
+  // Fetch engine API timing data (reference nodes only for accurate benchmarks)
+  const { data: engineTimingsData, isLoading: engineTimingsLoading } = useSlotEngineTimings({
+    slot,
+    referenceNodesOnly: true,
+  });
 
   // Fetch ALL attestation votes (with pagination)
   const slotTimestamp = currentNetwork ? slotToTimestamp(slot, currentNetwork.genesis_time) : 0;
@@ -1028,6 +1036,13 @@ export function DetailPage(): JSX.Element {
                     </Card>
                   </>
                 )}
+
+                {/* Engine API Timings */}
+                <EngineTimingsCard
+                  data={engineTimingsData}
+                  isLoading={engineTimingsLoading}
+                  hasBlobsInSlot={blobCount > 0}
+                />
               </div>
             </TabPanel>
 
