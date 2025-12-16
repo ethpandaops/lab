@@ -24,6 +24,13 @@ export interface SlotEngineTimingsData {
   getBlobsByClient: FctEngineGetBlobsByElClient[];
 }
 
+export interface UseSlotEngineTimingsOptions {
+  /** The slot number to fetch engine timing data for */
+  slot: number;
+  /** If true, only include data from EIP-7870 reference nodes */
+  referenceNodesOnly?: boolean;
+}
+
 export interface UseSlotEngineTimingsResult {
   data: SlotEngineTimingsData | null;
   isLoading: boolean;
@@ -34,11 +41,17 @@ export interface UseSlotEngineTimingsResult {
  * Hook to fetch engine API timing data for a specific slot.
  * Fetches both newPayload and getBlobs timing data along with per-client breakdowns.
  *
- * @param slot - The slot number to fetch engine timing data for
+ * @param options - Options including slot number and optional reference nodes filter
  * @returns Object containing engine timing data, loading state, and error state
  */
-export function useSlotEngineTimings(slot: number): UseSlotEngineTimingsResult {
+export function useSlotEngineTimings({
+  slot,
+  referenceNodesOnly = true,
+}: UseSlotEngineTimingsOptions): UseSlotEngineTimingsResult {
   const { currentNetwork } = useNetwork();
+
+  // Build node_class filter if reference nodes only is enabled
+  const refNodeFilter = referenceNodesOnly ? { node_class_eq: 'eip7870-block-builder' } : {};
 
   const queries = useQueries({
     queries: [
@@ -47,6 +60,7 @@ export function useSlotEngineTimings(slot: number): UseSlotEngineTimingsResult {
         ...fctEngineNewPayloadBySlotServiceListOptions({
           query: {
             slot_eq: slot,
+            ...refNodeFilter,
           },
         }),
         enabled: !!currentNetwork && slot > 0,
@@ -56,6 +70,7 @@ export function useSlotEngineTimings(slot: number): UseSlotEngineTimingsResult {
         ...fctEngineNewPayloadByElClientServiceListOptions({
           query: {
             slot_eq: slot,
+            ...refNodeFilter,
           },
         }),
         enabled: !!currentNetwork && slot > 0,
@@ -65,6 +80,7 @@ export function useSlotEngineTimings(slot: number): UseSlotEngineTimingsResult {
         ...fctEngineGetBlobsBySlotServiceListOptions({
           query: {
             slot_eq: slot,
+            ...refNodeFilter,
           },
         }),
         enabled: !!currentNetwork && slot > 0,
@@ -74,6 +90,7 @@ export function useSlotEngineTimings(slot: number): UseSlotEngineTimingsResult {
         ...fctEngineGetBlobsByElClientServiceListOptions({
           query: {
             slot_eq: slot,
+            ...refNodeFilter,
           },
         }),
         enabled: !!currentNetwork && slot > 0,

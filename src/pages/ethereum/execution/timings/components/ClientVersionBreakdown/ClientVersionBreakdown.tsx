@@ -26,6 +26,7 @@ interface ClientVersionData {
   median_duration_ms?: number;
   p95_duration_ms?: number;
   avg_returned_count?: number;
+  status?: string;
 }
 
 export interface ClientVersionBreakdownProps {
@@ -37,6 +38,18 @@ export interface ClientVersionBreakdownProps {
   description?: string;
   /** Whether to show average blob count column (for getBlobs data) */
   showBlobCount?: boolean;
+  /** If true, renders without Card wrapper (for embedding in existing Cards) */
+  noCard?: boolean;
+  /** If true, shows only logo without client name text (compact mode for smaller spaces) */
+  compactClient?: boolean;
+  /** If true, hides the observations column */
+  hideObservations?: boolean;
+  /** If true, hides the P95 column */
+  hideP95?: boolean;
+  /** Custom label for the duration column (defaults to "Median") */
+  durationLabel?: string;
+  /** Custom label for the blob count column (defaults to "Avg Blobs") */
+  blobCountLabel?: string;
 }
 
 interface AggregatedRow {
@@ -59,6 +72,12 @@ export function ClientVersionBreakdown({
   title = 'Client Version Breakdown',
   description = 'Duration statistics by execution client and version',
   showBlobCount = false,
+  noCard = false,
+  compactClient = false,
+  hideObservations = false,
+  hideP95 = false,
+  durationLabel = 'Median',
+  blobCountLabel = 'Avg Blobs',
 }: ClientVersionBreakdownProps): JSX.Element {
   const [sortField, setSortField] = useState<SortField>('observations');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
@@ -174,68 +193,88 @@ export function ClientVersionBreakdown({
     'cursor-pointer select-none py-3 px-3 text-left text-sm font-semibold text-foreground hover:text-accent transition-colors';
 
   if (aggregatedData.length === 0) {
+    const emptyContent = (
+      <>
+        {!noCard && (
+          <>
+            <h4 className="mb-2 text-base font-semibold text-foreground">{title}</h4>
+            <p className="mb-4 text-sm text-muted">{description}</p>
+          </>
+        )}
+        <div className="flex h-[200px] items-center justify-center text-muted">No client version data available</div>
+      </>
+    );
+
+    if (noCard) {
+      return <div>{emptyContent}</div>;
+    }
+
     return (
       <Card>
-        <div className="p-4">
-          <h4 className="mb-2 text-base font-semibold text-foreground">{title}</h4>
-          <p className="mb-4 text-sm text-muted">{description}</p>
-          <div className="flex h-[200px] items-center justify-center text-muted">No client version data available</div>
-        </div>
+        <div className="p-4">{emptyContent}</div>
       </Card>
     );
   }
 
-  return (
-    <Card>
-      <div className="p-4">
-        <h4 className="mb-2 text-base font-semibold text-foreground">{title}</h4>
-        <p className="mb-4 text-sm text-muted">{description}</p>
+  const tableContent = (
+    <>
+      {!noCard && (
+        <>
+          <h4 className="mb-2 text-base font-semibold text-foreground">{title}</h4>
+          <p className="mb-4 text-sm text-muted">{description}</p>
+        </>
+      )}
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-border">
-            <thead className="bg-surface">
-              <tr>
-                <th className={clsx(headerClass, 'pl-4')} onClick={() => handleSort('client')}>
-                  Client
-                  <SortIcon field="client" />
-                </th>
-                <th className={headerClass} onClick={() => handleSort('version')}>
-                  Version
-                  <SortIcon field="version" />
-                </th>
-                <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('medianDuration')}>
-                  Median
-                  <SortIcon field="medianDuration" />
-                </th>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="bg-surface">
+            <tr>
+              <th className={clsx(headerClass, 'pl-4')} onClick={() => handleSort('client')}>
+                Client
+                <SortIcon field="client" />
+              </th>
+              <th className={headerClass} onClick={() => handleSort('version')}>
+                Version
+                <SortIcon field="version" />
+              </th>
+              <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('medianDuration')}>
+                {durationLabel}
+                <SortIcon field="medianDuration" />
+              </th>
+              {!hideP95 && (
                 <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('p95Duration')}>
                   P95
                   <SortIcon field="p95Duration" />
                 </th>
-                {showBlobCount && (
-                  <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('avgBlobCount')}>
-                    Avg Blobs
-                    <SortIcon field="avgBlobCount" />
-                  </th>
-                )}
+              )}
+              {showBlobCount && (
+                <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('avgBlobCount')}>
+                  {blobCountLabel}
+                  <SortIcon field="avgBlobCount" />
+                </th>
+              )}
+              {!hideObservations && (
                 <th className={clsx(headerClass, 'pr-4 text-right')} onClick={() => handleSort('observations')}>
                   Observations
                   <SortIcon field="observations" />
                 </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border bg-surface">
-              {sortedData.map((row, index) => (
-                <tr key={`${row.client}-${row.version}-${index}`} className="transition-colors hover:bg-background">
-                  <td className="py-3 pr-3 pl-4">
-                    <div className="flex items-center gap-2">
-                      <ClientLogo client={row.client} size={20} />
-                      <span className="text-sm font-medium text-foreground">{row.client}</span>
-                    </div>
-                  </td>
-                  <td className="px-3 py-3">
-                    <span className="font-mono text-sm text-muted">{row.version}</span>
-                  </td>
-                  <td className="px-3 py-3 text-right">
+              )}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border bg-surface">
+            {sortedData.map((row, index) => (
+              <tr key={`${row.client}-${row.version}-${index}`} className="transition-colors hover:bg-background">
+                <td className="py-3 pr-3 pl-4">
+                  <div className="flex items-center gap-2" title={row.client}>
+                    <ClientLogo client={row.client} size={compactClient ? 24 : 20} />
+                    {!compactClient && <span className="text-sm font-medium text-foreground">{row.client}</span>}
+                  </div>
+                </td>
+                <td className="px-3 py-3">
+                  <span className="font-mono text-sm text-muted">{row.version}</span>
+                </td>
+                <td className="px-3 py-3 text-right">
+                  {row.medianDuration > 0 ? (
                     <span
                       className={clsx(
                         'text-sm font-medium',
@@ -244,24 +283,44 @@ export function ClientVersionBreakdown({
                     >
                       {row.medianDuration.toFixed(0)} ms
                     </span>
-                  </td>
-                  <td className="px-3 py-3 text-right">
-                    <span className="text-sm text-muted">{row.p95Duration.toFixed(0)} ms</span>
-                  </td>
-                  {showBlobCount && (
-                    <td className="px-3 py-3 text-right">
-                      <span className="text-sm text-muted">{(row.avgBlobCount ?? 0).toFixed(1)}</span>
-                    </td>
+                  ) : (
+                    <span className="text-sm text-muted">-</span>
                   )}
+                </td>
+                {!hideP95 && (
+                  <td className="px-3 py-3 text-right">
+                    {row.p95Duration > 0 ? (
+                      <span className="text-sm text-muted">{row.p95Duration.toFixed(0)} ms</span>
+                    ) : (
+                      <span className="text-sm text-muted">-</span>
+                    )}
+                  </td>
+                )}
+                {showBlobCount && (
+                  <td className="px-3 py-3 text-right">
+                    <span className="text-sm text-muted">{(row.avgBlobCount ?? 0).toFixed(1)}</span>
+                  </td>
+                )}
+                {!hideObservations && (
                   <td className="py-3 pr-4 pl-3 text-right">
                     <span className="text-sm text-muted">{row.observations.toLocaleString()}</span>
                   </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
+    </>
+  );
+
+  if (noCard) {
+    return <div>{tableContent}</div>;
+  }
+
+  return (
+    <Card>
+      <div className="p-4">{tableContent}</div>
     </Card>
   );
 }
