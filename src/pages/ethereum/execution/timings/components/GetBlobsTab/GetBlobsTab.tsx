@@ -84,7 +84,6 @@ export function GetBlobsTab({ data, isLoading }: GetBlobsTabProps): JSX.Element 
     }
 
     // Sum up counts from all rows
-    let totalObservations = 0;
     let successCount = 0;
     let partialCount = 0;
     let emptyCount = 0;
@@ -93,39 +92,41 @@ export function GetBlobsTab({ data, isLoading }: GetBlobsTabProps): JSX.Element 
     let totalWeightedDuration = 0;
 
     sourceData.forEach(row => {
-      const obs = row.observation_count ?? 0;
-      totalObservations += obs;
-      successCount += row.success_count ?? 0;
+      const success = row.success_count ?? 0;
+      successCount += success;
       partialCount += row.partial_count ?? 0;
       emptyCount += row.empty_count ?? 0;
       errorCount += row.error_count ?? 0;
       unsupportedCount += row.unsupported_count ?? 0;
-      // Weight duration averages by observation count
-      totalWeightedDuration += (row.avg_duration_ms ?? 0) * obs;
+      // Weight duration averages by success count (durations are SUCCESS only from backend)
+      totalWeightedDuration += (row.avg_duration_ms ?? 0) * success;
     });
 
     const totalStatusCount = successCount + partialCount + emptyCount + errorCount + unsupportedCount;
     const successRate = totalStatusCount > 0 ? ((successCount / totalStatusCount) * 100).toFixed(1) : '0';
-    const avgDuration = totalObservations > 0 ? (totalWeightedDuration / totalObservations).toFixed(0) : '0';
+    const avgDuration = successCount > 0 ? (totalWeightedDuration / successCount).toFixed(0) : '0';
 
-    return { totalObservations, successRate, avgDuration };
+    // Use successCount for observations to match the table which shows SUCCESS only
+    return { totalObservations: successCount, successRate, avgDuration };
   })();
 
   const { totalObservations, successRate, avgDuration } = aggregatedStats;
 
-  // Prepare slot data for charts (not stats)
+  // Prepare slot data for charts
   const slotData = [...getBlobsBySlot].sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0));
+  // Filter to SUCCESS only for metrics that should match the table
+  const successSlotData = slotData.filter(s => s.status?.toUpperCase() === 'SUCCESS');
 
   const minSlot = slotData.length > 0 ? (slotData[0].slot ?? 0) : 0;
   const maxSlot = slotData.length > 0 ? (slotData[slotData.length - 1].slot ?? 0) : 0;
 
-  // Calculate weighted average blobs per request from slot data (not available in aggregated data)
-  const slotTotalObservations = slotData.reduce((sum, s) => sum + (s.observation_count ?? 0), 0);
-  const totalWeightedBlobs = slotData.reduce(
+  // Calculate weighted average blobs per request (SUCCESS only to match table)
+  const successSlotTotalObs = successSlotData.reduce((sum, s) => sum + (s.observation_count ?? 0), 0);
+  const totalWeightedBlobs = successSlotData.reduce(
     (sum, s) => sum + (s.avg_returned_count ?? 0) * (s.observation_count ?? 0),
     0
   );
-  const avgBlobsPerRequest = slotTotalObservations > 0 ? (totalWeightedBlobs / slotTotalObservations).toFixed(1) : '0';
+  const avgBlobsPerRequest = successSlotTotalObs > 0 ? (totalWeightedBlobs / successSlotTotalObs).toFixed(1) : '0';
 
   // Prepare duration histogram data (SUCCESS status only)
   const histogramMap = new Map<number, number>();
@@ -176,9 +177,9 @@ export function GetBlobsTab({ data, isLoading }: GetBlobsTabProps): JSX.Element 
     { value: statusTotals.unsupported, color: themeColors.muted },
   ];
 
-  // Prepare blob count distribution (weight by observation count)
+  // Prepare blob count distribution (SUCCESS only to match table)
   const blobCountMap = new Map<number, number>();
-  slotData.forEach(item => {
+  successSlotData.forEach(item => {
     const blobCount = item.avg_returned_count ?? 0;
     const roundedCount = Math.round(blobCount);
     const obsCount = item.observation_count ?? 0;
@@ -309,6 +310,7 @@ export function GetBlobsTab({ data, isLoading }: GetBlobsTabProps): JSX.Element 
         title="EL Client Duration"
         description="Median engine_getBlobs duration (ms) by execution client and version"
         showBlobCount
+        hideObservations
       />
 
       {/* Duration Histogram and Per-Slot Duration - Side by Side */}

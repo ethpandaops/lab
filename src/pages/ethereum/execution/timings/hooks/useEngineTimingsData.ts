@@ -73,7 +73,15 @@ export interface UseEngineTimingsDataResult {
 }
 
 /**
- * Calculate time range timestamps based on the selected range
+ * Round a timestamp down to the nearest hour boundary
+ */
+function floorToHour(timestamp: number): number {
+  return Math.floor(timestamp / 3600) * 3600;
+}
+
+/**
+ * Calculate time range timestamps based on the selected range.
+ * Start time is rounded down to the hour boundary to align with hourly aggregated data.
  */
 function getTimeRangeTimestamps(range: TimeRange): { start: number; end: number } {
   const now = Math.floor(Date.now() / 1000);
@@ -94,7 +102,8 @@ function getTimeRangeTimestamps(range: TimeRange): { start: number; end: number 
       start = now - 3600; // Default to 1 hour
   }
 
-  return { start, end };
+  // Round start down to hour boundary so all queries use aligned time windows
+  return { start: floorToHour(start), end };
 }
 
 /**

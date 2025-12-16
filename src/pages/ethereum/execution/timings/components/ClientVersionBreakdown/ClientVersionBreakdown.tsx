@@ -79,8 +79,9 @@ export function ClientVersionBreakdown({
   durationLabel = 'Median',
   blobCountLabel = 'Avg Blobs',
 }: ClientVersionBreakdownProps): JSX.Element {
-  const [sortField, setSortField] = useState<SortField>('observations');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  // Default sort by medianDuration (ascending = fastest first) when observations hidden, otherwise by observations
+  const [sortField, setSortField] = useState<SortField>(hideObservations ? 'medianDuration' : 'observations');
+  const [sortDirection, setSortDirection] = useState<SortDirection>(hideObservations ? 'asc' : 'desc');
 
   // Aggregate data by client + version
   const aggregatedData = useMemo(() => {
