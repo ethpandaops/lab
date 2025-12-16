@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQueries } from '@tanstack/react-query';
 import {
   fctEngineNewPayloadStatusHourlyServiceList,
@@ -116,7 +117,8 @@ export function useEngineTimingsData({
   referenceNodesOnly,
 }: UseEngineTimingsDataOptions): UseEngineTimingsDataResult {
   const { currentNetwork } = useNetwork();
-  const { start, end } = getTimeRangeTimestamps(timeRange);
+
+  const { start, end } = useMemo(() => getTimeRangeTimestamps(timeRange), [timeRange]);
 
   // Determine if we should use hourly or daily data based on time range
   const useHourlyData = timeRange === 'hour' || timeRange === 'day';
@@ -140,7 +142,7 @@ export function useEngineTimingsData({
                 hour_start_date_time_gte: start,
                 hour_start_date_time_lte: end,
                 order_by: 'hour_start_date_time ASC',
-                page_size: 1000,
+                page_size: 10000,
                 ...refNodeFilter,
               },
             },
@@ -179,7 +181,7 @@ export function useEngineTimingsData({
                 slot_start_date_time_gte: start,
                 slot_start_date_time_lte: end,
                 order_by: 'slot DESC',
-                page_size: 1000,
+                page_size: 10000,
                 ...refNodeFilter,
               },
             },
@@ -199,7 +201,7 @@ export function useEngineTimingsData({
                 slot_start_date_time_gte: start,
                 slot_start_date_time_lte: end,
                 order_by: 'slot_start_date_time DESC',
-                page_size: 1000,
+                page_size: 10000,
                 ...refNodeFilter,
               },
             },
@@ -219,7 +221,7 @@ export function useEngineTimingsData({
                 slot_start_date_time_gte: start,
                 slot_start_date_time_lte: end,
                 order_by: 'chunk_duration_ms ASC',
-                page_size: 1000,
+                page_size: 10000,
                 ...refNodeFilter,
               },
             },
@@ -239,7 +241,7 @@ export function useEngineTimingsData({
                 hour_start_date_time_gte: start,
                 hour_start_date_time_lte: end,
                 order_by: 'hour_start_date_time ASC',
-                page_size: 1000,
+                page_size: 10000,
                 ...refNodeFilter,
               },
             },
@@ -278,7 +280,7 @@ export function useEngineTimingsData({
                 slot_start_date_time_gte: start,
                 slot_start_date_time_lte: end,
                 order_by: 'slot DESC',
-                page_size: 1000,
+                page_size: 10000,
                 ...refNodeFilter,
               },
             },
@@ -298,7 +300,7 @@ export function useEngineTimingsData({
                 slot_start_date_time_gte: start,
                 slot_start_date_time_lte: end,
                 order_by: 'slot_start_date_time DESC',
-                page_size: 1000,
+                page_size: 10000,
                 ...refNodeFilter,
               },
             },
@@ -318,7 +320,7 @@ export function useEngineTimingsData({
                 slot_start_date_time_gte: start,
                 slot_start_date_time_lte: end,
                 order_by: 'chunk_duration_ms ASC',
-                page_size: 1000,
+                page_size: 10000,
                 ...refNodeFilter,
               },
             },
