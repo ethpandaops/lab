@@ -38,14 +38,18 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
 
   const { newPayloadByStatus, newPayloadByClient, getBlobsByStatus, getBlobsByClient } = data!;
 
-  // Aggregate newPayload stats from status rows (weighted by observation count)
-  const newPayloadTotalObs = newPayloadByStatus.reduce((sum, r) => sum + (r.observation_count ?? 0), 0);
-  const newPayloadWeightedMedian = newPayloadByStatus.reduce(
+  // Filter to VALID status only for newPayload (duration metrics are VALID-only from backend)
+  const newPayloadValidRows = newPayloadByStatus.filter(r => r.status?.toUpperCase() === 'VALID');
+  const newPayloadValidByClient = newPayloadByClient.filter(r => r.status?.toUpperCase() === 'VALID');
+
+  // Aggregate newPayload stats from VALID status rows only (weighted by observation count)
+  const newPayloadTotalObs = newPayloadValidRows.reduce((sum, r) => sum + (r.observation_count ?? 0), 0);
+  const newPayloadWeightedMedian = newPayloadValidRows.reduce(
     (sum, r) => sum + (r.median_duration_ms ?? 0) * (r.observation_count ?? 0),
     0
   );
   const newPayloadMedian = newPayloadTotalObs > 0 ? newPayloadWeightedMedian / newPayloadTotalObs : 0;
-  const newPayloadWeightedP95 = newPayloadByStatus.reduce(
+  const newPayloadWeightedP95 = newPayloadValidRows.reduce(
     (sum, r) => sum + (r.p95_duration_ms ?? 0) * (r.observation_count ?? 0),
     0
   );
@@ -67,8 +71,9 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
 
   const hasNewPayloadData = newPayloadTotalObs > 0;
   const hasGetBlobsData = getBlobsTotalObs > 0;
-  const hasClientData = newPayloadByClient.length > 0;
-  const hasGetBlobsClientData = getBlobsByClient.length > 0;
+  const hasClientData = newPayloadValidByClient.length > 0;
+  const getBlobsSuccessByClient = getBlobsByClient.filter(r => r.status?.toUpperCase() === 'SUCCESS');
+  const hasGetBlobsClientData = getBlobsSuccessByClient.length > 0;
 
   // Don't render if no data at all
   if (!hasNewPayloadData && !hasGetBlobsData) {
@@ -95,10 +100,10 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
             <MiniStat label="P95" value={`${newPayloadP95.toFixed(0)} ms`} />
           </div>
 
-          {/* Per-Client Breakdown */}
+          {/* Per-Client Breakdown - only VALID status */}
           {hasClientData && (
             <ClientVersionBreakdown
-              data={newPayloadByClient}
+              data={newPayloadValidByClient}
               noCard
               hideObservations
               hideP95
@@ -125,10 +130,10 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
                 <MiniStat label="P95" value={`${getBlobsP95.toFixed(0)} ms`} />
               </div>
 
-              {/* Per-Client Breakdown - only show SUCCESS status */}
+              {/* Per-Client Breakdown - only SUCCESS status */}
               {hasGetBlobsClientData && (
                 <ClientVersionBreakdown
-                  data={getBlobsByClient.filter(r => r.status?.toUpperCase() === 'SUCCESS')}
+                  data={getBlobsSuccessByClient}
                   noCard
                   hideObservations
                   hideP95

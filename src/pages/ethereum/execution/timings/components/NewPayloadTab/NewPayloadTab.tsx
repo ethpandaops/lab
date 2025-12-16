@@ -43,7 +43,6 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
     }
 
     // Sum up counts from all rows
-    let totalObservations = 0;
     let validCount = 0;
     let invalidCount = 0;
     let syncingCount = 0;
@@ -53,24 +52,24 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
     let totalWeightedP95 = 0;
 
     sourceData.forEach(row => {
-      const obs = row.observation_count ?? 0;
-      totalObservations += obs;
-      validCount += row.valid_count ?? 0;
+      const valid = row.valid_count ?? 0;
+      validCount += valid;
       invalidCount += row.invalid_count ?? 0;
       syncingCount += row.syncing_count ?? 0;
       acceptedCount += row.accepted_count ?? 0;
       invalidBlockHashCount += row.invalid_block_hash_count ?? 0;
-      // Weight duration averages by observation count
-      totalWeightedDuration += (row.avg_duration_ms ?? 0) * obs;
-      totalWeightedP95 += (row.avg_p95_duration_ms ?? 0) * obs;
+      // Weight duration averages by valid count (durations are VALID only from backend)
+      totalWeightedDuration += (row.avg_duration_ms ?? 0) * valid;
+      totalWeightedP95 += (row.avg_p95_duration_ms ?? 0) * valid;
     });
 
     const totalStatusCount = validCount + invalidCount + syncingCount + acceptedCount + invalidBlockHashCount;
     const validRate = totalStatusCount > 0 ? ((validCount / totalStatusCount) * 100).toFixed(1) : '0';
-    const avgDuration = totalObservations > 0 ? (totalWeightedDuration / totalObservations).toFixed(0) : '0';
-    const avgP95Duration = totalObservations > 0 ? (totalWeightedP95 / totalObservations).toFixed(0) : '0';
+    const avgDuration = validCount > 0 ? (totalWeightedDuration / validCount).toFixed(0) : '0';
+    const avgP95Duration = validCount > 0 ? (totalWeightedP95 / validCount).toFixed(0) : '0';
 
-    return { totalObservations, validRate, avgDuration, avgP95Duration };
+    // Use validCount for observations to match the table which shows VALID only
+    return { totalObservations: validCount, validRate, avgDuration, avgP95Duration };
   })();
 
   const { totalObservations, validRate, avgDuration, avgP95Duration } = aggregatedStats;
@@ -306,6 +305,7 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
         data={validPayloadByElClient}
         title="EL Client Duration"
         description="Median engine_newPayload duration (ms) by execution client and version"
+        hideObservations
       />
 
       {/* Per-Slot Duration by Client and Block Complexity - Side by Side */}
