@@ -255,13 +255,23 @@ export function GetBlobsTab({ data, isLoading }: GetBlobsTabProps): JSX.Element 
     themeColors.secondary,
   ];
 
+  // Downsample to ~400 points max per series to keep chart performant
+  const MAX_POINTS_PER_SERIES = 400;
+
   const slotDurationByClientSeries = elClientList.map((client, index) => {
     const slotMap = clientSlotData.get(client) ?? new Map();
     const sortedSlots = Array.from(slotMap.entries()).sort((a, b) => a[0] - b[0]);
 
+    // Downsample if needed - take every Nth point to stay under max
+    let sampledSlots = sortedSlots;
+    if (sortedSlots.length > MAX_POINTS_PER_SERIES) {
+      const step = Math.ceil(sortedSlots.length / MAX_POINTS_PER_SERIES);
+      sampledSlots = sortedSlots.filter((_, i) => i % step === 0);
+    }
+
     return {
       name: client,
-      data: sortedSlots.map(([slot, duration]) => [slot, duration]) as [number, number][],
+      data: sampledSlots.map(([slot, duration]) => [slot, duration]) as [number, number][],
       color: clientColors[index % clientColors.length],
     };
   });
