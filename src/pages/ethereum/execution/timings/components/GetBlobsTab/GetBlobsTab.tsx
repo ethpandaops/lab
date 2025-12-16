@@ -1,29 +1,13 @@
 import type { JSX } from 'react';
-import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { BarChart } from '@/components/Charts/Bar';
-import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot } from '@/utils';
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
 import type { TimeRange } from '../../IndexPage.types';
-
-/**
- * Helper to get intensity class based on value relative to max
- */
-function getIntensityClass(value: number, max: number): string {
-  if (max === 0) return 'bg-surface border-border text-muted';
-
-  const ratio = value / max;
-
-  // Use a color scale from green (fast) to red (slow)
-  if (ratio <= 0.25) return 'bg-success/20 border-success/40 text-success';
-  if (ratio <= 0.5) return 'bg-success/10 border-success/30 text-foreground';
-  if (ratio <= 0.75) return 'bg-warning/10 border-warning/30 text-foreground';
-  return 'bg-danger/10 border-danger/30 text-danger';
-}
+import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
 
 export interface GetBlobsTabProps {
   data: EngineTimingsData;
@@ -268,82 +252,13 @@ export function GetBlobsTab({ data, timeRange }: GetBlobsTabProps): JSX.Element 
         ]}
       />
 
-      {/* EL Client Duration */}
-      {hasClientData && (
-        <Card>
-          <div className="p-4">
-            <h4 className="mb-2 text-base font-semibold text-foreground" id="client-matrix">
-              EL Client Duration
-            </h4>
-            <p className="mb-4 text-sm text-muted">Median engine_getBlobs duration (ms) by execution client</p>
-
-            <div className="overflow-x-auto">
-              <div className="inline-block min-w-full">
-                {/* EL client headers */}
-                <div className="mb-2 flex gap-1">
-                  {elClientList.map(el => (
-                    <div key={el} className="flex min-w-20 flex-1 flex-col items-center gap-1 px-1">
-                      <ClientLogo client={el} size={20} />
-                      <div className="text-xs font-medium text-foreground">{el}</div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Duration values row */}
-                <div className="flex gap-1">
-                  {elClientList.map(el => {
-                    const metrics = elClientMetrics.get(el);
-                    const medianDuration = metrics?.medianDuration ?? 0;
-                    const totalObs = metrics?.observationCount ?? 0;
-                    const hasData = totalObs > 0;
-
-                    return (
-                      <div
-                        key={el}
-                        className={clsx(
-                          'flex min-w-20 flex-1 flex-col items-center justify-center rounded-xs border p-2 text-sm',
-                          hasData ? getIntensityClass(medianDuration, maxMedianDuration) : 'border-border bg-surface/50'
-                        )}
-                        title={
-                          hasData
-                            ? `${el}: ${medianDuration.toFixed(0)}ms median, ${totalObs.toLocaleString()} obs`
-                            : `${el}: No data`
-                        }
-                      >
-                        {hasData ? (
-                          <>
-                            <span className="font-semibold">{medianDuration.toFixed(0)}</span>
-                            <span className="text-xs opacity-70">ms</span>
-                          </>
-                        ) : (
-                          <span className="text-muted">-</span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Legend */}
-            <div className="mt-4 flex items-center gap-4 text-xs text-muted">
-              <span>Duration:</span>
-              <div className="flex items-center gap-1">
-                <div className="size-3 rounded-xs border border-success/40 bg-success/20" />
-                <span>Fast</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="size-3 rounded-xs border border-warning/30 bg-warning/10" />
-                <span>Medium</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="size-3 rounded-xs border border-danger/30 bg-danger/10" />
-                <span>Slow</span>
-              </div>
-            </div>
-          </div>
-        </Card>
-      )}
+      {/* Client Version Breakdown */}
+      <ClientVersionBreakdown
+        data={getBlobsByElClient}
+        title="EL Client Duration"
+        description="Median engine_getBlobs duration (ms) by execution client and version"
+        showBlobCount
+      />
 
       {/* Duration Histogram and Per-Slot Duration - Side by Side */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
