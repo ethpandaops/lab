@@ -24,6 +24,9 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   const themeColors = useThemeColors();
   const { newPayloadBySlot, newPayloadDurationHistogram, newPayloadByElClient } = data;
 
+  // Filter to VALID status only for duration-based charts
+  const validPayloadByElClient = newPayloadByElClient.filter(r => r.status?.toUpperCase() === 'VALID');
+
   // State for scatter chart series visibility
   const [visibleScatterSeries, setVisibleScatterSeries] = useState<Set<string>>(new Set());
   const [scatterSeriesInitialized, setScatterSeriesInitialized] = useState(false);
@@ -80,12 +83,12 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   const minSlot = slotData.length > 0 ? (slotData[0].slot ?? 0) : 0;
   const maxSlot = slotData.length > 0 ? (slotData[slotData.length - 1].slot ?? 0) : 0;
 
-  // Prepare duration histogram data
-  // Group histogram data by bucket and sum counts
+  // Prepare duration histogram data (VALID status only)
+  // Group histogram data by bucket and sum VALID counts
   const histogramMap = new Map<number, number>();
   newPayloadDurationHistogram.forEach(item => {
     const bucket = item.chunk_duration_ms ?? 0;
-    const count = item.observation_count ?? 0;
+    const count = item.valid_count ?? 0;
     histogramMap.set(bucket, (histogramMap.get(bucket) ?? 0) + count);
   });
 
@@ -135,10 +138,10 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   ];
 
   // === Block Complexity vs Duration by Client ===
-  // Group scatter data by EL client
+  // Group scatter data by EL client (VALID status only)
   const clientGasData = new Map<string, [number, number][]>();
 
-  newPayloadByElClient.forEach(item => {
+  validPayloadByElClient.forEach(item => {
     const client = (item.meta_execution_implementation ?? 'unknown').toLowerCase();
     const gasUsed = item.gas_used;
     const duration = item.median_duration_ms;
@@ -164,7 +167,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   ];
 
   // === EL Client Analysis ===
-  // Build a map of EL client -> metrics
+  // Build a map of EL client -> metrics (VALID status only)
   const elClientMetrics = new Map<
     string,
     {
@@ -175,7 +178,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     }
   >();
 
-  newPayloadByElClient.forEach(item => {
+  validPayloadByElClient.forEach(item => {
     const el = (item.meta_execution_implementation ?? 'unknown').toLowerCase();
 
     const existing = elClientMetrics.get(el);
@@ -203,10 +206,10 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   const elClientList = Array.from(elClientMetrics.keys()).sort();
 
   // === Per-Slot Duration by Client ===
-  // Group newPayloadByElClient data by client, then by slot
+  // Group data by client, then by slot (VALID status only)
   const clientSlotData = new Map<string, Map<number, number>>();
 
-  newPayloadByElClient.forEach(item => {
+  validPayloadByElClient.forEach(item => {
     const client = (item.meta_execution_implementation ?? 'unknown').toLowerCase();
     const slot = item.slot ?? 0;
     const duration = item.median_duration_ms ?? 0;
@@ -300,9 +303,9 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
         ]}
       />
 
-      {/* Client Version Breakdown */}
+      {/* Client Version Breakdown - only VALID status */}
       <ClientVersionBreakdown
-        data={newPayloadByElClient}
+        data={validPayloadByElClient}
         title="EL Client Duration"
         description="Median engine_newPayload duration (ms) by execution client and version"
       />

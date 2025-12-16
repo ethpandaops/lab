@@ -21,6 +21,9 @@ export function GetBlobsTab({ data, timeRange }: GetBlobsTabProps): JSX.Element 
   const themeColors = useThemeColors();
   const { getBlobsBySlot, getBlobsByElClient, getBlobsDurationHistogram, getBlobsHourly, getBlobsDaily } = data;
 
+  // Filter to SUCCESS status only for duration-based charts
+  const successBlobsByElClient = getBlobsByElClient.filter(r => r.status?.toUpperCase() === 'SUCCESS');
+
   // Determine which aggregated data source to use based on time range
   const useHourlyData = timeRange === 'hour' || timeRange === 'day';
 
@@ -76,11 +79,11 @@ export function GetBlobsTab({ data, timeRange }: GetBlobsTabProps): JSX.Element 
   );
   const avgBlobsPerRequest = slotTotalObservations > 0 ? (totalWeightedBlobs / slotTotalObservations).toFixed(1) : '0';
 
-  // Prepare duration histogram data
+  // Prepare duration histogram data (SUCCESS status only)
   const histogramMap = new Map<number, number>();
   getBlobsDurationHistogram.forEach(item => {
     const bucket = item.chunk_duration_ms ?? 0;
-    const count = item.observation_count ?? 0;
+    const count = item.success_count ?? 0;
     histogramMap.set(bucket, (histogramMap.get(bucket) ?? 0) + count);
   });
 
@@ -139,7 +142,7 @@ export function GetBlobsTab({ data, timeRange }: GetBlobsTabProps): JSX.Element 
   const blobCountData = blobCountBuckets.map(count => blobCountMap.get(count) ?? 0);
 
   // === EL Client Analysis ===
-  // Build a map of EL client -> metrics
+  // Build a map of EL client -> metrics (SUCCESS status only)
   const elClientMetrics = new Map<
     string,
     {
@@ -150,7 +153,7 @@ export function GetBlobsTab({ data, timeRange }: GetBlobsTabProps): JSX.Element 
     }
   >();
 
-  getBlobsByElClient.forEach(item => {
+  successBlobsByElClient.forEach(item => {
     const el = (item.meta_execution_implementation ?? 'unknown').toLowerCase();
 
     const existing = elClientMetrics.get(el);
@@ -178,10 +181,10 @@ export function GetBlobsTab({ data, timeRange }: GetBlobsTabProps): JSX.Element 
   const elClientList = Array.from(elClientMetrics.keys()).sort();
 
   // === Per-Slot Duration by Client ===
-  // Group getBlobsByElClient data by client, then by slot
+  // Group data by client, then by slot (SUCCESS status only)
   const clientSlotData = new Map<string, Map<number, number>>();
 
-  getBlobsByElClient.forEach(item => {
+  successBlobsByElClient.forEach(item => {
     const client = (item.meta_execution_implementation ?? 'unknown').toLowerCase();
     const slot = item.slot ?? 0;
     const duration = item.median_duration_ms ?? 0;
@@ -252,9 +255,9 @@ export function GetBlobsTab({ data, timeRange }: GetBlobsTabProps): JSX.Element 
         ]}
       />
 
-      {/* Client Version Breakdown */}
+      {/* Client Version Breakdown - only SUCCESS status */}
       <ClientVersionBreakdown
-        data={getBlobsByElClient}
+        data={successBlobsByElClient}
         title="EL Client Duration"
         description="Median engine_getBlobs duration (ms) by execution client and version"
         showBlobCount
