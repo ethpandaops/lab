@@ -66,7 +66,7 @@ export function GetBlobsTab({ data, isLoading }: GetBlobsTabProps): JSX.Element 
     return <GetBlobsTabSkeleton />;
   }
 
-  const { getBlobsBySlot, getBlobsByElClient, getBlobsDurationHistogram, getBlobsHourly, getBlobsDaily } = data;
+  const { getBlobsByElClient, getBlobsDurationHistogram, getBlobsHourly, getBlobsDaily } = data;
 
   // Filter to SUCCESS status only for duration-based charts
   const successBlobsByElClient = getBlobsByElClient.filter(r => r.status?.toUpperCase() === 'SUCCESS');
@@ -112,21 +112,27 @@ export function GetBlobsTab({ data, isLoading }: GetBlobsTabProps): JSX.Element 
 
   const { totalObservations, successRate, avgDuration } = aggregatedStats;
 
-  // Prepare slot data for charts
-  const slotData = [...getBlobsBySlot].sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0));
-  // Filter to SUCCESS only for metrics that should match the table
-  const successSlotData = slotData.filter(s => s.status?.toUpperCase() === 'SUCCESS');
+  // Calculate slot bounds from per-EL-client data (which has per-slot granularity)
+  const slotBounds = (() => {
+    let min = Infinity;
+    let max = -Infinity;
+    successBlobsByElClient.forEach(item => {
+      const slot = item.slot ?? 0;
+      if (slot < min) min = slot;
+      if (slot > max) max = slot;
+    });
+    return { minSlot: min === Infinity ? 0 : min, maxSlot: max === -Infinity ? 0 : max };
+  })();
 
-  const minSlot = slotData.length > 0 ? (slotData[0].slot ?? 0) : 0;
-  const maxSlot = slotData.length > 0 ? (slotData[slotData.length - 1].slot ?? 0) : 0;
+  const { minSlot, maxSlot } = slotBounds;
 
-  // Calculate weighted average blobs per request (SUCCESS only to match table)
-  const successSlotTotalObs = successSlotData.reduce((sum, s) => sum + (s.observation_count ?? 0), 0);
-  const totalWeightedBlobs = successSlotData.reduce(
+  // Calculate weighted average blobs per request from per-EL-client data (SUCCESS only)
+  const successTotalObs = successBlobsByElClient.reduce((sum, s) => sum + (s.observation_count ?? 0), 0);
+  const totalWeightedBlobs = successBlobsByElClient.reduce(
     (sum, s) => sum + (s.avg_returned_count ?? 0) * (s.observation_count ?? 0),
     0
   );
-  const avgBlobsPerRequest = successSlotTotalObs > 0 ? (totalWeightedBlobs / successSlotTotalObs).toFixed(1) : '0';
+  const avgBlobsPerRequest = successTotalObs > 0 ? (totalWeightedBlobs / successTotalObs).toFixed(1) : '0';
 
   // Prepare duration histogram data (SUCCESS status only)
   const histogramMap = new Map<number, number>();
@@ -140,30 +146,15 @@ export function GetBlobsTab({ data, isLoading }: GetBlobsTabProps): JSX.Element 
   const histogramLabels = histogramBuckets.map(bucket => `${bucket}ms`);
   const histogramData = histogramBuckets.map(bucket => histogramMap.get(bucket) ?? 0);
 
-  // Calculate status breakdown from slot data for the status distribution chart
-  const statusTotals = slotData.reduce(
-    (acc, item) => {
-      const status = item.status?.toUpperCase() ?? 'UNKNOWN';
-      const count = item.observation_count ?? 0;
-      switch (status) {
-        case 'SUCCESS':
-          acc.success += count;
-          break;
-        case 'PARTIAL':
-          acc.partial += count;
-          break;
-        case 'EMPTY':
-          acc.empty += count;
-          break;
-        case 'ERROR':
-          acc.error += count;
-          break;
-        case 'UNSUPPORTED':
-          acc.unsupported += count;
-          break;
-      }
-      return acc;
-    },
+  // Calculate status breakdown from pre-aggregated hourly data
+  const statusTotals = getBlobsHourly.reduce(
+    (acc, item) => ({
+      success: acc.success + (item.success_count ?? 0),
+      partial: acc.partial + (item.partial_count ?? 0),
+      empty: acc.empty + (item.empty_count ?? 0),
+      error: acc.error + (item.error_count ?? 0),
+      unsupported: acc.unsupported + (item.unsupported_count ?? 0),
+    }),
     { success: 0, partial: 0, empty: 0, error: 0, unsupported: 0 }
   );
 
@@ -177,9 +168,9 @@ export function GetBlobsTab({ data, isLoading }: GetBlobsTabProps): JSX.Element 
     { value: statusTotals.unsupported, color: themeColors.muted },
   ];
 
-  // Prepare blob count distribution (SUCCESS only to match table)
+  // Prepare blob count distribution from per-EL-client data (SUCCESS only to match table)
   const blobCountMap = new Map<number, number>();
-  successSlotData.forEach(item => {
+  successBlobsByElClient.forEach(item => {
     const blobCount = item.avg_returned_count ?? 0;
     const roundedCount = Math.round(blobCount);
     const obsCount = item.observation_count ?? 0;
