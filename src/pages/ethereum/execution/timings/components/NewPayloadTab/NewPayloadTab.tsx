@@ -62,20 +62,37 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
   const histogramLabels = histogramBuckets.map(bucket => `${bucket}ms`);
   const histogramData = histogramBuckets.map(bucket => histogramMap.get(bucket) ?? 0);
 
-  // Calculate status breakdown from slot data
+  // Calculate status breakdown from slot data (new schema: each row has status + observation_count)
   const statusTotals = slotData.reduce(
     (acc, item) => {
-      acc.valid += item.valid_count ?? 0;
-      acc.invalid += item.invalid_count ?? 0;
-      acc.syncing += item.syncing_count ?? 0;
-      acc.accepted += item.accepted_count ?? 0;
-      acc.invalidBlockHash += item.invalid_block_hash_count ?? 0;
+      const status = item.status?.toUpperCase() ?? 'UNKNOWN';
+      const count = item.observation_count ?? 0;
+      switch (status) {
+        case 'VALID':
+          acc.valid += count;
+          break;
+        case 'INVALID':
+          acc.invalid += count;
+          break;
+        case 'SYNCING':
+          acc.syncing += count;
+          break;
+        case 'ACCEPTED':
+          acc.accepted += count;
+          break;
+        case 'INVALID_BLOCK_HASH':
+          acc.invalidBlockHash += count;
+          break;
+        case 'ERROR':
+          acc.error += count;
+          break;
+      }
       return acc;
     },
-    { valid: 0, invalid: 0, syncing: 0, accepted: 0, invalidBlockHash: 0 }
+    { valid: 0, invalid: 0, syncing: 0, accepted: 0, invalidBlockHash: 0, error: 0 }
   );
 
-  const statusLabels = ['VALID', 'INVALID', 'SYNCING', 'ACCEPTED', 'INVALID_BLOCK_HASH'];
+  const statusLabels = ['VALID', 'INVALID', 'SYNCING', 'ACCEPTED', 'INVALID_BLOCK_HASH', 'ERROR'];
   // Use BarDataItem with per-bar colors
   const statusData = [
     { value: statusTotals.valid, color: themeColors.success },
@@ -83,6 +100,7 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
     { value: statusTotals.syncing, color: themeColors.warning },
     { value: statusTotals.accepted, color: themeColors.accent },
     { value: statusTotals.invalidBlockHash, color: themeColors.danger },
+    { value: statusTotals.error, color: themeColors.muted },
   ];
 
   // Calculate summary stats
@@ -92,18 +110,19 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
     statusTotals.invalid +
     statusTotals.syncing +
     statusTotals.accepted +
-    statusTotals.invalidBlockHash;
+    statusTotals.invalidBlockHash +
+    statusTotals.error;
   const validRate = totalStatusCount > 0 ? ((statusTotals.valid / totalStatusCount) * 100).toFixed(1) : '0';
 
-  // Calculate average durations from slot data
-  const avgDuration =
-    slotData.length > 0
-      ? (slotData.reduce((sum, s) => sum + (s.avg_duration_ms ?? 0), 0) / slotData.length).toFixed(0)
-      : '0';
-  const avgP95Duration =
-    slotData.length > 0
-      ? (slotData.reduce((sum, s) => sum + (s.p95_duration_ms ?? 0), 0) / slotData.length).toFixed(0)
-      : '0';
+  // Calculate weighted average durations from slot data (weight by observation count)
+  const totalWeightedDuration = slotData.reduce(
+    (sum, s) => sum + (s.avg_duration_ms ?? 0) * (s.observation_count ?? 0),
+    0
+  );
+  const avgDuration = totalObservations > 0 ? (totalWeightedDuration / totalObservations).toFixed(0) : '0';
+
+  const totalWeightedP95 = slotData.reduce((sum, s) => sum + (s.p95_duration_ms ?? 0) * (s.observation_count ?? 0), 0);
+  const avgP95Duration = totalObservations > 0 ? (totalWeightedP95 / totalObservations).toFixed(0) : '0';
 
   // === Block Complexity vs Duration by Client ===
   // Group scatter data by EL client

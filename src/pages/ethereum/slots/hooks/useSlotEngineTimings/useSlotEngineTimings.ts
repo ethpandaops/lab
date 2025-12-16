@@ -14,13 +14,13 @@ import type {
 } from '@/api/types.gen';
 
 export interface SlotEngineTimingsData {
-  /** newPayload timing data for this slot */
-  newPayload: FctEngineNewPayloadBySlot | null;
-  /** newPayload per-EL-client breakdown for this slot */
+  /** newPayload timing data for this slot (one row per status: VALID, INVALID, etc.) */
+  newPayloadByStatus: FctEngineNewPayloadBySlot[];
+  /** newPayload per-EL-client breakdown for this slot (one row per client per status) */
   newPayloadByClient: FctEngineNewPayloadByElClient[];
-  /** getBlobs timing data for this slot */
-  getBlobs: FctEngineGetBlobsBySlot | null;
-  /** getBlobs per-EL-client breakdown for this slot */
+  /** getBlobs timing data for this slot (one row per status: SUCCESS, PARTIAL, etc.) */
+  getBlobsByStatus: FctEngineGetBlobsBySlot[];
+  /** getBlobs per-EL-client breakdown for this slot (one row per client per status) */
   getBlobsByClient: FctEngineGetBlobsByElClient[];
 }
 
@@ -92,15 +92,15 @@ export function useSlotEngineTimings(slot: number): UseSlotEngineTimingsResult {
     };
   }
 
-  const newPayloadList = queries[0].data?.fct_engine_new_payload_by_slot ?? [];
+  const newPayloadByStatus = queries[0].data?.fct_engine_new_payload_by_slot ?? [];
   const newPayloadByClient = queries[1].data?.fct_engine_new_payload_by_el_client ?? [];
-  const getBlobsList = queries[2].data?.fct_engine_get_blobs_by_slot ?? [];
+  const getBlobsByStatus = queries[2].data?.fct_engine_get_blobs_by_slot ?? [];
   const getBlobsByClient = queries[3].data?.fct_engine_get_blobs_by_el_client ?? [];
 
   const data: SlotEngineTimingsData = {
-    newPayload: newPayloadList.length > 0 ? newPayloadList[0] : null,
+    newPayloadByStatus,
     newPayloadByClient,
-    getBlobs: getBlobsList.length > 0 ? getBlobsList[0] : null,
+    getBlobsByStatus,
     getBlobsByClient,
   };
 

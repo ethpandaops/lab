@@ -32,7 +32,7 @@ export interface EngineTimingsCardProps {
  */
 export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTimingsCardProps): JSX.Element | null {
   // Don't render anything if no data and not loading
-  if (!isLoading && !data?.newPayload && !data?.getBlobs) {
+  if (!isLoading && !data?.newPayloadByStatus?.length && !data?.getBlobsByStatus?.length) {
     return null;
   }
 
@@ -51,7 +51,33 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
     );
   }
 
-  const { newPayload, newPayloadByClient, getBlobs, getBlobsByClient } = data!;
+  const { newPayloadByStatus, newPayloadByClient, getBlobsByStatus, getBlobsByClient } = data!;
+
+  // Aggregate newPayload stats from status rows (weighted by observation count)
+  const newPayloadTotalObs = newPayloadByStatus.reduce((sum, r) => sum + (r.observation_count ?? 0), 0);
+  const newPayloadWeightedMedian = newPayloadByStatus.reduce(
+    (sum, r) => sum + (r.median_duration_ms ?? 0) * (r.observation_count ?? 0),
+    0
+  );
+  const newPayloadMedian = newPayloadTotalObs > 0 ? newPayloadWeightedMedian / newPayloadTotalObs : 0;
+  const newPayloadWeightedP95 = newPayloadByStatus.reduce(
+    (sum, r) => sum + (r.p95_duration_ms ?? 0) * (r.observation_count ?? 0),
+    0
+  );
+  const newPayloadP95 = newPayloadTotalObs > 0 ? newPayloadWeightedP95 / newPayloadTotalObs : 0;
+
+  // Aggregate getBlobs stats from status rows (weighted by observation count)
+  const getBlobsTotalObs = getBlobsByStatus.reduce((sum, r) => sum + (r.observation_count ?? 0), 0);
+  const getBlobsWeightedMedian = getBlobsByStatus.reduce(
+    (sum, r) => sum + (r.median_duration_ms ?? 0) * (r.observation_count ?? 0),
+    0
+  );
+  const getBlobsMedian = getBlobsTotalObs > 0 ? getBlobsWeightedMedian / getBlobsTotalObs : 0;
+  const getBlobsWeightedAvgBlobs = getBlobsByStatus.reduce(
+    (sum, r) => sum + (r.avg_returned_count ?? 0) * (r.observation_count ?? 0),
+    0
+  );
+  const getBlobsAvgBlobs = getBlobsTotalObs > 0 ? getBlobsWeightedAvgBlobs / getBlobsTotalObs : 0;
 
   // Build client metrics map for newPayload
   const clientMetrics = new Map<
@@ -126,8 +152,8 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
     }
   });
 
-  const hasNewPayloadData = newPayload && (newPayload.observation_count ?? 0) > 0;
-  const hasGetBlobsData = getBlobs && (getBlobs.observation_count ?? 0) > 0;
+  const hasNewPayloadData = newPayloadTotalObs > 0;
+  const hasGetBlobsData = getBlobsTotalObs > 0;
   const hasClientData = clientList.length > 0;
   const hasGetBlobsClientData = getBlobsClientList.length > 0;
 
@@ -151,9 +177,9 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
 
           {/* Summary Stats */}
           <div className="mb-6 grid grid-cols-3 gap-4">
-            <MiniStat label="Observations" value={(newPayload.observation_count ?? 0).toLocaleString()} />
-            <MiniStat label="Median" value={`${(newPayload.median_duration_ms ?? 0).toFixed(0)} ms`} />
-            <MiniStat label="P95" value={`${(newPayload.p95_duration_ms ?? 0).toFixed(0)} ms`} />
+            <MiniStat label="Observations" value={newPayloadTotalObs.toLocaleString()} />
+            <MiniStat label="Median" value={`${newPayloadMedian.toFixed(0)} ms`} />
+            <MiniStat label="P95" value={`${newPayloadP95.toFixed(0)} ms`} />
           </div>
 
           {/* Per-Client Breakdown */}
@@ -225,9 +251,9 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
             <>
               {/* Summary Stats */}
               <div className="mb-6 grid grid-cols-3 gap-4">
-                <MiniStat label="Observations" value={(getBlobs!.observation_count ?? 0).toLocaleString()} />
-                <MiniStat label="Median" value={`${(getBlobs!.median_duration_ms ?? 0).toFixed(0)} ms`} />
-                <MiniStat label="Avg Blobs" value={(getBlobs!.avg_returned_count ?? 0).toFixed(1)} />
+                <MiniStat label="Observations" value={getBlobsTotalObs.toLocaleString()} />
+                <MiniStat label="Median" value={`${getBlobsMedian.toFixed(0)} ms`} />
+                <MiniStat label="Avg Blobs" value={getBlobsAvgBlobs.toFixed(1)} />
               </div>
 
               {/* Per-Client Breakdown */}

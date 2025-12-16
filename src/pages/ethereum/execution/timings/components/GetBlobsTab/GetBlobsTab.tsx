@@ -55,14 +55,28 @@ export function GetBlobsTab({ data }: GetBlobsTabProps): JSX.Element {
   const histogramLabels = histogramBuckets.map(bucket => `${bucket}ms`);
   const histogramData = histogramBuckets.map(bucket => histogramMap.get(bucket) ?? 0);
 
-  // Calculate status breakdown from slot data
+  // Calculate status breakdown from slot data (new schema: each row has status + observation_count)
   const statusTotals = slotData.reduce(
     (acc, item) => {
-      acc.success += item.success_count ?? 0;
-      acc.partial += item.partial_count ?? 0;
-      acc.empty += item.empty_count ?? 0;
-      acc.error += item.error_count ?? 0;
-      acc.unsupported += item.unsupported_count ?? 0;
+      const status = item.status?.toUpperCase() ?? 'UNKNOWN';
+      const count = item.observation_count ?? 0;
+      switch (status) {
+        case 'SUCCESS':
+          acc.success += count;
+          break;
+        case 'PARTIAL':
+          acc.partial += count;
+          break;
+        case 'EMPTY':
+          acc.empty += count;
+          break;
+        case 'ERROR':
+          acc.error += count;
+          break;
+        case 'UNSUPPORTED':
+          acc.unsupported += count;
+          break;
+      }
       return acc;
     },
     { success: 0, partial: 0, empty: 0, error: 0, unsupported: 0 }
@@ -78,12 +92,13 @@ export function GetBlobsTab({ data }: GetBlobsTabProps): JSX.Element {
     { value: statusTotals.unsupported, color: themeColors.muted },
   ];
 
-  // Prepare blob count distribution
+  // Prepare blob count distribution (weight by observation count)
   const blobCountMap = new Map<number, number>();
   slotData.forEach(item => {
     const blobCount = item.avg_returned_count ?? 0;
     const roundedCount = Math.round(blobCount);
-    blobCountMap.set(roundedCount, (blobCountMap.get(roundedCount) ?? 0) + 1);
+    const obsCount = item.observation_count ?? 0;
+    blobCountMap.set(roundedCount, (blobCountMap.get(roundedCount) ?? 0) + obsCount);
   });
 
   const blobCountBuckets = Array.from(blobCountMap.keys()).sort((a, b) => a - b);
@@ -96,15 +111,19 @@ export function GetBlobsTab({ data }: GetBlobsTabProps): JSX.Element {
     statusTotals.success + statusTotals.partial + statusTotals.empty + statusTotals.error + statusTotals.unsupported;
   const successRate = totalStatusCount > 0 ? ((statusTotals.success / totalStatusCount) * 100).toFixed(1) : '0';
 
-  // Calculate average durations from slot data
-  const avgDuration =
-    slotData.length > 0
-      ? (slotData.reduce((sum, s) => sum + (s.avg_duration_ms ?? 0), 0) / slotData.length).toFixed(0)
-      : '0';
-  const avgBlobsPerRequest =
-    slotData.length > 0
-      ? (slotData.reduce((sum, s) => sum + (s.avg_returned_count ?? 0), 0) / slotData.length).toFixed(1)
-      : '0';
+  // Calculate weighted average durations from slot data (weight by observation count)
+  const totalWeightedDuration = slotData.reduce(
+    (sum, s) => sum + (s.avg_duration_ms ?? 0) * (s.observation_count ?? 0),
+    0
+  );
+  const avgDuration = totalObservations > 0 ? (totalWeightedDuration / totalObservations).toFixed(0) : '0';
+
+  // Calculate weighted average blobs per request
+  const totalWeightedBlobs = slotData.reduce(
+    (sum, s) => sum + (s.avg_returned_count ?? 0) * (s.observation_count ?? 0),
+    0
+  );
+  const avgBlobsPerRequest = totalObservations > 0 ? (totalWeightedBlobs / totalObservations).toFixed(1) : '0';
 
   // === EL Client Analysis ===
   // Build a map of EL client -> metrics

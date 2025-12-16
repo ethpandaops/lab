@@ -1975,10 +1975,6 @@ export type FctEngineGetBlobsByElClient = {
    */
   block_root?: string;
   /**
-   * Number of observations with EMPTY status
-   */
-  empty_count?: number;
-  /**
    * Epoch number derived from the slot
    */
   epoch?: number;
@@ -1986,10 +1982,6 @@ export type FctEngineGetBlobsByElClient = {
    * The wall clock time when the epoch started
    */
   epoch_start_date_time?: number;
-  /**
-   * Number of observations with ERROR status
-   */
-  error_count?: number;
   /**
    * Maximum duration of engine_getBlobs calls in milliseconds
    */
@@ -2015,17 +2007,13 @@ export type FctEngineGetBlobsByElClient = {
    */
   node_class?: string;
   /**
-   * Number of observations for this EL client
+   * Number of observations for this EL client/status
    */
   observation_count?: number;
   /**
    * 95th percentile duration of engine_getBlobs calls in milliseconds
    */
   p95_duration_ms?: number;
-  /**
-   * Number of observations with PARTIAL status
-   */
-  partial_count?: number;
   /**
    * Slot number of the beacon block being reconstructed
    */
@@ -2035,21 +2023,13 @@ export type FctEngineGetBlobsByElClient = {
    */
   slot_start_date_time?: number;
   /**
-   * Number of observations with SUCCESS status
+   * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR)
    */
-  success_count?: number;
+  status?: string;
   /**
-   * Percentage of observations with SUCCESS status
-   */
-  success_pct?: number;
-  /**
-   * Number of unique nodes with this EL client
+   * Number of unique nodes with this EL client/status
    */
   unique_node_count?: number;
-  /**
-   * Number of observations with UNSUPPORTED status
-   */
-  unsupported_count?: number;
   /**
    * Timestamp when the record was last updated
    */
@@ -2070,10 +2050,6 @@ export type FctEngineGetBlobsBySlot = {
    */
   block_root?: string;
   /**
-   * Number of observations with EMPTY status
-   */
-  empty_count?: number;
-  /**
    * Epoch number derived from the slot
    */
   epoch?: number;
@@ -2081,10 +2057,6 @@ export type FctEngineGetBlobsBySlot = {
    * The wall clock time when the epoch started
    */
   epoch_start_date_time?: number;
-  /**
-   * Number of observations with ERROR status
-   */
-  error_count?: number;
   /**
    * Percentage of observations where returned_count equals requested_count
    */
@@ -2110,17 +2082,13 @@ export type FctEngineGetBlobsBySlot = {
    */
   node_class?: string;
   /**
-   * Number of observations for this slot/block
+   * Number of observations for this slot/block/status
    */
   observation_count?: number;
   /**
    * 95th percentile duration of engine_getBlobs calls in milliseconds
    */
   p95_duration_ms?: number;
-  /**
-   * Number of observations with PARTIAL status
-   */
-  partial_count?: number;
   /**
    * Slot number of the beacon block being reconstructed
    */
@@ -2130,13 +2098,9 @@ export type FctEngineGetBlobsBySlot = {
    */
   slot_start_date_time?: number;
   /**
-   * Number of observations with SUCCESS status
+   * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR)
    */
-  success_count?: number;
-  /**
-   * Percentage of observations with SUCCESS status
-   */
-  success_pct?: number;
+  status?: string;
   /**
    * Number of unique CL client implementations observing this block
    */
@@ -2146,13 +2110,9 @@ export type FctEngineGetBlobsBySlot = {
    */
   unique_el_implementation_count?: number;
   /**
-   * Number of unique nodes that observed this block
+   * Number of unique nodes that observed this block with this status
    */
   unique_node_count?: number;
-  /**
-   * Number of observations with UNSUPPORTED status
-   */
-  unsupported_count?: number;
   /**
    * Timestamp when the record was last updated
    */
@@ -2342,10 +2302,6 @@ export type FctEngineGetBlobsStatusHourly = {
 
 export type FctEngineNewPayloadByElClient = {
   /**
-   * Number of observations with ACCEPTED status
-   */
-  accepted_count?: number;
-  /**
    * Average duration of engine_newPayload calls in milliseconds
    */
   avg_duration_ms?: number;
@@ -2378,14 +2334,6 @@ export type FctEngineNewPayloadByElClient = {
    */
   gas_used?: number;
   /**
-   * Number of observations with INVALID_BLOCK_HASH status
-   */
-  invalid_block_hash_count?: number;
-  /**
-   * Number of observations with INVALID status
-   */
-  invalid_count?: number;
-  /**
    * Maximum duration of engine_newPayload calls in milliseconds
    */
   max_duration_ms?: number;
@@ -2406,7 +2354,7 @@ export type FctEngineNewPayloadByElClient = {
    */
   node_class?: string;
   /**
-   * Number of observations for this EL client
+   * Number of observations for this EL client/status
    */
   observation_count?: number;
   /**
@@ -2422,36 +2370,24 @@ export type FctEngineNewPayloadByElClient = {
    */
   slot_start_date_time?: number;
   /**
-   * Number of observations with SYNCING status
+   * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR)
    */
-  syncing_count?: number;
+  status?: string;
   /**
    * Number of transactions in the block
    */
   tx_count?: number;
   /**
-   * Number of unique nodes with this EL client
+   * Number of unique nodes with this EL client/status
    */
   unique_node_count?: number;
   /**
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
-  /**
-   * Number of observations with VALID status
-   */
-  valid_count?: number;
-  /**
-   * Percentage of observations with VALID status
-   */
-  valid_pct?: number;
 };
 
 export type FctEngineNewPayloadBySlot = {
-  /**
-   * Number of observations with ACCEPTED status
-   */
-  accepted_count?: number;
   /**
    * Average duration of engine_newPayload calls in milliseconds
    */
@@ -2481,10 +2417,6 @@ export type FctEngineNewPayloadBySlot = {
    */
   epoch_start_date_time?: number;
   /**
-   * Number of observations with ERROR status
-   */
-  error_count?: number;
-  /**
    * Gas limit of the block
    */
   gas_limit?: number;
@@ -2492,14 +2424,6 @@ export type FctEngineNewPayloadBySlot = {
    * Total gas used by all transactions in the block
    */
   gas_used?: number;
-  /**
-   * Number of observations with INVALID_BLOCK_HASH status
-   */
-  invalid_block_hash_count?: number;
-  /**
-   * Number of observations with INVALID status
-   */
-  invalid_count?: number;
   /**
    * Maximum duration of engine_newPayload calls in milliseconds
    */
@@ -2517,7 +2441,7 @@ export type FctEngineNewPayloadBySlot = {
    */
   node_class?: string;
   /**
-   * Number of observations for this slot/block
+   * Number of observations for this slot/block/status
    */
   observation_count?: number;
   /**
@@ -2541,9 +2465,9 @@ export type FctEngineNewPayloadBySlot = {
    */
   slot_start_date_time?: number;
   /**
-   * Number of observations with SYNCING status
+   * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR)
    */
-  syncing_count?: number;
+  status?: string;
   /**
    * Number of transactions in the block
    */
@@ -2557,21 +2481,13 @@ export type FctEngineNewPayloadBySlot = {
    */
   unique_el_implementation_count?: number;
   /**
-   * Number of unique nodes that observed this block
+   * Number of unique nodes that observed this block with this status
    */
   unique_node_count?: number;
   /**
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
-  /**
-   * Number of observations with VALID status
-   */
-  valid_count?: number;
-  /**
-   * Percentage of observations with VALID status
-   */
-  valid_pct?: number;
 };
 
 export type FctEngineNewPayloadDurationChunked50Ms = {
@@ -25915,6 +25831,42 @@ export type FctEngineGetBlobsByElClientServiceListData = {
      */
     meta_execution_implementation_not_in_values?: string;
     /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: like)
+     */
+    status_like?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
      * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
      */
     node_class_eq?: string;
@@ -26111,83 +26063,83 @@ export type FctEngineGetBlobsByElClientServiceListData = {
      */
     epoch_start_date_time_not_in_values?: string;
     /**
-     * Number of observations for this EL client (filter: eq)
+     * Number of observations for this EL client/status (filter: eq)
      */
     observation_count_eq?: number;
     /**
-     * Number of observations for this EL client (filter: ne)
+     * Number of observations for this EL client/status (filter: ne)
      */
     observation_count_ne?: number;
     /**
-     * Number of observations for this EL client (filter: lt)
+     * Number of observations for this EL client/status (filter: lt)
      */
     observation_count_lt?: number;
     /**
-     * Number of observations for this EL client (filter: lte)
+     * Number of observations for this EL client/status (filter: lte)
      */
     observation_count_lte?: number;
     /**
-     * Number of observations for this EL client (filter: gt)
+     * Number of observations for this EL client/status (filter: gt)
      */
     observation_count_gt?: number;
     /**
-     * Number of observations for this EL client (filter: gte)
+     * Number of observations for this EL client/status (filter: gte)
      */
     observation_count_gte?: number;
     /**
-     * Number of observations for this EL client (filter: between_min)
+     * Number of observations for this EL client/status (filter: between_min)
      */
     observation_count_between_min?: number;
     /**
-     * Number of observations for this EL client (filter: between_max_value)
+     * Number of observations for this EL client/status (filter: between_max_value)
      */
     observation_count_between_max_value?: number;
     /**
-     * Number of observations for this EL client (filter: in_values) (comma-separated list)
+     * Number of observations for this EL client/status (filter: in_values) (comma-separated list)
      */
     observation_count_in_values?: string;
     /**
-     * Number of observations for this EL client (filter: not_in_values) (comma-separated list)
+     * Number of observations for this EL client/status (filter: not_in_values) (comma-separated list)
      */
     observation_count_not_in_values?: string;
     /**
-     * Number of unique nodes with this EL client (filter: eq)
+     * Number of unique nodes with this EL client/status (filter: eq)
      */
     unique_node_count_eq?: number;
     /**
-     * Number of unique nodes with this EL client (filter: ne)
+     * Number of unique nodes with this EL client/status (filter: ne)
      */
     unique_node_count_ne?: number;
     /**
-     * Number of unique nodes with this EL client (filter: lt)
+     * Number of unique nodes with this EL client/status (filter: lt)
      */
     unique_node_count_lt?: number;
     /**
-     * Number of unique nodes with this EL client (filter: lte)
+     * Number of unique nodes with this EL client/status (filter: lte)
      */
     unique_node_count_lte?: number;
     /**
-     * Number of unique nodes with this EL client (filter: gt)
+     * Number of unique nodes with this EL client/status (filter: gt)
      */
     unique_node_count_gt?: number;
     /**
-     * Number of unique nodes with this EL client (filter: gte)
+     * Number of unique nodes with this EL client/status (filter: gte)
      */
     unique_node_count_gte?: number;
     /**
-     * Number of unique nodes with this EL client (filter: between_min)
+     * Number of unique nodes with this EL client/status (filter: between_min)
      */
     unique_node_count_between_min?: number;
     /**
-     * Number of unique nodes with this EL client (filter: between_max_value)
+     * Number of unique nodes with this EL client/status (filter: between_max_value)
      */
     unique_node_count_between_max_value?: number;
     /**
-     * Number of unique nodes with this EL client (filter: in_values) (comma-separated list)
+     * Number of unique nodes with this EL client/status (filter: in_values) (comma-separated list)
      */
     unique_node_count_in_values?: string;
     /**
-     * Number of unique nodes with this EL client (filter: not_in_values) (comma-separated list)
+     * Number of unique nodes with this EL client/status (filter: not_in_values) (comma-separated list)
      */
     unique_node_count_not_in_values?: string;
     /**
@@ -26234,210 +26186,6 @@ export type FctEngineGetBlobsByElClientServiceListData = {
      * Filter avg_returned_count using value
      */
     avg_returned_count_value?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: eq)
-     */
-    success_count_eq?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: ne)
-     */
-    success_count_ne?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: lt)
-     */
-    success_count_lt?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: lte)
-     */
-    success_count_lte?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: gt)
-     */
-    success_count_gt?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: gte)
-     */
-    success_count_gte?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: between_min)
-     */
-    success_count_between_min?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: between_max_value)
-     */
-    success_count_between_max_value?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: in_values) (comma-separated list)
-     */
-    success_count_in_values?: string;
-    /**
-     * Number of observations with SUCCESS status (filter: not_in_values) (comma-separated list)
-     */
-    success_count_not_in_values?: string;
-    /**
-     * Number of observations with PARTIAL status (filter: eq)
-     */
-    partial_count_eq?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: ne)
-     */
-    partial_count_ne?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: lt)
-     */
-    partial_count_lt?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: lte)
-     */
-    partial_count_lte?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: gt)
-     */
-    partial_count_gt?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: gte)
-     */
-    partial_count_gte?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: between_min)
-     */
-    partial_count_between_min?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: between_max_value)
-     */
-    partial_count_between_max_value?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: in_values) (comma-separated list)
-     */
-    partial_count_in_values?: string;
-    /**
-     * Number of observations with PARTIAL status (filter: not_in_values) (comma-separated list)
-     */
-    partial_count_not_in_values?: string;
-    /**
-     * Number of observations with EMPTY status (filter: eq)
-     */
-    empty_count_eq?: number;
-    /**
-     * Number of observations with EMPTY status (filter: ne)
-     */
-    empty_count_ne?: number;
-    /**
-     * Number of observations with EMPTY status (filter: lt)
-     */
-    empty_count_lt?: number;
-    /**
-     * Number of observations with EMPTY status (filter: lte)
-     */
-    empty_count_lte?: number;
-    /**
-     * Number of observations with EMPTY status (filter: gt)
-     */
-    empty_count_gt?: number;
-    /**
-     * Number of observations with EMPTY status (filter: gte)
-     */
-    empty_count_gte?: number;
-    /**
-     * Number of observations with EMPTY status (filter: between_min)
-     */
-    empty_count_between_min?: number;
-    /**
-     * Number of observations with EMPTY status (filter: between_max_value)
-     */
-    empty_count_between_max_value?: number;
-    /**
-     * Number of observations with EMPTY status (filter: in_values) (comma-separated list)
-     */
-    empty_count_in_values?: string;
-    /**
-     * Number of observations with EMPTY status (filter: not_in_values) (comma-separated list)
-     */
-    empty_count_not_in_values?: string;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: eq)
-     */
-    unsupported_count_eq?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: ne)
-     */
-    unsupported_count_ne?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: lt)
-     */
-    unsupported_count_lt?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: lte)
-     */
-    unsupported_count_lte?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: gt)
-     */
-    unsupported_count_gt?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: gte)
-     */
-    unsupported_count_gte?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: between_min)
-     */
-    unsupported_count_between_min?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: between_max_value)
-     */
-    unsupported_count_between_max_value?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: in_values) (comma-separated list)
-     */
-    unsupported_count_in_values?: string;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: not_in_values) (comma-separated list)
-     */
-    unsupported_count_not_in_values?: string;
-    /**
-     * Number of observations with ERROR status (filter: eq)
-     */
-    error_count_eq?: number;
-    /**
-     * Number of observations with ERROR status (filter: ne)
-     */
-    error_count_ne?: number;
-    /**
-     * Number of observations with ERROR status (filter: lt)
-     */
-    error_count_lt?: number;
-    /**
-     * Number of observations with ERROR status (filter: lte)
-     */
-    error_count_lte?: number;
-    /**
-     * Number of observations with ERROR status (filter: gt)
-     */
-    error_count_gt?: number;
-    /**
-     * Number of observations with ERROR status (filter: gte)
-     */
-    error_count_gte?: number;
-    /**
-     * Number of observations with ERROR status (filter: between_min)
-     */
-    error_count_between_min?: number;
-    /**
-     * Number of observations with ERROR status (filter: between_max_value)
-     */
-    error_count_between_max_value?: number;
-    /**
-     * Number of observations with ERROR status (filter: in_values) (comma-separated list)
-     */
-    error_count_in_values?: string;
-    /**
-     * Number of observations with ERROR status (filter: not_in_values) (comma-separated list)
-     */
-    error_count_not_in_values?: string;
-    /**
-     * Filter success_pct using value
-     */
-    success_pct_value?: number;
     /**
      * Average duration of engine_getBlobs calls in milliseconds (filter: eq)
      */
@@ -26787,6 +26535,42 @@ export type FctEngineGetBlobsBySlotServiceListData = {
      */
     block_root_not_in_values?: string;
     /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: like)
+     */
+    status_like?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
      * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
      */
     node_class_eq?: string;
@@ -26983,83 +26767,83 @@ export type FctEngineGetBlobsBySlotServiceListData = {
      */
     epoch_start_date_time_not_in_values?: string;
     /**
-     * Number of observations for this slot/block (filter: eq)
+     * Number of observations for this slot/block/status (filter: eq)
      */
     observation_count_eq?: number;
     /**
-     * Number of observations for this slot/block (filter: ne)
+     * Number of observations for this slot/block/status (filter: ne)
      */
     observation_count_ne?: number;
     /**
-     * Number of observations for this slot/block (filter: lt)
+     * Number of observations for this slot/block/status (filter: lt)
      */
     observation_count_lt?: number;
     /**
-     * Number of observations for this slot/block (filter: lte)
+     * Number of observations for this slot/block/status (filter: lte)
      */
     observation_count_lte?: number;
     /**
-     * Number of observations for this slot/block (filter: gt)
+     * Number of observations for this slot/block/status (filter: gt)
      */
     observation_count_gt?: number;
     /**
-     * Number of observations for this slot/block (filter: gte)
+     * Number of observations for this slot/block/status (filter: gte)
      */
     observation_count_gte?: number;
     /**
-     * Number of observations for this slot/block (filter: between_min)
+     * Number of observations for this slot/block/status (filter: between_min)
      */
     observation_count_between_min?: number;
     /**
-     * Number of observations for this slot/block (filter: between_max_value)
+     * Number of observations for this slot/block/status (filter: between_max_value)
      */
     observation_count_between_max_value?: number;
     /**
-     * Number of observations for this slot/block (filter: in_values) (comma-separated list)
+     * Number of observations for this slot/block/status (filter: in_values) (comma-separated list)
      */
     observation_count_in_values?: string;
     /**
-     * Number of observations for this slot/block (filter: not_in_values) (comma-separated list)
+     * Number of observations for this slot/block/status (filter: not_in_values) (comma-separated list)
      */
     observation_count_not_in_values?: string;
     /**
-     * Number of unique nodes that observed this block (filter: eq)
+     * Number of unique nodes that observed this block with this status (filter: eq)
      */
     unique_node_count_eq?: number;
     /**
-     * Number of unique nodes that observed this block (filter: ne)
+     * Number of unique nodes that observed this block with this status (filter: ne)
      */
     unique_node_count_ne?: number;
     /**
-     * Number of unique nodes that observed this block (filter: lt)
+     * Number of unique nodes that observed this block with this status (filter: lt)
      */
     unique_node_count_lt?: number;
     /**
-     * Number of unique nodes that observed this block (filter: lte)
+     * Number of unique nodes that observed this block with this status (filter: lte)
      */
     unique_node_count_lte?: number;
     /**
-     * Number of unique nodes that observed this block (filter: gt)
+     * Number of unique nodes that observed this block with this status (filter: gt)
      */
     unique_node_count_gt?: number;
     /**
-     * Number of unique nodes that observed this block (filter: gte)
+     * Number of unique nodes that observed this block with this status (filter: gte)
      */
     unique_node_count_gte?: number;
     /**
-     * Number of unique nodes that observed this block (filter: between_min)
+     * Number of unique nodes that observed this block with this status (filter: between_min)
      */
     unique_node_count_between_min?: number;
     /**
-     * Number of unique nodes that observed this block (filter: between_max_value)
+     * Number of unique nodes that observed this block with this status (filter: between_max_value)
      */
     unique_node_count_between_max_value?: number;
     /**
-     * Number of unique nodes that observed this block (filter: in_values) (comma-separated list)
+     * Number of unique nodes that observed this block with this status (filter: in_values) (comma-separated list)
      */
     unique_node_count_in_values?: string;
     /**
-     * Number of unique nodes that observed this block (filter: not_in_values) (comma-separated list)
+     * Number of unique nodes that observed this block with this status (filter: not_in_values) (comma-separated list)
      */
     unique_node_count_not_in_values?: string;
     /**
@@ -27106,210 +26890,6 @@ export type FctEngineGetBlobsBySlotServiceListData = {
      * Filter avg_returned_count using value
      */
     avg_returned_count_value?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: eq)
-     */
-    success_count_eq?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: ne)
-     */
-    success_count_ne?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: lt)
-     */
-    success_count_lt?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: lte)
-     */
-    success_count_lte?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: gt)
-     */
-    success_count_gt?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: gte)
-     */
-    success_count_gte?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: between_min)
-     */
-    success_count_between_min?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: between_max_value)
-     */
-    success_count_between_max_value?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: in_values) (comma-separated list)
-     */
-    success_count_in_values?: string;
-    /**
-     * Number of observations with SUCCESS status (filter: not_in_values) (comma-separated list)
-     */
-    success_count_not_in_values?: string;
-    /**
-     * Number of observations with PARTIAL status (filter: eq)
-     */
-    partial_count_eq?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: ne)
-     */
-    partial_count_ne?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: lt)
-     */
-    partial_count_lt?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: lte)
-     */
-    partial_count_lte?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: gt)
-     */
-    partial_count_gt?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: gte)
-     */
-    partial_count_gte?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: between_min)
-     */
-    partial_count_between_min?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: between_max_value)
-     */
-    partial_count_between_max_value?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: in_values) (comma-separated list)
-     */
-    partial_count_in_values?: string;
-    /**
-     * Number of observations with PARTIAL status (filter: not_in_values) (comma-separated list)
-     */
-    partial_count_not_in_values?: string;
-    /**
-     * Number of observations with EMPTY status (filter: eq)
-     */
-    empty_count_eq?: number;
-    /**
-     * Number of observations with EMPTY status (filter: ne)
-     */
-    empty_count_ne?: number;
-    /**
-     * Number of observations with EMPTY status (filter: lt)
-     */
-    empty_count_lt?: number;
-    /**
-     * Number of observations with EMPTY status (filter: lte)
-     */
-    empty_count_lte?: number;
-    /**
-     * Number of observations with EMPTY status (filter: gt)
-     */
-    empty_count_gt?: number;
-    /**
-     * Number of observations with EMPTY status (filter: gte)
-     */
-    empty_count_gte?: number;
-    /**
-     * Number of observations with EMPTY status (filter: between_min)
-     */
-    empty_count_between_min?: number;
-    /**
-     * Number of observations with EMPTY status (filter: between_max_value)
-     */
-    empty_count_between_max_value?: number;
-    /**
-     * Number of observations with EMPTY status (filter: in_values) (comma-separated list)
-     */
-    empty_count_in_values?: string;
-    /**
-     * Number of observations with EMPTY status (filter: not_in_values) (comma-separated list)
-     */
-    empty_count_not_in_values?: string;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: eq)
-     */
-    unsupported_count_eq?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: ne)
-     */
-    unsupported_count_ne?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: lt)
-     */
-    unsupported_count_lt?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: lte)
-     */
-    unsupported_count_lte?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: gt)
-     */
-    unsupported_count_gt?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: gte)
-     */
-    unsupported_count_gte?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: between_min)
-     */
-    unsupported_count_between_min?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: between_max_value)
-     */
-    unsupported_count_between_max_value?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: in_values) (comma-separated list)
-     */
-    unsupported_count_in_values?: string;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: not_in_values) (comma-separated list)
-     */
-    unsupported_count_not_in_values?: string;
-    /**
-     * Number of observations with ERROR status (filter: eq)
-     */
-    error_count_eq?: number;
-    /**
-     * Number of observations with ERROR status (filter: ne)
-     */
-    error_count_ne?: number;
-    /**
-     * Number of observations with ERROR status (filter: lt)
-     */
-    error_count_lt?: number;
-    /**
-     * Number of observations with ERROR status (filter: lte)
-     */
-    error_count_lte?: number;
-    /**
-     * Number of observations with ERROR status (filter: gt)
-     */
-    error_count_gt?: number;
-    /**
-     * Number of observations with ERROR status (filter: gte)
-     */
-    error_count_gte?: number;
-    /**
-     * Number of observations with ERROR status (filter: between_min)
-     */
-    error_count_between_min?: number;
-    /**
-     * Number of observations with ERROR status (filter: between_max_value)
-     */
-    error_count_between_max_value?: number;
-    /**
-     * Number of observations with ERROR status (filter: in_values) (comma-separated list)
-     */
-    error_count_in_values?: string;
-    /**
-     * Number of observations with ERROR status (filter: not_in_values) (comma-separated list)
-     */
-    error_count_not_in_values?: string;
-    /**
-     * Filter success_pct using value
-     */
-    success_pct_value?: number;
     /**
      * Filter full_return_pct using value
      */
@@ -29623,6 +29203,42 @@ export type FctEngineNewPayloadByElClientServiceListData = {
      */
     meta_execution_implementation_not_in_values?: string;
     /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: like)
+     */
+    status_like?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
      * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
      */
     node_class_eq?: string;
@@ -30015,289 +29631,85 @@ export type FctEngineNewPayloadByElClientServiceListData = {
      */
     blob_count_not_in_values?: string;
     /**
-     * Number of observations for this EL client (filter: eq)
+     * Number of observations for this EL client/status (filter: eq)
      */
     observation_count_eq?: number;
     /**
-     * Number of observations for this EL client (filter: ne)
+     * Number of observations for this EL client/status (filter: ne)
      */
     observation_count_ne?: number;
     /**
-     * Number of observations for this EL client (filter: lt)
+     * Number of observations for this EL client/status (filter: lt)
      */
     observation_count_lt?: number;
     /**
-     * Number of observations for this EL client (filter: lte)
+     * Number of observations for this EL client/status (filter: lte)
      */
     observation_count_lte?: number;
     /**
-     * Number of observations for this EL client (filter: gt)
+     * Number of observations for this EL client/status (filter: gt)
      */
     observation_count_gt?: number;
     /**
-     * Number of observations for this EL client (filter: gte)
+     * Number of observations for this EL client/status (filter: gte)
      */
     observation_count_gte?: number;
     /**
-     * Number of observations for this EL client (filter: between_min)
+     * Number of observations for this EL client/status (filter: between_min)
      */
     observation_count_between_min?: number;
     /**
-     * Number of observations for this EL client (filter: between_max_value)
+     * Number of observations for this EL client/status (filter: between_max_value)
      */
     observation_count_between_max_value?: number;
     /**
-     * Number of observations for this EL client (filter: in_values) (comma-separated list)
+     * Number of observations for this EL client/status (filter: in_values) (comma-separated list)
      */
     observation_count_in_values?: string;
     /**
-     * Number of observations for this EL client (filter: not_in_values) (comma-separated list)
+     * Number of observations for this EL client/status (filter: not_in_values) (comma-separated list)
      */
     observation_count_not_in_values?: string;
     /**
-     * Number of unique nodes with this EL client (filter: eq)
+     * Number of unique nodes with this EL client/status (filter: eq)
      */
     unique_node_count_eq?: number;
     /**
-     * Number of unique nodes with this EL client (filter: ne)
+     * Number of unique nodes with this EL client/status (filter: ne)
      */
     unique_node_count_ne?: number;
     /**
-     * Number of unique nodes with this EL client (filter: lt)
+     * Number of unique nodes with this EL client/status (filter: lt)
      */
     unique_node_count_lt?: number;
     /**
-     * Number of unique nodes with this EL client (filter: lte)
+     * Number of unique nodes with this EL client/status (filter: lte)
      */
     unique_node_count_lte?: number;
     /**
-     * Number of unique nodes with this EL client (filter: gt)
+     * Number of unique nodes with this EL client/status (filter: gt)
      */
     unique_node_count_gt?: number;
     /**
-     * Number of unique nodes with this EL client (filter: gte)
+     * Number of unique nodes with this EL client/status (filter: gte)
      */
     unique_node_count_gte?: number;
     /**
-     * Number of unique nodes with this EL client (filter: between_min)
+     * Number of unique nodes with this EL client/status (filter: between_min)
      */
     unique_node_count_between_min?: number;
     /**
-     * Number of unique nodes with this EL client (filter: between_max_value)
+     * Number of unique nodes with this EL client/status (filter: between_max_value)
      */
     unique_node_count_between_max_value?: number;
     /**
-     * Number of unique nodes with this EL client (filter: in_values) (comma-separated list)
+     * Number of unique nodes with this EL client/status (filter: in_values) (comma-separated list)
      */
     unique_node_count_in_values?: string;
     /**
-     * Number of unique nodes with this EL client (filter: not_in_values) (comma-separated list)
+     * Number of unique nodes with this EL client/status (filter: not_in_values) (comma-separated list)
      */
     unique_node_count_not_in_values?: string;
-    /**
-     * Number of observations with VALID status (filter: eq)
-     */
-    valid_count_eq?: number;
-    /**
-     * Number of observations with VALID status (filter: ne)
-     */
-    valid_count_ne?: number;
-    /**
-     * Number of observations with VALID status (filter: lt)
-     */
-    valid_count_lt?: number;
-    /**
-     * Number of observations with VALID status (filter: lte)
-     */
-    valid_count_lte?: number;
-    /**
-     * Number of observations with VALID status (filter: gt)
-     */
-    valid_count_gt?: number;
-    /**
-     * Number of observations with VALID status (filter: gte)
-     */
-    valid_count_gte?: number;
-    /**
-     * Number of observations with VALID status (filter: between_min)
-     */
-    valid_count_between_min?: number;
-    /**
-     * Number of observations with VALID status (filter: between_max_value)
-     */
-    valid_count_between_max_value?: number;
-    /**
-     * Number of observations with VALID status (filter: in_values) (comma-separated list)
-     */
-    valid_count_in_values?: string;
-    /**
-     * Number of observations with VALID status (filter: not_in_values) (comma-separated list)
-     */
-    valid_count_not_in_values?: string;
-    /**
-     * Number of observations with INVALID status (filter: eq)
-     */
-    invalid_count_eq?: number;
-    /**
-     * Number of observations with INVALID status (filter: ne)
-     */
-    invalid_count_ne?: number;
-    /**
-     * Number of observations with INVALID status (filter: lt)
-     */
-    invalid_count_lt?: number;
-    /**
-     * Number of observations with INVALID status (filter: lte)
-     */
-    invalid_count_lte?: number;
-    /**
-     * Number of observations with INVALID status (filter: gt)
-     */
-    invalid_count_gt?: number;
-    /**
-     * Number of observations with INVALID status (filter: gte)
-     */
-    invalid_count_gte?: number;
-    /**
-     * Number of observations with INVALID status (filter: between_min)
-     */
-    invalid_count_between_min?: number;
-    /**
-     * Number of observations with INVALID status (filter: between_max_value)
-     */
-    invalid_count_between_max_value?: number;
-    /**
-     * Number of observations with INVALID status (filter: in_values) (comma-separated list)
-     */
-    invalid_count_in_values?: string;
-    /**
-     * Number of observations with INVALID status (filter: not_in_values) (comma-separated list)
-     */
-    invalid_count_not_in_values?: string;
-    /**
-     * Number of observations with SYNCING status (filter: eq)
-     */
-    syncing_count_eq?: number;
-    /**
-     * Number of observations with SYNCING status (filter: ne)
-     */
-    syncing_count_ne?: number;
-    /**
-     * Number of observations with SYNCING status (filter: lt)
-     */
-    syncing_count_lt?: number;
-    /**
-     * Number of observations with SYNCING status (filter: lte)
-     */
-    syncing_count_lte?: number;
-    /**
-     * Number of observations with SYNCING status (filter: gt)
-     */
-    syncing_count_gt?: number;
-    /**
-     * Number of observations with SYNCING status (filter: gte)
-     */
-    syncing_count_gte?: number;
-    /**
-     * Number of observations with SYNCING status (filter: between_min)
-     */
-    syncing_count_between_min?: number;
-    /**
-     * Number of observations with SYNCING status (filter: between_max_value)
-     */
-    syncing_count_between_max_value?: number;
-    /**
-     * Number of observations with SYNCING status (filter: in_values) (comma-separated list)
-     */
-    syncing_count_in_values?: string;
-    /**
-     * Number of observations with SYNCING status (filter: not_in_values) (comma-separated list)
-     */
-    syncing_count_not_in_values?: string;
-    /**
-     * Number of observations with ACCEPTED status (filter: eq)
-     */
-    accepted_count_eq?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: ne)
-     */
-    accepted_count_ne?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: lt)
-     */
-    accepted_count_lt?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: lte)
-     */
-    accepted_count_lte?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: gt)
-     */
-    accepted_count_gt?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: gte)
-     */
-    accepted_count_gte?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: between_min)
-     */
-    accepted_count_between_min?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: between_max_value)
-     */
-    accepted_count_between_max_value?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: in_values) (comma-separated list)
-     */
-    accepted_count_in_values?: string;
-    /**
-     * Number of observations with ACCEPTED status (filter: not_in_values) (comma-separated list)
-     */
-    accepted_count_not_in_values?: string;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: eq)
-     */
-    invalid_block_hash_count_eq?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: ne)
-     */
-    invalid_block_hash_count_ne?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: lt)
-     */
-    invalid_block_hash_count_lt?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: lte)
-     */
-    invalid_block_hash_count_lte?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: gt)
-     */
-    invalid_block_hash_count_gt?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: gte)
-     */
-    invalid_block_hash_count_gte?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: between_min)
-     */
-    invalid_block_hash_count_between_min?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: between_max_value)
-     */
-    invalid_block_hash_count_between_max_value?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: in_values) (comma-separated list)
-     */
-    invalid_block_hash_count_in_values?: string;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: not_in_values) (comma-separated list)
-     */
-    invalid_block_hash_count_not_in_values?: string;
-    /**
-     * Filter valid_pct using value
-     */
-    valid_pct_value?: number;
     /**
      * Average duration of engine_newPayload calls in milliseconds (filter: eq)
      */
@@ -30646,6 +30058,42 @@ export type FctEngineNewPayloadBySlotServiceListData = {
      * Execution block hash (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
      */
     block_hash_not_in_values?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: like)
+     */
+    status_like?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
     /**
      * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
      */
@@ -31119,329 +30567,85 @@ export type FctEngineNewPayloadBySlotServiceListData = {
      */
     blob_count_not_in_values?: string;
     /**
-     * Number of observations for this slot/block (filter: eq)
+     * Number of observations for this slot/block/status (filter: eq)
      */
     observation_count_eq?: number;
     /**
-     * Number of observations for this slot/block (filter: ne)
+     * Number of observations for this slot/block/status (filter: ne)
      */
     observation_count_ne?: number;
     /**
-     * Number of observations for this slot/block (filter: lt)
+     * Number of observations for this slot/block/status (filter: lt)
      */
     observation_count_lt?: number;
     /**
-     * Number of observations for this slot/block (filter: lte)
+     * Number of observations for this slot/block/status (filter: lte)
      */
     observation_count_lte?: number;
     /**
-     * Number of observations for this slot/block (filter: gt)
+     * Number of observations for this slot/block/status (filter: gt)
      */
     observation_count_gt?: number;
     /**
-     * Number of observations for this slot/block (filter: gte)
+     * Number of observations for this slot/block/status (filter: gte)
      */
     observation_count_gte?: number;
     /**
-     * Number of observations for this slot/block (filter: between_min)
+     * Number of observations for this slot/block/status (filter: between_min)
      */
     observation_count_between_min?: number;
     /**
-     * Number of observations for this slot/block (filter: between_max_value)
+     * Number of observations for this slot/block/status (filter: between_max_value)
      */
     observation_count_between_max_value?: number;
     /**
-     * Number of observations for this slot/block (filter: in_values) (comma-separated list)
+     * Number of observations for this slot/block/status (filter: in_values) (comma-separated list)
      */
     observation_count_in_values?: string;
     /**
-     * Number of observations for this slot/block (filter: not_in_values) (comma-separated list)
+     * Number of observations for this slot/block/status (filter: not_in_values) (comma-separated list)
      */
     observation_count_not_in_values?: string;
     /**
-     * Number of unique nodes that observed this block (filter: eq)
+     * Number of unique nodes that observed this block with this status (filter: eq)
      */
     unique_node_count_eq?: number;
     /**
-     * Number of unique nodes that observed this block (filter: ne)
+     * Number of unique nodes that observed this block with this status (filter: ne)
      */
     unique_node_count_ne?: number;
     /**
-     * Number of unique nodes that observed this block (filter: lt)
+     * Number of unique nodes that observed this block with this status (filter: lt)
      */
     unique_node_count_lt?: number;
     /**
-     * Number of unique nodes that observed this block (filter: lte)
+     * Number of unique nodes that observed this block with this status (filter: lte)
      */
     unique_node_count_lte?: number;
     /**
-     * Number of unique nodes that observed this block (filter: gt)
+     * Number of unique nodes that observed this block with this status (filter: gt)
      */
     unique_node_count_gt?: number;
     /**
-     * Number of unique nodes that observed this block (filter: gte)
+     * Number of unique nodes that observed this block with this status (filter: gte)
      */
     unique_node_count_gte?: number;
     /**
-     * Number of unique nodes that observed this block (filter: between_min)
+     * Number of unique nodes that observed this block with this status (filter: between_min)
      */
     unique_node_count_between_min?: number;
     /**
-     * Number of unique nodes that observed this block (filter: between_max_value)
+     * Number of unique nodes that observed this block with this status (filter: between_max_value)
      */
     unique_node_count_between_max_value?: number;
     /**
-     * Number of unique nodes that observed this block (filter: in_values) (comma-separated list)
+     * Number of unique nodes that observed this block with this status (filter: in_values) (comma-separated list)
      */
     unique_node_count_in_values?: string;
     /**
-     * Number of unique nodes that observed this block (filter: not_in_values) (comma-separated list)
+     * Number of unique nodes that observed this block with this status (filter: not_in_values) (comma-separated list)
      */
     unique_node_count_not_in_values?: string;
-    /**
-     * Number of observations with VALID status (filter: eq)
-     */
-    valid_count_eq?: number;
-    /**
-     * Number of observations with VALID status (filter: ne)
-     */
-    valid_count_ne?: number;
-    /**
-     * Number of observations with VALID status (filter: lt)
-     */
-    valid_count_lt?: number;
-    /**
-     * Number of observations with VALID status (filter: lte)
-     */
-    valid_count_lte?: number;
-    /**
-     * Number of observations with VALID status (filter: gt)
-     */
-    valid_count_gt?: number;
-    /**
-     * Number of observations with VALID status (filter: gte)
-     */
-    valid_count_gte?: number;
-    /**
-     * Number of observations with VALID status (filter: between_min)
-     */
-    valid_count_between_min?: number;
-    /**
-     * Number of observations with VALID status (filter: between_max_value)
-     */
-    valid_count_between_max_value?: number;
-    /**
-     * Number of observations with VALID status (filter: in_values) (comma-separated list)
-     */
-    valid_count_in_values?: string;
-    /**
-     * Number of observations with VALID status (filter: not_in_values) (comma-separated list)
-     */
-    valid_count_not_in_values?: string;
-    /**
-     * Number of observations with INVALID status (filter: eq)
-     */
-    invalid_count_eq?: number;
-    /**
-     * Number of observations with INVALID status (filter: ne)
-     */
-    invalid_count_ne?: number;
-    /**
-     * Number of observations with INVALID status (filter: lt)
-     */
-    invalid_count_lt?: number;
-    /**
-     * Number of observations with INVALID status (filter: lte)
-     */
-    invalid_count_lte?: number;
-    /**
-     * Number of observations with INVALID status (filter: gt)
-     */
-    invalid_count_gt?: number;
-    /**
-     * Number of observations with INVALID status (filter: gte)
-     */
-    invalid_count_gte?: number;
-    /**
-     * Number of observations with INVALID status (filter: between_min)
-     */
-    invalid_count_between_min?: number;
-    /**
-     * Number of observations with INVALID status (filter: between_max_value)
-     */
-    invalid_count_between_max_value?: number;
-    /**
-     * Number of observations with INVALID status (filter: in_values) (comma-separated list)
-     */
-    invalid_count_in_values?: string;
-    /**
-     * Number of observations with INVALID status (filter: not_in_values) (comma-separated list)
-     */
-    invalid_count_not_in_values?: string;
-    /**
-     * Number of observations with SYNCING status (filter: eq)
-     */
-    syncing_count_eq?: number;
-    /**
-     * Number of observations with SYNCING status (filter: ne)
-     */
-    syncing_count_ne?: number;
-    /**
-     * Number of observations with SYNCING status (filter: lt)
-     */
-    syncing_count_lt?: number;
-    /**
-     * Number of observations with SYNCING status (filter: lte)
-     */
-    syncing_count_lte?: number;
-    /**
-     * Number of observations with SYNCING status (filter: gt)
-     */
-    syncing_count_gt?: number;
-    /**
-     * Number of observations with SYNCING status (filter: gte)
-     */
-    syncing_count_gte?: number;
-    /**
-     * Number of observations with SYNCING status (filter: between_min)
-     */
-    syncing_count_between_min?: number;
-    /**
-     * Number of observations with SYNCING status (filter: between_max_value)
-     */
-    syncing_count_between_max_value?: number;
-    /**
-     * Number of observations with SYNCING status (filter: in_values) (comma-separated list)
-     */
-    syncing_count_in_values?: string;
-    /**
-     * Number of observations with SYNCING status (filter: not_in_values) (comma-separated list)
-     */
-    syncing_count_not_in_values?: string;
-    /**
-     * Number of observations with ACCEPTED status (filter: eq)
-     */
-    accepted_count_eq?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: ne)
-     */
-    accepted_count_ne?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: lt)
-     */
-    accepted_count_lt?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: lte)
-     */
-    accepted_count_lte?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: gt)
-     */
-    accepted_count_gt?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: gte)
-     */
-    accepted_count_gte?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: between_min)
-     */
-    accepted_count_between_min?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: between_max_value)
-     */
-    accepted_count_between_max_value?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: in_values) (comma-separated list)
-     */
-    accepted_count_in_values?: string;
-    /**
-     * Number of observations with ACCEPTED status (filter: not_in_values) (comma-separated list)
-     */
-    accepted_count_not_in_values?: string;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: eq)
-     */
-    invalid_block_hash_count_eq?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: ne)
-     */
-    invalid_block_hash_count_ne?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: lt)
-     */
-    invalid_block_hash_count_lt?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: lte)
-     */
-    invalid_block_hash_count_lte?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: gt)
-     */
-    invalid_block_hash_count_gt?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: gte)
-     */
-    invalid_block_hash_count_gte?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: between_min)
-     */
-    invalid_block_hash_count_between_min?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: between_max_value)
-     */
-    invalid_block_hash_count_between_max_value?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: in_values) (comma-separated list)
-     */
-    invalid_block_hash_count_in_values?: string;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: not_in_values) (comma-separated list)
-     */
-    invalid_block_hash_count_not_in_values?: string;
-    /**
-     * Number of observations with ERROR status (filter: eq)
-     */
-    error_count_eq?: number;
-    /**
-     * Number of observations with ERROR status (filter: ne)
-     */
-    error_count_ne?: number;
-    /**
-     * Number of observations with ERROR status (filter: lt)
-     */
-    error_count_lt?: number;
-    /**
-     * Number of observations with ERROR status (filter: lte)
-     */
-    error_count_lte?: number;
-    /**
-     * Number of observations with ERROR status (filter: gt)
-     */
-    error_count_gt?: number;
-    /**
-     * Number of observations with ERROR status (filter: gte)
-     */
-    error_count_gte?: number;
-    /**
-     * Number of observations with ERROR status (filter: between_min)
-     */
-    error_count_between_min?: number;
-    /**
-     * Number of observations with ERROR status (filter: between_max_value)
-     */
-    error_count_between_max_value?: number;
-    /**
-     * Number of observations with ERROR status (filter: in_values) (comma-separated list)
-     */
-    error_count_in_values?: string;
-    /**
-     * Number of observations with ERROR status (filter: not_in_values) (comma-separated list)
-     */
-    error_count_not_in_values?: string;
-    /**
-     * Filter valid_pct using value
-     */
-    valid_pct_value?: number;
     /**
      * Average duration of engine_newPayload calls in milliseconds (filter: eq)
      */
