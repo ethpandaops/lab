@@ -6,26 +6,11 @@ import { Stats } from '@/components/DataDisplay/Stats';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { BarChart } from '@/components/Charts/Bar';
 import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
-import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot } from '@/utils';
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
 import type { TimeRange } from '../../IndexPage.types';
-
-/**
- * Helper to get intensity class based on value relative to max
- */
-function getIntensityClass(value: number, max: number): string {
-  if (max === 0) return 'bg-surface border-border text-muted';
-
-  const ratio = value / max;
-
-  // Use a color scale from green (fast) to red (slow)
-  if (ratio <= 0.25) return 'bg-success/20 border-success/40 text-success';
-  if (ratio <= 0.5) return 'bg-success/10 border-success/30 text-foreground';
-  if (ratio <= 0.75) return 'bg-warning/10 border-warning/30 text-foreground';
-  return 'bg-danger/10 border-danger/30 text-danger';
-}
+import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
 
 export interface NewPayloadTabProps {
   data: EngineTimingsData;
@@ -38,6 +23,9 @@ export interface NewPayloadTabProps {
 export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Element {
   const themeColors = useThemeColors();
   const { newPayloadBySlot, newPayloadDurationHistogram, newPayloadByElClient } = data;
+
+  // Filter to VALID status only for duration-based charts
+  const validPayloadByElClient = newPayloadByElClient.filter(r => r.status?.toUpperCase() === 'VALID');
 
   // State for scatter chart series visibility
   const [visibleScatterSeries, setVisibleScatterSeries] = useState<Set<string>>(new Set());
@@ -95,12 +83,12 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   const minSlot = slotData.length > 0 ? (slotData[0].slot ?? 0) : 0;
   const maxSlot = slotData.length > 0 ? (slotData[slotData.length - 1].slot ?? 0) : 0;
 
-  // Prepare duration histogram data
-  // Group histogram data by bucket and sum counts
+  // Prepare duration histogram data (VALID status only)
+  // Group histogram data by bucket and sum VALID counts
   const histogramMap = new Map<number, number>();
   newPayloadDurationHistogram.forEach(item => {
     const bucket = item.chunk_duration_ms ?? 0;
-    const count = item.observation_count ?? 0;
+    const count = item.valid_count ?? 0;
     histogramMap.set(bucket, (histogramMap.get(bucket) ?? 0) + count);
   });
 
@@ -150,10 +138,10 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   ];
 
   // === Block Complexity vs Duration by Client ===
-  // Group scatter data by EL client
+  // Group scatter data by EL client (VALID status only)
   const clientGasData = new Map<string, [number, number][]>();
 
-  newPayloadByElClient.forEach(item => {
+  validPayloadByElClient.forEach(item => {
     const client = (item.meta_execution_implementation ?? 'unknown').toLowerCase();
     const gasUsed = item.gas_used;
     const duration = item.median_duration_ms;
@@ -179,7 +167,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   ];
 
   // === EL Client Analysis ===
-  // Build a map of EL client -> metrics
+  // Build a map of EL client -> metrics (VALID status only)
   const elClientMetrics = new Map<
     string,
     {
@@ -190,7 +178,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     }
   >();
 
-  newPayloadByElClient.forEach(item => {
+  validPayloadByElClient.forEach(item => {
     const el = (item.meta_execution_implementation ?? 'unknown').toLowerCase();
 
     const existing = elClientMetrics.get(el);
@@ -218,10 +206,10 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   const elClientList = Array.from(elClientMetrics.keys()).sort();
 
   // === Per-Slot Duration by Client ===
-  // Group newPayloadByElClient data by client, then by slot
+  // Group data by client, then by slot (VALID status only)
   const clientSlotData = new Map<string, Map<number, number>>();
 
-  newPayloadByElClient.forEach(item => {
+  validPayloadByElClient.forEach(item => {
     const client = (item.meta_execution_implementation ?? 'unknown').toLowerCase();
     const slot = item.slot ?? 0;
     const duration = item.median_duration_ms ?? 0;
@@ -315,82 +303,12 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
         ]}
       />
 
-      {/* EL Client Duration */}
-      {hasClientData && (
-        <Card>
-          <div className="p-4">
-            <h4 className="mb-2 text-base font-semibold text-foreground" id="client-matrix">
-              EL Client Duration
-            </h4>
-            <p className="mb-4 text-sm text-muted">Median engine_newPayload duration (ms) by execution client</p>
-
-            <div className="overflow-x-auto">
-              <div className="inline-block min-w-full">
-                {/* EL client headers */}
-                <div className="mb-2 flex gap-1">
-                  {elClientList.map(el => (
-                    <div key={el} className="flex min-w-20 flex-1 flex-col items-center gap-1 px-1">
-                      <ClientLogo client={el} size={20} />
-                      <div className="text-xs font-medium text-foreground">{el}</div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Duration values row */}
-                <div className="flex gap-1">
-                  {elClientList.map(el => {
-                    const metrics = elClientMetrics.get(el);
-                    const medianDuration = metrics?.medianDuration ?? 0;
-                    const totalObs = metrics?.observationCount ?? 0;
-                    const hasData = totalObs > 0;
-
-                    return (
-                      <div
-                        key={el}
-                        className={clsx(
-                          'flex min-w-20 flex-1 flex-col items-center justify-center rounded-xs border p-2 text-sm',
-                          hasData ? getIntensityClass(medianDuration, maxMedianDuration) : 'border-border bg-surface/50'
-                        )}
-                        title={
-                          hasData
-                            ? `${el}: ${medianDuration.toFixed(0)}ms median, ${totalObs.toLocaleString()} obs`
-                            : `${el}: No data`
-                        }
-                      >
-                        {hasData ? (
-                          <>
-                            <span className="font-semibold">{medianDuration.toFixed(0)}</span>
-                            <span className="text-xs opacity-70">ms</span>
-                          </>
-                        ) : (
-                          <span className="text-muted">-</span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Legend */}
-            <div className="mt-4 flex items-center gap-4 text-xs text-muted">
-              <span>Duration:</span>
-              <div className="flex items-center gap-1">
-                <div className="size-3 rounded-xs border border-success/40 bg-success/20" />
-                <span>Fast</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="size-3 rounded-xs border border-warning/30 bg-warning/10" />
-                <span>Medium</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="size-3 rounded-xs border border-danger/30 bg-danger/10" />
-                <span>Slow</span>
-              </div>
-            </div>
-          </div>
-        </Card>
-      )}
+      {/* Client Version Breakdown - only VALID status */}
+      <ClientVersionBreakdown
+        data={validPayloadByElClient}
+        title="EL Client Duration"
+        description="Median engine_newPayload duration (ms) by execution client and version"
+      />
 
       {/* Per-Slot Duration by Client and Block Complexity - Side by Side */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">

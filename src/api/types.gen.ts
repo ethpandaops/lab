@@ -1999,6 +1999,10 @@ export type FctEngineGetBlobsByElClient = {
    */
   meta_execution_implementation?: string;
   /**
+   * Execution client version string
+   */
+  meta_execution_version?: string;
+  /**
    * Minimum duration of engine_getBlobs calls in milliseconds
    */
   min_duration_ms?: number;
@@ -2345,6 +2349,10 @@ export type FctEngineNewPayloadByElClient = {
    * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth)
    */
   meta_execution_implementation?: string;
+  /**
+   * Execution client version string
+   */
+  meta_execution_version?: string;
   /**
    * Minimum duration of engine_newPayload calls in milliseconds
    */
@@ -25831,6 +25839,42 @@ export type FctEngineGetBlobsByElClientServiceListData = {
      */
     meta_execution_implementation_not_in_values?: string;
     /**
+     * Execution client version string (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Execution client version string (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Execution client version string (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Execution client version string (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Execution client version string (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Execution client version string (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Execution client version string (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Execution client version string (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Execution client version string (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
      * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: eq)
      */
     status_eq?: string;
@@ -29202,6 +29246,42 @@ export type FctEngineNewPayloadByElClientServiceListData = {
      * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
      */
     meta_execution_implementation_not_in_values?: string;
+    /**
+     * Execution client version string (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Execution client version string (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Execution client version string (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Execution client version string (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Execution client version string (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Execution client version string (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Execution client version string (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Execution client version string (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Execution client version string (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
     /**
      * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: eq)
      */

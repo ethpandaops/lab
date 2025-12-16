@@ -90,8 +90,11 @@ export function DetailPage(): JSX.Element {
   // Fetch all slot data
   const { data, isLoading, error } = useSlotDetailData(slot);
 
-  // Fetch engine API timing data
-  const { data: engineTimingsData, isLoading: engineTimingsLoading } = useSlotEngineTimings(slot);
+  // Fetch engine API timing data (reference nodes only for accurate benchmarks)
+  const { data: engineTimingsData, isLoading: engineTimingsLoading } = useSlotEngineTimings({
+    slot,
+    referenceNodesOnly: true,
+  });
 
   // Fetch ALL attestation votes (with pagination)
   const slotTimestamp = currentNetwork ? slotToTimestamp(slot, currentNetwork.genesis_time) : 0;

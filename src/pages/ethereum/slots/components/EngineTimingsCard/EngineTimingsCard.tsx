@@ -2,23 +2,8 @@ import type { JSX } from 'react';
 import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
 import { MiniStat } from '@/components/DataDisplay/MiniStat';
-import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import type { SlotEngineTimingsData } from '../../hooks/useSlotEngineTimings';
-
-/**
- * Helper to get intensity class based on value relative to max
- */
-function getIntensityClass(value: number, max: number): string {
-  if (max === 0) return 'bg-surface border-border text-muted';
-
-  const ratio = value / max;
-
-  // Use a color scale from green (fast) to red (slow)
-  if (ratio <= 0.25) return 'bg-success/20 border-success/40 text-success';
-  if (ratio <= 0.5) return 'bg-success/10 border-success/30 text-foreground';
-  if (ratio <= 0.75) return 'bg-warning/10 border-warning/30 text-foreground';
-  return 'bg-danger/10 border-danger/30 text-danger';
-}
+import { ClientVersionBreakdown } from '@/pages/ethereum/execution/timings/components/ClientVersionBreakdown';
 
 export interface EngineTimingsCardProps {
   data: SlotEngineTimingsData | null;
@@ -66,96 +51,24 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
   );
   const newPayloadP95 = newPayloadTotalObs > 0 ? newPayloadWeightedP95 / newPayloadTotalObs : 0;
 
-  // Aggregate getBlobs stats from status rows (weighted by observation count)
-  const getBlobsTotalObs = getBlobsByStatus.reduce((sum, r) => sum + (r.observation_count ?? 0), 0);
-  const getBlobsWeightedMedian = getBlobsByStatus.reduce(
+  // Aggregate getBlobs stats from SUCCESS status rows only (weighted by observation count)
+  const getBlobsSuccessRows = getBlobsByStatus.filter(r => r.status?.toUpperCase() === 'SUCCESS');
+  const getBlobsTotalObs = getBlobsSuccessRows.reduce((sum, r) => sum + (r.observation_count ?? 0), 0);
+  const getBlobsWeightedMedian = getBlobsSuccessRows.reduce(
     (sum, r) => sum + (r.median_duration_ms ?? 0) * (r.observation_count ?? 0),
     0
   );
   const getBlobsMedian = getBlobsTotalObs > 0 ? getBlobsWeightedMedian / getBlobsTotalObs : 0;
-  const getBlobsWeightedAvgBlobs = getBlobsByStatus.reduce(
-    (sum, r) => sum + (r.avg_returned_count ?? 0) * (r.observation_count ?? 0),
+  const getBlobsWeightedP95 = getBlobsSuccessRows.reduce(
+    (sum, r) => sum + (r.p95_duration_ms ?? 0) * (r.observation_count ?? 0),
     0
   );
-  const getBlobsAvgBlobs = getBlobsTotalObs > 0 ? getBlobsWeightedAvgBlobs / getBlobsTotalObs : 0;
-
-  // Build client metrics map for newPayload
-  const clientMetrics = new Map<
-    string,
-    {
-      medianDuration: number;
-      observationCount: number;
-    }
-  >();
-
-  newPayloadByClient.forEach(item => {
-    const client = (item.meta_execution_implementation ?? 'unknown').toLowerCase();
-    const existing = clientMetrics.get(client);
-    const obs = item.observation_count ?? 0;
-    const medDur = item.median_duration_ms ?? 0;
-
-    if (existing) {
-      const totalObs = existing.observationCount + obs;
-      existing.medianDuration = (existing.medianDuration * existing.observationCount + medDur * obs) / (totalObs || 1);
-      existing.observationCount = totalObs;
-    } else {
-      clientMetrics.set(client, {
-        medianDuration: medDur,
-        observationCount: obs,
-      });
-    }
-  });
-
-  const clientList = Array.from(clientMetrics.keys()).sort();
-
-  // Find max median duration for color scaling
-  let maxMedianDuration = 0;
-  clientMetrics.forEach(metrics => {
-    if (metrics.medianDuration > maxMedianDuration) {
-      maxMedianDuration = metrics.medianDuration;
-    }
-  });
-
-  // Build client metrics map for getBlobs
-  const getBlobsClientMetrics = new Map<
-    string,
-    {
-      medianDuration: number;
-      observationCount: number;
-    }
-  >();
-
-  getBlobsByClient.forEach(item => {
-    const client = (item.meta_execution_implementation ?? 'unknown').toLowerCase();
-    const existing = getBlobsClientMetrics.get(client);
-    const obs = item.observation_count ?? 0;
-    const medDur = item.median_duration_ms ?? 0;
-
-    if (existing) {
-      const totalObs = existing.observationCount + obs;
-      existing.medianDuration = (existing.medianDuration * existing.observationCount + medDur * obs) / (totalObs || 1);
-      existing.observationCount = totalObs;
-    } else {
-      getBlobsClientMetrics.set(client, {
-        medianDuration: medDur,
-        observationCount: obs,
-      });
-    }
-  });
-
-  const getBlobsClientList = Array.from(getBlobsClientMetrics.keys()).sort();
-
-  let maxGetBlobsDuration = 0;
-  getBlobsClientMetrics.forEach(metrics => {
-    if (metrics.medianDuration > maxGetBlobsDuration) {
-      maxGetBlobsDuration = metrics.medianDuration;
-    }
-  });
+  const getBlobsP95 = getBlobsTotalObs > 0 ? getBlobsWeightedP95 / getBlobsTotalObs : 0;
 
   const hasNewPayloadData = newPayloadTotalObs > 0;
   const hasGetBlobsData = getBlobsTotalObs > 0;
-  const hasClientData = clientList.length > 0;
-  const hasGetBlobsClientData = getBlobsClientList.length > 0;
+  const hasClientData = newPayloadByClient.length > 0;
+  const hasGetBlobsClientData = getBlobsByClient.length > 0;
 
   // Don't render if no data at all
   if (!hasNewPayloadData && !hasGetBlobsData) {
@@ -184,57 +97,13 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
 
           {/* Per-Client Breakdown */}
           {hasClientData && (
-            <div>
-              <div className="overflow-x-auto">
-                <div className="inline-block min-w-full">
-                  {/* Client headers */}
-                  <div className="mb-2 flex gap-1">
-                    {clientList.map(client => (
-                      <div key={client} className="flex min-w-16 flex-1 flex-col items-center gap-1 px-1">
-                        <ClientLogo client={client} size={18} />
-                        <div className="text-xs font-medium text-foreground">{client}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Duration values */}
-                  <div className="flex gap-1">
-                    {clientList.map(client => {
-                      const metrics = clientMetrics.get(client);
-                      const medianDuration = metrics?.medianDuration ?? 0;
-                      const totalObs = metrics?.observationCount ?? 0;
-                      const hasData = totalObs > 0;
-
-                      return (
-                        <div
-                          key={client}
-                          className={clsx(
-                            'flex min-w-16 flex-1 flex-col items-center justify-center rounded-xs border p-2 text-sm',
-                            hasData
-                              ? getIntensityClass(medianDuration, maxMedianDuration)
-                              : 'border-border bg-surface/50'
-                          )}
-                          title={
-                            hasData
-                              ? `${client}: ${medianDuration.toFixed(0)}ms median, ${totalObs.toLocaleString()} obs`
-                              : `${client}: No data`
-                          }
-                        >
-                          {hasData ? (
-                            <>
-                              <span className="font-semibold">{medianDuration.toFixed(0)}</span>
-                              <span className="text-xs opacity-70">ms</span>
-                            </>
-                          ) : (
-                            <span className="text-muted">-</span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ClientVersionBreakdown
+              data={newPayloadByClient}
+              noCard
+              hideObservations
+              hideP95
+              durationLabel="Duration"
+            />
           )}
         </Card>
       )}
@@ -253,62 +122,20 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
               <div className="mb-6 grid grid-cols-3 gap-4">
                 <MiniStat label="Observations" value={getBlobsTotalObs.toLocaleString()} />
                 <MiniStat label="Median" value={`${getBlobsMedian.toFixed(0)} ms`} />
-                <MiniStat label="Avg Blobs" value={getBlobsAvgBlobs.toFixed(1)} />
+                <MiniStat label="P95" value={`${getBlobsP95.toFixed(0)} ms`} />
               </div>
 
-              {/* Per-Client Breakdown */}
+              {/* Per-Client Breakdown - only show SUCCESS status */}
               {hasGetBlobsClientData && (
-                <div>
-                  <div className="overflow-x-auto">
-                    <div className="inline-block min-w-full">
-                      {/* Client headers */}
-                      <div className="mb-2 flex gap-1">
-                        {getBlobsClientList.map(client => (
-                          <div key={client} className="flex min-w-16 flex-1 flex-col items-center gap-1 px-1">
-                            <ClientLogo client={client} size={18} />
-                            <div className="text-xs font-medium text-foreground">{client}</div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Duration values */}
-                      <div className="flex gap-1">
-                        {getBlobsClientList.map(client => {
-                          const metrics = getBlobsClientMetrics.get(client);
-                          const medianDuration = metrics?.medianDuration ?? 0;
-                          const totalObs = metrics?.observationCount ?? 0;
-                          const hasData = totalObs > 0;
-
-                          return (
-                            <div
-                              key={client}
-                              className={clsx(
-                                'flex min-w-16 flex-1 flex-col items-center justify-center rounded-xs border p-2 text-sm',
-                                hasData
-                                  ? getIntensityClass(medianDuration, maxGetBlobsDuration)
-                                  : 'border-border bg-surface/50'
-                              )}
-                              title={
-                                hasData
-                                  ? `${client}: ${medianDuration.toFixed(0)}ms median, ${totalObs.toLocaleString()} obs`
-                                  : `${client}: No data`
-                              }
-                            >
-                              {hasData ? (
-                                <>
-                                  <span className="font-semibold">{medianDuration.toFixed(0)}</span>
-                                  <span className="text-xs opacity-70">ms</span>
-                                </>
-                              ) : (
-                                <span className="text-muted">-</span>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ClientVersionBreakdown
+                  data={getBlobsByClient.filter(r => r.status?.toUpperCase() === 'SUCCESS')}
+                  noCard
+                  hideObservations
+                  hideP95
+                  durationLabel="Duration"
+                  showBlobCount
+                  blobCountLabel="Blobs"
+                />
               )}
             </>
           ) : (
