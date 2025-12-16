@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * Time range options for engine timing data
  */
-export type TimeRange = 'hour' | 'day' | '7days';
+export type TimeRange = '1hour' | '3hours' | '6hours';
 
 /**
  * Tab identifiers for the timings page
@@ -19,7 +19,7 @@ export const timingsSearchSchema = z.object({
   tab: z.enum(['overview', 'newPayload', 'getBlobs', 'clients']).optional(),
 
   // Time range for data queries
-  range: z.enum(['hour', 'day', '7days']).optional(),
+  range: z.enum(['1hour', '3hours', '6hours']).optional(),
 
   // Filter to reference nodes only (ethPandaOps controlled fleet)
   refNodes: z.boolean().optional(),
@@ -33,7 +33,7 @@ export type TimingsSearch = z.infer<typeof timingsSearchSchema>;
 /**
  * Default time range for the page
  */
-export const DEFAULT_TIME_RANGE: TimeRange = 'day';
+export const DEFAULT_TIME_RANGE: TimeRange = '1hour';
 
 /**
  * Status values for engine_newPayload responses

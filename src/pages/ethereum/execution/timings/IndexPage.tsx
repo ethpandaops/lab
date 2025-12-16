@@ -20,8 +20,8 @@ import type { TimeRange } from './IndexPage.types';
  * Displays CL-EL communication timing data for engine_newPayload and engine_getBlobs API calls
  */
 export function IndexPage(): JSX.Element {
-  // Time range state - default to last 24 hours for hourly aggregated data
-  const [timeRange, setTimeRange] = useState<TimeRange>('day');
+  // Time range state - default to last 1 hour
+  const [timeRange, setTimeRange] = useState<TimeRange>('1hour');
 
   // Reference nodes filter - default to true (only ethPandaOps controlled fleet)
   const [referenceNodesOnly, setReferenceNodesOnly] = useState(true);
@@ -35,8 +35,15 @@ export function IndexPage(): JSX.Element {
     { id: 'getBlobs', anchors: ['blob-duration'] },
   ]);
 
-  // Fetch all engine timing data
-  const { data, isLoading, error } = useEngineTimingsData({ timeRange, referenceNodesOnly });
+  // Map tab index to tab name
+  const activeTab = selectedIndex === 0 ? 'newPayload' : 'getBlobs';
+
+  // Fetch engine timing data (getBlobs queries only run when that tab is visited)
+  const { data, isLoading, isLoadingBlobs, error } = useEngineTimingsData({
+    timeRange,
+    referenceNodesOnly,
+    activeTab,
+  });
 
   // Loading state
   if (isLoading) {
@@ -92,7 +99,7 @@ export function IndexPage(): JSX.Element {
       <div className="mb-6 flex items-center gap-4">
         <span className="text-sm font-medium text-muted">Time Range:</span>
         <div className="flex gap-2">
-          {(['hour', 'day', '7days'] as const).map(range => (
+          {(['1hour', '3hours', '6hours'] as const).map(range => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
@@ -102,7 +109,7 @@ export function IndexPage(): JSX.Element {
                   : 'bg-surface text-muted hover:bg-surface/80 hover:text-foreground'
               }`}
             >
-              {range === 'hour' ? 'Last Hour' : range === 'day' ? 'Last 24h' : 'Last 7 Days'}
+              {range === '1hour' ? 'Last 1h' : range === '3hours' ? 'Last 3h' : 'Last 6h'}
             </button>
           ))}
         </div>
@@ -212,12 +219,12 @@ export function IndexPage(): JSX.Element {
         <TabPanels className="mt-6">
           {/* newPayload Tab */}
           <TabPanel>
-            <NewPayloadTab data={data} timeRange={timeRange} />
+            <NewPayloadTab data={data} />
           </TabPanel>
 
           {/* getBlobs Tab */}
           <TabPanel>
-            <GetBlobsTab data={data} timeRange={timeRange} />
+            <GetBlobsTab data={data} isLoading={isLoadingBlobs} />
           </TabPanel>
         </TabPanels>
       </TabGroup>

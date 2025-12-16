@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useQueries } from '@tanstack/react-query';
 import {
   fctEngineNewPayloadStatusHourlyServiceList,
@@ -56,14 +56,19 @@ export interface EngineTimingsData {
   getBlobsDurationHistogram: FctEngineGetBlobsDurationChunked50Ms[];
 }
 
+export type ActiveTab = 'newPayload' | 'getBlobs';
+
 export interface UseEngineTimingsDataOptions {
   timeRange: TimeRange;
   referenceNodesOnly: boolean;
+  /** Which tab is currently active - data is fetched lazily based on this */
+  activeTab: ActiveTab;
 }
 
 export interface UseEngineTimingsDataResult {
   data: EngineTimingsData | null;
   isLoading: boolean;
+  isLoadingBlobs: boolean;
   error: Error | null;
 }
 
@@ -76,17 +81,17 @@ function getTimeRangeTimestamps(range: TimeRange): { start: number; end: number 
 
   let start: number;
   switch (range) {
-    case 'hour':
+    case '1hour':
       start = now - 3600; // 1 hour ago
       break;
-    case 'day':
-      start = now - 86400; // 24 hours ago
+    case '3hours':
+      start = now - 10800; // 3 hours ago
       break;
-    case '7days':
-      start = now - 604800; // 7 days ago
+    case '6hours':
+      start = now - 21600; // 6 hours ago
       break;
     default:
-      start = now - 86400;
+      start = now - 3600; // Default to 1 hour
   }
 
   return { start, end };
@@ -115,13 +120,21 @@ function getDateRangeValues(days: number): string {
 export function useEngineTimingsData({
   timeRange,
   referenceNodesOnly,
+  activeTab,
 }: UseEngineTimingsDataOptions): UseEngineTimingsDataResult {
   const { currentNetwork } = useNetwork();
 
   const { start, end } = useMemo(() => getTimeRangeTimestamps(timeRange), [timeRange]);
 
-  // Determine if we should use hourly or daily data based on time range
-  const useHourlyData = timeRange === 'hour' || timeRange === 'day';
+  // Always use hourly data since all time ranges are < 24 hours
+  const useHourlyData = true;
+
+  // Track if blobs tab has ever been visited (to keep data cached after switching away)
+  const [blobsVisited, setBlobsVisited] = useState(false);
+  if (activeTab === 'getBlobs' && !blobsVisited) {
+    setBlobsVisited(true);
+  }
+  const fetchBlobs = blobsVisited || activeTab === 'getBlobs';
 
   // For daily queries, generate date range values (last 7 days)
   const dailyDateValues = getDateRangeValues(7);
@@ -248,7 +261,7 @@ export function useEngineTimingsData({
             'fct_engine_get_blobs_status_hourly',
             signal
           ),
-        enabled: !!currentNetwork && useHourlyData,
+        enabled: !!currentNetwork && useHourlyData && fetchBlobs,
       },
       // getBlobs daily data
       {
@@ -267,7 +280,7 @@ export function useEngineTimingsData({
             'fct_engine_get_blobs_status_daily',
             signal
           ),
-        enabled: !!currentNetwork && !useHourlyData,
+        enabled: !!currentNetwork && !useHourlyData && fetchBlobs,
       },
       // getBlobs per-slot data
       {
@@ -287,7 +300,7 @@ export function useEngineTimingsData({
             'fct_engine_get_blobs_by_slot',
             signal
           ),
-        enabled: !!currentNetwork,
+        enabled: !!currentNetwork && fetchBlobs,
       },
       // getBlobs per-EL-client aggregations
       {
@@ -307,7 +320,7 @@ export function useEngineTimingsData({
             'fct_engine_get_blobs_by_el_client',
             signal
           ),
-        enabled: !!currentNetwork,
+        enabled: !!currentNetwork && fetchBlobs,
       },
       // getBlobs duration histogram
       {
@@ -327,7 +340,7 @@ export function useEngineTimingsData({
             'fct_engine_get_blobs_duration_chunked_50ms',
             signal
           ),
-        enabled: !!currentNetwork,
+        enabled: !!currentNetwork && fetchBlobs,
       },
     ],
   });
@@ -346,13 +359,17 @@ export function useEngineTimingsData({
     getBlobsDurationHistogramQuery,
   ] = queries;
 
-  // Check loading state
-  const isLoading = queries.some(q => q.isLoading);
+  // Check loading state for newPayload queries only (first 5)
+  const newPayloadQueries = queries.slice(0, 5);
+  const blobQueries = queries.slice(5);
+
+  const isLoading = newPayloadQueries.some(q => q.isLoading);
+  const isLoadingBlobs = blobQueries.some(q => q.isLoading);
 
   // Check for errors
   const error = queries.find(q => q.error)?.error as Error | null;
 
-  // Build data object if not loading and no errors
+  // Build data object if newPayload is not loading and no errors
   const data: EngineTimingsData | null =
     !isLoading && !error
       ? {
@@ -369,5 +386,5 @@ export function useEngineTimingsData({
         }
       : null;
 
-  return { data, isLoading, error };
+  return { data, isLoading, isLoadingBlobs, error };
 }
