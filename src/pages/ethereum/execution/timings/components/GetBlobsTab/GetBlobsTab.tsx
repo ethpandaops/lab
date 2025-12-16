@@ -3,29 +3,77 @@ import { Card } from '@/components/Layout/Card';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { BarChart } from '@/components/Charts/Bar';
+import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot } from '@/utils';
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
-import type { TimeRange } from '../../IndexPage.types';
 import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
 
 export interface GetBlobsTabProps {
   data: EngineTimingsData;
-  timeRange: TimeRange;
+  isLoading?: boolean;
+}
+
+/**
+ * Loading skeleton for the getBlobs tab
+ */
+function GetBlobsTabSkeleton(): JSX.Element {
+  return (
+    <div className="space-y-6">
+      {/* Stats skeleton */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Card key={index}>
+            <div className="space-y-2 p-4">
+              <LoadingContainer className="h-3 w-20 rounded-xs" />
+              <LoadingContainer className="h-8 w-24 rounded-xs" />
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Client breakdown skeleton */}
+      <Card>
+        <div className="space-y-4 p-4">
+          <LoadingContainer className="h-5 w-40 rounded-xs" />
+          <LoadingContainer className="h-48 w-full rounded-xs" />
+        </div>
+      </Card>
+
+      {/* Charts skeleton */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {Array.from({ length: 2 }).map((_, index) => (
+          <Card key={index}>
+            <div className="space-y-4 p-4">
+              <LoadingContainer className="h-5 w-32 rounded-xs" />
+              <LoadingContainer className="h-[375px] w-full rounded-xs" />
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 /**
  * GetBlobs tab showing detailed engine_getBlobs timing analysis
  */
-export function GetBlobsTab({ data, timeRange }: GetBlobsTabProps): JSX.Element {
+export function GetBlobsTab({ data, isLoading }: GetBlobsTabProps): JSX.Element {
   const themeColors = useThemeColors();
+
+  // Show skeleton while loading
+  if (isLoading) {
+    return <GetBlobsTabSkeleton />;
+  }
+
   const { getBlobsBySlot, getBlobsByElClient, getBlobsDurationHistogram, getBlobsHourly, getBlobsDaily } = data;
 
   // Filter to SUCCESS status only for duration-based charts
   const successBlobsByElClient = getBlobsByElClient.filter(r => r.status?.toUpperCase() === 'SUCCESS');
 
   // Determine which aggregated data source to use based on time range
-  const useHourlyData = timeRange === 'hour' || timeRange === 'day';
+  // Always use hourly data since all time ranges are < 24 hours
+  const useHourlyData = true;
 
   // Calculate summary stats from pre-aggregated hourly/daily data
   const aggregatedStats = (() => {

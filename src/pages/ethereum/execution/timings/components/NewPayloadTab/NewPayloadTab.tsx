@@ -9,18 +9,16 @@ import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot } from '@/utils';
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
-import type { TimeRange } from '../../IndexPage.types';
 import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
 
 export interface NewPayloadTabProps {
   data: EngineTimingsData;
-  timeRange: TimeRange;
 }
 
 /**
  * NewPayload tab showing detailed engine_newPayload timing analysis
  */
-export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Element {
+export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
   const themeColors = useThemeColors();
   const { newPayloadBySlot, newPayloadDurationHistogram, newPayloadByElClient } = data;
 
@@ -31,8 +29,8 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   const [visibleScatterSeries, setVisibleScatterSeries] = useState<Set<string>>(new Set());
   const [scatterSeriesInitialized, setScatterSeriesInitialized] = useState(false);
 
-  // Determine which aggregated data source to use based on time range
-  const useHourlyData = timeRange === 'hour' || timeRange === 'day';
+  // Always use hourly data since all time ranges are < 24 hours
+  const useHourlyData = true;
   const { newPayloadHourly, newPayloadDaily } = data;
 
   // Calculate summary stats from pre-aggregated hourly/daily data
