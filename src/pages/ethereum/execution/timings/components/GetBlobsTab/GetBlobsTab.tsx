@@ -33,15 +33,64 @@ export interface GetBlobsTabProps {
 /**
  * GetBlobs tab showing detailed engine_getBlobs timing analysis
  */
-export function GetBlobsTab({ data }: GetBlobsTabProps): JSX.Element {
+export function GetBlobsTab({ data, timeRange }: GetBlobsTabProps): JSX.Element {
   const themeColors = useThemeColors();
-  const { getBlobsBySlot, getBlobsByElClient, getBlobsDurationHistogram } = data;
+  const { getBlobsBySlot, getBlobsByElClient, getBlobsDurationHistogram, getBlobsHourly, getBlobsDaily } = data;
 
-  // Prepare slot data for stats and other calculations
+  // Determine which aggregated data source to use based on time range
+  const useHourlyData = timeRange === 'hour' || timeRange === 'day';
+
+  // Calculate summary stats from pre-aggregated hourly/daily data
+  const aggregatedStats = (() => {
+    const sourceData = useHourlyData ? getBlobsHourly : getBlobsDaily;
+
+    if (sourceData.length === 0) {
+      return { totalObservations: 0, successRate: '0', avgDuration: '0' };
+    }
+
+    // Sum up counts from all rows
+    let totalObservations = 0;
+    let successCount = 0;
+    let partialCount = 0;
+    let emptyCount = 0;
+    let errorCount = 0;
+    let unsupportedCount = 0;
+    let totalWeightedDuration = 0;
+
+    sourceData.forEach(row => {
+      const obs = row.observation_count ?? 0;
+      totalObservations += obs;
+      successCount += row.success_count ?? 0;
+      partialCount += row.partial_count ?? 0;
+      emptyCount += row.empty_count ?? 0;
+      errorCount += row.error_count ?? 0;
+      unsupportedCount += row.unsupported_count ?? 0;
+      // Weight duration averages by observation count
+      totalWeightedDuration += (row.avg_duration_ms ?? 0) * obs;
+    });
+
+    const totalStatusCount = successCount + partialCount + emptyCount + errorCount + unsupportedCount;
+    const successRate = totalStatusCount > 0 ? ((successCount / totalStatusCount) * 100).toFixed(1) : '0';
+    const avgDuration = totalObservations > 0 ? (totalWeightedDuration / totalObservations).toFixed(0) : '0';
+
+    return { totalObservations, successRate, avgDuration };
+  })();
+
+  const { totalObservations, successRate, avgDuration } = aggregatedStats;
+
+  // Prepare slot data for charts (not stats)
   const slotData = [...getBlobsBySlot].sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0));
 
   const minSlot = slotData.length > 0 ? (slotData[0].slot ?? 0) : 0;
   const maxSlot = slotData.length > 0 ? (slotData[slotData.length - 1].slot ?? 0) : 0;
+
+  // Calculate weighted average blobs per request from slot data (not available in aggregated data)
+  const slotTotalObservations = slotData.reduce((sum, s) => sum + (s.observation_count ?? 0), 0);
+  const totalWeightedBlobs = slotData.reduce(
+    (sum, s) => sum + (s.avg_returned_count ?? 0) * (s.observation_count ?? 0),
+    0
+  );
+  const avgBlobsPerRequest = slotTotalObservations > 0 ? (totalWeightedBlobs / slotTotalObservations).toFixed(1) : '0';
 
   // Prepare duration histogram data
   const histogramMap = new Map<number, number>();
@@ -55,7 +104,7 @@ export function GetBlobsTab({ data }: GetBlobsTabProps): JSX.Element {
   const histogramLabels = histogramBuckets.map(bucket => `${bucket}ms`);
   const histogramData = histogramBuckets.map(bucket => histogramMap.get(bucket) ?? 0);
 
-  // Calculate status breakdown from slot data (new schema: each row has status + observation_count)
+  // Calculate status breakdown from slot data for the status distribution chart
   const statusTotals = slotData.reduce(
     (acc, item) => {
       const status = item.status?.toUpperCase() ?? 'UNKNOWN';
@@ -104,26 +153,6 @@ export function GetBlobsTab({ data }: GetBlobsTabProps): JSX.Element {
   const blobCountBuckets = Array.from(blobCountMap.keys()).sort((a, b) => a - b);
   const blobCountLabels = blobCountBuckets.map(count => `${count} blobs`);
   const blobCountData = blobCountBuckets.map(count => blobCountMap.get(count) ?? 0);
-
-  // Calculate summary stats
-  const totalObservations = slotData.reduce((sum, s) => sum + (s.observation_count ?? 0), 0);
-  const totalStatusCount =
-    statusTotals.success + statusTotals.partial + statusTotals.empty + statusTotals.error + statusTotals.unsupported;
-  const successRate = totalStatusCount > 0 ? ((statusTotals.success / totalStatusCount) * 100).toFixed(1) : '0';
-
-  // Calculate weighted average durations from slot data (weight by observation count)
-  const totalWeightedDuration = slotData.reduce(
-    (sum, s) => sum + (s.avg_duration_ms ?? 0) * (s.observation_count ?? 0),
-    0
-  );
-  const avgDuration = totalObservations > 0 ? (totalWeightedDuration / totalObservations).toFixed(0) : '0';
-
-  // Calculate weighted average blobs per request
-  const totalWeightedBlobs = slotData.reduce(
-    (sum, s) => sum + (s.avg_returned_count ?? 0) * (s.observation_count ?? 0),
-    0
-  );
-  const avgBlobsPerRequest = totalObservations > 0 ? (totalWeightedBlobs / totalObservations).toFixed(1) : '0';
 
   // === EL Client Analysis ===
   // Build a map of EL client -> metrics

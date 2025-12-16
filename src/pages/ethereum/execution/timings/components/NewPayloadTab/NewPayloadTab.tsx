@@ -35,7 +35,7 @@ export interface NewPayloadTabProps {
 /**
  * NewPayload tab showing detailed engine_newPayload timing analysis
  */
-export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
+export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Element {
   const themeColors = useThemeColors();
   const { newPayloadBySlot, newPayloadDurationHistogram, newPayloadByElClient } = data;
 
@@ -43,7 +43,53 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
   const [visibleScatterSeries, setVisibleScatterSeries] = useState<Set<string>>(new Set());
   const [scatterSeriesInitialized, setScatterSeriesInitialized] = useState(false);
 
-  // Prepare slot data for stats and other calculations
+  // Determine which aggregated data source to use based on time range
+  const useHourlyData = timeRange === 'hour' || timeRange === 'day';
+  const { newPayloadHourly, newPayloadDaily } = data;
+
+  // Calculate summary stats from pre-aggregated hourly/daily data
+  // These endpoints provide observation counts and weighted averages already computed server-side
+  const aggregatedStats = (() => {
+    const sourceData = useHourlyData ? newPayloadHourly : newPayloadDaily;
+
+    if (sourceData.length === 0) {
+      return { totalObservations: 0, validRate: '0', avgDuration: '0', avgP95Duration: '0' };
+    }
+
+    // Sum up counts from all rows
+    let totalObservations = 0;
+    let validCount = 0;
+    let invalidCount = 0;
+    let syncingCount = 0;
+    let acceptedCount = 0;
+    let invalidBlockHashCount = 0;
+    let totalWeightedDuration = 0;
+    let totalWeightedP95 = 0;
+
+    sourceData.forEach(row => {
+      const obs = row.observation_count ?? 0;
+      totalObservations += obs;
+      validCount += row.valid_count ?? 0;
+      invalidCount += row.invalid_count ?? 0;
+      syncingCount += row.syncing_count ?? 0;
+      acceptedCount += row.accepted_count ?? 0;
+      invalidBlockHashCount += row.invalid_block_hash_count ?? 0;
+      // Weight duration averages by observation count
+      totalWeightedDuration += (row.avg_duration_ms ?? 0) * obs;
+      totalWeightedP95 += (row.avg_p95_duration_ms ?? 0) * obs;
+    });
+
+    const totalStatusCount = validCount + invalidCount + syncingCount + acceptedCount + invalidBlockHashCount;
+    const validRate = totalStatusCount > 0 ? ((validCount / totalStatusCount) * 100).toFixed(1) : '0';
+    const avgDuration = totalObservations > 0 ? (totalWeightedDuration / totalObservations).toFixed(0) : '0';
+    const avgP95Duration = totalObservations > 0 ? (totalWeightedP95 / totalObservations).toFixed(0) : '0';
+
+    return { totalObservations, validRate, avgDuration, avgP95Duration };
+  })();
+
+  const { totalObservations, validRate, avgDuration, avgP95Duration } = aggregatedStats;
+
+  // Prepare slot data for charts (not stats)
   const slotData = [...newPayloadBySlot].sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0));
 
   const minSlot = slotData.length > 0 ? (slotData[0].slot ?? 0) : 0;
@@ -62,7 +108,7 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
   const histogramLabels = histogramBuckets.map(bucket => `${bucket}ms`);
   const histogramData = histogramBuckets.map(bucket => histogramMap.get(bucket) ?? 0);
 
-  // Calculate status breakdown from slot data (new schema: each row has status + observation_count)
+  // Calculate status breakdown from slot data for the status distribution chart
   const statusTotals = slotData.reduce(
     (acc, item) => {
       const status = item.status?.toUpperCase() ?? 'UNKNOWN';
@@ -102,27 +148,6 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
     { value: statusTotals.invalidBlockHash, color: themeColors.danger },
     { value: statusTotals.error, color: themeColors.muted },
   ];
-
-  // Calculate summary stats
-  const totalObservations = slotData.reduce((sum, s) => sum + (s.observation_count ?? 0), 0);
-  const totalStatusCount =
-    statusTotals.valid +
-    statusTotals.invalid +
-    statusTotals.syncing +
-    statusTotals.accepted +
-    statusTotals.invalidBlockHash +
-    statusTotals.error;
-  const validRate = totalStatusCount > 0 ? ((statusTotals.valid / totalStatusCount) * 100).toFixed(1) : '0';
-
-  // Calculate weighted average durations from slot data (weight by observation count)
-  const totalWeightedDuration = slotData.reduce(
-    (sum, s) => sum + (s.avg_duration_ms ?? 0) * (s.observation_count ?? 0),
-    0
-  );
-  const avgDuration = totalObservations > 0 ? (totalWeightedDuration / totalObservations).toFixed(0) : '0';
-
-  const totalWeightedP95 = slotData.reduce((sum, s) => sum + (s.p95_duration_ms ?? 0) * (s.observation_count ?? 0), 0);
-  const avgP95Duration = totalObservations > 0 ? (totalWeightedP95 / totalObservations).toFixed(0) : '0';
 
   // === Block Complexity vs Duration by Client ===
   // Group scatter data by EL client
