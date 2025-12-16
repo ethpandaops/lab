@@ -20,7 +20,7 @@ export interface NewPayloadTabProps {
  */
 export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
   const themeColors = useThemeColors();
-  const { newPayloadBySlot, newPayloadDurationHistogram, newPayloadByElClient } = data;
+  const { newPayloadDurationHistogram, newPayloadByElClient } = data;
 
   // Filter to VALID status only for duration-based charts
   const validPayloadByElClient = newPayloadByElClient.filter(r => r.status?.toUpperCase() === 'VALID');
@@ -74,11 +74,20 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
 
   const { totalObservations, validRate, avgDuration, avgP95Duration } = aggregatedStats;
 
-  // Prepare slot data for charts (not stats)
-  const slotData = [...newPayloadBySlot].sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0));
+  // Calculate slot bounds from per-EL-client data (which has per-slot granularity)
+  // This avoids needing the slow newPayloadBySlot endpoint
+  const slotBounds = (() => {
+    let min = Infinity;
+    let max = -Infinity;
+    validPayloadByElClient.forEach(item => {
+      const slot = item.slot ?? 0;
+      if (slot < min) min = slot;
+      if (slot > max) max = slot;
+    });
+    return { minSlot: min === Infinity ? 0 : min, maxSlot: max === -Infinity ? 0 : max };
+  })();
 
-  const minSlot = slotData.length > 0 ? (slotData[0].slot ?? 0) : 0;
-  const maxSlot = slotData.length > 0 ? (slotData[slotData.length - 1].slot ?? 0) : 0;
+  const { minSlot, maxSlot } = slotBounds;
 
   // Prepare duration histogram data (VALID status only)
   // Group histogram data by bucket and sum VALID counts
@@ -93,33 +102,16 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
   const histogramLabels = histogramBuckets.map(bucket => `${bucket}ms`);
   const histogramData = histogramBuckets.map(bucket => histogramMap.get(bucket) ?? 0);
 
-  // Calculate status breakdown from slot data for the status distribution chart
-  const statusTotals = slotData.reduce(
-    (acc, item) => {
-      const status = item.status?.toUpperCase() ?? 'UNKNOWN';
-      const count = item.observation_count ?? 0;
-      switch (status) {
-        case 'VALID':
-          acc.valid += count;
-          break;
-        case 'INVALID':
-          acc.invalid += count;
-          break;
-        case 'SYNCING':
-          acc.syncing += count;
-          break;
-        case 'ACCEPTED':
-          acc.accepted += count;
-          break;
-        case 'INVALID_BLOCK_HASH':
-          acc.invalidBlockHash += count;
-          break;
-        case 'ERROR':
-          acc.error += count;
-          break;
-      }
-      return acc;
-    },
+  // Calculate status breakdown from pre-aggregated hourly data
+  const statusTotals = newPayloadHourly.reduce(
+    (acc, item) => ({
+      valid: acc.valid + (item.valid_count ?? 0),
+      invalid: acc.invalid + (item.invalid_count ?? 0),
+      syncing: acc.syncing + (item.syncing_count ?? 0),
+      accepted: acc.accepted + (item.accepted_count ?? 0),
+      invalidBlockHash: acc.invalidBlockHash + (item.invalid_block_hash_count ?? 0),
+      error: 0, // Hourly data doesn't track errors separately (they're rare)
+    }),
     { valid: 0, invalid: 0, syncing: 0, accepted: 0, invalidBlockHash: 0, error: 0 }
   );
 

@@ -3,24 +3,20 @@ import { useQueries } from '@tanstack/react-query';
 import {
   fctEngineNewPayloadStatusHourlyServiceList,
   fctEngineNewPayloadStatusDailyServiceList,
-  fctEngineNewPayloadBySlotServiceList,
   fctEngineNewPayloadByElClientServiceList,
   fctEngineNewPayloadDurationChunked50MsServiceList,
   fctEngineGetBlobsStatusHourlyServiceList,
   fctEngineGetBlobsStatusDailyServiceList,
-  fctEngineGetBlobsBySlotServiceList,
   fctEngineGetBlobsByElClientServiceList,
   fctEngineGetBlobsDurationChunked50MsServiceList,
 } from '@/api/sdk.gen';
 import type {
   FctEngineNewPayloadStatusHourly,
   FctEngineNewPayloadStatusDaily,
-  FctEngineNewPayloadBySlot,
   FctEngineNewPayloadByElClient,
   FctEngineNewPayloadDurationChunked50Ms,
   FctEngineGetBlobsStatusHourly,
   FctEngineGetBlobsStatusDaily,
-  FctEngineGetBlobsBySlot,
   FctEngineGetBlobsByElClient,
   FctEngineGetBlobsDurationChunked50Ms,
 } from '@/api/types.gen';
@@ -33,10 +29,7 @@ export interface EngineTimingsData {
   newPayloadHourly: FctEngineNewPayloadStatusHourly[];
   newPayloadDaily: FctEngineNewPayloadStatusDaily[];
 
-  // newPayload per-slot data
-  newPayloadBySlot: FctEngineNewPayloadBySlot[];
-
-  // newPayload per-EL-client aggregations
+  // newPayload per-EL-client aggregations (includes per-slot granularity)
   newPayloadByElClient: FctEngineNewPayloadByElClient[];
 
   // newPayload duration histogram
@@ -46,10 +39,7 @@ export interface EngineTimingsData {
   getBlobsHourly: FctEngineGetBlobsStatusHourly[];
   getBlobsDaily: FctEngineGetBlobsStatusDaily[];
 
-  // getBlobs per-slot data
-  getBlobsBySlot: FctEngineGetBlobsBySlot[];
-
-  // getBlobs per-EL-client aggregations
+  // getBlobs per-EL-client aggregations (includes per-slot granularity)
   getBlobsByElClient: FctEngineGetBlobsByElClient[];
 
   // getBlobs duration histogram
@@ -192,27 +182,7 @@ export function useEngineTimingsData({
           ),
         enabled: !!currentNetwork && !useHourlyData,
       },
-      // newPayload per-slot data
-      {
-        queryKey: ['engine-timings', 'newPayload-by-slot', start, end, timeRange, referenceNodesOnly],
-        queryFn: ({ signal }) =>
-          fetchAllPages<FctEngineNewPayloadBySlot>(
-            fctEngineNewPayloadBySlotServiceList,
-            {
-              query: {
-                slot_start_date_time_gte: start,
-                slot_start_date_time_lte: end,
-                order_by: 'slot DESC',
-                page_size: 10000,
-                ...refNodeFilter,
-              },
-            },
-            'fct_engine_new_payload_by_slot',
-            signal
-          ),
-        enabled: !!currentNetwork,
-      },
-      // newPayload per-EL-client aggregations
+      // newPayload per-EL-client aggregations (includes per-slot data)
       {
         queryKey: ['engine-timings', 'newPayload-by-el-client', start, end, referenceNodesOnly],
         queryFn: ({ signal }) =>
@@ -291,27 +261,7 @@ export function useEngineTimingsData({
           ),
         enabled: !!currentNetwork && !useHourlyData && fetchBlobs,
       },
-      // getBlobs per-slot data
-      {
-        queryKey: ['engine-timings', 'getBlobs-by-slot', start, end, timeRange, referenceNodesOnly],
-        queryFn: ({ signal }) =>
-          fetchAllPages<FctEngineGetBlobsBySlot>(
-            fctEngineGetBlobsBySlotServiceList,
-            {
-              query: {
-                slot_start_date_time_gte: start,
-                slot_start_date_time_lte: end,
-                order_by: 'slot DESC',
-                page_size: 10000,
-                ...refNodeFilter,
-              },
-            },
-            'fct_engine_get_blobs_by_slot',
-            signal
-          ),
-        enabled: !!currentNetwork && fetchBlobs,
-      },
-      // getBlobs per-EL-client aggregations
+      // getBlobs per-EL-client aggregations (includes per-slot data)
       {
         queryKey: ['engine-timings', 'getBlobs-by-el-client', start, end, referenceNodesOnly],
         queryFn: ({ signal }) =>
@@ -358,19 +308,17 @@ export function useEngineTimingsData({
   const [
     newPayloadHourlyQuery,
     newPayloadDailyQuery,
-    newPayloadBySlotQuery,
     newPayloadByElClientQuery,
     newPayloadDurationHistogramQuery,
     getBlobsHourlyQuery,
     getBlobsDailyQuery,
-    getBlobsBySlotQuery,
     getBlobsByElClientQuery,
     getBlobsDurationHistogramQuery,
   ] = queries;
 
-  // Check loading state for newPayload queries only (first 5)
-  const newPayloadQueries = queries.slice(0, 5);
-  const blobQueries = queries.slice(5);
+  // Check loading state for newPayload queries only (first 4)
+  const newPayloadQueries = queries.slice(0, 4);
+  const blobQueries = queries.slice(4);
 
   const isLoading = newPayloadQueries.some(q => q.isLoading);
   const isLoadingBlobs = blobQueries.some(q => q.isLoading);
@@ -384,12 +332,10 @@ export function useEngineTimingsData({
       ? {
           newPayloadHourly: newPayloadHourlyQuery.data ?? [],
           newPayloadDaily: newPayloadDailyQuery.data ?? [],
-          newPayloadBySlot: newPayloadBySlotQuery.data ?? [],
           newPayloadByElClient: newPayloadByElClientQuery.data ?? [],
           newPayloadDurationHistogram: newPayloadDurationHistogramQuery.data ?? [],
           getBlobsHourly: getBlobsHourlyQuery.data ?? [],
           getBlobsDaily: getBlobsDailyQuery.data ?? [],
-          getBlobsBySlot: getBlobsBySlotQuery.data ?? [],
           getBlobsByElClient: getBlobsByElClientQuery.data ?? [],
           getBlobsDurationHistogram: getBlobsDurationHistogramQuery.data ?? [],
         }
