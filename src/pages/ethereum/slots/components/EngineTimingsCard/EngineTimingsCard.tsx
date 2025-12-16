@@ -1,9 +1,11 @@
-import type { JSX } from 'react';
+import { useState, type JSX } from 'react';
 import clsx from 'clsx';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { Card } from '@/components/Layout/Card';
 import { MiniStat } from '@/components/DataDisplay/MiniStat';
 import type { SlotEngineTimingsData } from '../../hooks/useSlotEngineTimings';
 import { ClientVersionBreakdown } from '@/pages/ethereum/execution/timings/components/ClientVersionBreakdown';
+import { ReferenceNodesInfoDialog } from '@/pages/ethereum/execution/timings/components/ReferenceNodesInfoDialog';
 
 export interface EngineTimingsCardProps {
   data: SlotEngineTimingsData | null;
@@ -16,6 +18,8 @@ export interface EngineTimingsCardProps {
  * Shows newPayload and getBlobs metrics with per-EL-client breakdown.
  */
 export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTimingsCardProps): JSX.Element | null {
+  const [showRefNodeInfo, setShowRefNodeInfo] = useState(false);
+
   // Don't render anything if no data and not loading
   if (!isLoading && !data?.newPayloadByStatus?.length && !data?.getBlobsByStatus?.length) {
     return null;
@@ -88,9 +92,18 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
       {/* newPayload Section */}
       {hasNewPayloadData && (
         <Card>
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold text-foreground">engine_newPayload</h3>
-            <p className="text-sm text-muted">Block validation timing</p>
+          <div className="mb-4 flex items-start justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-foreground">engine_newPayload</h3>
+              <p className="text-sm text-muted">Block validation timing</p>
+            </div>
+            <button
+              onClick={() => setShowRefNodeInfo(true)}
+              className="rounded-xs p-1 text-muted transition-colors hover:text-foreground"
+              aria-label="Learn more about reference nodes"
+            >
+              <InformationCircleIcon className="size-5" />
+            </button>
           </div>
 
           {/* Summary Stats */}
@@ -116,9 +129,18 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
       {/* getBlobs Section - show if there's timing data or if slot has blobs */}
       {showGetBlobsSection && (
         <Card>
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold text-foreground">engine_getBlobs</h3>
-            <p className="text-sm text-muted">Blob retrieval timing</p>
+          <div className="mb-4 flex items-start justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-foreground">engine_getBlobs</h3>
+              <p className="text-sm text-muted">Blob retrieval timing</p>
+            </div>
+            <button
+              onClick={() => setShowRefNodeInfo(true)}
+              className="rounded-xs p-1 text-muted transition-colors hover:text-foreground"
+              aria-label="Learn more about reference nodes"
+            >
+              <InformationCircleIcon className="size-5" />
+            </button>
           </div>
 
           {hasGetBlobsData ? (
@@ -148,6 +170,9 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
           )}
         </Card>
       )}
+
+      {/* Reference Node Info Dialog */}
+      <ReferenceNodesInfoDialog open={showRefNodeInfo} onClose={() => setShowRefNodeInfo(false)} />
     </div>
   );
 }
