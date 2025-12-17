@@ -89,6 +89,7 @@ const SHORT_NAME_MAP: Record<string, string> = {
   orderly: 'ORDR',
   phala: 'PHA',
   'phala network': 'PHA',
+  pk910: 'PK',
   polynomial: 'POLY',
   r0ar: 'R0AR',
   'r0ar chain': 'R0AR',
