@@ -23,7 +23,7 @@ interface ClientVersionData {
   meta_execution_implementation?: string;
   meta_execution_version?: string;
   observation_count?: number;
-  median_duration_ms?: number;
+  avg_duration_ms?: number;
   min_duration_ms?: number;
   max_duration_ms?: number;
   avg_returned_count?: number;
@@ -47,8 +47,6 @@ export interface ClientVersionBreakdownProps {
   hideObservations?: boolean;
   /** If true, hides the range column */
   hideRange?: boolean;
-  /** Custom label for the duration column (defaults to "Median") */
-  durationLabel?: string;
   /** Custom label for the blob count column (defaults to "Avg Blobs") */
   blobCountLabel?: string;
 }
@@ -56,14 +54,14 @@ export interface ClientVersionBreakdownProps {
 interface AggregatedRow {
   client: string;
   version: string;
-  medianDuration: number;
+  avgDuration: number;
   minDuration: number;
   maxDuration: number;
   observations: number;
   avgBlobCount?: number;
 }
 
-type SortField = 'client' | 'version' | 'medianDuration' | 'maxDuration' | 'observations' | 'avgBlobCount';
+type SortField = 'client' | 'version' | 'avgDuration' | 'observations' | 'avgBlobCount';
 type SortDirection = 'asc' | 'desc';
 
 /**
@@ -78,11 +76,10 @@ export function ClientVersionBreakdown({
   compactClient = false,
   hideObservations = false,
   hideRange = false,
-  durationLabel = 'Median',
   blobCountLabel = 'Avg Blobs',
 }: ClientVersionBreakdownProps): JSX.Element {
-  // Default sort by medianDuration (ascending = fastest first) when observations hidden, otherwise by observations
-  const [sortField, setSortField] = useState<SortField>(hideObservations ? 'medianDuration' : 'observations');
+  // Default sort by avgDuration (ascending = fastest first) when observations hidden, otherwise by observations
+  const [sortField, setSortField] = useState<SortField>(hideObservations ? 'avgDuration' : 'observations');
   const [sortDirection, setSortDirection] = useState<SortDirection>(hideObservations ? 'asc' : 'desc');
 
   // Aggregate data by client + version
@@ -92,7 +89,7 @@ export function ClientVersionBreakdown({
       {
         client: string;
         version: string;
-        totalWeightedMedian: number;
+        totalWeightedAvg: number;
         minDuration: number;
         maxDuration: number;
         totalObservations: number;
@@ -110,7 +107,7 @@ export function ClientVersionBreakdown({
 
       const existing = map.get(key);
       if (existing) {
-        existing.totalWeightedMedian += (row.median_duration_ms ?? 0) * obs;
+        existing.totalWeightedAvg += (row.avg_duration_ms ?? 0) * obs;
         // For min/max, take the actual min/max across all rows
         if (minDur > 0 && (existing.minDuration === 0 || minDur < existing.minDuration)) {
           existing.minDuration = minDur;
@@ -124,7 +121,7 @@ export function ClientVersionBreakdown({
         map.set(key, {
           client,
           version,
-          totalWeightedMedian: (row.median_duration_ms ?? 0) * obs,
+          totalWeightedAvg: (row.avg_duration_ms ?? 0) * obs,
           minDuration: minDur,
           maxDuration: maxDur,
           totalObservations: obs,
@@ -140,7 +137,7 @@ export function ClientVersionBreakdown({
         result.push({
           client: entry.client,
           version: entry.version,
-          medianDuration: entry.totalWeightedMedian / entry.totalObservations,
+          avgDuration: entry.totalWeightedAvg / entry.totalObservations,
           minDuration: entry.minDuration,
           maxDuration: entry.maxDuration,
           observations: entry.totalObservations,
@@ -152,9 +149,9 @@ export function ClientVersionBreakdown({
     return result;
   }, [data]);
 
-  // Calculate max median for color scaling
-  const maxMedianDuration = useMemo(() => {
-    return Math.max(...aggregatedData.map(r => r.medianDuration), 0);
+  // Calculate max avg duration for color scaling
+  const maxAvgDuration = useMemo(() => {
+    return Math.max(...aggregatedData.map(r => r.avgDuration), 0);
   }, [aggregatedData]);
 
   // Sort data
@@ -168,11 +165,8 @@ export function ClientVersionBreakdown({
         case 'version':
           comparison = a.version.localeCompare(b.version);
           break;
-        case 'medianDuration':
-          comparison = a.medianDuration - b.medianDuration;
-          break;
-        case 'maxDuration':
-          comparison = a.maxDuration - b.maxDuration;
+        case 'avgDuration':
+          comparison = a.avgDuration - b.avgDuration;
           break;
         case 'observations':
           comparison = a.observations - b.observations;
@@ -251,16 +245,11 @@ export function ClientVersionBreakdown({
                 Version
                 <SortIcon field="version" />
               </th>
-              <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('medianDuration')}>
-                {durationLabel}
-                <SortIcon field="medianDuration" />
+              <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('avgDuration')}>
+                Avg (ms)
+                <SortIcon field="avgDuration" />
               </th>
-              {!hideRange && (
-                <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('maxDuration')}>
-                  Range
-                  <SortIcon field="maxDuration" />
-                </th>
-              )}
+              {!hideRange && <th className={clsx(headerClass, 'text-right')}>Range</th>}
               {showBlobCount && (
                 <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('avgBlobCount')}>
                   {blobCountLabel}
@@ -288,14 +277,11 @@ export function ClientVersionBreakdown({
                   <span className="font-mono text-sm text-muted">{row.version}</span>
                 </td>
                 <td className="px-3 py-3 text-right">
-                  {row.medianDuration > 0 ? (
+                  {row.avgDuration > 0 ? (
                     <span
-                      className={clsx(
-                        'text-sm font-medium',
-                        getDurationColorClass(row.medianDuration, maxMedianDuration)
-                      )}
+                      className={clsx('text-sm font-medium', getDurationColorClass(row.avgDuration, maxAvgDuration))}
                     >
-                      {row.medianDuration.toFixed(0)} ms
+                      {row.avgDuration.toFixed(1)}
                     </span>
                   ) : (
                     <span className="text-sm text-muted">-</span>

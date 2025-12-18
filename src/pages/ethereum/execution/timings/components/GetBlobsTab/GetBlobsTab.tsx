@@ -66,24 +66,18 @@ export function GetBlobsTab({ data, isLoading }: GetBlobsTabProps): JSX.Element 
     return <GetBlobsTabSkeleton />;
   }
 
-  const { getBlobsByElClient, getBlobsDurationHistogram, getBlobsHourly, getBlobsDaily } = data;
+  const { getBlobsByElClient, getBlobsDurationHistogram } = data;
 
   // Filter to SUCCESS status only for duration-based charts
   const successBlobsByElClient = getBlobsByElClient.filter(r => r.status?.toUpperCase() === 'SUCCESS');
 
-  // Determine which aggregated data source to use based on time range
-  // Always use hourly data since all time ranges are < 24 hours
-  const useHourlyData = true;
-
-  // Calculate summary stats from pre-aggregated hourly/daily data
+  // Calculate summary stats from per-slot/per-client data for accuracy
   const aggregatedStats = (() => {
-    const sourceData = useHourlyData ? getBlobsHourly : getBlobsDaily;
-
-    if (sourceData.length === 0) {
+    if (getBlobsByElClient.length === 0) {
       return { totalObservations: 0, successRate: '0', avgDuration: '0' };
     }
 
-    // Sum up counts from all rows
+    // Sum up counts from all rows, grouped by status
     let successCount = 0;
     let partialCount = 0;
     let emptyCount = 0;
@@ -91,22 +85,35 @@ export function GetBlobsTab({ data, isLoading }: GetBlobsTabProps): JSX.Element 
     let unsupportedCount = 0;
     let totalWeightedDuration = 0;
 
-    sourceData.forEach(row => {
-      const success = row.success_count ?? 0;
-      successCount += success;
-      partialCount += row.partial_count ?? 0;
-      emptyCount += row.empty_count ?? 0;
-      errorCount += row.error_count ?? 0;
-      unsupportedCount += row.unsupported_count ?? 0;
-      // Weight duration averages by success count (durations are SUCCESS only from backend)
-      totalWeightedDuration += (row.avg_duration_ms ?? 0) * success;
+    getBlobsByElClient.forEach(row => {
+      const obs = row.observation_count ?? 0;
+      const status = row.status?.toUpperCase() ?? '';
+
+      switch (status) {
+        case 'SUCCESS':
+          successCount += obs;
+          // Duration stats only for SUCCESS
+          totalWeightedDuration += (row.avg_duration_ms ?? 0) * obs;
+          break;
+        case 'PARTIAL':
+          partialCount += obs;
+          break;
+        case 'EMPTY':
+          emptyCount += obs;
+          break;
+        case 'ERROR':
+          errorCount += obs;
+          break;
+        case 'UNSUPPORTED':
+          unsupportedCount += obs;
+          break;
+      }
     });
 
     const totalStatusCount = successCount + partialCount + emptyCount + errorCount + unsupportedCount;
     const successRate = totalStatusCount > 0 ? ((successCount / totalStatusCount) * 100).toFixed(1) : '0';
     const avgDuration = successCount > 0 ? (totalWeightedDuration / successCount).toFixed(0) : '0';
 
-    // Use successCount for observations to match the table which shows SUCCESS only
     return { totalObservations: successCount, successRate, avgDuration };
   })();
 
@@ -146,15 +153,27 @@ export function GetBlobsTab({ data, isLoading }: GetBlobsTabProps): JSX.Element 
   const histogramLabels = histogramBuckets.map(bucket => `${bucket}ms`);
   const histogramData = histogramBuckets.map(bucket => histogramMap.get(bucket) ?? 0);
 
-  // Calculate status breakdown from pre-aggregated hourly data
-  const statusTotals = getBlobsHourly.reduce(
-    (acc, item) => ({
-      success: acc.success + (item.success_count ?? 0),
-      partial: acc.partial + (item.partial_count ?? 0),
-      empty: acc.empty + (item.empty_count ?? 0),
-      error: acc.error + (item.error_count ?? 0),
-      unsupported: acc.unsupported + (item.unsupported_count ?? 0),
-    }),
+  // Calculate status breakdown from per-slot data
+  const statusTotals = getBlobsByElClient.reduce(
+    (acc, item) => {
+      const obs = item.observation_count ?? 0;
+      const status = item.status?.toUpperCase() ?? '';
+
+      switch (status) {
+        case 'SUCCESS':
+          return { ...acc, success: acc.success + obs };
+        case 'PARTIAL':
+          return { ...acc, partial: acc.partial + obs };
+        case 'EMPTY':
+          return { ...acc, empty: acc.empty + obs };
+        case 'ERROR':
+          return { ...acc, error: acc.error + obs };
+        case 'UNSUPPORTED':
+          return { ...acc, unsupported: acc.unsupported + obs };
+        default:
+          return acc;
+      }
+    },
     { success: 0, partial: 0, empty: 0, error: 0, unsupported: 0 }
   );
 
@@ -309,7 +328,7 @@ export function GetBlobsTab({ data, isLoading }: GetBlobsTabProps): JSX.Element 
       <ClientVersionBreakdown
         data={successBlobsByElClient}
         title="EL Client Duration"
-        description="Median engine_getBlobs duration (ms) by execution client and version"
+        description="engine_getBlobs duration (ms) by execution client and version"
         showBlobCount
         hideObservations
       />
