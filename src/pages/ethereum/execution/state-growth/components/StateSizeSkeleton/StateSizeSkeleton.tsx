@@ -3,90 +3,128 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Card } from '@/components/Layout/Card';
 
 /**
- * Loading skeleton for the State Size page.
- * Matches the layout: Hero total -> 3 metric cards -> Chart
+ * Loading skeleton for the State Growth page.
+ * Matches the layout: Stats row (Total + 3 cards) -> Main Chart -> Storage Slot Expiry section
  */
 export function StateSizeSkeleton(): JSX.Element {
   return (
     <div className="space-y-6">
-      {/* Hero: Total State Size skeleton */}
-      <div className="flex flex-col gap-1">
-        <LoadingContainer className="h-3 w-28 rounded-xs" />
-        <div className="mt-1 flex flex-wrap items-baseline gap-4">
-          <LoadingContainer className="h-12 w-40 rounded-xs" />
-          <div className="flex items-center gap-3">
-            <LoadingContainer className="h-7 w-24 rounded-xs" />
+      {/* Stats Row: Total State Size + Metric Cards */}
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch lg:gap-12">
+        {/* Total State Size */}
+        <div className="flex shrink-0 flex-col justify-center">
+          <LoadingContainer className="h-3 w-28 rounded-xs" />
+          <LoadingContainer className="mt-2 h-14 w-80 rounded-xs" />
+          <div className="mt-2 flex items-center gap-3">
+            <LoadingContainer className="h-7 w-24 rounded-sm" />
             <LoadingContainer className="h-5 w-16 rounded-xs" />
           </div>
         </div>
-        <LoadingContainer className="mt-2 h-3 w-48 rounded-xs" />
+
+        {/* Metric Cards */}
+        <div className="grid min-w-0 flex-1 grid-cols-1 gap-4 sm:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i} rounded className="p-3">
+              <LoadingContainer className="h-3 w-24 rounded-xs" />
+              <LoadingContainer className="mt-1 h-7 w-28 rounded-xs" />
+              <div className="mt-1.5 flex items-center gap-2">
+                <LoadingContainer className="h-5 w-20 rounded-sm" />
+                <LoadingContainer className="h-4 w-14 rounded-xs" />
+              </div>
+              <LoadingContainer className="mt-1.5 h-4 w-full rounded-xs" />
+            </Card>
+          ))}
+        </div>
       </div>
 
-      {/* Metric cards skeleton */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Card key={i} className="p-4">
-            <LoadingContainer className="mb-2 h-3 w-24 rounded-xs" />
-            <LoadingContainer className="mb-1 h-7 w-28 rounded-xs" />
-            <LoadingContainer className="mb-3 h-4 w-36 rounded-xs" />
-            <div className="flex items-center gap-2">
-              <LoadingContainer className="h-5 w-20 rounded-xs" />
-              <LoadingContainer className="h-4 w-14 rounded-xs" />
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      {/* Chart card skeleton */}
-      <Card className="p-6">
-        {/* Title and subtitle */}
-        <div className="mb-4">
-          <LoadingContainer className="mb-2 h-6 w-48 rounded-xs" />
-          <LoadingContainer className="h-4 w-80 rounded-xs" />
-        </div>
-
-        {/* Legend skeleton */}
-        <div className="mb-4 border-b border-border pb-4">
-          <LoadingContainer className="mb-2 h-4 w-16 rounded-xs" />
-          <div className="flex flex-wrap gap-2">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <LoadingContainer key={i} className="h-7 w-28 rounded-xs" />
-            ))}
+      {/* Main Chart */}
+      <Card rounded className="p-6">
+        <div className="mb-4 flex items-start justify-between">
+          <div>
+            <LoadingContainer className="h-5 w-48 rounded-xs" />
+            <LoadingContainer className="mt-2 h-4 w-72 rounded-xs" />
           </div>
-        </div>
-
-        {/* Chart area skeleton */}
-        <div className="relative h-[480px]">
-          {/* Y-axis labels */}
-          <div className="absolute top-0 left-0 flex h-full w-12 flex-col justify-between py-8">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <LoadingContainer key={i} className="h-3 w-10 rounded-xs" />
-            ))}
-          </div>
-
-          {/* Chart plot area */}
-          <div className="mr-4 ml-14 h-full">
-            <div className="relative h-[calc(100%-60px)]">
-              <LoadingContainer className="absolute top-[20%] left-0 h-0.5 w-full rounded-xs" />
-              <LoadingContainer className="absolute top-[40%] left-0 h-0.5 w-full rounded-xs" />
-              <LoadingContainer className="absolute top-[60%] left-0 h-0.5 w-full rounded-xs" />
-              <LoadingContainer className="absolute top-[80%] left-0 h-0.5 w-full rounded-xs" />
-            </div>
-
-            {/* X-axis labels */}
-            <div className="mt-4 flex justify-between">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <LoadingContainer key={i} className="h-3 w-16 rounded-xs" />
+          <div className="flex items-center gap-2">
+            <LoadingContainer className="h-4 w-12 rounded-xs" />
+            <div className="flex gap-1">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <LoadingContainer key={i} className="h-8 w-28 rounded-sm" />
               ))}
             </div>
+          </div>
+        </div>
+        <LoadingContainer className="h-[480px] w-full rounded-sm" />
+      </Card>
 
-            {/* Zoom slider skeleton */}
-            <div className="mt-4">
-              <LoadingContainer className="h-5 w-full rounded-xs" />
+      {/* Storage Slot Expiry Section */}
+      <div className="mt-8 space-y-6">
+        {/* Section Header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <LoadingContainer className="h-7 w-48 rounded-xs" />
+            <LoadingContainer className="mt-2 h-4 w-80 rounded-xs" />
+          </div>
+          <div className="flex items-center gap-2">
+            <LoadingContainer className="h-4 w-24 rounded-xs" />
+            <div className="flex gap-0.5">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <LoadingContainer key={i} className="h-8 w-10 rounded-xs" />
+              ))}
             </div>
           </div>
         </div>
-      </Card>
+
+        {/* Summary Stats */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i} rounded className="p-3">
+              <LoadingContainer className="h-3 w-28 rounded-xs" />
+              <LoadingContainer className="mt-1.5 h-7 w-24 rounded-xs" />
+              <div className="mt-1.5 flex items-center gap-2">
+                <LoadingContainer className="h-5 w-20 rounded-sm" />
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        {/* Storage Size Comparison Chart */}
+        <Card rounded className="p-6">
+          <div className="mb-4 flex items-start justify-between">
+            <div>
+              <LoadingContainer className="h-5 w-52 rounded-xs" />
+              <LoadingContainer className="mt-2 h-4 w-96 rounded-xs" />
+            </div>
+            <div className="flex items-center gap-2">
+              <LoadingContainer className="h-4 w-12 rounded-xs" />
+              <div className="flex gap-1">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <LoadingContainer key={i} className="h-8 w-20 rounded-sm" />
+                ))}
+              </div>
+            </div>
+          </div>
+          <LoadingContainer className="h-[360px] w-full rounded-sm" />
+        </Card>
+
+        {/* Active Storage Slots Chart */}
+        <Card rounded className="p-6">
+          <div className="mb-4 flex items-start justify-between">
+            <div>
+              <LoadingContainer className="h-5 w-60 rounded-xs" />
+              <LoadingContainer className="mt-2 h-4 w-72 rounded-xs" />
+            </div>
+            <div className="flex items-center gap-2">
+              <LoadingContainer className="h-4 w-12 rounded-xs" />
+              <div className="flex gap-1">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <LoadingContainer key={i} className="h-8 w-20 rounded-sm" />
+                ))}
+              </div>
+            </div>
+          </div>
+          <LoadingContainer className="h-[360px] w-full rounded-sm" />
+        </Card>
+      </div>
     </div>
   );
 }
