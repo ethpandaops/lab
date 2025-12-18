@@ -124,15 +124,7 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
           </div>
 
           {/* Per-Client Breakdown - only VALID status */}
-          {hasClientData && (
-            <ClientVersionBreakdown
-              data={newPayloadValidByClient}
-              noCard
-              hideObservations
-              hideRange
-              durationLabel="Duration"
-            />
-          )}
+          {hasClientData && <ClientVersionBreakdown data={newPayloadValidByClient} noCard hideObservations hideRange />}
         </Card>
       )}
 
@@ -169,7 +161,6 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
                   noCard
                   hideObservations
                   hideRange
-                  durationLabel="Duration"
                   showBlobCount
                   blobCountLabel="Blobs"
                 />

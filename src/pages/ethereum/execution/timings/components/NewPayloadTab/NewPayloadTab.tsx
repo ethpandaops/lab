@@ -29,54 +29,58 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
   const [visibleScatterSeries, setVisibleScatterSeries] = useState<Set<string>>(new Set());
   const [scatterSeriesInitialized, setScatterSeriesInitialized] = useState(false);
 
-  // Always use hourly data since all time ranges are < 24 hours
-  const useHourlyData = true;
-  const { newPayloadHourly, newPayloadDaily } = data;
-
-  // Calculate summary stats from pre-aggregated hourly/daily data
-  // These endpoints provide observation counts and weighted averages already computed server-side
+  // Calculate summary stats from per-slot/per-client data for accuracy
   const aggregatedStats = (() => {
-    const sourceData = useHourlyData ? newPayloadHourly : newPayloadDaily;
-
-    if (sourceData.length === 0) {
+    if (newPayloadByElClient.length === 0) {
       return { totalObservations: 0, validRate: '0', avgDuration: '0', minDuration: 0, maxDuration: 0 };
     }
 
-    // Sum up counts from all rows
+    // Sum up counts from all rows, grouped by status
     let validCount = 0;
     let invalidCount = 0;
     let syncingCount = 0;
     let acceptedCount = 0;
     let invalidBlockHashCount = 0;
     let totalWeightedDuration = 0;
+    let minDuration = Infinity;
+    let maxDuration = 0;
 
-    sourceData.forEach(row => {
-      const valid = row.valid_count ?? 0;
-      validCount += valid;
-      invalidCount += row.invalid_count ?? 0;
-      syncingCount += row.syncing_count ?? 0;
-      acceptedCount += row.accepted_count ?? 0;
-      invalidBlockHashCount += row.invalid_block_hash_count ?? 0;
-      // Weight duration averages by valid count (durations are VALID only from backend)
-      totalWeightedDuration += (row.avg_duration_ms ?? 0) * valid;
+    newPayloadByElClient.forEach(row => {
+      const obs = row.observation_count ?? 0;
+      const status = row.status?.toUpperCase() ?? '';
+
+      switch (status) {
+        case 'VALID': {
+          validCount += obs;
+          // Duration stats only for VALID
+          totalWeightedDuration += (row.avg_duration_ms ?? 0) * obs;
+          const min = row.min_duration_ms ?? 0;
+          const max = row.max_duration_ms ?? 0;
+          if (min > 0 && min < minDuration) minDuration = min;
+          if (max > maxDuration) maxDuration = max;
+          break;
+        }
+        case 'INVALID':
+          invalidCount += obs;
+          break;
+        case 'SYNCING':
+          syncingCount += obs;
+          break;
+        case 'ACCEPTED':
+          acceptedCount += obs;
+          break;
+        case 'INVALID_BLOCK_HASH':
+          invalidBlockHashCount += obs;
+          break;
+      }
     });
+
+    if (minDuration === Infinity) minDuration = 0;
 
     const totalStatusCount = validCount + invalidCount + syncingCount + acceptedCount + invalidBlockHashCount;
     const validRate = totalStatusCount > 0 ? ((validCount / totalStatusCount) * 100).toFixed(1) : '0';
     const avgDuration = validCount > 0 ? (totalWeightedDuration / validCount).toFixed(0) : '0';
 
-    // Calculate min/max from per-EL-client data (VALID only)
-    let minDuration = Infinity;
-    let maxDuration = 0;
-    validPayloadByElClient.forEach(row => {
-      const min = row.min_duration_ms ?? 0;
-      const max = row.max_duration_ms ?? 0;
-      if (min > 0 && min < minDuration) minDuration = min;
-      if (max > maxDuration) maxDuration = max;
-    });
-    if (minDuration === Infinity) minDuration = 0;
-
-    // Use validCount for observations to match the table which shows VALID only
     return { totalObservations: validCount, validRate, avgDuration, minDuration, maxDuration };
   })();
 
@@ -110,16 +114,29 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
   const histogramLabels = histogramBuckets.map(bucket => `${bucket}ms`);
   const histogramData = histogramBuckets.map(bucket => histogramMap.get(bucket) ?? 0);
 
-  // Calculate status breakdown from pre-aggregated hourly data
-  const statusTotals = newPayloadHourly.reduce(
-    (acc, item) => ({
-      valid: acc.valid + (item.valid_count ?? 0),
-      invalid: acc.invalid + (item.invalid_count ?? 0),
-      syncing: acc.syncing + (item.syncing_count ?? 0),
-      accepted: acc.accepted + (item.accepted_count ?? 0),
-      invalidBlockHash: acc.invalidBlockHash + (item.invalid_block_hash_count ?? 0),
-      error: 0, // Hourly data doesn't track errors separately (they're rare)
-    }),
+  // Calculate status breakdown from per-slot data
+  const statusTotals = newPayloadByElClient.reduce(
+    (acc, item) => {
+      const obs = item.observation_count ?? 0;
+      const status = item.status?.toUpperCase() ?? '';
+
+      switch (status) {
+        case 'VALID':
+          return { ...acc, valid: acc.valid + obs };
+        case 'INVALID':
+          return { ...acc, invalid: acc.invalid + obs };
+        case 'SYNCING':
+          return { ...acc, syncing: acc.syncing + obs };
+        case 'ACCEPTED':
+          return { ...acc, accepted: acc.accepted + obs };
+        case 'INVALID_BLOCK_HASH':
+          return { ...acc, invalidBlockHash: acc.invalidBlockHash + obs };
+        case 'ERROR':
+          return { ...acc, error: acc.error + obs };
+        default:
+          return acc;
+      }
+    },
     { valid: 0, invalid: 0, syncing: 0, accepted: 0, invalidBlockHash: 0, error: 0 }
   );
 
@@ -314,7 +331,7 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
       <ClientVersionBreakdown
         data={validPayloadByElClient}
         title="EL Client Duration"
-        description="Median engine_newPayload duration (ms) by execution client and version"
+        description="engine_newPayload duration (ms) by execution client and version"
         hideObservations
       />
 
