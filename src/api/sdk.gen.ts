@@ -9,12 +9,6 @@ import type {
   AdminCbtIncrementalServiceListData,
   AdminCbtIncrementalServiceListErrors,
   AdminCbtIncrementalServiceListResponses,
-  AdminCbtScheduledServiceGetData,
-  AdminCbtScheduledServiceGetErrors,
-  AdminCbtScheduledServiceGetResponses,
-  AdminCbtScheduledServiceListData,
-  AdminCbtScheduledServiceListErrors,
-  AdminCbtScheduledServiceListResponses,
   DimBlockBlobSubmitterServiceGetData,
   DimBlockBlobSubmitterServiceGetErrors,
   DimBlockBlobSubmitterServiceGetResponses,
@@ -537,10 +531,6 @@ import {
   zAdminCbtIncrementalServiceGetResponse,
   zAdminCbtIncrementalServiceListData,
   zAdminCbtIncrementalServiceListResponse,
-  zAdminCbtScheduledServiceGetData,
-  zAdminCbtScheduledServiceGetResponse,
-  zAdminCbtScheduledServiceListData,
-  zAdminCbtScheduledServiceListResponse,
   zDimBlockBlobSubmitterServiceGetData,
   zDimBlockBlobSubmitterServiceGetResponse,
   zDimBlockBlobSubmitterServiceListData,
@@ -940,46 +930,6 @@ export const adminCbtIncrementalServiceGet = <ThrowOnError extends boolean = fal
     requestValidator: async data => await zAdminCbtIncrementalServiceGetData.parseAsync(data),
     responseValidator: async data => await zAdminCbtIncrementalServiceGetResponse.parseAsync(data),
     url: '/api/v1/admin_cbt_incremental/{database}',
-    ...options,
-  });
-};
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const adminCbtScheduledServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<AdminCbtScheduledServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
-    AdminCbtScheduledServiceListResponses,
-    AdminCbtScheduledServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zAdminCbtScheduledServiceListData.parseAsync(data),
-    responseValidator: async data => await zAdminCbtScheduledServiceListResponse.parseAsync(data),
-    url: '/api/v1/admin_cbt_scheduled',
-    ...options,
-  });
-};
-
-/**
- * Get record
- *
- * Retrieve a single record by database
- */
-export const adminCbtScheduledServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<AdminCbtScheduledServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
-    AdminCbtScheduledServiceGetResponses,
-    AdminCbtScheduledServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zAdminCbtScheduledServiceGetData.parseAsync(data),
-    responseValidator: async data => await zAdminCbtScheduledServiceGetResponse.parseAsync(data),
-    url: '/api/v1/admin_cbt_scheduled/{database}',
     ...options,
   });
 };

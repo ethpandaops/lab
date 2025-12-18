@@ -136,4 +136,9 @@ export interface HeatmapChartProps {
    * @default true
    */
   emphasisDisabled?: boolean;
+  /**
+   * Custom text labels for the visual map legend [max, min]
+   * @example ['12s', '0s']
+   */
+  visualMapText?: [string, string];
 }

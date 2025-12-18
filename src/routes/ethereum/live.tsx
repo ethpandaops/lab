@@ -11,7 +11,12 @@ function LivePage(): JSX.Element {
   return (
     <SlotPlayerProvider
       key={currentNetwork?.name}
-      tables={['fct_block_head', 'fct_block_first_seen_by_node', 'fct_attestation_first_seen_chunked_50ms']}
+      tables={[
+        'fct_block_head',
+        'fct_block_first_seen_by_node',
+        'fct_attestation_first_seen_chunked_50ms',
+        'fct_block_blob_count_head',
+      ]}
       initialPlaying={true}
     >
       <IndexPage />

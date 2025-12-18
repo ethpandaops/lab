@@ -6,8 +6,6 @@ import { client } from '../client.gen';
 import {
   adminCbtIncrementalServiceGet,
   adminCbtIncrementalServiceList,
-  adminCbtScheduledServiceGet,
-  adminCbtScheduledServiceList,
   dimBlockBlobSubmitterServiceGet,
   dimBlockBlobSubmitterServiceList,
   dimNodeServiceGet,
@@ -189,12 +187,6 @@ import type {
   AdminCbtIncrementalServiceListData,
   AdminCbtIncrementalServiceListError,
   AdminCbtIncrementalServiceListResponse,
-  AdminCbtScheduledServiceGetData,
-  AdminCbtScheduledServiceGetError,
-  AdminCbtScheduledServiceGetResponse,
-  AdminCbtScheduledServiceListData,
-  AdminCbtScheduledServiceListError,
-  AdminCbtScheduledServiceListResponse,
   DimBlockBlobSubmitterServiceGetData,
   DimBlockBlobSubmitterServiceGetError,
   DimBlockBlobSubmitterServiceGetResponse,
@@ -804,60 +796,6 @@ export const adminCbtIncrementalServiceGetOptions = (options: Options<AdminCbtIn
       return data;
     },
     queryKey: adminCbtIncrementalServiceGetQueryKey(options),
-  });
-
-export const adminCbtScheduledServiceListQueryKey = (options?: Options<AdminCbtScheduledServiceListData>) =>
-  createQueryKey('adminCbtScheduledServiceList', options);
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const adminCbtScheduledServiceListOptions = (options?: Options<AdminCbtScheduledServiceListData>) =>
-  queryOptions<
-    AdminCbtScheduledServiceListResponse,
-    AdminCbtScheduledServiceListError,
-    AdminCbtScheduledServiceListResponse,
-    ReturnType<typeof adminCbtScheduledServiceListQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await adminCbtScheduledServiceList({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: adminCbtScheduledServiceListQueryKey(options),
-  });
-
-export const adminCbtScheduledServiceGetQueryKey = (options: Options<AdminCbtScheduledServiceGetData>) =>
-  createQueryKey('adminCbtScheduledServiceGet', options);
-
-/**
- * Get record
- *
- * Retrieve a single record by database
- */
-export const adminCbtScheduledServiceGetOptions = (options: Options<AdminCbtScheduledServiceGetData>) =>
-  queryOptions<
-    AdminCbtScheduledServiceGetResponse,
-    AdminCbtScheduledServiceGetError,
-    AdminCbtScheduledServiceGetResponse,
-    ReturnType<typeof adminCbtScheduledServiceGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await adminCbtScheduledServiceGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: adminCbtScheduledServiceGetQueryKey(options),
   });
 
 export const dimBlockBlobSubmitterServiceListQueryKey = (options?: Options<DimBlockBlobSubmitterServiceListData>) =>

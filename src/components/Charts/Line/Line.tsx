@@ -50,6 +50,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
     xAxisTitle,
     yAxisTitle,
     syncGroup,
+    tooltipFormatter,
   },
   ref
 ): JSX.Element {
@@ -213,6 +214,15 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           color: themeColors.foreground,
           fontSize: 12,
         },
+        formatter: tooltipFormatter
+          ? (
+              params: {
+                dataIndex: number;
+                value: number | null;
+                name: string;
+              }[]
+            ) => tooltipFormatter(params)
+          : undefined,
         axisPointer: {
           type: 'line',
           lineStyle: {
@@ -242,6 +252,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
       xAxisLabelInterval,
       xAxisTitle,
       yAxisTitle,
+      tooltipFormatter,
       themeColors.foreground,
       themeColors.border,
       themeColors.muted,

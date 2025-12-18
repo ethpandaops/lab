@@ -10,13 +10,6 @@ export const zAdminCbtIncremental = z.object({
   updated_date_time: z.optional(z.coerce.bigint()),
 });
 
-export const zAdminCbtScheduled = z.object({
-  database: z.optional(z.string()),
-  start_date_time: z.optional(z.coerce.bigint()),
-  table: z.optional(z.string()),
-  updated_date_time: z.optional(z.coerce.bigint()),
-});
-
 export const zDimBlockBlobSubmitter = z.object({
   address: z.optional(z.string()),
   block_number: z.optional(z.int()),
@@ -966,13 +959,6 @@ export const zFctStorageSlotStateWithExpiryHourly = z.object({
  */
 export const zGetAdminCbtIncrementalResponse = z.object({
   item: z.optional(zAdminCbtIncremental),
-});
-
-/**
- * Response for getting a single admin_cbt_scheduled record
- */
-export const zGetAdminCbtScheduledResponse = z.object({
-  item: z.optional(zAdminCbtScheduled),
 });
 
 /**
@@ -1969,14 +1955,6 @@ export const zListAdminCbtIncrementalResponse = z.object({
 });
 
 /**
- * Response for listing admin_cbt_scheduled records
- */
-export const zListAdminCbtScheduledResponse = z.object({
-  admin_cbt_scheduled: z.optional(z.array(zAdminCbtScheduled)),
-  next_page_token: z.optional(z.string()),
-});
-
-/**
  * Response for listing dim_block_blob_submitter records
  */
 export const zListDimBlockBlobSubmitterResponse = z.object({
@@ -2754,74 +2732,6 @@ export const zAdminCbtIncrementalServiceGetData = z.object({
  * OK
  */
 export const zAdminCbtIncrementalServiceGetResponse = zGetAdminCbtIncrementalResponse;
-
-export const zAdminCbtScheduledServiceListData = z.object({
-  body: z.optional(z.never()),
-  path: z.optional(z.never()),
-  query: z.optional(
-    z.object({
-      database_eq: z.optional(z.string()),
-      database_ne: z.optional(z.string()),
-      database_contains: z.optional(z.string()),
-      database_starts_with: z.optional(z.string()),
-      database_ends_with: z.optional(z.string()),
-      database_like: z.optional(z.string()),
-      database_not_like: z.optional(z.string()),
-      database_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      database_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      updated_date_time_eq: z.optional(z.coerce.bigint()),
-      updated_date_time_ne: z.optional(z.coerce.bigint()),
-      updated_date_time_lt: z.optional(z.coerce.bigint()),
-      updated_date_time_lte: z.optional(z.coerce.bigint()),
-      updated_date_time_gt: z.optional(z.coerce.bigint()),
-      updated_date_time_gte: z.optional(z.coerce.bigint()),
-      updated_date_time_between_min: z.optional(z.coerce.bigint()),
-      updated_date_time_between_max_value: z.optional(z.coerce.bigint()),
-      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      table_eq: z.optional(z.string()),
-      table_ne: z.optional(z.string()),
-      table_contains: z.optional(z.string()),
-      table_starts_with: z.optional(z.string()),
-      table_ends_with: z.optional(z.string()),
-      table_like: z.optional(z.string()),
-      table_not_like: z.optional(z.string()),
-      table_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      table_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      start_date_time_eq: z.optional(z.coerce.bigint()),
-      start_date_time_ne: z.optional(z.coerce.bigint()),
-      start_date_time_lt: z.optional(z.coerce.bigint()),
-      start_date_time_lte: z.optional(z.coerce.bigint()),
-      start_date_time_gt: z.optional(z.coerce.bigint()),
-      start_date_time_gte: z.optional(z.coerce.bigint()),
-      start_date_time_between_min: z.optional(z.coerce.bigint()),
-      start_date_time_between_max_value: z.optional(z.coerce.bigint()),
-      start_date_time_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      page_size: z.optional(z.int()),
-      page_token: z.optional(z.string()),
-      order_by: z.optional(z.string()),
-    })
-  ),
-});
-
-/**
- * OK
- */
-export const zAdminCbtScheduledServiceListResponse = zListAdminCbtScheduledResponse;
-
-export const zAdminCbtScheduledServiceGetData = z.object({
-  body: z.optional(z.never()),
-  path: z.object({
-    database: z.string(),
-  }),
-  query: z.optional(z.never()),
-});
-
-/**
- * OK
- */
-export const zAdminCbtScheduledServiceGetResponse = zGetAdminCbtScheduledResponse;
 
 export const zDimBlockBlobSubmitterServiceListData = z.object({
   body: z.optional(z.never()),
