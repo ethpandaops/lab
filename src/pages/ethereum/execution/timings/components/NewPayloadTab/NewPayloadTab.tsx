@@ -39,7 +39,7 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
     const sourceData = useHourlyData ? newPayloadHourly : newPayloadDaily;
 
     if (sourceData.length === 0) {
-      return { totalObservations: 0, validRate: '0', avgDuration: '0', avgP95Duration: '0' };
+      return { totalObservations: 0, validRate: '0', avgDuration: '0', minDuration: 0, maxDuration: 0 };
     }
 
     // Sum up counts from all rows
@@ -49,7 +49,6 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
     let acceptedCount = 0;
     let invalidBlockHashCount = 0;
     let totalWeightedDuration = 0;
-    let totalWeightedP95 = 0;
 
     sourceData.forEach(row => {
       const valid = row.valid_count ?? 0;
@@ -60,19 +59,28 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
       invalidBlockHashCount += row.invalid_block_hash_count ?? 0;
       // Weight duration averages by valid count (durations are VALID only from backend)
       totalWeightedDuration += (row.avg_duration_ms ?? 0) * valid;
-      totalWeightedP95 += (row.avg_p95_duration_ms ?? 0) * valid;
     });
 
     const totalStatusCount = validCount + invalidCount + syncingCount + acceptedCount + invalidBlockHashCount;
     const validRate = totalStatusCount > 0 ? ((validCount / totalStatusCount) * 100).toFixed(1) : '0';
     const avgDuration = validCount > 0 ? (totalWeightedDuration / validCount).toFixed(0) : '0';
-    const avgP95Duration = validCount > 0 ? (totalWeightedP95 / validCount).toFixed(0) : '0';
+
+    // Calculate min/max from per-EL-client data (VALID only)
+    let minDuration = Infinity;
+    let maxDuration = 0;
+    validPayloadByElClient.forEach(row => {
+      const min = row.min_duration_ms ?? 0;
+      const max = row.max_duration_ms ?? 0;
+      if (min > 0 && min < minDuration) minDuration = min;
+      if (max > maxDuration) maxDuration = max;
+    });
+    if (minDuration === Infinity) minDuration = 0;
 
     // Use validCount for observations to match the table which shows VALID only
-    return { totalObservations: validCount, validRate, avgDuration, avgP95Duration };
+    return { totalObservations: validCount, validRate, avgDuration, minDuration, maxDuration };
   })();
 
-  const { totalObservations, validRate, avgDuration, avgP95Duration } = aggregatedStats;
+  const { totalObservations, validRate, avgDuration, minDuration, maxDuration } = aggregatedStats;
 
   // Calculate slot bounds from per-EL-client data (which has per-slot granularity)
   // This avoids needing the slow newPayloadBySlot endpoint
@@ -180,7 +188,7 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
       const totalObs = existing.observationCount + obs;
       existing.avgDuration = (existing.avgDuration * existing.observationCount + avgDur * obs) / (totalObs || 1);
       existing.medianDuration = (existing.medianDuration * existing.observationCount + medDur * obs) / (totalObs || 1);
-      existing.p95Duration = Math.max(existing.p95Duration, p95Dur);
+      existing.p95Duration = (existing.p95Duration * existing.observationCount + p95Dur * obs) / (totalObs || 1);
       existing.observationCount = totalObs;
     } else {
       elClientMetrics.set(el, {
@@ -295,9 +303,9 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
             value: `${avgDuration} ms`,
           },
           {
-            id: 'p95-duration',
-            name: 'P95 Duration',
-            value: `${avgP95Duration} ms`,
+            id: 'duration-range',
+            name: 'Duration Range',
+            value: `${minDuration} – ${maxDuration} ms`,
           },
         ]}
       />
