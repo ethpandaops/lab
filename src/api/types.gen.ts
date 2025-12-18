@@ -2781,116 +2781,6 @@ export type FctExecutionStateSizeHourly = {
   updated_date_time?: number;
 };
 
-export type FctExecutionStateSizeMonthly = {
-  /**
-   * Account bytes at end of month
-   */
-  account_bytes?: number;
-  /**
-   * Account trie node bytes at end of month
-   */
-  account_trienode_bytes?: number;
-  /**
-   * Account trie nodes at end of month
-   */
-  account_trienodes?: number;
-  /**
-   * Total accounts at end of month
-   */
-  accounts?: number;
-  /**
-   * Contract code bytes at end of month
-   */
-  contract_code_bytes?: number;
-  /**
-   * Contract codes at end of month
-   */
-  contract_codes?: number;
-  /**
-   * Start of the month period
-   */
-  month_start_date?: string;
-  /**
-   * Storage bytes at end of month
-   */
-  storage_bytes?: number;
-  /**
-   * Storage trie node bytes at end of month
-   */
-  storage_trienode_bytes?: number;
-  /**
-   * Storage trie nodes at end of month
-   */
-  storage_trienodes?: number;
-  /**
-   * Storage slots at end of month
-   */
-  storages?: number;
-  /**
-   * Total state size in bytes
-   */
-  total_bytes?: number;
-  /**
-   * Timestamp when the record was last updated
-   */
-  updated_date_time?: number;
-};
-
-export type FctExecutionStateSizeWeekly = {
-  /**
-   * Account bytes at end of week
-   */
-  account_bytes?: number;
-  /**
-   * Account trie node bytes at end of week
-   */
-  account_trienode_bytes?: number;
-  /**
-   * Account trie nodes at end of week
-   */
-  account_trienodes?: number;
-  /**
-   * Total accounts at end of week
-   */
-  accounts?: number;
-  /**
-   * Contract code bytes at end of week
-   */
-  contract_code_bytes?: number;
-  /**
-   * Contract codes at end of week
-   */
-  contract_codes?: number;
-  /**
-   * Storage bytes at end of week
-   */
-  storage_bytes?: number;
-  /**
-   * Storage trie node bytes at end of week
-   */
-  storage_trienode_bytes?: number;
-  /**
-   * Storage trie nodes at end of week
-   */
-  storage_trienodes?: number;
-  /**
-   * Storage slots at end of week
-   */
-  storages?: number;
-  /**
-   * Total state size in bytes
-   */
-  total_bytes?: number;
-  /**
-   * Timestamp when the record was last updated
-   */
-  updated_date_time?: number;
-  /**
-   * Start of the week period (Monday)
-   */
-  week_start_date?: string;
-};
-
 export type FctHeadFirstSeenByNode = {
   /**
    * The head block root hash
@@ -3292,6 +3182,44 @@ export type FctStorageSlotState = {
   updated_date_time?: number;
 };
 
+export type FctStorageSlotStateDaily = {
+  /**
+   * Cumulative count of active storage slots at end of day
+   */
+  active_slots?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Cumulative sum of effective bytes at end of day
+   */
+  effective_bytes?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctStorageSlotStateHourly = {
+  /**
+   * Cumulative count of active storage slots at end of hour
+   */
+  active_slots?: number;
+  /**
+   * Cumulative sum of effective bytes at end of hour
+   */
+  effective_bytes?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type FctStorageSlotStateWithExpiryBy6m = {
   /**
    * Cumulative count of active storage slots at this block (with 6-month expiry applied)
@@ -3321,6 +3249,44 @@ export type FctStorageSlotStateWithExpiryBy6m = {
    * Net slot adjustment this block (negative=expiry, positive=reactivation)
    */
   net_slots_delta?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctStorageSlotStateWithExpiryBy6mDaily = {
+  /**
+   * Cumulative count of active storage slots at end of day (with 6m expiry policy)
+   */
+  active_slots?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Cumulative sum of effective bytes at end of day (with 6m expiry policy)
+   */
+  effective_bytes?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctStorageSlotStateWithExpiryBy6mHourly = {
+  /**
+   * Cumulative count of active storage slots at end of hour (with 6m expiry policy)
+   */
+  active_slots?: number;
+  /**
+   * Cumulative sum of effective bytes at end of hour (with 6m expiry policy)
+   */
+  effective_bytes?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
   /**
    * Timestamp when the record was last updated
    */
@@ -3657,20 +3623,6 @@ export type GetFctExecutionStateSizeHourlyResponse = {
 };
 
 /**
- * Response for getting a single fct_execution_state_size_monthly record
- */
-export type GetFctExecutionStateSizeMonthlyResponse = {
-  item?: FctExecutionStateSizeMonthly;
-};
-
-/**
- * Response for getting a single fct_execution_state_size_weekly record
- */
-export type GetFctExecutionStateSizeWeeklyResponse = {
-  item?: FctExecutionStateSizeWeekly;
-};
-
-/**
  * Response for getting a single fct_head_first_seen_by_node record
  */
 export type GetFctHeadFirstSeenByNodeResponse = {
@@ -3713,10 +3665,38 @@ export type GetFctPreparedBlockResponse = {
 };
 
 /**
+ * Response for getting a single fct_storage_slot_state_daily record
+ */
+export type GetFctStorageSlotStateDailyResponse = {
+  item?: FctStorageSlotStateDaily;
+};
+
+/**
+ * Response for getting a single fct_storage_slot_state_hourly record
+ */
+export type GetFctStorageSlotStateHourlyResponse = {
+  item?: FctStorageSlotStateHourly;
+};
+
+/**
  * Response for getting a single fct_storage_slot_state record
  */
 export type GetFctStorageSlotStateResponse = {
   item?: FctStorageSlotState;
+};
+
+/**
+ * Response for getting a single fct_storage_slot_state_with_expiry_by_6m_daily record
+ */
+export type GetFctStorageSlotStateWithExpiryBy6mDailyResponse = {
+  item?: FctStorageSlotStateWithExpiryBy6mDaily;
+};
+
+/**
+ * Response for getting a single fct_storage_slot_state_with_expiry_by_6m_hourly record
+ */
+export type GetFctStorageSlotStateWithExpiryBy6mHourlyResponse = {
+  item?: FctStorageSlotStateWithExpiryBy6mHourly;
 };
 
 /**
@@ -3822,6 +3802,13 @@ export type GetIntCustodyProbeOrderBySlotResponse = {
  */
 export type GetIntCustodyProbeResponse = {
   item?: IntCustodyProbe;
+};
+
+/**
+ * Response for getting a single int_engine_new_payload record
+ */
+export type GetIntEngineNewPayloadResponse = {
+  item?: IntEngineNewPayload;
 };
 
 /**
@@ -4746,6 +4733,169 @@ export type IntCustodyProbeOrderBySlot = {
   username?: string;
 };
 
+export type IntEngineNewPayload = {
+  /**
+   * Number of blobs in the block
+   */
+  blob_count?: number;
+  /**
+   * Execution block hash (hex encoded with 0x prefix)
+   */
+  block_hash?: string;
+  /**
+   * Execution block number
+   */
+  block_number?: number;
+  /**
+   * Root of the beacon block (hex encoded with 0x prefix)
+   */
+  block_root?: string;
+  /**
+   * Block status: canonical, orphaned, or unknown if not yet determined
+   */
+  block_status?: string;
+  /**
+   * The total bytes of the beacon block payload
+   */
+  block_total_bytes?: number | null;
+  /**
+   * The total bytes of the beacon block payload when compressed using snappy
+   */
+  block_total_bytes_compressed?: number | null;
+  /**
+   * The version of the beacon block (phase0, altair, bellatrix, capella, deneb)
+   */
+  block_version?: string;
+  /**
+   * How long the engine_newPayload call took in milliseconds
+   */
+  duration_ms?: number;
+  /**
+   * Epoch number derived from the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * When the sentry received the event
+   */
+  event_date_time?: number;
+  /**
+   * Gas limit of the block
+   */
+  gas_limit?: number;
+  /**
+   * Total gas used by all transactions in the block
+   */
+  gas_used?: number;
+  /**
+   * Latest valid hash when status is INVALID (hex encoded with 0x prefix)
+   */
+  latest_valid_hash?: string | null;
+  /**
+   * Autonomous system number of the client that generated the event
+   */
+  meta_client_geo_autonomous_system_number?: number | null;
+  /**
+   * Autonomous system organization of the client that generated the event
+   */
+  meta_client_geo_autonomous_system_organization?: string | null;
+  /**
+   * City of the client that generated the event
+   */
+  meta_client_geo_city?: string;
+  /**
+   * Continent code of the client that generated the event
+   */
+  meta_client_geo_continent_code?: string;
+  /**
+   * Country of the client that generated the event
+   */
+  meta_client_geo_country?: string;
+  /**
+   * Country code of the client that generated the event
+   */
+  meta_client_geo_country_code?: string;
+  /**
+   * Latitude of the client that generated the event
+   */
+  meta_client_geo_latitude?: number | null;
+  /**
+   * Longitude of the client that generated the event
+   */
+  meta_client_geo_longitude?: number | null;
+  /**
+   * Implementation of the client that generated the event
+   */
+  meta_client_implementation?: string;
+  /**
+   * Name of the client that generated the event
+   */
+  meta_client_name?: string;
+  /**
+   * Version of the client that generated the event
+   */
+  meta_client_version?: string;
+  /**
+   * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Full execution client version string from web3_clientVersion RPC
+   */
+  meta_execution_version?: string;
+  /**
+   * Version of the engine_newPayload method (e.g., V3, V4)
+   */
+  method_version?: string;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
+  /**
+   * Root of the parent beacon block (hex encoded with 0x prefix)
+   */
+  parent_block_root?: string;
+  /**
+   * Parent execution block hash (hex encoded with 0x prefix)
+   */
+  parent_hash?: string;
+  /**
+   * Validator index of the block proposer
+   */
+  proposer_index?: number;
+  /**
+   * When the engine_newPayload call was initiated
+   */
+  requested_date_time?: number;
+  /**
+   * Slot number of the beacon block containing the payload
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR)
+   */
+  status?: string;
+  /**
+   * Number of transactions in the block
+   */
+  tx_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Error message when validation fails
+   */
+  validation_error?: string | null;
+};
+
 export type IntExecutionBlockByDate = {
   /**
    * The block timestamp
@@ -5562,34 +5712,6 @@ export type ListFctExecutionStateSizeHourlyResponse = {
 };
 
 /**
- * Response for listing fct_execution_state_size_monthly records
- */
-export type ListFctExecutionStateSizeMonthlyResponse = {
-  /**
-   * The list of fct_execution_state_size_monthly.
-   */
-  fct_execution_state_size_monthly?: Array<FctExecutionStateSizeMonthly>;
-  /**
-   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
-   */
-  next_page_token?: string;
-};
-
-/**
- * Response for listing fct_execution_state_size_weekly records
- */
-export type ListFctExecutionStateSizeWeeklyResponse = {
-  /**
-   * The list of fct_execution_state_size_weekly.
-   */
-  fct_execution_state_size_weekly?: Array<FctExecutionStateSizeWeekly>;
-  /**
-   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
-   */
-  next_page_token?: string;
-};
-
-/**
  * Response for listing fct_head_first_seen_by_node records
  */
 export type ListFctHeadFirstSeenByNodeResponse = {
@@ -5674,6 +5796,34 @@ export type ListFctPreparedBlockResponse = {
 };
 
 /**
+ * Response for listing fct_storage_slot_state_daily records
+ */
+export type ListFctStorageSlotStateDailyResponse = {
+  /**
+   * The list of fct_storage_slot_state_daily.
+   */
+  fct_storage_slot_state_daily?: Array<FctStorageSlotStateDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_storage_slot_state_hourly records
+ */
+export type ListFctStorageSlotStateHourlyResponse = {
+  /**
+   * The list of fct_storage_slot_state_hourly.
+   */
+  fct_storage_slot_state_hourly?: Array<FctStorageSlotStateHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_storage_slot_state records
  */
 export type ListFctStorageSlotStateResponse = {
@@ -5681,6 +5831,34 @@ export type ListFctStorageSlotStateResponse = {
    * The list of fct_storage_slot_state.
    */
   fct_storage_slot_state?: Array<FctStorageSlotState>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_storage_slot_state_with_expiry_by_6m_daily records
+ */
+export type ListFctStorageSlotStateWithExpiryBy6mDailyResponse = {
+  /**
+   * The list of fct_storage_slot_state_with_expiry_by_6m_daily.
+   */
+  fct_storage_slot_state_with_expiry_by_6m_daily?: Array<FctStorageSlotStateWithExpiryBy6mDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_storage_slot_state_with_expiry_by_6m_hourly records
+ */
+export type ListFctStorageSlotStateWithExpiryBy6mHourlyResponse = {
+  /**
+   * The list of fct_storage_slot_state_with_expiry_by_6m_hourly.
+   */
+  fct_storage_slot_state_with_expiry_by_6m_hourly?: Array<FctStorageSlotStateWithExpiryBy6mHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -5891,6 +6069,20 @@ export type ListIntCustodyProbeResponse = {
    * The list of int_custody_probe.
    */
   int_custody_probe?: Array<IntCustodyProbe>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_engine_new_payload records
+ */
+export type ListIntEngineNewPayloadResponse = {
+  /**
+   * The list of int_engine_new_payload.
+   */
+  int_engine_new_payload?: Array<IntEngineNewPayload>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -34058,1182 +34250,6 @@ export type FctExecutionStateSizeHourlyServiceGetResponses = {
 export type FctExecutionStateSizeHourlyServiceGetResponse =
   FctExecutionStateSizeHourlyServiceGetResponses[keyof FctExecutionStateSizeHourlyServiceGetResponses];
 
-export type FctExecutionStateSizeMonthlyServiceListData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Start of the month period (filter: eq)
-     */
-    month_start_date_eq?: string;
-    /**
-     * Start of the month period (filter: ne)
-     */
-    month_start_date_ne?: string;
-    /**
-     * Start of the month period (filter: contains)
-     */
-    month_start_date_contains?: string;
-    /**
-     * Start of the month period (filter: starts_with)
-     */
-    month_start_date_starts_with?: string;
-    /**
-     * Start of the month period (filter: ends_with)
-     */
-    month_start_date_ends_with?: string;
-    /**
-     * Start of the month period (filter: like)
-     */
-    month_start_date_like?: string;
-    /**
-     * Start of the month period (filter: not_like)
-     */
-    month_start_date_not_like?: string;
-    /**
-     * Start of the month period (filter: in_values) (comma-separated list)
-     */
-    month_start_date_in_values?: string;
-    /**
-     * Start of the month period (filter: not_in_values) (comma-separated list)
-     */
-    month_start_date_not_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: eq)
-     */
-    updated_date_time_eq?: number;
-    /**
-     * Timestamp when the record was last updated (filter: ne)
-     */
-    updated_date_time_ne?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lt)
-     */
-    updated_date_time_lt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lte)
-     */
-    updated_date_time_lte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gt)
-     */
-    updated_date_time_gt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gte)
-     */
-    updated_date_time_gte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_min)
-     */
-    updated_date_time_between_min?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_max_value)
-     */
-    updated_date_time_between_max_value?: number;
-    /**
-     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
-     */
-    updated_date_time_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
-     */
-    updated_date_time_not_in_values?: string;
-    /**
-     * Total accounts at end of month (filter: eq)
-     */
-    accounts_eq?: number;
-    /**
-     * Total accounts at end of month (filter: ne)
-     */
-    accounts_ne?: number;
-    /**
-     * Total accounts at end of month (filter: lt)
-     */
-    accounts_lt?: number;
-    /**
-     * Total accounts at end of month (filter: lte)
-     */
-    accounts_lte?: number;
-    /**
-     * Total accounts at end of month (filter: gt)
-     */
-    accounts_gt?: number;
-    /**
-     * Total accounts at end of month (filter: gte)
-     */
-    accounts_gte?: number;
-    /**
-     * Total accounts at end of month (filter: between_min)
-     */
-    accounts_between_min?: number;
-    /**
-     * Total accounts at end of month (filter: between_max_value)
-     */
-    accounts_between_max_value?: number;
-    /**
-     * Total accounts at end of month (filter: in_values) (comma-separated list)
-     */
-    accounts_in_values?: string;
-    /**
-     * Total accounts at end of month (filter: not_in_values) (comma-separated list)
-     */
-    accounts_not_in_values?: string;
-    /**
-     * Account bytes at end of month (filter: eq)
-     */
-    account_bytes_eq?: number;
-    /**
-     * Account bytes at end of month (filter: ne)
-     */
-    account_bytes_ne?: number;
-    /**
-     * Account bytes at end of month (filter: lt)
-     */
-    account_bytes_lt?: number;
-    /**
-     * Account bytes at end of month (filter: lte)
-     */
-    account_bytes_lte?: number;
-    /**
-     * Account bytes at end of month (filter: gt)
-     */
-    account_bytes_gt?: number;
-    /**
-     * Account bytes at end of month (filter: gte)
-     */
-    account_bytes_gte?: number;
-    /**
-     * Account bytes at end of month (filter: between_min)
-     */
-    account_bytes_between_min?: number;
-    /**
-     * Account bytes at end of month (filter: between_max_value)
-     */
-    account_bytes_between_max_value?: number;
-    /**
-     * Account bytes at end of month (filter: in_values) (comma-separated list)
-     */
-    account_bytes_in_values?: string;
-    /**
-     * Account bytes at end of month (filter: not_in_values) (comma-separated list)
-     */
-    account_bytes_not_in_values?: string;
-    /**
-     * Account trie nodes at end of month (filter: eq)
-     */
-    account_trienodes_eq?: number;
-    /**
-     * Account trie nodes at end of month (filter: ne)
-     */
-    account_trienodes_ne?: number;
-    /**
-     * Account trie nodes at end of month (filter: lt)
-     */
-    account_trienodes_lt?: number;
-    /**
-     * Account trie nodes at end of month (filter: lte)
-     */
-    account_trienodes_lte?: number;
-    /**
-     * Account trie nodes at end of month (filter: gt)
-     */
-    account_trienodes_gt?: number;
-    /**
-     * Account trie nodes at end of month (filter: gte)
-     */
-    account_trienodes_gte?: number;
-    /**
-     * Account trie nodes at end of month (filter: between_min)
-     */
-    account_trienodes_between_min?: number;
-    /**
-     * Account trie nodes at end of month (filter: between_max_value)
-     */
-    account_trienodes_between_max_value?: number;
-    /**
-     * Account trie nodes at end of month (filter: in_values) (comma-separated list)
-     */
-    account_trienodes_in_values?: string;
-    /**
-     * Account trie nodes at end of month (filter: not_in_values) (comma-separated list)
-     */
-    account_trienodes_not_in_values?: string;
-    /**
-     * Account trie node bytes at end of month (filter: eq)
-     */
-    account_trienode_bytes_eq?: number;
-    /**
-     * Account trie node bytes at end of month (filter: ne)
-     */
-    account_trienode_bytes_ne?: number;
-    /**
-     * Account trie node bytes at end of month (filter: lt)
-     */
-    account_trienode_bytes_lt?: number;
-    /**
-     * Account trie node bytes at end of month (filter: lte)
-     */
-    account_trienode_bytes_lte?: number;
-    /**
-     * Account trie node bytes at end of month (filter: gt)
-     */
-    account_trienode_bytes_gt?: number;
-    /**
-     * Account trie node bytes at end of month (filter: gte)
-     */
-    account_trienode_bytes_gte?: number;
-    /**
-     * Account trie node bytes at end of month (filter: between_min)
-     */
-    account_trienode_bytes_between_min?: number;
-    /**
-     * Account trie node bytes at end of month (filter: between_max_value)
-     */
-    account_trienode_bytes_between_max_value?: number;
-    /**
-     * Account trie node bytes at end of month (filter: in_values) (comma-separated list)
-     */
-    account_trienode_bytes_in_values?: string;
-    /**
-     * Account trie node bytes at end of month (filter: not_in_values) (comma-separated list)
-     */
-    account_trienode_bytes_not_in_values?: string;
-    /**
-     * Contract codes at end of month (filter: eq)
-     */
-    contract_codes_eq?: number;
-    /**
-     * Contract codes at end of month (filter: ne)
-     */
-    contract_codes_ne?: number;
-    /**
-     * Contract codes at end of month (filter: lt)
-     */
-    contract_codes_lt?: number;
-    /**
-     * Contract codes at end of month (filter: lte)
-     */
-    contract_codes_lte?: number;
-    /**
-     * Contract codes at end of month (filter: gt)
-     */
-    contract_codes_gt?: number;
-    /**
-     * Contract codes at end of month (filter: gte)
-     */
-    contract_codes_gte?: number;
-    /**
-     * Contract codes at end of month (filter: between_min)
-     */
-    contract_codes_between_min?: number;
-    /**
-     * Contract codes at end of month (filter: between_max_value)
-     */
-    contract_codes_between_max_value?: number;
-    /**
-     * Contract codes at end of month (filter: in_values) (comma-separated list)
-     */
-    contract_codes_in_values?: string;
-    /**
-     * Contract codes at end of month (filter: not_in_values) (comma-separated list)
-     */
-    contract_codes_not_in_values?: string;
-    /**
-     * Contract code bytes at end of month (filter: eq)
-     */
-    contract_code_bytes_eq?: number;
-    /**
-     * Contract code bytes at end of month (filter: ne)
-     */
-    contract_code_bytes_ne?: number;
-    /**
-     * Contract code bytes at end of month (filter: lt)
-     */
-    contract_code_bytes_lt?: number;
-    /**
-     * Contract code bytes at end of month (filter: lte)
-     */
-    contract_code_bytes_lte?: number;
-    /**
-     * Contract code bytes at end of month (filter: gt)
-     */
-    contract_code_bytes_gt?: number;
-    /**
-     * Contract code bytes at end of month (filter: gte)
-     */
-    contract_code_bytes_gte?: number;
-    /**
-     * Contract code bytes at end of month (filter: between_min)
-     */
-    contract_code_bytes_between_min?: number;
-    /**
-     * Contract code bytes at end of month (filter: between_max_value)
-     */
-    contract_code_bytes_between_max_value?: number;
-    /**
-     * Contract code bytes at end of month (filter: in_values) (comma-separated list)
-     */
-    contract_code_bytes_in_values?: string;
-    /**
-     * Contract code bytes at end of month (filter: not_in_values) (comma-separated list)
-     */
-    contract_code_bytes_not_in_values?: string;
-    /**
-     * Storage slots at end of month (filter: eq)
-     */
-    storages_eq?: number;
-    /**
-     * Storage slots at end of month (filter: ne)
-     */
-    storages_ne?: number;
-    /**
-     * Storage slots at end of month (filter: lt)
-     */
-    storages_lt?: number;
-    /**
-     * Storage slots at end of month (filter: lte)
-     */
-    storages_lte?: number;
-    /**
-     * Storage slots at end of month (filter: gt)
-     */
-    storages_gt?: number;
-    /**
-     * Storage slots at end of month (filter: gte)
-     */
-    storages_gte?: number;
-    /**
-     * Storage slots at end of month (filter: between_min)
-     */
-    storages_between_min?: number;
-    /**
-     * Storage slots at end of month (filter: between_max_value)
-     */
-    storages_between_max_value?: number;
-    /**
-     * Storage slots at end of month (filter: in_values) (comma-separated list)
-     */
-    storages_in_values?: string;
-    /**
-     * Storage slots at end of month (filter: not_in_values) (comma-separated list)
-     */
-    storages_not_in_values?: string;
-    /**
-     * Storage bytes at end of month (filter: eq)
-     */
-    storage_bytes_eq?: number;
-    /**
-     * Storage bytes at end of month (filter: ne)
-     */
-    storage_bytes_ne?: number;
-    /**
-     * Storage bytes at end of month (filter: lt)
-     */
-    storage_bytes_lt?: number;
-    /**
-     * Storage bytes at end of month (filter: lte)
-     */
-    storage_bytes_lte?: number;
-    /**
-     * Storage bytes at end of month (filter: gt)
-     */
-    storage_bytes_gt?: number;
-    /**
-     * Storage bytes at end of month (filter: gte)
-     */
-    storage_bytes_gte?: number;
-    /**
-     * Storage bytes at end of month (filter: between_min)
-     */
-    storage_bytes_between_min?: number;
-    /**
-     * Storage bytes at end of month (filter: between_max_value)
-     */
-    storage_bytes_between_max_value?: number;
-    /**
-     * Storage bytes at end of month (filter: in_values) (comma-separated list)
-     */
-    storage_bytes_in_values?: string;
-    /**
-     * Storage bytes at end of month (filter: not_in_values) (comma-separated list)
-     */
-    storage_bytes_not_in_values?: string;
-    /**
-     * Storage trie nodes at end of month (filter: eq)
-     */
-    storage_trienodes_eq?: number;
-    /**
-     * Storage trie nodes at end of month (filter: ne)
-     */
-    storage_trienodes_ne?: number;
-    /**
-     * Storage trie nodes at end of month (filter: lt)
-     */
-    storage_trienodes_lt?: number;
-    /**
-     * Storage trie nodes at end of month (filter: lte)
-     */
-    storage_trienodes_lte?: number;
-    /**
-     * Storage trie nodes at end of month (filter: gt)
-     */
-    storage_trienodes_gt?: number;
-    /**
-     * Storage trie nodes at end of month (filter: gte)
-     */
-    storage_trienodes_gte?: number;
-    /**
-     * Storage trie nodes at end of month (filter: between_min)
-     */
-    storage_trienodes_between_min?: number;
-    /**
-     * Storage trie nodes at end of month (filter: between_max_value)
-     */
-    storage_trienodes_between_max_value?: number;
-    /**
-     * Storage trie nodes at end of month (filter: in_values) (comma-separated list)
-     */
-    storage_trienodes_in_values?: string;
-    /**
-     * Storage trie nodes at end of month (filter: not_in_values) (comma-separated list)
-     */
-    storage_trienodes_not_in_values?: string;
-    /**
-     * Storage trie node bytes at end of month (filter: eq)
-     */
-    storage_trienode_bytes_eq?: number;
-    /**
-     * Storage trie node bytes at end of month (filter: ne)
-     */
-    storage_trienode_bytes_ne?: number;
-    /**
-     * Storage trie node bytes at end of month (filter: lt)
-     */
-    storage_trienode_bytes_lt?: number;
-    /**
-     * Storage trie node bytes at end of month (filter: lte)
-     */
-    storage_trienode_bytes_lte?: number;
-    /**
-     * Storage trie node bytes at end of month (filter: gt)
-     */
-    storage_trienode_bytes_gt?: number;
-    /**
-     * Storage trie node bytes at end of month (filter: gte)
-     */
-    storage_trienode_bytes_gte?: number;
-    /**
-     * Storage trie node bytes at end of month (filter: between_min)
-     */
-    storage_trienode_bytes_between_min?: number;
-    /**
-     * Storage trie node bytes at end of month (filter: between_max_value)
-     */
-    storage_trienode_bytes_between_max_value?: number;
-    /**
-     * Storage trie node bytes at end of month (filter: in_values) (comma-separated list)
-     */
-    storage_trienode_bytes_in_values?: string;
-    /**
-     * Storage trie node bytes at end of month (filter: not_in_values) (comma-separated list)
-     */
-    storage_trienode_bytes_not_in_values?: string;
-    /**
-     * Total state size in bytes (filter: eq)
-     */
-    total_bytes_eq?: number;
-    /**
-     * Total state size in bytes (filter: ne)
-     */
-    total_bytes_ne?: number;
-    /**
-     * Total state size in bytes (filter: lt)
-     */
-    total_bytes_lt?: number;
-    /**
-     * Total state size in bytes (filter: lte)
-     */
-    total_bytes_lte?: number;
-    /**
-     * Total state size in bytes (filter: gt)
-     */
-    total_bytes_gt?: number;
-    /**
-     * Total state size in bytes (filter: gte)
-     */
-    total_bytes_gte?: number;
-    /**
-     * Total state size in bytes (filter: between_min)
-     */
-    total_bytes_between_min?: number;
-    /**
-     * Total state size in bytes (filter: between_max_value)
-     */
-    total_bytes_between_max_value?: number;
-    /**
-     * Total state size in bytes (filter: in_values) (comma-separated list)
-     */
-    total_bytes_in_values?: string;
-    /**
-     * Total state size in bytes (filter: not_in_values) (comma-separated list)
-     */
-    total_bytes_not_in_values?: string;
-    /**
-     * The maximum number of fct_execution_state_size_monthly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
-     */
-    page_size?: number;
-    /**
-     * A page token, received from a previous `ListFctExecutionStateSizeMonthly` call. Provide this to retrieve the subsequent page.
-     */
-    page_token?: string;
-    /**
-     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
-     */
-    order_by?: string;
-  };
-  url: '/api/v1/fct_execution_state_size_monthly';
-};
-
-export type FctExecutionStateSizeMonthlyServiceListErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type FctExecutionStateSizeMonthlyServiceListError =
-  FctExecutionStateSizeMonthlyServiceListErrors[keyof FctExecutionStateSizeMonthlyServiceListErrors];
-
-export type FctExecutionStateSizeMonthlyServiceListResponses = {
-  /**
-   * OK
-   */
-  200: ListFctExecutionStateSizeMonthlyResponse;
-};
-
-export type FctExecutionStateSizeMonthlyServiceListResponse =
-  FctExecutionStateSizeMonthlyServiceListResponses[keyof FctExecutionStateSizeMonthlyServiceListResponses];
-
-export type FctExecutionStateSizeMonthlyServiceGetData = {
-  body?: never;
-  path: {
-    /**
-     * Start of the month period
-     */
-    month_start_date: string;
-  };
-  query?: never;
-  url: '/api/v1/fct_execution_state_size_monthly/{month_start_date}';
-};
-
-export type FctExecutionStateSizeMonthlyServiceGetErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type FctExecutionStateSizeMonthlyServiceGetError =
-  FctExecutionStateSizeMonthlyServiceGetErrors[keyof FctExecutionStateSizeMonthlyServiceGetErrors];
-
-export type FctExecutionStateSizeMonthlyServiceGetResponses = {
-  /**
-   * OK
-   */
-  200: GetFctExecutionStateSizeMonthlyResponse;
-};
-
-export type FctExecutionStateSizeMonthlyServiceGetResponse =
-  FctExecutionStateSizeMonthlyServiceGetResponses[keyof FctExecutionStateSizeMonthlyServiceGetResponses];
-
-export type FctExecutionStateSizeWeeklyServiceListData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Start of the week period (Monday) (filter: eq)
-     */
-    week_start_date_eq?: string;
-    /**
-     * Start of the week period (Monday) (filter: ne)
-     */
-    week_start_date_ne?: string;
-    /**
-     * Start of the week period (Monday) (filter: contains)
-     */
-    week_start_date_contains?: string;
-    /**
-     * Start of the week period (Monday) (filter: starts_with)
-     */
-    week_start_date_starts_with?: string;
-    /**
-     * Start of the week period (Monday) (filter: ends_with)
-     */
-    week_start_date_ends_with?: string;
-    /**
-     * Start of the week period (Monday) (filter: like)
-     */
-    week_start_date_like?: string;
-    /**
-     * Start of the week period (Monday) (filter: not_like)
-     */
-    week_start_date_not_like?: string;
-    /**
-     * Start of the week period (Monday) (filter: in_values) (comma-separated list)
-     */
-    week_start_date_in_values?: string;
-    /**
-     * Start of the week period (Monday) (filter: not_in_values) (comma-separated list)
-     */
-    week_start_date_not_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: eq)
-     */
-    updated_date_time_eq?: number;
-    /**
-     * Timestamp when the record was last updated (filter: ne)
-     */
-    updated_date_time_ne?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lt)
-     */
-    updated_date_time_lt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lte)
-     */
-    updated_date_time_lte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gt)
-     */
-    updated_date_time_gt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gte)
-     */
-    updated_date_time_gte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_min)
-     */
-    updated_date_time_between_min?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_max_value)
-     */
-    updated_date_time_between_max_value?: number;
-    /**
-     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
-     */
-    updated_date_time_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
-     */
-    updated_date_time_not_in_values?: string;
-    /**
-     * Total accounts at end of week (filter: eq)
-     */
-    accounts_eq?: number;
-    /**
-     * Total accounts at end of week (filter: ne)
-     */
-    accounts_ne?: number;
-    /**
-     * Total accounts at end of week (filter: lt)
-     */
-    accounts_lt?: number;
-    /**
-     * Total accounts at end of week (filter: lte)
-     */
-    accounts_lte?: number;
-    /**
-     * Total accounts at end of week (filter: gt)
-     */
-    accounts_gt?: number;
-    /**
-     * Total accounts at end of week (filter: gte)
-     */
-    accounts_gte?: number;
-    /**
-     * Total accounts at end of week (filter: between_min)
-     */
-    accounts_between_min?: number;
-    /**
-     * Total accounts at end of week (filter: between_max_value)
-     */
-    accounts_between_max_value?: number;
-    /**
-     * Total accounts at end of week (filter: in_values) (comma-separated list)
-     */
-    accounts_in_values?: string;
-    /**
-     * Total accounts at end of week (filter: not_in_values) (comma-separated list)
-     */
-    accounts_not_in_values?: string;
-    /**
-     * Account bytes at end of week (filter: eq)
-     */
-    account_bytes_eq?: number;
-    /**
-     * Account bytes at end of week (filter: ne)
-     */
-    account_bytes_ne?: number;
-    /**
-     * Account bytes at end of week (filter: lt)
-     */
-    account_bytes_lt?: number;
-    /**
-     * Account bytes at end of week (filter: lte)
-     */
-    account_bytes_lte?: number;
-    /**
-     * Account bytes at end of week (filter: gt)
-     */
-    account_bytes_gt?: number;
-    /**
-     * Account bytes at end of week (filter: gte)
-     */
-    account_bytes_gte?: number;
-    /**
-     * Account bytes at end of week (filter: between_min)
-     */
-    account_bytes_between_min?: number;
-    /**
-     * Account bytes at end of week (filter: between_max_value)
-     */
-    account_bytes_between_max_value?: number;
-    /**
-     * Account bytes at end of week (filter: in_values) (comma-separated list)
-     */
-    account_bytes_in_values?: string;
-    /**
-     * Account bytes at end of week (filter: not_in_values) (comma-separated list)
-     */
-    account_bytes_not_in_values?: string;
-    /**
-     * Account trie nodes at end of week (filter: eq)
-     */
-    account_trienodes_eq?: number;
-    /**
-     * Account trie nodes at end of week (filter: ne)
-     */
-    account_trienodes_ne?: number;
-    /**
-     * Account trie nodes at end of week (filter: lt)
-     */
-    account_trienodes_lt?: number;
-    /**
-     * Account trie nodes at end of week (filter: lte)
-     */
-    account_trienodes_lte?: number;
-    /**
-     * Account trie nodes at end of week (filter: gt)
-     */
-    account_trienodes_gt?: number;
-    /**
-     * Account trie nodes at end of week (filter: gte)
-     */
-    account_trienodes_gte?: number;
-    /**
-     * Account trie nodes at end of week (filter: between_min)
-     */
-    account_trienodes_between_min?: number;
-    /**
-     * Account trie nodes at end of week (filter: between_max_value)
-     */
-    account_trienodes_between_max_value?: number;
-    /**
-     * Account trie nodes at end of week (filter: in_values) (comma-separated list)
-     */
-    account_trienodes_in_values?: string;
-    /**
-     * Account trie nodes at end of week (filter: not_in_values) (comma-separated list)
-     */
-    account_trienodes_not_in_values?: string;
-    /**
-     * Account trie node bytes at end of week (filter: eq)
-     */
-    account_trienode_bytes_eq?: number;
-    /**
-     * Account trie node bytes at end of week (filter: ne)
-     */
-    account_trienode_bytes_ne?: number;
-    /**
-     * Account trie node bytes at end of week (filter: lt)
-     */
-    account_trienode_bytes_lt?: number;
-    /**
-     * Account trie node bytes at end of week (filter: lte)
-     */
-    account_trienode_bytes_lte?: number;
-    /**
-     * Account trie node bytes at end of week (filter: gt)
-     */
-    account_trienode_bytes_gt?: number;
-    /**
-     * Account trie node bytes at end of week (filter: gte)
-     */
-    account_trienode_bytes_gte?: number;
-    /**
-     * Account trie node bytes at end of week (filter: between_min)
-     */
-    account_trienode_bytes_between_min?: number;
-    /**
-     * Account trie node bytes at end of week (filter: between_max_value)
-     */
-    account_trienode_bytes_between_max_value?: number;
-    /**
-     * Account trie node bytes at end of week (filter: in_values) (comma-separated list)
-     */
-    account_trienode_bytes_in_values?: string;
-    /**
-     * Account trie node bytes at end of week (filter: not_in_values) (comma-separated list)
-     */
-    account_trienode_bytes_not_in_values?: string;
-    /**
-     * Contract codes at end of week (filter: eq)
-     */
-    contract_codes_eq?: number;
-    /**
-     * Contract codes at end of week (filter: ne)
-     */
-    contract_codes_ne?: number;
-    /**
-     * Contract codes at end of week (filter: lt)
-     */
-    contract_codes_lt?: number;
-    /**
-     * Contract codes at end of week (filter: lte)
-     */
-    contract_codes_lte?: number;
-    /**
-     * Contract codes at end of week (filter: gt)
-     */
-    contract_codes_gt?: number;
-    /**
-     * Contract codes at end of week (filter: gte)
-     */
-    contract_codes_gte?: number;
-    /**
-     * Contract codes at end of week (filter: between_min)
-     */
-    contract_codes_between_min?: number;
-    /**
-     * Contract codes at end of week (filter: between_max_value)
-     */
-    contract_codes_between_max_value?: number;
-    /**
-     * Contract codes at end of week (filter: in_values) (comma-separated list)
-     */
-    contract_codes_in_values?: string;
-    /**
-     * Contract codes at end of week (filter: not_in_values) (comma-separated list)
-     */
-    contract_codes_not_in_values?: string;
-    /**
-     * Contract code bytes at end of week (filter: eq)
-     */
-    contract_code_bytes_eq?: number;
-    /**
-     * Contract code bytes at end of week (filter: ne)
-     */
-    contract_code_bytes_ne?: number;
-    /**
-     * Contract code bytes at end of week (filter: lt)
-     */
-    contract_code_bytes_lt?: number;
-    /**
-     * Contract code bytes at end of week (filter: lte)
-     */
-    contract_code_bytes_lte?: number;
-    /**
-     * Contract code bytes at end of week (filter: gt)
-     */
-    contract_code_bytes_gt?: number;
-    /**
-     * Contract code bytes at end of week (filter: gte)
-     */
-    contract_code_bytes_gte?: number;
-    /**
-     * Contract code bytes at end of week (filter: between_min)
-     */
-    contract_code_bytes_between_min?: number;
-    /**
-     * Contract code bytes at end of week (filter: between_max_value)
-     */
-    contract_code_bytes_between_max_value?: number;
-    /**
-     * Contract code bytes at end of week (filter: in_values) (comma-separated list)
-     */
-    contract_code_bytes_in_values?: string;
-    /**
-     * Contract code bytes at end of week (filter: not_in_values) (comma-separated list)
-     */
-    contract_code_bytes_not_in_values?: string;
-    /**
-     * Storage slots at end of week (filter: eq)
-     */
-    storages_eq?: number;
-    /**
-     * Storage slots at end of week (filter: ne)
-     */
-    storages_ne?: number;
-    /**
-     * Storage slots at end of week (filter: lt)
-     */
-    storages_lt?: number;
-    /**
-     * Storage slots at end of week (filter: lte)
-     */
-    storages_lte?: number;
-    /**
-     * Storage slots at end of week (filter: gt)
-     */
-    storages_gt?: number;
-    /**
-     * Storage slots at end of week (filter: gte)
-     */
-    storages_gte?: number;
-    /**
-     * Storage slots at end of week (filter: between_min)
-     */
-    storages_between_min?: number;
-    /**
-     * Storage slots at end of week (filter: between_max_value)
-     */
-    storages_between_max_value?: number;
-    /**
-     * Storage slots at end of week (filter: in_values) (comma-separated list)
-     */
-    storages_in_values?: string;
-    /**
-     * Storage slots at end of week (filter: not_in_values) (comma-separated list)
-     */
-    storages_not_in_values?: string;
-    /**
-     * Storage bytes at end of week (filter: eq)
-     */
-    storage_bytes_eq?: number;
-    /**
-     * Storage bytes at end of week (filter: ne)
-     */
-    storage_bytes_ne?: number;
-    /**
-     * Storage bytes at end of week (filter: lt)
-     */
-    storage_bytes_lt?: number;
-    /**
-     * Storage bytes at end of week (filter: lte)
-     */
-    storage_bytes_lte?: number;
-    /**
-     * Storage bytes at end of week (filter: gt)
-     */
-    storage_bytes_gt?: number;
-    /**
-     * Storage bytes at end of week (filter: gte)
-     */
-    storage_bytes_gte?: number;
-    /**
-     * Storage bytes at end of week (filter: between_min)
-     */
-    storage_bytes_between_min?: number;
-    /**
-     * Storage bytes at end of week (filter: between_max_value)
-     */
-    storage_bytes_between_max_value?: number;
-    /**
-     * Storage bytes at end of week (filter: in_values) (comma-separated list)
-     */
-    storage_bytes_in_values?: string;
-    /**
-     * Storage bytes at end of week (filter: not_in_values) (comma-separated list)
-     */
-    storage_bytes_not_in_values?: string;
-    /**
-     * Storage trie nodes at end of week (filter: eq)
-     */
-    storage_trienodes_eq?: number;
-    /**
-     * Storage trie nodes at end of week (filter: ne)
-     */
-    storage_trienodes_ne?: number;
-    /**
-     * Storage trie nodes at end of week (filter: lt)
-     */
-    storage_trienodes_lt?: number;
-    /**
-     * Storage trie nodes at end of week (filter: lte)
-     */
-    storage_trienodes_lte?: number;
-    /**
-     * Storage trie nodes at end of week (filter: gt)
-     */
-    storage_trienodes_gt?: number;
-    /**
-     * Storage trie nodes at end of week (filter: gte)
-     */
-    storage_trienodes_gte?: number;
-    /**
-     * Storage trie nodes at end of week (filter: between_min)
-     */
-    storage_trienodes_between_min?: number;
-    /**
-     * Storage trie nodes at end of week (filter: between_max_value)
-     */
-    storage_trienodes_between_max_value?: number;
-    /**
-     * Storage trie nodes at end of week (filter: in_values) (comma-separated list)
-     */
-    storage_trienodes_in_values?: string;
-    /**
-     * Storage trie nodes at end of week (filter: not_in_values) (comma-separated list)
-     */
-    storage_trienodes_not_in_values?: string;
-    /**
-     * Storage trie node bytes at end of week (filter: eq)
-     */
-    storage_trienode_bytes_eq?: number;
-    /**
-     * Storage trie node bytes at end of week (filter: ne)
-     */
-    storage_trienode_bytes_ne?: number;
-    /**
-     * Storage trie node bytes at end of week (filter: lt)
-     */
-    storage_trienode_bytes_lt?: number;
-    /**
-     * Storage trie node bytes at end of week (filter: lte)
-     */
-    storage_trienode_bytes_lte?: number;
-    /**
-     * Storage trie node bytes at end of week (filter: gt)
-     */
-    storage_trienode_bytes_gt?: number;
-    /**
-     * Storage trie node bytes at end of week (filter: gte)
-     */
-    storage_trienode_bytes_gte?: number;
-    /**
-     * Storage trie node bytes at end of week (filter: between_min)
-     */
-    storage_trienode_bytes_between_min?: number;
-    /**
-     * Storage trie node bytes at end of week (filter: between_max_value)
-     */
-    storage_trienode_bytes_between_max_value?: number;
-    /**
-     * Storage trie node bytes at end of week (filter: in_values) (comma-separated list)
-     */
-    storage_trienode_bytes_in_values?: string;
-    /**
-     * Storage trie node bytes at end of week (filter: not_in_values) (comma-separated list)
-     */
-    storage_trienode_bytes_not_in_values?: string;
-    /**
-     * Total state size in bytes (filter: eq)
-     */
-    total_bytes_eq?: number;
-    /**
-     * Total state size in bytes (filter: ne)
-     */
-    total_bytes_ne?: number;
-    /**
-     * Total state size in bytes (filter: lt)
-     */
-    total_bytes_lt?: number;
-    /**
-     * Total state size in bytes (filter: lte)
-     */
-    total_bytes_lte?: number;
-    /**
-     * Total state size in bytes (filter: gt)
-     */
-    total_bytes_gt?: number;
-    /**
-     * Total state size in bytes (filter: gte)
-     */
-    total_bytes_gte?: number;
-    /**
-     * Total state size in bytes (filter: between_min)
-     */
-    total_bytes_between_min?: number;
-    /**
-     * Total state size in bytes (filter: between_max_value)
-     */
-    total_bytes_between_max_value?: number;
-    /**
-     * Total state size in bytes (filter: in_values) (comma-separated list)
-     */
-    total_bytes_in_values?: string;
-    /**
-     * Total state size in bytes (filter: not_in_values) (comma-separated list)
-     */
-    total_bytes_not_in_values?: string;
-    /**
-     * The maximum number of fct_execution_state_size_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
-     */
-    page_size?: number;
-    /**
-     * A page token, received from a previous `ListFctExecutionStateSizeWeekly` call. Provide this to retrieve the subsequent page.
-     */
-    page_token?: string;
-    /**
-     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
-     */
-    order_by?: string;
-  };
-  url: '/api/v1/fct_execution_state_size_weekly';
-};
-
-export type FctExecutionStateSizeWeeklyServiceListErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type FctExecutionStateSizeWeeklyServiceListError =
-  FctExecutionStateSizeWeeklyServiceListErrors[keyof FctExecutionStateSizeWeeklyServiceListErrors];
-
-export type FctExecutionStateSizeWeeklyServiceListResponses = {
-  /**
-   * OK
-   */
-  200: ListFctExecutionStateSizeWeeklyResponse;
-};
-
-export type FctExecutionStateSizeWeeklyServiceListResponse =
-  FctExecutionStateSizeWeeklyServiceListResponses[keyof FctExecutionStateSizeWeeklyServiceListResponses];
-
-export type FctExecutionStateSizeWeeklyServiceGetData = {
-  body?: never;
-  path: {
-    /**
-     * Start of the week period (Monday)
-     */
-    week_start_date: string;
-  };
-  query?: never;
-  url: '/api/v1/fct_execution_state_size_weekly/{week_start_date}';
-};
-
-export type FctExecutionStateSizeWeeklyServiceGetErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type FctExecutionStateSizeWeeklyServiceGetError =
-  FctExecutionStateSizeWeeklyServiceGetErrors[keyof FctExecutionStateSizeWeeklyServiceGetErrors];
-
-export type FctExecutionStateSizeWeeklyServiceGetResponses = {
-  /**
-   * OK
-   */
-  200: GetFctExecutionStateSizeWeeklyResponse;
-};
-
-export type FctExecutionStateSizeWeeklyServiceGetResponse =
-  FctExecutionStateSizeWeeklyServiceGetResponses[keyof FctExecutionStateSizeWeeklyServiceGetResponses];
-
 export type FctHeadFirstSeenByNodeServiceListData = {
   body?: never;
   path?: never;
@@ -39209,6 +38225,466 @@ export type FctStorageSlotStateServiceGetResponses = {
 export type FctStorageSlotStateServiceGetResponse =
   FctStorageSlotStateServiceGetResponses[keyof FctStorageSlotStateServiceGetResponses];
 
+export type FctStorageSlotStateDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of fct_storage_slot_state_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctStorageSlotStateDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_storage_slot_state_daily';
+};
+
+export type FctStorageSlotStateDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotStateDailyServiceListError =
+  FctStorageSlotStateDailyServiceListErrors[keyof FctStorageSlotStateDailyServiceListErrors];
+
+export type FctStorageSlotStateDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctStorageSlotStateDailyResponse;
+};
+
+export type FctStorageSlotStateDailyServiceListResponse =
+  FctStorageSlotStateDailyServiceListResponses[keyof FctStorageSlotStateDailyServiceListResponses];
+
+export type FctStorageSlotStateDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_storage_slot_state_daily/{day_start_date}';
+};
+
+export type FctStorageSlotStateDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotStateDailyServiceGetError =
+  FctStorageSlotStateDailyServiceGetErrors[keyof FctStorageSlotStateDailyServiceGetErrors];
+
+export type FctStorageSlotStateDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctStorageSlotStateDailyResponse;
+};
+
+export type FctStorageSlotStateDailyServiceGetResponse =
+  FctStorageSlotStateDailyServiceGetResponses[keyof FctStorageSlotStateDailyServiceGetResponses];
+
+export type FctStorageSlotStateHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of fct_storage_slot_state_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctStorageSlotStateHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_storage_slot_state_hourly';
+};
+
+export type FctStorageSlotStateHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotStateHourlyServiceListError =
+  FctStorageSlotStateHourlyServiceListErrors[keyof FctStorageSlotStateHourlyServiceListErrors];
+
+export type FctStorageSlotStateHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctStorageSlotStateHourlyResponse;
+};
+
+export type FctStorageSlotStateHourlyServiceListResponse =
+  FctStorageSlotStateHourlyServiceListResponses[keyof FctStorageSlotStateHourlyServiceListResponses];
+
+export type FctStorageSlotStateHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_storage_slot_state_hourly/{hour_start_date_time}';
+};
+
+export type FctStorageSlotStateHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotStateHourlyServiceGetError =
+  FctStorageSlotStateHourlyServiceGetErrors[keyof FctStorageSlotStateHourlyServiceGetErrors];
+
+export type FctStorageSlotStateHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctStorageSlotStateHourlyResponse;
+};
+
+export type FctStorageSlotStateHourlyServiceGetResponse =
+  FctStorageSlotStateHourlyServiceGetResponses[keyof FctStorageSlotStateHourlyServiceGetResponses];
+
 export type FctStorageSlotStateWithExpiryBy6mServiceListData = {
   body?: never;
   path?: never;
@@ -39600,6 +39076,466 @@ export type FctStorageSlotStateWithExpiryBy6mServiceGetResponses = {
 
 export type FctStorageSlotStateWithExpiryBy6mServiceGetResponse =
   FctStorageSlotStateWithExpiryBy6mServiceGetResponses[keyof FctStorageSlotStateWithExpiryBy6mServiceGetResponses];
+
+export type FctStorageSlotStateWithExpiryBy6mDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of fct_storage_slot_state_with_expiry_by_6m_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctStorageSlotStateWithExpiryBy6mDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_storage_slot_state_with_expiry_by_6m_daily';
+};
+
+export type FctStorageSlotStateWithExpiryBy6mDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotStateWithExpiryBy6mDailyServiceListError =
+  FctStorageSlotStateWithExpiryBy6mDailyServiceListErrors[keyof FctStorageSlotStateWithExpiryBy6mDailyServiceListErrors];
+
+export type FctStorageSlotStateWithExpiryBy6mDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctStorageSlotStateWithExpiryBy6mDailyResponse;
+};
+
+export type FctStorageSlotStateWithExpiryBy6mDailyServiceListResponse =
+  FctStorageSlotStateWithExpiryBy6mDailyServiceListResponses[keyof FctStorageSlotStateWithExpiryBy6mDailyServiceListResponses];
+
+export type FctStorageSlotStateWithExpiryBy6mDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_storage_slot_state_with_expiry_by_6m_daily/{day_start_date}';
+};
+
+export type FctStorageSlotStateWithExpiryBy6mDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotStateWithExpiryBy6mDailyServiceGetError =
+  FctStorageSlotStateWithExpiryBy6mDailyServiceGetErrors[keyof FctStorageSlotStateWithExpiryBy6mDailyServiceGetErrors];
+
+export type FctStorageSlotStateWithExpiryBy6mDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctStorageSlotStateWithExpiryBy6mDailyResponse;
+};
+
+export type FctStorageSlotStateWithExpiryBy6mDailyServiceGetResponse =
+  FctStorageSlotStateWithExpiryBy6mDailyServiceGetResponses[keyof FctStorageSlotStateWithExpiryBy6mDailyServiceGetResponses];
+
+export type FctStorageSlotStateWithExpiryBy6mHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of fct_storage_slot_state_with_expiry_by_6m_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctStorageSlotStateWithExpiryBy6mHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_storage_slot_state_with_expiry_by_6m_hourly';
+};
+
+export type FctStorageSlotStateWithExpiryBy6mHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotStateWithExpiryBy6mHourlyServiceListError =
+  FctStorageSlotStateWithExpiryBy6mHourlyServiceListErrors[keyof FctStorageSlotStateWithExpiryBy6mHourlyServiceListErrors];
+
+export type FctStorageSlotStateWithExpiryBy6mHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctStorageSlotStateWithExpiryBy6mHourlyResponse;
+};
+
+export type FctStorageSlotStateWithExpiryBy6mHourlyServiceListResponse =
+  FctStorageSlotStateWithExpiryBy6mHourlyServiceListResponses[keyof FctStorageSlotStateWithExpiryBy6mHourlyServiceListResponses];
+
+export type FctStorageSlotStateWithExpiryBy6mHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_storage_slot_state_with_expiry_by_6m_hourly/{hour_start_date_time}';
+};
+
+export type FctStorageSlotStateWithExpiryBy6mHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotStateWithExpiryBy6mHourlyServiceGetError =
+  FctStorageSlotStateWithExpiryBy6mHourlyServiceGetErrors[keyof FctStorageSlotStateWithExpiryBy6mHourlyServiceGetErrors];
+
+export type FctStorageSlotStateWithExpiryBy6mHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctStorageSlotStateWithExpiryBy6mHourlyResponse;
+};
+
+export type FctStorageSlotStateWithExpiryBy6mHourlyServiceGetResponse =
+  FctStorageSlotStateWithExpiryBy6mHourlyServiceGetResponses[keyof FctStorageSlotStateWithExpiryBy6mHourlyServiceGetResponses];
 
 export type IntAddressFirstAccessServiceListData = {
   body?: never;
@@ -48022,6 +47958,1522 @@ export type IntCustodyProbeOrderBySlotServiceGetResponses = {
 
 export type IntCustodyProbeOrderBySlotServiceGetResponse =
   IntCustodyProbeOrderBySlotServiceGetResponses[keyof IntCustodyProbeOrderBySlotServiceGetResponses];
+
+export type IntEngineNewPayloadServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: eq)
+     */
+    block_hash_eq?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: ne)
+     */
+    block_hash_ne?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: contains)
+     */
+    block_hash_contains?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    block_hash_starts_with?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    block_hash_ends_with?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: like)
+     */
+    block_hash_like?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: not_like)
+     */
+    block_hash_not_like?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    block_hash_in_values?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    block_hash_not_in_values?: string;
+    /**
+     * Name of the client that generated the event (filter: eq)
+     */
+    meta_client_name_eq?: string;
+    /**
+     * Name of the client that generated the event (filter: ne)
+     */
+    meta_client_name_ne?: string;
+    /**
+     * Name of the client that generated the event (filter: contains)
+     */
+    meta_client_name_contains?: string;
+    /**
+     * Name of the client that generated the event (filter: starts_with)
+     */
+    meta_client_name_starts_with?: string;
+    /**
+     * Name of the client that generated the event (filter: ends_with)
+     */
+    meta_client_name_ends_with?: string;
+    /**
+     * Name of the client that generated the event (filter: like)
+     */
+    meta_client_name_like?: string;
+    /**
+     * Name of the client that generated the event (filter: not_like)
+     */
+    meta_client_name_not_like?: string;
+    /**
+     * Name of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_name_in_values?: string;
+    /**
+     * Name of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_name_not_in_values?: string;
+    /**
+     * When the sentry received the event (filter: eq)
+     */
+    event_date_time_eq?: number;
+    /**
+     * When the sentry received the event (filter: ne)
+     */
+    event_date_time_ne?: number;
+    /**
+     * When the sentry received the event (filter: lt)
+     */
+    event_date_time_lt?: number;
+    /**
+     * When the sentry received the event (filter: lte)
+     */
+    event_date_time_lte?: number;
+    /**
+     * When the sentry received the event (filter: gt)
+     */
+    event_date_time_gt?: number;
+    /**
+     * When the sentry received the event (filter: gte)
+     */
+    event_date_time_gte?: number;
+    /**
+     * When the sentry received the event (filter: between_min)
+     */
+    event_date_time_between_min?: number;
+    /**
+     * When the sentry received the event (filter: between_max_value)
+     */
+    event_date_time_between_max_value?: number;
+    /**
+     * When the sentry received the event (filter: in_values) (comma-separated list)
+     */
+    event_date_time_in_values?: string;
+    /**
+     * When the sentry received the event (filter: not_in_values) (comma-separated list)
+     */
+    event_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * When the engine_newPayload call was initiated (filter: eq)
+     */
+    requested_date_time_eq?: number;
+    /**
+     * When the engine_newPayload call was initiated (filter: ne)
+     */
+    requested_date_time_ne?: number;
+    /**
+     * When the engine_newPayload call was initiated (filter: lt)
+     */
+    requested_date_time_lt?: number;
+    /**
+     * When the engine_newPayload call was initiated (filter: lte)
+     */
+    requested_date_time_lte?: number;
+    /**
+     * When the engine_newPayload call was initiated (filter: gt)
+     */
+    requested_date_time_gt?: number;
+    /**
+     * When the engine_newPayload call was initiated (filter: gte)
+     */
+    requested_date_time_gte?: number;
+    /**
+     * When the engine_newPayload call was initiated (filter: between_min)
+     */
+    requested_date_time_between_min?: number;
+    /**
+     * When the engine_newPayload call was initiated (filter: between_max_value)
+     */
+    requested_date_time_between_max_value?: number;
+    /**
+     * When the engine_newPayload call was initiated (filter: in_values) (comma-separated list)
+     */
+    requested_date_time_in_values?: string;
+    /**
+     * When the engine_newPayload call was initiated (filter: not_in_values) (comma-separated list)
+     */
+    requested_date_time_not_in_values?: string;
+    /**
+     * How long the engine_newPayload call took in milliseconds (filter: eq)
+     */
+    duration_ms_eq?: number;
+    /**
+     * How long the engine_newPayload call took in milliseconds (filter: ne)
+     */
+    duration_ms_ne?: number;
+    /**
+     * How long the engine_newPayload call took in milliseconds (filter: lt)
+     */
+    duration_ms_lt?: number;
+    /**
+     * How long the engine_newPayload call took in milliseconds (filter: lte)
+     */
+    duration_ms_lte?: number;
+    /**
+     * How long the engine_newPayload call took in milliseconds (filter: gt)
+     */
+    duration_ms_gt?: number;
+    /**
+     * How long the engine_newPayload call took in milliseconds (filter: gte)
+     */
+    duration_ms_gte?: number;
+    /**
+     * How long the engine_newPayload call took in milliseconds (filter: between_min)
+     */
+    duration_ms_between_min?: number;
+    /**
+     * How long the engine_newPayload call took in milliseconds (filter: between_max_value)
+     */
+    duration_ms_between_max_value?: number;
+    /**
+     * How long the engine_newPayload call took in milliseconds (filter: in_values) (comma-separated list)
+     */
+    duration_ms_in_values?: string;
+    /**
+     * How long the engine_newPayload call took in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    duration_ms_not_in_values?: string;
+    /**
+     * Slot number of the beacon block containing the payload (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * Slot number of the beacon block containing the payload (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * Slot number of the beacon block containing the payload (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * Slot number of the beacon block containing the payload (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * Slot number of the beacon block containing the payload (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * Slot number of the beacon block containing the payload (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * Slot number of the beacon block containing the payload (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * Slot number of the beacon block containing the payload (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * Slot number of the beacon block containing the payload (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * Slot number of the beacon block containing the payload (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * Epoch number derived from the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * Epoch number derived from the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * Epoch number derived from the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * Epoch number derived from the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * Epoch number derived from the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * Epoch number derived from the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * Epoch number derived from the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * Epoch number derived from the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * Epoch number derived from the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * Epoch number derived from the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * Execution block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * Execution block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * Execution block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * Execution block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * Execution block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * Execution block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * Execution block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * Execution block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * Execution block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * Execution block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: eq)
+     */
+    parent_block_root_eq?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: ne)
+     */
+    parent_block_root_ne?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: contains)
+     */
+    parent_block_root_contains?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    parent_block_root_starts_with?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    parent_block_root_ends_with?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: like)
+     */
+    parent_block_root_like?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: not_like)
+     */
+    parent_block_root_not_like?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    parent_block_root_in_values?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    parent_block_root_not_in_values?: string;
+    /**
+     * Parent execution block hash (hex encoded with 0x prefix) (filter: eq)
+     */
+    parent_hash_eq?: string;
+    /**
+     * Parent execution block hash (hex encoded with 0x prefix) (filter: ne)
+     */
+    parent_hash_ne?: string;
+    /**
+     * Parent execution block hash (hex encoded with 0x prefix) (filter: contains)
+     */
+    parent_hash_contains?: string;
+    /**
+     * Parent execution block hash (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    parent_hash_starts_with?: string;
+    /**
+     * Parent execution block hash (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    parent_hash_ends_with?: string;
+    /**
+     * Parent execution block hash (hex encoded with 0x prefix) (filter: like)
+     */
+    parent_hash_like?: string;
+    /**
+     * Parent execution block hash (hex encoded with 0x prefix) (filter: not_like)
+     */
+    parent_hash_not_like?: string;
+    /**
+     * Parent execution block hash (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    parent_hash_in_values?: string;
+    /**
+     * Parent execution block hash (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    parent_hash_not_in_values?: string;
+    /**
+     * Validator index of the block proposer (filter: eq)
+     */
+    proposer_index_eq?: number;
+    /**
+     * Validator index of the block proposer (filter: ne)
+     */
+    proposer_index_ne?: number;
+    /**
+     * Validator index of the block proposer (filter: lt)
+     */
+    proposer_index_lt?: number;
+    /**
+     * Validator index of the block proposer (filter: lte)
+     */
+    proposer_index_lte?: number;
+    /**
+     * Validator index of the block proposer (filter: gt)
+     */
+    proposer_index_gt?: number;
+    /**
+     * Validator index of the block proposer (filter: gte)
+     */
+    proposer_index_gte?: number;
+    /**
+     * Validator index of the block proposer (filter: between_min)
+     */
+    proposer_index_between_min?: number;
+    /**
+     * Validator index of the block proposer (filter: between_max_value)
+     */
+    proposer_index_between_max_value?: number;
+    /**
+     * Validator index of the block proposer (filter: in_values) (comma-separated list)
+     */
+    proposer_index_in_values?: string;
+    /**
+     * Validator index of the block proposer (filter: not_in_values) (comma-separated list)
+     */
+    proposer_index_not_in_values?: string;
+    /**
+     * Total gas used by all transactions in the block (filter: eq)
+     */
+    gas_used_eq?: number;
+    /**
+     * Total gas used by all transactions in the block (filter: ne)
+     */
+    gas_used_ne?: number;
+    /**
+     * Total gas used by all transactions in the block (filter: lt)
+     */
+    gas_used_lt?: number;
+    /**
+     * Total gas used by all transactions in the block (filter: lte)
+     */
+    gas_used_lte?: number;
+    /**
+     * Total gas used by all transactions in the block (filter: gt)
+     */
+    gas_used_gt?: number;
+    /**
+     * Total gas used by all transactions in the block (filter: gte)
+     */
+    gas_used_gte?: number;
+    /**
+     * Total gas used by all transactions in the block (filter: between_min)
+     */
+    gas_used_between_min?: number;
+    /**
+     * Total gas used by all transactions in the block (filter: between_max_value)
+     */
+    gas_used_between_max_value?: number;
+    /**
+     * Total gas used by all transactions in the block (filter: in_values) (comma-separated list)
+     */
+    gas_used_in_values?: string;
+    /**
+     * Total gas used by all transactions in the block (filter: not_in_values) (comma-separated list)
+     */
+    gas_used_not_in_values?: string;
+    /**
+     * Gas limit of the block (filter: eq)
+     */
+    gas_limit_eq?: number;
+    /**
+     * Gas limit of the block (filter: ne)
+     */
+    gas_limit_ne?: number;
+    /**
+     * Gas limit of the block (filter: lt)
+     */
+    gas_limit_lt?: number;
+    /**
+     * Gas limit of the block (filter: lte)
+     */
+    gas_limit_lte?: number;
+    /**
+     * Gas limit of the block (filter: gt)
+     */
+    gas_limit_gt?: number;
+    /**
+     * Gas limit of the block (filter: gte)
+     */
+    gas_limit_gte?: number;
+    /**
+     * Gas limit of the block (filter: between_min)
+     */
+    gas_limit_between_min?: number;
+    /**
+     * Gas limit of the block (filter: between_max_value)
+     */
+    gas_limit_between_max_value?: number;
+    /**
+     * Gas limit of the block (filter: in_values) (comma-separated list)
+     */
+    gas_limit_in_values?: string;
+    /**
+     * Gas limit of the block (filter: not_in_values) (comma-separated list)
+     */
+    gas_limit_not_in_values?: string;
+    /**
+     * Number of transactions in the block (filter: eq)
+     */
+    tx_count_eq?: number;
+    /**
+     * Number of transactions in the block (filter: ne)
+     */
+    tx_count_ne?: number;
+    /**
+     * Number of transactions in the block (filter: lt)
+     */
+    tx_count_lt?: number;
+    /**
+     * Number of transactions in the block (filter: lte)
+     */
+    tx_count_lte?: number;
+    /**
+     * Number of transactions in the block (filter: gt)
+     */
+    tx_count_gt?: number;
+    /**
+     * Number of transactions in the block (filter: gte)
+     */
+    tx_count_gte?: number;
+    /**
+     * Number of transactions in the block (filter: between_min)
+     */
+    tx_count_between_min?: number;
+    /**
+     * Number of transactions in the block (filter: between_max_value)
+     */
+    tx_count_between_max_value?: number;
+    /**
+     * Number of transactions in the block (filter: in_values) (comma-separated list)
+     */
+    tx_count_in_values?: string;
+    /**
+     * Number of transactions in the block (filter: not_in_values) (comma-separated list)
+     */
+    tx_count_not_in_values?: string;
+    /**
+     * Number of blobs in the block (filter: eq)
+     */
+    blob_count_eq?: number;
+    /**
+     * Number of blobs in the block (filter: ne)
+     */
+    blob_count_ne?: number;
+    /**
+     * Number of blobs in the block (filter: lt)
+     */
+    blob_count_lt?: number;
+    /**
+     * Number of blobs in the block (filter: lte)
+     */
+    blob_count_lte?: number;
+    /**
+     * Number of blobs in the block (filter: gt)
+     */
+    blob_count_gt?: number;
+    /**
+     * Number of blobs in the block (filter: gte)
+     */
+    blob_count_gte?: number;
+    /**
+     * Number of blobs in the block (filter: between_min)
+     */
+    blob_count_between_min?: number;
+    /**
+     * Number of blobs in the block (filter: between_max_value)
+     */
+    blob_count_between_max_value?: number;
+    /**
+     * Number of blobs in the block (filter: in_values) (comma-separated list)
+     */
+    blob_count_in_values?: string;
+    /**
+     * Number of blobs in the block (filter: not_in_values) (comma-separated list)
+     */
+    blob_count_not_in_values?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: like)
+     */
+    status_like?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
+     * Error message when validation fails (filter: eq)
+     */
+    validation_error_eq?: string;
+    /**
+     * Error message when validation fails (filter: ne)
+     */
+    validation_error_ne?: string;
+    /**
+     * Error message when validation fails (filter: contains)
+     */
+    validation_error_contains?: string;
+    /**
+     * Error message when validation fails (filter: starts_with)
+     */
+    validation_error_starts_with?: string;
+    /**
+     * Error message when validation fails (filter: ends_with)
+     */
+    validation_error_ends_with?: string;
+    /**
+     * Error message when validation fails (filter: like)
+     */
+    validation_error_like?: string;
+    /**
+     * Error message when validation fails (filter: not_like)
+     */
+    validation_error_not_like?: string;
+    /**
+     * Error message when validation fails (filter: in_values) (comma-separated list)
+     */
+    validation_error_in_values?: string;
+    /**
+     * Error message when validation fails (filter: not_in_values) (comma-separated list)
+     */
+    validation_error_not_in_values?: string;
+    /**
+     * Latest valid hash when status is INVALID (hex encoded with 0x prefix) (filter: eq)
+     */
+    latest_valid_hash_eq?: string;
+    /**
+     * Latest valid hash when status is INVALID (hex encoded with 0x prefix) (filter: ne)
+     */
+    latest_valid_hash_ne?: string;
+    /**
+     * Latest valid hash when status is INVALID (hex encoded with 0x prefix) (filter: contains)
+     */
+    latest_valid_hash_contains?: string;
+    /**
+     * Latest valid hash when status is INVALID (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    latest_valid_hash_starts_with?: string;
+    /**
+     * Latest valid hash when status is INVALID (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    latest_valid_hash_ends_with?: string;
+    /**
+     * Latest valid hash when status is INVALID (hex encoded with 0x prefix) (filter: like)
+     */
+    latest_valid_hash_like?: string;
+    /**
+     * Latest valid hash when status is INVALID (hex encoded with 0x prefix) (filter: not_like)
+     */
+    latest_valid_hash_not_like?: string;
+    /**
+     * Latest valid hash when status is INVALID (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    latest_valid_hash_in_values?: string;
+    /**
+     * Latest valid hash when status is INVALID (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    latest_valid_hash_not_in_values?: string;
+    /**
+     * Version of the engine_newPayload method (e.g., V3, V4) (filter: eq)
+     */
+    method_version_eq?: string;
+    /**
+     * Version of the engine_newPayload method (e.g., V3, V4) (filter: ne)
+     */
+    method_version_ne?: string;
+    /**
+     * Version of the engine_newPayload method (e.g., V3, V4) (filter: contains)
+     */
+    method_version_contains?: string;
+    /**
+     * Version of the engine_newPayload method (e.g., V3, V4) (filter: starts_with)
+     */
+    method_version_starts_with?: string;
+    /**
+     * Version of the engine_newPayload method (e.g., V3, V4) (filter: ends_with)
+     */
+    method_version_ends_with?: string;
+    /**
+     * Version of the engine_newPayload method (e.g., V3, V4) (filter: like)
+     */
+    method_version_like?: string;
+    /**
+     * Version of the engine_newPayload method (e.g., V3, V4) (filter: not_like)
+     */
+    method_version_not_like?: string;
+    /**
+     * Version of the engine_newPayload method (e.g., V3, V4) (filter: in_values) (comma-separated list)
+     */
+    method_version_in_values?: string;
+    /**
+     * Version of the engine_newPayload method (e.g., V3, V4) (filter: not_in_values) (comma-separated list)
+     */
+    method_version_not_in_values?: string;
+    /**
+     * The total bytes of the beacon block payload (filter: eq)
+     */
+    block_total_bytes_eq?: number;
+    /**
+     * The total bytes of the beacon block payload (filter: ne)
+     */
+    block_total_bytes_ne?: number;
+    /**
+     * The total bytes of the beacon block payload (filter: lt)
+     */
+    block_total_bytes_lt?: number;
+    /**
+     * The total bytes of the beacon block payload (filter: lte)
+     */
+    block_total_bytes_lte?: number;
+    /**
+     * The total bytes of the beacon block payload (filter: gt)
+     */
+    block_total_bytes_gt?: number;
+    /**
+     * The total bytes of the beacon block payload (filter: gte)
+     */
+    block_total_bytes_gte?: number;
+    /**
+     * The total bytes of the beacon block payload (filter: between_min)
+     */
+    block_total_bytes_between_min?: number;
+    /**
+     * The total bytes of the beacon block payload (filter: between_max_value)
+     */
+    block_total_bytes_between_max_value?: number;
+    /**
+     * The total bytes of the beacon block payload (filter: in_values) (comma-separated list)
+     */
+    block_total_bytes_in_values?: string;
+    /**
+     * The total bytes of the beacon block payload (filter: not_in_values) (comma-separated list)
+     */
+    block_total_bytes_not_in_values?: string;
+    /**
+     * The total bytes of the beacon block payload when compressed using snappy (filter: eq)
+     */
+    block_total_bytes_compressed_eq?: number;
+    /**
+     * The total bytes of the beacon block payload when compressed using snappy (filter: ne)
+     */
+    block_total_bytes_compressed_ne?: number;
+    /**
+     * The total bytes of the beacon block payload when compressed using snappy (filter: lt)
+     */
+    block_total_bytes_compressed_lt?: number;
+    /**
+     * The total bytes of the beacon block payload when compressed using snappy (filter: lte)
+     */
+    block_total_bytes_compressed_lte?: number;
+    /**
+     * The total bytes of the beacon block payload when compressed using snappy (filter: gt)
+     */
+    block_total_bytes_compressed_gt?: number;
+    /**
+     * The total bytes of the beacon block payload when compressed using snappy (filter: gte)
+     */
+    block_total_bytes_compressed_gte?: number;
+    /**
+     * The total bytes of the beacon block payload when compressed using snappy (filter: between_min)
+     */
+    block_total_bytes_compressed_between_min?: number;
+    /**
+     * The total bytes of the beacon block payload when compressed using snappy (filter: between_max_value)
+     */
+    block_total_bytes_compressed_between_max_value?: number;
+    /**
+     * The total bytes of the beacon block payload when compressed using snappy (filter: in_values) (comma-separated list)
+     */
+    block_total_bytes_compressed_in_values?: string;
+    /**
+     * The total bytes of the beacon block payload when compressed using snappy (filter: not_in_values) (comma-separated list)
+     */
+    block_total_bytes_compressed_not_in_values?: string;
+    /**
+     * The version of the beacon block (phase0, altair, bellatrix, capella, deneb) (filter: eq)
+     */
+    block_version_eq?: string;
+    /**
+     * The version of the beacon block (phase0, altair, bellatrix, capella, deneb) (filter: ne)
+     */
+    block_version_ne?: string;
+    /**
+     * The version of the beacon block (phase0, altair, bellatrix, capella, deneb) (filter: contains)
+     */
+    block_version_contains?: string;
+    /**
+     * The version of the beacon block (phase0, altair, bellatrix, capella, deneb) (filter: starts_with)
+     */
+    block_version_starts_with?: string;
+    /**
+     * The version of the beacon block (phase0, altair, bellatrix, capella, deneb) (filter: ends_with)
+     */
+    block_version_ends_with?: string;
+    /**
+     * The version of the beacon block (phase0, altair, bellatrix, capella, deneb) (filter: like)
+     */
+    block_version_like?: string;
+    /**
+     * The version of the beacon block (phase0, altair, bellatrix, capella, deneb) (filter: not_like)
+     */
+    block_version_not_like?: string;
+    /**
+     * The version of the beacon block (phase0, altair, bellatrix, capella, deneb) (filter: in_values) (comma-separated list)
+     */
+    block_version_in_values?: string;
+    /**
+     * The version of the beacon block (phase0, altair, bellatrix, capella, deneb) (filter: not_in_values) (comma-separated list)
+     */
+    block_version_not_in_values?: string;
+    /**
+     * Block status: canonical, orphaned, or unknown if not yet determined (filter: eq)
+     */
+    block_status_eq?: string;
+    /**
+     * Block status: canonical, orphaned, or unknown if not yet determined (filter: ne)
+     */
+    block_status_ne?: string;
+    /**
+     * Block status: canonical, orphaned, or unknown if not yet determined (filter: contains)
+     */
+    block_status_contains?: string;
+    /**
+     * Block status: canonical, orphaned, or unknown if not yet determined (filter: starts_with)
+     */
+    block_status_starts_with?: string;
+    /**
+     * Block status: canonical, orphaned, or unknown if not yet determined (filter: ends_with)
+     */
+    block_status_ends_with?: string;
+    /**
+     * Block status: canonical, orphaned, or unknown if not yet determined (filter: like)
+     */
+    block_status_like?: string;
+    /**
+     * Block status: canonical, orphaned, or unknown if not yet determined (filter: not_like)
+     */
+    block_status_not_like?: string;
+    /**
+     * Block status: canonical, orphaned, or unknown if not yet determined (filter: in_values) (comma-separated list)
+     */
+    block_status_in_values?: string;
+    /**
+     * Block status: canonical, orphaned, or unknown if not yet determined (filter: not_in_values) (comma-separated list)
+     */
+    block_status_not_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Implementation of the client that generated the event (filter: eq)
+     */
+    meta_client_implementation_eq?: string;
+    /**
+     * Implementation of the client that generated the event (filter: ne)
+     */
+    meta_client_implementation_ne?: string;
+    /**
+     * Implementation of the client that generated the event (filter: contains)
+     */
+    meta_client_implementation_contains?: string;
+    /**
+     * Implementation of the client that generated the event (filter: starts_with)
+     */
+    meta_client_implementation_starts_with?: string;
+    /**
+     * Implementation of the client that generated the event (filter: ends_with)
+     */
+    meta_client_implementation_ends_with?: string;
+    /**
+     * Implementation of the client that generated the event (filter: like)
+     */
+    meta_client_implementation_like?: string;
+    /**
+     * Implementation of the client that generated the event (filter: not_like)
+     */
+    meta_client_implementation_not_like?: string;
+    /**
+     * Implementation of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_implementation_in_values?: string;
+    /**
+     * Implementation of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_implementation_not_in_values?: string;
+    /**
+     * Version of the client that generated the event (filter: eq)
+     */
+    meta_client_version_eq?: string;
+    /**
+     * Version of the client that generated the event (filter: ne)
+     */
+    meta_client_version_ne?: string;
+    /**
+     * Version of the client that generated the event (filter: contains)
+     */
+    meta_client_version_contains?: string;
+    /**
+     * Version of the client that generated the event (filter: starts_with)
+     */
+    meta_client_version_starts_with?: string;
+    /**
+     * Version of the client that generated the event (filter: ends_with)
+     */
+    meta_client_version_ends_with?: string;
+    /**
+     * Version of the client that generated the event (filter: like)
+     */
+    meta_client_version_like?: string;
+    /**
+     * Version of the client that generated the event (filter: not_like)
+     */
+    meta_client_version_not_like?: string;
+    /**
+     * Version of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_version_in_values?: string;
+    /**
+     * Version of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_version_not_in_values?: string;
+    /**
+     * City of the client that generated the event (filter: eq)
+     */
+    meta_client_geo_city_eq?: string;
+    /**
+     * City of the client that generated the event (filter: ne)
+     */
+    meta_client_geo_city_ne?: string;
+    /**
+     * City of the client that generated the event (filter: contains)
+     */
+    meta_client_geo_city_contains?: string;
+    /**
+     * City of the client that generated the event (filter: starts_with)
+     */
+    meta_client_geo_city_starts_with?: string;
+    /**
+     * City of the client that generated the event (filter: ends_with)
+     */
+    meta_client_geo_city_ends_with?: string;
+    /**
+     * City of the client that generated the event (filter: like)
+     */
+    meta_client_geo_city_like?: string;
+    /**
+     * City of the client that generated the event (filter: not_like)
+     */
+    meta_client_geo_city_not_like?: string;
+    /**
+     * City of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_city_in_values?: string;
+    /**
+     * City of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_city_not_in_values?: string;
+    /**
+     * Country of the client that generated the event (filter: eq)
+     */
+    meta_client_geo_country_eq?: string;
+    /**
+     * Country of the client that generated the event (filter: ne)
+     */
+    meta_client_geo_country_ne?: string;
+    /**
+     * Country of the client that generated the event (filter: contains)
+     */
+    meta_client_geo_country_contains?: string;
+    /**
+     * Country of the client that generated the event (filter: starts_with)
+     */
+    meta_client_geo_country_starts_with?: string;
+    /**
+     * Country of the client that generated the event (filter: ends_with)
+     */
+    meta_client_geo_country_ends_with?: string;
+    /**
+     * Country of the client that generated the event (filter: like)
+     */
+    meta_client_geo_country_like?: string;
+    /**
+     * Country of the client that generated the event (filter: not_like)
+     */
+    meta_client_geo_country_not_like?: string;
+    /**
+     * Country of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_country_in_values?: string;
+    /**
+     * Country of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_country_not_in_values?: string;
+    /**
+     * Country code of the client that generated the event (filter: eq)
+     */
+    meta_client_geo_country_code_eq?: string;
+    /**
+     * Country code of the client that generated the event (filter: ne)
+     */
+    meta_client_geo_country_code_ne?: string;
+    /**
+     * Country code of the client that generated the event (filter: contains)
+     */
+    meta_client_geo_country_code_contains?: string;
+    /**
+     * Country code of the client that generated the event (filter: starts_with)
+     */
+    meta_client_geo_country_code_starts_with?: string;
+    /**
+     * Country code of the client that generated the event (filter: ends_with)
+     */
+    meta_client_geo_country_code_ends_with?: string;
+    /**
+     * Country code of the client that generated the event (filter: like)
+     */
+    meta_client_geo_country_code_like?: string;
+    /**
+     * Country code of the client that generated the event (filter: not_like)
+     */
+    meta_client_geo_country_code_not_like?: string;
+    /**
+     * Country code of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_country_code_in_values?: string;
+    /**
+     * Country code of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_country_code_not_in_values?: string;
+    /**
+     * Continent code of the client that generated the event (filter: eq)
+     */
+    meta_client_geo_continent_code_eq?: string;
+    /**
+     * Continent code of the client that generated the event (filter: ne)
+     */
+    meta_client_geo_continent_code_ne?: string;
+    /**
+     * Continent code of the client that generated the event (filter: contains)
+     */
+    meta_client_geo_continent_code_contains?: string;
+    /**
+     * Continent code of the client that generated the event (filter: starts_with)
+     */
+    meta_client_geo_continent_code_starts_with?: string;
+    /**
+     * Continent code of the client that generated the event (filter: ends_with)
+     */
+    meta_client_geo_continent_code_ends_with?: string;
+    /**
+     * Continent code of the client that generated the event (filter: like)
+     */
+    meta_client_geo_continent_code_like?: string;
+    /**
+     * Continent code of the client that generated the event (filter: not_like)
+     */
+    meta_client_geo_continent_code_not_like?: string;
+    /**
+     * Continent code of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_continent_code_in_values?: string;
+    /**
+     * Continent code of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_continent_code_not_in_values?: string;
+    /**
+     * Filter meta_client_geo_latitude using value
+     */
+    meta_client_geo_latitude_value?: number;
+    /**
+     * Filter meta_client_geo_longitude using value
+     */
+    meta_client_geo_longitude_value?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: eq)
+     */
+    meta_client_geo_autonomous_system_number_eq?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: ne)
+     */
+    meta_client_geo_autonomous_system_number_ne?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: lt)
+     */
+    meta_client_geo_autonomous_system_number_lt?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: lte)
+     */
+    meta_client_geo_autonomous_system_number_lte?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: gt)
+     */
+    meta_client_geo_autonomous_system_number_gt?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: gte)
+     */
+    meta_client_geo_autonomous_system_number_gte?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: between_min)
+     */
+    meta_client_geo_autonomous_system_number_between_min?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: between_max_value)
+     */
+    meta_client_geo_autonomous_system_number_between_max_value?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_autonomous_system_number_in_values?: string;
+    /**
+     * Autonomous system number of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_autonomous_system_number_not_in_values?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: eq)
+     */
+    meta_client_geo_autonomous_system_organization_eq?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: ne)
+     */
+    meta_client_geo_autonomous_system_organization_ne?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: contains)
+     */
+    meta_client_geo_autonomous_system_organization_contains?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: starts_with)
+     */
+    meta_client_geo_autonomous_system_organization_starts_with?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: ends_with)
+     */
+    meta_client_geo_autonomous_system_organization_ends_with?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: like)
+     */
+    meta_client_geo_autonomous_system_organization_like?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: not_like)
+     */
+    meta_client_geo_autonomous_system_organization_not_like?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_autonomous_system_organization_in_values?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_autonomous_system_organization_not_in_values?: string;
+    /**
+     * The maximum number of int_engine_new_payload to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntEngineNewPayload` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_engine_new_payload';
+};
+
+export type IntEngineNewPayloadServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntEngineNewPayloadServiceListError =
+  IntEngineNewPayloadServiceListErrors[keyof IntEngineNewPayloadServiceListErrors];
+
+export type IntEngineNewPayloadServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntEngineNewPayloadResponse;
+};
+
+export type IntEngineNewPayloadServiceListResponse =
+  IntEngineNewPayloadServiceListResponses[keyof IntEngineNewPayloadServiceListResponses];
+
+export type IntEngineNewPayloadServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/int_engine_new_payload/{slot_start_date_time}';
+};
+
+export type IntEngineNewPayloadServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntEngineNewPayloadServiceGetError =
+  IntEngineNewPayloadServiceGetErrors[keyof IntEngineNewPayloadServiceGetErrors];
+
+export type IntEngineNewPayloadServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntEngineNewPayloadResponse;
+};
+
+export type IntEngineNewPayloadServiceGetResponse =
+  IntEngineNewPayloadServiceGetResponses[keyof IntEngineNewPayloadServiceGetResponses];
 
 export type IntExecutionBlockByDateServiceListData = {
   body?: never;

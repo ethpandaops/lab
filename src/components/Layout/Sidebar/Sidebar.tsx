@@ -164,7 +164,10 @@ const ethereumDataAvailabilityPages: NavItem[] = [
   { name: 'Probes', to: '/ethereum/data-availability/probes', icon: MagnifyingGlassIcon },
 ];
 
-const ethereumExecutionPages: NavItem[] = [{ name: 'Timings', to: '/ethereum/execution/timings', icon: ClockIcon }];
+const ethereumExecutionPages: NavItem[] = [
+  { name: 'Timings', to: '/ethereum/execution/timings', icon: ClockIcon },
+  { name: 'Slow Blocks', to: '/ethereum/execution/slow-blocks', icon: CubeIcon },
+];
 
 const xatuPages: NavItem[] = [
   { name: 'Contributors', to: '/xatu/contributors', icon: UserGroupIcon },
