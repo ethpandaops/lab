@@ -24,7 +24,8 @@ interface ClientVersionData {
   meta_execution_version?: string;
   observation_count?: number;
   median_duration_ms?: number;
-  p95_duration_ms?: number;
+  min_duration_ms?: number;
+  max_duration_ms?: number;
   avg_returned_count?: number;
   status?: string;
 }
@@ -44,8 +45,8 @@ export interface ClientVersionBreakdownProps {
   compactClient?: boolean;
   /** If true, hides the observations column */
   hideObservations?: boolean;
-  /** If true, hides the P95 column */
-  hideP95?: boolean;
+  /** If true, hides the range column */
+  hideRange?: boolean;
   /** Custom label for the duration column (defaults to "Median") */
   durationLabel?: string;
   /** Custom label for the blob count column (defaults to "Avg Blobs") */
@@ -56,12 +57,13 @@ interface AggregatedRow {
   client: string;
   version: string;
   medianDuration: number;
-  p95Duration: number;
+  minDuration: number;
+  maxDuration: number;
   observations: number;
   avgBlobCount?: number;
 }
 
-type SortField = 'client' | 'version' | 'medianDuration' | 'p95Duration' | 'observations' | 'avgBlobCount';
+type SortField = 'client' | 'version' | 'medianDuration' | 'maxDuration' | 'observations' | 'avgBlobCount';
 type SortDirection = 'asc' | 'desc';
 
 /**
@@ -75,7 +77,7 @@ export function ClientVersionBreakdown({
   noCard = false,
   compactClient = false,
   hideObservations = false,
-  hideP95 = false,
+  hideRange = false,
   durationLabel = 'Median',
   blobCountLabel = 'Avg Blobs',
 }: ClientVersionBreakdownProps): JSX.Element {
@@ -91,7 +93,8 @@ export function ClientVersionBreakdown({
         client: string;
         version: string;
         totalWeightedMedian: number;
-        maxP95: number;
+        minDuration: number;
+        maxDuration: number;
         totalObservations: number;
         totalWeightedBlobCount: number;
       }
@@ -102,11 +105,19 @@ export function ClientVersionBreakdown({
       const version = row.meta_execution_version ?? 'unknown';
       const key = `${client}|${version}`;
       const obs = row.observation_count ?? 0;
+      const minDur = row.min_duration_ms ?? 0;
+      const maxDur = row.max_duration_ms ?? 0;
 
       const existing = map.get(key);
       if (existing) {
         existing.totalWeightedMedian += (row.median_duration_ms ?? 0) * obs;
-        existing.maxP95 = Math.max(existing.maxP95, row.p95_duration_ms ?? 0);
+        // For min/max, take the actual min/max across all rows
+        if (minDur > 0 && (existing.minDuration === 0 || minDur < existing.minDuration)) {
+          existing.minDuration = minDur;
+        }
+        if (maxDur > existing.maxDuration) {
+          existing.maxDuration = maxDur;
+        }
         existing.totalObservations += obs;
         existing.totalWeightedBlobCount += (row.avg_returned_count ?? 0) * obs;
       } else {
@@ -114,7 +125,8 @@ export function ClientVersionBreakdown({
           client,
           version,
           totalWeightedMedian: (row.median_duration_ms ?? 0) * obs,
-          maxP95: row.p95_duration_ms ?? 0,
+          minDuration: minDur,
+          maxDuration: maxDur,
           totalObservations: obs,
           totalWeightedBlobCount: (row.avg_returned_count ?? 0) * obs,
         });
@@ -129,7 +141,8 @@ export function ClientVersionBreakdown({
           client: entry.client,
           version: entry.version,
           medianDuration: entry.totalWeightedMedian / entry.totalObservations,
-          p95Duration: entry.maxP95,
+          minDuration: entry.minDuration,
+          maxDuration: entry.maxDuration,
           observations: entry.totalObservations,
           avgBlobCount: entry.totalWeightedBlobCount / entry.totalObservations,
         });
@@ -158,8 +171,8 @@ export function ClientVersionBreakdown({
         case 'medianDuration':
           comparison = a.medianDuration - b.medianDuration;
           break;
-        case 'p95Duration':
-          comparison = a.p95Duration - b.p95Duration;
+        case 'maxDuration':
+          comparison = a.maxDuration - b.maxDuration;
           break;
         case 'observations':
           comparison = a.observations - b.observations;
@@ -242,10 +255,10 @@ export function ClientVersionBreakdown({
                 {durationLabel}
                 <SortIcon field="medianDuration" />
               </th>
-              {!hideP95 && (
-                <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('p95Duration')}>
-                  P95
-                  <SortIcon field="p95Duration" />
+              {!hideRange && (
+                <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('maxDuration')}>
+                  Range
+                  <SortIcon field="maxDuration" />
                 </th>
               )}
               {showBlobCount && (
@@ -288,10 +301,12 @@ export function ClientVersionBreakdown({
                     <span className="text-sm text-muted">-</span>
                   )}
                 </td>
-                {!hideP95 && (
+                {!hideRange && (
                   <td className="px-3 py-3 text-right">
-                    {row.p95Duration > 0 ? (
-                      <span className="text-sm text-muted">{row.p95Duration.toFixed(0)} ms</span>
+                    {row.maxDuration > 0 ? (
+                      <span className="text-sm text-muted">
+                        {row.minDuration.toFixed(0)} – {row.maxDuration.toFixed(0)} ms
+                      </span>
                     ) : (
                       <span className="text-sm text-muted">-</span>
                     )}

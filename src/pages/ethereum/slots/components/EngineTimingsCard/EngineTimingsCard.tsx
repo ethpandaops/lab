@@ -53,11 +53,16 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
     0
   );
   const newPayloadMedian = newPayloadTotalObs > 0 ? newPayloadWeightedMedian / newPayloadTotalObs : 0;
-  const newPayloadWeightedP95 = newPayloadValidRows.reduce(
-    (sum, r) => sum + (r.p95_duration_ms ?? 0) * (r.observation_count ?? 0),
-    0
-  );
-  const newPayloadP95 = newPayloadTotalObs > 0 ? newPayloadWeightedP95 / newPayloadTotalObs : 0;
+  // Calculate min/max for range display
+  let newPayloadMin = Infinity;
+  let newPayloadMax = 0;
+  newPayloadValidRows.forEach(r => {
+    const min = r.min_duration_ms ?? 0;
+    const max = r.max_duration_ms ?? 0;
+    if (min > 0 && min < newPayloadMin) newPayloadMin = min;
+    if (max > newPayloadMax) newPayloadMax = max;
+  });
+  if (newPayloadMin === Infinity) newPayloadMin = 0;
 
   // Aggregate getBlobs stats from SUCCESS status rows only (weighted by observation count)
   const getBlobsSuccessRows = getBlobsByStatus.filter(r => r.status?.toUpperCase() === 'SUCCESS');
@@ -67,11 +72,16 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
     0
   );
   const getBlobsMedian = getBlobsTotalObs > 0 ? getBlobsWeightedMedian / getBlobsTotalObs : 0;
-  const getBlobsWeightedP95 = getBlobsSuccessRows.reduce(
-    (sum, r) => sum + (r.p95_duration_ms ?? 0) * (r.observation_count ?? 0),
-    0
-  );
-  const getBlobsP95 = getBlobsTotalObs > 0 ? getBlobsWeightedP95 / getBlobsTotalObs : 0;
+  // Calculate min/max for range display
+  let getBlobsMin = Infinity;
+  let getBlobsMax = 0;
+  getBlobsSuccessRows.forEach(r => {
+    const min = r.min_duration_ms ?? 0;
+    const max = r.max_duration_ms ?? 0;
+    if (min > 0 && min < getBlobsMin) getBlobsMin = min;
+    if (max > getBlobsMax) getBlobsMax = max;
+  });
+  if (getBlobsMin === Infinity) getBlobsMin = 0;
 
   const hasNewPayloadData = newPayloadTotalObs > 0;
   const hasGetBlobsData = getBlobsTotalObs > 0;
@@ -110,7 +120,7 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
           <div className="mb-6 grid grid-cols-3 gap-4">
             <MiniStat label="Observations" value={newPayloadTotalObs.toLocaleString()} />
             <MiniStat label="Median" value={`${newPayloadMedian.toFixed(0)} ms`} />
-            <MiniStat label="P95" value={`${newPayloadP95.toFixed(0)} ms`} />
+            <MiniStat label="Range" value={`${newPayloadMin} – ${newPayloadMax} ms`} />
           </div>
 
           {/* Per-Client Breakdown - only VALID status */}
@@ -119,7 +129,7 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
               data={newPayloadValidByClient}
               noCard
               hideObservations
-              hideP95
+              hideRange
               durationLabel="Duration"
             />
           )}
@@ -149,7 +159,7 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
               <div className="mb-6 grid grid-cols-3 gap-4">
                 <MiniStat label="Observations" value={getBlobsTotalObs.toLocaleString()} />
                 <MiniStat label="Median" value={`${getBlobsMedian.toFixed(0)} ms`} />
-                <MiniStat label="P95" value={`${getBlobsP95.toFixed(0)} ms`} />
+                <MiniStat label="Range" value={`${getBlobsMin} – ${getBlobsMax} ms`} />
               </div>
 
               {/* Per-Client Breakdown - only SUCCESS status */}
@@ -158,7 +168,7 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
                   data={getBlobsSuccessByClient}
                   noCard
                   hideObservations
-                  hideP95
+                  hideRange
                   durationLabel="Duration"
                   showBlobCount
                   blobCountLabel="Blobs"

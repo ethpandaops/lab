@@ -206,7 +206,7 @@ export function GetBlobsTab({ data, isLoading }: GetBlobsTabProps): JSX.Element 
       const totalObs = existing.observationCount + obs;
       existing.avgDuration = (existing.avgDuration * existing.observationCount + avgDur * obs) / (totalObs || 1);
       existing.medianDuration = (existing.medianDuration * existing.observationCount + medDur * obs) / (totalObs || 1);
-      existing.p95Duration = Math.max(existing.p95Duration, p95Dur);
+      existing.p95Duration = (existing.p95Duration * existing.observationCount + p95Dur * obs) / (totalObs || 1);
       existing.observationCount = totalObs;
     } else {
       elClientMetrics.set(el, {
