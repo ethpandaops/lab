@@ -3,25 +3,25 @@ import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
 import { intEngineNewPayloadServiceListOptions } from '@/api/@tanstack/react-query.gen';
-import type { SlowBlocksSearch, FilterValues } from './IndexPage.types';
+import type { PayloadsSearch, FilterValues } from './IndexPage.types';
 import {
   DEFAULT_DURATION_MIN,
   DEFAULT_PAGE_SIZE,
   DEFAULT_TIME_RANGE_HOURS,
   LIVE_MODE_ENABLED,
 } from './IndexPage.types';
-import { SlowBlocksView } from './components/SlowBlocksView';
+import { PayloadsView } from './components/PayloadsView';
 import type { IntEngineNewPayload } from '@/api/types.gen';
 import type { SortingState } from '@tanstack/react-table';
-import { useLiveSlowBlocksStream } from './hooks';
+import { useLivePayloadsStream } from './hooks';
 
 /**
- * Slow Blocks Analysis page showing individual engine_newPayload observations
+ * Payloads page showing individual engine_newPayload observations
  * Focuses on blocks that took abnormally long to validate
  */
 export function IndexPage(): JSX.Element {
-  const navigate = useNavigate({ from: '/ethereum/execution/slow-blocks/' });
-  const search = useSearch({ from: '/ethereum/execution/slow-blocks/' }) as SlowBlocksSearch;
+  const navigate = useNavigate({ from: '/ethereum/execution/payloads/' });
+  const search = useSearch({ from: '/ethereum/execution/payloads/' }) as PayloadsSearch;
   const { currentNetwork } = useNetwork();
 
   // Capture initial detail params from URL on mount (for deep-linking)
@@ -94,7 +94,10 @@ export function IndexPage(): JSX.Element {
         // Server-side filters
         ...(search.status &&
           (search.status.includes(',') ? { status_in_values: search.status } : { status_eq: search.status })),
-        ...(search.elClient && { meta_execution_implementation_eq: search.elClient }),
+        ...(search.elClient &&
+          (search.elClient.includes(',')
+            ? { meta_execution_implementation_in_values: search.elClient }
+            : { meta_execution_implementation_eq: search.elClient })),
         ...(search.slot && { slot_eq: search.slot }),
         ...(search.blockNumber && { block_number_eq: search.blockNumber }),
         ...(search.gasUsedMin && { gas_used_gte: search.gasUsedMin }),
@@ -128,7 +131,7 @@ export function IndexPage(): JSX.Element {
     newItemIdsRef,
     hitPageLimitRef,
     error: liveError,
-  } = useLiveSlowBlocksStream({
+  } = useLivePayloadsStream({
     enabled: isLive && !!currentNetwork,
     filters: currentFilterValues,
     durationMin,
@@ -222,7 +225,7 @@ export function IndexPage(): JSX.Element {
   // Handle filter click from table cell values
   const handleFilterClick = useCallback(
     (field: string, value: string | number): void => {
-      const newSearch: Partial<SlowBlocksSearch> = {
+      const newSearch: Partial<PayloadsSearch> = {
         page: 0,
         pageToken: undefined,
       };
@@ -346,7 +349,7 @@ export function IndexPage(): JSX.Element {
   }, [data, search.detailSlot, search.detailNodeName]);
 
   return (
-    <SlowBlocksView
+    <PayloadsView
       data={data}
       isLoading={isLoading && !isLive}
       error={isLive ? liveError : (error as Error | null)}

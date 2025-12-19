@@ -166,7 +166,7 @@ const ethereumDataAvailabilityPages: NavItem[] = [
 
 const ethereumExecutionPages: NavItem[] = [
   { name: 'Timings', to: '/ethereum/execution/timings', icon: ClockIcon },
-  { name: 'Slow Blocks', to: '/ethereum/execution/slow-blocks', icon: CubeIcon },
+  { name: 'Payloads', to: '/ethereum/execution/payloads', icon: CubeIcon },
 ];
 
 const xatuPages: NavItem[] = [

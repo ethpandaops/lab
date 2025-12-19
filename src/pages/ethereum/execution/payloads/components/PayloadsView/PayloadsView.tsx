@@ -24,9 +24,9 @@ import {
 } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
 
-type SlowBlock = IntEngineNewPayload;
+type Payload = IntEngineNewPayload;
 
-const columnHelper = createColumnHelper<SlowBlock>();
+const columnHelper = createColumnHelper<Payload>();
 
 /**
  * Truncate a hash for display
@@ -135,8 +135,8 @@ function StatusBadge({
   );
 }
 
-export type SlowBlocksViewProps = {
-  data: SlowBlock[];
+export type PayloadsViewProps = {
+  data: Payload[];
   isLoading: boolean;
   error?: Error | null;
   pagination: {
@@ -153,8 +153,8 @@ export type SlowBlocksViewProps = {
   onFiltersChange: (filters: FilterValues) => void;
   onClearFilters: () => void;
   // Selected block for details
-  selectedBlock: SlowBlock | null;
-  onBlockSelect: (block: SlowBlock | null) => void;
+  selectedBlock: Payload | null;
+  onBlockSelect: (block: Payload | null) => void;
   // Duration threshold for display
   durationThreshold: number;
   // Live mode props
@@ -164,7 +164,7 @@ export type SlowBlocksViewProps = {
   liveHitPageLimitRef?: RefObject<boolean>;
 };
 
-export function SlowBlocksView({
+export function PayloadsView({
   data,
   isLoading,
   error,
@@ -180,7 +180,7 @@ export function SlowBlocksView({
   isLive = false,
   onLiveModeToggle,
   newItemIdsRef,
-}: SlowBlocksViewProps): JSX.Element {
+}: PayloadsViewProps): JSX.Element {
   // Learn more dialog state
   const [learnMoreOpen, setLearnMoreOpen] = useState(false);
 
@@ -240,15 +240,14 @@ export function SlowBlocksView({
         cell: info => {
           const nodeName = info.getValue();
           if (!nodeName) return <span className="text-muted">-</span>;
-          // Strip common prefixes
+          // Transform prefixes to shorter format (utility-mainnet- → utility/)
           const shortName = nodeName
             .replace(/^ethpandaops\/mainnet\//, '')
             .replace(/^ethpandaops\//, '')
-            .replace(/^utility-mainnet-/, '')
-            .replace(/^sigma-mainnet-/, '')
-            .replace(/^prysm-/, '');
+            .replace(/^utility-mainnet-/, 'utility/')
+            .replace(/^sigma-mainnet-/, 'sigma/');
           // Truncate long node names
-          const displayName = shortName.length > 25 ? `${shortName.slice(0, 25)}...` : shortName;
+          const displayName = shortName.length > 35 ? `${shortName.slice(0, 35)}...` : shortName;
           return (
             <span className="text-xs text-muted" title={nodeName}>
               {displayName}
@@ -295,12 +294,12 @@ export function SlowBlocksView({
   );
 
   // Get row ID for live mode highlighting
-  const getRowId = (row: SlowBlock): string => {
+  const getRowId = (row: Payload): string => {
     return `${row.slot_start_date_time}:${row.slot}:${row.meta_client_name}`;
   };
 
   // Check if row is newly added (for live mode animation)
-  const isRowNew = (row: SlowBlock): boolean => {
+  const isRowNew = (row: Payload): boolean => {
     if (!newItemIdsRef?.current) return false;
     return newItemIdsRef.current.has(getRowId(row));
   };
@@ -318,8 +317,8 @@ export function SlowBlocksView({
       {/* Header with Go Live and Learn More buttons */}
       <div className="mb-6 flex items-start justify-between gap-4">
         <Header
-          title="Slow Blocks"
-          description={`Individual engine_newPayload observations showing blocks taking ${durationThreshold}ms+ to validate`}
+          title="Payloads"
+          description={`Individual engine_newPayload observations taking ${durationThreshold}ms+ to validate`}
           className="mb-0"
         />
         <div className="flex shrink-0 items-center gap-2">
@@ -405,8 +404,8 @@ export function SlowBlocksView({
         manualSorting
         emptyMessage={
           filters.durationMin && filters.durationMin > DEFAULT_DURATION_MIN
-            ? `No blocks found with duration >= ${filters.durationMin}ms`
-            : `No slow blocks found (duration >= ${durationThreshold}ms)`
+            ? `No payloads found with duration >= ${filters.durationMin}ms`
+            : `No payloads found (duration >= ${durationThreshold}ms)`
         }
         getRowClassName={(row, _rowId) =>
           clsx('cursor-pointer transition-colors hover:bg-surface/50', isRowNew(row) && 'animate-pulse bg-green-500/10')

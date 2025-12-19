@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
 /**
- * Zod schema for slow blocks search parameters
+ * Zod schema for payloads search parameters
  * Validates filtering and pagination state in URL
  */
-export const slowBlocksSearchSchema = z.object({
+export const payloadsSearchSchema = z.object({
   // Pagination
   page: z.coerce.number().min(0).optional(),
   pageSize: z.coerce.number().min(1).max(100).optional(),
@@ -48,7 +48,7 @@ export const slowBlocksSearchSchema = z.object({
 /**
  * TypeScript type inferred from Zod schema
  */
-export type SlowBlocksSearch = z.infer<typeof slowBlocksSearchSchema>;
+export type PayloadsSearch = z.infer<typeof payloadsSearchSchema>;
 
 /**
  * Filter values for the FilterPanel component
@@ -77,7 +77,7 @@ export type EngineStatus = (typeof ENGINE_STATUS_VALUES)[number];
 /**
  * Default filter values
  */
-export const DEFAULT_DURATION_MIN = 500; // 500ms threshold
+export const DEFAULT_DURATION_MIN = 0; // No duration filter by default
 export const DEFAULT_PAGE_SIZE = 25;
 export const DEFAULT_TIME_RANGE_HOURS = 6;
 

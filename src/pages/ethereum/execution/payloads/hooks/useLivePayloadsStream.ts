@@ -40,7 +40,7 @@ function pruneOldSeenIds(seenIds: Set<string>, windowStart: number): void {
   }
 }
 
-interface UseLiveSlowBlocksStreamResult {
+interface UseLivePayloadsStreamResult {
   displayedItems: IntEngineNewPayload[];
   newItemIdsRef: MutableRefObject<Set<string>>;
   hitPageLimitRef: MutableRefObject<boolean>;
@@ -48,10 +48,10 @@ interface UseLiveSlowBlocksStreamResult {
 }
 
 /**
- * Hook for live streaming slow block observations
+ * Hook for live streaming payload observations
  * Polls based on bounds changes and animates new items in
  */
-export function useLiveSlowBlocksStream({
+export function useLivePayloadsStream({
   enabled,
   filters,
   durationMin,
@@ -59,7 +59,7 @@ export function useLiveSlowBlocksStream({
   enabled: boolean;
   filters: FilterValues;
   durationMin: number;
-}): UseLiveSlowBlocksStreamResult {
+}): UseLivePayloadsStreamResult {
   const { data: allBounds } = useBounds();
   const bounds = allBounds?.['int_engine_new_payload'];
 
@@ -121,7 +121,10 @@ export function useLiveSlowBlocksStream({
               (filtersRef.current.status.includes(',')
                 ? { status_in_values: filtersRef.current.status }
                 : { status_eq: filtersRef.current.status })),
-            ...(filtersRef.current.elClient && { meta_execution_implementation_eq: filtersRef.current.elClient }),
+            ...(filtersRef.current.elClient &&
+              (filtersRef.current.elClient.includes(',')
+                ? { meta_execution_implementation_in_values: filtersRef.current.elClient }
+                : { meta_execution_implementation_eq: filtersRef.current.elClient })),
             ...(filtersRef.current.slot && { slot_eq: filtersRef.current.slot }),
             ...(filtersRef.current.blockNumber && { block_number_eq: filtersRef.current.blockNumber }),
             ...(filtersRef.current.gasUsedMin && { gas_used_gte: filtersRef.current.gasUsedMin }),

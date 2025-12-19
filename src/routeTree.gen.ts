@@ -40,7 +40,7 @@ import { Route as XatuContributorsIdRouteImport } from './routes/xatu/contributo
 import { Route as EthereumSlotsSlotRouteImport } from './routes/ethereum/slots/$slot'
 import { Route as EthereumForksForkRouteImport } from './routes/ethereum/forks/$fork'
 import { Route as EthereumExecutionTimingsRouteImport } from './routes/ethereum/execution/timings'
-import { Route as EthereumExecutionSlowBlocksRouteImport } from './routes/ethereum/execution/slow-blocks'
+import { Route as EthereumExecutionPayloadsRouteImport } from './routes/ethereum/execution/payloads'
 import { Route as EthereumEpochsEpochRouteImport } from './routes/ethereum/epochs/$epoch'
 import { Route as EthereumEntitiesEntityRouteImport } from './routes/ethereum/entities/$entity'
 import { Route as EthereumDataAvailabilityProbesRouteImport } from './routes/ethereum/data-availability/probes'
@@ -48,7 +48,7 @@ import { Route as EthereumDataAvailabilityCustodyRouteImport } from './routes/et
 import { Route as BeaconSlotLiveRouteImport } from './routes/beacon/slot/live'
 import { Route as BeaconBlockProductionLiveRouteImport } from './routes/beacon/block-production/live'
 import { Route as EthereumExecutionTimingsIndexRouteImport } from './routes/ethereum/execution/timings/index'
-import { Route as EthereumExecutionSlowBlocksIndexRouteImport } from './routes/ethereum/execution/slow-blocks/index'
+import { Route as EthereumExecutionPayloadsIndexRouteImport } from './routes/ethereum/execution/payloads/index'
 import { Route as EthereumDataAvailabilityProbesIndexRouteImport } from './routes/ethereum/data-availability/probes/index'
 import { Route as EthereumDataAvailabilityCustodyIndexRouteImport } from './routes/ethereum/data-availability/custody/index'
 
@@ -213,10 +213,10 @@ const EthereumExecutionTimingsRoute =
     path: '/timings',
     getParentRoute: () => EthereumExecutionRoute,
   } as any)
-const EthereumExecutionSlowBlocksRoute =
-  EthereumExecutionSlowBlocksRouteImport.update({
-    id: '/slow-blocks',
-    path: '/slow-blocks',
+const EthereumExecutionPayloadsRoute =
+  EthereumExecutionPayloadsRouteImport.update({
+    id: '/payloads',
+    path: '/payloads',
     getParentRoute: () => EthereumExecutionRoute,
   } as any)
 const EthereumEpochsEpochRoute = EthereumEpochsEpochRouteImport.update({
@@ -258,11 +258,11 @@ const EthereumExecutionTimingsIndexRoute =
     path: '/',
     getParentRoute: () => EthereumExecutionTimingsRoute,
   } as any)
-const EthereumExecutionSlowBlocksIndexRoute =
-  EthereumExecutionSlowBlocksIndexRouteImport.update({
+const EthereumExecutionPayloadsIndexRoute =
+  EthereumExecutionPayloadsIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => EthereumExecutionSlowBlocksRoute,
+    getParentRoute: () => EthereumExecutionPayloadsRoute,
   } as any)
 const EthereumDataAvailabilityProbesIndexRoute =
   EthereumDataAvailabilityProbesIndexRouteImport.update({
@@ -306,7 +306,7 @@ export interface FileRoutesByFullPath {
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesRouteWithChildren
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
-  '/ethereum/execution/slow-blocks': typeof EthereumExecutionSlowBlocksRouteWithChildren
+  '/ethereum/execution/payloads': typeof EthereumExecutionPayloadsRouteWithChildren
   '/ethereum/execution/timings': typeof EthereumExecutionTimingsRouteWithChildren
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
@@ -318,7 +318,7 @@ export interface FileRoutesByFullPath {
   '/xatu/contributors/': typeof XatuContributorsIndexRoute
   '/ethereum/data-availability/custody/': typeof EthereumDataAvailabilityCustodyIndexRoute
   '/ethereum/data-availability/probes/': typeof EthereumDataAvailabilityProbesIndexRoute
-  '/ethereum/execution/slow-blocks/': typeof EthereumExecutionSlowBlocksIndexRoute
+  '/ethereum/execution/payloads/': typeof EthereumExecutionPayloadsIndexRoute
   '/ethereum/execution/timings/': typeof EthereumExecutionTimingsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -352,7 +352,7 @@ export interface FileRoutesByTo {
   '/xatu/contributors': typeof XatuContributorsIndexRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyIndexRoute
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesIndexRoute
-  '/ethereum/execution/slow-blocks': typeof EthereumExecutionSlowBlocksIndexRoute
+  '/ethereum/execution/payloads': typeof EthereumExecutionPayloadsIndexRoute
   '/ethereum/execution/timings': typeof EthereumExecutionTimingsIndexRoute
 }
 export interface FileRoutesById {
@@ -385,7 +385,7 @@ export interface FileRoutesById {
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesRouteWithChildren
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
-  '/ethereum/execution/slow-blocks': typeof EthereumExecutionSlowBlocksRouteWithChildren
+  '/ethereum/execution/payloads': typeof EthereumExecutionPayloadsRouteWithChildren
   '/ethereum/execution/timings': typeof EthereumExecutionTimingsRouteWithChildren
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
@@ -397,7 +397,7 @@ export interface FileRoutesById {
   '/xatu/contributors/': typeof XatuContributorsIndexRoute
   '/ethereum/data-availability/custody/': typeof EthereumDataAvailabilityCustodyIndexRoute
   '/ethereum/data-availability/probes/': typeof EthereumDataAvailabilityProbesIndexRoute
-  '/ethereum/execution/slow-blocks/': typeof EthereumExecutionSlowBlocksIndexRoute
+  '/ethereum/execution/payloads/': typeof EthereumExecutionPayloadsIndexRoute
   '/ethereum/execution/timings/': typeof EthereumExecutionTimingsIndexRoute
 }
 export interface FileRouteTypes {
@@ -431,7 +431,7 @@ export interface FileRouteTypes {
     | '/ethereum/data-availability/probes'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
-    | '/ethereum/execution/slow-blocks'
+    | '/ethereum/execution/payloads'
     | '/ethereum/execution/timings'
     | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
@@ -443,7 +443,7 @@ export interface FileRouteTypes {
     | '/xatu/contributors/'
     | '/ethereum/data-availability/custody/'
     | '/ethereum/data-availability/probes/'
-    | '/ethereum/execution/slow-blocks/'
+    | '/ethereum/execution/payloads/'
     | '/ethereum/execution/timings/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -477,7 +477,7 @@ export interface FileRouteTypes {
     | '/xatu/contributors'
     | '/ethereum/data-availability/custody'
     | '/ethereum/data-availability/probes'
-    | '/ethereum/execution/slow-blocks'
+    | '/ethereum/execution/payloads'
     | '/ethereum/execution/timings'
   id:
     | '__root__'
@@ -509,7 +509,7 @@ export interface FileRouteTypes {
     | '/ethereum/data-availability/probes'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
-    | '/ethereum/execution/slow-blocks'
+    | '/ethereum/execution/payloads'
     | '/ethereum/execution/timings'
     | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
@@ -521,7 +521,7 @@ export interface FileRouteTypes {
     | '/xatu/contributors/'
     | '/ethereum/data-availability/custody/'
     | '/ethereum/data-availability/probes/'
-    | '/ethereum/execution/slow-blocks/'
+    | '/ethereum/execution/payloads/'
     | '/ethereum/execution/timings/'
   fileRoutesById: FileRoutesById
 }
@@ -757,11 +757,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumExecutionTimingsRouteImport
       parentRoute: typeof EthereumExecutionRoute
     }
-    '/ethereum/execution/slow-blocks': {
-      id: '/ethereum/execution/slow-blocks'
-      path: '/slow-blocks'
-      fullPath: '/ethereum/execution/slow-blocks'
-      preLoaderRoute: typeof EthereumExecutionSlowBlocksRouteImport
+    '/ethereum/execution/payloads': {
+      id: '/ethereum/execution/payloads'
+      path: '/payloads'
+      fullPath: '/ethereum/execution/payloads'
+      preLoaderRoute: typeof EthereumExecutionPayloadsRouteImport
       parentRoute: typeof EthereumExecutionRoute
     }
     '/ethereum/epochs/$epoch': {
@@ -813,12 +813,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumExecutionTimingsIndexRouteImport
       parentRoute: typeof EthereumExecutionTimingsRoute
     }
-    '/ethereum/execution/slow-blocks/': {
-      id: '/ethereum/execution/slow-blocks/'
+    '/ethereum/execution/payloads/': {
+      id: '/ethereum/execution/payloads/'
       path: '/'
-      fullPath: '/ethereum/execution/slow-blocks/'
-      preLoaderRoute: typeof EthereumExecutionSlowBlocksIndexRouteImport
-      parentRoute: typeof EthereumExecutionSlowBlocksRoute
+      fullPath: '/ethereum/execution/payloads/'
+      preLoaderRoute: typeof EthereumExecutionPayloadsIndexRouteImport
+      parentRoute: typeof EthereumExecutionPayloadsRoute
     }
     '/ethereum/data-availability/probes/': {
       id: '/ethereum/data-availability/probes/'
@@ -912,19 +912,18 @@ const EthereumEpochsRouteWithChildren = EthereumEpochsRoute._addFileChildren(
   EthereumEpochsRouteChildren,
 )
 
-interface EthereumExecutionSlowBlocksRouteChildren {
-  EthereumExecutionSlowBlocksIndexRoute: typeof EthereumExecutionSlowBlocksIndexRoute
+interface EthereumExecutionPayloadsRouteChildren {
+  EthereumExecutionPayloadsIndexRoute: typeof EthereumExecutionPayloadsIndexRoute
 }
 
-const EthereumExecutionSlowBlocksRouteChildren: EthereumExecutionSlowBlocksRouteChildren =
+const EthereumExecutionPayloadsRouteChildren: EthereumExecutionPayloadsRouteChildren =
   {
-    EthereumExecutionSlowBlocksIndexRoute:
-      EthereumExecutionSlowBlocksIndexRoute,
+    EthereumExecutionPayloadsIndexRoute: EthereumExecutionPayloadsIndexRoute,
   }
 
-const EthereumExecutionSlowBlocksRouteWithChildren =
-  EthereumExecutionSlowBlocksRoute._addFileChildren(
-    EthereumExecutionSlowBlocksRouteChildren,
+const EthereumExecutionPayloadsRouteWithChildren =
+  EthereumExecutionPayloadsRoute._addFileChildren(
+    EthereumExecutionPayloadsRouteChildren,
   )
 
 interface EthereumExecutionTimingsRouteChildren {
@@ -942,13 +941,12 @@ const EthereumExecutionTimingsRouteWithChildren =
   )
 
 interface EthereumExecutionRouteChildren {
-  EthereumExecutionSlowBlocksRoute: typeof EthereumExecutionSlowBlocksRouteWithChildren
+  EthereumExecutionPayloadsRoute: typeof EthereumExecutionPayloadsRouteWithChildren
   EthereumExecutionTimingsRoute: typeof EthereumExecutionTimingsRouteWithChildren
 }
 
 const EthereumExecutionRouteChildren: EthereumExecutionRouteChildren = {
-  EthereumExecutionSlowBlocksRoute:
-    EthereumExecutionSlowBlocksRouteWithChildren,
+  EthereumExecutionPayloadsRoute: EthereumExecutionPayloadsRouteWithChildren,
   EthereumExecutionTimingsRoute: EthereumExecutionTimingsRouteWithChildren,
 }
 
