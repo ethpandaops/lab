@@ -70,11 +70,12 @@ export function SelectMenu<T>({
         </ListboxButton>
 
         <ListboxOptions
+          anchor="bottom start"
           transition
           className={clsx(
-            'absolute z-[9999] mt-1 max-h-60 overflow-auto border border-border bg-surface shadow-lg backdrop-blur-xl data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0',
+            'z-[9999] mt-1 max-h-60 overflow-auto border border-border bg-surface shadow-lg backdrop-blur-xl data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0',
             rounded && 'rounded-lg',
-            expandToFit ? 'w-max min-w-full' : 'w-full'
+            expandToFit ? 'w-max' : 'w-[var(--button-width)]'
           )}
         >
           {options.map((option, index) => (

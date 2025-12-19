@@ -11,13 +11,20 @@ export interface EngineTimingsCardProps {
   data: SlotEngineTimingsData | null;
   isLoading: boolean;
   hasBlobsInSlot: boolean;
+  /** Slot number for expandable row feature */
+  slot?: number;
 }
 
 /**
  * Card displaying engine API timing data for a specific slot.
  * Shows newPayload and getBlobs metrics with per-EL-client breakdown.
  */
-export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTimingsCardProps): JSX.Element | null {
+export function EngineTimingsCard({
+  data,
+  isLoading,
+  hasBlobsInSlot,
+  slot,
+}: EngineTimingsCardProps): JSX.Element | null {
   const [showRefNodeInfo, setShowRefNodeInfo] = useState(false);
 
   // Don't render anything if no data and not loading
@@ -42,9 +49,8 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
 
   const { newPayloadByStatus, newPayloadByClient, getBlobsByStatus, getBlobsByClient } = data!;
 
-  // Filter to VALID status only for newPayload (duration metrics are VALID-only from backend)
+  // Filter to VALID status only for summary stats
   const newPayloadValidRows = newPayloadByStatus.filter(r => r.status?.toUpperCase() === 'VALID');
-  const newPayloadValidByClient = newPayloadByClient.filter(r => r.status?.toUpperCase() === 'VALID');
 
   // Aggregate newPayload stats from VALID status rows only (weighted by observation count)
   const newPayloadTotalObs = newPayloadValidRows.reduce((sum, r) => sum + (r.observation_count ?? 0), 0);
@@ -83,9 +89,9 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
   });
   if (getBlobsMin === Infinity) getBlobsMin = 0;
 
-  const hasNewPayloadData = newPayloadTotalObs > 0;
+  const hasNewPayloadData = newPayloadTotalObs > 0 || newPayloadByClient.length > 0;
   const hasGetBlobsData = getBlobsTotalObs > 0;
-  const hasClientData = newPayloadValidByClient.length > 0;
+  const hasClientData = newPayloadByClient.length > 0;
   const getBlobsSuccessByClient = getBlobsByClient.filter(r => r.status?.toUpperCase() === 'SUCCESS');
   const hasGetBlobsClientData = getBlobsSuccessByClient.length > 0;
 
@@ -117,14 +123,23 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
           </div>
 
           {/* Summary Stats */}
-          <div className="mb-6 grid grid-cols-3 gap-4">
-            <MiniStat label="Observations" value={newPayloadTotalObs.toLocaleString()} />
+          <div className="mb-6 grid grid-cols-2 gap-4">
             <MiniStat label="Median" value={`${newPayloadMedian.toFixed(0)} ms`} />
             <MiniStat label="Range" value={`${newPayloadMin} – ${newPayloadMax} ms`} />
           </div>
 
-          {/* Per-Client Breakdown - only VALID status */}
-          {hasClientData && <ClientVersionBreakdown data={newPayloadValidByClient} noCard hideObservations hideRange />}
+          {/* Per-Client Breakdown - all statuses, expand to see details */}
+          {hasClientData && (
+            <ClientVersionBreakdown
+              data={newPayloadByClient}
+              noCard
+              hideObservations
+              hideRange
+              expandable
+              slot={slot}
+              durationStatusFilter="VALID"
+            />
+          )}
         </Card>
       )}
 
@@ -148,8 +163,7 @@ export function EngineTimingsCard({ data, isLoading, hasBlobsInSlot }: EngineTim
           {hasGetBlobsData ? (
             <>
               {/* Summary Stats */}
-              <div className="mb-6 grid grid-cols-3 gap-4">
-                <MiniStat label="Observations" value={getBlobsTotalObs.toLocaleString()} />
+              <div className="mb-6 grid grid-cols-2 gap-4">
                 <MiniStat label="Median" value={`${getBlobsMedian.toFixed(0)} ms`} />
                 <MiniStat label="Range" value={`${getBlobsMin} – ${getBlobsMax} ms`} />
               </div>

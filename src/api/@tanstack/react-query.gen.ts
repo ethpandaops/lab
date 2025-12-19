@@ -146,6 +146,8 @@ import {
   intCustodyProbeOrderBySlotServiceList,
   intCustodyProbeServiceGet,
   intCustodyProbeServiceList,
+  intEngineNewPayloadServiceGet,
+  intEngineNewPayloadServiceList,
   intExecutionBlockByDateServiceGet,
   intExecutionBlockByDateServiceList,
   intStorageSlotDiffByAddressSlotServiceGet,
@@ -605,6 +607,12 @@ import type {
   IntCustodyProbeServiceListData,
   IntCustodyProbeServiceListError,
   IntCustodyProbeServiceListResponse,
+  IntEngineNewPayloadServiceGetData,
+  IntEngineNewPayloadServiceGetError,
+  IntEngineNewPayloadServiceGetResponse,
+  IntEngineNewPayloadServiceListData,
+  IntEngineNewPayloadServiceListError,
+  IntEngineNewPayloadServiceListResponse,
   IntExecutionBlockByDateServiceGetData,
   IntExecutionBlockByDateServiceGetError,
   IntExecutionBlockByDateServiceGetResponse,
@@ -4811,6 +4819,60 @@ export const intCustodyProbeOrderBySlotServiceGetOptions = (
       return data;
     },
     queryKey: intCustodyProbeOrderBySlotServiceGetQueryKey(options),
+  });
+
+export const intEngineNewPayloadServiceListQueryKey = (options?: Options<IntEngineNewPayloadServiceListData>) =>
+  createQueryKey('intEngineNewPayloadServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intEngineNewPayloadServiceListOptions = (options?: Options<IntEngineNewPayloadServiceListData>) =>
+  queryOptions<
+    IntEngineNewPayloadServiceListResponse,
+    IntEngineNewPayloadServiceListError,
+    IntEngineNewPayloadServiceListResponse,
+    ReturnType<typeof intEngineNewPayloadServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intEngineNewPayloadServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intEngineNewPayloadServiceListQueryKey(options),
+  });
+
+export const intEngineNewPayloadServiceGetQueryKey = (options: Options<IntEngineNewPayloadServiceGetData>) =>
+  createQueryKey('intEngineNewPayloadServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intEngineNewPayloadServiceGetOptions = (options: Options<IntEngineNewPayloadServiceGetData>) =>
+  queryOptions<
+    IntEngineNewPayloadServiceGetResponse,
+    IntEngineNewPayloadServiceGetError,
+    IntEngineNewPayloadServiceGetResponse,
+    ReturnType<typeof intEngineNewPayloadServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intEngineNewPayloadServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intEngineNewPayloadServiceGetQueryKey(options),
   });
 
 export const intExecutionBlockByDateServiceListQueryKey = (options?: Options<IntExecutionBlockByDateServiceListData>) =>

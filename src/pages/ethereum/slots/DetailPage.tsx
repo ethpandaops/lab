@@ -1042,6 +1042,7 @@ export function DetailPage(): JSX.Element {
                   data={engineTimingsData}
                   isLoading={engineTimingsLoading}
                   hasBlobsInSlot={blobCount > 0}
+                  slot={slot}
                 />
               </div>
             </TabPanel>

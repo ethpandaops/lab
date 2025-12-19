@@ -429,6 +429,12 @@ import type {
   IntCustodyProbeServiceListData,
   IntCustodyProbeServiceListErrors,
   IntCustodyProbeServiceListResponses,
+  IntEngineNewPayloadServiceGetData,
+  IntEngineNewPayloadServiceGetErrors,
+  IntEngineNewPayloadServiceGetResponses,
+  IntEngineNewPayloadServiceListData,
+  IntEngineNewPayloadServiceListErrors,
+  IntEngineNewPayloadServiceListResponses,
   IntExecutionBlockByDateServiceGetData,
   IntExecutionBlockByDateServiceGetErrors,
   IntExecutionBlockByDateServiceGetResponses,
@@ -805,6 +811,10 @@ import {
   zIntCustodyProbeServiceGetResponse,
   zIntCustodyProbeServiceListData,
   zIntCustodyProbeServiceListResponse,
+  zIntEngineNewPayloadServiceGetData,
+  zIntEngineNewPayloadServiceGetResponse,
+  zIntEngineNewPayloadServiceListData,
+  zIntEngineNewPayloadServiceListResponse,
   zIntExecutionBlockByDateServiceGetData,
   zIntExecutionBlockByDateServiceGetResponse,
   zIntExecutionBlockByDateServiceListData,
@@ -3699,6 +3709,46 @@ export const intCustodyProbeOrderBySlotServiceGet = <ThrowOnError extends boolea
     requestValidator: async data => await zIntCustodyProbeOrderBySlotServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntCustodyProbeOrderBySlotServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_custody_probe_order_by_slot/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intEngineNewPayloadServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntEngineNewPayloadServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntEngineNewPayloadServiceListResponses,
+    IntEngineNewPayloadServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntEngineNewPayloadServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntEngineNewPayloadServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_engine_new_payload',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intEngineNewPayloadServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntEngineNewPayloadServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntEngineNewPayloadServiceGetResponses,
+    IntEngineNewPayloadServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntEngineNewPayloadServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntEngineNewPayloadServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_engine_new_payload/{slot_start_date_time}',
     ...options,
   });
 };
