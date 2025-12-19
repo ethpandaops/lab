@@ -30,9 +30,23 @@ interface ClientVersionData {
   status?: string;
 }
 
+interface HourlyClientVersionData {
+  meta_execution_implementation?: string;
+  meta_execution_version?: string;
+  observation_count?: number;
+  avg_duration_ms?: number;
+  p50_duration_ms?: number;
+  p95_duration_ms?: number;
+  min_duration_ms?: number;
+  max_duration_ms?: number;
+  avg_returned_count?: number;
+}
+
 export interface ClientVersionBreakdownProps {
   /** Raw per-slot data with client/version info */
   data: ClientVersionData[];
+  /** Optional hourly aggregated data with true percentiles (used for P50/P95 columns) */
+  hourlyData?: HourlyClientVersionData[];
   /** Title for the card */
   title?: string;
   /** Description for the card */
@@ -55,13 +69,15 @@ interface AggregatedRow {
   client: string;
   version: string;
   avgDuration: number;
+  p50Duration: number;
+  p95Duration: number;
   minDuration: number;
   maxDuration: number;
   observations: number;
   avgBlobCount?: number;
 }
 
-type SortField = 'client' | 'version' | 'avgDuration' | 'observations' | 'avgBlobCount';
+type SortField = 'client' | 'version' | 'avgDuration' | 'p50Duration' | 'p95Duration' | 'observations' | 'avgBlobCount';
 type SortDirection = 'asc' | 'desc';
 
 /**
@@ -69,6 +85,7 @@ type SortDirection = 'asc' | 'desc';
  */
 export function ClientVersionBreakdown({
   data,
+  hourlyData,
   title = 'Client Version Breakdown',
   description = 'Duration statistics by execution client and version',
   showBlobCount = false,
@@ -82,8 +99,93 @@ export function ClientVersionBreakdown({
   const [sortField, setSortField] = useState<SortField>(hideObservations ? 'avgDuration' : 'observations');
   const [sortDirection, setSortDirection] = useState<SortDirection>(hideObservations ? 'asc' : 'desc');
 
-  // Aggregate data by client + version
+  // Whether we have hourly data with true percentiles
+  const hasHourlyData = hourlyData && hourlyData.length > 0;
+
+  // Aggregate hourly data by client + version (for true percentiles)
+  const hourlyAggregatedData = useMemo(() => {
+    if (!hourlyData || hourlyData.length === 0) return new Map<string, AggregatedRow>();
+
+    const map = new Map<
+      string,
+      {
+        client: string;
+        version: string;
+        totalWeightedAvg: number;
+        totalWeightedP50: number;
+        totalWeightedP95: number;
+        minDuration: number;
+        maxDuration: number;
+        totalObservations: number;
+        totalWeightedBlobCount: number;
+      }
+    >();
+
+    hourlyData.forEach(row => {
+      const client = (row.meta_execution_implementation ?? 'unknown').toLowerCase();
+      const version = row.meta_execution_version ?? 'unknown';
+      const key = `${client}|${version}`;
+      const obs = row.observation_count ?? 0;
+      const minDur = row.min_duration_ms ?? 0;
+      const maxDur = row.max_duration_ms ?? 0;
+
+      const existing = map.get(key);
+      if (existing) {
+        existing.totalWeightedAvg += (row.avg_duration_ms ?? 0) * obs;
+        existing.totalWeightedP50 += (row.p50_duration_ms ?? 0) * obs;
+        existing.totalWeightedP95 += (row.p95_duration_ms ?? 0) * obs;
+        if (minDur > 0 && (existing.minDuration === 0 || minDur < existing.minDuration)) {
+          existing.minDuration = minDur;
+        }
+        if (maxDur > existing.maxDuration) {
+          existing.maxDuration = maxDur;
+        }
+        existing.totalObservations += obs;
+        existing.totalWeightedBlobCount += (row.avg_returned_count ?? 0) * obs;
+      } else {
+        map.set(key, {
+          client,
+          version,
+          totalWeightedAvg: (row.avg_duration_ms ?? 0) * obs,
+          totalWeightedP50: (row.p50_duration_ms ?? 0) * obs,
+          totalWeightedP95: (row.p95_duration_ms ?? 0) * obs,
+          minDuration: minDur,
+          maxDuration: maxDur,
+          totalObservations: obs,
+          totalWeightedBlobCount: (row.avg_returned_count ?? 0) * obs,
+        });
+      }
+    });
+
+    // Convert to AggregatedRow format
+    const result = new Map<string, AggregatedRow>();
+    map.forEach((entry, key) => {
+      if (entry.totalObservations > 0) {
+        result.set(key, {
+          client: entry.client,
+          version: entry.version,
+          avgDuration: entry.totalWeightedAvg / entry.totalObservations,
+          p50Duration: entry.totalWeightedP50 / entry.totalObservations,
+          p95Duration: entry.totalWeightedP95 / entry.totalObservations,
+          minDuration: entry.minDuration,
+          maxDuration: entry.maxDuration,
+          observations: entry.totalObservations,
+          avgBlobCount: entry.totalWeightedBlobCount / entry.totalObservations,
+        });
+      }
+    });
+
+    return result;
+  }, [hourlyData]);
+
+  // Aggregate per-slot data by client + version (fallback when no hourly data)
   const aggregatedData = useMemo(() => {
+    // If we have hourly data, use that directly
+    if (hasHourlyData) {
+      return Array.from(hourlyAggregatedData.values());
+    }
+
+    // Fall back to per-slot data aggregation
     const map = new Map<
       string,
       {
@@ -108,7 +210,6 @@ export function ClientVersionBreakdown({
       const existing = map.get(key);
       if (existing) {
         existing.totalWeightedAvg += (row.avg_duration_ms ?? 0) * obs;
-        // For min/max, take the actual min/max across all rows
         if (minDur > 0 && (existing.minDuration === 0 || minDur < existing.minDuration)) {
           existing.minDuration = minDur;
         }
@@ -130,7 +231,7 @@ export function ClientVersionBreakdown({
       }
     });
 
-    // Convert to final format
+    // Convert to final format (no p50/p95 without hourly data)
     const result: AggregatedRow[] = [];
     map.forEach(entry => {
       if (entry.totalObservations > 0) {
@@ -138,6 +239,8 @@ export function ClientVersionBreakdown({
           client: entry.client,
           version: entry.version,
           avgDuration: entry.totalWeightedAvg / entry.totalObservations,
+          p50Duration: 0,
+          p95Duration: 0,
           minDuration: entry.minDuration,
           maxDuration: entry.maxDuration,
           observations: entry.totalObservations,
@@ -147,7 +250,7 @@ export function ClientVersionBreakdown({
     });
 
     return result;
-  }, [data]);
+  }, [data, hasHourlyData, hourlyAggregatedData]);
 
   // Calculate max avg duration for color scaling
   const maxAvgDuration = useMemo(() => {
@@ -167,6 +270,12 @@ export function ClientVersionBreakdown({
           break;
         case 'avgDuration':
           comparison = a.avgDuration - b.avgDuration;
+          break;
+        case 'p50Duration':
+          comparison = a.p50Duration - b.p50Duration;
+          break;
+        case 'p95Duration':
+          comparison = a.p95Duration - b.p95Duration;
           break;
         case 'observations':
           comparison = a.observations - b.observations;
@@ -249,6 +358,18 @@ export function ClientVersionBreakdown({
                 Avg (ms)
                 <SortIcon field="avgDuration" />
               </th>
+              {hasHourlyData && (
+                <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('p50Duration')}>
+                  P50 (ms)
+                  <SortIcon field="p50Duration" />
+                </th>
+              )}
+              {hasHourlyData && (
+                <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('p95Duration')}>
+                  P95 (ms)
+                  <SortIcon field="p95Duration" />
+                </th>
+              )}
               {!hideRange && <th className={clsx(headerClass, 'text-right')}>Range</th>}
               {showBlobCount && (
                 <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('avgBlobCount')}>
@@ -287,6 +408,32 @@ export function ClientVersionBreakdown({
                     <span className="text-sm text-muted">-</span>
                   )}
                 </td>
+                {hasHourlyData && (
+                  <td className="px-3 py-3 text-right">
+                    {row.p50Duration > 0 ? (
+                      <span
+                        className={clsx('text-sm font-medium', getDurationColorClass(row.p50Duration, maxAvgDuration))}
+                      >
+                        {row.p50Duration.toFixed(1)}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-muted">-</span>
+                    )}
+                  </td>
+                )}
+                {hasHourlyData && (
+                  <td className="px-3 py-3 text-right">
+                    {row.p95Duration > 0 ? (
+                      <span
+                        className={clsx('text-sm font-medium', getDurationColorClass(row.p95Duration, maxAvgDuration))}
+                      >
+                        {row.p95Duration.toFixed(1)}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-muted">-</span>
+                    )}
+                  </td>
+                )}
                 {!hideRange && (
                   <td className="px-3 py-3 text-right">
                     {row.maxDuration > 0 ? (
