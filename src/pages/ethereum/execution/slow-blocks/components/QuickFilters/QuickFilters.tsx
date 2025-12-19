@@ -1,7 +1,8 @@
 import { type JSX } from 'react';
 import { clsx } from 'clsx';
-import { BoltIcon, ClockIcon, XCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { BoltIcon, ClockIcon, XCircleIcon, BeakerIcon } from '@heroicons/react/24/outline';
 import type { FilterValues } from '../../IndexPage.types';
+import { DEFAULT_DURATION_MIN } from '../../IndexPage.types';
 
 /**
  * Quick filter preset definition
@@ -20,19 +21,15 @@ type QuickFilterPreset = {
 function isPresetActive(preset: QuickFilterPreset, currentFilters: FilterValues): boolean {
   const presetFilters = preset.filters;
 
-  // Check durationMin filter
+  // Check durationMin filter (use default if undefined)
   if (presetFilters.durationMin !== undefined) {
-    if (currentFilters.durationMin !== presetFilters.durationMin) return false;
+    const currentDuration = currentFilters.durationMin ?? DEFAULT_DURATION_MIN;
+    if (currentDuration !== presetFilters.durationMin) return false;
   }
 
   // Check status filter
   if (presetFilters.status !== undefined) {
     if (currentFilters.status !== presetFilters.status) return false;
-  }
-
-  // Check blockStatus filter
-  if (presetFilters.blockStatus !== undefined) {
-    if (currentFilters.blockStatus !== presetFilters.blockStatus) return false;
   }
 
   return true;
@@ -61,30 +58,12 @@ const PRESETS: QuickFilterPreset[] = [
     },
   },
   {
-    id: 'slow-2s',
-    label: '2s+',
-    description: 'Blocks taking 2 seconds or longer to validate',
-    icon: <ClockIcon className="size-4 text-red-500" />,
-    filters: {
-      durationMin: 2000,
-    },
-  },
-  {
     id: 'failures',
     label: 'Failures',
     description: 'Show only INVALID or ERROR status',
     icon: <XCircleIcon className="size-4 text-red-500" />,
     filters: {
-      status: 'INVALID',
-    },
-  },
-  {
-    id: 'orphaned',
-    label: 'Orphaned',
-    description: 'Show only orphaned blocks',
-    icon: <ExclamationTriangleIcon className="size-4 text-yellow-500" />,
-    filters: {
-      blockStatus: 'orphaned',
+      status: 'INVALID,ERROR',
     },
   },
 ];
@@ -107,6 +86,13 @@ export function QuickFilters({ currentFilters, onApplyPreset, onClearFilters }: 
       // Apply the preset (replaces current filters)
       onApplyPreset(preset.filters);
     }
+  };
+
+  // Reference nodes is true by default
+  const isReferenceNodesActive = currentFilters.referenceNodes ?? true;
+
+  const handleReferenceNodesToggle = (): void => {
+    onApplyPreset({ referenceNodes: !isReferenceNodesActive });
   };
 
   return (
@@ -136,6 +122,21 @@ export function QuickFilters({ currentFilters, onApplyPreset, onClearFilters }: 
             </button>
           );
         })}
+        {/* Reference Nodes toggle */}
+        <button
+          type="button"
+          onClick={handleReferenceNodesToggle}
+          title={isReferenceNodesActive ? 'Show all nodes' : 'Show only reference nodes'}
+          className={clsx(
+            'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-all',
+            isReferenceNodesActive
+              ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
+              : 'bg-surface/50 text-muted ring-1 ring-border hover:bg-surface hover:text-foreground hover:ring-primary/30'
+          )}
+        >
+          <BeakerIcon className="size-4" />
+          <span>Reference</span>
+        </button>
       </div>
     </div>
   );

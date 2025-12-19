@@ -115,15 +115,18 @@ export function useLiveSlowBlocksStream({
             slot_start_date_time_lte: windowEnd,
             duration_ms_gte: durationMinRef.current,
             page_size: CONFIG.PAGE_SIZE,
-            order_by: 'duration_ms desc',
+            order_by: 'slot desc',
             // Apply filters
-            ...(filtersRef.current.durationMax && { duration_ms_lte: filtersRef.current.durationMax }),
-            ...(filtersRef.current.status && { status_eq: filtersRef.current.status }),
+            ...(filtersRef.current.status &&
+              (filtersRef.current.status.includes(',')
+                ? { status_in_values: filtersRef.current.status }
+                : { status_eq: filtersRef.current.status })),
             ...(filtersRef.current.elClient && { meta_execution_implementation_eq: filtersRef.current.elClient }),
-            ...(filtersRef.current.clClient && { meta_client_implementation_eq: filtersRef.current.clClient }),
-            ...(filtersRef.current.nodeName && { meta_client_name_eq: filtersRef.current.nodeName }),
-            ...(filtersRef.current.blockStatus && { block_status_eq: filtersRef.current.blockStatus }),
             ...(filtersRef.current.slot && { slot_eq: filtersRef.current.slot }),
+            ...(filtersRef.current.blockNumber && { block_number_eq: filtersRef.current.blockNumber }),
+            ...(filtersRef.current.gasUsedMin && { gas_used_gte: filtersRef.current.gasUsedMin }),
+            ...(filtersRef.current.txCountMin && { tx_count_gte: filtersRef.current.txCountMin }),
+            ...((filtersRef.current.referenceNodes ?? true) && { node_class_eq: 'eip7870-block-builder' }),
           },
         });
 

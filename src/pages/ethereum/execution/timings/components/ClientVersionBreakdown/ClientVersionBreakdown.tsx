@@ -1,9 +1,11 @@
-import type { JSX } from 'react';
-import { useState, useMemo } from 'react';
-import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import React, { type JSX, useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { ChevronUpIcon, ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { intEngineNewPayloadServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import type { IntEngineNewPayload } from '@/api/types.gen';
 
 /**
  * Get color class for duration value relative to max (green = fast, red = slow)
@@ -63,6 +65,12 @@ export interface ClientVersionBreakdownProps {
   hideRange?: boolean;
   /** Custom label for the blob count column (defaults to "Avg Blobs") */
   blobCountLabel?: string;
+  /** If true and slot is provided, rows can be expanded to show individual observations */
+  expandable?: boolean;
+  /** Slot number for fetching individual observations (required if expandable is true) */
+  slot?: number;
+  /** Only use rows with this status for duration calculation (e.g., "VALID"). Shows "-" if no matching rows. */
+  durationStatusFilter?: string;
 }
 
 interface AggregatedRow {
@@ -81,6 +89,150 @@ type SortField = 'client' | 'version' | 'avgDuration' | 'p50Duration' | 'p95Dura
 type SortDirection = 'asc' | 'desc';
 
 /**
+ * Get status badge styling
+ */
+function getStatusStyle(status?: string): { bg: string; text: string } {
+  switch (status?.toUpperCase()) {
+    case 'VALID':
+      return { bg: 'bg-success/10', text: 'text-success' };
+    case 'ERROR':
+    case 'INVALID':
+      return { bg: 'bg-danger/10', text: 'text-danger' };
+    case 'SYNCING':
+      return { bg: 'bg-warning/10', text: 'text-warning' };
+    default:
+      return { bg: 'bg-muted/10', text: 'text-muted' };
+  }
+}
+
+/**
+ * Shorten node name by removing common prefixes but keeping cluster identifier
+ */
+function shortenNodeName(nodeName?: string): string {
+  if (!nodeName) return '-';
+  return nodeName
+    .replace(/^ethpandaops\/mainnet\//, '')
+    .replace(/^ethpandaops\//, '')
+    .replace(/^utility-mainnet-/, 'utility/')
+    .replace(/^sigma-mainnet-/, 'sigma/')
+    .replace(/^prysm-/, '');
+}
+
+/**
+ * Expanded row content that lazy loads individual observations
+ */
+function ExpandedRowContent({ slot, client, colSpan }: { slot: number; client: string; colSpan: number }): JSX.Element {
+  // Map client display names to API values (handles case sensitivity)
+  const getClientFilter = (clientName: string): string => {
+    const lower = clientName.toLowerCase();
+    // Map to exact database values
+    const clientMap: Record<string, string> = {
+      geth: 'go-ethereum',
+      'go-ethereum': 'go-ethereum',
+      nethermind: 'Nethermind',
+      besu: 'Besu',
+      reth: 'Reth',
+      erigon: 'erigon',
+    };
+    return clientMap[lower] ?? clientName;
+  };
+
+  const clientApiValue = getClientFilter(client);
+
+  const { data, isLoading, error } = useQuery({
+    ...intEngineNewPayloadServiceListOptions({
+      query: {
+        slot_eq: slot,
+        meta_execution_implementation_eq: clientApiValue,
+        node_class_eq: 'eip7870-block-builder',
+        page_size: 50,
+      },
+    }),
+  });
+
+  const observations = data?.int_engine_new_payload ?? [];
+
+  if (isLoading) {
+    return (
+      <tr>
+        <td colSpan={colSpan} className="bg-background/50 px-4 py-3">
+          <div className="ml-8 flex items-center gap-2 text-sm text-muted">
+            <div className="size-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            Loading observations...
+          </div>
+        </td>
+      </tr>
+    );
+  }
+
+  if (error) {
+    return (
+      <tr>
+        <td colSpan={colSpan} className="bg-background/50 px-4 py-3">
+          <div className="ml-8 text-sm text-danger">Failed to load observations</div>
+        </td>
+      </tr>
+    );
+  }
+
+  if (observations.length === 0) {
+    return (
+      <tr>
+        <td colSpan={colSpan} className="bg-background/50 px-4 py-3">
+          <div className="ml-8 text-sm text-muted">No individual observations found</div>
+        </td>
+      </tr>
+    );
+  }
+
+  return (
+    <tr>
+      <td colSpan={colSpan} className="bg-background/50 p-0">
+        <div className="ml-8 border-l-2 border-border py-2 pl-4">
+          <table className="w-full">
+            <thead>
+              <tr className="text-xs text-muted">
+                <th className="px-2 py-1 text-left font-medium">Node</th>
+                <th className="px-2 py-1 text-left font-medium">Status</th>
+                <th className="px-2 py-1 text-right font-medium">Duration</th>
+              </tr>
+            </thead>
+            <tbody>
+              {observations.map((obs: IntEngineNewPayload, idx: number) => {
+                const statusStyle = getStatusStyle(obs.status);
+                return (
+                  <tr key={`${obs.meta_client_name}-${idx}`} className="text-sm">
+                    <td className="px-2 py-1.5">
+                      <span className="text-muted" title={obs.meta_client_name}>
+                        {shortenNodeName(obs.meta_client_name)}
+                      </span>
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <span
+                        className={clsx(
+                          'inline-block rounded-sm px-1.5 py-0.5 text-xs font-medium',
+                          statusStyle.bg,
+                          statusStyle.text
+                        )}
+                      >
+                        {obs.status ?? '-'}
+                      </span>
+                    </td>
+                    <td className="px-2 py-1.5 text-right">
+                      <span className="font-mono text-foreground">{obs.duration_ms?.toLocaleString() ?? '-'}ms</span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+/**
  * Displays a breakdown of execution client performance by client and version
  */
 export function ClientVersionBreakdown({
@@ -94,10 +246,16 @@ export function ClientVersionBreakdown({
   hideObservations = false,
   hideRange = false,
   blobCountLabel = 'Avg Blobs',
+  expandable = false,
+  slot,
+  durationStatusFilter,
 }: ClientVersionBreakdownProps): JSX.Element {
   // Default sort by avgDuration (ascending = fastest first) when observations hidden, otherwise by observations
   const [sortField, setSortField] = useState<SortField>(hideObservations ? 'avgDuration' : 'observations');
   const [sortDirection, setSortDirection] = useState<SortDirection>(hideObservations ? 'asc' : 'desc');
+
+  // Track which clients are expanded (for expandable mode)
+  const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set());
 
   // Whether we have hourly data with true percentiles
   const hasHourlyData = hourlyData && hourlyData.length > 0;
@@ -186,12 +344,14 @@ export function ClientVersionBreakdown({
     }
 
     // Fall back to per-slot data aggregation
+    // When durationStatusFilter is set, duration is computed only from matching rows
     const map = new Map<
       string,
       {
         client: string;
         version: string;
         totalWeightedAvg: number;
+        totalWeightedAvgObs: number; // observations for duration calc (may differ when filtered)
         minDuration: number;
         maxDuration: number;
         totalObservations: number;
@@ -207,14 +367,21 @@ export function ClientVersionBreakdown({
       const minDur = row.min_duration_ms ?? 0;
       const maxDur = row.max_duration_ms ?? 0;
 
+      // Check if this row's status matches the filter for duration calculation
+      const statusMatches = !durationStatusFilter || row.status?.toUpperCase() === durationStatusFilter.toUpperCase();
+
       const existing = map.get(key);
       if (existing) {
-        existing.totalWeightedAvg += (row.avg_duration_ms ?? 0) * obs;
-        if (minDur > 0 && (existing.minDuration === 0 || minDur < existing.minDuration)) {
-          existing.minDuration = minDur;
-        }
-        if (maxDur > existing.maxDuration) {
-          existing.maxDuration = maxDur;
+        // Only add to duration stats if status matches (or no filter)
+        if (statusMatches) {
+          existing.totalWeightedAvg += (row.avg_duration_ms ?? 0) * obs;
+          existing.totalWeightedAvgObs += obs;
+          if (minDur > 0 && (existing.minDuration === 0 || minDur < existing.minDuration)) {
+            existing.minDuration = minDur;
+          }
+          if (maxDur > existing.maxDuration) {
+            existing.maxDuration = maxDur;
+          }
         }
         existing.totalObservations += obs;
         existing.totalWeightedBlobCount += (row.avg_returned_count ?? 0) * obs;
@@ -222,9 +389,10 @@ export function ClientVersionBreakdown({
         map.set(key, {
           client,
           version,
-          totalWeightedAvg: (row.avg_duration_ms ?? 0) * obs,
-          minDuration: minDur,
-          maxDuration: maxDur,
+          totalWeightedAvg: statusMatches ? (row.avg_duration_ms ?? 0) * obs : 0,
+          totalWeightedAvgObs: statusMatches ? obs : 0,
+          minDuration: statusMatches ? minDur : 0,
+          maxDuration: statusMatches ? maxDur : 0,
           totalObservations: obs,
           totalWeightedBlobCount: (row.avg_returned_count ?? 0) * obs,
         });
@@ -232,13 +400,14 @@ export function ClientVersionBreakdown({
     });
 
     // Convert to final format (no p50/p95 without hourly data)
+    // avgDuration uses filtered observations (totalWeightedAvgObs), shows 0 if no matching status
     const result: AggregatedRow[] = [];
     map.forEach(entry => {
       if (entry.totalObservations > 0) {
         result.push({
           client: entry.client,
           version: entry.version,
-          avgDuration: entry.totalWeightedAvg / entry.totalObservations,
+          avgDuration: entry.totalWeightedAvgObs > 0 ? entry.totalWeightedAvg / entry.totalWeightedAvgObs : 0,
           p50Duration: 0,
           p95Duration: 0,
           minDuration: entry.minDuration,
@@ -250,7 +419,7 @@ export function ClientVersionBreakdown({
     });
 
     return result;
-  }, [data, hasHourlyData, hourlyAggregatedData]);
+  }, [data, hasHourlyData, hourlyAggregatedData, durationStatusFilter]);
 
   // Calculate max avg duration for color scaling
   const maxAvgDuration = useMemo(() => {
@@ -386,77 +555,129 @@ export function ClientVersionBreakdown({
             </tr>
           </thead>
           <tbody className="divide-y divide-border bg-surface">
-            {sortedData.map((row, index) => (
-              <tr key={`${row.client}-${row.version}-${index}`} className="transition-colors hover:bg-background">
-                <td className="py-3 pr-3 pl-4">
-                  <div className="flex items-center gap-2" title={row.client}>
-                    <ClientLogo client={row.client} size={compactClient ? 24 : 20} />
-                    {!compactClient && <span className="text-sm font-medium text-foreground">{row.client}</span>}
-                  </div>
-                </td>
-                <td className="px-3 py-3">
-                  <span className="font-mono text-sm text-muted">{row.version}</span>
-                </td>
-                <td className="px-3 py-3 text-right">
-                  {row.avgDuration > 0 ? (
-                    <span
-                      className={clsx('text-sm font-medium', getDurationColorClass(row.avgDuration, maxAvgDuration))}
-                    >
-                      {row.avgDuration.toFixed(1)}
-                    </span>
-                  ) : (
-                    <span className="text-sm text-muted">-</span>
+            {sortedData.map((row, index) => {
+              const rowKey = `${row.client}-${row.version}`;
+              const isExpanded = expandedClients.has(rowKey);
+              const canExpand = expandable && slot !== undefined;
+              // Calculate column count for colspan
+              const colCount =
+                3 +
+                (hasHourlyData ? 2 : 0) +
+                (hideRange ? 0 : 1) +
+                (showBlobCount ? 1 : 0) +
+                (hideObservations ? 0 : 1);
+
+              const handleRowClick = (): void => {
+                if (!canExpand) return;
+                setExpandedClients(prev => {
+                  const next = new Set(prev);
+                  if (next.has(rowKey)) {
+                    next.delete(rowKey);
+                  } else {
+                    next.add(rowKey);
+                  }
+                  return next;
+                });
+              };
+
+              return (
+                <React.Fragment key={`${row.client}-${row.version}-${index}`}>
+                  <tr
+                    className={clsx(
+                      'transition-colors hover:bg-background',
+                      canExpand && 'cursor-pointer',
+                      isExpanded && 'bg-background'
+                    )}
+                    onClick={handleRowClick}
+                  >
+                    <td className="py-3 pr-3 pl-4">
+                      <div className="flex items-center gap-2" title={row.client}>
+                        {canExpand && (
+                          <ChevronRightIcon
+                            className={clsx('size-4 text-muted transition-transform', isExpanded && 'rotate-90')}
+                          />
+                        )}
+                        <ClientLogo client={row.client} size={compactClient ? 24 : 20} />
+                        {!compactClient && <span className="text-sm font-medium text-foreground">{row.client}</span>}
+                      </div>
+                    </td>
+                    <td className="px-3 py-3">
+                      <span className="font-mono text-sm text-muted">{row.version}</span>
+                    </td>
+                    <td className="px-3 py-3 text-right">
+                      {row.avgDuration > 0 ? (
+                        <span
+                          className={clsx(
+                            'text-sm font-medium',
+                            getDurationColorClass(row.avgDuration, maxAvgDuration)
+                          )}
+                        >
+                          {row.avgDuration.toFixed(1)}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-muted">-</span>
+                      )}
+                    </td>
+                    {hasHourlyData && (
+                      <td className="px-3 py-3 text-right">
+                        {row.p50Duration > 0 ? (
+                          <span
+                            className={clsx(
+                              'text-sm font-medium',
+                              getDurationColorClass(row.p50Duration, maxAvgDuration)
+                            )}
+                          >
+                            {row.p50Duration.toFixed(1)}
+                          </span>
+                        ) : (
+                          <span className="text-sm text-muted">-</span>
+                        )}
+                      </td>
+                    )}
+                    {hasHourlyData && (
+                      <td className="px-3 py-3 text-right">
+                        {row.p95Duration > 0 ? (
+                          <span
+                            className={clsx(
+                              'text-sm font-medium',
+                              getDurationColorClass(row.p95Duration, maxAvgDuration)
+                            )}
+                          >
+                            {row.p95Duration.toFixed(1)}
+                          </span>
+                        ) : (
+                          <span className="text-sm text-muted">-</span>
+                        )}
+                      </td>
+                    )}
+                    {!hideRange && (
+                      <td className="px-3 py-3 text-right">
+                        {row.maxDuration > 0 ? (
+                          <span className="text-sm text-muted">
+                            {row.minDuration.toFixed(0)} – {row.maxDuration.toFixed(0)} ms
+                          </span>
+                        ) : (
+                          <span className="text-sm text-muted">-</span>
+                        )}
+                      </td>
+                    )}
+                    {showBlobCount && (
+                      <td className="px-3 py-3 text-right">
+                        <span className="text-sm text-muted">{(row.avgBlobCount ?? 0).toFixed(1)}</span>
+                      </td>
+                    )}
+                    {!hideObservations && (
+                      <td className="py-3 pr-4 pl-3 text-right">
+                        <span className="text-sm text-muted">{row.observations.toLocaleString()}</span>
+                      </td>
+                    )}
+                  </tr>
+                  {isExpanded && slot !== undefined && (
+                    <ExpandedRowContent slot={slot} client={row.client} colSpan={colCount} />
                   )}
-                </td>
-                {hasHourlyData && (
-                  <td className="px-3 py-3 text-right">
-                    {row.p50Duration > 0 ? (
-                      <span
-                        className={clsx('text-sm font-medium', getDurationColorClass(row.p50Duration, maxAvgDuration))}
-                      >
-                        {row.p50Duration.toFixed(1)}
-                      </span>
-                    ) : (
-                      <span className="text-sm text-muted">-</span>
-                    )}
-                  </td>
-                )}
-                {hasHourlyData && (
-                  <td className="px-3 py-3 text-right">
-                    {row.p95Duration > 0 ? (
-                      <span
-                        className={clsx('text-sm font-medium', getDurationColorClass(row.p95Duration, maxAvgDuration))}
-                      >
-                        {row.p95Duration.toFixed(1)}
-                      </span>
-                    ) : (
-                      <span className="text-sm text-muted">-</span>
-                    )}
-                  </td>
-                )}
-                {!hideRange && (
-                  <td className="px-3 py-3 text-right">
-                    {row.maxDuration > 0 ? (
-                      <span className="text-sm text-muted">
-                        {row.minDuration.toFixed(0)} – {row.maxDuration.toFixed(0)} ms
-                      </span>
-                    ) : (
-                      <span className="text-sm text-muted">-</span>
-                    )}
-                  </td>
-                )}
-                {showBlobCount && (
-                  <td className="px-3 py-3 text-right">
-                    <span className="text-sm text-muted">{(row.avgBlobCount ?? 0).toFixed(1)}</span>
-                  </td>
-                )}
-                {!hideObservations && (
-                  <td className="py-3 pr-4 pl-3 text-right">
-                    <span className="text-sm text-muted">{row.observations.toLocaleString()}</span>
-                  </td>
-                )}
-              </tr>
-            ))}
+                </React.Fragment>
+              );
+            })}
           </tbody>
         </table>
       </div>

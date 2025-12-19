@@ -6,6 +6,7 @@ import { z } from 'zod';
  */
 export const slowBlocksSearchSchema = z.object({
   // Pagination
+  page: z.coerce.number().min(0).optional(),
   pageSize: z.coerce.number().min(1).max(100).optional(),
   pageToken: z.string().optional(),
 
@@ -16,21 +17,25 @@ export const slowBlocksSearchSchema = z.object({
   timeStart: z.coerce.number().optional(),
   timeEnd: z.coerce.number().optional(),
 
-  // Duration filters (milliseconds)
+  // Duration filter (milliseconds)
   durationMin: z.coerce.number().optional(),
-  durationMax: z.coerce.number().optional(),
+
+  // Block metrics filters
+  gasUsedMin: z.coerce.number().optional(),
+  txCountMin: z.coerce.number().optional(),
 
   // Status filter (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR)
   status: z.string().optional(),
 
-  // Client filters
+  // Client filter
   elClient: z.string().optional(),
-  clClient: z.string().optional(),
-  nodeName: z.string().optional(),
 
   // Block filters
-  blockStatus: z.string().optional(), // canonical, orphaned, unknown
   slot: z.coerce.number().optional(),
+  blockNumber: z.coerce.number().optional(),
+
+  // Node class filter (reference nodes = eip7870-block-builder)
+  referenceNodes: z.coerce.boolean().optional(),
 
   // Block detail dialog (unique identifier)
   detailSlot: z.coerce.number().optional(),
@@ -53,32 +58,30 @@ export interface FilterValues {
   timeStart?: number;
   timeEnd?: number;
   durationMin?: number;
-  durationMax?: number;
+  gasUsedMin?: number;
+  txCountMin?: number;
   status?: string;
   elClient?: string;
-  clClient?: string;
-  nodeName?: string;
-  blockStatus?: string;
   slot?: number;
+  blockNumber?: number;
+  referenceNodes?: boolean;
 }
 
 /**
  * Engine API status values
  */
-export const ENGINE_STATUS_VALUES = ['VALID', 'INVALID', 'SYNCING', 'ACCEPTED', 'INVALID_BLOCK_HASH', 'ERROR'] as const;
+export const ENGINE_STATUS_VALUES = ['VALID', 'INVALID', 'SYNCING', 'ERROR'] as const;
 
 export type EngineStatus = (typeof ENGINE_STATUS_VALUES)[number];
-
-/**
- * Block status values
- */
-export const BLOCK_STATUS_VALUES = ['canonical', 'orphaned', 'unknown'] as const;
-
-export type BlockStatus = (typeof BLOCK_STATUS_VALUES)[number];
 
 /**
  * Default filter values
  */
 export const DEFAULT_DURATION_MIN = 500; // 500ms threshold
 export const DEFAULT_PAGE_SIZE = 25;
-export const DEFAULT_TIME_RANGE_HOURS = 1;
+export const DEFAULT_TIME_RANGE_HOURS = 6;
+
+/**
+ * Feature flags
+ */
+export const LIVE_MODE_ENABLED = false; // Disabled for now - can re-enable later

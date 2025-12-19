@@ -4,7 +4,12 @@ import { useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
 import { intEngineNewPayloadServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { SlowBlocksSearch, FilterValues } from './IndexPage.types';
-import { DEFAULT_DURATION_MIN, DEFAULT_PAGE_SIZE, DEFAULT_TIME_RANGE_HOURS } from './IndexPage.types';
+import {
+  DEFAULT_DURATION_MIN,
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_TIME_RANGE_HOURS,
+  LIVE_MODE_ENABLED,
+} from './IndexPage.types';
 import { SlowBlocksView } from './components/SlowBlocksView';
 import type { IntEngineNewPayload } from '@/api/types.gen';
 import type { SortingState } from '@tanstack/react-table';
@@ -23,7 +28,7 @@ export function IndexPage(): JSX.Element {
   const initialDetailSlotRef = useRef<number | undefined>(search.detailSlot);
 
   // Calculate time range in seconds
-  // Use URL params if provided, otherwise default to last hour
+  // Use URL params if provided, otherwise default to last hour with no upper bound
   const timeRange = useMemo(() => {
     const nowSeconds = Math.floor(Date.now() / 1000);
     const defaultRangeSeconds = DEFAULT_TIME_RANGE_HOURS * 60 * 60;
@@ -48,18 +53,21 @@ export function IndexPage(): JSX.Element {
       };
     }
 
-    // Default: NOW - 1h to NOW
+    // Default: NOW - 1h with no upper bound (undefined lets API use current time)
     return {
       start: nowSeconds - defaultRangeSeconds,
-      end: nowSeconds,
+      end: undefined,
     };
   }, [search.timeStart, search.timeEnd]);
 
-  // Check if live mode is enabled from URL
-  const isLive = search.isLive ?? false;
+  // Check if live mode is enabled from URL (only if feature is enabled)
+  const isLive = LIVE_MODE_ENABLED && (search.isLive ?? false);
 
   // Duration threshold (default 500ms)
   const durationMin = search.durationMin ?? DEFAULT_DURATION_MIN;
+
+  // Reference nodes filter (default true)
+  const referenceNodes = search.referenceNodes ?? true;
 
   // Build order_by string for API
   const orderBy = useMemo(() => {
@@ -78,19 +86,20 @@ export function IndexPage(): JSX.Element {
     ...intEngineNewPayloadServiceListOptions({
       query: {
         slot_start_date_time_gte: timeRange.start,
-        slot_start_date_time_lte: timeRange.end,
+        ...(timeRange.end !== undefined && { slot_start_date_time_lte: timeRange.end }),
         duration_ms_gte: durationMin,
         page_size: search.pageSize ?? DEFAULT_PAGE_SIZE,
         page_token: search.pageToken,
         order_by: orderBy,
         // Server-side filters
-        ...(search.durationMax && { duration_ms_lte: search.durationMax }),
-        ...(search.status && { status_eq: search.status }),
+        ...(search.status &&
+          (search.status.includes(',') ? { status_in_values: search.status } : { status_eq: search.status })),
         ...(search.elClient && { meta_execution_implementation_eq: search.elClient }),
-        ...(search.clClient && { meta_client_implementation_eq: search.clClient }),
-        ...(search.nodeName && { meta_client_name_eq: search.nodeName }),
-        ...(search.blockStatus && { block_status_eq: search.blockStatus }),
         ...(search.slot && { slot_eq: search.slot }),
+        ...(search.blockNumber && { block_number_eq: search.blockNumber }),
+        ...(search.gasUsedMin && { gas_used_gte: search.gasUsedMin }),
+        ...(search.txCountMin && { tx_count_gte: search.txCountMin }),
+        ...(referenceNodes && { node_class_eq: 'eip7870-block-builder' }),
       },
     }),
     enabled: !!currentNetwork && !isLive,
@@ -102,15 +111,15 @@ export function IndexPage(): JSX.Element {
       timeStart: search.timeStart,
       timeEnd: search.timeEnd,
       durationMin: search.durationMin,
-      durationMax: search.durationMax,
+      gasUsedMin: search.gasUsedMin,
+      txCountMin: search.txCountMin,
       status: search.status,
       elClient: search.elClient,
-      clClient: search.clClient,
-      nodeName: search.nodeName,
-      blockStatus: search.blockStatus,
       slot: search.slot,
+      blockNumber: search.blockNumber,
+      referenceNodes,
     }),
-    [search]
+    [search, referenceNodes]
   );
 
   // Live streaming mode - fetches on bounds change and animates items in
@@ -136,20 +145,51 @@ export function IndexPage(): JSX.Element {
   // Store the next page token for pagination
   const nextPageToken = apiData?.next_page_token;
 
+  // Current page from URL (0-indexed)
+  const currentPage = search.page ?? 0;
+
   // Handle pagination change
   const handlePaginationChange = useCallback(
-    (_pageIndex: number, pageSize: number): void => {
+    (newPageIndex: number, pageSize: number): void => {
       const isChangingPageSize = pageSize !== (search.pageSize ?? DEFAULT_PAGE_SIZE);
 
-      navigate({
-        search: prev => ({
-          ...prev,
-          pageSize,
-          pageToken: isChangingPageSize ? undefined : nextPageToken,
-        }),
-      });
+      // If changing page size, reset to first page
+      if (isChangingPageSize) {
+        navigate({
+          search: prev => ({
+            ...prev,
+            pageSize,
+            page: 0,
+            pageToken: undefined,
+          }),
+        });
+        return;
+      }
+
+      // Going to next page
+      if (newPageIndex > currentPage && nextPageToken) {
+        navigate({
+          search: prev => ({
+            ...prev,
+            page: newPageIndex,
+            pageToken: nextPageToken,
+          }),
+        });
+        return;
+      }
+
+      // Going back to first page (cursor pagination doesn't support arbitrary back navigation)
+      if (newPageIndex === 0) {
+        navigate({
+          search: prev => ({
+            ...prev,
+            page: 0,
+            pageToken: undefined,
+          }),
+        });
+      }
     },
-    [navigate, search.pageSize, nextPageToken]
+    [navigate, search.pageSize, nextPageToken, currentPage]
   );
 
   // Handle sorting change
@@ -160,6 +200,7 @@ export function IndexPage(): JSX.Element {
           search: prev => ({
             ...prev,
             orderBy: undefined,
+            page: 0,
             pageToken: undefined,
           }),
         });
@@ -169,6 +210,7 @@ export function IndexPage(): JSX.Element {
           search: prev => ({
             ...prev,
             orderBy: `${id} ${desc ? 'desc' : 'asc'}`,
+            page: 0,
             pageToken: undefined,
           }),
         });
@@ -181,6 +223,7 @@ export function IndexPage(): JSX.Element {
   const handleFilterClick = useCallback(
     (field: string, value: string | number): void => {
       const newSearch: Partial<SlowBlocksSearch> = {
+        page: 0,
         pageToken: undefined,
       };
 
@@ -190,15 +233,6 @@ export function IndexPage(): JSX.Element {
           break;
         case 'meta_execution_implementation':
           newSearch.elClient = value as string;
-          break;
-        case 'meta_client_implementation':
-          newSearch.clClient = value as string;
-          break;
-        case 'meta_client_name':
-          newSearch.nodeName = value as string;
-          break;
-        case 'block_status':
-          newSearch.blockStatus = value as string;
           break;
         case 'slot':
           newSearch.slot = value as number;
@@ -228,6 +262,7 @@ export function IndexPage(): JSX.Element {
       search: prev => ({
         ...prev,
         isLive: !prev.isLive,
+        page: 0,
         pageToken: undefined,
       }),
     });
@@ -239,39 +274,41 @@ export function IndexPage(): JSX.Element {
       navigate({
         search: prev => ({
           ...prev,
+          page: 0,
           pageToken: undefined,
           timeStart: filters.timeStart,
           timeEnd: filters.timeEnd,
           durationMin: filters.durationMin,
-          durationMax: filters.durationMax,
+          gasUsedMin: filters.gasUsedMin,
+          txCountMin: filters.txCountMin,
           status: filters.status,
           elClient: filters.elClient,
-          clClient: filters.clClient,
-          nodeName: filters.nodeName,
-          blockStatus: filters.blockStatus,
           slot: filters.slot,
+          blockNumber: filters.blockNumber,
+          referenceNodes: filters.referenceNodes,
         }),
       });
     },
     [navigate]
   );
 
-  // Handle clear all filters
+  // Handle clear all filters (keeps referenceNodes at default true)
   const handleClearFilters = useCallback((): void => {
     navigate({
       search: prev => ({
         ...prev,
+        page: 0,
         pageToken: undefined,
         timeStart: undefined,
         timeEnd: undefined,
         durationMin: undefined,
-        durationMax: undefined,
+        gasUsedMin: undefined,
+        txCountMin: undefined,
         status: undefined,
         elClient: undefined,
-        clClient: undefined,
-        nodeName: undefined,
-        blockStatus: undefined,
         slot: undefined,
+        blockNumber: undefined,
+        referenceNodes: undefined, // Will default to true
       }),
     });
   }, [navigate]);
@@ -314,7 +351,7 @@ export function IndexPage(): JSX.Element {
       isLoading={isLoading && !isLive}
       error={isLive ? liveError : (error as Error | null)}
       pagination={{
-        pageIndex: 0,
+        pageIndex: currentPage,
         pageSize: search.pageSize ?? DEFAULT_PAGE_SIZE,
         onPaginationChange: handlePaginationChange,
       }}
@@ -328,9 +365,9 @@ export function IndexPage(): JSX.Element {
       selectedBlock={selectedBlock}
       onBlockSelect={handleBlockSelect}
       durationThreshold={durationMin}
-      // Live mode props
+      // Live mode props (disabled when LIVE_MODE_ENABLED is false)
       isLive={isLive}
-      onLiveModeToggle={handleLiveModeToggle}
+      onLiveModeToggle={LIVE_MODE_ENABLED ? handleLiveModeToggle : undefined}
       newItemIdsRef={newItemIdsRef}
       liveHitPageLimitRef={hitPageLimitRef}
     />

@@ -4719,10 +4719,6 @@ export type IntEngineNewPayload = {
    */
   block_root?: string;
   /**
-   * Block status: canonical, orphaned, or unknown if not yet determined
-   */
-  block_status?: string;
-  /**
    * The total bytes of the beacon block payload
    */
   block_total_bytes?: number | null;
@@ -48439,42 +48435,6 @@ export type IntEngineNewPayloadServiceListData = {
      * The version of the beacon block (phase0, altair, bellatrix, capella, deneb) (filter: not_in_values) (comma-separated list)
      */
     block_version_not_in_values?: string;
-    /**
-     * Block status: canonical, orphaned, or unknown if not yet determined (filter: eq)
-     */
-    block_status_eq?: string;
-    /**
-     * Block status: canonical, orphaned, or unknown if not yet determined (filter: ne)
-     */
-    block_status_ne?: string;
-    /**
-     * Block status: canonical, orphaned, or unknown if not yet determined (filter: contains)
-     */
-    block_status_contains?: string;
-    /**
-     * Block status: canonical, orphaned, or unknown if not yet determined (filter: starts_with)
-     */
-    block_status_starts_with?: string;
-    /**
-     * Block status: canonical, orphaned, or unknown if not yet determined (filter: ends_with)
-     */
-    block_status_ends_with?: string;
-    /**
-     * Block status: canonical, orphaned, or unknown if not yet determined (filter: like)
-     */
-    block_status_like?: string;
-    /**
-     * Block status: canonical, orphaned, or unknown if not yet determined (filter: not_like)
-     */
-    block_status_not_like?: string;
-    /**
-     * Block status: canonical, orphaned, or unknown if not yet determined (filter: in_values) (comma-separated list)
-     */
-    block_status_in_values?: string;
-    /**
-     * Block status: canonical, orphaned, or unknown if not yet determined (filter: not_in_values) (comma-separated list)
-     */
-    block_status_not_in_values?: string;
     /**
      * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
      */

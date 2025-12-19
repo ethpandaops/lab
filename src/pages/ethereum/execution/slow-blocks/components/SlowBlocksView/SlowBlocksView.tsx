@@ -1,16 +1,16 @@
-import { type JSX, useMemo, type RefObject } from 'react';
+import { type JSX, useMemo, useState, type RefObject } from 'react';
 import { createColumnHelper, type SortingState } from '@tanstack/react-table';
 import { Link } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { DataTable } from '@/components/DataTable';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
-import { Button } from '@/components/Elements/Button';
 import { Alert } from '@/components/Feedback/Alert';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { IntEngineNewPayload } from '@/api/types.gen';
 import { FilterPanel } from '../FilterPanel';
 import { QuickFilters } from '../QuickFilters';
+import { ReferenceNodesInfoDialog } from '../../../timings/components/ReferenceNodesInfoDialog';
 import type { FilterValues } from '../../IndexPage.types';
 import { DEFAULT_DURATION_MIN } from '../../IndexPage.types';
 import {
@@ -20,9 +20,9 @@ import {
   PlayIcon,
   PauseIcon,
   SignalIcon,
+  InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
-import { formatSlot } from '@/utils';
 
 type SlowBlock = IntEngineNewPayload;
 
@@ -102,8 +102,8 @@ function StatusBadge({
   if (!status) return <span className="text-muted">-</span>;
 
   const isSuccess = status === 'VALID';
-  const isError = status === 'INVALID' || status === 'ERROR' || status === 'INVALID_BLOCK_HASH';
-  const isSyncing = status === 'SYNCING' || status === 'ACCEPTED';
+  const isError = status === 'INVALID' || status === 'ERROR';
+  const isSyncing = status === 'SYNCING';
 
   const icon = isSuccess ? (
     <CheckCircleIcon className="size-4 text-green-500" />
@@ -181,22 +181,27 @@ export function SlowBlocksView({
   onLiveModeToggle,
   newItemIdsRef,
 }: SlowBlocksViewProps): JSX.Element {
+  // Learn more dialog state
+  const [learnMoreOpen, setLearnMoreOpen] = useState(false);
+
   // Define table columns
   const columns = useMemo(
     () => [
-      columnHelper.accessor('slot', {
-        header: 'Slot',
+      columnHelper.accessor('block_number', {
+        header: 'Block',
         cell: info => {
-          const slot = info.getValue();
-          if (!slot) return <span className="text-muted">-</span>;
+          const blockNumber = info.getValue();
+          const slot = info.row.original.slot;
+          if (!blockNumber) return <span className="text-muted">-</span>;
           return (
             <Link
               to="/ethereum/slots/$slot"
               params={{ slot: String(slot) }}
+              search={{ tab: 'execution' }}
               className="font-mono text-primary hover:underline"
               onClick={e => e.stopPropagation()}
             >
-              {formatSlot(slot)}
+              {blockNumber}
             </Link>
           );
         },
@@ -219,37 +224,41 @@ export function SlowBlocksView({
         cell: info => {
           const client = info.getValue();
           if (!client) return <span className="text-muted">-</span>;
+          const clientLower = client.toLowerCase();
           return (
             <FilterableCell field="meta_execution_implementation" value={client} onFilterClick={onFilterClick}>
               <span className="inline-flex items-center gap-1.5">
-                <ClientLogo client={client} size={16} />
-                <span className="text-xs">{client}</span>
+                <ClientLogo client={clientLower} size={16} />
+                <span className="text-xs">{clientLower}</span>
               </span>
             </FilterableCell>
+          );
+        },
+      }),
+      columnHelper.accessor('meta_client_name', {
+        header: 'Node',
+        cell: info => {
+          const nodeName = info.getValue();
+          if (!nodeName) return <span className="text-muted">-</span>;
+          // Strip common prefixes
+          const shortName = nodeName
+            .replace(/^ethpandaops\/mainnet\//, '')
+            .replace(/^ethpandaops\//, '')
+            .replace(/^utility-mainnet-/, '')
+            .replace(/^sigma-mainnet-/, '')
+            .replace(/^prysm-/, '');
+          // Truncate long node names
+          const displayName = shortName.length > 25 ? `${shortName.slice(0, 25)}...` : shortName;
+          return (
+            <span className="text-xs text-muted" title={nodeName}>
+              {displayName}
+            </span>
           );
         },
       }),
       columnHelper.accessor('status', {
         header: 'Status',
         cell: info => <StatusBadge status={info.getValue()} onFilterClick={onFilterClick} />,
-      }),
-      columnHelper.accessor('block_status', {
-        header: 'Block Status',
-        cell: info => {
-          const status = info.getValue();
-          if (!status) return <span className="text-muted">-</span>;
-          const isOrphaned = status === 'orphaned';
-          return (
-            <FilterableCell
-              field="block_status"
-              value={status}
-              onFilterClick={onFilterClick}
-              className={clsx(isOrphaned && 'text-yellow-500')}
-            >
-              {status}
-            </FilterableCell>
-          );
-        },
       }),
       columnHelper.accessor('gas_used', {
         header: 'Gas Used',
@@ -306,35 +315,71 @@ export function SlowBlocksView({
 
   return (
     <Container>
-      <Header
-        title="Slow Blocks"
-        description={`Individual engine_newPayload observations showing blocks taking ${durationThreshold}ms+ to validate`}
-      />
-
-      {/* Live mode toggle */}
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <QuickFilters currentFilters={filters} onApplyPreset={handleApplyPreset} onClearFilters={onClearFilters} />
-        </div>
-
-        <div className="flex items-center gap-3">
+      {/* Header with Go Live and Learn More buttons */}
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <Header
+          title="Slow Blocks"
+          description={`Individual engine_newPayload observations showing blocks taking ${durationThreshold}ms+ to validate`}
+          className="mb-0"
+        />
+        <div className="flex shrink-0 items-center gap-2">
+          {/* Live mode toggle */}
           {onLiveModeToggle && (
-            <Button variant={isLive ? 'primary' : 'soft'} size="sm" onClick={onLiveModeToggle} className="gap-1.5">
+            <button
+              type="button"
+              onClick={onLiveModeToggle}
+              className={clsx(
+                'inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-sm font-medium transition-all',
+                isLive
+                  ? 'border-green-500/50 bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                  : 'border-border bg-surface text-muted hover:border-primary/30 hover:text-foreground'
+              )}
+            >
               {isLive ? (
                 <>
+                  <span className="relative flex size-2">
+                    <span className="absolute inline-flex size-full animate-ping rounded-full bg-green-400 opacity-75" />
+                    <span className="relative inline-flex size-2 rounded-full bg-green-500" />
+                  </span>
                   <PauseIcon className="size-4" />
-                  <span>Pause</span>
-                  <SignalIcon className="size-4 animate-pulse text-green-400" />
+                  <span>Live</span>
                 </>
               ) : (
                 <>
                   <PlayIcon className="size-4" />
-                  <span>Live</span>
+                  <span>Go Live</span>
                 </>
               )}
-            </Button>
+            </button>
           )}
+          {/* Learn more button */}
+          <button
+            type="button"
+            onClick={() => setLearnMoreOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-all hover:border-primary/50 hover:bg-primary/20"
+          >
+            <InformationCircleIcon className="size-4" />
+            Learn more
+          </button>
         </div>
+      </div>
+
+      {/* Live mode indicator bar */}
+      {isLive && (
+        <div className="mb-4 flex items-center rounded-sm border border-primary/30 bg-primary/10 px-4 py-2">
+          <div className="flex items-center gap-3">
+            <SignalIcon className="size-5 text-primary" />
+            <div>
+              <span className="text-sm font-medium text-primary">Live Mode Active</span>
+              <span className="ml-2 text-xs text-muted">Showing latest observations in real-time</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quick filters */}
+      <div className="mb-4">
+        <QuickFilters currentFilters={filters} onApplyPreset={handleApplyPreset} onClearFilters={onClearFilters} />
       </div>
 
       {/* Filter panel */}
@@ -360,8 +405,8 @@ export function SlowBlocksView({
         manualSorting
         emptyMessage={
           filters.durationMin && filters.durationMin > DEFAULT_DURATION_MIN
-            ? `No blocks found with duration >= ${filters.durationMin}ms in the selected time range`
-            : `No slow blocks found (duration >= ${durationThreshold}ms) in the selected time range`
+            ? `No blocks found with duration >= ${filters.durationMin}ms`
+            : `No slow blocks found (duration >= ${durationThreshold}ms)`
         }
         getRowClassName={(row, _rowId) =>
           clsx('cursor-pointer transition-colors hover:bg-surface/50', isRowNew(row) && 'animate-pulse bg-green-500/10')
@@ -377,6 +422,9 @@ export function SlowBlocksView({
           Showing latest {data.length} observations (max 50) • New items animate in
         </div>
       )}
+
+      {/* Reference Nodes Info Dialog */}
+      <ReferenceNodesInfoDialog open={learnMoreOpen} onClose={() => setLearnMoreOpen(false)} />
     </Container>
   );
 }
