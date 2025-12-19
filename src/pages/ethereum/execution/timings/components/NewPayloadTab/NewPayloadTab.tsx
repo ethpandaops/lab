@@ -9,82 +9,70 @@ import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot } from '@/utils';
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
+import { PER_SLOT_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
 import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
 
 export interface NewPayloadTabProps {
   data: EngineTimingsData;
+  timeRange: TimeRange;
 }
 
 /**
  * NewPayload tab showing detailed engine_newPayload timing analysis
  */
-export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
+export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Element {
   const themeColors = useThemeColors();
-  const { newPayloadDurationHistogram, newPayloadByElClient } = data;
+  const { newPayloadDurationHistogram, newPayloadByElClient, newPayloadByElClientHourly } = data;
+
+  // Check if we should show per-slot charts (only for short time ranges)
+  const showPerSlotCharts = PER_SLOT_CHART_RANGES.includes(timeRange);
 
   // Filter to VALID status only for duration-based charts
   const validPayloadByElClient = newPayloadByElClient.filter(r => r.status?.toUpperCase() === 'VALID');
+
+  // Hourly data is already filtered to VALID status in the SQL query (via quantileIf)
+  // so we can use it directly for the summary table
 
   // State for scatter chart series visibility
   const [visibleScatterSeries, setVisibleScatterSeries] = useState<Set<string>>(new Set());
   const [scatterSeriesInitialized, setScatterSeriesInitialized] = useState(false);
 
-  // Calculate summary stats from per-slot/per-client data for accuracy
+  // State for percentile toggle (P50 vs P95) in hourly duration chart
+  const [selectedPercentile, setSelectedPercentile] = useState<'p50' | 'p95'>('p50');
+
+  // Calculate summary stats from hourly data (always available, accurate aggregations)
   const aggregatedStats = (() => {
-    if (newPayloadByElClient.length === 0) {
-      return { totalObservations: 0, validRate: '0', avgDuration: '0', minDuration: 0, maxDuration: 0 };
+    if (newPayloadByElClientHourly.length === 0) {
+      return { totalObservations: 0, validRate: '0', avgDuration: '0', p50Duration: '0' };
     }
 
-    // Sum up counts from all rows, grouped by status
-    let validCount = 0;
+    let totalObs = 0;
     let invalidCount = 0;
-    let syncingCount = 0;
     let acceptedCount = 0;
-    let invalidBlockHashCount = 0;
     let totalWeightedDuration = 0;
-    let minDuration = Infinity;
-    let maxDuration = 0;
+    let totalWeightedP50 = 0;
 
-    newPayloadByElClient.forEach(row => {
+    newPayloadByElClientHourly.forEach(row => {
       const obs = row.observation_count ?? 0;
-      const status = row.status?.toUpperCase() ?? '';
+      totalObs += obs;
+      invalidCount += row.invalid_count ?? 0;
+      acceptedCount += row.accepted_count ?? 0;
 
-      switch (status) {
-        case 'VALID': {
-          validCount += obs;
-          // Duration stats only for VALID
-          totalWeightedDuration += (row.avg_duration_ms ?? 0) * obs;
-          const min = row.min_duration_ms ?? 0;
-          const max = row.max_duration_ms ?? 0;
-          if (min > 0 && min < minDuration) minDuration = min;
-          if (max > maxDuration) maxDuration = max;
-          break;
-        }
-        case 'INVALID':
-          invalidCount += obs;
-          break;
-        case 'SYNCING':
-          syncingCount += obs;
-          break;
-        case 'ACCEPTED':
-          acceptedCount += obs;
-          break;
-        case 'INVALID_BLOCK_HASH':
-          invalidBlockHashCount += obs;
-          break;
-      }
+      // Duration stats (hourly data uses VALID status for duration metrics)
+      totalWeightedDuration += (row.avg_duration_ms ?? 0) * obs;
+      totalWeightedP50 += (row.p50_duration_ms ?? 0) * obs;
     });
 
-    if (minDuration === Infinity) minDuration = 0;
+    // Valid count is total minus invalid/accepted (hourly data doesn't track syncing/invalid_block_hash separately)
+    const validCount = totalObs - invalidCount - acceptedCount;
+    const validRate = totalObs > 0 ? ((validCount / totalObs) * 100).toFixed(1) : '0';
+    const avgDuration = totalObs > 0 ? (totalWeightedDuration / totalObs).toFixed(0) : '0';
+    const p50Duration = totalObs > 0 ? (totalWeightedP50 / totalObs).toFixed(0) : '0';
 
-    const totalStatusCount = validCount + invalidCount + syncingCount + acceptedCount + invalidBlockHashCount;
-    const validRate = totalStatusCount > 0 ? ((validCount / totalStatusCount) * 100).toFixed(1) : '0';
-    const avgDuration = validCount > 0 ? (totalWeightedDuration / validCount).toFixed(0) : '0';
-
-    return { totalObservations: validCount, validRate, avgDuration, minDuration, maxDuration };
+    return { totalObservations: totalObs, validRate, avgDuration, p50Duration };
   })();
 
-  const { totalObservations, validRate, avgDuration, minDuration, maxDuration } = aggregatedStats;
+  const { totalObservations, validRate, avgDuration, p50Duration } = aggregatedStats;
 
   // Calculate slot bounds from per-EL-client data (which has per-slot granularity)
   // This avoids needing the slow newPayloadBySlot endpoint
@@ -231,7 +219,6 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
     if (!clientSlotData.has(client)) {
       clientSlotData.set(client, new Map());
     }
-    // Use the median duration for this client+slot combination
     clientSlotData.get(client)!.set(slot, duration);
   });
 
@@ -252,7 +239,153 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
 
     return {
       name: client,
-      data: sampledSlots.map(([slot, duration]) => [slot, duration]) as [number, number][],
+      data: sampledSlots.map(([slot, duration]) => [slot, duration] as [number, number]),
+      color: clientColors[index % clientColors.length],
+    };
+  });
+
+  // === Hourly Trend Series (for longer time ranges) ===
+  // Group hourly data by client and hour, aggregating across versions with weighted average
+  const hourlyClientData = new Map<
+    string,
+    Map<number, { totalP50: number; totalP95: number; totalGasUsed: number; totalObs: number }>
+  >();
+  const hourlyClients = new Set<string>();
+
+  newPayloadByElClientHourly.forEach(row => {
+    const client = (row.meta_execution_implementation ?? 'unknown').toLowerCase();
+    hourlyClients.add(client);
+
+    const timestamp = row.hour_start_date_time ?? 0;
+    const p50 = row.p50_duration_ms ?? 0;
+    const p95 = row.p95_duration_ms ?? 0;
+    const gasUsed = row.avg_gas_used ?? 0;
+    const obs = row.observation_count ?? 0;
+
+    if (timestamp > 0 && obs > 0 && p50 > 0) {
+      const timestampMs = timestamp * 1000;
+
+      if (!hourlyClientData.has(client)) {
+        hourlyClientData.set(client, new Map());
+      }
+      const clientHours = hourlyClientData.get(client)!;
+
+      // Aggregate by hour - weighted by observation count
+      const existing = clientHours.get(timestampMs);
+      if (existing) {
+        existing.totalP50 += p50 * obs;
+        existing.totalP95 += p95 * obs;
+        existing.totalGasUsed += gasUsed * obs;
+        existing.totalObs += obs;
+      } else {
+        clientHours.set(timestampMs, {
+          totalP50: p50 * obs,
+          totalP95: p95 * obs,
+          totalGasUsed: gasUsed * obs,
+          totalObs: obs,
+        });
+      }
+    }
+  });
+
+  // Sort clients for consistent coloring and create series
+  const hourlyClientList = Array.from(hourlyClients).sort();
+
+  // Calculate time bounds for the hourly chart
+  let hourlyMinTime = Infinity;
+  let hourlyMaxTime = -Infinity;
+
+  const hourlyP50Series = hourlyClientList.map((client, index) => {
+    const clientHours = hourlyClientData.get(client) ?? new Map();
+    const dataPoints: [number, number][] = [];
+
+    clientHours.forEach((agg, timestampMs) => {
+      const avgP50 = agg.totalObs > 0 ? agg.totalP50 / agg.totalObs : 0;
+      dataPoints.push([timestampMs, avgP50]);
+
+      // Track min/max for axis bounds
+      if (timestampMs < hourlyMinTime) hourlyMinTime = timestampMs;
+      if (timestampMs > hourlyMaxTime) hourlyMaxTime = timestampMs;
+    });
+
+    // Sort by timestamp
+    dataPoints.sort((a, b) => a[0] - b[0]);
+
+    return {
+      name: client,
+      data: dataPoints,
+      color: clientColors[index % clientColors.length],
+    };
+  });
+
+  // P95 Duration series
+  const hourlyP95Series = hourlyClientList.map((client, index) => {
+    const clientHours = hourlyClientData.get(client) ?? new Map();
+    const dataPoints: [number, number][] = [];
+
+    clientHours.forEach((agg, timestampMs) => {
+      const avgP95 = agg.totalObs > 0 ? agg.totalP95 / agg.totalObs : 0;
+      dataPoints.push([timestampMs, avgP95]);
+    });
+
+    dataPoints.sort((a, b) => a[0] - b[0]);
+
+    return {
+      name: client,
+      data: dataPoints,
+      color: clientColors[index % clientColors.length],
+    };
+  });
+
+  // Ensure valid bounds (fallback to now if no data)
+  if (hourlyMinTime === Infinity) hourlyMinTime = Date.now() - 3600000;
+  if (hourlyMaxTime === -Infinity) hourlyMaxTime = Date.now();
+
+  // Keep hourlyTrendSeries as alias for backward compatibility
+  const hourlyTrendSeries = hourlyP50Series;
+
+  // === Valid Rate Trend Series (for longer time ranges) ===
+  // Calculate valid rate per client per hour
+  const validRateClientData = new Map<string, Map<number, { validCount: number; totalCount: number }>>();
+
+  newPayloadByElClientHourly.forEach(row => {
+    const client = (row.meta_execution_implementation ?? 'unknown').toLowerCase();
+    const timestamp = row.hour_start_date_time ?? 0;
+    const validCount = row.valid_count ?? 0;
+    const totalCount = row.observation_count ?? 0;
+
+    if (timestamp > 0 && totalCount > 0) {
+      if (!validRateClientData.has(client)) {
+        validRateClientData.set(client, new Map());
+      }
+      const clientHours = validRateClientData.get(client)!;
+      const timestampMs = timestamp * 1000;
+
+      // Aggregate by hour
+      const existing = clientHours.get(timestampMs);
+      if (existing) {
+        existing.validCount += validCount;
+        existing.totalCount += totalCount;
+      } else {
+        clientHours.set(timestampMs, { validCount, totalCount });
+      }
+    }
+  });
+
+  const validRateTrendSeries = hourlyClientList.map((client, index) => {
+    const clientHours = validRateClientData.get(client) ?? new Map();
+    const dataPoints: [number, number][] = [];
+
+    clientHours.forEach((counts, timestampMs) => {
+      const rate = counts.totalCount > 0 ? (counts.validCount / counts.totalCount) * 100 : 0;
+      dataPoints.push([timestampMs, rate]);
+    });
+
+    dataPoints.sort((a, b) => a[0] - b[0]);
+
+    return {
+      name: client,
+      data: dataPoints,
       color: clientColors[index % clientColors.length],
     };
   });
@@ -320,9 +453,9 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
             value: `${avgDuration} ms`,
           },
           {
-            id: 'duration-range',
-            name: 'Duration Range',
-            value: `${minDuration} – ${maxDuration} ms`,
+            id: 'p50-duration',
+            name: 'P50 Duration',
+            value: `${p50Duration} ms`,
           },
         ]}
       />
@@ -330,138 +463,297 @@ export function NewPayloadTab({ data }: NewPayloadTabProps): JSX.Element {
       {/* Client Version Breakdown - only VALID status */}
       <ClientVersionBreakdown
         data={validPayloadByElClient}
+        hourlyData={newPayloadByElClientHourly}
         title="EL Client Duration"
         description="engine_newPayload duration (ms) by execution client and version"
         hideObservations
+        hideRange
       />
 
-      {/* Per-Slot Duration by Client and Block Complexity - Side by Side */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Per-Slot Duration by Client Chart */}
-        <Card>
-          <div className="p-4">
-            <h4 className="mb-2 text-base font-semibold text-foreground" id="slot-duration">
-              Per-Slot Duration by Client
-            </h4>
-            <p className="mb-4 text-sm text-muted">Median duration for each slot, grouped by execution client</p>
-            {hasClientData && slotDurationByClientSeries.some(s => s.data.length > 0) ? (
-              <MultiLineChart
-                series={slotDurationByClientSeries}
-                xAxis={{
-                  type: 'value',
-                  name: 'Slot',
-                  min: minSlot,
-                  max: maxSlot,
-                  formatter: (value: number | string) => formatSlot(Number(value)),
-                }}
-                yAxis={{
-                  name: 'Duration (ms)',
-                }}
-                height={300}
-                showLegend={true}
-                enableDataZoom={true}
-              />
-            ) : (
-              <div className="flex h-[300px] items-center justify-center text-muted">No slot data available</div>
-            )}
-          </div>
-        </Card>
+      {/* Per-slot charts - only for shorter time ranges */}
+      {showPerSlotCharts && (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Per-Slot Duration by Client Chart */}
+          <Card>
+            <div className="p-4">
+              <h4 className="mb-2 text-base font-semibold text-foreground" id="slot-duration">
+                Per-Slot Duration by Client
+              </h4>
+              <p className="mb-4 text-sm text-muted">Median duration for each slot, grouped by execution client</p>
+              {hasClientData && slotDurationByClientSeries.some(s => s.data.length > 0) ? (
+                <MultiLineChart
+                  series={slotDurationByClientSeries}
+                  xAxis={{
+                    type: 'value',
+                    name: 'Slot',
+                    min: minSlot,
+                    max: maxSlot,
+                    formatter: (value: number | string) => formatSlot(Number(value)),
+                  }}
+                  yAxis={{
+                    name: 'Duration (ms)',
+                  }}
+                  height={300}
+                  showLegend={true}
+                  enableDataZoom={true}
+                />
+              ) : (
+                <div className="flex h-[300px] items-center justify-center text-muted">No slot data available</div>
+              )}
+            </div>
+          </Card>
 
-        {/* Block Complexity vs Duration by Client */}
-        <Card>
-          <div className="p-4">
-            <h4 className="mb-2 text-base font-semibold text-foreground">Block Complexity vs Duration</h4>
-            <p className="mb-4 text-sm text-muted">Gas used vs processing time, grouped by execution client</p>
-            {hasBlockComplexityData ? (
-              <>
-                {/* Custom Series Legend - matching MultiLineChart style */}
-                <div className="mb-4 border-b border-border pb-4">
-                  <div className="mb-2">
-                    <span className="text-sm/6 font-medium text-muted">Series:</span>
+          {/* Block Complexity vs Duration by Client */}
+          <Card>
+            <div className="p-4">
+              <h4 className="mb-2 text-base font-semibold text-foreground">Block Complexity vs Duration</h4>
+              <p className="mb-4 text-sm text-muted">Gas used vs processing time, grouped by execution client</p>
+              {hasBlockComplexityData ? (
+                <>
+                  {/* Custom Series Legend - matching MultiLineChart style */}
+                  <div className="mb-4 border-b border-border pb-4">
+                    <div className="mb-2">
+                      <span className="text-sm/6 font-medium text-muted">Series:</span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {blockComplexitySeries.map(s => {
+                        const isVisible = visibleScatterSeries.has(s.name);
+                        return (
+                          <button
+                            key={s.name}
+                            onClick={() => toggleScatterSeries(s.name)}
+                            className={clsx(
+                              'flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs/5 transition-colors',
+                              isVisible
+                                ? 'bg-surface-hover text-foreground'
+                                : 'hover:bg-surface-hover/50 bg-surface/50 text-muted/50'
+                            )}
+                          >
+                            <span
+                              className="h-2 w-2 rounded-full"
+                              style={{
+                                backgroundColor: isVisible ? s.color : 'transparent',
+                                border: `2px solid ${s.color}`,
+                              }}
+                            />
+                            <span className="font-medium">{s.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    {blockComplexitySeries.map(s => {
-                      const isVisible = visibleScatterSeries.has(s.name);
-                      return (
-                        <button
-                          key={s.name}
-                          onClick={() => toggleScatterSeries(s.name)}
-                          className={clsx(
-                            'flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs/5 transition-colors',
-                            isVisible
-                              ? 'bg-surface-hover text-foreground'
-                              : 'hover:bg-surface-hover/50 bg-surface/50 text-muted/50'
-                          )}
-                        >
-                          <span
-                            className="h-2 w-2 rounded-full"
-                            style={{
-                              backgroundColor: isVisible ? s.color : 'transparent',
-                              border: `2px solid ${s.color}`,
-                            }}
-                          />
-                          <span className="font-medium">{s.name}</span>
-                        </button>
-                      );
-                    })}
+                  <ScatterAndLineChart
+                    key={Array.from(visibleScatterSeries).sort().join(',')}
+                    scatterSeries={visibleBlockComplexitySeries}
+                    xAxisTitle="Gas Used (millions)"
+                    yAxisTitle="Duration (ms)"
+                    height={300}
+                    showLegend={false}
+                    tooltipFormatter={(params: unknown) => {
+                      const p = params as { seriesName: string; data: [number, number] };
+                      return `<strong>${p.seriesName}</strong><br/>Gas: ${p.data[0].toFixed(1)}M<br/>Duration: ${p.data[1].toFixed(0)}ms`;
+                    }}
+                  />
+                </>
+              ) : (
+                <div className="flex h-[300px] items-center justify-center text-muted">No block data available</div>
+              )}
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Hourly charts - only for longer time ranges */}
+      {!showPerSlotCharts && (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Hourly P50/P95 Duration */}
+          {hourlyTrendSeries.length > 0 && hourlyTrendSeries.some(s => s.data.length > 0) && (
+            <Card>
+              <div className="p-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <h4 className="text-base font-semibold text-foreground">
+                    Hourly {selectedPercentile === 'p50' ? 'P50' : 'P95'} Duration by Client
+                  </h4>
+                  <div className="flex rounded-md border border-border">
+                    <button
+                      onClick={() => setSelectedPercentile('p50')}
+                      className={clsx(
+                        'px-3 py-1 text-xs font-medium transition-colors',
+                        selectedPercentile === 'p50'
+                          ? 'bg-primary text-white'
+                          : 'bg-transparent text-muted hover:text-foreground'
+                      )}
+                    >
+                      P50
+                    </button>
+                    <button
+                      onClick={() => setSelectedPercentile('p95')}
+                      className={clsx(
+                        'px-3 py-1 text-xs font-medium transition-colors',
+                        selectedPercentile === 'p95'
+                          ? 'bg-primary text-white'
+                          : 'bg-transparent text-muted hover:text-foreground'
+                      )}
+                    >
+                      P95
+                    </button>
                   </div>
                 </div>
-                <ScatterAndLineChart
-                  key={Array.from(visibleScatterSeries).sort().join(',')}
-                  scatterSeries={visibleBlockComplexitySeries}
-                  xAxisTitle="Gas Used (millions)"
-                  yAxisTitle="Duration (ms)"
+                <p className="mb-4 text-sm text-muted">
+                  {selectedPercentile === 'p50'
+                    ? '50th percentile duration over time, grouped by execution client'
+                    : '95th percentile duration over time (tail latency)'}
+                </p>
+                <MultiLineChart
+                  series={selectedPercentile === 'p50' ? hourlyTrendSeries : hourlyP95Series}
+                  xAxis={{
+                    type: 'value',
+                    name: 'Time',
+                    min: hourlyMinTime,
+                    max: hourlyMaxTime,
+                    formatter: (value: number | string) => {
+                      const date = new Date(Number(value));
+                      if (timeRange === '7days') {
+                        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                      }
+                      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    },
+                  }}
+                  yAxis={{
+                    name: `${selectedPercentile === 'p50' ? 'P50' : 'P95'} Duration (ms)`,
+                  }}
                   height={300}
-                  showLegend={false}
+                  showLegend={true}
+                  enableDataZoom={true}
                   tooltipFormatter={(params: unknown) => {
-                    const p = params as { seriesName: string; data: [number, number] };
-                    return `<strong>${p.seriesName}</strong><br/>Gas: ${p.data[0].toFixed(1)}M<br/>Duration: ${p.data[1].toFixed(0)}ms`;
+                    const dataPoints = Array.isArray(params) ? params : [params];
+                    if (dataPoints.length === 0) return '';
+
+                    const firstPoint = dataPoints[0] as { value?: [number, number]; axisValue?: number };
+                    const timestamp = firstPoint.value?.[0] ?? firstPoint.axisValue ?? 0;
+                    const date = new Date(timestamp);
+                    const timeStr = date.toLocaleString([], {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    });
+
+                    let html = `<div style="font-weight: 600; margin-bottom: 8px;">${timeStr}</div>`;
+                    dataPoints.forEach((point: unknown) => {
+                      const p = point as { seriesName?: string; value?: [number, number]; color?: string };
+                      const value = p.value?.[1];
+                      if (value !== undefined && value !== null) {
+                        html += `<div style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">`;
+                        html += `<span style="display: inline-block; width: 10px; height: 10px; background: ${p.color}; border-radius: 50%;"></span>`;
+                        html += `<span>${p.seriesName}:</span>`;
+                        html += `<span style="font-weight: 600; margin-left: auto;">${Math.round(value)} ms</span>`;
+                        html += `</div>`;
+                      }
+                    });
+                    return html;
                   }}
                 />
-              </>
-            ) : (
-              <div className="flex h-[300px] items-center justify-center text-muted">No block data available</div>
-            )}
-          </div>
-        </Card>
-      </div>
+              </div>
+            </Card>
+          )}
 
-      {/* Duration Histogram and Status Distribution - Side by Side */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Duration Histogram */}
-        <Card>
-          <div className="p-4">
-            <h4 className="mb-2 text-base font-semibold text-foreground" id="duration-histogram">
-              Duration Distribution (50ms buckets)
-            </h4>
-            <p className="mb-4 text-sm text-muted">Histogram of engine_newPayload call durations</p>
-            {histogramData.length > 0 ? (
-              <BarChart
-                data={histogramData}
-                labels={histogramLabels}
-                title="Observations"
-                color={themeColors.primary}
-                height={300}
-              />
-            ) : (
-              <div className="flex h-[300px] items-center justify-center text-muted">No histogram data available</div>
-            )}
-          </div>
-        </Card>
+          {/* Valid Rate Over Time */}
+          {validRateTrendSeries.length > 0 && validRateTrendSeries.some(s => s.data.length > 0) && (
+            <Card>
+              <div className="p-4">
+                <h4 className="mb-2 text-base font-semibold text-foreground">Valid Rate Over Time</h4>
+                <p className="mb-4 text-sm text-muted">Percentage of VALID responses per hour by client</p>
+                <MultiLineChart
+                  series={validRateTrendSeries}
+                  xAxis={{
+                    type: 'value',
+                    name: 'Time',
+                    min: hourlyMinTime,
+                    max: hourlyMaxTime,
+                    formatter: (value: number | string) => {
+                      const date = new Date(Number(value));
+                      if (timeRange === '7days') {
+                        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                      }
+                      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    },
+                  }}
+                  yAxis={{
+                    name: 'Valid Rate (%)',
+                    min: 0,
+                    max: 100,
+                    formatter: (value: number) => `${value}%`,
+                  }}
+                  height={300}
+                  showLegend={true}
+                  tooltipFormatter={(params: unknown) => {
+                    const dataPoints = Array.isArray(params) ? params : [params];
+                    if (dataPoints.length === 0) return '';
 
-        {/* Status Breakdown */}
-        <Card>
-          <div className="p-4">
-            <h4 className="mb-2 text-base font-semibold text-foreground">Status Distribution</h4>
-            <p className="mb-4 text-sm text-muted">Breakdown of validation status responses</p>
-            {statusData.some(d => d.value > 0) ? (
-              <BarChart data={statusData} labels={statusLabels} title="Count" height={300} orientation="horizontal" />
-            ) : (
-              <div className="flex h-[300px] items-center justify-center text-muted">No status data available</div>
-            )}
-          </div>
-        </Card>
-      </div>
+                    const firstPoint = dataPoints[0] as { value?: [number, number]; axisValue?: number };
+                    const timestamp = firstPoint.value?.[0] ?? firstPoint.axisValue ?? 0;
+                    const date = new Date(timestamp);
+                    const timeStr = date.toLocaleString([], {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    });
+
+                    let html = `<div style="font-weight: 600; margin-bottom: 8px;">${timeStr}</div>`;
+                    dataPoints.forEach((point: unknown) => {
+                      const p = point as { seriesName?: string; value?: [number, number]; color?: string };
+                      const value = p.value?.[1];
+                      if (value !== undefined && value !== null) {
+                        html += `<div style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">`;
+                        html += `<span style="display: inline-block; width: 10px; height: 10px; background: ${p.color}; border-radius: 50%;"></span>`;
+                        html += `<span>${p.seriesName}:</span>`;
+                        html += `<span style="font-weight: 600; margin-left: auto;">${value.toFixed(1)}%</span>`;
+                        html += `</div>`;
+                      }
+                    });
+                    return html;
+                  }}
+                />
+              </div>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {/* Duration Histogram and Status Distribution - Side by Side (per-slot data) */}
+      {showPerSlotCharts && (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Duration Histogram */}
+          <Card>
+            <div className="p-4">
+              <h4 className="mb-2 text-base font-semibold text-foreground" id="duration-histogram">
+                Duration Distribution (50ms buckets)
+              </h4>
+              <p className="mb-4 text-sm text-muted">Histogram of engine_newPayload call durations</p>
+              {histogramData.length > 0 ? (
+                <BarChart data={histogramData} labels={histogramLabels} color={themeColors.primary} height={300} />
+              ) : (
+                <div className="flex h-[300px] items-center justify-center text-muted">No histogram data available</div>
+              )}
+            </div>
+          </Card>
+
+          {/* Status Breakdown */}
+          <Card>
+            <div className="p-4">
+              <h4 className="mb-2 text-base font-semibold text-foreground">Status Distribution</h4>
+              <p className="mb-4 text-sm text-muted">Breakdown of validation status responses</p>
+              {statusData.some(d => d.value > 0) ? (
+                <BarChart data={statusData} labels={statusLabels} height={300} orientation="horizontal" />
+              ) : (
+                <div className="flex h-[300px] items-center justify-center text-muted">No status data available</div>
+              )}
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
