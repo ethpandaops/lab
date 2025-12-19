@@ -7,7 +7,7 @@ import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { BarChart } from '@/components/Charts/Bar';
 import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { formatSlot } from '@/utils';
+import { formatSlot, getExecutionClientColor } from '@/utils';
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
 import { PER_SLOT_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
 import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
@@ -158,16 +158,6 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
 
   const hasBlockComplexityData = clientGasData.size > 0;
 
-  // Shared color palette for client charts
-  const clientColors = [
-    themeColors.primary,
-    themeColors.success,
-    themeColors.warning,
-    themeColors.danger,
-    themeColors.accent,
-    themeColors.secondary,
-  ];
-
   // === EL Client Analysis ===
   // Build a map of EL client -> metrics (VALID status only)
   const elClientMetrics = new Map<
@@ -240,7 +230,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     return {
       name: client,
       data: sampledSlots.map(([slot, duration]) => [slot, duration] as [number, number]),
-      color: clientColors[index % clientColors.length],
+      color: getExecutionClientColor(client, index),
     };
   });
 
@@ -314,7 +304,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     return {
       name: client,
       data: dataPoints,
-      color: clientColors[index % clientColors.length],
+      color: getExecutionClientColor(client, index),
     };
   });
 
@@ -333,7 +323,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     return {
       name: client,
       data: dataPoints,
-      color: clientColors[index % clientColors.length],
+      color: getExecutionClientColor(client, index),
     };
   });
 
@@ -386,7 +376,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     return {
       name: client,
       data: dataPoints,
-      color: clientColors[index % clientColors.length],
+      color: getExecutionClientColor(client, index),
     };
   });
 
@@ -394,7 +384,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   const blockComplexitySeries = elClientList.map((client, index) => ({
     name: client,
     data: clientGasData.get(client) ?? [],
-    color: clientColors[index % clientColors.length],
+    color: getExecutionClientColor(client, index),
     symbolSize: 6,
   }));
 

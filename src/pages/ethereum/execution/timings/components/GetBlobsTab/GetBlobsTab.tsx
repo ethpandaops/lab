@@ -7,7 +7,7 @@ import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { BarChart } from '@/components/Charts/Bar';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { formatSlot } from '@/utils';
+import { formatSlot, getExecutionClientColor } from '@/utils';
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
 import { PER_SLOT_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
 import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
@@ -249,16 +249,6 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
     clientSlotData.get(client)!.set(slot, duration);
   });
 
-  // Create series for the by-client chart
-  const clientColors = [
-    themeColors.primary,
-    themeColors.success,
-    themeColors.warning,
-    themeColors.danger,
-    themeColors.accent,
-    themeColors.secondary,
-  ];
-
   // Downsample to ~400 points max per series to keep chart performant
   const MAX_POINTS_PER_SERIES = 400;
 
@@ -276,7 +266,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
     return {
       name: client,
       data: sampledSlots.map(([slot, duration]) => [slot, duration]) as [number, number][],
-      color: clientColors[index % clientColors.length],
+      color: getExecutionClientColor(client, index),
     };
   });
 
@@ -350,7 +340,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
     return {
       name: client,
       data: dataPoints,
-      color: clientColors[index % clientColors.length],
+      color: getExecutionClientColor(client, index),
     };
   });
 
@@ -369,7 +359,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
     return {
       name: client,
       data: dataPoints,
-      color: clientColors[index % clientColors.length],
+      color: getExecutionClientColor(client, index),
     };
   });
 
@@ -423,7 +413,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
     return {
       name: client,
       data: dataPoints,
-      color: clientColors[index % clientColors.length],
+      color: getExecutionClientColor(client, index),
     };
   });
 

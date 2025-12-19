@@ -103,6 +103,49 @@ export function truncateAddress(pubkey?: string, startChars = 6, endChars = 4): 
 const EXECUTION_CLIENTS = ['geth', 'nethermind', 'besu', 'erigon', 'reth'] as const;
 
 /**
+ * Official brand colors for Ethereum execution clients
+ */
+export const EXECUTION_CLIENT_COLORS: Record<string, string> = {
+  besu: '#1ba0a1',
+  nethermind: '#02bbec',
+  reth: '#f44f02',
+  geth: '#707d91',
+  'go-ethereum': '#707d91',
+  erigon: '#f5ad73',
+};
+
+/**
+ * Default fallback colors for unknown clients
+ */
+const FALLBACK_COLORS = [
+  '#6b7280', // gray-500
+  '#8b5cf6', // violet-500
+  '#ec4899', // pink-500
+  '#14b8a6', // teal-500
+  '#f97316', // orange-500
+  '#84cc16', // lime-500
+];
+
+/**
+ * Get the brand color for an execution client
+ *
+ * @param clientName - Name of the execution client (case-insensitive)
+ * @param fallbackIndex - Index for fallback color if client is unknown (cycles through fallback colors)
+ * @returns Hex color string
+ *
+ * @example
+ * ```tsx
+ * getExecutionClientColor('nethermind') // Returns '#02bbec'
+ * getExecutionClientColor('Reth')       // Returns '#f44f02'
+ * getExecutionClientColor('unknown', 0) // Returns '#6b7280'
+ * ```
+ */
+export function getExecutionClientColor(clientName: string, fallbackIndex = 0): string {
+  const normalized = clientName.toLowerCase().trim();
+  return EXECUTION_CLIENT_COLORS[normalized] ?? FALLBACK_COLORS[fallbackIndex % FALLBACK_COLORS.length];
+}
+
+/**
  * Parse execution client name from meta client name
  * Extracts client name and version from strings like "Nethermind/v1.25.4"
  *
