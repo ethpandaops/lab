@@ -2040,6 +2040,85 @@ export type FctEngineGetBlobsByElClient = {
   updated_date_time?: number;
 };
 
+export type FctEngineGetBlobsByElClientHourly = {
+  /**
+   * Average duration of engine_getBlobs calls in milliseconds
+   */
+  avg_duration_ms?: number;
+  /**
+   * Average number of blobs returned
+   */
+  avg_returned_count?: number;
+  /**
+   * Number of observations with EMPTY status
+   */
+  empty_count?: number;
+  /**
+   * Number of observations with ERROR status
+   */
+  error_count?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Maximum duration in milliseconds
+   */
+  max_duration_ms?: number;
+  /**
+   * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Execution client version string
+   */
+  meta_execution_version?: string;
+  /**
+   * Minimum duration in milliseconds
+   */
+  min_duration_ms?: number;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
+  /**
+   * Total number of observations for this client in this hour
+   */
+  observation_count?: number;
+  /**
+   * 50th percentile (median) duration in milliseconds
+   */
+  p50_duration_ms?: number;
+  /**
+   * 95th percentile duration in milliseconds
+   */
+  p95_duration_ms?: number;
+  /**
+   * Number of observations with PARTIAL status
+   */
+  partial_count?: number;
+  /**
+   * Number of unique slots in this hour
+   */
+  slot_count?: number;
+  /**
+   * Number of observations with SUCCESS status
+   */
+  success_count?: number;
+  /**
+   * Number of unique nodes reporting for this client
+   */
+  unique_node_count?: number;
+  /**
+   * Number of observations with UNSUPPORTED status
+   */
+  unsupported_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type FctEngineGetBlobsBySlot = {
   /**
    * Average duration of engine_getBlobs calls in milliseconds
@@ -2178,132 +2257,6 @@ export type FctEngineGetBlobsDurationChunked50Ms = {
   updated_date_time?: number;
 };
 
-export type FctEngineGetBlobsStatusDaily = {
-  /**
-   * Average duration of engine_getBlobs calls in milliseconds
-   */
-  avg_duration_ms?: number;
-  /**
-   * Average of median durations across slots in milliseconds
-   */
-  avg_p50_duration_ms?: number;
-  /**
-   * Average of p95 durations across slots in milliseconds
-   */
-  avg_p95_duration_ms?: number;
-  /**
-   * Start of the day period
-   */
-  day_start_date?: string;
-  /**
-   * Number of observations with EMPTY status
-   */
-  empty_count?: number;
-  /**
-   * Number of observations with ERROR status
-   */
-  error_count?: number;
-  /**
-   * Maximum duration of engine_getBlobs calls in milliseconds
-   */
-  max_duration_ms?: number;
-  /**
-   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
-   */
-  node_class?: string;
-  /**
-   * Total number of observations in this day
-   */
-  observation_count?: number;
-  /**
-   * Number of observations with PARTIAL status
-   */
-  partial_count?: number;
-  /**
-   * Number of slots in this day aggregation
-   */
-  slot_count?: number;
-  /**
-   * Number of observations with SUCCESS status
-   */
-  success_count?: number;
-  /**
-   * Percentage of observations with SUCCESS status
-   */
-  success_pct?: number;
-  /**
-   * Number of observations with UNSUPPORTED status
-   */
-  unsupported_count?: number;
-  /**
-   * Timestamp when the record was last updated
-   */
-  updated_date_time?: number;
-};
-
-export type FctEngineGetBlobsStatusHourly = {
-  /**
-   * Average duration of engine_getBlobs calls in milliseconds
-   */
-  avg_duration_ms?: number;
-  /**
-   * Average of median durations across slots in milliseconds
-   */
-  avg_p50_duration_ms?: number;
-  /**
-   * Average of p95 durations across slots in milliseconds
-   */
-  avg_p95_duration_ms?: number;
-  /**
-   * Number of observations with EMPTY status
-   */
-  empty_count?: number;
-  /**
-   * Number of observations with ERROR status
-   */
-  error_count?: number;
-  /**
-   * Start of the hour period
-   */
-  hour_start_date_time?: number;
-  /**
-   * Maximum duration of engine_getBlobs calls in milliseconds
-   */
-  max_duration_ms?: number;
-  /**
-   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
-   */
-  node_class?: string;
-  /**
-   * Total number of observations in this hour
-   */
-  observation_count?: number;
-  /**
-   * Number of observations with PARTIAL status
-   */
-  partial_count?: number;
-  /**
-   * Number of slots in this hour aggregation
-   */
-  slot_count?: number;
-  /**
-   * Number of observations with SUCCESS status
-   */
-  success_count?: number;
-  /**
-   * Percentage of observations with SUCCESS status
-   */
-  success_pct?: number;
-  /**
-   * Number of observations with UNSUPPORTED status
-   */
-  unsupported_count?: number;
-  /**
-   * Timestamp when the record was last updated
-   */
-  updated_date_time?: number;
-};
-
 export type FctEngineNewPayloadByElClient = {
   /**
    * Average duration of engine_newPayload calls in milliseconds
@@ -2393,6 +2346,93 @@ export type FctEngineNewPayloadByElClient = {
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
+};
+
+export type FctEngineNewPayloadByElClientHourly = {
+  /**
+   * Number of observations with ACCEPTED status
+   */
+  accepted_count?: number;
+  /**
+   * Average blob count per block (VALID status only)
+   */
+  avg_blob_count?: number;
+  /**
+   * Average duration of engine_newPayload calls in milliseconds
+   */
+  avg_duration_ms?: number;
+  /**
+   * Average gas limit per block (VALID status only)
+   */
+  avg_gas_limit?: number;
+  /**
+   * Average gas used per block (VALID status only)
+   */
+  avg_gas_used?: number;
+  /**
+   * Average transaction count per block (VALID status only)
+   */
+  avg_tx_count?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Number of observations with INVALID status
+   */
+  invalid_count?: number;
+  /**
+   * Maximum duration in milliseconds
+   */
+  max_duration_ms?: number;
+  /**
+   * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Execution client version string
+   */
+  meta_execution_version?: string;
+  /**
+   * Minimum duration in milliseconds
+   */
+  min_duration_ms?: number;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
+  /**
+   * Total number of observations for this client in this hour
+   */
+  observation_count?: number;
+  /**
+   * 50th percentile (median) duration in milliseconds
+   */
+  p50_duration_ms?: number;
+  /**
+   * 95th percentile duration in milliseconds
+   */
+  p95_duration_ms?: number;
+  /**
+   * Number of unique slots in this hour
+   */
+  slot_count?: number;
+  /**
+   * Number of observations with SYNCING status
+   */
+  syncing_count?: number;
+  /**
+   * Number of unique nodes reporting for this client
+   */
+  unique_node_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Number of observations with VALID status
+   */
+  valid_count?: number;
 };
 
 export type FctEngineNewPayloadBySlot = {
@@ -2543,132 +2583,6 @@ export type FctEngineNewPayloadDurationChunked50Ms = {
    * Number of VALID status observations in this chunk
    */
   valid_count?: number;
-};
-
-export type FctEngineNewPayloadStatusDaily = {
-  /**
-   * Number of observations with ACCEPTED status
-   */
-  accepted_count?: number;
-  /**
-   * Average duration of engine_newPayload calls in milliseconds
-   */
-  avg_duration_ms?: number;
-  /**
-   * Average of median durations across slots in milliseconds
-   */
-  avg_p50_duration_ms?: number;
-  /**
-   * Average of p95 durations across slots in milliseconds
-   */
-  avg_p95_duration_ms?: number;
-  /**
-   * Start of the day period
-   */
-  day_start_date?: string;
-  /**
-   * Number of observations with INVALID_BLOCK_HASH status
-   */
-  invalid_block_hash_count?: number;
-  /**
-   * Number of observations with INVALID status
-   */
-  invalid_count?: number;
-  /**
-   * Maximum duration of engine_newPayload calls in milliseconds
-   */
-  max_duration_ms?: number;
-  /**
-   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
-   */
-  node_class?: string;
-  /**
-   * Total number of observations in this day
-   */
-  observation_count?: number;
-  /**
-   * Number of slots in this day aggregation
-   */
-  slot_count?: number;
-  /**
-   * Number of observations with SYNCING status
-   */
-  syncing_count?: number;
-  /**
-   * Timestamp when the record was last updated
-   */
-  updated_date_time?: number;
-  /**
-   * Number of observations with VALID status
-   */
-  valid_count?: number;
-  /**
-   * Percentage of observations with VALID status
-   */
-  valid_pct?: number;
-};
-
-export type FctEngineNewPayloadStatusHourly = {
-  /**
-   * Number of observations with ACCEPTED status
-   */
-  accepted_count?: number;
-  /**
-   * Average duration of engine_newPayload calls in milliseconds
-   */
-  avg_duration_ms?: number;
-  /**
-   * Average of median durations across slots in milliseconds
-   */
-  avg_p50_duration_ms?: number;
-  /**
-   * Average of p95 durations across slots in milliseconds
-   */
-  avg_p95_duration_ms?: number;
-  /**
-   * Start of the hour period
-   */
-  hour_start_date_time?: number;
-  /**
-   * Number of observations with INVALID_BLOCK_HASH status
-   */
-  invalid_block_hash_count?: number;
-  /**
-   * Number of observations with INVALID status
-   */
-  invalid_count?: number;
-  /**
-   * Maximum duration of engine_newPayload calls in milliseconds
-   */
-  max_duration_ms?: number;
-  /**
-   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
-   */
-  node_class?: string;
-  /**
-   * Total number of observations in this hour
-   */
-  observation_count?: number;
-  /**
-   * Number of slots in this hour aggregation
-   */
-  slot_count?: number;
-  /**
-   * Number of observations with SYNCING status
-   */
-  syncing_count?: number;
-  /**
-   * Timestamp when the record was last updated
-   */
-  updated_date_time?: number;
-  /**
-   * Number of observations with VALID status
-   */
-  valid_count?: number;
-  /**
-   * Percentage of observations with VALID status
-   */
-  valid_pct?: number;
 };
 
 export type FctExecutionStateSizeDaily = {
@@ -3220,9 +3134,9 @@ export type FctStorageSlotStateHourly = {
   updated_date_time?: number;
 };
 
-export type FctStorageSlotStateWithExpiryBy6m = {
+export type FctStorageSlotStateWithExpiry = {
   /**
-   * Cumulative count of active storage slots at this block (with 6-month expiry applied)
+   * Cumulative count of active storage slots at this block (with expiry applied)
    */
   active_slots?: number;
   /**
@@ -3238,9 +3152,13 @@ export type FctStorageSlotStateWithExpiryBy6m = {
    */
   cumulative_net_slots?: number;
   /**
-   * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied)
+   * Cumulative sum of effective bytes at this block (with expiry applied)
    */
   effective_bytes?: number;
+  /**
+   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+   */
+  expiry_policy?: string;
   /**
    * Net bytes adjustment this block (negative=expiry, positive=reactivation)
    */
@@ -3255,9 +3173,9 @@ export type FctStorageSlotStateWithExpiryBy6m = {
   updated_date_time?: number;
 };
 
-export type FctStorageSlotStateWithExpiryBy6mDaily = {
+export type FctStorageSlotStateWithExpiryDaily = {
   /**
-   * Cumulative count of active storage slots at end of day (with 6m expiry policy)
+   * Cumulative count of active storage slots at end of day (with expiry applied)
    */
   active_slots?: number;
   /**
@@ -3265,24 +3183,32 @@ export type FctStorageSlotStateWithExpiryBy6mDaily = {
    */
   day_start_date?: string;
   /**
-   * Cumulative sum of effective bytes at end of day (with 6m expiry policy)
+   * Cumulative sum of effective bytes at end of day (with expiry applied)
    */
   effective_bytes?: number;
+  /**
+   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+   */
+  expiry_policy?: string;
   /**
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
 };
 
-export type FctStorageSlotStateWithExpiryBy6mHourly = {
+export type FctStorageSlotStateWithExpiryHourly = {
   /**
-   * Cumulative count of active storage slots at end of hour (with 6m expiry policy)
+   * Cumulative count of active storage slots at end of hour (with expiry applied)
    */
   active_slots?: number;
   /**
-   * Cumulative sum of effective bytes at end of hour (with 6m expiry policy)
+   * Cumulative sum of effective bytes at end of hour (with expiry applied)
    */
   effective_bytes?: number;
+  /**
+   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+   */
+  expiry_policy?: string;
   /**
    * Start of the hour period
    */
@@ -3539,6 +3465,13 @@ export type GetFctDataColumnAvailabilityHourlyResponse = {
 };
 
 /**
+ * Response for getting a single fct_engine_get_blobs_by_el_client_hourly record
+ */
+export type GetFctEngineGetBlobsByElClientHourlyResponse = {
+  item?: FctEngineGetBlobsByElClientHourly;
+};
+
+/**
  * Response for getting a single fct_engine_get_blobs_by_el_client record
  */
 export type GetFctEngineGetBlobsByElClientResponse = {
@@ -3560,17 +3493,10 @@ export type GetFctEngineGetBlobsDurationChunked50MsResponse = {
 };
 
 /**
- * Response for getting a single fct_engine_get_blobs_status_daily record
+ * Response for getting a single fct_engine_new_payload_by_el_client_hourly record
  */
-export type GetFctEngineGetBlobsStatusDailyResponse = {
-  item?: FctEngineGetBlobsStatusDaily;
-};
-
-/**
- * Response for getting a single fct_engine_get_blobs_status_hourly record
- */
-export type GetFctEngineGetBlobsStatusHourlyResponse = {
-  item?: FctEngineGetBlobsStatusHourly;
+export type GetFctEngineNewPayloadByElClientHourlyResponse = {
+  item?: FctEngineNewPayloadByElClientHourly;
 };
 
 /**
@@ -3592,20 +3518,6 @@ export type GetFctEngineNewPayloadBySlotResponse = {
  */
 export type GetFctEngineNewPayloadDurationChunked50MsResponse = {
   item?: FctEngineNewPayloadDurationChunked50Ms;
-};
-
-/**
- * Response for getting a single fct_engine_new_payload_status_daily record
- */
-export type GetFctEngineNewPayloadStatusDailyResponse = {
-  item?: FctEngineNewPayloadStatusDaily;
-};
-
-/**
- * Response for getting a single fct_engine_new_payload_status_hourly record
- */
-export type GetFctEngineNewPayloadStatusHourlyResponse = {
-  item?: FctEngineNewPayloadStatusHourly;
 };
 
 /**
@@ -3686,24 +3598,24 @@ export type GetFctStorageSlotStateResponse = {
 };
 
 /**
- * Response for getting a single fct_storage_slot_state_with_expiry_by_6m_daily record
+ * Response for getting a single fct_storage_slot_state_with_expiry_daily record
  */
-export type GetFctStorageSlotStateWithExpiryBy6mDailyResponse = {
-  item?: FctStorageSlotStateWithExpiryBy6mDaily;
+export type GetFctStorageSlotStateWithExpiryDailyResponse = {
+  item?: FctStorageSlotStateWithExpiryDaily;
 };
 
 /**
- * Response for getting a single fct_storage_slot_state_with_expiry_by_6m_hourly record
+ * Response for getting a single fct_storage_slot_state_with_expiry_hourly record
  */
-export type GetFctStorageSlotStateWithExpiryBy6mHourlyResponse = {
-  item?: FctStorageSlotStateWithExpiryBy6mHourly;
+export type GetFctStorageSlotStateWithExpiryHourlyResponse = {
+  item?: FctStorageSlotStateWithExpiryHourly;
 };
 
 /**
- * Response for getting a single fct_storage_slot_state_with_expiry_by_6m record
+ * Response for getting a single fct_storage_slot_state_with_expiry record
  */
-export type GetFctStorageSlotStateWithExpiryBy6mResponse = {
-  item?: FctStorageSlotStateWithExpiryBy6m;
+export type GetFctStorageSlotStateWithExpiryResponse = {
+  item?: FctStorageSlotStateWithExpiry;
 };
 
 /**
@@ -3833,10 +3745,38 @@ export type GetIntStorageSlotDiffResponse = {
 };
 
 /**
- * Response for getting a single int_storage_slot_expiry_by_6m record
+ * Response for getting a single int_storage_slot_expiry_1m record
  */
-export type GetIntStorageSlotExpiryBy6mResponse = {
-  item?: IntStorageSlotExpiryBy6m;
+export type GetIntStorageSlotExpiry1mResponse = {
+  item?: IntStorageSlotExpiry1m;
+};
+
+/**
+ * Response for getting a single int_storage_slot_expiry_6m record
+ */
+export type GetIntStorageSlotExpiry6mResponse = {
+  item?: IntStorageSlotExpiry6m;
+};
+
+/**
+ * Response for getting a single int_storage_slot_expiry_12m record
+ */
+export type GetIntStorageSlotExpiry12mResponse = {
+  item?: IntStorageSlotExpiry12m;
+};
+
+/**
+ * Response for getting a single int_storage_slot_expiry_18m record
+ */
+export type GetIntStorageSlotExpiry18mResponse = {
+  item?: IntStorageSlotExpiry18m;
+};
+
+/**
+ * Response for getting a single int_storage_slot_expiry_24m record
+ */
+export type GetIntStorageSlotExpiry24mResponse = {
+  item?: IntStorageSlotExpiry24m;
 };
 
 /**
@@ -3847,10 +3787,38 @@ export type GetIntStorageSlotNextTouchResponse = {
 };
 
 /**
- * Response for getting a single int_storage_slot_reactivation_by_6m record
+ * Response for getting a single int_storage_slot_reactivation_1m record
  */
-export type GetIntStorageSlotReactivationBy6mResponse = {
-  item?: IntStorageSlotReactivationBy6m;
+export type GetIntStorageSlotReactivation1mResponse = {
+  item?: IntStorageSlotReactivation1m;
+};
+
+/**
+ * Response for getting a single int_storage_slot_reactivation_6m record
+ */
+export type GetIntStorageSlotReactivation6mResponse = {
+  item?: IntStorageSlotReactivation6m;
+};
+
+/**
+ * Response for getting a single int_storage_slot_reactivation_12m record
+ */
+export type GetIntStorageSlotReactivation12mResponse = {
+  item?: IntStorageSlotReactivation12m;
+};
+
+/**
+ * Response for getting a single int_storage_slot_reactivation_18m record
+ */
+export type GetIntStorageSlotReactivation18mResponse = {
+  item?: IntStorageSlotReactivation18m;
+};
+
+/**
+ * Response for getting a single int_storage_slot_reactivation_24m record
+ */
+export type GetIntStorageSlotReactivation24mResponse = {
+  item?: IntStorageSlotReactivation24m;
 };
 
 /**
@@ -4965,23 +4933,135 @@ export type IntStorageSlotDiffByAddressSlot = {
   updated_date_time?: number;
 };
 
-export type IntStorageSlotExpiryBy6m = {
+export type IntStorageSlotExpiry1m = {
   /**
    * The contract address
    */
   address?: string;
   /**
-   * The block number where this slot expiry is recorded (6 months after it was set)
+   * The block number where this slot expiry is recorded
    */
   block_number?: number;
   /**
-   * Number of effective bytes that were set and are now being marked for expiry (0-32)
+   * Number of effective bytes that were set (0-32)
    */
   effective_bytes?: number;
   /**
    * The storage slot key
    */
   slot_key?: string;
+  /**
+   * The original touch block that led to this expiry (propagates through waterfall chain)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotExpiry6m = {
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this slot expiry is recorded
+   */
+  block_number?: number;
+  /**
+   * Number of effective bytes that were set (0-32)
+   */
+  effective_bytes?: number;
+  /**
+   * The storage slot key
+   */
+  slot_key?: string;
+  /**
+   * The original touch block that led to this expiry (propagates through waterfall chain)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotExpiry12m = {
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this slot expiry is recorded
+   */
+  block_number?: number;
+  /**
+   * Number of effective bytes that were set (0-32)
+   */
+  effective_bytes?: number;
+  /**
+   * The storage slot key
+   */
+  slot_key?: string;
+  /**
+   * The original touch block that led to this expiry (propagates through waterfall chain)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotExpiry18m = {
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this slot expiry is recorded
+   */
+  block_number?: number;
+  /**
+   * Number of effective bytes that were set (0-32)
+   */
+  effective_bytes?: number;
+  /**
+   * The storage slot key
+   */
+  slot_key?: string;
+  /**
+   * The original touch block that led to this expiry (propagates through waterfall chain)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotExpiry24m = {
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this slot expiry is recorded
+   */
+  block_number?: number;
+  /**
+   * Number of effective bytes that were set (0-32)
+   */
+  effective_bytes?: number;
+  /**
+   * The storage slot key
+   */
+  slot_key?: string;
+  /**
+   * The original touch block that led to this expiry (propagates through waterfall chain)
+   */
+  touch_block?: number;
   /**
    * Timestamp when the record was last updated
    */
@@ -5011,23 +5091,135 @@ export type IntStorageSlotNextTouch = {
   updated_date_time?: number;
 };
 
-export type IntStorageSlotReactivationBy6m = {
+export type IntStorageSlotReactivation1m = {
   /**
    * The contract address
    */
   address?: string;
   /**
-   * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity)
+   * The block number where this slot was reactivated
    */
   block_number?: number;
   /**
-   * Number of effective bytes being reactivated (must match corresponding expiry record)
+   * Number of effective bytes being reactivated (0-32)
    */
   effective_bytes?: number;
   /**
    * The storage slot key
    */
   slot_key?: string;
+  /**
+   * The original touch block that expired (for matching with expiry records)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotReactivation6m = {
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this slot was reactivated
+   */
+  block_number?: number;
+  /**
+   * Number of effective bytes being reactivated (0-32)
+   */
+  effective_bytes?: number;
+  /**
+   * The storage slot key
+   */
+  slot_key?: string;
+  /**
+   * The original touch block that expired (for matching with expiry records)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotReactivation12m = {
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this slot was reactivated
+   */
+  block_number?: number;
+  /**
+   * Number of effective bytes being reactivated (0-32)
+   */
+  effective_bytes?: number;
+  /**
+   * The storage slot key
+   */
+  slot_key?: string;
+  /**
+   * The original touch block that expired (for matching with expiry records)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotReactivation18m = {
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this slot was reactivated
+   */
+  block_number?: number;
+  /**
+   * Number of effective bytes being reactivated (0-32)
+   */
+  effective_bytes?: number;
+  /**
+   * The storage slot key
+   */
+  slot_key?: string;
+  /**
+   * The original touch block that expired (for matching with expiry records)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotReactivation24m = {
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this slot was reactivated
+   */
+  block_number?: number;
+  /**
+   * Number of effective bytes being reactivated (0-32)
+   */
+  effective_bytes?: number;
+  /**
+   * The storage slot key
+   */
+  slot_key?: string;
+  /**
+   * The original touch block that expired (for matching with expiry records)
+   */
+  touch_block?: number;
   /**
    * Timestamp when the record was last updated
    */
@@ -5544,6 +5736,20 @@ export type ListFctDataColumnAvailabilityHourlyResponse = {
 };
 
 /**
+ * Response for listing fct_engine_get_blobs_by_el_client_hourly records
+ */
+export type ListFctEngineGetBlobsByElClientHourlyResponse = {
+  /**
+   * The list of fct_engine_get_blobs_by_el_client_hourly.
+   */
+  fct_engine_get_blobs_by_el_client_hourly?: Array<FctEngineGetBlobsByElClientHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_engine_get_blobs_by_el_client records
  */
 export type ListFctEngineGetBlobsByElClientResponse = {
@@ -5586,27 +5792,13 @@ export type ListFctEngineGetBlobsDurationChunked50MsResponse = {
 };
 
 /**
- * Response for listing fct_engine_get_blobs_status_daily records
+ * Response for listing fct_engine_new_payload_by_el_client_hourly records
  */
-export type ListFctEngineGetBlobsStatusDailyResponse = {
+export type ListFctEngineNewPayloadByElClientHourlyResponse = {
   /**
-   * The list of fct_engine_get_blobs_status_daily.
+   * The list of fct_engine_new_payload_by_el_client_hourly.
    */
-  fct_engine_get_blobs_status_daily?: Array<FctEngineGetBlobsStatusDaily>;
-  /**
-   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
-   */
-  next_page_token?: string;
-};
-
-/**
- * Response for listing fct_engine_get_blobs_status_hourly records
- */
-export type ListFctEngineGetBlobsStatusHourlyResponse = {
-  /**
-   * The list of fct_engine_get_blobs_status_hourly.
-   */
-  fct_engine_get_blobs_status_hourly?: Array<FctEngineGetBlobsStatusHourly>;
+  fct_engine_new_payload_by_el_client_hourly?: Array<FctEngineNewPayloadByElClientHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -5649,34 +5841,6 @@ export type ListFctEngineNewPayloadDurationChunked50MsResponse = {
    * The list of fct_engine_new_payload_duration_chunked_50ms.
    */
   fct_engine_new_payload_duration_chunked_50ms?: Array<FctEngineNewPayloadDurationChunked50Ms>;
-  /**
-   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
-   */
-  next_page_token?: string;
-};
-
-/**
- * Response for listing fct_engine_new_payload_status_daily records
- */
-export type ListFctEngineNewPayloadStatusDailyResponse = {
-  /**
-   * The list of fct_engine_new_payload_status_daily.
-   */
-  fct_engine_new_payload_status_daily?: Array<FctEngineNewPayloadStatusDaily>;
-  /**
-   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
-   */
-  next_page_token?: string;
-};
-
-/**
- * Response for listing fct_engine_new_payload_status_hourly records
- */
-export type ListFctEngineNewPayloadStatusHourlyResponse = {
-  /**
-   * The list of fct_engine_new_payload_status_hourly.
-   */
-  fct_engine_new_payload_status_hourly?: Array<FctEngineNewPayloadStatusHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -5838,13 +6002,13 @@ export type ListFctStorageSlotStateResponse = {
 };
 
 /**
- * Response for listing fct_storage_slot_state_with_expiry_by_6m_daily records
+ * Response for listing fct_storage_slot_state_with_expiry_daily records
  */
-export type ListFctStorageSlotStateWithExpiryBy6mDailyResponse = {
+export type ListFctStorageSlotStateWithExpiryDailyResponse = {
   /**
-   * The list of fct_storage_slot_state_with_expiry_by_6m_daily.
+   * The list of fct_storage_slot_state_with_expiry_daily.
    */
-  fct_storage_slot_state_with_expiry_by_6m_daily?: Array<FctStorageSlotStateWithExpiryBy6mDaily>;
+  fct_storage_slot_state_with_expiry_daily?: Array<FctStorageSlotStateWithExpiryDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -5852,13 +6016,13 @@ export type ListFctStorageSlotStateWithExpiryBy6mDailyResponse = {
 };
 
 /**
- * Response for listing fct_storage_slot_state_with_expiry_by_6m_hourly records
+ * Response for listing fct_storage_slot_state_with_expiry_hourly records
  */
-export type ListFctStorageSlotStateWithExpiryBy6mHourlyResponse = {
+export type ListFctStorageSlotStateWithExpiryHourlyResponse = {
   /**
-   * The list of fct_storage_slot_state_with_expiry_by_6m_hourly.
+   * The list of fct_storage_slot_state_with_expiry_hourly.
    */
-  fct_storage_slot_state_with_expiry_by_6m_hourly?: Array<FctStorageSlotStateWithExpiryBy6mHourly>;
+  fct_storage_slot_state_with_expiry_hourly?: Array<FctStorageSlotStateWithExpiryHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -5866,13 +6030,13 @@ export type ListFctStorageSlotStateWithExpiryBy6mHourlyResponse = {
 };
 
 /**
- * Response for listing fct_storage_slot_state_with_expiry_by_6m records
+ * Response for listing fct_storage_slot_state_with_expiry records
  */
-export type ListFctStorageSlotStateWithExpiryBy6mResponse = {
+export type ListFctStorageSlotStateWithExpiryResponse = {
   /**
-   * The list of fct_storage_slot_state_with_expiry_by_6m.
+   * The list of fct_storage_slot_state_with_expiry.
    */
-  fct_storage_slot_state_with_expiry_by_6m?: Array<FctStorageSlotStateWithExpiryBy6m>;
+  fct_storage_slot_state_with_expiry?: Array<FctStorageSlotStateWithExpiry>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -6132,13 +6296,69 @@ export type ListIntStorageSlotDiffResponse = {
 };
 
 /**
- * Response for listing int_storage_slot_expiry_by_6m records
+ * Response for listing int_storage_slot_expiry_1m records
  */
-export type ListIntStorageSlotExpiryBy6mResponse = {
+export type ListIntStorageSlotExpiry1mResponse = {
   /**
-   * The list of int_storage_slot_expiry_by_6m.
+   * The list of int_storage_slot_expiry_1m.
    */
-  int_storage_slot_expiry_by_6m?: Array<IntStorageSlotExpiryBy6m>;
+  int_storage_slot_expiry_1m?: Array<IntStorageSlotExpiry1m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_expiry_6m records
+ */
+export type ListIntStorageSlotExpiry6mResponse = {
+  /**
+   * The list of int_storage_slot_expiry_6m.
+   */
+  int_storage_slot_expiry_6m?: Array<IntStorageSlotExpiry6m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_expiry_12m records
+ */
+export type ListIntStorageSlotExpiry12mResponse = {
+  /**
+   * The list of int_storage_slot_expiry_12m.
+   */
+  int_storage_slot_expiry_12m?: Array<IntStorageSlotExpiry12m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_expiry_18m records
+ */
+export type ListIntStorageSlotExpiry18mResponse = {
+  /**
+   * The list of int_storage_slot_expiry_18m.
+   */
+  int_storage_slot_expiry_18m?: Array<IntStorageSlotExpiry18m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_expiry_24m records
+ */
+export type ListIntStorageSlotExpiry24mResponse = {
+  /**
+   * The list of int_storage_slot_expiry_24m.
+   */
+  int_storage_slot_expiry_24m?: Array<IntStorageSlotExpiry24m>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -6160,13 +6380,69 @@ export type ListIntStorageSlotNextTouchResponse = {
 };
 
 /**
- * Response for listing int_storage_slot_reactivation_by_6m records
+ * Response for listing int_storage_slot_reactivation_1m records
  */
-export type ListIntStorageSlotReactivationBy6mResponse = {
+export type ListIntStorageSlotReactivation1mResponse = {
   /**
-   * The list of int_storage_slot_reactivation_by_6m.
+   * The list of int_storage_slot_reactivation_1m.
    */
-  int_storage_slot_reactivation_by_6m?: Array<IntStorageSlotReactivationBy6m>;
+  int_storage_slot_reactivation_1m?: Array<IntStorageSlotReactivation1m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_reactivation_6m records
+ */
+export type ListIntStorageSlotReactivation6mResponse = {
+  /**
+   * The list of int_storage_slot_reactivation_6m.
+   */
+  int_storage_slot_reactivation_6m?: Array<IntStorageSlotReactivation6m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_reactivation_12m records
+ */
+export type ListIntStorageSlotReactivation12mResponse = {
+  /**
+   * The list of int_storage_slot_reactivation_12m.
+   */
+  int_storage_slot_reactivation_12m?: Array<IntStorageSlotReactivation12m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_reactivation_18m records
+ */
+export type ListIntStorageSlotReactivation18mResponse = {
+  /**
+   * The list of int_storage_slot_reactivation_18m.
+   */
+  int_storage_slot_reactivation_18m?: Array<IntStorageSlotReactivation18m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_reactivation_24m records
+ */
+export type ListIntStorageSlotReactivation24mResponse = {
+  /**
+   * The list of int_storage_slot_reactivation_24m.
+   */
+  int_storage_slot_reactivation_24m?: Array<IntStorageSlotReactivation24m>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -26690,6 +26966,790 @@ export type FctEngineGetBlobsByElClientServiceGetResponses = {
 export type FctEngineGetBlobsByElClientServiceGetResponse =
   FctEngineGetBlobsByElClientServiceGetResponses[keyof FctEngineGetBlobsByElClientServiceGetResponses];
 
+export type FctEngineGetBlobsByElClientHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Execution client version string (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Execution client version string (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Execution client version string (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Execution client version string (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Execution client version string (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Execution client version string (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Execution client version string (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Execution client version string (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Execution client version string (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of unique slots in this hour (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Number of unique slots in this hour (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Number of unique slots in this hour (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Number of unique slots in this hour (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Number of unique slots in this hour (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Number of unique slots in this hour (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Number of unique slots in this hour (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Number of unique slots in this hour (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Number of unique slots in this hour (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Number of unique slots in this hour (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Total number of observations for this client in this hour (filter: eq)
+     */
+    observation_count_eq?: number;
+    /**
+     * Total number of observations for this client in this hour (filter: ne)
+     */
+    observation_count_ne?: number;
+    /**
+     * Total number of observations for this client in this hour (filter: lt)
+     */
+    observation_count_lt?: number;
+    /**
+     * Total number of observations for this client in this hour (filter: lte)
+     */
+    observation_count_lte?: number;
+    /**
+     * Total number of observations for this client in this hour (filter: gt)
+     */
+    observation_count_gt?: number;
+    /**
+     * Total number of observations for this client in this hour (filter: gte)
+     */
+    observation_count_gte?: number;
+    /**
+     * Total number of observations for this client in this hour (filter: between_min)
+     */
+    observation_count_between_min?: number;
+    /**
+     * Total number of observations for this client in this hour (filter: between_max_value)
+     */
+    observation_count_between_max_value?: number;
+    /**
+     * Total number of observations for this client in this hour (filter: in_values) (comma-separated list)
+     */
+    observation_count_in_values?: string;
+    /**
+     * Total number of observations for this client in this hour (filter: not_in_values) (comma-separated list)
+     */
+    observation_count_not_in_values?: string;
+    /**
+     * Number of unique nodes reporting for this client (filter: eq)
+     */
+    unique_node_count_eq?: number;
+    /**
+     * Number of unique nodes reporting for this client (filter: ne)
+     */
+    unique_node_count_ne?: number;
+    /**
+     * Number of unique nodes reporting for this client (filter: lt)
+     */
+    unique_node_count_lt?: number;
+    /**
+     * Number of unique nodes reporting for this client (filter: lte)
+     */
+    unique_node_count_lte?: number;
+    /**
+     * Number of unique nodes reporting for this client (filter: gt)
+     */
+    unique_node_count_gt?: number;
+    /**
+     * Number of unique nodes reporting for this client (filter: gte)
+     */
+    unique_node_count_gte?: number;
+    /**
+     * Number of unique nodes reporting for this client (filter: between_min)
+     */
+    unique_node_count_between_min?: number;
+    /**
+     * Number of unique nodes reporting for this client (filter: between_max_value)
+     */
+    unique_node_count_between_max_value?: number;
+    /**
+     * Number of unique nodes reporting for this client (filter: in_values) (comma-separated list)
+     */
+    unique_node_count_in_values?: string;
+    /**
+     * Number of unique nodes reporting for this client (filter: not_in_values) (comma-separated list)
+     */
+    unique_node_count_not_in_values?: string;
+    /**
+     * Number of observations with SUCCESS status (filter: eq)
+     */
+    success_count_eq?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: ne)
+     */
+    success_count_ne?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: lt)
+     */
+    success_count_lt?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: lte)
+     */
+    success_count_lte?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: gt)
+     */
+    success_count_gt?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: gte)
+     */
+    success_count_gte?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: between_min)
+     */
+    success_count_between_min?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: between_max_value)
+     */
+    success_count_between_max_value?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: in_values) (comma-separated list)
+     */
+    success_count_in_values?: string;
+    /**
+     * Number of observations with SUCCESS status (filter: not_in_values) (comma-separated list)
+     */
+    success_count_not_in_values?: string;
+    /**
+     * Number of observations with PARTIAL status (filter: eq)
+     */
+    partial_count_eq?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: ne)
+     */
+    partial_count_ne?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: lt)
+     */
+    partial_count_lt?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: lte)
+     */
+    partial_count_lte?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: gt)
+     */
+    partial_count_gt?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: gte)
+     */
+    partial_count_gte?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: between_min)
+     */
+    partial_count_between_min?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: between_max_value)
+     */
+    partial_count_between_max_value?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: in_values) (comma-separated list)
+     */
+    partial_count_in_values?: string;
+    /**
+     * Number of observations with PARTIAL status (filter: not_in_values) (comma-separated list)
+     */
+    partial_count_not_in_values?: string;
+    /**
+     * Number of observations with EMPTY status (filter: eq)
+     */
+    empty_count_eq?: number;
+    /**
+     * Number of observations with EMPTY status (filter: ne)
+     */
+    empty_count_ne?: number;
+    /**
+     * Number of observations with EMPTY status (filter: lt)
+     */
+    empty_count_lt?: number;
+    /**
+     * Number of observations with EMPTY status (filter: lte)
+     */
+    empty_count_lte?: number;
+    /**
+     * Number of observations with EMPTY status (filter: gt)
+     */
+    empty_count_gt?: number;
+    /**
+     * Number of observations with EMPTY status (filter: gte)
+     */
+    empty_count_gte?: number;
+    /**
+     * Number of observations with EMPTY status (filter: between_min)
+     */
+    empty_count_between_min?: number;
+    /**
+     * Number of observations with EMPTY status (filter: between_max_value)
+     */
+    empty_count_between_max_value?: number;
+    /**
+     * Number of observations with EMPTY status (filter: in_values) (comma-separated list)
+     */
+    empty_count_in_values?: string;
+    /**
+     * Number of observations with EMPTY status (filter: not_in_values) (comma-separated list)
+     */
+    empty_count_not_in_values?: string;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: eq)
+     */
+    unsupported_count_eq?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: ne)
+     */
+    unsupported_count_ne?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: lt)
+     */
+    unsupported_count_lt?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: lte)
+     */
+    unsupported_count_lte?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: gt)
+     */
+    unsupported_count_gt?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: gte)
+     */
+    unsupported_count_gte?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: between_min)
+     */
+    unsupported_count_between_min?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: between_max_value)
+     */
+    unsupported_count_between_max_value?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: in_values) (comma-separated list)
+     */
+    unsupported_count_in_values?: string;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: not_in_values) (comma-separated list)
+     */
+    unsupported_count_not_in_values?: string;
+    /**
+     * Number of observations with ERROR status (filter: eq)
+     */
+    error_count_eq?: number;
+    /**
+     * Number of observations with ERROR status (filter: ne)
+     */
+    error_count_ne?: number;
+    /**
+     * Number of observations with ERROR status (filter: lt)
+     */
+    error_count_lt?: number;
+    /**
+     * Number of observations with ERROR status (filter: lte)
+     */
+    error_count_lte?: number;
+    /**
+     * Number of observations with ERROR status (filter: gt)
+     */
+    error_count_gt?: number;
+    /**
+     * Number of observations with ERROR status (filter: gte)
+     */
+    error_count_gte?: number;
+    /**
+     * Number of observations with ERROR status (filter: between_min)
+     */
+    error_count_between_min?: number;
+    /**
+     * Number of observations with ERROR status (filter: between_max_value)
+     */
+    error_count_between_max_value?: number;
+    /**
+     * Number of observations with ERROR status (filter: in_values) (comma-separated list)
+     */
+    error_count_in_values?: string;
+    /**
+     * Number of observations with ERROR status (filter: not_in_values) (comma-separated list)
+     */
+    error_count_not_in_values?: string;
+    /**
+     * Filter avg_returned_count using value
+     */
+    avg_returned_count_value?: number;
+    /**
+     * Average duration of engine_getBlobs calls in milliseconds (filter: eq)
+     */
+    avg_duration_ms_eq?: number;
+    /**
+     * Average duration of engine_getBlobs calls in milliseconds (filter: ne)
+     */
+    avg_duration_ms_ne?: number;
+    /**
+     * Average duration of engine_getBlobs calls in milliseconds (filter: lt)
+     */
+    avg_duration_ms_lt?: number;
+    /**
+     * Average duration of engine_getBlobs calls in milliseconds (filter: lte)
+     */
+    avg_duration_ms_lte?: number;
+    /**
+     * Average duration of engine_getBlobs calls in milliseconds (filter: gt)
+     */
+    avg_duration_ms_gt?: number;
+    /**
+     * Average duration of engine_getBlobs calls in milliseconds (filter: gte)
+     */
+    avg_duration_ms_gte?: number;
+    /**
+     * Average duration of engine_getBlobs calls in milliseconds (filter: between_min)
+     */
+    avg_duration_ms_between_min?: number;
+    /**
+     * Average duration of engine_getBlobs calls in milliseconds (filter: between_max_value)
+     */
+    avg_duration_ms_between_max_value?: number;
+    /**
+     * Average duration of engine_getBlobs calls in milliseconds (filter: in_values) (comma-separated list)
+     */
+    avg_duration_ms_in_values?: string;
+    /**
+     * Average duration of engine_getBlobs calls in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    avg_duration_ms_not_in_values?: string;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: eq)
+     */
+    p50_duration_ms_eq?: number;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: ne)
+     */
+    p50_duration_ms_ne?: number;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: lt)
+     */
+    p50_duration_ms_lt?: number;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: lte)
+     */
+    p50_duration_ms_lte?: number;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: gt)
+     */
+    p50_duration_ms_gt?: number;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: gte)
+     */
+    p50_duration_ms_gte?: number;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: between_min)
+     */
+    p50_duration_ms_between_min?: number;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: between_max_value)
+     */
+    p50_duration_ms_between_max_value?: number;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: in_values) (comma-separated list)
+     */
+    p50_duration_ms_in_values?: string;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    p50_duration_ms_not_in_values?: string;
+    /**
+     * 95th percentile duration in milliseconds (filter: eq)
+     */
+    p95_duration_ms_eq?: number;
+    /**
+     * 95th percentile duration in milliseconds (filter: ne)
+     */
+    p95_duration_ms_ne?: number;
+    /**
+     * 95th percentile duration in milliseconds (filter: lt)
+     */
+    p95_duration_ms_lt?: number;
+    /**
+     * 95th percentile duration in milliseconds (filter: lte)
+     */
+    p95_duration_ms_lte?: number;
+    /**
+     * 95th percentile duration in milliseconds (filter: gt)
+     */
+    p95_duration_ms_gt?: number;
+    /**
+     * 95th percentile duration in milliseconds (filter: gte)
+     */
+    p95_duration_ms_gte?: number;
+    /**
+     * 95th percentile duration in milliseconds (filter: between_min)
+     */
+    p95_duration_ms_between_min?: number;
+    /**
+     * 95th percentile duration in milliseconds (filter: between_max_value)
+     */
+    p95_duration_ms_between_max_value?: number;
+    /**
+     * 95th percentile duration in milliseconds (filter: in_values) (comma-separated list)
+     */
+    p95_duration_ms_in_values?: string;
+    /**
+     * 95th percentile duration in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    p95_duration_ms_not_in_values?: string;
+    /**
+     * Minimum duration in milliseconds (filter: eq)
+     */
+    min_duration_ms_eq?: number;
+    /**
+     * Minimum duration in milliseconds (filter: ne)
+     */
+    min_duration_ms_ne?: number;
+    /**
+     * Minimum duration in milliseconds (filter: lt)
+     */
+    min_duration_ms_lt?: number;
+    /**
+     * Minimum duration in milliseconds (filter: lte)
+     */
+    min_duration_ms_lte?: number;
+    /**
+     * Minimum duration in milliseconds (filter: gt)
+     */
+    min_duration_ms_gt?: number;
+    /**
+     * Minimum duration in milliseconds (filter: gte)
+     */
+    min_duration_ms_gte?: number;
+    /**
+     * Minimum duration in milliseconds (filter: between_min)
+     */
+    min_duration_ms_between_min?: number;
+    /**
+     * Minimum duration in milliseconds (filter: between_max_value)
+     */
+    min_duration_ms_between_max_value?: number;
+    /**
+     * Minimum duration in milliseconds (filter: in_values) (comma-separated list)
+     */
+    min_duration_ms_in_values?: string;
+    /**
+     * Minimum duration in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    min_duration_ms_not_in_values?: string;
+    /**
+     * Maximum duration in milliseconds (filter: eq)
+     */
+    max_duration_ms_eq?: number;
+    /**
+     * Maximum duration in milliseconds (filter: ne)
+     */
+    max_duration_ms_ne?: number;
+    /**
+     * Maximum duration in milliseconds (filter: lt)
+     */
+    max_duration_ms_lt?: number;
+    /**
+     * Maximum duration in milliseconds (filter: lte)
+     */
+    max_duration_ms_lte?: number;
+    /**
+     * Maximum duration in milliseconds (filter: gt)
+     */
+    max_duration_ms_gt?: number;
+    /**
+     * Maximum duration in milliseconds (filter: gte)
+     */
+    max_duration_ms_gte?: number;
+    /**
+     * Maximum duration in milliseconds (filter: between_min)
+     */
+    max_duration_ms_between_min?: number;
+    /**
+     * Maximum duration in milliseconds (filter: between_max_value)
+     */
+    max_duration_ms_between_max_value?: number;
+    /**
+     * Maximum duration in milliseconds (filter: in_values) (comma-separated list)
+     */
+    max_duration_ms_in_values?: string;
+    /**
+     * Maximum duration in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    max_duration_ms_not_in_values?: string;
+    /**
+     * The maximum number of fct_engine_get_blobs_by_el_client_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineGetBlobsByElClientHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_get_blobs_by_el_client_hourly';
+};
+
+export type FctEngineGetBlobsByElClientHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineGetBlobsByElClientHourlyServiceListError =
+  FctEngineGetBlobsByElClientHourlyServiceListErrors[keyof FctEngineGetBlobsByElClientHourlyServiceListErrors];
+
+export type FctEngineGetBlobsByElClientHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineGetBlobsByElClientHourlyResponse;
+};
+
+export type FctEngineGetBlobsByElClientHourlyServiceListResponse =
+  FctEngineGetBlobsByElClientHourlyServiceListResponses[keyof FctEngineGetBlobsByElClientHourlyServiceListResponses];
+
+export type FctEngineGetBlobsByElClientHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_get_blobs_by_el_client_hourly/{hour_start_date_time}';
+};
+
+export type FctEngineGetBlobsByElClientHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineGetBlobsByElClientHourlyServiceGetError =
+  FctEngineGetBlobsByElClientHourlyServiceGetErrors[keyof FctEngineGetBlobsByElClientHourlyServiceGetErrors];
+
+export type FctEngineGetBlobsByElClientHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineGetBlobsByElClientHourlyResponse;
+};
+
+export type FctEngineGetBlobsByElClientHourlyServiceGetResponse =
+  FctEngineGetBlobsByElClientHourlyServiceGetResponses[keyof FctEngineGetBlobsByElClientHourlyServiceGetResponses];
+
 export type FctEngineGetBlobsBySlotServiceListData = {
   body?: never;
   path?: never;
@@ -28062,1266 +29122,6 @@ export type FctEngineGetBlobsDurationChunked50MsServiceGetResponses = {
 export type FctEngineGetBlobsDurationChunked50MsServiceGetResponse =
   FctEngineGetBlobsDurationChunked50MsServiceGetResponses[keyof FctEngineGetBlobsDurationChunked50MsServiceGetResponses];
 
-export type FctEngineGetBlobsStatusDailyServiceListData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Start of the day period (filter: eq)
-     */
-    day_start_date_eq?: string;
-    /**
-     * Start of the day period (filter: ne)
-     */
-    day_start_date_ne?: string;
-    /**
-     * Start of the day period (filter: contains)
-     */
-    day_start_date_contains?: string;
-    /**
-     * Start of the day period (filter: starts_with)
-     */
-    day_start_date_starts_with?: string;
-    /**
-     * Start of the day period (filter: ends_with)
-     */
-    day_start_date_ends_with?: string;
-    /**
-     * Start of the day period (filter: like)
-     */
-    day_start_date_like?: string;
-    /**
-     * Start of the day period (filter: not_like)
-     */
-    day_start_date_not_like?: string;
-    /**
-     * Start of the day period (filter: in_values) (comma-separated list)
-     */
-    day_start_date_in_values?: string;
-    /**
-     * Start of the day period (filter: not_in_values) (comma-separated list)
-     */
-    day_start_date_not_in_values?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
-     */
-    node_class_eq?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
-     */
-    node_class_ne?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
-     */
-    node_class_contains?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
-     */
-    node_class_starts_with?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
-     */
-    node_class_ends_with?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
-     */
-    node_class_like?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
-     */
-    node_class_not_like?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
-     */
-    node_class_in_values?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
-     */
-    node_class_not_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: eq)
-     */
-    updated_date_time_eq?: number;
-    /**
-     * Timestamp when the record was last updated (filter: ne)
-     */
-    updated_date_time_ne?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lt)
-     */
-    updated_date_time_lt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lte)
-     */
-    updated_date_time_lte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gt)
-     */
-    updated_date_time_gt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gte)
-     */
-    updated_date_time_gte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_min)
-     */
-    updated_date_time_between_min?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_max_value)
-     */
-    updated_date_time_between_max_value?: number;
-    /**
-     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
-     */
-    updated_date_time_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
-     */
-    updated_date_time_not_in_values?: string;
-    /**
-     * Number of slots in this day aggregation (filter: eq)
-     */
-    slot_count_eq?: number;
-    /**
-     * Number of slots in this day aggregation (filter: ne)
-     */
-    slot_count_ne?: number;
-    /**
-     * Number of slots in this day aggregation (filter: lt)
-     */
-    slot_count_lt?: number;
-    /**
-     * Number of slots in this day aggregation (filter: lte)
-     */
-    slot_count_lte?: number;
-    /**
-     * Number of slots in this day aggregation (filter: gt)
-     */
-    slot_count_gt?: number;
-    /**
-     * Number of slots in this day aggregation (filter: gte)
-     */
-    slot_count_gte?: number;
-    /**
-     * Number of slots in this day aggregation (filter: between_min)
-     */
-    slot_count_between_min?: number;
-    /**
-     * Number of slots in this day aggregation (filter: between_max_value)
-     */
-    slot_count_between_max_value?: number;
-    /**
-     * Number of slots in this day aggregation (filter: in_values) (comma-separated list)
-     */
-    slot_count_in_values?: string;
-    /**
-     * Number of slots in this day aggregation (filter: not_in_values) (comma-separated list)
-     */
-    slot_count_not_in_values?: string;
-    /**
-     * Total number of observations in this day (filter: eq)
-     */
-    observation_count_eq?: number;
-    /**
-     * Total number of observations in this day (filter: ne)
-     */
-    observation_count_ne?: number;
-    /**
-     * Total number of observations in this day (filter: lt)
-     */
-    observation_count_lt?: number;
-    /**
-     * Total number of observations in this day (filter: lte)
-     */
-    observation_count_lte?: number;
-    /**
-     * Total number of observations in this day (filter: gt)
-     */
-    observation_count_gt?: number;
-    /**
-     * Total number of observations in this day (filter: gte)
-     */
-    observation_count_gte?: number;
-    /**
-     * Total number of observations in this day (filter: between_min)
-     */
-    observation_count_between_min?: number;
-    /**
-     * Total number of observations in this day (filter: between_max_value)
-     */
-    observation_count_between_max_value?: number;
-    /**
-     * Total number of observations in this day (filter: in_values) (comma-separated list)
-     */
-    observation_count_in_values?: string;
-    /**
-     * Total number of observations in this day (filter: not_in_values) (comma-separated list)
-     */
-    observation_count_not_in_values?: string;
-    /**
-     * Number of observations with SUCCESS status (filter: eq)
-     */
-    success_count_eq?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: ne)
-     */
-    success_count_ne?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: lt)
-     */
-    success_count_lt?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: lte)
-     */
-    success_count_lte?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: gt)
-     */
-    success_count_gt?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: gte)
-     */
-    success_count_gte?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: between_min)
-     */
-    success_count_between_min?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: between_max_value)
-     */
-    success_count_between_max_value?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: in_values) (comma-separated list)
-     */
-    success_count_in_values?: string;
-    /**
-     * Number of observations with SUCCESS status (filter: not_in_values) (comma-separated list)
-     */
-    success_count_not_in_values?: string;
-    /**
-     * Number of observations with PARTIAL status (filter: eq)
-     */
-    partial_count_eq?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: ne)
-     */
-    partial_count_ne?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: lt)
-     */
-    partial_count_lt?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: lte)
-     */
-    partial_count_lte?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: gt)
-     */
-    partial_count_gt?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: gte)
-     */
-    partial_count_gte?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: between_min)
-     */
-    partial_count_between_min?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: between_max_value)
-     */
-    partial_count_between_max_value?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: in_values) (comma-separated list)
-     */
-    partial_count_in_values?: string;
-    /**
-     * Number of observations with PARTIAL status (filter: not_in_values) (comma-separated list)
-     */
-    partial_count_not_in_values?: string;
-    /**
-     * Number of observations with EMPTY status (filter: eq)
-     */
-    empty_count_eq?: number;
-    /**
-     * Number of observations with EMPTY status (filter: ne)
-     */
-    empty_count_ne?: number;
-    /**
-     * Number of observations with EMPTY status (filter: lt)
-     */
-    empty_count_lt?: number;
-    /**
-     * Number of observations with EMPTY status (filter: lte)
-     */
-    empty_count_lte?: number;
-    /**
-     * Number of observations with EMPTY status (filter: gt)
-     */
-    empty_count_gt?: number;
-    /**
-     * Number of observations with EMPTY status (filter: gte)
-     */
-    empty_count_gte?: number;
-    /**
-     * Number of observations with EMPTY status (filter: between_min)
-     */
-    empty_count_between_min?: number;
-    /**
-     * Number of observations with EMPTY status (filter: between_max_value)
-     */
-    empty_count_between_max_value?: number;
-    /**
-     * Number of observations with EMPTY status (filter: in_values) (comma-separated list)
-     */
-    empty_count_in_values?: string;
-    /**
-     * Number of observations with EMPTY status (filter: not_in_values) (comma-separated list)
-     */
-    empty_count_not_in_values?: string;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: eq)
-     */
-    unsupported_count_eq?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: ne)
-     */
-    unsupported_count_ne?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: lt)
-     */
-    unsupported_count_lt?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: lte)
-     */
-    unsupported_count_lte?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: gt)
-     */
-    unsupported_count_gt?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: gte)
-     */
-    unsupported_count_gte?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: between_min)
-     */
-    unsupported_count_between_min?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: between_max_value)
-     */
-    unsupported_count_between_max_value?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: in_values) (comma-separated list)
-     */
-    unsupported_count_in_values?: string;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: not_in_values) (comma-separated list)
-     */
-    unsupported_count_not_in_values?: string;
-    /**
-     * Number of observations with ERROR status (filter: eq)
-     */
-    error_count_eq?: number;
-    /**
-     * Number of observations with ERROR status (filter: ne)
-     */
-    error_count_ne?: number;
-    /**
-     * Number of observations with ERROR status (filter: lt)
-     */
-    error_count_lt?: number;
-    /**
-     * Number of observations with ERROR status (filter: lte)
-     */
-    error_count_lte?: number;
-    /**
-     * Number of observations with ERROR status (filter: gt)
-     */
-    error_count_gt?: number;
-    /**
-     * Number of observations with ERROR status (filter: gte)
-     */
-    error_count_gte?: number;
-    /**
-     * Number of observations with ERROR status (filter: between_min)
-     */
-    error_count_between_min?: number;
-    /**
-     * Number of observations with ERROR status (filter: between_max_value)
-     */
-    error_count_between_max_value?: number;
-    /**
-     * Number of observations with ERROR status (filter: in_values) (comma-separated list)
-     */
-    error_count_in_values?: string;
-    /**
-     * Number of observations with ERROR status (filter: not_in_values) (comma-separated list)
-     */
-    error_count_not_in_values?: string;
-    /**
-     * Filter success_pct using value
-     */
-    success_pct_value?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: eq)
-     */
-    avg_duration_ms_eq?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: ne)
-     */
-    avg_duration_ms_ne?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: lt)
-     */
-    avg_duration_ms_lt?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: lte)
-     */
-    avg_duration_ms_lte?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: gt)
-     */
-    avg_duration_ms_gt?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: gte)
-     */
-    avg_duration_ms_gte?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: between_min)
-     */
-    avg_duration_ms_between_min?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: between_max_value)
-     */
-    avg_duration_ms_between_max_value?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: in_values) (comma-separated list)
-     */
-    avg_duration_ms_in_values?: string;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: not_in_values) (comma-separated list)
-     */
-    avg_duration_ms_not_in_values?: string;
-    /**
-     * Average of median durations across slots in milliseconds (filter: eq)
-     */
-    avg_p50_duration_ms_eq?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: ne)
-     */
-    avg_p50_duration_ms_ne?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: lt)
-     */
-    avg_p50_duration_ms_lt?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: lte)
-     */
-    avg_p50_duration_ms_lte?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: gt)
-     */
-    avg_p50_duration_ms_gt?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: gte)
-     */
-    avg_p50_duration_ms_gte?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: between_min)
-     */
-    avg_p50_duration_ms_between_min?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: between_max_value)
-     */
-    avg_p50_duration_ms_between_max_value?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: in_values) (comma-separated list)
-     */
-    avg_p50_duration_ms_in_values?: string;
-    /**
-     * Average of median durations across slots in milliseconds (filter: not_in_values) (comma-separated list)
-     */
-    avg_p50_duration_ms_not_in_values?: string;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: eq)
-     */
-    avg_p95_duration_ms_eq?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: ne)
-     */
-    avg_p95_duration_ms_ne?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: lt)
-     */
-    avg_p95_duration_ms_lt?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: lte)
-     */
-    avg_p95_duration_ms_lte?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: gt)
-     */
-    avg_p95_duration_ms_gt?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: gte)
-     */
-    avg_p95_duration_ms_gte?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: between_min)
-     */
-    avg_p95_duration_ms_between_min?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: between_max_value)
-     */
-    avg_p95_duration_ms_between_max_value?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: in_values) (comma-separated list)
-     */
-    avg_p95_duration_ms_in_values?: string;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: not_in_values) (comma-separated list)
-     */
-    avg_p95_duration_ms_not_in_values?: string;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: eq)
-     */
-    max_duration_ms_eq?: number;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: ne)
-     */
-    max_duration_ms_ne?: number;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: lt)
-     */
-    max_duration_ms_lt?: number;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: lte)
-     */
-    max_duration_ms_lte?: number;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: gt)
-     */
-    max_duration_ms_gt?: number;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: gte)
-     */
-    max_duration_ms_gte?: number;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: between_min)
-     */
-    max_duration_ms_between_min?: number;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: between_max_value)
-     */
-    max_duration_ms_between_max_value?: number;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: in_values) (comma-separated list)
-     */
-    max_duration_ms_in_values?: string;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: not_in_values) (comma-separated list)
-     */
-    max_duration_ms_not_in_values?: string;
-    /**
-     * The maximum number of fct_engine_get_blobs_status_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
-     */
-    page_size?: number;
-    /**
-     * A page token, received from a previous `ListFctEngineGetBlobsStatusDaily` call. Provide this to retrieve the subsequent page.
-     */
-    page_token?: string;
-    /**
-     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
-     */
-    order_by?: string;
-  };
-  url: '/api/v1/fct_engine_get_blobs_status_daily';
-};
-
-export type FctEngineGetBlobsStatusDailyServiceListErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type FctEngineGetBlobsStatusDailyServiceListError =
-  FctEngineGetBlobsStatusDailyServiceListErrors[keyof FctEngineGetBlobsStatusDailyServiceListErrors];
-
-export type FctEngineGetBlobsStatusDailyServiceListResponses = {
-  /**
-   * OK
-   */
-  200: ListFctEngineGetBlobsStatusDailyResponse;
-};
-
-export type FctEngineGetBlobsStatusDailyServiceListResponse =
-  FctEngineGetBlobsStatusDailyServiceListResponses[keyof FctEngineGetBlobsStatusDailyServiceListResponses];
-
-export type FctEngineGetBlobsStatusDailyServiceGetData = {
-  body?: never;
-  path: {
-    /**
-     * Start of the day period
-     */
-    day_start_date: string;
-  };
-  query?: never;
-  url: '/api/v1/fct_engine_get_blobs_status_daily/{day_start_date}';
-};
-
-export type FctEngineGetBlobsStatusDailyServiceGetErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type FctEngineGetBlobsStatusDailyServiceGetError =
-  FctEngineGetBlobsStatusDailyServiceGetErrors[keyof FctEngineGetBlobsStatusDailyServiceGetErrors];
-
-export type FctEngineGetBlobsStatusDailyServiceGetResponses = {
-  /**
-   * OK
-   */
-  200: GetFctEngineGetBlobsStatusDailyResponse;
-};
-
-export type FctEngineGetBlobsStatusDailyServiceGetResponse =
-  FctEngineGetBlobsStatusDailyServiceGetResponses[keyof FctEngineGetBlobsStatusDailyServiceGetResponses];
-
-export type FctEngineGetBlobsStatusHourlyServiceListData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Start of the hour period (filter: eq)
-     */
-    hour_start_date_time_eq?: number;
-    /**
-     * Start of the hour period (filter: ne)
-     */
-    hour_start_date_time_ne?: number;
-    /**
-     * Start of the hour period (filter: lt)
-     */
-    hour_start_date_time_lt?: number;
-    /**
-     * Start of the hour period (filter: lte)
-     */
-    hour_start_date_time_lte?: number;
-    /**
-     * Start of the hour period (filter: gt)
-     */
-    hour_start_date_time_gt?: number;
-    /**
-     * Start of the hour period (filter: gte)
-     */
-    hour_start_date_time_gte?: number;
-    /**
-     * Start of the hour period (filter: between_min)
-     */
-    hour_start_date_time_between_min?: number;
-    /**
-     * Start of the hour period (filter: between_max_value)
-     */
-    hour_start_date_time_between_max_value?: number;
-    /**
-     * Start of the hour period (filter: in_values) (comma-separated list)
-     */
-    hour_start_date_time_in_values?: string;
-    /**
-     * Start of the hour period (filter: not_in_values) (comma-separated list)
-     */
-    hour_start_date_time_not_in_values?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
-     */
-    node_class_eq?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
-     */
-    node_class_ne?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
-     */
-    node_class_contains?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
-     */
-    node_class_starts_with?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
-     */
-    node_class_ends_with?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
-     */
-    node_class_like?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
-     */
-    node_class_not_like?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
-     */
-    node_class_in_values?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
-     */
-    node_class_not_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: eq)
-     */
-    updated_date_time_eq?: number;
-    /**
-     * Timestamp when the record was last updated (filter: ne)
-     */
-    updated_date_time_ne?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lt)
-     */
-    updated_date_time_lt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lte)
-     */
-    updated_date_time_lte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gt)
-     */
-    updated_date_time_gt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gte)
-     */
-    updated_date_time_gte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_min)
-     */
-    updated_date_time_between_min?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_max_value)
-     */
-    updated_date_time_between_max_value?: number;
-    /**
-     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
-     */
-    updated_date_time_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
-     */
-    updated_date_time_not_in_values?: string;
-    /**
-     * Number of slots in this hour aggregation (filter: eq)
-     */
-    slot_count_eq?: number;
-    /**
-     * Number of slots in this hour aggregation (filter: ne)
-     */
-    slot_count_ne?: number;
-    /**
-     * Number of slots in this hour aggregation (filter: lt)
-     */
-    slot_count_lt?: number;
-    /**
-     * Number of slots in this hour aggregation (filter: lte)
-     */
-    slot_count_lte?: number;
-    /**
-     * Number of slots in this hour aggregation (filter: gt)
-     */
-    slot_count_gt?: number;
-    /**
-     * Number of slots in this hour aggregation (filter: gte)
-     */
-    slot_count_gte?: number;
-    /**
-     * Number of slots in this hour aggregation (filter: between_min)
-     */
-    slot_count_between_min?: number;
-    /**
-     * Number of slots in this hour aggregation (filter: between_max_value)
-     */
-    slot_count_between_max_value?: number;
-    /**
-     * Number of slots in this hour aggregation (filter: in_values) (comma-separated list)
-     */
-    slot_count_in_values?: string;
-    /**
-     * Number of slots in this hour aggregation (filter: not_in_values) (comma-separated list)
-     */
-    slot_count_not_in_values?: string;
-    /**
-     * Total number of observations in this hour (filter: eq)
-     */
-    observation_count_eq?: number;
-    /**
-     * Total number of observations in this hour (filter: ne)
-     */
-    observation_count_ne?: number;
-    /**
-     * Total number of observations in this hour (filter: lt)
-     */
-    observation_count_lt?: number;
-    /**
-     * Total number of observations in this hour (filter: lte)
-     */
-    observation_count_lte?: number;
-    /**
-     * Total number of observations in this hour (filter: gt)
-     */
-    observation_count_gt?: number;
-    /**
-     * Total number of observations in this hour (filter: gte)
-     */
-    observation_count_gte?: number;
-    /**
-     * Total number of observations in this hour (filter: between_min)
-     */
-    observation_count_between_min?: number;
-    /**
-     * Total number of observations in this hour (filter: between_max_value)
-     */
-    observation_count_between_max_value?: number;
-    /**
-     * Total number of observations in this hour (filter: in_values) (comma-separated list)
-     */
-    observation_count_in_values?: string;
-    /**
-     * Total number of observations in this hour (filter: not_in_values) (comma-separated list)
-     */
-    observation_count_not_in_values?: string;
-    /**
-     * Number of observations with SUCCESS status (filter: eq)
-     */
-    success_count_eq?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: ne)
-     */
-    success_count_ne?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: lt)
-     */
-    success_count_lt?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: lte)
-     */
-    success_count_lte?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: gt)
-     */
-    success_count_gt?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: gte)
-     */
-    success_count_gte?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: between_min)
-     */
-    success_count_between_min?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: between_max_value)
-     */
-    success_count_between_max_value?: number;
-    /**
-     * Number of observations with SUCCESS status (filter: in_values) (comma-separated list)
-     */
-    success_count_in_values?: string;
-    /**
-     * Number of observations with SUCCESS status (filter: not_in_values) (comma-separated list)
-     */
-    success_count_not_in_values?: string;
-    /**
-     * Number of observations with PARTIAL status (filter: eq)
-     */
-    partial_count_eq?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: ne)
-     */
-    partial_count_ne?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: lt)
-     */
-    partial_count_lt?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: lte)
-     */
-    partial_count_lte?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: gt)
-     */
-    partial_count_gt?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: gte)
-     */
-    partial_count_gte?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: between_min)
-     */
-    partial_count_between_min?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: between_max_value)
-     */
-    partial_count_between_max_value?: number;
-    /**
-     * Number of observations with PARTIAL status (filter: in_values) (comma-separated list)
-     */
-    partial_count_in_values?: string;
-    /**
-     * Number of observations with PARTIAL status (filter: not_in_values) (comma-separated list)
-     */
-    partial_count_not_in_values?: string;
-    /**
-     * Number of observations with EMPTY status (filter: eq)
-     */
-    empty_count_eq?: number;
-    /**
-     * Number of observations with EMPTY status (filter: ne)
-     */
-    empty_count_ne?: number;
-    /**
-     * Number of observations with EMPTY status (filter: lt)
-     */
-    empty_count_lt?: number;
-    /**
-     * Number of observations with EMPTY status (filter: lte)
-     */
-    empty_count_lte?: number;
-    /**
-     * Number of observations with EMPTY status (filter: gt)
-     */
-    empty_count_gt?: number;
-    /**
-     * Number of observations with EMPTY status (filter: gte)
-     */
-    empty_count_gte?: number;
-    /**
-     * Number of observations with EMPTY status (filter: between_min)
-     */
-    empty_count_between_min?: number;
-    /**
-     * Number of observations with EMPTY status (filter: between_max_value)
-     */
-    empty_count_between_max_value?: number;
-    /**
-     * Number of observations with EMPTY status (filter: in_values) (comma-separated list)
-     */
-    empty_count_in_values?: string;
-    /**
-     * Number of observations with EMPTY status (filter: not_in_values) (comma-separated list)
-     */
-    empty_count_not_in_values?: string;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: eq)
-     */
-    unsupported_count_eq?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: ne)
-     */
-    unsupported_count_ne?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: lt)
-     */
-    unsupported_count_lt?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: lte)
-     */
-    unsupported_count_lte?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: gt)
-     */
-    unsupported_count_gt?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: gte)
-     */
-    unsupported_count_gte?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: between_min)
-     */
-    unsupported_count_between_min?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: between_max_value)
-     */
-    unsupported_count_between_max_value?: number;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: in_values) (comma-separated list)
-     */
-    unsupported_count_in_values?: string;
-    /**
-     * Number of observations with UNSUPPORTED status (filter: not_in_values) (comma-separated list)
-     */
-    unsupported_count_not_in_values?: string;
-    /**
-     * Number of observations with ERROR status (filter: eq)
-     */
-    error_count_eq?: number;
-    /**
-     * Number of observations with ERROR status (filter: ne)
-     */
-    error_count_ne?: number;
-    /**
-     * Number of observations with ERROR status (filter: lt)
-     */
-    error_count_lt?: number;
-    /**
-     * Number of observations with ERROR status (filter: lte)
-     */
-    error_count_lte?: number;
-    /**
-     * Number of observations with ERROR status (filter: gt)
-     */
-    error_count_gt?: number;
-    /**
-     * Number of observations with ERROR status (filter: gte)
-     */
-    error_count_gte?: number;
-    /**
-     * Number of observations with ERROR status (filter: between_min)
-     */
-    error_count_between_min?: number;
-    /**
-     * Number of observations with ERROR status (filter: between_max_value)
-     */
-    error_count_between_max_value?: number;
-    /**
-     * Number of observations with ERROR status (filter: in_values) (comma-separated list)
-     */
-    error_count_in_values?: string;
-    /**
-     * Number of observations with ERROR status (filter: not_in_values) (comma-separated list)
-     */
-    error_count_not_in_values?: string;
-    /**
-     * Filter success_pct using value
-     */
-    success_pct_value?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: eq)
-     */
-    avg_duration_ms_eq?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: ne)
-     */
-    avg_duration_ms_ne?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: lt)
-     */
-    avg_duration_ms_lt?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: lte)
-     */
-    avg_duration_ms_lte?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: gt)
-     */
-    avg_duration_ms_gt?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: gte)
-     */
-    avg_duration_ms_gte?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: between_min)
-     */
-    avg_duration_ms_between_min?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: between_max_value)
-     */
-    avg_duration_ms_between_max_value?: number;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: in_values) (comma-separated list)
-     */
-    avg_duration_ms_in_values?: string;
-    /**
-     * Average duration of engine_getBlobs calls in milliseconds (filter: not_in_values) (comma-separated list)
-     */
-    avg_duration_ms_not_in_values?: string;
-    /**
-     * Average of median durations across slots in milliseconds (filter: eq)
-     */
-    avg_p50_duration_ms_eq?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: ne)
-     */
-    avg_p50_duration_ms_ne?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: lt)
-     */
-    avg_p50_duration_ms_lt?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: lte)
-     */
-    avg_p50_duration_ms_lte?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: gt)
-     */
-    avg_p50_duration_ms_gt?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: gte)
-     */
-    avg_p50_duration_ms_gte?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: between_min)
-     */
-    avg_p50_duration_ms_between_min?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: between_max_value)
-     */
-    avg_p50_duration_ms_between_max_value?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: in_values) (comma-separated list)
-     */
-    avg_p50_duration_ms_in_values?: string;
-    /**
-     * Average of median durations across slots in milliseconds (filter: not_in_values) (comma-separated list)
-     */
-    avg_p50_duration_ms_not_in_values?: string;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: eq)
-     */
-    avg_p95_duration_ms_eq?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: ne)
-     */
-    avg_p95_duration_ms_ne?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: lt)
-     */
-    avg_p95_duration_ms_lt?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: lte)
-     */
-    avg_p95_duration_ms_lte?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: gt)
-     */
-    avg_p95_duration_ms_gt?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: gte)
-     */
-    avg_p95_duration_ms_gte?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: between_min)
-     */
-    avg_p95_duration_ms_between_min?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: between_max_value)
-     */
-    avg_p95_duration_ms_between_max_value?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: in_values) (comma-separated list)
-     */
-    avg_p95_duration_ms_in_values?: string;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: not_in_values) (comma-separated list)
-     */
-    avg_p95_duration_ms_not_in_values?: string;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: eq)
-     */
-    max_duration_ms_eq?: number;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: ne)
-     */
-    max_duration_ms_ne?: number;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: lt)
-     */
-    max_duration_ms_lt?: number;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: lte)
-     */
-    max_duration_ms_lte?: number;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: gt)
-     */
-    max_duration_ms_gt?: number;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: gte)
-     */
-    max_duration_ms_gte?: number;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: between_min)
-     */
-    max_duration_ms_between_min?: number;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: between_max_value)
-     */
-    max_duration_ms_between_max_value?: number;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: in_values) (comma-separated list)
-     */
-    max_duration_ms_in_values?: string;
-    /**
-     * Maximum duration of engine_getBlobs calls in milliseconds (filter: not_in_values) (comma-separated list)
-     */
-    max_duration_ms_not_in_values?: string;
-    /**
-     * The maximum number of fct_engine_get_blobs_status_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
-     */
-    page_size?: number;
-    /**
-     * A page token, received from a previous `ListFctEngineGetBlobsStatusHourly` call. Provide this to retrieve the subsequent page.
-     */
-    page_token?: string;
-    /**
-     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
-     */
-    order_by?: string;
-  };
-  url: '/api/v1/fct_engine_get_blobs_status_hourly';
-};
-
-export type FctEngineGetBlobsStatusHourlyServiceListErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type FctEngineGetBlobsStatusHourlyServiceListError =
-  FctEngineGetBlobsStatusHourlyServiceListErrors[keyof FctEngineGetBlobsStatusHourlyServiceListErrors];
-
-export type FctEngineGetBlobsStatusHourlyServiceListResponses = {
-  /**
-   * OK
-   */
-  200: ListFctEngineGetBlobsStatusHourlyResponse;
-};
-
-export type FctEngineGetBlobsStatusHourlyServiceListResponse =
-  FctEngineGetBlobsStatusHourlyServiceListResponses[keyof FctEngineGetBlobsStatusHourlyServiceListResponses];
-
-export type FctEngineGetBlobsStatusHourlyServiceGetData = {
-  body?: never;
-  path: {
-    /**
-     * Start of the hour period
-     */
-    hour_start_date_time: number;
-  };
-  query?: never;
-  url: '/api/v1/fct_engine_get_blobs_status_hourly/{hour_start_date_time}';
-};
-
-export type FctEngineGetBlobsStatusHourlyServiceGetErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type FctEngineGetBlobsStatusHourlyServiceGetError =
-  FctEngineGetBlobsStatusHourlyServiceGetErrors[keyof FctEngineGetBlobsStatusHourlyServiceGetErrors];
-
-export type FctEngineGetBlobsStatusHourlyServiceGetResponses = {
-  /**
-   * OK
-   */
-  200: GetFctEngineGetBlobsStatusHourlyResponse;
-};
-
-export type FctEngineGetBlobsStatusHourlyServiceGetResponse =
-  FctEngineGetBlobsStatusHourlyServiceGetResponses[keyof FctEngineGetBlobsStatusHourlyServiceGetResponses];
-
 export type FctEngineNewPayloadByElClientServiceListData = {
   body?: never;
   path?: never;
@@ -30249,6 +30049,834 @@ export type FctEngineNewPayloadByElClientServiceGetResponses = {
 
 export type FctEngineNewPayloadByElClientServiceGetResponse =
   FctEngineNewPayloadByElClientServiceGetResponses[keyof FctEngineNewPayloadByElClientServiceGetResponses];
+
+export type FctEngineNewPayloadByElClientHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Execution client version string (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Execution client version string (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Execution client version string (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Execution client version string (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Execution client version string (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Execution client version string (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Execution client version string (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Execution client version string (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Execution client version string (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of unique slots in this hour (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Number of unique slots in this hour (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Number of unique slots in this hour (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Number of unique slots in this hour (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Number of unique slots in this hour (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Number of unique slots in this hour (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Number of unique slots in this hour (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Number of unique slots in this hour (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Number of unique slots in this hour (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Number of unique slots in this hour (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Total number of observations for this client in this hour (filter: eq)
+     */
+    observation_count_eq?: number;
+    /**
+     * Total number of observations for this client in this hour (filter: ne)
+     */
+    observation_count_ne?: number;
+    /**
+     * Total number of observations for this client in this hour (filter: lt)
+     */
+    observation_count_lt?: number;
+    /**
+     * Total number of observations for this client in this hour (filter: lte)
+     */
+    observation_count_lte?: number;
+    /**
+     * Total number of observations for this client in this hour (filter: gt)
+     */
+    observation_count_gt?: number;
+    /**
+     * Total number of observations for this client in this hour (filter: gte)
+     */
+    observation_count_gte?: number;
+    /**
+     * Total number of observations for this client in this hour (filter: between_min)
+     */
+    observation_count_between_min?: number;
+    /**
+     * Total number of observations for this client in this hour (filter: between_max_value)
+     */
+    observation_count_between_max_value?: number;
+    /**
+     * Total number of observations for this client in this hour (filter: in_values) (comma-separated list)
+     */
+    observation_count_in_values?: string;
+    /**
+     * Total number of observations for this client in this hour (filter: not_in_values) (comma-separated list)
+     */
+    observation_count_not_in_values?: string;
+    /**
+     * Number of unique nodes reporting for this client (filter: eq)
+     */
+    unique_node_count_eq?: number;
+    /**
+     * Number of unique nodes reporting for this client (filter: ne)
+     */
+    unique_node_count_ne?: number;
+    /**
+     * Number of unique nodes reporting for this client (filter: lt)
+     */
+    unique_node_count_lt?: number;
+    /**
+     * Number of unique nodes reporting for this client (filter: lte)
+     */
+    unique_node_count_lte?: number;
+    /**
+     * Number of unique nodes reporting for this client (filter: gt)
+     */
+    unique_node_count_gt?: number;
+    /**
+     * Number of unique nodes reporting for this client (filter: gte)
+     */
+    unique_node_count_gte?: number;
+    /**
+     * Number of unique nodes reporting for this client (filter: between_min)
+     */
+    unique_node_count_between_min?: number;
+    /**
+     * Number of unique nodes reporting for this client (filter: between_max_value)
+     */
+    unique_node_count_between_max_value?: number;
+    /**
+     * Number of unique nodes reporting for this client (filter: in_values) (comma-separated list)
+     */
+    unique_node_count_in_values?: string;
+    /**
+     * Number of unique nodes reporting for this client (filter: not_in_values) (comma-separated list)
+     */
+    unique_node_count_not_in_values?: string;
+    /**
+     * Number of observations with VALID status (filter: eq)
+     */
+    valid_count_eq?: number;
+    /**
+     * Number of observations with VALID status (filter: ne)
+     */
+    valid_count_ne?: number;
+    /**
+     * Number of observations with VALID status (filter: lt)
+     */
+    valid_count_lt?: number;
+    /**
+     * Number of observations with VALID status (filter: lte)
+     */
+    valid_count_lte?: number;
+    /**
+     * Number of observations with VALID status (filter: gt)
+     */
+    valid_count_gt?: number;
+    /**
+     * Number of observations with VALID status (filter: gte)
+     */
+    valid_count_gte?: number;
+    /**
+     * Number of observations with VALID status (filter: between_min)
+     */
+    valid_count_between_min?: number;
+    /**
+     * Number of observations with VALID status (filter: between_max_value)
+     */
+    valid_count_between_max_value?: number;
+    /**
+     * Number of observations with VALID status (filter: in_values) (comma-separated list)
+     */
+    valid_count_in_values?: string;
+    /**
+     * Number of observations with VALID status (filter: not_in_values) (comma-separated list)
+     */
+    valid_count_not_in_values?: string;
+    /**
+     * Number of observations with INVALID status (filter: eq)
+     */
+    invalid_count_eq?: number;
+    /**
+     * Number of observations with INVALID status (filter: ne)
+     */
+    invalid_count_ne?: number;
+    /**
+     * Number of observations with INVALID status (filter: lt)
+     */
+    invalid_count_lt?: number;
+    /**
+     * Number of observations with INVALID status (filter: lte)
+     */
+    invalid_count_lte?: number;
+    /**
+     * Number of observations with INVALID status (filter: gt)
+     */
+    invalid_count_gt?: number;
+    /**
+     * Number of observations with INVALID status (filter: gte)
+     */
+    invalid_count_gte?: number;
+    /**
+     * Number of observations with INVALID status (filter: between_min)
+     */
+    invalid_count_between_min?: number;
+    /**
+     * Number of observations with INVALID status (filter: between_max_value)
+     */
+    invalid_count_between_max_value?: number;
+    /**
+     * Number of observations with INVALID status (filter: in_values) (comma-separated list)
+     */
+    invalid_count_in_values?: string;
+    /**
+     * Number of observations with INVALID status (filter: not_in_values) (comma-separated list)
+     */
+    invalid_count_not_in_values?: string;
+    /**
+     * Number of observations with SYNCING status (filter: eq)
+     */
+    syncing_count_eq?: number;
+    /**
+     * Number of observations with SYNCING status (filter: ne)
+     */
+    syncing_count_ne?: number;
+    /**
+     * Number of observations with SYNCING status (filter: lt)
+     */
+    syncing_count_lt?: number;
+    /**
+     * Number of observations with SYNCING status (filter: lte)
+     */
+    syncing_count_lte?: number;
+    /**
+     * Number of observations with SYNCING status (filter: gt)
+     */
+    syncing_count_gt?: number;
+    /**
+     * Number of observations with SYNCING status (filter: gte)
+     */
+    syncing_count_gte?: number;
+    /**
+     * Number of observations with SYNCING status (filter: between_min)
+     */
+    syncing_count_between_min?: number;
+    /**
+     * Number of observations with SYNCING status (filter: between_max_value)
+     */
+    syncing_count_between_max_value?: number;
+    /**
+     * Number of observations with SYNCING status (filter: in_values) (comma-separated list)
+     */
+    syncing_count_in_values?: string;
+    /**
+     * Number of observations with SYNCING status (filter: not_in_values) (comma-separated list)
+     */
+    syncing_count_not_in_values?: string;
+    /**
+     * Number of observations with ACCEPTED status (filter: eq)
+     */
+    accepted_count_eq?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: ne)
+     */
+    accepted_count_ne?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: lt)
+     */
+    accepted_count_lt?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: lte)
+     */
+    accepted_count_lte?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: gt)
+     */
+    accepted_count_gt?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: gte)
+     */
+    accepted_count_gte?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: between_min)
+     */
+    accepted_count_between_min?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: between_max_value)
+     */
+    accepted_count_between_max_value?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: in_values) (comma-separated list)
+     */
+    accepted_count_in_values?: string;
+    /**
+     * Number of observations with ACCEPTED status (filter: not_in_values) (comma-separated list)
+     */
+    accepted_count_not_in_values?: string;
+    /**
+     * Average duration of engine_newPayload calls in milliseconds (filter: eq)
+     */
+    avg_duration_ms_eq?: number;
+    /**
+     * Average duration of engine_newPayload calls in milliseconds (filter: ne)
+     */
+    avg_duration_ms_ne?: number;
+    /**
+     * Average duration of engine_newPayload calls in milliseconds (filter: lt)
+     */
+    avg_duration_ms_lt?: number;
+    /**
+     * Average duration of engine_newPayload calls in milliseconds (filter: lte)
+     */
+    avg_duration_ms_lte?: number;
+    /**
+     * Average duration of engine_newPayload calls in milliseconds (filter: gt)
+     */
+    avg_duration_ms_gt?: number;
+    /**
+     * Average duration of engine_newPayload calls in milliseconds (filter: gte)
+     */
+    avg_duration_ms_gte?: number;
+    /**
+     * Average duration of engine_newPayload calls in milliseconds (filter: between_min)
+     */
+    avg_duration_ms_between_min?: number;
+    /**
+     * Average duration of engine_newPayload calls in milliseconds (filter: between_max_value)
+     */
+    avg_duration_ms_between_max_value?: number;
+    /**
+     * Average duration of engine_newPayload calls in milliseconds (filter: in_values) (comma-separated list)
+     */
+    avg_duration_ms_in_values?: string;
+    /**
+     * Average duration of engine_newPayload calls in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    avg_duration_ms_not_in_values?: string;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: eq)
+     */
+    p50_duration_ms_eq?: number;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: ne)
+     */
+    p50_duration_ms_ne?: number;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: lt)
+     */
+    p50_duration_ms_lt?: number;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: lte)
+     */
+    p50_duration_ms_lte?: number;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: gt)
+     */
+    p50_duration_ms_gt?: number;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: gte)
+     */
+    p50_duration_ms_gte?: number;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: between_min)
+     */
+    p50_duration_ms_between_min?: number;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: between_max_value)
+     */
+    p50_duration_ms_between_max_value?: number;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: in_values) (comma-separated list)
+     */
+    p50_duration_ms_in_values?: string;
+    /**
+     * 50th percentile (median) duration in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    p50_duration_ms_not_in_values?: string;
+    /**
+     * 95th percentile duration in milliseconds (filter: eq)
+     */
+    p95_duration_ms_eq?: number;
+    /**
+     * 95th percentile duration in milliseconds (filter: ne)
+     */
+    p95_duration_ms_ne?: number;
+    /**
+     * 95th percentile duration in milliseconds (filter: lt)
+     */
+    p95_duration_ms_lt?: number;
+    /**
+     * 95th percentile duration in milliseconds (filter: lte)
+     */
+    p95_duration_ms_lte?: number;
+    /**
+     * 95th percentile duration in milliseconds (filter: gt)
+     */
+    p95_duration_ms_gt?: number;
+    /**
+     * 95th percentile duration in milliseconds (filter: gte)
+     */
+    p95_duration_ms_gte?: number;
+    /**
+     * 95th percentile duration in milliseconds (filter: between_min)
+     */
+    p95_duration_ms_between_min?: number;
+    /**
+     * 95th percentile duration in milliseconds (filter: between_max_value)
+     */
+    p95_duration_ms_between_max_value?: number;
+    /**
+     * 95th percentile duration in milliseconds (filter: in_values) (comma-separated list)
+     */
+    p95_duration_ms_in_values?: string;
+    /**
+     * 95th percentile duration in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    p95_duration_ms_not_in_values?: string;
+    /**
+     * Minimum duration in milliseconds (filter: eq)
+     */
+    min_duration_ms_eq?: number;
+    /**
+     * Minimum duration in milliseconds (filter: ne)
+     */
+    min_duration_ms_ne?: number;
+    /**
+     * Minimum duration in milliseconds (filter: lt)
+     */
+    min_duration_ms_lt?: number;
+    /**
+     * Minimum duration in milliseconds (filter: lte)
+     */
+    min_duration_ms_lte?: number;
+    /**
+     * Minimum duration in milliseconds (filter: gt)
+     */
+    min_duration_ms_gt?: number;
+    /**
+     * Minimum duration in milliseconds (filter: gte)
+     */
+    min_duration_ms_gte?: number;
+    /**
+     * Minimum duration in milliseconds (filter: between_min)
+     */
+    min_duration_ms_between_min?: number;
+    /**
+     * Minimum duration in milliseconds (filter: between_max_value)
+     */
+    min_duration_ms_between_max_value?: number;
+    /**
+     * Minimum duration in milliseconds (filter: in_values) (comma-separated list)
+     */
+    min_duration_ms_in_values?: string;
+    /**
+     * Minimum duration in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    min_duration_ms_not_in_values?: string;
+    /**
+     * Maximum duration in milliseconds (filter: eq)
+     */
+    max_duration_ms_eq?: number;
+    /**
+     * Maximum duration in milliseconds (filter: ne)
+     */
+    max_duration_ms_ne?: number;
+    /**
+     * Maximum duration in milliseconds (filter: lt)
+     */
+    max_duration_ms_lt?: number;
+    /**
+     * Maximum duration in milliseconds (filter: lte)
+     */
+    max_duration_ms_lte?: number;
+    /**
+     * Maximum duration in milliseconds (filter: gt)
+     */
+    max_duration_ms_gt?: number;
+    /**
+     * Maximum duration in milliseconds (filter: gte)
+     */
+    max_duration_ms_gte?: number;
+    /**
+     * Maximum duration in milliseconds (filter: between_min)
+     */
+    max_duration_ms_between_min?: number;
+    /**
+     * Maximum duration in milliseconds (filter: between_max_value)
+     */
+    max_duration_ms_between_max_value?: number;
+    /**
+     * Maximum duration in milliseconds (filter: in_values) (comma-separated list)
+     */
+    max_duration_ms_in_values?: string;
+    /**
+     * Maximum duration in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    max_duration_ms_not_in_values?: string;
+    /**
+     * Average gas used per block (VALID status only) (filter: eq)
+     */
+    avg_gas_used_eq?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: ne)
+     */
+    avg_gas_used_ne?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: lt)
+     */
+    avg_gas_used_lt?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: lte)
+     */
+    avg_gas_used_lte?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: gt)
+     */
+    avg_gas_used_gt?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: gte)
+     */
+    avg_gas_used_gte?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: between_min)
+     */
+    avg_gas_used_between_min?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: between_max_value)
+     */
+    avg_gas_used_between_max_value?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: in_values) (comma-separated list)
+     */
+    avg_gas_used_in_values?: string;
+    /**
+     * Average gas used per block (VALID status only) (filter: not_in_values) (comma-separated list)
+     */
+    avg_gas_used_not_in_values?: string;
+    /**
+     * Average gas limit per block (VALID status only) (filter: eq)
+     */
+    avg_gas_limit_eq?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: ne)
+     */
+    avg_gas_limit_ne?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: lt)
+     */
+    avg_gas_limit_lt?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: lte)
+     */
+    avg_gas_limit_lte?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: gt)
+     */
+    avg_gas_limit_gt?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: gte)
+     */
+    avg_gas_limit_gte?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: between_min)
+     */
+    avg_gas_limit_between_min?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: between_max_value)
+     */
+    avg_gas_limit_between_max_value?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: in_values) (comma-separated list)
+     */
+    avg_gas_limit_in_values?: string;
+    /**
+     * Average gas limit per block (VALID status only) (filter: not_in_values) (comma-separated list)
+     */
+    avg_gas_limit_not_in_values?: string;
+    /**
+     * Filter avg_tx_count using value
+     */
+    avg_tx_count_value?: number;
+    /**
+     * Filter avg_blob_count using value
+     */
+    avg_blob_count_value?: number;
+    /**
+     * The maximum number of fct_engine_new_payload_by_el_client_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadByElClientHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_by_el_client_hourly';
+};
+
+export type FctEngineNewPayloadByElClientHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadByElClientHourlyServiceListError =
+  FctEngineNewPayloadByElClientHourlyServiceListErrors[keyof FctEngineNewPayloadByElClientHourlyServiceListErrors];
+
+export type FctEngineNewPayloadByElClientHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadByElClientHourlyResponse;
+};
+
+export type FctEngineNewPayloadByElClientHourlyServiceListResponse =
+  FctEngineNewPayloadByElClientHourlyServiceListResponses[keyof FctEngineNewPayloadByElClientHourlyServiceListResponses];
+
+export type FctEngineNewPayloadByElClientHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_by_el_client_hourly/{hour_start_date_time}';
+};
+
+export type FctEngineNewPayloadByElClientHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadByElClientHourlyServiceGetError =
+  FctEngineNewPayloadByElClientHourlyServiceGetErrors[keyof FctEngineNewPayloadByElClientHourlyServiceGetErrors];
+
+export type FctEngineNewPayloadByElClientHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadByElClientHourlyResponse;
+};
+
+export type FctEngineNewPayloadByElClientHourlyServiceGetResponse =
+  FctEngineNewPayloadByElClientHourlyServiceGetResponses[keyof FctEngineNewPayloadByElClientHourlyServiceGetResponses];
 
 export type FctEngineNewPayloadBySlotServiceListData = {
   body?: never;
@@ -31809,1266 +32437,6 @@ export type FctEngineNewPayloadDurationChunked50MsServiceGetResponses = {
 
 export type FctEngineNewPayloadDurationChunked50MsServiceGetResponse =
   FctEngineNewPayloadDurationChunked50MsServiceGetResponses[keyof FctEngineNewPayloadDurationChunked50MsServiceGetResponses];
-
-export type FctEngineNewPayloadStatusDailyServiceListData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Start of the day period (filter: eq)
-     */
-    day_start_date_eq?: string;
-    /**
-     * Start of the day period (filter: ne)
-     */
-    day_start_date_ne?: string;
-    /**
-     * Start of the day period (filter: contains)
-     */
-    day_start_date_contains?: string;
-    /**
-     * Start of the day period (filter: starts_with)
-     */
-    day_start_date_starts_with?: string;
-    /**
-     * Start of the day period (filter: ends_with)
-     */
-    day_start_date_ends_with?: string;
-    /**
-     * Start of the day period (filter: like)
-     */
-    day_start_date_like?: string;
-    /**
-     * Start of the day period (filter: not_like)
-     */
-    day_start_date_not_like?: string;
-    /**
-     * Start of the day period (filter: in_values) (comma-separated list)
-     */
-    day_start_date_in_values?: string;
-    /**
-     * Start of the day period (filter: not_in_values) (comma-separated list)
-     */
-    day_start_date_not_in_values?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
-     */
-    node_class_eq?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
-     */
-    node_class_ne?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
-     */
-    node_class_contains?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
-     */
-    node_class_starts_with?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
-     */
-    node_class_ends_with?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
-     */
-    node_class_like?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
-     */
-    node_class_not_like?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
-     */
-    node_class_in_values?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
-     */
-    node_class_not_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: eq)
-     */
-    updated_date_time_eq?: number;
-    /**
-     * Timestamp when the record was last updated (filter: ne)
-     */
-    updated_date_time_ne?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lt)
-     */
-    updated_date_time_lt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lte)
-     */
-    updated_date_time_lte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gt)
-     */
-    updated_date_time_gt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gte)
-     */
-    updated_date_time_gte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_min)
-     */
-    updated_date_time_between_min?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_max_value)
-     */
-    updated_date_time_between_max_value?: number;
-    /**
-     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
-     */
-    updated_date_time_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
-     */
-    updated_date_time_not_in_values?: string;
-    /**
-     * Number of slots in this day aggregation (filter: eq)
-     */
-    slot_count_eq?: number;
-    /**
-     * Number of slots in this day aggregation (filter: ne)
-     */
-    slot_count_ne?: number;
-    /**
-     * Number of slots in this day aggregation (filter: lt)
-     */
-    slot_count_lt?: number;
-    /**
-     * Number of slots in this day aggregation (filter: lte)
-     */
-    slot_count_lte?: number;
-    /**
-     * Number of slots in this day aggregation (filter: gt)
-     */
-    slot_count_gt?: number;
-    /**
-     * Number of slots in this day aggregation (filter: gte)
-     */
-    slot_count_gte?: number;
-    /**
-     * Number of slots in this day aggregation (filter: between_min)
-     */
-    slot_count_between_min?: number;
-    /**
-     * Number of slots in this day aggregation (filter: between_max_value)
-     */
-    slot_count_between_max_value?: number;
-    /**
-     * Number of slots in this day aggregation (filter: in_values) (comma-separated list)
-     */
-    slot_count_in_values?: string;
-    /**
-     * Number of slots in this day aggregation (filter: not_in_values) (comma-separated list)
-     */
-    slot_count_not_in_values?: string;
-    /**
-     * Total number of observations in this day (filter: eq)
-     */
-    observation_count_eq?: number;
-    /**
-     * Total number of observations in this day (filter: ne)
-     */
-    observation_count_ne?: number;
-    /**
-     * Total number of observations in this day (filter: lt)
-     */
-    observation_count_lt?: number;
-    /**
-     * Total number of observations in this day (filter: lte)
-     */
-    observation_count_lte?: number;
-    /**
-     * Total number of observations in this day (filter: gt)
-     */
-    observation_count_gt?: number;
-    /**
-     * Total number of observations in this day (filter: gte)
-     */
-    observation_count_gte?: number;
-    /**
-     * Total number of observations in this day (filter: between_min)
-     */
-    observation_count_between_min?: number;
-    /**
-     * Total number of observations in this day (filter: between_max_value)
-     */
-    observation_count_between_max_value?: number;
-    /**
-     * Total number of observations in this day (filter: in_values) (comma-separated list)
-     */
-    observation_count_in_values?: string;
-    /**
-     * Total number of observations in this day (filter: not_in_values) (comma-separated list)
-     */
-    observation_count_not_in_values?: string;
-    /**
-     * Number of observations with VALID status (filter: eq)
-     */
-    valid_count_eq?: number;
-    /**
-     * Number of observations with VALID status (filter: ne)
-     */
-    valid_count_ne?: number;
-    /**
-     * Number of observations with VALID status (filter: lt)
-     */
-    valid_count_lt?: number;
-    /**
-     * Number of observations with VALID status (filter: lte)
-     */
-    valid_count_lte?: number;
-    /**
-     * Number of observations with VALID status (filter: gt)
-     */
-    valid_count_gt?: number;
-    /**
-     * Number of observations with VALID status (filter: gte)
-     */
-    valid_count_gte?: number;
-    /**
-     * Number of observations with VALID status (filter: between_min)
-     */
-    valid_count_between_min?: number;
-    /**
-     * Number of observations with VALID status (filter: between_max_value)
-     */
-    valid_count_between_max_value?: number;
-    /**
-     * Number of observations with VALID status (filter: in_values) (comma-separated list)
-     */
-    valid_count_in_values?: string;
-    /**
-     * Number of observations with VALID status (filter: not_in_values) (comma-separated list)
-     */
-    valid_count_not_in_values?: string;
-    /**
-     * Number of observations with INVALID status (filter: eq)
-     */
-    invalid_count_eq?: number;
-    /**
-     * Number of observations with INVALID status (filter: ne)
-     */
-    invalid_count_ne?: number;
-    /**
-     * Number of observations with INVALID status (filter: lt)
-     */
-    invalid_count_lt?: number;
-    /**
-     * Number of observations with INVALID status (filter: lte)
-     */
-    invalid_count_lte?: number;
-    /**
-     * Number of observations with INVALID status (filter: gt)
-     */
-    invalid_count_gt?: number;
-    /**
-     * Number of observations with INVALID status (filter: gte)
-     */
-    invalid_count_gte?: number;
-    /**
-     * Number of observations with INVALID status (filter: between_min)
-     */
-    invalid_count_between_min?: number;
-    /**
-     * Number of observations with INVALID status (filter: between_max_value)
-     */
-    invalid_count_between_max_value?: number;
-    /**
-     * Number of observations with INVALID status (filter: in_values) (comma-separated list)
-     */
-    invalid_count_in_values?: string;
-    /**
-     * Number of observations with INVALID status (filter: not_in_values) (comma-separated list)
-     */
-    invalid_count_not_in_values?: string;
-    /**
-     * Number of observations with SYNCING status (filter: eq)
-     */
-    syncing_count_eq?: number;
-    /**
-     * Number of observations with SYNCING status (filter: ne)
-     */
-    syncing_count_ne?: number;
-    /**
-     * Number of observations with SYNCING status (filter: lt)
-     */
-    syncing_count_lt?: number;
-    /**
-     * Number of observations with SYNCING status (filter: lte)
-     */
-    syncing_count_lte?: number;
-    /**
-     * Number of observations with SYNCING status (filter: gt)
-     */
-    syncing_count_gt?: number;
-    /**
-     * Number of observations with SYNCING status (filter: gte)
-     */
-    syncing_count_gte?: number;
-    /**
-     * Number of observations with SYNCING status (filter: between_min)
-     */
-    syncing_count_between_min?: number;
-    /**
-     * Number of observations with SYNCING status (filter: between_max_value)
-     */
-    syncing_count_between_max_value?: number;
-    /**
-     * Number of observations with SYNCING status (filter: in_values) (comma-separated list)
-     */
-    syncing_count_in_values?: string;
-    /**
-     * Number of observations with SYNCING status (filter: not_in_values) (comma-separated list)
-     */
-    syncing_count_not_in_values?: string;
-    /**
-     * Number of observations with ACCEPTED status (filter: eq)
-     */
-    accepted_count_eq?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: ne)
-     */
-    accepted_count_ne?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: lt)
-     */
-    accepted_count_lt?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: lte)
-     */
-    accepted_count_lte?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: gt)
-     */
-    accepted_count_gt?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: gte)
-     */
-    accepted_count_gte?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: between_min)
-     */
-    accepted_count_between_min?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: between_max_value)
-     */
-    accepted_count_between_max_value?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: in_values) (comma-separated list)
-     */
-    accepted_count_in_values?: string;
-    /**
-     * Number of observations with ACCEPTED status (filter: not_in_values) (comma-separated list)
-     */
-    accepted_count_not_in_values?: string;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: eq)
-     */
-    invalid_block_hash_count_eq?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: ne)
-     */
-    invalid_block_hash_count_ne?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: lt)
-     */
-    invalid_block_hash_count_lt?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: lte)
-     */
-    invalid_block_hash_count_lte?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: gt)
-     */
-    invalid_block_hash_count_gt?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: gte)
-     */
-    invalid_block_hash_count_gte?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: between_min)
-     */
-    invalid_block_hash_count_between_min?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: between_max_value)
-     */
-    invalid_block_hash_count_between_max_value?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: in_values) (comma-separated list)
-     */
-    invalid_block_hash_count_in_values?: string;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: not_in_values) (comma-separated list)
-     */
-    invalid_block_hash_count_not_in_values?: string;
-    /**
-     * Filter valid_pct using value
-     */
-    valid_pct_value?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: eq)
-     */
-    avg_duration_ms_eq?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: ne)
-     */
-    avg_duration_ms_ne?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: lt)
-     */
-    avg_duration_ms_lt?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: lte)
-     */
-    avg_duration_ms_lte?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: gt)
-     */
-    avg_duration_ms_gt?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: gte)
-     */
-    avg_duration_ms_gte?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: between_min)
-     */
-    avg_duration_ms_between_min?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: between_max_value)
-     */
-    avg_duration_ms_between_max_value?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: in_values) (comma-separated list)
-     */
-    avg_duration_ms_in_values?: string;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: not_in_values) (comma-separated list)
-     */
-    avg_duration_ms_not_in_values?: string;
-    /**
-     * Average of median durations across slots in milliseconds (filter: eq)
-     */
-    avg_p50_duration_ms_eq?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: ne)
-     */
-    avg_p50_duration_ms_ne?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: lt)
-     */
-    avg_p50_duration_ms_lt?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: lte)
-     */
-    avg_p50_duration_ms_lte?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: gt)
-     */
-    avg_p50_duration_ms_gt?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: gte)
-     */
-    avg_p50_duration_ms_gte?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: between_min)
-     */
-    avg_p50_duration_ms_between_min?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: between_max_value)
-     */
-    avg_p50_duration_ms_between_max_value?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: in_values) (comma-separated list)
-     */
-    avg_p50_duration_ms_in_values?: string;
-    /**
-     * Average of median durations across slots in milliseconds (filter: not_in_values) (comma-separated list)
-     */
-    avg_p50_duration_ms_not_in_values?: string;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: eq)
-     */
-    avg_p95_duration_ms_eq?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: ne)
-     */
-    avg_p95_duration_ms_ne?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: lt)
-     */
-    avg_p95_duration_ms_lt?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: lte)
-     */
-    avg_p95_duration_ms_lte?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: gt)
-     */
-    avg_p95_duration_ms_gt?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: gte)
-     */
-    avg_p95_duration_ms_gte?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: between_min)
-     */
-    avg_p95_duration_ms_between_min?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: between_max_value)
-     */
-    avg_p95_duration_ms_between_max_value?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: in_values) (comma-separated list)
-     */
-    avg_p95_duration_ms_in_values?: string;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: not_in_values) (comma-separated list)
-     */
-    avg_p95_duration_ms_not_in_values?: string;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: eq)
-     */
-    max_duration_ms_eq?: number;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: ne)
-     */
-    max_duration_ms_ne?: number;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: lt)
-     */
-    max_duration_ms_lt?: number;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: lte)
-     */
-    max_duration_ms_lte?: number;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: gt)
-     */
-    max_duration_ms_gt?: number;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: gte)
-     */
-    max_duration_ms_gte?: number;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: between_min)
-     */
-    max_duration_ms_between_min?: number;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: between_max_value)
-     */
-    max_duration_ms_between_max_value?: number;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: in_values) (comma-separated list)
-     */
-    max_duration_ms_in_values?: string;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: not_in_values) (comma-separated list)
-     */
-    max_duration_ms_not_in_values?: string;
-    /**
-     * The maximum number of fct_engine_new_payload_status_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
-     */
-    page_size?: number;
-    /**
-     * A page token, received from a previous `ListFctEngineNewPayloadStatusDaily` call. Provide this to retrieve the subsequent page.
-     */
-    page_token?: string;
-    /**
-     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
-     */
-    order_by?: string;
-  };
-  url: '/api/v1/fct_engine_new_payload_status_daily';
-};
-
-export type FctEngineNewPayloadStatusDailyServiceListErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type FctEngineNewPayloadStatusDailyServiceListError =
-  FctEngineNewPayloadStatusDailyServiceListErrors[keyof FctEngineNewPayloadStatusDailyServiceListErrors];
-
-export type FctEngineNewPayloadStatusDailyServiceListResponses = {
-  /**
-   * OK
-   */
-  200: ListFctEngineNewPayloadStatusDailyResponse;
-};
-
-export type FctEngineNewPayloadStatusDailyServiceListResponse =
-  FctEngineNewPayloadStatusDailyServiceListResponses[keyof FctEngineNewPayloadStatusDailyServiceListResponses];
-
-export type FctEngineNewPayloadStatusDailyServiceGetData = {
-  body?: never;
-  path: {
-    /**
-     * Start of the day period
-     */
-    day_start_date: string;
-  };
-  query?: never;
-  url: '/api/v1/fct_engine_new_payload_status_daily/{day_start_date}';
-};
-
-export type FctEngineNewPayloadStatusDailyServiceGetErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type FctEngineNewPayloadStatusDailyServiceGetError =
-  FctEngineNewPayloadStatusDailyServiceGetErrors[keyof FctEngineNewPayloadStatusDailyServiceGetErrors];
-
-export type FctEngineNewPayloadStatusDailyServiceGetResponses = {
-  /**
-   * OK
-   */
-  200: GetFctEngineNewPayloadStatusDailyResponse;
-};
-
-export type FctEngineNewPayloadStatusDailyServiceGetResponse =
-  FctEngineNewPayloadStatusDailyServiceGetResponses[keyof FctEngineNewPayloadStatusDailyServiceGetResponses];
-
-export type FctEngineNewPayloadStatusHourlyServiceListData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Start of the hour period (filter: eq)
-     */
-    hour_start_date_time_eq?: number;
-    /**
-     * Start of the hour period (filter: ne)
-     */
-    hour_start_date_time_ne?: number;
-    /**
-     * Start of the hour period (filter: lt)
-     */
-    hour_start_date_time_lt?: number;
-    /**
-     * Start of the hour period (filter: lte)
-     */
-    hour_start_date_time_lte?: number;
-    /**
-     * Start of the hour period (filter: gt)
-     */
-    hour_start_date_time_gt?: number;
-    /**
-     * Start of the hour period (filter: gte)
-     */
-    hour_start_date_time_gte?: number;
-    /**
-     * Start of the hour period (filter: between_min)
-     */
-    hour_start_date_time_between_min?: number;
-    /**
-     * Start of the hour period (filter: between_max_value)
-     */
-    hour_start_date_time_between_max_value?: number;
-    /**
-     * Start of the hour period (filter: in_values) (comma-separated list)
-     */
-    hour_start_date_time_in_values?: string;
-    /**
-     * Start of the hour period (filter: not_in_values) (comma-separated list)
-     */
-    hour_start_date_time_not_in_values?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
-     */
-    node_class_eq?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
-     */
-    node_class_ne?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
-     */
-    node_class_contains?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
-     */
-    node_class_starts_with?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
-     */
-    node_class_ends_with?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
-     */
-    node_class_like?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
-     */
-    node_class_not_like?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
-     */
-    node_class_in_values?: string;
-    /**
-     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
-     */
-    node_class_not_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: eq)
-     */
-    updated_date_time_eq?: number;
-    /**
-     * Timestamp when the record was last updated (filter: ne)
-     */
-    updated_date_time_ne?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lt)
-     */
-    updated_date_time_lt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lte)
-     */
-    updated_date_time_lte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gt)
-     */
-    updated_date_time_gt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gte)
-     */
-    updated_date_time_gte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_min)
-     */
-    updated_date_time_between_min?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_max_value)
-     */
-    updated_date_time_between_max_value?: number;
-    /**
-     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
-     */
-    updated_date_time_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
-     */
-    updated_date_time_not_in_values?: string;
-    /**
-     * Number of slots in this hour aggregation (filter: eq)
-     */
-    slot_count_eq?: number;
-    /**
-     * Number of slots in this hour aggregation (filter: ne)
-     */
-    slot_count_ne?: number;
-    /**
-     * Number of slots in this hour aggregation (filter: lt)
-     */
-    slot_count_lt?: number;
-    /**
-     * Number of slots in this hour aggregation (filter: lte)
-     */
-    slot_count_lte?: number;
-    /**
-     * Number of slots in this hour aggregation (filter: gt)
-     */
-    slot_count_gt?: number;
-    /**
-     * Number of slots in this hour aggregation (filter: gte)
-     */
-    slot_count_gte?: number;
-    /**
-     * Number of slots in this hour aggregation (filter: between_min)
-     */
-    slot_count_between_min?: number;
-    /**
-     * Number of slots in this hour aggregation (filter: between_max_value)
-     */
-    slot_count_between_max_value?: number;
-    /**
-     * Number of slots in this hour aggregation (filter: in_values) (comma-separated list)
-     */
-    slot_count_in_values?: string;
-    /**
-     * Number of slots in this hour aggregation (filter: not_in_values) (comma-separated list)
-     */
-    slot_count_not_in_values?: string;
-    /**
-     * Total number of observations in this hour (filter: eq)
-     */
-    observation_count_eq?: number;
-    /**
-     * Total number of observations in this hour (filter: ne)
-     */
-    observation_count_ne?: number;
-    /**
-     * Total number of observations in this hour (filter: lt)
-     */
-    observation_count_lt?: number;
-    /**
-     * Total number of observations in this hour (filter: lte)
-     */
-    observation_count_lte?: number;
-    /**
-     * Total number of observations in this hour (filter: gt)
-     */
-    observation_count_gt?: number;
-    /**
-     * Total number of observations in this hour (filter: gte)
-     */
-    observation_count_gte?: number;
-    /**
-     * Total number of observations in this hour (filter: between_min)
-     */
-    observation_count_between_min?: number;
-    /**
-     * Total number of observations in this hour (filter: between_max_value)
-     */
-    observation_count_between_max_value?: number;
-    /**
-     * Total number of observations in this hour (filter: in_values) (comma-separated list)
-     */
-    observation_count_in_values?: string;
-    /**
-     * Total number of observations in this hour (filter: not_in_values) (comma-separated list)
-     */
-    observation_count_not_in_values?: string;
-    /**
-     * Number of observations with VALID status (filter: eq)
-     */
-    valid_count_eq?: number;
-    /**
-     * Number of observations with VALID status (filter: ne)
-     */
-    valid_count_ne?: number;
-    /**
-     * Number of observations with VALID status (filter: lt)
-     */
-    valid_count_lt?: number;
-    /**
-     * Number of observations with VALID status (filter: lte)
-     */
-    valid_count_lte?: number;
-    /**
-     * Number of observations with VALID status (filter: gt)
-     */
-    valid_count_gt?: number;
-    /**
-     * Number of observations with VALID status (filter: gte)
-     */
-    valid_count_gte?: number;
-    /**
-     * Number of observations with VALID status (filter: between_min)
-     */
-    valid_count_between_min?: number;
-    /**
-     * Number of observations with VALID status (filter: between_max_value)
-     */
-    valid_count_between_max_value?: number;
-    /**
-     * Number of observations with VALID status (filter: in_values) (comma-separated list)
-     */
-    valid_count_in_values?: string;
-    /**
-     * Number of observations with VALID status (filter: not_in_values) (comma-separated list)
-     */
-    valid_count_not_in_values?: string;
-    /**
-     * Number of observations with INVALID status (filter: eq)
-     */
-    invalid_count_eq?: number;
-    /**
-     * Number of observations with INVALID status (filter: ne)
-     */
-    invalid_count_ne?: number;
-    /**
-     * Number of observations with INVALID status (filter: lt)
-     */
-    invalid_count_lt?: number;
-    /**
-     * Number of observations with INVALID status (filter: lte)
-     */
-    invalid_count_lte?: number;
-    /**
-     * Number of observations with INVALID status (filter: gt)
-     */
-    invalid_count_gt?: number;
-    /**
-     * Number of observations with INVALID status (filter: gte)
-     */
-    invalid_count_gte?: number;
-    /**
-     * Number of observations with INVALID status (filter: between_min)
-     */
-    invalid_count_between_min?: number;
-    /**
-     * Number of observations with INVALID status (filter: between_max_value)
-     */
-    invalid_count_between_max_value?: number;
-    /**
-     * Number of observations with INVALID status (filter: in_values) (comma-separated list)
-     */
-    invalid_count_in_values?: string;
-    /**
-     * Number of observations with INVALID status (filter: not_in_values) (comma-separated list)
-     */
-    invalid_count_not_in_values?: string;
-    /**
-     * Number of observations with SYNCING status (filter: eq)
-     */
-    syncing_count_eq?: number;
-    /**
-     * Number of observations with SYNCING status (filter: ne)
-     */
-    syncing_count_ne?: number;
-    /**
-     * Number of observations with SYNCING status (filter: lt)
-     */
-    syncing_count_lt?: number;
-    /**
-     * Number of observations with SYNCING status (filter: lte)
-     */
-    syncing_count_lte?: number;
-    /**
-     * Number of observations with SYNCING status (filter: gt)
-     */
-    syncing_count_gt?: number;
-    /**
-     * Number of observations with SYNCING status (filter: gte)
-     */
-    syncing_count_gte?: number;
-    /**
-     * Number of observations with SYNCING status (filter: between_min)
-     */
-    syncing_count_between_min?: number;
-    /**
-     * Number of observations with SYNCING status (filter: between_max_value)
-     */
-    syncing_count_between_max_value?: number;
-    /**
-     * Number of observations with SYNCING status (filter: in_values) (comma-separated list)
-     */
-    syncing_count_in_values?: string;
-    /**
-     * Number of observations with SYNCING status (filter: not_in_values) (comma-separated list)
-     */
-    syncing_count_not_in_values?: string;
-    /**
-     * Number of observations with ACCEPTED status (filter: eq)
-     */
-    accepted_count_eq?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: ne)
-     */
-    accepted_count_ne?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: lt)
-     */
-    accepted_count_lt?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: lte)
-     */
-    accepted_count_lte?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: gt)
-     */
-    accepted_count_gt?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: gte)
-     */
-    accepted_count_gte?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: between_min)
-     */
-    accepted_count_between_min?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: between_max_value)
-     */
-    accepted_count_between_max_value?: number;
-    /**
-     * Number of observations with ACCEPTED status (filter: in_values) (comma-separated list)
-     */
-    accepted_count_in_values?: string;
-    /**
-     * Number of observations with ACCEPTED status (filter: not_in_values) (comma-separated list)
-     */
-    accepted_count_not_in_values?: string;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: eq)
-     */
-    invalid_block_hash_count_eq?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: ne)
-     */
-    invalid_block_hash_count_ne?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: lt)
-     */
-    invalid_block_hash_count_lt?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: lte)
-     */
-    invalid_block_hash_count_lte?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: gt)
-     */
-    invalid_block_hash_count_gt?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: gte)
-     */
-    invalid_block_hash_count_gte?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: between_min)
-     */
-    invalid_block_hash_count_between_min?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: between_max_value)
-     */
-    invalid_block_hash_count_between_max_value?: number;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: in_values) (comma-separated list)
-     */
-    invalid_block_hash_count_in_values?: string;
-    /**
-     * Number of observations with INVALID_BLOCK_HASH status (filter: not_in_values) (comma-separated list)
-     */
-    invalid_block_hash_count_not_in_values?: string;
-    /**
-     * Filter valid_pct using value
-     */
-    valid_pct_value?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: eq)
-     */
-    avg_duration_ms_eq?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: ne)
-     */
-    avg_duration_ms_ne?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: lt)
-     */
-    avg_duration_ms_lt?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: lte)
-     */
-    avg_duration_ms_lte?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: gt)
-     */
-    avg_duration_ms_gt?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: gte)
-     */
-    avg_duration_ms_gte?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: between_min)
-     */
-    avg_duration_ms_between_min?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: between_max_value)
-     */
-    avg_duration_ms_between_max_value?: number;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: in_values) (comma-separated list)
-     */
-    avg_duration_ms_in_values?: string;
-    /**
-     * Average duration of engine_newPayload calls in milliseconds (filter: not_in_values) (comma-separated list)
-     */
-    avg_duration_ms_not_in_values?: string;
-    /**
-     * Average of median durations across slots in milliseconds (filter: eq)
-     */
-    avg_p50_duration_ms_eq?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: ne)
-     */
-    avg_p50_duration_ms_ne?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: lt)
-     */
-    avg_p50_duration_ms_lt?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: lte)
-     */
-    avg_p50_duration_ms_lte?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: gt)
-     */
-    avg_p50_duration_ms_gt?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: gte)
-     */
-    avg_p50_duration_ms_gte?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: between_min)
-     */
-    avg_p50_duration_ms_between_min?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: between_max_value)
-     */
-    avg_p50_duration_ms_between_max_value?: number;
-    /**
-     * Average of median durations across slots in milliseconds (filter: in_values) (comma-separated list)
-     */
-    avg_p50_duration_ms_in_values?: string;
-    /**
-     * Average of median durations across slots in milliseconds (filter: not_in_values) (comma-separated list)
-     */
-    avg_p50_duration_ms_not_in_values?: string;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: eq)
-     */
-    avg_p95_duration_ms_eq?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: ne)
-     */
-    avg_p95_duration_ms_ne?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: lt)
-     */
-    avg_p95_duration_ms_lt?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: lte)
-     */
-    avg_p95_duration_ms_lte?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: gt)
-     */
-    avg_p95_duration_ms_gt?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: gte)
-     */
-    avg_p95_duration_ms_gte?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: between_min)
-     */
-    avg_p95_duration_ms_between_min?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: between_max_value)
-     */
-    avg_p95_duration_ms_between_max_value?: number;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: in_values) (comma-separated list)
-     */
-    avg_p95_duration_ms_in_values?: string;
-    /**
-     * Average of p95 durations across slots in milliseconds (filter: not_in_values) (comma-separated list)
-     */
-    avg_p95_duration_ms_not_in_values?: string;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: eq)
-     */
-    max_duration_ms_eq?: number;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: ne)
-     */
-    max_duration_ms_ne?: number;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: lt)
-     */
-    max_duration_ms_lt?: number;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: lte)
-     */
-    max_duration_ms_lte?: number;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: gt)
-     */
-    max_duration_ms_gt?: number;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: gte)
-     */
-    max_duration_ms_gte?: number;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: between_min)
-     */
-    max_duration_ms_between_min?: number;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: between_max_value)
-     */
-    max_duration_ms_between_max_value?: number;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: in_values) (comma-separated list)
-     */
-    max_duration_ms_in_values?: string;
-    /**
-     * Maximum duration of engine_newPayload calls in milliseconds (filter: not_in_values) (comma-separated list)
-     */
-    max_duration_ms_not_in_values?: string;
-    /**
-     * The maximum number of fct_engine_new_payload_status_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
-     */
-    page_size?: number;
-    /**
-     * A page token, received from a previous `ListFctEngineNewPayloadStatusHourly` call. Provide this to retrieve the subsequent page.
-     */
-    page_token?: string;
-    /**
-     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
-     */
-    order_by?: string;
-  };
-  url: '/api/v1/fct_engine_new_payload_status_hourly';
-};
-
-export type FctEngineNewPayloadStatusHourlyServiceListErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type FctEngineNewPayloadStatusHourlyServiceListError =
-  FctEngineNewPayloadStatusHourlyServiceListErrors[keyof FctEngineNewPayloadStatusHourlyServiceListErrors];
-
-export type FctEngineNewPayloadStatusHourlyServiceListResponses = {
-  /**
-   * OK
-   */
-  200: ListFctEngineNewPayloadStatusHourlyResponse;
-};
-
-export type FctEngineNewPayloadStatusHourlyServiceListResponse =
-  FctEngineNewPayloadStatusHourlyServiceListResponses[keyof FctEngineNewPayloadStatusHourlyServiceListResponses];
-
-export type FctEngineNewPayloadStatusHourlyServiceGetData = {
-  body?: never;
-  path: {
-    /**
-     * Start of the hour period
-     */
-    hour_start_date_time: number;
-  };
-  query?: never;
-  url: '/api/v1/fct_engine_new_payload_status_hourly/{hour_start_date_time}';
-};
-
-export type FctEngineNewPayloadStatusHourlyServiceGetErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type FctEngineNewPayloadStatusHourlyServiceGetError =
-  FctEngineNewPayloadStatusHourlyServiceGetErrors[keyof FctEngineNewPayloadStatusHourlyServiceGetErrors];
-
-export type FctEngineNewPayloadStatusHourlyServiceGetResponses = {
-  /**
-   * OK
-   */
-  200: GetFctEngineNewPayloadStatusHourlyResponse;
-};
-
-export type FctEngineNewPayloadStatusHourlyServiceGetResponse =
-  FctEngineNewPayloadStatusHourlyServiceGetResponses[keyof FctEngineNewPayloadStatusHourlyServiceGetResponses];
 
 export type FctExecutionStateSizeDailyServiceListData = {
   body?: never;
@@ -38685,10 +38053,46 @@ export type FctStorageSlotStateHourlyServiceGetResponses = {
 export type FctStorageSlotStateHourlyServiceGetResponse =
   FctStorageSlotStateHourlyServiceGetResponses[keyof FctStorageSlotStateHourlyServiceGetResponses];
 
-export type FctStorageSlotStateWithExpiryBy6mServiceListData = {
+export type FctStorageSlotStateWithExpiryServiceListData = {
   body?: never;
   path?: never;
   query?: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
     /**
      * The block number (filter: eq)
      */
@@ -38930,91 +38334,91 @@ export type FctStorageSlotStateWithExpiryBy6mServiceListData = {
      */
     cumulative_net_bytes_not_in_values?: string;
     /**
-     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: eq)
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: eq)
      */
     active_slots_eq?: number;
     /**
-     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: ne)
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: ne)
      */
     active_slots_ne?: number;
     /**
-     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: lt)
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: lt)
      */
     active_slots_lt?: number;
     /**
-     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: lte)
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: lte)
      */
     active_slots_lte?: number;
     /**
-     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: gt)
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: gt)
      */
     active_slots_gt?: number;
     /**
-     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: gte)
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: gte)
      */
     active_slots_gte?: number;
     /**
-     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: between_min)
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: between_min)
      */
     active_slots_between_min?: number;
     /**
-     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: between_max_value)
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: between_max_value)
      */
     active_slots_between_max_value?: number;
     /**
-     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: in_values) (comma-separated list)
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: in_values) (comma-separated list)
      */
     active_slots_in_values?: string;
     /**
-     * Cumulative count of active storage slots at this block (with 6-month expiry applied) (filter: not_in_values) (comma-separated list)
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: not_in_values) (comma-separated list)
      */
     active_slots_not_in_values?: string;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: eq)
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: eq)
      */
     effective_bytes_eq?: number;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: ne)
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: ne)
      */
     effective_bytes_ne?: number;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: lt)
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: lt)
      */
     effective_bytes_lt?: number;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: lte)
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: lte)
      */
     effective_bytes_lte?: number;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: gt)
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: gt)
      */
     effective_bytes_gt?: number;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: gte)
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: gte)
      */
     effective_bytes_gte?: number;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: between_min)
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: between_min)
      */
     effective_bytes_between_min?: number;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: between_max_value)
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: between_max_value)
      */
     effective_bytes_between_max_value?: number;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: in_values) (comma-separated list)
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: in_values) (comma-separated list)
      */
     effective_bytes_in_values?: string;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (with 6-month expiry applied) (filter: not_in_values) (comma-separated list)
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: not_in_values) (comma-separated list)
      */
     effective_bytes_not_in_values?: string;
     /**
-     * The maximum number of fct_storage_slot_state_with_expiry_by_6m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of fct_storage_slot_state_with_expiry to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListFctStorageSlotStateWithExpiryBy6m` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListFctStorageSlotStateWithExpiry` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -39022,65 +38426,101 @@ export type FctStorageSlotStateWithExpiryBy6mServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/fct_storage_slot_state_with_expiry_by_6m';
+  url: '/api/v1/fct_storage_slot_state_with_expiry';
 };
 
-export type FctStorageSlotStateWithExpiryBy6mServiceListErrors = {
+export type FctStorageSlotStateWithExpiryServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateWithExpiryBy6mServiceListError =
-  FctStorageSlotStateWithExpiryBy6mServiceListErrors[keyof FctStorageSlotStateWithExpiryBy6mServiceListErrors];
+export type FctStorageSlotStateWithExpiryServiceListError =
+  FctStorageSlotStateWithExpiryServiceListErrors[keyof FctStorageSlotStateWithExpiryServiceListErrors];
 
-export type FctStorageSlotStateWithExpiryBy6mServiceListResponses = {
+export type FctStorageSlotStateWithExpiryServiceListResponses = {
   /**
    * OK
    */
-  200: ListFctStorageSlotStateWithExpiryBy6mResponse;
+  200: ListFctStorageSlotStateWithExpiryResponse;
 };
 
-export type FctStorageSlotStateWithExpiryBy6mServiceListResponse =
-  FctStorageSlotStateWithExpiryBy6mServiceListResponses[keyof FctStorageSlotStateWithExpiryBy6mServiceListResponses];
+export type FctStorageSlotStateWithExpiryServiceListResponse =
+  FctStorageSlotStateWithExpiryServiceListResponses[keyof FctStorageSlotStateWithExpiryServiceListResponses];
 
-export type FctStorageSlotStateWithExpiryBy6mServiceGetData = {
+export type FctStorageSlotStateWithExpiryServiceGetData = {
   body?: never;
   path: {
     /**
-     * The block number
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
      */
-    block_number: number;
+    expiry_policy: string;
   };
   query?: never;
-  url: '/api/v1/fct_storage_slot_state_with_expiry_by_6m/{block_number}';
+  url: '/api/v1/fct_storage_slot_state_with_expiry/{expiry_policy}';
 };
 
-export type FctStorageSlotStateWithExpiryBy6mServiceGetErrors = {
+export type FctStorageSlotStateWithExpiryServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateWithExpiryBy6mServiceGetError =
-  FctStorageSlotStateWithExpiryBy6mServiceGetErrors[keyof FctStorageSlotStateWithExpiryBy6mServiceGetErrors];
+export type FctStorageSlotStateWithExpiryServiceGetError =
+  FctStorageSlotStateWithExpiryServiceGetErrors[keyof FctStorageSlotStateWithExpiryServiceGetErrors];
 
-export type FctStorageSlotStateWithExpiryBy6mServiceGetResponses = {
+export type FctStorageSlotStateWithExpiryServiceGetResponses = {
   /**
    * OK
    */
-  200: GetFctStorageSlotStateWithExpiryBy6mResponse;
+  200: GetFctStorageSlotStateWithExpiryResponse;
 };
 
-export type FctStorageSlotStateWithExpiryBy6mServiceGetResponse =
-  FctStorageSlotStateWithExpiryBy6mServiceGetResponses[keyof FctStorageSlotStateWithExpiryBy6mServiceGetResponses];
+export type FctStorageSlotStateWithExpiryServiceGetResponse =
+  FctStorageSlotStateWithExpiryServiceGetResponses[keyof FctStorageSlotStateWithExpiryServiceGetResponses];
 
-export type FctStorageSlotStateWithExpiryBy6mDailyServiceListData = {
+export type FctStorageSlotStateWithExpiryDailyServiceListData = {
   body?: never;
   path?: never;
   query?: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
     /**
      * Start of the day period (filter: eq)
      */
@@ -39158,91 +38598,91 @@ export type FctStorageSlotStateWithExpiryBy6mDailyServiceListData = {
      */
     updated_date_time_not_in_values?: string;
     /**
-     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: eq)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: eq)
      */
     active_slots_eq?: number;
     /**
-     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: ne)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: ne)
      */
     active_slots_ne?: number;
     /**
-     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: lt)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: lt)
      */
     active_slots_lt?: number;
     /**
-     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: lte)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: lte)
      */
     active_slots_lte?: number;
     /**
-     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: gt)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: gt)
      */
     active_slots_gt?: number;
     /**
-     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: gte)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: gte)
      */
     active_slots_gte?: number;
     /**
-     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: between_min)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: between_min)
      */
     active_slots_between_min?: number;
     /**
-     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: between_max_value)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: between_max_value)
      */
     active_slots_between_max_value?: number;
     /**
-     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: in_values) (comma-separated list)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: in_values) (comma-separated list)
      */
     active_slots_in_values?: string;
     /**
-     * Cumulative count of active storage slots at end of day (with 6m expiry policy) (filter: not_in_values) (comma-separated list)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: not_in_values) (comma-separated list)
      */
     active_slots_not_in_values?: string;
     /**
-     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: eq)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: eq)
      */
     effective_bytes_eq?: number;
     /**
-     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: ne)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: ne)
      */
     effective_bytes_ne?: number;
     /**
-     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: lt)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: lt)
      */
     effective_bytes_lt?: number;
     /**
-     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: lte)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: lte)
      */
     effective_bytes_lte?: number;
     /**
-     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: gt)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: gt)
      */
     effective_bytes_gt?: number;
     /**
-     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: gte)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: gte)
      */
     effective_bytes_gte?: number;
     /**
-     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: between_min)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: between_min)
      */
     effective_bytes_between_min?: number;
     /**
-     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: between_max_value)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: between_max_value)
      */
     effective_bytes_between_max_value?: number;
     /**
-     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: in_values) (comma-separated list)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: in_values) (comma-separated list)
      */
     effective_bytes_in_values?: string;
     /**
-     * Cumulative sum of effective bytes at end of day (with 6m expiry policy) (filter: not_in_values) (comma-separated list)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: not_in_values) (comma-separated list)
      */
     effective_bytes_not_in_values?: string;
     /**
-     * The maximum number of fct_storage_slot_state_with_expiry_by_6m_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of fct_storage_slot_state_with_expiry_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListFctStorageSlotStateWithExpiryBy6mDaily` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListFctStorageSlotStateWithExpiryDaily` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -39250,65 +38690,101 @@ export type FctStorageSlotStateWithExpiryBy6mDailyServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/fct_storage_slot_state_with_expiry_by_6m_daily';
+  url: '/api/v1/fct_storage_slot_state_with_expiry_daily';
 };
 
-export type FctStorageSlotStateWithExpiryBy6mDailyServiceListErrors = {
+export type FctStorageSlotStateWithExpiryDailyServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateWithExpiryBy6mDailyServiceListError =
-  FctStorageSlotStateWithExpiryBy6mDailyServiceListErrors[keyof FctStorageSlotStateWithExpiryBy6mDailyServiceListErrors];
+export type FctStorageSlotStateWithExpiryDailyServiceListError =
+  FctStorageSlotStateWithExpiryDailyServiceListErrors[keyof FctStorageSlotStateWithExpiryDailyServiceListErrors];
 
-export type FctStorageSlotStateWithExpiryBy6mDailyServiceListResponses = {
+export type FctStorageSlotStateWithExpiryDailyServiceListResponses = {
   /**
    * OK
    */
-  200: ListFctStorageSlotStateWithExpiryBy6mDailyResponse;
+  200: ListFctStorageSlotStateWithExpiryDailyResponse;
 };
 
-export type FctStorageSlotStateWithExpiryBy6mDailyServiceListResponse =
-  FctStorageSlotStateWithExpiryBy6mDailyServiceListResponses[keyof FctStorageSlotStateWithExpiryBy6mDailyServiceListResponses];
+export type FctStorageSlotStateWithExpiryDailyServiceListResponse =
+  FctStorageSlotStateWithExpiryDailyServiceListResponses[keyof FctStorageSlotStateWithExpiryDailyServiceListResponses];
 
-export type FctStorageSlotStateWithExpiryBy6mDailyServiceGetData = {
+export type FctStorageSlotStateWithExpiryDailyServiceGetData = {
   body?: never;
   path: {
     /**
-     * Start of the day period
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
      */
-    day_start_date: string;
+    expiry_policy: string;
   };
   query?: never;
-  url: '/api/v1/fct_storage_slot_state_with_expiry_by_6m_daily/{day_start_date}';
+  url: '/api/v1/fct_storage_slot_state_with_expiry_daily/{expiry_policy}';
 };
 
-export type FctStorageSlotStateWithExpiryBy6mDailyServiceGetErrors = {
+export type FctStorageSlotStateWithExpiryDailyServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateWithExpiryBy6mDailyServiceGetError =
-  FctStorageSlotStateWithExpiryBy6mDailyServiceGetErrors[keyof FctStorageSlotStateWithExpiryBy6mDailyServiceGetErrors];
+export type FctStorageSlotStateWithExpiryDailyServiceGetError =
+  FctStorageSlotStateWithExpiryDailyServiceGetErrors[keyof FctStorageSlotStateWithExpiryDailyServiceGetErrors];
 
-export type FctStorageSlotStateWithExpiryBy6mDailyServiceGetResponses = {
+export type FctStorageSlotStateWithExpiryDailyServiceGetResponses = {
   /**
    * OK
    */
-  200: GetFctStorageSlotStateWithExpiryBy6mDailyResponse;
+  200: GetFctStorageSlotStateWithExpiryDailyResponse;
 };
 
-export type FctStorageSlotStateWithExpiryBy6mDailyServiceGetResponse =
-  FctStorageSlotStateWithExpiryBy6mDailyServiceGetResponses[keyof FctStorageSlotStateWithExpiryBy6mDailyServiceGetResponses];
+export type FctStorageSlotStateWithExpiryDailyServiceGetResponse =
+  FctStorageSlotStateWithExpiryDailyServiceGetResponses[keyof FctStorageSlotStateWithExpiryDailyServiceGetResponses];
 
-export type FctStorageSlotStateWithExpiryBy6mHourlyServiceListData = {
+export type FctStorageSlotStateWithExpiryHourlyServiceListData = {
   body?: never;
   path?: never;
   query?: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
     /**
      * Start of the hour period (filter: eq)
      */
@@ -39390,91 +38866,91 @@ export type FctStorageSlotStateWithExpiryBy6mHourlyServiceListData = {
      */
     updated_date_time_not_in_values?: string;
     /**
-     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: eq)
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: eq)
      */
     active_slots_eq?: number;
     /**
-     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: ne)
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: ne)
      */
     active_slots_ne?: number;
     /**
-     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: lt)
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: lt)
      */
     active_slots_lt?: number;
     /**
-     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: lte)
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: lte)
      */
     active_slots_lte?: number;
     /**
-     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: gt)
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: gt)
      */
     active_slots_gt?: number;
     /**
-     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: gte)
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: gte)
      */
     active_slots_gte?: number;
     /**
-     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: between_min)
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: between_min)
      */
     active_slots_between_min?: number;
     /**
-     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: between_max_value)
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: between_max_value)
      */
     active_slots_between_max_value?: number;
     /**
-     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: in_values) (comma-separated list)
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: in_values) (comma-separated list)
      */
     active_slots_in_values?: string;
     /**
-     * Cumulative count of active storage slots at end of hour (with 6m expiry policy) (filter: not_in_values) (comma-separated list)
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: not_in_values) (comma-separated list)
      */
     active_slots_not_in_values?: string;
     /**
-     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: eq)
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: eq)
      */
     effective_bytes_eq?: number;
     /**
-     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: ne)
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: ne)
      */
     effective_bytes_ne?: number;
     /**
-     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: lt)
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: lt)
      */
     effective_bytes_lt?: number;
     /**
-     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: lte)
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: lte)
      */
     effective_bytes_lte?: number;
     /**
-     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: gt)
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: gt)
      */
     effective_bytes_gt?: number;
     /**
-     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: gte)
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: gte)
      */
     effective_bytes_gte?: number;
     /**
-     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: between_min)
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: between_min)
      */
     effective_bytes_between_min?: number;
     /**
-     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: between_max_value)
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: between_max_value)
      */
     effective_bytes_between_max_value?: number;
     /**
-     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: in_values) (comma-separated list)
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: in_values) (comma-separated list)
      */
     effective_bytes_in_values?: string;
     /**
-     * Cumulative sum of effective bytes at end of hour (with 6m expiry policy) (filter: not_in_values) (comma-separated list)
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: not_in_values) (comma-separated list)
      */
     effective_bytes_not_in_values?: string;
     /**
-     * The maximum number of fct_storage_slot_state_with_expiry_by_6m_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of fct_storage_slot_state_with_expiry_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListFctStorageSlotStateWithExpiryBy6mHourly` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListFctStorageSlotStateWithExpiryHourly` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -39482,60 +38958,60 @@ export type FctStorageSlotStateWithExpiryBy6mHourlyServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/fct_storage_slot_state_with_expiry_by_6m_hourly';
+  url: '/api/v1/fct_storage_slot_state_with_expiry_hourly';
 };
 
-export type FctStorageSlotStateWithExpiryBy6mHourlyServiceListErrors = {
+export type FctStorageSlotStateWithExpiryHourlyServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateWithExpiryBy6mHourlyServiceListError =
-  FctStorageSlotStateWithExpiryBy6mHourlyServiceListErrors[keyof FctStorageSlotStateWithExpiryBy6mHourlyServiceListErrors];
+export type FctStorageSlotStateWithExpiryHourlyServiceListError =
+  FctStorageSlotStateWithExpiryHourlyServiceListErrors[keyof FctStorageSlotStateWithExpiryHourlyServiceListErrors];
 
-export type FctStorageSlotStateWithExpiryBy6mHourlyServiceListResponses = {
+export type FctStorageSlotStateWithExpiryHourlyServiceListResponses = {
   /**
    * OK
    */
-  200: ListFctStorageSlotStateWithExpiryBy6mHourlyResponse;
+  200: ListFctStorageSlotStateWithExpiryHourlyResponse;
 };
 
-export type FctStorageSlotStateWithExpiryBy6mHourlyServiceListResponse =
-  FctStorageSlotStateWithExpiryBy6mHourlyServiceListResponses[keyof FctStorageSlotStateWithExpiryBy6mHourlyServiceListResponses];
+export type FctStorageSlotStateWithExpiryHourlyServiceListResponse =
+  FctStorageSlotStateWithExpiryHourlyServiceListResponses[keyof FctStorageSlotStateWithExpiryHourlyServiceListResponses];
 
-export type FctStorageSlotStateWithExpiryBy6mHourlyServiceGetData = {
+export type FctStorageSlotStateWithExpiryHourlyServiceGetData = {
   body?: never;
   path: {
     /**
-     * Start of the hour period
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
      */
-    hour_start_date_time: number;
+    expiry_policy: string;
   };
   query?: never;
-  url: '/api/v1/fct_storage_slot_state_with_expiry_by_6m_hourly/{hour_start_date_time}';
+  url: '/api/v1/fct_storage_slot_state_with_expiry_hourly/{expiry_policy}';
 };
 
-export type FctStorageSlotStateWithExpiryBy6mHourlyServiceGetErrors = {
+export type FctStorageSlotStateWithExpiryHourlyServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateWithExpiryBy6mHourlyServiceGetError =
-  FctStorageSlotStateWithExpiryBy6mHourlyServiceGetErrors[keyof FctStorageSlotStateWithExpiryBy6mHourlyServiceGetErrors];
+export type FctStorageSlotStateWithExpiryHourlyServiceGetError =
+  FctStorageSlotStateWithExpiryHourlyServiceGetErrors[keyof FctStorageSlotStateWithExpiryHourlyServiceGetErrors];
 
-export type FctStorageSlotStateWithExpiryBy6mHourlyServiceGetResponses = {
+export type FctStorageSlotStateWithExpiryHourlyServiceGetResponses = {
   /**
    * OK
    */
-  200: GetFctStorageSlotStateWithExpiryBy6mHourlyResponse;
+  200: GetFctStorageSlotStateWithExpiryHourlyResponse;
 };
 
-export type FctStorageSlotStateWithExpiryBy6mHourlyServiceGetResponse =
-  FctStorageSlotStateWithExpiryBy6mHourlyServiceGetResponses[keyof FctStorageSlotStateWithExpiryBy6mHourlyServiceGetResponses];
+export type FctStorageSlotStateWithExpiryHourlyServiceGetResponse =
+  FctStorageSlotStateWithExpiryHourlyServiceGetResponses[keyof FctStorageSlotStateWithExpiryHourlyServiceGetResponses];
 
 export type IntAddressFirstAccessServiceListData = {
   body?: never;
@@ -50275,48 +49751,48 @@ export type IntStorageSlotDiffByAddressSlotServiceGetResponses = {
 export type IntStorageSlotDiffByAddressSlotServiceGetResponse =
   IntStorageSlotDiffByAddressSlotServiceGetResponses[keyof IntStorageSlotDiffByAddressSlotServiceGetResponses];
 
-export type IntStorageSlotExpiryBy6mServiceListData = {
+export type IntStorageSlotExpiry1mServiceListData = {
   body?: never;
   path?: never;
   query?: {
     /**
-     * The block number where this slot expiry is recorded (6 months after it was set) (filter: eq)
+     * The block number where this slot expiry is recorded (filter: eq)
      */
     block_number_eq?: number;
     /**
-     * The block number where this slot expiry is recorded (6 months after it was set) (filter: ne)
+     * The block number where this slot expiry is recorded (filter: ne)
      */
     block_number_ne?: number;
     /**
-     * The block number where this slot expiry is recorded (6 months after it was set) (filter: lt)
+     * The block number where this slot expiry is recorded (filter: lt)
      */
     block_number_lt?: number;
     /**
-     * The block number where this slot expiry is recorded (6 months after it was set) (filter: lte)
+     * The block number where this slot expiry is recorded (filter: lte)
      */
     block_number_lte?: number;
     /**
-     * The block number where this slot expiry is recorded (6 months after it was set) (filter: gt)
+     * The block number where this slot expiry is recorded (filter: gt)
      */
     block_number_gt?: number;
     /**
-     * The block number where this slot expiry is recorded (6 months after it was set) (filter: gte)
+     * The block number where this slot expiry is recorded (filter: gte)
      */
     block_number_gte?: number;
     /**
-     * The block number where this slot expiry is recorded (6 months after it was set) (filter: between_min)
+     * The block number where this slot expiry is recorded (filter: between_min)
      */
     block_number_between_min?: number;
     /**
-     * The block number where this slot expiry is recorded (6 months after it was set) (filter: between_max_value)
+     * The block number where this slot expiry is recorded (filter: between_max_value)
      */
     block_number_between_max_value?: number;
     /**
-     * The block number where this slot expiry is recorded (6 months after it was set) (filter: in_values) (comma-separated list)
+     * The block number where this slot expiry is recorded (filter: in_values) (comma-separated list)
      */
     block_number_in_values?: string;
     /**
-     * The block number where this slot expiry is recorded (6 months after it was set) (filter: not_in_values) (comma-separated list)
+     * The block number where this slot expiry is recorded (filter: not_in_values) (comma-separated list)
      */
     block_number_not_in_values?: string;
     /**
@@ -50392,6 +49868,46 @@ export type IntStorageSlotExpiryBy6mServiceListData = {
      */
     slot_key_not_in_values?: string;
     /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
      * Timestamp when the record was last updated (filter: eq)
      */
     updated_date_time_eq?: number;
@@ -50432,51 +49948,51 @@ export type IntStorageSlotExpiryBy6mServiceListData = {
      */
     updated_date_time_not_in_values?: string;
     /**
-     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: eq)
+     * Number of effective bytes that were set (0-32) (filter: eq)
      */
     effective_bytes_eq?: number;
     /**
-     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: ne)
+     * Number of effective bytes that were set (0-32) (filter: ne)
      */
     effective_bytes_ne?: number;
     /**
-     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: lt)
+     * Number of effective bytes that were set (0-32) (filter: lt)
      */
     effective_bytes_lt?: number;
     /**
-     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: lte)
+     * Number of effective bytes that were set (0-32) (filter: lte)
      */
     effective_bytes_lte?: number;
     /**
-     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: gt)
+     * Number of effective bytes that were set (0-32) (filter: gt)
      */
     effective_bytes_gt?: number;
     /**
-     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: gte)
+     * Number of effective bytes that were set (0-32) (filter: gte)
      */
     effective_bytes_gte?: number;
     /**
-     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: between_min)
+     * Number of effective bytes that were set (0-32) (filter: between_min)
      */
     effective_bytes_between_min?: number;
     /**
-     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: between_max_value)
+     * Number of effective bytes that were set (0-32) (filter: between_max_value)
      */
     effective_bytes_between_max_value?: number;
     /**
-     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: in_values) (comma-separated list)
+     * Number of effective bytes that were set (0-32) (filter: in_values) (comma-separated list)
      */
     effective_bytes_in_values?: string;
     /**
-     * Number of effective bytes that were set and are now being marked for expiry (0-32) (filter: not_in_values) (comma-separated list)
+     * Number of effective bytes that were set (0-32) (filter: not_in_values) (comma-separated list)
      */
     effective_bytes_not_in_values?: string;
     /**
-     * The maximum number of int_storage_slot_expiry_by_6m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of int_storage_slot_expiry_1m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListIntStorageSlotExpiryBy6m` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListIntStorageSlotExpiry1m` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -50484,60 +50000,1276 @@ export type IntStorageSlotExpiryBy6mServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/int_storage_slot_expiry_by_6m';
+  url: '/api/v1/int_storage_slot_expiry_1m';
 };
 
-export type IntStorageSlotExpiryBy6mServiceListErrors = {
+export type IntStorageSlotExpiry1mServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type IntStorageSlotExpiryBy6mServiceListError =
-  IntStorageSlotExpiryBy6mServiceListErrors[keyof IntStorageSlotExpiryBy6mServiceListErrors];
+export type IntStorageSlotExpiry1mServiceListError =
+  IntStorageSlotExpiry1mServiceListErrors[keyof IntStorageSlotExpiry1mServiceListErrors];
 
-export type IntStorageSlotExpiryBy6mServiceListResponses = {
+export type IntStorageSlotExpiry1mServiceListResponses = {
   /**
    * OK
    */
-  200: ListIntStorageSlotExpiryBy6mResponse;
+  200: ListIntStorageSlotExpiry1mResponse;
 };
 
-export type IntStorageSlotExpiryBy6mServiceListResponse =
-  IntStorageSlotExpiryBy6mServiceListResponses[keyof IntStorageSlotExpiryBy6mServiceListResponses];
+export type IntStorageSlotExpiry1mServiceListResponse =
+  IntStorageSlotExpiry1mServiceListResponses[keyof IntStorageSlotExpiry1mServiceListResponses];
 
-export type IntStorageSlotExpiryBy6mServiceGetData = {
+export type IntStorageSlotExpiry1mServiceGetData = {
   body?: never;
   path: {
     /**
-     * The block number where this slot expiry is recorded (6 months after it was set)
+     * The block number where this slot expiry is recorded
      */
     block_number: number;
   };
   query?: never;
-  url: '/api/v1/int_storage_slot_expiry_by_6m/{block_number}';
+  url: '/api/v1/int_storage_slot_expiry_1m/{block_number}';
 };
 
-export type IntStorageSlotExpiryBy6mServiceGetErrors = {
+export type IntStorageSlotExpiry1mServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type IntStorageSlotExpiryBy6mServiceGetError =
-  IntStorageSlotExpiryBy6mServiceGetErrors[keyof IntStorageSlotExpiryBy6mServiceGetErrors];
+export type IntStorageSlotExpiry1mServiceGetError =
+  IntStorageSlotExpiry1mServiceGetErrors[keyof IntStorageSlotExpiry1mServiceGetErrors];
 
-export type IntStorageSlotExpiryBy6mServiceGetResponses = {
+export type IntStorageSlotExpiry1mServiceGetResponses = {
   /**
    * OK
    */
-  200: GetIntStorageSlotExpiryBy6mResponse;
+  200: GetIntStorageSlotExpiry1mResponse;
 };
 
-export type IntStorageSlotExpiryBy6mServiceGetResponse =
-  IntStorageSlotExpiryBy6mServiceGetResponses[keyof IntStorageSlotExpiryBy6mServiceGetResponses];
+export type IntStorageSlotExpiry1mServiceGetResponse =
+  IntStorageSlotExpiry1mServiceGetResponses[keyof IntStorageSlotExpiry1mServiceGetResponses];
+
+export type IntStorageSlotExpiry6mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this slot expiry is recorded (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this slot expiry is recorded (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The storage slot key (filter: eq)
+     */
+    slot_key_eq?: string;
+    /**
+     * The storage slot key (filter: ne)
+     */
+    slot_key_ne?: string;
+    /**
+     * The storage slot key (filter: contains)
+     */
+    slot_key_contains?: string;
+    /**
+     * The storage slot key (filter: starts_with)
+     */
+    slot_key_starts_with?: string;
+    /**
+     * The storage slot key (filter: ends_with)
+     */
+    slot_key_ends_with?: string;
+    /**
+     * The storage slot key (filter: like)
+     */
+    slot_key_like?: string;
+    /**
+     * The storage slot key (filter: not_like)
+     */
+    slot_key_not_like?: string;
+    /**
+     * The storage slot key (filter: in_values) (comma-separated list)
+     */
+    slot_key_in_values?: string;
+    /**
+     * The storage slot key (filter: not_in_values) (comma-separated list)
+     */
+    slot_key_not_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_expiry_6m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotExpiry6m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_expiry_6m';
+};
+
+export type IntStorageSlotExpiry6mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotExpiry6mServiceListError =
+  IntStorageSlotExpiry6mServiceListErrors[keyof IntStorageSlotExpiry6mServiceListErrors];
+
+export type IntStorageSlotExpiry6mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotExpiry6mResponse;
+};
+
+export type IntStorageSlotExpiry6mServiceListResponse =
+  IntStorageSlotExpiry6mServiceListResponses[keyof IntStorageSlotExpiry6mServiceListResponses];
+
+export type IntStorageSlotExpiry6mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this slot expiry is recorded
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_expiry_6m/{block_number}';
+};
+
+export type IntStorageSlotExpiry6mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotExpiry6mServiceGetError =
+  IntStorageSlotExpiry6mServiceGetErrors[keyof IntStorageSlotExpiry6mServiceGetErrors];
+
+export type IntStorageSlotExpiry6mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotExpiry6mResponse;
+};
+
+export type IntStorageSlotExpiry6mServiceGetResponse =
+  IntStorageSlotExpiry6mServiceGetResponses[keyof IntStorageSlotExpiry6mServiceGetResponses];
+
+export type IntStorageSlotExpiry12mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this slot expiry is recorded (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this slot expiry is recorded (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The storage slot key (filter: eq)
+     */
+    slot_key_eq?: string;
+    /**
+     * The storage slot key (filter: ne)
+     */
+    slot_key_ne?: string;
+    /**
+     * The storage slot key (filter: contains)
+     */
+    slot_key_contains?: string;
+    /**
+     * The storage slot key (filter: starts_with)
+     */
+    slot_key_starts_with?: string;
+    /**
+     * The storage slot key (filter: ends_with)
+     */
+    slot_key_ends_with?: string;
+    /**
+     * The storage slot key (filter: like)
+     */
+    slot_key_like?: string;
+    /**
+     * The storage slot key (filter: not_like)
+     */
+    slot_key_not_like?: string;
+    /**
+     * The storage slot key (filter: in_values) (comma-separated list)
+     */
+    slot_key_in_values?: string;
+    /**
+     * The storage slot key (filter: not_in_values) (comma-separated list)
+     */
+    slot_key_not_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_expiry_12m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotExpiry12m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_expiry_12m';
+};
+
+export type IntStorageSlotExpiry12mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotExpiry12mServiceListError =
+  IntStorageSlotExpiry12mServiceListErrors[keyof IntStorageSlotExpiry12mServiceListErrors];
+
+export type IntStorageSlotExpiry12mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotExpiry12mResponse;
+};
+
+export type IntStorageSlotExpiry12mServiceListResponse =
+  IntStorageSlotExpiry12mServiceListResponses[keyof IntStorageSlotExpiry12mServiceListResponses];
+
+export type IntStorageSlotExpiry12mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this slot expiry is recorded
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_expiry_12m/{block_number}';
+};
+
+export type IntStorageSlotExpiry12mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotExpiry12mServiceGetError =
+  IntStorageSlotExpiry12mServiceGetErrors[keyof IntStorageSlotExpiry12mServiceGetErrors];
+
+export type IntStorageSlotExpiry12mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotExpiry12mResponse;
+};
+
+export type IntStorageSlotExpiry12mServiceGetResponse =
+  IntStorageSlotExpiry12mServiceGetResponses[keyof IntStorageSlotExpiry12mServiceGetResponses];
+
+export type IntStorageSlotExpiry18mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this slot expiry is recorded (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this slot expiry is recorded (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The storage slot key (filter: eq)
+     */
+    slot_key_eq?: string;
+    /**
+     * The storage slot key (filter: ne)
+     */
+    slot_key_ne?: string;
+    /**
+     * The storage slot key (filter: contains)
+     */
+    slot_key_contains?: string;
+    /**
+     * The storage slot key (filter: starts_with)
+     */
+    slot_key_starts_with?: string;
+    /**
+     * The storage slot key (filter: ends_with)
+     */
+    slot_key_ends_with?: string;
+    /**
+     * The storage slot key (filter: like)
+     */
+    slot_key_like?: string;
+    /**
+     * The storage slot key (filter: not_like)
+     */
+    slot_key_not_like?: string;
+    /**
+     * The storage slot key (filter: in_values) (comma-separated list)
+     */
+    slot_key_in_values?: string;
+    /**
+     * The storage slot key (filter: not_in_values) (comma-separated list)
+     */
+    slot_key_not_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_expiry_18m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotExpiry18m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_expiry_18m';
+};
+
+export type IntStorageSlotExpiry18mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotExpiry18mServiceListError =
+  IntStorageSlotExpiry18mServiceListErrors[keyof IntStorageSlotExpiry18mServiceListErrors];
+
+export type IntStorageSlotExpiry18mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotExpiry18mResponse;
+};
+
+export type IntStorageSlotExpiry18mServiceListResponse =
+  IntStorageSlotExpiry18mServiceListResponses[keyof IntStorageSlotExpiry18mServiceListResponses];
+
+export type IntStorageSlotExpiry18mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this slot expiry is recorded
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_expiry_18m/{block_number}';
+};
+
+export type IntStorageSlotExpiry18mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotExpiry18mServiceGetError =
+  IntStorageSlotExpiry18mServiceGetErrors[keyof IntStorageSlotExpiry18mServiceGetErrors];
+
+export type IntStorageSlotExpiry18mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotExpiry18mResponse;
+};
+
+export type IntStorageSlotExpiry18mServiceGetResponse =
+  IntStorageSlotExpiry18mServiceGetResponses[keyof IntStorageSlotExpiry18mServiceGetResponses];
+
+export type IntStorageSlotExpiry24mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this slot expiry is recorded (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this slot expiry is recorded (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this slot expiry is recorded (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The storage slot key (filter: eq)
+     */
+    slot_key_eq?: string;
+    /**
+     * The storage slot key (filter: ne)
+     */
+    slot_key_ne?: string;
+    /**
+     * The storage slot key (filter: contains)
+     */
+    slot_key_contains?: string;
+    /**
+     * The storage slot key (filter: starts_with)
+     */
+    slot_key_starts_with?: string;
+    /**
+     * The storage slot key (filter: ends_with)
+     */
+    slot_key_ends_with?: string;
+    /**
+     * The storage slot key (filter: like)
+     */
+    slot_key_like?: string;
+    /**
+     * The storage slot key (filter: not_like)
+     */
+    slot_key_not_like?: string;
+    /**
+     * The storage slot key (filter: in_values) (comma-separated list)
+     */
+    slot_key_in_values?: string;
+    /**
+     * The storage slot key (filter: not_in_values) (comma-separated list)
+     */
+    slot_key_not_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Number of effective bytes that were set (0-32) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_expiry_24m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotExpiry24m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_expiry_24m';
+};
+
+export type IntStorageSlotExpiry24mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotExpiry24mServiceListError =
+  IntStorageSlotExpiry24mServiceListErrors[keyof IntStorageSlotExpiry24mServiceListErrors];
+
+export type IntStorageSlotExpiry24mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotExpiry24mResponse;
+};
+
+export type IntStorageSlotExpiry24mServiceListResponse =
+  IntStorageSlotExpiry24mServiceListResponses[keyof IntStorageSlotExpiry24mServiceListResponses];
+
+export type IntStorageSlotExpiry24mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this slot expiry is recorded
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_expiry_24m/{block_number}';
+};
+
+export type IntStorageSlotExpiry24mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotExpiry24mServiceGetError =
+  IntStorageSlotExpiry24mServiceGetErrors[keyof IntStorageSlotExpiry24mServiceGetErrors];
+
+export type IntStorageSlotExpiry24mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotExpiry24mResponse;
+};
+
+export type IntStorageSlotExpiry24mServiceGetResponse =
+  IntStorageSlotExpiry24mServiceGetResponses[keyof IntStorageSlotExpiry24mServiceGetResponses];
 
 export type IntStorageSlotNextTouchServiceListData = {
   body?: never;
@@ -50803,48 +51535,48 @@ export type IntStorageSlotNextTouchServiceGetResponses = {
 export type IntStorageSlotNextTouchServiceGetResponse =
   IntStorageSlotNextTouchServiceGetResponses[keyof IntStorageSlotNextTouchServiceGetResponses];
 
-export type IntStorageSlotReactivationBy6mServiceListData = {
+export type IntStorageSlotReactivation1mServiceListData = {
   body?: never;
   path?: never;
   query?: {
     /**
-     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: eq)
+     * The block number where this slot was reactivated (filter: eq)
      */
     block_number_eq?: number;
     /**
-     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: ne)
+     * The block number where this slot was reactivated (filter: ne)
      */
     block_number_ne?: number;
     /**
-     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: lt)
+     * The block number where this slot was reactivated (filter: lt)
      */
     block_number_lt?: number;
     /**
-     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: lte)
+     * The block number where this slot was reactivated (filter: lte)
      */
     block_number_lte?: number;
     /**
-     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: gt)
+     * The block number where this slot was reactivated (filter: gt)
      */
     block_number_gt?: number;
     /**
-     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: gte)
+     * The block number where this slot was reactivated (filter: gte)
      */
     block_number_gte?: number;
     /**
-     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: between_min)
+     * The block number where this slot was reactivated (filter: between_min)
      */
     block_number_between_min?: number;
     /**
-     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: between_max_value)
+     * The block number where this slot was reactivated (filter: between_max_value)
      */
     block_number_between_max_value?: number;
     /**
-     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: in_values) (comma-separated list)
+     * The block number where this slot was reactivated (filter: in_values) (comma-separated list)
      */
     block_number_in_values?: string;
     /**
-     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity) (filter: not_in_values) (comma-separated list)
+     * The block number where this slot was reactivated (filter: not_in_values) (comma-separated list)
      */
     block_number_not_in_values?: string;
     /**
@@ -50920,6 +51652,46 @@ export type IntStorageSlotReactivationBy6mServiceListData = {
      */
     slot_key_not_in_values?: string;
     /**
+     * The original touch block that expired (for matching with expiry records) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
      * Timestamp when the record was last updated (filter: eq)
      */
     updated_date_time_eq?: number;
@@ -50960,51 +51732,51 @@ export type IntStorageSlotReactivationBy6mServiceListData = {
      */
     updated_date_time_not_in_values?: string;
     /**
-     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: eq)
+     * Number of effective bytes being reactivated (0-32) (filter: eq)
      */
     effective_bytes_eq?: number;
     /**
-     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: ne)
+     * Number of effective bytes being reactivated (0-32) (filter: ne)
      */
     effective_bytes_ne?: number;
     /**
-     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: lt)
+     * Number of effective bytes being reactivated (0-32) (filter: lt)
      */
     effective_bytes_lt?: number;
     /**
-     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: lte)
+     * Number of effective bytes being reactivated (0-32) (filter: lte)
      */
     effective_bytes_lte?: number;
     /**
-     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: gt)
+     * Number of effective bytes being reactivated (0-32) (filter: gt)
      */
     effective_bytes_gt?: number;
     /**
-     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: gte)
+     * Number of effective bytes being reactivated (0-32) (filter: gte)
      */
     effective_bytes_gte?: number;
     /**
-     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: between_min)
+     * Number of effective bytes being reactivated (0-32) (filter: between_min)
      */
     effective_bytes_between_min?: number;
     /**
-     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: between_max_value)
+     * Number of effective bytes being reactivated (0-32) (filter: between_max_value)
      */
     effective_bytes_between_max_value?: number;
     /**
-     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: in_values) (comma-separated list)
+     * Number of effective bytes being reactivated (0-32) (filter: in_values) (comma-separated list)
      */
     effective_bytes_in_values?: string;
     /**
-     * Number of effective bytes being reactivated (must match corresponding expiry record) (filter: not_in_values) (comma-separated list)
+     * Number of effective bytes being reactivated (0-32) (filter: not_in_values) (comma-separated list)
      */
     effective_bytes_not_in_values?: string;
     /**
-     * The maximum number of int_storage_slot_reactivation_by_6m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of int_storage_slot_reactivation_1m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListIntStorageSlotReactivationBy6m` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListIntStorageSlotReactivation1m` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -51012,60 +51784,1276 @@ export type IntStorageSlotReactivationBy6mServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/int_storage_slot_reactivation_by_6m';
+  url: '/api/v1/int_storage_slot_reactivation_1m';
 };
 
-export type IntStorageSlotReactivationBy6mServiceListErrors = {
+export type IntStorageSlotReactivation1mServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type IntStorageSlotReactivationBy6mServiceListError =
-  IntStorageSlotReactivationBy6mServiceListErrors[keyof IntStorageSlotReactivationBy6mServiceListErrors];
+export type IntStorageSlotReactivation1mServiceListError =
+  IntStorageSlotReactivation1mServiceListErrors[keyof IntStorageSlotReactivation1mServiceListErrors];
 
-export type IntStorageSlotReactivationBy6mServiceListResponses = {
+export type IntStorageSlotReactivation1mServiceListResponses = {
   /**
    * OK
    */
-  200: ListIntStorageSlotReactivationBy6mResponse;
+  200: ListIntStorageSlotReactivation1mResponse;
 };
 
-export type IntStorageSlotReactivationBy6mServiceListResponse =
-  IntStorageSlotReactivationBy6mServiceListResponses[keyof IntStorageSlotReactivationBy6mServiceListResponses];
+export type IntStorageSlotReactivation1mServiceListResponse =
+  IntStorageSlotReactivation1mServiceListResponses[keyof IntStorageSlotReactivation1mServiceListResponses];
 
-export type IntStorageSlotReactivationBy6mServiceGetData = {
+export type IntStorageSlotReactivation1mServiceGetData = {
   body?: never;
   path: {
     /**
-     * The block number where this slot was reactivated/cancelled (touched after 6+ months of inactivity)
+     * The block number where this slot was reactivated
      */
     block_number: number;
   };
   query?: never;
-  url: '/api/v1/int_storage_slot_reactivation_by_6m/{block_number}';
+  url: '/api/v1/int_storage_slot_reactivation_1m/{block_number}';
 };
 
-export type IntStorageSlotReactivationBy6mServiceGetErrors = {
+export type IntStorageSlotReactivation1mServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type IntStorageSlotReactivationBy6mServiceGetError =
-  IntStorageSlotReactivationBy6mServiceGetErrors[keyof IntStorageSlotReactivationBy6mServiceGetErrors];
+export type IntStorageSlotReactivation1mServiceGetError =
+  IntStorageSlotReactivation1mServiceGetErrors[keyof IntStorageSlotReactivation1mServiceGetErrors];
 
-export type IntStorageSlotReactivationBy6mServiceGetResponses = {
+export type IntStorageSlotReactivation1mServiceGetResponses = {
   /**
    * OK
    */
-  200: GetIntStorageSlotReactivationBy6mResponse;
+  200: GetIntStorageSlotReactivation1mResponse;
 };
 
-export type IntStorageSlotReactivationBy6mServiceGetResponse =
-  IntStorageSlotReactivationBy6mServiceGetResponses[keyof IntStorageSlotReactivationBy6mServiceGetResponses];
+export type IntStorageSlotReactivation1mServiceGetResponse =
+  IntStorageSlotReactivation1mServiceGetResponses[keyof IntStorageSlotReactivation1mServiceGetResponses];
+
+export type IntStorageSlotReactivation6mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this slot was reactivated (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this slot was reactivated (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this slot was reactivated (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this slot was reactivated (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this slot was reactivated (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this slot was reactivated (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this slot was reactivated (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this slot was reactivated (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this slot was reactivated (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this slot was reactivated (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The storage slot key (filter: eq)
+     */
+    slot_key_eq?: string;
+    /**
+     * The storage slot key (filter: ne)
+     */
+    slot_key_ne?: string;
+    /**
+     * The storage slot key (filter: contains)
+     */
+    slot_key_contains?: string;
+    /**
+     * The storage slot key (filter: starts_with)
+     */
+    slot_key_starts_with?: string;
+    /**
+     * The storage slot key (filter: ends_with)
+     */
+    slot_key_ends_with?: string;
+    /**
+     * The storage slot key (filter: like)
+     */
+    slot_key_like?: string;
+    /**
+     * The storage slot key (filter: not_like)
+     */
+    slot_key_not_like?: string;
+    /**
+     * The storage slot key (filter: in_values) (comma-separated list)
+     */
+    slot_key_in_values?: string;
+    /**
+     * The storage slot key (filter: not_in_values) (comma-separated list)
+     */
+    slot_key_not_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_reactivation_6m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotReactivation6m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_reactivation_6m';
+};
+
+export type IntStorageSlotReactivation6mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotReactivation6mServiceListError =
+  IntStorageSlotReactivation6mServiceListErrors[keyof IntStorageSlotReactivation6mServiceListErrors];
+
+export type IntStorageSlotReactivation6mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotReactivation6mResponse;
+};
+
+export type IntStorageSlotReactivation6mServiceListResponse =
+  IntStorageSlotReactivation6mServiceListResponses[keyof IntStorageSlotReactivation6mServiceListResponses];
+
+export type IntStorageSlotReactivation6mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this slot was reactivated
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_reactivation_6m/{block_number}';
+};
+
+export type IntStorageSlotReactivation6mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotReactivation6mServiceGetError =
+  IntStorageSlotReactivation6mServiceGetErrors[keyof IntStorageSlotReactivation6mServiceGetErrors];
+
+export type IntStorageSlotReactivation6mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotReactivation6mResponse;
+};
+
+export type IntStorageSlotReactivation6mServiceGetResponse =
+  IntStorageSlotReactivation6mServiceGetResponses[keyof IntStorageSlotReactivation6mServiceGetResponses];
+
+export type IntStorageSlotReactivation12mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this slot was reactivated (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this slot was reactivated (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this slot was reactivated (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this slot was reactivated (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this slot was reactivated (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this slot was reactivated (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this slot was reactivated (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this slot was reactivated (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this slot was reactivated (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this slot was reactivated (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The storage slot key (filter: eq)
+     */
+    slot_key_eq?: string;
+    /**
+     * The storage slot key (filter: ne)
+     */
+    slot_key_ne?: string;
+    /**
+     * The storage slot key (filter: contains)
+     */
+    slot_key_contains?: string;
+    /**
+     * The storage slot key (filter: starts_with)
+     */
+    slot_key_starts_with?: string;
+    /**
+     * The storage slot key (filter: ends_with)
+     */
+    slot_key_ends_with?: string;
+    /**
+     * The storage slot key (filter: like)
+     */
+    slot_key_like?: string;
+    /**
+     * The storage slot key (filter: not_like)
+     */
+    slot_key_not_like?: string;
+    /**
+     * The storage slot key (filter: in_values) (comma-separated list)
+     */
+    slot_key_in_values?: string;
+    /**
+     * The storage slot key (filter: not_in_values) (comma-separated list)
+     */
+    slot_key_not_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_reactivation_12m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotReactivation12m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_reactivation_12m';
+};
+
+export type IntStorageSlotReactivation12mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotReactivation12mServiceListError =
+  IntStorageSlotReactivation12mServiceListErrors[keyof IntStorageSlotReactivation12mServiceListErrors];
+
+export type IntStorageSlotReactivation12mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotReactivation12mResponse;
+};
+
+export type IntStorageSlotReactivation12mServiceListResponse =
+  IntStorageSlotReactivation12mServiceListResponses[keyof IntStorageSlotReactivation12mServiceListResponses];
+
+export type IntStorageSlotReactivation12mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this slot was reactivated
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_reactivation_12m/{block_number}';
+};
+
+export type IntStorageSlotReactivation12mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotReactivation12mServiceGetError =
+  IntStorageSlotReactivation12mServiceGetErrors[keyof IntStorageSlotReactivation12mServiceGetErrors];
+
+export type IntStorageSlotReactivation12mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotReactivation12mResponse;
+};
+
+export type IntStorageSlotReactivation12mServiceGetResponse =
+  IntStorageSlotReactivation12mServiceGetResponses[keyof IntStorageSlotReactivation12mServiceGetResponses];
+
+export type IntStorageSlotReactivation18mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this slot was reactivated (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this slot was reactivated (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this slot was reactivated (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this slot was reactivated (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this slot was reactivated (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this slot was reactivated (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this slot was reactivated (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this slot was reactivated (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this slot was reactivated (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this slot was reactivated (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The storage slot key (filter: eq)
+     */
+    slot_key_eq?: string;
+    /**
+     * The storage slot key (filter: ne)
+     */
+    slot_key_ne?: string;
+    /**
+     * The storage slot key (filter: contains)
+     */
+    slot_key_contains?: string;
+    /**
+     * The storage slot key (filter: starts_with)
+     */
+    slot_key_starts_with?: string;
+    /**
+     * The storage slot key (filter: ends_with)
+     */
+    slot_key_ends_with?: string;
+    /**
+     * The storage slot key (filter: like)
+     */
+    slot_key_like?: string;
+    /**
+     * The storage slot key (filter: not_like)
+     */
+    slot_key_not_like?: string;
+    /**
+     * The storage slot key (filter: in_values) (comma-separated list)
+     */
+    slot_key_in_values?: string;
+    /**
+     * The storage slot key (filter: not_in_values) (comma-separated list)
+     */
+    slot_key_not_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_reactivation_18m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotReactivation18m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_reactivation_18m';
+};
+
+export type IntStorageSlotReactivation18mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotReactivation18mServiceListError =
+  IntStorageSlotReactivation18mServiceListErrors[keyof IntStorageSlotReactivation18mServiceListErrors];
+
+export type IntStorageSlotReactivation18mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotReactivation18mResponse;
+};
+
+export type IntStorageSlotReactivation18mServiceListResponse =
+  IntStorageSlotReactivation18mServiceListResponses[keyof IntStorageSlotReactivation18mServiceListResponses];
+
+export type IntStorageSlotReactivation18mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this slot was reactivated
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_reactivation_18m/{block_number}';
+};
+
+export type IntStorageSlotReactivation18mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotReactivation18mServiceGetError =
+  IntStorageSlotReactivation18mServiceGetErrors[keyof IntStorageSlotReactivation18mServiceGetErrors];
+
+export type IntStorageSlotReactivation18mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotReactivation18mResponse;
+};
+
+export type IntStorageSlotReactivation18mServiceGetResponse =
+  IntStorageSlotReactivation18mServiceGetResponses[keyof IntStorageSlotReactivation18mServiceGetResponses];
+
+export type IntStorageSlotReactivation24mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this slot was reactivated (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this slot was reactivated (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this slot was reactivated (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this slot was reactivated (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this slot was reactivated (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this slot was reactivated (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this slot was reactivated (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this slot was reactivated (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this slot was reactivated (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this slot was reactivated (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The storage slot key (filter: eq)
+     */
+    slot_key_eq?: string;
+    /**
+     * The storage slot key (filter: ne)
+     */
+    slot_key_ne?: string;
+    /**
+     * The storage slot key (filter: contains)
+     */
+    slot_key_contains?: string;
+    /**
+     * The storage slot key (filter: starts_with)
+     */
+    slot_key_starts_with?: string;
+    /**
+     * The storage slot key (filter: ends_with)
+     */
+    slot_key_ends_with?: string;
+    /**
+     * The storage slot key (filter: like)
+     */
+    slot_key_like?: string;
+    /**
+     * The storage slot key (filter: not_like)
+     */
+    slot_key_not_like?: string;
+    /**
+     * The storage slot key (filter: in_values) (comma-separated list)
+     */
+    slot_key_in_values?: string;
+    /**
+     * The storage slot key (filter: not_in_values) (comma-separated list)
+     */
+    slot_key_not_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Number of effective bytes being reactivated (0-32) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_reactivation_24m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotReactivation24m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_reactivation_24m';
+};
+
+export type IntStorageSlotReactivation24mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotReactivation24mServiceListError =
+  IntStorageSlotReactivation24mServiceListErrors[keyof IntStorageSlotReactivation24mServiceListErrors];
+
+export type IntStorageSlotReactivation24mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotReactivation24mResponse;
+};
+
+export type IntStorageSlotReactivation24mServiceListResponse =
+  IntStorageSlotReactivation24mServiceListResponses[keyof IntStorageSlotReactivation24mServiceListResponses];
+
+export type IntStorageSlotReactivation24mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this slot was reactivated
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_reactivation_24m/{block_number}';
+};
+
+export type IntStorageSlotReactivation24mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotReactivation24mServiceGetError =
+  IntStorageSlotReactivation24mServiceGetErrors[keyof IntStorageSlotReactivation24mServiceGetErrors];
+
+export type IntStorageSlotReactivation24mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotReactivation24mResponse;
+};
+
+export type IntStorageSlotReactivation24mServiceGetResponse =
+  IntStorageSlotReactivation24mServiceGetResponses[keyof IntStorageSlotReactivation24mServiceGetResponses];
 
 export type IntStorageSlotReadServiceListData = {
   body?: never;
