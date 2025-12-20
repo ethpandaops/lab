@@ -29,9 +29,19 @@ export function IndexPage(): JSX.Element {
 
   // Calculate time range in seconds
   // Use URL params if provided, otherwise default to last hour with no upper bound
+  // Skip time filtering when blockNumber is provided for deep-linking
   const timeRange = useMemo(() => {
     const nowSeconds = Math.floor(Date.now() / 1000);
     const defaultRangeSeconds = DEFAULT_TIME_RANGE_HOURS * 60 * 60;
+
+    // When blockNumber is provided, skip time filtering to allow deep-linking
+    // to blocks that fall outside the default 6-hour window
+    if (search.blockNumber !== undefined) {
+      return {
+        start: undefined,
+        end: undefined,
+      };
+    }
 
     if (search.timeStart !== undefined && search.timeEnd !== undefined) {
       return {
@@ -58,7 +68,7 @@ export function IndexPage(): JSX.Element {
       start: nowSeconds - defaultRangeSeconds,
       end: undefined,
     };
-  }, [search.timeStart, search.timeEnd]);
+  }, [search.timeStart, search.timeEnd, search.blockNumber]);
 
   // Check if live mode is enabled from URL (only if feature is enabled)
   const isLive = LIVE_MODE_ENABLED && (search.isLive ?? false);
@@ -85,7 +95,7 @@ export function IndexPage(): JSX.Element {
   } = useQuery({
     ...intEngineNewPayloadServiceListOptions({
       query: {
-        slot_start_date_time_gte: timeRange.start,
+        ...(timeRange.start !== undefined && { slot_start_date_time_gte: timeRange.start }),
         ...(timeRange.end !== undefined && { slot_start_date_time_lte: timeRange.end }),
         duration_ms_gte: durationMin,
         page_size: search.pageSize ?? DEFAULT_PAGE_SIZE,
@@ -348,6 +358,9 @@ export function IndexPage(): JSX.Element {
     );
   }, [data, search.detailSlot, search.detailNodeName]);
 
+  // Get tracoor URL from network config for external links
+  const tracoorUrl = currentNetwork?.service_urls?.tracoor;
+
   return (
     <PayloadsView
       data={data}
@@ -368,6 +381,7 @@ export function IndexPage(): JSX.Element {
       selectedBlock={selectedBlock}
       onBlockSelect={handleBlockSelect}
       durationThreshold={durationMin}
+      tracoorUrl={tracoorUrl}
       // Live mode props (disabled when LIVE_MODE_ENABLED is false)
       isLive={isLive}
       onLiveModeToggle={LIVE_MODE_ENABLED ? handleLiveModeToggle : undefined}

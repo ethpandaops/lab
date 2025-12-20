@@ -5,6 +5,7 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { DataTable } from '@/components/DataTable';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { TracoorIcon } from '@/components/Ethereum/TracoorIcon';
 import { Alert } from '@/components/Feedback/Alert';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { IntEngineNewPayload } from '@/api/types.gen';
@@ -157,6 +158,8 @@ export type PayloadsViewProps = {
   onBlockSelect: (block: Payload | null) => void;
   // Duration threshold for display
   durationThreshold: number;
+  // External links
+  tracoorUrl?: string;
   // Live mode props
   isLive?: boolean;
   onLiveModeToggle?: () => void;
@@ -177,6 +180,7 @@ export function PayloadsView({
   onFiltersChange,
   onClearFilters,
   durationThreshold,
+  tracoorUrl,
   isLive = false,
   onLiveModeToggle,
   newItemIdsRef,
@@ -289,8 +293,35 @@ export function PayloadsView({
         },
         sortingFn: 'basic',
       }),
+      // Tracoor external link column (only shown if tracoorUrl is available)
+      ...(tracoorUrl
+        ? [
+            columnHelper.display({
+              id: 'tracoor',
+              header: '',
+              cell: info => {
+                const blockNumber = info.row.original.block_number;
+                if (blockNumber === undefined) return null;
+                const url = `${tracoorUrl}/execution_block_trace?executionBlockTraceBlockNumber=${blockNumber}`;
+                return (
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={e => e.stopPropagation()}
+                    className="inline-flex items-center transition-opacity hover:opacity-70"
+                    title="View in Tracoor"
+                  >
+                    <TracoorIcon className="size-4" />
+                  </a>
+                );
+              },
+              enableSorting: false,
+            }),
+          ]
+        : []),
     ],
-    [onFilterClick]
+    [onFilterClick, tracoorUrl]
   );
 
   // Get row ID for live mode highlighting
