@@ -100,7 +100,8 @@ export function ContractPage(): JSX.Element {
     if (!data || data.length === 0) return null;
 
     // Determine the unit for display based on the max value
-    const maxBytes = Math.max(...data.map(d => d.effectiveBytes));
+    const validBytes = data.map(d => d.effectiveBytes).filter((b): b is number => b !== null);
+    const maxBytes = validBytes.length > 0 ? Math.max(...validBytes) : 0;
     const bytesUnit = maxBytes < 1024 * 1024 ? 'KB' : 'MB';
     const bytesDivisor = bytesUnit === 'KB' ? 1024 : 1024 * 1024;
 
@@ -290,22 +291,22 @@ export function ContractPage(): JSX.Element {
         {contractOwner && (
           <div className="mt-2 flex flex-wrap items-center gap-2">
             {contractOwner.usage_category && (
-              <Badge variant="default" size="sm">
+              <Badge variant="border" size="small">
                 {contractOwner.usage_category}
               </Badge>
             )}
             {contractOwner.account_owner && (
-              <Badge variant="outline" size="sm">
+              <Badge variant="border" size="small">
                 Owner: {contractOwner.account_owner}
               </Badge>
             )}
             {contractOwner.factory_contract && (
-              <Badge variant="outline" size="sm" className="font-mono">
+              <Badge variant="border" size="small" className="font-mono">
                 Factory: {contractOwner.factory_contract.slice(0, 10)}...
               </Badge>
             )}
             {contractOwner.source && (
-              <Badge variant="muted" size="sm">
+              <Badge variant="flat" size="small">
                 via {contractOwner.source}
               </Badge>
             )}
