@@ -13,7 +13,7 @@ import { TimingsSkeleton } from './components/TimingsSkeleton';
 import { NewPayloadTab } from './components/NewPayloadTab';
 import { GetBlobsTab } from './components/GetBlobsTab';
 import { ReferenceNodesInfoDialog } from './components/ReferenceNodesInfoDialog';
-import type { TimeRange } from './IndexPage.types';
+import { TIME_RANGE_CONFIG, type TimeRange } from './IndexPage.types';
 
 /**
  * Engine API Timings page
@@ -99,7 +99,7 @@ export function IndexPage(): JSX.Element {
       <div className="mb-6 flex items-center gap-4">
         <span className="text-sm font-medium text-muted">Time Range:</span>
         <div className="flex gap-2">
-          {(['1hour', '3hours', '6hours'] as const).map(range => (
+          {(Object.keys(TIME_RANGE_CONFIG) as TimeRange[]).map(range => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
@@ -109,7 +109,7 @@ export function IndexPage(): JSX.Element {
                   : 'bg-surface text-muted hover:bg-surface/80 hover:text-foreground'
               }`}
             >
-              {range === '1hour' ? 'Last 1h' : range === '3hours' ? 'Last 3h' : 'Last 6h'}
+              {TIME_RANGE_CONFIG[range].label}
             </button>
           ))}
         </div>
@@ -149,12 +149,12 @@ export function IndexPage(): JSX.Element {
         <TabPanels className="mt-6">
           {/* newPayload Tab */}
           <TabPanel>
-            <NewPayloadTab data={data} />
+            <NewPayloadTab data={data} timeRange={timeRange} />
           </TabPanel>
 
           {/* getBlobs Tab */}
           <TabPanel>
-            <GetBlobsTab data={data} isLoading={isLoadingBlobs} />
+            <GetBlobsTab data={data} timeRange={timeRange} isLoading={isLoadingBlobs} />
           </TabPanel>
         </TabPanels>
       </TabGroup>

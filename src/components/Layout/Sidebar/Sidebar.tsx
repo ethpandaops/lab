@@ -167,8 +167,10 @@ const ethereumDataAvailabilityPages: NavItem[] = [
 
 const ethereumExecutionPages: NavItem[] = [
   { name: 'Timings', to: '/ethereum/execution/timings', icon: ClockIcon },
-  { name: 'State Growth', to: '/ethereum/execution/state-growth', icon: ServerStackIcon },
-  { name: 'State Expiry', to: '/ethereum/execution/state-expiry', icon: ClockIcon },
+  { name: 'Payloads', to: '/ethereum/execution/payloads', icon: CubeIcon },
+  // Manually disabled for now
+  // { name: 'State Growth', to: '/ethereum/execution/state-growth', icon: ServerStackIcon },
+  // { name: 'State Expiry', to: '/ethereum/execution/state-expiry', icon: ClockIcon },
 ];
 
 const xatuPages: NavItem[] = [

@@ -1,46 +1,40 @@
 import { useMemo, useState } from 'react';
 import { useQueries } from '@tanstack/react-query';
 import {
-  fctEngineNewPayloadStatusHourlyServiceList,
-  fctEngineNewPayloadStatusDailyServiceList,
   fctEngineNewPayloadByElClientServiceList,
+  fctEngineNewPayloadByElClientHourlyServiceList,
   fctEngineNewPayloadDurationChunked50MsServiceList,
-  fctEngineGetBlobsStatusHourlyServiceList,
-  fctEngineGetBlobsStatusDailyServiceList,
   fctEngineGetBlobsByElClientServiceList,
+  fctEngineGetBlobsByElClientHourlyServiceList,
   fctEngineGetBlobsDurationChunked50MsServiceList,
 } from '@/api/sdk.gen';
 import type {
-  FctEngineNewPayloadStatusHourly,
-  FctEngineNewPayloadStatusDaily,
   FctEngineNewPayloadByElClient,
+  FctEngineNewPayloadByElClientHourly,
   FctEngineNewPayloadDurationChunked50Ms,
-  FctEngineGetBlobsStatusHourly,
-  FctEngineGetBlobsStatusDaily,
   FctEngineGetBlobsByElClient,
+  FctEngineGetBlobsByElClientHourly,
   FctEngineGetBlobsDurationChunked50Ms,
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import type { TimeRange } from '../IndexPage.types';
+import { TIME_RANGE_CONFIG, PER_SLOT_CHART_RANGES, type TimeRange } from '../IndexPage.types';
 
 export interface EngineTimingsData {
-  // newPayload hourly/daily aggregations
-  newPayloadHourly: FctEngineNewPayloadStatusHourly[];
-  newPayloadDaily: FctEngineNewPayloadStatusDaily[];
-
   // newPayload per-EL-client aggregations (includes per-slot granularity)
   newPayloadByElClient: FctEngineNewPayloadByElClient[];
+
+  // newPayload hourly aggregations with true percentiles (for summary table)
+  newPayloadByElClientHourly: FctEngineNewPayloadByElClientHourly[];
 
   // newPayload duration histogram
   newPayloadDurationHistogram: FctEngineNewPayloadDurationChunked50Ms[];
 
-  // getBlobs hourly/daily aggregations
-  getBlobsHourly: FctEngineGetBlobsStatusHourly[];
-  getBlobsDaily: FctEngineGetBlobsStatusDaily[];
-
   // getBlobs per-EL-client aggregations (includes per-slot granularity)
   getBlobsByElClient: FctEngineGetBlobsByElClient[];
+
+  // getBlobs hourly aggregations with true percentiles (for summary table)
+  getBlobsByElClientHourly: FctEngineGetBlobsByElClientHourly[];
 
   // getBlobs duration histogram
   getBlobsDurationHistogram: FctEngineGetBlobsDurationChunked50Ms[];
@@ -63,53 +57,22 @@ export interface UseEngineTimingsDataResult {
 }
 
 /**
- * Round a timestamp down to the nearest hour boundary
+ * Calculate hour-aligned time range timestamps based on the selected range.
+ * All queries use hour-aligned timestamps for consistency across the page.
+ * Uses floor(now) to always show the last complete hour(s), avoiding sparse partial-hour data.
+ * e.g., "Last 1h" at 08:57 → the 07:00 bucket (complete), not the 08:00 bucket (partial)
  */
-function floorToHour(timestamp: number): number {
-  return Math.floor(timestamp / 3600) * 3600;
-}
-
-/**
- * Calculate time range timestamps based on the selected range.
- * Start time is rounded down to the hour boundary to align with hourly aggregated data.
- */
-function getTimeRangeTimestamps(range: TimeRange): { start: number; end: number } {
+function getTimeRangeTimestamps(range: TimeRange): {
+  hourlyStart: number;
+  hourlyEnd: number;
+} {
   const now = Math.floor(Date.now() / 1000);
-  const end = now;
+  const config = TIME_RANGE_CONFIG[range];
 
-  let start: number;
-  switch (range) {
-    case '1hour':
-      start = now - 3600; // 1 hour ago
-      break;
-    case '3hours':
-      start = now - 10800; // 3 hours ago
-      break;
-    case '6hours':
-      start = now - 21600; // 6 hours ago
-      break;
-    default:
-      start = now - 3600; // Default to 1 hour
-  }
+  const hourlyEnd = Math.floor(now / 3600) * 3600;
+  const hourlyStart = hourlyEnd - config.seconds;
 
-  // Round start down to hour boundary so all queries use aligned time windows
-  return { start: floorToHour(start), end };
-}
-
-/**
- * Generate comma-separated date strings for the last N days (YYYY-MM-DD format)
- */
-function getDateRangeValues(days: number): string {
-  const dates: string[] = [];
-  const now = new Date();
-
-  for (let i = 0; i < days; i++) {
-    const date = new Date(now);
-    date.setDate(date.getDate() - i);
-    dates.push(date.toISOString().split('T')[0]);
-  }
-
-  return dates.join(',');
+  return { hourlyStart, hourlyEnd };
 }
 
 /**
@@ -123,10 +86,7 @@ export function useEngineTimingsData({
 }: UseEngineTimingsDataOptions): UseEngineTimingsDataResult {
   const { currentNetwork } = useNetwork();
 
-  const { start, end } = useMemo(() => getTimeRangeTimestamps(timeRange), [timeRange]);
-
-  // Always use hourly data since all time ranges are < 24 hours
-  const useHourlyData = true;
+  const { hourlyStart, hourlyEnd } = useMemo(() => getTimeRangeTimestamps(timeRange), [timeRange]);
 
   // Track if blobs tab has ever been visited (to keep data cached after switching away)
   const [blobsVisited, setBlobsVisited] = useState(false);
@@ -135,63 +95,26 @@ export function useEngineTimingsData({
   }
   const fetchBlobs = blobsVisited || activeTab === 'getBlobs';
 
-  // For daily queries, generate date range values (last 7 days)
-  const dailyDateValues = getDateRangeValues(7);
-
   // Build node_class filter if enabled
   const refNodeFilter = referenceNodesOnly ? { node_class_eq: 'eip7870-block-builder' } : {};
 
+  // Only fetch per-slot data for short time ranges (per-slot charts not shown for 24h, 7d)
+  const fetchPerSlotData = PER_SLOT_CHART_RANGES.includes(timeRange);
+
   const queries = useQueries({
     queries: [
-      // newPayload hourly data
-      {
-        queryKey: ['engine-timings', 'newPayload-hourly', start, end, referenceNodesOnly],
-        queryFn: ({ signal }) =>
-          fetchAllPages<FctEngineNewPayloadStatusHourly>(
-            fctEngineNewPayloadStatusHourlyServiceList,
-            {
-              query: {
-                hour_start_date_time_gte: start,
-                hour_start_date_time_lte: end,
-                order_by: 'hour_start_date_time ASC',
-                page_size: 10000,
-                ...refNodeFilter,
-              },
-            },
-            'fct_engine_new_payload_status_hourly',
-            signal
-          ),
-        enabled: !!currentNetwork && useHourlyData,
-      },
-      // newPayload daily data
-      {
-        queryKey: ['engine-timings', 'newPayload-daily', dailyDateValues, referenceNodesOnly],
-        queryFn: ({ signal }) =>
-          fetchAllPages<FctEngineNewPayloadStatusDaily>(
-            fctEngineNewPayloadStatusDailyServiceList,
-            {
-              query: {
-                day_start_date_in_values: dailyDateValues,
-                order_by: 'day_start_date DESC',
-                page_size: 100,
-                ...refNodeFilter,
-              },
-            },
-            'fct_engine_new_payload_status_daily',
-            signal
-          ),
-        enabled: !!currentNetwork && !useHourlyData,
-      },
       // newPayload per-EL-client aggregations (includes per-slot data)
+      // Only fetched for short time ranges to keep queries performant
+      // Use hour-aligned timestamps to match hourly data
       {
-        queryKey: ['engine-timings', 'newPayload-by-el-client', start, end, referenceNodesOnly],
+        queryKey: ['engine-timings', 'newPayload-by-el-client', hourlyStart, hourlyEnd, referenceNodesOnly],
         queryFn: ({ signal }) =>
           fetchAllPages<FctEngineNewPayloadByElClient>(
             fctEngineNewPayloadByElClientServiceList,
             {
               query: {
-                slot_start_date_time_gte: start,
-                slot_start_date_time_lte: end,
+                slot_start_date_time_gte: hourlyStart,
+                slot_start_date_time_lt: hourlyEnd,
                 order_by: 'slot_start_date_time DESC',
                 page_size: 10000,
                 ...refNodeFilter,
@@ -200,18 +123,41 @@ export function useEngineTimingsData({
             'fct_engine_new_payload_by_el_client',
             signal
           ),
+        enabled: !!currentNetwork && fetchPerSlotData,
+      },
+      // newPayload hourly aggregations (true percentiles for summary table)
+      // Use hour-aligned timestamps to include all overlapping hour buckets
+      {
+        queryKey: ['engine-timings', 'newPayload-by-el-client-hourly', hourlyStart, hourlyEnd, referenceNodesOnly],
+        queryFn: ({ signal }) =>
+          fetchAllPages<FctEngineNewPayloadByElClientHourly>(
+            fctEngineNewPayloadByElClientHourlyServiceList,
+            {
+              query: {
+                hour_start_date_time_gte: hourlyStart,
+                hour_start_date_time_lt: hourlyEnd,
+                order_by: 'hour_start_date_time DESC',
+                page_size: 10000,
+                ...refNodeFilter,
+              },
+            },
+            'fct_engine_new_payload_by_el_client_hourly',
+            signal
+          ),
         enabled: !!currentNetwork,
       },
       // newPayload duration histogram
+      // Only fetched for short time ranges (histogram based on per-slot data)
+      // Use hour-aligned timestamps to match hourly data
       {
-        queryKey: ['engine-timings', 'newPayload-duration-histogram', start, end, referenceNodesOnly],
+        queryKey: ['engine-timings', 'newPayload-duration-histogram', hourlyStart, hourlyEnd, referenceNodesOnly],
         queryFn: ({ signal }) =>
           fetchAllPages<FctEngineNewPayloadDurationChunked50Ms>(
             fctEngineNewPayloadDurationChunked50MsServiceList,
             {
               query: {
-                slot_start_date_time_gte: start,
-                slot_start_date_time_lte: end,
+                slot_start_date_time_gte: hourlyStart,
+                slot_start_date_time_lt: hourlyEnd,
                 order_by: 'chunk_duration_ms ASC',
                 page_size: 10000,
                 ...refNodeFilter,
@@ -220,57 +166,20 @@ export function useEngineTimingsData({
             'fct_engine_new_payload_duration_chunked_50ms',
             signal
           ),
-        enabled: !!currentNetwork,
-      },
-      // getBlobs hourly data
-      {
-        queryKey: ['engine-timings', 'getBlobs-hourly', start, end, referenceNodesOnly],
-        queryFn: ({ signal }) =>
-          fetchAllPages<FctEngineGetBlobsStatusHourly>(
-            fctEngineGetBlobsStatusHourlyServiceList,
-            {
-              query: {
-                hour_start_date_time_gte: start,
-                hour_start_date_time_lte: end,
-                order_by: 'hour_start_date_time ASC',
-                page_size: 10000,
-                ...refNodeFilter,
-              },
-            },
-            'fct_engine_get_blobs_status_hourly',
-            signal
-          ),
-        enabled: !!currentNetwork && useHourlyData && fetchBlobs,
-      },
-      // getBlobs daily data
-      {
-        queryKey: ['engine-timings', 'getBlobs-daily', dailyDateValues, referenceNodesOnly],
-        queryFn: ({ signal }) =>
-          fetchAllPages<FctEngineGetBlobsStatusDaily>(
-            fctEngineGetBlobsStatusDailyServiceList,
-            {
-              query: {
-                day_start_date_in_values: dailyDateValues,
-                order_by: 'day_start_date DESC',
-                page_size: 100,
-                ...refNodeFilter,
-              },
-            },
-            'fct_engine_get_blobs_status_daily',
-            signal
-          ),
-        enabled: !!currentNetwork && !useHourlyData && fetchBlobs,
+        enabled: !!currentNetwork && fetchPerSlotData,
       },
       // getBlobs per-EL-client aggregations (includes per-slot data)
+      // Only fetched for short time ranges to keep queries performant
+      // Use hour-aligned timestamps to match hourly data
       {
-        queryKey: ['engine-timings', 'getBlobs-by-el-client', start, end, referenceNodesOnly],
+        queryKey: ['engine-timings', 'getBlobs-by-el-client', hourlyStart, hourlyEnd, referenceNodesOnly],
         queryFn: ({ signal }) =>
           fetchAllPages<FctEngineGetBlobsByElClient>(
             fctEngineGetBlobsByElClientServiceList,
             {
               query: {
-                slot_start_date_time_gte: start,
-                slot_start_date_time_lte: end,
+                slot_start_date_time_gte: hourlyStart,
+                slot_start_date_time_lt: hourlyEnd,
                 order_by: 'slot_start_date_time DESC',
                 page_size: 10000,
                 ...refNodeFilter,
@@ -279,18 +188,41 @@ export function useEngineTimingsData({
             'fct_engine_get_blobs_by_el_client',
             signal
           ),
+        enabled: !!currentNetwork && fetchBlobs && fetchPerSlotData,
+      },
+      // getBlobs hourly aggregations (true percentiles for summary table)
+      // Use hour-aligned timestamps to include all overlapping hour buckets
+      {
+        queryKey: ['engine-timings', 'getBlobs-by-el-client-hourly', hourlyStart, hourlyEnd, referenceNodesOnly],
+        queryFn: ({ signal }) =>
+          fetchAllPages<FctEngineGetBlobsByElClientHourly>(
+            fctEngineGetBlobsByElClientHourlyServiceList,
+            {
+              query: {
+                hour_start_date_time_gte: hourlyStart,
+                hour_start_date_time_lt: hourlyEnd,
+                order_by: 'hour_start_date_time DESC',
+                page_size: 10000,
+                ...refNodeFilter,
+              },
+            },
+            'fct_engine_get_blobs_by_el_client_hourly',
+            signal
+          ),
         enabled: !!currentNetwork && fetchBlobs,
       },
       // getBlobs duration histogram
+      // Only fetched for short time ranges (histogram based on per-slot data)
+      // Use hour-aligned timestamps to match hourly data
       {
-        queryKey: ['engine-timings', 'getBlobs-duration-histogram', start, end, referenceNodesOnly],
+        queryKey: ['engine-timings', 'getBlobs-duration-histogram', hourlyStart, hourlyEnd, referenceNodesOnly],
         queryFn: ({ signal }) =>
           fetchAllPages<FctEngineGetBlobsDurationChunked50Ms>(
             fctEngineGetBlobsDurationChunked50MsServiceList,
             {
               query: {
-                slot_start_date_time_gte: start,
-                slot_start_date_time_lte: end,
+                slot_start_date_time_gte: hourlyStart,
+                slot_start_date_time_lt: hourlyEnd,
                 order_by: 'chunk_duration_ms ASC',
                 page_size: 10000,
                 ...refNodeFilter,
@@ -299,26 +231,24 @@ export function useEngineTimingsData({
             'fct_engine_get_blobs_duration_chunked_50ms',
             signal
           ),
-        enabled: !!currentNetwork && fetchBlobs,
+        enabled: !!currentNetwork && fetchBlobs && fetchPerSlotData,
       },
     ],
   });
 
   // Extract results
   const [
-    newPayloadHourlyQuery,
-    newPayloadDailyQuery,
     newPayloadByElClientQuery,
+    newPayloadByElClientHourlyQuery,
     newPayloadDurationHistogramQuery,
-    getBlobsHourlyQuery,
-    getBlobsDailyQuery,
     getBlobsByElClientQuery,
+    getBlobsByElClientHourlyQuery,
     getBlobsDurationHistogramQuery,
   ] = queries;
 
-  // Check loading state for newPayload queries only (first 4)
-  const newPayloadQueries = queries.slice(0, 4);
-  const blobQueries = queries.slice(4);
+  // Check loading state for newPayload queries (first 3)
+  const newPayloadQueries = queries.slice(0, 3);
+  const blobQueries = queries.slice(3);
 
   const isLoading = newPayloadQueries.some(q => q.isLoading);
   const isLoadingBlobs = blobQueries.some(q => q.isLoading);
@@ -330,13 +260,11 @@ export function useEngineTimingsData({
   const data: EngineTimingsData | null =
     !isLoading && !error
       ? {
-          newPayloadHourly: newPayloadHourlyQuery.data ?? [],
-          newPayloadDaily: newPayloadDailyQuery.data ?? [],
           newPayloadByElClient: newPayloadByElClientQuery.data ?? [],
+          newPayloadByElClientHourly: newPayloadByElClientHourlyQuery.data ?? [],
           newPayloadDurationHistogram: newPayloadDurationHistogramQuery.data ?? [],
-          getBlobsHourly: getBlobsHourlyQuery.data ?? [],
-          getBlobsDaily: getBlobsDailyQuery.data ?? [],
           getBlobsByElClient: getBlobsByElClientQuery.data ?? [],
+          getBlobsByElClientHourly: getBlobsByElClientHourlyQuery.data ?? [],
           getBlobsDurationHistogram: getBlobsDurationHistogramQuery.data ?? [],
         }
       : null;
