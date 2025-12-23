@@ -314,4 +314,9 @@ export interface MultiLineChartProps {
    * @default true
    */
   notMerge?: boolean;
+  /**
+   * Callback when a series line is clicked
+   * @param seriesName - The name of the clicked series
+   */
+  onSeriesClick?: (seriesName: string) => void;
 }

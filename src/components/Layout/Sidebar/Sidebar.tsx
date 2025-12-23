@@ -168,6 +168,7 @@ const ethereumDataAvailabilityPages: NavItem[] = [
 const ethereumExecutionPages: NavItem[] = [
   { name: 'Timings', to: '/ethereum/execution/timings', icon: ClockIcon },
   { name: 'State Growth', to: '/ethereum/execution/state-growth', icon: ServerStackIcon },
+  { name: 'State Expiry', to: '/ethereum/execution/state-expiry', icon: ClockIcon },
 ];
 
 const xatuPages: NavItem[] = [

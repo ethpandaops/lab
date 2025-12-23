@@ -1,0 +1,583 @@
+import { type JSX, useMemo, useCallback, useState } from 'react';
+import {
+  CubeIcon,
+  CursorArrowRaysIcon,
+  DocumentTextIcon,
+  ClockIcon,
+  ArrowDownIcon,
+  InformationCircleIcon,
+  SparklesIcon,
+} from '@heroicons/react/24/outline';
+import { Container } from '@/components/Layout/Container';
+import { Card } from '@/components/Layout/Card';
+import { PopoutCard } from '@/components/Layout/PopoutCard';
+import { MultiLineChart } from '@/components/Charts/MultiLine';
+import { Popover, PopoverButton, PopoverPanel } from '@/components/Overlays/Popover';
+import { formatSmartDecimal, hexToRgba } from '@/utils';
+import { useThemeColors } from '@/hooks/useThemeColors';
+import { useStateExpiryData, EXPIRY_POLICIES, EXPIRY_TYPES, type ExpiryPolicy, type ExpiryType } from './hooks';
+import { PolicySelector, StateExpirySkeleton, ContractTop100List } from './components';
+
+/** Display labels for expiry policies */
+const POLICY_LABELS: Record<ExpiryPolicy, string> = {
+  '6m': '6 Month',
+  '12m': '12 Month',
+  '18m': '18 Month',
+  '24m': '24 Month',
+};
+
+/** Display labels for expiry types */
+const TYPE_LABELS: Record<ExpiryType, string> = {
+  slot: 'Slot',
+  contract: 'Contract',
+};
+
+/** Colors for expiry types */
+const TYPE_COLORS: Record<ExpiryType, string> = {
+  slot: '#3b82f6', // blue
+  contract: '#8b5cf6', // violet
+};
+
+/**
+ * Format bytes to human-readable format (GB, TB)
+ */
+function formatBytes(bytes: number): string {
+  const gb = bytes / (1024 * 1024 * 1024);
+  if (gb >= 1000) {
+    return `${(gb / 1024).toFixed(2)} TB`;
+  }
+  return `${gb.toFixed(2)} GB`;
+}
+
+/**
+ * Format storage slot count to human-readable format
+ */
+function formatStorageSlotCount(count: number): string {
+  if (count >= 1_000_000_000) {
+    return `${(count / 1_000_000_000).toFixed(2)}B`;
+  }
+  if (count >= 1_000_000) {
+    return `${(count / 1_000_000).toFixed(2)}M`;
+  }
+  if (count >= 1_000) {
+    return `${(count / 1_000).toFixed(2)}K`;
+  }
+  return count.toFixed(0);
+}
+
+/**
+ * State Expiry page - Visualizes the impact of different state expiry policies
+ * on Ethereum's storage size over time.
+ */
+export function IndexPage(): JSX.Element {
+  const { data, isLoading, error } = useStateExpiryData();
+  const [selectedPolicy, setSelectedPolicy] = useState<ExpiryPolicy>('6m');
+  const [selectedType, setSelectedType] = useState<ExpiryType>('slot');
+  const themeColors = useThemeColors();
+
+  // Calculate savings data for the policy selector matrix
+  const savingsData = useMemo(() => {
+    const result: Record<
+      ExpiryType,
+      Record<ExpiryPolicy, { bytesPercent: number | null; slotsPercent: number | null }>
+    > = {
+      slot: {
+        '6m': { bytesPercent: null, slotsPercent: null },
+        '12m': { bytesPercent: null, slotsPercent: null },
+        '18m': { bytesPercent: null, slotsPercent: null },
+        '24m': { bytesPercent: null, slotsPercent: null },
+      },
+      contract: {
+        '6m': { bytesPercent: null, slotsPercent: null },
+        '12m': { bytesPercent: null, slotsPercent: null },
+        '18m': { bytesPercent: null, slotsPercent: null },
+        '24m': { bytesPercent: null, slotsPercent: null },
+      },
+    };
+
+    if (!data || data.length === 0) return result;
+
+    // Find latest data point with expiry info
+    for (let i = data.length - 1; i >= 0; i--) {
+      const point = data[i];
+
+      for (const type of EXPIRY_TYPES) {
+        for (const policy of EXPIRY_POLICIES) {
+          if (result[type][policy].bytesPercent !== null) continue;
+
+          const policyData = type === 'slot' ? point.slotExpiryData[policy] : point.contractExpiryData[policy];
+          if (policyData.effectiveBytes !== null && point.effectiveBytes > 0) {
+            const bytesSaved = point.effectiveBytes - policyData.effectiveBytes;
+            result[type][policy].bytesPercent = (bytesSaved / point.effectiveBytes) * 100;
+          }
+          if (policyData.activeSlots !== null && point.activeSlots > 0) {
+            const slotsSaved = point.activeSlots - policyData.activeSlots;
+            result[type][policy].slotsPercent = (slotsSaved / point.activeSlots) * 100;
+          }
+        }
+      }
+    }
+
+    return result;
+  }, [data]);
+
+  // Current selection savings
+  const selectedSavings = useMemo(() => {
+    if (!data || data.length === 0) return null;
+
+    // Find latest data point with data for selected policy
+    for (let i = data.length - 1; i >= 0; i--) {
+      const point = data[i];
+      const policyData =
+        selectedType === 'slot' ? point.slotExpiryData[selectedPolicy] : point.contractExpiryData[selectedPolicy];
+
+      if (policyData.effectiveBytes !== null && policyData.activeSlots !== null) {
+        const bytesSaved = point.effectiveBytes - policyData.effectiveBytes;
+        const bytesPercent = point.effectiveBytes > 0 ? (bytesSaved / point.effectiveBytes) * 100 : 0;
+        const slotsSaved = point.activeSlots - policyData.activeSlots;
+        const slotsPercent = point.activeSlots > 0 ? (slotsSaved / point.activeSlots) * 100 : 0;
+
+        return {
+          currentBytes: point.effectiveBytes,
+          currentSlots: point.activeSlots,
+          afterBytes: policyData.effectiveBytes,
+          afterSlots: policyData.activeSlots,
+          bytesSaved,
+          bytesPercent,
+          slotsSaved,
+          slotsPercent,
+        };
+      }
+    }
+    return null;
+  }, [data, selectedType, selectedPolicy]);
+
+  // Chart data - show all policies with selected one highlighted
+  const chartData = useMemo(() => {
+    if (!data || data.length === 0) return null;
+
+    const bytesToGB = (bytes: number | null): number | null => (bytes === null ? null : bytes / (1024 * 1024 * 1024));
+
+    const selectedColor = TYPE_COLORS[selectedType];
+    // Use muted color for current state line (adapts to theme)
+    const currentStateColor = themeColors.muted;
+    // Use border color with 20% opacity for non-selected lines
+    const inactiveColor = hexToRgba(themeColors.border, 0.2);
+
+    // Build series in fixed order: Current -> Slot 6,12,18,24 -> Contract 6,12,18,24
+    const bytesSeries: Array<{
+      name: string;
+      data: (number | null)[];
+      color: string;
+      lineWidth: number;
+    }> = [];
+
+    const slotsSeries: Array<{
+      name: string;
+      data: (number | null)[];
+      color: string;
+      lineWidth: number;
+    }> = [];
+
+    // 1. Current State first
+    bytesSeries.push({
+      name: 'Current State',
+      data: data.map(item => bytesToGB(item.effectiveBytes)),
+      color: currentStateColor,
+      lineWidth: 3,
+    });
+    slotsSeries.push({
+      name: 'Current State',
+      data: data.map(item => item.activeSlots),
+      color: currentStateColor,
+      lineWidth: 3,
+    });
+
+    // 2. Then all policies in order: Slot 6,12,18,24 -> Contract 6,12,18,24
+    for (const type of EXPIRY_TYPES) {
+      for (const policy of EXPIRY_POLICIES) {
+        const isSelected = type === selectedType && policy === selectedPolicy;
+        const seriesName = `${TYPE_LABELS[type]} (${policy})`;
+
+        bytesSeries.push({
+          name: seriesName,
+          data: data.map(item => {
+            const policyData = type === 'slot' ? item.slotExpiryData[policy] : item.contractExpiryData[policy];
+            return bytesToGB(policyData.effectiveBytes);
+          }),
+          color: isSelected ? selectedColor : inactiveColor,
+          lineWidth: isSelected ? 3 : 2,
+        });
+
+        slotsSeries.push({
+          name: seriesName,
+          data: data.map(item => {
+            const policyData = type === 'slot' ? item.slotExpiryData[policy] : item.contractExpiryData[policy];
+            return policyData.activeSlots;
+          }),
+          color: isSelected ? selectedColor : inactiveColor,
+          lineWidth: isSelected ? 3 : 2,
+        });
+      }
+    }
+
+    return {
+      labels: data.map(item => item.dateLabel),
+      bytesSeries,
+      slotsSeries,
+    };
+  }, [data, selectedType, selectedPolicy, themeColors]);
+
+  const bytesTooltipFormatter = useCallback((params: unknown): string => {
+    const dataPoints = Array.isArray(params) ? params : [params];
+    let html = '';
+
+    if (dataPoints.length > 0 && dataPoints[0]) {
+      const firstPoint = dataPoints[0] as { axisValue?: string };
+      if (firstPoint.axisValue) {
+        html += `<div style="margin-bottom: 8px; font-weight: 600; font-size: 13px;">${firstPoint.axisValue}</div>`;
+      }
+    }
+
+    dataPoints.forEach(point => {
+      const p = point as { marker?: string; seriesName?: string; value?: number | [number, number] };
+      if (p.marker && p.seriesName !== undefined) {
+        const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+        if (yValue !== undefined && yValue !== null) {
+          html += `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">`;
+          html += p.marker;
+          html += `<span>${p.seriesName}:</span>`;
+          html += `<span style="font-weight: 600; min-width: 80px; text-align: right;">${formatSmartDecimal(yValue, 2)} GB</span>`;
+          html += `</div>`;
+        }
+      }
+    });
+
+    return html;
+  }, []);
+
+  const slotsTooltipFormatter = useCallback((params: unknown): string => {
+    const dataPoints = Array.isArray(params) ? params : [params];
+    let html = '';
+
+    if (dataPoints.length > 0 && dataPoints[0]) {
+      const firstPoint = dataPoints[0] as { axisValue?: string };
+      if (firstPoint.axisValue) {
+        html += `<div style="margin-bottom: 8px; font-weight: 600; font-size: 13px;">${firstPoint.axisValue}</div>`;
+      }
+    }
+
+    dataPoints.forEach(point => {
+      const p = point as { marker?: string; seriesName?: string; value?: number | [number, number] };
+      if (p.marker && p.seriesName !== undefined) {
+        const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+        if (yValue !== undefined && yValue !== null) {
+          html += `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">`;
+          html += p.marker;
+          html += `<span>${p.seriesName}:</span>`;
+          html += `<span style="font-weight: 600; min-width: 80px; text-align: right;">${formatStorageSlotCount(yValue)}</span>`;
+          html += `</div>`;
+        }
+      }
+    });
+
+    return html;
+  }, []);
+
+  const handlePolicySelect = useCallback((type: ExpiryType, policy: ExpiryPolicy) => {
+    setSelectedType(type);
+    setSelectedPolicy(policy);
+  }, []);
+
+  /** Handle click on chart series to switch to that policy */
+  const handleSeriesClick = useCallback((seriesName: string) => {
+    // Skip "Current State" series
+    if (seriesName === 'Current State') return;
+
+    // Parse series name like "Slot (6m)" or "Contract (12m)"
+    const match = seriesName.match(/^(Slot|Contract)\s+\((\d+m)\)$/i);
+    if (match) {
+      const type = match[1].toLowerCase() as ExpiryType;
+      const policy = match[2] as ExpiryPolicy;
+
+      // Validate policy exists
+      if (EXPIRY_POLICIES.includes(policy) && EXPIRY_TYPES.includes(type)) {
+        setSelectedType(type);
+        setSelectedPolicy(policy);
+      }
+    }
+  }, []);
+
+  const selectedColor = TYPE_COLORS[selectedType];
+
+  return (
+    <Container>
+      {/* Header */}
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-3xl font-bold text-foreground">State Expiry</h1>
+            <Popover className="relative">
+              <PopoverButton
+                variant="blank"
+                iconOnly
+                leadingIcon={
+                  <InformationCircleIcon className="size-5 text-muted transition-colors hover:text-foreground" />
+                }
+                className="!p-0"
+              />
+              <PopoverPanel anchor="bottom start" className="w-80 p-3">
+                <p className="text-xs/5 text-muted">
+                  <span className="font-semibold text-foreground">State expiry</span> reduces Ethereum&apos;s state size
+                  by marking storage slots as &quot;expired&quot; after a period of inactivity. Expired state is pruned
+                  from active storage but can be restored via witnesses when needed.
+                </p>
+              </PopoverPanel>
+            </Popover>
+          </div>
+          <p className="mt-0.5 text-sm text-muted">Impact of expiring unused storage after inactivity periods</p>
+        </div>
+
+        {/* Compact legend chips with popovers - visible below lg */}
+        <div className="flex flex-wrap items-center gap-2 text-xs lg:hidden">
+          <Popover className="relative">
+            <PopoverButton
+              variant="blank"
+              className="inline-flex items-center gap-1.5 border border-blue-500/30 bg-blue-500/10 px-2.5 py-1 text-blue-600 hover:bg-blue-500/20 dark:border-blue-400/30 dark:bg-blue-400/10 dark:text-blue-400 dark:hover:bg-blue-400/20"
+            >
+              <CubeIcon className="size-3.5" />
+              <span className="font-medium">Slot</span>
+            </PopoverButton>
+            <PopoverPanel anchor="bottom start" className="w-56 p-2.5">
+              <p className="text-xs/5 text-muted">
+                <span className="font-semibold text-foreground">Slot-based expiry</span> marks individual storage slots
+                as expired based on when each slot was last accessed.
+              </p>
+            </PopoverPanel>
+          </Popover>
+          <Popover className="relative">
+            <PopoverButton
+              variant="blank"
+              className="inline-flex items-center gap-1.5 border border-violet-500/30 bg-violet-500/10 px-2.5 py-1 text-violet-600 hover:bg-violet-500/20 dark:border-violet-400/30 dark:bg-violet-400/10 dark:text-violet-400 dark:hover:bg-violet-400/20"
+            >
+              <DocumentTextIcon className="size-3.5" />
+              <span className="font-medium">Contract</span>
+            </PopoverButton>
+            <PopoverPanel anchor="bottom start" className="w-56 p-2.5">
+              <p className="text-xs/5 text-muted">
+                <span className="font-semibold text-foreground">Contract-based expiry</span> marks all storage slots of
+                a contract as expired based on when the contract was last accessed.
+              </p>
+            </PopoverPanel>
+          </Popover>
+          <Popover className="relative">
+            <PopoverButton
+              variant="blank"
+              className="inline-flex items-center gap-1.5 border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-emerald-600 hover:bg-emerald-500/20 dark:border-emerald-400/30 dark:bg-emerald-400/10 dark:text-emerald-400 dark:hover:bg-emerald-400/20"
+            >
+              <ClockIcon className="size-3.5" />
+              <span className="font-medium">6-24m</span>
+            </PopoverButton>
+            <PopoverPanel anchor="bottom start" className="w-56 p-2.5">
+              <p className="text-xs/5 text-muted">
+                <span className="font-semibold text-foreground">Inactivity period</span> determines how long a storage
+                slot must be inactive before being marked as expired (6, 12, 18, or 24 months).
+              </p>
+            </PopoverPanel>
+          </Popover>
+        </div>
+      </div>
+
+      {error && (
+        <Card className="p-6">
+          <p className="text-danger">Failed to load state expiry data: {error.message}</p>
+        </Card>
+      )}
+
+      {!error && (
+        <div className="space-y-4">
+          {/* Call to action - always visible */}
+          <div className="inline-flex items-center gap-2 rounded-sm border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary">
+            <CursorArrowRaysIcon className="size-4 shrink-0" />
+            <span>Select an expiry policy below to see how much storage could be reclaimed</span>
+          </div>
+
+          {/* Policy Selector - always visible */}
+          <PolicySelector
+            selectedType={selectedType}
+            selectedPolicy={selectedPolicy}
+            onSelect={handlePolicySelect}
+            savingsData={savingsData}
+          />
+
+          {/* Skeleton for data-dependent content */}
+          {isLoading && <StateExpirySkeleton />}
+
+          {/* Data-dependent content */}
+          {chartData && selectedSavings && (
+            <>
+              {/* Summary Cards */}
+              <div className="grid gap-2 md:grid-cols-3 md:gap-3">
+                {/* Current State */}
+                <Card className="border-l-2 border-l-muted/50 p-2 md:p-3">
+                  <p className="flex items-center gap-1 text-xs font-medium tracking-wide text-muted uppercase">
+                    <CubeIcon className="size-3" />
+                    <span>Current State</span>
+                  </p>
+                  <div className="mt-1 flex items-center gap-1">
+                    <p className="text-base font-bold text-foreground tabular-nums md:text-lg">
+                      {formatBytes(selectedSavings.currentBytes)}
+                    </p>
+                    <Popover className="relative">
+                      <PopoverButton
+                        variant="blank"
+                        iconOnly
+                        leadingIcon={
+                          <InformationCircleIcon className="size-3.5 text-muted/50 transition-colors hover:text-muted" />
+                        }
+                        className="!p-0"
+                      />
+                      <PopoverPanel anchor="bottom start" className="w-56 p-2.5">
+                        <p className="text-xs/5 text-muted">
+                          <span className="font-semibold text-foreground">Effective bytes</span> measures actual data
+                          stored, excluding leading zeros. Each storage slot is 32 bytes.
+                        </p>
+                      </PopoverPanel>
+                    </Popover>
+                  </div>
+                  <p className="mt-0.5 text-xs text-muted tabular-nums">
+                    {formatStorageSlotCount(selectedSavings.currentSlots)} slots
+                  </p>
+                </Card>
+
+                {/* After Expiry */}
+                <div className="border-l-2" style={{ borderLeftColor: selectedColor }}>
+                  <Card className="border-l-0 p-2 md:p-3">
+                    <p
+                      className="flex items-center gap-1 text-xs font-medium tracking-wide uppercase"
+                      style={{ color: selectedColor }}
+                    >
+                      <ClockIcon className="size-3" />
+                      <span>
+                        {POLICY_LABELS[selectedPolicy]} {TYPE_LABELS[selectedType]}
+                      </span>
+                    </p>
+                    <div className="mt-1 flex items-center gap-1">
+                      <p className="text-base font-bold tabular-nums md:text-lg" style={{ color: selectedColor }}>
+                        {formatBytes(selectedSavings.afterBytes)}
+                      </p>
+                      <Popover className="relative">
+                        <PopoverButton
+                          variant="blank"
+                          iconOnly
+                          leadingIcon={
+                            <InformationCircleIcon
+                              className="size-3.5 transition-colors"
+                              style={{ color: `${selectedColor}50` }}
+                            />
+                          }
+                          className="!p-0 hover:opacity-80"
+                        />
+                        <PopoverPanel anchor="bottom start" className="w-56 p-2.5">
+                          <p className="text-xs/5 text-muted">
+                            <span className="font-semibold text-foreground">Effective bytes</span> measures actual data
+                            stored, excluding leading zeros. Each storage slot is 32 bytes.
+                          </p>
+                        </PopoverPanel>
+                      </Popover>
+                    </div>
+                    <p className="mt-0.5 text-xs tabular-nums" style={{ color: `${selectedColor}99` }}>
+                      {formatStorageSlotCount(selectedSavings.afterSlots)} slots
+                    </p>
+                  </Card>
+                </div>
+
+                {/* Difference */}
+                <Card className="border-l-2 border-l-emerald-500 p-2 md:p-3">
+                  <p className="flex items-center gap-1 text-xs font-medium tracking-wide text-emerald-600 uppercase dark:text-emerald-400">
+                    <SparklesIcon className="size-3" />
+                    <span>Difference</span>
+                  </p>
+                  <div className="mt-1 flex items-baseline gap-1">
+                    <p className="text-base font-bold text-emerald-600 tabular-nums md:text-lg dark:text-emerald-400">
+                      -{formatBytes(selectedSavings.bytesSaved)} ({selectedSavings.bytesPercent.toFixed(1)}%)
+                    </p>
+                    <ArrowDownIcon className="size-3 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <p className="mt-0.5 text-xs text-emerald-600/70 tabular-nums dark:text-emerald-400/70">
+                    {formatStorageSlotCount(selectedSavings.slotsSaved)} slots (
+                    {selectedSavings.slotsPercent.toFixed(1)}% reduction)
+                  </p>
+                </Card>
+              </div>
+
+              {/* Charts */}
+              <div className="grid gap-4 md:grid-cols-2">
+                <PopoutCard
+                  title="Storage Size"
+                  subtitle="Current vs expiry policy"
+                  downloadFilename="state-expiry-storage-size"
+                >
+                  <MultiLineChart
+                    series={chartData.bytesSeries}
+                    xAxis={{
+                      type: 'category',
+                      labels: chartData.labels,
+                      name: 'Date',
+                    }}
+                    yAxis={{
+                      name: 'Size (GB)',
+                      formatter: (value: number) => value.toFixed(4),
+                    }}
+                    height={280}
+                    showLegend={false}
+                    enableDataZoom={true}
+                    tooltipFormatter={bytesTooltipFormatter}
+                    syncGroup="state-expiry"
+                    onSeriesClick={handleSeriesClick}
+                  />
+                </PopoutCard>
+
+                <PopoutCard
+                  title="Active Storage Slots"
+                  subtitle="Current vs expiry policy"
+                  downloadFilename="state-expiry-active-slots"
+                >
+                  <MultiLineChart
+                    series={chartData.slotsSeries}
+                    xAxis={{
+                      type: 'category',
+                      labels: chartData.labels,
+                      name: 'Date',
+                    }}
+                    yAxis={{
+                      name: 'Slots',
+                      formatter: (value: number) => {
+                        if (value >= 1_000_000) {
+                          return `${(value / 1_000_000).toFixed(4)}M`;
+                        }
+                        if (value >= 1_000) {
+                          return `${(value / 1_000).toFixed(4)}K`;
+                        }
+                        return value.toFixed(0);
+                      },
+                    }}
+                    height={280}
+                    showLegend={false}
+                    enableDataZoom={true}
+                    tooltipFormatter={slotsTooltipFormatter}
+                    syncGroup="state-expiry"
+                    onSeriesClick={handleSeriesClick}
+                  />
+                </PopoutCard>
+              </div>
+
+              {/* Top 100 Contracts */}
+              <ContractTop100List />
+            </>
+          )}
+        </div>
+      )}
+    </Container>
+  );
+}

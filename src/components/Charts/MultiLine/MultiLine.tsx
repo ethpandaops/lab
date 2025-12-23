@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import ReactEChartsCore from 'echarts-for-react/lib/core';
+import type ReactEChartsCore from 'echarts-for-react/lib/core';
+import ReactEChartsComponent from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { LineChart as EChartsLine } from 'echarts/charts';
 import {
@@ -87,9 +88,72 @@ export function MultiLineChart({
   relativeSlots,
   syncGroup,
   notMerge = true,
+  onSeriesClick,
 }: MultiLineChartProps): React.JSX.Element {
-  // Get callback ref for crosshair sync
-  const chartRef = useSharedCrosshairs({ syncGroup });
+  // Store ref to the ReactEChartsCore wrapper (not the instance) for click handling
+  const chartWrapperRef = useRef<ReactEChartsCore | null>(null);
+
+  // Get callback ref for crosshair sync, extended to also store the wrapper ref
+  const baseCrosshairRef = useSharedCrosshairs({ syncGroup });
+
+  // Combined ref that handles both crosshair sync and stores wrapper ref
+  const chartRef = useCallback(
+    (node: ReactEChartsCore | null) => {
+      // First, call the crosshair sync ref
+      baseCrosshairRef(node);
+      // Store wrapper ref for click handling
+      chartWrapperRef.current = node;
+    },
+    [baseCrosshairRef]
+  );
+
+  // Handle click on chart to find closest series
+  const handleChartClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!onSeriesClick || !chartWrapperRef.current) return;
+
+      // Get fresh instance from wrapper
+      const instance = chartWrapperRef.current.getEchartsInstance() as unknown as import('echarts/core').EChartsType;
+      if (!instance || instance.isDisposed?.()) return;
+
+      const rect = e.currentTarget.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left;
+      const offsetY = e.clientY - rect.top;
+
+      // Convert pixel coordinates to data coordinates
+      const pointInGrid = instance.convertFromPixel('grid', [offsetX, offsetY]);
+      if (!pointInGrid) return;
+
+      // Get all series data and find which one is closest to click position
+      const opt = instance.getOption() as { series?: Array<{ name?: string; data?: unknown[] }> };
+      const chartSeries = opt.series || [];
+      let closestSeries: string | null = null;
+      let minDistance = Infinity;
+
+      for (const s of chartSeries) {
+        if (!s.name || !s.data) continue;
+        // Find the y value at the clicked x position
+        const xIndex = Math.round(pointInGrid[0]);
+        if (xIndex < 0 || xIndex >= s.data.length) continue;
+        const dataPoint = s.data[xIndex];
+        if (dataPoint === null || dataPoint === undefined) continue;
+
+        const yValue = typeof dataPoint === 'number' ? dataPoint : (dataPoint as [number, number])[1];
+        if (yValue === null || yValue === undefined) continue;
+
+        const distance = Math.abs(yValue - pointInGrid[1]);
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestSeries = s.name;
+        }
+      }
+
+      if (closestSeries) {
+        onSeriesClick(closestSeries);
+      }
+    },
+    [onSeriesClick]
+  );
 
   const themeColors = useThemeColors();
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -158,6 +222,7 @@ export function MultiLineChart({
     });
 
     // Remove series from visible set if they no longer exist in current series
+    // Also remove from seenSeriesNamesRef so they'll be treated as "new" when re-added
     setVisibleSeries(prevVisible => {
       const updated = new Set(prevVisible);
       let changed = false;
@@ -166,7 +231,15 @@ export function MultiLineChart({
       prevVisible.forEach(name => {
         if (!currentSeriesNames.has(name)) {
           updated.delete(name);
+          seenSeriesNamesRef.current.delete(name); // Forget this series so it's "new" when re-added
           changed = true;
+        }
+      });
+
+      // Also clean up seenSeriesNamesRef for series that were hidden (not in prevVisible) but removed
+      seenSeriesNamesRef.current.forEach(name => {
+        if (!currentSeriesNames.has(name)) {
+          seenSeriesNamesRef.current.delete(name);
         }
       });
 
@@ -316,6 +389,7 @@ export function MultiLineChart({
         showSymbol: s.showSymbol ?? false,
         symbolSize: s.symbolSize ?? 4,
         stack: s.stack,
+        triggerLineEvent: true, // Enable click events on lines
         lineStyle: {
           color: seriesColor,
           width: s.lineWidth ?? 2,
@@ -613,7 +687,6 @@ export function MultiLineChart({
     themeColors.border,
     themeColors.muted,
     themeColors.surface,
-    themeColors.background,
     themeColors.primary,
     xAxis,
     yAxis,
@@ -782,13 +855,14 @@ export function MultiLineChart({
 
       <div
         style={{
-          pointerEvents: 'none',
           height: _height === '100%' ? '100%' : 'auto',
           flex: _height === '100%' ? '1 1 0%' : undefined,
           minHeight: _height === '100%' ? 0 : undefined,
+          cursor: onSeriesClick ? 'pointer' : undefined,
         }}
+        onClickCapture={onSeriesClick ? handleChartClick : undefined}
       >
-        <ReactEChartsCore
+        <ReactEChartsComponent
           ref={chartRef}
           echarts={echarts}
           option={option}
@@ -796,7 +870,6 @@ export function MultiLineChart({
             height: typeof _height === 'number' && !(showLegend && series.length > 1) ? _height + 52 : _height,
             width: '100%',
             minHeight: typeof _height === 'number' && !(showLegend && series.length > 1) ? _height + 52 : _height,
-            pointerEvents: 'auto',
           }}
           notMerge={notMerge}
           opts={{ renderer: 'canvas' }}

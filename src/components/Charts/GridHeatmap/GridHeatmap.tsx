@@ -140,7 +140,7 @@ export function GridHeatmap<T = unknown>({
     const shouldShow = isPersistent ? isHovered || !isNearbyColumnHovered : isHovered;
 
     // Positioning for 3xs: first column left-aligned, last column right-aligned, others centered
-    const getPositionClass = () => {
+    const getPositionClass = (): string => {
       if (!is3xs) return '';
       if (isFirstColumn) return 'absolute top-0 left-0';
       if (isLastColumn) return 'absolute top-0 right-0';

@@ -6,7 +6,7 @@ import { Card } from '@/components/Layout/Card';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { formatSmartDecimal } from '@/utils';
 import { useStateSizeData, useStateDelta, type DeltaTimeframe } from './hooks';
-import { StateSizeSkeleton, StorageSlotStateChart } from './components';
+import { StateSizeSkeleton } from './components';
 
 const TIMEFRAME_OPTIONS: { value: DeltaTimeframe; label: string }[] = [
   { value: 'daily', label: '24h' },
@@ -335,11 +335,6 @@ export function IndexPage(): JSX.Element {
           </Card>
         </div>
       )}
-
-      {/* Storage Slot State Comparison - rendered independently */}
-      <div className="mt-8">
-        <StorageSlotStateChart />
-      </div>
     </Container>
   );
 }
