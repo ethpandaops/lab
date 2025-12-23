@@ -42,6 +42,11 @@ export interface SeriesData {
    */
   showArea?: boolean;
   /**
+   * Stack group name - series with the same stack value will be stacked
+   * When set, areas are stacked on top of each other
+   */
+  stack?: string;
+  /**
    * Opacity of the area fill (0-1)
    * If not specified, uses a gradient from 0.5 to 0.06
    * @default undefined (gradient)
@@ -309,4 +314,9 @@ export interface MultiLineChartProps {
    * @default true
    */
   notMerge?: boolean;
+  /**
+   * Callback when a series line is clicked
+   * @param seriesName - The name of the clicked series
+   */
+  onSeriesClick?: (seriesName: string) => void;
 }

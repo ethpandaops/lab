@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import ReactEChartsCore from 'echarts-for-react/lib/core';
+import type ReactEChartsCore from 'echarts-for-react/lib/core';
+import ReactEChartsComponent from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { LineChart as EChartsLine } from 'echarts/charts';
 import {
@@ -87,9 +88,72 @@ export function MultiLineChart({
   relativeSlots,
   syncGroup,
   notMerge = true,
+  onSeriesClick,
 }: MultiLineChartProps): React.JSX.Element {
-  // Get callback ref for crosshair sync
-  const chartRef = useSharedCrosshairs({ syncGroup });
+  // Store ref to the ReactEChartsCore wrapper (not the instance) for click handling
+  const chartWrapperRef = useRef<ReactEChartsCore | null>(null);
+
+  // Get callback ref for crosshair sync, extended to also store the wrapper ref
+  const baseCrosshairRef = useSharedCrosshairs({ syncGroup });
+
+  // Combined ref that handles both crosshair sync and stores wrapper ref
+  const chartRef = useCallback(
+    (node: ReactEChartsCore | null) => {
+      // First, call the crosshair sync ref
+      baseCrosshairRef(node);
+      // Store wrapper ref for click handling
+      chartWrapperRef.current = node;
+    },
+    [baseCrosshairRef]
+  );
+
+  // Handle click on chart to find closest series
+  const handleChartClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!onSeriesClick || !chartWrapperRef.current) return;
+
+      // Get fresh instance from wrapper
+      const instance = chartWrapperRef.current.getEchartsInstance() as unknown as import('echarts/core').EChartsType;
+      if (!instance || instance.isDisposed?.()) return;
+
+      const rect = e.currentTarget.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left;
+      const offsetY = e.clientY - rect.top;
+
+      // Convert pixel coordinates to data coordinates
+      const pointInGrid = instance.convertFromPixel('grid', [offsetX, offsetY]);
+      if (!pointInGrid) return;
+
+      // Get all series data and find which one is closest to click position
+      const opt = instance.getOption() as { series?: Array<{ name?: string; data?: unknown[] }> };
+      const chartSeries = opt.series || [];
+      let closestSeries: string | null = null;
+      let minDistance = Infinity;
+
+      for (const s of chartSeries) {
+        if (!s.name || !s.data) continue;
+        // Find the y value at the clicked x position
+        const xIndex = Math.round(pointInGrid[0]);
+        if (xIndex < 0 || xIndex >= s.data.length) continue;
+        const dataPoint = s.data[xIndex];
+        if (dataPoint === null || dataPoint === undefined) continue;
+
+        const yValue = typeof dataPoint === 'number' ? dataPoint : (dataPoint as [number, number])[1];
+        if (yValue === null || yValue === undefined) continue;
+
+        const distance = Math.abs(yValue - pointInGrid[1]);
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestSeries = s.name;
+        }
+      }
+
+      if (closestSeries) {
+        onSeriesClick(closestSeries);
+      }
+    },
+    [onSeriesClick]
+  );
 
   const themeColors = useThemeColors();
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -158,6 +222,7 @@ export function MultiLineChart({
     });
 
     // Remove series from visible set if they no longer exist in current series
+    // Also remove from seenSeriesNamesRef so they'll be treated as "new" when re-added
     setVisibleSeries(prevVisible => {
       const updated = new Set(prevVisible);
       let changed = false;
@@ -166,7 +231,15 @@ export function MultiLineChart({
       prevVisible.forEach(name => {
         if (!currentSeriesNames.has(name)) {
           updated.delete(name);
+          seenSeriesNamesRef.current.delete(name); // Forget this series so it's "new" when re-added
           changed = true;
+        }
+      });
+
+      // Also clean up seenSeriesNamesRef for series that were hidden (not in prevVisible) but removed
+      seenSeriesNamesRef.current.forEach(name => {
+        if (!currentSeriesNames.has(name)) {
+          seenSeriesNamesRef.current.delete(name);
         }
       });
 
@@ -315,6 +388,8 @@ export function MultiLineChart({
         connectNulls,
         showSymbol: s.showSymbol ?? false,
         symbolSize: s.symbolSize ?? 4,
+        stack: s.stack,
+        triggerLineEvent: true, // Enable click events on lines
         lineStyle: {
           color: seriesColor,
           width: s.lineWidth ?? 2,
@@ -324,7 +399,7 @@ export function MultiLineChart({
           color: seriesColor,
         },
         // Add emphasis configuration for hover effects
-        // Auto-enable symbol display on hover for better interactivity (especially important for step charts)
+        // Use 'none' focus to prevent other series from fading (avoids flickering on stacked charts)
         emphasis: s.emphasis
           ? {
               focus: s.emphasis.focus,
@@ -335,13 +410,9 @@ export function MultiLineChart({
               ...(s.emphasis.symbolSize !== undefined ? { symbolSize: s.emphasis.symbolSize } : {}),
             }
           : {
-              focus: 'series' as const,
-              showSymbol: true,
-              symbolSize: 8,
+              focus: 'none' as const,
               itemStyle: {
                 color: seriesColor,
-                borderColor: themeColors.background,
-                borderWidth: 2,
               },
             },
         // Add label at the right side of the chart if requested
@@ -402,11 +473,16 @@ export function MultiLineChart({
     });
 
     // Calculate grid padding - just basic padding, let ECharts handle the rest
+    // Add extra bottom padding for dataZoom slider when enabled
+    const baseBottom = 50;
+    const legendBottom = useNativeLegend && showLegend && legendPosition === 'bottom' ? 40 : 0;
+    const dataZoomBottom = enableDataZoom ? 40 : 0;
+
     const gridConfig = grid ?? {
       left: 60,
       right: 24,
       top: 16,
-      bottom: useNativeLegend && showLegend && legendPosition === 'bottom' ? 90 : 50,
+      bottom: baseBottom + legendBottom + dataZoomBottom,
     };
 
     // Create default smart tooltip formatter
@@ -573,9 +649,34 @@ export function MultiLineChart({
               type: 'inside' as const,
               xAxisIndex: 0,
               filterMode: 'none' as const,
-              zoomOnMouseWheel: false,
+              zoomOnMouseWheel: true,
               moveOnMouseWheel: false,
               moveOnMouseMove: true,
+            },
+            {
+              type: 'slider' as const,
+              xAxisIndex: 0,
+              filterMode: 'none' as const,
+              height: 20,
+              bottom: 10,
+              borderColor: themeColors.border,
+              backgroundColor: 'transparent',
+              fillerColor: hexToRgba(themeColors.primary, 0.2),
+              handleStyle: {
+                color: themeColors.primary,
+                borderColor: themeColors.primary,
+              },
+              textStyle: {
+                color: themeColors.muted,
+              },
+              dataBackground: {
+                lineStyle: { color: themeColors.border },
+                areaStyle: { color: themeColors.border, opacity: 0.1 },
+              },
+              selectedDataBackground: {
+                lineStyle: { color: themeColors.primary },
+                areaStyle: { color: themeColors.primary, opacity: 0.1 },
+              },
             },
           ]
         : undefined,
@@ -586,7 +687,7 @@ export function MultiLineChart({
     themeColors.border,
     themeColors.muted,
     themeColors.surface,
-    themeColors.background,
+    themeColors.primary,
     xAxis,
     yAxis,
     displayedSeries,
@@ -728,17 +829,19 @@ export function MultiLineChart({
                     <button
                       key={s.name}
                       onClick={() => toggleSeries(s.name)}
-                      className={`flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs/5 transition-colors ${
+                      className={`flex cursor-pointer items-center gap-1.5 rounded-sm border px-2 py-1 text-xs/5 transition-all ${
                         isVisible
-                          ? 'bg-surface-hover text-foreground'
-                          : 'hover:bg-surface-hover/50 bg-surface/50 text-muted/50'
+                          ? 'bg-surface-hover border-border text-foreground hover:border-primary/50 hover:bg-primary/10'
+                          : 'hover:bg-surface-hover/50 border-transparent bg-surface/50 text-muted/50 hover:border-border'
                       }`}
+                      title={isVisible ? `Click to hide ${s.name}` : `Click to show ${s.name}`}
                     >
                       <span
-                        className="h-2 w-2 rounded-full"
+                        className="h-2 w-2 rounded-full transition-colors"
                         style={{
                           backgroundColor: isVisible ? seriesColor : 'transparent',
                           border: `2px solid ${seriesColor}`,
+                          opacity: isVisible ? 1 : 0.5,
                         }}
                       />
                       <span className="font-medium">{s.name}</span>
@@ -752,13 +855,14 @@ export function MultiLineChart({
 
       <div
         style={{
-          pointerEvents: 'none',
           height: _height === '100%' ? '100%' : 'auto',
           flex: _height === '100%' ? '1 1 0%' : undefined,
           minHeight: _height === '100%' ? 0 : undefined,
+          cursor: onSeriesClick ? 'pointer' : undefined,
         }}
+        onClickCapture={onSeriesClick ? handleChartClick : undefined}
       >
-        <ReactEChartsCore
+        <ReactEChartsComponent
           ref={chartRef}
           echarts={echarts}
           option={option}
@@ -766,7 +870,6 @@ export function MultiLineChart({
             height: typeof _height === 'number' && !(showLegend && series.length > 1) ? _height + 52 : _height,
             width: '100%',
             minHeight: typeof _height === 'number' && !(showLegend && series.length > 1) ? _height + 52 : _height,
-            pointerEvents: 'auto',
           }}
           notMerge={notMerge}
           opts={{ renderer: 'canvas' }}
@@ -800,17 +903,19 @@ export function MultiLineChart({
                     <button
                       key={s.name}
                       onClick={() => toggleSeries(s.name)}
-                      className={`flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs/5 transition-colors ${
+                      className={`flex cursor-pointer items-center gap-1.5 rounded-sm border px-2 py-1 text-xs/5 transition-all ${
                         isVisible
-                          ? 'bg-surface-hover text-foreground'
-                          : 'hover:bg-surface-hover/50 bg-surface/50 text-muted/50'
+                          ? 'bg-surface-hover border-border text-foreground hover:border-primary/50 hover:bg-primary/10'
+                          : 'hover:bg-surface-hover/50 border-transparent bg-surface/50 text-muted/50 hover:border-border'
                       }`}
+                      title={isVisible ? `Click to hide ${s.name}` : `Click to show ${s.name}`}
                     >
                       <span
-                        className="h-2 w-2 rounded-full"
+                        className="h-2 w-2 rounded-full transition-colors"
                         style={{
                           backgroundColor: isVisible ? seriesColor : 'transparent',
                           border: `2px solid ${seriesColor}`,
+                          opacity: isVisible ? 1 : 0.5,
                         }}
                       />
                       <span className="font-medium">{s.name}</span>

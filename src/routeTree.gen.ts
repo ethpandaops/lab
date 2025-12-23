@@ -30,6 +30,7 @@ import { Route as EthereumExecutionRouteImport } from './routes/ethereum/executi
 import { Route as EthereumEpochsRouteImport } from './routes/ethereum/epochs'
 import { Route as EthereumEntitiesRouteImport } from './routes/ethereum/entities'
 import { Route as EthereumDataAvailabilityRouteImport } from './routes/ethereum/data-availability'
+import { Route as EthereumContractsRouteImport } from './routes/ethereum/contracts'
 import { Route as BeaconLocallyBuiltBlocksRouteImport } from './routes/beacon/locally-built-blocks'
 import { Route as XatuContributorsIndexRouteImport } from './routes/xatu/contributors/index'
 import { Route as EthereumSlotsIndexRouteImport } from './routes/ethereum/slots/index'
@@ -40,11 +41,14 @@ import { Route as XatuContributorsIdRouteImport } from './routes/xatu/contributo
 import { Route as EthereumSlotsSlotRouteImport } from './routes/ethereum/slots/$slot'
 import { Route as EthereumForksForkRouteImport } from './routes/ethereum/forks/$fork'
 import { Route as EthereumExecutionTimingsRouteImport } from './routes/ethereum/execution/timings'
+import { Route as EthereumExecutionStateGrowthRouteImport } from './routes/ethereum/execution/state-growth'
+import { Route as EthereumExecutionStateExpiryRouteImport } from './routes/ethereum/execution/state-expiry'
 import { Route as EthereumExecutionPayloadsRouteImport } from './routes/ethereum/execution/payloads'
 import { Route as EthereumEpochsEpochRouteImport } from './routes/ethereum/epochs/$epoch'
 import { Route as EthereumEntitiesEntityRouteImport } from './routes/ethereum/entities/$entity'
 import { Route as EthereumDataAvailabilityProbesRouteImport } from './routes/ethereum/data-availability/probes'
 import { Route as EthereumDataAvailabilityCustodyRouteImport } from './routes/ethereum/data-availability/custody'
+import { Route as EthereumContractsAddressRouteImport } from './routes/ethereum/contracts/$address'
 import { Route as BeaconSlotLiveRouteImport } from './routes/beacon/slot/live'
 import { Route as BeaconBlockProductionLiveRouteImport } from './routes/beacon/block-production/live'
 import { Route as EthereumExecutionTimingsIndexRouteImport } from './routes/ethereum/execution/timings/index'
@@ -161,6 +165,11 @@ const EthereumDataAvailabilityRoute =
     path: '/data-availability',
     getParentRoute: () => EthereumRoute,
   } as any)
+const EthereumContractsRoute = EthereumContractsRouteImport.update({
+  id: '/contracts',
+  path: '/contracts',
+  getParentRoute: () => EthereumRoute,
+} as any)
 const BeaconLocallyBuiltBlocksRoute =
   BeaconLocallyBuiltBlocksRouteImport.update({
     id: '/beacon/locally-built-blocks',
@@ -213,6 +222,18 @@ const EthereumExecutionTimingsRoute =
     path: '/timings',
     getParentRoute: () => EthereumExecutionRoute,
   } as any)
+const EthereumExecutionStateGrowthRoute =
+  EthereumExecutionStateGrowthRouteImport.update({
+    id: '/state-growth',
+    path: '/state-growth',
+    getParentRoute: () => EthereumExecutionRoute,
+  } as any)
+const EthereumExecutionStateExpiryRoute =
+  EthereumExecutionStateExpiryRouteImport.update({
+    id: '/state-expiry',
+    path: '/state-expiry',
+    getParentRoute: () => EthereumExecutionRoute,
+  } as any)
 const EthereumExecutionPayloadsRoute =
   EthereumExecutionPayloadsRouteImport.update({
     id: '/payloads',
@@ -240,6 +261,12 @@ const EthereumDataAvailabilityCustodyRoute =
     id: '/custody',
     path: '/custody',
     getParentRoute: () => EthereumDataAvailabilityRoute,
+  } as any)
+const EthereumContractsAddressRoute =
+  EthereumContractsAddressRouteImport.update({
+    id: '/$address',
+    path: '/$address',
+    getParentRoute: () => EthereumContractsRoute,
   } as any)
 const BeaconSlotLiveRoute = BeaconSlotLiveRouteImport.update({
   id: '/beacon/slot/live',
@@ -283,6 +310,7 @@ export interface FileRoutesByFullPath {
   '/experiments': typeof ExperimentsRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
   '/beacon/locally-built-blocks': typeof BeaconLocallyBuiltBlocksRoute
+  '/ethereum/contracts': typeof EthereumContractsRouteWithChildren
   '/ethereum/data-availability': typeof EthereumDataAvailabilityRouteWithChildren
   '/ethereum/entities': typeof EthereumEntitiesRouteWithChildren
   '/ethereum/epochs': typeof EthereumEpochsRouteWithChildren
@@ -302,11 +330,14 @@ export interface FileRoutesByFullPath {
   '/xatu-data': typeof XatuDataIndexRoute
   '/beacon/block-production/live': typeof BeaconBlockProductionLiveRoute
   '/beacon/slot/live': typeof BeaconSlotLiveRoute
+  '/ethereum/contracts/$address': typeof EthereumContractsAddressRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyRouteWithChildren
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesRouteWithChildren
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
   '/ethereum/execution/payloads': typeof EthereumExecutionPayloadsRouteWithChildren
+  '/ethereum/execution/state-expiry': typeof EthereumExecutionStateExpiryRoute
+  '/ethereum/execution/state-growth': typeof EthereumExecutionStateGrowthRoute
   '/ethereum/execution/timings': typeof EthereumExecutionTimingsRouteWithChildren
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
@@ -326,6 +357,7 @@ export interface FileRoutesByTo {
   '/ethereum': typeof EthereumRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
   '/beacon/locally-built-blocks': typeof BeaconLocallyBuiltBlocksRoute
+  '/ethereum/contracts': typeof EthereumContractsRouteWithChildren
   '/ethereum/data-availability': typeof EthereumDataAvailabilityRouteWithChildren
   '/ethereum/execution': typeof EthereumExecutionRouteWithChildren
   '/ethereum/live': typeof EthereumLiveRoute
@@ -340,8 +372,11 @@ export interface FileRoutesByTo {
   '/xatu-data': typeof XatuDataIndexRoute
   '/beacon/block-production/live': typeof BeaconBlockProductionLiveRoute
   '/beacon/slot/live': typeof BeaconSlotLiveRoute
+  '/ethereum/contracts/$address': typeof EthereumContractsAddressRoute
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
+  '/ethereum/execution/state-expiry': typeof EthereumExecutionStateExpiryRoute
+  '/ethereum/execution/state-growth': typeof EthereumExecutionStateGrowthRoute
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
@@ -362,6 +397,7 @@ export interface FileRoutesById {
   '/experiments': typeof ExperimentsRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
   '/beacon/locally-built-blocks': typeof BeaconLocallyBuiltBlocksRoute
+  '/ethereum/contracts': typeof EthereumContractsRouteWithChildren
   '/ethereum/data-availability': typeof EthereumDataAvailabilityRouteWithChildren
   '/ethereum/entities': typeof EthereumEntitiesRouteWithChildren
   '/ethereum/epochs': typeof EthereumEpochsRouteWithChildren
@@ -381,11 +417,14 @@ export interface FileRoutesById {
   '/xatu-data/': typeof XatuDataIndexRoute
   '/beacon/block-production/live': typeof BeaconBlockProductionLiveRoute
   '/beacon/slot/live': typeof BeaconSlotLiveRoute
+  '/ethereum/contracts/$address': typeof EthereumContractsAddressRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyRouteWithChildren
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesRouteWithChildren
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
   '/ethereum/execution/payloads': typeof EthereumExecutionPayloadsRouteWithChildren
+  '/ethereum/execution/state-expiry': typeof EthereumExecutionStateExpiryRoute
+  '/ethereum/execution/state-growth': typeof EthereumExecutionStateGrowthRoute
   '/ethereum/execution/timings': typeof EthereumExecutionTimingsRouteWithChildren
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
@@ -408,6 +447,7 @@ export interface FileRouteTypes {
     | '/experiments'
     | '/xatu'
     | '/beacon/locally-built-blocks'
+    | '/ethereum/contracts'
     | '/ethereum/data-availability'
     | '/ethereum/entities'
     | '/ethereum/epochs'
@@ -427,11 +467,14 @@ export interface FileRouteTypes {
     | '/xatu-data'
     | '/beacon/block-production/live'
     | '/beacon/slot/live'
+    | '/ethereum/contracts/$address'
     | '/ethereum/data-availability/custody'
     | '/ethereum/data-availability/probes'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
     | '/ethereum/execution/payloads'
+    | '/ethereum/execution/state-expiry'
+    | '/ethereum/execution/state-growth'
     | '/ethereum/execution/timings'
     | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
@@ -451,6 +494,7 @@ export interface FileRouteTypes {
     | '/ethereum'
     | '/xatu'
     | '/beacon/locally-built-blocks'
+    | '/ethereum/contracts'
     | '/ethereum/data-availability'
     | '/ethereum/execution'
     | '/ethereum/live'
@@ -465,8 +509,11 @@ export interface FileRouteTypes {
     | '/xatu-data'
     | '/beacon/block-production/live'
     | '/beacon/slot/live'
+    | '/ethereum/contracts/$address'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
+    | '/ethereum/execution/state-expiry'
+    | '/ethereum/execution/state-growth'
     | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
     | '/xatu/contributors/$id'
@@ -486,6 +533,7 @@ export interface FileRouteTypes {
     | '/experiments'
     | '/xatu'
     | '/beacon/locally-built-blocks'
+    | '/ethereum/contracts'
     | '/ethereum/data-availability'
     | '/ethereum/entities'
     | '/ethereum/epochs'
@@ -505,11 +553,14 @@ export interface FileRouteTypes {
     | '/xatu-data/'
     | '/beacon/block-production/live'
     | '/beacon/slot/live'
+    | '/ethereum/contracts/$address'
     | '/ethereum/data-availability/custody'
     | '/ethereum/data-availability/probes'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
     | '/ethereum/execution/payloads'
+    | '/ethereum/execution/state-expiry'
+    | '/ethereum/execution/state-growth'
     | '/ethereum/execution/timings'
     | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
@@ -687,6 +738,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumDataAvailabilityRouteImport
       parentRoute: typeof EthereumRoute
     }
+    '/ethereum/contracts': {
+      id: '/ethereum/contracts'
+      path: '/contracts'
+      fullPath: '/ethereum/contracts'
+      preLoaderRoute: typeof EthereumContractsRouteImport
+      parentRoute: typeof EthereumRoute
+    }
     '/beacon/locally-built-blocks': {
       id: '/beacon/locally-built-blocks'
       path: '/beacon/locally-built-blocks'
@@ -757,6 +815,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumExecutionTimingsRouteImport
       parentRoute: typeof EthereumExecutionRoute
     }
+    '/ethereum/execution/state-growth': {
+      id: '/ethereum/execution/state-growth'
+      path: '/state-growth'
+      fullPath: '/ethereum/execution/state-growth'
+      preLoaderRoute: typeof EthereumExecutionStateGrowthRouteImport
+      parentRoute: typeof EthereumExecutionRoute
+    }
+    '/ethereum/execution/state-expiry': {
+      id: '/ethereum/execution/state-expiry'
+      path: '/state-expiry'
+      fullPath: '/ethereum/execution/state-expiry'
+      preLoaderRoute: typeof EthereumExecutionStateExpiryRouteImport
+      parentRoute: typeof EthereumExecutionRoute
+    }
     '/ethereum/execution/payloads': {
       id: '/ethereum/execution/payloads'
       path: '/payloads'
@@ -791,6 +863,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ethereum/data-availability/custody'
       preLoaderRoute: typeof EthereumDataAvailabilityCustodyRouteImport
       parentRoute: typeof EthereumDataAvailabilityRoute
+    }
+    '/ethereum/contracts/$address': {
+      id: '/ethereum/contracts/$address'
+      path: '/$address'
+      fullPath: '/ethereum/contracts/$address'
+      preLoaderRoute: typeof EthereumContractsAddressRouteImport
+      parentRoute: typeof EthereumContractsRoute
     }
     '/beacon/slot/live': {
       id: '/beacon/slot/live'
@@ -836,6 +915,17 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface EthereumContractsRouteChildren {
+  EthereumContractsAddressRoute: typeof EthereumContractsAddressRoute
+}
+
+const EthereumContractsRouteChildren: EthereumContractsRouteChildren = {
+  EthereumContractsAddressRoute: EthereumContractsAddressRoute,
+}
+
+const EthereumContractsRouteWithChildren =
+  EthereumContractsRoute._addFileChildren(EthereumContractsRouteChildren)
 
 interface EthereumDataAvailabilityCustodyRouteChildren {
   EthereumDataAvailabilityCustodyIndexRoute: typeof EthereumDataAvailabilityCustodyIndexRoute
@@ -942,11 +1032,15 @@ const EthereumExecutionTimingsRouteWithChildren =
 
 interface EthereumExecutionRouteChildren {
   EthereumExecutionPayloadsRoute: typeof EthereumExecutionPayloadsRouteWithChildren
+  EthereumExecutionStateExpiryRoute: typeof EthereumExecutionStateExpiryRoute
+  EthereumExecutionStateGrowthRoute: typeof EthereumExecutionStateGrowthRoute
   EthereumExecutionTimingsRoute: typeof EthereumExecutionTimingsRouteWithChildren
 }
 
 const EthereumExecutionRouteChildren: EthereumExecutionRouteChildren = {
   EthereumExecutionPayloadsRoute: EthereumExecutionPayloadsRouteWithChildren,
+  EthereumExecutionStateExpiryRoute: EthereumExecutionStateExpiryRoute,
+  EthereumExecutionStateGrowthRoute: EthereumExecutionStateGrowthRoute,
   EthereumExecutionTimingsRoute: EthereumExecutionTimingsRouteWithChildren,
 }
 
@@ -982,6 +1076,7 @@ const EthereumSlotsRouteWithChildren = EthereumSlotsRoute._addFileChildren(
 )
 
 interface EthereumRouteChildren {
+  EthereumContractsRoute: typeof EthereumContractsRouteWithChildren
   EthereumDataAvailabilityRoute: typeof EthereumDataAvailabilityRouteWithChildren
   EthereumEntitiesRoute: typeof EthereumEntitiesRouteWithChildren
   EthereumEpochsRoute: typeof EthereumEpochsRouteWithChildren
@@ -992,6 +1087,7 @@ interface EthereumRouteChildren {
 }
 
 const EthereumRouteChildren: EthereumRouteChildren = {
+  EthereumContractsRoute: EthereumContractsRouteWithChildren,
   EthereumDataAvailabilityRoute: EthereumDataAvailabilityRouteWithChildren,
   EthereumEntitiesRoute: EthereumEntitiesRouteWithChildren,
   EthereumEpochsRoute: EthereumEpochsRouteWithChildren,

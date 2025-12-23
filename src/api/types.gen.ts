@@ -71,6 +71,41 @@ export type DimBlockBlobSubmitter = {
   versioned_hashes?: Array<string>;
 };
 
+export type DimContractOwner = {
+  /**
+   * Account owner of the contract
+   */
+  account_owner?: string | null;
+  /**
+   * The contract address
+   */
+  contract_address?: string;
+  /**
+   * Name of the contract
+   */
+  contract_name?: string | null;
+  /**
+   * Factory contract or deployer address
+   */
+  factory_contract?: string | null;
+  /**
+   * Owner key identifier
+   */
+  owner_key?: string | null;
+  /**
+   * Source of the label data (dune or growthepie)
+   */
+  source?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Usage category (e.g., stablecoin, dex, trading)
+   */
+  usage_category?: string | null;
+};
+
 export type DimNode = {
   /**
    * Additional attributes of the node
@@ -1516,6 +1551,206 @@ export type FctBlockProposerHead = {
    * The wall clock time when the slot started
    */
   slot_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctContractStorageStateByAddressDaily = {
+  /**
+   * Cumulative count of active storage slots at end of day
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Cumulative sum of effective bytes at end of day
+   */
+  effective_bytes?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctContractStorageStateByAddressHourly = {
+  /**
+   * Cumulative count of active storage slots at end of hour
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * Cumulative sum of effective bytes at end of hour
+   */
+  effective_bytes?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctContractStorageStateByBlockDaily = {
+  /**
+   * Cumulative count of contracts with at least one active slot at end of day
+   */
+  active_contracts?: number;
+  /**
+   * Cumulative count of active storage slots at end of day
+   */
+  active_slots?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Cumulative sum of effective bytes at end of day
+   */
+  effective_bytes?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctContractStorageStateByBlockHourly = {
+  /**
+   * Cumulative count of contracts with at least one active slot at end of hour
+   */
+  active_contracts?: number;
+  /**
+   * Cumulative count of active storage slots at end of hour
+   */
+  active_slots?: number;
+  /**
+   * Cumulative sum of effective bytes at end of hour
+   */
+  effective_bytes?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctContractStorageStateWithExpiryByAddressDaily = {
+  /**
+   * Active storage slots in this contract at end of day (0 if expired)
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Effective bytes at end of day (0 if expired)
+   */
+  effective_bytes?: number;
+  /**
+   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+   */
+  expiry_policy?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctContractStorageStateWithExpiryByAddressHourly = {
+  /**
+   * Active storage slots in this contract at end of hour (0 if expired)
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * Effective bytes at end of hour (0 if expired)
+   */
+  effective_bytes?: number;
+  /**
+   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+   */
+  expiry_policy?: string;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctContractStorageStateWithExpiryByBlockDaily = {
+  /**
+   * Count of contracts with active_slots > 0 at end of day
+   */
+  active_contracts?: number;
+  /**
+   * Total active storage slots at end of day (with expiry applied)
+   */
+  active_slots?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Total effective bytes at end of day (with expiry applied)
+   */
+  effective_bytes?: number;
+  /**
+   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+   */
+  expiry_policy?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctContractStorageStateWithExpiryByBlockHourly = {
+  /**
+   * Count of contracts with active_slots > 0 at end of hour
+   */
+  active_contracts?: number;
+  /**
+   * Total active storage slots at end of hour (with expiry applied)
+   */
+  active_slots?: number;
+  /**
+   * Total effective bytes at end of hour (with expiry applied)
+   */
+  effective_bytes?: number;
+  /**
+   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+   */
+  expiry_policy?: string;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
   /**
    * Timestamp when the record was last updated
    */
@@ -3069,34 +3304,53 @@ export type FctPreparedBlock = {
   updated_date_time?: number;
 };
 
-export type FctStorageSlotState = {
+export type FctStorageSlotStateByAddressDaily = {
   /**
-   * Cumulative count of active storage slots at this block
+   * Cumulative count of active storage slots at end of day
    */
   active_slots?: number;
   /**
-   * The block number
+   * The contract address
    */
-  block_number?: number;
+  address?: string;
   /**
-   * Change in effective bytes for this block
+   * Start of the day period
    */
-  bytes_delta?: number;
+  day_start_date?: string;
   /**
-   * Cumulative sum of effective bytes across all active slots at this block
+   * Cumulative sum of effective bytes at end of day
    */
   effective_bytes?: number;
-  /**
-   * Change in active slots for this block (positive=activated, negative=deactivated)
-   */
-  slots_delta?: number;
   /**
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
 };
 
-export type FctStorageSlotStateDaily = {
+export type FctStorageSlotStateByAddressHourly = {
+  /**
+   * Cumulative count of active storage slots at end of hour
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * Cumulative sum of effective bytes at end of hour
+   */
+  effective_bytes?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctStorageSlotStateByBlockDaily = {
   /**
    * Cumulative count of active storage slots at end of day
    */
@@ -3115,7 +3369,7 @@ export type FctStorageSlotStateDaily = {
   updated_date_time?: number;
 };
 
-export type FctStorageSlotStateHourly = {
+export type FctStorageSlotStateByBlockHourly = {
   /**
    * Cumulative count of active storage slots at end of hour
    */
@@ -3134,25 +3388,21 @@ export type FctStorageSlotStateHourly = {
   updated_date_time?: number;
 };
 
-export type FctStorageSlotStateWithExpiry = {
+export type FctStorageSlotStateWithExpiryByAddressDaily = {
   /**
-   * Cumulative count of active storage slots at this block (with expiry applied)
+   * Cumulative count of active storage slots at end of day (with expiry applied)
    */
   active_slots?: number;
   /**
-   * The block number
+   * The contract address
    */
-  block_number?: number;
+  address?: string;
   /**
-   * Cumulative net bytes adjustment up to this block
+   * Start of the day period
    */
-  cumulative_net_bytes?: number;
+  day_start_date?: string;
   /**
-   * Cumulative net slot adjustment up to this block
-   */
-  cumulative_net_slots?: number;
-  /**
-   * Cumulative sum of effective bytes at this block (with expiry applied)
+   * Cumulative sum of effective bytes at end of day (with expiry applied)
    */
   effective_bytes?: number;
   /**
@@ -3160,20 +3410,39 @@ export type FctStorageSlotStateWithExpiry = {
    */
   expiry_policy?: string;
   /**
-   * Net bytes adjustment this block (negative=expiry, positive=reactivation)
+   * Timestamp when the record was last updated
    */
-  net_bytes_delta?: number;
+  updated_date_time?: number;
+};
+
+export type FctStorageSlotStateWithExpiryByAddressHourly = {
   /**
-   * Net slot adjustment this block (negative=expiry, positive=reactivation)
+   * Cumulative count of active storage slots at end of hour (with expiry applied)
    */
-  net_slots_delta?: number;
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * Cumulative sum of effective bytes at end of hour (with expiry applied)
+   */
+  effective_bytes?: number;
+  /**
+   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+   */
+  expiry_policy?: string;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
   /**
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
 };
 
-export type FctStorageSlotStateWithExpiryDaily = {
+export type FctStorageSlotStateWithExpiryByBlockDaily = {
   /**
    * Cumulative count of active storage slots at end of day (with expiry applied)
    */
@@ -3196,7 +3465,7 @@ export type FctStorageSlotStateWithExpiryDaily = {
   updated_date_time?: number;
 };
 
-export type FctStorageSlotStateWithExpiryHourly = {
+export type FctStorageSlotStateWithExpiryByBlockHourly = {
   /**
    * Cumulative count of active storage slots at end of hour (with expiry applied)
    */
@@ -3219,6 +3488,186 @@ export type FctStorageSlotStateWithExpiryHourly = {
   updated_date_time?: number;
 };
 
+export type FctStorageSlotTop100ByBytes = {
+  /**
+   * Account owner of the contract
+   */
+  account_owner?: string | null;
+  /**
+   * Number of active storage slots for this contract
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  contract_address?: string;
+  /**
+   * Name of the contract
+   */
+  contract_name?: string | null;
+  /**
+   * Effective bytes of storage for this contract
+   */
+  effective_bytes?: number;
+  /**
+   * Factory contract or deployer address
+   */
+  factory_contract?: string | null;
+  /**
+   * Owner key identifier
+   */
+  owner_key?: string | null;
+  /**
+   * Rank by effective bytes (1=highest)
+   */
+  rank?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Usage category (e.g., stablecoin, dex, trading)
+   */
+  usage_category?: string | null;
+};
+
+export type FctStorageSlotTop100ByBytesWithExpiry = {
+  /**
+   * Account owner of the contract
+   */
+  account_owner?: string | null;
+  /**
+   * Number of active storage slots for this contract (with expiry applied)
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  contract_address?: string;
+  /**
+   * Name of the contract
+   */
+  contract_name?: string | null;
+  /**
+   * Effective bytes of storage for this contract (with expiry applied)
+   */
+  effective_bytes?: number;
+  /**
+   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+   */
+  expiry_policy?: string;
+  /**
+   * Factory contract or deployer address
+   */
+  factory_contract?: string | null;
+  /**
+   * Owner key identifier
+   */
+  owner_key?: string | null;
+  /**
+   * Rank by effective bytes within expiry policy (1=highest)
+   */
+  rank?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Usage category (e.g., stablecoin, dex, trading)
+   */
+  usage_category?: string | null;
+};
+
+export type FctStorageSlotTop100BySlots = {
+  /**
+   * Account owner of the contract
+   */
+  account_owner?: string | null;
+  /**
+   * Number of active storage slots for this contract
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  contract_address?: string;
+  /**
+   * Name of the contract
+   */
+  contract_name?: string | null;
+  /**
+   * Effective bytes of storage for this contract
+   */
+  effective_bytes?: number;
+  /**
+   * Factory contract or deployer address
+   */
+  factory_contract?: string | null;
+  /**
+   * Owner key identifier
+   */
+  owner_key?: string | null;
+  /**
+   * Rank by active slots (1=highest)
+   */
+  rank?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Usage category (e.g., stablecoin, dex, trading)
+   */
+  usage_category?: string | null;
+};
+
+export type FctStorageSlotTop100BySlotsWithExpiry = {
+  /**
+   * Account owner of the contract
+   */
+  account_owner?: string | null;
+  /**
+   * Number of active storage slots for this contract (with expiry applied)
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  contract_address?: string;
+  /**
+   * Name of the contract
+   */
+  contract_name?: string | null;
+  /**
+   * Effective bytes of storage for this contract (with expiry applied)
+   */
+  effective_bytes?: number;
+  /**
+   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+   */
+  expiry_policy?: string;
+  /**
+   * Factory contract or deployer address
+   */
+  factory_contract?: string | null;
+  /**
+   * Owner key identifier
+   */
+  owner_key?: string | null;
+  /**
+   * Rank by active slots within expiry policy (1=highest)
+   */
+  rank?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Usage category (e.g., stablecoin, dex, trading)
+   */
+  usage_category?: string | null;
+};
+
 /**
  * Response for getting a single admin_cbt_incremental record
  */
@@ -3238,6 +3687,13 @@ export type GetAdminCbtScheduledResponse = {
  */
 export type GetDimBlockBlobSubmitterResponse = {
   item?: DimBlockBlobSubmitter;
+};
+
+/**
+ * Response for getting a single dim_contract_owner record
+ */
+export type GetDimContractOwnerResponse = {
+  item?: DimContractOwner;
 };
 
 /**
@@ -3430,6 +3886,62 @@ export type GetFctBlockResponse = {
 };
 
 /**
+ * Response for getting a single fct_contract_storage_state_by_address_daily record
+ */
+export type GetFctContractStorageStateByAddressDailyResponse = {
+  item?: FctContractStorageStateByAddressDaily;
+};
+
+/**
+ * Response for getting a single fct_contract_storage_state_by_address_hourly record
+ */
+export type GetFctContractStorageStateByAddressHourlyResponse = {
+  item?: FctContractStorageStateByAddressHourly;
+};
+
+/**
+ * Response for getting a single fct_contract_storage_state_by_block_daily record
+ */
+export type GetFctContractStorageStateByBlockDailyResponse = {
+  item?: FctContractStorageStateByBlockDaily;
+};
+
+/**
+ * Response for getting a single fct_contract_storage_state_by_block_hourly record
+ */
+export type GetFctContractStorageStateByBlockHourlyResponse = {
+  item?: FctContractStorageStateByBlockHourly;
+};
+
+/**
+ * Response for getting a single fct_contract_storage_state_with_expiry_by_address_daily record
+ */
+export type GetFctContractStorageStateWithExpiryByAddressDailyResponse = {
+  item?: FctContractStorageStateWithExpiryByAddressDaily;
+};
+
+/**
+ * Response for getting a single fct_contract_storage_state_with_expiry_by_address_hourly record
+ */
+export type GetFctContractStorageStateWithExpiryByAddressHourlyResponse = {
+  item?: FctContractStorageStateWithExpiryByAddressHourly;
+};
+
+/**
+ * Response for getting a single fct_contract_storage_state_with_expiry_by_block_daily record
+ */
+export type GetFctContractStorageStateWithExpiryByBlockDailyResponse = {
+  item?: FctContractStorageStateWithExpiryByBlockDaily;
+};
+
+/**
+ * Response for getting a single fct_contract_storage_state_with_expiry_by_block_hourly record
+ */
+export type GetFctContractStorageStateWithExpiryByBlockHourlyResponse = {
+  item?: FctContractStorageStateWithExpiryByBlockHourly;
+};
+
+/**
  * Response for getting a single fct_data_column_availability_by_epoch record
  */
 export type GetFctDataColumnAvailabilityByEpochResponse = {
@@ -3577,45 +4089,87 @@ export type GetFctPreparedBlockResponse = {
 };
 
 /**
- * Response for getting a single fct_storage_slot_state_daily record
+ * Response for getting a single fct_storage_slot_state_by_address_daily record
  */
-export type GetFctStorageSlotStateDailyResponse = {
-  item?: FctStorageSlotStateDaily;
+export type GetFctStorageSlotStateByAddressDailyResponse = {
+  item?: FctStorageSlotStateByAddressDaily;
 };
 
 /**
- * Response for getting a single fct_storage_slot_state_hourly record
+ * Response for getting a single fct_storage_slot_state_by_address_hourly record
  */
-export type GetFctStorageSlotStateHourlyResponse = {
-  item?: FctStorageSlotStateHourly;
+export type GetFctStorageSlotStateByAddressHourlyResponse = {
+  item?: FctStorageSlotStateByAddressHourly;
 };
 
 /**
- * Response for getting a single fct_storage_slot_state record
+ * Response for getting a single fct_storage_slot_state_by_block_daily record
  */
-export type GetFctStorageSlotStateResponse = {
-  item?: FctStorageSlotState;
+export type GetFctStorageSlotStateByBlockDailyResponse = {
+  item?: FctStorageSlotStateByBlockDaily;
 };
 
 /**
- * Response for getting a single fct_storage_slot_state_with_expiry_daily record
+ * Response for getting a single fct_storage_slot_state_by_block_hourly record
  */
-export type GetFctStorageSlotStateWithExpiryDailyResponse = {
-  item?: FctStorageSlotStateWithExpiryDaily;
+export type GetFctStorageSlotStateByBlockHourlyResponse = {
+  item?: FctStorageSlotStateByBlockHourly;
 };
 
 /**
- * Response for getting a single fct_storage_slot_state_with_expiry_hourly record
+ * Response for getting a single fct_storage_slot_state_with_expiry_by_address_daily record
  */
-export type GetFctStorageSlotStateWithExpiryHourlyResponse = {
-  item?: FctStorageSlotStateWithExpiryHourly;
+export type GetFctStorageSlotStateWithExpiryByAddressDailyResponse = {
+  item?: FctStorageSlotStateWithExpiryByAddressDaily;
 };
 
 /**
- * Response for getting a single fct_storage_slot_state_with_expiry record
+ * Response for getting a single fct_storage_slot_state_with_expiry_by_address_hourly record
  */
-export type GetFctStorageSlotStateWithExpiryResponse = {
-  item?: FctStorageSlotStateWithExpiry;
+export type GetFctStorageSlotStateWithExpiryByAddressHourlyResponse = {
+  item?: FctStorageSlotStateWithExpiryByAddressHourly;
+};
+
+/**
+ * Response for getting a single fct_storage_slot_state_with_expiry_by_block_daily record
+ */
+export type GetFctStorageSlotStateWithExpiryByBlockDailyResponse = {
+  item?: FctStorageSlotStateWithExpiryByBlockDaily;
+};
+
+/**
+ * Response for getting a single fct_storage_slot_state_with_expiry_by_block_hourly record
+ */
+export type GetFctStorageSlotStateWithExpiryByBlockHourlyResponse = {
+  item?: FctStorageSlotStateWithExpiryByBlockHourly;
+};
+
+/**
+ * Response for getting a single fct_storage_slot_top_100_by_bytes record
+ */
+export type GetFctStorageSlotTop100ByBytesResponse = {
+  item?: FctStorageSlotTop100ByBytes;
+};
+
+/**
+ * Response for getting a single fct_storage_slot_top_100_by_bytes_with_expiry record
+ */
+export type GetFctStorageSlotTop100ByBytesWithExpiryResponse = {
+  item?: FctStorageSlotTop100ByBytesWithExpiry;
+};
+
+/**
+ * Response for getting a single fct_storage_slot_top_100_by_slots record
+ */
+export type GetFctStorageSlotTop100BySlotsResponse = {
+  item?: FctStorageSlotTop100BySlots;
+};
+
+/**
+ * Response for getting a single fct_storage_slot_top_100_by_slots_with_expiry record
+ */
+export type GetFctStorageSlotTop100BySlotsWithExpiryResponse = {
+  item?: FctStorageSlotTop100BySlotsWithExpiry;
 };
 
 /**
@@ -3700,6 +4254,125 @@ export type GetIntBlockMevCanonicalResponse = {
  */
 export type GetIntBlockProposerCanonicalResponse = {
   item?: IntBlockProposerCanonical;
+};
+
+/**
+ * Response for getting a single int_contract_storage_expiry_1m record
+ */
+export type GetIntContractStorageExpiry1mResponse = {
+  item?: IntContractStorageExpiry1m;
+};
+
+/**
+ * Response for getting a single int_contract_storage_expiry_6m record
+ */
+export type GetIntContractStorageExpiry6mResponse = {
+  item?: IntContractStorageExpiry6m;
+};
+
+/**
+ * Response for getting a single int_contract_storage_expiry_12m record
+ */
+export type GetIntContractStorageExpiry12mResponse = {
+  item?: IntContractStorageExpiry12m;
+};
+
+/**
+ * Response for getting a single int_contract_storage_expiry_18m record
+ */
+export type GetIntContractStorageExpiry18mResponse = {
+  item?: IntContractStorageExpiry18m;
+};
+
+/**
+ * Response for getting a single int_contract_storage_expiry_24m record
+ */
+export type GetIntContractStorageExpiry24mResponse = {
+  item?: IntContractStorageExpiry24m;
+};
+
+/**
+ * Response for getting a single int_contract_storage_next_touch record
+ */
+export type GetIntContractStorageNextTouchResponse = {
+  item?: IntContractStorageNextTouch;
+};
+
+/**
+ * Response for getting a single int_contract_storage_reactivation_1m record
+ */
+export type GetIntContractStorageReactivation1mResponse = {
+  item?: IntContractStorageReactivation1m;
+};
+
+/**
+ * Response for getting a single int_contract_storage_reactivation_6m record
+ */
+export type GetIntContractStorageReactivation6mResponse = {
+  item?: IntContractStorageReactivation6m;
+};
+
+/**
+ * Response for getting a single int_contract_storage_reactivation_12m record
+ */
+export type GetIntContractStorageReactivation12mResponse = {
+  item?: IntContractStorageReactivation12m;
+};
+
+/**
+ * Response for getting a single int_contract_storage_reactivation_18m record
+ */
+export type GetIntContractStorageReactivation18mResponse = {
+  item?: IntContractStorageReactivation18m;
+};
+
+/**
+ * Response for getting a single int_contract_storage_reactivation_24m record
+ */
+export type GetIntContractStorageReactivation24mResponse = {
+  item?: IntContractStorageReactivation24m;
+};
+
+/**
+ * Response for getting a single int_contract_storage_state_by_address record
+ */
+export type GetIntContractStorageStateByAddressResponse = {
+  item?: IntContractStorageStateByAddress;
+};
+
+/**
+ * Response for getting a single int_contract_storage_state_by_block record
+ */
+export type GetIntContractStorageStateByBlockResponse = {
+  item?: IntContractStorageStateByBlock;
+};
+
+/**
+ * Response for getting a single int_contract_storage_state record
+ */
+export type GetIntContractStorageStateResponse = {
+  item?: IntContractStorageState;
+};
+
+/**
+ * Response for getting a single int_contract_storage_state_with_expiry_by_address record
+ */
+export type GetIntContractStorageStateWithExpiryByAddressResponse = {
+  item?: IntContractStorageStateWithExpiryByAddress;
+};
+
+/**
+ * Response for getting a single int_contract_storage_state_with_expiry_by_block record
+ */
+export type GetIntContractStorageStateWithExpiryByBlockResponse = {
+  item?: IntContractStorageStateWithExpiryByBlock;
+};
+
+/**
+ * Response for getting a single int_contract_storage_state_with_expiry record
+ */
+export type GetIntContractStorageStateWithExpiryResponse = {
+  item?: IntContractStorageStateWithExpiry;
 };
 
 /**
@@ -3826,6 +4499,48 @@ export type GetIntStorageSlotReactivation24mResponse = {
  */
 export type GetIntStorageSlotReadResponse = {
   item?: IntStorageSlotRead;
+};
+
+/**
+ * Response for getting a single int_storage_slot_state_by_address record
+ */
+export type GetIntStorageSlotStateByAddressResponse = {
+  item?: IntStorageSlotStateByAddress;
+};
+
+/**
+ * Response for getting a single int_storage_slot_state_by_block record
+ */
+export type GetIntStorageSlotStateByBlockResponse = {
+  item?: IntStorageSlotStateByBlock;
+};
+
+/**
+ * Response for getting a single int_storage_slot_state record
+ */
+export type GetIntStorageSlotStateResponse = {
+  item?: IntStorageSlotState;
+};
+
+/**
+ * Response for getting a single int_storage_slot_state_with_expiry_by_address record
+ */
+export type GetIntStorageSlotStateWithExpiryByAddressResponse = {
+  item?: IntStorageSlotStateWithExpiryByAddress;
+};
+
+/**
+ * Response for getting a single int_storage_slot_state_with_expiry_by_block record
+ */
+export type GetIntStorageSlotStateWithExpiryByBlockResponse = {
+  item?: IntStorageSlotStateWithExpiryByBlock;
+};
+
+/**
+ * Response for getting a single int_storage_slot_state_with_expiry record
+ */
+export type GetIntStorageSlotStateWithExpiryResponse = {
+  item?: IntStorageSlotStateWithExpiry;
 };
 
 /**
@@ -4409,6 +5124,497 @@ export type IntBlockProposerCanonical = {
    * The wall clock time when the slot started
    */
   slot_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageExpiry1m = {
+  /**
+   * Count of slots in the contract at expiry time
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this contract expiry is recorded
+   */
+  block_number?: number;
+  /**
+   * Sum of effective bytes across all slots in the contract at expiry time
+   */
+  effective_bytes?: number;
+  /**
+   * The original touch block that led to this expiry (propagates through waterfall chain)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageExpiry6m = {
+  /**
+   * Count of slots in the contract at expiry time
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this contract expiry is recorded
+   */
+  block_number?: number;
+  /**
+   * Sum of effective bytes across all slots in the contract at expiry time
+   */
+  effective_bytes?: number;
+  /**
+   * The original touch block that led to this expiry (propagates through waterfall chain)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageExpiry12m = {
+  /**
+   * Count of slots in the contract at expiry time
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this contract expiry is recorded
+   */
+  block_number?: number;
+  /**
+   * Sum of effective bytes across all slots in the contract at expiry time
+   */
+  effective_bytes?: number;
+  /**
+   * The original touch block that led to this expiry (propagates through waterfall chain)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageExpiry18m = {
+  /**
+   * Count of slots in the contract at expiry time
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this contract expiry is recorded
+   */
+  block_number?: number;
+  /**
+   * Sum of effective bytes across all slots in the contract at expiry time
+   */
+  effective_bytes?: number;
+  /**
+   * The original touch block that led to this expiry (propagates through waterfall chain)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageExpiry24m = {
+  /**
+   * Count of slots in the contract at expiry time
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this contract expiry is recorded
+   */
+  block_number?: number;
+  /**
+   * Sum of effective bytes across all slots in the contract at expiry time
+   */
+  effective_bytes?: number;
+  /**
+   * The original touch block that led to this expiry (propagates through waterfall chain)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageNextTouch = {
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this contract was touched
+   */
+  block_number?: number;
+  /**
+   * The next block number where this contract was touched (NULL if no subsequent touch)
+   */
+  next_touch_block?: number | null;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageReactivation1m = {
+  /**
+   * Count of slots being reactivated
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this contract was reactivated
+   */
+  block_number?: number;
+  /**
+   * Sum of effective bytes being reactivated
+   */
+  effective_bytes?: number;
+  /**
+   * The original touch block that expired (for matching with expiry records)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageReactivation6m = {
+  /**
+   * Count of slots being reactivated
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this contract was reactivated
+   */
+  block_number?: number;
+  /**
+   * Sum of effective bytes being reactivated
+   */
+  effective_bytes?: number;
+  /**
+   * The original touch block that expired (for matching with expiry records)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageReactivation12m = {
+  /**
+   * Count of slots being reactivated
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this contract was reactivated
+   */
+  block_number?: number;
+  /**
+   * Sum of effective bytes being reactivated
+   */
+  effective_bytes?: number;
+  /**
+   * The original touch block that expired (for matching with expiry records)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageReactivation18m = {
+  /**
+   * Count of slots being reactivated
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this contract was reactivated
+   */
+  block_number?: number;
+  /**
+   * Sum of effective bytes being reactivated
+   */
+  effective_bytes?: number;
+  /**
+   * The original touch block that expired (for matching with expiry records)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageReactivation24m = {
+  /**
+   * Count of slots being reactivated
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this contract was reactivated
+   */
+  block_number?: number;
+  /**
+   * Sum of effective bytes being reactivated
+   */
+  effective_bytes?: number;
+  /**
+   * The original touch block that expired (for matching with expiry records)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageState = {
+  /**
+   * Cumulative count of active storage slots for this contract at this block
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Change in effective bytes for this block
+   */
+  bytes_delta?: number;
+  /**
+   * Cumulative sum of effective bytes for this contract at this block
+   */
+  effective_bytes?: number;
+  /**
+   * Change in active slots for this block (positive=activated, negative=deactivated)
+   */
+  slots_delta?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageStateByAddress = {
+  /**
+   * Cumulative count of active storage slots for this contract at this block
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Change in effective bytes for this block
+   */
+  bytes_delta?: number;
+  /**
+   * Cumulative sum of effective bytes for this contract at this block
+   */
+  effective_bytes?: number;
+  /**
+   * Change in active slots for this block (positive=activated, negative=deactivated)
+   */
+  slots_delta?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageStateByBlock = {
+  /**
+   * Cumulative count of contracts with at least one active slot at this block
+   */
+  active_contracts?: number;
+  /**
+   * Cumulative count of active storage slots at this block
+   */
+  active_slots?: number;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Change in effective bytes for this block
+   */
+  bytes_delta?: number;
+  /**
+   * Change in active contracts for this block (positive=activated, negative=deactivated)
+   */
+  contracts_delta?: number;
+  /**
+   * Cumulative sum of effective bytes across all active slots at this block
+   */
+  effective_bytes?: number;
+  /**
+   * Change in active slots for this block (positive=activated, negative=deactivated)
+   */
+  slots_delta?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageStateWithExpiry = {
+  /**
+   * Number of active storage slots in this contract (with expiry applied)
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Cumulative net bytes adjustment up to this block
+   */
+  cumulative_net_bytes?: number;
+  /**
+   * Cumulative net slot adjustment up to this block
+   */
+  cumulative_net_slots?: number;
+  /**
+   * Effective bytes for this contract (with expiry applied)
+   */
+  effective_bytes?: number;
+  /**
+   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+   */
+  expiry_policy?: string;
+  /**
+   * Net bytes adjustment this block (negative=expiry, positive=reactivation)
+   */
+  net_bytes_delta?: number;
+  /**
+   * Net slot adjustment this block (negative=expiry, positive=reactivation)
+   */
+  net_slots_delta?: number;
+  /**
+   * Previous block active_slots for this address (for transition detection)
+   */
+  prev_active_slots?: number;
+  /**
+   * Previous block effective_bytes for this address (for delta calculation)
+   */
+  prev_effective_bytes?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageStateWithExpiryByAddress = {
+  /**
+   * Number of active storage slots in this contract (0 if expired)
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Effective bytes for this contract (0 if expired)
+   */
+  effective_bytes?: number;
+  /**
+   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+   */
+  expiry_policy?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageStateWithExpiryByBlock = {
+  /**
+   * Count of contracts with active_slots > 0 (with expiry applied)
+   */
+  active_contracts?: number;
+  /**
+   * Total active storage slots network-wide (with expiry applied)
+   */
+  active_slots?: number;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Total effective bytes network-wide (with expiry applied)
+   */
+  effective_bytes?: number;
+  /**
+   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+   */
+  expiry_policy?: string;
   /**
    * Timestamp when the record was last updated
    */
@@ -5241,6 +6447,220 @@ export type IntStorageSlotRead = {
   updated_date_time?: number;
 };
 
+export type IntStorageSlotState = {
+  /**
+   * Cumulative count of active storage slots for this address at this block
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Change in effective bytes for this block
+   */
+  bytes_delta?: number;
+  /**
+   * Cumulative sum of effective bytes for this address at this block
+   */
+  effective_bytes?: number;
+  /**
+   * Change in active slots for this block (positive=activated, negative=deactivated)
+   */
+  slots_delta?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotStateByAddress = {
+  /**
+   * Cumulative count of active storage slots for this address at this block
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Change in effective bytes for this block
+   */
+  bytes_delta?: number;
+  /**
+   * Cumulative sum of effective bytes for this address at this block
+   */
+  effective_bytes?: number;
+  /**
+   * Change in active slots for this block (positive=activated, negative=deactivated)
+   */
+  slots_delta?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotStateByBlock = {
+  /**
+   * Cumulative count of active storage slots at this block
+   */
+  active_slots?: number;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Change in effective bytes for this block
+   */
+  bytes_delta?: number;
+  /**
+   * Cumulative sum of effective bytes across all active slots at this block
+   */
+  effective_bytes?: number;
+  /**
+   * Change in active slots for this block (positive=activated, negative=deactivated)
+   */
+  slots_delta?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotStateWithExpiry = {
+  /**
+   * Cumulative count of active storage slots for this address at this block (with expiry applied)
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Cumulative net bytes adjustment up to this block
+   */
+  cumulative_net_bytes?: number;
+  /**
+   * Cumulative net slot adjustment up to this block
+   */
+  cumulative_net_slots?: number;
+  /**
+   * Cumulative sum of effective bytes for this address at this block (with expiry applied)
+   */
+  effective_bytes?: number;
+  /**
+   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+   */
+  expiry_policy?: string;
+  /**
+   * Net bytes adjustment this block (negative=expiry, positive=reactivation)
+   */
+  net_bytes_delta?: number;
+  /**
+   * Net slot adjustment this block (negative=expiry, positive=reactivation)
+   */
+  net_slots_delta?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotStateWithExpiryByAddress = {
+  /**
+   * Cumulative count of active storage slots for this address at this block (with expiry applied)
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Cumulative net bytes adjustment up to this block
+   */
+  cumulative_net_bytes?: number;
+  /**
+   * Cumulative net slot adjustment up to this block
+   */
+  cumulative_net_slots?: number;
+  /**
+   * Cumulative sum of effective bytes for this address at this block (with expiry applied)
+   */
+  effective_bytes?: number;
+  /**
+   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+   */
+  expiry_policy?: string;
+  /**
+   * Net bytes adjustment this block (negative=expiry, positive=reactivation)
+   */
+  net_bytes_delta?: number;
+  /**
+   * Net slot adjustment this block (negative=expiry, positive=reactivation)
+   */
+  net_slots_delta?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSlotStateWithExpiryByBlock = {
+  /**
+   * Cumulative count of active storage slots at this block (with expiry applied)
+   */
+  active_slots?: number;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Cumulative net bytes adjustment up to this block
+   */
+  cumulative_net_bytes?: number;
+  /**
+   * Cumulative net slot adjustment up to this block
+   */
+  cumulative_net_slots?: number;
+  /**
+   * Cumulative sum of effective bytes at this block (with expiry applied)
+   */
+  effective_bytes?: number;
+  /**
+   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+   */
+  expiry_policy?: string;
+  /**
+   * Net bytes adjustment this block (negative=expiry, positive=reactivation)
+   */
+  net_bytes_delta?: number;
+  /**
+   * Net slot adjustment this block (negative=expiry, positive=reactivation)
+   */
+  net_slots_delta?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 /**
  * Response for listing admin_cbt_incremental records
  */
@@ -5277,6 +6697,20 @@ export type ListDimBlockBlobSubmitterResponse = {
    * The list of dim_block_blob_submitter.
    */
   dim_block_blob_submitter?: Array<DimBlockBlobSubmitter>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing dim_contract_owner records
+ */
+export type ListDimContractOwnerResponse = {
+  /**
+   * The list of dim_contract_owner.
+   */
+  dim_contract_owner?: Array<DimContractOwner>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -5662,6 +7096,118 @@ export type ListFctBlockResponse = {
 };
 
 /**
+ * Response for listing fct_contract_storage_state_by_address_daily records
+ */
+export type ListFctContractStorageStateByAddressDailyResponse = {
+  /**
+   * The list of fct_contract_storage_state_by_address_daily.
+   */
+  fct_contract_storage_state_by_address_daily?: Array<FctContractStorageStateByAddressDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_contract_storage_state_by_address_hourly records
+ */
+export type ListFctContractStorageStateByAddressHourlyResponse = {
+  /**
+   * The list of fct_contract_storage_state_by_address_hourly.
+   */
+  fct_contract_storage_state_by_address_hourly?: Array<FctContractStorageStateByAddressHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_contract_storage_state_by_block_daily records
+ */
+export type ListFctContractStorageStateByBlockDailyResponse = {
+  /**
+   * The list of fct_contract_storage_state_by_block_daily.
+   */
+  fct_contract_storage_state_by_block_daily?: Array<FctContractStorageStateByBlockDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_contract_storage_state_by_block_hourly records
+ */
+export type ListFctContractStorageStateByBlockHourlyResponse = {
+  /**
+   * The list of fct_contract_storage_state_by_block_hourly.
+   */
+  fct_contract_storage_state_by_block_hourly?: Array<FctContractStorageStateByBlockHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_contract_storage_state_with_expiry_by_address_daily records
+ */
+export type ListFctContractStorageStateWithExpiryByAddressDailyResponse = {
+  /**
+   * The list of fct_contract_storage_state_with_expiry_by_address_daily.
+   */
+  fct_contract_storage_state_with_expiry_by_address_daily?: Array<FctContractStorageStateWithExpiryByAddressDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_contract_storage_state_with_expiry_by_address_hourly records
+ */
+export type ListFctContractStorageStateWithExpiryByAddressHourlyResponse = {
+  /**
+   * The list of fct_contract_storage_state_with_expiry_by_address_hourly.
+   */
+  fct_contract_storage_state_with_expiry_by_address_hourly?: Array<FctContractStorageStateWithExpiryByAddressHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_contract_storage_state_with_expiry_by_block_daily records
+ */
+export type ListFctContractStorageStateWithExpiryByBlockDailyResponse = {
+  /**
+   * The list of fct_contract_storage_state_with_expiry_by_block_daily.
+   */
+  fct_contract_storage_state_with_expiry_by_block_daily?: Array<FctContractStorageStateWithExpiryByBlockDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_contract_storage_state_with_expiry_by_block_hourly records
+ */
+export type ListFctContractStorageStateWithExpiryByBlockHourlyResponse = {
+  /**
+   * The list of fct_contract_storage_state_with_expiry_by_block_hourly.
+   */
+  fct_contract_storage_state_with_expiry_by_block_hourly?: Array<FctContractStorageStateWithExpiryByBlockHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_data_column_availability_by_epoch records
  */
 export type ListFctDataColumnAvailabilityByEpochResponse = {
@@ -5956,13 +7502,13 @@ export type ListFctPreparedBlockResponse = {
 };
 
 /**
- * Response for listing fct_storage_slot_state_daily records
+ * Response for listing fct_storage_slot_state_by_address_daily records
  */
-export type ListFctStorageSlotStateDailyResponse = {
+export type ListFctStorageSlotStateByAddressDailyResponse = {
   /**
-   * The list of fct_storage_slot_state_daily.
+   * The list of fct_storage_slot_state_by_address_daily.
    */
-  fct_storage_slot_state_daily?: Array<FctStorageSlotStateDaily>;
+  fct_storage_slot_state_by_address_daily?: Array<FctStorageSlotStateByAddressDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -5970,13 +7516,13 @@ export type ListFctStorageSlotStateDailyResponse = {
 };
 
 /**
- * Response for listing fct_storage_slot_state_hourly records
+ * Response for listing fct_storage_slot_state_by_address_hourly records
  */
-export type ListFctStorageSlotStateHourlyResponse = {
+export type ListFctStorageSlotStateByAddressHourlyResponse = {
   /**
-   * The list of fct_storage_slot_state_hourly.
+   * The list of fct_storage_slot_state_by_address_hourly.
    */
-  fct_storage_slot_state_hourly?: Array<FctStorageSlotStateHourly>;
+  fct_storage_slot_state_by_address_hourly?: Array<FctStorageSlotStateByAddressHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -5984,13 +7530,13 @@ export type ListFctStorageSlotStateHourlyResponse = {
 };
 
 /**
- * Response for listing fct_storage_slot_state records
+ * Response for listing fct_storage_slot_state_by_block_daily records
  */
-export type ListFctStorageSlotStateResponse = {
+export type ListFctStorageSlotStateByBlockDailyResponse = {
   /**
-   * The list of fct_storage_slot_state.
+   * The list of fct_storage_slot_state_by_block_daily.
    */
-  fct_storage_slot_state?: Array<FctStorageSlotState>;
+  fct_storage_slot_state_by_block_daily?: Array<FctStorageSlotStateByBlockDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -5998,13 +7544,13 @@ export type ListFctStorageSlotStateResponse = {
 };
 
 /**
- * Response for listing fct_storage_slot_state_with_expiry_daily records
+ * Response for listing fct_storage_slot_state_by_block_hourly records
  */
-export type ListFctStorageSlotStateWithExpiryDailyResponse = {
+export type ListFctStorageSlotStateByBlockHourlyResponse = {
   /**
-   * The list of fct_storage_slot_state_with_expiry_daily.
+   * The list of fct_storage_slot_state_by_block_hourly.
    */
-  fct_storage_slot_state_with_expiry_daily?: Array<FctStorageSlotStateWithExpiryDaily>;
+  fct_storage_slot_state_by_block_hourly?: Array<FctStorageSlotStateByBlockHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -6012,13 +7558,13 @@ export type ListFctStorageSlotStateWithExpiryDailyResponse = {
 };
 
 /**
- * Response for listing fct_storage_slot_state_with_expiry_hourly records
+ * Response for listing fct_storage_slot_state_with_expiry_by_address_daily records
  */
-export type ListFctStorageSlotStateWithExpiryHourlyResponse = {
+export type ListFctStorageSlotStateWithExpiryByAddressDailyResponse = {
   /**
-   * The list of fct_storage_slot_state_with_expiry_hourly.
+   * The list of fct_storage_slot_state_with_expiry_by_address_daily.
    */
-  fct_storage_slot_state_with_expiry_hourly?: Array<FctStorageSlotStateWithExpiryHourly>;
+  fct_storage_slot_state_with_expiry_by_address_daily?: Array<FctStorageSlotStateWithExpiryByAddressDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -6026,13 +7572,97 @@ export type ListFctStorageSlotStateWithExpiryHourlyResponse = {
 };
 
 /**
- * Response for listing fct_storage_slot_state_with_expiry records
+ * Response for listing fct_storage_slot_state_with_expiry_by_address_hourly records
  */
-export type ListFctStorageSlotStateWithExpiryResponse = {
+export type ListFctStorageSlotStateWithExpiryByAddressHourlyResponse = {
   /**
-   * The list of fct_storage_slot_state_with_expiry.
+   * The list of fct_storage_slot_state_with_expiry_by_address_hourly.
    */
-  fct_storage_slot_state_with_expiry?: Array<FctStorageSlotStateWithExpiry>;
+  fct_storage_slot_state_with_expiry_by_address_hourly?: Array<FctStorageSlotStateWithExpiryByAddressHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_storage_slot_state_with_expiry_by_block_daily records
+ */
+export type ListFctStorageSlotStateWithExpiryByBlockDailyResponse = {
+  /**
+   * The list of fct_storage_slot_state_with_expiry_by_block_daily.
+   */
+  fct_storage_slot_state_with_expiry_by_block_daily?: Array<FctStorageSlotStateWithExpiryByBlockDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_storage_slot_state_with_expiry_by_block_hourly records
+ */
+export type ListFctStorageSlotStateWithExpiryByBlockHourlyResponse = {
+  /**
+   * The list of fct_storage_slot_state_with_expiry_by_block_hourly.
+   */
+  fct_storage_slot_state_with_expiry_by_block_hourly?: Array<FctStorageSlotStateWithExpiryByBlockHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_storage_slot_top_100_by_bytes records
+ */
+export type ListFctStorageSlotTop100ByBytesResponse = {
+  /**
+   * The list of fct_storage_slot_top_100_by_bytes.
+   */
+  fct_storage_slot_top_100_by_bytes?: Array<FctStorageSlotTop100ByBytes>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_storage_slot_top_100_by_bytes_with_expiry records
+ */
+export type ListFctStorageSlotTop100ByBytesWithExpiryResponse = {
+  /**
+   * The list of fct_storage_slot_top_100_by_bytes_with_expiry.
+   */
+  fct_storage_slot_top_100_by_bytes_with_expiry?: Array<FctStorageSlotTop100ByBytesWithExpiry>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_storage_slot_top_100_by_slots records
+ */
+export type ListFctStorageSlotTop100BySlotsResponse = {
+  /**
+   * The list of fct_storage_slot_top_100_by_slots.
+   */
+  fct_storage_slot_top_100_by_slots?: Array<FctStorageSlotTop100BySlots>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_storage_slot_top_100_by_slots_with_expiry records
+ */
+export type ListFctStorageSlotTop100BySlotsWithExpiryResponse = {
+  /**
+   * The list of fct_storage_slot_top_100_by_slots_with_expiry.
+   */
+  fct_storage_slot_top_100_by_slots_with_expiry?: Array<FctStorageSlotTop100BySlotsWithExpiry>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -6201,6 +7831,244 @@ export type ListIntBlockProposerCanonicalResponse = {
    * The list of int_block_proposer_canonical.
    */
   int_block_proposer_canonical?: Array<IntBlockProposerCanonical>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_expiry_1m records
+ */
+export type ListIntContractStorageExpiry1mResponse = {
+  /**
+   * The list of int_contract_storage_expiry_1m.
+   */
+  int_contract_storage_expiry_1m?: Array<IntContractStorageExpiry1m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_expiry_6m records
+ */
+export type ListIntContractStorageExpiry6mResponse = {
+  /**
+   * The list of int_contract_storage_expiry_6m.
+   */
+  int_contract_storage_expiry_6m?: Array<IntContractStorageExpiry6m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_expiry_12m records
+ */
+export type ListIntContractStorageExpiry12mResponse = {
+  /**
+   * The list of int_contract_storage_expiry_12m.
+   */
+  int_contract_storage_expiry_12m?: Array<IntContractStorageExpiry12m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_expiry_18m records
+ */
+export type ListIntContractStorageExpiry18mResponse = {
+  /**
+   * The list of int_contract_storage_expiry_18m.
+   */
+  int_contract_storage_expiry_18m?: Array<IntContractStorageExpiry18m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_expiry_24m records
+ */
+export type ListIntContractStorageExpiry24mResponse = {
+  /**
+   * The list of int_contract_storage_expiry_24m.
+   */
+  int_contract_storage_expiry_24m?: Array<IntContractStorageExpiry24m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_next_touch records
+ */
+export type ListIntContractStorageNextTouchResponse = {
+  /**
+   * The list of int_contract_storage_next_touch.
+   */
+  int_contract_storage_next_touch?: Array<IntContractStorageNextTouch>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_reactivation_1m records
+ */
+export type ListIntContractStorageReactivation1mResponse = {
+  /**
+   * The list of int_contract_storage_reactivation_1m.
+   */
+  int_contract_storage_reactivation_1m?: Array<IntContractStorageReactivation1m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_reactivation_6m records
+ */
+export type ListIntContractStorageReactivation6mResponse = {
+  /**
+   * The list of int_contract_storage_reactivation_6m.
+   */
+  int_contract_storage_reactivation_6m?: Array<IntContractStorageReactivation6m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_reactivation_12m records
+ */
+export type ListIntContractStorageReactivation12mResponse = {
+  /**
+   * The list of int_contract_storage_reactivation_12m.
+   */
+  int_contract_storage_reactivation_12m?: Array<IntContractStorageReactivation12m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_reactivation_18m records
+ */
+export type ListIntContractStorageReactivation18mResponse = {
+  /**
+   * The list of int_contract_storage_reactivation_18m.
+   */
+  int_contract_storage_reactivation_18m?: Array<IntContractStorageReactivation18m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_reactivation_24m records
+ */
+export type ListIntContractStorageReactivation24mResponse = {
+  /**
+   * The list of int_contract_storage_reactivation_24m.
+   */
+  int_contract_storage_reactivation_24m?: Array<IntContractStorageReactivation24m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_state_by_address records
+ */
+export type ListIntContractStorageStateByAddressResponse = {
+  /**
+   * The list of int_contract_storage_state_by_address.
+   */
+  int_contract_storage_state_by_address?: Array<IntContractStorageStateByAddress>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_state_by_block records
+ */
+export type ListIntContractStorageStateByBlockResponse = {
+  /**
+   * The list of int_contract_storage_state_by_block.
+   */
+  int_contract_storage_state_by_block?: Array<IntContractStorageStateByBlock>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_state records
+ */
+export type ListIntContractStorageStateResponse = {
+  /**
+   * The list of int_contract_storage_state.
+   */
+  int_contract_storage_state?: Array<IntContractStorageState>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_state_with_expiry_by_address records
+ */
+export type ListIntContractStorageStateWithExpiryByAddressResponse = {
+  /**
+   * The list of int_contract_storage_state_with_expiry_by_address.
+   */
+  int_contract_storage_state_with_expiry_by_address?: Array<IntContractStorageStateWithExpiryByAddress>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_state_with_expiry_by_block records
+ */
+export type ListIntContractStorageStateWithExpiryByBlockResponse = {
+  /**
+   * The list of int_contract_storage_state_with_expiry_by_block.
+   */
+  int_contract_storage_state_with_expiry_by_block?: Array<IntContractStorageStateWithExpiryByBlock>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_state_with_expiry records
+ */
+export type ListIntContractStorageStateWithExpiryResponse = {
+  /**
+   * The list of int_contract_storage_state_with_expiry.
+   */
+  int_contract_storage_state_with_expiry?: Array<IntContractStorageStateWithExpiry>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -6453,6 +8321,90 @@ export type ListIntStorageSlotReadResponse = {
    * The list of int_storage_slot_read.
    */
   int_storage_slot_read?: Array<IntStorageSlotRead>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_state_by_address records
+ */
+export type ListIntStorageSlotStateByAddressResponse = {
+  /**
+   * The list of int_storage_slot_state_by_address.
+   */
+  int_storage_slot_state_by_address?: Array<IntStorageSlotStateByAddress>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_state_by_block records
+ */
+export type ListIntStorageSlotStateByBlockResponse = {
+  /**
+   * The list of int_storage_slot_state_by_block.
+   */
+  int_storage_slot_state_by_block?: Array<IntStorageSlotStateByBlock>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_state records
+ */
+export type ListIntStorageSlotStateResponse = {
+  /**
+   * The list of int_storage_slot_state.
+   */
+  int_storage_slot_state?: Array<IntStorageSlotState>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_state_with_expiry_by_address records
+ */
+export type ListIntStorageSlotStateWithExpiryByAddressResponse = {
+  /**
+   * The list of int_storage_slot_state_with_expiry_by_address.
+   */
+  int_storage_slot_state_with_expiry_by_address?: Array<IntStorageSlotStateWithExpiryByAddress>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_state_with_expiry_by_block records
+ */
+export type ListIntStorageSlotStateWithExpiryByBlockResponse = {
+  /**
+   * The list of int_storage_slot_state_with_expiry_by_block.
+   */
+  int_storage_slot_state_with_expiry_by_block?: Array<IntStorageSlotStateWithExpiryByBlock>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_slot_state_with_expiry records
+ */
+export type ListIntStorageSlotStateWithExpiryResponse = {
+  /**
+   * The list of int_storage_slot_state_with_expiry.
+   */
+  int_storage_slot_state_with_expiry?: Array<IntStorageSlotStateWithExpiry>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -7296,6 +9248,369 @@ export type DimBlockBlobSubmitterServiceGetResponses = {
 
 export type DimBlockBlobSubmitterServiceGetResponse =
   DimBlockBlobSubmitterServiceGetResponses[keyof DimBlockBlobSubmitterServiceGetResponses];
+
+export type DimContractOwnerServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The contract address (filter: eq)
+     */
+    contract_address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    contract_address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    contract_address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    contract_address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    contract_address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    contract_address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    contract_address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    contract_address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    contract_address_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Owner key identifier (filter: eq)
+     */
+    owner_key_eq?: string;
+    /**
+     * Owner key identifier (filter: ne)
+     */
+    owner_key_ne?: string;
+    /**
+     * Owner key identifier (filter: contains)
+     */
+    owner_key_contains?: string;
+    /**
+     * Owner key identifier (filter: starts_with)
+     */
+    owner_key_starts_with?: string;
+    /**
+     * Owner key identifier (filter: ends_with)
+     */
+    owner_key_ends_with?: string;
+    /**
+     * Owner key identifier (filter: like)
+     */
+    owner_key_like?: string;
+    /**
+     * Owner key identifier (filter: not_like)
+     */
+    owner_key_not_like?: string;
+    /**
+     * Owner key identifier (filter: in_values) (comma-separated list)
+     */
+    owner_key_in_values?: string;
+    /**
+     * Owner key identifier (filter: not_in_values) (comma-separated list)
+     */
+    owner_key_not_in_values?: string;
+    /**
+     * Account owner of the contract (filter: eq)
+     */
+    account_owner_eq?: string;
+    /**
+     * Account owner of the contract (filter: ne)
+     */
+    account_owner_ne?: string;
+    /**
+     * Account owner of the contract (filter: contains)
+     */
+    account_owner_contains?: string;
+    /**
+     * Account owner of the contract (filter: starts_with)
+     */
+    account_owner_starts_with?: string;
+    /**
+     * Account owner of the contract (filter: ends_with)
+     */
+    account_owner_ends_with?: string;
+    /**
+     * Account owner of the contract (filter: like)
+     */
+    account_owner_like?: string;
+    /**
+     * Account owner of the contract (filter: not_like)
+     */
+    account_owner_not_like?: string;
+    /**
+     * Account owner of the contract (filter: in_values) (comma-separated list)
+     */
+    account_owner_in_values?: string;
+    /**
+     * Account owner of the contract (filter: not_in_values) (comma-separated list)
+     */
+    account_owner_not_in_values?: string;
+    /**
+     * Name of the contract (filter: eq)
+     */
+    contract_name_eq?: string;
+    /**
+     * Name of the contract (filter: ne)
+     */
+    contract_name_ne?: string;
+    /**
+     * Name of the contract (filter: contains)
+     */
+    contract_name_contains?: string;
+    /**
+     * Name of the contract (filter: starts_with)
+     */
+    contract_name_starts_with?: string;
+    /**
+     * Name of the contract (filter: ends_with)
+     */
+    contract_name_ends_with?: string;
+    /**
+     * Name of the contract (filter: like)
+     */
+    contract_name_like?: string;
+    /**
+     * Name of the contract (filter: not_like)
+     */
+    contract_name_not_like?: string;
+    /**
+     * Name of the contract (filter: in_values) (comma-separated list)
+     */
+    contract_name_in_values?: string;
+    /**
+     * Name of the contract (filter: not_in_values) (comma-separated list)
+     */
+    contract_name_not_in_values?: string;
+    /**
+     * Factory contract or deployer address (filter: eq)
+     */
+    factory_contract_eq?: string;
+    /**
+     * Factory contract or deployer address (filter: ne)
+     */
+    factory_contract_ne?: string;
+    /**
+     * Factory contract or deployer address (filter: contains)
+     */
+    factory_contract_contains?: string;
+    /**
+     * Factory contract or deployer address (filter: starts_with)
+     */
+    factory_contract_starts_with?: string;
+    /**
+     * Factory contract or deployer address (filter: ends_with)
+     */
+    factory_contract_ends_with?: string;
+    /**
+     * Factory contract or deployer address (filter: like)
+     */
+    factory_contract_like?: string;
+    /**
+     * Factory contract or deployer address (filter: not_like)
+     */
+    factory_contract_not_like?: string;
+    /**
+     * Factory contract or deployer address (filter: in_values) (comma-separated list)
+     */
+    factory_contract_in_values?: string;
+    /**
+     * Factory contract or deployer address (filter: not_in_values) (comma-separated list)
+     */
+    factory_contract_not_in_values?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: eq)
+     */
+    usage_category_eq?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: ne)
+     */
+    usage_category_ne?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: contains)
+     */
+    usage_category_contains?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: starts_with)
+     */
+    usage_category_starts_with?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: ends_with)
+     */
+    usage_category_ends_with?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: like)
+     */
+    usage_category_like?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: not_like)
+     */
+    usage_category_not_like?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: in_values) (comma-separated list)
+     */
+    usage_category_in_values?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: not_in_values) (comma-separated list)
+     */
+    usage_category_not_in_values?: string;
+    /**
+     * Source of the label data (dune or growthepie) (filter: eq)
+     */
+    source_eq?: string;
+    /**
+     * Source of the label data (dune or growthepie) (filter: ne)
+     */
+    source_ne?: string;
+    /**
+     * Source of the label data (dune or growthepie) (filter: contains)
+     */
+    source_contains?: string;
+    /**
+     * Source of the label data (dune or growthepie) (filter: starts_with)
+     */
+    source_starts_with?: string;
+    /**
+     * Source of the label data (dune or growthepie) (filter: ends_with)
+     */
+    source_ends_with?: string;
+    /**
+     * Source of the label data (dune or growthepie) (filter: like)
+     */
+    source_like?: string;
+    /**
+     * Source of the label data (dune or growthepie) (filter: not_like)
+     */
+    source_not_like?: string;
+    /**
+     * Source of the label data (dune or growthepie) (filter: in_values) (comma-separated list)
+     */
+    source_in_values?: string;
+    /**
+     * Source of the label data (dune or growthepie) (filter: not_in_values) (comma-separated list)
+     */
+    source_not_in_values?: string;
+    /**
+     * The maximum number of dim_contract_owner to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListDimContractOwner` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/dim_contract_owner';
+};
+
+export type DimContractOwnerServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimContractOwnerServiceListError =
+  DimContractOwnerServiceListErrors[keyof DimContractOwnerServiceListErrors];
+
+export type DimContractOwnerServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListDimContractOwnerResponse;
+};
+
+export type DimContractOwnerServiceListResponse =
+  DimContractOwnerServiceListResponses[keyof DimContractOwnerServiceListResponses];
+
+export type DimContractOwnerServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The contract address
+     */
+    contract_address: string;
+  };
+  query?: never;
+  url: '/api/v1/dim_contract_owner/{contract_address}';
+};
+
+export type DimContractOwnerServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimContractOwnerServiceGetError = DimContractOwnerServiceGetErrors[keyof DimContractOwnerServiceGetErrors];
+
+export type DimContractOwnerServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetDimContractOwnerResponse;
+};
+
+export type DimContractOwnerServiceGetResponse =
+  DimContractOwnerServiceGetResponses[keyof DimContractOwnerServiceGetResponses];
 
 export type DimNodeServiceListData = {
   body?: never;
@@ -21989,6 +24304,2294 @@ export type FctBlockProposerHeadServiceGetResponses = {
 
 export type FctBlockProposerHeadServiceGetResponse =
   FctBlockProposerHeadServiceGetResponses[keyof FctBlockProposerHeadServiceGetResponses];
+
+export type FctContractStorageStateByAddressDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of fct_contract_storage_state_by_address_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctContractStorageStateByAddressDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_contract_storage_state_by_address_daily';
+};
+
+export type FctContractStorageStateByAddressDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctContractStorageStateByAddressDailyServiceListError =
+  FctContractStorageStateByAddressDailyServiceListErrors[keyof FctContractStorageStateByAddressDailyServiceListErrors];
+
+export type FctContractStorageStateByAddressDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctContractStorageStateByAddressDailyResponse;
+};
+
+export type FctContractStorageStateByAddressDailyServiceListResponse =
+  FctContractStorageStateByAddressDailyServiceListResponses[keyof FctContractStorageStateByAddressDailyServiceListResponses];
+
+export type FctContractStorageStateByAddressDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The contract address
+     */
+    address: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_contract_storage_state_by_address_daily/{address}';
+};
+
+export type FctContractStorageStateByAddressDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctContractStorageStateByAddressDailyServiceGetError =
+  FctContractStorageStateByAddressDailyServiceGetErrors[keyof FctContractStorageStateByAddressDailyServiceGetErrors];
+
+export type FctContractStorageStateByAddressDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctContractStorageStateByAddressDailyResponse;
+};
+
+export type FctContractStorageStateByAddressDailyServiceGetResponse =
+  FctContractStorageStateByAddressDailyServiceGetResponses[keyof FctContractStorageStateByAddressDailyServiceGetResponses];
+
+export type FctContractStorageStateByAddressHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of fct_contract_storage_state_by_address_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctContractStorageStateByAddressHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_contract_storage_state_by_address_hourly';
+};
+
+export type FctContractStorageStateByAddressHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctContractStorageStateByAddressHourlyServiceListError =
+  FctContractStorageStateByAddressHourlyServiceListErrors[keyof FctContractStorageStateByAddressHourlyServiceListErrors];
+
+export type FctContractStorageStateByAddressHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctContractStorageStateByAddressHourlyResponse;
+};
+
+export type FctContractStorageStateByAddressHourlyServiceListResponse =
+  FctContractStorageStateByAddressHourlyServiceListResponses[keyof FctContractStorageStateByAddressHourlyServiceListResponses];
+
+export type FctContractStorageStateByAddressHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The contract address
+     */
+    address: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_contract_storage_state_by_address_hourly/{address}';
+};
+
+export type FctContractStorageStateByAddressHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctContractStorageStateByAddressHourlyServiceGetError =
+  FctContractStorageStateByAddressHourlyServiceGetErrors[keyof FctContractStorageStateByAddressHourlyServiceGetErrors];
+
+export type FctContractStorageStateByAddressHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctContractStorageStateByAddressHourlyResponse;
+};
+
+export type FctContractStorageStateByAddressHourlyServiceGetResponse =
+  FctContractStorageStateByAddressHourlyServiceGetResponses[keyof FctContractStorageStateByAddressHourlyServiceGetResponses];
+
+export type FctContractStorageStateByBlockDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of day (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of day (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of day (filter: eq)
+     */
+    active_contracts_eq?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of day (filter: ne)
+     */
+    active_contracts_ne?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of day (filter: lt)
+     */
+    active_contracts_lt?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of day (filter: lte)
+     */
+    active_contracts_lte?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of day (filter: gt)
+     */
+    active_contracts_gt?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of day (filter: gte)
+     */
+    active_contracts_gte?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of day (filter: between_min)
+     */
+    active_contracts_between_min?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of day (filter: between_max_value)
+     */
+    active_contracts_between_max_value?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of day (filter: in_values) (comma-separated list)
+     */
+    active_contracts_in_values?: string;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of day (filter: not_in_values) (comma-separated list)
+     */
+    active_contracts_not_in_values?: string;
+    /**
+     * The maximum number of fct_contract_storage_state_by_block_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctContractStorageStateByBlockDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_contract_storage_state_by_block_daily';
+};
+
+export type FctContractStorageStateByBlockDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctContractStorageStateByBlockDailyServiceListError =
+  FctContractStorageStateByBlockDailyServiceListErrors[keyof FctContractStorageStateByBlockDailyServiceListErrors];
+
+export type FctContractStorageStateByBlockDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctContractStorageStateByBlockDailyResponse;
+};
+
+export type FctContractStorageStateByBlockDailyServiceListResponse =
+  FctContractStorageStateByBlockDailyServiceListResponses[keyof FctContractStorageStateByBlockDailyServiceListResponses];
+
+export type FctContractStorageStateByBlockDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_contract_storage_state_by_block_daily/{day_start_date}';
+};
+
+export type FctContractStorageStateByBlockDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctContractStorageStateByBlockDailyServiceGetError =
+  FctContractStorageStateByBlockDailyServiceGetErrors[keyof FctContractStorageStateByBlockDailyServiceGetErrors];
+
+export type FctContractStorageStateByBlockDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctContractStorageStateByBlockDailyResponse;
+};
+
+export type FctContractStorageStateByBlockDailyServiceGetResponse =
+  FctContractStorageStateByBlockDailyServiceGetResponses[keyof FctContractStorageStateByBlockDailyServiceGetResponses];
+
+export type FctContractStorageStateByBlockHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of hour (filter: eq)
+     */
+    active_contracts_eq?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of hour (filter: ne)
+     */
+    active_contracts_ne?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of hour (filter: lt)
+     */
+    active_contracts_lt?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of hour (filter: lte)
+     */
+    active_contracts_lte?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of hour (filter: gt)
+     */
+    active_contracts_gt?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of hour (filter: gte)
+     */
+    active_contracts_gte?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of hour (filter: between_min)
+     */
+    active_contracts_between_min?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of hour (filter: between_max_value)
+     */
+    active_contracts_between_max_value?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of hour (filter: in_values) (comma-separated list)
+     */
+    active_contracts_in_values?: string;
+    /**
+     * Cumulative count of contracts with at least one active slot at end of hour (filter: not_in_values) (comma-separated list)
+     */
+    active_contracts_not_in_values?: string;
+    /**
+     * The maximum number of fct_contract_storage_state_by_block_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctContractStorageStateByBlockHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_contract_storage_state_by_block_hourly';
+};
+
+export type FctContractStorageStateByBlockHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctContractStorageStateByBlockHourlyServiceListError =
+  FctContractStorageStateByBlockHourlyServiceListErrors[keyof FctContractStorageStateByBlockHourlyServiceListErrors];
+
+export type FctContractStorageStateByBlockHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctContractStorageStateByBlockHourlyResponse;
+};
+
+export type FctContractStorageStateByBlockHourlyServiceListResponse =
+  FctContractStorageStateByBlockHourlyServiceListResponses[keyof FctContractStorageStateByBlockHourlyServiceListResponses];
+
+export type FctContractStorageStateByBlockHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_contract_storage_state_by_block_hourly/{hour_start_date_time}';
+};
+
+export type FctContractStorageStateByBlockHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctContractStorageStateByBlockHourlyServiceGetError =
+  FctContractStorageStateByBlockHourlyServiceGetErrors[keyof FctContractStorageStateByBlockHourlyServiceGetErrors];
+
+export type FctContractStorageStateByBlockHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctContractStorageStateByBlockHourlyResponse;
+};
+
+export type FctContractStorageStateByBlockHourlyServiceGetResponse =
+  FctContractStorageStateByBlockHourlyServiceGetResponses[keyof FctContractStorageStateByBlockHourlyServiceGetResponses];
+
+export type FctContractStorageStateWithExpiryByAddressDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Active storage slots in this contract at end of day (0 if expired) (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Active storage slots in this contract at end of day (0 if expired) (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Active storage slots in this contract at end of day (0 if expired) (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Active storage slots in this contract at end of day (0 if expired) (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Active storage slots in this contract at end of day (0 if expired) (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Active storage slots in this contract at end of day (0 if expired) (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Active storage slots in this contract at end of day (0 if expired) (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Active storage slots in this contract at end of day (0 if expired) (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Active storage slots in this contract at end of day (0 if expired) (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Active storage slots in this contract at end of day (0 if expired) (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Effective bytes at end of day (0 if expired) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Effective bytes at end of day (0 if expired) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Effective bytes at end of day (0 if expired) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Effective bytes at end of day (0 if expired) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Effective bytes at end of day (0 if expired) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Effective bytes at end of day (0 if expired) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Effective bytes at end of day (0 if expired) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Effective bytes at end of day (0 if expired) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Effective bytes at end of day (0 if expired) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Effective bytes at end of day (0 if expired) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of fct_contract_storage_state_with_expiry_by_address_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctContractStorageStateWithExpiryByAddressDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_contract_storage_state_with_expiry_by_address_daily';
+};
+
+export type FctContractStorageStateWithExpiryByAddressDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctContractStorageStateWithExpiryByAddressDailyServiceListError =
+  FctContractStorageStateWithExpiryByAddressDailyServiceListErrors[keyof FctContractStorageStateWithExpiryByAddressDailyServiceListErrors];
+
+export type FctContractStorageStateWithExpiryByAddressDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctContractStorageStateWithExpiryByAddressDailyResponse;
+};
+
+export type FctContractStorageStateWithExpiryByAddressDailyServiceListResponse =
+  FctContractStorageStateWithExpiryByAddressDailyServiceListResponses[keyof FctContractStorageStateWithExpiryByAddressDailyServiceListResponses];
+
+export type FctContractStorageStateWithExpiryByAddressDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The contract address
+     */
+    address: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_contract_storage_state_with_expiry_by_address_daily/{address}';
+};
+
+export type FctContractStorageStateWithExpiryByAddressDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctContractStorageStateWithExpiryByAddressDailyServiceGetError =
+  FctContractStorageStateWithExpiryByAddressDailyServiceGetErrors[keyof FctContractStorageStateWithExpiryByAddressDailyServiceGetErrors];
+
+export type FctContractStorageStateWithExpiryByAddressDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctContractStorageStateWithExpiryByAddressDailyResponse;
+};
+
+export type FctContractStorageStateWithExpiryByAddressDailyServiceGetResponse =
+  FctContractStorageStateWithExpiryByAddressDailyServiceGetResponses[keyof FctContractStorageStateWithExpiryByAddressDailyServiceGetResponses];
+
+export type FctContractStorageStateWithExpiryByAddressHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Active storage slots in this contract at end of hour (0 if expired) (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Active storage slots in this contract at end of hour (0 if expired) (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Active storage slots in this contract at end of hour (0 if expired) (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Active storage slots in this contract at end of hour (0 if expired) (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Active storage slots in this contract at end of hour (0 if expired) (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Active storage slots in this contract at end of hour (0 if expired) (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Active storage slots in this contract at end of hour (0 if expired) (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Active storage slots in this contract at end of hour (0 if expired) (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Active storage slots in this contract at end of hour (0 if expired) (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Active storage slots in this contract at end of hour (0 if expired) (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Effective bytes at end of hour (0 if expired) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Effective bytes at end of hour (0 if expired) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Effective bytes at end of hour (0 if expired) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Effective bytes at end of hour (0 if expired) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Effective bytes at end of hour (0 if expired) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Effective bytes at end of hour (0 if expired) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Effective bytes at end of hour (0 if expired) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Effective bytes at end of hour (0 if expired) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Effective bytes at end of hour (0 if expired) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Effective bytes at end of hour (0 if expired) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of fct_contract_storage_state_with_expiry_by_address_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctContractStorageStateWithExpiryByAddressHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_contract_storage_state_with_expiry_by_address_hourly';
+};
+
+export type FctContractStorageStateWithExpiryByAddressHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctContractStorageStateWithExpiryByAddressHourlyServiceListError =
+  FctContractStorageStateWithExpiryByAddressHourlyServiceListErrors[keyof FctContractStorageStateWithExpiryByAddressHourlyServiceListErrors];
+
+export type FctContractStorageStateWithExpiryByAddressHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctContractStorageStateWithExpiryByAddressHourlyResponse;
+};
+
+export type FctContractStorageStateWithExpiryByAddressHourlyServiceListResponse =
+  FctContractStorageStateWithExpiryByAddressHourlyServiceListResponses[keyof FctContractStorageStateWithExpiryByAddressHourlyServiceListResponses];
+
+export type FctContractStorageStateWithExpiryByAddressHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The contract address
+     */
+    address: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_contract_storage_state_with_expiry_by_address_hourly/{address}';
+};
+
+export type FctContractStorageStateWithExpiryByAddressHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctContractStorageStateWithExpiryByAddressHourlyServiceGetError =
+  FctContractStorageStateWithExpiryByAddressHourlyServiceGetErrors[keyof FctContractStorageStateWithExpiryByAddressHourlyServiceGetErrors];
+
+export type FctContractStorageStateWithExpiryByAddressHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctContractStorageStateWithExpiryByAddressHourlyResponse;
+};
+
+export type FctContractStorageStateWithExpiryByAddressHourlyServiceGetResponse =
+  FctContractStorageStateWithExpiryByAddressHourlyServiceGetResponses[keyof FctContractStorageStateWithExpiryByAddressHourlyServiceGetResponses];
+
+export type FctContractStorageStateWithExpiryByBlockDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Total active storage slots at end of day (with expiry applied) (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Total active storage slots at end of day (with expiry applied) (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Total active storage slots at end of day (with expiry applied) (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Total active storage slots at end of day (with expiry applied) (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Total active storage slots at end of day (with expiry applied) (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Total active storage slots at end of day (with expiry applied) (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Total active storage slots at end of day (with expiry applied) (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Total active storage slots at end of day (with expiry applied) (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Total active storage slots at end of day (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Total active storage slots at end of day (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Total effective bytes at end of day (with expiry applied) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Total effective bytes at end of day (with expiry applied) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Total effective bytes at end of day (with expiry applied) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Total effective bytes at end of day (with expiry applied) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Total effective bytes at end of day (with expiry applied) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Total effective bytes at end of day (with expiry applied) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Total effective bytes at end of day (with expiry applied) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Total effective bytes at end of day (with expiry applied) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Total effective bytes at end of day (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Total effective bytes at end of day (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * Count of contracts with active_slots > 0 at end of day (filter: eq)
+     */
+    active_contracts_eq?: number;
+    /**
+     * Count of contracts with active_slots > 0 at end of day (filter: ne)
+     */
+    active_contracts_ne?: number;
+    /**
+     * Count of contracts with active_slots > 0 at end of day (filter: lt)
+     */
+    active_contracts_lt?: number;
+    /**
+     * Count of contracts with active_slots > 0 at end of day (filter: lte)
+     */
+    active_contracts_lte?: number;
+    /**
+     * Count of contracts with active_slots > 0 at end of day (filter: gt)
+     */
+    active_contracts_gt?: number;
+    /**
+     * Count of contracts with active_slots > 0 at end of day (filter: gte)
+     */
+    active_contracts_gte?: number;
+    /**
+     * Count of contracts with active_slots > 0 at end of day (filter: between_min)
+     */
+    active_contracts_between_min?: number;
+    /**
+     * Count of contracts with active_slots > 0 at end of day (filter: between_max_value)
+     */
+    active_contracts_between_max_value?: number;
+    /**
+     * Count of contracts with active_slots > 0 at end of day (filter: in_values) (comma-separated list)
+     */
+    active_contracts_in_values?: string;
+    /**
+     * Count of contracts with active_slots > 0 at end of day (filter: not_in_values) (comma-separated list)
+     */
+    active_contracts_not_in_values?: string;
+    /**
+     * The maximum number of fct_contract_storage_state_with_expiry_by_block_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctContractStorageStateWithExpiryByBlockDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_contract_storage_state_with_expiry_by_block_daily';
+};
+
+export type FctContractStorageStateWithExpiryByBlockDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctContractStorageStateWithExpiryByBlockDailyServiceListError =
+  FctContractStorageStateWithExpiryByBlockDailyServiceListErrors[keyof FctContractStorageStateWithExpiryByBlockDailyServiceListErrors];
+
+export type FctContractStorageStateWithExpiryByBlockDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctContractStorageStateWithExpiryByBlockDailyResponse;
+};
+
+export type FctContractStorageStateWithExpiryByBlockDailyServiceListResponse =
+  FctContractStorageStateWithExpiryByBlockDailyServiceListResponses[keyof FctContractStorageStateWithExpiryByBlockDailyServiceListResponses];
+
+export type FctContractStorageStateWithExpiryByBlockDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+     */
+    expiry_policy: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_contract_storage_state_with_expiry_by_block_daily/{expiry_policy}';
+};
+
+export type FctContractStorageStateWithExpiryByBlockDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctContractStorageStateWithExpiryByBlockDailyServiceGetError =
+  FctContractStorageStateWithExpiryByBlockDailyServiceGetErrors[keyof FctContractStorageStateWithExpiryByBlockDailyServiceGetErrors];
+
+export type FctContractStorageStateWithExpiryByBlockDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctContractStorageStateWithExpiryByBlockDailyResponse;
+};
+
+export type FctContractStorageStateWithExpiryByBlockDailyServiceGetResponse =
+  FctContractStorageStateWithExpiryByBlockDailyServiceGetResponses[keyof FctContractStorageStateWithExpiryByBlockDailyServiceGetResponses];
+
+export type FctContractStorageStateWithExpiryByBlockHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Total active storage slots at end of hour (with expiry applied) (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Total active storage slots at end of hour (with expiry applied) (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Total active storage slots at end of hour (with expiry applied) (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Total active storage slots at end of hour (with expiry applied) (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Total active storage slots at end of hour (with expiry applied) (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Total active storage slots at end of hour (with expiry applied) (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Total active storage slots at end of hour (with expiry applied) (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Total active storage slots at end of hour (with expiry applied) (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Total active storage slots at end of hour (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Total active storage slots at end of hour (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Total effective bytes at end of hour (with expiry applied) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Total effective bytes at end of hour (with expiry applied) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Total effective bytes at end of hour (with expiry applied) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Total effective bytes at end of hour (with expiry applied) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Total effective bytes at end of hour (with expiry applied) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Total effective bytes at end of hour (with expiry applied) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Total effective bytes at end of hour (with expiry applied) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Total effective bytes at end of hour (with expiry applied) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Total effective bytes at end of hour (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Total effective bytes at end of hour (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * Count of contracts with active_slots > 0 at end of hour (filter: eq)
+     */
+    active_contracts_eq?: number;
+    /**
+     * Count of contracts with active_slots > 0 at end of hour (filter: ne)
+     */
+    active_contracts_ne?: number;
+    /**
+     * Count of contracts with active_slots > 0 at end of hour (filter: lt)
+     */
+    active_contracts_lt?: number;
+    /**
+     * Count of contracts with active_slots > 0 at end of hour (filter: lte)
+     */
+    active_contracts_lte?: number;
+    /**
+     * Count of contracts with active_slots > 0 at end of hour (filter: gt)
+     */
+    active_contracts_gt?: number;
+    /**
+     * Count of contracts with active_slots > 0 at end of hour (filter: gte)
+     */
+    active_contracts_gte?: number;
+    /**
+     * Count of contracts with active_slots > 0 at end of hour (filter: between_min)
+     */
+    active_contracts_between_min?: number;
+    /**
+     * Count of contracts with active_slots > 0 at end of hour (filter: between_max_value)
+     */
+    active_contracts_between_max_value?: number;
+    /**
+     * Count of contracts with active_slots > 0 at end of hour (filter: in_values) (comma-separated list)
+     */
+    active_contracts_in_values?: string;
+    /**
+     * Count of contracts with active_slots > 0 at end of hour (filter: not_in_values) (comma-separated list)
+     */
+    active_contracts_not_in_values?: string;
+    /**
+     * The maximum number of fct_contract_storage_state_with_expiry_by_block_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctContractStorageStateWithExpiryByBlockHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_contract_storage_state_with_expiry_by_block_hourly';
+};
+
+export type FctContractStorageStateWithExpiryByBlockHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctContractStorageStateWithExpiryByBlockHourlyServiceListError =
+  FctContractStorageStateWithExpiryByBlockHourlyServiceListErrors[keyof FctContractStorageStateWithExpiryByBlockHourlyServiceListErrors];
+
+export type FctContractStorageStateWithExpiryByBlockHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctContractStorageStateWithExpiryByBlockHourlyResponse;
+};
+
+export type FctContractStorageStateWithExpiryByBlockHourlyServiceListResponse =
+  FctContractStorageStateWithExpiryByBlockHourlyServiceListResponses[keyof FctContractStorageStateWithExpiryByBlockHourlyServiceListResponses];
+
+export type FctContractStorageStateWithExpiryByBlockHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+     */
+    expiry_policy: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_contract_storage_state_with_expiry_by_block_hourly/{expiry_policy}';
+};
+
+export type FctContractStorageStateWithExpiryByBlockHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctContractStorageStateWithExpiryByBlockHourlyServiceGetError =
+  FctContractStorageStateWithExpiryByBlockHourlyServiceGetErrors[keyof FctContractStorageStateWithExpiryByBlockHourlyServiceGetErrors];
+
+export type FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctContractStorageStateWithExpiryByBlockHourlyResponse;
+};
+
+export type FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponse =
+  FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponses[keyof FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponses];
 
 export type FctDataColumnAvailabilityByEpochServiceListData = {
   body?: never;
@@ -37277,50 +41880,82 @@ export type FctPreparedBlockServiceGetResponses = {
 export type FctPreparedBlockServiceGetResponse =
   FctPreparedBlockServiceGetResponses[keyof FctPreparedBlockServiceGetResponses];
 
-export type FctStorageSlotStateServiceListData = {
+export type FctStorageSlotStateByAddressDailyServiceListData = {
   body?: never;
   path?: never;
   query?: {
     /**
-     * The block number (filter: eq)
+     * The contract address (filter: eq)
      */
-    block_number_eq?: number;
+    address_eq?: string;
     /**
-     * The block number (filter: ne)
+     * The contract address (filter: ne)
      */
-    block_number_ne?: number;
+    address_ne?: string;
     /**
-     * The block number (filter: lt)
+     * The contract address (filter: contains)
      */
-    block_number_lt?: number;
+    address_contains?: string;
     /**
-     * The block number (filter: lte)
+     * The contract address (filter: starts_with)
      */
-    block_number_lte?: number;
+    address_starts_with?: string;
     /**
-     * The block number (filter: gt)
+     * The contract address (filter: ends_with)
      */
-    block_number_gt?: number;
+    address_ends_with?: string;
     /**
-     * The block number (filter: gte)
+     * The contract address (filter: like)
      */
-    block_number_gte?: number;
+    address_like?: string;
     /**
-     * The block number (filter: between_min)
+     * The contract address (filter: not_like)
      */
-    block_number_between_min?: number;
+    address_not_like?: string;
     /**
-     * The block number (filter: between_max_value)
+     * The contract address (filter: in_values) (comma-separated list)
      */
-    block_number_between_max_value?: number;
+    address_in_values?: string;
     /**
-     * The block number (filter: in_values) (comma-separated list)
+     * The contract address (filter: not_in_values) (comma-separated list)
      */
-    block_number_in_values?: string;
+    address_not_in_values?: string;
     /**
-     * The block number (filter: not_in_values) (comma-separated list)
+     * Start of the day period (filter: eq)
      */
-    block_number_not_in_values?: string;
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
     /**
      * Timestamp when the record was last updated (filter: eq)
      */
@@ -37362,171 +41997,91 @@ export type FctStorageSlotStateServiceListData = {
      */
     updated_date_time_not_in_values?: string;
     /**
-     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: eq)
-     */
-    slots_delta_eq?: number;
-    /**
-     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: ne)
-     */
-    slots_delta_ne?: number;
-    /**
-     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: lt)
-     */
-    slots_delta_lt?: number;
-    /**
-     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: lte)
-     */
-    slots_delta_lte?: number;
-    /**
-     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: gt)
-     */
-    slots_delta_gt?: number;
-    /**
-     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: gte)
-     */
-    slots_delta_gte?: number;
-    /**
-     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: between_min)
-     */
-    slots_delta_between_min?: number;
-    /**
-     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: between_max_value)
-     */
-    slots_delta_between_max_value?: number;
-    /**
-     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: in_values) (comma-separated list)
-     */
-    slots_delta_in_values?: string;
-    /**
-     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: not_in_values) (comma-separated list)
-     */
-    slots_delta_not_in_values?: string;
-    /**
-     * Change in effective bytes for this block (filter: eq)
-     */
-    bytes_delta_eq?: number;
-    /**
-     * Change in effective bytes for this block (filter: ne)
-     */
-    bytes_delta_ne?: number;
-    /**
-     * Change in effective bytes for this block (filter: lt)
-     */
-    bytes_delta_lt?: number;
-    /**
-     * Change in effective bytes for this block (filter: lte)
-     */
-    bytes_delta_lte?: number;
-    /**
-     * Change in effective bytes for this block (filter: gt)
-     */
-    bytes_delta_gt?: number;
-    /**
-     * Change in effective bytes for this block (filter: gte)
-     */
-    bytes_delta_gte?: number;
-    /**
-     * Change in effective bytes for this block (filter: between_min)
-     */
-    bytes_delta_between_min?: number;
-    /**
-     * Change in effective bytes for this block (filter: between_max_value)
-     */
-    bytes_delta_between_max_value?: number;
-    /**
-     * Change in effective bytes for this block (filter: in_values) (comma-separated list)
-     */
-    bytes_delta_in_values?: string;
-    /**
-     * Change in effective bytes for this block (filter: not_in_values) (comma-separated list)
-     */
-    bytes_delta_not_in_values?: string;
-    /**
-     * Cumulative count of active storage slots at this block (filter: eq)
+     * Cumulative count of active storage slots at end of day (filter: eq)
      */
     active_slots_eq?: number;
     /**
-     * Cumulative count of active storage slots at this block (filter: ne)
+     * Cumulative count of active storage slots at end of day (filter: ne)
      */
     active_slots_ne?: number;
     /**
-     * Cumulative count of active storage slots at this block (filter: lt)
+     * Cumulative count of active storage slots at end of day (filter: lt)
      */
     active_slots_lt?: number;
     /**
-     * Cumulative count of active storage slots at this block (filter: lte)
+     * Cumulative count of active storage slots at end of day (filter: lte)
      */
     active_slots_lte?: number;
     /**
-     * Cumulative count of active storage slots at this block (filter: gt)
+     * Cumulative count of active storage slots at end of day (filter: gt)
      */
     active_slots_gt?: number;
     /**
-     * Cumulative count of active storage slots at this block (filter: gte)
+     * Cumulative count of active storage slots at end of day (filter: gte)
      */
     active_slots_gte?: number;
     /**
-     * Cumulative count of active storage slots at this block (filter: between_min)
+     * Cumulative count of active storage slots at end of day (filter: between_min)
      */
     active_slots_between_min?: number;
     /**
-     * Cumulative count of active storage slots at this block (filter: between_max_value)
+     * Cumulative count of active storage slots at end of day (filter: between_max_value)
      */
     active_slots_between_max_value?: number;
     /**
-     * Cumulative count of active storage slots at this block (filter: in_values) (comma-separated list)
+     * Cumulative count of active storage slots at end of day (filter: in_values) (comma-separated list)
      */
     active_slots_in_values?: string;
     /**
-     * Cumulative count of active storage slots at this block (filter: not_in_values) (comma-separated list)
+     * Cumulative count of active storage slots at end of day (filter: not_in_values) (comma-separated list)
      */
     active_slots_not_in_values?: string;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (filter: eq)
+     * Cumulative sum of effective bytes at end of day (filter: eq)
      */
     effective_bytes_eq?: number;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (filter: ne)
+     * Cumulative sum of effective bytes at end of day (filter: ne)
      */
     effective_bytes_ne?: number;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (filter: lt)
+     * Cumulative sum of effective bytes at end of day (filter: lt)
      */
     effective_bytes_lt?: number;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (filter: lte)
+     * Cumulative sum of effective bytes at end of day (filter: lte)
      */
     effective_bytes_lte?: number;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (filter: gt)
+     * Cumulative sum of effective bytes at end of day (filter: gt)
      */
     effective_bytes_gt?: number;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (filter: gte)
+     * Cumulative sum of effective bytes at end of day (filter: gte)
      */
     effective_bytes_gte?: number;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (filter: between_min)
+     * Cumulative sum of effective bytes at end of day (filter: between_min)
      */
     effective_bytes_between_min?: number;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (filter: between_max_value)
+     * Cumulative sum of effective bytes at end of day (filter: between_max_value)
      */
     effective_bytes_between_max_value?: number;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (filter: in_values) (comma-separated list)
+     * Cumulative sum of effective bytes at end of day (filter: in_values) (comma-separated list)
      */
     effective_bytes_in_values?: string;
     /**
-     * Cumulative sum of effective bytes across all active slots at this block (filter: not_in_values) (comma-separated list)
+     * Cumulative sum of effective bytes at end of day (filter: not_in_values) (comma-separated list)
      */
     effective_bytes_not_in_values?: string;
     /**
-     * The maximum number of fct_storage_slot_state to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of fct_storage_slot_state_by_address_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListFctStorageSlotState` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListFctStorageSlotStateByAddressDaily` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -37534,62 +42089,330 @@ export type FctStorageSlotStateServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/fct_storage_slot_state';
+  url: '/api/v1/fct_storage_slot_state_by_address_daily';
 };
 
-export type FctStorageSlotStateServiceListErrors = {
+export type FctStorageSlotStateByAddressDailyServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateServiceListError =
-  FctStorageSlotStateServiceListErrors[keyof FctStorageSlotStateServiceListErrors];
+export type FctStorageSlotStateByAddressDailyServiceListError =
+  FctStorageSlotStateByAddressDailyServiceListErrors[keyof FctStorageSlotStateByAddressDailyServiceListErrors];
 
-export type FctStorageSlotStateServiceListResponses = {
+export type FctStorageSlotStateByAddressDailyServiceListResponses = {
   /**
    * OK
    */
-  200: ListFctStorageSlotStateResponse;
+  200: ListFctStorageSlotStateByAddressDailyResponse;
 };
 
-export type FctStorageSlotStateServiceListResponse =
-  FctStorageSlotStateServiceListResponses[keyof FctStorageSlotStateServiceListResponses];
+export type FctStorageSlotStateByAddressDailyServiceListResponse =
+  FctStorageSlotStateByAddressDailyServiceListResponses[keyof FctStorageSlotStateByAddressDailyServiceListResponses];
 
-export type FctStorageSlotStateServiceGetData = {
+export type FctStorageSlotStateByAddressDailyServiceGetData = {
   body?: never;
   path: {
     /**
-     * The block number
+     * The contract address
      */
-    block_number: number;
+    address: string;
   };
   query?: never;
-  url: '/api/v1/fct_storage_slot_state/{block_number}';
+  url: '/api/v1/fct_storage_slot_state_by_address_daily/{address}';
 };
 
-export type FctStorageSlotStateServiceGetErrors = {
+export type FctStorageSlotStateByAddressDailyServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateServiceGetError =
-  FctStorageSlotStateServiceGetErrors[keyof FctStorageSlotStateServiceGetErrors];
+export type FctStorageSlotStateByAddressDailyServiceGetError =
+  FctStorageSlotStateByAddressDailyServiceGetErrors[keyof FctStorageSlotStateByAddressDailyServiceGetErrors];
 
-export type FctStorageSlotStateServiceGetResponses = {
+export type FctStorageSlotStateByAddressDailyServiceGetResponses = {
   /**
    * OK
    */
-  200: GetFctStorageSlotStateResponse;
+  200: GetFctStorageSlotStateByAddressDailyResponse;
 };
 
-export type FctStorageSlotStateServiceGetResponse =
-  FctStorageSlotStateServiceGetResponses[keyof FctStorageSlotStateServiceGetResponses];
+export type FctStorageSlotStateByAddressDailyServiceGetResponse =
+  FctStorageSlotStateByAddressDailyServiceGetResponses[keyof FctStorageSlotStateByAddressDailyServiceGetResponses];
 
-export type FctStorageSlotStateDailyServiceListData = {
+export type FctStorageSlotStateByAddressHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of hour (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of hour (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of fct_storage_slot_state_by_address_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctStorageSlotStateByAddressHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_storage_slot_state_by_address_hourly';
+};
+
+export type FctStorageSlotStateByAddressHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotStateByAddressHourlyServiceListError =
+  FctStorageSlotStateByAddressHourlyServiceListErrors[keyof FctStorageSlotStateByAddressHourlyServiceListErrors];
+
+export type FctStorageSlotStateByAddressHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctStorageSlotStateByAddressHourlyResponse;
+};
+
+export type FctStorageSlotStateByAddressHourlyServiceListResponse =
+  FctStorageSlotStateByAddressHourlyServiceListResponses[keyof FctStorageSlotStateByAddressHourlyServiceListResponses];
+
+export type FctStorageSlotStateByAddressHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The contract address
+     */
+    address: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_storage_slot_state_by_address_hourly/{address}';
+};
+
+export type FctStorageSlotStateByAddressHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotStateByAddressHourlyServiceGetError =
+  FctStorageSlotStateByAddressHourlyServiceGetErrors[keyof FctStorageSlotStateByAddressHourlyServiceGetErrors];
+
+export type FctStorageSlotStateByAddressHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctStorageSlotStateByAddressHourlyResponse;
+};
+
+export type FctStorageSlotStateByAddressHourlyServiceGetResponse =
+  FctStorageSlotStateByAddressHourlyServiceGetResponses[keyof FctStorageSlotStateByAddressHourlyServiceGetResponses];
+
+export type FctStorageSlotStateByBlockDailyServiceListData = {
   body?: never;
   path?: never;
   query?: {
@@ -37750,11 +42573,11 @@ export type FctStorageSlotStateDailyServiceListData = {
      */
     effective_bytes_not_in_values?: string;
     /**
-     * The maximum number of fct_storage_slot_state_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of fct_storage_slot_state_by_block_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListFctStorageSlotStateDaily` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListFctStorageSlotStateByBlockDaily` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -37762,30 +42585,30 @@ export type FctStorageSlotStateDailyServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/fct_storage_slot_state_daily';
+  url: '/api/v1/fct_storage_slot_state_by_block_daily';
 };
 
-export type FctStorageSlotStateDailyServiceListErrors = {
+export type FctStorageSlotStateByBlockDailyServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateDailyServiceListError =
-  FctStorageSlotStateDailyServiceListErrors[keyof FctStorageSlotStateDailyServiceListErrors];
+export type FctStorageSlotStateByBlockDailyServiceListError =
+  FctStorageSlotStateByBlockDailyServiceListErrors[keyof FctStorageSlotStateByBlockDailyServiceListErrors];
 
-export type FctStorageSlotStateDailyServiceListResponses = {
+export type FctStorageSlotStateByBlockDailyServiceListResponses = {
   /**
    * OK
    */
-  200: ListFctStorageSlotStateDailyResponse;
+  200: ListFctStorageSlotStateByBlockDailyResponse;
 };
 
-export type FctStorageSlotStateDailyServiceListResponse =
-  FctStorageSlotStateDailyServiceListResponses[keyof FctStorageSlotStateDailyServiceListResponses];
+export type FctStorageSlotStateByBlockDailyServiceListResponse =
+  FctStorageSlotStateByBlockDailyServiceListResponses[keyof FctStorageSlotStateByBlockDailyServiceListResponses];
 
-export type FctStorageSlotStateDailyServiceGetData = {
+export type FctStorageSlotStateByBlockDailyServiceGetData = {
   body?: never;
   path: {
     /**
@@ -37794,30 +42617,30 @@ export type FctStorageSlotStateDailyServiceGetData = {
     day_start_date: string;
   };
   query?: never;
-  url: '/api/v1/fct_storage_slot_state_daily/{day_start_date}';
+  url: '/api/v1/fct_storage_slot_state_by_block_daily/{day_start_date}';
 };
 
-export type FctStorageSlotStateDailyServiceGetErrors = {
+export type FctStorageSlotStateByBlockDailyServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateDailyServiceGetError =
-  FctStorageSlotStateDailyServiceGetErrors[keyof FctStorageSlotStateDailyServiceGetErrors];
+export type FctStorageSlotStateByBlockDailyServiceGetError =
+  FctStorageSlotStateByBlockDailyServiceGetErrors[keyof FctStorageSlotStateByBlockDailyServiceGetErrors];
 
-export type FctStorageSlotStateDailyServiceGetResponses = {
+export type FctStorageSlotStateByBlockDailyServiceGetResponses = {
   /**
    * OK
    */
-  200: GetFctStorageSlotStateDailyResponse;
+  200: GetFctStorageSlotStateByBlockDailyResponse;
 };
 
-export type FctStorageSlotStateDailyServiceGetResponse =
-  FctStorageSlotStateDailyServiceGetResponses[keyof FctStorageSlotStateDailyServiceGetResponses];
+export type FctStorageSlotStateByBlockDailyServiceGetResponse =
+  FctStorageSlotStateByBlockDailyServiceGetResponses[keyof FctStorageSlotStateByBlockDailyServiceGetResponses];
 
-export type FctStorageSlotStateHourlyServiceListData = {
+export type FctStorageSlotStateByBlockHourlyServiceListData = {
   body?: never;
   path?: never;
   query?: {
@@ -37982,11 +42805,11 @@ export type FctStorageSlotStateHourlyServiceListData = {
      */
     effective_bytes_not_in_values?: string;
     /**
-     * The maximum number of fct_storage_slot_state_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of fct_storage_slot_state_by_block_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListFctStorageSlotStateHourly` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListFctStorageSlotStateByBlockHourly` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -37994,30 +42817,30 @@ export type FctStorageSlotStateHourlyServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/fct_storage_slot_state_hourly';
+  url: '/api/v1/fct_storage_slot_state_by_block_hourly';
 };
 
-export type FctStorageSlotStateHourlyServiceListErrors = {
+export type FctStorageSlotStateByBlockHourlyServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateHourlyServiceListError =
-  FctStorageSlotStateHourlyServiceListErrors[keyof FctStorageSlotStateHourlyServiceListErrors];
+export type FctStorageSlotStateByBlockHourlyServiceListError =
+  FctStorageSlotStateByBlockHourlyServiceListErrors[keyof FctStorageSlotStateByBlockHourlyServiceListErrors];
 
-export type FctStorageSlotStateHourlyServiceListResponses = {
+export type FctStorageSlotStateByBlockHourlyServiceListResponses = {
   /**
    * OK
    */
-  200: ListFctStorageSlotStateHourlyResponse;
+  200: ListFctStorageSlotStateByBlockHourlyResponse;
 };
 
-export type FctStorageSlotStateHourlyServiceListResponse =
-  FctStorageSlotStateHourlyServiceListResponses[keyof FctStorageSlotStateHourlyServiceListResponses];
+export type FctStorageSlotStateByBlockHourlyServiceListResponse =
+  FctStorageSlotStateByBlockHourlyServiceListResponses[keyof FctStorageSlotStateByBlockHourlyServiceListResponses];
 
-export type FctStorageSlotStateHourlyServiceGetData = {
+export type FctStorageSlotStateByBlockHourlyServiceGetData = {
   body?: never;
   path: {
     /**
@@ -38026,33 +42849,69 @@ export type FctStorageSlotStateHourlyServiceGetData = {
     hour_start_date_time: number;
   };
   query?: never;
-  url: '/api/v1/fct_storage_slot_state_hourly/{hour_start_date_time}';
+  url: '/api/v1/fct_storage_slot_state_by_block_hourly/{hour_start_date_time}';
 };
 
-export type FctStorageSlotStateHourlyServiceGetErrors = {
+export type FctStorageSlotStateByBlockHourlyServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateHourlyServiceGetError =
-  FctStorageSlotStateHourlyServiceGetErrors[keyof FctStorageSlotStateHourlyServiceGetErrors];
+export type FctStorageSlotStateByBlockHourlyServiceGetError =
+  FctStorageSlotStateByBlockHourlyServiceGetErrors[keyof FctStorageSlotStateByBlockHourlyServiceGetErrors];
 
-export type FctStorageSlotStateHourlyServiceGetResponses = {
+export type FctStorageSlotStateByBlockHourlyServiceGetResponses = {
   /**
    * OK
    */
-  200: GetFctStorageSlotStateHourlyResponse;
+  200: GetFctStorageSlotStateByBlockHourlyResponse;
 };
 
-export type FctStorageSlotStateHourlyServiceGetResponse =
-  FctStorageSlotStateHourlyServiceGetResponses[keyof FctStorageSlotStateHourlyServiceGetResponses];
+export type FctStorageSlotStateByBlockHourlyServiceGetResponse =
+  FctStorageSlotStateByBlockHourlyServiceGetResponses[keyof FctStorageSlotStateByBlockHourlyServiceGetResponses];
 
-export type FctStorageSlotStateWithExpiryServiceListData = {
+export type FctStorageSlotStateWithExpiryByAddressDailyServiceListData = {
   body?: never;
   path?: never;
   query?: {
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
     /**
      * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
      */
@@ -38090,45 +42949,41 @@ export type FctStorageSlotStateWithExpiryServiceListData = {
      */
     expiry_policy_not_in_values?: string;
     /**
-     * The block number (filter: eq)
+     * Start of the day period (filter: eq)
      */
-    block_number_eq?: number;
+    day_start_date_eq?: string;
     /**
-     * The block number (filter: ne)
+     * Start of the day period (filter: ne)
      */
-    block_number_ne?: number;
+    day_start_date_ne?: string;
     /**
-     * The block number (filter: lt)
+     * Start of the day period (filter: contains)
      */
-    block_number_lt?: number;
+    day_start_date_contains?: string;
     /**
-     * The block number (filter: lte)
+     * Start of the day period (filter: starts_with)
      */
-    block_number_lte?: number;
+    day_start_date_starts_with?: string;
     /**
-     * The block number (filter: gt)
+     * Start of the day period (filter: ends_with)
      */
-    block_number_gt?: number;
+    day_start_date_ends_with?: string;
     /**
-     * The block number (filter: gte)
+     * Start of the day period (filter: like)
      */
-    block_number_gte?: number;
+    day_start_date_like?: string;
     /**
-     * The block number (filter: between_min)
+     * Start of the day period (filter: not_like)
      */
-    block_number_between_min?: number;
+    day_start_date_not_like?: string;
     /**
-     * The block number (filter: between_max_value)
+     * Start of the day period (filter: in_values) (comma-separated list)
      */
-    block_number_between_max_value?: number;
+    day_start_date_in_values?: string;
     /**
-     * The block number (filter: in_values) (comma-separated list)
+     * Start of the day period (filter: not_in_values) (comma-separated list)
      */
-    block_number_in_values?: string;
-    /**
-     * The block number (filter: not_in_values) (comma-separated list)
-     */
-    block_number_not_in_values?: string;
+    day_start_date_not_in_values?: string;
     /**
      * Timestamp when the record was last updated (filter: eq)
      */
@@ -38170,251 +43025,91 @@ export type FctStorageSlotStateWithExpiryServiceListData = {
      */
     updated_date_time_not_in_values?: string;
     /**
-     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: eq)
-     */
-    net_slots_delta_eq?: number;
-    /**
-     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: ne)
-     */
-    net_slots_delta_ne?: number;
-    /**
-     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: lt)
-     */
-    net_slots_delta_lt?: number;
-    /**
-     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: lte)
-     */
-    net_slots_delta_lte?: number;
-    /**
-     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: gt)
-     */
-    net_slots_delta_gt?: number;
-    /**
-     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: gte)
-     */
-    net_slots_delta_gte?: number;
-    /**
-     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: between_min)
-     */
-    net_slots_delta_between_min?: number;
-    /**
-     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: between_max_value)
-     */
-    net_slots_delta_between_max_value?: number;
-    /**
-     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: in_values) (comma-separated list)
-     */
-    net_slots_delta_in_values?: string;
-    /**
-     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: not_in_values) (comma-separated list)
-     */
-    net_slots_delta_not_in_values?: string;
-    /**
-     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: eq)
-     */
-    net_bytes_delta_eq?: number;
-    /**
-     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: ne)
-     */
-    net_bytes_delta_ne?: number;
-    /**
-     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: lt)
-     */
-    net_bytes_delta_lt?: number;
-    /**
-     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: lte)
-     */
-    net_bytes_delta_lte?: number;
-    /**
-     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: gt)
-     */
-    net_bytes_delta_gt?: number;
-    /**
-     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: gte)
-     */
-    net_bytes_delta_gte?: number;
-    /**
-     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: between_min)
-     */
-    net_bytes_delta_between_min?: number;
-    /**
-     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: between_max_value)
-     */
-    net_bytes_delta_between_max_value?: number;
-    /**
-     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: in_values) (comma-separated list)
-     */
-    net_bytes_delta_in_values?: string;
-    /**
-     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: not_in_values) (comma-separated list)
-     */
-    net_bytes_delta_not_in_values?: string;
-    /**
-     * Cumulative net slot adjustment up to this block (filter: eq)
-     */
-    cumulative_net_slots_eq?: number;
-    /**
-     * Cumulative net slot adjustment up to this block (filter: ne)
-     */
-    cumulative_net_slots_ne?: number;
-    /**
-     * Cumulative net slot adjustment up to this block (filter: lt)
-     */
-    cumulative_net_slots_lt?: number;
-    /**
-     * Cumulative net slot adjustment up to this block (filter: lte)
-     */
-    cumulative_net_slots_lte?: number;
-    /**
-     * Cumulative net slot adjustment up to this block (filter: gt)
-     */
-    cumulative_net_slots_gt?: number;
-    /**
-     * Cumulative net slot adjustment up to this block (filter: gte)
-     */
-    cumulative_net_slots_gte?: number;
-    /**
-     * Cumulative net slot adjustment up to this block (filter: between_min)
-     */
-    cumulative_net_slots_between_min?: number;
-    /**
-     * Cumulative net slot adjustment up to this block (filter: between_max_value)
-     */
-    cumulative_net_slots_between_max_value?: number;
-    /**
-     * Cumulative net slot adjustment up to this block (filter: in_values) (comma-separated list)
-     */
-    cumulative_net_slots_in_values?: string;
-    /**
-     * Cumulative net slot adjustment up to this block (filter: not_in_values) (comma-separated list)
-     */
-    cumulative_net_slots_not_in_values?: string;
-    /**
-     * Cumulative net bytes adjustment up to this block (filter: eq)
-     */
-    cumulative_net_bytes_eq?: number;
-    /**
-     * Cumulative net bytes adjustment up to this block (filter: ne)
-     */
-    cumulative_net_bytes_ne?: number;
-    /**
-     * Cumulative net bytes adjustment up to this block (filter: lt)
-     */
-    cumulative_net_bytes_lt?: number;
-    /**
-     * Cumulative net bytes adjustment up to this block (filter: lte)
-     */
-    cumulative_net_bytes_lte?: number;
-    /**
-     * Cumulative net bytes adjustment up to this block (filter: gt)
-     */
-    cumulative_net_bytes_gt?: number;
-    /**
-     * Cumulative net bytes adjustment up to this block (filter: gte)
-     */
-    cumulative_net_bytes_gte?: number;
-    /**
-     * Cumulative net bytes adjustment up to this block (filter: between_min)
-     */
-    cumulative_net_bytes_between_min?: number;
-    /**
-     * Cumulative net bytes adjustment up to this block (filter: between_max_value)
-     */
-    cumulative_net_bytes_between_max_value?: number;
-    /**
-     * Cumulative net bytes adjustment up to this block (filter: in_values) (comma-separated list)
-     */
-    cumulative_net_bytes_in_values?: string;
-    /**
-     * Cumulative net bytes adjustment up to this block (filter: not_in_values) (comma-separated list)
-     */
-    cumulative_net_bytes_not_in_values?: string;
-    /**
-     * Cumulative count of active storage slots at this block (with expiry applied) (filter: eq)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: eq)
      */
     active_slots_eq?: number;
     /**
-     * Cumulative count of active storage slots at this block (with expiry applied) (filter: ne)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: ne)
      */
     active_slots_ne?: number;
     /**
-     * Cumulative count of active storage slots at this block (with expiry applied) (filter: lt)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: lt)
      */
     active_slots_lt?: number;
     /**
-     * Cumulative count of active storage slots at this block (with expiry applied) (filter: lte)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: lte)
      */
     active_slots_lte?: number;
     /**
-     * Cumulative count of active storage slots at this block (with expiry applied) (filter: gt)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: gt)
      */
     active_slots_gt?: number;
     /**
-     * Cumulative count of active storage slots at this block (with expiry applied) (filter: gte)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: gte)
      */
     active_slots_gte?: number;
     /**
-     * Cumulative count of active storage slots at this block (with expiry applied) (filter: between_min)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: between_min)
      */
     active_slots_between_min?: number;
     /**
-     * Cumulative count of active storage slots at this block (with expiry applied) (filter: between_max_value)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: between_max_value)
      */
     active_slots_between_max_value?: number;
     /**
-     * Cumulative count of active storage slots at this block (with expiry applied) (filter: in_values) (comma-separated list)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: in_values) (comma-separated list)
      */
     active_slots_in_values?: string;
     /**
-     * Cumulative count of active storage slots at this block (with expiry applied) (filter: not_in_values) (comma-separated list)
+     * Cumulative count of active storage slots at end of day (with expiry applied) (filter: not_in_values) (comma-separated list)
      */
     active_slots_not_in_values?: string;
     /**
-     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: eq)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: eq)
      */
     effective_bytes_eq?: number;
     /**
-     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: ne)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: ne)
      */
     effective_bytes_ne?: number;
     /**
-     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: lt)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: lt)
      */
     effective_bytes_lt?: number;
     /**
-     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: lte)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: lte)
      */
     effective_bytes_lte?: number;
     /**
-     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: gt)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: gt)
      */
     effective_bytes_gt?: number;
     /**
-     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: gte)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: gte)
      */
     effective_bytes_gte?: number;
     /**
-     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: between_min)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: between_min)
      */
     effective_bytes_between_min?: number;
     /**
-     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: between_max_value)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: between_max_value)
      */
     effective_bytes_between_max_value?: number;
     /**
-     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: in_values) (comma-separated list)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: in_values) (comma-separated list)
      */
     effective_bytes_in_values?: string;
     /**
-     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: not_in_values) (comma-separated list)
+     * Cumulative sum of effective bytes at end of day (with expiry applied) (filter: not_in_values) (comma-separated list)
      */
     effective_bytes_not_in_values?: string;
     /**
-     * The maximum number of fct_storage_slot_state_with_expiry to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of fct_storage_slot_state_with_expiry_by_address_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListFctStorageSlotStateWithExpiry` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListFctStorageSlotStateWithExpiryByAddressDaily` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -38422,62 +43117,366 @@ export type FctStorageSlotStateWithExpiryServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/fct_storage_slot_state_with_expiry';
+  url: '/api/v1/fct_storage_slot_state_with_expiry_by_address_daily';
 };
 
-export type FctStorageSlotStateWithExpiryServiceListErrors = {
+export type FctStorageSlotStateWithExpiryByAddressDailyServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateWithExpiryServiceListError =
-  FctStorageSlotStateWithExpiryServiceListErrors[keyof FctStorageSlotStateWithExpiryServiceListErrors];
+export type FctStorageSlotStateWithExpiryByAddressDailyServiceListError =
+  FctStorageSlotStateWithExpiryByAddressDailyServiceListErrors[keyof FctStorageSlotStateWithExpiryByAddressDailyServiceListErrors];
 
-export type FctStorageSlotStateWithExpiryServiceListResponses = {
+export type FctStorageSlotStateWithExpiryByAddressDailyServiceListResponses = {
   /**
    * OK
    */
-  200: ListFctStorageSlotStateWithExpiryResponse;
+  200: ListFctStorageSlotStateWithExpiryByAddressDailyResponse;
 };
 
-export type FctStorageSlotStateWithExpiryServiceListResponse =
-  FctStorageSlotStateWithExpiryServiceListResponses[keyof FctStorageSlotStateWithExpiryServiceListResponses];
+export type FctStorageSlotStateWithExpiryByAddressDailyServiceListResponse =
+  FctStorageSlotStateWithExpiryByAddressDailyServiceListResponses[keyof FctStorageSlotStateWithExpiryByAddressDailyServiceListResponses];
 
-export type FctStorageSlotStateWithExpiryServiceGetData = {
+export type FctStorageSlotStateWithExpiryByAddressDailyServiceGetData = {
   body?: never;
   path: {
     /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+     * The contract address
      */
-    expiry_policy: string;
+    address: string;
   };
   query?: never;
-  url: '/api/v1/fct_storage_slot_state_with_expiry/{expiry_policy}';
+  url: '/api/v1/fct_storage_slot_state_with_expiry_by_address_daily/{address}';
 };
 
-export type FctStorageSlotStateWithExpiryServiceGetErrors = {
+export type FctStorageSlotStateWithExpiryByAddressDailyServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateWithExpiryServiceGetError =
-  FctStorageSlotStateWithExpiryServiceGetErrors[keyof FctStorageSlotStateWithExpiryServiceGetErrors];
+export type FctStorageSlotStateWithExpiryByAddressDailyServiceGetError =
+  FctStorageSlotStateWithExpiryByAddressDailyServiceGetErrors[keyof FctStorageSlotStateWithExpiryByAddressDailyServiceGetErrors];
 
-export type FctStorageSlotStateWithExpiryServiceGetResponses = {
+export type FctStorageSlotStateWithExpiryByAddressDailyServiceGetResponses = {
   /**
    * OK
    */
-  200: GetFctStorageSlotStateWithExpiryResponse;
+  200: GetFctStorageSlotStateWithExpiryByAddressDailyResponse;
 };
 
-export type FctStorageSlotStateWithExpiryServiceGetResponse =
-  FctStorageSlotStateWithExpiryServiceGetResponses[keyof FctStorageSlotStateWithExpiryServiceGetResponses];
+export type FctStorageSlotStateWithExpiryByAddressDailyServiceGetResponse =
+  FctStorageSlotStateWithExpiryByAddressDailyServiceGetResponses[keyof FctStorageSlotStateWithExpiryByAddressDailyServiceGetResponses];
 
-export type FctStorageSlotStateWithExpiryDailyServiceListData = {
+export type FctStorageSlotStateWithExpiryByAddressHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at end of hour (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at end of hour (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of fct_storage_slot_state_with_expiry_by_address_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctStorageSlotStateWithExpiryByAddressHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_storage_slot_state_with_expiry_by_address_hourly';
+};
+
+export type FctStorageSlotStateWithExpiryByAddressHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotStateWithExpiryByAddressHourlyServiceListError =
+  FctStorageSlotStateWithExpiryByAddressHourlyServiceListErrors[keyof FctStorageSlotStateWithExpiryByAddressHourlyServiceListErrors];
+
+export type FctStorageSlotStateWithExpiryByAddressHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctStorageSlotStateWithExpiryByAddressHourlyResponse;
+};
+
+export type FctStorageSlotStateWithExpiryByAddressHourlyServiceListResponse =
+  FctStorageSlotStateWithExpiryByAddressHourlyServiceListResponses[keyof FctStorageSlotStateWithExpiryByAddressHourlyServiceListResponses];
+
+export type FctStorageSlotStateWithExpiryByAddressHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The contract address
+     */
+    address: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_storage_slot_state_with_expiry_by_address_hourly/{address}';
+};
+
+export type FctStorageSlotStateWithExpiryByAddressHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotStateWithExpiryByAddressHourlyServiceGetError =
+  FctStorageSlotStateWithExpiryByAddressHourlyServiceGetErrors[keyof FctStorageSlotStateWithExpiryByAddressHourlyServiceGetErrors];
+
+export type FctStorageSlotStateWithExpiryByAddressHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctStorageSlotStateWithExpiryByAddressHourlyResponse;
+};
+
+export type FctStorageSlotStateWithExpiryByAddressHourlyServiceGetResponse =
+  FctStorageSlotStateWithExpiryByAddressHourlyServiceGetResponses[keyof FctStorageSlotStateWithExpiryByAddressHourlyServiceGetResponses];
+
+export type FctStorageSlotStateWithExpiryByBlockDailyServiceListData = {
   body?: never;
   path?: never;
   query?: {
@@ -38674,11 +43673,11 @@ export type FctStorageSlotStateWithExpiryDailyServiceListData = {
      */
     effective_bytes_not_in_values?: string;
     /**
-     * The maximum number of fct_storage_slot_state_with_expiry_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of fct_storage_slot_state_with_expiry_by_block_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListFctStorageSlotStateWithExpiryDaily` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListFctStorageSlotStateWithExpiryByBlockDaily` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -38686,30 +43685,30 @@ export type FctStorageSlotStateWithExpiryDailyServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/fct_storage_slot_state_with_expiry_daily';
+  url: '/api/v1/fct_storage_slot_state_with_expiry_by_block_daily';
 };
 
-export type FctStorageSlotStateWithExpiryDailyServiceListErrors = {
+export type FctStorageSlotStateWithExpiryByBlockDailyServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateWithExpiryDailyServiceListError =
-  FctStorageSlotStateWithExpiryDailyServiceListErrors[keyof FctStorageSlotStateWithExpiryDailyServiceListErrors];
+export type FctStorageSlotStateWithExpiryByBlockDailyServiceListError =
+  FctStorageSlotStateWithExpiryByBlockDailyServiceListErrors[keyof FctStorageSlotStateWithExpiryByBlockDailyServiceListErrors];
 
-export type FctStorageSlotStateWithExpiryDailyServiceListResponses = {
+export type FctStorageSlotStateWithExpiryByBlockDailyServiceListResponses = {
   /**
    * OK
    */
-  200: ListFctStorageSlotStateWithExpiryDailyResponse;
+  200: ListFctStorageSlotStateWithExpiryByBlockDailyResponse;
 };
 
-export type FctStorageSlotStateWithExpiryDailyServiceListResponse =
-  FctStorageSlotStateWithExpiryDailyServiceListResponses[keyof FctStorageSlotStateWithExpiryDailyServiceListResponses];
+export type FctStorageSlotStateWithExpiryByBlockDailyServiceListResponse =
+  FctStorageSlotStateWithExpiryByBlockDailyServiceListResponses[keyof FctStorageSlotStateWithExpiryByBlockDailyServiceListResponses];
 
-export type FctStorageSlotStateWithExpiryDailyServiceGetData = {
+export type FctStorageSlotStateWithExpiryByBlockDailyServiceGetData = {
   body?: never;
   path: {
     /**
@@ -38718,30 +43717,30 @@ export type FctStorageSlotStateWithExpiryDailyServiceGetData = {
     expiry_policy: string;
   };
   query?: never;
-  url: '/api/v1/fct_storage_slot_state_with_expiry_daily/{expiry_policy}';
+  url: '/api/v1/fct_storage_slot_state_with_expiry_by_block_daily/{expiry_policy}';
 };
 
-export type FctStorageSlotStateWithExpiryDailyServiceGetErrors = {
+export type FctStorageSlotStateWithExpiryByBlockDailyServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateWithExpiryDailyServiceGetError =
-  FctStorageSlotStateWithExpiryDailyServiceGetErrors[keyof FctStorageSlotStateWithExpiryDailyServiceGetErrors];
+export type FctStorageSlotStateWithExpiryByBlockDailyServiceGetError =
+  FctStorageSlotStateWithExpiryByBlockDailyServiceGetErrors[keyof FctStorageSlotStateWithExpiryByBlockDailyServiceGetErrors];
 
-export type FctStorageSlotStateWithExpiryDailyServiceGetResponses = {
+export type FctStorageSlotStateWithExpiryByBlockDailyServiceGetResponses = {
   /**
    * OK
    */
-  200: GetFctStorageSlotStateWithExpiryDailyResponse;
+  200: GetFctStorageSlotStateWithExpiryByBlockDailyResponse;
 };
 
-export type FctStorageSlotStateWithExpiryDailyServiceGetResponse =
-  FctStorageSlotStateWithExpiryDailyServiceGetResponses[keyof FctStorageSlotStateWithExpiryDailyServiceGetResponses];
+export type FctStorageSlotStateWithExpiryByBlockDailyServiceGetResponse =
+  FctStorageSlotStateWithExpiryByBlockDailyServiceGetResponses[keyof FctStorageSlotStateWithExpiryByBlockDailyServiceGetResponses];
 
-export type FctStorageSlotStateWithExpiryHourlyServiceListData = {
+export type FctStorageSlotStateWithExpiryByBlockHourlyServiceListData = {
   body?: never;
   path?: never;
   query?: {
@@ -38942,11 +43941,11 @@ export type FctStorageSlotStateWithExpiryHourlyServiceListData = {
      */
     effective_bytes_not_in_values?: string;
     /**
-     * The maximum number of fct_storage_slot_state_with_expiry_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of fct_storage_slot_state_with_expiry_by_block_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListFctStorageSlotStateWithExpiryHourly` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListFctStorageSlotStateWithExpiryByBlockHourly` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -38954,30 +43953,30 @@ export type FctStorageSlotStateWithExpiryHourlyServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/fct_storage_slot_state_with_expiry_hourly';
+  url: '/api/v1/fct_storage_slot_state_with_expiry_by_block_hourly';
 };
 
-export type FctStorageSlotStateWithExpiryHourlyServiceListErrors = {
+export type FctStorageSlotStateWithExpiryByBlockHourlyServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateWithExpiryHourlyServiceListError =
-  FctStorageSlotStateWithExpiryHourlyServiceListErrors[keyof FctStorageSlotStateWithExpiryHourlyServiceListErrors];
+export type FctStorageSlotStateWithExpiryByBlockHourlyServiceListError =
+  FctStorageSlotStateWithExpiryByBlockHourlyServiceListErrors[keyof FctStorageSlotStateWithExpiryByBlockHourlyServiceListErrors];
 
-export type FctStorageSlotStateWithExpiryHourlyServiceListResponses = {
+export type FctStorageSlotStateWithExpiryByBlockHourlyServiceListResponses = {
   /**
    * OK
    */
-  200: ListFctStorageSlotStateWithExpiryHourlyResponse;
+  200: ListFctStorageSlotStateWithExpiryByBlockHourlyResponse;
 };
 
-export type FctStorageSlotStateWithExpiryHourlyServiceListResponse =
-  FctStorageSlotStateWithExpiryHourlyServiceListResponses[keyof FctStorageSlotStateWithExpiryHourlyServiceListResponses];
+export type FctStorageSlotStateWithExpiryByBlockHourlyServiceListResponse =
+  FctStorageSlotStateWithExpiryByBlockHourlyServiceListResponses[keyof FctStorageSlotStateWithExpiryByBlockHourlyServiceListResponses];
 
-export type FctStorageSlotStateWithExpiryHourlyServiceGetData = {
+export type FctStorageSlotStateWithExpiryByBlockHourlyServiceGetData = {
   body?: never;
   path: {
     /**
@@ -38986,28 +43985,1892 @@ export type FctStorageSlotStateWithExpiryHourlyServiceGetData = {
     expiry_policy: string;
   };
   query?: never;
-  url: '/api/v1/fct_storage_slot_state_with_expiry_hourly/{expiry_policy}';
+  url: '/api/v1/fct_storage_slot_state_with_expiry_by_block_hourly/{expiry_policy}';
 };
 
-export type FctStorageSlotStateWithExpiryHourlyServiceGetErrors = {
+export type FctStorageSlotStateWithExpiryByBlockHourlyServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctStorageSlotStateWithExpiryHourlyServiceGetError =
-  FctStorageSlotStateWithExpiryHourlyServiceGetErrors[keyof FctStorageSlotStateWithExpiryHourlyServiceGetErrors];
+export type FctStorageSlotStateWithExpiryByBlockHourlyServiceGetError =
+  FctStorageSlotStateWithExpiryByBlockHourlyServiceGetErrors[keyof FctStorageSlotStateWithExpiryByBlockHourlyServiceGetErrors];
 
-export type FctStorageSlotStateWithExpiryHourlyServiceGetResponses = {
+export type FctStorageSlotStateWithExpiryByBlockHourlyServiceGetResponses = {
   /**
    * OK
    */
-  200: GetFctStorageSlotStateWithExpiryHourlyResponse;
+  200: GetFctStorageSlotStateWithExpiryByBlockHourlyResponse;
 };
 
-export type FctStorageSlotStateWithExpiryHourlyServiceGetResponse =
-  FctStorageSlotStateWithExpiryHourlyServiceGetResponses[keyof FctStorageSlotStateWithExpiryHourlyServiceGetResponses];
+export type FctStorageSlotStateWithExpiryByBlockHourlyServiceGetResponse =
+  FctStorageSlotStateWithExpiryByBlockHourlyServiceGetResponses[keyof FctStorageSlotStateWithExpiryByBlockHourlyServiceGetResponses];
+
+export type FctStorageSlotTop100ByBytesServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Rank by effective bytes (1=highest) (filter: eq)
+     */
+    rank_eq?: number;
+    /**
+     * Rank by effective bytes (1=highest) (filter: ne)
+     */
+    rank_ne?: number;
+    /**
+     * Rank by effective bytes (1=highest) (filter: lt)
+     */
+    rank_lt?: number;
+    /**
+     * Rank by effective bytes (1=highest) (filter: lte)
+     */
+    rank_lte?: number;
+    /**
+     * Rank by effective bytes (1=highest) (filter: gt)
+     */
+    rank_gt?: number;
+    /**
+     * Rank by effective bytes (1=highest) (filter: gte)
+     */
+    rank_gte?: number;
+    /**
+     * Rank by effective bytes (1=highest) (filter: between_min)
+     */
+    rank_between_min?: number;
+    /**
+     * Rank by effective bytes (1=highest) (filter: between_max_value)
+     */
+    rank_between_max_value?: number;
+    /**
+     * Rank by effective bytes (1=highest) (filter: in_values) (comma-separated list)
+     */
+    rank_in_values?: string;
+    /**
+     * Rank by effective bytes (1=highest) (filter: not_in_values) (comma-separated list)
+     */
+    rank_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    contract_address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    contract_address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    contract_address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    contract_address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    contract_address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    contract_address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    contract_address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    contract_address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    contract_address_not_in_values?: string;
+    /**
+     * Effective bytes of storage for this contract (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Effective bytes of storage for this contract (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Effective bytes of storage for this contract (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Effective bytes of storage for this contract (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Effective bytes of storage for this contract (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Effective bytes of storage for this contract (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Effective bytes of storage for this contract (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Effective bytes of storage for this contract (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Effective bytes of storage for this contract (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Effective bytes of storage for this contract (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * Number of active storage slots for this contract (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Number of active storage slots for this contract (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Number of active storage slots for this contract (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Number of active storage slots for this contract (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Number of active storage slots for this contract (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Number of active storage slots for this contract (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Number of active storage slots for this contract (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Number of active storage slots for this contract (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Number of active storage slots for this contract (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Number of active storage slots for this contract (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Owner key identifier (filter: eq)
+     */
+    owner_key_eq?: string;
+    /**
+     * Owner key identifier (filter: ne)
+     */
+    owner_key_ne?: string;
+    /**
+     * Owner key identifier (filter: contains)
+     */
+    owner_key_contains?: string;
+    /**
+     * Owner key identifier (filter: starts_with)
+     */
+    owner_key_starts_with?: string;
+    /**
+     * Owner key identifier (filter: ends_with)
+     */
+    owner_key_ends_with?: string;
+    /**
+     * Owner key identifier (filter: like)
+     */
+    owner_key_like?: string;
+    /**
+     * Owner key identifier (filter: not_like)
+     */
+    owner_key_not_like?: string;
+    /**
+     * Owner key identifier (filter: in_values) (comma-separated list)
+     */
+    owner_key_in_values?: string;
+    /**
+     * Owner key identifier (filter: not_in_values) (comma-separated list)
+     */
+    owner_key_not_in_values?: string;
+    /**
+     * Account owner of the contract (filter: eq)
+     */
+    account_owner_eq?: string;
+    /**
+     * Account owner of the contract (filter: ne)
+     */
+    account_owner_ne?: string;
+    /**
+     * Account owner of the contract (filter: contains)
+     */
+    account_owner_contains?: string;
+    /**
+     * Account owner of the contract (filter: starts_with)
+     */
+    account_owner_starts_with?: string;
+    /**
+     * Account owner of the contract (filter: ends_with)
+     */
+    account_owner_ends_with?: string;
+    /**
+     * Account owner of the contract (filter: like)
+     */
+    account_owner_like?: string;
+    /**
+     * Account owner of the contract (filter: not_like)
+     */
+    account_owner_not_like?: string;
+    /**
+     * Account owner of the contract (filter: in_values) (comma-separated list)
+     */
+    account_owner_in_values?: string;
+    /**
+     * Account owner of the contract (filter: not_in_values) (comma-separated list)
+     */
+    account_owner_not_in_values?: string;
+    /**
+     * Name of the contract (filter: eq)
+     */
+    contract_name_eq?: string;
+    /**
+     * Name of the contract (filter: ne)
+     */
+    contract_name_ne?: string;
+    /**
+     * Name of the contract (filter: contains)
+     */
+    contract_name_contains?: string;
+    /**
+     * Name of the contract (filter: starts_with)
+     */
+    contract_name_starts_with?: string;
+    /**
+     * Name of the contract (filter: ends_with)
+     */
+    contract_name_ends_with?: string;
+    /**
+     * Name of the contract (filter: like)
+     */
+    contract_name_like?: string;
+    /**
+     * Name of the contract (filter: not_like)
+     */
+    contract_name_not_like?: string;
+    /**
+     * Name of the contract (filter: in_values) (comma-separated list)
+     */
+    contract_name_in_values?: string;
+    /**
+     * Name of the contract (filter: not_in_values) (comma-separated list)
+     */
+    contract_name_not_in_values?: string;
+    /**
+     * Factory contract or deployer address (filter: eq)
+     */
+    factory_contract_eq?: string;
+    /**
+     * Factory contract or deployer address (filter: ne)
+     */
+    factory_contract_ne?: string;
+    /**
+     * Factory contract or deployer address (filter: contains)
+     */
+    factory_contract_contains?: string;
+    /**
+     * Factory contract or deployer address (filter: starts_with)
+     */
+    factory_contract_starts_with?: string;
+    /**
+     * Factory contract or deployer address (filter: ends_with)
+     */
+    factory_contract_ends_with?: string;
+    /**
+     * Factory contract or deployer address (filter: like)
+     */
+    factory_contract_like?: string;
+    /**
+     * Factory contract or deployer address (filter: not_like)
+     */
+    factory_contract_not_like?: string;
+    /**
+     * Factory contract or deployer address (filter: in_values) (comma-separated list)
+     */
+    factory_contract_in_values?: string;
+    /**
+     * Factory contract or deployer address (filter: not_in_values) (comma-separated list)
+     */
+    factory_contract_not_in_values?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: eq)
+     */
+    usage_category_eq?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: ne)
+     */
+    usage_category_ne?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: contains)
+     */
+    usage_category_contains?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: starts_with)
+     */
+    usage_category_starts_with?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: ends_with)
+     */
+    usage_category_ends_with?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: like)
+     */
+    usage_category_like?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: not_like)
+     */
+    usage_category_not_like?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: in_values) (comma-separated list)
+     */
+    usage_category_in_values?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: not_in_values) (comma-separated list)
+     */
+    usage_category_not_in_values?: string;
+    /**
+     * The maximum number of fct_storage_slot_top_100_by_bytes to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctStorageSlotTop100ByBytes` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_storage_slot_top_100_by_bytes';
+};
+
+export type FctStorageSlotTop100ByBytesServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotTop100ByBytesServiceListError =
+  FctStorageSlotTop100ByBytesServiceListErrors[keyof FctStorageSlotTop100ByBytesServiceListErrors];
+
+export type FctStorageSlotTop100ByBytesServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctStorageSlotTop100ByBytesResponse;
+};
+
+export type FctStorageSlotTop100ByBytesServiceListResponse =
+  FctStorageSlotTop100ByBytesServiceListResponses[keyof FctStorageSlotTop100ByBytesServiceListResponses];
+
+export type FctStorageSlotTop100ByBytesServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Rank by effective bytes (1=highest)
+     */
+    rank: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_storage_slot_top_100_by_bytes/{rank}';
+};
+
+export type FctStorageSlotTop100ByBytesServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotTop100ByBytesServiceGetError =
+  FctStorageSlotTop100ByBytesServiceGetErrors[keyof FctStorageSlotTop100ByBytesServiceGetErrors];
+
+export type FctStorageSlotTop100ByBytesServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctStorageSlotTop100ByBytesResponse;
+};
+
+export type FctStorageSlotTop100ByBytesServiceGetResponse =
+  FctStorageSlotTop100ByBytesServiceGetResponses[keyof FctStorageSlotTop100ByBytesServiceGetResponses];
+
+export type FctStorageSlotTop100ByBytesWithExpiryServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
+    /**
+     * Rank by effective bytes within expiry policy (1=highest) (filter: eq)
+     */
+    rank_eq?: number;
+    /**
+     * Rank by effective bytes within expiry policy (1=highest) (filter: ne)
+     */
+    rank_ne?: number;
+    /**
+     * Rank by effective bytes within expiry policy (1=highest) (filter: lt)
+     */
+    rank_lt?: number;
+    /**
+     * Rank by effective bytes within expiry policy (1=highest) (filter: lte)
+     */
+    rank_lte?: number;
+    /**
+     * Rank by effective bytes within expiry policy (1=highest) (filter: gt)
+     */
+    rank_gt?: number;
+    /**
+     * Rank by effective bytes within expiry policy (1=highest) (filter: gte)
+     */
+    rank_gte?: number;
+    /**
+     * Rank by effective bytes within expiry policy (1=highest) (filter: between_min)
+     */
+    rank_between_min?: number;
+    /**
+     * Rank by effective bytes within expiry policy (1=highest) (filter: between_max_value)
+     */
+    rank_between_max_value?: number;
+    /**
+     * Rank by effective bytes within expiry policy (1=highest) (filter: in_values) (comma-separated list)
+     */
+    rank_in_values?: string;
+    /**
+     * Rank by effective bytes within expiry policy (1=highest) (filter: not_in_values) (comma-separated list)
+     */
+    rank_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    contract_address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    contract_address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    contract_address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    contract_address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    contract_address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    contract_address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    contract_address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    contract_address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    contract_address_not_in_values?: string;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Owner key identifier (filter: eq)
+     */
+    owner_key_eq?: string;
+    /**
+     * Owner key identifier (filter: ne)
+     */
+    owner_key_ne?: string;
+    /**
+     * Owner key identifier (filter: contains)
+     */
+    owner_key_contains?: string;
+    /**
+     * Owner key identifier (filter: starts_with)
+     */
+    owner_key_starts_with?: string;
+    /**
+     * Owner key identifier (filter: ends_with)
+     */
+    owner_key_ends_with?: string;
+    /**
+     * Owner key identifier (filter: like)
+     */
+    owner_key_like?: string;
+    /**
+     * Owner key identifier (filter: not_like)
+     */
+    owner_key_not_like?: string;
+    /**
+     * Owner key identifier (filter: in_values) (comma-separated list)
+     */
+    owner_key_in_values?: string;
+    /**
+     * Owner key identifier (filter: not_in_values) (comma-separated list)
+     */
+    owner_key_not_in_values?: string;
+    /**
+     * Account owner of the contract (filter: eq)
+     */
+    account_owner_eq?: string;
+    /**
+     * Account owner of the contract (filter: ne)
+     */
+    account_owner_ne?: string;
+    /**
+     * Account owner of the contract (filter: contains)
+     */
+    account_owner_contains?: string;
+    /**
+     * Account owner of the contract (filter: starts_with)
+     */
+    account_owner_starts_with?: string;
+    /**
+     * Account owner of the contract (filter: ends_with)
+     */
+    account_owner_ends_with?: string;
+    /**
+     * Account owner of the contract (filter: like)
+     */
+    account_owner_like?: string;
+    /**
+     * Account owner of the contract (filter: not_like)
+     */
+    account_owner_not_like?: string;
+    /**
+     * Account owner of the contract (filter: in_values) (comma-separated list)
+     */
+    account_owner_in_values?: string;
+    /**
+     * Account owner of the contract (filter: not_in_values) (comma-separated list)
+     */
+    account_owner_not_in_values?: string;
+    /**
+     * Name of the contract (filter: eq)
+     */
+    contract_name_eq?: string;
+    /**
+     * Name of the contract (filter: ne)
+     */
+    contract_name_ne?: string;
+    /**
+     * Name of the contract (filter: contains)
+     */
+    contract_name_contains?: string;
+    /**
+     * Name of the contract (filter: starts_with)
+     */
+    contract_name_starts_with?: string;
+    /**
+     * Name of the contract (filter: ends_with)
+     */
+    contract_name_ends_with?: string;
+    /**
+     * Name of the contract (filter: like)
+     */
+    contract_name_like?: string;
+    /**
+     * Name of the contract (filter: not_like)
+     */
+    contract_name_not_like?: string;
+    /**
+     * Name of the contract (filter: in_values) (comma-separated list)
+     */
+    contract_name_in_values?: string;
+    /**
+     * Name of the contract (filter: not_in_values) (comma-separated list)
+     */
+    contract_name_not_in_values?: string;
+    /**
+     * Factory contract or deployer address (filter: eq)
+     */
+    factory_contract_eq?: string;
+    /**
+     * Factory contract or deployer address (filter: ne)
+     */
+    factory_contract_ne?: string;
+    /**
+     * Factory contract or deployer address (filter: contains)
+     */
+    factory_contract_contains?: string;
+    /**
+     * Factory contract or deployer address (filter: starts_with)
+     */
+    factory_contract_starts_with?: string;
+    /**
+     * Factory contract or deployer address (filter: ends_with)
+     */
+    factory_contract_ends_with?: string;
+    /**
+     * Factory contract or deployer address (filter: like)
+     */
+    factory_contract_like?: string;
+    /**
+     * Factory contract or deployer address (filter: not_like)
+     */
+    factory_contract_not_like?: string;
+    /**
+     * Factory contract or deployer address (filter: in_values) (comma-separated list)
+     */
+    factory_contract_in_values?: string;
+    /**
+     * Factory contract or deployer address (filter: not_in_values) (comma-separated list)
+     */
+    factory_contract_not_in_values?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: eq)
+     */
+    usage_category_eq?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: ne)
+     */
+    usage_category_ne?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: contains)
+     */
+    usage_category_contains?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: starts_with)
+     */
+    usage_category_starts_with?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: ends_with)
+     */
+    usage_category_ends_with?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: like)
+     */
+    usage_category_like?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: not_like)
+     */
+    usage_category_not_like?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: in_values) (comma-separated list)
+     */
+    usage_category_in_values?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: not_in_values) (comma-separated list)
+     */
+    usage_category_not_in_values?: string;
+    /**
+     * The maximum number of fct_storage_slot_top_100_by_bytes_with_expiry to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctStorageSlotTop100ByBytesWithExpiry` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_storage_slot_top_100_by_bytes_with_expiry';
+};
+
+export type FctStorageSlotTop100ByBytesWithExpiryServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotTop100ByBytesWithExpiryServiceListError =
+  FctStorageSlotTop100ByBytesWithExpiryServiceListErrors[keyof FctStorageSlotTop100ByBytesWithExpiryServiceListErrors];
+
+export type FctStorageSlotTop100ByBytesWithExpiryServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctStorageSlotTop100ByBytesWithExpiryResponse;
+};
+
+export type FctStorageSlotTop100ByBytesWithExpiryServiceListResponse =
+  FctStorageSlotTop100ByBytesWithExpiryServiceListResponses[keyof FctStorageSlotTop100ByBytesWithExpiryServiceListResponses];
+
+export type FctStorageSlotTop100ByBytesWithExpiryServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+     */
+    expiry_policy: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_storage_slot_top_100_by_bytes_with_expiry/{expiry_policy}';
+};
+
+export type FctStorageSlotTop100ByBytesWithExpiryServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotTop100ByBytesWithExpiryServiceGetError =
+  FctStorageSlotTop100ByBytesWithExpiryServiceGetErrors[keyof FctStorageSlotTop100ByBytesWithExpiryServiceGetErrors];
+
+export type FctStorageSlotTop100ByBytesWithExpiryServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctStorageSlotTop100ByBytesWithExpiryResponse;
+};
+
+export type FctStorageSlotTop100ByBytesWithExpiryServiceGetResponse =
+  FctStorageSlotTop100ByBytesWithExpiryServiceGetResponses[keyof FctStorageSlotTop100ByBytesWithExpiryServiceGetResponses];
+
+export type FctStorageSlotTop100BySlotsServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Rank by active slots (1=highest) (filter: eq)
+     */
+    rank_eq?: number;
+    /**
+     * Rank by active slots (1=highest) (filter: ne)
+     */
+    rank_ne?: number;
+    /**
+     * Rank by active slots (1=highest) (filter: lt)
+     */
+    rank_lt?: number;
+    /**
+     * Rank by active slots (1=highest) (filter: lte)
+     */
+    rank_lte?: number;
+    /**
+     * Rank by active slots (1=highest) (filter: gt)
+     */
+    rank_gt?: number;
+    /**
+     * Rank by active slots (1=highest) (filter: gte)
+     */
+    rank_gte?: number;
+    /**
+     * Rank by active slots (1=highest) (filter: between_min)
+     */
+    rank_between_min?: number;
+    /**
+     * Rank by active slots (1=highest) (filter: between_max_value)
+     */
+    rank_between_max_value?: number;
+    /**
+     * Rank by active slots (1=highest) (filter: in_values) (comma-separated list)
+     */
+    rank_in_values?: string;
+    /**
+     * Rank by active slots (1=highest) (filter: not_in_values) (comma-separated list)
+     */
+    rank_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    contract_address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    contract_address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    contract_address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    contract_address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    contract_address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    contract_address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    contract_address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    contract_address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    contract_address_not_in_values?: string;
+    /**
+     * Number of active storage slots for this contract (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Number of active storage slots for this contract (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Number of active storage slots for this contract (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Number of active storage slots for this contract (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Number of active storage slots for this contract (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Number of active storage slots for this contract (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Number of active storage slots for this contract (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Number of active storage slots for this contract (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Number of active storage slots for this contract (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Number of active storage slots for this contract (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Effective bytes of storage for this contract (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Effective bytes of storage for this contract (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Effective bytes of storage for this contract (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Effective bytes of storage for this contract (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Effective bytes of storage for this contract (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Effective bytes of storage for this contract (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Effective bytes of storage for this contract (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Effective bytes of storage for this contract (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Effective bytes of storage for this contract (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Effective bytes of storage for this contract (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * Owner key identifier (filter: eq)
+     */
+    owner_key_eq?: string;
+    /**
+     * Owner key identifier (filter: ne)
+     */
+    owner_key_ne?: string;
+    /**
+     * Owner key identifier (filter: contains)
+     */
+    owner_key_contains?: string;
+    /**
+     * Owner key identifier (filter: starts_with)
+     */
+    owner_key_starts_with?: string;
+    /**
+     * Owner key identifier (filter: ends_with)
+     */
+    owner_key_ends_with?: string;
+    /**
+     * Owner key identifier (filter: like)
+     */
+    owner_key_like?: string;
+    /**
+     * Owner key identifier (filter: not_like)
+     */
+    owner_key_not_like?: string;
+    /**
+     * Owner key identifier (filter: in_values) (comma-separated list)
+     */
+    owner_key_in_values?: string;
+    /**
+     * Owner key identifier (filter: not_in_values) (comma-separated list)
+     */
+    owner_key_not_in_values?: string;
+    /**
+     * Account owner of the contract (filter: eq)
+     */
+    account_owner_eq?: string;
+    /**
+     * Account owner of the contract (filter: ne)
+     */
+    account_owner_ne?: string;
+    /**
+     * Account owner of the contract (filter: contains)
+     */
+    account_owner_contains?: string;
+    /**
+     * Account owner of the contract (filter: starts_with)
+     */
+    account_owner_starts_with?: string;
+    /**
+     * Account owner of the contract (filter: ends_with)
+     */
+    account_owner_ends_with?: string;
+    /**
+     * Account owner of the contract (filter: like)
+     */
+    account_owner_like?: string;
+    /**
+     * Account owner of the contract (filter: not_like)
+     */
+    account_owner_not_like?: string;
+    /**
+     * Account owner of the contract (filter: in_values) (comma-separated list)
+     */
+    account_owner_in_values?: string;
+    /**
+     * Account owner of the contract (filter: not_in_values) (comma-separated list)
+     */
+    account_owner_not_in_values?: string;
+    /**
+     * Name of the contract (filter: eq)
+     */
+    contract_name_eq?: string;
+    /**
+     * Name of the contract (filter: ne)
+     */
+    contract_name_ne?: string;
+    /**
+     * Name of the contract (filter: contains)
+     */
+    contract_name_contains?: string;
+    /**
+     * Name of the contract (filter: starts_with)
+     */
+    contract_name_starts_with?: string;
+    /**
+     * Name of the contract (filter: ends_with)
+     */
+    contract_name_ends_with?: string;
+    /**
+     * Name of the contract (filter: like)
+     */
+    contract_name_like?: string;
+    /**
+     * Name of the contract (filter: not_like)
+     */
+    contract_name_not_like?: string;
+    /**
+     * Name of the contract (filter: in_values) (comma-separated list)
+     */
+    contract_name_in_values?: string;
+    /**
+     * Name of the contract (filter: not_in_values) (comma-separated list)
+     */
+    contract_name_not_in_values?: string;
+    /**
+     * Factory contract or deployer address (filter: eq)
+     */
+    factory_contract_eq?: string;
+    /**
+     * Factory contract or deployer address (filter: ne)
+     */
+    factory_contract_ne?: string;
+    /**
+     * Factory contract or deployer address (filter: contains)
+     */
+    factory_contract_contains?: string;
+    /**
+     * Factory contract or deployer address (filter: starts_with)
+     */
+    factory_contract_starts_with?: string;
+    /**
+     * Factory contract or deployer address (filter: ends_with)
+     */
+    factory_contract_ends_with?: string;
+    /**
+     * Factory contract or deployer address (filter: like)
+     */
+    factory_contract_like?: string;
+    /**
+     * Factory contract or deployer address (filter: not_like)
+     */
+    factory_contract_not_like?: string;
+    /**
+     * Factory contract or deployer address (filter: in_values) (comma-separated list)
+     */
+    factory_contract_in_values?: string;
+    /**
+     * Factory contract or deployer address (filter: not_in_values) (comma-separated list)
+     */
+    factory_contract_not_in_values?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: eq)
+     */
+    usage_category_eq?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: ne)
+     */
+    usage_category_ne?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: contains)
+     */
+    usage_category_contains?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: starts_with)
+     */
+    usage_category_starts_with?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: ends_with)
+     */
+    usage_category_ends_with?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: like)
+     */
+    usage_category_like?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: not_like)
+     */
+    usage_category_not_like?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: in_values) (comma-separated list)
+     */
+    usage_category_in_values?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: not_in_values) (comma-separated list)
+     */
+    usage_category_not_in_values?: string;
+    /**
+     * The maximum number of fct_storage_slot_top_100_by_slots to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctStorageSlotTop100BySlots` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_storage_slot_top_100_by_slots';
+};
+
+export type FctStorageSlotTop100BySlotsServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotTop100BySlotsServiceListError =
+  FctStorageSlotTop100BySlotsServiceListErrors[keyof FctStorageSlotTop100BySlotsServiceListErrors];
+
+export type FctStorageSlotTop100BySlotsServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctStorageSlotTop100BySlotsResponse;
+};
+
+export type FctStorageSlotTop100BySlotsServiceListResponse =
+  FctStorageSlotTop100BySlotsServiceListResponses[keyof FctStorageSlotTop100BySlotsServiceListResponses];
+
+export type FctStorageSlotTop100BySlotsServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Rank by active slots (1=highest)
+     */
+    rank: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_storage_slot_top_100_by_slots/{rank}';
+};
+
+export type FctStorageSlotTop100BySlotsServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotTop100BySlotsServiceGetError =
+  FctStorageSlotTop100BySlotsServiceGetErrors[keyof FctStorageSlotTop100BySlotsServiceGetErrors];
+
+export type FctStorageSlotTop100BySlotsServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctStorageSlotTop100BySlotsResponse;
+};
+
+export type FctStorageSlotTop100BySlotsServiceGetResponse =
+  FctStorageSlotTop100BySlotsServiceGetResponses[keyof FctStorageSlotTop100BySlotsServiceGetResponses];
+
+export type FctStorageSlotTop100BySlotsWithExpiryServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
+    /**
+     * Rank by active slots within expiry policy (1=highest) (filter: eq)
+     */
+    rank_eq?: number;
+    /**
+     * Rank by active slots within expiry policy (1=highest) (filter: ne)
+     */
+    rank_ne?: number;
+    /**
+     * Rank by active slots within expiry policy (1=highest) (filter: lt)
+     */
+    rank_lt?: number;
+    /**
+     * Rank by active slots within expiry policy (1=highest) (filter: lte)
+     */
+    rank_lte?: number;
+    /**
+     * Rank by active slots within expiry policy (1=highest) (filter: gt)
+     */
+    rank_gt?: number;
+    /**
+     * Rank by active slots within expiry policy (1=highest) (filter: gte)
+     */
+    rank_gte?: number;
+    /**
+     * Rank by active slots within expiry policy (1=highest) (filter: between_min)
+     */
+    rank_between_min?: number;
+    /**
+     * Rank by active slots within expiry policy (1=highest) (filter: between_max_value)
+     */
+    rank_between_max_value?: number;
+    /**
+     * Rank by active slots within expiry policy (1=highest) (filter: in_values) (comma-separated list)
+     */
+    rank_in_values?: string;
+    /**
+     * Rank by active slots within expiry policy (1=highest) (filter: not_in_values) (comma-separated list)
+     */
+    rank_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    contract_address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    contract_address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    contract_address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    contract_address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    contract_address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    contract_address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    contract_address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    contract_address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    contract_address_not_in_values?: string;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Number of active storage slots for this contract (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Effective bytes of storage for this contract (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * Owner key identifier (filter: eq)
+     */
+    owner_key_eq?: string;
+    /**
+     * Owner key identifier (filter: ne)
+     */
+    owner_key_ne?: string;
+    /**
+     * Owner key identifier (filter: contains)
+     */
+    owner_key_contains?: string;
+    /**
+     * Owner key identifier (filter: starts_with)
+     */
+    owner_key_starts_with?: string;
+    /**
+     * Owner key identifier (filter: ends_with)
+     */
+    owner_key_ends_with?: string;
+    /**
+     * Owner key identifier (filter: like)
+     */
+    owner_key_like?: string;
+    /**
+     * Owner key identifier (filter: not_like)
+     */
+    owner_key_not_like?: string;
+    /**
+     * Owner key identifier (filter: in_values) (comma-separated list)
+     */
+    owner_key_in_values?: string;
+    /**
+     * Owner key identifier (filter: not_in_values) (comma-separated list)
+     */
+    owner_key_not_in_values?: string;
+    /**
+     * Account owner of the contract (filter: eq)
+     */
+    account_owner_eq?: string;
+    /**
+     * Account owner of the contract (filter: ne)
+     */
+    account_owner_ne?: string;
+    /**
+     * Account owner of the contract (filter: contains)
+     */
+    account_owner_contains?: string;
+    /**
+     * Account owner of the contract (filter: starts_with)
+     */
+    account_owner_starts_with?: string;
+    /**
+     * Account owner of the contract (filter: ends_with)
+     */
+    account_owner_ends_with?: string;
+    /**
+     * Account owner of the contract (filter: like)
+     */
+    account_owner_like?: string;
+    /**
+     * Account owner of the contract (filter: not_like)
+     */
+    account_owner_not_like?: string;
+    /**
+     * Account owner of the contract (filter: in_values) (comma-separated list)
+     */
+    account_owner_in_values?: string;
+    /**
+     * Account owner of the contract (filter: not_in_values) (comma-separated list)
+     */
+    account_owner_not_in_values?: string;
+    /**
+     * Name of the contract (filter: eq)
+     */
+    contract_name_eq?: string;
+    /**
+     * Name of the contract (filter: ne)
+     */
+    contract_name_ne?: string;
+    /**
+     * Name of the contract (filter: contains)
+     */
+    contract_name_contains?: string;
+    /**
+     * Name of the contract (filter: starts_with)
+     */
+    contract_name_starts_with?: string;
+    /**
+     * Name of the contract (filter: ends_with)
+     */
+    contract_name_ends_with?: string;
+    /**
+     * Name of the contract (filter: like)
+     */
+    contract_name_like?: string;
+    /**
+     * Name of the contract (filter: not_like)
+     */
+    contract_name_not_like?: string;
+    /**
+     * Name of the contract (filter: in_values) (comma-separated list)
+     */
+    contract_name_in_values?: string;
+    /**
+     * Name of the contract (filter: not_in_values) (comma-separated list)
+     */
+    contract_name_not_in_values?: string;
+    /**
+     * Factory contract or deployer address (filter: eq)
+     */
+    factory_contract_eq?: string;
+    /**
+     * Factory contract or deployer address (filter: ne)
+     */
+    factory_contract_ne?: string;
+    /**
+     * Factory contract or deployer address (filter: contains)
+     */
+    factory_contract_contains?: string;
+    /**
+     * Factory contract or deployer address (filter: starts_with)
+     */
+    factory_contract_starts_with?: string;
+    /**
+     * Factory contract or deployer address (filter: ends_with)
+     */
+    factory_contract_ends_with?: string;
+    /**
+     * Factory contract or deployer address (filter: like)
+     */
+    factory_contract_like?: string;
+    /**
+     * Factory contract or deployer address (filter: not_like)
+     */
+    factory_contract_not_like?: string;
+    /**
+     * Factory contract or deployer address (filter: in_values) (comma-separated list)
+     */
+    factory_contract_in_values?: string;
+    /**
+     * Factory contract or deployer address (filter: not_in_values) (comma-separated list)
+     */
+    factory_contract_not_in_values?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: eq)
+     */
+    usage_category_eq?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: ne)
+     */
+    usage_category_ne?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: contains)
+     */
+    usage_category_contains?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: starts_with)
+     */
+    usage_category_starts_with?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: ends_with)
+     */
+    usage_category_ends_with?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: like)
+     */
+    usage_category_like?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: not_like)
+     */
+    usage_category_not_like?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: in_values) (comma-separated list)
+     */
+    usage_category_in_values?: string;
+    /**
+     * Usage category (e.g., stablecoin, dex, trading) (filter: not_in_values) (comma-separated list)
+     */
+    usage_category_not_in_values?: string;
+    /**
+     * The maximum number of fct_storage_slot_top_100_by_slots_with_expiry to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctStorageSlotTop100BySlotsWithExpiry` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_storage_slot_top_100_by_slots_with_expiry';
+};
+
+export type FctStorageSlotTop100BySlotsWithExpiryServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotTop100BySlotsWithExpiryServiceListError =
+  FctStorageSlotTop100BySlotsWithExpiryServiceListErrors[keyof FctStorageSlotTop100BySlotsWithExpiryServiceListErrors];
+
+export type FctStorageSlotTop100BySlotsWithExpiryServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctStorageSlotTop100BySlotsWithExpiryResponse;
+};
+
+export type FctStorageSlotTop100BySlotsWithExpiryServiceListResponse =
+  FctStorageSlotTop100BySlotsWithExpiryServiceListResponses[keyof FctStorageSlotTop100BySlotsWithExpiryServiceListResponses];
+
+export type FctStorageSlotTop100BySlotsWithExpiryServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+     */
+    expiry_policy: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_storage_slot_top_100_by_slots_with_expiry/{expiry_policy}';
+};
+
+export type FctStorageSlotTop100BySlotsWithExpiryServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctStorageSlotTop100BySlotsWithExpiryServiceGetError =
+  FctStorageSlotTop100BySlotsWithExpiryServiceGetErrors[keyof FctStorageSlotTop100BySlotsWithExpiryServiceGetErrors];
+
+export type FctStorageSlotTop100BySlotsWithExpiryServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctStorageSlotTop100BySlotsWithExpiryResponse;
+};
+
+export type FctStorageSlotTop100BySlotsWithExpiryServiceGetResponse =
+  FctStorageSlotTop100BySlotsWithExpiryServiceGetResponses[keyof FctStorageSlotTop100BySlotsWithExpiryServiceGetResponses];
 
 export type IntAddressFirstAccessServiceListData = {
   body?: never;
@@ -44976,6 +51839,5558 @@ export type IntBlockProposerCanonicalServiceGetResponses = {
 
 export type IntBlockProposerCanonicalServiceGetResponse =
   IntBlockProposerCanonicalServiceGetResponses[keyof IntBlockProposerCanonicalServiceGetResponses];
+
+export type IntContractStorageExpiry1mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this contract expiry is recorded (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this contract expiry is recorded (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Count of slots in the contract at expiry time (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Count of slots in the contract at expiry time (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_expiry_1m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageExpiry1m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_expiry_1m';
+};
+
+export type IntContractStorageExpiry1mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageExpiry1mServiceListError =
+  IntContractStorageExpiry1mServiceListErrors[keyof IntContractStorageExpiry1mServiceListErrors];
+
+export type IntContractStorageExpiry1mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageExpiry1mResponse;
+};
+
+export type IntContractStorageExpiry1mServiceListResponse =
+  IntContractStorageExpiry1mServiceListResponses[keyof IntContractStorageExpiry1mServiceListResponses];
+
+export type IntContractStorageExpiry1mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this contract expiry is recorded
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_expiry_1m/{block_number}';
+};
+
+export type IntContractStorageExpiry1mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageExpiry1mServiceGetError =
+  IntContractStorageExpiry1mServiceGetErrors[keyof IntContractStorageExpiry1mServiceGetErrors];
+
+export type IntContractStorageExpiry1mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageExpiry1mResponse;
+};
+
+export type IntContractStorageExpiry1mServiceGetResponse =
+  IntContractStorageExpiry1mServiceGetResponses[keyof IntContractStorageExpiry1mServiceGetResponses];
+
+export type IntContractStorageExpiry6mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this contract expiry is recorded (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this contract expiry is recorded (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Count of slots in the contract at expiry time (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Count of slots in the contract at expiry time (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_expiry_6m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageExpiry6m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_expiry_6m';
+};
+
+export type IntContractStorageExpiry6mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageExpiry6mServiceListError =
+  IntContractStorageExpiry6mServiceListErrors[keyof IntContractStorageExpiry6mServiceListErrors];
+
+export type IntContractStorageExpiry6mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageExpiry6mResponse;
+};
+
+export type IntContractStorageExpiry6mServiceListResponse =
+  IntContractStorageExpiry6mServiceListResponses[keyof IntContractStorageExpiry6mServiceListResponses];
+
+export type IntContractStorageExpiry6mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this contract expiry is recorded
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_expiry_6m/{block_number}';
+};
+
+export type IntContractStorageExpiry6mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageExpiry6mServiceGetError =
+  IntContractStorageExpiry6mServiceGetErrors[keyof IntContractStorageExpiry6mServiceGetErrors];
+
+export type IntContractStorageExpiry6mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageExpiry6mResponse;
+};
+
+export type IntContractStorageExpiry6mServiceGetResponse =
+  IntContractStorageExpiry6mServiceGetResponses[keyof IntContractStorageExpiry6mServiceGetResponses];
+
+export type IntContractStorageExpiry12mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this contract expiry is recorded (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this contract expiry is recorded (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Count of slots in the contract at expiry time (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Count of slots in the contract at expiry time (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_expiry_12m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageExpiry12m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_expiry_12m';
+};
+
+export type IntContractStorageExpiry12mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageExpiry12mServiceListError =
+  IntContractStorageExpiry12mServiceListErrors[keyof IntContractStorageExpiry12mServiceListErrors];
+
+export type IntContractStorageExpiry12mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageExpiry12mResponse;
+};
+
+export type IntContractStorageExpiry12mServiceListResponse =
+  IntContractStorageExpiry12mServiceListResponses[keyof IntContractStorageExpiry12mServiceListResponses];
+
+export type IntContractStorageExpiry12mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this contract expiry is recorded
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_expiry_12m/{block_number}';
+};
+
+export type IntContractStorageExpiry12mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageExpiry12mServiceGetError =
+  IntContractStorageExpiry12mServiceGetErrors[keyof IntContractStorageExpiry12mServiceGetErrors];
+
+export type IntContractStorageExpiry12mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageExpiry12mResponse;
+};
+
+export type IntContractStorageExpiry12mServiceGetResponse =
+  IntContractStorageExpiry12mServiceGetResponses[keyof IntContractStorageExpiry12mServiceGetResponses];
+
+export type IntContractStorageExpiry18mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this contract expiry is recorded (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this contract expiry is recorded (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Count of slots in the contract at expiry time (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Count of slots in the contract at expiry time (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_expiry_18m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageExpiry18m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_expiry_18m';
+};
+
+export type IntContractStorageExpiry18mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageExpiry18mServiceListError =
+  IntContractStorageExpiry18mServiceListErrors[keyof IntContractStorageExpiry18mServiceListErrors];
+
+export type IntContractStorageExpiry18mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageExpiry18mResponse;
+};
+
+export type IntContractStorageExpiry18mServiceListResponse =
+  IntContractStorageExpiry18mServiceListResponses[keyof IntContractStorageExpiry18mServiceListResponses];
+
+export type IntContractStorageExpiry18mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this contract expiry is recorded
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_expiry_18m/{block_number}';
+};
+
+export type IntContractStorageExpiry18mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageExpiry18mServiceGetError =
+  IntContractStorageExpiry18mServiceGetErrors[keyof IntContractStorageExpiry18mServiceGetErrors];
+
+export type IntContractStorageExpiry18mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageExpiry18mResponse;
+};
+
+export type IntContractStorageExpiry18mServiceGetResponse =
+  IntContractStorageExpiry18mServiceGetResponses[keyof IntContractStorageExpiry18mServiceGetResponses];
+
+export type IntContractStorageExpiry24mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this contract expiry is recorded (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this contract expiry is recorded (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this contract expiry is recorded (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that led to this expiry (propagates through waterfall chain) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Count of slots in the contract at expiry time (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Count of slots in the contract at expiry time (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Count of slots in the contract at expiry time (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Sum of effective bytes across all slots in the contract at expiry time (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_expiry_24m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageExpiry24m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_expiry_24m';
+};
+
+export type IntContractStorageExpiry24mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageExpiry24mServiceListError =
+  IntContractStorageExpiry24mServiceListErrors[keyof IntContractStorageExpiry24mServiceListErrors];
+
+export type IntContractStorageExpiry24mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageExpiry24mResponse;
+};
+
+export type IntContractStorageExpiry24mServiceListResponse =
+  IntContractStorageExpiry24mServiceListResponses[keyof IntContractStorageExpiry24mServiceListResponses];
+
+export type IntContractStorageExpiry24mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this contract expiry is recorded
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_expiry_24m/{block_number}';
+};
+
+export type IntContractStorageExpiry24mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageExpiry24mServiceGetError =
+  IntContractStorageExpiry24mServiceGetErrors[keyof IntContractStorageExpiry24mServiceGetErrors];
+
+export type IntContractStorageExpiry24mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageExpiry24mResponse;
+};
+
+export type IntContractStorageExpiry24mServiceGetResponse =
+  IntContractStorageExpiry24mServiceGetResponses[keyof IntContractStorageExpiry24mServiceGetResponses];
+
+export type IntContractStorageNextTouchServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this contract was touched (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this contract was touched (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this contract was touched (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this contract was touched (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this contract was touched (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this contract was touched (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this contract was touched (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this contract was touched (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this contract was touched (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this contract was touched (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The next block number where this contract was touched (NULL if no subsequent touch) (filter: eq)
+     */
+    next_touch_block_eq?: number;
+    /**
+     * The next block number where this contract was touched (NULL if no subsequent touch) (filter: ne)
+     */
+    next_touch_block_ne?: number;
+    /**
+     * The next block number where this contract was touched (NULL if no subsequent touch) (filter: lt)
+     */
+    next_touch_block_lt?: number;
+    /**
+     * The next block number where this contract was touched (NULL if no subsequent touch) (filter: lte)
+     */
+    next_touch_block_lte?: number;
+    /**
+     * The next block number where this contract was touched (NULL if no subsequent touch) (filter: gt)
+     */
+    next_touch_block_gt?: number;
+    /**
+     * The next block number where this contract was touched (NULL if no subsequent touch) (filter: gte)
+     */
+    next_touch_block_gte?: number;
+    /**
+     * The next block number where this contract was touched (NULL if no subsequent touch) (filter: between_min)
+     */
+    next_touch_block_between_min?: number;
+    /**
+     * The next block number where this contract was touched (NULL if no subsequent touch) (filter: between_max_value)
+     */
+    next_touch_block_between_max_value?: number;
+    /**
+     * The next block number where this contract was touched (NULL if no subsequent touch) (filter: in_values) (comma-separated list)
+     */
+    next_touch_block_in_values?: string;
+    /**
+     * The next block number where this contract was touched (NULL if no subsequent touch) (filter: not_in_values) (comma-separated list)
+     */
+    next_touch_block_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_next_touch to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageNextTouch` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_next_touch';
+};
+
+export type IntContractStorageNextTouchServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageNextTouchServiceListError =
+  IntContractStorageNextTouchServiceListErrors[keyof IntContractStorageNextTouchServiceListErrors];
+
+export type IntContractStorageNextTouchServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageNextTouchResponse;
+};
+
+export type IntContractStorageNextTouchServiceListResponse =
+  IntContractStorageNextTouchServiceListResponses[keyof IntContractStorageNextTouchServiceListResponses];
+
+export type IntContractStorageNextTouchServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this contract was touched
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_next_touch/{block_number}';
+};
+
+export type IntContractStorageNextTouchServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageNextTouchServiceGetError =
+  IntContractStorageNextTouchServiceGetErrors[keyof IntContractStorageNextTouchServiceGetErrors];
+
+export type IntContractStorageNextTouchServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageNextTouchResponse;
+};
+
+export type IntContractStorageNextTouchServiceGetResponse =
+  IntContractStorageNextTouchServiceGetResponses[keyof IntContractStorageNextTouchServiceGetResponses];
+
+export type IntContractStorageReactivation1mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this contract was reactivated (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this contract was reactivated (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this contract was reactivated (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this contract was reactivated (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this contract was reactivated (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this contract was reactivated (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this contract was reactivated (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this contract was reactivated (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this contract was reactivated (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this contract was reactivated (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Count of slots being reactivated (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Count of slots being reactivated (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Count of slots being reactivated (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Count of slots being reactivated (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Count of slots being reactivated (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Count of slots being reactivated (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Count of slots being reactivated (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Count of slots being reactivated (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Count of slots being reactivated (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Count of slots being reactivated (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Sum of effective bytes being reactivated (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Sum of effective bytes being reactivated (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_reactivation_1m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageReactivation1m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_reactivation_1m';
+};
+
+export type IntContractStorageReactivation1mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageReactivation1mServiceListError =
+  IntContractStorageReactivation1mServiceListErrors[keyof IntContractStorageReactivation1mServiceListErrors];
+
+export type IntContractStorageReactivation1mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageReactivation1mResponse;
+};
+
+export type IntContractStorageReactivation1mServiceListResponse =
+  IntContractStorageReactivation1mServiceListResponses[keyof IntContractStorageReactivation1mServiceListResponses];
+
+export type IntContractStorageReactivation1mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this contract was reactivated
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_reactivation_1m/{block_number}';
+};
+
+export type IntContractStorageReactivation1mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageReactivation1mServiceGetError =
+  IntContractStorageReactivation1mServiceGetErrors[keyof IntContractStorageReactivation1mServiceGetErrors];
+
+export type IntContractStorageReactivation1mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageReactivation1mResponse;
+};
+
+export type IntContractStorageReactivation1mServiceGetResponse =
+  IntContractStorageReactivation1mServiceGetResponses[keyof IntContractStorageReactivation1mServiceGetResponses];
+
+export type IntContractStorageReactivation6mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this contract was reactivated (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this contract was reactivated (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this contract was reactivated (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this contract was reactivated (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this contract was reactivated (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this contract was reactivated (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this contract was reactivated (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this contract was reactivated (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this contract was reactivated (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this contract was reactivated (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Count of slots being reactivated (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Count of slots being reactivated (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Count of slots being reactivated (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Count of slots being reactivated (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Count of slots being reactivated (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Count of slots being reactivated (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Count of slots being reactivated (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Count of slots being reactivated (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Count of slots being reactivated (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Count of slots being reactivated (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Sum of effective bytes being reactivated (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Sum of effective bytes being reactivated (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_reactivation_6m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageReactivation6m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_reactivation_6m';
+};
+
+export type IntContractStorageReactivation6mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageReactivation6mServiceListError =
+  IntContractStorageReactivation6mServiceListErrors[keyof IntContractStorageReactivation6mServiceListErrors];
+
+export type IntContractStorageReactivation6mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageReactivation6mResponse;
+};
+
+export type IntContractStorageReactivation6mServiceListResponse =
+  IntContractStorageReactivation6mServiceListResponses[keyof IntContractStorageReactivation6mServiceListResponses];
+
+export type IntContractStorageReactivation6mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this contract was reactivated
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_reactivation_6m/{block_number}';
+};
+
+export type IntContractStorageReactivation6mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageReactivation6mServiceGetError =
+  IntContractStorageReactivation6mServiceGetErrors[keyof IntContractStorageReactivation6mServiceGetErrors];
+
+export type IntContractStorageReactivation6mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageReactivation6mResponse;
+};
+
+export type IntContractStorageReactivation6mServiceGetResponse =
+  IntContractStorageReactivation6mServiceGetResponses[keyof IntContractStorageReactivation6mServiceGetResponses];
+
+export type IntContractStorageReactivation12mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this contract was reactivated (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this contract was reactivated (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this contract was reactivated (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this contract was reactivated (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this contract was reactivated (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this contract was reactivated (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this contract was reactivated (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this contract was reactivated (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this contract was reactivated (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this contract was reactivated (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Count of slots being reactivated (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Count of slots being reactivated (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Count of slots being reactivated (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Count of slots being reactivated (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Count of slots being reactivated (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Count of slots being reactivated (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Count of slots being reactivated (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Count of slots being reactivated (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Count of slots being reactivated (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Count of slots being reactivated (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Sum of effective bytes being reactivated (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Sum of effective bytes being reactivated (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_reactivation_12m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageReactivation12m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_reactivation_12m';
+};
+
+export type IntContractStorageReactivation12mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageReactivation12mServiceListError =
+  IntContractStorageReactivation12mServiceListErrors[keyof IntContractStorageReactivation12mServiceListErrors];
+
+export type IntContractStorageReactivation12mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageReactivation12mResponse;
+};
+
+export type IntContractStorageReactivation12mServiceListResponse =
+  IntContractStorageReactivation12mServiceListResponses[keyof IntContractStorageReactivation12mServiceListResponses];
+
+export type IntContractStorageReactivation12mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this contract was reactivated
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_reactivation_12m/{block_number}';
+};
+
+export type IntContractStorageReactivation12mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageReactivation12mServiceGetError =
+  IntContractStorageReactivation12mServiceGetErrors[keyof IntContractStorageReactivation12mServiceGetErrors];
+
+export type IntContractStorageReactivation12mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageReactivation12mResponse;
+};
+
+export type IntContractStorageReactivation12mServiceGetResponse =
+  IntContractStorageReactivation12mServiceGetResponses[keyof IntContractStorageReactivation12mServiceGetResponses];
+
+export type IntContractStorageReactivation18mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this contract was reactivated (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this contract was reactivated (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this contract was reactivated (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this contract was reactivated (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this contract was reactivated (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this contract was reactivated (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this contract was reactivated (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this contract was reactivated (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this contract was reactivated (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this contract was reactivated (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Count of slots being reactivated (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Count of slots being reactivated (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Count of slots being reactivated (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Count of slots being reactivated (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Count of slots being reactivated (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Count of slots being reactivated (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Count of slots being reactivated (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Count of slots being reactivated (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Count of slots being reactivated (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Count of slots being reactivated (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Sum of effective bytes being reactivated (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Sum of effective bytes being reactivated (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_reactivation_18m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageReactivation18m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_reactivation_18m';
+};
+
+export type IntContractStorageReactivation18mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageReactivation18mServiceListError =
+  IntContractStorageReactivation18mServiceListErrors[keyof IntContractStorageReactivation18mServiceListErrors];
+
+export type IntContractStorageReactivation18mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageReactivation18mResponse;
+};
+
+export type IntContractStorageReactivation18mServiceListResponse =
+  IntContractStorageReactivation18mServiceListResponses[keyof IntContractStorageReactivation18mServiceListResponses];
+
+export type IntContractStorageReactivation18mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this contract was reactivated
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_reactivation_18m/{block_number}';
+};
+
+export type IntContractStorageReactivation18mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageReactivation18mServiceGetError =
+  IntContractStorageReactivation18mServiceGetErrors[keyof IntContractStorageReactivation18mServiceGetErrors];
+
+export type IntContractStorageReactivation18mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageReactivation18mResponse;
+};
+
+export type IntContractStorageReactivation18mServiceGetResponse =
+  IntContractStorageReactivation18mServiceGetResponses[keyof IntContractStorageReactivation18mServiceGetResponses];
+
+export type IntContractStorageReactivation24mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this contract was reactivated (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this contract was reactivated (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this contract was reactivated (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this contract was reactivated (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this contract was reactivated (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this contract was reactivated (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this contract was reactivated (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this contract was reactivated (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this contract was reactivated (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this contract was reactivated (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Count of slots being reactivated (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Count of slots being reactivated (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Count of slots being reactivated (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Count of slots being reactivated (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Count of slots being reactivated (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Count of slots being reactivated (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Count of slots being reactivated (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Count of slots being reactivated (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Count of slots being reactivated (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Count of slots being reactivated (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Sum of effective bytes being reactivated (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Sum of effective bytes being reactivated (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_reactivation_24m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageReactivation24m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_reactivation_24m';
+};
+
+export type IntContractStorageReactivation24mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageReactivation24mServiceListError =
+  IntContractStorageReactivation24mServiceListErrors[keyof IntContractStorageReactivation24mServiceListErrors];
+
+export type IntContractStorageReactivation24mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageReactivation24mResponse;
+};
+
+export type IntContractStorageReactivation24mServiceListResponse =
+  IntContractStorageReactivation24mServiceListResponses[keyof IntContractStorageReactivation24mServiceListResponses];
+
+export type IntContractStorageReactivation24mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this contract was reactivated
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_reactivation_24m/{block_number}';
+};
+
+export type IntContractStorageReactivation24mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageReactivation24mServiceGetError =
+  IntContractStorageReactivation24mServiceGetErrors[keyof IntContractStorageReactivation24mServiceGetErrors];
+
+export type IntContractStorageReactivation24mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageReactivation24mResponse;
+};
+
+export type IntContractStorageReactivation24mServiceGetResponse =
+  IntContractStorageReactivation24mServiceGetResponses[keyof IntContractStorageReactivation24mServiceGetResponses];
+
+export type IntContractStorageStateServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: eq)
+     */
+    slots_delta_eq?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: ne)
+     */
+    slots_delta_ne?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: lt)
+     */
+    slots_delta_lt?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: lte)
+     */
+    slots_delta_lte?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: gt)
+     */
+    slots_delta_gt?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: gte)
+     */
+    slots_delta_gte?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: between_min)
+     */
+    slots_delta_between_min?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: between_max_value)
+     */
+    slots_delta_between_max_value?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: in_values) (comma-separated list)
+     */
+    slots_delta_in_values?: string;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: not_in_values) (comma-separated list)
+     */
+    slots_delta_not_in_values?: string;
+    /**
+     * Change in effective bytes for this block (filter: eq)
+     */
+    bytes_delta_eq?: number;
+    /**
+     * Change in effective bytes for this block (filter: ne)
+     */
+    bytes_delta_ne?: number;
+    /**
+     * Change in effective bytes for this block (filter: lt)
+     */
+    bytes_delta_lt?: number;
+    /**
+     * Change in effective bytes for this block (filter: lte)
+     */
+    bytes_delta_lte?: number;
+    /**
+     * Change in effective bytes for this block (filter: gt)
+     */
+    bytes_delta_gt?: number;
+    /**
+     * Change in effective bytes for this block (filter: gte)
+     */
+    bytes_delta_gte?: number;
+    /**
+     * Change in effective bytes for this block (filter: between_min)
+     */
+    bytes_delta_between_min?: number;
+    /**
+     * Change in effective bytes for this block (filter: between_max_value)
+     */
+    bytes_delta_between_max_value?: number;
+    /**
+     * Change in effective bytes for this block (filter: in_values) (comma-separated list)
+     */
+    bytes_delta_in_values?: string;
+    /**
+     * Change in effective bytes for this block (filter: not_in_values) (comma-separated list)
+     */
+    bytes_delta_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_state to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageState` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_state';
+};
+
+export type IntContractStorageStateServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageStateServiceListError =
+  IntContractStorageStateServiceListErrors[keyof IntContractStorageStateServiceListErrors];
+
+export type IntContractStorageStateServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageStateResponse;
+};
+
+export type IntContractStorageStateServiceListResponse =
+  IntContractStorageStateServiceListResponses[keyof IntContractStorageStateServiceListResponses];
+
+export type IntContractStorageStateServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_state/{block_number}';
+};
+
+export type IntContractStorageStateServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageStateServiceGetError =
+  IntContractStorageStateServiceGetErrors[keyof IntContractStorageStateServiceGetErrors];
+
+export type IntContractStorageStateServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageStateResponse;
+};
+
+export type IntContractStorageStateServiceGetResponse =
+  IntContractStorageStateServiceGetResponses[keyof IntContractStorageStateServiceGetResponses];
+
+export type IntContractStorageStateByAddressServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: eq)
+     */
+    slots_delta_eq?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: ne)
+     */
+    slots_delta_ne?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: lt)
+     */
+    slots_delta_lt?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: lte)
+     */
+    slots_delta_lte?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: gt)
+     */
+    slots_delta_gt?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: gte)
+     */
+    slots_delta_gte?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: between_min)
+     */
+    slots_delta_between_min?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: between_max_value)
+     */
+    slots_delta_between_max_value?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: in_values) (comma-separated list)
+     */
+    slots_delta_in_values?: string;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: not_in_values) (comma-separated list)
+     */
+    slots_delta_not_in_values?: string;
+    /**
+     * Change in effective bytes for this block (filter: eq)
+     */
+    bytes_delta_eq?: number;
+    /**
+     * Change in effective bytes for this block (filter: ne)
+     */
+    bytes_delta_ne?: number;
+    /**
+     * Change in effective bytes for this block (filter: lt)
+     */
+    bytes_delta_lt?: number;
+    /**
+     * Change in effective bytes for this block (filter: lte)
+     */
+    bytes_delta_lte?: number;
+    /**
+     * Change in effective bytes for this block (filter: gt)
+     */
+    bytes_delta_gt?: number;
+    /**
+     * Change in effective bytes for this block (filter: gte)
+     */
+    bytes_delta_gte?: number;
+    /**
+     * Change in effective bytes for this block (filter: between_min)
+     */
+    bytes_delta_between_min?: number;
+    /**
+     * Change in effective bytes for this block (filter: between_max_value)
+     */
+    bytes_delta_between_max_value?: number;
+    /**
+     * Change in effective bytes for this block (filter: in_values) (comma-separated list)
+     */
+    bytes_delta_in_values?: string;
+    /**
+     * Change in effective bytes for this block (filter: not_in_values) (comma-separated list)
+     */
+    bytes_delta_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots for this contract at this block (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes for this contract at this block (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_state_by_address to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageStateByAddress` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_state_by_address';
+};
+
+export type IntContractStorageStateByAddressServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageStateByAddressServiceListError =
+  IntContractStorageStateByAddressServiceListErrors[keyof IntContractStorageStateByAddressServiceListErrors];
+
+export type IntContractStorageStateByAddressServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageStateByAddressResponse;
+};
+
+export type IntContractStorageStateByAddressServiceListResponse =
+  IntContractStorageStateByAddressServiceListResponses[keyof IntContractStorageStateByAddressServiceListResponses];
+
+export type IntContractStorageStateByAddressServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The contract address
+     */
+    address: string;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_state_by_address/{address}';
+};
+
+export type IntContractStorageStateByAddressServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageStateByAddressServiceGetError =
+  IntContractStorageStateByAddressServiceGetErrors[keyof IntContractStorageStateByAddressServiceGetErrors];
+
+export type IntContractStorageStateByAddressServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageStateByAddressResponse;
+};
+
+export type IntContractStorageStateByAddressServiceGetResponse =
+  IntContractStorageStateByAddressServiceGetResponses[keyof IntContractStorageStateByAddressServiceGetResponses];
+
+export type IntContractStorageStateByBlockServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: eq)
+     */
+    slots_delta_eq?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: ne)
+     */
+    slots_delta_ne?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: lt)
+     */
+    slots_delta_lt?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: lte)
+     */
+    slots_delta_lte?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: gt)
+     */
+    slots_delta_gt?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: gte)
+     */
+    slots_delta_gte?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: between_min)
+     */
+    slots_delta_between_min?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: between_max_value)
+     */
+    slots_delta_between_max_value?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: in_values) (comma-separated list)
+     */
+    slots_delta_in_values?: string;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: not_in_values) (comma-separated list)
+     */
+    slots_delta_not_in_values?: string;
+    /**
+     * Change in effective bytes for this block (filter: eq)
+     */
+    bytes_delta_eq?: number;
+    /**
+     * Change in effective bytes for this block (filter: ne)
+     */
+    bytes_delta_ne?: number;
+    /**
+     * Change in effective bytes for this block (filter: lt)
+     */
+    bytes_delta_lt?: number;
+    /**
+     * Change in effective bytes for this block (filter: lte)
+     */
+    bytes_delta_lte?: number;
+    /**
+     * Change in effective bytes for this block (filter: gt)
+     */
+    bytes_delta_gt?: number;
+    /**
+     * Change in effective bytes for this block (filter: gte)
+     */
+    bytes_delta_gte?: number;
+    /**
+     * Change in effective bytes for this block (filter: between_min)
+     */
+    bytes_delta_between_min?: number;
+    /**
+     * Change in effective bytes for this block (filter: between_max_value)
+     */
+    bytes_delta_between_max_value?: number;
+    /**
+     * Change in effective bytes for this block (filter: in_values) (comma-separated list)
+     */
+    bytes_delta_in_values?: string;
+    /**
+     * Change in effective bytes for this block (filter: not_in_values) (comma-separated list)
+     */
+    bytes_delta_not_in_values?: string;
+    /**
+     * Change in active contracts for this block (positive=activated, negative=deactivated) (filter: eq)
+     */
+    contracts_delta_eq?: number;
+    /**
+     * Change in active contracts for this block (positive=activated, negative=deactivated) (filter: ne)
+     */
+    contracts_delta_ne?: number;
+    /**
+     * Change in active contracts for this block (positive=activated, negative=deactivated) (filter: lt)
+     */
+    contracts_delta_lt?: number;
+    /**
+     * Change in active contracts for this block (positive=activated, negative=deactivated) (filter: lte)
+     */
+    contracts_delta_lte?: number;
+    /**
+     * Change in active contracts for this block (positive=activated, negative=deactivated) (filter: gt)
+     */
+    contracts_delta_gt?: number;
+    /**
+     * Change in active contracts for this block (positive=activated, negative=deactivated) (filter: gte)
+     */
+    contracts_delta_gte?: number;
+    /**
+     * Change in active contracts for this block (positive=activated, negative=deactivated) (filter: between_min)
+     */
+    contracts_delta_between_min?: number;
+    /**
+     * Change in active contracts for this block (positive=activated, negative=deactivated) (filter: between_max_value)
+     */
+    contracts_delta_between_max_value?: number;
+    /**
+     * Change in active contracts for this block (positive=activated, negative=deactivated) (filter: in_values) (comma-separated list)
+     */
+    contracts_delta_in_values?: string;
+    /**
+     * Change in active contracts for this block (positive=activated, negative=deactivated) (filter: not_in_values) (comma-separated list)
+     */
+    contracts_delta_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at this block (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at this block (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * Cumulative count of contracts with at least one active slot at this block (filter: eq)
+     */
+    active_contracts_eq?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at this block (filter: ne)
+     */
+    active_contracts_ne?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at this block (filter: lt)
+     */
+    active_contracts_lt?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at this block (filter: lte)
+     */
+    active_contracts_lte?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at this block (filter: gt)
+     */
+    active_contracts_gt?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at this block (filter: gte)
+     */
+    active_contracts_gte?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at this block (filter: between_min)
+     */
+    active_contracts_between_min?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at this block (filter: between_max_value)
+     */
+    active_contracts_between_max_value?: number;
+    /**
+     * Cumulative count of contracts with at least one active slot at this block (filter: in_values) (comma-separated list)
+     */
+    active_contracts_in_values?: string;
+    /**
+     * Cumulative count of contracts with at least one active slot at this block (filter: not_in_values) (comma-separated list)
+     */
+    active_contracts_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_state_by_block to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageStateByBlock` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_state_by_block';
+};
+
+export type IntContractStorageStateByBlockServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageStateByBlockServiceListError =
+  IntContractStorageStateByBlockServiceListErrors[keyof IntContractStorageStateByBlockServiceListErrors];
+
+export type IntContractStorageStateByBlockServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageStateByBlockResponse;
+};
+
+export type IntContractStorageStateByBlockServiceListResponse =
+  IntContractStorageStateByBlockServiceListResponses[keyof IntContractStorageStateByBlockServiceListResponses];
+
+export type IntContractStorageStateByBlockServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_state_by_block/{block_number}';
+};
+
+export type IntContractStorageStateByBlockServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageStateByBlockServiceGetError =
+  IntContractStorageStateByBlockServiceGetErrors[keyof IntContractStorageStateByBlockServiceGetErrors];
+
+export type IntContractStorageStateByBlockServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageStateByBlockResponse;
+};
+
+export type IntContractStorageStateByBlockServiceGetResponse =
+  IntContractStorageStateByBlockServiceGetResponses[keyof IntContractStorageStateByBlockServiceGetResponses];
+
+export type IntContractStorageStateWithExpiryServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: eq)
+     */
+    net_slots_delta_eq?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: ne)
+     */
+    net_slots_delta_ne?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: lt)
+     */
+    net_slots_delta_lt?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: lte)
+     */
+    net_slots_delta_lte?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: gt)
+     */
+    net_slots_delta_gt?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: gte)
+     */
+    net_slots_delta_gte?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: between_min)
+     */
+    net_slots_delta_between_min?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: between_max_value)
+     */
+    net_slots_delta_between_max_value?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: in_values) (comma-separated list)
+     */
+    net_slots_delta_in_values?: string;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: not_in_values) (comma-separated list)
+     */
+    net_slots_delta_not_in_values?: string;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: eq)
+     */
+    net_bytes_delta_eq?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: ne)
+     */
+    net_bytes_delta_ne?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: lt)
+     */
+    net_bytes_delta_lt?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: lte)
+     */
+    net_bytes_delta_lte?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: gt)
+     */
+    net_bytes_delta_gt?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: gte)
+     */
+    net_bytes_delta_gte?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: between_min)
+     */
+    net_bytes_delta_between_min?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: between_max_value)
+     */
+    net_bytes_delta_between_max_value?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: in_values) (comma-separated list)
+     */
+    net_bytes_delta_in_values?: string;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: not_in_values) (comma-separated list)
+     */
+    net_bytes_delta_not_in_values?: string;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: eq)
+     */
+    cumulative_net_slots_eq?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: ne)
+     */
+    cumulative_net_slots_ne?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: lt)
+     */
+    cumulative_net_slots_lt?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: lte)
+     */
+    cumulative_net_slots_lte?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: gt)
+     */
+    cumulative_net_slots_gt?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: gte)
+     */
+    cumulative_net_slots_gte?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: between_min)
+     */
+    cumulative_net_slots_between_min?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: between_max_value)
+     */
+    cumulative_net_slots_between_max_value?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: in_values) (comma-separated list)
+     */
+    cumulative_net_slots_in_values?: string;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: not_in_values) (comma-separated list)
+     */
+    cumulative_net_slots_not_in_values?: string;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: eq)
+     */
+    cumulative_net_bytes_eq?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: ne)
+     */
+    cumulative_net_bytes_ne?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: lt)
+     */
+    cumulative_net_bytes_lt?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: lte)
+     */
+    cumulative_net_bytes_lte?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: gt)
+     */
+    cumulative_net_bytes_gt?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: gte)
+     */
+    cumulative_net_bytes_gte?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: between_min)
+     */
+    cumulative_net_bytes_between_min?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: between_max_value)
+     */
+    cumulative_net_bytes_between_max_value?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: in_values) (comma-separated list)
+     */
+    cumulative_net_bytes_in_values?: string;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: not_in_values) (comma-separated list)
+     */
+    cumulative_net_bytes_not_in_values?: string;
+    /**
+     * Number of active storage slots in this contract (with expiry applied) (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Number of active storage slots in this contract (with expiry applied) (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Number of active storage slots in this contract (with expiry applied) (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Number of active storage slots in this contract (with expiry applied) (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Number of active storage slots in this contract (with expiry applied) (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Number of active storage slots in this contract (with expiry applied) (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Number of active storage slots in this contract (with expiry applied) (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Number of active storage slots in this contract (with expiry applied) (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Number of active storage slots in this contract (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Number of active storage slots in this contract (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Effective bytes for this contract (with expiry applied) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Effective bytes for this contract (with expiry applied) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Effective bytes for this contract (with expiry applied) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Effective bytes for this contract (with expiry applied) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Effective bytes for this contract (with expiry applied) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Effective bytes for this contract (with expiry applied) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Effective bytes for this contract (with expiry applied) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Effective bytes for this contract (with expiry applied) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Effective bytes for this contract (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Effective bytes for this contract (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * Previous block active_slots for this address (for transition detection) (filter: eq)
+     */
+    prev_active_slots_eq?: number;
+    /**
+     * Previous block active_slots for this address (for transition detection) (filter: ne)
+     */
+    prev_active_slots_ne?: number;
+    /**
+     * Previous block active_slots for this address (for transition detection) (filter: lt)
+     */
+    prev_active_slots_lt?: number;
+    /**
+     * Previous block active_slots for this address (for transition detection) (filter: lte)
+     */
+    prev_active_slots_lte?: number;
+    /**
+     * Previous block active_slots for this address (for transition detection) (filter: gt)
+     */
+    prev_active_slots_gt?: number;
+    /**
+     * Previous block active_slots for this address (for transition detection) (filter: gte)
+     */
+    prev_active_slots_gte?: number;
+    /**
+     * Previous block active_slots for this address (for transition detection) (filter: between_min)
+     */
+    prev_active_slots_between_min?: number;
+    /**
+     * Previous block active_slots for this address (for transition detection) (filter: between_max_value)
+     */
+    prev_active_slots_between_max_value?: number;
+    /**
+     * Previous block active_slots for this address (for transition detection) (filter: in_values) (comma-separated list)
+     */
+    prev_active_slots_in_values?: string;
+    /**
+     * Previous block active_slots for this address (for transition detection) (filter: not_in_values) (comma-separated list)
+     */
+    prev_active_slots_not_in_values?: string;
+    /**
+     * Previous block effective_bytes for this address (for delta calculation) (filter: eq)
+     */
+    prev_effective_bytes_eq?: number;
+    /**
+     * Previous block effective_bytes for this address (for delta calculation) (filter: ne)
+     */
+    prev_effective_bytes_ne?: number;
+    /**
+     * Previous block effective_bytes for this address (for delta calculation) (filter: lt)
+     */
+    prev_effective_bytes_lt?: number;
+    /**
+     * Previous block effective_bytes for this address (for delta calculation) (filter: lte)
+     */
+    prev_effective_bytes_lte?: number;
+    /**
+     * Previous block effective_bytes for this address (for delta calculation) (filter: gt)
+     */
+    prev_effective_bytes_gt?: number;
+    /**
+     * Previous block effective_bytes for this address (for delta calculation) (filter: gte)
+     */
+    prev_effective_bytes_gte?: number;
+    /**
+     * Previous block effective_bytes for this address (for delta calculation) (filter: between_min)
+     */
+    prev_effective_bytes_between_min?: number;
+    /**
+     * Previous block effective_bytes for this address (for delta calculation) (filter: between_max_value)
+     */
+    prev_effective_bytes_between_max_value?: number;
+    /**
+     * Previous block effective_bytes for this address (for delta calculation) (filter: in_values) (comma-separated list)
+     */
+    prev_effective_bytes_in_values?: string;
+    /**
+     * Previous block effective_bytes for this address (for delta calculation) (filter: not_in_values) (comma-separated list)
+     */
+    prev_effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_state_with_expiry to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageStateWithExpiry` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_state_with_expiry';
+};
+
+export type IntContractStorageStateWithExpiryServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageStateWithExpiryServiceListError =
+  IntContractStorageStateWithExpiryServiceListErrors[keyof IntContractStorageStateWithExpiryServiceListErrors];
+
+export type IntContractStorageStateWithExpiryServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageStateWithExpiryResponse;
+};
+
+export type IntContractStorageStateWithExpiryServiceListResponse =
+  IntContractStorageStateWithExpiryServiceListResponses[keyof IntContractStorageStateWithExpiryServiceListResponses];
+
+export type IntContractStorageStateWithExpiryServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+     */
+    expiry_policy: string;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_state_with_expiry/{expiry_policy}';
+};
+
+export type IntContractStorageStateWithExpiryServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageStateWithExpiryServiceGetError =
+  IntContractStorageStateWithExpiryServiceGetErrors[keyof IntContractStorageStateWithExpiryServiceGetErrors];
+
+export type IntContractStorageStateWithExpiryServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageStateWithExpiryResponse;
+};
+
+export type IntContractStorageStateWithExpiryServiceGetResponse =
+  IntContractStorageStateWithExpiryServiceGetResponses[keyof IntContractStorageStateWithExpiryServiceGetResponses];
+
+export type IntContractStorageStateWithExpiryByAddressServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of active storage slots in this contract (0 if expired) (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Number of active storage slots in this contract (0 if expired) (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Number of active storage slots in this contract (0 if expired) (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Number of active storage slots in this contract (0 if expired) (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Number of active storage slots in this contract (0 if expired) (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Number of active storage slots in this contract (0 if expired) (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Number of active storage slots in this contract (0 if expired) (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Number of active storage slots in this contract (0 if expired) (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Number of active storage slots in this contract (0 if expired) (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Number of active storage slots in this contract (0 if expired) (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Effective bytes for this contract (0 if expired) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Effective bytes for this contract (0 if expired) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Effective bytes for this contract (0 if expired) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Effective bytes for this contract (0 if expired) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Effective bytes for this contract (0 if expired) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Effective bytes for this contract (0 if expired) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Effective bytes for this contract (0 if expired) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Effective bytes for this contract (0 if expired) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Effective bytes for this contract (0 if expired) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Effective bytes for this contract (0 if expired) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_state_with_expiry_by_address to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageStateWithExpiryByAddress` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_state_with_expiry_by_address';
+};
+
+export type IntContractStorageStateWithExpiryByAddressServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageStateWithExpiryByAddressServiceListError =
+  IntContractStorageStateWithExpiryByAddressServiceListErrors[keyof IntContractStorageStateWithExpiryByAddressServiceListErrors];
+
+export type IntContractStorageStateWithExpiryByAddressServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageStateWithExpiryByAddressResponse;
+};
+
+export type IntContractStorageStateWithExpiryByAddressServiceListResponse =
+  IntContractStorageStateWithExpiryByAddressServiceListResponses[keyof IntContractStorageStateWithExpiryByAddressServiceListResponses];
+
+export type IntContractStorageStateWithExpiryByAddressServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The contract address
+     */
+    address: string;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_state_with_expiry_by_address/{address}';
+};
+
+export type IntContractStorageStateWithExpiryByAddressServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageStateWithExpiryByAddressServiceGetError =
+  IntContractStorageStateWithExpiryByAddressServiceGetErrors[keyof IntContractStorageStateWithExpiryByAddressServiceGetErrors];
+
+export type IntContractStorageStateWithExpiryByAddressServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageStateWithExpiryByAddressResponse;
+};
+
+export type IntContractStorageStateWithExpiryByAddressServiceGetResponse =
+  IntContractStorageStateWithExpiryByAddressServiceGetResponses[keyof IntContractStorageStateWithExpiryByAddressServiceGetResponses];
+
+export type IntContractStorageStateWithExpiryByBlockServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Total active storage slots network-wide (with expiry applied) (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Total active storage slots network-wide (with expiry applied) (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Total active storage slots network-wide (with expiry applied) (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Total active storage slots network-wide (with expiry applied) (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Total active storage slots network-wide (with expiry applied) (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Total active storage slots network-wide (with expiry applied) (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Total active storage slots network-wide (with expiry applied) (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Total active storage slots network-wide (with expiry applied) (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Total active storage slots network-wide (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Total active storage slots network-wide (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Total effective bytes network-wide (with expiry applied) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Total effective bytes network-wide (with expiry applied) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Total effective bytes network-wide (with expiry applied) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Total effective bytes network-wide (with expiry applied) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Total effective bytes network-wide (with expiry applied) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Total effective bytes network-wide (with expiry applied) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Total effective bytes network-wide (with expiry applied) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Total effective bytes network-wide (with expiry applied) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Total effective bytes network-wide (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Total effective bytes network-wide (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * Count of contracts with active_slots > 0 (with expiry applied) (filter: eq)
+     */
+    active_contracts_eq?: number;
+    /**
+     * Count of contracts with active_slots > 0 (with expiry applied) (filter: ne)
+     */
+    active_contracts_ne?: number;
+    /**
+     * Count of contracts with active_slots > 0 (with expiry applied) (filter: lt)
+     */
+    active_contracts_lt?: number;
+    /**
+     * Count of contracts with active_slots > 0 (with expiry applied) (filter: lte)
+     */
+    active_contracts_lte?: number;
+    /**
+     * Count of contracts with active_slots > 0 (with expiry applied) (filter: gt)
+     */
+    active_contracts_gt?: number;
+    /**
+     * Count of contracts with active_slots > 0 (with expiry applied) (filter: gte)
+     */
+    active_contracts_gte?: number;
+    /**
+     * Count of contracts with active_slots > 0 (with expiry applied) (filter: between_min)
+     */
+    active_contracts_between_min?: number;
+    /**
+     * Count of contracts with active_slots > 0 (with expiry applied) (filter: between_max_value)
+     */
+    active_contracts_between_max_value?: number;
+    /**
+     * Count of contracts with active_slots > 0 (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    active_contracts_in_values?: string;
+    /**
+     * Count of contracts with active_slots > 0 (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    active_contracts_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_state_with_expiry_by_block to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageStateWithExpiryByBlock` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_state_with_expiry_by_block';
+};
+
+export type IntContractStorageStateWithExpiryByBlockServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageStateWithExpiryByBlockServiceListError =
+  IntContractStorageStateWithExpiryByBlockServiceListErrors[keyof IntContractStorageStateWithExpiryByBlockServiceListErrors];
+
+export type IntContractStorageStateWithExpiryByBlockServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageStateWithExpiryByBlockResponse;
+};
+
+export type IntContractStorageStateWithExpiryByBlockServiceListResponse =
+  IntContractStorageStateWithExpiryByBlockServiceListResponses[keyof IntContractStorageStateWithExpiryByBlockServiceListResponses];
+
+export type IntContractStorageStateWithExpiryByBlockServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+     */
+    expiry_policy: string;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_state_with_expiry_by_block/{expiry_policy}';
+};
+
+export type IntContractStorageStateWithExpiryByBlockServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageStateWithExpiryByBlockServiceGetError =
+  IntContractStorageStateWithExpiryByBlockServiceGetErrors[keyof IntContractStorageStateWithExpiryByBlockServiceGetErrors];
+
+export type IntContractStorageStateWithExpiryByBlockServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageStateWithExpiryByBlockResponse;
+};
+
+export type IntContractStorageStateWithExpiryByBlockServiceGetResponse =
+  IntContractStorageStateWithExpiryByBlockServiceGetResponses[keyof IntContractStorageStateWithExpiryByBlockServiceGetResponses];
 
 export type IntCustodyProbeServiceListData = {
   body?: never;
@@ -53238,3 +65653,2367 @@ export type IntStorageSlotReadServiceGetResponses = {
 
 export type IntStorageSlotReadServiceGetResponse =
   IntStorageSlotReadServiceGetResponses[keyof IntStorageSlotReadServiceGetResponses];
+
+export type IntStorageSlotStateServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: eq)
+     */
+    slots_delta_eq?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: ne)
+     */
+    slots_delta_ne?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: lt)
+     */
+    slots_delta_lt?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: lte)
+     */
+    slots_delta_lte?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: gt)
+     */
+    slots_delta_gt?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: gte)
+     */
+    slots_delta_gte?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: between_min)
+     */
+    slots_delta_between_min?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: between_max_value)
+     */
+    slots_delta_between_max_value?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: in_values) (comma-separated list)
+     */
+    slots_delta_in_values?: string;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: not_in_values) (comma-separated list)
+     */
+    slots_delta_not_in_values?: string;
+    /**
+     * Change in effective bytes for this block (filter: eq)
+     */
+    bytes_delta_eq?: number;
+    /**
+     * Change in effective bytes for this block (filter: ne)
+     */
+    bytes_delta_ne?: number;
+    /**
+     * Change in effective bytes for this block (filter: lt)
+     */
+    bytes_delta_lt?: number;
+    /**
+     * Change in effective bytes for this block (filter: lte)
+     */
+    bytes_delta_lte?: number;
+    /**
+     * Change in effective bytes for this block (filter: gt)
+     */
+    bytes_delta_gt?: number;
+    /**
+     * Change in effective bytes for this block (filter: gte)
+     */
+    bytes_delta_gte?: number;
+    /**
+     * Change in effective bytes for this block (filter: between_min)
+     */
+    bytes_delta_between_min?: number;
+    /**
+     * Change in effective bytes for this block (filter: between_max_value)
+     */
+    bytes_delta_between_max_value?: number;
+    /**
+     * Change in effective bytes for this block (filter: in_values) (comma-separated list)
+     */
+    bytes_delta_in_values?: string;
+    /**
+     * Change in effective bytes for this block (filter: not_in_values) (comma-separated list)
+     */
+    bytes_delta_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_state to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotState` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_state';
+};
+
+export type IntStorageSlotStateServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotStateServiceListError =
+  IntStorageSlotStateServiceListErrors[keyof IntStorageSlotStateServiceListErrors];
+
+export type IntStorageSlotStateServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotStateResponse;
+};
+
+export type IntStorageSlotStateServiceListResponse =
+  IntStorageSlotStateServiceListResponses[keyof IntStorageSlotStateServiceListResponses];
+
+export type IntStorageSlotStateServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_state/{block_number}';
+};
+
+export type IntStorageSlotStateServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotStateServiceGetError =
+  IntStorageSlotStateServiceGetErrors[keyof IntStorageSlotStateServiceGetErrors];
+
+export type IntStorageSlotStateServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotStateResponse;
+};
+
+export type IntStorageSlotStateServiceGetResponse =
+  IntStorageSlotStateServiceGetResponses[keyof IntStorageSlotStateServiceGetResponses];
+
+export type IntStorageSlotStateByAddressServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: eq)
+     */
+    slots_delta_eq?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: ne)
+     */
+    slots_delta_ne?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: lt)
+     */
+    slots_delta_lt?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: lte)
+     */
+    slots_delta_lte?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: gt)
+     */
+    slots_delta_gt?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: gte)
+     */
+    slots_delta_gte?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: between_min)
+     */
+    slots_delta_between_min?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: between_max_value)
+     */
+    slots_delta_between_max_value?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: in_values) (comma-separated list)
+     */
+    slots_delta_in_values?: string;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: not_in_values) (comma-separated list)
+     */
+    slots_delta_not_in_values?: string;
+    /**
+     * Change in effective bytes for this block (filter: eq)
+     */
+    bytes_delta_eq?: number;
+    /**
+     * Change in effective bytes for this block (filter: ne)
+     */
+    bytes_delta_ne?: number;
+    /**
+     * Change in effective bytes for this block (filter: lt)
+     */
+    bytes_delta_lt?: number;
+    /**
+     * Change in effective bytes for this block (filter: lte)
+     */
+    bytes_delta_lte?: number;
+    /**
+     * Change in effective bytes for this block (filter: gt)
+     */
+    bytes_delta_gt?: number;
+    /**
+     * Change in effective bytes for this block (filter: gte)
+     */
+    bytes_delta_gte?: number;
+    /**
+     * Change in effective bytes for this block (filter: between_min)
+     */
+    bytes_delta_between_min?: number;
+    /**
+     * Change in effective bytes for this block (filter: between_max_value)
+     */
+    bytes_delta_between_max_value?: number;
+    /**
+     * Change in effective bytes for this block (filter: in_values) (comma-separated list)
+     */
+    bytes_delta_in_values?: string;
+    /**
+     * Change in effective bytes for this block (filter: not_in_values) (comma-separated list)
+     */
+    bytes_delta_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots for this address at this block (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_state_by_address to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotStateByAddress` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_state_by_address';
+};
+
+export type IntStorageSlotStateByAddressServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotStateByAddressServiceListError =
+  IntStorageSlotStateByAddressServiceListErrors[keyof IntStorageSlotStateByAddressServiceListErrors];
+
+export type IntStorageSlotStateByAddressServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotStateByAddressResponse;
+};
+
+export type IntStorageSlotStateByAddressServiceListResponse =
+  IntStorageSlotStateByAddressServiceListResponses[keyof IntStorageSlotStateByAddressServiceListResponses];
+
+export type IntStorageSlotStateByAddressServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The contract address
+     */
+    address: string;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_state_by_address/{address}';
+};
+
+export type IntStorageSlotStateByAddressServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotStateByAddressServiceGetError =
+  IntStorageSlotStateByAddressServiceGetErrors[keyof IntStorageSlotStateByAddressServiceGetErrors];
+
+export type IntStorageSlotStateByAddressServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotStateByAddressResponse;
+};
+
+export type IntStorageSlotStateByAddressServiceGetResponse =
+  IntStorageSlotStateByAddressServiceGetResponses[keyof IntStorageSlotStateByAddressServiceGetResponses];
+
+export type IntStorageSlotStateByBlockServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: eq)
+     */
+    slots_delta_eq?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: ne)
+     */
+    slots_delta_ne?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: lt)
+     */
+    slots_delta_lt?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: lte)
+     */
+    slots_delta_lte?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: gt)
+     */
+    slots_delta_gt?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: gte)
+     */
+    slots_delta_gte?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: between_min)
+     */
+    slots_delta_between_min?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: between_max_value)
+     */
+    slots_delta_between_max_value?: number;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: in_values) (comma-separated list)
+     */
+    slots_delta_in_values?: string;
+    /**
+     * Change in active slots for this block (positive=activated, negative=deactivated) (filter: not_in_values) (comma-separated list)
+     */
+    slots_delta_not_in_values?: string;
+    /**
+     * Change in effective bytes for this block (filter: eq)
+     */
+    bytes_delta_eq?: number;
+    /**
+     * Change in effective bytes for this block (filter: ne)
+     */
+    bytes_delta_ne?: number;
+    /**
+     * Change in effective bytes for this block (filter: lt)
+     */
+    bytes_delta_lt?: number;
+    /**
+     * Change in effective bytes for this block (filter: lte)
+     */
+    bytes_delta_lte?: number;
+    /**
+     * Change in effective bytes for this block (filter: gt)
+     */
+    bytes_delta_gt?: number;
+    /**
+     * Change in effective bytes for this block (filter: gte)
+     */
+    bytes_delta_gte?: number;
+    /**
+     * Change in effective bytes for this block (filter: between_min)
+     */
+    bytes_delta_between_min?: number;
+    /**
+     * Change in effective bytes for this block (filter: between_max_value)
+     */
+    bytes_delta_between_max_value?: number;
+    /**
+     * Change in effective bytes for this block (filter: in_values) (comma-separated list)
+     */
+    bytes_delta_in_values?: string;
+    /**
+     * Change in effective bytes for this block (filter: not_in_values) (comma-separated list)
+     */
+    bytes_delta_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at this block (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots at this block (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at this block (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes across all active slots at this block (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_state_by_block to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotStateByBlock` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_state_by_block';
+};
+
+export type IntStorageSlotStateByBlockServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotStateByBlockServiceListError =
+  IntStorageSlotStateByBlockServiceListErrors[keyof IntStorageSlotStateByBlockServiceListErrors];
+
+export type IntStorageSlotStateByBlockServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotStateByBlockResponse;
+};
+
+export type IntStorageSlotStateByBlockServiceListResponse =
+  IntStorageSlotStateByBlockServiceListResponses[keyof IntStorageSlotStateByBlockServiceListResponses];
+
+export type IntStorageSlotStateByBlockServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_state_by_block/{block_number}';
+};
+
+export type IntStorageSlotStateByBlockServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotStateByBlockServiceGetError =
+  IntStorageSlotStateByBlockServiceGetErrors[keyof IntStorageSlotStateByBlockServiceGetErrors];
+
+export type IntStorageSlotStateByBlockServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotStateByBlockResponse;
+};
+
+export type IntStorageSlotStateByBlockServiceGetResponse =
+  IntStorageSlotStateByBlockServiceGetResponses[keyof IntStorageSlotStateByBlockServiceGetResponses];
+
+export type IntStorageSlotStateWithExpiryServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: eq)
+     */
+    net_slots_delta_eq?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: ne)
+     */
+    net_slots_delta_ne?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: lt)
+     */
+    net_slots_delta_lt?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: lte)
+     */
+    net_slots_delta_lte?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: gt)
+     */
+    net_slots_delta_gt?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: gte)
+     */
+    net_slots_delta_gte?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: between_min)
+     */
+    net_slots_delta_between_min?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: between_max_value)
+     */
+    net_slots_delta_between_max_value?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: in_values) (comma-separated list)
+     */
+    net_slots_delta_in_values?: string;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: not_in_values) (comma-separated list)
+     */
+    net_slots_delta_not_in_values?: string;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: eq)
+     */
+    net_bytes_delta_eq?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: ne)
+     */
+    net_bytes_delta_ne?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: lt)
+     */
+    net_bytes_delta_lt?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: lte)
+     */
+    net_bytes_delta_lte?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: gt)
+     */
+    net_bytes_delta_gt?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: gte)
+     */
+    net_bytes_delta_gte?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: between_min)
+     */
+    net_bytes_delta_between_min?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: between_max_value)
+     */
+    net_bytes_delta_between_max_value?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: in_values) (comma-separated list)
+     */
+    net_bytes_delta_in_values?: string;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: not_in_values) (comma-separated list)
+     */
+    net_bytes_delta_not_in_values?: string;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: eq)
+     */
+    cumulative_net_slots_eq?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: ne)
+     */
+    cumulative_net_slots_ne?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: lt)
+     */
+    cumulative_net_slots_lt?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: lte)
+     */
+    cumulative_net_slots_lte?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: gt)
+     */
+    cumulative_net_slots_gt?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: gte)
+     */
+    cumulative_net_slots_gte?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: between_min)
+     */
+    cumulative_net_slots_between_min?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: between_max_value)
+     */
+    cumulative_net_slots_between_max_value?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: in_values) (comma-separated list)
+     */
+    cumulative_net_slots_in_values?: string;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: not_in_values) (comma-separated list)
+     */
+    cumulative_net_slots_not_in_values?: string;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: eq)
+     */
+    cumulative_net_bytes_eq?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: ne)
+     */
+    cumulative_net_bytes_ne?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: lt)
+     */
+    cumulative_net_bytes_lt?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: lte)
+     */
+    cumulative_net_bytes_lte?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: gt)
+     */
+    cumulative_net_bytes_gt?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: gte)
+     */
+    cumulative_net_bytes_gte?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: between_min)
+     */
+    cumulative_net_bytes_between_min?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: between_max_value)
+     */
+    cumulative_net_bytes_between_max_value?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: in_values) (comma-separated list)
+     */
+    cumulative_net_bytes_in_values?: string;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: not_in_values) (comma-separated list)
+     */
+    cumulative_net_bytes_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_state_with_expiry to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotStateWithExpiry` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_state_with_expiry';
+};
+
+export type IntStorageSlotStateWithExpiryServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotStateWithExpiryServiceListError =
+  IntStorageSlotStateWithExpiryServiceListErrors[keyof IntStorageSlotStateWithExpiryServiceListErrors];
+
+export type IntStorageSlotStateWithExpiryServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotStateWithExpiryResponse;
+};
+
+export type IntStorageSlotStateWithExpiryServiceListResponse =
+  IntStorageSlotStateWithExpiryServiceListResponses[keyof IntStorageSlotStateWithExpiryServiceListResponses];
+
+export type IntStorageSlotStateWithExpiryServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+     */
+    expiry_policy: string;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_state_with_expiry/{expiry_policy}';
+};
+
+export type IntStorageSlotStateWithExpiryServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotStateWithExpiryServiceGetError =
+  IntStorageSlotStateWithExpiryServiceGetErrors[keyof IntStorageSlotStateWithExpiryServiceGetErrors];
+
+export type IntStorageSlotStateWithExpiryServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotStateWithExpiryResponse;
+};
+
+export type IntStorageSlotStateWithExpiryServiceGetResponse =
+  IntStorageSlotStateWithExpiryServiceGetResponses[keyof IntStorageSlotStateWithExpiryServiceGetResponses];
+
+export type IntStorageSlotStateWithExpiryByAddressServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: eq)
+     */
+    net_slots_delta_eq?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: ne)
+     */
+    net_slots_delta_ne?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: lt)
+     */
+    net_slots_delta_lt?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: lte)
+     */
+    net_slots_delta_lte?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: gt)
+     */
+    net_slots_delta_gt?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: gte)
+     */
+    net_slots_delta_gte?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: between_min)
+     */
+    net_slots_delta_between_min?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: between_max_value)
+     */
+    net_slots_delta_between_max_value?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: in_values) (comma-separated list)
+     */
+    net_slots_delta_in_values?: string;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: not_in_values) (comma-separated list)
+     */
+    net_slots_delta_not_in_values?: string;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: eq)
+     */
+    net_bytes_delta_eq?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: ne)
+     */
+    net_bytes_delta_ne?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: lt)
+     */
+    net_bytes_delta_lt?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: lte)
+     */
+    net_bytes_delta_lte?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: gt)
+     */
+    net_bytes_delta_gt?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: gte)
+     */
+    net_bytes_delta_gte?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: between_min)
+     */
+    net_bytes_delta_between_min?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: between_max_value)
+     */
+    net_bytes_delta_between_max_value?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: in_values) (comma-separated list)
+     */
+    net_bytes_delta_in_values?: string;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: not_in_values) (comma-separated list)
+     */
+    net_bytes_delta_not_in_values?: string;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: eq)
+     */
+    cumulative_net_slots_eq?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: ne)
+     */
+    cumulative_net_slots_ne?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: lt)
+     */
+    cumulative_net_slots_lt?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: lte)
+     */
+    cumulative_net_slots_lte?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: gt)
+     */
+    cumulative_net_slots_gt?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: gte)
+     */
+    cumulative_net_slots_gte?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: between_min)
+     */
+    cumulative_net_slots_between_min?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: between_max_value)
+     */
+    cumulative_net_slots_between_max_value?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: in_values) (comma-separated list)
+     */
+    cumulative_net_slots_in_values?: string;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: not_in_values) (comma-separated list)
+     */
+    cumulative_net_slots_not_in_values?: string;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: eq)
+     */
+    cumulative_net_bytes_eq?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: ne)
+     */
+    cumulative_net_bytes_ne?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: lt)
+     */
+    cumulative_net_bytes_lt?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: lte)
+     */
+    cumulative_net_bytes_lte?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: gt)
+     */
+    cumulative_net_bytes_gt?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: gte)
+     */
+    cumulative_net_bytes_gte?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: between_min)
+     */
+    cumulative_net_bytes_between_min?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: between_max_value)
+     */
+    cumulative_net_bytes_between_max_value?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: in_values) (comma-separated list)
+     */
+    cumulative_net_bytes_in_values?: string;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: not_in_values) (comma-separated list)
+     */
+    cumulative_net_bytes_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots for this address at this block (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes for this address at this block (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_state_with_expiry_by_address to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotStateWithExpiryByAddress` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_state_with_expiry_by_address';
+};
+
+export type IntStorageSlotStateWithExpiryByAddressServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotStateWithExpiryByAddressServiceListError =
+  IntStorageSlotStateWithExpiryByAddressServiceListErrors[keyof IntStorageSlotStateWithExpiryByAddressServiceListErrors];
+
+export type IntStorageSlotStateWithExpiryByAddressServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotStateWithExpiryByAddressResponse;
+};
+
+export type IntStorageSlotStateWithExpiryByAddressServiceListResponse =
+  IntStorageSlotStateWithExpiryByAddressServiceListResponses[keyof IntStorageSlotStateWithExpiryByAddressServiceListResponses];
+
+export type IntStorageSlotStateWithExpiryByAddressServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The contract address
+     */
+    address: string;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_state_with_expiry_by_address/{address}';
+};
+
+export type IntStorageSlotStateWithExpiryByAddressServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotStateWithExpiryByAddressServiceGetError =
+  IntStorageSlotStateWithExpiryByAddressServiceGetErrors[keyof IntStorageSlotStateWithExpiryByAddressServiceGetErrors];
+
+export type IntStorageSlotStateWithExpiryByAddressServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotStateWithExpiryByAddressResponse;
+};
+
+export type IntStorageSlotStateWithExpiryByAddressServiceGetResponse =
+  IntStorageSlotStateWithExpiryByAddressServiceGetResponses[keyof IntStorageSlotStateWithExpiryByAddressServiceGetResponses];
+
+export type IntStorageSlotStateWithExpiryByBlockServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: eq)
+     */
+    net_slots_delta_eq?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: ne)
+     */
+    net_slots_delta_ne?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: lt)
+     */
+    net_slots_delta_lt?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: lte)
+     */
+    net_slots_delta_lte?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: gt)
+     */
+    net_slots_delta_gt?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: gte)
+     */
+    net_slots_delta_gte?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: between_min)
+     */
+    net_slots_delta_between_min?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: between_max_value)
+     */
+    net_slots_delta_between_max_value?: number;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: in_values) (comma-separated list)
+     */
+    net_slots_delta_in_values?: string;
+    /**
+     * Net slot adjustment this block (negative=expiry, positive=reactivation) (filter: not_in_values) (comma-separated list)
+     */
+    net_slots_delta_not_in_values?: string;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: eq)
+     */
+    net_bytes_delta_eq?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: ne)
+     */
+    net_bytes_delta_ne?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: lt)
+     */
+    net_bytes_delta_lt?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: lte)
+     */
+    net_bytes_delta_lte?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: gt)
+     */
+    net_bytes_delta_gt?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: gte)
+     */
+    net_bytes_delta_gte?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: between_min)
+     */
+    net_bytes_delta_between_min?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: between_max_value)
+     */
+    net_bytes_delta_between_max_value?: number;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: in_values) (comma-separated list)
+     */
+    net_bytes_delta_in_values?: string;
+    /**
+     * Net bytes adjustment this block (negative=expiry, positive=reactivation) (filter: not_in_values) (comma-separated list)
+     */
+    net_bytes_delta_not_in_values?: string;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: eq)
+     */
+    cumulative_net_slots_eq?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: ne)
+     */
+    cumulative_net_slots_ne?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: lt)
+     */
+    cumulative_net_slots_lt?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: lte)
+     */
+    cumulative_net_slots_lte?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: gt)
+     */
+    cumulative_net_slots_gt?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: gte)
+     */
+    cumulative_net_slots_gte?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: between_min)
+     */
+    cumulative_net_slots_between_min?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: between_max_value)
+     */
+    cumulative_net_slots_between_max_value?: number;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: in_values) (comma-separated list)
+     */
+    cumulative_net_slots_in_values?: string;
+    /**
+     * Cumulative net slot adjustment up to this block (filter: not_in_values) (comma-separated list)
+     */
+    cumulative_net_slots_not_in_values?: string;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: eq)
+     */
+    cumulative_net_bytes_eq?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: ne)
+     */
+    cumulative_net_bytes_ne?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: lt)
+     */
+    cumulative_net_bytes_lt?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: lte)
+     */
+    cumulative_net_bytes_lte?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: gt)
+     */
+    cumulative_net_bytes_gt?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: gte)
+     */
+    cumulative_net_bytes_gte?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: between_min)
+     */
+    cumulative_net_bytes_between_min?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: between_max_value)
+     */
+    cumulative_net_bytes_between_max_value?: number;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: in_values) (comma-separated list)
+     */
+    cumulative_net_bytes_in_values?: string;
+    /**
+     * Cumulative net bytes adjustment up to this block (filter: not_in_values) (comma-separated list)
+     */
+    cumulative_net_bytes_not_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Cumulative count of active storage slots at this block (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Cumulative sum of effective bytes at this block (with expiry applied) (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_slot_state_with_expiry_by_block to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSlotStateWithExpiryByBlock` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_slot_state_with_expiry_by_block';
+};
+
+export type IntStorageSlotStateWithExpiryByBlockServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotStateWithExpiryByBlockServiceListError =
+  IntStorageSlotStateWithExpiryByBlockServiceListErrors[keyof IntStorageSlotStateWithExpiryByBlockServiceListErrors];
+
+export type IntStorageSlotStateWithExpiryByBlockServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSlotStateWithExpiryByBlockResponse;
+};
+
+export type IntStorageSlotStateWithExpiryByBlockServiceListResponse =
+  IntStorageSlotStateWithExpiryByBlockServiceListResponses[keyof IntStorageSlotStateWithExpiryByBlockServiceListResponses];
+
+export type IntStorageSlotStateWithExpiryByBlockServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
+     */
+    expiry_policy: string;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_slot_state_with_expiry_by_block/{expiry_policy}';
+};
+
+export type IntStorageSlotStateWithExpiryByBlockServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSlotStateWithExpiryByBlockServiceGetError =
+  IntStorageSlotStateWithExpiryByBlockServiceGetErrors[keyof IntStorageSlotStateWithExpiryByBlockServiceGetErrors];
+
+export type IntStorageSlotStateWithExpiryByBlockServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSlotStateWithExpiryByBlockResponse;
+};
+
+export type IntStorageSlotStateWithExpiryByBlockServiceGetResponse =
+  IntStorageSlotStateWithExpiryByBlockServiceGetResponses[keyof IntStorageSlotStateWithExpiryByBlockServiceGetResponses];
