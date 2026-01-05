@@ -1,6 +1,14 @@
-import { type JSX } from 'react';
+import type { JSX } from 'react';
 import { clsx } from 'clsx';
-import { ClockIcon, XCircleIcon, BeakerIcon, FireIcon, QueueListIcon, BoltIcon } from '@heroicons/react/24/outline';
+import {
+  ClockIcon,
+  XCircleIcon,
+  BeakerIcon,
+  FireIcon,
+  QueueListIcon,
+  PlayIcon,
+  PauseIcon,
+} from '@heroicons/react/24/outline';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import type { FilterValues } from '../../IndexPage.types';
 import { DEFAULT_DURATION_MIN } from '../../IndexPage.types';
@@ -106,12 +114,21 @@ type QuickFiltersProps = {
   currentFilters: FilterValues;
   onApplyPreset: (filters: Partial<FilterValues>) => void;
   onClearFilters: () => void;
+  // Live mode props
+  isLive?: boolean;
+  onLiveModeToggle?: () => void;
 };
 
 /**
- * Compact quick filter presets for common payload filter combinations
+ * Unified toolbar with quick filters, live toggle, and reference nodes
  */
-export function QuickFilters({ currentFilters, onApplyPreset, onClearFilters }: QuickFiltersProps): JSX.Element {
+export function QuickFilters({
+  currentFilters,
+  onApplyPreset,
+  onClearFilters,
+  isLive,
+  onLiveModeToggle,
+}: QuickFiltersProps): JSX.Element {
   const handlePresetClick = (preset: QuickFilterPreset): void => {
     if (isPresetActive(preset, currentFilters)) {
       onClearFilters();
@@ -145,12 +162,39 @@ export function QuickFilters({ currentFilters, onApplyPreset, onClearFilters }: 
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-      {/* Label */}
-      <div className="flex items-center gap-1.5 text-xs text-muted">
-        <BoltIcon className="size-3.5" />
-        <span className="font-medium">Quick:</span>
-      </div>
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+      {/* Live mode toggle */}
+      {onLiveModeToggle && (
+        <>
+          <button
+            type="button"
+            onClick={onLiveModeToggle}
+            className={clsx(
+              'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all',
+              isLive
+                ? 'bg-green-500/20 text-green-400 ring-2 ring-green-500/30'
+                : 'bg-surface text-muted ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
+            )}
+          >
+            {isLive ? (
+              <>
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-green-400 opacity-75" />
+                  <span className="relative inline-flex size-2 rounded-full bg-green-500" />
+                </span>
+                <PauseIcon className="size-3.5" />
+                <span>Live</span>
+              </>
+            ) : (
+              <>
+                <PlayIcon className="size-3.5" />
+                <span>Go Live</span>
+              </>
+            )}
+          </button>
+          <div className="hidden h-5 w-px bg-border sm:block" />
+        </>
+      )}
 
       {/* Core Presets - always visible */}
       <div className="flex flex-wrap items-center gap-1.5">
@@ -228,7 +272,7 @@ export function QuickFilters({ currentFilters, onApplyPreset, onClearFilters }: 
         <button
           type="button"
           onClick={handleReferenceNodesToggle}
-          title={isReferenceNodesActive ? 'Showing EIP-7870 block builders only' : 'Showing all nodes'}
+          title={isReferenceNodesActive ? 'Showing EIP-7870 reference nodes only' : 'Showing all nodes'}
           className={clsx(
             'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all',
             isReferenceNodesActive
