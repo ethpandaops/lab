@@ -366,7 +366,7 @@ export function PayloadsView({
       </div>
 
       {/* Hardware specs banner */}
-      <EIP7870SpecsBanner nodeClass="attester" className="mb-4" />
+      <EIP7870SpecsBanner className="mb-4" />
 
       {/* Unified toolbar: Live toggle + Quick filters + Reference */}
       <div className="mb-4">
@@ -418,9 +418,15 @@ export function PayloadsView({
             ? `No payloads found with duration >= ${filters.durationMin}ms`
             : `No payloads found (duration >= ${durationThreshold}ms)`
         }
-        getRowClassName={(row, _rowId) =>
-          clsx('cursor-pointer transition-colors hover:bg-surface/50', isRowNew(row) && 'animate-pulse bg-green-500/10')
-        }
+        getRowClassName={(row, _rowId) => {
+          const isReferenceNode = row.node_class === 'eip7870-block-builder';
+          const showReferenceHighlight = !filters.referenceNodes && isReferenceNode;
+          return clsx(
+            'cursor-pointer transition-colors hover:bg-surface/50',
+            isRowNew(row) && 'animate-pulse bg-green-500/10',
+            showReferenceHighlight && 'bg-primary/5 border-l-2 border-l-primary'
+          );
+        }}
         hideGlobalFilter
         hideColumnVisibility
         paginationPosition={isLive ? undefined : 'bottom'}

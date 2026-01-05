@@ -426,7 +426,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   return (
     <div className="space-y-6">
       {/* Hardware specs banner */}
-      <EIP7870SpecsBanner nodeClass="attester" />
+      <EIP7870SpecsBanner />
 
       {/* Summary Stats */}
       <Stats

@@ -2,62 +2,81 @@ import { useState, type JSX } from 'react';
 import { clsx } from 'clsx';
 import { ChevronDownIcon, ChevronUpIcon, ServerIcon } from '@heroicons/react/24/outline';
 
-import type { EIP7870SpecsBannerProps, HardwareSpec, NodeClass } from './EIP7870SpecsBanner.types';
+import type { EIP7870SpecsBannerProps } from './EIP7870SpecsBanner.types';
 
 /**
- * EIP-7870 hardware specifications by node class
+ * Cluster hardware specifications
  */
-const HARDWARE_SPECS: Record<NodeClass, HardwareSpec> = {
-  'full-node': {
-    nodeClass: 'full-node',
-    displayName: 'Full Node',
-    storage: '4 TB NVMe',
-    memory: '32 GB',
-    cpu: '4c / 8t',
-    passMarkST: '~1000',
-    passMarkMT: '~3000',
-    bandwidthDown: '50 Mbps',
-    bandwidthUp: '15 Mbps',
-  },
-  attester: {
-    nodeClass: 'attester',
-    displayName: 'Attester',
-    storage: '4 TB NVMe',
-    memory: '64 GB',
-    cpu: '8c / 16t',
-    passMarkST: '~3500',
-    passMarkMT: '~25000',
-    bandwidthDown: '50 Mbps',
-    bandwidthUp: '25 Mbps',
-  },
-  'local-block-builder': {
-    nodeClass: 'local-block-builder',
-    displayName: 'Local Block Builder',
-    storage: '4 TB NVMe',
-    memory: '64 GB',
-    cpu: '8c / 16t',
-    passMarkST: '~3500',
-    passMarkMT: '~25000',
-    bandwidthDown: '100 Mbps',
-    bandwidthUp: '50 Mbps',
-  },
+type ClusterSpec = {
+  name: string;
+  cpu: {
+    model: string;
+    cores: number;
+    threads: number;
+    maxFrequency: string;
+  };
+  memory: {
+    total: string;
+    type: string;
+    speed: string;
+  };
+  storage: {
+    model: string;
+    capacity: string;
+    interface: string;
+  };
 };
 
 /**
- * Displays EIP-7870 hardware specifications in a compact, expandable banner.
- * Shows key specs inline with option to expand for full details.
- *
- * @example
- * // Default attester specs
- * <EIP7870SpecsBanner />
- *
- * @example
- * // Full node specs
- * <EIP7870SpecsBanner nodeClass="full-node" />
+ * Hardware specifications by cluster
  */
-export function EIP7870SpecsBanner({ nodeClass = 'attester', className }: EIP7870SpecsBannerProps): JSX.Element {
+const CLUSTER_SPECS: ClusterSpec[] = [
+  {
+    name: 'utility',
+    cpu: {
+      model: 'AMD Ryzen 7 7700',
+      cores: 8,
+      threads: 16,
+      maxFrequency: '5.4 GHz',
+    },
+    memory: {
+      total: '64 GB',
+      type: 'DDR5',
+      speed: '5200 MT/s',
+    },
+    storage: {
+      model: 'SOLIDIGM SSDPFKKW010X7',
+      capacity: '2x 1 TB',
+      interface: 'NVMe 1.4',
+    },
+  },
+  {
+    name: 'sigma',
+    cpu: {
+      model: 'Intel Core i7-13700H',
+      cores: 14,
+      threads: 20,
+      maxFrequency: '5.0 GHz',
+    },
+    memory: {
+      total: '64 GB',
+      type: 'DDR5',
+      speed: '4800 MT/s',
+    },
+    storage: {
+      model: 'Samsung 990 PRO',
+      capacity: '4 TB',
+      interface: 'NVMe 2.0',
+    },
+  },
+];
+
+/**
+ * Displays EIP-7870 hardware specifications in a compact, expandable banner.
+ * Shows cluster specs with option to expand for full details.
+ */
+export function EIP7870SpecsBanner({ className }: EIP7870SpecsBannerProps): JSX.Element {
   const [isExpanded, setIsExpanded] = useState(false);
-  const spec = HARDWARE_SPECS[nodeClass];
 
   return (
     <div className={clsx('rounded-xs border border-border bg-surface/50', className)}>
@@ -69,21 +88,10 @@ export function EIP7870SpecsBanner({ nodeClass = 'attester', className }: EIP787
       >
         <div className="flex items-center gap-2.5">
           <ServerIcon className="size-4 shrink-0 text-muted" />
-          <span className="text-xs text-muted">
-            <span className="font-medium text-foreground">Reference Nodes:</span>{' '}
-            <span className="font-medium text-foreground">{spec.displayName}</span>
-            <span className="hidden sm:inline">
-              {' '}
-              ({spec.memory} · {spec.cpu} · {spec.storage} · {spec.bandwidthDown} / {spec.bandwidthUp})
-            </span>
-            <span className="sm:hidden">
-              {' '}
-              ({spec.memory} · {spec.cpu})
-            </span>
-          </span>
+          <span className="text-xs font-medium text-foreground">Reference Node Hardware Specs</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-accent hover:underline">EIP-7870</span>
+          <span className="text-xs text-accent">EIP-7870</span>
           {isExpanded ? (
             <ChevronUpIcon className="size-4 text-muted" />
           ) : (
@@ -92,34 +100,45 @@ export function EIP7870SpecsBanner({ nodeClass = 'attester', className }: EIP787
         </div>
       </button>
 
-      {/* Expanded view - full specs table */}
+      {/* Expanded view - cluster specs table */}
       {isExpanded && (
         <div className="border-t border-border px-4 py-3">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="pr-4 pb-2 font-medium text-foreground">Node Type</th>
-                  <th className="pr-4 pb-2 font-medium text-foreground">Storage</th>
-                  <th className="pr-4 pb-2 font-medium text-foreground">Memory</th>
+                  <th className="pr-4 pb-2 font-medium text-foreground">Cluster</th>
                   <th className="pr-4 pb-2 font-medium text-foreground">CPU</th>
-                  <th className="pr-4 pb-2 font-medium text-foreground">PassMark ST / MT</th>
-                  <th className="pb-2 font-medium text-foreground">Bandwidth</th>
+                  <th className="pr-4 pb-2 font-medium text-foreground">Cores / Threads</th>
+                  <th className="pr-4 pb-2 font-medium text-foreground">Memory</th>
+                  <th className="pb-2 font-medium text-foreground">Storage</th>
                 </tr>
               </thead>
               <tbody className="text-muted">
-                <tr>
-                  <td className="pt-2 pr-4 font-medium text-foreground">{spec.displayName}</td>
-                  <td className="pt-2 pr-4">{spec.storage}</td>
-                  <td className="pt-2 pr-4">{spec.memory}</td>
-                  <td className="pt-2 pr-4">{spec.cpu}</td>
-                  <td className="pt-2 pr-4">
-                    {spec.passMarkST} / {spec.passMarkMT}
-                  </td>
-                  <td className="pt-2">
-                    {spec.bandwidthDown} / {spec.bandwidthUp}
-                  </td>
-                </tr>
+                {CLUSTER_SPECS.map(cluster => (
+                  <tr key={cluster.name} className="border-b border-border/50 last:border-0">
+                    <td className="py-2 pr-4 font-medium text-foreground">{cluster.name}</td>
+                    <td className="py-2 pr-4">
+                      <div>{cluster.cpu.model}</div>
+                      <div className="text-muted/70">up to {cluster.cpu.maxFrequency}</div>
+                    </td>
+                    <td className="py-2 pr-4">
+                      {cluster.cpu.cores}c / {cluster.cpu.threads}t
+                    </td>
+                    <td className="py-2 pr-4">
+                      <div>{cluster.memory.total}</div>
+                      <div className="text-muted/70">
+                        {cluster.memory.type} @ {cluster.memory.speed}
+                      </div>
+                    </td>
+                    <td className="py-2">
+                      <div>
+                        {cluster.storage.model} {cluster.storage.capacity}
+                      </div>
+                      <div className="text-muted/70">{cluster.storage.interface}</div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

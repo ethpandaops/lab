@@ -25,39 +25,26 @@ export const Default: Story = {
   args: {},
 };
 
-export const Attester: Story = {
-  args: {
-    nodeClass: 'attester',
+export const Collapsed: Story = {
+  args: {},
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the collapsed view with summary hardware specs',
+      },
+    },
   },
 };
 
-export const FullNode: Story = {
+export const WithCustomClass: Story = {
   args: {
-    nodeClass: 'full-node',
+    className: 'border-primary/30',
   },
-};
-
-export const LocalBlockBuilder: Story = {
-  args: {
-    nodeClass: 'local-block-builder',
+  parameters: {
+    docs: {
+      description: {
+        story: 'Banner with custom border styling',
+      },
+    },
   },
-};
-
-export const AllNodeClasses: Story = {
-  render: () => (
-    <div className="flex flex-col gap-4">
-      <div>
-        <span className="mb-2 block text-sm text-muted">Attester (default):</span>
-        <EIP7870SpecsBanner nodeClass="attester" />
-      </div>
-      <div>
-        <span className="mb-2 block text-sm text-muted">Full Node:</span>
-        <EIP7870SpecsBanner nodeClass="full-node" />
-      </div>
-      <div>
-        <span className="mb-2 block text-sm text-muted">Local Block Builder:</span>
-        <EIP7870SpecsBanner nodeClass="local-block-builder" />
-      </div>
-    </div>
-  ),
 };
