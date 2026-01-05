@@ -5,6 +5,7 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { DataTable } from '@/components/DataTable';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { EIP7870SpecsBanner } from '@/components/Ethereum/EIP7870SpecsBanner';
 import { TracoorIcon } from '@/components/Ethereum/TracoorIcon';
 import { Alert } from '@/components/Feedback/Alert';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
@@ -229,11 +230,15 @@ export function PayloadsView({
           const client = info.getValue();
           if (!client) return <span className="text-muted">-</span>;
           const clientLower = client.toLowerCase();
+          const version = info.row.original.meta_execution_version;
           return (
             <FilterableCell field="meta_execution_implementation" value={client} onFilterClick={onFilterClick}>
               <span className="inline-flex items-center gap-1.5">
                 <ClientLogo client={clientLower} size={16} />
-                <span className="text-xs">{clientLower}</span>
+                <span className="text-xs">
+                  {clientLower}
+                  {version && <span className="text-muted"> ({version})</span>}
+                </span>
               </span>
             </FilterableCell>
           );
@@ -346,7 +351,7 @@ export function PayloadsView({
   return (
     <Container>
       {/* Header with Go Live and Learn More buttons */}
-      <div className="mb-6 flex items-start justify-between gap-4">
+      <div className="flex items-start justify-between gap-4">
         <Header
           title="Payloads"
           description={`Individual engine_newPayload observations taking ${durationThreshold}ms+ to validate`}
@@ -406,6 +411,9 @@ export function PayloadsView({
           </div>
         </div>
       )}
+
+      {/* Hardware specs banner */}
+      <EIP7870SpecsBanner nodeClass="attester" className="mb-4" />
 
       {/* Quick filters */}
       <div className="mb-4">

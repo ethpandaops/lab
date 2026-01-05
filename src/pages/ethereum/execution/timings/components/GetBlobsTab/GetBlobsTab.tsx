@@ -2,6 +2,7 @@ import type { JSX } from 'react';
 import { useState } from 'react';
 import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
+import { EIP7870SpecsBanner } from '@/components/Ethereum/EIP7870SpecsBanner';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { BarChart } from '@/components/Charts/Bar';
@@ -419,6 +420,9 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
 
   return (
     <div className="space-y-6">
+      {/* Hardware specs banner */}
+      <EIP7870SpecsBanner nodeClass="attester" />
+
       {/* Summary Stats */}
       <Stats
         stats={[
