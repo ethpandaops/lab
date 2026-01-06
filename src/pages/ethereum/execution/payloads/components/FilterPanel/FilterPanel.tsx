@@ -103,6 +103,7 @@ const EL_CLIENT_OPTIONS = [
   { value: 'Besu', label: 'Besu', icon: <ClientLogo client="besu" size={20} /> },
   { value: 'erigon', label: 'Erigon', icon: <ClientLogo client="erigon" size={20} /> },
   { value: 'Reth', label: 'Reth', icon: <ClientLogo client="reth" size={20} /> },
+  { value: 'Ethrex', label: 'Ethrex', icon: <ClientLogo client="ethrex" size={20} /> },
 ];
 
 /**

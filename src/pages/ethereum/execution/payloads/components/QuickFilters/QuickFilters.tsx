@@ -108,6 +108,7 @@ const EL_CLIENTS: ClientFilter[] = [
   { id: 'besu', name: 'Besu', value: 'Besu' },
   { id: 'erigon', name: 'Erigon', value: 'erigon' },
   { id: 'reth', name: 'Reth', value: 'Reth' },
+  { id: 'ethrex', name: 'Ethrex', value: 'Ethrex' },
 ];
 
 type QuickFiltersProps = {
