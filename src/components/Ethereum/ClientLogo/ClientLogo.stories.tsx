@@ -67,6 +67,15 @@ export const Reth: Story = {
   },
 };
 
+/**
+ * Ethrex execution client logo
+ */
+export const Ethrex: Story = {
+  args: {
+    client: 'ethrex',
+  },
+};
+
 // Consensus Clients
 
 /**
@@ -182,6 +191,10 @@ export const AllExecutionClients: Story = {
         <div className="flex flex-col items-center gap-1">
           <ClientLogo client="reth" />
           <span className="text-xs text-muted">reth</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="ethrex" />
+          <span className="text-xs text-muted">ethrex</span>
         </div>
       </div>
     </div>
