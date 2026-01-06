@@ -3510,52 +3510,9 @@ export type FctStorageSlotTop100ByBytes = {
    */
   effective_bytes?: number;
   /**
-   * Factory contract or deployer address
+   * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m
    */
-  factory_contract?: string | null;
-  /**
-   * Owner key identifier
-   */
-  owner_key?: string | null;
-  /**
-   * Rank by effective bytes (1=highest)
-   */
-  rank?: number;
-  /**
-   * Timestamp when the record was last updated
-   */
-  updated_date_time?: number;
-  /**
-   * Usage category (e.g., stablecoin, dex, trading)
-   */
-  usage_category?: string | null;
-};
-
-export type FctStorageSlotTop100ByBytesWithExpiry = {
-  /**
-   * Account owner of the contract
-   */
-  account_owner?: string | null;
-  /**
-   * Number of active storage slots for this contract (with expiry applied)
-   */
-  active_slots?: number;
-  /**
-   * The contract address
-   */
-  contract_address?: string;
-  /**
-   * Name of the contract
-   */
-  contract_name?: string | null;
-  /**
-   * Effective bytes of storage for this contract (with expiry applied)
-   */
-  effective_bytes?: number;
-  /**
-   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
-   */
-  expiry_policy?: string;
+  expiry_policy?: string | null;
   /**
    * Factory contract or deployer address
    */
@@ -3565,7 +3522,7 @@ export type FctStorageSlotTop100ByBytesWithExpiry = {
    */
   owner_key?: string | null;
   /**
-   * Rank by effective bytes within expiry policy (1=highest)
+   * Rank by effective bytes (1=highest), based on raw state
    */
   rank?: number;
   /**
@@ -3600,52 +3557,9 @@ export type FctStorageSlotTop100BySlots = {
    */
   effective_bytes?: number;
   /**
-   * Factory contract or deployer address
+   * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m
    */
-  factory_contract?: string | null;
-  /**
-   * Owner key identifier
-   */
-  owner_key?: string | null;
-  /**
-   * Rank by active slots (1=highest)
-   */
-  rank?: number;
-  /**
-   * Timestamp when the record was last updated
-   */
-  updated_date_time?: number;
-  /**
-   * Usage category (e.g., stablecoin, dex, trading)
-   */
-  usage_category?: string | null;
-};
-
-export type FctStorageSlotTop100BySlotsWithExpiry = {
-  /**
-   * Account owner of the contract
-   */
-  account_owner?: string | null;
-  /**
-   * Number of active storage slots for this contract (with expiry applied)
-   */
-  active_slots?: number;
-  /**
-   * The contract address
-   */
-  contract_address?: string;
-  /**
-   * Name of the contract
-   */
-  contract_name?: string | null;
-  /**
-   * Effective bytes of storage for this contract (with expiry applied)
-   */
-  effective_bytes?: number;
-  /**
-   * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
-   */
-  expiry_policy?: string;
+  expiry_policy?: string | null;
   /**
    * Factory contract or deployer address
    */
@@ -3655,7 +3569,7 @@ export type FctStorageSlotTop100BySlotsWithExpiry = {
    */
   owner_key?: string | null;
   /**
-   * Rank by active slots within expiry policy (1=highest)
+   * Rank by active slots (1=highest), based on raw state
    */
   rank?: number;
   /**
@@ -4152,24 +4066,10 @@ export type GetFctStorageSlotTop100ByBytesResponse = {
 };
 
 /**
- * Response for getting a single fct_storage_slot_top_100_by_bytes_with_expiry record
- */
-export type GetFctStorageSlotTop100ByBytesWithExpiryResponse = {
-  item?: FctStorageSlotTop100ByBytesWithExpiry;
-};
-
-/**
  * Response for getting a single fct_storage_slot_top_100_by_slots record
  */
 export type GetFctStorageSlotTop100BySlotsResponse = {
   item?: FctStorageSlotTop100BySlots;
-};
-
-/**
- * Response for getting a single fct_storage_slot_top_100_by_slots_with_expiry record
- */
-export type GetFctStorageSlotTop100BySlotsWithExpiryResponse = {
-  item?: FctStorageSlotTop100BySlotsWithExpiry;
 };
 
 /**
@@ -7628,20 +7528,6 @@ export type ListFctStorageSlotTop100ByBytesResponse = {
 };
 
 /**
- * Response for listing fct_storage_slot_top_100_by_bytes_with_expiry records
- */
-export type ListFctStorageSlotTop100ByBytesWithExpiryResponse = {
-  /**
-   * The list of fct_storage_slot_top_100_by_bytes_with_expiry.
-   */
-  fct_storage_slot_top_100_by_bytes_with_expiry?: Array<FctStorageSlotTop100ByBytesWithExpiry>;
-  /**
-   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
-   */
-  next_page_token?: string;
-};
-
-/**
  * Response for listing fct_storage_slot_top_100_by_slots records
  */
 export type ListFctStorageSlotTop100BySlotsResponse = {
@@ -7649,20 +7535,6 @@ export type ListFctStorageSlotTop100BySlotsResponse = {
    * The list of fct_storage_slot_top_100_by_slots.
    */
   fct_storage_slot_top_100_by_slots?: Array<FctStorageSlotTop100BySlots>;
-  /**
-   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
-   */
-  next_page_token?: string;
-};
-
-/**
- * Response for listing fct_storage_slot_top_100_by_slots_with_expiry records
- */
-export type ListFctStorageSlotTop100BySlotsWithExpiryResponse = {
-  /**
-   * The list of fct_storage_slot_top_100_by_slots_with_expiry.
-   */
-  fct_storage_slot_top_100_by_slots_with_expiry?: Array<FctStorageSlotTop100BySlotsWithExpiry>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -44013,43 +43885,43 @@ export type FctStorageSlotTop100ByBytesServiceListData = {
   path?: never;
   query?: {
     /**
-     * Rank by effective bytes (1=highest) (filter: eq)
+     * Rank by effective bytes (1=highest), based on raw state (filter: eq)
      */
     rank_eq?: number;
     /**
-     * Rank by effective bytes (1=highest) (filter: ne)
+     * Rank by effective bytes (1=highest), based on raw state (filter: ne)
      */
     rank_ne?: number;
     /**
-     * Rank by effective bytes (1=highest) (filter: lt)
+     * Rank by effective bytes (1=highest), based on raw state (filter: lt)
      */
     rank_lt?: number;
     /**
-     * Rank by effective bytes (1=highest) (filter: lte)
+     * Rank by effective bytes (1=highest), based on raw state (filter: lte)
      */
     rank_lte?: number;
     /**
-     * Rank by effective bytes (1=highest) (filter: gt)
+     * Rank by effective bytes (1=highest), based on raw state (filter: gt)
      */
     rank_gt?: number;
     /**
-     * Rank by effective bytes (1=highest) (filter: gte)
+     * Rank by effective bytes (1=highest), based on raw state (filter: gte)
      */
     rank_gte?: number;
     /**
-     * Rank by effective bytes (1=highest) (filter: between_min)
+     * Rank by effective bytes (1=highest), based on raw state (filter: between_min)
      */
     rank_between_min?: number;
     /**
-     * Rank by effective bytes (1=highest) (filter: between_max_value)
+     * Rank by effective bytes (1=highest), based on raw state (filter: between_max_value)
      */
     rank_between_max_value?: number;
     /**
-     * Rank by effective bytes (1=highest) (filter: in_values) (comma-separated list)
+     * Rank by effective bytes (1=highest), based on raw state (filter: in_values) (comma-separated list)
      */
     rank_in_values?: string;
     /**
-     * Rank by effective bytes (1=highest) (filter: not_in_values) (comma-separated list)
+     * Rank by effective bytes (1=highest), based on raw state (filter: not_in_values) (comma-separated list)
      */
     rank_not_in_values?: string;
     /**
@@ -44092,6 +43964,42 @@ export type FctStorageSlotTop100ByBytesServiceListData = {
      * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
      */
     updated_date_time_not_in_values?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
     /**
      * The contract address (filter: eq)
      */
@@ -44428,7 +44336,7 @@ export type FctStorageSlotTop100ByBytesServiceGetData = {
   body?: never;
   path: {
     /**
-     * Rank by effective bytes (1=highest)
+     * Rank by effective bytes (1=highest), based on raw state
      */
     rank: number;
   };
@@ -44456,532 +44364,48 @@ export type FctStorageSlotTop100ByBytesServiceGetResponses = {
 export type FctStorageSlotTop100ByBytesServiceGetResponse =
   FctStorageSlotTop100ByBytesServiceGetResponses[keyof FctStorageSlotTop100ByBytesServiceGetResponses];
 
-export type FctStorageSlotTop100ByBytesWithExpiryServiceListData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
-     */
-    expiry_policy_eq?: string;
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
-     */
-    expiry_policy_ne?: string;
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
-     */
-    expiry_policy_contains?: string;
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
-     */
-    expiry_policy_starts_with?: string;
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
-     */
-    expiry_policy_ends_with?: string;
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
-     */
-    expiry_policy_like?: string;
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
-     */
-    expiry_policy_not_like?: string;
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
-     */
-    expiry_policy_in_values?: string;
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
-     */
-    expiry_policy_not_in_values?: string;
-    /**
-     * Rank by effective bytes within expiry policy (1=highest) (filter: eq)
-     */
-    rank_eq?: number;
-    /**
-     * Rank by effective bytes within expiry policy (1=highest) (filter: ne)
-     */
-    rank_ne?: number;
-    /**
-     * Rank by effective bytes within expiry policy (1=highest) (filter: lt)
-     */
-    rank_lt?: number;
-    /**
-     * Rank by effective bytes within expiry policy (1=highest) (filter: lte)
-     */
-    rank_lte?: number;
-    /**
-     * Rank by effective bytes within expiry policy (1=highest) (filter: gt)
-     */
-    rank_gt?: number;
-    /**
-     * Rank by effective bytes within expiry policy (1=highest) (filter: gte)
-     */
-    rank_gte?: number;
-    /**
-     * Rank by effective bytes within expiry policy (1=highest) (filter: between_min)
-     */
-    rank_between_min?: number;
-    /**
-     * Rank by effective bytes within expiry policy (1=highest) (filter: between_max_value)
-     */
-    rank_between_max_value?: number;
-    /**
-     * Rank by effective bytes within expiry policy (1=highest) (filter: in_values) (comma-separated list)
-     */
-    rank_in_values?: string;
-    /**
-     * Rank by effective bytes within expiry policy (1=highest) (filter: not_in_values) (comma-separated list)
-     */
-    rank_not_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: eq)
-     */
-    updated_date_time_eq?: number;
-    /**
-     * Timestamp when the record was last updated (filter: ne)
-     */
-    updated_date_time_ne?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lt)
-     */
-    updated_date_time_lt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lte)
-     */
-    updated_date_time_lte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gt)
-     */
-    updated_date_time_gt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gte)
-     */
-    updated_date_time_gte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_min)
-     */
-    updated_date_time_between_min?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_max_value)
-     */
-    updated_date_time_between_max_value?: number;
-    /**
-     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
-     */
-    updated_date_time_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
-     */
-    updated_date_time_not_in_values?: string;
-    /**
-     * The contract address (filter: eq)
-     */
-    contract_address_eq?: string;
-    /**
-     * The contract address (filter: ne)
-     */
-    contract_address_ne?: string;
-    /**
-     * The contract address (filter: contains)
-     */
-    contract_address_contains?: string;
-    /**
-     * The contract address (filter: starts_with)
-     */
-    contract_address_starts_with?: string;
-    /**
-     * The contract address (filter: ends_with)
-     */
-    contract_address_ends_with?: string;
-    /**
-     * The contract address (filter: like)
-     */
-    contract_address_like?: string;
-    /**
-     * The contract address (filter: not_like)
-     */
-    contract_address_not_like?: string;
-    /**
-     * The contract address (filter: in_values) (comma-separated list)
-     */
-    contract_address_in_values?: string;
-    /**
-     * The contract address (filter: not_in_values) (comma-separated list)
-     */
-    contract_address_not_in_values?: string;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: eq)
-     */
-    effective_bytes_eq?: number;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: ne)
-     */
-    effective_bytes_ne?: number;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: lt)
-     */
-    effective_bytes_lt?: number;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: lte)
-     */
-    effective_bytes_lte?: number;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: gt)
-     */
-    effective_bytes_gt?: number;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: gte)
-     */
-    effective_bytes_gte?: number;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: between_min)
-     */
-    effective_bytes_between_min?: number;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: between_max_value)
-     */
-    effective_bytes_between_max_value?: number;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: in_values) (comma-separated list)
-     */
-    effective_bytes_in_values?: string;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: not_in_values) (comma-separated list)
-     */
-    effective_bytes_not_in_values?: string;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: eq)
-     */
-    active_slots_eq?: number;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: ne)
-     */
-    active_slots_ne?: number;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: lt)
-     */
-    active_slots_lt?: number;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: lte)
-     */
-    active_slots_lte?: number;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: gt)
-     */
-    active_slots_gt?: number;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: gte)
-     */
-    active_slots_gte?: number;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: between_min)
-     */
-    active_slots_between_min?: number;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: between_max_value)
-     */
-    active_slots_between_max_value?: number;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: in_values) (comma-separated list)
-     */
-    active_slots_in_values?: string;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: not_in_values) (comma-separated list)
-     */
-    active_slots_not_in_values?: string;
-    /**
-     * Owner key identifier (filter: eq)
-     */
-    owner_key_eq?: string;
-    /**
-     * Owner key identifier (filter: ne)
-     */
-    owner_key_ne?: string;
-    /**
-     * Owner key identifier (filter: contains)
-     */
-    owner_key_contains?: string;
-    /**
-     * Owner key identifier (filter: starts_with)
-     */
-    owner_key_starts_with?: string;
-    /**
-     * Owner key identifier (filter: ends_with)
-     */
-    owner_key_ends_with?: string;
-    /**
-     * Owner key identifier (filter: like)
-     */
-    owner_key_like?: string;
-    /**
-     * Owner key identifier (filter: not_like)
-     */
-    owner_key_not_like?: string;
-    /**
-     * Owner key identifier (filter: in_values) (comma-separated list)
-     */
-    owner_key_in_values?: string;
-    /**
-     * Owner key identifier (filter: not_in_values) (comma-separated list)
-     */
-    owner_key_not_in_values?: string;
-    /**
-     * Account owner of the contract (filter: eq)
-     */
-    account_owner_eq?: string;
-    /**
-     * Account owner of the contract (filter: ne)
-     */
-    account_owner_ne?: string;
-    /**
-     * Account owner of the contract (filter: contains)
-     */
-    account_owner_contains?: string;
-    /**
-     * Account owner of the contract (filter: starts_with)
-     */
-    account_owner_starts_with?: string;
-    /**
-     * Account owner of the contract (filter: ends_with)
-     */
-    account_owner_ends_with?: string;
-    /**
-     * Account owner of the contract (filter: like)
-     */
-    account_owner_like?: string;
-    /**
-     * Account owner of the contract (filter: not_like)
-     */
-    account_owner_not_like?: string;
-    /**
-     * Account owner of the contract (filter: in_values) (comma-separated list)
-     */
-    account_owner_in_values?: string;
-    /**
-     * Account owner of the contract (filter: not_in_values) (comma-separated list)
-     */
-    account_owner_not_in_values?: string;
-    /**
-     * Name of the contract (filter: eq)
-     */
-    contract_name_eq?: string;
-    /**
-     * Name of the contract (filter: ne)
-     */
-    contract_name_ne?: string;
-    /**
-     * Name of the contract (filter: contains)
-     */
-    contract_name_contains?: string;
-    /**
-     * Name of the contract (filter: starts_with)
-     */
-    contract_name_starts_with?: string;
-    /**
-     * Name of the contract (filter: ends_with)
-     */
-    contract_name_ends_with?: string;
-    /**
-     * Name of the contract (filter: like)
-     */
-    contract_name_like?: string;
-    /**
-     * Name of the contract (filter: not_like)
-     */
-    contract_name_not_like?: string;
-    /**
-     * Name of the contract (filter: in_values) (comma-separated list)
-     */
-    contract_name_in_values?: string;
-    /**
-     * Name of the contract (filter: not_in_values) (comma-separated list)
-     */
-    contract_name_not_in_values?: string;
-    /**
-     * Factory contract or deployer address (filter: eq)
-     */
-    factory_contract_eq?: string;
-    /**
-     * Factory contract or deployer address (filter: ne)
-     */
-    factory_contract_ne?: string;
-    /**
-     * Factory contract or deployer address (filter: contains)
-     */
-    factory_contract_contains?: string;
-    /**
-     * Factory contract or deployer address (filter: starts_with)
-     */
-    factory_contract_starts_with?: string;
-    /**
-     * Factory contract or deployer address (filter: ends_with)
-     */
-    factory_contract_ends_with?: string;
-    /**
-     * Factory contract or deployer address (filter: like)
-     */
-    factory_contract_like?: string;
-    /**
-     * Factory contract or deployer address (filter: not_like)
-     */
-    factory_contract_not_like?: string;
-    /**
-     * Factory contract or deployer address (filter: in_values) (comma-separated list)
-     */
-    factory_contract_in_values?: string;
-    /**
-     * Factory contract or deployer address (filter: not_in_values) (comma-separated list)
-     */
-    factory_contract_not_in_values?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: eq)
-     */
-    usage_category_eq?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: ne)
-     */
-    usage_category_ne?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: contains)
-     */
-    usage_category_contains?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: starts_with)
-     */
-    usage_category_starts_with?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: ends_with)
-     */
-    usage_category_ends_with?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: like)
-     */
-    usage_category_like?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: not_like)
-     */
-    usage_category_not_like?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: in_values) (comma-separated list)
-     */
-    usage_category_in_values?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: not_in_values) (comma-separated list)
-     */
-    usage_category_not_in_values?: string;
-    /**
-     * The maximum number of fct_storage_slot_top_100_by_bytes_with_expiry to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
-     */
-    page_size?: number;
-    /**
-     * A page token, received from a previous `ListFctStorageSlotTop100ByBytesWithExpiry` call. Provide this to retrieve the subsequent page.
-     */
-    page_token?: string;
-    /**
-     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
-     */
-    order_by?: string;
-  };
-  url: '/api/v1/fct_storage_slot_top_100_by_bytes_with_expiry';
-};
-
-export type FctStorageSlotTop100ByBytesWithExpiryServiceListErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type FctStorageSlotTop100ByBytesWithExpiryServiceListError =
-  FctStorageSlotTop100ByBytesWithExpiryServiceListErrors[keyof FctStorageSlotTop100ByBytesWithExpiryServiceListErrors];
-
-export type FctStorageSlotTop100ByBytesWithExpiryServiceListResponses = {
-  /**
-   * OK
-   */
-  200: ListFctStorageSlotTop100ByBytesWithExpiryResponse;
-};
-
-export type FctStorageSlotTop100ByBytesWithExpiryServiceListResponse =
-  FctStorageSlotTop100ByBytesWithExpiryServiceListResponses[keyof FctStorageSlotTop100ByBytesWithExpiryServiceListResponses];
-
-export type FctStorageSlotTop100ByBytesWithExpiryServiceGetData = {
-  body?: never;
-  path: {
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
-     */
-    expiry_policy: string;
-  };
-  query?: never;
-  url: '/api/v1/fct_storage_slot_top_100_by_bytes_with_expiry/{expiry_policy}';
-};
-
-export type FctStorageSlotTop100ByBytesWithExpiryServiceGetErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type FctStorageSlotTop100ByBytesWithExpiryServiceGetError =
-  FctStorageSlotTop100ByBytesWithExpiryServiceGetErrors[keyof FctStorageSlotTop100ByBytesWithExpiryServiceGetErrors];
-
-export type FctStorageSlotTop100ByBytesWithExpiryServiceGetResponses = {
-  /**
-   * OK
-   */
-  200: GetFctStorageSlotTop100ByBytesWithExpiryResponse;
-};
-
-export type FctStorageSlotTop100ByBytesWithExpiryServiceGetResponse =
-  FctStorageSlotTop100ByBytesWithExpiryServiceGetResponses[keyof FctStorageSlotTop100ByBytesWithExpiryServiceGetResponses];
-
 export type FctStorageSlotTop100BySlotsServiceListData = {
   body?: never;
   path?: never;
   query?: {
     /**
-     * Rank by active slots (1=highest) (filter: eq)
+     * Rank by active slots (1=highest), based on raw state (filter: eq)
      */
     rank_eq?: number;
     /**
-     * Rank by active slots (1=highest) (filter: ne)
+     * Rank by active slots (1=highest), based on raw state (filter: ne)
      */
     rank_ne?: number;
     /**
-     * Rank by active slots (1=highest) (filter: lt)
+     * Rank by active slots (1=highest), based on raw state (filter: lt)
      */
     rank_lt?: number;
     /**
-     * Rank by active slots (1=highest) (filter: lte)
+     * Rank by active slots (1=highest), based on raw state (filter: lte)
      */
     rank_lte?: number;
     /**
-     * Rank by active slots (1=highest) (filter: gt)
+     * Rank by active slots (1=highest), based on raw state (filter: gt)
      */
     rank_gt?: number;
     /**
-     * Rank by active slots (1=highest) (filter: gte)
+     * Rank by active slots (1=highest), based on raw state (filter: gte)
      */
     rank_gte?: number;
     /**
-     * Rank by active slots (1=highest) (filter: between_min)
+     * Rank by active slots (1=highest), based on raw state (filter: between_min)
      */
     rank_between_min?: number;
     /**
-     * Rank by active slots (1=highest) (filter: between_max_value)
+     * Rank by active slots (1=highest), based on raw state (filter: between_max_value)
      */
     rank_between_max_value?: number;
     /**
-     * Rank by active slots (1=highest) (filter: in_values) (comma-separated list)
+     * Rank by active slots (1=highest), based on raw state (filter: in_values) (comma-separated list)
      */
     rank_in_values?: string;
     /**
-     * Rank by active slots (1=highest) (filter: not_in_values) (comma-separated list)
+     * Rank by active slots (1=highest), based on raw state (filter: not_in_values) (comma-separated list)
      */
     rank_not_in_values?: string;
     /**
@@ -45024,6 +44448,42 @@ export type FctStorageSlotTop100BySlotsServiceListData = {
      * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
      */
     updated_date_time_not_in_values?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: eq)
+     */
+    expiry_policy_eq?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: ne)
+     */
+    expiry_policy_ne?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: contains)
+     */
+    expiry_policy_contains?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: starts_with)
+     */
+    expiry_policy_starts_with?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: ends_with)
+     */
+    expiry_policy_ends_with?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: like)
+     */
+    expiry_policy_like?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: not_like)
+     */
+    expiry_policy_not_like?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
+     */
+    expiry_policy_in_values?: string;
+    /**
+     * Expiry policy identifier: NULL (raw), 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
+     */
+    expiry_policy_not_in_values?: string;
     /**
      * The contract address (filter: eq)
      */
@@ -45360,7 +44820,7 @@ export type FctStorageSlotTop100BySlotsServiceGetData = {
   body?: never;
   path: {
     /**
-     * Rank by active slots (1=highest)
+     * Rank by active slots (1=highest), based on raw state
      */
     rank: number;
   };
@@ -45387,490 +44847,6 @@ export type FctStorageSlotTop100BySlotsServiceGetResponses = {
 
 export type FctStorageSlotTop100BySlotsServiceGetResponse =
   FctStorageSlotTop100BySlotsServiceGetResponses[keyof FctStorageSlotTop100BySlotsServiceGetResponses];
-
-export type FctStorageSlotTop100BySlotsWithExpiryServiceListData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: eq)
-     */
-    expiry_policy_eq?: string;
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ne)
-     */
-    expiry_policy_ne?: string;
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: contains)
-     */
-    expiry_policy_contains?: string;
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: starts_with)
-     */
-    expiry_policy_starts_with?: string;
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: ends_with)
-     */
-    expiry_policy_ends_with?: string;
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: like)
-     */
-    expiry_policy_like?: string;
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_like)
-     */
-    expiry_policy_not_like?: string;
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: in_values) (comma-separated list)
-     */
-    expiry_policy_in_values?: string;
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m (filter: not_in_values) (comma-separated list)
-     */
-    expiry_policy_not_in_values?: string;
-    /**
-     * Rank by active slots within expiry policy (1=highest) (filter: eq)
-     */
-    rank_eq?: number;
-    /**
-     * Rank by active slots within expiry policy (1=highest) (filter: ne)
-     */
-    rank_ne?: number;
-    /**
-     * Rank by active slots within expiry policy (1=highest) (filter: lt)
-     */
-    rank_lt?: number;
-    /**
-     * Rank by active slots within expiry policy (1=highest) (filter: lte)
-     */
-    rank_lte?: number;
-    /**
-     * Rank by active slots within expiry policy (1=highest) (filter: gt)
-     */
-    rank_gt?: number;
-    /**
-     * Rank by active slots within expiry policy (1=highest) (filter: gte)
-     */
-    rank_gte?: number;
-    /**
-     * Rank by active slots within expiry policy (1=highest) (filter: between_min)
-     */
-    rank_between_min?: number;
-    /**
-     * Rank by active slots within expiry policy (1=highest) (filter: between_max_value)
-     */
-    rank_between_max_value?: number;
-    /**
-     * Rank by active slots within expiry policy (1=highest) (filter: in_values) (comma-separated list)
-     */
-    rank_in_values?: string;
-    /**
-     * Rank by active slots within expiry policy (1=highest) (filter: not_in_values) (comma-separated list)
-     */
-    rank_not_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: eq)
-     */
-    updated_date_time_eq?: number;
-    /**
-     * Timestamp when the record was last updated (filter: ne)
-     */
-    updated_date_time_ne?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lt)
-     */
-    updated_date_time_lt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lte)
-     */
-    updated_date_time_lte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gt)
-     */
-    updated_date_time_gt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gte)
-     */
-    updated_date_time_gte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_min)
-     */
-    updated_date_time_between_min?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_max_value)
-     */
-    updated_date_time_between_max_value?: number;
-    /**
-     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
-     */
-    updated_date_time_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
-     */
-    updated_date_time_not_in_values?: string;
-    /**
-     * The contract address (filter: eq)
-     */
-    contract_address_eq?: string;
-    /**
-     * The contract address (filter: ne)
-     */
-    contract_address_ne?: string;
-    /**
-     * The contract address (filter: contains)
-     */
-    contract_address_contains?: string;
-    /**
-     * The contract address (filter: starts_with)
-     */
-    contract_address_starts_with?: string;
-    /**
-     * The contract address (filter: ends_with)
-     */
-    contract_address_ends_with?: string;
-    /**
-     * The contract address (filter: like)
-     */
-    contract_address_like?: string;
-    /**
-     * The contract address (filter: not_like)
-     */
-    contract_address_not_like?: string;
-    /**
-     * The contract address (filter: in_values) (comma-separated list)
-     */
-    contract_address_in_values?: string;
-    /**
-     * The contract address (filter: not_in_values) (comma-separated list)
-     */
-    contract_address_not_in_values?: string;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: eq)
-     */
-    active_slots_eq?: number;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: ne)
-     */
-    active_slots_ne?: number;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: lt)
-     */
-    active_slots_lt?: number;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: lte)
-     */
-    active_slots_lte?: number;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: gt)
-     */
-    active_slots_gt?: number;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: gte)
-     */
-    active_slots_gte?: number;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: between_min)
-     */
-    active_slots_between_min?: number;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: between_max_value)
-     */
-    active_slots_between_max_value?: number;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: in_values) (comma-separated list)
-     */
-    active_slots_in_values?: string;
-    /**
-     * Number of active storage slots for this contract (with expiry applied) (filter: not_in_values) (comma-separated list)
-     */
-    active_slots_not_in_values?: string;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: eq)
-     */
-    effective_bytes_eq?: number;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: ne)
-     */
-    effective_bytes_ne?: number;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: lt)
-     */
-    effective_bytes_lt?: number;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: lte)
-     */
-    effective_bytes_lte?: number;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: gt)
-     */
-    effective_bytes_gt?: number;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: gte)
-     */
-    effective_bytes_gte?: number;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: between_min)
-     */
-    effective_bytes_between_min?: number;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: between_max_value)
-     */
-    effective_bytes_between_max_value?: number;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: in_values) (comma-separated list)
-     */
-    effective_bytes_in_values?: string;
-    /**
-     * Effective bytes of storage for this contract (with expiry applied) (filter: not_in_values) (comma-separated list)
-     */
-    effective_bytes_not_in_values?: string;
-    /**
-     * Owner key identifier (filter: eq)
-     */
-    owner_key_eq?: string;
-    /**
-     * Owner key identifier (filter: ne)
-     */
-    owner_key_ne?: string;
-    /**
-     * Owner key identifier (filter: contains)
-     */
-    owner_key_contains?: string;
-    /**
-     * Owner key identifier (filter: starts_with)
-     */
-    owner_key_starts_with?: string;
-    /**
-     * Owner key identifier (filter: ends_with)
-     */
-    owner_key_ends_with?: string;
-    /**
-     * Owner key identifier (filter: like)
-     */
-    owner_key_like?: string;
-    /**
-     * Owner key identifier (filter: not_like)
-     */
-    owner_key_not_like?: string;
-    /**
-     * Owner key identifier (filter: in_values) (comma-separated list)
-     */
-    owner_key_in_values?: string;
-    /**
-     * Owner key identifier (filter: not_in_values) (comma-separated list)
-     */
-    owner_key_not_in_values?: string;
-    /**
-     * Account owner of the contract (filter: eq)
-     */
-    account_owner_eq?: string;
-    /**
-     * Account owner of the contract (filter: ne)
-     */
-    account_owner_ne?: string;
-    /**
-     * Account owner of the contract (filter: contains)
-     */
-    account_owner_contains?: string;
-    /**
-     * Account owner of the contract (filter: starts_with)
-     */
-    account_owner_starts_with?: string;
-    /**
-     * Account owner of the contract (filter: ends_with)
-     */
-    account_owner_ends_with?: string;
-    /**
-     * Account owner of the contract (filter: like)
-     */
-    account_owner_like?: string;
-    /**
-     * Account owner of the contract (filter: not_like)
-     */
-    account_owner_not_like?: string;
-    /**
-     * Account owner of the contract (filter: in_values) (comma-separated list)
-     */
-    account_owner_in_values?: string;
-    /**
-     * Account owner of the contract (filter: not_in_values) (comma-separated list)
-     */
-    account_owner_not_in_values?: string;
-    /**
-     * Name of the contract (filter: eq)
-     */
-    contract_name_eq?: string;
-    /**
-     * Name of the contract (filter: ne)
-     */
-    contract_name_ne?: string;
-    /**
-     * Name of the contract (filter: contains)
-     */
-    contract_name_contains?: string;
-    /**
-     * Name of the contract (filter: starts_with)
-     */
-    contract_name_starts_with?: string;
-    /**
-     * Name of the contract (filter: ends_with)
-     */
-    contract_name_ends_with?: string;
-    /**
-     * Name of the contract (filter: like)
-     */
-    contract_name_like?: string;
-    /**
-     * Name of the contract (filter: not_like)
-     */
-    contract_name_not_like?: string;
-    /**
-     * Name of the contract (filter: in_values) (comma-separated list)
-     */
-    contract_name_in_values?: string;
-    /**
-     * Name of the contract (filter: not_in_values) (comma-separated list)
-     */
-    contract_name_not_in_values?: string;
-    /**
-     * Factory contract or deployer address (filter: eq)
-     */
-    factory_contract_eq?: string;
-    /**
-     * Factory contract or deployer address (filter: ne)
-     */
-    factory_contract_ne?: string;
-    /**
-     * Factory contract or deployer address (filter: contains)
-     */
-    factory_contract_contains?: string;
-    /**
-     * Factory contract or deployer address (filter: starts_with)
-     */
-    factory_contract_starts_with?: string;
-    /**
-     * Factory contract or deployer address (filter: ends_with)
-     */
-    factory_contract_ends_with?: string;
-    /**
-     * Factory contract or deployer address (filter: like)
-     */
-    factory_contract_like?: string;
-    /**
-     * Factory contract or deployer address (filter: not_like)
-     */
-    factory_contract_not_like?: string;
-    /**
-     * Factory contract or deployer address (filter: in_values) (comma-separated list)
-     */
-    factory_contract_in_values?: string;
-    /**
-     * Factory contract or deployer address (filter: not_in_values) (comma-separated list)
-     */
-    factory_contract_not_in_values?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: eq)
-     */
-    usage_category_eq?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: ne)
-     */
-    usage_category_ne?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: contains)
-     */
-    usage_category_contains?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: starts_with)
-     */
-    usage_category_starts_with?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: ends_with)
-     */
-    usage_category_ends_with?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: like)
-     */
-    usage_category_like?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: not_like)
-     */
-    usage_category_not_like?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: in_values) (comma-separated list)
-     */
-    usage_category_in_values?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: not_in_values) (comma-separated list)
-     */
-    usage_category_not_in_values?: string;
-    /**
-     * The maximum number of fct_storage_slot_top_100_by_slots_with_expiry to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
-     */
-    page_size?: number;
-    /**
-     * A page token, received from a previous `ListFctStorageSlotTop100BySlotsWithExpiry` call. Provide this to retrieve the subsequent page.
-     */
-    page_token?: string;
-    /**
-     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
-     */
-    order_by?: string;
-  };
-  url: '/api/v1/fct_storage_slot_top_100_by_slots_with_expiry';
-};
-
-export type FctStorageSlotTop100BySlotsWithExpiryServiceListErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type FctStorageSlotTop100BySlotsWithExpiryServiceListError =
-  FctStorageSlotTop100BySlotsWithExpiryServiceListErrors[keyof FctStorageSlotTop100BySlotsWithExpiryServiceListErrors];
-
-export type FctStorageSlotTop100BySlotsWithExpiryServiceListResponses = {
-  /**
-   * OK
-   */
-  200: ListFctStorageSlotTop100BySlotsWithExpiryResponse;
-};
-
-export type FctStorageSlotTop100BySlotsWithExpiryServiceListResponse =
-  FctStorageSlotTop100BySlotsWithExpiryServiceListResponses[keyof FctStorageSlotTop100BySlotsWithExpiryServiceListResponses];
-
-export type FctStorageSlotTop100BySlotsWithExpiryServiceGetData = {
-  body?: never;
-  path: {
-    /**
-     * Expiry policy identifier: 1m, 6m, 12m, 18m, 24m
-     */
-    expiry_policy: string;
-  };
-  query?: never;
-  url: '/api/v1/fct_storage_slot_top_100_by_slots_with_expiry/{expiry_policy}';
-};
-
-export type FctStorageSlotTop100BySlotsWithExpiryServiceGetErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type FctStorageSlotTop100BySlotsWithExpiryServiceGetError =
-  FctStorageSlotTop100BySlotsWithExpiryServiceGetErrors[keyof FctStorageSlotTop100BySlotsWithExpiryServiceGetErrors];
-
-export type FctStorageSlotTop100BySlotsWithExpiryServiceGetResponses = {
-  /**
-   * OK
-   */
-  200: GetFctStorageSlotTop100BySlotsWithExpiryResponse;
-};
-
-export type FctStorageSlotTop100BySlotsWithExpiryServiceGetResponse =
-  FctStorageSlotTop100BySlotsWithExpiryServiceGetResponses[keyof FctStorageSlotTop100BySlotsWithExpiryServiceGetResponses];
 
 export type IntAddressFirstAccessServiceListData = {
   body?: never;

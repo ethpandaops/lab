@@ -1033,20 +1033,7 @@ export const zFctStorageSlotTop100ByBytes = z.object({
   contract_address: z.optional(z.string()),
   contract_name: z.optional(z.union([z.string(), z.null()])),
   effective_bytes: z.optional(z.coerce.bigint()),
-  factory_contract: z.optional(z.union([z.string(), z.null()])),
-  owner_key: z.optional(z.union([z.string(), z.null()])),
-  rank: z.optional(z.int()),
-  updated_date_time: z.optional(z.int()),
-  usage_category: z.optional(z.union([z.string(), z.null()])),
-});
-
-export const zFctStorageSlotTop100ByBytesWithExpiry = z.object({
-  account_owner: z.optional(z.union([z.string(), z.null()])),
-  active_slots: z.optional(z.coerce.bigint()),
-  contract_address: z.optional(z.string()),
-  contract_name: z.optional(z.union([z.string(), z.null()])),
-  effective_bytes: z.optional(z.coerce.bigint()),
-  expiry_policy: z.optional(z.string()),
+  expiry_policy: z.optional(z.union([z.string(), z.null()])),
   factory_contract: z.optional(z.union([z.string(), z.null()])),
   owner_key: z.optional(z.union([z.string(), z.null()])),
   rank: z.optional(z.int()),
@@ -1060,20 +1047,7 @@ export const zFctStorageSlotTop100BySlots = z.object({
   contract_address: z.optional(z.string()),
   contract_name: z.optional(z.union([z.string(), z.null()])),
   effective_bytes: z.optional(z.coerce.bigint()),
-  factory_contract: z.optional(z.union([z.string(), z.null()])),
-  owner_key: z.optional(z.union([z.string(), z.null()])),
-  rank: z.optional(z.int()),
-  updated_date_time: z.optional(z.int()),
-  usage_category: z.optional(z.union([z.string(), z.null()])),
-});
-
-export const zFctStorageSlotTop100BySlotsWithExpiry = z.object({
-  account_owner: z.optional(z.union([z.string(), z.null()])),
-  active_slots: z.optional(z.coerce.bigint()),
-  contract_address: z.optional(z.string()),
-  contract_name: z.optional(z.union([z.string(), z.null()])),
-  effective_bytes: z.optional(z.coerce.bigint()),
-  expiry_policy: z.optional(z.string()),
+  expiry_policy: z.optional(z.union([z.string(), z.null()])),
   factory_contract: z.optional(z.union([z.string(), z.null()])),
   owner_key: z.optional(z.union([z.string(), z.null()])),
   rank: z.optional(z.int()),
@@ -1565,24 +1539,10 @@ export const zGetFctStorageSlotTop100ByBytesResponse = z.object({
 });
 
 /**
- * Response for getting a single fct_storage_slot_top_100_by_bytes_with_expiry record
- */
-export const zGetFctStorageSlotTop100ByBytesWithExpiryResponse = z.object({
-  item: z.optional(zFctStorageSlotTop100ByBytesWithExpiry),
-});
-
-/**
  * Response for getting a single fct_storage_slot_top_100_by_slots record
  */
 export const zGetFctStorageSlotTop100BySlotsResponse = z.object({
   item: z.optional(zFctStorageSlotTop100BySlots),
-});
-
-/**
- * Response for getting a single fct_storage_slot_top_100_by_slots_with_expiry record
- */
-export const zGetFctStorageSlotTop100BySlotsWithExpiryResponse = z.object({
-  item: z.optional(zFctStorageSlotTop100BySlotsWithExpiry),
 });
 
 /**
@@ -3178,26 +3138,10 @@ export const zListFctStorageSlotTop100ByBytesResponse = z.object({
 });
 
 /**
- * Response for listing fct_storage_slot_top_100_by_bytes_with_expiry records
- */
-export const zListFctStorageSlotTop100ByBytesWithExpiryResponse = z.object({
-  fct_storage_slot_top_100_by_bytes_with_expiry: z.optional(z.array(zFctStorageSlotTop100ByBytesWithExpiry)),
-  next_page_token: z.optional(z.string()),
-});
-
-/**
  * Response for listing fct_storage_slot_top_100_by_slots records
  */
 export const zListFctStorageSlotTop100BySlotsResponse = z.object({
   fct_storage_slot_top_100_by_slots: z.optional(z.array(zFctStorageSlotTop100BySlots)),
-  next_page_token: z.optional(z.string()),
-});
-
-/**
- * Response for listing fct_storage_slot_top_100_by_slots_with_expiry records
- */
-export const zListFctStorageSlotTop100BySlotsWithExpiryResponse = z.object({
-  fct_storage_slot_top_100_by_slots_with_expiry: z.optional(z.array(zFctStorageSlotTop100BySlotsWithExpiry)),
   next_page_token: z.optional(z.string()),
 });
 
@@ -13447,6 +13391,15 @@ export const zFctStorageSlotTop100ByBytesServiceListData = z.object({
       updated_date_time_between_max_value: z.optional(z.int()),
       updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
       updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      expiry_policy_eq: z.optional(z.string()),
+      expiry_policy_ne: z.optional(z.string()),
+      expiry_policy_contains: z.optional(z.string()),
+      expiry_policy_starts_with: z.optional(z.string()),
+      expiry_policy_ends_with: z.optional(z.string()),
+      expiry_policy_like: z.optional(z.string()),
+      expiry_policy_not_like: z.optional(z.string()),
+      expiry_policy_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      expiry_policy_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
       contract_address_eq: z.optional(z.string()),
       contract_address_ne: z.optional(z.string()),
       contract_address_contains: z.optional(z.string()),
@@ -13546,141 +13499,6 @@ export const zFctStorageSlotTop100ByBytesServiceGetData = z.object({
  */
 export const zFctStorageSlotTop100ByBytesServiceGetResponse = zGetFctStorageSlotTop100ByBytesResponse;
 
-export const zFctStorageSlotTop100ByBytesWithExpiryServiceListData = z.object({
-  body: z.optional(z.never()),
-  path: z.optional(z.never()),
-  query: z.optional(
-    z.object({
-      expiry_policy_eq: z.optional(z.string()),
-      expiry_policy_ne: z.optional(z.string()),
-      expiry_policy_contains: z.optional(z.string()),
-      expiry_policy_starts_with: z.optional(z.string()),
-      expiry_policy_ends_with: z.optional(z.string()),
-      expiry_policy_like: z.optional(z.string()),
-      expiry_policy_not_like: z.optional(z.string()),
-      expiry_policy_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      expiry_policy_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      rank_eq: z.optional(z.int()),
-      rank_ne: z.optional(z.int()),
-      rank_lt: z.optional(z.int()),
-      rank_lte: z.optional(z.int()),
-      rank_gt: z.optional(z.int()),
-      rank_gte: z.optional(z.int()),
-      rank_between_min: z.optional(z.int()),
-      rank_between_max_value: z.optional(z.int()),
-      rank_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
-      rank_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
-      updated_date_time_eq: z.optional(z.int()),
-      updated_date_time_ne: z.optional(z.int()),
-      updated_date_time_lt: z.optional(z.int()),
-      updated_date_time_lte: z.optional(z.int()),
-      updated_date_time_gt: z.optional(z.int()),
-      updated_date_time_gte: z.optional(z.int()),
-      updated_date_time_between_min: z.optional(z.int()),
-      updated_date_time_between_max_value: z.optional(z.int()),
-      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
-      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
-      contract_address_eq: z.optional(z.string()),
-      contract_address_ne: z.optional(z.string()),
-      contract_address_contains: z.optional(z.string()),
-      contract_address_starts_with: z.optional(z.string()),
-      contract_address_ends_with: z.optional(z.string()),
-      contract_address_like: z.optional(z.string()),
-      contract_address_not_like: z.optional(z.string()),
-      contract_address_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      contract_address_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      effective_bytes_eq: z.optional(z.coerce.bigint()),
-      effective_bytes_ne: z.optional(z.coerce.bigint()),
-      effective_bytes_lt: z.optional(z.coerce.bigint()),
-      effective_bytes_lte: z.optional(z.coerce.bigint()),
-      effective_bytes_gt: z.optional(z.coerce.bigint()),
-      effective_bytes_gte: z.optional(z.coerce.bigint()),
-      effective_bytes_between_min: z.optional(z.coerce.bigint()),
-      effective_bytes_between_max_value: z.optional(z.coerce.bigint()),
-      effective_bytes_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      effective_bytes_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      active_slots_eq: z.optional(z.coerce.bigint()),
-      active_slots_ne: z.optional(z.coerce.bigint()),
-      active_slots_lt: z.optional(z.coerce.bigint()),
-      active_slots_lte: z.optional(z.coerce.bigint()),
-      active_slots_gt: z.optional(z.coerce.bigint()),
-      active_slots_gte: z.optional(z.coerce.bigint()),
-      active_slots_between_min: z.optional(z.coerce.bigint()),
-      active_slots_between_max_value: z.optional(z.coerce.bigint()),
-      active_slots_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      active_slots_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      owner_key_eq: z.optional(z.string()),
-      owner_key_ne: z.optional(z.string()),
-      owner_key_contains: z.optional(z.string()),
-      owner_key_starts_with: z.optional(z.string()),
-      owner_key_ends_with: z.optional(z.string()),
-      owner_key_like: z.optional(z.string()),
-      owner_key_not_like: z.optional(z.string()),
-      owner_key_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      owner_key_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      account_owner_eq: z.optional(z.string()),
-      account_owner_ne: z.optional(z.string()),
-      account_owner_contains: z.optional(z.string()),
-      account_owner_starts_with: z.optional(z.string()),
-      account_owner_ends_with: z.optional(z.string()),
-      account_owner_like: z.optional(z.string()),
-      account_owner_not_like: z.optional(z.string()),
-      account_owner_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      account_owner_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      contract_name_eq: z.optional(z.string()),
-      contract_name_ne: z.optional(z.string()),
-      contract_name_contains: z.optional(z.string()),
-      contract_name_starts_with: z.optional(z.string()),
-      contract_name_ends_with: z.optional(z.string()),
-      contract_name_like: z.optional(z.string()),
-      contract_name_not_like: z.optional(z.string()),
-      contract_name_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      contract_name_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      factory_contract_eq: z.optional(z.string()),
-      factory_contract_ne: z.optional(z.string()),
-      factory_contract_contains: z.optional(z.string()),
-      factory_contract_starts_with: z.optional(z.string()),
-      factory_contract_ends_with: z.optional(z.string()),
-      factory_contract_like: z.optional(z.string()),
-      factory_contract_not_like: z.optional(z.string()),
-      factory_contract_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      factory_contract_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      usage_category_eq: z.optional(z.string()),
-      usage_category_ne: z.optional(z.string()),
-      usage_category_contains: z.optional(z.string()),
-      usage_category_starts_with: z.optional(z.string()),
-      usage_category_ends_with: z.optional(z.string()),
-      usage_category_like: z.optional(z.string()),
-      usage_category_not_like: z.optional(z.string()),
-      usage_category_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      usage_category_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      page_size: z.optional(z.int()),
-      page_token: z.optional(z.string()),
-      order_by: z.optional(z.string()),
-    })
-  ),
-});
-
-/**
- * OK
- */
-export const zFctStorageSlotTop100ByBytesWithExpiryServiceListResponse =
-  zListFctStorageSlotTop100ByBytesWithExpiryResponse;
-
-export const zFctStorageSlotTop100ByBytesWithExpiryServiceGetData = z.object({
-  body: z.optional(z.never()),
-  path: z.object({
-    expiry_policy: z.string(),
-  }),
-  query: z.optional(z.never()),
-});
-
-/**
- * OK
- */
-export const zFctStorageSlotTop100ByBytesWithExpiryServiceGetResponse =
-  zGetFctStorageSlotTop100ByBytesWithExpiryResponse;
-
 export const zFctStorageSlotTop100BySlotsServiceListData = z.object({
   body: z.optional(z.never()),
   path: z.optional(z.never()),
@@ -13706,6 +13524,15 @@ export const zFctStorageSlotTop100BySlotsServiceListData = z.object({
       updated_date_time_between_max_value: z.optional(z.int()),
       updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
       updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      expiry_policy_eq: z.optional(z.string()),
+      expiry_policy_ne: z.optional(z.string()),
+      expiry_policy_contains: z.optional(z.string()),
+      expiry_policy_starts_with: z.optional(z.string()),
+      expiry_policy_ends_with: z.optional(z.string()),
+      expiry_policy_like: z.optional(z.string()),
+      expiry_policy_not_like: z.optional(z.string()),
+      expiry_policy_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      expiry_policy_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
       contract_address_eq: z.optional(z.string()),
       contract_address_ne: z.optional(z.string()),
       contract_address_contains: z.optional(z.string()),
@@ -13804,141 +13631,6 @@ export const zFctStorageSlotTop100BySlotsServiceGetData = z.object({
  * OK
  */
 export const zFctStorageSlotTop100BySlotsServiceGetResponse = zGetFctStorageSlotTop100BySlotsResponse;
-
-export const zFctStorageSlotTop100BySlotsWithExpiryServiceListData = z.object({
-  body: z.optional(z.never()),
-  path: z.optional(z.never()),
-  query: z.optional(
-    z.object({
-      expiry_policy_eq: z.optional(z.string()),
-      expiry_policy_ne: z.optional(z.string()),
-      expiry_policy_contains: z.optional(z.string()),
-      expiry_policy_starts_with: z.optional(z.string()),
-      expiry_policy_ends_with: z.optional(z.string()),
-      expiry_policy_like: z.optional(z.string()),
-      expiry_policy_not_like: z.optional(z.string()),
-      expiry_policy_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      expiry_policy_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      rank_eq: z.optional(z.int()),
-      rank_ne: z.optional(z.int()),
-      rank_lt: z.optional(z.int()),
-      rank_lte: z.optional(z.int()),
-      rank_gt: z.optional(z.int()),
-      rank_gte: z.optional(z.int()),
-      rank_between_min: z.optional(z.int()),
-      rank_between_max_value: z.optional(z.int()),
-      rank_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
-      rank_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
-      updated_date_time_eq: z.optional(z.int()),
-      updated_date_time_ne: z.optional(z.int()),
-      updated_date_time_lt: z.optional(z.int()),
-      updated_date_time_lte: z.optional(z.int()),
-      updated_date_time_gt: z.optional(z.int()),
-      updated_date_time_gte: z.optional(z.int()),
-      updated_date_time_between_min: z.optional(z.int()),
-      updated_date_time_between_max_value: z.optional(z.int()),
-      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
-      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
-      contract_address_eq: z.optional(z.string()),
-      contract_address_ne: z.optional(z.string()),
-      contract_address_contains: z.optional(z.string()),
-      contract_address_starts_with: z.optional(z.string()),
-      contract_address_ends_with: z.optional(z.string()),
-      contract_address_like: z.optional(z.string()),
-      contract_address_not_like: z.optional(z.string()),
-      contract_address_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      contract_address_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      active_slots_eq: z.optional(z.coerce.bigint()),
-      active_slots_ne: z.optional(z.coerce.bigint()),
-      active_slots_lt: z.optional(z.coerce.bigint()),
-      active_slots_lte: z.optional(z.coerce.bigint()),
-      active_slots_gt: z.optional(z.coerce.bigint()),
-      active_slots_gte: z.optional(z.coerce.bigint()),
-      active_slots_between_min: z.optional(z.coerce.bigint()),
-      active_slots_between_max_value: z.optional(z.coerce.bigint()),
-      active_slots_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      active_slots_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      effective_bytes_eq: z.optional(z.coerce.bigint()),
-      effective_bytes_ne: z.optional(z.coerce.bigint()),
-      effective_bytes_lt: z.optional(z.coerce.bigint()),
-      effective_bytes_lte: z.optional(z.coerce.bigint()),
-      effective_bytes_gt: z.optional(z.coerce.bigint()),
-      effective_bytes_gte: z.optional(z.coerce.bigint()),
-      effective_bytes_between_min: z.optional(z.coerce.bigint()),
-      effective_bytes_between_max_value: z.optional(z.coerce.bigint()),
-      effective_bytes_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      effective_bytes_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
-      owner_key_eq: z.optional(z.string()),
-      owner_key_ne: z.optional(z.string()),
-      owner_key_contains: z.optional(z.string()),
-      owner_key_starts_with: z.optional(z.string()),
-      owner_key_ends_with: z.optional(z.string()),
-      owner_key_like: z.optional(z.string()),
-      owner_key_not_like: z.optional(z.string()),
-      owner_key_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      owner_key_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      account_owner_eq: z.optional(z.string()),
-      account_owner_ne: z.optional(z.string()),
-      account_owner_contains: z.optional(z.string()),
-      account_owner_starts_with: z.optional(z.string()),
-      account_owner_ends_with: z.optional(z.string()),
-      account_owner_like: z.optional(z.string()),
-      account_owner_not_like: z.optional(z.string()),
-      account_owner_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      account_owner_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      contract_name_eq: z.optional(z.string()),
-      contract_name_ne: z.optional(z.string()),
-      contract_name_contains: z.optional(z.string()),
-      contract_name_starts_with: z.optional(z.string()),
-      contract_name_ends_with: z.optional(z.string()),
-      contract_name_like: z.optional(z.string()),
-      contract_name_not_like: z.optional(z.string()),
-      contract_name_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      contract_name_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      factory_contract_eq: z.optional(z.string()),
-      factory_contract_ne: z.optional(z.string()),
-      factory_contract_contains: z.optional(z.string()),
-      factory_contract_starts_with: z.optional(z.string()),
-      factory_contract_ends_with: z.optional(z.string()),
-      factory_contract_like: z.optional(z.string()),
-      factory_contract_not_like: z.optional(z.string()),
-      factory_contract_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      factory_contract_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      usage_category_eq: z.optional(z.string()),
-      usage_category_ne: z.optional(z.string()),
-      usage_category_contains: z.optional(z.string()),
-      usage_category_starts_with: z.optional(z.string()),
-      usage_category_ends_with: z.optional(z.string()),
-      usage_category_like: z.optional(z.string()),
-      usage_category_not_like: z.optional(z.string()),
-      usage_category_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      usage_category_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
-      page_size: z.optional(z.int()),
-      page_token: z.optional(z.string()),
-      order_by: z.optional(z.string()),
-    })
-  ),
-});
-
-/**
- * OK
- */
-export const zFctStorageSlotTop100BySlotsWithExpiryServiceListResponse =
-  zListFctStorageSlotTop100BySlotsWithExpiryResponse;
-
-export const zFctStorageSlotTop100BySlotsWithExpiryServiceGetData = z.object({
-  body: z.optional(z.never()),
-  path: z.object({
-    expiry_policy: z.string(),
-  }),
-  query: z.optional(z.never()),
-});
-
-/**
- * OK
- */
-export const zFctStorageSlotTop100BySlotsWithExpiryServiceGetResponse =
-  zGetFctStorageSlotTop100BySlotsWithExpiryResponse;
 
 export const zIntAddressFirstAccessServiceListData = z.object({
   body: z.optional(z.never()),
