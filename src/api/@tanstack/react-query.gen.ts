@@ -142,12 +142,8 @@ import {
   fctStorageSlotStateWithExpiryByBlockHourlyServiceList,
   fctStorageSlotTop100ByBytesServiceGet,
   fctStorageSlotTop100ByBytesServiceList,
-  fctStorageSlotTop100ByBytesWithExpiryServiceGet,
-  fctStorageSlotTop100ByBytesWithExpiryServiceList,
   fctStorageSlotTop100BySlotsServiceGet,
   fctStorageSlotTop100BySlotsServiceList,
-  fctStorageSlotTop100BySlotsWithExpiryServiceGet,
-  fctStorageSlotTop100BySlotsWithExpiryServiceList,
   intAddressFirstAccessServiceGet,
   intAddressFirstAccessServiceList,
   intAddressLastAccessServiceGet,
@@ -671,24 +667,12 @@ import type {
   FctStorageSlotTop100ByBytesServiceListData,
   FctStorageSlotTop100ByBytesServiceListError,
   FctStorageSlotTop100ByBytesServiceListResponse,
-  FctStorageSlotTop100ByBytesWithExpiryServiceGetData,
-  FctStorageSlotTop100ByBytesWithExpiryServiceGetError,
-  FctStorageSlotTop100ByBytesWithExpiryServiceGetResponse,
-  FctStorageSlotTop100ByBytesWithExpiryServiceListData,
-  FctStorageSlotTop100ByBytesWithExpiryServiceListError,
-  FctStorageSlotTop100ByBytesWithExpiryServiceListResponse,
   FctStorageSlotTop100BySlotsServiceGetData,
   FctStorageSlotTop100BySlotsServiceGetError,
   FctStorageSlotTop100BySlotsServiceGetResponse,
   FctStorageSlotTop100BySlotsServiceListData,
   FctStorageSlotTop100BySlotsServiceListError,
   FctStorageSlotTop100BySlotsServiceListResponse,
-  FctStorageSlotTop100BySlotsWithExpiryServiceGetData,
-  FctStorageSlotTop100BySlotsWithExpiryServiceGetError,
-  FctStorageSlotTop100BySlotsWithExpiryServiceGetResponse,
-  FctStorageSlotTop100BySlotsWithExpiryServiceListData,
-  FctStorageSlotTop100BySlotsWithExpiryServiceListError,
-  FctStorageSlotTop100BySlotsWithExpiryServiceListResponse,
   IntAddressFirstAccessServiceGetData,
   IntAddressFirstAccessServiceGetError,
   IntAddressFirstAccessServiceGetResponse,
@@ -5054,66 +5038,6 @@ export const fctStorageSlotTop100ByBytesServiceGetOptions = (
     queryKey: fctStorageSlotTop100ByBytesServiceGetQueryKey(options),
   });
 
-export const fctStorageSlotTop100ByBytesWithExpiryServiceListQueryKey = (
-  options?: Options<FctStorageSlotTop100ByBytesWithExpiryServiceListData>
-) => createQueryKey('fctStorageSlotTop100ByBytesWithExpiryServiceList', options);
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const fctStorageSlotTop100ByBytesWithExpiryServiceListOptions = (
-  options?: Options<FctStorageSlotTop100ByBytesWithExpiryServiceListData>
-) =>
-  queryOptions<
-    FctStorageSlotTop100ByBytesWithExpiryServiceListResponse,
-    FctStorageSlotTop100ByBytesWithExpiryServiceListError,
-    FctStorageSlotTop100ByBytesWithExpiryServiceListResponse,
-    ReturnType<typeof fctStorageSlotTop100ByBytesWithExpiryServiceListQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctStorageSlotTop100ByBytesWithExpiryServiceList({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: fctStorageSlotTop100ByBytesWithExpiryServiceListQueryKey(options),
-  });
-
-export const fctStorageSlotTop100ByBytesWithExpiryServiceGetQueryKey = (
-  options: Options<FctStorageSlotTop100ByBytesWithExpiryServiceGetData>
-) => createQueryKey('fctStorageSlotTop100ByBytesWithExpiryServiceGet', options);
-
-/**
- * Get record
- *
- * Retrieve a single record by expiry_policy
- */
-export const fctStorageSlotTop100ByBytesWithExpiryServiceGetOptions = (
-  options: Options<FctStorageSlotTop100ByBytesWithExpiryServiceGetData>
-) =>
-  queryOptions<
-    FctStorageSlotTop100ByBytesWithExpiryServiceGetResponse,
-    FctStorageSlotTop100ByBytesWithExpiryServiceGetError,
-    FctStorageSlotTop100ByBytesWithExpiryServiceGetResponse,
-    ReturnType<typeof fctStorageSlotTop100ByBytesWithExpiryServiceGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctStorageSlotTop100ByBytesWithExpiryServiceGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: fctStorageSlotTop100ByBytesWithExpiryServiceGetQueryKey(options),
-  });
-
 export const fctStorageSlotTop100BySlotsServiceListQueryKey = (
   options?: Options<FctStorageSlotTop100BySlotsServiceListData>
 ) => createQueryKey('fctStorageSlotTop100BySlotsServiceList', options);
@@ -5172,66 +5096,6 @@ export const fctStorageSlotTop100BySlotsServiceGetOptions = (
       return data;
     },
     queryKey: fctStorageSlotTop100BySlotsServiceGetQueryKey(options),
-  });
-
-export const fctStorageSlotTop100BySlotsWithExpiryServiceListQueryKey = (
-  options?: Options<FctStorageSlotTop100BySlotsWithExpiryServiceListData>
-) => createQueryKey('fctStorageSlotTop100BySlotsWithExpiryServiceList', options);
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const fctStorageSlotTop100BySlotsWithExpiryServiceListOptions = (
-  options?: Options<FctStorageSlotTop100BySlotsWithExpiryServiceListData>
-) =>
-  queryOptions<
-    FctStorageSlotTop100BySlotsWithExpiryServiceListResponse,
-    FctStorageSlotTop100BySlotsWithExpiryServiceListError,
-    FctStorageSlotTop100BySlotsWithExpiryServiceListResponse,
-    ReturnType<typeof fctStorageSlotTop100BySlotsWithExpiryServiceListQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctStorageSlotTop100BySlotsWithExpiryServiceList({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: fctStorageSlotTop100BySlotsWithExpiryServiceListQueryKey(options),
-  });
-
-export const fctStorageSlotTop100BySlotsWithExpiryServiceGetQueryKey = (
-  options: Options<FctStorageSlotTop100BySlotsWithExpiryServiceGetData>
-) => createQueryKey('fctStorageSlotTop100BySlotsWithExpiryServiceGet', options);
-
-/**
- * Get record
- *
- * Retrieve a single record by expiry_policy
- */
-export const fctStorageSlotTop100BySlotsWithExpiryServiceGetOptions = (
-  options: Options<FctStorageSlotTop100BySlotsWithExpiryServiceGetData>
-) =>
-  queryOptions<
-    FctStorageSlotTop100BySlotsWithExpiryServiceGetResponse,
-    FctStorageSlotTop100BySlotsWithExpiryServiceGetError,
-    FctStorageSlotTop100BySlotsWithExpiryServiceGetResponse,
-    ReturnType<typeof fctStorageSlotTop100BySlotsWithExpiryServiceGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctStorageSlotTop100BySlotsWithExpiryServiceGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: fctStorageSlotTop100BySlotsWithExpiryServiceGetQueryKey(options),
   });
 
 export const intAddressFirstAccessServiceListQueryKey = (options?: Options<IntAddressFirstAccessServiceListData>) =>

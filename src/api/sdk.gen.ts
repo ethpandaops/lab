@@ -417,24 +417,12 @@ import type {
   FctStorageSlotTop100ByBytesServiceListData,
   FctStorageSlotTop100ByBytesServiceListErrors,
   FctStorageSlotTop100ByBytesServiceListResponses,
-  FctStorageSlotTop100ByBytesWithExpiryServiceGetData,
-  FctStorageSlotTop100ByBytesWithExpiryServiceGetErrors,
-  FctStorageSlotTop100ByBytesWithExpiryServiceGetResponses,
-  FctStorageSlotTop100ByBytesWithExpiryServiceListData,
-  FctStorageSlotTop100ByBytesWithExpiryServiceListErrors,
-  FctStorageSlotTop100ByBytesWithExpiryServiceListResponses,
   FctStorageSlotTop100BySlotsServiceGetData,
   FctStorageSlotTop100BySlotsServiceGetErrors,
   FctStorageSlotTop100BySlotsServiceGetResponses,
   FctStorageSlotTop100BySlotsServiceListData,
   FctStorageSlotTop100BySlotsServiceListErrors,
   FctStorageSlotTop100BySlotsServiceListResponses,
-  FctStorageSlotTop100BySlotsWithExpiryServiceGetData,
-  FctStorageSlotTop100BySlotsWithExpiryServiceGetErrors,
-  FctStorageSlotTop100BySlotsWithExpiryServiceGetResponses,
-  FctStorageSlotTop100BySlotsWithExpiryServiceListData,
-  FctStorageSlotTop100BySlotsWithExpiryServiceListErrors,
-  FctStorageSlotTop100BySlotsWithExpiryServiceListResponses,
   IntAddressFirstAccessServiceGetData,
   IntAddressFirstAccessServiceGetErrors,
   IntAddressFirstAccessServiceGetResponses,
@@ -1031,18 +1019,10 @@ import {
   zFctStorageSlotTop100ByBytesServiceGetResponse,
   zFctStorageSlotTop100ByBytesServiceListData,
   zFctStorageSlotTop100ByBytesServiceListResponse,
-  zFctStorageSlotTop100ByBytesWithExpiryServiceGetData,
-  zFctStorageSlotTop100ByBytesWithExpiryServiceGetResponse,
-  zFctStorageSlotTop100ByBytesWithExpiryServiceListData,
-  zFctStorageSlotTop100ByBytesWithExpiryServiceListResponse,
   zFctStorageSlotTop100BySlotsServiceGetData,
   zFctStorageSlotTop100BySlotsServiceGetResponse,
   zFctStorageSlotTop100BySlotsServiceListData,
   zFctStorageSlotTop100BySlotsServiceListResponse,
-  zFctStorageSlotTop100BySlotsWithExpiryServiceGetData,
-  zFctStorageSlotTop100BySlotsWithExpiryServiceGetResponse,
-  zFctStorageSlotTop100BySlotsWithExpiryServiceListData,
-  zFctStorageSlotTop100BySlotsWithExpiryServiceListResponse,
   zIntAddressFirstAccessServiceGetData,
   zIntAddressFirstAccessServiceGetResponse,
   zIntAddressFirstAccessServiceListData,
@@ -4041,46 +4021,6 @@ export const fctStorageSlotTop100ByBytesServiceGet = <ThrowOnError extends boole
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctStorageSlotTop100ByBytesWithExpiryServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctStorageSlotTop100ByBytesWithExpiryServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
-    FctStorageSlotTop100ByBytesWithExpiryServiceListResponses,
-    FctStorageSlotTop100ByBytesWithExpiryServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotTop100ByBytesWithExpiryServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctStorageSlotTop100ByBytesWithExpiryServiceListResponse.parseAsync(data),
-    url: '/api/v1/fct_storage_slot_top_100_by_bytes_with_expiry',
-    ...options,
-  });
-};
-
-/**
- * Get record
- *
- * Retrieve a single record by expiry_policy
- */
-export const fctStorageSlotTop100ByBytesWithExpiryServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctStorageSlotTop100ByBytesWithExpiryServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
-    FctStorageSlotTop100ByBytesWithExpiryServiceGetResponses,
-    FctStorageSlotTop100ByBytesWithExpiryServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotTop100ByBytesWithExpiryServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctStorageSlotTop100ByBytesWithExpiryServiceGetResponse.parseAsync(data),
-    url: '/api/v1/fct_storage_slot_top_100_by_bytes_with_expiry/{expiry_policy}',
-    ...options,
-  });
-};
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
 export const fctStorageSlotTop100BySlotsServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotTop100BySlotsServiceListData, ThrowOnError>
 ) => {
@@ -4112,46 +4052,6 @@ export const fctStorageSlotTop100BySlotsServiceGet = <ThrowOnError extends boole
     requestValidator: async data => await zFctStorageSlotTop100BySlotsServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctStorageSlotTop100BySlotsServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_top_100_by_slots/{rank}',
-    ...options,
-  });
-};
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const fctStorageSlotTop100BySlotsWithExpiryServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctStorageSlotTop100BySlotsWithExpiryServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
-    FctStorageSlotTop100BySlotsWithExpiryServiceListResponses,
-    FctStorageSlotTop100BySlotsWithExpiryServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotTop100BySlotsWithExpiryServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctStorageSlotTop100BySlotsWithExpiryServiceListResponse.parseAsync(data),
-    url: '/api/v1/fct_storage_slot_top_100_by_slots_with_expiry',
-    ...options,
-  });
-};
-
-/**
- * Get record
- *
- * Retrieve a single record by expiry_policy
- */
-export const fctStorageSlotTop100BySlotsWithExpiryServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctStorageSlotTop100BySlotsWithExpiryServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
-    FctStorageSlotTop100BySlotsWithExpiryServiceGetResponses,
-    FctStorageSlotTop100BySlotsWithExpiryServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotTop100BySlotsWithExpiryServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctStorageSlotTop100BySlotsWithExpiryServiceGetResponse.parseAsync(data),
-    url: '/api/v1/fct_storage_slot_top_100_by_slots_with_expiry/{expiry_policy}',
     ...options,
   });
 };
