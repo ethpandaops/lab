@@ -2,81 +2,15 @@ import { useState, type JSX } from 'react';
 import { clsx } from 'clsx';
 import { ChevronDownIcon, ChevronUpIcon, ServerIcon } from '@heroicons/react/24/outline';
 
+import { CLUSTER_SPECS, CLUSTER_COLORS } from '@/constants/eip7870';
 import type { EIP7870SpecsBannerProps } from './EIP7870SpecsBanner.types';
-
-/**
- * Cluster hardware specifications
- */
-type ClusterSpec = {
-  name: string;
-  cpu: {
-    model: string;
-    cores: number;
-    threads: number;
-    maxFrequency: string;
-  };
-  memory: {
-    total: string;
-    type: string;
-    speed: string;
-  };
-  storage: {
-    model: string;
-    capacity: string;
-    interface: string;
-  };
-};
-
-/**
- * Hardware specifications by cluster
- */
-const CLUSTER_SPECS: ClusterSpec[] = [
-  {
-    name: 'utility',
-    cpu: {
-      model: 'AMD Ryzen 7 7700',
-      cores: 8,
-      threads: 16,
-      maxFrequency: '5.4 GHz',
-    },
-    memory: {
-      total: '64 GB',
-      type: 'DDR5',
-      speed: '5200 MT/s',
-    },
-    storage: {
-      model: 'SOLIDIGM SSDPFKKW010X7',
-      capacity: '2x 1 TB',
-      interface: 'NVMe 1.4',
-    },
-  },
-  {
-    name: 'sigma',
-    cpu: {
-      model: 'Intel Core i7-13700H',
-      cores: 14,
-      threads: 20,
-      maxFrequency: '5.0 GHz',
-    },
-    memory: {
-      total: '64 GB',
-      type: 'DDR5',
-      speed: '4800 MT/s',
-    },
-    storage: {
-      model: 'Samsung 990 PRO',
-      capacity: '4 TB',
-      interface: 'NVMe 2.0',
-    },
-  },
-];
 
 /**
  * Displays EIP-7870 hardware specifications in a compact, expandable banner.
  * Shows cluster specs with option to expand for full details.
  */
 export function EIP7870SpecsBanner({ className }: EIP7870SpecsBannerProps): JSX.Element {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   return (
     <div className={clsx('rounded-xs border border-border bg-surface/50', className)}>
@@ -110,6 +44,7 @@ export function EIP7870SpecsBanner({ className }: EIP7870SpecsBannerProps): JSX.
                   <th className="pr-4 pb-2 font-medium text-foreground">Cluster</th>
                   <th className="pr-4 pb-2 font-medium text-foreground">CPU</th>
                   <th className="pr-4 pb-2 font-medium text-foreground">Cores / Threads</th>
+                  <th className="pr-4 pb-2 font-medium text-foreground">Passmark</th>
                   <th className="pr-4 pb-2 font-medium text-foreground">Memory</th>
                   <th className="pb-2 font-medium text-foreground">Storage</th>
                 </tr>
@@ -117,13 +52,22 @@ export function EIP7870SpecsBanner({ className }: EIP7870SpecsBannerProps): JSX.
               <tbody className="text-muted">
                 {CLUSTER_SPECS.map(cluster => (
                   <tr key={cluster.name} className="border-b border-border/50 last:border-0">
-                    <td className="py-2 pr-4 font-medium text-foreground">{cluster.name}</td>
+                    <td className="py-2 pr-4">
+                      <div className="flex items-center gap-2">
+                        <ServerIcon className={clsx('size-4 shrink-0', CLUSTER_COLORS[cluster.name])} />
+                        <span className="font-medium text-foreground">{cluster.name}</span>
+                      </div>
+                    </td>
                     <td className="py-2 pr-4">
                       <div>{cluster.cpu.model}</div>
                       <div className="text-muted/70">up to {cluster.cpu.maxFrequency}</div>
                     </td>
                     <td className="py-2 pr-4">
                       {cluster.cpu.cores}c / {cluster.cpu.threads}t
+                    </td>
+                    <td className="py-2 pr-4">
+                      <div>{cluster.cpu.passmarkSingle} Single</div>
+                      <div className="text-muted/70">{cluster.cpu.passmarkMulti} Multi</div>
                     </td>
                     <td className="py-2 pr-4">
                       <div>{cluster.memory.total}</div>

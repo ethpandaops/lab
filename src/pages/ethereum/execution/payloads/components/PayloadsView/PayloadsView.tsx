@@ -1,4 +1,4 @@
-import { type JSX, useMemo, useState, type RefObject } from 'react';
+import { type JSX, useMemo, useState, useCallback, type RefObject } from 'react';
 import { createColumnHelper, type SortingState } from '@tanstack/react-table';
 import { Link } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
@@ -6,6 +6,8 @@ import { Header } from '@/components/Layout/Header';
 import { DataTable } from '@/components/DataTable';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { EIP7870SpecsBanner } from '@/components/Ethereum/EIP7870SpecsBanner';
+import { ClusterSpecsModal } from '@/components/Ethereum/ClusterSpecsModal';
+import { extractClusterFromNodeName, CLUSTER_COLORS } from '@/constants/eip7870';
 import { TracoorIcon } from '@/components/Ethereum/TracoorIcon';
 import { Alert } from '@/components/Feedback/Alert';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
@@ -21,6 +23,7 @@ import {
   QuestionMarkCircleIcon,
   SignalIcon,
   InformationCircleIcon,
+  ServerIcon,
 } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
 
@@ -186,6 +189,14 @@ export function PayloadsView({
 }: PayloadsViewProps): JSX.Element {
   // Learn more dialog state
   const [learnMoreOpen, setLearnMoreOpen] = useState(false);
+  // Cluster specs modal state
+  const [clusterSpecsOpen, setClusterSpecsOpen] = useState(false);
+  const [selectedCluster, setSelectedCluster] = useState<string | null>(null);
+
+  const handleClusterClick = useCallback((clusterName: string): void => {
+    setSelectedCluster(clusterName);
+    setClusterSpecsOpen(true);
+  }, []);
 
   // Define table columns
   const columns = useMemo(
@@ -255,8 +266,24 @@ export function PayloadsView({
             .replace(/^sigma-mainnet-/, 'sigma/');
           // Truncate long node names
           const displayName = shortName.length > 35 ? `${shortName.slice(0, 35)}...` : shortName;
+          // Extract cluster for EIP-7870 reference nodes
+          const clusterName = extractClusterFromNodeName(nodeName);
+          const clusterColor = clusterName ? CLUSTER_COLORS[clusterName] : null;
           return (
-            <span className="text-xs text-muted" title={nodeName}>
+            <span className="flex items-center gap-1.5 text-xs text-muted" title={nodeName}>
+              {clusterColor && clusterName && (
+                <button
+                  type="button"
+                  onClick={e => {
+                    e.stopPropagation();
+                    handleClusterClick(clusterName);
+                  }}
+                  className="cursor-pointer transition-opacity hover:opacity-70"
+                  title={`View ${clusterName} cluster specs`}
+                >
+                  <ServerIcon className={`size-3.5 shrink-0 ${clusterColor}`} />
+                </button>
+              )}
               {displayName}
             </span>
           );
@@ -324,7 +351,7 @@ export function PayloadsView({
           ]
         : []),
     ],
-    [onFilterClick, tracoorUrl]
+    [onFilterClick, tracoorUrl, handleClusterClick]
   );
 
   // Get row ID for live mode highlighting
@@ -441,6 +468,13 @@ export function PayloadsView({
 
       {/* Reference Nodes Info Dialog */}
       <ReferenceNodesInfoDialog open={learnMoreOpen} onClose={() => setLearnMoreOpen(false)} />
+
+      {/* Cluster Specs Modal */}
+      <ClusterSpecsModal
+        open={clusterSpecsOpen}
+        onClose={() => setClusterSpecsOpen(false)}
+        clusterName={selectedCluster}
+      />
     </Container>
   );
 }
