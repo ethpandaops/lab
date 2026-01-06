@@ -1,10 +1,13 @@
-import { type JSX, useMemo, useState, type RefObject } from 'react';
+import { type JSX, useMemo, useState, useCallback, type RefObject } from 'react';
 import { createColumnHelper, type SortingState } from '@tanstack/react-table';
 import { Link } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { DataTable } from '@/components/DataTable';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { EIP7870SpecsBanner } from '@/components/Ethereum/EIP7870SpecsBanner';
+import { ClusterSpecsModal } from '@/components/Ethereum/ClusterSpecsModal';
+import { extractClusterFromNodeName, CLUSTER_COLORS } from '@/constants/eip7870';
 import { TracoorIcon } from '@/components/Ethereum/TracoorIcon';
 import { Alert } from '@/components/Feedback/Alert';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
@@ -18,10 +21,9 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   QuestionMarkCircleIcon,
-  PlayIcon,
-  PauseIcon,
   SignalIcon,
   InformationCircleIcon,
+  ServerIcon,
 } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
 
@@ -187,6 +189,14 @@ export function PayloadsView({
 }: PayloadsViewProps): JSX.Element {
   // Learn more dialog state
   const [learnMoreOpen, setLearnMoreOpen] = useState(false);
+  // Cluster specs modal state
+  const [clusterSpecsOpen, setClusterSpecsOpen] = useState(false);
+  const [selectedCluster, setSelectedCluster] = useState<string | null>(null);
+
+  const handleClusterClick = useCallback((clusterName: string): void => {
+    setSelectedCluster(clusterName);
+    setClusterSpecsOpen(true);
+  }, []);
 
   // Define table columns
   const columns = useMemo(
@@ -229,11 +239,15 @@ export function PayloadsView({
           const client = info.getValue();
           if (!client) return <span className="text-muted">-</span>;
           const clientLower = client.toLowerCase();
+          const version = info.row.original.meta_execution_version;
           return (
             <FilterableCell field="meta_execution_implementation" value={client} onFilterClick={onFilterClick}>
               <span className="inline-flex items-center gap-1.5">
                 <ClientLogo client={clientLower} size={16} />
-                <span className="text-xs">{clientLower}</span>
+                <span className="text-xs">
+                  {clientLower}
+                  {version && <span className="text-muted"> ({version})</span>}
+                </span>
               </span>
             </FilterableCell>
           );
@@ -252,8 +266,24 @@ export function PayloadsView({
             .replace(/^sigma-mainnet-/, 'sigma/');
           // Truncate long node names
           const displayName = shortName.length > 35 ? `${shortName.slice(0, 35)}...` : shortName;
+          // Extract cluster for EIP-7870 reference nodes
+          const clusterName = extractClusterFromNodeName(nodeName);
+          const clusterColor = clusterName ? CLUSTER_COLORS[clusterName] : null;
           return (
-            <span className="text-xs text-muted" title={nodeName}>
+            <span className="flex items-center gap-1.5 text-xs text-muted" title={nodeName}>
+              {clusterColor && clusterName && (
+                <button
+                  type="button"
+                  onClick={e => {
+                    e.stopPropagation();
+                    handleClusterClick(clusterName);
+                  }}
+                  className="cursor-pointer transition-opacity hover:opacity-70"
+                  title={`View ${clusterName} cluster specs`}
+                >
+                  <ServerIcon className={`size-3.5 shrink-0 ${clusterColor}`} />
+                </button>
+              )}
               {displayName}
             </span>
           );
@@ -321,7 +351,7 @@ export function PayloadsView({
           ]
         : []),
     ],
-    [onFilterClick, tracoorUrl]
+    [onFilterClick, tracoorUrl, handleClusterClick]
   );
 
   // Get row ID for live mode highlighting
@@ -345,72 +375,49 @@ export function PayloadsView({
 
   return (
     <Container>
-      {/* Header with Go Live and Learn More buttons */}
-      <div className="mb-6 flex items-start justify-between gap-4">
+      {/* Header with Learn more button */}
+      <div className="flex items-start justify-between gap-4">
         <Header
           title="Payloads"
           description={`Individual engine_newPayload observations taking ${durationThreshold}ms+ to validate`}
           className="mb-0"
         />
-        <div className="flex shrink-0 items-center gap-2">
-          {/* Live mode toggle */}
-          {onLiveModeToggle && (
-            <button
-              type="button"
-              onClick={onLiveModeToggle}
-              className={clsx(
-                'inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-sm font-medium transition-all',
-                isLive
-                  ? 'border-green-500/50 bg-green-500/20 text-green-400 hover:bg-green-500/30'
-                  : 'border-border bg-surface text-muted hover:border-primary/30 hover:text-foreground'
-              )}
-            >
-              {isLive ? (
-                <>
-                  <span className="relative flex size-2">
-                    <span className="absolute inline-flex size-full animate-ping rounded-full bg-green-400 opacity-75" />
-                    <span className="relative inline-flex size-2 rounded-full bg-green-500" />
-                  </span>
-                  <PauseIcon className="size-4" />
-                  <span>Live</span>
-                </>
-              ) : (
-                <>
-                  <PlayIcon className="size-4" />
-                  <span>Go Live</span>
-                </>
-              )}
-            </button>
-          )}
-          {/* Learn more button */}
-          <button
-            type="button"
-            onClick={() => setLearnMoreOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-all hover:border-primary/50 hover:bg-primary/20"
-          >
-            <InformationCircleIcon className="size-4" />
-            Learn more
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setLearnMoreOpen(true)}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-all hover:border-primary/50 hover:bg-primary/20"
+        >
+          <InformationCircleIcon className="size-4" />
+          Learn more
+        </button>
+      </div>
+
+      {/* Hardware specs banner */}
+      <EIP7870SpecsBanner className="mb-4" />
+
+      {/* Unified toolbar: Live toggle + Quick filters + Reference */}
+      <div className="mb-4">
+        <QuickFilters
+          currentFilters={filters}
+          onApplyPreset={handleApplyPreset}
+          onClearFilters={onClearFilters}
+          isLive={isLive}
+          onLiveModeToggle={onLiveModeToggle}
+        />
       </div>
 
       {/* Live mode indicator bar */}
       {isLive && (
-        <div className="mb-4 flex items-center rounded-sm border border-primary/30 bg-primary/10 px-4 py-2">
+        <div className="mb-4 flex items-center rounded-sm border border-green-500/30 bg-green-500/10 px-4 py-2">
           <div className="flex items-center gap-3">
-            <SignalIcon className="size-5 text-primary" />
+            <SignalIcon className="size-5 text-green-500" />
             <div>
-              <span className="text-sm font-medium text-primary">Live Mode Active</span>
+              <span className="text-sm font-medium text-green-500">Live Mode Active</span>
               <span className="ml-2 text-xs text-muted">Showing latest observations in real-time</span>
             </div>
           </div>
         </div>
       )}
-
-      {/* Quick filters */}
-      <div className="mb-4">
-        <QuickFilters currentFilters={filters} onApplyPreset={handleApplyPreset} onClearFilters={onClearFilters} />
-      </div>
 
       {/* Filter panel */}
       <div className="mb-4">
@@ -438,9 +445,15 @@ export function PayloadsView({
             ? `No payloads found with duration >= ${filters.durationMin}ms`
             : `No payloads found (duration >= ${durationThreshold}ms)`
         }
-        getRowClassName={(row, _rowId) =>
-          clsx('cursor-pointer transition-colors hover:bg-surface/50', isRowNew(row) && 'animate-pulse bg-green-500/10')
-        }
+        getRowClassName={(row, _rowId) => {
+          const isReferenceNode = row.node_class === 'eip7870-block-builder';
+          const showReferenceHighlight = !filters.referenceNodes && isReferenceNode;
+          return clsx(
+            'cursor-pointer transition-colors hover:bg-surface/50',
+            isRowNew(row) && 'animate-pulse bg-green-500/10',
+            showReferenceHighlight && 'bg-primary/5 border-l-2 border-l-primary'
+          );
+        }}
         hideGlobalFilter
         hideColumnVisibility
         paginationPosition={isLive ? undefined : 'bottom'}
@@ -455,6 +468,13 @@ export function PayloadsView({
 
       {/* Reference Nodes Info Dialog */}
       <ReferenceNodesInfoDialog open={learnMoreOpen} onClose={() => setLearnMoreOpen(false)} />
+
+      {/* Cluster Specs Modal */}
+      <ClusterSpecsModal
+        open={clusterSpecsOpen}
+        onClose={() => setClusterSpecsOpen(false)}
+        clusterName={selectedCluster}
+      />
     </Container>
   );
 }

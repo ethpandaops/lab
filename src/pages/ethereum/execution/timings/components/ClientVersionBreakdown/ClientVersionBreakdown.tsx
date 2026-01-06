@@ -1,11 +1,13 @@
 import React, { type JSX, useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronUpIcon, ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { ChevronUpIcon, ChevronDownIcon, ChevronRightIcon, ServerIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { ClusterSpecsModal } from '@/components/Ethereum/ClusterSpecsModal';
 import { intEngineNewPayloadServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { IntEngineNewPayload } from '@/api/types.gen';
+import { extractClusterFromNodeName, CLUSTER_COLORS } from '@/constants/eip7870';
 
 /**
  * Get color class for duration value relative to max (green = fast, red = slow)
@@ -121,7 +123,17 @@ function shortenNodeName(nodeName?: string): string {
 /**
  * Expanded row content that lazy loads individual observations
  */
-function ExpandedRowContent({ slot, client, colSpan }: { slot: number; client: string; colSpan: number }): JSX.Element {
+function ExpandedRowContent({
+  slot,
+  client,
+  colSpan,
+  onClusterClick,
+}: {
+  slot: number;
+  client: string;
+  colSpan: number;
+  onClusterClick: (clusterName: string) => void;
+}): JSX.Element {
   // Map client display names to API values (handles case sensitivity)
   const getClientFilter = (clientName: string): string => {
     const lower = clientName.toLowerCase();
@@ -200,10 +212,25 @@ function ExpandedRowContent({ slot, client, colSpan }: { slot: number; client: s
             <tbody>
               {observations.map((obs: IntEngineNewPayload, idx: number) => {
                 const statusStyle = getStatusStyle(obs.status);
+                const clusterName = extractClusterFromNodeName(obs.meta_client_name ?? '');
+                const clusterColor = clusterName ? CLUSTER_COLORS[clusterName] : null;
                 return (
                   <tr key={`${obs.meta_client_name}-${idx}`} className="text-sm">
                     <td className="px-2 py-1.5">
-                      <span className="text-muted" title={obs.meta_client_name}>
+                      <span className="flex items-center gap-1.5 text-muted" title={obs.meta_client_name}>
+                        {clusterColor && clusterName && (
+                          <button
+                            type="button"
+                            onClick={e => {
+                              e.stopPropagation();
+                              onClusterClick(clusterName);
+                            }}
+                            className="rounded-xs p-0.5 transition-all hover:bg-primary/10 hover:ring-1 hover:ring-primary/30"
+                            title={`View ${clusterName} cluster specs`}
+                          >
+                            <ServerIcon className={clsx('size-3.5 shrink-0', clusterColor)} />
+                          </button>
+                        )}
                         {shortenNodeName(obs.meta_client_name)}
                       </span>
                     </td>
@@ -256,6 +283,15 @@ export function ClientVersionBreakdown({
 
   // Track which clients are expanded (for expandable mode)
   const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set());
+
+  // Cluster specs modal state
+  const [clusterSpecsOpen, setClusterSpecsOpen] = useState(false);
+  const [selectedCluster, setSelectedCluster] = useState<string | null>(null);
+
+  const handleClusterClick = (clusterName: string): void => {
+    setSelectedCluster(clusterName);
+    setClusterSpecsOpen(true);
+  };
 
   // Whether we have hourly data with true percentiles
   const hasHourlyData = hourlyData && hourlyData.length > 0;
@@ -673,7 +709,12 @@ export function ClientVersionBreakdown({
                     )}
                   </tr>
                   {isExpanded && slot !== undefined && (
-                    <ExpandedRowContent slot={slot} client={row.client} colSpan={colCount} />
+                    <ExpandedRowContent
+                      slot={slot}
+                      client={row.client}
+                      colSpan={colCount}
+                      onClusterClick={handleClusterClick}
+                    />
                   )}
                 </React.Fragment>
               );
@@ -685,12 +726,28 @@ export function ClientVersionBreakdown({
   );
 
   if (noCard) {
-    return <div>{tableContent}</div>;
+    return (
+      <>
+        <div>{tableContent}</div>
+        <ClusterSpecsModal
+          open={clusterSpecsOpen}
+          onClose={() => setClusterSpecsOpen(false)}
+          clusterName={selectedCluster}
+        />
+      </>
+    );
   }
 
   return (
-    <Card>
-      <div className="p-4">{tableContent}</div>
-    </Card>
+    <>
+      <Card>
+        <div className="p-4">{tableContent}</div>
+      </Card>
+      <ClusterSpecsModal
+        open={clusterSpecsOpen}
+        onClose={() => setClusterSpecsOpen(false)}
+        clusterName={selectedCluster}
+      />
+    </>
   );
 }
