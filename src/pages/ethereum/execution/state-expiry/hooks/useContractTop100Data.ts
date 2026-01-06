@@ -18,6 +18,7 @@ export function useContractTop100Data(): UseContractTop100DataResult {
       query: {
         rank_gte: 1,
         page_size: 10000,
+        order_by: 'rank',
       },
     }),
     placeholderData: keepPreviousData,
@@ -25,10 +26,8 @@ export function useContractTop100Data(): UseContractTop100DataResult {
 
   const data = query.data?.fct_storage_slot_top_100_by_bytes ?? null;
 
-  // Filter for raw state (null expiry_policy) and sort by rank
-  const filteredData = data
-    ? [...data].filter(item => item.expiry_policy == null).sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
-    : null;
+  // Filter for raw state (null expiry_policy)
+  const filteredData = data ? [...data].filter(item => item.expiry_policy == null) : null;
 
   return {
     data: filteredData,
