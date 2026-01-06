@@ -15,21 +15,6 @@ import type {
 export const EXPIRY_POLICIES = ['6m', '12m', '18m', '24m'] as const;
 export type ExpiryPolicy = (typeof EXPIRY_POLICIES)[number];
 
-/** Policy duration in months */
-const POLICY_MONTHS: Record<ExpiryPolicy, number> = {
-  '6m': 6,
-  '12m': 12,
-  '18m': 18,
-  '24m': 24,
-};
-
-/** Add months to a date */
-function addMonths(date: Date, months: number): Date {
-  const result = new Date(date);
-  result.setMonth(result.getMonth() + months);
-  return result;
-}
-
 /** Format date as YYYY-MM-DD */
 function formatDateStr(date: Date): string {
   return date.toISOString().split('T')[0];
@@ -66,20 +51,11 @@ interface UseContractStorageDataResult {
   error: Error | null;
 }
 
-interface UseContractStorageDataOptions {
-  /** Whether to extrapolate data to today (default: false) */
-  extrapolate?: boolean;
-}
-
 /**
  * Hook that fetches daily storage data for a specific contract address.
  * Uses contract-level endpoints for current state and expiry policies.
  */
-export function useContractStorageData(
-  address: string,
-  options: UseContractStorageDataOptions = {}
-): UseContractStorageDataResult {
-  const { extrapolate = false } = options;
+export function useContractStorageData(address: string): UseContractStorageDataResult {
   // Fetch current state for this address (no expiry)
   const currentStateQuery = useQuery({
     ...fctContractStorageStateByAddressDailyServiceListOptions({
@@ -304,12 +280,30 @@ export function useContractStorageData(
 
     if (!contractCurrentRange) return null;
 
-    const contractLatestDate = new Date(contractCurrentRange.max);
-    const slotLatestDate = slotCurrentRange ? new Date(slotCurrentRange.max) : null;
+    // Get ranges for all expiry datasets
+    const contractExpiryRanges: Record<ExpiryPolicy, { min: string; max: string } | null> = {
+      '6m': getDateRange(contractExpiryMaps['6m']),
+      '12m': getDateRange(contractExpiryMaps['12m']),
+      '18m': getDateRange(contractExpiryMaps['18m']),
+      '24m': getDateRange(contractExpiryMaps['24m']),
+    };
+    const slotExpiryRanges: Record<ExpiryPolicy, { min: string; max: string } | null> = {
+      '6m': getDateRange(slotExpiryMaps['6m']),
+      '12m': getDateRange(slotExpiryMaps['12m']),
+      '18m': getDateRange(slotExpiryMaps['18m']),
+      '24m': getDateRange(slotExpiryMaps['24m']),
+    };
 
-    // Find aligned latest date (max of both categories' latest)
-    const alignedLatestDate =
-      slotLatestDate && slotLatestDate > contractLatestDate ? slotLatestDate : contractLatestDate;
+    // Calculate global max date across ALL datasets (current + expiry for both contract and slot)
+    // This ensures we display data until the latest available date from any source
+    const allMaxDates: string[] = [contractCurrentRange.max];
+    if (slotCurrentRange) allMaxDates.push(slotCurrentRange.max);
+    for (const policy of EXPIRY_POLICIES) {
+      if (contractExpiryRanges[policy]) allMaxDates.push(contractExpiryRanges[policy]!.max);
+      if (slotExpiryRanges[policy]) allMaxDates.push(slotExpiryRanges[policy]!.max);
+    }
+    const globalMaxDateStr = allMaxDates.sort().pop()!;
+    const globalMaxDate = new Date(globalMaxDateStr);
 
     // === STEP 3: Helper to fill gaps in a dataset within its own min/max range ===
     const fillGaps = (
@@ -335,12 +329,14 @@ export function useContractStorageData(
       return filled;
     };
 
-    // === STEP 4: Fill gaps for each dataset within its own range ===
+    // === STEP 4: Fill gaps for each dataset ===
+    // For "current" series, extend to global max date (forward-filling last known value)
+    // For "expiry" series, fill within their own range
 
-    // Contract current - fill from min to max
-    const filledContractCurrent = fillGaps(contractCurrentMap, contractCurrentRange.min, contractCurrentRange.max);
+    // Contract current - fill from min to global max (extends beyond its own max with forward-fill)
+    const filledContractCurrent = fillGaps(contractCurrentMap, contractCurrentRange.min, globalMaxDateStr);
 
-    // Contract expiry - fill each policy within its own range
+    // Contract expiry - fill each policy from its min to global max (forward-fill to align all series)
     const filledContractExpiry: Record<ExpiryPolicy, Map<string, { slots: number; bytes: number }>> = {
       '6m': new Map(),
       '12m': new Map(),
@@ -350,17 +346,17 @@ export function useContractStorageData(
     for (const policy of EXPIRY_POLICIES) {
       const range = getDateRange(contractExpiryMaps[policy]);
       if (range) {
-        filledContractExpiry[policy] = fillGaps(contractExpiryMaps[policy], range.min, range.max);
+        filledContractExpiry[policy] = fillGaps(contractExpiryMaps[policy], range.min, globalMaxDateStr);
       }
     }
 
-    // Slot current - fill from min to max (if data exists)
+    // Slot current - fill from min to global max (extends beyond its own max with forward-fill)
     let filledSlotCurrent: Map<string, { slots: number; bytes: number }> | null = null;
     if (slotCurrentRange) {
-      filledSlotCurrent = fillGaps(slotCurrentMap, slotCurrentRange.min, slotCurrentRange.max);
+      filledSlotCurrent = fillGaps(slotCurrentMap, slotCurrentRange.min, globalMaxDateStr);
     }
 
-    // Slot expiry - fill each policy within its own range
+    // Slot expiry - fill each policy from its min to global max (forward-fill to align all series)
     const filledSlotExpiry: Record<ExpiryPolicy, Map<string, { slots: number; bytes: number }>> = {
       '6m': new Map(),
       '12m': new Map(),
@@ -370,153 +366,57 @@ export function useContractStorageData(
     for (const policy of EXPIRY_POLICIES) {
       const range = getDateRange(slotExpiryMaps[policy]);
       if (range) {
-        filledSlotExpiry[policy] = fillGaps(slotExpiryMaps[policy], range.min, range.max);
+        filledSlotExpiry[policy] = fillGaps(slotExpiryMaps[policy], range.min, globalMaxDateStr);
       }
     }
 
     // === STEP 5: Build the date range for output ===
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    // Determine the end date based on extrapolation setting
-    const endDate = extrapolate ? today : alignedLatestDate;
     const startDate = new Date(contractCurrentRange.min);
 
-    // Generate all dates from start to end
+    // Generate all dates from start to global max date
     const allDates: string[] = [];
     const current = new Date(startDate);
-    while (current <= endDate) {
+    while (current <= globalMaxDate) {
       allDates.push(formatDateStr(current));
       current.setDate(current.getDate() + 1);
     }
 
-    // === STEP 6: Get last known values for extrapolation ===
-    const contractLastValue = filledContractCurrent.get(contractCurrentRange.max) ?? { slots: 0, bytes: 0 };
-    const slotLastValue = filledSlotCurrent?.get(slotCurrentRange!.max) ?? null;
-
-    const contractExpiryLastValues: Record<ExpiryPolicy, { slots: number; bytes: number } | null> = {
-      '6m': null,
-      '12m': null,
-      '18m': null,
-      '24m': null,
-    };
-    const slotExpiryLastValues: Record<ExpiryPolicy, { slots: number; bytes: number } | null> = {
-      '6m': null,
-      '12m': null,
-      '18m': null,
-      '24m': null,
-    };
-
-    for (const policy of EXPIRY_POLICIES) {
-      const contractRange = getDateRange(contractExpiryMaps[policy]);
-      if (contractRange) {
-        contractExpiryLastValues[policy] = filledContractExpiry[policy].get(contractRange.max) ?? null;
-      }
-      const slotRange = getDateRange(slotExpiryMaps[policy]);
-      if (slotRange) {
-        slotExpiryLastValues[policy] = filledSlotExpiry[policy].get(slotRange.max) ?? null;
-      }
-    }
-
-    // Calculate expiry dates (last datapoint + expiry period)
-    const contractExpiryDates: Record<ExpiryPolicy, Date> = {
-      '6m': addMonths(contractLatestDate, POLICY_MONTHS['6m']),
-      '12m': addMonths(contractLatestDate, POLICY_MONTHS['12m']),
-      '18m': addMonths(contractLatestDate, POLICY_MONTHS['18m']),
-      '24m': addMonths(contractLatestDate, POLICY_MONTHS['24m']),
-    };
-
-    const slotExpiryDates: Record<ExpiryPolicy, Date> | null = slotLatestDate
-      ? {
-          '6m': addMonths(slotLatestDate, POLICY_MONTHS['6m']),
-          '12m': addMonths(slotLatestDate, POLICY_MONTHS['12m']),
-          '18m': addMonths(slotLatestDate, POLICY_MONTHS['18m']),
-          '24m': addMonths(slotLatestDate, POLICY_MONTHS['24m']),
-        }
-      : null;
-
-    // === STEP 7: Build final result ===
+    // === STEP 6: Build final result ===
     const result: ContractStorageDataPoint[] = allDates.map(dateStr => {
       const date = new Date(dateStr);
 
-      // --- Contract Current ---
-      let contractCurrent: { slots: number; bytes: number } | null = null;
-      if (filledContractCurrent.has(dateStr)) {
-        // Within contract data range
-        contractCurrent = filledContractCurrent.get(dateStr)!;
-      } else if (extrapolate) {
-        // Extrapolation ON: extend beyond range as straight line
-        contractCurrent = contractLastValue;
-      }
-      // Extrapolation OFF: leave as null (dataset only shows within its own range)
+      // Get contract current (forward-filled to global max)
+      const contractCurrent = filledContractCurrent.get(dateStr) ?? null;
 
-      // --- Contract Expiry ---
+      // Get contract expiry data for each policy (forward-filled to global max)
       const contractExpiry: Record<ExpiryPolicy, ExpiryPolicyData> = {
         '6m': { activeSlots: null, effectiveBytes: null },
         '12m': { activeSlots: null, effectiveBytes: null },
         '18m': { activeSlots: null, effectiveBytes: null },
         '24m': { activeSlots: null, effectiveBytes: null },
       };
-
       for (const policy of EXPIRY_POLICIES) {
-        const filled = filledContractExpiry[policy];
-        const lastVal = contractExpiryLastValues[policy];
-        const expiryDate = contractExpiryDates[policy];
-
-        if (filled.has(dateStr)) {
-          // Within expiry data range
-          const val = filled.get(dateStr)!;
+        const val = filledContractExpiry[policy].get(dateStr);
+        if (val) {
           contractExpiry[policy] = { activeSlots: val.slots, effectiveBytes: val.bytes };
-        } else if (extrapolate && lastVal) {
-          // Extrapolation ON: extend beyond range
-          if (date >= expiryDate) {
-            contractExpiry[policy] = { activeSlots: 0, effectiveBytes: 0 };
-          } else {
-            // Straight line from last datapoint
-            contractExpiry[policy] = { activeSlots: lastVal.slots, effectiveBytes: lastVal.bytes };
-          }
         }
-        // Extrapolation OFF: leave as null (dataset only shows within its own range)
       }
 
-      // --- Slot Current ---
-      let slotCurrent: { slots: number; bytes: number } | null = null;
-      if (filledSlotCurrent?.has(dateStr)) {
-        // Within slot data range
-        slotCurrent = filledSlotCurrent.get(dateStr)!;
-      } else if (extrapolate && slotLastValue) {
-        // Extrapolation ON: extend beyond range as straight line
-        slotCurrent = slotLastValue;
-      }
-      // Extrapolation OFF: leave as null (dataset only shows within its own range)
+      // Get slot current (forward-filled to global max)
+      const slotCurrent = filledSlotCurrent?.get(dateStr) ?? null;
 
-      // --- Slot Expiry ---
+      // Get slot expiry data for each policy (forward-filled to global max)
       const slotExpiry: Record<ExpiryPolicy, ExpiryPolicyData> = {
         '6m': { activeSlots: null, effectiveBytes: null },
         '12m': { activeSlots: null, effectiveBytes: null },
         '18m': { activeSlots: null, effectiveBytes: null },
         '24m': { activeSlots: null, effectiveBytes: null },
       };
-
       for (const policy of EXPIRY_POLICIES) {
-        const filled = filledSlotExpiry[policy];
-        const lastVal = slotExpiryLastValues[policy];
-        const expiryDate = slotExpiryDates?.[policy];
-
-        if (filled.has(dateStr)) {
-          // Within expiry data range
-          const val = filled.get(dateStr)!;
+        const val = filledSlotExpiry[policy].get(dateStr);
+        if (val) {
           slotExpiry[policy] = { activeSlots: val.slots, effectiveBytes: val.bytes };
-        } else if (extrapolate && lastVal && expiryDate) {
-          // Extrapolation ON: extend beyond range
-          if (date >= expiryDate) {
-            slotExpiry[policy] = { activeSlots: 0, effectiveBytes: 0 };
-          } else {
-            // Straight line from last datapoint
-            slotExpiry[policy] = { activeSlots: lastVal.slots, effectiveBytes: lastVal.bytes };
-          }
         }
-        // Extrapolation OFF: leave as null (dataset only shows within its own range)
       }
 
       return {
@@ -543,7 +443,6 @@ export function useContractStorageData(
     slotExpiry12mQuery.data,
     slotExpiry18mQuery.data,
     slotExpiry24mQuery.data,
-    extrapolate,
   ]);
 
   const latestData = useMemo(() => {

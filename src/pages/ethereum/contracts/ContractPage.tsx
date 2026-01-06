@@ -11,7 +11,7 @@ import { Badge } from '@/components/Elements/Badge';
 import { formatSmartDecimal } from '@/utils';
 import { useContractStorageData, EXPIRY_POLICIES } from './hooks';
 import { ContractPageSkeleton } from './components';
-import { ArrowTrendingUpIcon, CircleStackIcon, CubeIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { CircleStackIcon, CubeIcon, ClockIcon } from '@heroicons/react/24/outline';
 
 /** Colors for contract-level expiry policy lines */
 const CONTRACT_POLICY_COLORS = {
@@ -66,13 +66,12 @@ interface VisibilityState {
  */
 export function ContractPage(): JSX.Element {
   const { address } = useParams({ from: '/ethereum/contracts/$address' });
-  const [extrapolate, setExtrapolate] = useState(false);
   const [visibility, setVisibility] = useState<VisibilityState>({
     slot: true,
     contract: true,
     policies: { '6m': true, '12m': true, '18m': true, '24m': true },
   });
-  const { data, isLoading, error } = useContractStorageData(address, { extrapolate });
+  const { data, isLoading, error } = useContractStorageData(address);
 
   /** Toggle visibility for a category or policy */
   const toggleVisibility = useCallback((key: 'slot' | 'contract' | ExpiryPolicy) => {
@@ -328,33 +327,15 @@ export function ContractPage(): JSX.Element {
         <div className="space-y-4">
           {/* Controls */}
           <div className="flex flex-wrap items-center gap-2">
-            {/* Extrapolate */}
-            <button
-              type="button"
-              onClick={() => setExtrapolate(!extrapolate)}
-              className={clsx(
-                'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all',
-                extrapolate
-                  ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
-                  : 'bg-surface/50 text-muted ring-1 ring-border hover:bg-surface hover:text-foreground hover:ring-primary/30'
-              )}
-            >
-              <ArrowTrendingUpIcon className="size-3.5" />
-              Extrapolate
-            </button>
-
-            {/* Divider */}
-            <div className="h-5 w-px bg-border" />
-
             {/* Category toggles */}
             <button
               type="button"
               onClick={() => toggleVisibility('slot')}
               className={clsx(
-                'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all',
+                'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
                 visibility.slot
                   ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
-                  : 'bg-surface/50 text-muted ring-1 ring-border hover:bg-surface hover:text-foreground hover:ring-primary/30'
+                  : 'bg-surface ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
               )}
             >
               <CubeIcon className="size-3.5" />
@@ -364,10 +345,10 @@ export function ContractPage(): JSX.Element {
               type="button"
               onClick={() => toggleVisibility('contract')}
               className={clsx(
-                'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all',
+                'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
                 visibility.contract
                   ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
-                  : 'bg-surface/50 text-muted ring-1 ring-border hover:bg-surface hover:text-foreground hover:ring-primary/30'
+                  : 'bg-surface ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
               )}
             >
               <CircleStackIcon className="size-3.5" />
@@ -384,10 +365,10 @@ export function ContractPage(): JSX.Element {
                 type="button"
                 onClick={() => toggleVisibility(policy)}
                 className={clsx(
-                  'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all',
+                  'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
                   visibility.policies[policy]
                     ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
-                    : 'bg-surface/50 text-muted ring-1 ring-border hover:bg-surface hover:text-foreground hover:ring-primary/30'
+                    : 'bg-surface ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
                 )}
               >
                 <ClockIcon className="size-3.5" />
