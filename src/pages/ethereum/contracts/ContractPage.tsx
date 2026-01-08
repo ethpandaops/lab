@@ -139,10 +139,10 @@ export function ContractPage(): JSX.Element {
   const [selectedType, setSelectedType] = useState<ExpiryType>('slot');
   const themeColors = useThemeColors();
 
-  // Fetch contract owner details
+  // Fetch contract owner details (address must be lowercase for API)
   const contractOwnerQuery = useQuery({
     ...dimContractOwnerServiceListOptions({
-      query: { contract_address_eq: address },
+      query: { contract_address_eq: address.toLowerCase() },
     }),
   });
   const contractOwner = contractOwnerQuery.data?.dim_contract_owner?.[0];

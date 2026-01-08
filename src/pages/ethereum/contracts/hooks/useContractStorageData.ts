@@ -60,11 +60,14 @@ interface UseContractStorageDataResult {
  * Uses contract-level endpoints for current state and expiry policies.
  */
 export function useContractStorageData(address: string): UseContractStorageDataResult {
+  // Normalize address to lowercase for API requests
+  const normalizedAddress = address.toLowerCase();
+
   // Fetch current state for this address (no expiry)
   const currentStateQuery = useQuery({
     ...fctContractStorageStateByAddressDailyServiceListOptions({
       query: {
-        address_eq: address,
+        address_eq: normalizedAddress,
         day_start_date_like: '20%',
         page_size: 10000,
       },
@@ -76,7 +79,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
   const expiry12mQuery = useQuery({
     ...fctContractStorageStateWithExpiryByAddressDailyServiceListOptions({
       query: {
-        address_eq: address,
+        address_eq: normalizedAddress,
         expiry_policy_eq: '12m',
         day_start_date_like: '20%',
         page_size: 10000,
@@ -88,7 +91,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
   const expiry24mQuery = useQuery({
     ...fctContractStorageStateWithExpiryByAddressDailyServiceListOptions({
       query: {
-        address_eq: address,
+        address_eq: normalizedAddress,
         expiry_policy_eq: '24m',
         day_start_date_like: '20%',
         page_size: 10000,
@@ -101,7 +104,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
   const slotCurrentStateQuery = useQuery({
     ...fctStorageSlotStateByAddressDailyServiceListOptions({
       query: {
-        address_eq: address,
+        address_eq: normalizedAddress,
         day_start_date_like: '20%',
         page_size: 10000,
       },
@@ -113,7 +116,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
   const slotExpiry12mQuery = useQuery({
     ...fctStorageSlotStateWithExpiryByAddressDailyServiceListOptions({
       query: {
-        address_eq: address,
+        address_eq: normalizedAddress,
         expiry_policy_eq: '12m',
         day_start_date_like: '20%',
         page_size: 10000,
@@ -125,7 +128,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
   const slotExpiry24mQuery = useQuery({
     ...fctStorageSlotStateWithExpiryByAddressDailyServiceListOptions({
       query: {
-        address_eq: address,
+        address_eq: normalizedAddress,
         expiry_policy_eq: '24m',
         day_start_date_like: '20%',
         page_size: 10000,
