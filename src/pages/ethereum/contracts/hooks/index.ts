@@ -1,2 +1,2 @@
-export { useContractStorageData, EXPIRY_POLICIES } from './useContractStorageData';
-export type { ExpiryPolicy, ContractStorageDataPoint } from './useContractStorageData';
+export { useContractStorageData, EXPIRY_TYPES, EXPIRY_POLICIES } from './useContractStorageData';
+export type { ExpiryType, ExpiryPolicy, ContractStorageDataPoint } from './useContractStorageData';

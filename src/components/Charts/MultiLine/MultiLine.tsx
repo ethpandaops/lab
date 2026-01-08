@@ -10,6 +10,7 @@ import {
   TitleComponent,
   DataZoomComponent,
   LegendComponent,
+  MarkLineComponent,
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { hexToRgba, formatSmartDecimal, getDataVizColors, resolveCssColorToHex } from '@/utils';
@@ -26,6 +27,7 @@ echarts.use([
   TitleComponent,
   DataZoomComponent,
   LegendComponent,
+  MarkLineComponent,
   CanvasRenderer,
 ]);
 
@@ -89,6 +91,7 @@ export function MultiLineChart({
   syncGroup,
   notMerge = true,
   onSeriesClick,
+  markLines,
 }: MultiLineChartProps): React.JSX.Element {
   // Store ref to the ReactEChartsCore wrapper (not the instance) for click handling
   const chartWrapperRef = useRef<ReactEChartsCore | null>(null);
@@ -472,6 +475,43 @@ export function MultiLineChart({
       return baseConfig;
     });
 
+    // Add annotation series for markLines if provided
+    const annotationSeries =
+      markLines && markLines.length > 0
+        ? [
+            {
+              name: '__annotations__',
+              type: 'line' as const,
+              data: [], // Empty data - this series is only for markLine
+              silent: true, // Don't trigger events
+              legendHoverLink: false,
+              markLine: {
+                silent: true,
+                symbol: 'none',
+                data: markLines.map(ml => ({
+                  xAxis: ml.xValue,
+                  label: {
+                    show: !!ml.label,
+                    formatter: ml.label ?? '',
+                    position: ml.labelPosition ?? 'end',
+                    color: ml.color ?? themeColors.muted,
+                    fontSize: 11,
+                    backgroundColor: themeColors.surface,
+                    padding: [2, 4],
+                  },
+                  lineStyle: {
+                    color: ml.color ?? themeColors.muted,
+                    type: (ml.lineStyle ?? 'dashed') as 'solid' | 'dashed' | 'dotted',
+                    width: ml.lineWidth ?? 1,
+                  },
+                })),
+              },
+            },
+          ]
+        : [];
+
+    const finalSeriesConfig = [...seriesConfig, ...annotationSeries];
+
     // Calculate grid padding - just basic padding, let ECharts handle the rest
     // Add extra bottom padding for dataZoom slider when enabled
     const baseBottom = 50;
@@ -625,7 +665,7 @@ export function MultiLineChart({
       grid: gridConfig,
       xAxis: xAxisConfig,
       yAxis: yAxisConfig,
-      series: seriesConfig,
+      series: finalSeriesConfig,
       tooltip: tooltipConfig,
       legend:
         useNativeLegend && showLegend
@@ -705,6 +745,7 @@ export function MultiLineChart({
     useNativeLegend,
     showLegend,
     legendPosition,
+    markLines,
   ]);
 
   const chartContent = (

@@ -37,6 +37,7 @@ import { Route as EthereumSlotsIndexRouteImport } from './routes/ethereum/slots/
 import { Route as EthereumForksIndexRouteImport } from './routes/ethereum/forks/index'
 import { Route as EthereumEpochsIndexRouteImport } from './routes/ethereum/epochs/index'
 import { Route as EthereumEntitiesIndexRouteImport } from './routes/ethereum/entities/index'
+import { Route as EthereumContractsIndexRouteImport } from './routes/ethereum/contracts/index'
 import { Route as XatuContributorsIdRouteImport } from './routes/xatu/contributors/$id'
 import { Route as EthereumSlotsSlotRouteImport } from './routes/ethereum/slots/$slot'
 import { Route as EthereumForksForkRouteImport } from './routes/ethereum/forks/$fork'
@@ -201,6 +202,11 @@ const EthereumEntitiesIndexRoute = EthereumEntitiesIndexRouteImport.update({
   path: '/',
   getParentRoute: () => EthereumEntitiesRoute,
 } as any)
+const EthereumContractsIndexRoute = EthereumContractsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EthereumContractsRoute,
+} as any)
 const XatuContributorsIdRoute = XatuContributorsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -342,6 +348,7 @@ export interface FileRoutesByFullPath {
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
+  '/ethereum/contracts/': typeof EthereumContractsIndexRoute
   '/ethereum/entities/': typeof EthereumEntitiesIndexRoute
   '/ethereum/epochs/': typeof EthereumEpochsIndexRoute
   '/ethereum/forks/': typeof EthereumForksIndexRoute
@@ -357,7 +364,6 @@ export interface FileRoutesByTo {
   '/ethereum': typeof EthereumRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
   '/beacon/locally-built-blocks': typeof BeaconLocallyBuiltBlocksRoute
-  '/ethereum/contracts': typeof EthereumContractsRouteWithChildren
   '/ethereum/data-availability': typeof EthereumDataAvailabilityRouteWithChildren
   '/ethereum/execution': typeof EthereumExecutionRouteWithChildren
   '/ethereum/live': typeof EthereumLiveRoute
@@ -380,6 +386,7 @@ export interface FileRoutesByTo {
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
+  '/ethereum/contracts': typeof EthereumContractsIndexRoute
   '/ethereum/entities': typeof EthereumEntitiesIndexRoute
   '/ethereum/epochs': typeof EthereumEpochsIndexRoute
   '/ethereum/forks': typeof EthereumForksIndexRoute
@@ -429,6 +436,7 @@ export interface FileRoutesById {
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
+  '/ethereum/contracts/': typeof EthereumContractsIndexRoute
   '/ethereum/entities/': typeof EthereumEntitiesIndexRoute
   '/ethereum/epochs/': typeof EthereumEpochsIndexRoute
   '/ethereum/forks/': typeof EthereumForksIndexRoute
@@ -479,6 +487,7 @@ export interface FileRouteTypes {
     | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
     | '/xatu/contributors/$id'
+    | '/ethereum/contracts/'
     | '/ethereum/entities/'
     | '/ethereum/epochs/'
     | '/ethereum/forks/'
@@ -494,7 +503,6 @@ export interface FileRouteTypes {
     | '/ethereum'
     | '/xatu'
     | '/beacon/locally-built-blocks'
-    | '/ethereum/contracts'
     | '/ethereum/data-availability'
     | '/ethereum/execution'
     | '/ethereum/live'
@@ -517,6 +525,7 @@ export interface FileRouteTypes {
     | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
     | '/xatu/contributors/$id'
+    | '/ethereum/contracts'
     | '/ethereum/entities'
     | '/ethereum/epochs'
     | '/ethereum/forks'
@@ -565,6 +574,7 @@ export interface FileRouteTypes {
     | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
     | '/xatu/contributors/$id'
+    | '/ethereum/contracts/'
     | '/ethereum/entities/'
     | '/ethereum/epochs/'
     | '/ethereum/forks/'
@@ -787,6 +797,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumEntitiesIndexRouteImport
       parentRoute: typeof EthereumEntitiesRoute
     }
+    '/ethereum/contracts/': {
+      id: '/ethereum/contracts/'
+      path: '/'
+      fullPath: '/ethereum/contracts/'
+      preLoaderRoute: typeof EthereumContractsIndexRouteImport
+      parentRoute: typeof EthereumContractsRoute
+    }
     '/xatu/contributors/$id': {
       id: '/xatu/contributors/$id'
       path: '/$id'
@@ -918,10 +935,12 @@ declare module '@tanstack/react-router' {
 
 interface EthereumContractsRouteChildren {
   EthereumContractsAddressRoute: typeof EthereumContractsAddressRoute
+  EthereumContractsIndexRoute: typeof EthereumContractsIndexRoute
 }
 
 const EthereumContractsRouteChildren: EthereumContractsRouteChildren = {
   EthereumContractsAddressRoute: EthereumContractsAddressRoute,
+  EthereumContractsIndexRoute: EthereumContractsIndexRoute,
 }
 
 const EthereumContractsRouteWithChildren =

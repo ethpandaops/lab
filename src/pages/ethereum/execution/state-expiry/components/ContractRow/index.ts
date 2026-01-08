@@ -1,1 +1,1 @@
-export { ContractRow } from './ContractRow';
+export { ContractRow, ContractCard } from './ContractRow';

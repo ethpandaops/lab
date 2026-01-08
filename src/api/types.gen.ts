@@ -89,21 +89,21 @@ export type DimContractOwner = {
    */
   factory_contract?: string | null;
   /**
+   * Labels/categories (e.g., stablecoin, dex, circle)
+   */
+  labels?: Array<string>;
+  /**
    * Owner key identifier
    */
   owner_key?: string | null;
   /**
-   * Source of the label data (dune or growthepie)
+   * Sources of the label data (e.g., growthepie, dune, eth-labels)
    */
-  source?: string;
+  sources?: Array<string>;
   /**
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
-  /**
-   * Usage category (e.g., stablecoin, dex, trading)
-   */
-  usage_category?: string | null;
 };
 
 export type DimNode = {
@@ -3518,6 +3518,10 @@ export type FctStorageSlotTop100ByBytes = {
    */
   factory_contract?: string | null;
   /**
+   * Labels/categories (e.g., stablecoin, dex, circle)
+   */
+  labels?: Array<string>;
+  /**
    * Owner key identifier
    */
   owner_key?: string | null;
@@ -3529,10 +3533,6 @@ export type FctStorageSlotTop100ByBytes = {
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
-  /**
-   * Usage category (e.g., stablecoin, dex, trading)
-   */
-  usage_category?: string | null;
 };
 
 export type FctStorageSlotTop100BySlots = {
@@ -3565,6 +3565,10 @@ export type FctStorageSlotTop100BySlots = {
    */
   factory_contract?: string | null;
   /**
+   * Labels/categories (e.g., stablecoin, dex, circle)
+   */
+  labels?: Array<string>;
+  /**
    * Owner key identifier
    */
   owner_key?: string | null;
@@ -3576,10 +3580,6 @@ export type FctStorageSlotTop100BySlots = {
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
-  /**
-   * Usage category (e.g., stablecoin, dex, trading)
-   */
-  usage_category?: string | null;
 };
 
 /**
@@ -9346,77 +9346,69 @@ export type DimContractOwnerServiceListData = {
      */
     factory_contract_not_in_values?: string;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: eq)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: has)
      */
-    usage_category_eq?: string;
+    labels_has?: string;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: ne)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: has_all_values)
      */
-    usage_category_ne?: string;
+    labels_has_all_values?: Array<string>;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: contains)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: has_any_values)
      */
-    usage_category_contains?: string;
+    labels_has_any_values?: Array<string>;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: starts_with)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: length_eq)
      */
-    usage_category_starts_with?: string;
+    labels_length_eq?: number;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: ends_with)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: length_gt)
      */
-    usage_category_ends_with?: string;
+    labels_length_gt?: number;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: like)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: length_gte)
      */
-    usage_category_like?: string;
+    labels_length_gte?: number;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: not_like)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: length_lt)
      */
-    usage_category_not_like?: string;
+    labels_length_lt?: number;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: in_values) (comma-separated list)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: length_lte)
      */
-    usage_category_in_values?: string;
+    labels_length_lte?: number;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: not_in_values) (comma-separated list)
+     * Sources of the label data (e.g., growthepie, dune, eth-labels) (filter: has)
      */
-    usage_category_not_in_values?: string;
+    sources_has?: string;
     /**
-     * Source of the label data (dune or growthepie) (filter: eq)
+     * Sources of the label data (e.g., growthepie, dune, eth-labels) (filter: has_all_values)
      */
-    source_eq?: string;
+    sources_has_all_values?: Array<string>;
     /**
-     * Source of the label data (dune or growthepie) (filter: ne)
+     * Sources of the label data (e.g., growthepie, dune, eth-labels) (filter: has_any_values)
      */
-    source_ne?: string;
+    sources_has_any_values?: Array<string>;
     /**
-     * Source of the label data (dune or growthepie) (filter: contains)
+     * Sources of the label data (e.g., growthepie, dune, eth-labels) (filter: length_eq)
      */
-    source_contains?: string;
+    sources_length_eq?: number;
     /**
-     * Source of the label data (dune or growthepie) (filter: starts_with)
+     * Sources of the label data (e.g., growthepie, dune, eth-labels) (filter: length_gt)
      */
-    source_starts_with?: string;
+    sources_length_gt?: number;
     /**
-     * Source of the label data (dune or growthepie) (filter: ends_with)
+     * Sources of the label data (e.g., growthepie, dune, eth-labels) (filter: length_gte)
      */
-    source_ends_with?: string;
+    sources_length_gte?: number;
     /**
-     * Source of the label data (dune or growthepie) (filter: like)
+     * Sources of the label data (e.g., growthepie, dune, eth-labels) (filter: length_lt)
      */
-    source_like?: string;
+    sources_length_lt?: number;
     /**
-     * Source of the label data (dune or growthepie) (filter: not_like)
+     * Sources of the label data (e.g., growthepie, dune, eth-labels) (filter: length_lte)
      */
-    source_not_like?: string;
-    /**
-     * Source of the label data (dune or growthepie) (filter: in_values) (comma-separated list)
-     */
-    source_in_values?: string;
-    /**
-     * Source of the label data (dune or growthepie) (filter: not_in_values) (comma-separated list)
-     */
-    source_not_in_values?: string;
+    sources_length_lte?: number;
     /**
      * The maximum number of dim_contract_owner to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
@@ -44261,41 +44253,37 @@ export type FctStorageSlotTop100ByBytesServiceListData = {
      */
     factory_contract_not_in_values?: string;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: eq)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: has)
      */
-    usage_category_eq?: string;
+    labels_has?: string;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: ne)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: has_all_values)
      */
-    usage_category_ne?: string;
+    labels_has_all_values?: Array<string>;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: contains)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: has_any_values)
      */
-    usage_category_contains?: string;
+    labels_has_any_values?: Array<string>;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: starts_with)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: length_eq)
      */
-    usage_category_starts_with?: string;
+    labels_length_eq?: number;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: ends_with)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: length_gt)
      */
-    usage_category_ends_with?: string;
+    labels_length_gt?: number;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: like)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: length_gte)
      */
-    usage_category_like?: string;
+    labels_length_gte?: number;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: not_like)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: length_lt)
      */
-    usage_category_not_like?: string;
+    labels_length_lt?: number;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: in_values) (comma-separated list)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: length_lte)
      */
-    usage_category_in_values?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: not_in_values) (comma-separated list)
-     */
-    usage_category_not_in_values?: string;
+    labels_length_lte?: number;
     /**
      * The maximum number of fct_storage_slot_top_100_by_bytes to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
@@ -44745,41 +44733,37 @@ export type FctStorageSlotTop100BySlotsServiceListData = {
      */
     factory_contract_not_in_values?: string;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: eq)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: has)
      */
-    usage_category_eq?: string;
+    labels_has?: string;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: ne)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: has_all_values)
      */
-    usage_category_ne?: string;
+    labels_has_all_values?: Array<string>;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: contains)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: has_any_values)
      */
-    usage_category_contains?: string;
+    labels_has_any_values?: Array<string>;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: starts_with)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: length_eq)
      */
-    usage_category_starts_with?: string;
+    labels_length_eq?: number;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: ends_with)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: length_gt)
      */
-    usage_category_ends_with?: string;
+    labels_length_gt?: number;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: like)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: length_gte)
      */
-    usage_category_like?: string;
+    labels_length_gte?: number;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: not_like)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: length_lt)
      */
-    usage_category_not_like?: string;
+    labels_length_lt?: number;
     /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: in_values) (comma-separated list)
+     * Labels/categories (e.g., stablecoin, dex, circle) (filter: length_lte)
      */
-    usage_category_in_values?: string;
-    /**
-     * Usage category (e.g., stablecoin, dex, trading) (filter: not_in_values) (comma-separated list)
-     */
-    usage_category_not_in_values?: string;
+    labels_length_lte?: number;
     /**
      * The maximum number of fct_storage_slot_top_100_by_slots to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
