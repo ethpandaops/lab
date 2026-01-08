@@ -10,6 +10,7 @@ import type { ScrollAreaProps, ScrollBarProps } from './ScrollArea.types';
 export function ScrollArea({
   className,
   children,
+  orientation = 'vertical',
   scrollHorizontalWithWheel = false,
   ...props
 }: ScrollAreaProps): JSX.Element {
@@ -28,6 +29,9 @@ export function ScrollArea({
     [scrollHorizontalWithWheel]
   );
 
+  const showVertical = orientation === 'vertical' || orientation === 'both';
+  const showHorizontal = orientation === 'horizontal' || orientation === 'both';
+
   return (
     <ScrollAreaPrimitive.Root
       data-slot="scroll-area"
@@ -42,7 +46,8 @@ export function ScrollArea({
       >
         {children}
       </ScrollAreaPrimitive.Viewport>
-      <ScrollBar />
+      {showVertical && <ScrollBar orientation="vertical" />}
+      {showHorizontal && <ScrollBar orientation="horizontal" />}
       <ScrollAreaPrimitive.Corner />
     </ScrollAreaPrimitive.Root>
   );

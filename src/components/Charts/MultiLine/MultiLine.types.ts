@@ -177,6 +177,39 @@ export interface YAxisConfig {
 }
 
 /**
+ * Configuration for a vertical annotation line (markLine)
+ */
+export interface MarkLineConfig {
+  /**
+   * X-axis value where the vertical line should appear
+   */
+  xValue: number | string;
+  /**
+   * Label to display on the line
+   */
+  label?: string;
+  /**
+   * Position of the label
+   * @default 'end'
+   */
+  labelPosition?: 'start' | 'middle' | 'end';
+  /**
+   * Line color (hex or rgb)
+   */
+  color?: string;
+  /**
+   * Line style
+   * @default 'dashed'
+   */
+  lineStyle?: 'solid' | 'dashed' | 'dotted';
+  /**
+   * Line width
+   * @default 1
+   */
+  lineWidth?: number;
+}
+
+/**
  * MultiLineChart component props
  */
 export interface MultiLineChartProps {
@@ -319,4 +352,9 @@ export interface MultiLineChartProps {
    * @param seriesName - The name of the clicked series
    */
   onSeriesClick?: (seriesName: string) => void;
+  /**
+   * Vertical annotation lines to display on the chart
+   * Useful for marking important events like resurrections or thresholds
+   */
+  markLines?: MarkLineConfig[];
 }

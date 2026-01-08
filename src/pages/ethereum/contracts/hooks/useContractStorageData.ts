@@ -11,8 +11,12 @@ import type {
   FctStorageSlotStateWithExpiryByAddressDaily,
 } from '@/api/types.gen';
 
+/** Available expiry type options (slot vs contract based) */
+export const EXPIRY_TYPES = ['slot', 'contract'] as const;
+export type ExpiryType = (typeof EXPIRY_TYPES)[number];
+
 /** Available expiry policy options */
-export const EXPIRY_POLICIES = ['6m', '12m', '18m', '24m'] as const;
+export const EXPIRY_POLICIES = ['12m', '24m'] as const;
 export type ExpiryPolicy = (typeof EXPIRY_POLICIES)[number];
 
 /** Format date as YYYY-MM-DD */
@@ -68,36 +72,12 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     placeholderData: keepPreviousData,
   });
 
-  // Contract-based expiry queries (6m, 12m, 18m, 24m)
-  const expiry6mQuery = useQuery({
-    ...fctContractStorageStateWithExpiryByAddressDailyServiceListOptions({
-      query: {
-        address_eq: address,
-        expiry_policy_eq: '6m',
-        day_start_date_like: '20%',
-        page_size: 10000,
-      },
-    }),
-    placeholderData: keepPreviousData,
-  });
-
+  // Contract-based expiry queries (12m, 24m)
   const expiry12mQuery = useQuery({
     ...fctContractStorageStateWithExpiryByAddressDailyServiceListOptions({
       query: {
         address_eq: address,
         expiry_policy_eq: '12m',
-        day_start_date_like: '20%',
-        page_size: 10000,
-      },
-    }),
-    placeholderData: keepPreviousData,
-  });
-
-  const expiry18mQuery = useQuery({
-    ...fctContractStorageStateWithExpiryByAddressDailyServiceListOptions({
-      query: {
-        address_eq: address,
-        expiry_policy_eq: '18m',
         day_start_date_like: '20%',
         page_size: 10000,
       },
@@ -130,35 +110,11 @@ export function useContractStorageData(address: string): UseContractStorageDataR
   });
 
   // Slot-level expiry queries (NOT extrapolated)
-  const slotExpiry6mQuery = useQuery({
-    ...fctStorageSlotStateWithExpiryByAddressDailyServiceListOptions({
-      query: {
-        address_eq: address,
-        expiry_policy_eq: '6m',
-        day_start_date_like: '20%',
-        page_size: 10000,
-      },
-    }),
-    placeholderData: keepPreviousData,
-  });
-
   const slotExpiry12mQuery = useQuery({
     ...fctStorageSlotStateWithExpiryByAddressDailyServiceListOptions({
       query: {
         address_eq: address,
         expiry_policy_eq: '12m',
-        day_start_date_like: '20%',
-        page_size: 10000,
-      },
-    }),
-    placeholderData: keepPreviousData,
-  });
-
-  const slotExpiry18mQuery = useQuery({
-    ...fctStorageSlotStateWithExpiryByAddressDailyServiceListOptions({
-      query: {
-        address_eq: address,
-        expiry_policy_eq: '18m',
         day_start_date_like: '20%',
         page_size: 10000,
       },
@@ -181,14 +137,10 @@ export function useContractStorageData(address: string): UseContractStorageDataR
   // Combine and normalize the data
   const processedData = useMemo((): ContractStorageDataPoint[] | null => {
     const currentData = currentStateQuery.data?.fct_contract_storage_state_by_address_daily;
-    const expiry6mData = expiry6mQuery.data?.fct_contract_storage_state_with_expiry_by_address_daily;
     const expiry12mData = expiry12mQuery.data?.fct_contract_storage_state_with_expiry_by_address_daily;
-    const expiry18mData = expiry18mQuery.data?.fct_contract_storage_state_with_expiry_by_address_daily;
     const expiry24mData = expiry24mQuery.data?.fct_contract_storage_state_with_expiry_by_address_daily;
     const slotCurrentData = slotCurrentStateQuery.data?.fct_storage_slot_state_by_address_daily;
-    const slotExpiry6mData = slotExpiry6mQuery.data?.fct_storage_slot_state_with_expiry_by_address_daily;
     const slotExpiry12mData = slotExpiry12mQuery.data?.fct_storage_slot_state_with_expiry_by_address_daily;
-    const slotExpiry18mData = slotExpiry18mQuery.data?.fct_storage_slot_state_with_expiry_by_address_daily;
     const slotExpiry24mData = slotExpiry24mQuery.data?.fct_storage_slot_state_with_expiry_by_address_daily;
 
     if (!currentData || currentData.length === 0) {
@@ -217,15 +169,11 @@ export function useContractStorageData(address: string): UseContractStorageDataR
 
     // Contract expiry maps
     const contractExpiryMaps: Record<ExpiryPolicy, Map<string, { slots: number; bytes: number }>> = {
-      '6m': new Map(),
       '12m': new Map(),
-      '18m': new Map(),
       '24m': new Map(),
     };
     const contractExpiryData: Record<ExpiryPolicy, FctContractStorageStateWithExpiryByAddressDaily[] | undefined> = {
-      '6m': expiry6mData,
       '12m': expiry12mData,
-      '18m': expiry18mData,
       '24m': expiry24mData,
     };
     for (const policy of EXPIRY_POLICIES) {
@@ -252,15 +200,11 @@ export function useContractStorageData(address: string): UseContractStorageDataR
 
     // Slot expiry maps
     const slotExpiryMaps: Record<ExpiryPolicy, Map<string, { slots: number; bytes: number }>> = {
-      '6m': new Map(),
       '12m': new Map(),
-      '18m': new Map(),
       '24m': new Map(),
     };
     const slotExpiryData: Record<ExpiryPolicy, FctStorageSlotStateWithExpiryByAddressDaily[] | undefined> = {
-      '6m': slotExpiry6mData,
       '12m': slotExpiry12mData,
-      '18m': slotExpiry18mData,
       '24m': slotExpiry24mData,
     };
     for (const policy of EXPIRY_POLICIES) {
@@ -282,15 +226,11 @@ export function useContractStorageData(address: string): UseContractStorageDataR
 
     // Get ranges for all expiry datasets
     const contractExpiryRanges: Record<ExpiryPolicy, { min: string; max: string } | null> = {
-      '6m': getDateRange(contractExpiryMaps['6m']),
       '12m': getDateRange(contractExpiryMaps['12m']),
-      '18m': getDateRange(contractExpiryMaps['18m']),
       '24m': getDateRange(contractExpiryMaps['24m']),
     };
     const slotExpiryRanges: Record<ExpiryPolicy, { min: string; max: string } | null> = {
-      '6m': getDateRange(slotExpiryMaps['6m']),
       '12m': getDateRange(slotExpiryMaps['12m']),
-      '18m': getDateRange(slotExpiryMaps['18m']),
       '24m': getDateRange(slotExpiryMaps['24m']),
     };
 
@@ -338,9 +278,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
 
     // Contract expiry - fill each policy from its min to global max (forward-fill to align all series)
     const filledContractExpiry: Record<ExpiryPolicy, Map<string, { slots: number; bytes: number }>> = {
-      '6m': new Map(),
       '12m': new Map(),
-      '18m': new Map(),
       '24m': new Map(),
     };
     for (const policy of EXPIRY_POLICIES) {
@@ -358,9 +296,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
 
     // Slot expiry - fill each policy from its min to global max (forward-fill to align all series)
     const filledSlotExpiry: Record<ExpiryPolicy, Map<string, { slots: number; bytes: number }>> = {
-      '6m': new Map(),
       '12m': new Map(),
-      '18m': new Map(),
       '24m': new Map(),
     };
     for (const policy of EXPIRY_POLICIES) {
@@ -390,9 +326,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
 
       // Get contract expiry data for each policy (forward-filled to global max)
       const contractExpiry: Record<ExpiryPolicy, ExpiryPolicyData> = {
-        '6m': { activeSlots: null, effectiveBytes: null },
         '12m': { activeSlots: null, effectiveBytes: null },
-        '18m': { activeSlots: null, effectiveBytes: null },
         '24m': { activeSlots: null, effectiveBytes: null },
       };
       for (const policy of EXPIRY_POLICIES) {
@@ -407,9 +341,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
 
       // Get slot expiry data for each policy (forward-filled to global max)
       const slotExpiry: Record<ExpiryPolicy, ExpiryPolicyData> = {
-        '6m': { activeSlots: null, effectiveBytes: null },
         '12m': { activeSlots: null, effectiveBytes: null },
-        '18m': { activeSlots: null, effectiveBytes: null },
         '24m': { activeSlots: null, effectiveBytes: null },
       };
       for (const policy of EXPIRY_POLICIES) {
@@ -434,14 +366,10 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     return result;
   }, [
     currentStateQuery.data,
-    expiry6mQuery.data,
     expiry12mQuery.data,
-    expiry18mQuery.data,
     expiry24mQuery.data,
     slotCurrentStateQuery.data,
-    slotExpiry6mQuery.data,
     slotExpiry12mQuery.data,
-    slotExpiry18mQuery.data,
     slotExpiry24mQuery.data,
   ]);
 
@@ -452,25 +380,17 @@ export function useContractStorageData(address: string): UseContractStorageDataR
 
   const isLoading =
     currentStateQuery.isLoading ||
-    expiry6mQuery.isLoading ||
     expiry12mQuery.isLoading ||
-    expiry18mQuery.isLoading ||
     expiry24mQuery.isLoading ||
     slotCurrentStateQuery.isLoading ||
-    slotExpiry6mQuery.isLoading ||
     slotExpiry12mQuery.isLoading ||
-    slotExpiry18mQuery.isLoading ||
     slotExpiry24mQuery.isLoading;
 
   const error = (currentStateQuery.error ||
-    expiry6mQuery.error ||
     expiry12mQuery.error ||
-    expiry18mQuery.error ||
     expiry24mQuery.error ||
     slotCurrentStateQuery.error ||
-    slotExpiry6mQuery.error ||
     slotExpiry12mQuery.error ||
-    slotExpiry18mQuery.error ||
     slotExpiry24mQuery.error) as Error | null;
 
   return {

@@ -16,14 +16,18 @@ import { Popover, PopoverButton, PopoverPanel } from '@/components/Overlays/Popo
 import { formatSmartDecimal, hexToRgba } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useStateExpiryData, EXPIRY_POLICIES, EXPIRY_TYPES, type ExpiryPolicy, type ExpiryType } from './hooks';
-import { PolicySelector, StateExpirySkeleton, ContractTop100List } from './components';
+import { PolicySelector, type PolicySelectorConfig, StateExpirySkeleton, ContractTop100List } from './components';
 
 /** Display labels for expiry policies */
 const POLICY_LABELS: Record<ExpiryPolicy, string> = {
-  '6m': '6 Month',
-  '12m': '12 Month',
-  '18m': '18 Month',
-  '24m': '24 Month',
+  '12m': '1 Year',
+  '24m': '2 Year',
+};
+
+/** Short labels for chart series */
+const POLICY_LABELS_SHORT: Record<ExpiryPolicy, string> = {
+  '12m': '1y',
+  '24m': '2y',
 };
 
 /** Display labels for expiry types */
@@ -36,6 +40,60 @@ const TYPE_LABELS: Record<ExpiryType, string> = {
 const TYPE_COLORS: Record<ExpiryType, string> = {
   slot: '#3b82f6', // blue
   contract: '#8b5cf6', // violet
+};
+
+/** Configuration for the PolicySelector component */
+const POLICY_SELECTOR_CONFIG: PolicySelectorConfig<ExpiryType, ExpiryPolicy> = {
+  types: EXPIRY_TYPES,
+  policies: EXPIRY_POLICIES,
+  typeConfig: {
+    slot: {
+      label: 'Slot',
+      icon: CubeIcon,
+      textColor: 'text-blue-600 dark:text-blue-400',
+      selectedBg: 'bg-blue-500/25',
+      selectedRing: 'ring-blue-500 dark:ring-blue-400',
+      hoverBg: 'hover:bg-blue-500/20 dark:hover:bg-blue-500/25',
+      rowHoverBg: 'bg-blue-500/10 dark:bg-blue-500/15',
+      cellBg: 'bg-blue-500/10 dark:bg-blue-500/10',
+      fillColor: 'bg-blue-500/30 dark:bg-blue-500/25',
+    },
+    contract: {
+      label: 'Contract',
+      icon: DocumentTextIcon,
+      textColor: 'text-violet-600 dark:text-violet-400',
+      selectedBg: 'bg-violet-500/25',
+      selectedRing: 'ring-violet-500 dark:ring-violet-400',
+      hoverBg: 'hover:bg-violet-500/20 dark:hover:bg-violet-500/25',
+      rowHoverBg: 'bg-violet-500/10 dark:bg-violet-500/15',
+      cellBg: 'bg-violet-500/10 dark:bg-violet-500/10',
+      fillColor: 'bg-violet-500/30 dark:bg-violet-500/25',
+    },
+  },
+  policyConfig: {
+    '12m': {
+      shortLabel: '1y',
+      fullLabel: '1 year',
+      tooltip: 'Storage expires after 1 year of inactivity. More aggressive pruning.',
+    },
+    '24m': {
+      shortLabel: '2y',
+      fullLabel: '2 years',
+      tooltip: 'Storage expires after 2 years of inactivity. More conservative.',
+    },
+  },
+  typeTooltips: {
+    slot: {
+      title: 'Slot-based expiry',
+      description:
+        "Tracks each storage slot independently. A slot expires if it hasn't been accessed within the inactivity period. More aggressive pruning, finer control.",
+    },
+    contract: {
+      title: 'Contract-based expiry',
+      description:
+        'Groups all slots by contract. If ANY slot is accessed, the entire contract stays active. Simpler but less aggressive.',
+    },
+  },
 };
 
 /**
@@ -71,7 +129,7 @@ function formatStorageSlotCount(count: number): string {
  */
 export function IndexPage(): JSX.Element {
   const { data, isLoading, error } = useStateExpiryData();
-  const [selectedPolicy, setSelectedPolicy] = useState<ExpiryPolicy>('6m');
+  const [selectedPolicy, setSelectedPolicy] = useState<ExpiryPolicy>('12m');
   const [selectedType, setSelectedType] = useState<ExpiryType>('slot');
   const themeColors = useThemeColors();
 
@@ -82,15 +140,11 @@ export function IndexPage(): JSX.Element {
       Record<ExpiryPolicy, { bytesPercent: number | null; slotsPercent: number | null }>
     > = {
       slot: {
-        '6m': { bytesPercent: null, slotsPercent: null },
         '12m': { bytesPercent: null, slotsPercent: null },
-        '18m': { bytesPercent: null, slotsPercent: null },
         '24m': { bytesPercent: null, slotsPercent: null },
       },
       contract: {
-        '6m': { bytesPercent: null, slotsPercent: null },
         '12m': { bytesPercent: null, slotsPercent: null },
-        '18m': { bytesPercent: null, slotsPercent: null },
         '24m': { bytesPercent: null, slotsPercent: null },
       },
     };
@@ -197,7 +251,7 @@ export function IndexPage(): JSX.Element {
     for (const type of EXPIRY_TYPES) {
       for (const policy of EXPIRY_POLICIES) {
         const isSelected = type === selectedType && policy === selectedPolicy;
-        const seriesName = `${TYPE_LABELS[type]} (${policy})`;
+        const seriesName = `${TYPE_LABELS[type]} (${POLICY_LABELS_SHORT[policy]})`;
 
         bytesSeries.push({
           name: seriesName,
@@ -294,11 +348,13 @@ export function IndexPage(): JSX.Element {
     // Skip "Current State" series
     if (seriesName === 'Current State') return;
 
-    // Parse series name like "Slot (6m)" or "Contract (12m)"
-    const match = seriesName.match(/^(Slot|Contract)\s+\((\d+m)\)$/i);
+    // Parse series name like "Slot (1y)" or "Contract (2y)"
+    const match = seriesName.match(/^(Slot|Contract)\s+\((\d+y)\)$/i);
     if (match) {
       const type = match[1].toLowerCase() as ExpiryType;
-      const policy = match[2] as ExpiryPolicy;
+      // Convert label back to policy key
+      const labelToPolicy: Record<string, ExpiryPolicy> = { '1y': '12m', '2y': '24m' };
+      const policy = labelToPolicy[match[2]];
 
       // Validate policy exists
       if (EXPIRY_POLICIES.includes(policy) && EXPIRY_TYPES.includes(type)) {
@@ -376,12 +432,12 @@ export function IndexPage(): JSX.Element {
               className="inline-flex items-center gap-1.5 border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-emerald-600 hover:bg-emerald-500/20 dark:border-emerald-400/30 dark:bg-emerald-400/10 dark:text-emerald-400 dark:hover:bg-emerald-400/20"
             >
               <ClockIcon className="size-3.5" />
-              <span className="font-medium">6-24m</span>
+              <span className="font-medium">1-2y</span>
             </PopoverButton>
             <PopoverPanel anchor="bottom start" className="w-56 p-2.5">
               <p className="text-xs/5 text-muted">
                 <span className="font-semibold text-foreground">Inactivity period</span> determines how long a storage
-                slot must be inactive before being marked as expired (6, 12, 18, or 24 months).
+                slot must be inactive before being marked as expired (1 or 2 years).
               </p>
             </PopoverPanel>
           </Popover>
@@ -408,6 +464,7 @@ export function IndexPage(): JSX.Element {
             selectedPolicy={selectedPolicy}
             onSelect={handlePolicySelect}
             savingsData={savingsData}
+            config={POLICY_SELECTOR_CONFIG}
           />
 
           {/* Skeleton for data-dependent content */}

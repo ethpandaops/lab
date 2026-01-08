@@ -4,7 +4,7 @@ import { ContractPage } from '@/pages/ethereum/contracts';
 export const Route = createFileRoute('/ethereum/contracts/$address')({
   component: ContractPage,
   beforeLoad: ({ params }) => ({
-    getBreadcrumb: () => ({ label: `${params.address.slice(0, 10)}...` }),
+    getBreadcrumb: () => ({ label: params.address }),
   }),
   head: ({ params }) => ({
     meta: [

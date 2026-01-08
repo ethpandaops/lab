@@ -12,7 +12,7 @@ import type {
 } from '@/api/types.gen';
 
 /** Available expiry policy options */
-export const EXPIRY_POLICIES = ['6m', '12m', '18m', '24m'] as const;
+export const EXPIRY_POLICIES = ['12m', '24m'] as const;
 export type ExpiryPolicy = (typeof EXPIRY_POLICIES)[number];
 
 /** Available expiry type options */
@@ -73,32 +73,10 @@ export function useStateExpiryData(): UseStateExpiryDataResult {
   });
 
   // Slot-based expiry queries
-  const slotExpiry6mQuery = useQuery({
-    ...fctStorageSlotStateWithExpiryByBlockDailyServiceListOptions({
-      query: {
-        expiry_policy_eq: '6m',
-        day_start_date_like: '20%',
-        page_size: 10000,
-      },
-    }),
-    placeholderData: keepPreviousData,
-  });
-
   const slotExpiry12mQuery = useQuery({
     ...fctStorageSlotStateWithExpiryByBlockDailyServiceListOptions({
       query: {
         expiry_policy_eq: '12m',
-        day_start_date_like: '20%',
-        page_size: 10000,
-      },
-    }),
-    placeholderData: keepPreviousData,
-  });
-
-  const slotExpiry18mQuery = useQuery({
-    ...fctStorageSlotStateWithExpiryByBlockDailyServiceListOptions({
-      query: {
-        expiry_policy_eq: '18m',
         day_start_date_like: '20%',
         page_size: 10000,
       },
@@ -118,32 +96,10 @@ export function useStateExpiryData(): UseStateExpiryDataResult {
   });
 
   // Contract-based expiry queries
-  const contractExpiry6mQuery = useQuery({
-    ...fctContractStorageStateWithExpiryByBlockDailyServiceListOptions({
-      query: {
-        expiry_policy_eq: '6m',
-        day_start_date_like: '20%',
-        page_size: 10000,
-      },
-    }),
-    placeholderData: keepPreviousData,
-  });
-
   const contractExpiry12mQuery = useQuery({
     ...fctContractStorageStateWithExpiryByBlockDailyServiceListOptions({
       query: {
         expiry_policy_eq: '12m',
-        day_start_date_like: '20%',
-        page_size: 10000,
-      },
-    }),
-    placeholderData: keepPreviousData,
-  });
-
-  const contractExpiry18mQuery = useQuery({
-    ...fctContractStorageStateWithExpiryByBlockDailyServiceListOptions({
-      query: {
-        expiry_policy_eq: '18m',
         day_start_date_like: '20%',
         page_size: 10000,
       },
@@ -167,19 +123,15 @@ export function useStateExpiryData(): UseStateExpiryDataResult {
     const currentData = currentStateQuery.data?.fct_storage_slot_state_by_block_daily;
 
     // Slot expiry data
-    const slotExpiry6mData = slotExpiry6mQuery.data?.fct_storage_slot_state_with_expiry_by_block_daily;
     const slotExpiry12mData = slotExpiry12mQuery.data?.fct_storage_slot_state_with_expiry_by_block_daily;
-    const slotExpiry18mData = slotExpiry18mQuery.data?.fct_storage_slot_state_with_expiry_by_block_daily;
     const slotExpiry24mData = slotExpiry24mQuery.data?.fct_storage_slot_state_with_expiry_by_block_daily;
 
     // Contract expiry data
-    const contractExpiry6mData = contractExpiry6mQuery.data?.fct_contract_storage_state_with_expiry_by_block_daily;
     const contractExpiry12mData = contractExpiry12mQuery.data?.fct_contract_storage_state_with_expiry_by_block_daily;
-    const contractExpiry18mData = contractExpiry18mQuery.data?.fct_contract_storage_state_with_expiry_by_block_daily;
     const contractExpiry24mData = contractExpiry24mQuery.data?.fct_contract_storage_state_with_expiry_by_block_daily;
 
     // Need at least current data and all slot expiry data
-    if (!currentData || !slotExpiry6mData || !slotExpiry12mData || !slotExpiry18mData || !slotExpiry24mData) {
+    if (!currentData || !slotExpiry12mData || !slotExpiry24mData) {
       return null;
     }
 
@@ -221,17 +173,13 @@ export function useStateExpiryData(): UseStateExpiryDataResult {
 
     // Create maps for slot expiry policies
     const slotExpiryMaps: Record<ExpiryPolicy, Map<string, FctStorageSlotStateWithExpiryByBlockDaily>> = {
-      '6m': createSlotDateMap(slotExpiry6mData),
       '12m': createSlotDateMap(slotExpiry12mData),
-      '18m': createSlotDateMap(slotExpiry18mData),
       '24m': createSlotDateMap(slotExpiry24mData),
     };
 
     // Create maps for contract expiry policies
     const contractExpiryMaps: Record<ExpiryPolicy, Map<string, FctContractStorageStateWithExpiryByBlockDaily>> = {
-      '6m': createContractDateMap(contractExpiry6mData),
       '12m': createContractDateMap(contractExpiry12mData),
-      '18m': createContractDateMap(contractExpiry18mData),
       '24m': createContractDateMap(contractExpiry24mData),
     };
 
@@ -289,13 +237,9 @@ export function useStateExpiryData(): UseStateExpiryDataResult {
     });
   }, [
     currentStateQuery.data,
-    slotExpiry6mQuery.data,
     slotExpiry12mQuery.data,
-    slotExpiry18mQuery.data,
     slotExpiry24mQuery.data,
-    contractExpiry6mQuery.data,
     contractExpiry12mQuery.data,
-    contractExpiry18mQuery.data,
     contractExpiry24mQuery.data,
   ]);
 
@@ -306,23 +250,15 @@ export function useStateExpiryData(): UseStateExpiryDataResult {
 
   const isLoading =
     currentStateQuery.isLoading ||
-    slotExpiry6mQuery.isLoading ||
     slotExpiry12mQuery.isLoading ||
-    slotExpiry18mQuery.isLoading ||
     slotExpiry24mQuery.isLoading ||
-    contractExpiry6mQuery.isLoading ||
     contractExpiry12mQuery.isLoading ||
-    contractExpiry18mQuery.isLoading ||
     contractExpiry24mQuery.isLoading;
 
   const error = (currentStateQuery.error ||
-    slotExpiry6mQuery.error ||
     slotExpiry12mQuery.error ||
-    slotExpiry18mQuery.error ||
     slotExpiry24mQuery.error ||
-    contractExpiry6mQuery.error ||
     contractExpiry12mQuery.error ||
-    contractExpiry18mQuery.error ||
     contractExpiry24mQuery.error) as Error | null;
 
   return {

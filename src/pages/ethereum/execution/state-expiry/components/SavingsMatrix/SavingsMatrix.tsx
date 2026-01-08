@@ -4,10 +4,8 @@ import { EXPIRY_POLICIES, type ExpiryPolicy, type ExpiryType } from '../../hooks
 
 /** Display labels for expiry policies */
 const POLICY_LABELS: Record<ExpiryPolicy, string> = {
-  '6m': '6 Month',
-  '12m': '12 Month',
-  '18m': '18 Month',
-  '24m': '24 Month',
+  '12m': '1 Year',
+  '24m': '2 Year',
 };
 
 interface PolicyExpiryData {

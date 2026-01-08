@@ -4,16 +4,19 @@ import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
 import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
 import {
+  ArchiveBoxXMarkIcon,
   ChartBarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   CubeIcon,
+  DocumentTextIcon,
   PlayCircleIcon,
   Square3Stack3DIcon,
   UserGroupIcon,
   ClockIcon,
   MapIcon,
   WrenchScrewdriverIcon,
+  ServerStackIcon,
   SignalIcon,
   CircleStackIcon,
   MagnifyingGlassIcon,
@@ -167,9 +170,9 @@ const ethereumDataAvailabilityPages: NavItem[] = [
 const ethereumExecutionPages: NavItem[] = [
   { name: 'Timings', to: '/ethereum/execution/timings', icon: ClockIcon },
   { name: 'Payloads', to: '/ethereum/execution/payloads', icon: CubeIcon },
-  // Manually disabled for now
-  // { name: 'State Growth', to: '/ethereum/execution/state-growth', icon: ServerStackIcon },
-  // { name: 'State Expiry', to: '/ethereum/execution/state-expiry', icon: ClockIcon },
+  { name: 'State Growth', to: '/ethereum/execution/state-growth', icon: ServerStackIcon },
+  { name: 'State Expiry', to: '/ethereum/execution/state-expiry', icon: ArchiveBoxXMarkIcon },
+  { name: 'Contracts', to: '/ethereum/contracts', icon: DocumentTextIcon },
 ];
 
 const xatuPages: NavItem[] = [
