@@ -1,32 +1,11 @@
 import { type JSX } from 'react';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
-import { Badge, type BadgeColor } from '@/components/Elements/Badge';
+import { Badge } from '@/components/Elements/Badge';
 import { CopyToClipboard } from '@/components/Elements/CopyToClipboard';
 import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
 import { useNetwork } from '@/hooks/useNetwork';
+import { getLabelColor } from '../../utils';
 import type { ContractInfoCardProps } from './ContractInfoCard.types';
-
-/** Map labels to badge colors */
-const LABEL_COLORS: Record<string, BadgeColor> = {
-  stablecoin: 'green',
-  dex: 'blue',
-  trading: 'indigo',
-  defi: 'purple',
-  nft: 'pink',
-  bridge: 'yellow',
-  lending: 'green',
-  gaming: 'pink',
-  infrastructure: 'gray',
-  governance: 'indigo',
-  oracle: 'yellow',
-  layer2: 'blue',
-};
-
-/** Get badge color for a label */
-function getLabelColor(label: string): BadgeColor {
-  const normalized = label.toLowerCase().trim();
-  return LABEL_COLORS[normalized] ?? 'gray';
-}
 
 /** Known source info for external links */
 const SOURCE_INFO: Record<string, { url: string; description: string }> = {

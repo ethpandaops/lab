@@ -1,34 +1,11 @@
 import { type JSX } from 'react';
 import { Link } from '@tanstack/react-router';
-import { Badge, type BadgeColor } from '@/components/Elements/Badge';
+import { Badge } from '@/components/Elements/Badge';
+import { getLabelColor } from '@/pages/ethereum/contracts/utils';
 import type { ContractTop100Item } from '../../hooks';
 
 interface ContractRowProps {
   item: ContractTop100Item;
-}
-
-/** Map usage categories to badge colors */
-const CATEGORY_COLORS: Record<string, BadgeColor> = {
-  stablecoin: 'green',
-  dex: 'blue',
-  trading: 'indigo',
-  defi: 'purple',
-  nft: 'pink',
-  bridge: 'yellow',
-  lending: 'green',
-  gaming: 'pink',
-  infrastructure: 'gray',
-  governance: 'indigo',
-  oracle: 'yellow',
-  layer2: 'blue',
-};
-
-/**
- * Get badge color for a usage category
- */
-function getCategoryColor(category: string): BadgeColor {
-  const normalized = category.toLowerCase().trim();
-  return CATEGORY_COLORS[normalized] ?? 'gray';
 }
 
 /**
@@ -93,7 +70,7 @@ export function ContractRow({ item }: ContractRowProps): JSX.Element {
               <span className="truncate font-mono text-sm text-foreground">{contract_address}</span>
             )}
             {labels?.map(label => (
-              <Badge key={label} color={getCategoryColor(label)} size="small" variant="flat">
+              <Badge key={label} color={getLabelColor(label)} size="small" variant="flat">
                 {label}
               </Badge>
             ))}
@@ -163,7 +140,7 @@ export function ContractCard({ item }: ContractRowProps): JSX.Element {
               <span className="truncate font-mono text-sm text-foreground">{contract_address}</span>
             )}
             {labels?.slice(0, 2).map(label => (
-              <Badge key={label} color={getCategoryColor(label)} size="small" variant="flat">
+              <Badge key={label} color={getLabelColor(label)} size="small" variant="flat">
                 {label}
               </Badge>
             ))}
