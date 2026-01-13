@@ -1261,8 +1261,8 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  */
 export const adminCbtIncrementalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<AdminCbtIncrementalServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     AdminCbtIncrementalServiceListResponses,
     AdminCbtIncrementalServiceListErrors,
     ThrowOnError
@@ -1272,7 +1272,6 @@ export const adminCbtIncrementalServiceList = <ThrowOnError extends boolean = fa
     url: '/api/v1/admin_cbt_incremental',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1281,8 +1280,8 @@ export const adminCbtIncrementalServiceList = <ThrowOnError extends boolean = fa
  */
 export const adminCbtIncrementalServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<AdminCbtIncrementalServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     AdminCbtIncrementalServiceGetResponses,
     AdminCbtIncrementalServiceGetErrors,
     ThrowOnError
@@ -1292,7 +1291,6 @@ export const adminCbtIncrementalServiceGet = <ThrowOnError extends boolean = fal
     url: '/api/v1/admin_cbt_incremental/{database}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1301,8 +1299,8 @@ export const adminCbtIncrementalServiceGet = <ThrowOnError extends boolean = fal
  */
 export const adminCbtScheduledServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<AdminCbtScheduledServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     AdminCbtScheduledServiceListResponses,
     AdminCbtScheduledServiceListErrors,
     ThrowOnError
@@ -1312,7 +1310,6 @@ export const adminCbtScheduledServiceList = <ThrowOnError extends boolean = fals
     url: '/api/v1/admin_cbt_scheduled',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1321,18 +1318,15 @@ export const adminCbtScheduledServiceList = <ThrowOnError extends boolean = fals
  */
 export const adminCbtScheduledServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<AdminCbtScheduledServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
-    AdminCbtScheduledServiceGetResponses,
-    AdminCbtScheduledServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zAdminCbtScheduledServiceGetData.parseAsync(data),
-    responseValidator: async data => await zAdminCbtScheduledServiceGetResponse.parseAsync(data),
-    url: '/api/v1/admin_cbt_scheduled/{database}',
-    ...options,
-  });
-};
+) =>
+  (options.client ?? client).get<AdminCbtScheduledServiceGetResponses, AdminCbtScheduledServiceGetErrors, ThrowOnError>(
+    {
+      requestValidator: async data => await zAdminCbtScheduledServiceGetData.parseAsync(data),
+      responseValidator: async data => await zAdminCbtScheduledServiceGetResponse.parseAsync(data),
+      url: '/api/v1/admin_cbt_scheduled/{database}',
+      ...options,
+    }
+  );
 
 /**
  * List records
@@ -1341,8 +1335,8 @@ export const adminCbtScheduledServiceGet = <ThrowOnError extends boolean = false
  */
 export const dimBlockBlobSubmitterServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<DimBlockBlobSubmitterServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     DimBlockBlobSubmitterServiceListResponses,
     DimBlockBlobSubmitterServiceListErrors,
     ThrowOnError
@@ -1352,7 +1346,6 @@ export const dimBlockBlobSubmitterServiceList = <ThrowOnError extends boolean = 
     url: '/api/v1/dim_block_blob_submitter',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1361,8 +1354,8 @@ export const dimBlockBlobSubmitterServiceList = <ThrowOnError extends boolean = 
  */
 export const dimBlockBlobSubmitterServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<DimBlockBlobSubmitterServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     DimBlockBlobSubmitterServiceGetResponses,
     DimBlockBlobSubmitterServiceGetErrors,
     ThrowOnError
@@ -1372,7 +1365,6 @@ export const dimBlockBlobSubmitterServiceGet = <ThrowOnError extends boolean = f
     url: '/api/v1/dim_block_blob_submitter/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1381,8 +1373,8 @@ export const dimBlockBlobSubmitterServiceGet = <ThrowOnError extends boolean = f
  */
 export const dimContractOwnerServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<DimContractOwnerServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     DimContractOwnerServiceListResponses,
     DimContractOwnerServiceListErrors,
     ThrowOnError
@@ -1392,7 +1384,6 @@ export const dimContractOwnerServiceList = <ThrowOnError extends boolean = false
     url: '/api/v1/dim_contract_owner',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1401,18 +1392,13 @@ export const dimContractOwnerServiceList = <ThrowOnError extends boolean = false
  */
 export const dimContractOwnerServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<DimContractOwnerServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
-    DimContractOwnerServiceGetResponses,
-    DimContractOwnerServiceGetErrors,
-    ThrowOnError
-  >({
+) =>
+  (options.client ?? client).get<DimContractOwnerServiceGetResponses, DimContractOwnerServiceGetErrors, ThrowOnError>({
     requestValidator: async data => await zDimContractOwnerServiceGetData.parseAsync(data),
     responseValidator: async data => await zDimContractOwnerServiceGetResponse.parseAsync(data),
     url: '/api/v1/dim_contract_owner/{contract_address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1421,14 +1407,13 @@ export const dimContractOwnerServiceGet = <ThrowOnError extends boolean = false>
  */
 export const dimNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<DimNodeServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<DimNodeServiceListResponses, DimNodeServiceListErrors, ThrowOnError>({
+) =>
+  (options?.client ?? client).get<DimNodeServiceListResponses, DimNodeServiceListErrors, ThrowOnError>({
     requestValidator: async data => await zDimNodeServiceListData.parseAsync(data),
     responseValidator: async data => await zDimNodeServiceListResponse.parseAsync(data),
     url: '/api/v1/dim_node',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1437,14 +1422,13 @@ export const dimNodeServiceList = <ThrowOnError extends boolean = false>(
  */
 export const dimNodeServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<DimNodeServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<DimNodeServiceGetResponses, DimNodeServiceGetErrors, ThrowOnError>({
+) =>
+  (options.client ?? client).get<DimNodeServiceGetResponses, DimNodeServiceGetErrors, ThrowOnError>({
     requestValidator: async data => await zDimNodeServiceGetData.parseAsync(data),
     responseValidator: async data => await zDimNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/dim_node/{validator_index}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1453,8 +1437,8 @@ export const dimNodeServiceGet = <ThrowOnError extends boolean = false>(
  */
 export const fctAddressAccessChunked10000ServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAddressAccessChunked10000ServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctAddressAccessChunked10000ServiceListResponses,
     FctAddressAccessChunked10000ServiceListErrors,
     ThrowOnError
@@ -1464,7 +1448,6 @@ export const fctAddressAccessChunked10000ServiceList = <ThrowOnError extends boo
     url: '/api/v1/fct_address_access_chunked_10000',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1473,8 +1456,8 @@ export const fctAddressAccessChunked10000ServiceList = <ThrowOnError extends boo
  */
 export const fctAddressAccessChunked10000ServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctAddressAccessChunked10000ServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctAddressAccessChunked10000ServiceGetResponses,
     FctAddressAccessChunked10000ServiceGetErrors,
     ThrowOnError
@@ -1484,7 +1467,6 @@ export const fctAddressAccessChunked10000ServiceGet = <ThrowOnError extends bool
     url: '/api/v1/fct_address_access_chunked_10000/{chunk_start_block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1493,8 +1475,8 @@ export const fctAddressAccessChunked10000ServiceGet = <ThrowOnError extends bool
  */
 export const fctAddressAccessTotalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAddressAccessTotalServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctAddressAccessTotalServiceListResponses,
     FctAddressAccessTotalServiceListErrors,
     ThrowOnError
@@ -1504,7 +1486,6 @@ export const fctAddressAccessTotalServiceList = <ThrowOnError extends boolean = 
     url: '/api/v1/fct_address_access_total',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1513,8 +1494,8 @@ export const fctAddressAccessTotalServiceList = <ThrowOnError extends boolean = 
  */
 export const fctAddressAccessTotalServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctAddressAccessTotalServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctAddressAccessTotalServiceGetResponses,
     FctAddressAccessTotalServiceGetErrors,
     ThrowOnError
@@ -1524,7 +1505,6 @@ export const fctAddressAccessTotalServiceGet = <ThrowOnError extends boolean = f
     url: '/api/v1/fct_address_access_total/{updated_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1533,8 +1513,8 @@ export const fctAddressAccessTotalServiceGet = <ThrowOnError extends boolean = f
  */
 export const fctAddressStorageSlotChunked10000ServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAddressStorageSlotChunked10000ServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctAddressStorageSlotChunked10000ServiceListResponses,
     FctAddressStorageSlotChunked10000ServiceListErrors,
     ThrowOnError
@@ -1544,7 +1524,6 @@ export const fctAddressStorageSlotChunked10000ServiceList = <ThrowOnError extend
     url: '/api/v1/fct_address_storage_slot_chunked_10000',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1553,8 +1532,8 @@ export const fctAddressStorageSlotChunked10000ServiceList = <ThrowOnError extend
  */
 export const fctAddressStorageSlotChunked10000ServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctAddressStorageSlotChunked10000ServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctAddressStorageSlotChunked10000ServiceGetResponses,
     FctAddressStorageSlotChunked10000ServiceGetErrors,
     ThrowOnError
@@ -1564,7 +1543,6 @@ export const fctAddressStorageSlotChunked10000ServiceGet = <ThrowOnError extends
     url: '/api/v1/fct_address_storage_slot_chunked_10000/{chunk_start_block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1573,8 +1551,8 @@ export const fctAddressStorageSlotChunked10000ServiceGet = <ThrowOnError extends
  */
 export const fctAddressStorageSlotExpiredTop100ByContractServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAddressStorageSlotExpiredTop100ByContractServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctAddressStorageSlotExpiredTop100ByContractServiceListResponses,
     FctAddressStorageSlotExpiredTop100ByContractServiceListErrors,
     ThrowOnError
@@ -1585,7 +1563,6 @@ export const fctAddressStorageSlotExpiredTop100ByContractServiceList = <ThrowOnE
     url: '/api/v1/fct_address_storage_slot_expired_top_100_by_contract',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1594,8 +1571,8 @@ export const fctAddressStorageSlotExpiredTop100ByContractServiceList = <ThrowOnE
  */
 export const fctAddressStorageSlotExpiredTop100ByContractServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctAddressStorageSlotExpiredTop100ByContractServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctAddressStorageSlotExpiredTop100ByContractServiceGetResponses,
     FctAddressStorageSlotExpiredTop100ByContractServiceGetErrors,
     ThrowOnError
@@ -1606,7 +1583,6 @@ export const fctAddressStorageSlotExpiredTop100ByContractServiceGet = <ThrowOnEr
     url: '/api/v1/fct_address_storage_slot_expired_top_100_by_contract/{rank}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1615,8 +1591,8 @@ export const fctAddressStorageSlotExpiredTop100ByContractServiceGet = <ThrowOnEr
  */
 export const fctAddressStorageSlotTop100ByContractServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAddressStorageSlotTop100ByContractServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctAddressStorageSlotTop100ByContractServiceListResponses,
     FctAddressStorageSlotTop100ByContractServiceListErrors,
     ThrowOnError
@@ -1626,7 +1602,6 @@ export const fctAddressStorageSlotTop100ByContractServiceList = <ThrowOnError ex
     url: '/api/v1/fct_address_storage_slot_top_100_by_contract',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1635,8 +1610,8 @@ export const fctAddressStorageSlotTop100ByContractServiceList = <ThrowOnError ex
  */
 export const fctAddressStorageSlotTop100ByContractServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctAddressStorageSlotTop100ByContractServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctAddressStorageSlotTop100ByContractServiceGetResponses,
     FctAddressStorageSlotTop100ByContractServiceGetErrors,
     ThrowOnError
@@ -1646,7 +1621,6 @@ export const fctAddressStorageSlotTop100ByContractServiceGet = <ThrowOnError ext
     url: '/api/v1/fct_address_storage_slot_top_100_by_contract/{rank}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1655,8 +1629,8 @@ export const fctAddressStorageSlotTop100ByContractServiceGet = <ThrowOnError ext
  */
 export const fctAddressStorageSlotTotalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAddressStorageSlotTotalServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctAddressStorageSlotTotalServiceListResponses,
     FctAddressStorageSlotTotalServiceListErrors,
     ThrowOnError
@@ -1666,7 +1640,6 @@ export const fctAddressStorageSlotTotalServiceList = <ThrowOnError extends boole
     url: '/api/v1/fct_address_storage_slot_total',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1675,8 +1648,8 @@ export const fctAddressStorageSlotTotalServiceList = <ThrowOnError extends boole
  */
 export const fctAddressStorageSlotTotalServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctAddressStorageSlotTotalServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctAddressStorageSlotTotalServiceGetResponses,
     FctAddressStorageSlotTotalServiceGetErrors,
     ThrowOnError
@@ -1686,7 +1659,6 @@ export const fctAddressStorageSlotTotalServiceGet = <ThrowOnError extends boolea
     url: '/api/v1/fct_address_storage_slot_total/{updated_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1695,8 +1667,8 @@ export const fctAddressStorageSlotTotalServiceGet = <ThrowOnError extends boolea
  */
 export const fctAttestationCorrectnessByValidatorCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationCorrectnessByValidatorCanonicalServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctAttestationCorrectnessByValidatorCanonicalServiceListResponses,
     FctAttestationCorrectnessByValidatorCanonicalServiceListErrors,
     ThrowOnError
@@ -1708,7 +1680,6 @@ export const fctAttestationCorrectnessByValidatorCanonicalServiceList = <ThrowOn
     url: '/api/v1/fct_attestation_correctness_by_validator_canonical',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1717,8 +1688,8 @@ export const fctAttestationCorrectnessByValidatorCanonicalServiceList = <ThrowOn
  */
 export const fctAttestationCorrectnessByValidatorCanonicalServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctAttestationCorrectnessByValidatorCanonicalServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctAttestationCorrectnessByValidatorCanonicalServiceGetResponses,
     FctAttestationCorrectnessByValidatorCanonicalServiceGetErrors,
     ThrowOnError
@@ -1729,7 +1700,6 @@ export const fctAttestationCorrectnessByValidatorCanonicalServiceGet = <ThrowOnE
     url: '/api/v1/fct_attestation_correctness_by_validator_canonical/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1738,8 +1708,8 @@ export const fctAttestationCorrectnessByValidatorCanonicalServiceGet = <ThrowOnE
  */
 export const fctAttestationCorrectnessByValidatorHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationCorrectnessByValidatorHeadServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctAttestationCorrectnessByValidatorHeadServiceListResponses,
     FctAttestationCorrectnessByValidatorHeadServiceListErrors,
     ThrowOnError
@@ -1750,7 +1720,6 @@ export const fctAttestationCorrectnessByValidatorHeadServiceList = <ThrowOnError
     url: '/api/v1/fct_attestation_correctness_by_validator_head',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1759,8 +1728,8 @@ export const fctAttestationCorrectnessByValidatorHeadServiceList = <ThrowOnError
  */
 export const fctAttestationCorrectnessByValidatorHeadServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctAttestationCorrectnessByValidatorHeadServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctAttestationCorrectnessByValidatorHeadServiceGetResponses,
     FctAttestationCorrectnessByValidatorHeadServiceGetErrors,
     ThrowOnError
@@ -1770,7 +1739,6 @@ export const fctAttestationCorrectnessByValidatorHeadServiceGet = <ThrowOnError 
     url: '/api/v1/fct_attestation_correctness_by_validator_head/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1779,8 +1747,8 @@ export const fctAttestationCorrectnessByValidatorHeadServiceGet = <ThrowOnError 
  */
 export const fctAttestationCorrectnessCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationCorrectnessCanonicalServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctAttestationCorrectnessCanonicalServiceListResponses,
     FctAttestationCorrectnessCanonicalServiceListErrors,
     ThrowOnError
@@ -1790,7 +1758,6 @@ export const fctAttestationCorrectnessCanonicalServiceList = <ThrowOnError exten
     url: '/api/v1/fct_attestation_correctness_canonical',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1799,8 +1766,8 @@ export const fctAttestationCorrectnessCanonicalServiceList = <ThrowOnError exten
  */
 export const fctAttestationCorrectnessCanonicalServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctAttestationCorrectnessCanonicalServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctAttestationCorrectnessCanonicalServiceGetResponses,
     FctAttestationCorrectnessCanonicalServiceGetErrors,
     ThrowOnError
@@ -1810,7 +1777,6 @@ export const fctAttestationCorrectnessCanonicalServiceGet = <ThrowOnError extend
     url: '/api/v1/fct_attestation_correctness_canonical/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1819,8 +1785,8 @@ export const fctAttestationCorrectnessCanonicalServiceGet = <ThrowOnError extend
  */
 export const fctAttestationCorrectnessHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationCorrectnessHeadServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctAttestationCorrectnessHeadServiceListResponses,
     FctAttestationCorrectnessHeadServiceListErrors,
     ThrowOnError
@@ -1830,7 +1796,6 @@ export const fctAttestationCorrectnessHeadServiceList = <ThrowOnError extends bo
     url: '/api/v1/fct_attestation_correctness_head',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1839,8 +1804,8 @@ export const fctAttestationCorrectnessHeadServiceList = <ThrowOnError extends bo
  */
 export const fctAttestationCorrectnessHeadServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctAttestationCorrectnessHeadServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctAttestationCorrectnessHeadServiceGetResponses,
     FctAttestationCorrectnessHeadServiceGetErrors,
     ThrowOnError
@@ -1850,7 +1815,6 @@ export const fctAttestationCorrectnessHeadServiceGet = <ThrowOnError extends boo
     url: '/api/v1/fct_attestation_correctness_head/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1859,8 +1823,8 @@ export const fctAttestationCorrectnessHeadServiceGet = <ThrowOnError extends boo
  */
 export const fctAttestationFirstSeenChunked50MsServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationFirstSeenChunked50MsServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctAttestationFirstSeenChunked50MsServiceListResponses,
     FctAttestationFirstSeenChunked50MsServiceListErrors,
     ThrowOnError
@@ -1870,7 +1834,6 @@ export const fctAttestationFirstSeenChunked50MsServiceList = <ThrowOnError exten
     url: '/api/v1/fct_attestation_first_seen_chunked_50ms',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1879,8 +1842,8 @@ export const fctAttestationFirstSeenChunked50MsServiceList = <ThrowOnError exten
  */
 export const fctAttestationFirstSeenChunked50MsServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctAttestationFirstSeenChunked50MsServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctAttestationFirstSeenChunked50MsServiceGetResponses,
     FctAttestationFirstSeenChunked50MsServiceGetErrors,
     ThrowOnError
@@ -1890,7 +1853,6 @@ export const fctAttestationFirstSeenChunked50MsServiceGet = <ThrowOnError extend
     url: '/api/v1/fct_attestation_first_seen_chunked_50ms/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1899,8 +1861,8 @@ export const fctAttestationFirstSeenChunked50MsServiceGet = <ThrowOnError extend
  */
 export const fctAttestationLivenessByEntityHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationLivenessByEntityHeadServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctAttestationLivenessByEntityHeadServiceListResponses,
     FctAttestationLivenessByEntityHeadServiceListErrors,
     ThrowOnError
@@ -1910,7 +1872,6 @@ export const fctAttestationLivenessByEntityHeadServiceList = <ThrowOnError exten
     url: '/api/v1/fct_attestation_liveness_by_entity_head',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1919,8 +1880,8 @@ export const fctAttestationLivenessByEntityHeadServiceList = <ThrowOnError exten
  */
 export const fctAttestationLivenessByEntityHeadServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctAttestationLivenessByEntityHeadServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctAttestationLivenessByEntityHeadServiceGetResponses,
     FctAttestationLivenessByEntityHeadServiceGetErrors,
     ThrowOnError
@@ -1930,7 +1891,6 @@ export const fctAttestationLivenessByEntityHeadServiceGet = <ThrowOnError extend
     url: '/api/v1/fct_attestation_liveness_by_entity_head/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1939,8 +1899,8 @@ export const fctAttestationLivenessByEntityHeadServiceGet = <ThrowOnError extend
  */
 export const fctAttestationObservationByNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationObservationByNodeServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctAttestationObservationByNodeServiceListResponses,
     FctAttestationObservationByNodeServiceListErrors,
     ThrowOnError
@@ -1950,7 +1910,6 @@ export const fctAttestationObservationByNodeServiceList = <ThrowOnError extends 
     url: '/api/v1/fct_attestation_observation_by_node',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1959,8 +1918,8 @@ export const fctAttestationObservationByNodeServiceList = <ThrowOnError extends 
  */
 export const fctAttestationObservationByNodeServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctAttestationObservationByNodeServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctAttestationObservationByNodeServiceGetResponses,
     FctAttestationObservationByNodeServiceGetErrors,
     ThrowOnError
@@ -1970,7 +1929,6 @@ export const fctAttestationObservationByNodeServiceGet = <ThrowOnError extends b
     url: '/api/v1/fct_attestation_observation_by_node/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -1979,14 +1937,13 @@ export const fctAttestationObservationByNodeServiceGet = <ThrowOnError extends b
  */
 export const fctBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<FctBlockServiceListResponses, FctBlockServiceListErrors, ThrowOnError>({
+) =>
+  (options?.client ?? client).get<FctBlockServiceListResponses, FctBlockServiceListErrors, ThrowOnError>({
     requestValidator: async data => await zFctBlockServiceListData.parseAsync(data),
     responseValidator: async data => await zFctBlockServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -1995,14 +1952,13 @@ export const fctBlockServiceList = <ThrowOnError extends boolean = false>(
  */
 export const fctBlockServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctBlockServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<FctBlockServiceGetResponses, FctBlockServiceGetErrors, ThrowOnError>({
+) =>
+  (options.client ?? client).get<FctBlockServiceGetResponses, FctBlockServiceGetErrors, ThrowOnError>({
     requestValidator: async data => await zFctBlockServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2011,8 +1967,8 @@ export const fctBlockServiceGet = <ThrowOnError extends boolean = false>(
  */
 export const fctBlockBlobCountServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockBlobCountServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctBlockBlobCountServiceListResponses,
     FctBlockBlobCountServiceListErrors,
     ThrowOnError
@@ -2022,7 +1978,6 @@ export const fctBlockBlobCountServiceList = <ThrowOnError extends boolean = fals
     url: '/api/v1/fct_block_blob_count',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2031,18 +1986,15 @@ export const fctBlockBlobCountServiceList = <ThrowOnError extends boolean = fals
  */
 export const fctBlockBlobCountServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctBlockBlobCountServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
-    FctBlockBlobCountServiceGetResponses,
-    FctBlockBlobCountServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockBlobCountServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlockBlobCountServiceGetResponse.parseAsync(data),
-    url: '/api/v1/fct_block_blob_count/{slot_start_date_time}',
-    ...options,
-  });
-};
+) =>
+  (options.client ?? client).get<FctBlockBlobCountServiceGetResponses, FctBlockBlobCountServiceGetErrors, ThrowOnError>(
+    {
+      requestValidator: async data => await zFctBlockBlobCountServiceGetData.parseAsync(data),
+      responseValidator: async data => await zFctBlockBlobCountServiceGetResponse.parseAsync(data),
+      url: '/api/v1/fct_block_blob_count/{slot_start_date_time}',
+      ...options,
+    }
+  );
 
 /**
  * List records
@@ -2051,8 +2003,8 @@ export const fctBlockBlobCountServiceGet = <ThrowOnError extends boolean = false
  */
 export const fctBlockBlobCountHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockBlobCountHeadServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctBlockBlobCountHeadServiceListResponses,
     FctBlockBlobCountHeadServiceListErrors,
     ThrowOnError
@@ -2062,7 +2014,6 @@ export const fctBlockBlobCountHeadServiceList = <ThrowOnError extends boolean = 
     url: '/api/v1/fct_block_blob_count_head',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2071,8 +2022,8 @@ export const fctBlockBlobCountHeadServiceList = <ThrowOnError extends boolean = 
  */
 export const fctBlockBlobCountHeadServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctBlockBlobCountHeadServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctBlockBlobCountHeadServiceGetResponses,
     FctBlockBlobCountHeadServiceGetErrors,
     ThrowOnError
@@ -2082,7 +2033,6 @@ export const fctBlockBlobCountHeadServiceGet = <ThrowOnError extends boolean = f
     url: '/api/v1/fct_block_blob_count_head/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2091,8 +2041,8 @@ export const fctBlockBlobCountHeadServiceGet = <ThrowOnError extends boolean = f
  */
 export const fctBlockBlobFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockBlobFirstSeenByNodeServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctBlockBlobFirstSeenByNodeServiceListResponses,
     FctBlockBlobFirstSeenByNodeServiceListErrors,
     ThrowOnError
@@ -2102,7 +2052,6 @@ export const fctBlockBlobFirstSeenByNodeServiceList = <ThrowOnError extends bool
     url: '/api/v1/fct_block_blob_first_seen_by_node',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2111,8 +2060,8 @@ export const fctBlockBlobFirstSeenByNodeServiceList = <ThrowOnError extends bool
  */
 export const fctBlockBlobFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctBlockBlobFirstSeenByNodeServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctBlockBlobFirstSeenByNodeServiceGetResponses,
     FctBlockBlobFirstSeenByNodeServiceGetErrors,
     ThrowOnError
@@ -2122,7 +2071,6 @@ export const fctBlockBlobFirstSeenByNodeServiceGet = <ThrowOnError extends boole
     url: '/api/v1/fct_block_blob_first_seen_by_node/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2131,8 +2079,8 @@ export const fctBlockBlobFirstSeenByNodeServiceGet = <ThrowOnError extends boole
  */
 export const fctBlockDataColumnSidecarFirstSeenServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockDataColumnSidecarFirstSeenServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctBlockDataColumnSidecarFirstSeenServiceListResponses,
     FctBlockDataColumnSidecarFirstSeenServiceListErrors,
     ThrowOnError
@@ -2142,7 +2090,6 @@ export const fctBlockDataColumnSidecarFirstSeenServiceList = <ThrowOnError exten
     url: '/api/v1/fct_block_data_column_sidecar_first_seen',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2151,8 +2098,8 @@ export const fctBlockDataColumnSidecarFirstSeenServiceList = <ThrowOnError exten
  */
 export const fctBlockDataColumnSidecarFirstSeenServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctBlockDataColumnSidecarFirstSeenServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctBlockDataColumnSidecarFirstSeenServiceGetResponses,
     FctBlockDataColumnSidecarFirstSeenServiceGetErrors,
     ThrowOnError
@@ -2162,7 +2109,6 @@ export const fctBlockDataColumnSidecarFirstSeenServiceGet = <ThrowOnError extend
     url: '/api/v1/fct_block_data_column_sidecar_first_seen/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2171,8 +2117,8 @@ export const fctBlockDataColumnSidecarFirstSeenServiceGet = <ThrowOnError extend
  */
 export const fctBlockDataColumnSidecarFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponses,
     FctBlockDataColumnSidecarFirstSeenByNodeServiceListErrors,
     ThrowOnError
@@ -2183,7 +2129,6 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeServiceList = <ThrowOnError
     url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2192,8 +2137,8 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeServiceList = <ThrowOnError
  */
 export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponses,
     FctBlockDataColumnSidecarFirstSeenByNodeServiceGetErrors,
     ThrowOnError
@@ -2203,7 +2148,6 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGet = <ThrowOnError 
     url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2212,8 +2156,8 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGet = <ThrowOnError 
  */
 export const fctBlockFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockFirstSeenByNodeServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctBlockFirstSeenByNodeServiceListResponses,
     FctBlockFirstSeenByNodeServiceListErrors,
     ThrowOnError
@@ -2223,7 +2167,6 @@ export const fctBlockFirstSeenByNodeServiceList = <ThrowOnError extends boolean 
     url: '/api/v1/fct_block_first_seen_by_node',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2232,8 +2175,8 @@ export const fctBlockFirstSeenByNodeServiceList = <ThrowOnError extends boolean 
  */
 export const fctBlockFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctBlockFirstSeenByNodeServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctBlockFirstSeenByNodeServiceGetResponses,
     FctBlockFirstSeenByNodeServiceGetErrors,
     ThrowOnError
@@ -2243,7 +2186,6 @@ export const fctBlockFirstSeenByNodeServiceGet = <ThrowOnError extends boolean =
     url: '/api/v1/fct_block_first_seen_by_node/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2252,16 +2194,13 @@ export const fctBlockFirstSeenByNodeServiceGet = <ThrowOnError extends boolean =
  */
 export const fctBlockHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockHeadServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<FctBlockHeadServiceListResponses, FctBlockHeadServiceListErrors, ThrowOnError>(
-    {
-      requestValidator: async data => await zFctBlockHeadServiceListData.parseAsync(data),
-      responseValidator: async data => await zFctBlockHeadServiceListResponse.parseAsync(data),
-      url: '/api/v1/fct_block_head',
-      ...options,
-    }
-  );
-};
+) =>
+  (options?.client ?? client).get<FctBlockHeadServiceListResponses, FctBlockHeadServiceListErrors, ThrowOnError>({
+    requestValidator: async data => await zFctBlockHeadServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockHeadServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_head',
+    ...options,
+  });
 
 /**
  * Get record
@@ -2270,14 +2209,13 @@ export const fctBlockHeadServiceList = <ThrowOnError extends boolean = false>(
  */
 export const fctBlockHeadServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctBlockHeadServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<FctBlockHeadServiceGetResponses, FctBlockHeadServiceGetErrors, ThrowOnError>({
+) =>
+  (options.client ?? client).get<FctBlockHeadServiceGetResponses, FctBlockHeadServiceGetErrors, ThrowOnError>({
     requestValidator: async data => await zFctBlockHeadServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_head/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2286,14 +2224,13 @@ export const fctBlockHeadServiceGet = <ThrowOnError extends boolean = false>(
  */
 export const fctBlockMevServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockMevServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<FctBlockMevServiceListResponses, FctBlockMevServiceListErrors, ThrowOnError>({
+) =>
+  (options?.client ?? client).get<FctBlockMevServiceListResponses, FctBlockMevServiceListErrors, ThrowOnError>({
     requestValidator: async data => await zFctBlockMevServiceListData.parseAsync(data),
     responseValidator: async data => await zFctBlockMevServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_mev',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2302,14 +2239,13 @@ export const fctBlockMevServiceList = <ThrowOnError extends boolean = false>(
  */
 export const fctBlockMevServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctBlockMevServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<FctBlockMevServiceGetResponses, FctBlockMevServiceGetErrors, ThrowOnError>({
+) =>
+  (options.client ?? client).get<FctBlockMevServiceGetResponses, FctBlockMevServiceGetErrors, ThrowOnError>({
     requestValidator: async data => await zFctBlockMevServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockMevServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_mev/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2318,18 +2254,13 @@ export const fctBlockMevServiceGet = <ThrowOnError extends boolean = false>(
  */
 export const fctBlockMevHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockMevHeadServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
-    FctBlockMevHeadServiceListResponses,
-    FctBlockMevHeadServiceListErrors,
-    ThrowOnError
-  >({
+) =>
+  (options?.client ?? client).get<FctBlockMevHeadServiceListResponses, FctBlockMevHeadServiceListErrors, ThrowOnError>({
     requestValidator: async data => await zFctBlockMevHeadServiceListData.parseAsync(data),
     responseValidator: async data => await zFctBlockMevHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_mev_head',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2338,18 +2269,13 @@ export const fctBlockMevHeadServiceList = <ThrowOnError extends boolean = false>
  */
 export const fctBlockMevHeadServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctBlockMevHeadServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
-    FctBlockMevHeadServiceGetResponses,
-    FctBlockMevHeadServiceGetErrors,
-    ThrowOnError
-  >({
+) =>
+  (options.client ?? client).get<FctBlockMevHeadServiceGetResponses, FctBlockMevHeadServiceGetErrors, ThrowOnError>({
     requestValidator: async data => await zFctBlockMevHeadServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockMevHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_mev_head/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2358,8 +2284,8 @@ export const fctBlockMevHeadServiceGet = <ThrowOnError extends boolean = false>(
  */
 export const fctBlockProposerServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockProposerServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctBlockProposerServiceListResponses,
     FctBlockProposerServiceListErrors,
     ThrowOnError
@@ -2369,7 +2295,6 @@ export const fctBlockProposerServiceList = <ThrowOnError extends boolean = false
     url: '/api/v1/fct_block_proposer',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2378,18 +2303,13 @@ export const fctBlockProposerServiceList = <ThrowOnError extends boolean = false
  */
 export const fctBlockProposerServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctBlockProposerServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
-    FctBlockProposerServiceGetResponses,
-    FctBlockProposerServiceGetErrors,
-    ThrowOnError
-  >({
+) =>
+  (options.client ?? client).get<FctBlockProposerServiceGetResponses, FctBlockProposerServiceGetErrors, ThrowOnError>({
     requestValidator: async data => await zFctBlockProposerServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockProposerServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2398,8 +2318,8 @@ export const fctBlockProposerServiceGet = <ThrowOnError extends boolean = false>
  */
 export const fctBlockProposerEntityServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockProposerEntityServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctBlockProposerEntityServiceListResponses,
     FctBlockProposerEntityServiceListErrors,
     ThrowOnError
@@ -2409,7 +2329,6 @@ export const fctBlockProposerEntityServiceList = <ThrowOnError extends boolean =
     url: '/api/v1/fct_block_proposer_entity',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2418,8 +2337,8 @@ export const fctBlockProposerEntityServiceList = <ThrowOnError extends boolean =
  */
 export const fctBlockProposerEntityServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctBlockProposerEntityServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctBlockProposerEntityServiceGetResponses,
     FctBlockProposerEntityServiceGetErrors,
     ThrowOnError
@@ -2429,7 +2348,6 @@ export const fctBlockProposerEntityServiceGet = <ThrowOnError extends boolean = 
     url: '/api/v1/fct_block_proposer_entity/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2438,8 +2356,8 @@ export const fctBlockProposerEntityServiceGet = <ThrowOnError extends boolean = 
  */
 export const fctBlockProposerHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockProposerHeadServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctBlockProposerHeadServiceListResponses,
     FctBlockProposerHeadServiceListErrors,
     ThrowOnError
@@ -2449,7 +2367,6 @@ export const fctBlockProposerHeadServiceList = <ThrowOnError extends boolean = f
     url: '/api/v1/fct_block_proposer_head',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2458,8 +2375,8 @@ export const fctBlockProposerHeadServiceList = <ThrowOnError extends boolean = f
  */
 export const fctBlockProposerHeadServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctBlockProposerHeadServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctBlockProposerHeadServiceGetResponses,
     FctBlockProposerHeadServiceGetErrors,
     ThrowOnError
@@ -2469,7 +2386,6 @@ export const fctBlockProposerHeadServiceGet = <ThrowOnError extends boolean = fa
     url: '/api/v1/fct_block_proposer_head/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2478,8 +2394,8 @@ export const fctBlockProposerHeadServiceGet = <ThrowOnError extends boolean = fa
  */
 export const fctContractStorageStateByAddressDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctContractStorageStateByAddressDailyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctContractStorageStateByAddressDailyServiceListResponses,
     FctContractStorageStateByAddressDailyServiceListErrors,
     ThrowOnError
@@ -2489,7 +2405,6 @@ export const fctContractStorageStateByAddressDailyServiceList = <ThrowOnError ex
     url: '/api/v1/fct_contract_storage_state_by_address_daily',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2498,8 +2413,8 @@ export const fctContractStorageStateByAddressDailyServiceList = <ThrowOnError ex
  */
 export const fctContractStorageStateByAddressDailyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctContractStorageStateByAddressDailyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctContractStorageStateByAddressDailyServiceGetResponses,
     FctContractStorageStateByAddressDailyServiceGetErrors,
     ThrowOnError
@@ -2509,7 +2424,6 @@ export const fctContractStorageStateByAddressDailyServiceGet = <ThrowOnError ext
     url: '/api/v1/fct_contract_storage_state_by_address_daily/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2518,8 +2432,8 @@ export const fctContractStorageStateByAddressDailyServiceGet = <ThrowOnError ext
  */
 export const fctContractStorageStateByAddressHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctContractStorageStateByAddressHourlyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctContractStorageStateByAddressHourlyServiceListResponses,
     FctContractStorageStateByAddressHourlyServiceListErrors,
     ThrowOnError
@@ -2529,7 +2443,6 @@ export const fctContractStorageStateByAddressHourlyServiceList = <ThrowOnError e
     url: '/api/v1/fct_contract_storage_state_by_address_hourly',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2538,8 +2451,8 @@ export const fctContractStorageStateByAddressHourlyServiceList = <ThrowOnError e
  */
 export const fctContractStorageStateByAddressHourlyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctContractStorageStateByAddressHourlyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctContractStorageStateByAddressHourlyServiceGetResponses,
     FctContractStorageStateByAddressHourlyServiceGetErrors,
     ThrowOnError
@@ -2549,7 +2462,6 @@ export const fctContractStorageStateByAddressHourlyServiceGet = <ThrowOnError ex
     url: '/api/v1/fct_contract_storage_state_by_address_hourly/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2558,8 +2470,8 @@ export const fctContractStorageStateByAddressHourlyServiceGet = <ThrowOnError ex
  */
 export const fctContractStorageStateByBlockDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctContractStorageStateByBlockDailyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctContractStorageStateByBlockDailyServiceListResponses,
     FctContractStorageStateByBlockDailyServiceListErrors,
     ThrowOnError
@@ -2569,7 +2481,6 @@ export const fctContractStorageStateByBlockDailyServiceList = <ThrowOnError exte
     url: '/api/v1/fct_contract_storage_state_by_block_daily',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2578,8 +2489,8 @@ export const fctContractStorageStateByBlockDailyServiceList = <ThrowOnError exte
  */
 export const fctContractStorageStateByBlockDailyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctContractStorageStateByBlockDailyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctContractStorageStateByBlockDailyServiceGetResponses,
     FctContractStorageStateByBlockDailyServiceGetErrors,
     ThrowOnError
@@ -2589,7 +2500,6 @@ export const fctContractStorageStateByBlockDailyServiceGet = <ThrowOnError exten
     url: '/api/v1/fct_contract_storage_state_by_block_daily/{day_start_date}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2598,8 +2508,8 @@ export const fctContractStorageStateByBlockDailyServiceGet = <ThrowOnError exten
  */
 export const fctContractStorageStateByBlockHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctContractStorageStateByBlockHourlyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctContractStorageStateByBlockHourlyServiceListResponses,
     FctContractStorageStateByBlockHourlyServiceListErrors,
     ThrowOnError
@@ -2609,7 +2519,6 @@ export const fctContractStorageStateByBlockHourlyServiceList = <ThrowOnError ext
     url: '/api/v1/fct_contract_storage_state_by_block_hourly',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2618,8 +2527,8 @@ export const fctContractStorageStateByBlockHourlyServiceList = <ThrowOnError ext
  */
 export const fctContractStorageStateByBlockHourlyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctContractStorageStateByBlockHourlyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctContractStorageStateByBlockHourlyServiceGetResponses,
     FctContractStorageStateByBlockHourlyServiceGetErrors,
     ThrowOnError
@@ -2629,7 +2538,6 @@ export const fctContractStorageStateByBlockHourlyServiceGet = <ThrowOnError exte
     url: '/api/v1/fct_contract_storage_state_by_block_hourly/{hour_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2638,8 +2546,8 @@ export const fctContractStorageStateByBlockHourlyServiceGet = <ThrowOnError exte
  */
 export const fctContractStorageStateWithExpiryByAddressDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctContractStorageStateWithExpiryByAddressDailyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctContractStorageStateWithExpiryByAddressDailyServiceListResponses,
     FctContractStorageStateWithExpiryByAddressDailyServiceListErrors,
     ThrowOnError
@@ -2651,7 +2559,6 @@ export const fctContractStorageStateWithExpiryByAddressDailyServiceList = <Throw
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_address_daily',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2660,8 +2567,8 @@ export const fctContractStorageStateWithExpiryByAddressDailyServiceList = <Throw
  */
 export const fctContractStorageStateWithExpiryByAddressDailyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctContractStorageStateWithExpiryByAddressDailyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctContractStorageStateWithExpiryByAddressDailyServiceGetResponses,
     FctContractStorageStateWithExpiryByAddressDailyServiceGetErrors,
     ThrowOnError
@@ -2673,7 +2580,6 @@ export const fctContractStorageStateWithExpiryByAddressDailyServiceGet = <ThrowO
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_address_daily/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2682,8 +2588,8 @@ export const fctContractStorageStateWithExpiryByAddressDailyServiceGet = <ThrowO
  */
 export const fctContractStorageStateWithExpiryByAddressHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctContractStorageStateWithExpiryByAddressHourlyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctContractStorageStateWithExpiryByAddressHourlyServiceListResponses,
     FctContractStorageStateWithExpiryByAddressHourlyServiceListErrors,
     ThrowOnError
@@ -2695,7 +2601,6 @@ export const fctContractStorageStateWithExpiryByAddressHourlyServiceList = <Thro
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_address_hourly',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2704,8 +2609,8 @@ export const fctContractStorageStateWithExpiryByAddressHourlyServiceList = <Thro
  */
 export const fctContractStorageStateWithExpiryByAddressHourlyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctContractStorageStateWithExpiryByAddressHourlyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctContractStorageStateWithExpiryByAddressHourlyServiceGetResponses,
     FctContractStorageStateWithExpiryByAddressHourlyServiceGetErrors,
     ThrowOnError
@@ -2717,7 +2622,6 @@ export const fctContractStorageStateWithExpiryByAddressHourlyServiceGet = <Throw
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_address_hourly/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2726,8 +2630,8 @@ export const fctContractStorageStateWithExpiryByAddressHourlyServiceGet = <Throw
  */
 export const fctContractStorageStateWithExpiryByBlockDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctContractStorageStateWithExpiryByBlockDailyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctContractStorageStateWithExpiryByBlockDailyServiceListResponses,
     FctContractStorageStateWithExpiryByBlockDailyServiceListErrors,
     ThrowOnError
@@ -2739,7 +2643,6 @@ export const fctContractStorageStateWithExpiryByBlockDailyServiceList = <ThrowOn
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_block_daily',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2748,8 +2651,8 @@ export const fctContractStorageStateWithExpiryByBlockDailyServiceList = <ThrowOn
  */
 export const fctContractStorageStateWithExpiryByBlockDailyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctContractStorageStateWithExpiryByBlockDailyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctContractStorageStateWithExpiryByBlockDailyServiceGetResponses,
     FctContractStorageStateWithExpiryByBlockDailyServiceGetErrors,
     ThrowOnError
@@ -2760,7 +2663,6 @@ export const fctContractStorageStateWithExpiryByBlockDailyServiceGet = <ThrowOnE
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_block_daily/{expiry_policy}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2769,8 +2671,8 @@ export const fctContractStorageStateWithExpiryByBlockDailyServiceGet = <ThrowOnE
  */
 export const fctContractStorageStateWithExpiryByBlockHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctContractStorageStateWithExpiryByBlockHourlyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctContractStorageStateWithExpiryByBlockHourlyServiceListResponses,
     FctContractStorageStateWithExpiryByBlockHourlyServiceListErrors,
     ThrowOnError
@@ -2782,7 +2684,6 @@ export const fctContractStorageStateWithExpiryByBlockHourlyServiceList = <ThrowO
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_block_hourly',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2791,8 +2692,8 @@ export const fctContractStorageStateWithExpiryByBlockHourlyServiceList = <ThrowO
  */
 export const fctContractStorageStateWithExpiryByBlockHourlyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctContractStorageStateWithExpiryByBlockHourlyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponses,
     FctContractStorageStateWithExpiryByBlockHourlyServiceGetErrors,
     ThrowOnError
@@ -2804,7 +2705,6 @@ export const fctContractStorageStateWithExpiryByBlockHourlyServiceGet = <ThrowOn
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_block_hourly/{expiry_policy}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2813,8 +2713,8 @@ export const fctContractStorageStateWithExpiryByBlockHourlyServiceGet = <ThrowOn
  */
 export const fctDataColumnAvailabilityByEpochServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnAvailabilityByEpochServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctDataColumnAvailabilityByEpochServiceListResponses,
     FctDataColumnAvailabilityByEpochServiceListErrors,
     ThrowOnError
@@ -2824,7 +2724,6 @@ export const fctDataColumnAvailabilityByEpochServiceList = <ThrowOnError extends
     url: '/api/v1/fct_data_column_availability_by_epoch',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2833,8 +2732,8 @@ export const fctDataColumnAvailabilityByEpochServiceList = <ThrowOnError extends
  */
 export const fctDataColumnAvailabilityByEpochServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctDataColumnAvailabilityByEpochServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctDataColumnAvailabilityByEpochServiceGetResponses,
     FctDataColumnAvailabilityByEpochServiceGetErrors,
     ThrowOnError
@@ -2844,7 +2743,6 @@ export const fctDataColumnAvailabilityByEpochServiceGet = <ThrowOnError extends 
     url: '/api/v1/fct_data_column_availability_by_epoch/{epoch_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2853,8 +2751,8 @@ export const fctDataColumnAvailabilityByEpochServiceGet = <ThrowOnError extends 
  */
 export const fctDataColumnAvailabilityBySlotServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnAvailabilityBySlotServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctDataColumnAvailabilityBySlotServiceListResponses,
     FctDataColumnAvailabilityBySlotServiceListErrors,
     ThrowOnError
@@ -2864,7 +2762,6 @@ export const fctDataColumnAvailabilityBySlotServiceList = <ThrowOnError extends 
     url: '/api/v1/fct_data_column_availability_by_slot',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2873,8 +2770,8 @@ export const fctDataColumnAvailabilityBySlotServiceList = <ThrowOnError extends 
  */
 export const fctDataColumnAvailabilityBySlotServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctDataColumnAvailabilityBySlotServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctDataColumnAvailabilityBySlotServiceGetResponses,
     FctDataColumnAvailabilityBySlotServiceGetErrors,
     ThrowOnError
@@ -2884,7 +2781,6 @@ export const fctDataColumnAvailabilityBySlotServiceGet = <ThrowOnError extends b
     url: '/api/v1/fct_data_column_availability_by_slot/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2893,8 +2789,8 @@ export const fctDataColumnAvailabilityBySlotServiceGet = <ThrowOnError extends b
  */
 export const fctDataColumnAvailabilityBySlotBlobServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnAvailabilityBySlotBlobServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctDataColumnAvailabilityBySlotBlobServiceListResponses,
     FctDataColumnAvailabilityBySlotBlobServiceListErrors,
     ThrowOnError
@@ -2904,7 +2800,6 @@ export const fctDataColumnAvailabilityBySlotBlobServiceList = <ThrowOnError exte
     url: '/api/v1/fct_data_column_availability_by_slot_blob',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2913,8 +2808,8 @@ export const fctDataColumnAvailabilityBySlotBlobServiceList = <ThrowOnError exte
  */
 export const fctDataColumnAvailabilityBySlotBlobServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctDataColumnAvailabilityBySlotBlobServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctDataColumnAvailabilityBySlotBlobServiceGetResponses,
     FctDataColumnAvailabilityBySlotBlobServiceGetErrors,
     ThrowOnError
@@ -2924,7 +2819,6 @@ export const fctDataColumnAvailabilityBySlotBlobServiceGet = <ThrowOnError exten
     url: '/api/v1/fct_data_column_availability_by_slot_blob/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2933,8 +2827,8 @@ export const fctDataColumnAvailabilityBySlotBlobServiceGet = <ThrowOnError exten
  */
 export const fctDataColumnAvailabilityDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnAvailabilityDailyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctDataColumnAvailabilityDailyServiceListResponses,
     FctDataColumnAvailabilityDailyServiceListErrors,
     ThrowOnError
@@ -2944,7 +2838,6 @@ export const fctDataColumnAvailabilityDailyServiceList = <ThrowOnError extends b
     url: '/api/v1/fct_data_column_availability_daily',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2953,8 +2846,8 @@ export const fctDataColumnAvailabilityDailyServiceList = <ThrowOnError extends b
  */
 export const fctDataColumnAvailabilityDailyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctDataColumnAvailabilityDailyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctDataColumnAvailabilityDailyServiceGetResponses,
     FctDataColumnAvailabilityDailyServiceGetErrors,
     ThrowOnError
@@ -2964,7 +2857,6 @@ export const fctDataColumnAvailabilityDailyServiceGet = <ThrowOnError extends bo
     url: '/api/v1/fct_data_column_availability_daily/{date}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -2973,8 +2865,8 @@ export const fctDataColumnAvailabilityDailyServiceGet = <ThrowOnError extends bo
  */
 export const fctDataColumnAvailabilityHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnAvailabilityHourlyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctDataColumnAvailabilityHourlyServiceListResponses,
     FctDataColumnAvailabilityHourlyServiceListErrors,
     ThrowOnError
@@ -2984,7 +2876,6 @@ export const fctDataColumnAvailabilityHourlyServiceList = <ThrowOnError extends 
     url: '/api/v1/fct_data_column_availability_hourly',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -2993,8 +2884,8 @@ export const fctDataColumnAvailabilityHourlyServiceList = <ThrowOnError extends 
  */
 export const fctDataColumnAvailabilityHourlyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctDataColumnAvailabilityHourlyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctDataColumnAvailabilityHourlyServiceGetResponses,
     FctDataColumnAvailabilityHourlyServiceGetErrors,
     ThrowOnError
@@ -3004,7 +2895,6 @@ export const fctDataColumnAvailabilityHourlyServiceGet = <ThrowOnError extends b
     url: '/api/v1/fct_data_column_availability_hourly/{hour_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3013,8 +2903,8 @@ export const fctDataColumnAvailabilityHourlyServiceGet = <ThrowOnError extends b
  */
 export const fctEngineGetBlobsByElClientServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineGetBlobsByElClientServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctEngineGetBlobsByElClientServiceListResponses,
     FctEngineGetBlobsByElClientServiceListErrors,
     ThrowOnError
@@ -3024,7 +2914,6 @@ export const fctEngineGetBlobsByElClientServiceList = <ThrowOnError extends bool
     url: '/api/v1/fct_engine_get_blobs_by_el_client',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3033,8 +2922,8 @@ export const fctEngineGetBlobsByElClientServiceList = <ThrowOnError extends bool
  */
 export const fctEngineGetBlobsByElClientServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctEngineGetBlobsByElClientServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctEngineGetBlobsByElClientServiceGetResponses,
     FctEngineGetBlobsByElClientServiceGetErrors,
     ThrowOnError
@@ -3044,7 +2933,6 @@ export const fctEngineGetBlobsByElClientServiceGet = <ThrowOnError extends boole
     url: '/api/v1/fct_engine_get_blobs_by_el_client/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3053,8 +2941,8 @@ export const fctEngineGetBlobsByElClientServiceGet = <ThrowOnError extends boole
  */
 export const fctEngineGetBlobsByElClientHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineGetBlobsByElClientHourlyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctEngineGetBlobsByElClientHourlyServiceListResponses,
     FctEngineGetBlobsByElClientHourlyServiceListErrors,
     ThrowOnError
@@ -3064,7 +2952,6 @@ export const fctEngineGetBlobsByElClientHourlyServiceList = <ThrowOnError extend
     url: '/api/v1/fct_engine_get_blobs_by_el_client_hourly',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3073,8 +2960,8 @@ export const fctEngineGetBlobsByElClientHourlyServiceList = <ThrowOnError extend
  */
 export const fctEngineGetBlobsByElClientHourlyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctEngineGetBlobsByElClientHourlyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctEngineGetBlobsByElClientHourlyServiceGetResponses,
     FctEngineGetBlobsByElClientHourlyServiceGetErrors,
     ThrowOnError
@@ -3084,7 +2971,6 @@ export const fctEngineGetBlobsByElClientHourlyServiceGet = <ThrowOnError extends
     url: '/api/v1/fct_engine_get_blobs_by_el_client_hourly/{hour_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3093,8 +2979,8 @@ export const fctEngineGetBlobsByElClientHourlyServiceGet = <ThrowOnError extends
  */
 export const fctEngineGetBlobsBySlotServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineGetBlobsBySlotServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctEngineGetBlobsBySlotServiceListResponses,
     FctEngineGetBlobsBySlotServiceListErrors,
     ThrowOnError
@@ -3104,7 +2990,6 @@ export const fctEngineGetBlobsBySlotServiceList = <ThrowOnError extends boolean 
     url: '/api/v1/fct_engine_get_blobs_by_slot',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3113,8 +2998,8 @@ export const fctEngineGetBlobsBySlotServiceList = <ThrowOnError extends boolean 
  */
 export const fctEngineGetBlobsBySlotServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctEngineGetBlobsBySlotServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctEngineGetBlobsBySlotServiceGetResponses,
     FctEngineGetBlobsBySlotServiceGetErrors,
     ThrowOnError
@@ -3124,7 +3009,6 @@ export const fctEngineGetBlobsBySlotServiceGet = <ThrowOnError extends boolean =
     url: '/api/v1/fct_engine_get_blobs_by_slot/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3133,8 +3017,8 @@ export const fctEngineGetBlobsBySlotServiceGet = <ThrowOnError extends boolean =
  */
 export const fctEngineGetBlobsDurationChunked50MsServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineGetBlobsDurationChunked50MsServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctEngineGetBlobsDurationChunked50MsServiceListResponses,
     FctEngineGetBlobsDurationChunked50MsServiceListErrors,
     ThrowOnError
@@ -3144,7 +3028,6 @@ export const fctEngineGetBlobsDurationChunked50MsServiceList = <ThrowOnError ext
     url: '/api/v1/fct_engine_get_blobs_duration_chunked_50ms',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3153,8 +3036,8 @@ export const fctEngineGetBlobsDurationChunked50MsServiceList = <ThrowOnError ext
  */
 export const fctEngineGetBlobsDurationChunked50MsServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctEngineGetBlobsDurationChunked50MsServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctEngineGetBlobsDurationChunked50MsServiceGetResponses,
     FctEngineGetBlobsDurationChunked50MsServiceGetErrors,
     ThrowOnError
@@ -3164,7 +3047,6 @@ export const fctEngineGetBlobsDurationChunked50MsServiceGet = <ThrowOnError exte
     url: '/api/v1/fct_engine_get_blobs_duration_chunked_50ms/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3173,8 +3055,8 @@ export const fctEngineGetBlobsDurationChunked50MsServiceGet = <ThrowOnError exte
  */
 export const fctEngineNewPayloadByElClientServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineNewPayloadByElClientServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctEngineNewPayloadByElClientServiceListResponses,
     FctEngineNewPayloadByElClientServiceListErrors,
     ThrowOnError
@@ -3184,7 +3066,6 @@ export const fctEngineNewPayloadByElClientServiceList = <ThrowOnError extends bo
     url: '/api/v1/fct_engine_new_payload_by_el_client',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3193,8 +3074,8 @@ export const fctEngineNewPayloadByElClientServiceList = <ThrowOnError extends bo
  */
 export const fctEngineNewPayloadByElClientServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctEngineNewPayloadByElClientServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctEngineNewPayloadByElClientServiceGetResponses,
     FctEngineNewPayloadByElClientServiceGetErrors,
     ThrowOnError
@@ -3204,7 +3085,6 @@ export const fctEngineNewPayloadByElClientServiceGet = <ThrowOnError extends boo
     url: '/api/v1/fct_engine_new_payload_by_el_client/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3213,8 +3093,8 @@ export const fctEngineNewPayloadByElClientServiceGet = <ThrowOnError extends boo
  */
 export const fctEngineNewPayloadByElClientHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineNewPayloadByElClientHourlyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctEngineNewPayloadByElClientHourlyServiceListResponses,
     FctEngineNewPayloadByElClientHourlyServiceListErrors,
     ThrowOnError
@@ -3224,7 +3104,6 @@ export const fctEngineNewPayloadByElClientHourlyServiceList = <ThrowOnError exte
     url: '/api/v1/fct_engine_new_payload_by_el_client_hourly',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3233,8 +3112,8 @@ export const fctEngineNewPayloadByElClientHourlyServiceList = <ThrowOnError exte
  */
 export const fctEngineNewPayloadByElClientHourlyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctEngineNewPayloadByElClientHourlyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctEngineNewPayloadByElClientHourlyServiceGetResponses,
     FctEngineNewPayloadByElClientHourlyServiceGetErrors,
     ThrowOnError
@@ -3244,7 +3123,6 @@ export const fctEngineNewPayloadByElClientHourlyServiceGet = <ThrowOnError exten
     url: '/api/v1/fct_engine_new_payload_by_el_client_hourly/{hour_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3253,8 +3131,8 @@ export const fctEngineNewPayloadByElClientHourlyServiceGet = <ThrowOnError exten
  */
 export const fctEngineNewPayloadBySlotServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineNewPayloadBySlotServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctEngineNewPayloadBySlotServiceListResponses,
     FctEngineNewPayloadBySlotServiceListErrors,
     ThrowOnError
@@ -3264,7 +3142,6 @@ export const fctEngineNewPayloadBySlotServiceList = <ThrowOnError extends boolea
     url: '/api/v1/fct_engine_new_payload_by_slot',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3273,8 +3150,8 @@ export const fctEngineNewPayloadBySlotServiceList = <ThrowOnError extends boolea
  */
 export const fctEngineNewPayloadBySlotServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctEngineNewPayloadBySlotServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctEngineNewPayloadBySlotServiceGetResponses,
     FctEngineNewPayloadBySlotServiceGetErrors,
     ThrowOnError
@@ -3284,7 +3161,6 @@ export const fctEngineNewPayloadBySlotServiceGet = <ThrowOnError extends boolean
     url: '/api/v1/fct_engine_new_payload_by_slot/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3293,8 +3169,8 @@ export const fctEngineNewPayloadBySlotServiceGet = <ThrowOnError extends boolean
  */
 export const fctEngineNewPayloadDurationChunked50MsServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineNewPayloadDurationChunked50MsServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctEngineNewPayloadDurationChunked50MsServiceListResponses,
     FctEngineNewPayloadDurationChunked50MsServiceListErrors,
     ThrowOnError
@@ -3304,7 +3180,6 @@ export const fctEngineNewPayloadDurationChunked50MsServiceList = <ThrowOnError e
     url: '/api/v1/fct_engine_new_payload_duration_chunked_50ms',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3313,8 +3188,8 @@ export const fctEngineNewPayloadDurationChunked50MsServiceList = <ThrowOnError e
  */
 export const fctEngineNewPayloadDurationChunked50MsServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctEngineNewPayloadDurationChunked50MsServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctEngineNewPayloadDurationChunked50MsServiceGetResponses,
     FctEngineNewPayloadDurationChunked50MsServiceGetErrors,
     ThrowOnError
@@ -3324,7 +3199,6 @@ export const fctEngineNewPayloadDurationChunked50MsServiceGet = <ThrowOnError ex
     url: '/api/v1/fct_engine_new_payload_duration_chunked_50ms/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3333,8 +3207,8 @@ export const fctEngineNewPayloadDurationChunked50MsServiceGet = <ThrowOnError ex
  */
 export const fctExecutionStateSizeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionStateSizeDailyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctExecutionStateSizeDailyServiceListResponses,
     FctExecutionStateSizeDailyServiceListErrors,
     ThrowOnError
@@ -3344,7 +3218,6 @@ export const fctExecutionStateSizeDailyServiceList = <ThrowOnError extends boole
     url: '/api/v1/fct_execution_state_size_daily',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3353,8 +3226,8 @@ export const fctExecutionStateSizeDailyServiceList = <ThrowOnError extends boole
  */
 export const fctExecutionStateSizeDailyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctExecutionStateSizeDailyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctExecutionStateSizeDailyServiceGetResponses,
     FctExecutionStateSizeDailyServiceGetErrors,
     ThrowOnError
@@ -3364,7 +3237,6 @@ export const fctExecutionStateSizeDailyServiceGet = <ThrowOnError extends boolea
     url: '/api/v1/fct_execution_state_size_daily/{day_start_date}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3373,8 +3245,8 @@ export const fctExecutionStateSizeDailyServiceGet = <ThrowOnError extends boolea
  */
 export const fctExecutionStateSizeHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionStateSizeHourlyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctExecutionStateSizeHourlyServiceListResponses,
     FctExecutionStateSizeHourlyServiceListErrors,
     ThrowOnError
@@ -3384,7 +3256,6 @@ export const fctExecutionStateSizeHourlyServiceList = <ThrowOnError extends bool
     url: '/api/v1/fct_execution_state_size_hourly',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3393,8 +3264,8 @@ export const fctExecutionStateSizeHourlyServiceList = <ThrowOnError extends bool
  */
 export const fctExecutionStateSizeHourlyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctExecutionStateSizeHourlyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctExecutionStateSizeHourlyServiceGetResponses,
     FctExecutionStateSizeHourlyServiceGetErrors,
     ThrowOnError
@@ -3404,7 +3275,6 @@ export const fctExecutionStateSizeHourlyServiceGet = <ThrowOnError extends boole
     url: '/api/v1/fct_execution_state_size_hourly/{hour_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3413,8 +3283,8 @@ export const fctExecutionStateSizeHourlyServiceGet = <ThrowOnError extends boole
  */
 export const fctHeadFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctHeadFirstSeenByNodeServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctHeadFirstSeenByNodeServiceListResponses,
     FctHeadFirstSeenByNodeServiceListErrors,
     ThrowOnError
@@ -3424,7 +3294,6 @@ export const fctHeadFirstSeenByNodeServiceList = <ThrowOnError extends boolean =
     url: '/api/v1/fct_head_first_seen_by_node',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3433,8 +3302,8 @@ export const fctHeadFirstSeenByNodeServiceList = <ThrowOnError extends boolean =
  */
 export const fctHeadFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctHeadFirstSeenByNodeServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctHeadFirstSeenByNodeServiceGetResponses,
     FctHeadFirstSeenByNodeServiceGetErrors,
     ThrowOnError
@@ -3444,7 +3313,6 @@ export const fctHeadFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = 
     url: '/api/v1/fct_head_first_seen_by_node/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3453,8 +3321,8 @@ export const fctHeadFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = 
  */
 export const fctMevBidCountByBuilderServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctMevBidCountByBuilderServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctMevBidCountByBuilderServiceListResponses,
     FctMevBidCountByBuilderServiceListErrors,
     ThrowOnError
@@ -3464,7 +3332,6 @@ export const fctMevBidCountByBuilderServiceList = <ThrowOnError extends boolean 
     url: '/api/v1/fct_mev_bid_count_by_builder',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3473,8 +3340,8 @@ export const fctMevBidCountByBuilderServiceList = <ThrowOnError extends boolean 
  */
 export const fctMevBidCountByBuilderServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctMevBidCountByBuilderServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctMevBidCountByBuilderServiceGetResponses,
     FctMevBidCountByBuilderServiceGetErrors,
     ThrowOnError
@@ -3484,7 +3351,6 @@ export const fctMevBidCountByBuilderServiceGet = <ThrowOnError extends boolean =
     url: '/api/v1/fct_mev_bid_count_by_builder/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3493,8 +3359,8 @@ export const fctMevBidCountByBuilderServiceGet = <ThrowOnError extends boolean =
  */
 export const fctMevBidCountByRelayServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctMevBidCountByRelayServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctMevBidCountByRelayServiceListResponses,
     FctMevBidCountByRelayServiceListErrors,
     ThrowOnError
@@ -3504,7 +3370,6 @@ export const fctMevBidCountByRelayServiceList = <ThrowOnError extends boolean = 
     url: '/api/v1/fct_mev_bid_count_by_relay',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3513,8 +3378,8 @@ export const fctMevBidCountByRelayServiceList = <ThrowOnError extends boolean = 
  */
 export const fctMevBidCountByRelayServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctMevBidCountByRelayServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctMevBidCountByRelayServiceGetResponses,
     FctMevBidCountByRelayServiceGetErrors,
     ThrowOnError
@@ -3524,7 +3389,6 @@ export const fctMevBidCountByRelayServiceGet = <ThrowOnError extends boolean = f
     url: '/api/v1/fct_mev_bid_count_by_relay/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3533,8 +3397,8 @@ export const fctMevBidCountByRelayServiceGet = <ThrowOnError extends boolean = f
  */
 export const fctMevBidHighestValueByBuilderChunked50MsServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctMevBidHighestValueByBuilderChunked50MsServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctMevBidHighestValueByBuilderChunked50MsServiceListResponses,
     FctMevBidHighestValueByBuilderChunked50MsServiceListErrors,
     ThrowOnError
@@ -3545,7 +3409,6 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceList = <ThrowOnErro
     url: '/api/v1/fct_mev_bid_highest_value_by_builder_chunked_50ms',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3554,8 +3417,8 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceList = <ThrowOnErro
  */
 export const fctMevBidHighestValueByBuilderChunked50MsServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctMevBidHighestValueByBuilderChunked50MsServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctMevBidHighestValueByBuilderChunked50MsServiceGetResponses,
     FctMevBidHighestValueByBuilderChunked50MsServiceGetErrors,
     ThrowOnError
@@ -3566,7 +3429,6 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceGet = <ThrowOnError
     url: '/api/v1/fct_mev_bid_highest_value_by_builder_chunked_50ms/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3575,8 +3437,8 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceGet = <ThrowOnError
  */
 export const fctNodeActiveLast24hServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctNodeActiveLast24hServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctNodeActiveLast24hServiceListResponses,
     FctNodeActiveLast24hServiceListErrors,
     ThrowOnError
@@ -3586,7 +3448,6 @@ export const fctNodeActiveLast24hServiceList = <ThrowOnError extends boolean = f
     url: '/api/v1/fct_node_active_last_24h',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3595,8 +3456,8 @@ export const fctNodeActiveLast24hServiceList = <ThrowOnError extends boolean = f
  */
 export const fctNodeActiveLast24hServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctNodeActiveLast24hServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctNodeActiveLast24hServiceGetResponses,
     FctNodeActiveLast24hServiceGetErrors,
     ThrowOnError
@@ -3606,7 +3467,6 @@ export const fctNodeActiveLast24hServiceGet = <ThrowOnError extends boolean = fa
     url: '/api/v1/fct_node_active_last_24h/{meta_client_name}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3615,8 +3475,8 @@ export const fctNodeActiveLast24hServiceGet = <ThrowOnError extends boolean = fa
  */
 export const fctPreparedBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPreparedBlockServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctPreparedBlockServiceListResponses,
     FctPreparedBlockServiceListErrors,
     ThrowOnError
@@ -3626,7 +3486,6 @@ export const fctPreparedBlockServiceList = <ThrowOnError extends boolean = false
     url: '/api/v1/fct_prepared_block',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3635,18 +3494,13 @@ export const fctPreparedBlockServiceList = <ThrowOnError extends boolean = false
  */
 export const fctPreparedBlockServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctPreparedBlockServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
-    FctPreparedBlockServiceGetResponses,
-    FctPreparedBlockServiceGetErrors,
-    ThrowOnError
-  >({
+) =>
+  (options.client ?? client).get<FctPreparedBlockServiceGetResponses, FctPreparedBlockServiceGetErrors, ThrowOnError>({
     requestValidator: async data => await zFctPreparedBlockServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctPreparedBlockServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_prepared_block/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3655,8 +3509,8 @@ export const fctPreparedBlockServiceGet = <ThrowOnError extends boolean = false>
  */
 export const fctStorageSlotStateByAddressDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotStateByAddressDailyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctStorageSlotStateByAddressDailyServiceListResponses,
     FctStorageSlotStateByAddressDailyServiceListErrors,
     ThrowOnError
@@ -3666,7 +3520,6 @@ export const fctStorageSlotStateByAddressDailyServiceList = <ThrowOnError extend
     url: '/api/v1/fct_storage_slot_state_by_address_daily',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3675,8 +3528,8 @@ export const fctStorageSlotStateByAddressDailyServiceList = <ThrowOnError extend
  */
 export const fctStorageSlotStateByAddressDailyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctStorageSlotStateByAddressDailyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctStorageSlotStateByAddressDailyServiceGetResponses,
     FctStorageSlotStateByAddressDailyServiceGetErrors,
     ThrowOnError
@@ -3686,7 +3539,6 @@ export const fctStorageSlotStateByAddressDailyServiceGet = <ThrowOnError extends
     url: '/api/v1/fct_storage_slot_state_by_address_daily/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3695,8 +3547,8 @@ export const fctStorageSlotStateByAddressDailyServiceGet = <ThrowOnError extends
  */
 export const fctStorageSlotStateByAddressHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotStateByAddressHourlyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctStorageSlotStateByAddressHourlyServiceListResponses,
     FctStorageSlotStateByAddressHourlyServiceListErrors,
     ThrowOnError
@@ -3706,7 +3558,6 @@ export const fctStorageSlotStateByAddressHourlyServiceList = <ThrowOnError exten
     url: '/api/v1/fct_storage_slot_state_by_address_hourly',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3715,8 +3566,8 @@ export const fctStorageSlotStateByAddressHourlyServiceList = <ThrowOnError exten
  */
 export const fctStorageSlotStateByAddressHourlyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctStorageSlotStateByAddressHourlyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctStorageSlotStateByAddressHourlyServiceGetResponses,
     FctStorageSlotStateByAddressHourlyServiceGetErrors,
     ThrowOnError
@@ -3726,7 +3577,6 @@ export const fctStorageSlotStateByAddressHourlyServiceGet = <ThrowOnError extend
     url: '/api/v1/fct_storage_slot_state_by_address_hourly/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3735,8 +3585,8 @@ export const fctStorageSlotStateByAddressHourlyServiceGet = <ThrowOnError extend
  */
 export const fctStorageSlotStateByBlockDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotStateByBlockDailyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctStorageSlotStateByBlockDailyServiceListResponses,
     FctStorageSlotStateByBlockDailyServiceListErrors,
     ThrowOnError
@@ -3746,7 +3596,6 @@ export const fctStorageSlotStateByBlockDailyServiceList = <ThrowOnError extends 
     url: '/api/v1/fct_storage_slot_state_by_block_daily',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3755,8 +3604,8 @@ export const fctStorageSlotStateByBlockDailyServiceList = <ThrowOnError extends 
  */
 export const fctStorageSlotStateByBlockDailyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctStorageSlotStateByBlockDailyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctStorageSlotStateByBlockDailyServiceGetResponses,
     FctStorageSlotStateByBlockDailyServiceGetErrors,
     ThrowOnError
@@ -3766,7 +3615,6 @@ export const fctStorageSlotStateByBlockDailyServiceGet = <ThrowOnError extends b
     url: '/api/v1/fct_storage_slot_state_by_block_daily/{day_start_date}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3775,8 +3623,8 @@ export const fctStorageSlotStateByBlockDailyServiceGet = <ThrowOnError extends b
  */
 export const fctStorageSlotStateByBlockHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotStateByBlockHourlyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctStorageSlotStateByBlockHourlyServiceListResponses,
     FctStorageSlotStateByBlockHourlyServiceListErrors,
     ThrowOnError
@@ -3786,7 +3634,6 @@ export const fctStorageSlotStateByBlockHourlyServiceList = <ThrowOnError extends
     url: '/api/v1/fct_storage_slot_state_by_block_hourly',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3795,8 +3642,8 @@ export const fctStorageSlotStateByBlockHourlyServiceList = <ThrowOnError extends
  */
 export const fctStorageSlotStateByBlockHourlyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctStorageSlotStateByBlockHourlyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctStorageSlotStateByBlockHourlyServiceGetResponses,
     FctStorageSlotStateByBlockHourlyServiceGetErrors,
     ThrowOnError
@@ -3806,7 +3653,6 @@ export const fctStorageSlotStateByBlockHourlyServiceGet = <ThrowOnError extends 
     url: '/api/v1/fct_storage_slot_state_by_block_hourly/{hour_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3815,8 +3661,8 @@ export const fctStorageSlotStateByBlockHourlyServiceGet = <ThrowOnError extends 
  */
 export const fctStorageSlotStateWithExpiryByAddressDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotStateWithExpiryByAddressDailyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctStorageSlotStateWithExpiryByAddressDailyServiceListResponses,
     FctStorageSlotStateWithExpiryByAddressDailyServiceListErrors,
     ThrowOnError
@@ -3827,7 +3673,6 @@ export const fctStorageSlotStateWithExpiryByAddressDailyServiceList = <ThrowOnEr
     url: '/api/v1/fct_storage_slot_state_with_expiry_by_address_daily',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3836,8 +3681,8 @@ export const fctStorageSlotStateWithExpiryByAddressDailyServiceList = <ThrowOnEr
  */
 export const fctStorageSlotStateWithExpiryByAddressDailyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctStorageSlotStateWithExpiryByAddressDailyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctStorageSlotStateWithExpiryByAddressDailyServiceGetResponses,
     FctStorageSlotStateWithExpiryByAddressDailyServiceGetErrors,
     ThrowOnError
@@ -3848,7 +3693,6 @@ export const fctStorageSlotStateWithExpiryByAddressDailyServiceGet = <ThrowOnErr
     url: '/api/v1/fct_storage_slot_state_with_expiry_by_address_daily/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3857,8 +3701,8 @@ export const fctStorageSlotStateWithExpiryByAddressDailyServiceGet = <ThrowOnErr
  */
 export const fctStorageSlotStateWithExpiryByAddressHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotStateWithExpiryByAddressHourlyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctStorageSlotStateWithExpiryByAddressHourlyServiceListResponses,
     FctStorageSlotStateWithExpiryByAddressHourlyServiceListErrors,
     ThrowOnError
@@ -3869,7 +3713,6 @@ export const fctStorageSlotStateWithExpiryByAddressHourlyServiceList = <ThrowOnE
     url: '/api/v1/fct_storage_slot_state_with_expiry_by_address_hourly',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3878,8 +3721,8 @@ export const fctStorageSlotStateWithExpiryByAddressHourlyServiceList = <ThrowOnE
  */
 export const fctStorageSlotStateWithExpiryByAddressHourlyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctStorageSlotStateWithExpiryByAddressHourlyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctStorageSlotStateWithExpiryByAddressHourlyServiceGetResponses,
     FctStorageSlotStateWithExpiryByAddressHourlyServiceGetErrors,
     ThrowOnError
@@ -3890,7 +3733,6 @@ export const fctStorageSlotStateWithExpiryByAddressHourlyServiceGet = <ThrowOnEr
     url: '/api/v1/fct_storage_slot_state_with_expiry_by_address_hourly/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3899,8 +3741,8 @@ export const fctStorageSlotStateWithExpiryByAddressHourlyServiceGet = <ThrowOnEr
  */
 export const fctStorageSlotStateWithExpiryByBlockDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotStateWithExpiryByBlockDailyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctStorageSlotStateWithExpiryByBlockDailyServiceListResponses,
     FctStorageSlotStateWithExpiryByBlockDailyServiceListErrors,
     ThrowOnError
@@ -3911,7 +3753,6 @@ export const fctStorageSlotStateWithExpiryByBlockDailyServiceList = <ThrowOnErro
     url: '/api/v1/fct_storage_slot_state_with_expiry_by_block_daily',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3920,8 +3761,8 @@ export const fctStorageSlotStateWithExpiryByBlockDailyServiceList = <ThrowOnErro
  */
 export const fctStorageSlotStateWithExpiryByBlockDailyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctStorageSlotStateWithExpiryByBlockDailyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctStorageSlotStateWithExpiryByBlockDailyServiceGetResponses,
     FctStorageSlotStateWithExpiryByBlockDailyServiceGetErrors,
     ThrowOnError
@@ -3932,7 +3773,6 @@ export const fctStorageSlotStateWithExpiryByBlockDailyServiceGet = <ThrowOnError
     url: '/api/v1/fct_storage_slot_state_with_expiry_by_block_daily/{expiry_policy}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3941,8 +3781,8 @@ export const fctStorageSlotStateWithExpiryByBlockDailyServiceGet = <ThrowOnError
  */
 export const fctStorageSlotStateWithExpiryByBlockHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotStateWithExpiryByBlockHourlyServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctStorageSlotStateWithExpiryByBlockHourlyServiceListResponses,
     FctStorageSlotStateWithExpiryByBlockHourlyServiceListErrors,
     ThrowOnError
@@ -3953,7 +3793,6 @@ export const fctStorageSlotStateWithExpiryByBlockHourlyServiceList = <ThrowOnErr
     url: '/api/v1/fct_storage_slot_state_with_expiry_by_block_hourly',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -3962,8 +3801,8 @@ export const fctStorageSlotStateWithExpiryByBlockHourlyServiceList = <ThrowOnErr
  */
 export const fctStorageSlotStateWithExpiryByBlockHourlyServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctStorageSlotStateWithExpiryByBlockHourlyServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctStorageSlotStateWithExpiryByBlockHourlyServiceGetResponses,
     FctStorageSlotStateWithExpiryByBlockHourlyServiceGetErrors,
     ThrowOnError
@@ -3974,7 +3813,6 @@ export const fctStorageSlotStateWithExpiryByBlockHourlyServiceGet = <ThrowOnErro
     url: '/api/v1/fct_storage_slot_state_with_expiry_by_block_hourly/{expiry_policy}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -3983,8 +3821,8 @@ export const fctStorageSlotStateWithExpiryByBlockHourlyServiceGet = <ThrowOnErro
  */
 export const fctStorageSlotTop100ByBytesServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotTop100ByBytesServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctStorageSlotTop100ByBytesServiceListResponses,
     FctStorageSlotTop100ByBytesServiceListErrors,
     ThrowOnError
@@ -3994,7 +3832,6 @@ export const fctStorageSlotTop100ByBytesServiceList = <ThrowOnError extends bool
     url: '/api/v1/fct_storage_slot_top_100_by_bytes',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4003,8 +3840,8 @@ export const fctStorageSlotTop100ByBytesServiceList = <ThrowOnError extends bool
  */
 export const fctStorageSlotTop100ByBytesServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctStorageSlotTop100ByBytesServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctStorageSlotTop100ByBytesServiceGetResponses,
     FctStorageSlotTop100ByBytesServiceGetErrors,
     ThrowOnError
@@ -4014,7 +3851,6 @@ export const fctStorageSlotTop100ByBytesServiceGet = <ThrowOnError extends boole
     url: '/api/v1/fct_storage_slot_top_100_by_bytes/{rank}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4023,8 +3859,8 @@ export const fctStorageSlotTop100ByBytesServiceGet = <ThrowOnError extends boole
  */
 export const fctStorageSlotTop100BySlotsServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotTop100BySlotsServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     FctStorageSlotTop100BySlotsServiceListResponses,
     FctStorageSlotTop100BySlotsServiceListErrors,
     ThrowOnError
@@ -4034,7 +3870,6 @@ export const fctStorageSlotTop100BySlotsServiceList = <ThrowOnError extends bool
     url: '/api/v1/fct_storage_slot_top_100_by_slots',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4043,8 +3878,8 @@ export const fctStorageSlotTop100BySlotsServiceList = <ThrowOnError extends bool
  */
 export const fctStorageSlotTop100BySlotsServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<FctStorageSlotTop100BySlotsServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     FctStorageSlotTop100BySlotsServiceGetResponses,
     FctStorageSlotTop100BySlotsServiceGetErrors,
     ThrowOnError
@@ -4054,7 +3889,6 @@ export const fctStorageSlotTop100BySlotsServiceGet = <ThrowOnError extends boole
     url: '/api/v1/fct_storage_slot_top_100_by_slots/{rank}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4063,8 +3897,8 @@ export const fctStorageSlotTop100BySlotsServiceGet = <ThrowOnError extends boole
  */
 export const intAddressFirstAccessServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntAddressFirstAccessServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntAddressFirstAccessServiceListResponses,
     IntAddressFirstAccessServiceListErrors,
     ThrowOnError
@@ -4074,7 +3908,6 @@ export const intAddressFirstAccessServiceList = <ThrowOnError extends boolean = 
     url: '/api/v1/int_address_first_access',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4083,8 +3916,8 @@ export const intAddressFirstAccessServiceList = <ThrowOnError extends boolean = 
  */
 export const intAddressFirstAccessServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntAddressFirstAccessServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntAddressFirstAccessServiceGetResponses,
     IntAddressFirstAccessServiceGetErrors,
     ThrowOnError
@@ -4094,7 +3927,6 @@ export const intAddressFirstAccessServiceGet = <ThrowOnError extends boolean = f
     url: '/api/v1/int_address_first_access/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4103,8 +3935,8 @@ export const intAddressFirstAccessServiceGet = <ThrowOnError extends boolean = f
  */
 export const intAddressLastAccessServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntAddressLastAccessServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntAddressLastAccessServiceListResponses,
     IntAddressLastAccessServiceListErrors,
     ThrowOnError
@@ -4114,7 +3946,6 @@ export const intAddressLastAccessServiceList = <ThrowOnError extends boolean = f
     url: '/api/v1/int_address_last_access',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4123,8 +3954,8 @@ export const intAddressLastAccessServiceList = <ThrowOnError extends boolean = f
  */
 export const intAddressLastAccessServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntAddressLastAccessServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntAddressLastAccessServiceGetResponses,
     IntAddressLastAccessServiceGetErrors,
     ThrowOnError
@@ -4134,7 +3965,6 @@ export const intAddressLastAccessServiceGet = <ThrowOnError extends boolean = fa
     url: '/api/v1/int_address_last_access/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4143,8 +3973,8 @@ export const intAddressLastAccessServiceGet = <ThrowOnError extends boolean = fa
  */
 export const intAddressStorageSlotFirstAccessServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntAddressStorageSlotFirstAccessServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntAddressStorageSlotFirstAccessServiceListResponses,
     IntAddressStorageSlotFirstAccessServiceListErrors,
     ThrowOnError
@@ -4154,7 +3984,6 @@ export const intAddressStorageSlotFirstAccessServiceList = <ThrowOnError extends
     url: '/api/v1/int_address_storage_slot_first_access',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4163,8 +3992,8 @@ export const intAddressStorageSlotFirstAccessServiceList = <ThrowOnError extends
  */
 export const intAddressStorageSlotFirstAccessServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntAddressStorageSlotFirstAccessServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntAddressStorageSlotFirstAccessServiceGetResponses,
     IntAddressStorageSlotFirstAccessServiceGetErrors,
     ThrowOnError
@@ -4174,7 +4003,6 @@ export const intAddressStorageSlotFirstAccessServiceGet = <ThrowOnError extends 
     url: '/api/v1/int_address_storage_slot_first_access/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4183,8 +4011,8 @@ export const intAddressStorageSlotFirstAccessServiceGet = <ThrowOnError extends 
  */
 export const intAddressStorageSlotLastAccessServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntAddressStorageSlotLastAccessServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntAddressStorageSlotLastAccessServiceListResponses,
     IntAddressStorageSlotLastAccessServiceListErrors,
     ThrowOnError
@@ -4194,7 +4022,6 @@ export const intAddressStorageSlotLastAccessServiceList = <ThrowOnError extends 
     url: '/api/v1/int_address_storage_slot_last_access',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4203,8 +4030,8 @@ export const intAddressStorageSlotLastAccessServiceList = <ThrowOnError extends 
  */
 export const intAddressStorageSlotLastAccessServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntAddressStorageSlotLastAccessServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntAddressStorageSlotLastAccessServiceGetResponses,
     IntAddressStorageSlotLastAccessServiceGetErrors,
     ThrowOnError
@@ -4214,7 +4041,6 @@ export const intAddressStorageSlotLastAccessServiceGet = <ThrowOnError extends b
     url: '/api/v1/int_address_storage_slot_last_access/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4223,8 +4049,8 @@ export const intAddressStorageSlotLastAccessServiceGet = <ThrowOnError extends b
  */
 export const intAttestationAttestedCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntAttestationAttestedCanonicalServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntAttestationAttestedCanonicalServiceListResponses,
     IntAttestationAttestedCanonicalServiceListErrors,
     ThrowOnError
@@ -4234,7 +4060,6 @@ export const intAttestationAttestedCanonicalServiceList = <ThrowOnError extends 
     url: '/api/v1/int_attestation_attested_canonical',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4243,8 +4068,8 @@ export const intAttestationAttestedCanonicalServiceList = <ThrowOnError extends 
  */
 export const intAttestationAttestedCanonicalServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntAttestationAttestedCanonicalServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntAttestationAttestedCanonicalServiceGetResponses,
     IntAttestationAttestedCanonicalServiceGetErrors,
     ThrowOnError
@@ -4254,7 +4079,6 @@ export const intAttestationAttestedCanonicalServiceGet = <ThrowOnError extends b
     url: '/api/v1/int_attestation_attested_canonical/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4263,8 +4087,8 @@ export const intAttestationAttestedCanonicalServiceGet = <ThrowOnError extends b
  */
 export const intAttestationAttestedHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntAttestationAttestedHeadServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntAttestationAttestedHeadServiceListResponses,
     IntAttestationAttestedHeadServiceListErrors,
     ThrowOnError
@@ -4274,7 +4098,6 @@ export const intAttestationAttestedHeadServiceList = <ThrowOnError extends boole
     url: '/api/v1/int_attestation_attested_head',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4283,8 +4106,8 @@ export const intAttestationAttestedHeadServiceList = <ThrowOnError extends boole
  */
 export const intAttestationAttestedHeadServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntAttestationAttestedHeadServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntAttestationAttestedHeadServiceGetResponses,
     IntAttestationAttestedHeadServiceGetErrors,
     ThrowOnError
@@ -4294,7 +4117,6 @@ export const intAttestationAttestedHeadServiceGet = <ThrowOnError extends boolea
     url: '/api/v1/int_attestation_attested_head/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4303,8 +4125,8 @@ export const intAttestationAttestedHeadServiceGet = <ThrowOnError extends boolea
  */
 export const intAttestationFirstSeenServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntAttestationFirstSeenServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntAttestationFirstSeenServiceListResponses,
     IntAttestationFirstSeenServiceListErrors,
     ThrowOnError
@@ -4314,7 +4136,6 @@ export const intAttestationFirstSeenServiceList = <ThrowOnError extends boolean 
     url: '/api/v1/int_attestation_first_seen',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4323,8 +4144,8 @@ export const intAttestationFirstSeenServiceList = <ThrowOnError extends boolean 
  */
 export const intAttestationFirstSeenServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntAttestationFirstSeenServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntAttestationFirstSeenServiceGetResponses,
     IntAttestationFirstSeenServiceGetErrors,
     ThrowOnError
@@ -4334,7 +4155,6 @@ export const intAttestationFirstSeenServiceGet = <ThrowOnError extends boolean =
     url: '/api/v1/int_attestation_first_seen/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4343,8 +4163,8 @@ export const intAttestationFirstSeenServiceGet = <ThrowOnError extends boolean =
  */
 export const intBeaconCommitteeHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBeaconCommitteeHeadServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntBeaconCommitteeHeadServiceListResponses,
     IntBeaconCommitteeHeadServiceListErrors,
     ThrowOnError
@@ -4354,7 +4174,6 @@ export const intBeaconCommitteeHeadServiceList = <ThrowOnError extends boolean =
     url: '/api/v1/int_beacon_committee_head',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4363,8 +4182,8 @@ export const intBeaconCommitteeHeadServiceList = <ThrowOnError extends boolean =
  */
 export const intBeaconCommitteeHeadServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntBeaconCommitteeHeadServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntBeaconCommitteeHeadServiceGetResponses,
     IntBeaconCommitteeHeadServiceGetErrors,
     ThrowOnError
@@ -4374,7 +4193,6 @@ export const intBeaconCommitteeHeadServiceGet = <ThrowOnError extends boolean = 
     url: '/api/v1/int_beacon_committee_head/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4383,8 +4201,8 @@ export const intBeaconCommitteeHeadServiceGet = <ThrowOnError extends boolean = 
  */
 export const intBlockBlobCountCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBlockBlobCountCanonicalServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntBlockBlobCountCanonicalServiceListResponses,
     IntBlockBlobCountCanonicalServiceListErrors,
     ThrowOnError
@@ -4394,7 +4212,6 @@ export const intBlockBlobCountCanonicalServiceList = <ThrowOnError extends boole
     url: '/api/v1/int_block_blob_count_canonical',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4403,8 +4220,8 @@ export const intBlockBlobCountCanonicalServiceList = <ThrowOnError extends boole
  */
 export const intBlockBlobCountCanonicalServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntBlockBlobCountCanonicalServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntBlockBlobCountCanonicalServiceGetResponses,
     IntBlockBlobCountCanonicalServiceGetErrors,
     ThrowOnError
@@ -4414,7 +4231,6 @@ export const intBlockBlobCountCanonicalServiceGet = <ThrowOnError extends boolea
     url: '/api/v1/int_block_blob_count_canonical/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4423,8 +4239,8 @@ export const intBlockBlobCountCanonicalServiceGet = <ThrowOnError extends boolea
  */
 export const intBlockCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBlockCanonicalServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntBlockCanonicalServiceListResponses,
     IntBlockCanonicalServiceListErrors,
     ThrowOnError
@@ -4434,7 +4250,6 @@ export const intBlockCanonicalServiceList = <ThrowOnError extends boolean = fals
     url: '/api/v1/int_block_canonical',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4443,18 +4258,15 @@ export const intBlockCanonicalServiceList = <ThrowOnError extends boolean = fals
  */
 export const intBlockCanonicalServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntBlockCanonicalServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
-    IntBlockCanonicalServiceGetResponses,
-    IntBlockCanonicalServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntBlockCanonicalServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntBlockCanonicalServiceGetResponse.parseAsync(data),
-    url: '/api/v1/int_block_canonical/{slot_start_date_time}',
-    ...options,
-  });
-};
+) =>
+  (options.client ?? client).get<IntBlockCanonicalServiceGetResponses, IntBlockCanonicalServiceGetErrors, ThrowOnError>(
+    {
+      requestValidator: async data => await zIntBlockCanonicalServiceGetData.parseAsync(data),
+      responseValidator: async data => await zIntBlockCanonicalServiceGetResponse.parseAsync(data),
+      url: '/api/v1/int_block_canonical/{slot_start_date_time}',
+      ...options,
+    }
+  );
 
 /**
  * List records
@@ -4463,8 +4275,8 @@ export const intBlockCanonicalServiceGet = <ThrowOnError extends boolean = false
  */
 export const intBlockMevCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBlockMevCanonicalServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntBlockMevCanonicalServiceListResponses,
     IntBlockMevCanonicalServiceListErrors,
     ThrowOnError
@@ -4474,7 +4286,6 @@ export const intBlockMevCanonicalServiceList = <ThrowOnError extends boolean = f
     url: '/api/v1/int_block_mev_canonical',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4483,8 +4294,8 @@ export const intBlockMevCanonicalServiceList = <ThrowOnError extends boolean = f
  */
 export const intBlockMevCanonicalServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntBlockMevCanonicalServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntBlockMevCanonicalServiceGetResponses,
     IntBlockMevCanonicalServiceGetErrors,
     ThrowOnError
@@ -4494,7 +4305,6 @@ export const intBlockMevCanonicalServiceGet = <ThrowOnError extends boolean = fa
     url: '/api/v1/int_block_mev_canonical/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4503,8 +4313,8 @@ export const intBlockMevCanonicalServiceGet = <ThrowOnError extends boolean = fa
  */
 export const intBlockProposerCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBlockProposerCanonicalServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntBlockProposerCanonicalServiceListResponses,
     IntBlockProposerCanonicalServiceListErrors,
     ThrowOnError
@@ -4514,7 +4324,6 @@ export const intBlockProposerCanonicalServiceList = <ThrowOnError extends boolea
     url: '/api/v1/int_block_proposer_canonical',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4523,8 +4332,8 @@ export const intBlockProposerCanonicalServiceList = <ThrowOnError extends boolea
  */
 export const intBlockProposerCanonicalServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntBlockProposerCanonicalServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntBlockProposerCanonicalServiceGetResponses,
     IntBlockProposerCanonicalServiceGetErrors,
     ThrowOnError
@@ -4534,7 +4343,6 @@ export const intBlockProposerCanonicalServiceGet = <ThrowOnError extends boolean
     url: '/api/v1/int_block_proposer_canonical/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4543,8 +4351,8 @@ export const intBlockProposerCanonicalServiceGet = <ThrowOnError extends boolean
  */
 export const intContractStorageExpiry1mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageExpiry1mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageExpiry1mServiceListResponses,
     IntContractStorageExpiry1mServiceListErrors,
     ThrowOnError
@@ -4554,7 +4362,6 @@ export const intContractStorageExpiry1mServiceList = <ThrowOnError extends boole
     url: '/api/v1/int_contract_storage_expiry_1m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4563,8 +4370,8 @@ export const intContractStorageExpiry1mServiceList = <ThrowOnError extends boole
  */
 export const intContractStorageExpiry1mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageExpiry1mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageExpiry1mServiceGetResponses,
     IntContractStorageExpiry1mServiceGetErrors,
     ThrowOnError
@@ -4574,7 +4381,6 @@ export const intContractStorageExpiry1mServiceGet = <ThrowOnError extends boolea
     url: '/api/v1/int_contract_storage_expiry_1m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4583,8 +4389,8 @@ export const intContractStorageExpiry1mServiceGet = <ThrowOnError extends boolea
  */
 export const intContractStorageExpiry6mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageExpiry6mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageExpiry6mServiceListResponses,
     IntContractStorageExpiry6mServiceListErrors,
     ThrowOnError
@@ -4594,7 +4400,6 @@ export const intContractStorageExpiry6mServiceList = <ThrowOnError extends boole
     url: '/api/v1/int_contract_storage_expiry_6m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4603,8 +4408,8 @@ export const intContractStorageExpiry6mServiceList = <ThrowOnError extends boole
  */
 export const intContractStorageExpiry6mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageExpiry6mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageExpiry6mServiceGetResponses,
     IntContractStorageExpiry6mServiceGetErrors,
     ThrowOnError
@@ -4614,7 +4419,6 @@ export const intContractStorageExpiry6mServiceGet = <ThrowOnError extends boolea
     url: '/api/v1/int_contract_storage_expiry_6m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4623,8 +4427,8 @@ export const intContractStorageExpiry6mServiceGet = <ThrowOnError extends boolea
  */
 export const intContractStorageExpiry12mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageExpiry12mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageExpiry12mServiceListResponses,
     IntContractStorageExpiry12mServiceListErrors,
     ThrowOnError
@@ -4634,7 +4438,6 @@ export const intContractStorageExpiry12mServiceList = <ThrowOnError extends bool
     url: '/api/v1/int_contract_storage_expiry_12m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4643,8 +4446,8 @@ export const intContractStorageExpiry12mServiceList = <ThrowOnError extends bool
  */
 export const intContractStorageExpiry12mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageExpiry12mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageExpiry12mServiceGetResponses,
     IntContractStorageExpiry12mServiceGetErrors,
     ThrowOnError
@@ -4654,7 +4457,6 @@ export const intContractStorageExpiry12mServiceGet = <ThrowOnError extends boole
     url: '/api/v1/int_contract_storage_expiry_12m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4663,8 +4465,8 @@ export const intContractStorageExpiry12mServiceGet = <ThrowOnError extends boole
  */
 export const intContractStorageExpiry18mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageExpiry18mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageExpiry18mServiceListResponses,
     IntContractStorageExpiry18mServiceListErrors,
     ThrowOnError
@@ -4674,7 +4476,6 @@ export const intContractStorageExpiry18mServiceList = <ThrowOnError extends bool
     url: '/api/v1/int_contract_storage_expiry_18m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4683,8 +4484,8 @@ export const intContractStorageExpiry18mServiceList = <ThrowOnError extends bool
  */
 export const intContractStorageExpiry18mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageExpiry18mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageExpiry18mServiceGetResponses,
     IntContractStorageExpiry18mServiceGetErrors,
     ThrowOnError
@@ -4694,7 +4495,6 @@ export const intContractStorageExpiry18mServiceGet = <ThrowOnError extends boole
     url: '/api/v1/int_contract_storage_expiry_18m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4703,8 +4503,8 @@ export const intContractStorageExpiry18mServiceGet = <ThrowOnError extends boole
  */
 export const intContractStorageExpiry24mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageExpiry24mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageExpiry24mServiceListResponses,
     IntContractStorageExpiry24mServiceListErrors,
     ThrowOnError
@@ -4714,7 +4514,6 @@ export const intContractStorageExpiry24mServiceList = <ThrowOnError extends bool
     url: '/api/v1/int_contract_storage_expiry_24m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4723,8 +4522,8 @@ export const intContractStorageExpiry24mServiceList = <ThrowOnError extends bool
  */
 export const intContractStorageExpiry24mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageExpiry24mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageExpiry24mServiceGetResponses,
     IntContractStorageExpiry24mServiceGetErrors,
     ThrowOnError
@@ -4734,7 +4533,6 @@ export const intContractStorageExpiry24mServiceGet = <ThrowOnError extends boole
     url: '/api/v1/int_contract_storage_expiry_24m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4743,8 +4541,8 @@ export const intContractStorageExpiry24mServiceGet = <ThrowOnError extends boole
  */
 export const intContractStorageNextTouchServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageNextTouchServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageNextTouchServiceListResponses,
     IntContractStorageNextTouchServiceListErrors,
     ThrowOnError
@@ -4754,7 +4552,6 @@ export const intContractStorageNextTouchServiceList = <ThrowOnError extends bool
     url: '/api/v1/int_contract_storage_next_touch',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4763,8 +4560,8 @@ export const intContractStorageNextTouchServiceList = <ThrowOnError extends bool
  */
 export const intContractStorageNextTouchServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageNextTouchServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageNextTouchServiceGetResponses,
     IntContractStorageNextTouchServiceGetErrors,
     ThrowOnError
@@ -4774,7 +4571,6 @@ export const intContractStorageNextTouchServiceGet = <ThrowOnError extends boole
     url: '/api/v1/int_contract_storage_next_touch/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4783,8 +4579,8 @@ export const intContractStorageNextTouchServiceGet = <ThrowOnError extends boole
  */
 export const intContractStorageReactivation1mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageReactivation1mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageReactivation1mServiceListResponses,
     IntContractStorageReactivation1mServiceListErrors,
     ThrowOnError
@@ -4794,7 +4590,6 @@ export const intContractStorageReactivation1mServiceList = <ThrowOnError extends
     url: '/api/v1/int_contract_storage_reactivation_1m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4803,8 +4598,8 @@ export const intContractStorageReactivation1mServiceList = <ThrowOnError extends
  */
 export const intContractStorageReactivation1mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageReactivation1mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageReactivation1mServiceGetResponses,
     IntContractStorageReactivation1mServiceGetErrors,
     ThrowOnError
@@ -4814,7 +4609,6 @@ export const intContractStorageReactivation1mServiceGet = <ThrowOnError extends 
     url: '/api/v1/int_contract_storage_reactivation_1m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4823,8 +4617,8 @@ export const intContractStorageReactivation1mServiceGet = <ThrowOnError extends 
  */
 export const intContractStorageReactivation6mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageReactivation6mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageReactivation6mServiceListResponses,
     IntContractStorageReactivation6mServiceListErrors,
     ThrowOnError
@@ -4834,7 +4628,6 @@ export const intContractStorageReactivation6mServiceList = <ThrowOnError extends
     url: '/api/v1/int_contract_storage_reactivation_6m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4843,8 +4636,8 @@ export const intContractStorageReactivation6mServiceList = <ThrowOnError extends
  */
 export const intContractStorageReactivation6mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageReactivation6mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageReactivation6mServiceGetResponses,
     IntContractStorageReactivation6mServiceGetErrors,
     ThrowOnError
@@ -4854,7 +4647,6 @@ export const intContractStorageReactivation6mServiceGet = <ThrowOnError extends 
     url: '/api/v1/int_contract_storage_reactivation_6m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4863,8 +4655,8 @@ export const intContractStorageReactivation6mServiceGet = <ThrowOnError extends 
  */
 export const intContractStorageReactivation12mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageReactivation12mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageReactivation12mServiceListResponses,
     IntContractStorageReactivation12mServiceListErrors,
     ThrowOnError
@@ -4874,7 +4666,6 @@ export const intContractStorageReactivation12mServiceList = <ThrowOnError extend
     url: '/api/v1/int_contract_storage_reactivation_12m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4883,8 +4674,8 @@ export const intContractStorageReactivation12mServiceList = <ThrowOnError extend
  */
 export const intContractStorageReactivation12mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageReactivation12mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageReactivation12mServiceGetResponses,
     IntContractStorageReactivation12mServiceGetErrors,
     ThrowOnError
@@ -4894,7 +4685,6 @@ export const intContractStorageReactivation12mServiceGet = <ThrowOnError extends
     url: '/api/v1/int_contract_storage_reactivation_12m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4903,8 +4693,8 @@ export const intContractStorageReactivation12mServiceGet = <ThrowOnError extends
  */
 export const intContractStorageReactivation18mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageReactivation18mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageReactivation18mServiceListResponses,
     IntContractStorageReactivation18mServiceListErrors,
     ThrowOnError
@@ -4914,7 +4704,6 @@ export const intContractStorageReactivation18mServiceList = <ThrowOnError extend
     url: '/api/v1/int_contract_storage_reactivation_18m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4923,8 +4712,8 @@ export const intContractStorageReactivation18mServiceList = <ThrowOnError extend
  */
 export const intContractStorageReactivation18mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageReactivation18mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageReactivation18mServiceGetResponses,
     IntContractStorageReactivation18mServiceGetErrors,
     ThrowOnError
@@ -4934,7 +4723,6 @@ export const intContractStorageReactivation18mServiceGet = <ThrowOnError extends
     url: '/api/v1/int_contract_storage_reactivation_18m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4943,8 +4731,8 @@ export const intContractStorageReactivation18mServiceGet = <ThrowOnError extends
  */
 export const intContractStorageReactivation24mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageReactivation24mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageReactivation24mServiceListResponses,
     IntContractStorageReactivation24mServiceListErrors,
     ThrowOnError
@@ -4954,7 +4742,6 @@ export const intContractStorageReactivation24mServiceList = <ThrowOnError extend
     url: '/api/v1/int_contract_storage_reactivation_24m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -4963,8 +4750,8 @@ export const intContractStorageReactivation24mServiceList = <ThrowOnError extend
  */
 export const intContractStorageReactivation24mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageReactivation24mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageReactivation24mServiceGetResponses,
     IntContractStorageReactivation24mServiceGetErrors,
     ThrowOnError
@@ -4974,7 +4761,6 @@ export const intContractStorageReactivation24mServiceGet = <ThrowOnError extends
     url: '/api/v1/int_contract_storage_reactivation_24m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -4983,8 +4769,8 @@ export const intContractStorageReactivation24mServiceGet = <ThrowOnError extends
  */
 export const intContractStorageStateServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageStateServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageStateServiceListResponses,
     IntContractStorageStateServiceListErrors,
     ThrowOnError
@@ -4994,7 +4780,6 @@ export const intContractStorageStateServiceList = <ThrowOnError extends boolean 
     url: '/api/v1/int_contract_storage_state',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5003,8 +4788,8 @@ export const intContractStorageStateServiceList = <ThrowOnError extends boolean 
  */
 export const intContractStorageStateServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageStateServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageStateServiceGetResponses,
     IntContractStorageStateServiceGetErrors,
     ThrowOnError
@@ -5014,7 +4799,6 @@ export const intContractStorageStateServiceGet = <ThrowOnError extends boolean =
     url: '/api/v1/int_contract_storage_state/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5023,8 +4807,8 @@ export const intContractStorageStateServiceGet = <ThrowOnError extends boolean =
  */
 export const intContractStorageStateByAddressServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageStateByAddressServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageStateByAddressServiceListResponses,
     IntContractStorageStateByAddressServiceListErrors,
     ThrowOnError
@@ -5034,7 +4818,6 @@ export const intContractStorageStateByAddressServiceList = <ThrowOnError extends
     url: '/api/v1/int_contract_storage_state_by_address',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5043,8 +4826,8 @@ export const intContractStorageStateByAddressServiceList = <ThrowOnError extends
  */
 export const intContractStorageStateByAddressServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageStateByAddressServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageStateByAddressServiceGetResponses,
     IntContractStorageStateByAddressServiceGetErrors,
     ThrowOnError
@@ -5054,7 +4837,6 @@ export const intContractStorageStateByAddressServiceGet = <ThrowOnError extends 
     url: '/api/v1/int_contract_storage_state_by_address/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5063,8 +4845,8 @@ export const intContractStorageStateByAddressServiceGet = <ThrowOnError extends 
  */
 export const intContractStorageStateByBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageStateByBlockServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageStateByBlockServiceListResponses,
     IntContractStorageStateByBlockServiceListErrors,
     ThrowOnError
@@ -5074,7 +4856,6 @@ export const intContractStorageStateByBlockServiceList = <ThrowOnError extends b
     url: '/api/v1/int_contract_storage_state_by_block',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5083,8 +4864,8 @@ export const intContractStorageStateByBlockServiceList = <ThrowOnError extends b
  */
 export const intContractStorageStateByBlockServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageStateByBlockServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageStateByBlockServiceGetResponses,
     IntContractStorageStateByBlockServiceGetErrors,
     ThrowOnError
@@ -5094,7 +4875,6 @@ export const intContractStorageStateByBlockServiceGet = <ThrowOnError extends bo
     url: '/api/v1/int_contract_storage_state_by_block/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5103,8 +4883,8 @@ export const intContractStorageStateByBlockServiceGet = <ThrowOnError extends bo
  */
 export const intContractStorageStateWithExpiryServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageStateWithExpiryServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageStateWithExpiryServiceListResponses,
     IntContractStorageStateWithExpiryServiceListErrors,
     ThrowOnError
@@ -5114,7 +4894,6 @@ export const intContractStorageStateWithExpiryServiceList = <ThrowOnError extend
     url: '/api/v1/int_contract_storage_state_with_expiry',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5123,8 +4902,8 @@ export const intContractStorageStateWithExpiryServiceList = <ThrowOnError extend
  */
 export const intContractStorageStateWithExpiryServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageStateWithExpiryServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageStateWithExpiryServiceGetResponses,
     IntContractStorageStateWithExpiryServiceGetErrors,
     ThrowOnError
@@ -5134,7 +4913,6 @@ export const intContractStorageStateWithExpiryServiceGet = <ThrowOnError extends
     url: '/api/v1/int_contract_storage_state_with_expiry/{expiry_policy}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5143,8 +4921,8 @@ export const intContractStorageStateWithExpiryServiceGet = <ThrowOnError extends
  */
 export const intContractStorageStateWithExpiryByAddressServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageStateWithExpiryByAddressServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageStateWithExpiryByAddressServiceListResponses,
     IntContractStorageStateWithExpiryByAddressServiceListErrors,
     ThrowOnError
@@ -5155,7 +4933,6 @@ export const intContractStorageStateWithExpiryByAddressServiceList = <ThrowOnErr
     url: '/api/v1/int_contract_storage_state_with_expiry_by_address',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5164,8 +4941,8 @@ export const intContractStorageStateWithExpiryByAddressServiceList = <ThrowOnErr
  */
 export const intContractStorageStateWithExpiryByAddressServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageStateWithExpiryByAddressServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageStateWithExpiryByAddressServiceGetResponses,
     IntContractStorageStateWithExpiryByAddressServiceGetErrors,
     ThrowOnError
@@ -5176,7 +4953,6 @@ export const intContractStorageStateWithExpiryByAddressServiceGet = <ThrowOnErro
     url: '/api/v1/int_contract_storage_state_with_expiry_by_address/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5185,8 +4961,8 @@ export const intContractStorageStateWithExpiryByAddressServiceGet = <ThrowOnErro
  */
 export const intContractStorageStateWithExpiryByBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageStateWithExpiryByBlockServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntContractStorageStateWithExpiryByBlockServiceListResponses,
     IntContractStorageStateWithExpiryByBlockServiceListErrors,
     ThrowOnError
@@ -5197,7 +4973,6 @@ export const intContractStorageStateWithExpiryByBlockServiceList = <ThrowOnError
     url: '/api/v1/int_contract_storage_state_with_expiry_by_block',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5206,8 +4981,8 @@ export const intContractStorageStateWithExpiryByBlockServiceList = <ThrowOnError
  */
 export const intContractStorageStateWithExpiryByBlockServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntContractStorageStateWithExpiryByBlockServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntContractStorageStateWithExpiryByBlockServiceGetResponses,
     IntContractStorageStateWithExpiryByBlockServiceGetErrors,
     ThrowOnError
@@ -5217,7 +4992,6 @@ export const intContractStorageStateWithExpiryByBlockServiceGet = <ThrowOnError 
     url: '/api/v1/int_contract_storage_state_with_expiry_by_block/{expiry_policy}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5226,18 +5000,13 @@ export const intContractStorageStateWithExpiryByBlockServiceGet = <ThrowOnError 
  */
 export const intCustodyProbeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntCustodyProbeServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
-    IntCustodyProbeServiceListResponses,
-    IntCustodyProbeServiceListErrors,
-    ThrowOnError
-  >({
+) =>
+  (options?.client ?? client).get<IntCustodyProbeServiceListResponses, IntCustodyProbeServiceListErrors, ThrowOnError>({
     requestValidator: async data => await zIntCustodyProbeServiceListData.parseAsync(data),
     responseValidator: async data => await zIntCustodyProbeServiceListResponse.parseAsync(data),
     url: '/api/v1/int_custody_probe',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5246,18 +5015,13 @@ export const intCustodyProbeServiceList = <ThrowOnError extends boolean = false>
  */
 export const intCustodyProbeServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntCustodyProbeServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
-    IntCustodyProbeServiceGetResponses,
-    IntCustodyProbeServiceGetErrors,
-    ThrowOnError
-  >({
+) =>
+  (options.client ?? client).get<IntCustodyProbeServiceGetResponses, IntCustodyProbeServiceGetErrors, ThrowOnError>({
     requestValidator: async data => await zIntCustodyProbeServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntCustodyProbeServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_custody_probe/{probe_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5266,8 +5030,8 @@ export const intCustodyProbeServiceGet = <ThrowOnError extends boolean = false>(
  */
 export const intCustodyProbeOrderBySlotServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntCustodyProbeOrderBySlotServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntCustodyProbeOrderBySlotServiceListResponses,
     IntCustodyProbeOrderBySlotServiceListErrors,
     ThrowOnError
@@ -5277,7 +5041,6 @@ export const intCustodyProbeOrderBySlotServiceList = <ThrowOnError extends boole
     url: '/api/v1/int_custody_probe_order_by_slot',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5286,8 +5049,8 @@ export const intCustodyProbeOrderBySlotServiceList = <ThrowOnError extends boole
  */
 export const intCustodyProbeOrderBySlotServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntCustodyProbeOrderBySlotServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntCustodyProbeOrderBySlotServiceGetResponses,
     IntCustodyProbeOrderBySlotServiceGetErrors,
     ThrowOnError
@@ -5297,7 +5060,6 @@ export const intCustodyProbeOrderBySlotServiceGet = <ThrowOnError extends boolea
     url: '/api/v1/int_custody_probe_order_by_slot/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5306,8 +5068,8 @@ export const intCustodyProbeOrderBySlotServiceGet = <ThrowOnError extends boolea
  */
 export const intEngineNewPayloadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntEngineNewPayloadServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntEngineNewPayloadServiceListResponses,
     IntEngineNewPayloadServiceListErrors,
     ThrowOnError
@@ -5317,7 +5079,6 @@ export const intEngineNewPayloadServiceList = <ThrowOnError extends boolean = fa
     url: '/api/v1/int_engine_new_payload',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5326,8 +5087,8 @@ export const intEngineNewPayloadServiceList = <ThrowOnError extends boolean = fa
  */
 export const intEngineNewPayloadServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntEngineNewPayloadServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntEngineNewPayloadServiceGetResponses,
     IntEngineNewPayloadServiceGetErrors,
     ThrowOnError
@@ -5337,7 +5098,6 @@ export const intEngineNewPayloadServiceGet = <ThrowOnError extends boolean = fal
     url: '/api/v1/int_engine_new_payload/{slot_start_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5346,8 +5106,8 @@ export const intEngineNewPayloadServiceGet = <ThrowOnError extends boolean = fal
  */
 export const intExecutionBlockByDateServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntExecutionBlockByDateServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntExecutionBlockByDateServiceListResponses,
     IntExecutionBlockByDateServiceListErrors,
     ThrowOnError
@@ -5357,7 +5117,6 @@ export const intExecutionBlockByDateServiceList = <ThrowOnError extends boolean 
     url: '/api/v1/int_execution_block_by_date',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5366,8 +5125,8 @@ export const intExecutionBlockByDateServiceList = <ThrowOnError extends boolean 
  */
 export const intExecutionBlockByDateServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntExecutionBlockByDateServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntExecutionBlockByDateServiceGetResponses,
     IntExecutionBlockByDateServiceGetErrors,
     ThrowOnError
@@ -5377,7 +5136,6 @@ export const intExecutionBlockByDateServiceGet = <ThrowOnError extends boolean =
     url: '/api/v1/int_execution_block_by_date/{block_date_time}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5386,8 +5144,8 @@ export const intExecutionBlockByDateServiceGet = <ThrowOnError extends boolean =
  */
 export const intStorageSlotDiffServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotDiffServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotDiffServiceListResponses,
     IntStorageSlotDiffServiceListErrors,
     ThrowOnError
@@ -5397,7 +5155,6 @@ export const intStorageSlotDiffServiceList = <ThrowOnError extends boolean = fal
     url: '/api/v1/int_storage_slot_diff',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5406,8 +5163,8 @@ export const intStorageSlotDiffServiceList = <ThrowOnError extends boolean = fal
  */
 export const intStorageSlotDiffServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotDiffServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotDiffServiceGetResponses,
     IntStorageSlotDiffServiceGetErrors,
     ThrowOnError
@@ -5417,7 +5174,6 @@ export const intStorageSlotDiffServiceGet = <ThrowOnError extends boolean = fals
     url: '/api/v1/int_storage_slot_diff/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5426,8 +5182,8 @@ export const intStorageSlotDiffServiceGet = <ThrowOnError extends boolean = fals
  */
 export const intStorageSlotDiffByAddressSlotServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotDiffByAddressSlotServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotDiffByAddressSlotServiceListResponses,
     IntStorageSlotDiffByAddressSlotServiceListErrors,
     ThrowOnError
@@ -5437,7 +5193,6 @@ export const intStorageSlotDiffByAddressSlotServiceList = <ThrowOnError extends 
     url: '/api/v1/int_storage_slot_diff_by_address_slot',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5446,8 +5201,8 @@ export const intStorageSlotDiffByAddressSlotServiceList = <ThrowOnError extends 
  */
 export const intStorageSlotDiffByAddressSlotServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotDiffByAddressSlotServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotDiffByAddressSlotServiceGetResponses,
     IntStorageSlotDiffByAddressSlotServiceGetErrors,
     ThrowOnError
@@ -5457,7 +5212,6 @@ export const intStorageSlotDiffByAddressSlotServiceGet = <ThrowOnError extends b
     url: '/api/v1/int_storage_slot_diff_by_address_slot/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5466,8 +5220,8 @@ export const intStorageSlotDiffByAddressSlotServiceGet = <ThrowOnError extends b
  */
 export const intStorageSlotExpiry1mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotExpiry1mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotExpiry1mServiceListResponses,
     IntStorageSlotExpiry1mServiceListErrors,
     ThrowOnError
@@ -5477,7 +5231,6 @@ export const intStorageSlotExpiry1mServiceList = <ThrowOnError extends boolean =
     url: '/api/v1/int_storage_slot_expiry_1m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5486,8 +5239,8 @@ export const intStorageSlotExpiry1mServiceList = <ThrowOnError extends boolean =
  */
 export const intStorageSlotExpiry1mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotExpiry1mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotExpiry1mServiceGetResponses,
     IntStorageSlotExpiry1mServiceGetErrors,
     ThrowOnError
@@ -5497,7 +5250,6 @@ export const intStorageSlotExpiry1mServiceGet = <ThrowOnError extends boolean = 
     url: '/api/v1/int_storage_slot_expiry_1m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5506,8 +5258,8 @@ export const intStorageSlotExpiry1mServiceGet = <ThrowOnError extends boolean = 
  */
 export const intStorageSlotExpiry6mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotExpiry6mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotExpiry6mServiceListResponses,
     IntStorageSlotExpiry6mServiceListErrors,
     ThrowOnError
@@ -5517,7 +5269,6 @@ export const intStorageSlotExpiry6mServiceList = <ThrowOnError extends boolean =
     url: '/api/v1/int_storage_slot_expiry_6m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5526,8 +5277,8 @@ export const intStorageSlotExpiry6mServiceList = <ThrowOnError extends boolean =
  */
 export const intStorageSlotExpiry6mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotExpiry6mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotExpiry6mServiceGetResponses,
     IntStorageSlotExpiry6mServiceGetErrors,
     ThrowOnError
@@ -5537,7 +5288,6 @@ export const intStorageSlotExpiry6mServiceGet = <ThrowOnError extends boolean = 
     url: '/api/v1/int_storage_slot_expiry_6m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5546,8 +5296,8 @@ export const intStorageSlotExpiry6mServiceGet = <ThrowOnError extends boolean = 
  */
 export const intStorageSlotExpiry12mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotExpiry12mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotExpiry12mServiceListResponses,
     IntStorageSlotExpiry12mServiceListErrors,
     ThrowOnError
@@ -5557,7 +5307,6 @@ export const intStorageSlotExpiry12mServiceList = <ThrowOnError extends boolean 
     url: '/api/v1/int_storage_slot_expiry_12m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5566,8 +5315,8 @@ export const intStorageSlotExpiry12mServiceList = <ThrowOnError extends boolean 
  */
 export const intStorageSlotExpiry12mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotExpiry12mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotExpiry12mServiceGetResponses,
     IntStorageSlotExpiry12mServiceGetErrors,
     ThrowOnError
@@ -5577,7 +5326,6 @@ export const intStorageSlotExpiry12mServiceGet = <ThrowOnError extends boolean =
     url: '/api/v1/int_storage_slot_expiry_12m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5586,8 +5334,8 @@ export const intStorageSlotExpiry12mServiceGet = <ThrowOnError extends boolean =
  */
 export const intStorageSlotExpiry18mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotExpiry18mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotExpiry18mServiceListResponses,
     IntStorageSlotExpiry18mServiceListErrors,
     ThrowOnError
@@ -5597,7 +5345,6 @@ export const intStorageSlotExpiry18mServiceList = <ThrowOnError extends boolean 
     url: '/api/v1/int_storage_slot_expiry_18m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5606,8 +5353,8 @@ export const intStorageSlotExpiry18mServiceList = <ThrowOnError extends boolean 
  */
 export const intStorageSlotExpiry18mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotExpiry18mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotExpiry18mServiceGetResponses,
     IntStorageSlotExpiry18mServiceGetErrors,
     ThrowOnError
@@ -5617,7 +5364,6 @@ export const intStorageSlotExpiry18mServiceGet = <ThrowOnError extends boolean =
     url: '/api/v1/int_storage_slot_expiry_18m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5626,8 +5372,8 @@ export const intStorageSlotExpiry18mServiceGet = <ThrowOnError extends boolean =
  */
 export const intStorageSlotExpiry24mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotExpiry24mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotExpiry24mServiceListResponses,
     IntStorageSlotExpiry24mServiceListErrors,
     ThrowOnError
@@ -5637,7 +5383,6 @@ export const intStorageSlotExpiry24mServiceList = <ThrowOnError extends boolean 
     url: '/api/v1/int_storage_slot_expiry_24m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5646,8 +5391,8 @@ export const intStorageSlotExpiry24mServiceList = <ThrowOnError extends boolean 
  */
 export const intStorageSlotExpiry24mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotExpiry24mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotExpiry24mServiceGetResponses,
     IntStorageSlotExpiry24mServiceGetErrors,
     ThrowOnError
@@ -5657,7 +5402,6 @@ export const intStorageSlotExpiry24mServiceGet = <ThrowOnError extends boolean =
     url: '/api/v1/int_storage_slot_expiry_24m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5666,8 +5410,8 @@ export const intStorageSlotExpiry24mServiceGet = <ThrowOnError extends boolean =
  */
 export const intStorageSlotNextTouchServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotNextTouchServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotNextTouchServiceListResponses,
     IntStorageSlotNextTouchServiceListErrors,
     ThrowOnError
@@ -5677,7 +5421,6 @@ export const intStorageSlotNextTouchServiceList = <ThrowOnError extends boolean 
     url: '/api/v1/int_storage_slot_next_touch',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5686,8 +5429,8 @@ export const intStorageSlotNextTouchServiceList = <ThrowOnError extends boolean 
  */
 export const intStorageSlotNextTouchServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotNextTouchServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotNextTouchServiceGetResponses,
     IntStorageSlotNextTouchServiceGetErrors,
     ThrowOnError
@@ -5697,7 +5440,6 @@ export const intStorageSlotNextTouchServiceGet = <ThrowOnError extends boolean =
     url: '/api/v1/int_storage_slot_next_touch/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5706,8 +5448,8 @@ export const intStorageSlotNextTouchServiceGet = <ThrowOnError extends boolean =
  */
 export const intStorageSlotReactivation1mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotReactivation1mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotReactivation1mServiceListResponses,
     IntStorageSlotReactivation1mServiceListErrors,
     ThrowOnError
@@ -5717,7 +5459,6 @@ export const intStorageSlotReactivation1mServiceList = <ThrowOnError extends boo
     url: '/api/v1/int_storage_slot_reactivation_1m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5726,8 +5467,8 @@ export const intStorageSlotReactivation1mServiceList = <ThrowOnError extends boo
  */
 export const intStorageSlotReactivation1mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotReactivation1mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotReactivation1mServiceGetResponses,
     IntStorageSlotReactivation1mServiceGetErrors,
     ThrowOnError
@@ -5737,7 +5478,6 @@ export const intStorageSlotReactivation1mServiceGet = <ThrowOnError extends bool
     url: '/api/v1/int_storage_slot_reactivation_1m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5746,8 +5486,8 @@ export const intStorageSlotReactivation1mServiceGet = <ThrowOnError extends bool
  */
 export const intStorageSlotReactivation6mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotReactivation6mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotReactivation6mServiceListResponses,
     IntStorageSlotReactivation6mServiceListErrors,
     ThrowOnError
@@ -5757,7 +5497,6 @@ export const intStorageSlotReactivation6mServiceList = <ThrowOnError extends boo
     url: '/api/v1/int_storage_slot_reactivation_6m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5766,8 +5505,8 @@ export const intStorageSlotReactivation6mServiceList = <ThrowOnError extends boo
  */
 export const intStorageSlotReactivation6mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotReactivation6mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotReactivation6mServiceGetResponses,
     IntStorageSlotReactivation6mServiceGetErrors,
     ThrowOnError
@@ -5777,7 +5516,6 @@ export const intStorageSlotReactivation6mServiceGet = <ThrowOnError extends bool
     url: '/api/v1/int_storage_slot_reactivation_6m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5786,8 +5524,8 @@ export const intStorageSlotReactivation6mServiceGet = <ThrowOnError extends bool
  */
 export const intStorageSlotReactivation12mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotReactivation12mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotReactivation12mServiceListResponses,
     IntStorageSlotReactivation12mServiceListErrors,
     ThrowOnError
@@ -5797,7 +5535,6 @@ export const intStorageSlotReactivation12mServiceList = <ThrowOnError extends bo
     url: '/api/v1/int_storage_slot_reactivation_12m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5806,8 +5543,8 @@ export const intStorageSlotReactivation12mServiceList = <ThrowOnError extends bo
  */
 export const intStorageSlotReactivation12mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotReactivation12mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotReactivation12mServiceGetResponses,
     IntStorageSlotReactivation12mServiceGetErrors,
     ThrowOnError
@@ -5817,7 +5554,6 @@ export const intStorageSlotReactivation12mServiceGet = <ThrowOnError extends boo
     url: '/api/v1/int_storage_slot_reactivation_12m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5826,8 +5562,8 @@ export const intStorageSlotReactivation12mServiceGet = <ThrowOnError extends boo
  */
 export const intStorageSlotReactivation18mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotReactivation18mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotReactivation18mServiceListResponses,
     IntStorageSlotReactivation18mServiceListErrors,
     ThrowOnError
@@ -5837,7 +5573,6 @@ export const intStorageSlotReactivation18mServiceList = <ThrowOnError extends bo
     url: '/api/v1/int_storage_slot_reactivation_18m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5846,8 +5581,8 @@ export const intStorageSlotReactivation18mServiceList = <ThrowOnError extends bo
  */
 export const intStorageSlotReactivation18mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotReactivation18mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotReactivation18mServiceGetResponses,
     IntStorageSlotReactivation18mServiceGetErrors,
     ThrowOnError
@@ -5857,7 +5592,6 @@ export const intStorageSlotReactivation18mServiceGet = <ThrowOnError extends boo
     url: '/api/v1/int_storage_slot_reactivation_18m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5866,8 +5600,8 @@ export const intStorageSlotReactivation18mServiceGet = <ThrowOnError extends boo
  */
 export const intStorageSlotReactivation24mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotReactivation24mServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotReactivation24mServiceListResponses,
     IntStorageSlotReactivation24mServiceListErrors,
     ThrowOnError
@@ -5877,7 +5611,6 @@ export const intStorageSlotReactivation24mServiceList = <ThrowOnError extends bo
     url: '/api/v1/int_storage_slot_reactivation_24m',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5886,8 +5619,8 @@ export const intStorageSlotReactivation24mServiceList = <ThrowOnError extends bo
  */
 export const intStorageSlotReactivation24mServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotReactivation24mServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotReactivation24mServiceGetResponses,
     IntStorageSlotReactivation24mServiceGetErrors,
     ThrowOnError
@@ -5897,7 +5630,6 @@ export const intStorageSlotReactivation24mServiceGet = <ThrowOnError extends boo
     url: '/api/v1/int_storage_slot_reactivation_24m/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5906,8 +5638,8 @@ export const intStorageSlotReactivation24mServiceGet = <ThrowOnError extends boo
  */
 export const intStorageSlotReadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotReadServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotReadServiceListResponses,
     IntStorageSlotReadServiceListErrors,
     ThrowOnError
@@ -5917,7 +5649,6 @@ export const intStorageSlotReadServiceList = <ThrowOnError extends boolean = fal
     url: '/api/v1/int_storage_slot_read',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5926,8 +5657,8 @@ export const intStorageSlotReadServiceList = <ThrowOnError extends boolean = fal
  */
 export const intStorageSlotReadServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotReadServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotReadServiceGetResponses,
     IntStorageSlotReadServiceGetErrors,
     ThrowOnError
@@ -5937,7 +5668,6 @@ export const intStorageSlotReadServiceGet = <ThrowOnError extends boolean = fals
     url: '/api/v1/int_storage_slot_read/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5946,8 +5676,8 @@ export const intStorageSlotReadServiceGet = <ThrowOnError extends boolean = fals
  */
 export const intStorageSlotStateServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotStateServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotStateServiceListResponses,
     IntStorageSlotStateServiceListErrors,
     ThrowOnError
@@ -5957,7 +5687,6 @@ export const intStorageSlotStateServiceList = <ThrowOnError extends boolean = fa
     url: '/api/v1/int_storage_slot_state',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -5966,8 +5695,8 @@ export const intStorageSlotStateServiceList = <ThrowOnError extends boolean = fa
  */
 export const intStorageSlotStateServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotStateServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotStateServiceGetResponses,
     IntStorageSlotStateServiceGetErrors,
     ThrowOnError
@@ -5977,7 +5706,6 @@ export const intStorageSlotStateServiceGet = <ThrowOnError extends boolean = fal
     url: '/api/v1/int_storage_slot_state/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -5986,8 +5714,8 @@ export const intStorageSlotStateServiceGet = <ThrowOnError extends boolean = fal
  */
 export const intStorageSlotStateByAddressServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotStateByAddressServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotStateByAddressServiceListResponses,
     IntStorageSlotStateByAddressServiceListErrors,
     ThrowOnError
@@ -5997,7 +5725,6 @@ export const intStorageSlotStateByAddressServiceList = <ThrowOnError extends boo
     url: '/api/v1/int_storage_slot_state_by_address',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -6006,8 +5733,8 @@ export const intStorageSlotStateByAddressServiceList = <ThrowOnError extends boo
  */
 export const intStorageSlotStateByAddressServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotStateByAddressServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotStateByAddressServiceGetResponses,
     IntStorageSlotStateByAddressServiceGetErrors,
     ThrowOnError
@@ -6017,7 +5744,6 @@ export const intStorageSlotStateByAddressServiceGet = <ThrowOnError extends bool
     url: '/api/v1/int_storage_slot_state_by_address/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -6026,8 +5752,8 @@ export const intStorageSlotStateByAddressServiceGet = <ThrowOnError extends bool
  */
 export const intStorageSlotStateByBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotStateByBlockServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotStateByBlockServiceListResponses,
     IntStorageSlotStateByBlockServiceListErrors,
     ThrowOnError
@@ -6037,7 +5763,6 @@ export const intStorageSlotStateByBlockServiceList = <ThrowOnError extends boole
     url: '/api/v1/int_storage_slot_state_by_block',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -6046,8 +5771,8 @@ export const intStorageSlotStateByBlockServiceList = <ThrowOnError extends boole
  */
 export const intStorageSlotStateByBlockServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotStateByBlockServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotStateByBlockServiceGetResponses,
     IntStorageSlotStateByBlockServiceGetErrors,
     ThrowOnError
@@ -6057,7 +5782,6 @@ export const intStorageSlotStateByBlockServiceGet = <ThrowOnError extends boolea
     url: '/api/v1/int_storage_slot_state_by_block/{block_number}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -6066,8 +5790,8 @@ export const intStorageSlotStateByBlockServiceGet = <ThrowOnError extends boolea
  */
 export const intStorageSlotStateWithExpiryServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotStateWithExpiryServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotStateWithExpiryServiceListResponses,
     IntStorageSlotStateWithExpiryServiceListErrors,
     ThrowOnError
@@ -6077,7 +5801,6 @@ export const intStorageSlotStateWithExpiryServiceList = <ThrowOnError extends bo
     url: '/api/v1/int_storage_slot_state_with_expiry',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -6086,8 +5809,8 @@ export const intStorageSlotStateWithExpiryServiceList = <ThrowOnError extends bo
  */
 export const intStorageSlotStateWithExpiryServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotStateWithExpiryServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotStateWithExpiryServiceGetResponses,
     IntStorageSlotStateWithExpiryServiceGetErrors,
     ThrowOnError
@@ -6097,7 +5820,6 @@ export const intStorageSlotStateWithExpiryServiceGet = <ThrowOnError extends boo
     url: '/api/v1/int_storage_slot_state_with_expiry/{expiry_policy}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -6106,8 +5828,8 @@ export const intStorageSlotStateWithExpiryServiceGet = <ThrowOnError extends boo
  */
 export const intStorageSlotStateWithExpiryByAddressServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotStateWithExpiryByAddressServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotStateWithExpiryByAddressServiceListResponses,
     IntStorageSlotStateWithExpiryByAddressServiceListErrors,
     ThrowOnError
@@ -6117,7 +5839,6 @@ export const intStorageSlotStateWithExpiryByAddressServiceList = <ThrowOnError e
     url: '/api/v1/int_storage_slot_state_with_expiry_by_address',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -6126,8 +5847,8 @@ export const intStorageSlotStateWithExpiryByAddressServiceList = <ThrowOnError e
  */
 export const intStorageSlotStateWithExpiryByAddressServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotStateWithExpiryByAddressServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotStateWithExpiryByAddressServiceGetResponses,
     IntStorageSlotStateWithExpiryByAddressServiceGetErrors,
     ThrowOnError
@@ -6137,7 +5858,6 @@ export const intStorageSlotStateWithExpiryByAddressServiceGet = <ThrowOnError ex
     url: '/api/v1/int_storage_slot_state_with_expiry_by_address/{address}',
     ...options,
   });
-};
 
 /**
  * List records
@@ -6146,8 +5866,8 @@ export const intStorageSlotStateWithExpiryByAddressServiceGet = <ThrowOnError ex
  */
 export const intStorageSlotStateWithExpiryByBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotStateWithExpiryByBlockServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     IntStorageSlotStateWithExpiryByBlockServiceListResponses,
     IntStorageSlotStateWithExpiryByBlockServiceListErrors,
     ThrowOnError
@@ -6157,7 +5877,6 @@ export const intStorageSlotStateWithExpiryByBlockServiceList = <ThrowOnError ext
     url: '/api/v1/int_storage_slot_state_with_expiry_by_block',
     ...options,
   });
-};
 
 /**
  * Get record
@@ -6166,8 +5885,8 @@ export const intStorageSlotStateWithExpiryByBlockServiceList = <ThrowOnError ext
  */
 export const intStorageSlotStateWithExpiryByBlockServiceGet = <ThrowOnError extends boolean = false>(
   options: Options<IntStorageSlotStateWithExpiryByBlockServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     IntStorageSlotStateWithExpiryByBlockServiceGetResponses,
     IntStorageSlotStateWithExpiryByBlockServiceGetErrors,
     ThrowOnError
@@ -6177,4 +5896,3 @@ export const intStorageSlotStateWithExpiryByBlockServiceGet = <ThrowOnError exte
     url: '/api/v1/int_storage_slot_state_with_expiry_by_block/{expiry_policy}',
     ...options,
   });
-};
