@@ -86,11 +86,9 @@ export default tseslint.config(
       'better-tailwindcss/no-conflicting-classes': 'warn', // Less expensive than error
       'better-tailwindcss/no-duplicate-classes': 'warn',
       // Disabled: Custom component classes in @layer components are intentional
-      'better-tailwindcss/no-unregistered-classes': 'off',
+      'better-tailwindcss/no-unknown-classes': 'off',
       'better-tailwindcss/no-deprecated-classes': 'off', // Disable expensive rule - Tailwind 4 is stable
       // Disable all stylistic rules (Prettier handles these)
-      'better-tailwindcss/multiline': 'off',
-      'better-tailwindcss/sort-classes': 'off',
       'better-tailwindcss/enforce-consistent-class-order': 'off',
       'better-tailwindcss/enforce-consistent-important-position': 'off',
       'better-tailwindcss/enforce-consistent-line-wrapping': 'off',
