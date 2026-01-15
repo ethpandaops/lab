@@ -1,0 +1,203 @@
+/**
+ * Node in the flame graph tree structure
+ */
+export interface FlameGraphNode {
+  /**
+   * Unique identifier for this node
+   */
+  id: string;
+
+  /**
+   * Display label
+   */
+  label: string;
+
+  /**
+   * Total value for this node AND all descendants
+   */
+  value: number;
+
+  /**
+   * Value for this node only (excludes children)
+   */
+  selfValue?: number;
+
+  /**
+   * Child nodes
+   */
+  children?: FlameGraphNode[];
+
+  /**
+   * Category/type for color mapping (e.g., "CALL", "STATICCALL", "folder", "component")
+   */
+  category?: string;
+
+  /**
+   * Whether this node has an error/warning state
+   */
+  hasError?: boolean;
+
+  /**
+   * Additional metadata (displayed in tooltip, passed to click handlers)
+   */
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Color mapping for node categories
+ * Key is the category name, value is the Tailwind color class
+ */
+export interface FlameGraphColorMap {
+  [category: string]: {
+    bg: string;
+    hover: string;
+  };
+}
+
+/**
+ * Props for the FlameGraph component
+ *
+ * A hierarchical visualization for displaying nested data.
+ * Can be used for call trees, file systems, org charts, or any hierarchical data.
+ */
+export interface FlameGraphProps {
+  /**
+   * Root node of the tree
+   */
+  data: FlameGraphNode | null;
+
+  /**
+   * Callback when a node is clicked
+   */
+  onNodeClick?: (node: FlameGraphNode) => void;
+
+  /**
+   * Callback when hovering over a node (null when leaving)
+   */
+  onNodeHover?: (node: FlameGraphNode | null) => void;
+
+  /**
+   * ID of the currently selected node
+   */
+  selectedNodeId?: string;
+
+  /**
+   * Custom color mapping for categories
+   * If not provided, uses default colors based on category or auto-assigns
+   */
+  colorMap?: FlameGraphColorMap;
+
+  /**
+   * Default color for nodes without a category match
+   * @default { bg: 'bg-slate-500', hover: 'hover:bg-slate-400' }
+   */
+  defaultColor?: { bg: string; hover: string };
+
+  /**
+   * Color for error nodes (hasError: true)
+   * @default { bg: 'bg-red-500', hover: 'hover:bg-red-400' }
+   */
+  errorColor?: { bg: string; hover: string };
+
+  /**
+   * Minimum width percentage to render a node (hides very small nodes)
+   * @default 0.5
+   */
+  minWidthPercent?: number;
+
+  /**
+   * Height of the chart container in pixels
+   * @default 400
+   */
+  height?: number;
+
+  /**
+   * Height of each row in pixels
+   * @default 24
+   */
+  rowHeight?: number;
+
+  /**
+   * Show labels on nodes
+   * @default true
+   */
+  showLabels?: boolean;
+
+  /**
+   * Title displayed above the chart
+   */
+  title?: string;
+
+  /**
+   * Unit label for values (e.g., "gas", "bytes", "ms")
+   * @default undefined
+   */
+  valueUnit?: string;
+
+  /**
+   * Custom value formatter
+   * @default Formats with K/M suffix
+   */
+  valueFormatter?: (value: number) => string;
+
+  /**
+   * Show legend with category colors
+   * @default true if colorMap is provided
+   */
+  showLegend?: boolean;
+
+  /**
+   * Custom tooltip renderer
+   * If provided, replaces the default tooltip
+   */
+  renderTooltip?: (node: FlameGraphNode) => React.ReactNode;
+}
+
+/**
+ * Internal representation of a flattened node for rendering
+ */
+export interface FlattenedNode {
+  node: FlameGraphNode;
+  depth: number;
+  startPercent: number;
+  widthPercent: number;
+  parent?: FlameGraphNode;
+}
+
+// ============================================================================
+// Preset Color Maps
+// ============================================================================
+
+/**
+ * EVM call type colors (for Ethereum transaction call trees)
+ */
+export const EVM_CALL_TYPE_COLORS: FlameGraphColorMap = {
+  CALL: { bg: 'bg-blue-500', hover: 'hover:bg-blue-400' },
+  DELEGATECALL: { bg: 'bg-purple-500', hover: 'hover:bg-purple-400' },
+  STATICCALL: { bg: 'bg-cyan-500', hover: 'hover:bg-cyan-400' },
+  CALLCODE: { bg: 'bg-indigo-500', hover: 'hover:bg-indigo-400' },
+  CREATE: { bg: 'bg-orange-500', hover: 'hover:bg-orange-400' },
+  CREATE2: { bg: 'bg-amber-500', hover: 'hover:bg-amber-400' },
+};
+
+/**
+ * File type colors (for file system visualization)
+ */
+export const FILE_TYPE_COLORS: FlameGraphColorMap = {
+  folder: { bg: 'bg-amber-500', hover: 'hover:bg-amber-400' },
+  file: { bg: 'bg-blue-500', hover: 'hover:bg-blue-400' },
+  image: { bg: 'bg-green-500', hover: 'hover:bg-green-400' },
+  video: { bg: 'bg-purple-500', hover: 'hover:bg-purple-400' },
+  document: { bg: 'bg-cyan-500', hover: 'hover:bg-cyan-400' },
+};
+
+/**
+ * Process type colors (for profiling visualization)
+ */
+export const PROCESS_TYPE_COLORS: FlameGraphColorMap = {
+  cpu: { bg: 'bg-red-500', hover: 'hover:bg-red-400' },
+  memory: { bg: 'bg-blue-500', hover: 'hover:bg-blue-400' },
+  io: { bg: 'bg-green-500', hover: 'hover:bg-green-400' },
+  network: { bg: 'bg-purple-500', hover: 'hover:bg-purple-400' },
+  wait: { bg: 'bg-gray-500', hover: 'hover:bg-gray-400' },
+};
