@@ -1,5 +1,6 @@
 import type {
   FctBlockFirstSeenByNode,
+  FctHeadFirstSeenByNode,
   FctBlockBlobFirstSeenByNode,
   FctBlockDataColumnSidecarFirstSeenByNode,
   FctAttestationFirstSeenChunked50Ms,
@@ -14,6 +15,8 @@ export interface SlotProgressTimelineProps {
   slot: number;
   /** Block propagation data for first-seen times */
   blockPropagation: FctBlockFirstSeenByNode[];
+  /** Head propagation data - when chain head updated after block import */
+  headPropagation: FctHeadFirstSeenByNode[];
   /** Blob propagation data (pre-Fulu) */
   blobPropagation: FctBlockBlobFirstSeenByNode[];
   /** Data column propagation data (Fulu+) */

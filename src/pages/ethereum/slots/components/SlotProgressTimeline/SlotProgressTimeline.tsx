@@ -29,6 +29,7 @@ const LABEL_WIDTH = 280;
 export function SlotProgressTimeline({
   slot,
   blockPropagation,
+  headPropagation,
   blobPropagation,
   dataColumnPropagation,
   attestations,
@@ -58,6 +59,7 @@ export function SlotProgressTimeline({
   } = useTraceSpans({
     slot,
     blockPropagation,
+    headPropagation,
     blobPropagation,
     dataColumnPropagation,
     attestations,
