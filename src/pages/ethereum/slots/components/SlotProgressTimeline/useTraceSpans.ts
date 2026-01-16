@@ -659,7 +659,7 @@ function buildBlockProposalSpans(
 
         result.push({
           id: daSpanId,
-          label: `Data availability (${columnCount})`,
+          label: `Data Availability (${columnCount})`,
           startMs: daStartMs,
           endMs: timeline.daCompleteMs,
           category: 'column',
@@ -669,7 +669,7 @@ function buildBlockProposalSpans(
           parentId: nodeId,
           collapsible: columnCount > 1,
           defaultCollapsed: true,
-          nodeCount: columnCount,
+          // nodeCount omitted - already shown in label
         });
 
         // Add child spans for each individual column/blob (only if multiple)
