@@ -3,7 +3,10 @@ import { z } from 'zod';
 import { DetailPage } from '@/pages/ethereum/slots';
 
 const slotSearchSchema = z.object({
-  tab: z.enum(['overview', 'block', 'attestations', 'propagation', 'blobs', 'execution', 'mev']).default('overview'),
+  tab: z
+    .enum(['overview', 'timeline', 'block', 'attestations', 'propagation', 'blobs', 'execution', 'mev'])
+    .default('overview'),
+  contributor: z.string().optional(),
 });
 
 export const Route = createFileRoute('/ethereum/slots/$slot')({
