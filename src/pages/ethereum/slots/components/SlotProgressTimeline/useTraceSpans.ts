@@ -247,6 +247,8 @@ interface NodeTimeline {
   /** Execution data if available (EIP7870 nodes) */
   execution: {
     client: string;
+    version: string;
+    methodVersion: string;
     startMs: number;
     endMs: number;
     durationMs: number;
@@ -270,6 +272,8 @@ function aggregateNodeTimelines(
     duration_ms?: number;
     meta_client_name?: string;
     meta_execution_implementation?: string;
+    meta_execution_version?: string;
+    method_version?: string;
     meta_client_geo_country?: string;
     meta_client_geo_city?: string;
     meta_client_implementation?: string;
@@ -383,6 +387,8 @@ function aggregateNodeTimelines(
 
     timeline.execution = {
       client: node.meta_execution_implementation ?? 'Unknown',
+      version: node.meta_execution_version ?? '',
+      methodVersion: node.method_version ?? '',
       startMs,
       endMs,
       durationMs: node.duration_ms,
@@ -583,6 +589,11 @@ function buildBlockProposalSpans(
         classification: timeline.classification,
         collapsible: eventCount > 1,
         defaultCollapsed: true,
+        // Include execution info if available
+        executionClient: timeline.execution?.client,
+        executionVersion: timeline.execution?.version,
+        methodVersion: timeline.execution?.methodVersion,
+        executionDurationMs: timeline.execution?.durationMs,
       });
 
       // Child spans: Individual events for this node
@@ -613,7 +624,11 @@ function buildBlockProposalSpans(
           details: `newPayload executed in ${formatMs(timeline.execution.durationMs)} by ${timeline.execution.client}`,
           isLate: timeline.execution.endMs > ATTESTATION_DEADLINE_MS,
           parentId: nodeId,
-          clientName: timeline.execution.client,
+          // Don't set clientName for execution spans - it's only for CL client
+          executionClient: timeline.execution.client,
+          executionVersion: timeline.execution.version,
+          methodVersion: timeline.execution.methodVersion,
+          executionDurationMs: timeline.execution.durationMs,
         });
       }
 

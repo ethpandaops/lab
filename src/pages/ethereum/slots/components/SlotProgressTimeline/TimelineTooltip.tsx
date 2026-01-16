@@ -51,14 +51,46 @@ export function TimelineTooltip({ span, position, containerWidth }: TimelineTool
           </>
         )}
 
-        {/* Client implementation + version */}
+        {/* Consensus client (CL) - only show if different from execution client */}
         {span.clientName && (
           <>
-            <span className="text-muted">Client</span>
+            <span className="text-muted">Consensus</span>
             <span className="text-foreground">
-              {span.clientName}
+              <span className="inline-flex items-center gap-1">
+                <ClientLogo client={span.clientName} size={14} />
+                {span.clientName}
+              </span>
               {span.clientVersion && <span className="ml-1 text-muted">v{span.clientVersion}</span>}
             </span>
+          </>
+        )}
+
+        {/* Execution client (EL) */}
+        {span.executionClient && (
+          <>
+            <span className="text-muted">Execution</span>
+            <span className="text-foreground">
+              <span className="inline-flex items-center gap-1">
+                <ClientLogo client={span.executionClient} size={14} />
+                {span.executionClient}
+              </span>
+              {span.executionVersion && (
+                <span className="ml-1 text-muted" title={span.executionVersion}>
+                  v{span.executionVersion.split('/')[0]}
+                </span>
+              )}
+              {span.methodVersion && (
+                <span className="ml-1 rounded bg-surface/50 px-1 text-xs text-muted">{span.methodVersion}</span>
+              )}
+            </span>
+          </>
+        )}
+
+        {/* Execution duration (show on node span) */}
+        {span.executionDurationMs !== undefined && span.executionDurationMs > 0 && !span.executionClient && (
+          <>
+            <span className="text-muted">Execution Time</span>
+            <span className="text-foreground">{formatMs(span.executionDurationMs)}</span>
           </>
         )}
 

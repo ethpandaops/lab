@@ -91,4 +91,12 @@ export interface TraceSpan {
   classification?: string;
   /** Whether this is a point-in-time event (show absolute time, not duration) */
   isPointInTime?: boolean;
+  /** Execution client implementation (Geth, Besu, Nethermind, etc) */
+  executionClient?: string;
+  /** Execution client version string */
+  executionVersion?: string;
+  /** Engine API method version (V3, V4) */
+  methodVersion?: string;
+  /** Execution duration in milliseconds */
+  executionDurationMs?: number;
 }

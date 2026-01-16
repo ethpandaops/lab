@@ -258,7 +258,13 @@ export function SlotProgressTimeline({
                       ) : (
                         span.depth > 0 && <span className="text-muted">{'└'}</span>
                       )}
-                      {span.clientName && <ClientLogo client={span.clientName} size={14} className="shrink-0" />}
+                      {(span.clientName || span.executionClient) && (
+                        <ClientLogo
+                          client={span.clientName ?? span.executionClient ?? ''}
+                          size={14}
+                          className="shrink-0"
+                        />
+                      )}
                       <span
                         className={clsx('truncate', span.isLate ? 'text-danger' : 'text-foreground')}
                         title={span.label}
