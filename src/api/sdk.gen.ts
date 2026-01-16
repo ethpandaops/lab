@@ -315,6 +315,42 @@ import type {
   FctEngineNewPayloadDurationChunked50MsServiceListData,
   FctEngineNewPayloadDurationChunked50MsServiceListErrors,
   FctEngineNewPayloadDurationChunked50MsServiceListResponses,
+  FctExecutionGasLimitDailyServiceGetData,
+  FctExecutionGasLimitDailyServiceGetErrors,
+  FctExecutionGasLimitDailyServiceGetResponses,
+  FctExecutionGasLimitDailyServiceListData,
+  FctExecutionGasLimitDailyServiceListErrors,
+  FctExecutionGasLimitDailyServiceListResponses,
+  FctExecutionGasLimitHourlyServiceGetData,
+  FctExecutionGasLimitHourlyServiceGetErrors,
+  FctExecutionGasLimitHourlyServiceGetResponses,
+  FctExecutionGasLimitHourlyServiceListData,
+  FctExecutionGasLimitHourlyServiceListErrors,
+  FctExecutionGasLimitHourlyServiceListResponses,
+  FctExecutionGasLimitSignallingDailyServiceGetData,
+  FctExecutionGasLimitSignallingDailyServiceGetErrors,
+  FctExecutionGasLimitSignallingDailyServiceGetResponses,
+  FctExecutionGasLimitSignallingDailyServiceListData,
+  FctExecutionGasLimitSignallingDailyServiceListErrors,
+  FctExecutionGasLimitSignallingDailyServiceListResponses,
+  FctExecutionGasLimitSignallingHourlyServiceGetData,
+  FctExecutionGasLimitSignallingHourlyServiceGetErrors,
+  FctExecutionGasLimitSignallingHourlyServiceGetResponses,
+  FctExecutionGasLimitSignallingHourlyServiceListData,
+  FctExecutionGasLimitSignallingHourlyServiceListErrors,
+  FctExecutionGasLimitSignallingHourlyServiceListResponses,
+  FctExecutionGasUsedDailyServiceGetData,
+  FctExecutionGasUsedDailyServiceGetErrors,
+  FctExecutionGasUsedDailyServiceGetResponses,
+  FctExecutionGasUsedDailyServiceListData,
+  FctExecutionGasUsedDailyServiceListErrors,
+  FctExecutionGasUsedDailyServiceListResponses,
+  FctExecutionGasUsedHourlyServiceGetData,
+  FctExecutionGasUsedHourlyServiceGetErrors,
+  FctExecutionGasUsedHourlyServiceGetResponses,
+  FctExecutionGasUsedHourlyServiceListData,
+  FctExecutionGasUsedHourlyServiceListErrors,
+  FctExecutionGasUsedHourlyServiceListResponses,
   FctExecutionStateSizeDailyServiceGetData,
   FctExecutionStateSizeDailyServiceGetErrors,
   FctExecutionStateSizeDailyServiceGetResponses,
@@ -327,6 +363,30 @@ import type {
   FctExecutionStateSizeHourlyServiceListData,
   FctExecutionStateSizeHourlyServiceListErrors,
   FctExecutionStateSizeHourlyServiceListResponses,
+  FctExecutionTpsDailyServiceGetData,
+  FctExecutionTpsDailyServiceGetErrors,
+  FctExecutionTpsDailyServiceGetResponses,
+  FctExecutionTpsDailyServiceListData,
+  FctExecutionTpsDailyServiceListErrors,
+  FctExecutionTpsDailyServiceListResponses,
+  FctExecutionTpsHourlyServiceGetData,
+  FctExecutionTpsHourlyServiceGetErrors,
+  FctExecutionTpsHourlyServiceGetResponses,
+  FctExecutionTpsHourlyServiceListData,
+  FctExecutionTpsHourlyServiceListErrors,
+  FctExecutionTpsHourlyServiceListResponses,
+  FctExecutionTransactionsDailyServiceGetData,
+  FctExecutionTransactionsDailyServiceGetErrors,
+  FctExecutionTransactionsDailyServiceGetResponses,
+  FctExecutionTransactionsDailyServiceListData,
+  FctExecutionTransactionsDailyServiceListErrors,
+  FctExecutionTransactionsDailyServiceListResponses,
+  FctExecutionTransactionsHourlyServiceGetData,
+  FctExecutionTransactionsHourlyServiceGetErrors,
+  FctExecutionTransactionsHourlyServiceGetResponses,
+  FctExecutionTransactionsHourlyServiceListData,
+  FctExecutionTransactionsHourlyServiceListErrors,
+  FctExecutionTransactionsHourlyServiceListResponses,
   FctHeadFirstSeenByNodeServiceGetData,
   FctHeadFirstSeenByNodeServiceGetErrors,
   FctHeadFirstSeenByNodeServiceGetResponses,
@@ -951,6 +1011,30 @@ import {
   zFctEngineNewPayloadDurationChunked50MsServiceGetResponse,
   zFctEngineNewPayloadDurationChunked50MsServiceListData,
   zFctEngineNewPayloadDurationChunked50MsServiceListResponse,
+  zFctExecutionGasLimitDailyServiceGetData,
+  zFctExecutionGasLimitDailyServiceGetResponse,
+  zFctExecutionGasLimitDailyServiceListData,
+  zFctExecutionGasLimitDailyServiceListResponse,
+  zFctExecutionGasLimitHourlyServiceGetData,
+  zFctExecutionGasLimitHourlyServiceGetResponse,
+  zFctExecutionGasLimitHourlyServiceListData,
+  zFctExecutionGasLimitHourlyServiceListResponse,
+  zFctExecutionGasLimitSignallingDailyServiceGetData,
+  zFctExecutionGasLimitSignallingDailyServiceGetResponse,
+  zFctExecutionGasLimitSignallingDailyServiceListData,
+  zFctExecutionGasLimitSignallingDailyServiceListResponse,
+  zFctExecutionGasLimitSignallingHourlyServiceGetData,
+  zFctExecutionGasLimitSignallingHourlyServiceGetResponse,
+  zFctExecutionGasLimitSignallingHourlyServiceListData,
+  zFctExecutionGasLimitSignallingHourlyServiceListResponse,
+  zFctExecutionGasUsedDailyServiceGetData,
+  zFctExecutionGasUsedDailyServiceGetResponse,
+  zFctExecutionGasUsedDailyServiceListData,
+  zFctExecutionGasUsedDailyServiceListResponse,
+  zFctExecutionGasUsedHourlyServiceGetData,
+  zFctExecutionGasUsedHourlyServiceGetResponse,
+  zFctExecutionGasUsedHourlyServiceListData,
+  zFctExecutionGasUsedHourlyServiceListResponse,
   zFctExecutionStateSizeDailyServiceGetData,
   zFctExecutionStateSizeDailyServiceGetResponse,
   zFctExecutionStateSizeDailyServiceListData,
@@ -959,6 +1043,22 @@ import {
   zFctExecutionStateSizeHourlyServiceGetResponse,
   zFctExecutionStateSizeHourlyServiceListData,
   zFctExecutionStateSizeHourlyServiceListResponse,
+  zFctExecutionTpsDailyServiceGetData,
+  zFctExecutionTpsDailyServiceGetResponse,
+  zFctExecutionTpsDailyServiceListData,
+  zFctExecutionTpsDailyServiceListResponse,
+  zFctExecutionTpsHourlyServiceGetData,
+  zFctExecutionTpsHourlyServiceGetResponse,
+  zFctExecutionTpsHourlyServiceListData,
+  zFctExecutionTpsHourlyServiceListResponse,
+  zFctExecutionTransactionsDailyServiceGetData,
+  zFctExecutionTransactionsDailyServiceGetResponse,
+  zFctExecutionTransactionsDailyServiceListData,
+  zFctExecutionTransactionsDailyServiceListResponse,
+  zFctExecutionTransactionsHourlyServiceGetData,
+  zFctExecutionTransactionsHourlyServiceGetResponse,
+  zFctExecutionTransactionsHourlyServiceListData,
+  zFctExecutionTransactionsHourlyServiceListResponse,
   zFctHeadFirstSeenByNodeServiceGetData,
   zFctHeadFirstSeenByNodeServiceGetResponse,
   zFctHeadFirstSeenByNodeServiceListData,
@@ -3205,6 +3305,234 @@ export const fctEngineNewPayloadDurationChunked50MsServiceGet = <ThrowOnError ex
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctExecutionGasLimitDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctExecutionGasLimitDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctExecutionGasLimitDailyServiceListResponses,
+    FctExecutionGasLimitDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionGasLimitDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionGasLimitDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_gas_limit_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctExecutionGasLimitDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctExecutionGasLimitDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctExecutionGasLimitDailyServiceGetResponses,
+    FctExecutionGasLimitDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionGasLimitDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionGasLimitDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_gas_limit_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctExecutionGasLimitHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctExecutionGasLimitHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctExecutionGasLimitHourlyServiceListResponses,
+    FctExecutionGasLimitHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionGasLimitHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionGasLimitHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_gas_limit_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctExecutionGasLimitHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctExecutionGasLimitHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctExecutionGasLimitHourlyServiceGetResponses,
+    FctExecutionGasLimitHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionGasLimitHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionGasLimitHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_gas_limit_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctExecutionGasLimitSignallingDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctExecutionGasLimitSignallingDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctExecutionGasLimitSignallingDailyServiceListResponses,
+    FctExecutionGasLimitSignallingDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionGasLimitSignallingDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionGasLimitSignallingDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_gas_limit_signalling_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctExecutionGasLimitSignallingDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctExecutionGasLimitSignallingDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctExecutionGasLimitSignallingDailyServiceGetResponses,
+    FctExecutionGasLimitSignallingDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionGasLimitSignallingDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionGasLimitSignallingDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_gas_limit_signalling_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctExecutionGasLimitSignallingHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctExecutionGasLimitSignallingHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctExecutionGasLimitSignallingHourlyServiceListResponses,
+    FctExecutionGasLimitSignallingHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionGasLimitSignallingHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionGasLimitSignallingHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_gas_limit_signalling_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctExecutionGasLimitSignallingHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctExecutionGasLimitSignallingHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctExecutionGasLimitSignallingHourlyServiceGetResponses,
+    FctExecutionGasLimitSignallingHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionGasLimitSignallingHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionGasLimitSignallingHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_gas_limit_signalling_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctExecutionGasUsedDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctExecutionGasUsedDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctExecutionGasUsedDailyServiceListResponses,
+    FctExecutionGasUsedDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionGasUsedDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionGasUsedDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_gas_used_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctExecutionGasUsedDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctExecutionGasUsedDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctExecutionGasUsedDailyServiceGetResponses,
+    FctExecutionGasUsedDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionGasUsedDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionGasUsedDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_gas_used_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctExecutionGasUsedHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctExecutionGasUsedHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctExecutionGasUsedHourlyServiceListResponses,
+    FctExecutionGasUsedHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionGasUsedHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionGasUsedHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_gas_used_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctExecutionGasUsedHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctExecutionGasUsedHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctExecutionGasUsedHourlyServiceGetResponses,
+    FctExecutionGasUsedHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionGasUsedHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionGasUsedHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_gas_used_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctExecutionStateSizeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionStateSizeDailyServiceListData, ThrowOnError>
 ) =>
@@ -3273,6 +3601,158 @@ export const fctExecutionStateSizeHourlyServiceGet = <ThrowOnError extends boole
     requestValidator: async data => await zFctExecutionStateSizeHourlyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctExecutionStateSizeHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_execution_state_size_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctExecutionTpsDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctExecutionTpsDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctExecutionTpsDailyServiceListResponses,
+    FctExecutionTpsDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionTpsDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionTpsDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_tps_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctExecutionTpsDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctExecutionTpsDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctExecutionTpsDailyServiceGetResponses,
+    FctExecutionTpsDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionTpsDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionTpsDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_tps_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctExecutionTpsHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctExecutionTpsHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctExecutionTpsHourlyServiceListResponses,
+    FctExecutionTpsHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionTpsHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionTpsHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_tps_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctExecutionTpsHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctExecutionTpsHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctExecutionTpsHourlyServiceGetResponses,
+    FctExecutionTpsHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionTpsHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionTpsHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_tps_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctExecutionTransactionsDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctExecutionTransactionsDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctExecutionTransactionsDailyServiceListResponses,
+    FctExecutionTransactionsDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionTransactionsDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionTransactionsDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_transactions_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctExecutionTransactionsDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctExecutionTransactionsDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctExecutionTransactionsDailyServiceGetResponses,
+    FctExecutionTransactionsDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionTransactionsDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionTransactionsDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_transactions_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctExecutionTransactionsHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctExecutionTransactionsHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctExecutionTransactionsHourlyServiceListResponses,
+    FctExecutionTransactionsHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionTransactionsHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionTransactionsHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_transactions_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctExecutionTransactionsHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctExecutionTransactionsHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctExecutionTransactionsHourlyServiceGetResponses,
+    FctExecutionTransactionsHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionTransactionsHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionTransactionsHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_transactions_hourly/{hour_start_date_time}',
     ...options,
   });
 

@@ -2820,6 +2820,266 @@ export type FctEngineNewPayloadDurationChunked50Ms = {
   valid_count?: number;
 };
 
+export type FctExecutionGasLimitDaily = {
+  /**
+   * Average gas limit per block
+   */
+  avg_gas_limit?: number;
+  /**
+   * Number of blocks in this day
+   */
+  block_count?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility
+   */
+  lower_band_gas_limit?: number;
+  /**
+   * Maximum gas limit in a block
+   */
+  max_gas_limit?: number;
+  /**
+   * Minimum gas limit in a block
+   */
+  min_gas_limit?: number;
+  /**
+   * Moving average gas limit (7-day window)
+   */
+  moving_avg_gas_limit?: number;
+  /**
+   * 5th percentile gas limit
+   */
+  p05_gas_limit?: number;
+  /**
+   * 50th percentile (median) gas limit
+   */
+  p50_gas_limit?: number;
+  /**
+   * 95th percentile gas limit
+   */
+  p95_gas_limit?: number;
+  /**
+   * Standard deviation of gas limit
+   */
+  stddev_gas_limit?: number;
+  /**
+   * Total gas limit in this day
+   */
+  total_gas_limit?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_gas_limit?: number;
+};
+
+export type FctExecutionGasLimitHourly = {
+  /**
+   * Average gas limit per block
+   */
+  avg_gas_limit?: number;
+  /**
+   * Number of blocks in this hour
+   */
+  block_count?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility
+   */
+  lower_band_gas_limit?: number;
+  /**
+   * Maximum gas limit in a block
+   */
+  max_gas_limit?: number;
+  /**
+   * Minimum gas limit in a block
+   */
+  min_gas_limit?: number;
+  /**
+   * Moving average gas limit (6-hour window)
+   */
+  moving_avg_gas_limit?: number;
+  /**
+   * 5th percentile gas limit
+   */
+  p05_gas_limit?: number;
+  /**
+   * 50th percentile (median) gas limit
+   */
+  p50_gas_limit?: number;
+  /**
+   * 95th percentile gas limit
+   */
+  p95_gas_limit?: number;
+  /**
+   * Standard deviation of gas limit
+   */
+  stddev_gas_limit?: number;
+  /**
+   * Total gas limit in this hour
+   */
+  total_gas_limit?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_gas_limit?: number;
+};
+
+export type FctExecutionGasLimitSignallingDaily = {
+  day_start_date?: string;
+  gas_limit_band_counts?: {
+    [key: string]: number;
+  };
+  updated_date_time?: number;
+};
+
+export type FctExecutionGasLimitSignallingHourly = {
+  gas_limit_band_counts?: {
+    [key: string]: number;
+  };
+  hour_start_date_time?: number;
+  updated_date_time?: number;
+};
+
+export type FctExecutionGasUsedDaily = {
+  /**
+   * Average gas used per block
+   */
+  avg_gas_used?: number;
+  /**
+   * Number of blocks in this day
+   */
+  block_count?: number;
+  /**
+   * Cumulative gas used since genesis
+   */
+  cumulative_gas_used?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility
+   */
+  lower_band_gas_used?: number;
+  /**
+   * Maximum gas used in a block
+   */
+  max_gas_used?: number;
+  /**
+   * Minimum gas used in a block
+   */
+  min_gas_used?: number;
+  /**
+   * Moving average gas used (7-day window)
+   */
+  moving_avg_gas_used?: number;
+  /**
+   * 5th percentile gas used
+   */
+  p05_gas_used?: number;
+  /**
+   * 50th percentile (median) gas used
+   */
+  p50_gas_used?: number;
+  /**
+   * 95th percentile gas used
+   */
+  p95_gas_used?: number;
+  /**
+   * Standard deviation of gas used
+   */
+  stddev_gas_used?: number;
+  /**
+   * Total gas used in this day
+   */
+  total_gas_used?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_gas_used?: number;
+};
+
+export type FctExecutionGasUsedHourly = {
+  /**
+   * Average gas used per block
+   */
+  avg_gas_used?: number;
+  /**
+   * Number of blocks in this hour
+   */
+  block_count?: number;
+  /**
+   * Cumulative gas used since genesis
+   */
+  cumulative_gas_used?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility
+   */
+  lower_band_gas_used?: number;
+  /**
+   * Maximum gas used in a block
+   */
+  max_gas_used?: number;
+  /**
+   * Minimum gas used in a block
+   */
+  min_gas_used?: number;
+  /**
+   * Moving average gas used (6-hour window)
+   */
+  moving_avg_gas_used?: number;
+  /**
+   * 5th percentile gas used
+   */
+  p05_gas_used?: number;
+  /**
+   * 50th percentile (median) gas used
+   */
+  p50_gas_used?: number;
+  /**
+   * 95th percentile gas used
+   */
+  p95_gas_used?: number;
+  /**
+   * Standard deviation of gas used
+   */
+  stddev_gas_used?: number;
+  /**
+   * Total gas used in this hour
+   */
+  total_gas_used?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_gas_used?: number;
+};
+
 export type FctExecutionStateSizeDaily = {
   /**
    * Account bytes at end of day
@@ -2928,6 +3188,258 @@ export type FctExecutionStateSizeHourly = {
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
+};
+
+export type FctExecutionTpsDaily = {
+  /**
+   * Average TPS using actual block time gaps
+   */
+  avg_tps?: number;
+  /**
+   * Number of blocks in this day
+   */
+  block_count?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility
+   */
+  lower_band_tps?: number;
+  /**
+   * Maximum per-block TPS
+   */
+  max_tps?: number;
+  /**
+   * Minimum per-block TPS
+   */
+  min_tps?: number;
+  /**
+   * Moving average TPS (7-day window)
+   */
+  moving_avg_tps?: number;
+  /**
+   * 5th percentile TPS
+   */
+  p05_tps?: number;
+  /**
+   * 50th percentile (median) TPS
+   */
+  p50_tps?: number;
+  /**
+   * 95th percentile TPS
+   */
+  p95_tps?: number;
+  /**
+   * Standard deviation of TPS
+   */
+  stddev_tps?: number;
+  /**
+   * Total actual seconds covered by blocks (sum of block time gaps)
+   */
+  total_seconds?: number;
+  /**
+   * Total transactions in this day
+   */
+  total_transactions?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_tps?: number;
+};
+
+export type FctExecutionTpsHourly = {
+  /**
+   * Average TPS using actual block time gaps
+   */
+  avg_tps?: number;
+  /**
+   * Number of blocks in this hour
+   */
+  block_count?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility
+   */
+  lower_band_tps?: number;
+  /**
+   * Maximum per-block TPS
+   */
+  max_tps?: number;
+  /**
+   * Minimum per-block TPS
+   */
+  min_tps?: number;
+  /**
+   * Moving average TPS (6-hour window)
+   */
+  moving_avg_tps?: number;
+  /**
+   * 5th percentile TPS
+   */
+  p05_tps?: number;
+  /**
+   * 50th percentile (median) TPS
+   */
+  p50_tps?: number;
+  /**
+   * 95th percentile TPS
+   */
+  p95_tps?: number;
+  /**
+   * Standard deviation of TPS
+   */
+  stddev_tps?: number;
+  /**
+   * Total actual seconds covered by blocks (sum of block time gaps)
+   */
+  total_seconds?: number;
+  /**
+   * Total transactions in this hour
+   */
+  total_transactions?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_tps?: number;
+};
+
+export type FctExecutionTransactionsDaily = {
+  /**
+   * Average transactions per block
+   */
+  avg_txn_per_block?: number;
+  /**
+   * Number of blocks in this day
+   */
+  block_count?: number;
+  /**
+   * Cumulative transaction count since genesis
+   */
+  cumulative_transactions?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Lower Bollinger band (avg - 2*stddev)
+   */
+  lower_band_txn_per_block?: number;
+  /**
+   * Maximum transactions in a block
+   */
+  max_txn_per_block?: number;
+  /**
+   * Minimum transactions in a block
+   */
+  min_txn_per_block?: number;
+  /**
+   * Moving average transactions per block (7-day window)
+   */
+  moving_avg_txn_per_block?: number;
+  /**
+   * 5th percentile transactions per block
+   */
+  p05_txn_per_block?: number;
+  /**
+   * 50th percentile (median) transactions per block
+   */
+  p50_txn_per_block?: number;
+  /**
+   * 95th percentile transactions per block
+   */
+  p95_txn_per_block?: number;
+  /**
+   * Standard deviation of transactions per block
+   */
+  stddev_txn_per_block?: number;
+  /**
+   * Total transactions in this day
+   */
+  total_transactions?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_txn_per_block?: number;
+};
+
+export type FctExecutionTransactionsHourly = {
+  /**
+   * Average transactions per block
+   */
+  avg_txn_per_block?: number;
+  /**
+   * Number of blocks in this hour
+   */
+  block_count?: number;
+  /**
+   * Cumulative transaction count since genesis
+   */
+  cumulative_transactions?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Lower Bollinger band (avg - 2*stddev)
+   */
+  lower_band_txn_per_block?: number;
+  /**
+   * Maximum transactions in a block
+   */
+  max_txn_per_block?: number;
+  /**
+   * Minimum transactions in a block
+   */
+  min_txn_per_block?: number;
+  /**
+   * Moving average transactions per block (6-hour window)
+   */
+  moving_avg_txn_per_block?: number;
+  /**
+   * 5th percentile transactions per block
+   */
+  p05_txn_per_block?: number;
+  /**
+   * 50th percentile (median) transactions per block
+   */
+  p50_txn_per_block?: number;
+  /**
+   * 95th percentile transactions per block
+   */
+  p95_txn_per_block?: number;
+  /**
+   * Standard deviation of transactions per block
+   */
+  stddev_txn_per_block?: number;
+  /**
+   * Total transactions in this hour
+   */
+  total_transactions?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_txn_per_block?: number;
 };
 
 export type FctHeadFirstSeenByNode = {
@@ -3947,6 +4459,48 @@ export type GetFctEngineNewPayloadDurationChunked50MsResponse = {
 };
 
 /**
+ * Response for getting a single fct_execution_gas_limit_daily record
+ */
+export type GetFctExecutionGasLimitDailyResponse = {
+  item?: FctExecutionGasLimitDaily;
+};
+
+/**
+ * Response for getting a single fct_execution_gas_limit_hourly record
+ */
+export type GetFctExecutionGasLimitHourlyResponse = {
+  item?: FctExecutionGasLimitHourly;
+};
+
+/**
+ * Response for getting a single fct_execution_gas_limit_signalling_daily record
+ */
+export type GetFctExecutionGasLimitSignallingDailyResponse = {
+  item?: FctExecutionGasLimitSignallingDaily;
+};
+
+/**
+ * Response for getting a single fct_execution_gas_limit_signalling_hourly record
+ */
+export type GetFctExecutionGasLimitSignallingHourlyResponse = {
+  item?: FctExecutionGasLimitSignallingHourly;
+};
+
+/**
+ * Response for getting a single fct_execution_gas_used_daily record
+ */
+export type GetFctExecutionGasUsedDailyResponse = {
+  item?: FctExecutionGasUsedDaily;
+};
+
+/**
+ * Response for getting a single fct_execution_gas_used_hourly record
+ */
+export type GetFctExecutionGasUsedHourlyResponse = {
+  item?: FctExecutionGasUsedHourly;
+};
+
+/**
  * Response for getting a single fct_execution_state_size_daily record
  */
 export type GetFctExecutionStateSizeDailyResponse = {
@@ -3958,6 +4512,34 @@ export type GetFctExecutionStateSizeDailyResponse = {
  */
 export type GetFctExecutionStateSizeHourlyResponse = {
   item?: FctExecutionStateSizeHourly;
+};
+
+/**
+ * Response for getting a single fct_execution_tps_daily record
+ */
+export type GetFctExecutionTpsDailyResponse = {
+  item?: FctExecutionTpsDaily;
+};
+
+/**
+ * Response for getting a single fct_execution_tps_hourly record
+ */
+export type GetFctExecutionTpsHourlyResponse = {
+  item?: FctExecutionTpsHourly;
+};
+
+/**
+ * Response for getting a single fct_execution_transactions_daily record
+ */
+export type GetFctExecutionTransactionsDailyResponse = {
+  item?: FctExecutionTransactionsDaily;
+};
+
+/**
+ * Response for getting a single fct_execution_transactions_hourly record
+ */
+export type GetFctExecutionTransactionsHourlyResponse = {
+  item?: FctExecutionTransactionsHourly;
 };
 
 /**
@@ -7290,6 +7872,90 @@ export type ListFctEngineNewPayloadDurationChunked50MsResponse = {
 };
 
 /**
+ * Response for listing fct_execution_gas_limit_daily records
+ */
+export type ListFctExecutionGasLimitDailyResponse = {
+  /**
+   * The list of fct_execution_gas_limit_daily.
+   */
+  fct_execution_gas_limit_daily?: Array<FctExecutionGasLimitDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_execution_gas_limit_hourly records
+ */
+export type ListFctExecutionGasLimitHourlyResponse = {
+  /**
+   * The list of fct_execution_gas_limit_hourly.
+   */
+  fct_execution_gas_limit_hourly?: Array<FctExecutionGasLimitHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_execution_gas_limit_signalling_daily records
+ */
+export type ListFctExecutionGasLimitSignallingDailyResponse = {
+  /**
+   * The list of fct_execution_gas_limit_signalling_daily.
+   */
+  fct_execution_gas_limit_signalling_daily?: Array<FctExecutionGasLimitSignallingDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_execution_gas_limit_signalling_hourly records
+ */
+export type ListFctExecutionGasLimitSignallingHourlyResponse = {
+  /**
+   * The list of fct_execution_gas_limit_signalling_hourly.
+   */
+  fct_execution_gas_limit_signalling_hourly?: Array<FctExecutionGasLimitSignallingHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_execution_gas_used_daily records
+ */
+export type ListFctExecutionGasUsedDailyResponse = {
+  /**
+   * The list of fct_execution_gas_used_daily.
+   */
+  fct_execution_gas_used_daily?: Array<FctExecutionGasUsedDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_execution_gas_used_hourly records
+ */
+export type ListFctExecutionGasUsedHourlyResponse = {
+  /**
+   * The list of fct_execution_gas_used_hourly.
+   */
+  fct_execution_gas_used_hourly?: Array<FctExecutionGasUsedHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_execution_state_size_daily records
  */
 export type ListFctExecutionStateSizeDailyResponse = {
@@ -7311,6 +7977,62 @@ export type ListFctExecutionStateSizeHourlyResponse = {
    * The list of fct_execution_state_size_hourly.
    */
   fct_execution_state_size_hourly?: Array<FctExecutionStateSizeHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_execution_tps_daily records
+ */
+export type ListFctExecutionTpsDailyResponse = {
+  /**
+   * The list of fct_execution_tps_daily.
+   */
+  fct_execution_tps_daily?: Array<FctExecutionTpsDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_execution_tps_hourly records
+ */
+export type ListFctExecutionTpsHourlyResponse = {
+  /**
+   * The list of fct_execution_tps_hourly.
+   */
+  fct_execution_tps_hourly?: Array<FctExecutionTpsHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_execution_transactions_daily records
+ */
+export type ListFctExecutionTransactionsDailyResponse = {
+  /**
+   * The list of fct_execution_transactions_daily.
+   */
+  fct_execution_transactions_daily?: Array<FctExecutionTransactionsDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_execution_transactions_hourly records
+ */
+export type ListFctExecutionTransactionsHourlyResponse = {
+  /**
+   * The list of fct_execution_transactions_hourly.
+   */
+  fct_execution_transactions_hourly?: Array<FctExecutionTransactionsHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -36901,6 +37623,3020 @@ export type FctEngineNewPayloadDurationChunked50MsServiceGetResponses = {
 export type FctEngineNewPayloadDurationChunked50MsServiceGetResponse =
   FctEngineNewPayloadDurationChunked50MsServiceGetResponses[keyof FctEngineNewPayloadDurationChunked50MsServiceGetResponses];
 
+export type FctExecutionGasLimitDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks in this day (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks in this day (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks in this day (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks in this day (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks in this day (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks in this day (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks in this day (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks in this day (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks in this day (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks in this day (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total gas limit in this day (filter: eq)
+     */
+    total_gas_limit_eq?: number;
+    /**
+     * Total gas limit in this day (filter: ne)
+     */
+    total_gas_limit_ne?: number;
+    /**
+     * Total gas limit in this day (filter: lt)
+     */
+    total_gas_limit_lt?: number;
+    /**
+     * Total gas limit in this day (filter: lte)
+     */
+    total_gas_limit_lte?: number;
+    /**
+     * Total gas limit in this day (filter: gt)
+     */
+    total_gas_limit_gt?: number;
+    /**
+     * Total gas limit in this day (filter: gte)
+     */
+    total_gas_limit_gte?: number;
+    /**
+     * Total gas limit in this day (filter: between_min)
+     */
+    total_gas_limit_between_min?: number;
+    /**
+     * Total gas limit in this day (filter: between_max_value)
+     */
+    total_gas_limit_between_max_value?: number;
+    /**
+     * Total gas limit in this day (filter: in_values) (comma-separated list)
+     */
+    total_gas_limit_in_values?: string;
+    /**
+     * Total gas limit in this day (filter: not_in_values) (comma-separated list)
+     */
+    total_gas_limit_not_in_values?: string;
+    /**
+     * Average gas limit per block (filter: eq)
+     */
+    avg_gas_limit_eq?: number;
+    /**
+     * Average gas limit per block (filter: ne)
+     */
+    avg_gas_limit_ne?: number;
+    /**
+     * Average gas limit per block (filter: lt)
+     */
+    avg_gas_limit_lt?: number;
+    /**
+     * Average gas limit per block (filter: lte)
+     */
+    avg_gas_limit_lte?: number;
+    /**
+     * Average gas limit per block (filter: gt)
+     */
+    avg_gas_limit_gt?: number;
+    /**
+     * Average gas limit per block (filter: gte)
+     */
+    avg_gas_limit_gte?: number;
+    /**
+     * Average gas limit per block (filter: between_min)
+     */
+    avg_gas_limit_between_min?: number;
+    /**
+     * Average gas limit per block (filter: between_max_value)
+     */
+    avg_gas_limit_between_max_value?: number;
+    /**
+     * Average gas limit per block (filter: in_values) (comma-separated list)
+     */
+    avg_gas_limit_in_values?: string;
+    /**
+     * Average gas limit per block (filter: not_in_values) (comma-separated list)
+     */
+    avg_gas_limit_not_in_values?: string;
+    /**
+     * Minimum gas limit in a block (filter: eq)
+     */
+    min_gas_limit_eq?: number;
+    /**
+     * Minimum gas limit in a block (filter: ne)
+     */
+    min_gas_limit_ne?: number;
+    /**
+     * Minimum gas limit in a block (filter: lt)
+     */
+    min_gas_limit_lt?: number;
+    /**
+     * Minimum gas limit in a block (filter: lte)
+     */
+    min_gas_limit_lte?: number;
+    /**
+     * Minimum gas limit in a block (filter: gt)
+     */
+    min_gas_limit_gt?: number;
+    /**
+     * Minimum gas limit in a block (filter: gte)
+     */
+    min_gas_limit_gte?: number;
+    /**
+     * Minimum gas limit in a block (filter: between_min)
+     */
+    min_gas_limit_between_min?: number;
+    /**
+     * Minimum gas limit in a block (filter: between_max_value)
+     */
+    min_gas_limit_between_max_value?: number;
+    /**
+     * Minimum gas limit in a block (filter: in_values) (comma-separated list)
+     */
+    min_gas_limit_in_values?: string;
+    /**
+     * Minimum gas limit in a block (filter: not_in_values) (comma-separated list)
+     */
+    min_gas_limit_not_in_values?: string;
+    /**
+     * Maximum gas limit in a block (filter: eq)
+     */
+    max_gas_limit_eq?: number;
+    /**
+     * Maximum gas limit in a block (filter: ne)
+     */
+    max_gas_limit_ne?: number;
+    /**
+     * Maximum gas limit in a block (filter: lt)
+     */
+    max_gas_limit_lt?: number;
+    /**
+     * Maximum gas limit in a block (filter: lte)
+     */
+    max_gas_limit_lte?: number;
+    /**
+     * Maximum gas limit in a block (filter: gt)
+     */
+    max_gas_limit_gt?: number;
+    /**
+     * Maximum gas limit in a block (filter: gte)
+     */
+    max_gas_limit_gte?: number;
+    /**
+     * Maximum gas limit in a block (filter: between_min)
+     */
+    max_gas_limit_between_min?: number;
+    /**
+     * Maximum gas limit in a block (filter: between_max_value)
+     */
+    max_gas_limit_between_max_value?: number;
+    /**
+     * Maximum gas limit in a block (filter: in_values) (comma-separated list)
+     */
+    max_gas_limit_in_values?: string;
+    /**
+     * Maximum gas limit in a block (filter: not_in_values) (comma-separated list)
+     */
+    max_gas_limit_not_in_values?: string;
+    /**
+     * 5th percentile gas limit (filter: eq)
+     */
+    p05_gas_limit_eq?: number;
+    /**
+     * 5th percentile gas limit (filter: ne)
+     */
+    p05_gas_limit_ne?: number;
+    /**
+     * 5th percentile gas limit (filter: lt)
+     */
+    p05_gas_limit_lt?: number;
+    /**
+     * 5th percentile gas limit (filter: lte)
+     */
+    p05_gas_limit_lte?: number;
+    /**
+     * 5th percentile gas limit (filter: gt)
+     */
+    p05_gas_limit_gt?: number;
+    /**
+     * 5th percentile gas limit (filter: gte)
+     */
+    p05_gas_limit_gte?: number;
+    /**
+     * 5th percentile gas limit (filter: between_min)
+     */
+    p05_gas_limit_between_min?: number;
+    /**
+     * 5th percentile gas limit (filter: between_max_value)
+     */
+    p05_gas_limit_between_max_value?: number;
+    /**
+     * 5th percentile gas limit (filter: in_values) (comma-separated list)
+     */
+    p05_gas_limit_in_values?: string;
+    /**
+     * 5th percentile gas limit (filter: not_in_values) (comma-separated list)
+     */
+    p05_gas_limit_not_in_values?: string;
+    /**
+     * 50th percentile (median) gas limit (filter: eq)
+     */
+    p50_gas_limit_eq?: number;
+    /**
+     * 50th percentile (median) gas limit (filter: ne)
+     */
+    p50_gas_limit_ne?: number;
+    /**
+     * 50th percentile (median) gas limit (filter: lt)
+     */
+    p50_gas_limit_lt?: number;
+    /**
+     * 50th percentile (median) gas limit (filter: lte)
+     */
+    p50_gas_limit_lte?: number;
+    /**
+     * 50th percentile (median) gas limit (filter: gt)
+     */
+    p50_gas_limit_gt?: number;
+    /**
+     * 50th percentile (median) gas limit (filter: gte)
+     */
+    p50_gas_limit_gte?: number;
+    /**
+     * 50th percentile (median) gas limit (filter: between_min)
+     */
+    p50_gas_limit_between_min?: number;
+    /**
+     * 50th percentile (median) gas limit (filter: between_max_value)
+     */
+    p50_gas_limit_between_max_value?: number;
+    /**
+     * 50th percentile (median) gas limit (filter: in_values) (comma-separated list)
+     */
+    p50_gas_limit_in_values?: string;
+    /**
+     * 50th percentile (median) gas limit (filter: not_in_values) (comma-separated list)
+     */
+    p50_gas_limit_not_in_values?: string;
+    /**
+     * 95th percentile gas limit (filter: eq)
+     */
+    p95_gas_limit_eq?: number;
+    /**
+     * 95th percentile gas limit (filter: ne)
+     */
+    p95_gas_limit_ne?: number;
+    /**
+     * 95th percentile gas limit (filter: lt)
+     */
+    p95_gas_limit_lt?: number;
+    /**
+     * 95th percentile gas limit (filter: lte)
+     */
+    p95_gas_limit_lte?: number;
+    /**
+     * 95th percentile gas limit (filter: gt)
+     */
+    p95_gas_limit_gt?: number;
+    /**
+     * 95th percentile gas limit (filter: gte)
+     */
+    p95_gas_limit_gte?: number;
+    /**
+     * 95th percentile gas limit (filter: between_min)
+     */
+    p95_gas_limit_between_min?: number;
+    /**
+     * 95th percentile gas limit (filter: between_max_value)
+     */
+    p95_gas_limit_between_max_value?: number;
+    /**
+     * 95th percentile gas limit (filter: in_values) (comma-separated list)
+     */
+    p95_gas_limit_in_values?: string;
+    /**
+     * 95th percentile gas limit (filter: not_in_values) (comma-separated list)
+     */
+    p95_gas_limit_not_in_values?: string;
+    /**
+     * Standard deviation of gas limit (filter: eq)
+     */
+    stddev_gas_limit_eq?: number;
+    /**
+     * Standard deviation of gas limit (filter: ne)
+     */
+    stddev_gas_limit_ne?: number;
+    /**
+     * Standard deviation of gas limit (filter: lt)
+     */
+    stddev_gas_limit_lt?: number;
+    /**
+     * Standard deviation of gas limit (filter: lte)
+     */
+    stddev_gas_limit_lte?: number;
+    /**
+     * Standard deviation of gas limit (filter: gt)
+     */
+    stddev_gas_limit_gt?: number;
+    /**
+     * Standard deviation of gas limit (filter: gte)
+     */
+    stddev_gas_limit_gte?: number;
+    /**
+     * Standard deviation of gas limit (filter: between_min)
+     */
+    stddev_gas_limit_between_min?: number;
+    /**
+     * Standard deviation of gas limit (filter: between_max_value)
+     */
+    stddev_gas_limit_between_max_value?: number;
+    /**
+     * Standard deviation of gas limit (filter: in_values) (comma-separated list)
+     */
+    stddev_gas_limit_in_values?: string;
+    /**
+     * Standard deviation of gas limit (filter: not_in_values) (comma-separated list)
+     */
+    stddev_gas_limit_not_in_values?: string;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: eq)
+     */
+    upper_band_gas_limit_eq?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: ne)
+     */
+    upper_band_gas_limit_ne?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: lt)
+     */
+    upper_band_gas_limit_lt?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: lte)
+     */
+    upper_band_gas_limit_lte?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: gt)
+     */
+    upper_band_gas_limit_gt?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: gte)
+     */
+    upper_band_gas_limit_gte?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: between_min)
+     */
+    upper_band_gas_limit_between_min?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: between_max_value)
+     */
+    upper_band_gas_limit_between_max_value?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: in_values) (comma-separated list)
+     */
+    upper_band_gas_limit_in_values?: string;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: not_in_values) (comma-separated list)
+     */
+    upper_band_gas_limit_not_in_values?: string;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: eq)
+     */
+    lower_band_gas_limit_eq?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: ne)
+     */
+    lower_band_gas_limit_ne?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: lt)
+     */
+    lower_band_gas_limit_lt?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: lte)
+     */
+    lower_band_gas_limit_lte?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: gt)
+     */
+    lower_band_gas_limit_gt?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: gte)
+     */
+    lower_band_gas_limit_gte?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: between_min)
+     */
+    lower_band_gas_limit_between_min?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: between_max_value)
+     */
+    lower_band_gas_limit_between_max_value?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: in_values) (comma-separated list)
+     */
+    lower_band_gas_limit_in_values?: string;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: not_in_values) (comma-separated list)
+     */
+    lower_band_gas_limit_not_in_values?: string;
+    /**
+     * Moving average gas limit (7-day window) (filter: eq)
+     */
+    moving_avg_gas_limit_eq?: number;
+    /**
+     * Moving average gas limit (7-day window) (filter: ne)
+     */
+    moving_avg_gas_limit_ne?: number;
+    /**
+     * Moving average gas limit (7-day window) (filter: lt)
+     */
+    moving_avg_gas_limit_lt?: number;
+    /**
+     * Moving average gas limit (7-day window) (filter: lte)
+     */
+    moving_avg_gas_limit_lte?: number;
+    /**
+     * Moving average gas limit (7-day window) (filter: gt)
+     */
+    moving_avg_gas_limit_gt?: number;
+    /**
+     * Moving average gas limit (7-day window) (filter: gte)
+     */
+    moving_avg_gas_limit_gte?: number;
+    /**
+     * Moving average gas limit (7-day window) (filter: between_min)
+     */
+    moving_avg_gas_limit_between_min?: number;
+    /**
+     * Moving average gas limit (7-day window) (filter: between_max_value)
+     */
+    moving_avg_gas_limit_between_max_value?: number;
+    /**
+     * Moving average gas limit (7-day window) (filter: in_values) (comma-separated list)
+     */
+    moving_avg_gas_limit_in_values?: string;
+    /**
+     * Moving average gas limit (7-day window) (filter: not_in_values) (comma-separated list)
+     */
+    moving_avg_gas_limit_not_in_values?: string;
+    /**
+     * The maximum number of fct_execution_gas_limit_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctExecutionGasLimitDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_execution_gas_limit_daily';
+};
+
+export type FctExecutionGasLimitDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionGasLimitDailyServiceListError =
+  FctExecutionGasLimitDailyServiceListErrors[keyof FctExecutionGasLimitDailyServiceListErrors];
+
+export type FctExecutionGasLimitDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctExecutionGasLimitDailyResponse;
+};
+
+export type FctExecutionGasLimitDailyServiceListResponse =
+  FctExecutionGasLimitDailyServiceListResponses[keyof FctExecutionGasLimitDailyServiceListResponses];
+
+export type FctExecutionGasLimitDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_execution_gas_limit_daily/{day_start_date}';
+};
+
+export type FctExecutionGasLimitDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionGasLimitDailyServiceGetError =
+  FctExecutionGasLimitDailyServiceGetErrors[keyof FctExecutionGasLimitDailyServiceGetErrors];
+
+export type FctExecutionGasLimitDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctExecutionGasLimitDailyResponse;
+};
+
+export type FctExecutionGasLimitDailyServiceGetResponse =
+  FctExecutionGasLimitDailyServiceGetResponses[keyof FctExecutionGasLimitDailyServiceGetResponses];
+
+export type FctExecutionGasLimitHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks in this hour (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks in this hour (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks in this hour (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks in this hour (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks in this hour (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks in this hour (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks in this hour (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks in this hour (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks in this hour (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks in this hour (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total gas limit in this hour (filter: eq)
+     */
+    total_gas_limit_eq?: number;
+    /**
+     * Total gas limit in this hour (filter: ne)
+     */
+    total_gas_limit_ne?: number;
+    /**
+     * Total gas limit in this hour (filter: lt)
+     */
+    total_gas_limit_lt?: number;
+    /**
+     * Total gas limit in this hour (filter: lte)
+     */
+    total_gas_limit_lte?: number;
+    /**
+     * Total gas limit in this hour (filter: gt)
+     */
+    total_gas_limit_gt?: number;
+    /**
+     * Total gas limit in this hour (filter: gte)
+     */
+    total_gas_limit_gte?: number;
+    /**
+     * Total gas limit in this hour (filter: between_min)
+     */
+    total_gas_limit_between_min?: number;
+    /**
+     * Total gas limit in this hour (filter: between_max_value)
+     */
+    total_gas_limit_between_max_value?: number;
+    /**
+     * Total gas limit in this hour (filter: in_values) (comma-separated list)
+     */
+    total_gas_limit_in_values?: string;
+    /**
+     * Total gas limit in this hour (filter: not_in_values) (comma-separated list)
+     */
+    total_gas_limit_not_in_values?: string;
+    /**
+     * Average gas limit per block (filter: eq)
+     */
+    avg_gas_limit_eq?: number;
+    /**
+     * Average gas limit per block (filter: ne)
+     */
+    avg_gas_limit_ne?: number;
+    /**
+     * Average gas limit per block (filter: lt)
+     */
+    avg_gas_limit_lt?: number;
+    /**
+     * Average gas limit per block (filter: lte)
+     */
+    avg_gas_limit_lte?: number;
+    /**
+     * Average gas limit per block (filter: gt)
+     */
+    avg_gas_limit_gt?: number;
+    /**
+     * Average gas limit per block (filter: gte)
+     */
+    avg_gas_limit_gte?: number;
+    /**
+     * Average gas limit per block (filter: between_min)
+     */
+    avg_gas_limit_between_min?: number;
+    /**
+     * Average gas limit per block (filter: between_max_value)
+     */
+    avg_gas_limit_between_max_value?: number;
+    /**
+     * Average gas limit per block (filter: in_values) (comma-separated list)
+     */
+    avg_gas_limit_in_values?: string;
+    /**
+     * Average gas limit per block (filter: not_in_values) (comma-separated list)
+     */
+    avg_gas_limit_not_in_values?: string;
+    /**
+     * Minimum gas limit in a block (filter: eq)
+     */
+    min_gas_limit_eq?: number;
+    /**
+     * Minimum gas limit in a block (filter: ne)
+     */
+    min_gas_limit_ne?: number;
+    /**
+     * Minimum gas limit in a block (filter: lt)
+     */
+    min_gas_limit_lt?: number;
+    /**
+     * Minimum gas limit in a block (filter: lte)
+     */
+    min_gas_limit_lte?: number;
+    /**
+     * Minimum gas limit in a block (filter: gt)
+     */
+    min_gas_limit_gt?: number;
+    /**
+     * Minimum gas limit in a block (filter: gte)
+     */
+    min_gas_limit_gte?: number;
+    /**
+     * Minimum gas limit in a block (filter: between_min)
+     */
+    min_gas_limit_between_min?: number;
+    /**
+     * Minimum gas limit in a block (filter: between_max_value)
+     */
+    min_gas_limit_between_max_value?: number;
+    /**
+     * Minimum gas limit in a block (filter: in_values) (comma-separated list)
+     */
+    min_gas_limit_in_values?: string;
+    /**
+     * Minimum gas limit in a block (filter: not_in_values) (comma-separated list)
+     */
+    min_gas_limit_not_in_values?: string;
+    /**
+     * Maximum gas limit in a block (filter: eq)
+     */
+    max_gas_limit_eq?: number;
+    /**
+     * Maximum gas limit in a block (filter: ne)
+     */
+    max_gas_limit_ne?: number;
+    /**
+     * Maximum gas limit in a block (filter: lt)
+     */
+    max_gas_limit_lt?: number;
+    /**
+     * Maximum gas limit in a block (filter: lte)
+     */
+    max_gas_limit_lte?: number;
+    /**
+     * Maximum gas limit in a block (filter: gt)
+     */
+    max_gas_limit_gt?: number;
+    /**
+     * Maximum gas limit in a block (filter: gte)
+     */
+    max_gas_limit_gte?: number;
+    /**
+     * Maximum gas limit in a block (filter: between_min)
+     */
+    max_gas_limit_between_min?: number;
+    /**
+     * Maximum gas limit in a block (filter: between_max_value)
+     */
+    max_gas_limit_between_max_value?: number;
+    /**
+     * Maximum gas limit in a block (filter: in_values) (comma-separated list)
+     */
+    max_gas_limit_in_values?: string;
+    /**
+     * Maximum gas limit in a block (filter: not_in_values) (comma-separated list)
+     */
+    max_gas_limit_not_in_values?: string;
+    /**
+     * 5th percentile gas limit (filter: eq)
+     */
+    p05_gas_limit_eq?: number;
+    /**
+     * 5th percentile gas limit (filter: ne)
+     */
+    p05_gas_limit_ne?: number;
+    /**
+     * 5th percentile gas limit (filter: lt)
+     */
+    p05_gas_limit_lt?: number;
+    /**
+     * 5th percentile gas limit (filter: lte)
+     */
+    p05_gas_limit_lte?: number;
+    /**
+     * 5th percentile gas limit (filter: gt)
+     */
+    p05_gas_limit_gt?: number;
+    /**
+     * 5th percentile gas limit (filter: gte)
+     */
+    p05_gas_limit_gte?: number;
+    /**
+     * 5th percentile gas limit (filter: between_min)
+     */
+    p05_gas_limit_between_min?: number;
+    /**
+     * 5th percentile gas limit (filter: between_max_value)
+     */
+    p05_gas_limit_between_max_value?: number;
+    /**
+     * 5th percentile gas limit (filter: in_values) (comma-separated list)
+     */
+    p05_gas_limit_in_values?: string;
+    /**
+     * 5th percentile gas limit (filter: not_in_values) (comma-separated list)
+     */
+    p05_gas_limit_not_in_values?: string;
+    /**
+     * 50th percentile (median) gas limit (filter: eq)
+     */
+    p50_gas_limit_eq?: number;
+    /**
+     * 50th percentile (median) gas limit (filter: ne)
+     */
+    p50_gas_limit_ne?: number;
+    /**
+     * 50th percentile (median) gas limit (filter: lt)
+     */
+    p50_gas_limit_lt?: number;
+    /**
+     * 50th percentile (median) gas limit (filter: lte)
+     */
+    p50_gas_limit_lte?: number;
+    /**
+     * 50th percentile (median) gas limit (filter: gt)
+     */
+    p50_gas_limit_gt?: number;
+    /**
+     * 50th percentile (median) gas limit (filter: gte)
+     */
+    p50_gas_limit_gte?: number;
+    /**
+     * 50th percentile (median) gas limit (filter: between_min)
+     */
+    p50_gas_limit_between_min?: number;
+    /**
+     * 50th percentile (median) gas limit (filter: between_max_value)
+     */
+    p50_gas_limit_between_max_value?: number;
+    /**
+     * 50th percentile (median) gas limit (filter: in_values) (comma-separated list)
+     */
+    p50_gas_limit_in_values?: string;
+    /**
+     * 50th percentile (median) gas limit (filter: not_in_values) (comma-separated list)
+     */
+    p50_gas_limit_not_in_values?: string;
+    /**
+     * 95th percentile gas limit (filter: eq)
+     */
+    p95_gas_limit_eq?: number;
+    /**
+     * 95th percentile gas limit (filter: ne)
+     */
+    p95_gas_limit_ne?: number;
+    /**
+     * 95th percentile gas limit (filter: lt)
+     */
+    p95_gas_limit_lt?: number;
+    /**
+     * 95th percentile gas limit (filter: lte)
+     */
+    p95_gas_limit_lte?: number;
+    /**
+     * 95th percentile gas limit (filter: gt)
+     */
+    p95_gas_limit_gt?: number;
+    /**
+     * 95th percentile gas limit (filter: gte)
+     */
+    p95_gas_limit_gte?: number;
+    /**
+     * 95th percentile gas limit (filter: between_min)
+     */
+    p95_gas_limit_between_min?: number;
+    /**
+     * 95th percentile gas limit (filter: between_max_value)
+     */
+    p95_gas_limit_between_max_value?: number;
+    /**
+     * 95th percentile gas limit (filter: in_values) (comma-separated list)
+     */
+    p95_gas_limit_in_values?: string;
+    /**
+     * 95th percentile gas limit (filter: not_in_values) (comma-separated list)
+     */
+    p95_gas_limit_not_in_values?: string;
+    /**
+     * Standard deviation of gas limit (filter: eq)
+     */
+    stddev_gas_limit_eq?: number;
+    /**
+     * Standard deviation of gas limit (filter: ne)
+     */
+    stddev_gas_limit_ne?: number;
+    /**
+     * Standard deviation of gas limit (filter: lt)
+     */
+    stddev_gas_limit_lt?: number;
+    /**
+     * Standard deviation of gas limit (filter: lte)
+     */
+    stddev_gas_limit_lte?: number;
+    /**
+     * Standard deviation of gas limit (filter: gt)
+     */
+    stddev_gas_limit_gt?: number;
+    /**
+     * Standard deviation of gas limit (filter: gte)
+     */
+    stddev_gas_limit_gte?: number;
+    /**
+     * Standard deviation of gas limit (filter: between_min)
+     */
+    stddev_gas_limit_between_min?: number;
+    /**
+     * Standard deviation of gas limit (filter: between_max_value)
+     */
+    stddev_gas_limit_between_max_value?: number;
+    /**
+     * Standard deviation of gas limit (filter: in_values) (comma-separated list)
+     */
+    stddev_gas_limit_in_values?: string;
+    /**
+     * Standard deviation of gas limit (filter: not_in_values) (comma-separated list)
+     */
+    stddev_gas_limit_not_in_values?: string;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: eq)
+     */
+    upper_band_gas_limit_eq?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: ne)
+     */
+    upper_band_gas_limit_ne?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: lt)
+     */
+    upper_band_gas_limit_lt?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: lte)
+     */
+    upper_band_gas_limit_lte?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: gt)
+     */
+    upper_band_gas_limit_gt?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: gte)
+     */
+    upper_band_gas_limit_gte?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: between_min)
+     */
+    upper_band_gas_limit_between_min?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: between_max_value)
+     */
+    upper_band_gas_limit_between_max_value?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: in_values) (comma-separated list)
+     */
+    upper_band_gas_limit_in_values?: string;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: not_in_values) (comma-separated list)
+     */
+    upper_band_gas_limit_not_in_values?: string;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: eq)
+     */
+    lower_band_gas_limit_eq?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: ne)
+     */
+    lower_band_gas_limit_ne?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: lt)
+     */
+    lower_band_gas_limit_lt?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: lte)
+     */
+    lower_band_gas_limit_lte?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: gt)
+     */
+    lower_band_gas_limit_gt?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: gte)
+     */
+    lower_band_gas_limit_gte?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: between_min)
+     */
+    lower_band_gas_limit_between_min?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: between_max_value)
+     */
+    lower_band_gas_limit_between_max_value?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: in_values) (comma-separated list)
+     */
+    lower_band_gas_limit_in_values?: string;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: not_in_values) (comma-separated list)
+     */
+    lower_band_gas_limit_not_in_values?: string;
+    /**
+     * Moving average gas limit (6-hour window) (filter: eq)
+     */
+    moving_avg_gas_limit_eq?: number;
+    /**
+     * Moving average gas limit (6-hour window) (filter: ne)
+     */
+    moving_avg_gas_limit_ne?: number;
+    /**
+     * Moving average gas limit (6-hour window) (filter: lt)
+     */
+    moving_avg_gas_limit_lt?: number;
+    /**
+     * Moving average gas limit (6-hour window) (filter: lte)
+     */
+    moving_avg_gas_limit_lte?: number;
+    /**
+     * Moving average gas limit (6-hour window) (filter: gt)
+     */
+    moving_avg_gas_limit_gt?: number;
+    /**
+     * Moving average gas limit (6-hour window) (filter: gte)
+     */
+    moving_avg_gas_limit_gte?: number;
+    /**
+     * Moving average gas limit (6-hour window) (filter: between_min)
+     */
+    moving_avg_gas_limit_between_min?: number;
+    /**
+     * Moving average gas limit (6-hour window) (filter: between_max_value)
+     */
+    moving_avg_gas_limit_between_max_value?: number;
+    /**
+     * Moving average gas limit (6-hour window) (filter: in_values) (comma-separated list)
+     */
+    moving_avg_gas_limit_in_values?: string;
+    /**
+     * Moving average gas limit (6-hour window) (filter: not_in_values) (comma-separated list)
+     */
+    moving_avg_gas_limit_not_in_values?: string;
+    /**
+     * The maximum number of fct_execution_gas_limit_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctExecutionGasLimitHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_execution_gas_limit_hourly';
+};
+
+export type FctExecutionGasLimitHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionGasLimitHourlyServiceListError =
+  FctExecutionGasLimitHourlyServiceListErrors[keyof FctExecutionGasLimitHourlyServiceListErrors];
+
+export type FctExecutionGasLimitHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctExecutionGasLimitHourlyResponse;
+};
+
+export type FctExecutionGasLimitHourlyServiceListResponse =
+  FctExecutionGasLimitHourlyServiceListResponses[keyof FctExecutionGasLimitHourlyServiceListResponses];
+
+export type FctExecutionGasLimitHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_execution_gas_limit_hourly/{hour_start_date_time}';
+};
+
+export type FctExecutionGasLimitHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionGasLimitHourlyServiceGetError =
+  FctExecutionGasLimitHourlyServiceGetErrors[keyof FctExecutionGasLimitHourlyServiceGetErrors];
+
+export type FctExecutionGasLimitHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctExecutionGasLimitHourlyResponse;
+};
+
+export type FctExecutionGasLimitHourlyServiceGetResponse =
+  FctExecutionGasLimitHourlyServiceGetResponses[keyof FctExecutionGasLimitHourlyServiceGetResponses];
+
+export type FctExecutionGasLimitSignallingDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * required) (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * required) (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * required) (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * required) (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * required) (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * required) (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * required) (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * required) (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * required) (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * updated_date_time (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * updated_date_time (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * updated_date_time (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * updated_date_time (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * updated_date_time (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * updated_date_time (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * updated_date_time (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * updated_date_time (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * updated_date_time (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * updated_date_time (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * gas_limit_band_counts (filter: key_value_key)
+     */
+    gas_limit_band_counts_key_value_key?: string;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_eq)
+     */
+    gas_limit_band_counts_key_value_value_filter_eq?: number;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_ne)
+     */
+    gas_limit_band_counts_key_value_value_filter_ne?: number;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_lt)
+     */
+    gas_limit_band_counts_key_value_value_filter_lt?: number;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_lte)
+     */
+    gas_limit_band_counts_key_value_value_filter_lte?: number;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_gt)
+     */
+    gas_limit_band_counts_key_value_value_filter_gt?: number;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_gte)
+     */
+    gas_limit_band_counts_key_value_value_filter_gte?: number;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_between_min)
+     */
+    gas_limit_band_counts_key_value_value_filter_between_min?: number;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_between_max_value)
+     */
+    gas_limit_band_counts_key_value_value_filter_between_max_value?: number;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_in_values) (comma-separated list)
+     */
+    gas_limit_band_counts_key_value_value_filter_in_values?: string;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_not_in_values) (comma-separated list)
+     */
+    gas_limit_band_counts_key_value_value_filter_not_in_values?: string;
+    /**
+     * gas_limit_band_counts (filter: has_key)
+     */
+    gas_limit_band_counts_has_key?: string;
+    /**
+     * gas_limit_band_counts (filter: not_has_key)
+     */
+    gas_limit_band_counts_not_has_key?: string;
+    /**
+     * gas_limit_band_counts (filter: has_any_key_values)
+     */
+    gas_limit_band_counts_has_any_key_values?: Array<string>;
+    /**
+     * gas_limit_band_counts (filter: has_all_keys_values)
+     */
+    gas_limit_band_counts_has_all_keys_values?: Array<string>;
+    /**
+     * The maximum number of fct_execution_gas_limit_signalling_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctExecutionGasLimitSignallingDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_execution_gas_limit_signalling_daily';
+};
+
+export type FctExecutionGasLimitSignallingDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionGasLimitSignallingDailyServiceListError =
+  FctExecutionGasLimitSignallingDailyServiceListErrors[keyof FctExecutionGasLimitSignallingDailyServiceListErrors];
+
+export type FctExecutionGasLimitSignallingDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctExecutionGasLimitSignallingDailyResponse;
+};
+
+export type FctExecutionGasLimitSignallingDailyServiceListResponse =
+  FctExecutionGasLimitSignallingDailyServiceListResponses[keyof FctExecutionGasLimitSignallingDailyServiceListResponses];
+
+export type FctExecutionGasLimitSignallingDailyServiceGetData = {
+  body?: never;
+  path: {
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_execution_gas_limit_signalling_daily/{day_start_date}';
+};
+
+export type FctExecutionGasLimitSignallingDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionGasLimitSignallingDailyServiceGetError =
+  FctExecutionGasLimitSignallingDailyServiceGetErrors[keyof FctExecutionGasLimitSignallingDailyServiceGetErrors];
+
+export type FctExecutionGasLimitSignallingDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctExecutionGasLimitSignallingDailyResponse;
+};
+
+export type FctExecutionGasLimitSignallingDailyServiceGetResponse =
+  FctExecutionGasLimitSignallingDailyServiceGetResponses[keyof FctExecutionGasLimitSignallingDailyServiceGetResponses];
+
+export type FctExecutionGasLimitSignallingHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * required) (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * required) (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * required) (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * required) (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * required) (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * required) (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * required) (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * required) (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * required) (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * required) (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * updated_date_time (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * updated_date_time (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * updated_date_time (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * updated_date_time (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * updated_date_time (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * updated_date_time (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * updated_date_time (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * updated_date_time (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * updated_date_time (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * updated_date_time (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * gas_limit_band_counts (filter: key_value_key)
+     */
+    gas_limit_band_counts_key_value_key?: string;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_eq)
+     */
+    gas_limit_band_counts_key_value_value_filter_eq?: number;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_ne)
+     */
+    gas_limit_band_counts_key_value_value_filter_ne?: number;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_lt)
+     */
+    gas_limit_band_counts_key_value_value_filter_lt?: number;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_lte)
+     */
+    gas_limit_band_counts_key_value_value_filter_lte?: number;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_gt)
+     */
+    gas_limit_band_counts_key_value_value_filter_gt?: number;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_gte)
+     */
+    gas_limit_band_counts_key_value_value_filter_gte?: number;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_between_min)
+     */
+    gas_limit_band_counts_key_value_value_filter_between_min?: number;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_between_max_value)
+     */
+    gas_limit_band_counts_key_value_value_filter_between_max_value?: number;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_in_values) (comma-separated list)
+     */
+    gas_limit_band_counts_key_value_value_filter_in_values?: string;
+    /**
+     * gas_limit_band_counts (filter: key_value_value_filter_not_in_values) (comma-separated list)
+     */
+    gas_limit_band_counts_key_value_value_filter_not_in_values?: string;
+    /**
+     * gas_limit_band_counts (filter: has_key)
+     */
+    gas_limit_band_counts_has_key?: string;
+    /**
+     * gas_limit_band_counts (filter: not_has_key)
+     */
+    gas_limit_band_counts_not_has_key?: string;
+    /**
+     * gas_limit_band_counts (filter: has_any_key_values)
+     */
+    gas_limit_band_counts_has_any_key_values?: Array<string>;
+    /**
+     * gas_limit_band_counts (filter: has_all_keys_values)
+     */
+    gas_limit_band_counts_has_all_keys_values?: Array<string>;
+    /**
+     * The maximum number of fct_execution_gas_limit_signalling_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctExecutionGasLimitSignallingHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_execution_gas_limit_signalling_hourly';
+};
+
+export type FctExecutionGasLimitSignallingHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionGasLimitSignallingHourlyServiceListError =
+  FctExecutionGasLimitSignallingHourlyServiceListErrors[keyof FctExecutionGasLimitSignallingHourlyServiceListErrors];
+
+export type FctExecutionGasLimitSignallingHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctExecutionGasLimitSignallingHourlyResponse;
+};
+
+export type FctExecutionGasLimitSignallingHourlyServiceListResponse =
+  FctExecutionGasLimitSignallingHourlyServiceListResponses[keyof FctExecutionGasLimitSignallingHourlyServiceListResponses];
+
+export type FctExecutionGasLimitSignallingHourlyServiceGetData = {
+  body?: never;
+  path: {
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_execution_gas_limit_signalling_hourly/{hour_start_date_time}';
+};
+
+export type FctExecutionGasLimitSignallingHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionGasLimitSignallingHourlyServiceGetError =
+  FctExecutionGasLimitSignallingHourlyServiceGetErrors[keyof FctExecutionGasLimitSignallingHourlyServiceGetErrors];
+
+export type FctExecutionGasLimitSignallingHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctExecutionGasLimitSignallingHourlyResponse;
+};
+
+export type FctExecutionGasLimitSignallingHourlyServiceGetResponse =
+  FctExecutionGasLimitSignallingHourlyServiceGetResponses[keyof FctExecutionGasLimitSignallingHourlyServiceGetResponses];
+
+export type FctExecutionGasUsedDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks in this day (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks in this day (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks in this day (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks in this day (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks in this day (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks in this day (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks in this day (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks in this day (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks in this day (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks in this day (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total gas used in this day (filter: eq)
+     */
+    total_gas_used_eq?: number;
+    /**
+     * Total gas used in this day (filter: ne)
+     */
+    total_gas_used_ne?: number;
+    /**
+     * Total gas used in this day (filter: lt)
+     */
+    total_gas_used_lt?: number;
+    /**
+     * Total gas used in this day (filter: lte)
+     */
+    total_gas_used_lte?: number;
+    /**
+     * Total gas used in this day (filter: gt)
+     */
+    total_gas_used_gt?: number;
+    /**
+     * Total gas used in this day (filter: gte)
+     */
+    total_gas_used_gte?: number;
+    /**
+     * Total gas used in this day (filter: between_min)
+     */
+    total_gas_used_between_min?: number;
+    /**
+     * Total gas used in this day (filter: between_max_value)
+     */
+    total_gas_used_between_max_value?: number;
+    /**
+     * Total gas used in this day (filter: in_values) (comma-separated list)
+     */
+    total_gas_used_in_values?: string;
+    /**
+     * Total gas used in this day (filter: not_in_values) (comma-separated list)
+     */
+    total_gas_used_not_in_values?: string;
+    /**
+     * Cumulative gas used since genesis (filter: eq)
+     */
+    cumulative_gas_used_eq?: number;
+    /**
+     * Cumulative gas used since genesis (filter: ne)
+     */
+    cumulative_gas_used_ne?: number;
+    /**
+     * Cumulative gas used since genesis (filter: lt)
+     */
+    cumulative_gas_used_lt?: number;
+    /**
+     * Cumulative gas used since genesis (filter: lte)
+     */
+    cumulative_gas_used_lte?: number;
+    /**
+     * Cumulative gas used since genesis (filter: gt)
+     */
+    cumulative_gas_used_gt?: number;
+    /**
+     * Cumulative gas used since genesis (filter: gte)
+     */
+    cumulative_gas_used_gte?: number;
+    /**
+     * Cumulative gas used since genesis (filter: between_min)
+     */
+    cumulative_gas_used_between_min?: number;
+    /**
+     * Cumulative gas used since genesis (filter: between_max_value)
+     */
+    cumulative_gas_used_between_max_value?: number;
+    /**
+     * Cumulative gas used since genesis (filter: in_values) (comma-separated list)
+     */
+    cumulative_gas_used_in_values?: string;
+    /**
+     * Cumulative gas used since genesis (filter: not_in_values) (comma-separated list)
+     */
+    cumulative_gas_used_not_in_values?: string;
+    /**
+     * Average gas used per block (filter: eq)
+     */
+    avg_gas_used_eq?: number;
+    /**
+     * Average gas used per block (filter: ne)
+     */
+    avg_gas_used_ne?: number;
+    /**
+     * Average gas used per block (filter: lt)
+     */
+    avg_gas_used_lt?: number;
+    /**
+     * Average gas used per block (filter: lte)
+     */
+    avg_gas_used_lte?: number;
+    /**
+     * Average gas used per block (filter: gt)
+     */
+    avg_gas_used_gt?: number;
+    /**
+     * Average gas used per block (filter: gte)
+     */
+    avg_gas_used_gte?: number;
+    /**
+     * Average gas used per block (filter: between_min)
+     */
+    avg_gas_used_between_min?: number;
+    /**
+     * Average gas used per block (filter: between_max_value)
+     */
+    avg_gas_used_between_max_value?: number;
+    /**
+     * Average gas used per block (filter: in_values) (comma-separated list)
+     */
+    avg_gas_used_in_values?: string;
+    /**
+     * Average gas used per block (filter: not_in_values) (comma-separated list)
+     */
+    avg_gas_used_not_in_values?: string;
+    /**
+     * Minimum gas used in a block (filter: eq)
+     */
+    min_gas_used_eq?: number;
+    /**
+     * Minimum gas used in a block (filter: ne)
+     */
+    min_gas_used_ne?: number;
+    /**
+     * Minimum gas used in a block (filter: lt)
+     */
+    min_gas_used_lt?: number;
+    /**
+     * Minimum gas used in a block (filter: lte)
+     */
+    min_gas_used_lte?: number;
+    /**
+     * Minimum gas used in a block (filter: gt)
+     */
+    min_gas_used_gt?: number;
+    /**
+     * Minimum gas used in a block (filter: gte)
+     */
+    min_gas_used_gte?: number;
+    /**
+     * Minimum gas used in a block (filter: between_min)
+     */
+    min_gas_used_between_min?: number;
+    /**
+     * Minimum gas used in a block (filter: between_max_value)
+     */
+    min_gas_used_between_max_value?: number;
+    /**
+     * Minimum gas used in a block (filter: in_values) (comma-separated list)
+     */
+    min_gas_used_in_values?: string;
+    /**
+     * Minimum gas used in a block (filter: not_in_values) (comma-separated list)
+     */
+    min_gas_used_not_in_values?: string;
+    /**
+     * Maximum gas used in a block (filter: eq)
+     */
+    max_gas_used_eq?: number;
+    /**
+     * Maximum gas used in a block (filter: ne)
+     */
+    max_gas_used_ne?: number;
+    /**
+     * Maximum gas used in a block (filter: lt)
+     */
+    max_gas_used_lt?: number;
+    /**
+     * Maximum gas used in a block (filter: lte)
+     */
+    max_gas_used_lte?: number;
+    /**
+     * Maximum gas used in a block (filter: gt)
+     */
+    max_gas_used_gt?: number;
+    /**
+     * Maximum gas used in a block (filter: gte)
+     */
+    max_gas_used_gte?: number;
+    /**
+     * Maximum gas used in a block (filter: between_min)
+     */
+    max_gas_used_between_min?: number;
+    /**
+     * Maximum gas used in a block (filter: between_max_value)
+     */
+    max_gas_used_between_max_value?: number;
+    /**
+     * Maximum gas used in a block (filter: in_values) (comma-separated list)
+     */
+    max_gas_used_in_values?: string;
+    /**
+     * Maximum gas used in a block (filter: not_in_values) (comma-separated list)
+     */
+    max_gas_used_not_in_values?: string;
+    /**
+     * 5th percentile gas used (filter: eq)
+     */
+    p05_gas_used_eq?: number;
+    /**
+     * 5th percentile gas used (filter: ne)
+     */
+    p05_gas_used_ne?: number;
+    /**
+     * 5th percentile gas used (filter: lt)
+     */
+    p05_gas_used_lt?: number;
+    /**
+     * 5th percentile gas used (filter: lte)
+     */
+    p05_gas_used_lte?: number;
+    /**
+     * 5th percentile gas used (filter: gt)
+     */
+    p05_gas_used_gt?: number;
+    /**
+     * 5th percentile gas used (filter: gte)
+     */
+    p05_gas_used_gte?: number;
+    /**
+     * 5th percentile gas used (filter: between_min)
+     */
+    p05_gas_used_between_min?: number;
+    /**
+     * 5th percentile gas used (filter: between_max_value)
+     */
+    p05_gas_used_between_max_value?: number;
+    /**
+     * 5th percentile gas used (filter: in_values) (comma-separated list)
+     */
+    p05_gas_used_in_values?: string;
+    /**
+     * 5th percentile gas used (filter: not_in_values) (comma-separated list)
+     */
+    p05_gas_used_not_in_values?: string;
+    /**
+     * 50th percentile (median) gas used (filter: eq)
+     */
+    p50_gas_used_eq?: number;
+    /**
+     * 50th percentile (median) gas used (filter: ne)
+     */
+    p50_gas_used_ne?: number;
+    /**
+     * 50th percentile (median) gas used (filter: lt)
+     */
+    p50_gas_used_lt?: number;
+    /**
+     * 50th percentile (median) gas used (filter: lte)
+     */
+    p50_gas_used_lte?: number;
+    /**
+     * 50th percentile (median) gas used (filter: gt)
+     */
+    p50_gas_used_gt?: number;
+    /**
+     * 50th percentile (median) gas used (filter: gte)
+     */
+    p50_gas_used_gte?: number;
+    /**
+     * 50th percentile (median) gas used (filter: between_min)
+     */
+    p50_gas_used_between_min?: number;
+    /**
+     * 50th percentile (median) gas used (filter: between_max_value)
+     */
+    p50_gas_used_between_max_value?: number;
+    /**
+     * 50th percentile (median) gas used (filter: in_values) (comma-separated list)
+     */
+    p50_gas_used_in_values?: string;
+    /**
+     * 50th percentile (median) gas used (filter: not_in_values) (comma-separated list)
+     */
+    p50_gas_used_not_in_values?: string;
+    /**
+     * 95th percentile gas used (filter: eq)
+     */
+    p95_gas_used_eq?: number;
+    /**
+     * 95th percentile gas used (filter: ne)
+     */
+    p95_gas_used_ne?: number;
+    /**
+     * 95th percentile gas used (filter: lt)
+     */
+    p95_gas_used_lt?: number;
+    /**
+     * 95th percentile gas used (filter: lte)
+     */
+    p95_gas_used_lte?: number;
+    /**
+     * 95th percentile gas used (filter: gt)
+     */
+    p95_gas_used_gt?: number;
+    /**
+     * 95th percentile gas used (filter: gte)
+     */
+    p95_gas_used_gte?: number;
+    /**
+     * 95th percentile gas used (filter: between_min)
+     */
+    p95_gas_used_between_min?: number;
+    /**
+     * 95th percentile gas used (filter: between_max_value)
+     */
+    p95_gas_used_between_max_value?: number;
+    /**
+     * 95th percentile gas used (filter: in_values) (comma-separated list)
+     */
+    p95_gas_used_in_values?: string;
+    /**
+     * 95th percentile gas used (filter: not_in_values) (comma-separated list)
+     */
+    p95_gas_used_not_in_values?: string;
+    /**
+     * Standard deviation of gas used (filter: eq)
+     */
+    stddev_gas_used_eq?: number;
+    /**
+     * Standard deviation of gas used (filter: ne)
+     */
+    stddev_gas_used_ne?: number;
+    /**
+     * Standard deviation of gas used (filter: lt)
+     */
+    stddev_gas_used_lt?: number;
+    /**
+     * Standard deviation of gas used (filter: lte)
+     */
+    stddev_gas_used_lte?: number;
+    /**
+     * Standard deviation of gas used (filter: gt)
+     */
+    stddev_gas_used_gt?: number;
+    /**
+     * Standard deviation of gas used (filter: gte)
+     */
+    stddev_gas_used_gte?: number;
+    /**
+     * Standard deviation of gas used (filter: between_min)
+     */
+    stddev_gas_used_between_min?: number;
+    /**
+     * Standard deviation of gas used (filter: between_max_value)
+     */
+    stddev_gas_used_between_max_value?: number;
+    /**
+     * Standard deviation of gas used (filter: in_values) (comma-separated list)
+     */
+    stddev_gas_used_in_values?: string;
+    /**
+     * Standard deviation of gas used (filter: not_in_values) (comma-separated list)
+     */
+    stddev_gas_used_not_in_values?: string;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: eq)
+     */
+    upper_band_gas_used_eq?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: ne)
+     */
+    upper_band_gas_used_ne?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: lt)
+     */
+    upper_band_gas_used_lt?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: lte)
+     */
+    upper_band_gas_used_lte?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: gt)
+     */
+    upper_band_gas_used_gt?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: gte)
+     */
+    upper_band_gas_used_gte?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: between_min)
+     */
+    upper_band_gas_used_between_min?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: between_max_value)
+     */
+    upper_band_gas_used_between_max_value?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: in_values) (comma-separated list)
+     */
+    upper_band_gas_used_in_values?: string;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: not_in_values) (comma-separated list)
+     */
+    upper_band_gas_used_not_in_values?: string;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: eq)
+     */
+    lower_band_gas_used_eq?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: ne)
+     */
+    lower_band_gas_used_ne?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: lt)
+     */
+    lower_band_gas_used_lt?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: lte)
+     */
+    lower_band_gas_used_lte?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: gt)
+     */
+    lower_band_gas_used_gt?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: gte)
+     */
+    lower_band_gas_used_gte?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: between_min)
+     */
+    lower_band_gas_used_between_min?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: between_max_value)
+     */
+    lower_band_gas_used_between_max_value?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: in_values) (comma-separated list)
+     */
+    lower_band_gas_used_in_values?: string;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: not_in_values) (comma-separated list)
+     */
+    lower_band_gas_used_not_in_values?: string;
+    /**
+     * Moving average gas used (7-day window) (filter: eq)
+     */
+    moving_avg_gas_used_eq?: number;
+    /**
+     * Moving average gas used (7-day window) (filter: ne)
+     */
+    moving_avg_gas_used_ne?: number;
+    /**
+     * Moving average gas used (7-day window) (filter: lt)
+     */
+    moving_avg_gas_used_lt?: number;
+    /**
+     * Moving average gas used (7-day window) (filter: lte)
+     */
+    moving_avg_gas_used_lte?: number;
+    /**
+     * Moving average gas used (7-day window) (filter: gt)
+     */
+    moving_avg_gas_used_gt?: number;
+    /**
+     * Moving average gas used (7-day window) (filter: gte)
+     */
+    moving_avg_gas_used_gte?: number;
+    /**
+     * Moving average gas used (7-day window) (filter: between_min)
+     */
+    moving_avg_gas_used_between_min?: number;
+    /**
+     * Moving average gas used (7-day window) (filter: between_max_value)
+     */
+    moving_avg_gas_used_between_max_value?: number;
+    /**
+     * Moving average gas used (7-day window) (filter: in_values) (comma-separated list)
+     */
+    moving_avg_gas_used_in_values?: string;
+    /**
+     * Moving average gas used (7-day window) (filter: not_in_values) (comma-separated list)
+     */
+    moving_avg_gas_used_not_in_values?: string;
+    /**
+     * The maximum number of fct_execution_gas_used_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctExecutionGasUsedDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_execution_gas_used_daily';
+};
+
+export type FctExecutionGasUsedDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionGasUsedDailyServiceListError =
+  FctExecutionGasUsedDailyServiceListErrors[keyof FctExecutionGasUsedDailyServiceListErrors];
+
+export type FctExecutionGasUsedDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctExecutionGasUsedDailyResponse;
+};
+
+export type FctExecutionGasUsedDailyServiceListResponse =
+  FctExecutionGasUsedDailyServiceListResponses[keyof FctExecutionGasUsedDailyServiceListResponses];
+
+export type FctExecutionGasUsedDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_execution_gas_used_daily/{day_start_date}';
+};
+
+export type FctExecutionGasUsedDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionGasUsedDailyServiceGetError =
+  FctExecutionGasUsedDailyServiceGetErrors[keyof FctExecutionGasUsedDailyServiceGetErrors];
+
+export type FctExecutionGasUsedDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctExecutionGasUsedDailyResponse;
+};
+
+export type FctExecutionGasUsedDailyServiceGetResponse =
+  FctExecutionGasUsedDailyServiceGetResponses[keyof FctExecutionGasUsedDailyServiceGetResponses];
+
+export type FctExecutionGasUsedHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks in this hour (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks in this hour (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks in this hour (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks in this hour (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks in this hour (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks in this hour (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks in this hour (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks in this hour (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks in this hour (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks in this hour (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total gas used in this hour (filter: eq)
+     */
+    total_gas_used_eq?: number;
+    /**
+     * Total gas used in this hour (filter: ne)
+     */
+    total_gas_used_ne?: number;
+    /**
+     * Total gas used in this hour (filter: lt)
+     */
+    total_gas_used_lt?: number;
+    /**
+     * Total gas used in this hour (filter: lte)
+     */
+    total_gas_used_lte?: number;
+    /**
+     * Total gas used in this hour (filter: gt)
+     */
+    total_gas_used_gt?: number;
+    /**
+     * Total gas used in this hour (filter: gte)
+     */
+    total_gas_used_gte?: number;
+    /**
+     * Total gas used in this hour (filter: between_min)
+     */
+    total_gas_used_between_min?: number;
+    /**
+     * Total gas used in this hour (filter: between_max_value)
+     */
+    total_gas_used_between_max_value?: number;
+    /**
+     * Total gas used in this hour (filter: in_values) (comma-separated list)
+     */
+    total_gas_used_in_values?: string;
+    /**
+     * Total gas used in this hour (filter: not_in_values) (comma-separated list)
+     */
+    total_gas_used_not_in_values?: string;
+    /**
+     * Cumulative gas used since genesis (filter: eq)
+     */
+    cumulative_gas_used_eq?: number;
+    /**
+     * Cumulative gas used since genesis (filter: ne)
+     */
+    cumulative_gas_used_ne?: number;
+    /**
+     * Cumulative gas used since genesis (filter: lt)
+     */
+    cumulative_gas_used_lt?: number;
+    /**
+     * Cumulative gas used since genesis (filter: lte)
+     */
+    cumulative_gas_used_lte?: number;
+    /**
+     * Cumulative gas used since genesis (filter: gt)
+     */
+    cumulative_gas_used_gt?: number;
+    /**
+     * Cumulative gas used since genesis (filter: gte)
+     */
+    cumulative_gas_used_gte?: number;
+    /**
+     * Cumulative gas used since genesis (filter: between_min)
+     */
+    cumulative_gas_used_between_min?: number;
+    /**
+     * Cumulative gas used since genesis (filter: between_max_value)
+     */
+    cumulative_gas_used_between_max_value?: number;
+    /**
+     * Cumulative gas used since genesis (filter: in_values) (comma-separated list)
+     */
+    cumulative_gas_used_in_values?: string;
+    /**
+     * Cumulative gas used since genesis (filter: not_in_values) (comma-separated list)
+     */
+    cumulative_gas_used_not_in_values?: string;
+    /**
+     * Average gas used per block (filter: eq)
+     */
+    avg_gas_used_eq?: number;
+    /**
+     * Average gas used per block (filter: ne)
+     */
+    avg_gas_used_ne?: number;
+    /**
+     * Average gas used per block (filter: lt)
+     */
+    avg_gas_used_lt?: number;
+    /**
+     * Average gas used per block (filter: lte)
+     */
+    avg_gas_used_lte?: number;
+    /**
+     * Average gas used per block (filter: gt)
+     */
+    avg_gas_used_gt?: number;
+    /**
+     * Average gas used per block (filter: gte)
+     */
+    avg_gas_used_gte?: number;
+    /**
+     * Average gas used per block (filter: between_min)
+     */
+    avg_gas_used_between_min?: number;
+    /**
+     * Average gas used per block (filter: between_max_value)
+     */
+    avg_gas_used_between_max_value?: number;
+    /**
+     * Average gas used per block (filter: in_values) (comma-separated list)
+     */
+    avg_gas_used_in_values?: string;
+    /**
+     * Average gas used per block (filter: not_in_values) (comma-separated list)
+     */
+    avg_gas_used_not_in_values?: string;
+    /**
+     * Minimum gas used in a block (filter: eq)
+     */
+    min_gas_used_eq?: number;
+    /**
+     * Minimum gas used in a block (filter: ne)
+     */
+    min_gas_used_ne?: number;
+    /**
+     * Minimum gas used in a block (filter: lt)
+     */
+    min_gas_used_lt?: number;
+    /**
+     * Minimum gas used in a block (filter: lte)
+     */
+    min_gas_used_lte?: number;
+    /**
+     * Minimum gas used in a block (filter: gt)
+     */
+    min_gas_used_gt?: number;
+    /**
+     * Minimum gas used in a block (filter: gte)
+     */
+    min_gas_used_gte?: number;
+    /**
+     * Minimum gas used in a block (filter: between_min)
+     */
+    min_gas_used_between_min?: number;
+    /**
+     * Minimum gas used in a block (filter: between_max_value)
+     */
+    min_gas_used_between_max_value?: number;
+    /**
+     * Minimum gas used in a block (filter: in_values) (comma-separated list)
+     */
+    min_gas_used_in_values?: string;
+    /**
+     * Minimum gas used in a block (filter: not_in_values) (comma-separated list)
+     */
+    min_gas_used_not_in_values?: string;
+    /**
+     * Maximum gas used in a block (filter: eq)
+     */
+    max_gas_used_eq?: number;
+    /**
+     * Maximum gas used in a block (filter: ne)
+     */
+    max_gas_used_ne?: number;
+    /**
+     * Maximum gas used in a block (filter: lt)
+     */
+    max_gas_used_lt?: number;
+    /**
+     * Maximum gas used in a block (filter: lte)
+     */
+    max_gas_used_lte?: number;
+    /**
+     * Maximum gas used in a block (filter: gt)
+     */
+    max_gas_used_gt?: number;
+    /**
+     * Maximum gas used in a block (filter: gte)
+     */
+    max_gas_used_gte?: number;
+    /**
+     * Maximum gas used in a block (filter: between_min)
+     */
+    max_gas_used_between_min?: number;
+    /**
+     * Maximum gas used in a block (filter: between_max_value)
+     */
+    max_gas_used_between_max_value?: number;
+    /**
+     * Maximum gas used in a block (filter: in_values) (comma-separated list)
+     */
+    max_gas_used_in_values?: string;
+    /**
+     * Maximum gas used in a block (filter: not_in_values) (comma-separated list)
+     */
+    max_gas_used_not_in_values?: string;
+    /**
+     * 5th percentile gas used (filter: eq)
+     */
+    p05_gas_used_eq?: number;
+    /**
+     * 5th percentile gas used (filter: ne)
+     */
+    p05_gas_used_ne?: number;
+    /**
+     * 5th percentile gas used (filter: lt)
+     */
+    p05_gas_used_lt?: number;
+    /**
+     * 5th percentile gas used (filter: lte)
+     */
+    p05_gas_used_lte?: number;
+    /**
+     * 5th percentile gas used (filter: gt)
+     */
+    p05_gas_used_gt?: number;
+    /**
+     * 5th percentile gas used (filter: gte)
+     */
+    p05_gas_used_gte?: number;
+    /**
+     * 5th percentile gas used (filter: between_min)
+     */
+    p05_gas_used_between_min?: number;
+    /**
+     * 5th percentile gas used (filter: between_max_value)
+     */
+    p05_gas_used_between_max_value?: number;
+    /**
+     * 5th percentile gas used (filter: in_values) (comma-separated list)
+     */
+    p05_gas_used_in_values?: string;
+    /**
+     * 5th percentile gas used (filter: not_in_values) (comma-separated list)
+     */
+    p05_gas_used_not_in_values?: string;
+    /**
+     * 50th percentile (median) gas used (filter: eq)
+     */
+    p50_gas_used_eq?: number;
+    /**
+     * 50th percentile (median) gas used (filter: ne)
+     */
+    p50_gas_used_ne?: number;
+    /**
+     * 50th percentile (median) gas used (filter: lt)
+     */
+    p50_gas_used_lt?: number;
+    /**
+     * 50th percentile (median) gas used (filter: lte)
+     */
+    p50_gas_used_lte?: number;
+    /**
+     * 50th percentile (median) gas used (filter: gt)
+     */
+    p50_gas_used_gt?: number;
+    /**
+     * 50th percentile (median) gas used (filter: gte)
+     */
+    p50_gas_used_gte?: number;
+    /**
+     * 50th percentile (median) gas used (filter: between_min)
+     */
+    p50_gas_used_between_min?: number;
+    /**
+     * 50th percentile (median) gas used (filter: between_max_value)
+     */
+    p50_gas_used_between_max_value?: number;
+    /**
+     * 50th percentile (median) gas used (filter: in_values) (comma-separated list)
+     */
+    p50_gas_used_in_values?: string;
+    /**
+     * 50th percentile (median) gas used (filter: not_in_values) (comma-separated list)
+     */
+    p50_gas_used_not_in_values?: string;
+    /**
+     * 95th percentile gas used (filter: eq)
+     */
+    p95_gas_used_eq?: number;
+    /**
+     * 95th percentile gas used (filter: ne)
+     */
+    p95_gas_used_ne?: number;
+    /**
+     * 95th percentile gas used (filter: lt)
+     */
+    p95_gas_used_lt?: number;
+    /**
+     * 95th percentile gas used (filter: lte)
+     */
+    p95_gas_used_lte?: number;
+    /**
+     * 95th percentile gas used (filter: gt)
+     */
+    p95_gas_used_gt?: number;
+    /**
+     * 95th percentile gas used (filter: gte)
+     */
+    p95_gas_used_gte?: number;
+    /**
+     * 95th percentile gas used (filter: between_min)
+     */
+    p95_gas_used_between_min?: number;
+    /**
+     * 95th percentile gas used (filter: between_max_value)
+     */
+    p95_gas_used_between_max_value?: number;
+    /**
+     * 95th percentile gas used (filter: in_values) (comma-separated list)
+     */
+    p95_gas_used_in_values?: string;
+    /**
+     * 95th percentile gas used (filter: not_in_values) (comma-separated list)
+     */
+    p95_gas_used_not_in_values?: string;
+    /**
+     * Standard deviation of gas used (filter: eq)
+     */
+    stddev_gas_used_eq?: number;
+    /**
+     * Standard deviation of gas used (filter: ne)
+     */
+    stddev_gas_used_ne?: number;
+    /**
+     * Standard deviation of gas used (filter: lt)
+     */
+    stddev_gas_used_lt?: number;
+    /**
+     * Standard deviation of gas used (filter: lte)
+     */
+    stddev_gas_used_lte?: number;
+    /**
+     * Standard deviation of gas used (filter: gt)
+     */
+    stddev_gas_used_gt?: number;
+    /**
+     * Standard deviation of gas used (filter: gte)
+     */
+    stddev_gas_used_gte?: number;
+    /**
+     * Standard deviation of gas used (filter: between_min)
+     */
+    stddev_gas_used_between_min?: number;
+    /**
+     * Standard deviation of gas used (filter: between_max_value)
+     */
+    stddev_gas_used_between_max_value?: number;
+    /**
+     * Standard deviation of gas used (filter: in_values) (comma-separated list)
+     */
+    stddev_gas_used_in_values?: string;
+    /**
+     * Standard deviation of gas used (filter: not_in_values) (comma-separated list)
+     */
+    stddev_gas_used_not_in_values?: string;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: eq)
+     */
+    upper_band_gas_used_eq?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: ne)
+     */
+    upper_band_gas_used_ne?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: lt)
+     */
+    upper_band_gas_used_lt?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: lte)
+     */
+    upper_band_gas_used_lte?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: gt)
+     */
+    upper_band_gas_used_gt?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: gte)
+     */
+    upper_band_gas_used_gte?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: between_min)
+     */
+    upper_band_gas_used_between_min?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: between_max_value)
+     */
+    upper_band_gas_used_between_max_value?: number;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: in_values) (comma-separated list)
+     */
+    upper_band_gas_used_in_values?: string;
+    /**
+     * Upper Bollinger band (avg + 2*stddev) (filter: not_in_values) (comma-separated list)
+     */
+    upper_band_gas_used_not_in_values?: string;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: eq)
+     */
+    lower_band_gas_used_eq?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: ne)
+     */
+    lower_band_gas_used_ne?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: lt)
+     */
+    lower_band_gas_used_lt?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: lte)
+     */
+    lower_band_gas_used_lte?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: gt)
+     */
+    lower_band_gas_used_gt?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: gte)
+     */
+    lower_band_gas_used_gte?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: between_min)
+     */
+    lower_band_gas_used_between_min?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: between_max_value)
+     */
+    lower_band_gas_used_between_max_value?: number;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: in_values) (comma-separated list)
+     */
+    lower_band_gas_used_in_values?: string;
+    /**
+     * Lower Bollinger band (avg - 2*stddev), can be negative during high volatility (filter: not_in_values) (comma-separated list)
+     */
+    lower_band_gas_used_not_in_values?: string;
+    /**
+     * Moving average gas used (6-hour window) (filter: eq)
+     */
+    moving_avg_gas_used_eq?: number;
+    /**
+     * Moving average gas used (6-hour window) (filter: ne)
+     */
+    moving_avg_gas_used_ne?: number;
+    /**
+     * Moving average gas used (6-hour window) (filter: lt)
+     */
+    moving_avg_gas_used_lt?: number;
+    /**
+     * Moving average gas used (6-hour window) (filter: lte)
+     */
+    moving_avg_gas_used_lte?: number;
+    /**
+     * Moving average gas used (6-hour window) (filter: gt)
+     */
+    moving_avg_gas_used_gt?: number;
+    /**
+     * Moving average gas used (6-hour window) (filter: gte)
+     */
+    moving_avg_gas_used_gte?: number;
+    /**
+     * Moving average gas used (6-hour window) (filter: between_min)
+     */
+    moving_avg_gas_used_between_min?: number;
+    /**
+     * Moving average gas used (6-hour window) (filter: between_max_value)
+     */
+    moving_avg_gas_used_between_max_value?: number;
+    /**
+     * Moving average gas used (6-hour window) (filter: in_values) (comma-separated list)
+     */
+    moving_avg_gas_used_in_values?: string;
+    /**
+     * Moving average gas used (6-hour window) (filter: not_in_values) (comma-separated list)
+     */
+    moving_avg_gas_used_not_in_values?: string;
+    /**
+     * The maximum number of fct_execution_gas_used_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctExecutionGasUsedHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_execution_gas_used_hourly';
+};
+
+export type FctExecutionGasUsedHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionGasUsedHourlyServiceListError =
+  FctExecutionGasUsedHourlyServiceListErrors[keyof FctExecutionGasUsedHourlyServiceListErrors];
+
+export type FctExecutionGasUsedHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctExecutionGasUsedHourlyResponse;
+};
+
+export type FctExecutionGasUsedHourlyServiceListResponse =
+  FctExecutionGasUsedHourlyServiceListResponses[keyof FctExecutionGasUsedHourlyServiceListResponses];
+
+export type FctExecutionGasUsedHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_execution_gas_used_hourly/{hour_start_date_time}';
+};
+
+export type FctExecutionGasUsedHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionGasUsedHourlyServiceGetError =
+  FctExecutionGasUsedHourlyServiceGetErrors[keyof FctExecutionGasUsedHourlyServiceGetErrors];
+
+export type FctExecutionGasUsedHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctExecutionGasUsedHourlyResponse;
+};
+
+export type FctExecutionGasUsedHourlyServiceGetResponse =
+  FctExecutionGasUsedHourlyServiceGetResponses[keyof FctExecutionGasUsedHourlyServiceGetResponses];
+
 export type FctExecutionStateSizeDailyServiceListData = {
   body?: never;
   path?: never;
@@ -38080,6 +41816,1606 @@ export type FctExecutionStateSizeHourlyServiceGetResponses = {
 
 export type FctExecutionStateSizeHourlyServiceGetResponse =
   FctExecutionStateSizeHourlyServiceGetResponses[keyof FctExecutionStateSizeHourlyServiceGetResponses];
+
+export type FctExecutionTpsDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks in this day (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks in this day (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks in this day (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks in this day (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks in this day (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks in this day (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks in this day (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks in this day (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks in this day (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks in this day (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total transactions in this day (filter: eq)
+     */
+    total_transactions_eq?: number;
+    /**
+     * Total transactions in this day (filter: ne)
+     */
+    total_transactions_ne?: number;
+    /**
+     * Total transactions in this day (filter: lt)
+     */
+    total_transactions_lt?: number;
+    /**
+     * Total transactions in this day (filter: lte)
+     */
+    total_transactions_lte?: number;
+    /**
+     * Total transactions in this day (filter: gt)
+     */
+    total_transactions_gt?: number;
+    /**
+     * Total transactions in this day (filter: gte)
+     */
+    total_transactions_gte?: number;
+    /**
+     * Total transactions in this day (filter: between_min)
+     */
+    total_transactions_between_min?: number;
+    /**
+     * Total transactions in this day (filter: between_max_value)
+     */
+    total_transactions_between_max_value?: number;
+    /**
+     * Total transactions in this day (filter: in_values) (comma-separated list)
+     */
+    total_transactions_in_values?: string;
+    /**
+     * Total transactions in this day (filter: not_in_values) (comma-separated list)
+     */
+    total_transactions_not_in_values?: string;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: eq)
+     */
+    total_seconds_eq?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: ne)
+     */
+    total_seconds_ne?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: lt)
+     */
+    total_seconds_lt?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: lte)
+     */
+    total_seconds_lte?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: gt)
+     */
+    total_seconds_gt?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: gte)
+     */
+    total_seconds_gte?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: between_min)
+     */
+    total_seconds_between_min?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: between_max_value)
+     */
+    total_seconds_between_max_value?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: in_values) (comma-separated list)
+     */
+    total_seconds_in_values?: string;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: not_in_values) (comma-separated list)
+     */
+    total_seconds_not_in_values?: string;
+    /**
+     * Filter avg_tps using value
+     */
+    avg_tps_value?: number;
+    /**
+     * Filter min_tps using value
+     */
+    min_tps_value?: number;
+    /**
+     * Filter max_tps using value
+     */
+    max_tps_value?: number;
+    /**
+     * Filter p05_tps using value
+     */
+    p05_tps_value?: number;
+    /**
+     * Filter p50_tps using value
+     */
+    p50_tps_value?: number;
+    /**
+     * Filter p95_tps using value
+     */
+    p95_tps_value?: number;
+    /**
+     * Filter stddev_tps using value
+     */
+    stddev_tps_value?: number;
+    /**
+     * Filter upper_band_tps using value
+     */
+    upper_band_tps_value?: number;
+    /**
+     * Filter lower_band_tps using value
+     */
+    lower_band_tps_value?: number;
+    /**
+     * Filter moving_avg_tps using value
+     */
+    moving_avg_tps_value?: number;
+    /**
+     * The maximum number of fct_execution_tps_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctExecutionTpsDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_execution_tps_daily';
+};
+
+export type FctExecutionTpsDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionTpsDailyServiceListError =
+  FctExecutionTpsDailyServiceListErrors[keyof FctExecutionTpsDailyServiceListErrors];
+
+export type FctExecutionTpsDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctExecutionTpsDailyResponse;
+};
+
+export type FctExecutionTpsDailyServiceListResponse =
+  FctExecutionTpsDailyServiceListResponses[keyof FctExecutionTpsDailyServiceListResponses];
+
+export type FctExecutionTpsDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_execution_tps_daily/{day_start_date}';
+};
+
+export type FctExecutionTpsDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionTpsDailyServiceGetError =
+  FctExecutionTpsDailyServiceGetErrors[keyof FctExecutionTpsDailyServiceGetErrors];
+
+export type FctExecutionTpsDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctExecutionTpsDailyResponse;
+};
+
+export type FctExecutionTpsDailyServiceGetResponse =
+  FctExecutionTpsDailyServiceGetResponses[keyof FctExecutionTpsDailyServiceGetResponses];
+
+export type FctExecutionTpsHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks in this hour (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks in this hour (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks in this hour (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks in this hour (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks in this hour (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks in this hour (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks in this hour (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks in this hour (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks in this hour (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks in this hour (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total transactions in this hour (filter: eq)
+     */
+    total_transactions_eq?: number;
+    /**
+     * Total transactions in this hour (filter: ne)
+     */
+    total_transactions_ne?: number;
+    /**
+     * Total transactions in this hour (filter: lt)
+     */
+    total_transactions_lt?: number;
+    /**
+     * Total transactions in this hour (filter: lte)
+     */
+    total_transactions_lte?: number;
+    /**
+     * Total transactions in this hour (filter: gt)
+     */
+    total_transactions_gt?: number;
+    /**
+     * Total transactions in this hour (filter: gte)
+     */
+    total_transactions_gte?: number;
+    /**
+     * Total transactions in this hour (filter: between_min)
+     */
+    total_transactions_between_min?: number;
+    /**
+     * Total transactions in this hour (filter: between_max_value)
+     */
+    total_transactions_between_max_value?: number;
+    /**
+     * Total transactions in this hour (filter: in_values) (comma-separated list)
+     */
+    total_transactions_in_values?: string;
+    /**
+     * Total transactions in this hour (filter: not_in_values) (comma-separated list)
+     */
+    total_transactions_not_in_values?: string;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: eq)
+     */
+    total_seconds_eq?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: ne)
+     */
+    total_seconds_ne?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: lt)
+     */
+    total_seconds_lt?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: lte)
+     */
+    total_seconds_lte?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: gt)
+     */
+    total_seconds_gt?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: gte)
+     */
+    total_seconds_gte?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: between_min)
+     */
+    total_seconds_between_min?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: between_max_value)
+     */
+    total_seconds_between_max_value?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: in_values) (comma-separated list)
+     */
+    total_seconds_in_values?: string;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: not_in_values) (comma-separated list)
+     */
+    total_seconds_not_in_values?: string;
+    /**
+     * Filter avg_tps using value
+     */
+    avg_tps_value?: number;
+    /**
+     * Filter min_tps using value
+     */
+    min_tps_value?: number;
+    /**
+     * Filter max_tps using value
+     */
+    max_tps_value?: number;
+    /**
+     * Filter p05_tps using value
+     */
+    p05_tps_value?: number;
+    /**
+     * Filter p50_tps using value
+     */
+    p50_tps_value?: number;
+    /**
+     * Filter p95_tps using value
+     */
+    p95_tps_value?: number;
+    /**
+     * Filter stddev_tps using value
+     */
+    stddev_tps_value?: number;
+    /**
+     * Filter upper_band_tps using value
+     */
+    upper_band_tps_value?: number;
+    /**
+     * Filter lower_band_tps using value
+     */
+    lower_band_tps_value?: number;
+    /**
+     * Filter moving_avg_tps using value
+     */
+    moving_avg_tps_value?: number;
+    /**
+     * The maximum number of fct_execution_tps_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctExecutionTpsHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_execution_tps_hourly';
+};
+
+export type FctExecutionTpsHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionTpsHourlyServiceListError =
+  FctExecutionTpsHourlyServiceListErrors[keyof FctExecutionTpsHourlyServiceListErrors];
+
+export type FctExecutionTpsHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctExecutionTpsHourlyResponse;
+};
+
+export type FctExecutionTpsHourlyServiceListResponse =
+  FctExecutionTpsHourlyServiceListResponses[keyof FctExecutionTpsHourlyServiceListResponses];
+
+export type FctExecutionTpsHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_execution_tps_hourly/{hour_start_date_time}';
+};
+
+export type FctExecutionTpsHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionTpsHourlyServiceGetError =
+  FctExecutionTpsHourlyServiceGetErrors[keyof FctExecutionTpsHourlyServiceGetErrors];
+
+export type FctExecutionTpsHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctExecutionTpsHourlyResponse;
+};
+
+export type FctExecutionTpsHourlyServiceGetResponse =
+  FctExecutionTpsHourlyServiceGetResponses[keyof FctExecutionTpsHourlyServiceGetResponses];
+
+export type FctExecutionTransactionsDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks in this day (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks in this day (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks in this day (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks in this day (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks in this day (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks in this day (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks in this day (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks in this day (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks in this day (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks in this day (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total transactions in this day (filter: eq)
+     */
+    total_transactions_eq?: number;
+    /**
+     * Total transactions in this day (filter: ne)
+     */
+    total_transactions_ne?: number;
+    /**
+     * Total transactions in this day (filter: lt)
+     */
+    total_transactions_lt?: number;
+    /**
+     * Total transactions in this day (filter: lte)
+     */
+    total_transactions_lte?: number;
+    /**
+     * Total transactions in this day (filter: gt)
+     */
+    total_transactions_gt?: number;
+    /**
+     * Total transactions in this day (filter: gte)
+     */
+    total_transactions_gte?: number;
+    /**
+     * Total transactions in this day (filter: between_min)
+     */
+    total_transactions_between_min?: number;
+    /**
+     * Total transactions in this day (filter: between_max_value)
+     */
+    total_transactions_between_max_value?: number;
+    /**
+     * Total transactions in this day (filter: in_values) (comma-separated list)
+     */
+    total_transactions_in_values?: string;
+    /**
+     * Total transactions in this day (filter: not_in_values) (comma-separated list)
+     */
+    total_transactions_not_in_values?: string;
+    /**
+     * Cumulative transaction count since genesis (filter: eq)
+     */
+    cumulative_transactions_eq?: number;
+    /**
+     * Cumulative transaction count since genesis (filter: ne)
+     */
+    cumulative_transactions_ne?: number;
+    /**
+     * Cumulative transaction count since genesis (filter: lt)
+     */
+    cumulative_transactions_lt?: number;
+    /**
+     * Cumulative transaction count since genesis (filter: lte)
+     */
+    cumulative_transactions_lte?: number;
+    /**
+     * Cumulative transaction count since genesis (filter: gt)
+     */
+    cumulative_transactions_gt?: number;
+    /**
+     * Cumulative transaction count since genesis (filter: gte)
+     */
+    cumulative_transactions_gte?: number;
+    /**
+     * Cumulative transaction count since genesis (filter: between_min)
+     */
+    cumulative_transactions_between_min?: number;
+    /**
+     * Cumulative transaction count since genesis (filter: between_max_value)
+     */
+    cumulative_transactions_between_max_value?: number;
+    /**
+     * Cumulative transaction count since genesis (filter: in_values) (comma-separated list)
+     */
+    cumulative_transactions_in_values?: string;
+    /**
+     * Cumulative transaction count since genesis (filter: not_in_values) (comma-separated list)
+     */
+    cumulative_transactions_not_in_values?: string;
+    /**
+     * Filter avg_txn_per_block using value
+     */
+    avg_txn_per_block_value?: number;
+    /**
+     * Minimum transactions in a block (filter: eq)
+     */
+    min_txn_per_block_eq?: number;
+    /**
+     * Minimum transactions in a block (filter: ne)
+     */
+    min_txn_per_block_ne?: number;
+    /**
+     * Minimum transactions in a block (filter: lt)
+     */
+    min_txn_per_block_lt?: number;
+    /**
+     * Minimum transactions in a block (filter: lte)
+     */
+    min_txn_per_block_lte?: number;
+    /**
+     * Minimum transactions in a block (filter: gt)
+     */
+    min_txn_per_block_gt?: number;
+    /**
+     * Minimum transactions in a block (filter: gte)
+     */
+    min_txn_per_block_gte?: number;
+    /**
+     * Minimum transactions in a block (filter: between_min)
+     */
+    min_txn_per_block_between_min?: number;
+    /**
+     * Minimum transactions in a block (filter: between_max_value)
+     */
+    min_txn_per_block_between_max_value?: number;
+    /**
+     * Minimum transactions in a block (filter: in_values) (comma-separated list)
+     */
+    min_txn_per_block_in_values?: string;
+    /**
+     * Minimum transactions in a block (filter: not_in_values) (comma-separated list)
+     */
+    min_txn_per_block_not_in_values?: string;
+    /**
+     * Maximum transactions in a block (filter: eq)
+     */
+    max_txn_per_block_eq?: number;
+    /**
+     * Maximum transactions in a block (filter: ne)
+     */
+    max_txn_per_block_ne?: number;
+    /**
+     * Maximum transactions in a block (filter: lt)
+     */
+    max_txn_per_block_lt?: number;
+    /**
+     * Maximum transactions in a block (filter: lte)
+     */
+    max_txn_per_block_lte?: number;
+    /**
+     * Maximum transactions in a block (filter: gt)
+     */
+    max_txn_per_block_gt?: number;
+    /**
+     * Maximum transactions in a block (filter: gte)
+     */
+    max_txn_per_block_gte?: number;
+    /**
+     * Maximum transactions in a block (filter: between_min)
+     */
+    max_txn_per_block_between_min?: number;
+    /**
+     * Maximum transactions in a block (filter: between_max_value)
+     */
+    max_txn_per_block_between_max_value?: number;
+    /**
+     * Maximum transactions in a block (filter: in_values) (comma-separated list)
+     */
+    max_txn_per_block_in_values?: string;
+    /**
+     * Maximum transactions in a block (filter: not_in_values) (comma-separated list)
+     */
+    max_txn_per_block_not_in_values?: string;
+    /**
+     * 50th percentile (median) transactions per block (filter: eq)
+     */
+    p50_txn_per_block_eq?: number;
+    /**
+     * 50th percentile (median) transactions per block (filter: ne)
+     */
+    p50_txn_per_block_ne?: number;
+    /**
+     * 50th percentile (median) transactions per block (filter: lt)
+     */
+    p50_txn_per_block_lt?: number;
+    /**
+     * 50th percentile (median) transactions per block (filter: lte)
+     */
+    p50_txn_per_block_lte?: number;
+    /**
+     * 50th percentile (median) transactions per block (filter: gt)
+     */
+    p50_txn_per_block_gt?: number;
+    /**
+     * 50th percentile (median) transactions per block (filter: gte)
+     */
+    p50_txn_per_block_gte?: number;
+    /**
+     * 50th percentile (median) transactions per block (filter: between_min)
+     */
+    p50_txn_per_block_between_min?: number;
+    /**
+     * 50th percentile (median) transactions per block (filter: between_max_value)
+     */
+    p50_txn_per_block_between_max_value?: number;
+    /**
+     * 50th percentile (median) transactions per block (filter: in_values) (comma-separated list)
+     */
+    p50_txn_per_block_in_values?: string;
+    /**
+     * 50th percentile (median) transactions per block (filter: not_in_values) (comma-separated list)
+     */
+    p50_txn_per_block_not_in_values?: string;
+    /**
+     * 95th percentile transactions per block (filter: eq)
+     */
+    p95_txn_per_block_eq?: number;
+    /**
+     * 95th percentile transactions per block (filter: ne)
+     */
+    p95_txn_per_block_ne?: number;
+    /**
+     * 95th percentile transactions per block (filter: lt)
+     */
+    p95_txn_per_block_lt?: number;
+    /**
+     * 95th percentile transactions per block (filter: lte)
+     */
+    p95_txn_per_block_lte?: number;
+    /**
+     * 95th percentile transactions per block (filter: gt)
+     */
+    p95_txn_per_block_gt?: number;
+    /**
+     * 95th percentile transactions per block (filter: gte)
+     */
+    p95_txn_per_block_gte?: number;
+    /**
+     * 95th percentile transactions per block (filter: between_min)
+     */
+    p95_txn_per_block_between_min?: number;
+    /**
+     * 95th percentile transactions per block (filter: between_max_value)
+     */
+    p95_txn_per_block_between_max_value?: number;
+    /**
+     * 95th percentile transactions per block (filter: in_values) (comma-separated list)
+     */
+    p95_txn_per_block_in_values?: string;
+    /**
+     * 95th percentile transactions per block (filter: not_in_values) (comma-separated list)
+     */
+    p95_txn_per_block_not_in_values?: string;
+    /**
+     * 5th percentile transactions per block (filter: eq)
+     */
+    p05_txn_per_block_eq?: number;
+    /**
+     * 5th percentile transactions per block (filter: ne)
+     */
+    p05_txn_per_block_ne?: number;
+    /**
+     * 5th percentile transactions per block (filter: lt)
+     */
+    p05_txn_per_block_lt?: number;
+    /**
+     * 5th percentile transactions per block (filter: lte)
+     */
+    p05_txn_per_block_lte?: number;
+    /**
+     * 5th percentile transactions per block (filter: gt)
+     */
+    p05_txn_per_block_gt?: number;
+    /**
+     * 5th percentile transactions per block (filter: gte)
+     */
+    p05_txn_per_block_gte?: number;
+    /**
+     * 5th percentile transactions per block (filter: between_min)
+     */
+    p05_txn_per_block_between_min?: number;
+    /**
+     * 5th percentile transactions per block (filter: between_max_value)
+     */
+    p05_txn_per_block_between_max_value?: number;
+    /**
+     * 5th percentile transactions per block (filter: in_values) (comma-separated list)
+     */
+    p05_txn_per_block_in_values?: string;
+    /**
+     * 5th percentile transactions per block (filter: not_in_values) (comma-separated list)
+     */
+    p05_txn_per_block_not_in_values?: string;
+    /**
+     * Filter stddev_txn_per_block using value
+     */
+    stddev_txn_per_block_value?: number;
+    /**
+     * Filter upper_band_txn_per_block using value
+     */
+    upper_band_txn_per_block_value?: number;
+    /**
+     * Filter lower_band_txn_per_block using value
+     */
+    lower_band_txn_per_block_value?: number;
+    /**
+     * Filter moving_avg_txn_per_block using value
+     */
+    moving_avg_txn_per_block_value?: number;
+    /**
+     * The maximum number of fct_execution_transactions_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctExecutionTransactionsDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_execution_transactions_daily';
+};
+
+export type FctExecutionTransactionsDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionTransactionsDailyServiceListError =
+  FctExecutionTransactionsDailyServiceListErrors[keyof FctExecutionTransactionsDailyServiceListErrors];
+
+export type FctExecutionTransactionsDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctExecutionTransactionsDailyResponse;
+};
+
+export type FctExecutionTransactionsDailyServiceListResponse =
+  FctExecutionTransactionsDailyServiceListResponses[keyof FctExecutionTransactionsDailyServiceListResponses];
+
+export type FctExecutionTransactionsDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_execution_transactions_daily/{day_start_date}';
+};
+
+export type FctExecutionTransactionsDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionTransactionsDailyServiceGetError =
+  FctExecutionTransactionsDailyServiceGetErrors[keyof FctExecutionTransactionsDailyServiceGetErrors];
+
+export type FctExecutionTransactionsDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctExecutionTransactionsDailyResponse;
+};
+
+export type FctExecutionTransactionsDailyServiceGetResponse =
+  FctExecutionTransactionsDailyServiceGetResponses[keyof FctExecutionTransactionsDailyServiceGetResponses];
+
+export type FctExecutionTransactionsHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks in this hour (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks in this hour (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks in this hour (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks in this hour (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks in this hour (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks in this hour (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks in this hour (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks in this hour (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks in this hour (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks in this hour (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total transactions in this hour (filter: eq)
+     */
+    total_transactions_eq?: number;
+    /**
+     * Total transactions in this hour (filter: ne)
+     */
+    total_transactions_ne?: number;
+    /**
+     * Total transactions in this hour (filter: lt)
+     */
+    total_transactions_lt?: number;
+    /**
+     * Total transactions in this hour (filter: lte)
+     */
+    total_transactions_lte?: number;
+    /**
+     * Total transactions in this hour (filter: gt)
+     */
+    total_transactions_gt?: number;
+    /**
+     * Total transactions in this hour (filter: gte)
+     */
+    total_transactions_gte?: number;
+    /**
+     * Total transactions in this hour (filter: between_min)
+     */
+    total_transactions_between_min?: number;
+    /**
+     * Total transactions in this hour (filter: between_max_value)
+     */
+    total_transactions_between_max_value?: number;
+    /**
+     * Total transactions in this hour (filter: in_values) (comma-separated list)
+     */
+    total_transactions_in_values?: string;
+    /**
+     * Total transactions in this hour (filter: not_in_values) (comma-separated list)
+     */
+    total_transactions_not_in_values?: string;
+    /**
+     * Cumulative transaction count since genesis (filter: eq)
+     */
+    cumulative_transactions_eq?: number;
+    /**
+     * Cumulative transaction count since genesis (filter: ne)
+     */
+    cumulative_transactions_ne?: number;
+    /**
+     * Cumulative transaction count since genesis (filter: lt)
+     */
+    cumulative_transactions_lt?: number;
+    /**
+     * Cumulative transaction count since genesis (filter: lte)
+     */
+    cumulative_transactions_lte?: number;
+    /**
+     * Cumulative transaction count since genesis (filter: gt)
+     */
+    cumulative_transactions_gt?: number;
+    /**
+     * Cumulative transaction count since genesis (filter: gte)
+     */
+    cumulative_transactions_gte?: number;
+    /**
+     * Cumulative transaction count since genesis (filter: between_min)
+     */
+    cumulative_transactions_between_min?: number;
+    /**
+     * Cumulative transaction count since genesis (filter: between_max_value)
+     */
+    cumulative_transactions_between_max_value?: number;
+    /**
+     * Cumulative transaction count since genesis (filter: in_values) (comma-separated list)
+     */
+    cumulative_transactions_in_values?: string;
+    /**
+     * Cumulative transaction count since genesis (filter: not_in_values) (comma-separated list)
+     */
+    cumulative_transactions_not_in_values?: string;
+    /**
+     * Filter avg_txn_per_block using value
+     */
+    avg_txn_per_block_value?: number;
+    /**
+     * Minimum transactions in a block (filter: eq)
+     */
+    min_txn_per_block_eq?: number;
+    /**
+     * Minimum transactions in a block (filter: ne)
+     */
+    min_txn_per_block_ne?: number;
+    /**
+     * Minimum transactions in a block (filter: lt)
+     */
+    min_txn_per_block_lt?: number;
+    /**
+     * Minimum transactions in a block (filter: lte)
+     */
+    min_txn_per_block_lte?: number;
+    /**
+     * Minimum transactions in a block (filter: gt)
+     */
+    min_txn_per_block_gt?: number;
+    /**
+     * Minimum transactions in a block (filter: gte)
+     */
+    min_txn_per_block_gte?: number;
+    /**
+     * Minimum transactions in a block (filter: between_min)
+     */
+    min_txn_per_block_between_min?: number;
+    /**
+     * Minimum transactions in a block (filter: between_max_value)
+     */
+    min_txn_per_block_between_max_value?: number;
+    /**
+     * Minimum transactions in a block (filter: in_values) (comma-separated list)
+     */
+    min_txn_per_block_in_values?: string;
+    /**
+     * Minimum transactions in a block (filter: not_in_values) (comma-separated list)
+     */
+    min_txn_per_block_not_in_values?: string;
+    /**
+     * Maximum transactions in a block (filter: eq)
+     */
+    max_txn_per_block_eq?: number;
+    /**
+     * Maximum transactions in a block (filter: ne)
+     */
+    max_txn_per_block_ne?: number;
+    /**
+     * Maximum transactions in a block (filter: lt)
+     */
+    max_txn_per_block_lt?: number;
+    /**
+     * Maximum transactions in a block (filter: lte)
+     */
+    max_txn_per_block_lte?: number;
+    /**
+     * Maximum transactions in a block (filter: gt)
+     */
+    max_txn_per_block_gt?: number;
+    /**
+     * Maximum transactions in a block (filter: gte)
+     */
+    max_txn_per_block_gte?: number;
+    /**
+     * Maximum transactions in a block (filter: between_min)
+     */
+    max_txn_per_block_between_min?: number;
+    /**
+     * Maximum transactions in a block (filter: between_max_value)
+     */
+    max_txn_per_block_between_max_value?: number;
+    /**
+     * Maximum transactions in a block (filter: in_values) (comma-separated list)
+     */
+    max_txn_per_block_in_values?: string;
+    /**
+     * Maximum transactions in a block (filter: not_in_values) (comma-separated list)
+     */
+    max_txn_per_block_not_in_values?: string;
+    /**
+     * 50th percentile (median) transactions per block (filter: eq)
+     */
+    p50_txn_per_block_eq?: number;
+    /**
+     * 50th percentile (median) transactions per block (filter: ne)
+     */
+    p50_txn_per_block_ne?: number;
+    /**
+     * 50th percentile (median) transactions per block (filter: lt)
+     */
+    p50_txn_per_block_lt?: number;
+    /**
+     * 50th percentile (median) transactions per block (filter: lte)
+     */
+    p50_txn_per_block_lte?: number;
+    /**
+     * 50th percentile (median) transactions per block (filter: gt)
+     */
+    p50_txn_per_block_gt?: number;
+    /**
+     * 50th percentile (median) transactions per block (filter: gte)
+     */
+    p50_txn_per_block_gte?: number;
+    /**
+     * 50th percentile (median) transactions per block (filter: between_min)
+     */
+    p50_txn_per_block_between_min?: number;
+    /**
+     * 50th percentile (median) transactions per block (filter: between_max_value)
+     */
+    p50_txn_per_block_between_max_value?: number;
+    /**
+     * 50th percentile (median) transactions per block (filter: in_values) (comma-separated list)
+     */
+    p50_txn_per_block_in_values?: string;
+    /**
+     * 50th percentile (median) transactions per block (filter: not_in_values) (comma-separated list)
+     */
+    p50_txn_per_block_not_in_values?: string;
+    /**
+     * 95th percentile transactions per block (filter: eq)
+     */
+    p95_txn_per_block_eq?: number;
+    /**
+     * 95th percentile transactions per block (filter: ne)
+     */
+    p95_txn_per_block_ne?: number;
+    /**
+     * 95th percentile transactions per block (filter: lt)
+     */
+    p95_txn_per_block_lt?: number;
+    /**
+     * 95th percentile transactions per block (filter: lte)
+     */
+    p95_txn_per_block_lte?: number;
+    /**
+     * 95th percentile transactions per block (filter: gt)
+     */
+    p95_txn_per_block_gt?: number;
+    /**
+     * 95th percentile transactions per block (filter: gte)
+     */
+    p95_txn_per_block_gte?: number;
+    /**
+     * 95th percentile transactions per block (filter: between_min)
+     */
+    p95_txn_per_block_between_min?: number;
+    /**
+     * 95th percentile transactions per block (filter: between_max_value)
+     */
+    p95_txn_per_block_between_max_value?: number;
+    /**
+     * 95th percentile transactions per block (filter: in_values) (comma-separated list)
+     */
+    p95_txn_per_block_in_values?: string;
+    /**
+     * 95th percentile transactions per block (filter: not_in_values) (comma-separated list)
+     */
+    p95_txn_per_block_not_in_values?: string;
+    /**
+     * 5th percentile transactions per block (filter: eq)
+     */
+    p05_txn_per_block_eq?: number;
+    /**
+     * 5th percentile transactions per block (filter: ne)
+     */
+    p05_txn_per_block_ne?: number;
+    /**
+     * 5th percentile transactions per block (filter: lt)
+     */
+    p05_txn_per_block_lt?: number;
+    /**
+     * 5th percentile transactions per block (filter: lte)
+     */
+    p05_txn_per_block_lte?: number;
+    /**
+     * 5th percentile transactions per block (filter: gt)
+     */
+    p05_txn_per_block_gt?: number;
+    /**
+     * 5th percentile transactions per block (filter: gte)
+     */
+    p05_txn_per_block_gte?: number;
+    /**
+     * 5th percentile transactions per block (filter: between_min)
+     */
+    p05_txn_per_block_between_min?: number;
+    /**
+     * 5th percentile transactions per block (filter: between_max_value)
+     */
+    p05_txn_per_block_between_max_value?: number;
+    /**
+     * 5th percentile transactions per block (filter: in_values) (comma-separated list)
+     */
+    p05_txn_per_block_in_values?: string;
+    /**
+     * 5th percentile transactions per block (filter: not_in_values) (comma-separated list)
+     */
+    p05_txn_per_block_not_in_values?: string;
+    /**
+     * Filter stddev_txn_per_block using value
+     */
+    stddev_txn_per_block_value?: number;
+    /**
+     * Filter upper_band_txn_per_block using value
+     */
+    upper_band_txn_per_block_value?: number;
+    /**
+     * Filter lower_band_txn_per_block using value
+     */
+    lower_band_txn_per_block_value?: number;
+    /**
+     * Filter moving_avg_txn_per_block using value
+     */
+    moving_avg_txn_per_block_value?: number;
+    /**
+     * The maximum number of fct_execution_transactions_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctExecutionTransactionsHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_execution_transactions_hourly';
+};
+
+export type FctExecutionTransactionsHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionTransactionsHourlyServiceListError =
+  FctExecutionTransactionsHourlyServiceListErrors[keyof FctExecutionTransactionsHourlyServiceListErrors];
+
+export type FctExecutionTransactionsHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctExecutionTransactionsHourlyResponse;
+};
+
+export type FctExecutionTransactionsHourlyServiceListResponse =
+  FctExecutionTransactionsHourlyServiceListResponses[keyof FctExecutionTransactionsHourlyServiceListResponses];
+
+export type FctExecutionTransactionsHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_execution_transactions_hourly/{hour_start_date_time}';
+};
+
+export type FctExecutionTransactionsHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionTransactionsHourlyServiceGetError =
+  FctExecutionTransactionsHourlyServiceGetErrors[keyof FctExecutionTransactionsHourlyServiceGetErrors];
+
+export type FctExecutionTransactionsHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctExecutionTransactionsHourlyResponse;
+};
+
+export type FctExecutionTransactionsHourlyServiceGetResponse =
+  FctExecutionTransactionsHourlyServiceGetResponses[keyof FctExecutionTransactionsHourlyServiceGetResponses];
 
 export type FctHeadFirstSeenByNodeServiceListData = {
   body?: never;

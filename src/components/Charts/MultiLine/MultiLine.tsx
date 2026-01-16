@@ -1,5 +1,6 @@
 import type React from 'react';
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, useContext } from 'react';
+import type { EChartsInstance } from 'echarts-for-react/lib';
 import type ReactEChartsCore from 'echarts-for-react/lib/core';
 import ReactEChartsComponent from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
@@ -15,7 +16,7 @@ import {
 import { CanvasRenderer } from 'echarts/renderers';
 import { hexToRgba, formatSmartDecimal, getDataVizColors, resolveCssColorToHex } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { useSharedCrosshairs } from '@/hooks/useSharedCrosshairs';
+import { SharedCrosshairsContext } from '@/contexts/SharedCrosshairsContext';
 import { Disclosure } from '@/components/Layout/Disclosure';
 import type { MultiLineChartProps } from './MultiLine.types';
 
@@ -69,6 +70,7 @@ export function MultiLineChart({
   series,
   xAxis,
   yAxis,
+  secondaryYAxis,
   title,
   subtitle,
   height: _height = 400,
@@ -95,20 +97,54 @@ export function MultiLineChart({
 }: MultiLineChartProps): React.JSX.Element {
   // Store ref to the ReactEChartsCore wrapper (not the instance) for click handling
   const chartWrapperRef = useRef<ReactEChartsCore | null>(null);
+  // Store the chart instance for sync cleanup
+  const chartInstanceRef = useRef<EChartsInstance | null>(null);
+  // Store dataZoom state to preserve zoom when legend toggles series visibility
+  const dataZoomStateRef = useRef<{ start: number; end: number } | null>(null);
 
-  // Get callback ref for crosshair sync, extended to also store the wrapper ref
-  const baseCrosshairRef = useSharedCrosshairs({ syncGroup });
+  // Get shared crosshairs context for sync registration
+  const crosshairsContext = useContext(SharedCrosshairsContext);
 
-  // Combined ref that handles both crosshair sync and stores wrapper ref
-  const chartRef = useCallback(
-    (node: ReactEChartsCore | null) => {
-      // First, call the crosshair sync ref
-      baseCrosshairRef(node);
-      // Store wrapper ref for click handling
-      chartWrapperRef.current = node;
+  // Handle chart ready - register for sync when chart is fully initialized
+  const handleChartReady = useCallback(
+    (instance: EChartsInstance) => {
+      const echartsInstance = instance;
+      chartInstanceRef.current = echartsInstance;
+      if (syncGroup && crosshairsContext) {
+        crosshairsContext.registerChart(syncGroup, echartsInstance);
+      }
+
+      // Track dataZoom changes to preserve zoom state when legend toggles series
+      // Must be attached here because chartInstanceRef is not available during effect mount
+      if (enableDataZoom) {
+        const handleDataZoom = (): void => {
+          const option = echartsInstance.getOption() as {
+            dataZoom?: Array<{ start?: number; end?: number }>;
+          };
+          const dz = option.dataZoom?.[0];
+          if (dz && typeof dz.start === 'number' && typeof dz.end === 'number') {
+            dataZoomStateRef.current = { start: dz.start, end: dz.end };
+          }
+        };
+        echartsInstance.on('datazoom', handleDataZoom);
+      }
     },
-    [baseCrosshairRef]
+    [syncGroup, crosshairsContext, enableDataZoom]
   );
+
+  // Cleanup sync registration on unmount or syncGroup change
+  useEffect(() => {
+    return () => {
+      if (chartInstanceRef.current && syncGroup && crosshairsContext) {
+        crosshairsContext.unregisterChart(syncGroup, chartInstanceRef.current);
+      }
+    };
+  }, [syncGroup, crosshairsContext]);
+
+  // Store wrapper ref for click handling
+  const chartRef = useCallback((node: ReactEChartsCore | null) => {
+    chartWrapperRef.current = node;
+  }, []);
 
   // Handle click on chart to find closest series
   const handleChartClick = useCallback(
@@ -199,8 +235,9 @@ export function MultiLineChart({
 
   // Manage visible series when interactive legend is enabled
   // Use lazy initialization to ensure stable initial Set reference across StrictMode remounts
+  // Filter by visible !== false (shown in legend) AND initiallyVisible !== false (starts enabled)
   const [visibleSeries, setVisibleSeries] = useState<Set<string>>(
-    () => new Set(series.filter(s => s.visible !== false).map(s => s.name))
+    () => new Set(series.filter(s => s.visible !== false && s.initiallyVisible !== false).map(s => s.name))
   );
 
   // Series filter state
@@ -246,12 +283,16 @@ export function MultiLineChart({
         }
       });
 
-      // Auto-add only genuinely new series
+      // Auto-add only genuinely new series (respecting initiallyVisible)
       if (newSeriesNames.size > 0) {
         newSeriesNames.forEach(name => {
-          updated.add(name);
+          const s = series.find(s => s.name === name);
+          // Only auto-add if initiallyVisible is not explicitly false
+          if (s && s.initiallyVisible !== false) {
+            updated.add(name);
+            changed = true;
+          }
         });
-        changed = true;
       }
 
       // Return same reference if nothing changed to avoid re-render
@@ -308,6 +349,9 @@ export function MultiLineChart({
   // Use useMemo to create a new array reference only when filtering actually changes
   const displayedSeries = useMemo(() => {
     return series.filter(s => {
+      // Series with visible: false are always rendered (hidden from legend but part of chart)
+      // This is essential for stacked area bands where base series must render
+      if (s.visible === false) return true;
       // Filter by visibility if legend or series filter is enabled
       if ((showLegend || enableSeriesFilter) && !visibleSeries.has(s.name)) return false;
       // Filter aggregate series if toggle is enabled and aggregate is hidden
@@ -324,12 +368,43 @@ export function MultiLineChart({
     showAggregate,
   ]);
 
+  // Restore dataZoom state after chart option changes
+  // This handles: legend toggles, data refetches, any re-render that resets zoom
+  useEffect(() => {
+    const instance = chartInstanceRef.current;
+    if (!instance || !enableDataZoom || !dataZoomStateRef.current) return;
+
+    // Use setTimeout to ensure this runs after the chart option update
+    const timeoutId = setTimeout(() => {
+      if (dataZoomStateRef.current) {
+        instance.dispatchAction({
+          type: 'dataZoom',
+          start: dataZoomStateRef.current.start,
+          end: dataZoomStateRef.current.end,
+        });
+      }
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [displayedSeries, enableDataZoom]);
+
   // Build complete option
   // Memoize based on actual data that should trigger re-animation
   const option = useMemo(() => {
     // Build x-axis configuration
+    // For time axis, use 'value' type with Unix timestamps for proper crosshair sync
+    const isTimeAxis = xAxis.type === 'time';
+    const timeMin = isTimeAxis && xAxis.timestamps?.length ? Math.min(...xAxis.timestamps) : undefined;
+    const timeMax = isTimeAxis && xAxis.timestamps?.length ? Math.max(...xAxis.timestamps) : undefined;
+
+    // Default time formatter: "Jan 15" format
+    const defaultTimeFormatter = (ts: number): string => {
+      const d = new Date(ts * 1000);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+    };
+
     const xAxisConfig = {
-      type: xAxis.type,
+      type: isTimeAxis ? ('value' as const) : xAxis.type,
       name: xAxis.name,
       nameLocation: 'middle' as const,
       nameGap: 30,
@@ -342,17 +417,20 @@ export function MultiLineChart({
       },
       axisLabel: {
         color: themeColors.muted,
-        formatter: xAxis.formatter || (relativeSlots ? (value: number) => formatSlotLabel(value) : undefined),
+        formatter:
+          xAxis.formatter ||
+          (isTimeAxis ? defaultTimeFormatter : undefined) ||
+          (relativeSlots ? (value: number) => formatSlotLabel(value) : undefined),
       },
       splitLine: {
         show: false,
       },
-      min: xAxis.type === 'value' ? xAxis.min : undefined,
-      max: xAxis.type === 'value' ? xAxis.max : undefined,
+      min: isTimeAxis ? (xAxis.min ?? timeMin) : xAxis.type === 'value' ? xAxis.min : undefined,
+      max: isTimeAxis ? (xAxis.max ?? timeMax) : xAxis.type === 'value' ? xAxis.max : undefined,
     };
 
-    // Build y-axis configuration
-    const yAxisConfig = {
+    // Build y-axis configuration (primary)
+    const primaryYAxisConfig = {
       type: 'value' as const,
       name: yAxis?.name,
       nameLocation: 'middle' as const,
@@ -375,6 +453,34 @@ export function MultiLineChart({
       minInterval: yAxis?.minInterval,
     };
 
+    // Build secondary y-axis configuration (right side) if provided
+    const secondaryYAxisConfig = secondaryYAxis
+      ? {
+          type: 'value' as const,
+          name: secondaryYAxis.name,
+          nameLocation: 'middle' as const,
+          nameGap: secondaryYAxis.name ? 45 : 0,
+          nameTextStyle: { color: themeColors.muted },
+          position: 'right' as const,
+          axisLine: {
+            show: true,
+            lineStyle: { color: themeColors.border },
+          },
+          axisTick: { show: false },
+          splitLine: { show: false },
+          axisLabel: {
+            color: themeColors.muted,
+            formatter: secondaryYAxis.formatter,
+          },
+          min: secondaryYAxis.min,
+          max: secondaryYAxis.max,
+          minInterval: secondaryYAxis.minInterval,
+        }
+      : null;
+
+    // Combined y-axis config (single or array)
+    const yAxisConfig = secondaryYAxisConfig ? [primaryYAxisConfig, secondaryYAxisConfig] : primaryYAxisConfig;
+
     // Build series configuration
     // Note: Don't filter by visible property here - displayedSeries already handles visibility via visibleSeries state
     const seriesConfig = displayedSeries.map(s => {
@@ -392,6 +498,7 @@ export function MultiLineChart({
         showSymbol: s.showSymbol ?? false,
         symbolSize: s.symbolSize ?? 4,
         stack: s.stack,
+        yAxisIndex: s.yAxisIndex ?? 0,
         triggerLineEvent: true, // Enable click events on lines
         lineStyle: {
           color: seriesColor,
@@ -520,7 +627,7 @@ export function MultiLineChart({
 
     const gridConfig = grid ?? {
       left: 60,
-      right: 24,
+      right: secondaryYAxis ? 70 : 24, // Extra space for secondary y-axis
       top: 16,
       bottom: baseBottom + legendBottom + dataZoomBottom,
     };
@@ -730,6 +837,7 @@ export function MultiLineChart({
     themeColors.primary,
     xAxis,
     yAxis,
+    secondaryYAxis,
     displayedSeries,
     series,
     grid,
@@ -860,36 +968,60 @@ export function MultiLineChart({
             )}
           </div>
           <div className="max-h-[200px] overflow-y-auto">
-            <div className="flex flex-wrap items-center gap-2">
-              {series
-                .filter(s => !enableAggregateToggle || s.name !== aggregateSeriesName)
-                .map(s => {
-                  const isVisible = visibleSeries.has(s.name);
-                  const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
-                  return (
-                    <button
-                      key={s.name}
-                      onClick={() => toggleSeries(s.name)}
-                      className={`flex cursor-pointer items-center gap-1.5 rounded-sm border px-2 py-1 text-xs/5 transition-all ${
-                        isVisible
-                          ? 'bg-surface-hover border-border text-foreground hover:border-primary/50 hover:bg-primary/10'
-                          : 'hover:bg-surface-hover/50 border-transparent bg-surface/50 text-muted/50 hover:border-border'
-                      }`}
-                      title={isVisible ? `Click to hide ${s.name}` : `Click to show ${s.name}`}
-                    >
-                      <span
-                        className="h-2 w-2 rounded-full transition-colors"
-                        style={{
-                          backgroundColor: isVisible ? seriesColor : 'transparent',
-                          border: `2px solid ${seriesColor}`,
-                          opacity: isVisible ? 1 : 0.5,
-                        }}
-                      />
-                      <span className="font-medium">{s.name}</span>
-                    </button>
-                  );
-                })}
-            </div>
+            {(() => {
+              const legendSeries = series.filter(
+                s => s.visible !== false && (!enableAggregateToggle || s.name !== aggregateSeriesName)
+              );
+              // Group series by their group property, maintaining order
+              const groups: Array<{ name: string | null; items: typeof legendSeries }> = [];
+              const seenGroups = new Set<string | null>();
+              legendSeries.forEach(s => {
+                const groupName = s.group ?? null;
+                if (!seenGroups.has(groupName)) {
+                  seenGroups.add(groupName);
+                  groups.push({ name: groupName, items: [] });
+                }
+                groups.find(g => g.name === groupName)?.items.push(s);
+              });
+
+              return (
+                <div className="flex flex-col gap-2">
+                  {groups.map(group => (
+                    <div key={group.name ?? '__ungrouped__'} className="flex items-center gap-2">
+                      {group.name && <span className="text-xs text-muted">{group.name}:</span>}
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {group.items.map(s => {
+                          const isVisible = visibleSeries.has(s.name);
+                          const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
+                          return (
+                            <button
+                              key={s.name}
+                              onClick={() => toggleSeries(s.name)}
+                              className={`flex cursor-pointer items-center gap-1.5 rounded-sm border px-2 py-1 text-xs/5 transition-all ${
+                                isVisible
+                                  ? 'bg-surface-hover border-border text-foreground hover:border-primary/50 hover:bg-primary/10'
+                                  : 'hover:bg-surface-hover/50 border-transparent bg-surface/50 text-muted/50 hover:border-border'
+                              }`}
+                              title={isVisible ? `Click to hide ${s.name}` : `Click to show ${s.name}`}
+                            >
+                              <span
+                                className="h-2 w-2 rounded-full transition-colors"
+                                style={{
+                                  backgroundColor: isVisible ? seriesColor : 'transparent',
+                                  border: `2px solid ${seriesColor}`,
+                                  opacity: isVisible ? 1 : 0.5,
+                                }}
+                              />
+                              <span className="font-medium">{s.name}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}
@@ -914,6 +1046,7 @@ export function MultiLineChart({
           }}
           notMerge={notMerge}
           opts={{ renderer: 'canvas' }}
+          onChartReady={handleChartReady}
         />
       </div>
 
@@ -934,36 +1067,60 @@ export function MultiLineChart({
             )}
           </div>
           <div className="max-h-[200px] overflow-y-auto">
-            <div className="flex flex-wrap items-center gap-2">
-              {series
-                .filter(s => !enableAggregateToggle || s.name !== aggregateSeriesName)
-                .map(s => {
-                  const isVisible = visibleSeries.has(s.name);
-                  const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
-                  return (
-                    <button
-                      key={s.name}
-                      onClick={() => toggleSeries(s.name)}
-                      className={`flex cursor-pointer items-center gap-1.5 rounded-sm border px-2 py-1 text-xs/5 transition-all ${
-                        isVisible
-                          ? 'bg-surface-hover border-border text-foreground hover:border-primary/50 hover:bg-primary/10'
-                          : 'hover:bg-surface-hover/50 border-transparent bg-surface/50 text-muted/50 hover:border-border'
-                      }`}
-                      title={isVisible ? `Click to hide ${s.name}` : `Click to show ${s.name}`}
-                    >
-                      <span
-                        className="h-2 w-2 rounded-full transition-colors"
-                        style={{
-                          backgroundColor: isVisible ? seriesColor : 'transparent',
-                          border: `2px solid ${seriesColor}`,
-                          opacity: isVisible ? 1 : 0.5,
-                        }}
-                      />
-                      <span className="font-medium">{s.name}</span>
-                    </button>
-                  );
-                })}
-            </div>
+            {(() => {
+              const legendSeries = series.filter(
+                s => s.visible !== false && (!enableAggregateToggle || s.name !== aggregateSeriesName)
+              );
+              // Group series by their group property, maintaining order
+              const groups: Array<{ name: string | null; items: typeof legendSeries }> = [];
+              const seenGroups = new Set<string | null>();
+              legendSeries.forEach(s => {
+                const groupName = s.group ?? null;
+                if (!seenGroups.has(groupName)) {
+                  seenGroups.add(groupName);
+                  groups.push({ name: groupName, items: [] });
+                }
+                groups.find(g => g.name === groupName)?.items.push(s);
+              });
+
+              return (
+                <div className="flex flex-col gap-2">
+                  {groups.map(group => (
+                    <div key={group.name ?? '__ungrouped__'} className="flex items-center gap-2">
+                      {group.name && <span className="text-xs text-muted">{group.name}:</span>}
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {group.items.map(s => {
+                          const isVisible = visibleSeries.has(s.name);
+                          const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
+                          return (
+                            <button
+                              key={s.name}
+                              onClick={() => toggleSeries(s.name)}
+                              className={`flex cursor-pointer items-center gap-1.5 rounded-sm border px-2 py-1 text-xs/5 transition-all ${
+                                isVisible
+                                  ? 'bg-surface-hover border-border text-foreground hover:border-primary/50 hover:bg-primary/10'
+                                  : 'hover:bg-surface-hover/50 border-transparent bg-surface/50 text-muted/50 hover:border-border'
+                              }`}
+                              title={isVisible ? `Click to hide ${s.name}` : `Click to show ${s.name}`}
+                            >
+                              <span
+                                className="h-2 w-2 rounded-full transition-colors"
+                                style={{
+                                  backgroundColor: isVisible ? seriesColor : 'transparent',
+                                  border: `2px solid ${seriesColor}`,
+                                  opacity: isVisible ? 1 : 0.5,
+                                }}
+                              />
+                              <span className="font-medium">{s.name}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}

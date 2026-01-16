@@ -8,25 +8,50 @@ export interface MinClientVersions {
   tysm?: string;
 }
 
-export interface Fork {
+export interface ConsensusFork {
   epoch: number;
+  timestamp?: number;
   min_client_versions: MinClientVersions;
 }
 
 export interface ConsensusForks {
-  phase0?: Fork;
-  altair?: Fork;
-  bellatrix?: Fork;
-  capella?: Fork;
-  deneb?: Fork;
-  electra?: Fork;
-  fulu?: Fork;
-  glaos?: Fork;
-  fusaka?: Fork;
+  phase0?: ConsensusFork;
+  altair?: ConsensusFork;
+  bellatrix?: ConsensusFork;
+  capella?: ConsensusFork;
+  deneb?: ConsensusFork;
+  electra?: ConsensusFork;
+  fulu?: ConsensusFork;
+  glaos?: ConsensusFork;
+  fusaka?: ConsensusFork;
+}
+
+export interface ExecutionFork {
+  block: number;
+  timestamp: number;
+}
+
+export interface ExecutionForks {
+  frontier?: ExecutionFork;
+  homestead?: ExecutionFork;
+  dao?: ExecutionFork;
+  tangerine_whistle?: ExecutionFork;
+  spurious_dragon?: ExecutionFork;
+  byzantium?: ExecutionFork;
+  constantinople?: ExecutionFork;
+  petersburg?: ExecutionFork;
+  istanbul?: ExecutionFork;
+  muir_glacier?: ExecutionFork;
+  berlin?: ExecutionFork;
+  london?: ExecutionFork;
+  arrow_glacier?: ExecutionFork;
+  gray_glacier?: ExecutionFork;
+  paris?: ExecutionFork;
 }
 
 export interface Forks {
   consensus: ConsensusForks;
+  execution?: ExecutionForks;
 }
 
 export interface ServiceUrls {
@@ -41,6 +66,7 @@ export interface ServiceUrls {
 
 export interface BlobScheduleItem {
   epoch: number;
+  timestamp?: number;
   max_blobs_per_block: number;
 }
 

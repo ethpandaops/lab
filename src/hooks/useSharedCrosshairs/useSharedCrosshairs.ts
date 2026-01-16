@@ -1,5 +1,6 @@
 import { useContext, useCallback } from 'react';
 import type ReactEChartsCore from 'echarts-for-react/lib/core';
+import type { EChartsInstance } from 'echarts-for-react/lib';
 import { SharedCrosshairsContext } from '@/contexts/SharedCrosshairsContext';
 
 /**
@@ -30,7 +31,7 @@ export function useSharedCrosshairs({ syncGroup }: { syncGroup?: string }): (nod
         // Chart mounted - get instance and register
         const chartInstance = node.getEchartsInstance();
         if (chartInstance) {
-          const instance = chartInstance as unknown as import('echarts/core').EChartsType;
+          const instance = chartInstance as EChartsInstance;
           context.registerChart(syncGroup, instance);
         }
       } else {

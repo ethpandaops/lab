@@ -1,4 +1,4 @@
-import type { EChartsType } from 'echarts/core';
+import type { EChartsInstance } from 'echarts-for-react/lib';
 
 /**
  * Sync group identifier for grouping charts that should share crosshairs
@@ -15,12 +15,12 @@ export interface SharedCrosshairsContextValue {
    * @param group - The sync group identifier
    * @param instance - The ECharts instance to register
    */
-  registerChart: (group: SyncGroup, instance: EChartsType) => void;
+  registerChart: (group: SyncGroup, instance: EChartsInstance) => void;
 
   /**
    * Unregister a chart instance from a sync group
    * @param group - The sync group identifier
    * @param instance - The ECharts instance to unregister
    */
-  unregisterChart: (group: SyncGroup, instance: EChartsType) => void;
+  unregisterChart: (group: SyncGroup, instance: EChartsInstance) => void;
 }
