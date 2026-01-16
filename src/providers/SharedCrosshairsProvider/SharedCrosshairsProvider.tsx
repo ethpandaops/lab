@@ -1,6 +1,7 @@
 import { type JSX, useCallback, useRef } from 'react';
 import * as echarts from 'echarts/core';
 import type { EChartsType } from 'echarts/core';
+import type { EChartsInstance } from 'echarts-for-react/lib';
 import { SharedCrosshairsContext } from '@/contexts/SharedCrosshairsContext';
 import type { SyncGroup } from '@/contexts/SharedCrosshairsContext';
 
@@ -24,13 +25,13 @@ interface SharedCrosshairsProviderProps {
  */
 export function SharedCrosshairsProvider({ children }: SharedCrosshairsProviderProps): JSX.Element {
   // Map of sync group ID to Set of chart instances
-  const chartGroupsRef = useRef<Map<SyncGroup, Set<EChartsType>>>(new Map());
+  const chartGroupsRef = useRef<Map<SyncGroup, Set<EChartsInstance>>>(new Map());
 
   /**
    * Register a chart instance to a sync group
    * Connects all charts in the group via echarts.connect()
    */
-  const registerChart = useCallback((group: SyncGroup, instance: EChartsType) => {
+  const registerChart = useCallback((group: SyncGroup, instance: EChartsInstance) => {
     const groups = chartGroupsRef.current;
 
     // Get or create the set for this group
@@ -43,7 +44,7 @@ export function SharedCrosshairsProvider({ children }: SharedCrosshairsProviderP
 
     // Connect all charts in this group - pass the array of instances
     if (groupSet.size > 1) {
-      echarts.connect(Array.from(groupSet));
+      echarts.connect(Array.from(groupSet) as unknown as EChartsType[]);
     }
   }, []);
 
@@ -51,7 +52,7 @@ export function SharedCrosshairsProvider({ children }: SharedCrosshairsProviderP
    * Unregister a chart instance from a sync group
    * Disconnects the instance and reconnects remaining charts
    */
-  const unregisterChart = useCallback((group: SyncGroup, instance: EChartsType) => {
+  const unregisterChart = useCallback((group: SyncGroup, instance: EChartsInstance) => {
     const groups = chartGroupsRef.current;
     const groupSet = groups.get(group);
 
@@ -68,7 +69,7 @@ export function SharedCrosshairsProvider({ children }: SharedCrosshairsProviderP
 
     // Reconnect remaining charts if there are multiple
     if (groupSet.size > 1) {
-      echarts.connect(Array.from(groupSet));
+      echarts.connect(Array.from(groupSet) as unknown as EChartsType[]);
     }
   }, []);
 

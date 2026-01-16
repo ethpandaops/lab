@@ -45,6 +45,7 @@ import { Route as EthereumExecutionTimingsRouteImport } from './routes/ethereum/
 import { Route as EthereumExecutionStateGrowthRouteImport } from './routes/ethereum/execution/state-growth'
 import { Route as EthereumExecutionStateExpiryRouteImport } from './routes/ethereum/execution/state-expiry'
 import { Route as EthereumExecutionPayloadsRouteImport } from './routes/ethereum/execution/payloads'
+import { Route as EthereumExecutionOverviewRouteImport } from './routes/ethereum/execution/overview'
 import { Route as EthereumEpochsEpochRouteImport } from './routes/ethereum/epochs/$epoch'
 import { Route as EthereumEntitiesEntityRouteImport } from './routes/ethereum/entities/$entity'
 import { Route as EthereumDataAvailabilityProbesRouteImport } from './routes/ethereum/data-availability/probes'
@@ -246,6 +247,12 @@ const EthereumExecutionPayloadsRoute =
     path: '/payloads',
     getParentRoute: () => EthereumExecutionRoute,
   } as any)
+const EthereumExecutionOverviewRoute =
+  EthereumExecutionOverviewRouteImport.update({
+    id: '/overview',
+    path: '/overview',
+    getParentRoute: () => EthereumExecutionRoute,
+  } as any)
 const EthereumEpochsEpochRoute = EthereumEpochsEpochRouteImport.update({
   id: '/$epoch',
   path: '/$epoch',
@@ -341,6 +348,7 @@ export interface FileRoutesByFullPath {
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesRouteWithChildren
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
+  '/ethereum/execution/overview': typeof EthereumExecutionOverviewRoute
   '/ethereum/execution/payloads': typeof EthereumExecutionPayloadsRouteWithChildren
   '/ethereum/execution/state-expiry': typeof EthereumExecutionStateExpiryRoute
   '/ethereum/execution/state-growth': typeof EthereumExecutionStateGrowthRoute
@@ -381,6 +389,7 @@ export interface FileRoutesByTo {
   '/ethereum/contracts/$address': typeof EthereumContractsAddressRoute
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
+  '/ethereum/execution/overview': typeof EthereumExecutionOverviewRoute
   '/ethereum/execution/state-expiry': typeof EthereumExecutionStateExpiryRoute
   '/ethereum/execution/state-growth': typeof EthereumExecutionStateGrowthRoute
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
@@ -429,6 +438,7 @@ export interface FileRoutesById {
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesRouteWithChildren
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
+  '/ethereum/execution/overview': typeof EthereumExecutionOverviewRoute
   '/ethereum/execution/payloads': typeof EthereumExecutionPayloadsRouteWithChildren
   '/ethereum/execution/state-expiry': typeof EthereumExecutionStateExpiryRoute
   '/ethereum/execution/state-growth': typeof EthereumExecutionStateGrowthRoute
@@ -480,6 +490,7 @@ export interface FileRouteTypes {
     | '/ethereum/data-availability/probes'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
+    | '/ethereum/execution/overview'
     | '/ethereum/execution/payloads'
     | '/ethereum/execution/state-expiry'
     | '/ethereum/execution/state-growth'
@@ -520,6 +531,7 @@ export interface FileRouteTypes {
     | '/ethereum/contracts/$address'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
+    | '/ethereum/execution/overview'
     | '/ethereum/execution/state-expiry'
     | '/ethereum/execution/state-growth'
     | '/ethereum/forks/$fork'
@@ -567,6 +579,7 @@ export interface FileRouteTypes {
     | '/ethereum/data-availability/probes'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
+    | '/ethereum/execution/overview'
     | '/ethereum/execution/payloads'
     | '/ethereum/execution/state-expiry'
     | '/ethereum/execution/state-growth'
@@ -853,6 +866,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumExecutionPayloadsRouteImport
       parentRoute: typeof EthereumExecutionRoute
     }
+    '/ethereum/execution/overview': {
+      id: '/ethereum/execution/overview'
+      path: '/overview'
+      fullPath: '/ethereum/execution/overview'
+      preLoaderRoute: typeof EthereumExecutionOverviewRouteImport
+      parentRoute: typeof EthereumExecutionRoute
+    }
     '/ethereum/epochs/$epoch': {
       id: '/ethereum/epochs/$epoch'
       path: '/$epoch'
@@ -1050,6 +1070,7 @@ const EthereumExecutionTimingsRouteWithChildren =
   )
 
 interface EthereumExecutionRouteChildren {
+  EthereumExecutionOverviewRoute: typeof EthereumExecutionOverviewRoute
   EthereumExecutionPayloadsRoute: typeof EthereumExecutionPayloadsRouteWithChildren
   EthereumExecutionStateExpiryRoute: typeof EthereumExecutionStateExpiryRoute
   EthereumExecutionStateGrowthRoute: typeof EthereumExecutionStateGrowthRoute
@@ -1057,6 +1078,7 @@ interface EthereumExecutionRouteChildren {
 }
 
 const EthereumExecutionRouteChildren: EthereumExecutionRouteChildren = {
+  EthereumExecutionOverviewRoute: EthereumExecutionOverviewRoute,
   EthereumExecutionPayloadsRoute: EthereumExecutionPayloadsRouteWithChildren,
   EthereumExecutionStateExpiryRoute: EthereumExecutionStateExpiryRoute,
   EthereumExecutionStateGrowthRoute: EthereumExecutionStateGrowthRoute,

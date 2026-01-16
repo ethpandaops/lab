@@ -27,10 +27,17 @@ export interface SeriesData {
    */
   color?: string;
   /**
-   * Whether the series is visible
+   * Whether the series is visible in the legend
+   * When false, series is hidden from legend but still renders (for stacking)
    * @default true
    */
   visible?: boolean;
+  /**
+   * Whether the series starts enabled/checked in the legend
+   * Only applies when visible is true (shown in legend)
+   * @default true
+   */
+  initiallyVisible?: boolean;
   /**
    * Enable smooth curve for this series
    * @default false
@@ -106,6 +113,17 @@ export interface SeriesData {
      */
     symbolSize?: number;
   };
+  /**
+   * Legend group name - series with the same group will be grouped together in the legend
+   * Groups are displayed in the order they first appear in the series array
+   */
+  group?: string;
+  /**
+   * Y-axis index for dual-axis charts
+   * 0 = primary (left), 1 = secondary (right)
+   * @default 0
+   */
+  yAxisIndex?: number;
 }
 
 /**
@@ -116,8 +134,9 @@ export interface XAxisConfig {
    * Axis type
    * - 'category': Uses string labels (e.g., days of week)
    * - 'value': Uses numeric values (e.g., slot numbers)
+   * - 'time': Uses Unix timestamps (seconds) for time-based sync
    */
-  type: 'category' | 'value';
+  type: 'category' | 'value' | 'time';
   /**
    * Axis name/label
    */
@@ -127,11 +146,16 @@ export interface XAxisConfig {
    */
   labels?: string[];
   /**
-   * Minimum value (only for type 'value')
+   * Unix timestamps in seconds (required when type is 'time')
+   * Used to set axis min/max and for time-based crosshair sync
+   */
+  timestamps?: number[];
+  /**
+   * Minimum value (only for type 'value' or 'time')
    */
   min?: number | 'dataMin';
   /**
-   * Maximum value (only for type 'value')
+   * Maximum value (only for type 'value' or 'time')
    */
   max?: number | 'dataMax';
   /**
@@ -222,9 +246,14 @@ export interface MultiLineChartProps {
    */
   xAxis: XAxisConfig;
   /**
-   * Y-axis configuration
+   * Y-axis configuration (primary/left axis)
    */
   yAxis?: YAxisConfig;
+  /**
+   * Secondary Y-axis configuration (right axis)
+   * Used for dual-axis charts with series that have yAxisIndex: 1
+   */
+  secondaryYAxis?: YAxisConfig;
   /**
    * Chart title
    */

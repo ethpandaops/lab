@@ -735,3 +735,157 @@ export const EmphasisHover: Story = {
     );
   },
 };
+
+// ==========================
+// NEW FEATURES
+// ==========================
+
+/**
+ * Vertical annotation lines for marking events (forks, deployments, etc.)
+ */
+export const MarkLines: Story = {
+  render: () => {
+    const themeColors = useThemeColors();
+    return (
+      <MultiLineChart
+        series={[
+          {
+            name: 'Transactions',
+            data: [120, 200, 150, 80, 70, 110, 130],
+            color: themeColors.primary,
+          },
+          {
+            name: 'Gas Used',
+            data: [90, 140, 100, 120, 80, 90, 100],
+            color: themeColors.accent,
+          },
+        ]}
+        xAxis={{
+          type: 'category',
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        }}
+        yAxis={{
+          name: 'Value',
+        }}
+        title="Fork Annotations Example"
+        subtitle="Vertical annotation lines mark important events"
+        showCard={true}
+        showLegend={true}
+        markLines={[
+          { xValue: 'Wed', label: 'DENEB', color: '#9ca3af', lineStyle: 'dashed', lineWidth: 1 },
+          { xValue: 'Fri', label: 'PECTRA', color: '#f59e0b', lineStyle: 'dashed', lineWidth: 1 },
+        ]}
+        height={300}
+      />
+    );
+  },
+};
+
+/**
+ * Dual y-axis chart with primary (left) and secondary (right) axes
+ */
+export const DualAxis: Story = {
+  render: () => {
+    const themeColors = useThemeColors();
+    // Generate data for gas used with cumulative
+    const days = ['Jan 1', 'Jan 2', 'Jan 3', 'Jan 4', 'Jan 5', 'Jan 6', 'Jan 7'];
+    const gasUsed = [15000000, 18000000, 22000000, 19000000, 25000000, 28000000, 30000000];
+    let cumulative = 0;
+    const cumulativeData = gasUsed.map(g => {
+      cumulative += g;
+      return cumulative;
+    });
+
+    return (
+      <MultiLineChart
+        series={[
+          {
+            name: 'Gas Used',
+            data: gasUsed,
+            color: themeColors.primary,
+            yAxisIndex: 0,
+          },
+          {
+            name: 'Cumulative Gas',
+            data: cumulativeData,
+            color: 'rgba(156, 163, 175, 0.6)',
+            lineWidth: 1.5,
+            yAxisIndex: 1,
+          },
+        ]}
+        xAxis={{
+          type: 'category',
+          labels: days,
+        }}
+        yAxis={{
+          name: 'Gas Used',
+          min: 0,
+          formatter: (val: number) => `${(val / 1_000_000).toFixed(0)}M`,
+        }}
+        secondaryYAxis={{
+          name: 'Cumulative',
+          min: 0,
+          formatter: (val: number) => `${(val / 1_000_000_000).toFixed(1)}B`,
+        }}
+        title="Dual Y-Axis Example"
+        subtitle="Left axis for daily values, right axis for cumulative"
+        showCard={true}
+        showLegend={true}
+        height={300}
+      />
+    );
+  },
+};
+
+/**
+ * Series with initiallyVisible set to false start hidden in the legend
+ */
+export const InitiallyVisible: Story = {
+  render: () => {
+    const themeColors = useThemeColors();
+    return (
+      <MultiLineChart
+        series={[
+          {
+            name: 'Average',
+            data: [50, 60, 55, 65, 70, 68, 75],
+            color: themeColors.primary,
+            initiallyVisible: true,
+          },
+          {
+            name: 'Median',
+            data: [48, 58, 52, 62, 68, 65, 72],
+            color: themeColors.accent,
+            initiallyVisible: true,
+          },
+          {
+            name: 'Min',
+            data: [20, 25, 22, 30, 35, 32, 40],
+            color: colors.gray[400],
+            lineStyle: 'dashed',
+            initiallyVisible: false,
+          },
+          {
+            name: 'Max',
+            data: [80, 95, 88, 100, 105, 100, 110],
+            color: colors.gray[400],
+            lineStyle: 'dashed',
+            initiallyVisible: false,
+          },
+        ]}
+        xAxis={{
+          type: 'category',
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        }}
+        yAxis={{
+          name: 'Value',
+        }}
+        title="Initially Visible Example"
+        subtitle="Average and Median visible by default; Min/Max hidden until toggled"
+        showCard={true}
+        showLegend={true}
+        height={300}
+      />
+    );
+  },
+};

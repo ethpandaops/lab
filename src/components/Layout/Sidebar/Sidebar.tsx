@@ -11,6 +11,7 @@ import {
   CubeIcon,
   DocumentTextIcon,
   PlayCircleIcon,
+  PresentationChartLineIcon,
   Square3Stack3DIcon,
   UserGroupIcon,
   ClockIcon,
@@ -168,6 +169,7 @@ const ethereumDataAvailabilityPages: NavItem[] = [
 ];
 
 const ethereumExecutionPages: NavItem[] = [
+  { name: 'Overview', to: '/ethereum/execution/overview', icon: PresentationChartLineIcon },
   { name: 'Timings', to: '/ethereum/execution/timings', icon: ClockIcon },
   { name: 'Payloads', to: '/ethereum/execution/payloads', icon: CubeIcon },
   { name: 'State Growth', to: '/ethereum/execution/state-growth', icon: ServerStackIcon },
