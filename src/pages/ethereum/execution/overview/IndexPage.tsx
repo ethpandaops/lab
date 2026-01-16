@@ -264,8 +264,16 @@ export function IndexPage(): JSX.Element {
   }, [tpsRecords, gasRecords, signallingRecords, transactionsRecords, isDaily]);
 
   const isLoading = isDaily
-    ? tpsDailyQuery.isLoading || gasDailyQuery.isLoading || gasLimitDailyQuery.isLoading
-    : tpsHourlyQuery.isLoading || gasHourlyQuery.isLoading || gasLimitHourlyQuery.isLoading;
+    ? tpsDailyQuery.isLoading ||
+      gasDailyQuery.isLoading ||
+      gasLimitDailyQuery.isLoading ||
+      signallingDailyQuery.isLoading ||
+      transactionsDailyQuery.isLoading
+    : tpsHourlyQuery.isLoading ||
+      gasHourlyQuery.isLoading ||
+      gasLimitHourlyQuery.isLoading ||
+      signallingHourlyQuery.isLoading ||
+      transactionsHourlyQuery.isLoading;
 
   const error = isDaily
     ? tpsDailyQuery.error || gasDailyQuery.error || gasLimitDailyQuery.error
@@ -510,35 +518,64 @@ export function IndexPage(): JSX.Element {
   );
 
   // Signalling tooltip formatter
-  const signallingTooltipFormatter = useCallback((params: unknown): string => {
-    const dataPoints = Array.isArray(params) ? params : [params];
-    if (!dataPoints.length) return '';
+  const signallingTooltipFormatter = useCallback(
+    (params: unknown): string => {
+      if (!signallingRecords?.length || !unifiedTimeKeys.length) return '';
 
-    const firstPoint = dataPoints[0] as { name?: string };
-    type TooltipParam = { value?: number; marker?: string; seriesName?: string };
-    const byName = new Map<string, TooltipParam>();
-    for (const p of dataPoints as TooltipParam[]) {
-      if (p.seriesName) byName.set(p.seriesName, p);
-    }
+      const recordsByKey = new Map<
+        string,
+        FctExecutionGasLimitSignallingHourly | FctExecutionGasLimitSignallingDaily
+      >();
+      for (const r of signallingRecords) {
+        const key = isDaily
+          ? ((r as FctExecutionGasLimitSignallingDaily).day_start_date ?? '')
+          : String((r as FctExecutionGasLimitSignallingHourly).hour_start_date_time ?? '');
+        recordsByKey.set(key, r);
+      }
 
-    const gasLimitItems = [...GAS_BANDS].reverse().map(band => {
-      const p = byName.get(band.label);
-      const value = p?.value ?? 0;
-      return { color: band.color, label: band.label, value: `${value.toFixed(1)}%`, style: 'area' as const };
-    });
+      const dataPoints = Array.isArray(params) ? params : [params];
+      if (!dataPoints.length) return '';
 
-    const sections: TooltipSection[] = [{ title: 'Gas Limits', items: gasLimitItems }];
+      const firstPoint = dataPoints[0] as { dataIndex?: number };
+      if (firstPoint.dataIndex === undefined) return '';
 
-    const mevData = byName.get('Relay Registered Validators');
-    if (mevData) {
-      sections.push({
-        title: 'Total',
-        items: [{ color: '#a855f7', label: 'Relay Registered Validators', value: formatCompact(mevData.value ?? 0) }],
+      const timeKey = unifiedTimeKeys[firstPoint.dataIndex];
+      if (!timeKey) return '';
+
+      const record = recordsByKey.get(timeKey);
+      if (!record) return '';
+
+      const dateValue = isDaily
+        ? ((record as FctExecutionGasLimitSignallingDaily).day_start_date ?? '')
+        : ((record as FctExecutionGasLimitSignallingHourly).hour_start_date_time ?? 0);
+      const dateStr = formatTooltipDate(dateValue, isDaily);
+
+      type TooltipParam = { value?: number; marker?: string; seriesName?: string };
+      const byName = new Map<string, TooltipParam>();
+      for (const p of dataPoints as TooltipParam[]) {
+        if (p.seriesName) byName.set(p.seriesName, p);
+      }
+
+      const gasLimitItems = [...GAS_BANDS].reverse().map(band => {
+        const p = byName.get(band.label);
+        const value = p?.value ?? 0;
+        return { color: band.color, label: band.label, value: `${value.toFixed(1)}%`, style: 'area' as const };
       });
-    }
 
-    return buildTooltipHtml(firstPoint.name ?? '', sections);
-  }, []);
+      const sections: TooltipSection[] = [{ title: 'Gas Limits', items: gasLimitItems }];
+
+      const mevData = byName.get('Relay Registered Validators');
+      if (mevData) {
+        sections.push({
+          title: 'Total',
+          items: [{ color: '#a855f7', label: 'Relay Registered Validators', value: formatCompact(mevData.value ?? 0) }],
+        });
+      }
+
+      return buildTooltipHtml(dateStr, sections);
+    },
+    [signallingRecords, unifiedTimeKeys, isDaily]
+  );
 
   // Transactions tooltip formatter
   const transactionsTooltipFormatter = useCallback(
@@ -670,156 +707,158 @@ export function IndexPage(): JSX.Element {
       )}
 
       {/* Charts */}
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        {/* TPS Chart */}
-        {tpsChartConfig && (
-          <PopoutCard title="Transactions Per Second" subtitle={subtitles.tps} anchorId="tps-chart" modalSize="full">
-            {({ inModal }) => (
-              <MultiLineChart
-                series={tpsChartConfig.series}
-                xAxis={{
-                  type: 'category',
-                  labels: tpsChartConfig.labels,
-                  name: 'Date',
-                }}
-                yAxis={{
-                  name: 'TPS',
-                  min: 0,
-                }}
-                height={inModal ? 600 : 400}
-                showLegend
-                legendPosition="top"
-                enableDataZoom
-                tooltipFormatter={tpsTooltipFormatter}
-                markLines={forkMarkLines}
-                syncGroup="execution-overview"
-              />
-            )}
-          </PopoutCard>
-        )}
+      {!isLoading && (
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          {/* TPS Chart */}
+          {tpsChartConfig && (
+            <PopoutCard title="Transactions Per Second" subtitle={subtitles.tps} anchorId="tps-chart" modalSize="full">
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={tpsChartConfig.series}
+                  xAxis={{
+                    type: 'category',
+                    labels: tpsChartConfig.labels,
+                    name: 'Date',
+                  }}
+                  yAxis={{
+                    name: 'TPS',
+                    min: 0,
+                  }}
+                  height={inModal ? 600 : 400}
+                  showLegend
+                  legendPosition="top"
+                  enableDataZoom
+                  tooltipFormatter={tpsTooltipFormatter}
+                  markLines={forkMarkLines}
+                  syncGroup="execution-overview"
+                />
+              )}
+            </PopoutCard>
+          )}
 
-        {/* Transactions Chart */}
-        {transactionsChartConfig && (
-          <PopoutCard
-            title="Transactions Per Block"
-            subtitle={subtitles.transactions}
-            anchorId="transactions-chart"
-            modalSize="full"
-          >
-            {({ inModal }) => (
-              <MultiLineChart
-                series={transactionsChartConfig.series}
-                xAxis={{
-                  type: 'category',
-                  labels: transactionsChartConfig.labels,
-                  name: 'Date',
-                }}
-                yAxis={{
-                  name: 'Txn/Block',
-                  min: 0,
-                }}
-                secondaryYAxis={{
-                  name: 'Cumulative',
-                  min: 0,
-                  formatter: (val: number) => {
-                    if (val >= 1_000_000_000) return `${(val / 1_000_000_000).toFixed(1)}B`;
-                    if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(0)}M`;
-                    return String(val);
-                  },
-                }}
-                height={inModal ? 600 : 400}
-                showLegend
-                legendPosition="top"
-                enableDataZoom
-                tooltipFormatter={transactionsTooltipFormatter}
-                markLines={forkMarkLines}
-                syncGroup="execution-overview"
-              />
-            )}
-          </PopoutCard>
-        )}
+          {/* Transactions Chart */}
+          {transactionsChartConfig && (
+            <PopoutCard
+              title="Transactions Per Block"
+              subtitle={subtitles.transactions}
+              anchorId="transactions-chart"
+              modalSize="full"
+            >
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={transactionsChartConfig.series}
+                  xAxis={{
+                    type: 'category',
+                    labels: transactionsChartConfig.labels,
+                    name: 'Date',
+                  }}
+                  yAxis={{
+                    name: 'Txn/Block',
+                    min: 0,
+                  }}
+                  secondaryYAxis={{
+                    name: 'Cumulative',
+                    min: 0,
+                    formatter: (val: number) => {
+                      if (val >= 1_000_000_000) return `${(val / 1_000_000_000).toFixed(1)}B`;
+                      if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(0)}M`;
+                      return String(val);
+                    },
+                  }}
+                  height={inModal ? 600 : 400}
+                  showLegend
+                  legendPosition="top"
+                  enableDataZoom
+                  tooltipFormatter={transactionsTooltipFormatter}
+                  markLines={forkMarkLines}
+                  syncGroup="execution-overview"
+                />
+              )}
+            </PopoutCard>
+          )}
 
-        {/* Gas Used Chart */}
-        {gasChartConfig && (
-          <PopoutCard title="Gas Used Per Block" subtitle={subtitles.gas} anchorId="gas-chart" modalSize="full">
-            {({ inModal }) => (
-              <MultiLineChart
-                series={gasChartConfig.series}
-                xAxis={{
-                  type: 'category',
-                  labels: gasChartConfig.labels,
-                  name: 'Date',
-                }}
-                yAxis={{
-                  name: 'Gas',
-                  min: 0,
-                }}
-                secondaryYAxis={{
-                  name: 'Cumulative',
-                  min: 0,
-                  formatter: (val: number) => {
-                    if (val >= 1e18) return `${(val / 1e18).toFixed(1)}E`;
-                    if (val >= 1e15) return `${(val / 1e15).toFixed(1)}P`;
-                    if (val >= 1e12) return `${(val / 1e12).toFixed(1)}T`;
-                    if (val >= 1_000_000_000) return `${(val / 1_000_000_000).toFixed(1)}B`;
-                    if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(0)}M`;
-                    return String(val);
-                  },
-                }}
-                height={inModal ? 600 : 400}
-                showLegend
-                legendPosition="top"
-                enableDataZoom
-                tooltipFormatter={gasTooltipFormatter}
-                markLines={forkMarkLines}
-                syncGroup="execution-overview"
-              />
-            )}
-          </PopoutCard>
-        )}
+          {/* Gas Used Chart */}
+          {gasChartConfig && (
+            <PopoutCard title="Gas Used Per Block" subtitle={subtitles.gas} anchorId="gas-chart" modalSize="full">
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={gasChartConfig.series}
+                  xAxis={{
+                    type: 'category',
+                    labels: gasChartConfig.labels,
+                    name: 'Date',
+                  }}
+                  yAxis={{
+                    name: 'Gas',
+                    min: 0,
+                  }}
+                  secondaryYAxis={{
+                    name: 'Cumulative',
+                    min: 0,
+                    formatter: (val: number) => {
+                      if (val >= 1e18) return `${(val / 1e18).toFixed(1)}E`;
+                      if (val >= 1e15) return `${(val / 1e15).toFixed(1)}P`;
+                      if (val >= 1e12) return `${(val / 1e12).toFixed(1)}T`;
+                      if (val >= 1_000_000_000) return `${(val / 1_000_000_000).toFixed(1)}B`;
+                      if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(0)}M`;
+                      return String(val);
+                    },
+                  }}
+                  height={inModal ? 600 : 400}
+                  showLegend
+                  legendPosition="top"
+                  enableDataZoom
+                  tooltipFormatter={gasTooltipFormatter}
+                  markLines={forkMarkLines}
+                  syncGroup="execution-overview"
+                />
+              )}
+            </PopoutCard>
+          )}
 
-        {/* Gas Limit Signalling Chart */}
-        {signallingChartConfig && (
-          <PopoutCard
-            title="Gas Limit Signalling"
-            subtitle={subtitles.signalling}
-            anchorId="gas-signalling-chart"
-            modalSize="full"
-          >
-            {({ inModal }) => (
-              <MultiLineChart
-                series={signallingChartConfig.series}
-                xAxis={{
-                  type: 'category',
-                  labels: signallingChartConfig.labels,
-                  name: 'Date',
-                }}
-                yAxis={{
-                  name: 'Share (%)',
-                  min: 0,
-                  max: 100,
-                }}
-                secondaryYAxis={{
-                  name: 'Validators',
-                  min: 0,
-                  formatter: (val: number) => {
-                    if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
-                    if (val >= 1_000) return `${(val / 1_000).toFixed(0)}K`;
-                    return String(val);
-                  },
-                }}
-                height={inModal ? 600 : 400}
-                showLegend
-                legendPosition="top"
-                enableDataZoom
-                tooltipFormatter={signallingTooltipFormatter}
-                markLines={signallingForkMarkLines}
-                syncGroup="execution-overview"
-              />
-            )}
-          </PopoutCard>
-        )}
-      </div>
+          {/* Gas Limit Signalling Chart */}
+          {signallingChartConfig && (
+            <PopoutCard
+              title="Gas Limit Signalling"
+              subtitle={subtitles.signalling}
+              anchorId="gas-signalling-chart"
+              modalSize="full"
+            >
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={signallingChartConfig.series}
+                  xAxis={{
+                    type: 'category',
+                    labels: signallingChartConfig.labels,
+                    name: 'Date',
+                  }}
+                  yAxis={{
+                    name: 'Share (%)',
+                    min: 0,
+                    max: 100,
+                  }}
+                  secondaryYAxis={{
+                    name: 'Validators',
+                    min: 0,
+                    formatter: (val: number) => {
+                      if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
+                      if (val >= 1_000) return `${(val / 1_000).toFixed(0)}K`;
+                      return String(val);
+                    },
+                  }}
+                  height={inModal ? 600 : 400}
+                  showLegend
+                  legendPosition="top"
+                  enableDataZoom
+                  tooltipFormatter={signallingTooltipFormatter}
+                  markLines={signallingForkMarkLines}
+                  syncGroup="execution-overview"
+                />
+              )}
+            </PopoutCard>
+          )}
+        </div>
+      )}
     </Container>
   );
 }
