@@ -20,7 +20,7 @@ import {
   fctBlockProposerEntityServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { slotToTimestamp, getForkForSlot } from '@/utils/beacon';
+import { slotToTimestamp } from '@/utils/beacon';
 import type {
   FctBlock,
   FctBlockHead,
@@ -108,10 +108,6 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
   // Convert slot to timestamp for querying
   const slotTimestamp = currentNetwork ? slotToTimestamp(slot, currentNetwork.genesis_time) : 0;
 
-  // Determine if this is a Fulu+ slot (needs data column data instead of blob data)
-  const forkVersion = getForkForSlot(slot, currentNetwork);
-  const isFuluOrLater = forkVersion === 'fulu';
-
   const queries = useQueries({
     queries: [
       // Block head data (canonical blocks only)
@@ -169,7 +165,7 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
         }),
         enabled: !!currentNetwork && slotTimestamp > 0,
       },
-      // Blob propagation data (pre-Fulu)
+      // Blob propagation data (pre-Fulu, but always fetch to handle edge cases)
       {
         ...fctBlockBlobFirstSeenByNodeServiceListOptions({
           query: {
@@ -177,9 +173,9 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
             page_size: 10000,
           },
         }),
-        enabled: !!currentNetwork && slotTimestamp > 0 && !isFuluOrLater,
+        enabled: !!currentNetwork && slotTimestamp > 0,
       },
-      // Data column propagation data (Fulu+)
+      // Data column propagation data (Fulu+, but always fetch to handle edge cases)
       {
         ...fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions({
           query: {
@@ -187,7 +183,7 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
             page_size: 10000,
           },
         }),
-        enabled: !!currentNetwork && slotTimestamp > 0 && isFuluOrLater,
+        enabled: !!currentNetwork && slotTimestamp > 0,
       },
       // Attestation data
       {

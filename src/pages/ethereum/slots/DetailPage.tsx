@@ -1,5 +1,5 @@
-import { type JSX, useEffect } from 'react';
-import { useParams, useNavigate, Link } from '@tanstack/react-router';
+import { type JSX, useCallback, useEffect } from 'react';
+import { useParams, useNavigate, useSearch, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
 import { ChevronLeftIcon, ChevronRightIcon, QuestionMarkCircleIcon, EyeIcon } from '@heroicons/react/24/outline';
@@ -39,6 +39,7 @@ import { formatGasToMillions, ATTESTATION_DEADLINE_MS } from '@/utils';
 import type { ForkVersion } from '@/utils/beacon';
 import { SlotDetailSkeleton } from './components/SlotDetailSkeleton';
 import { EngineTimingsCard } from './components/EngineTimingsCard';
+import { SlotProgressTimeline } from './components/SlotProgressTimeline';
 import { useSlotEngineTimings } from './hooks/useSlotEngineTimings';
 
 /**
@@ -47,8 +48,25 @@ import { useSlotEngineTimings } from './hooks/useSlotEngineTimings';
  */
 export function DetailPage(): JSX.Element {
   const { slot: slotParam } = useParams({ from: '/ethereum/slots/$slot' });
+  const search = useSearch({ from: '/ethereum/slots/$slot' });
   const context = Route.useRouteContext();
   const navigate = useNavigate();
+
+  // Handle contributor filter change - updates URL params
+  const handleContributorChange = useCallback(
+    (contributor: string | undefined) => {
+      navigate({
+        to: '/ethereum/slots/$slot',
+        params: { slot: slotParam },
+        search: {
+          tab: search.tab,
+          contributor: contributor || undefined,
+        },
+        replace: true,
+      });
+    },
+    [navigate, slotParam, search.tab]
+  );
 
   // Redirect to slots index when network changes
   useNetworkChangeRedirect(context.redirectOnNetworkChange);
@@ -118,6 +136,7 @@ export function DetailPage(): JSX.Element {
   // Tab state management with URL search params
   const { selectedIndex, onChange } = useTabState([
     { id: 'overview' },
+    { id: 'timeline' },
     { id: 'block' },
     { id: 'attestations', anchors: ['missed-attestations'] },
     { id: 'propagation' },
@@ -367,6 +386,7 @@ export function DetailPage(): JSX.Element {
         <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
           <ScrollableTabs>
             <Tab>Overview</Tab>
+            <Tab>Timeline</Tab>
             <Tab>Block</Tab>
             <Tab>Attestations</Tab>
             <Tab>Propagation</Tab>
@@ -492,6 +512,20 @@ export function DetailPage(): JSX.Element {
                   </Card>
                 )}
               </div>
+            </TabPanel>
+
+            {/* Timeline Tab - First-seen timing visualization */}
+            <TabPanel>
+              <SlotProgressTimeline
+                slot={slot}
+                blockPropagation={data.blockPropagation}
+                blobPropagation={data.blobPropagation}
+                dataColumnPropagation={data.dataColumnPropagation}
+                attestations={data.attestations}
+                mevBidding={data.mevBidding}
+                contributor={search.contributor}
+                onContributorChange={handleContributorChange}
+              />
             </TabPanel>
 
             {/* Block Tab - All block data in two-column layout */}
