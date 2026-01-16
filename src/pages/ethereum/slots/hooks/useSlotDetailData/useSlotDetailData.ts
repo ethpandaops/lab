@@ -6,6 +6,7 @@ import {
   fctBlockMevServiceListOptions,
   fctBlockBlobCountServiceListOptions,
   fctBlockFirstSeenByNodeServiceListOptions,
+  fctHeadFirstSeenByNodeServiceListOptions,
   fctBlockBlobFirstSeenByNodeServiceListOptions,
   fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions,
   fctAttestationFirstSeenChunked50MsServiceListOptions,
@@ -28,6 +29,7 @@ import type {
   FctBlockMev,
   FctBlockBlobCount,
   FctBlockFirstSeenByNode,
+  FctHeadFirstSeenByNode,
   FctBlockBlobFirstSeenByNode,
   FctBlockDataColumnSidecarFirstSeenByNode,
   FctAttestationFirstSeenChunked50Ms,
@@ -57,6 +59,8 @@ export interface SlotDetailData {
   blockMev: FctBlockMev[];
   blobCount: FctBlockBlobCount[];
   blockPropagation: FctBlockFirstSeenByNode[];
+  /** Head (chain import complete) propagation data - when nodes updated their head */
+  headPropagation: FctHeadFirstSeenByNode[];
   blobPropagation: FctBlockBlobFirstSeenByNode[];
   dataColumnPropagation: FctBlockDataColumnSidecarFirstSeenByNode[];
   attestations: FctAttestationFirstSeenChunked50Ms[];
@@ -158,6 +162,16 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
       // Block propagation data
       {
         ...fctBlockFirstSeenByNodeServiceListOptions({
+          query: {
+            slot_start_date_time_eq: slotTimestamp,
+            page_size: 10000,
+          },
+        }),
+        enabled: !!currentNetwork && slotTimestamp > 0,
+      },
+      // Head propagation data (when chain head updated after import)
+      {
+        ...fctHeadFirstSeenByNodeServiceListOptions({
           query: {
             slot_start_date_time_eq: slotTimestamp,
             page_size: 10000,
@@ -312,7 +326,7 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
 
   // Process attestation liveness data to get top 10 missed attestations
   const attestationLivenessData: FctAttestationLivenessByEntityHead[] =
-    queries[17].data?.fct_attestation_liveness_by_entity_head ?? [];
+    queries[18].data?.fct_attestation_liveness_by_entity_head ?? [];
 
   // Sort by missed_count and get top 10
   const missedAttestations: MissedAttestationEntity[] = attestationLivenessData
@@ -342,19 +356,20 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
   // 3: fct_block_mev
   // 4: fct_block_blob_count
   // 5: fct_block_first_seen_by_node
-  // 6: fct_block_blob_first_seen_by_node (pre-Fulu)
-  // 7: fct_block_data_column_sidecar_first_seen_by_node (Fulu+)
-  // 8: fct_attestation_first_seen_chunked_50ms
-  // 9: fct_attestation_correctness_head
-  // 10: int_attestation_attested_head
-  // 11: fct_mev_bid_highest_value_by_builder_chunked_50ms
-  // 12: int_beacon_committee_head
-  // 13: fct_prepared_block
-  // 14: fct_mev_bid_count_by_relay
-  // 15: fct_mev_bid_count_by_builder
-  // 16: fct_block_proposer_entity
-  // 17: fct_attestation_liveness_by_entity_head
-  // 18: fct_block_head (voted-for blocks)
+  // 6: fct_head_first_seen_by_node (head updated after import)
+  // 7: fct_block_blob_first_seen_by_node (pre-Fulu)
+  // 8: fct_block_data_column_sidecar_first_seen_by_node (Fulu+)
+  // 9: fct_attestation_first_seen_chunked_50ms
+  // 10: fct_attestation_correctness_head
+  // 11: int_attestation_attested_head
+  // 12: fct_mev_bid_highest_value_by_builder_chunked_50ms
+  // 13: int_beacon_committee_head
+  // 14: fct_prepared_block
+  // 15: fct_mev_bid_count_by_relay
+  // 16: fct_mev_bid_count_by_builder
+  // 17: fct_block_proposer_entity
+  // 18: fct_attestation_liveness_by_entity_head
+  // 19: fct_block_head (voted-for blocks)
   const data: SlotDetailData = {
     blockHead: blockHeadData,
     block: allBlockData,
@@ -363,20 +378,21 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
     blockMev: queries[3].data?.fct_block_mev ?? [],
     blobCount: queries[4].data?.fct_block_blob_count ?? [],
     blockPropagation: queries[5].data?.fct_block_first_seen_by_node ?? [],
-    blobPropagation: queries[6].data?.fct_block_blob_first_seen_by_node ?? [],
-    dataColumnPropagation: queries[7].data?.fct_block_data_column_sidecar_first_seen_by_node ?? [],
-    attestations: queries[8].data?.fct_attestation_first_seen_chunked_50ms ?? [],
-    attestationCorrectness: queries[9].data?.fct_attestation_correctness_head ?? [],
-    attestationAttested: queries[10].data?.int_attestation_attested_head ?? [],
+    headPropagation: queries[6].data?.fct_head_first_seen_by_node ?? [],
+    blobPropagation: queries[7].data?.fct_block_blob_first_seen_by_node ?? [],
+    dataColumnPropagation: queries[8].data?.fct_block_data_column_sidecar_first_seen_by_node ?? [],
+    attestations: queries[9].data?.fct_attestation_first_seen_chunked_50ms ?? [],
+    attestationCorrectness: queries[10].data?.fct_attestation_correctness_head ?? [],
+    attestationAttested: queries[11].data?.int_attestation_attested_head ?? [],
     attestationLiveness: attestationLivenessData,
     missedAttestations,
-    mevBidding: queries[11].data?.fct_mev_bid_highest_value_by_builder_chunked_50ms ?? [],
-    committees: queries[12].data?.int_beacon_committee_head ?? [],
-    preparedBlocks: queries[13].data?.fct_prepared_block ?? [],
-    relayBids: queries[14].data?.fct_mev_bid_count_by_relay ?? [],
-    builderBids: queries[15].data?.fct_mev_bid_count_by_builder ?? [],
-    proposerEntity: queries[16].data?.fct_block_proposer_entity ?? [],
-    votedForBlocks: queries[18].data?.fct_block_head ?? [],
+    mevBidding: queries[12].data?.fct_mev_bid_highest_value_by_builder_chunked_50ms ?? [],
+    committees: queries[13].data?.int_beacon_committee_head ?? [],
+    preparedBlocks: queries[14].data?.fct_prepared_block ?? [],
+    relayBids: queries[15].data?.fct_mev_bid_count_by_relay ?? [],
+    builderBids: queries[16].data?.fct_mev_bid_count_by_builder ?? [],
+    proposerEntity: queries[17].data?.fct_block_proposer_entity ?? [],
+    votedForBlocks: queries[19].data?.fct_block_head ?? [],
   };
 
   // Extract raw API data for SlotProgressTimeline (arrays -> first element)

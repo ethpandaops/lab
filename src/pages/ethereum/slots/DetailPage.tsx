@@ -519,6 +519,7 @@ export function DetailPage(): JSX.Element {
               <SlotProgressTimeline
                 slot={slot}
                 blockPropagation={data.blockPropagation}
+                headPropagation={data.headPropagation}
                 blobPropagation={data.blobPropagation}
                 dataColumnPropagation={data.dataColumnPropagation}
                 attestations={data.attestations}

@@ -1,5 +1,6 @@
 import type {
   FctBlockFirstSeenByNode,
+  FctHeadFirstSeenByNode,
   FctBlockBlobFirstSeenByNode,
   FctBlockDataColumnSidecarFirstSeenByNode,
   FctAttestationFirstSeenChunked50Ms,
@@ -14,6 +15,8 @@ export interface SlotProgressTimelineProps {
   slot: number;
   /** Block propagation data for first-seen times */
   blockPropagation: FctBlockFirstSeenByNode[];
+  /** Head propagation data - when chain head updated after block import */
+  headPropagation: FctHeadFirstSeenByNode[];
   /** Blob propagation data (pre-Fulu) */
   blobPropagation: FctBlockBlobFirstSeenByNode[];
   /** Data column propagation data (Fulu+) */
@@ -88,4 +91,12 @@ export interface TraceSpan {
   classification?: string;
   /** Whether this is a point-in-time event (show absolute time, not duration) */
   isPointInTime?: boolean;
+  /** Execution client implementation (Geth, Besu, Nethermind, etc) */
+  executionClient?: string;
+  /** Execution client version string */
+  executionVersion?: string;
+  /** Engine API method version (V3, V4) */
+  methodVersion?: string;
+  /** Execution duration in milliseconds */
+  executionDurationMs?: number;
 }

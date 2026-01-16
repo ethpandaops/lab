@@ -4,6 +4,15 @@ import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { formatMs } from './utils';
 import type { TraceSpan } from './SlotProgressTimeline.types';
 
+/** Formats version string with consistent "v" prefix, avoiding double "v" */
+function formatVersion(version: string): string {
+  const trimmed = version.trim();
+  if (trimmed.startsWith('v')) {
+    return trimmed;
+  }
+  return `v${trimmed}`;
+}
+
 interface TimelineTooltipProps {
   span: TraceSpan;
   position: { x: number; y: number };
@@ -31,14 +40,22 @@ export function TimelineTooltip({ span, position, containerWidth }: TimelineTool
         )}
       </div>
 
-      {/* Timing row */}
+      {/* Timing row - point-in-time events show just timestamp, not range/delta */}
       <div className="mt-2 flex items-center gap-4 rounded bg-surface/50 px-2 py-1.5 font-mono text-sm">
-        <span className="text-muted">
-          {formatMs(span.startMs)} → {formatMs(span.endMs)}
-        </span>
-        <span className={clsx('font-semibold', span.isLate ? 'text-danger' : 'text-foreground')}>
-          Δ {formatMs(span.endMs - span.startMs)}
-        </span>
+        {span.isPointInTime ? (
+          <span className={clsx('font-semibold', span.isLate ? 'text-danger' : 'text-foreground')}>
+            @ {formatMs(span.startMs)}
+          </span>
+        ) : (
+          <>
+            <span className="text-muted">
+              {formatMs(span.startMs)} → {formatMs(span.endMs)}
+            </span>
+            <span className={clsx('font-semibold', span.isLate ? 'text-danger' : 'text-foreground')}>
+              Δ {formatMs(span.endMs - span.startMs)}
+            </span>
+          </>
+        )}
       </div>
 
       {/* Details grid */}
@@ -51,14 +68,46 @@ export function TimelineTooltip({ span, position, containerWidth }: TimelineTool
           </>
         )}
 
-        {/* Client implementation + version */}
+        {/* Consensus client (CL) - only show if different from execution client */}
         {span.clientName && (
           <>
-            <span className="text-muted">Client</span>
+            <span className="text-muted">Consensus</span>
             <span className="text-foreground">
-              {span.clientName}
-              {span.clientVersion && <span className="ml-1 text-muted">v{span.clientVersion}</span>}
+              <span className="inline-flex items-center gap-1">
+                <ClientLogo client={span.clientName} size={14} />
+                {span.clientName}
+              </span>
+              {span.clientVersion && <span className="ml-1 text-muted">{formatVersion(span.clientVersion)}</span>}
             </span>
+          </>
+        )}
+
+        {/* Execution client (EL) */}
+        {span.executionClient && (
+          <>
+            <span className="text-muted">Execution</span>
+            <span className="text-foreground">
+              <span className="inline-flex items-center gap-1">
+                <ClientLogo client={span.executionClient} size={14} />
+                {span.executionClient}
+              </span>
+              {span.executionVersion && (
+                <span className="ml-1 text-muted" title={span.executionVersion}>
+                  {formatVersion(span.executionVersion.split('/')[0])}
+                </span>
+              )}
+              {span.methodVersion && (
+                <span className="ml-1 rounded bg-surface/50 px-1 text-xs text-muted">{span.methodVersion}</span>
+              )}
+            </span>
+          </>
+        )}
+
+        {/* Execution duration (show on node span) */}
+        {span.executionDurationMs !== undefined && span.executionDurationMs > 0 && !span.executionClient && (
+          <>
+            <span className="text-muted">Execution Time</span>
+            <span className="text-foreground">{formatMs(span.executionDurationMs)}</span>
           </>
         )}
 

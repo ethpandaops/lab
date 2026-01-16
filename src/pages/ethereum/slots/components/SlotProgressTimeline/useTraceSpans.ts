@@ -2,21 +2,22 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ATTESTATION_DEADLINE_MS } from '@/utils';
 import { intEngineNewPayloadServiceListOptions } from '@/api/@tanstack/react-query.gen';
-import { extractClusterFromNodeName } from '@/constants/eip7870';
 import type {
   FctBlockFirstSeenByNode,
+  FctHeadFirstSeenByNode,
   FctBlockBlobFirstSeenByNode,
   FctBlockDataColumnSidecarFirstSeenByNode,
   FctAttestationFirstSeenChunked50Ms,
   FctMevBidHighestValueByBuilderChunked50Ms,
 } from '@/api/types.gen';
 import { SLOT_DURATION_MS, MAX_REASONABLE_SEEN_TIME_MS } from './constants';
-import { formatMs, classificationToCategory, getShortNodeId, filterOutliers } from './utils';
+import { formatMs, classificationToCategory, filterOutliers } from './utils';
 import type { TraceSpan } from './SlotProgressTimeline.types';
 
 interface UseTraceSpansOptions {
   slot: number;
   blockPropagation: FctBlockFirstSeenByNode[];
+  headPropagation: FctHeadFirstSeenByNode[];
   blobPropagation: FctBlockBlobFirstSeenByNode[];
   dataColumnPropagation: FctBlockDataColumnSidecarFirstSeenByNode[];
   attestations: FctAttestationFirstSeenChunked50Ms[];
@@ -39,6 +40,7 @@ interface UseTraceSpansResult {
 export function useTraceSpans({
   slot,
   blockPropagation,
+  headPropagation,
   blobPropagation,
   dataColumnPropagation,
   attestations,
@@ -46,13 +48,12 @@ export function useTraceSpans({
   selectedUsername,
   excludeOutliers,
 }: UseTraceSpansOptions): UseTraceSpansResult {
-  // Fetch raw execution data to get individual node timings
+  // Fetch raw execution data to get individual node timings (all nodes, not just EIP7870)
   const { data: rawExecutionData, isLoading: executionLoading } = useQuery({
     ...intEngineNewPayloadServiceListOptions({
       query: {
         slot_eq: slot,
-        node_class_eq: 'eip7870-block-builder',
-        page_size: 100,
+        page_size: 10000,
       },
     }),
     enabled: slot > 0,
@@ -98,11 +99,8 @@ export function useTraceSpans({
       details: 'Full slot duration (12 seconds)',
     });
 
-    // Block arrival timing - calculate first
+    // Calculate when block was first seen (for MEV bidding end time)
     let blockFirstSeenMs: number | null = null;
-    let blockLastSeenMs: number | null = null;
-    let blockLastSeenMsForParent: number | null = null;
-
     if (blockPropagation.length > 0) {
       const validTimes = blockPropagation
         .map(node => node.seen_slot_start_diff ?? Infinity)
@@ -110,55 +108,24 @@ export function useTraceSpans({
 
       if (validTimes.length > 0) {
         blockFirstSeenMs = Math.min(...validTimes);
-        blockLastSeenMs = Math.max(...validTimes);
-
-        if (excludeOutliers) {
-          const filteredTimes = filterOutliers(validTimes);
-          blockLastSeenMsForParent = filteredTimes.length > 0 ? Math.max(...filteredTimes) : blockLastSeenMs;
-        } else {
-          blockLastSeenMsForParent = blockLastSeenMs;
-        }
       }
     }
 
     // MEV Builders
     buildMevSpans(result, mevBidding, blockFirstSeenMs);
 
-    // Calculate execution data
-    const { executionClientData, maxExecutionEnd } = calculateExecutionData(
+    // Aggregate all node data into per-node timelines
+    const nodeTimelines = aggregateNodeTimelines(
+      blockPropagation,
+      headPropagation,
       rawExecutionNodes,
-      blockFirstSeenMs,
-      blockPropagation,
-      selectedNodeNames
-    );
-
-    // Create geo lookup map
-    const nodeGeoMap = buildNodeGeoMap(blockPropagation);
-
-    // Block Propagation
-    buildPropagationSpans(
-      result,
-      blockPropagation,
-      selectedUsername,
-      blockFirstSeenMs,
-      blockLastSeenMs,
-      blockLastSeenMsForParent,
-      excludeOutliers
-    );
-
-    // EIP7870 Execution
-    buildExecutionSpans(result, executionClientData, maxExecutionEnd, selectedUsername, nodeGeoMap, excludeOutliers);
-
-    // Data availability
-    buildDataAvailabilitySpans(
-      result,
       dataColumnPropagation,
       blobPropagation,
-      selectedUsername,
-      selectedNodeNames,
-      nodeGeoMap,
-      excludeOutliers
+      selectedUsername
     );
+
+    // Block Proposal (unified per-node view)
+    buildBlockProposalSpans(result, nodeTimelines, excludeOutliers, selectedUsername);
 
     // Attestations
     buildAttestationSpans(result, attestations);
@@ -166,13 +133,13 @@ export function useTraceSpans({
     return result;
   }, [
     blockPropagation,
+    headPropagation,
     blobPropagation,
     dataColumnPropagation,
     attestations,
     mevBidding,
     rawExecutionNodes,
     selectedUsername,
-    selectedNodeNames,
     excludeOutliers,
   ]);
 
@@ -260,636 +227,469 @@ function buildMevSpans(
   }
 }
 
-interface ExecutionNodeData {
+/**
+ * Aggregated timeline data for a single node.
+ * Combines data from block propagation, execution, head update, and data availability.
+ */
+interface NodeTimeline {
   nodeName: string;
-  cluster: string;
-  startMs: number;
-  endMs: number;
-  duration: number;
-  status: string;
+  username: string;
+  country: string;
+  city: string;
+  nodeId: string;
+  classification: string;
+  consensusClient: string;
+  consensusVersion: string;
+  /** When block gossip was first received (ms from slot start) */
+  blockReceivedMs: number;
+  /** When chain head was updated after import (ms from slot start) */
+  headUpdatedMs: number | null;
+  /** Execution data if available (EIP7870 nodes) */
+  execution: {
+    client: string;
+    version: string;
+    methodVersion: string;
+    startMs: number;
+    endMs: number;
+    durationMs: number;
+  } | null;
+  /** Data availability completion time (ms from slot start) */
+  daCompleteMs: number | null;
+  /** Individual column/blob timing data (column index -> first seen time) */
+  daColumns: Map<number, number>;
+  /** Whether using data columns (true) or blobs (false) */
+  isDataColumns: boolean;
 }
 
-interface ExecutionClientData {
-  impl: string;
-  nodes: ExecutionNodeData[];
-  minStart: number;
-  maxEnd: number;
-}
-
-function calculateExecutionData(
-  rawExecutionNodes: Array<{
+/**
+ * Aggregates all data sources into per-node timelines.
+ */
+function aggregateNodeTimelines(
+  blockPropagation: FctBlockFirstSeenByNode[],
+  headPropagation: FctHeadFirstSeenByNode[],
+  executionNodes: Array<{
     status?: string;
     duration_ms?: number;
     meta_client_name?: string;
     meta_execution_implementation?: string;
+    meta_execution_version?: string;
+    method_version?: string;
+    meta_client_geo_country?: string;
+    meta_client_geo_city?: string;
+    meta_client_implementation?: string;
+    meta_client_version?: string;
+    requested_date_time?: number;
+    slot_start_date_time?: number;
   }>,
-  blockFirstSeenMs: number | null,
-  blockPropagation: FctBlockFirstSeenByNode[],
-  selectedNodeNames: Set<string> | null
-): { executionClientData: ExecutionClientData[]; maxExecutionEnd: number } {
-  let maxExecutionEnd = blockFirstSeenMs ?? 0;
-  const executionClientData: ExecutionClientData[] = [];
+  dataColumnPropagation: FctBlockDataColumnSidecarFirstSeenByNode[],
+  blobPropagation: FctBlockBlobFirstSeenByNode[],
+  selectedUsername: string | null
+): NodeTimeline[] {
+  const timelines = new Map<string, NodeTimeline>();
 
-  if (rawExecutionNodes.length === 0 || blockFirstSeenMs === null) {
-    return { executionClientData, maxExecutionEnd };
+  // First pass: Build base timeline from block propagation data
+  for (const node of blockPropagation) {
+    const nodeName = node.meta_client_name;
+    const seenTime = node.seen_slot_start_diff;
+
+    if (!nodeName) continue;
+    if (seenTime === undefined || seenTime === null || seenTime < 0 || seenTime > MAX_REASONABLE_SEEN_TIME_MS) continue;
+    if (selectedUsername && node.username !== selectedUsername) continue;
+
+    timelines.set(nodeName, {
+      nodeName,
+      username: node.username || nodeName,
+      country: node.meta_client_geo_country || 'Unknown',
+      city: (node as { meta_client_geo_city?: string }).meta_client_geo_city || '',
+      nodeId: node.node_id || '',
+      classification: node.classification || 'unclassified',
+      consensusClient: node.meta_consensus_implementation || 'unknown',
+      consensusVersion: (node as { meta_client_version?: string }).meta_client_version || '',
+      blockReceivedMs: seenTime,
+      headUpdatedMs: null,
+      execution: null,
+      daCompleteMs: null,
+      daColumns: new Map(),
+      isDataColumns: dataColumnPropagation.length > 0,
+    });
   }
 
-  const nodeSeenTimeMap = new Map<string, number>();
-  for (const propNode of blockPropagation) {
-    const nodeName = propNode.meta_client_name;
-    const seenTime = propNode.seen_slot_start_diff;
-    if (
-      nodeName &&
-      seenTime !== undefined &&
-      seenTime !== null &&
-      seenTime >= 0 &&
-      seenTime <= MAX_REASONABLE_SEEN_TIME_MS
-    ) {
-      nodeSeenTimeMap.set(nodeName, seenTime);
+  // Second pass: Add head update times
+  for (const node of headPropagation) {
+    const nodeName = node.meta_client_name;
+    const seenTime = node.seen_slot_start_diff;
+
+    if (!nodeName) continue;
+    if (seenTime === undefined || seenTime === null || seenTime < 0 || seenTime > MAX_REASONABLE_SEEN_TIME_MS) continue;
+
+    const timeline = timelines.get(nodeName);
+    if (timeline) {
+      timeline.headUpdatedMs = seenTime;
     }
   }
 
-  const clientsByImpl = new Map<string, ExecutionNodeData[]>();
-
-  for (const node of rawExecutionNodes) {
+  // Third pass: Add execution data (for all nodes, not just those with block propagation)
+  for (const node of executionNodes) {
     if (node.status?.toUpperCase() !== 'VALID') continue;
     if (!node.duration_ms || node.duration_ms <= 0) continue;
 
     const nodeName = node.meta_client_name ?? 'unknown';
+    if (!nodeName || nodeName === 'unknown') continue;
 
-    if (selectedNodeNames && !selectedNodeNames.has(nodeName)) continue;
-
-    const nodeBlockSeenMs = nodeSeenTimeMap.get(nodeName) ?? blockFirstSeenMs;
-    const nodeStartMs = nodeBlockSeenMs;
-    const nodeEndMs = nodeStartMs + node.duration_ms;
-
-    const impl = node.meta_execution_implementation ?? 'Unknown';
-    const cluster = extractClusterFromNodeName(nodeName) ?? 'other';
-
-    if (!clientsByImpl.has(impl)) {
-      clientsByImpl.set(impl, []);
-    }
-    clientsByImpl.get(impl)!.push({
-      nodeName,
-      cluster,
-      startMs: nodeStartMs,
-      endMs: nodeEndMs,
-      duration: node.duration_ms,
-      status: node.status ?? 'UNKNOWN',
-    });
-  }
-
-  if (clientsByImpl.size > 0) {
-    for (const [impl, nodes] of clientsByImpl) {
-      let clientMinStart = Infinity;
-      let clientMaxEnd = 0;
-
-      for (const node of nodes) {
-        clientMinStart = Math.min(clientMinStart, node.startMs);
-        clientMaxEnd = Math.max(clientMaxEnd, node.endMs);
+    // Calculate execution timing from execution data's own timestamps
+    // Note: requested_date_time is in microseconds, slot_start_date_time is in seconds
+    let startMs: number;
+    if (node.requested_date_time && node.slot_start_date_time) {
+      const requestedMs = node.requested_date_time / 1000; // microseconds -> milliseconds
+      const slotStartMs = node.slot_start_date_time * 1000; // seconds -> milliseconds
+      startMs = requestedMs - slotStartMs;
+    } else {
+      // Fallback: use block received time if available
+      const existingTimeline = timelines.get(nodeName);
+      if (existingTimeline) {
+        startMs = existingTimeline.blockReceivedMs;
+      } else {
+        // Can't position execution without timing data
+        continue;
       }
-
-      executionClientData.push({
-        impl,
-        nodes,
-        minStart: clientMinStart,
-        maxEnd: clientMaxEnd,
-      });
-      maxExecutionEnd = Math.max(maxExecutionEnd, clientMaxEnd);
     }
-  }
 
-  return { executionClientData, maxExecutionEnd };
-}
+    // Skip unreasonable values
+    if (startMs < 0 || startMs > MAX_REASONABLE_SEEN_TIME_MS) continue;
 
-function buildNodeGeoMap(
-  blockPropagation: FctBlockFirstSeenByNode[]
-): Map<string, { country: string; city: string; clientImpl: string; clientVersion: string }> {
-  const nodeGeoMap = new Map<string, { country: string; city: string; clientImpl: string; clientVersion: string }>();
-  for (const node of blockPropagation) {
-    if (node.meta_client_name) {
-      nodeGeoMap.set(node.meta_client_name, {
+    const endMs = startMs + node.duration_ms;
+    let timeline = timelines.get(nodeName);
+
+    // Create new timeline for execution-only nodes (not in block propagation)
+    if (!timeline) {
+      // Skip if filtering by username and this node doesn't have username data
+      // (execution-only nodes can't be filtered by username since they don't have that field)
+      if (selectedUsername) continue;
+
+      timeline = {
+        nodeName,
+        username: nodeName, // Use node name as username for execution-only nodes
         country: node.meta_client_geo_country || 'Unknown',
-        city: (node as { meta_client_geo_city?: string }).meta_client_geo_city || '',
-        clientImpl: node.meta_consensus_implementation || 'unknown',
-        clientVersion: (node as { meta_client_version?: string }).meta_client_version || '',
-      });
+        city: node.meta_client_geo_city || '',
+        nodeId: '',
+        classification: 'unclassified',
+        consensusClient: node.meta_client_implementation || 'unknown',
+        consensusVersion: node.meta_client_version || '',
+        blockReceivedMs: startMs, // Use execution start as proxy for block received
+        headUpdatedMs: null,
+        execution: null,
+        daCompleteMs: null,
+        daColumns: new Map(),
+        isDataColumns: dataColumnPropagation.length > 0,
+      };
+      timelines.set(nodeName, timeline);
     }
+
+    timeline.execution = {
+      client: node.meta_execution_implementation ?? 'Unknown',
+      version: node.meta_execution_version ?? '',
+      methodVersion: node.method_version ?? '',
+      startMs,
+      endMs,
+      durationMs: node.duration_ms,
+    };
   }
-  return nodeGeoMap;
-}
 
-interface NodeData {
-  name: string;
-  username: string;
-  seenTime: number;
-  classification: string;
-  clientImpl: string;
-  clientVersion: string;
-  nodeId: string;
-  country: string;
-  city: string;
-}
+  // Fourth pass: Add data availability completion times
+  // Track unique column/blob indices per node to get accurate counts
+  const daData = dataColumnPropagation.length > 0 ? dataColumnPropagation : blobPropagation;
+  const daByNode = new Map<string, { columns: Map<number, number>; lastSeenMs: number }>();
 
-function buildPropagationSpans(
-  result: TraceSpan[],
-  blockPropagation: FctBlockFirstSeenByNode[],
-  selectedUsername: string | null,
-  blockFirstSeenMs: number | null,
-  blockLastSeenMs: number | null,
-  blockLastSeenMsForParent: number | null,
-  excludeOutliers: boolean
-): void {
-  if (blockFirstSeenMs === null || blockLastSeenMs === null) return;
+  for (const item of daData) {
+    const nodeName = item.meta_client_name;
+    const seenTime = item.seen_slot_start_diff;
+    // Extract column index (for data columns) or blob index (for blobs)
+    const columnIndex =
+      'column_index' in item ? (item.column_index ?? 0) : 'blob_index' in item ? (item.blob_index ?? 0) : 0;
 
-  const filteredPropagation = selectedUsername
-    ? blockPropagation.filter(node => node.username === selectedUsername)
-    : blockPropagation;
-
-  const allNodes: NodeData[] = [];
-  let filteredFirstSeen = Infinity;
-  let filteredLastSeen = 0;
-
-  for (const node of filteredPropagation) {
-    const seenTime = node.seen_slot_start_diff;
+    if (!nodeName) continue;
     if (seenTime === undefined || seenTime === null || seenTime < 0 || seenTime > MAX_REASONABLE_SEEN_TIME_MS) continue;
 
-    filteredFirstSeen = Math.min(filteredFirstSeen, seenTime);
-    filteredLastSeen = Math.max(filteredLastSeen, seenTime);
-
-    const country = node.meta_client_geo_country || 'Unknown';
-    const city = (node as { meta_client_geo_city?: string }).meta_client_geo_city || '';
-    const nodeName = node.meta_client_name || 'unknown';
-    const username = node.username || nodeName;
-    const classification = node.classification || 'unclassified';
-    const clientImpl = node.meta_consensus_implementation || 'unknown';
-    const clientVersion = (node as { meta_client_version?: string }).meta_client_version || '';
-    const nodeId = node.node_id || '';
-
-    allNodes.push({
-      name: nodeName,
-      username,
-      seenTime,
-      classification,
-      clientImpl,
-      clientVersion,
-      nodeId,
-      country,
-      city,
-    });
-  }
-
-  const propagationStart = selectedUsername && filteredFirstSeen !== Infinity ? filteredFirstSeen : blockFirstSeenMs;
-
-  let propagationEndForParent: number;
-  if (selectedUsername && filteredLastSeen > 0) {
-    if (excludeOutliers) {
-      const filteredTimes = filterOutliers(allNodes.map(n => n.seenTime));
-      propagationEndForParent = filteredTimes.length > 0 ? Math.max(...filteredTimes) : filteredLastSeen;
+    const existing = daByNode.get(nodeName);
+    if (existing) {
+      // Keep the earliest time for each column
+      const existingColTime = existing.columns.get(columnIndex);
+      if (existingColTime === undefined || seenTime < existingColTime) {
+        existing.columns.set(columnIndex, seenTime);
+      }
+      existing.lastSeenMs = Math.max(existing.lastSeenMs, seenTime);
     } else {
-      propagationEndForParent = filteredLastSeen;
-    }
-  } else {
-    propagationEndForParent = blockLastSeenMsForParent ?? blockLastSeenMs;
-  }
-  const propagationEnd = propagationEndForParent;
-
-  if (selectedUsername && allNodes.length > 0) {
-    // Simplified per-node view when filtering by contributor
-    result.push({
-      id: 'propagation',
-      label: 'Block Propagation',
-      startMs: propagationStart,
-      endMs: propagationEnd,
-      category: 'propagation',
-      depth: 1,
-      details: `${selectedUsername}: ${allNodes.length} node${allNodes.length !== 1 ? 's' : ''} saw block`,
-      isLate: propagationEnd > ATTESTATION_DEADLINE_MS,
-      collapsible: allNodes.length > 0,
-      defaultCollapsed: false,
-    });
-
-    const sortedNodes = [...allNodes].sort((a, b) => a.seenTime - b.seenTime);
-    for (const nodeData of sortedNodes) {
-      const shortId = getShortNodeId(nodeData.name);
-      const location = nodeData.city || nodeData.country;
-      result.push({
-        id: `prop-node-${nodeData.name}`,
-        label: `${location} (${shortId})`,
-        startMs: nodeData.seenTime,
-        endMs: nodeData.seenTime + 30,
-        category: 'country',
-        depth: 2,
-        isLate: nodeData.seenTime > ATTESTATION_DEADLINE_MS,
-        isPointInTime: true,
-        parentId: 'propagation',
-        clientName: nodeData.clientImpl,
-        clientVersion: nodeData.clientVersion,
-        nodeId: nodeData.nodeId,
-        username: nodeData.username,
-        nodeName: nodeData.name,
-        country: nodeData.country,
-        city: nodeData.city,
-        classification: nodeData.classification,
-      });
-    }
-  } else if (allNodes.length > 0) {
-    // Default hierarchical view: Country → Node
-    type CountryData = {
-      firstSeen: number;
-      lastSeen: number;
-      nodeCount: number;
-      allTimes: number[];
-      nodes: NodeData[];
-    };
-
-    const propagationByCountry = new Map<string, CountryData>();
-
-    for (const nodeData of allNodes) {
-      let countryEntry = propagationByCountry.get(nodeData.country);
-      if (!countryEntry) {
-        countryEntry = {
-          firstSeen: nodeData.seenTime,
-          lastSeen: nodeData.seenTime,
-          nodeCount: 0,
-          allTimes: [],
-          nodes: [],
-        };
-        propagationByCountry.set(nodeData.country, countryEntry);
-      }
-
-      countryEntry.firstSeen = Math.min(countryEntry.firstSeen, nodeData.seenTime);
-      countryEntry.lastSeen = Math.max(countryEntry.lastSeen, nodeData.seenTime);
-      countryEntry.allTimes.push(nodeData.seenTime);
-      countryEntry.nodeCount++;
-      countryEntry.nodes.push(nodeData);
-    }
-
-    const sortedCountries = Array.from(propagationByCountry.entries()).sort((a, b) => a[1].firstSeen - b[1].firstSeen);
-
-    result.push({
-      id: 'propagation',
-      label: 'Block Propagation',
-      startMs: propagationStart,
-      endMs: propagationEnd,
-      category: 'propagation',
-      depth: 1,
-      details: `Block propagated to ${allNodes.length} nodes in ${propagationByCountry.size} countries`,
-      isLate: propagationEnd > ATTESTATION_DEADLINE_MS,
-      collapsible: sortedCountries.length >= 1,
-      defaultCollapsed: false,
-    });
-
-    for (const [country, countryData] of sortedCountries) {
-      const countryId = `country-${country}`;
-
-      let countryEndMs: number;
-      if (countryData.nodeCount > 1) {
-        if (excludeOutliers) {
-          const filteredTimes = filterOutliers(countryData.allTimes);
-          countryEndMs = filteredTimes.length > 0 ? Math.max(...filteredTimes) : countryData.lastSeen;
-        } else {
-          countryEndMs = countryData.lastSeen;
-        }
-      } else {
-        countryEndMs = countryData.firstSeen + 50;
-      }
-
-      result.push({
-        id: countryId,
-        label: country,
-        startMs: countryData.firstSeen,
-        endMs: countryEndMs,
-        category: 'country',
-        depth: 2,
-        details:
-          countryData.nodeCount > 1
-            ? `${country}: ${formatMs(countryData.firstSeen)} → ${formatMs(countryData.lastSeen)} (${countryData.nodeCount} nodes)`
-            : `${country}: first seen at ${formatMs(countryData.firstSeen)}`,
-        isLate: countryEndMs > ATTESTATION_DEADLINE_MS,
-        parentId: 'propagation',
-        nodeCount: countryData.nodeCount,
-        collapsible: true,
-        defaultCollapsed: true,
-      });
-
-      const sortedNodes = [...countryData.nodes].sort((a, b) => a.seenTime - b.seenTime);
-      for (const nodeData of sortedNodes) {
-        result.push({
-          id: `node-${country}-${nodeData.name}`,
-          label: nodeData.username,
-          startMs: nodeData.seenTime,
-          endMs: nodeData.seenTime + 30,
-          category: classificationToCategory(nodeData.classification),
-          depth: 3,
-          details: `${nodeData.username}: seen at ${formatMs(nodeData.seenTime)} (${nodeData.classification})`,
-          isLate: nodeData.seenTime > ATTESTATION_DEADLINE_MS,
-          isPointInTime: true,
-          parentId: countryId,
-          clientName: nodeData.clientImpl,
-          nodeId: nodeData.nodeId,
-          username: nodeData.username,
-          nodeName: nodeData.name,
-          classification: nodeData.classification,
-        });
-      }
+      const columns = new Map<number, number>();
+      columns.set(columnIndex, seenTime);
+      daByNode.set(nodeName, { columns, lastSeenMs: seenTime });
     }
   }
+
+  for (const [nodeName, daInfo] of daByNode) {
+    const timeline = timelines.get(nodeName);
+    if (timeline) {
+      timeline.daCompleteMs = daInfo.lastSeenMs;
+      timeline.daColumns = daInfo.columns; // Store the full column map for child spans
+    }
+  }
+
+  return Array.from(timelines.values());
 }
 
-function buildExecutionSpans(
+/**
+ * Builds the "Block Proposal" section with per-node integrated timelines.
+ * Structure:
+ * - Block Proposal (parent)
+ *   - [Country] (collapsible)
+ *     - [node-name] (collapsible, shows earliest → latest)
+ *       - Block Received @Xms (point-in-time)
+ *       - Execution (client) Yms (duration span if available)
+ *       - Head Updated @Zms (point-in-time)
+ *       - DA Complete @Wms (point-in-time if available)
+ */
+function buildBlockProposalSpans(
   result: TraceSpan[],
-  executionClientData: ExecutionClientData[],
-  maxExecutionEnd: number,
-  selectedUsername: string | null,
-  nodeGeoMap: Map<string, { country: string; city: string; clientImpl: string; clientVersion: string }>,
-  excludeOutliers: boolean
+  nodeTimelines: NodeTimeline[],
+  excludeOutliers: boolean,
+  selectedUsername: string | null
 ): void {
-  if (executionClientData.length === 0) return;
+  if (nodeTimelines.length === 0) return;
 
-  const executionMinStart = Math.min(...executionClientData.map(c => c.minStart));
-  const totalNodes = executionClientData.reduce((sum, c) => sum + c.nodes.length, 0);
+  // Calculate overall timing bounds
+  const allStartTimes = nodeTimelines.map(n => n.blockReceivedMs);
+  const allEndTimes = nodeTimelines.map(n => {
+    // Find the latest event for each node
+    const times = [n.blockReceivedMs];
+    if (n.headUpdatedMs !== null) times.push(n.headUpdatedMs);
+    if (n.execution) times.push(n.execution.endMs);
+    if (n.daCompleteMs !== null) times.push(n.daCompleteMs);
+    return Math.max(...times);
+  });
 
-  const allExecNodes = executionClientData.flatMap(c => c.nodes.map(n => ({ ...n, impl: c.impl })));
+  const firstSeenMs = Math.min(...allStartTimes);
+  let lastEventMs = Math.max(...allEndTimes);
 
-  let executionEndForParent = maxExecutionEnd;
-  if (excludeOutliers && allExecNodes.length >= 4) {
-    const allEndTimes = allExecNodes.map(n => n.endMs);
+  // Apply outlier filtering for parent span
+  if (excludeOutliers && allEndTimes.length >= 4) {
     const filteredEndTimes = filterOutliers(allEndTimes);
     if (filteredEndTimes.length > 0) {
-      executionEndForParent = Math.max(...filteredEndTimes);
+      lastEventMs = Math.max(...filteredEndTimes);
     }
   }
 
+  // Group by country
+  const byCountry = new Map<string, NodeTimeline[]>();
+  for (const timeline of nodeTimelines) {
+    const existing = byCountry.get(timeline.country) || [];
+    existing.push(timeline);
+    byCountry.set(timeline.country, existing);
+  }
+
+  // Sort countries by first seen time
+  const sortedCountries = Array.from(byCountry.entries()).sort((a, b) => {
+    const aFirst = Math.min(...a[1].map(n => n.blockReceivedMs));
+    const bFirst = Math.min(...b[1].map(n => n.blockReceivedMs));
+    return aFirst - bFirst;
+  });
+
+  // Parent span: Block Proposal
   result.push({
-    id: 'execution',
-    label: 'EIP7870 Execution',
-    startMs: executionMinStart,
-    endMs: executionEndForParent,
-    category: 'execution',
+    id: 'block-proposal',
+    label: 'Block Proposal',
+    startMs: firstSeenMs,
+    endMs: lastEventMs,
+    category: 'propagation',
     depth: 1,
     details: selectedUsername
-      ? `${selectedUsername}: ${totalNodes} node${totalNodes !== 1 ? 's' : ''} executed block`
-      : `EIP7870 reference nodes: ${formatMs(executionMinStart)} → ${formatMs(maxExecutionEnd)} (${totalNodes} nodes, ${executionClientData.length} clients)`,
-    isLate: executionEndForParent > ATTESTATION_DEADLINE_MS,
-    collapsible: totalNodes > 0,
+      ? `${selectedUsername}: ${nodeTimelines.length} node${nodeTimelines.length !== 1 ? 's' : ''} processed block`
+      : `Block proposal lifecycle across ${nodeTimelines.length} nodes in ${sortedCountries.length} countries`,
+    isLate: lastEventMs > ATTESTATION_DEADLINE_MS,
+    collapsible: sortedCountries.length > 0,
     defaultCollapsed: false,
   });
 
-  if (selectedUsername) {
-    const sortedNodes = [...allExecNodes].sort((a, b) => a.startMs - b.startMs);
-    for (const nodeData of sortedNodes) {
-      const shortId = getShortNodeId(nodeData.nodeName);
-      const geo = nodeGeoMap.get(nodeData.nodeName) || {
-        country: 'Unknown',
-        city: '',
-        clientImpl: 'unknown',
-        clientVersion: '',
-      };
-      const location = geo.city ? `${geo.city}, ${geo.country}` : geo.country;
+  // Build country → node → events hierarchy
+  for (const [country, countryNodes] of sortedCountries) {
+    const countryId = `country-${country}`;
 
+    // Sort nodes by first seen
+    const sortedNodes = [...countryNodes].sort((a, b) => a.blockReceivedMs - b.blockReceivedMs);
+
+    // Calculate country span bounds
+    const countryFirstSeen = Math.min(...sortedNodes.map(n => n.blockReceivedMs));
+    const countryEndTimes = sortedNodes.map(n => {
+      const times = [n.blockReceivedMs];
+      if (n.headUpdatedMs !== null) times.push(n.headUpdatedMs);
+      if (n.execution) times.push(n.execution.endMs);
+      if (n.daCompleteMs !== null) times.push(n.daCompleteMs);
+      return Math.max(...times);
+    });
+
+    let countryLastEvent = Math.max(...countryEndTimes);
+    if (excludeOutliers && countryEndTimes.length >= 4) {
+      const filteredTimes = filterOutliers(countryEndTimes);
+      if (filteredTimes.length > 0) {
+        countryLastEvent = Math.max(...filteredTimes);
+      }
+    }
+
+    // Country span
+    result.push({
+      id: countryId,
+      label: country,
+      startMs: countryFirstSeen,
+      endMs: countryLastEvent,
+      category: 'country',
+      depth: 2,
+      details: `${country}: ${sortedNodes.length} node${sortedNodes.length !== 1 ? 's' : ''}`,
+      isLate: countryLastEvent > ATTESTATION_DEADLINE_MS,
+      parentId: 'block-proposal',
+      nodeCount: sortedNodes.length,
+      collapsible: true,
+      defaultCollapsed: true,
+    });
+
+    // Node spans within country
+    for (const timeline of sortedNodes) {
+      const nodeId = `node-${country}-${timeline.nodeName}`;
+
+      // Calculate node span bounds (from first to last event)
+      const nodeEvents: number[] = [timeline.blockReceivedMs];
+      if (timeline.headUpdatedMs !== null) nodeEvents.push(timeline.headUpdatedMs);
+      if (timeline.execution) nodeEvents.push(timeline.execution.endMs);
+      if (timeline.daCompleteMs !== null) nodeEvents.push(timeline.daCompleteMs);
+
+      const nodeStartMs = Math.min(...nodeEvents);
+      const nodeEndMs = Math.max(...nodeEvents);
+
+      // Count how many child events this node has
+      let eventCount = 1; // Block Received is always shown
+      if (timeline.headUpdatedMs !== null) eventCount++;
+      if (timeline.execution) eventCount++;
+      if (timeline.daCompleteMs !== null) eventCount++;
+
+      // Node span (shows full timeline)
       result.push({
-        id: `exec-node-${nodeData.nodeName}`,
-        label: `${location} (${shortId})`,
-        startMs: nodeData.startMs,
-        endMs: nodeData.endMs,
-        category: 'execution-client',
-        depth: 2,
-        isLate: nodeData.endMs > ATTESTATION_DEADLINE_MS,
-        parentId: 'execution',
-        clientName: nodeData.impl,
-        clientVersion: geo.clientVersion,
-        nodeName: nodeData.nodeName,
-        country: geo.country,
-        city: geo.city,
-      });
-    }
-  } else {
-    const sortedNodes = [...allExecNodes].sort((a, b) => a.startMs - b.startMs);
-    for (const nodeData of sortedNodes) {
-      const geo = nodeGeoMap.get(nodeData.nodeName);
-      const location = geo ? (geo.city ? `${geo.city}, ${geo.country}` : geo.country) : nodeData.cluster;
-
-      result.push({
-        id: `exec-node-${nodeData.nodeName}`,
-        label: `${location} (${nodeData.impl})`,
-        startMs: nodeData.startMs,
-        endMs: nodeData.endMs,
-        category: 'execution-client',
-        depth: 2,
-        isLate: nodeData.endMs > ATTESTATION_DEADLINE_MS,
-        parentId: 'execution',
-        clientName: nodeData.impl,
-        clientVersion: geo?.clientVersion,
-        nodeName: nodeData.nodeName,
-        country: geo?.country,
-        city: geo?.city,
-      });
-    }
-  }
-}
-
-function buildDataAvailabilitySpans(
-  result: TraceSpan[],
-  dataColumnPropagation: FctBlockDataColumnSidecarFirstSeenByNode[],
-  blobPropagation: FctBlockBlobFirstSeenByNode[],
-  selectedUsername: string | null,
-  selectedNodeNames: Set<string> | null,
-  nodeGeoMap: Map<string, { country: string; city: string; clientImpl: string; clientVersion: string }>,
-  excludeOutliers: boolean
-): void {
-  const daData = dataColumnPropagation.length > 0 ? dataColumnPropagation : blobPropagation;
-  const isDataColumns = dataColumnPropagation.length > 0;
-
-  if (daData.length === 0) return;
-
-  const filteredDaData = selectedNodeNames
-    ? daData.filter(item => item.meta_client_name && selectedNodeNames.has(item.meta_client_name))
-    : daData;
-
-  if (selectedUsername && selectedNodeNames) {
-    // Group by node, then by column
-    const byNode = new Map<
-      string,
-      {
-        columns: Map<number, number>;
-        firstSeen: number;
-        lastSeen: number;
-        columnCount: number;
-        country: string;
-        city: string;
-        clientImpl: string;
-        clientVersion: string;
-      }
-    >();
-
-    for (const item of filteredDaData) {
-      const nodeName = item.meta_client_name ?? 'unknown';
-      const index =
-        'column_index' in item ? (item.column_index ?? 0) : 'blob_index' in item ? (item.blob_index ?? 0) : 0;
-      const seenTime = item.seen_slot_start_diff ?? Infinity;
-      if (seenTime === Infinity || seenTime < 0 || seenTime > MAX_REASONABLE_SEEN_TIME_MS) continue;
-
-      let nodeEntry = byNode.get(nodeName);
-      if (!nodeEntry) {
-        const geo = nodeGeoMap.get(nodeName) || {
-          country: 'Unknown',
-          city: '',
-          clientImpl: 'unknown',
-          clientVersion: '',
-        };
-        nodeEntry = {
-          columns: new Map(),
-          firstSeen: Infinity,
-          lastSeen: 0,
-          columnCount: 0,
-          country: geo.country,
-          city: geo.city,
-          clientImpl: geo.clientImpl,
-          clientVersion: geo.clientVersion,
-        };
-        byNode.set(nodeName, nodeEntry);
-      }
-
-      if (!nodeEntry.columns.has(index)) {
-        nodeEntry.columns.set(index, seenTime);
-        nodeEntry.columnCount++;
-      }
-      nodeEntry.firstSeen = Math.min(nodeEntry.firstSeen, seenTime);
-      nodeEntry.lastSeen = Math.max(nodeEntry.lastSeen, seenTime);
-    }
-
-    if (byNode.size > 0) {
-      const sortedNodes = Array.from(byNode.entries()).sort((a, b) => a[1].firstSeen - b[1].firstSeen);
-      const daStartMs = Math.min(...sortedNodes.map(([, d]) => d.firstSeen));
-      const daEndMsRaw = Math.max(...sortedNodes.map(([, d]) => d.lastSeen));
-
-      let daEndMs = daEndMsRaw;
-      if (excludeOutliers && sortedNodes.length >= 4) {
-        const allLastSeens = sortedNodes.map(([, d]) => d.lastSeen);
-        const filteredLastSeens = filterOutliers(allLastSeens);
-        if (filteredLastSeens.length > 0) {
-          daEndMs = Math.max(...filteredLastSeens);
-        }
-      }
-
-      result.push({
-        id: 'data-availability',
-        label: isDataColumns ? 'Data Columns' : 'Blobs',
-        startMs: daStartMs,
-        endMs: daEndMs,
-        category: 'data-availability',
-        depth: 1,
-        details: `${selectedUsername}: ${sortedNodes.length} node${sortedNodes.length !== 1 ? 's' : ''} receiving ${isDataColumns ? 'columns' : 'blobs'}`,
-        isLate: daEndMs > ATTESTATION_DEADLINE_MS,
-        collapsible: true,
-        defaultCollapsed: false,
-      });
-
-      for (const [nodeName, nodeData] of sortedNodes) {
-        const shortId = getShortNodeId(nodeName);
-        const location = nodeData.city ? `${nodeData.city}, ${nodeData.country}` : nodeData.country;
-        const nodeId = `da-node-${nodeName}`;
-
-        result.push({
-          id: nodeId,
-          label: `${location} (${shortId})`,
-          startMs: nodeData.firstSeen,
-          endMs: nodeData.lastSeen,
-          category: 'column',
-          depth: 2,
-          isLate: nodeData.lastSeen > ATTESTATION_DEADLINE_MS,
-          parentId: 'data-availability',
-          collapsible: true,
-          defaultCollapsed: true,
-          nodeName,
-          country: nodeData.country,
-          city: nodeData.city,
-          nodeCount: nodeData.columnCount,
-          clientName: nodeData.clientImpl,
-          clientVersion: nodeData.clientVersion,
-        });
-
-        const sortedColumns = Array.from(nodeData.columns.entries()).sort((a, b) => a[1] - b[1]);
-        for (const [colIndex, colTime] of sortedColumns) {
-          result.push({
-            id: `da-${nodeName}-col-${colIndex}`,
-            label: `${isDataColumns ? 'Col' : 'Blob'} ${colIndex}`,
-            startMs: colTime,
-            endMs: colTime + 30,
-            category: 'column',
-            depth: 3,
-            details: `${isDataColumns ? 'Column' : 'Blob'} ${colIndex} seen at ${formatMs(colTime)}`,
-            isLate: colTime > ATTESTATION_DEADLINE_MS,
-            isPointInTime: true,
-            parentId: nodeId,
-          });
-        }
-      }
-    }
-  } else {
-    // Default view: group by column index
-    const itemsByIndex = new Map<number, number[]>();
-
-    for (const item of filteredDaData) {
-      const index =
-        'column_index' in item ? (item.column_index ?? 0) : 'blob_index' in item ? (item.blob_index ?? 0) : 0;
-      const seenTime = item.seen_slot_start_diff ?? Infinity;
-      if (seenTime !== Infinity && seenTime >= 0 && seenTime <= MAX_REASONABLE_SEEN_TIME_MS) {
-        const existing = itemsByIndex.get(index) || [];
-        existing.push(seenTime);
-        itemsByIndex.set(index, existing);
-      }
-    }
-
-    if (itemsByIndex.size > 0) {
-      const columnFirstSeen = Array.from(itemsByIndex.entries())
-        .map(([index, times]) => ({
-          index,
-          firstSeenMs: Math.min(...times),
-          nodeCount: times.length,
-        }))
-        .sort((a, b) => a.index - b.index);
-
-      const daStartMs = Math.min(...columnFirstSeen.map(c => c.firstSeenMs));
-      const daEndMsRaw = Math.max(...columnFirstSeen.map(c => c.firstSeenMs));
-
-      let daEndMs = daEndMsRaw;
-      if (excludeOutliers && columnFirstSeen.length >= 4) {
-        const allFirstSeens = columnFirstSeen.map(c => c.firstSeenMs);
-        const filteredFirstSeens = filterOutliers(allFirstSeens);
-        if (filteredFirstSeens.length > 0) {
-          daEndMs = Math.max(...filteredFirstSeens);
-        }
-      }
-
-      result.push({
-        id: 'data-availability',
-        label: isDataColumns ? 'Data Columns' : 'Blobs',
-        startMs: daStartMs,
-        endMs: daEndMs,
-        category: 'data-availability',
-        depth: 1,
-        details: `${columnFirstSeen.length} ${isDataColumns ? 'columns' : 'blobs'} available from ${formatMs(daStartMs)} to ${formatMs(daEndMsRaw)}`,
-        isLate: daEndMs > ATTESTATION_DEADLINE_MS,
-        collapsible: true,
+        id: nodeId,
+        label: timeline.username,
+        startMs: nodeStartMs,
+        endMs: nodeEndMs,
+        category: classificationToCategory(timeline.classification),
+        depth: 3,
+        details: `${timeline.username}: ${formatMs(nodeStartMs)} → ${formatMs(nodeEndMs)}`,
+        isLate: nodeEndMs > ATTESTATION_DEADLINE_MS,
+        parentId: countryId,
+        clientName: timeline.consensusClient,
+        clientVersion: timeline.consensusVersion,
+        nodeId: timeline.nodeId,
+        username: timeline.username,
+        nodeName: timeline.nodeName,
+        country: timeline.country,
+        city: timeline.city,
+        classification: timeline.classification,
+        collapsible: eventCount > 1,
         defaultCollapsed: true,
+        // Include execution info if available
+        executionClient: timeline.execution?.client,
+        executionVersion: timeline.execution?.version,
+        methodVersion: timeline.execution?.methodVersion,
+        executionDurationMs: timeline.execution?.durationMs,
       });
 
-      for (const col of columnFirstSeen) {
+      // Child spans: Individual events for this node
+
+      // 1. Block Received (point-in-time)
+      result.push({
+        id: `${nodeId}-block-received`,
+        label: 'Block Received',
+        startMs: timeline.blockReceivedMs,
+        endMs: timeline.blockReceivedMs + 30,
+        category: 'individual',
+        depth: 4,
+        details: `Block gossip received at ${formatMs(timeline.blockReceivedMs)}`,
+        isLate: timeline.blockReceivedMs > ATTESTATION_DEADLINE_MS,
+        isPointInTime: true,
+        parentId: nodeId,
+      });
+
+      // 2. Execution (duration span, if available)
+      if (timeline.execution) {
         result.push({
-          id: `column-${col.index}`,
-          label: `${isDataColumns ? 'Col' : 'Blob'} ${col.index}`,
-          startMs: col.firstSeenMs,
-          endMs: col.firstSeenMs + 50,
-          category: 'column',
-          depth: 2,
-          details: `${isDataColumns ? 'Column' : 'Blob'} ${col.index} first seen at ${formatMs(col.firstSeenMs)} (${col.nodeCount} nodes)`,
-          isLate: col.firstSeenMs > ATTESTATION_DEADLINE_MS,
-          isPointInTime: true,
-          nodeCount: col.nodeCount,
-          parentId: 'data-availability',
+          id: `${nodeId}-execution`,
+          label: `Execution (${timeline.execution.client})`,
+          startMs: timeline.execution.startMs,
+          endMs: timeline.execution.endMs,
+          category: 'execution-node',
+          depth: 4,
+          details: `newPayload executed in ${formatMs(timeline.execution.durationMs)} by ${timeline.execution.client}`,
+          isLate: timeline.execution.endMs > ATTESTATION_DEADLINE_MS,
+          parentId: nodeId,
+          // Don't set clientName for execution spans - it's only for CL client
+          executionClient: timeline.execution.client,
+          executionVersion: timeline.execution.version,
+          methodVersion: timeline.execution.methodVersion,
+          executionDurationMs: timeline.execution.durationMs,
         });
+      }
+
+      // 3. Head Updated (point-in-time, if available)
+      if (timeline.headUpdatedMs !== null) {
+        result.push({
+          id: `${nodeId}-head-updated`,
+          label: 'Head Updated',
+          startMs: timeline.headUpdatedMs,
+          endMs: timeline.headUpdatedMs + 30,
+          category: 'internal',
+          depth: 4,
+          details: `Chain head updated at ${formatMs(timeline.headUpdatedMs)}`,
+          isLate: timeline.headUpdatedMs > ATTESTATION_DEADLINE_MS,
+          isPointInTime: true,
+          parentId: nodeId,
+        });
+      }
+
+      // 4. Data availability (collapsible with individual columns as children)
+      if (timeline.daCompleteMs !== null && timeline.daColumns.size > 0) {
+        const daSpanId = `${nodeId}-da-complete`;
+        const columnCount = timeline.daColumns.size;
+
+        // Calculate DA start time (first column received)
+        const columnTimes = Array.from(timeline.daColumns.values());
+        const daStartMs = Math.min(...columnTimes);
+
+        result.push({
+          id: daSpanId,
+          label: `Data Availability (${columnCount})`,
+          startMs: daStartMs,
+          endMs: timeline.daCompleteMs,
+          category: 'column',
+          depth: 4,
+          details: `${timeline.isDataColumns ? 'Data columns' : 'Blobs'}: ${formatMs(daStartMs)} → ${formatMs(timeline.daCompleteMs)} (${columnCount} ${timeline.isDataColumns ? 'columns' : 'blobs'})`,
+          isLate: timeline.daCompleteMs > ATTESTATION_DEADLINE_MS,
+          parentId: nodeId,
+          collapsible: columnCount > 1,
+          defaultCollapsed: true,
+          // nodeCount omitted - already shown in label
+        });
+
+        // Add child spans for each individual column/blob (only if multiple)
+        if (columnCount > 1) {
+          const sortedColumns = Array.from(timeline.daColumns.entries()).sort((a, b) => a[1] - b[1]);
+          for (const [colIndex, colTime] of sortedColumns) {
+            result.push({
+              id: `${daSpanId}-col-${colIndex}`,
+              label: `${timeline.isDataColumns ? 'Column' : 'Blob'} ${colIndex}`,
+              startMs: colTime,
+              endMs: colTime + 30,
+              category: 'column',
+              depth: 5,
+              details: `${timeline.isDataColumns ? 'Column' : 'Blob'} ${colIndex} seen at ${formatMs(colTime)}`,
+              isLate: colTime > ATTESTATION_DEADLINE_MS,
+              isPointInTime: true,
+              parentId: daSpanId,
+            });
+          }
+        }
       }
     }
   }
