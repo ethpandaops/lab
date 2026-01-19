@@ -595,12 +595,16 @@ export function MultiLineChart({
               markLine: {
                 silent: true,
                 symbol: 'none',
+                animation: false,
                 data: markLines.map(ml => ({
                   xAxis: ml.xValue,
                   label: {
                     show: !!ml.label,
                     formatter: ml.label ?? '',
                     position: ml.labelPosition ?? 'end',
+                    rotate: -90,
+                    align: 'left',
+                    offset: [0, -2],
                     color: ml.color ?? themeColors.muted,
                     fontSize: 11,
                     backgroundColor: themeColors.surface,
