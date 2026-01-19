@@ -47,7 +47,7 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
               leadingIcon={
                 <InformationCircleIcon className="size-3 text-muted/50 transition-colors hover:text-muted" />
               }
-              className="!p-0"
+              className="p-0!"
             />
             <PopoverPanel anchor="bottom start" className="w-56 p-2.5">
               <p className="text-xs/5 text-muted">

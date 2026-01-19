@@ -233,7 +233,7 @@ export function ContractTop100List({ variant = 'contained' }: ContractTop100List
   }
 
   return (
-    <Card className="h-[30rem] overflow-hidden rounded-sm">
+    <Card className="h-120 overflow-hidden rounded-sm">
       {/* Title */}
       <div className="bg-card border-b border-border px-3 py-2">
         <h3 className="text-base font-semibold text-foreground">Top 100 Contracts</h3>

@@ -374,7 +374,7 @@ export function IndexPage(): JSX.Element {
                 leadingIcon={
                   <InformationCircleIcon className="size-5 text-muted transition-colors hover:text-foreground" />
                 }
-                className="!p-0"
+                className="p-0!"
               />
               <PopoverPanel anchor="bottom start" className="w-80 p-3">
                 <p className="text-xs/5 text-muted">
