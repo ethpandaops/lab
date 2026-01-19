@@ -160,15 +160,15 @@ export function ContractTop100List({ variant = 'contained' }: ContractTop100List
         <table className="w-full min-w-[600px] table-fixed border-collapse">
           <TableColGroup />
           <thead className="sticky top-0 z-10 bg-surface">
-            <tr className="border-b border-border/50 text-[10px] font-medium uppercase">
+            <tr className="border-b border-border/50 text-xs font-medium uppercase">
               <th className="px-2 py-1.5 text-center text-muted">#</th>
               <th className="px-2 py-1.5 text-left text-muted">Contract</th>
               <th className="px-2 py-1.5 text-left text-muted">Owner</th>
               <SortHeader column="size" currentSort={sortColumn} currentDirection={sortDirection} onSort={handleSort}>
-                Size
+                SIZE
               </SortHeader>
               <SortHeader column="slots" currentSort={sortColumn} currentDirection={sortDirection} onSort={handleSort}>
-                Slots
+                SLOTS
               </SortHeader>
               <SortHeader
                 column="expiry1y"
@@ -177,7 +177,7 @@ export function ContractTop100List({ variant = 'contained' }: ContractTop100List
                 onSort={handleSort}
                 title="Savings with 1 year expiry policy"
               >
-                1y Expiry
+                1Y EXP.
               </SortHeader>
               <SortHeader
                 column="expiry2y"
@@ -186,7 +186,7 @@ export function ContractTop100List({ variant = 'contained' }: ContractTop100List
                 onSort={handleSort}
                 title="Savings with 2 year expiry policy"
               >
-                2y Expiry
+                2Y EXP.
               </SortHeader>
             </tr>
           </thead>

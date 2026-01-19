@@ -452,7 +452,7 @@ export function ContractPage(): JSX.Element {
           {/* Call to action */}
           <div className="inline-flex items-center gap-2 rounded-sm border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary">
             <CursorArrowRaysIcon className="size-4 shrink-0" />
-            <span>Select an expiry policy below to see how much storage could be reclaimed</span>
+            <span>Select an expiry policy below to see how much storage could be removed</span>
           </div>
 
           {/* Policy Selector - always visible */}
