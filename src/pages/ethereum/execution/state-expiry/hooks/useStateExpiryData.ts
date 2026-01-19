@@ -19,6 +19,12 @@ export type ExpiryPolicy = (typeof EXPIRY_POLICIES)[number];
 export const EXPIRY_TYPES = ['slot', 'contract'] as const;
 export type ExpiryType = (typeof EXPIRY_TYPES)[number];
 
+/**
+ * Key overhead per storage slot in geth's snapshot structure.
+ * Each slot key = 1 (prefix) + 32 (account hash) + 32 (storage hash) = 65 bytes
+ */
+const SLOT_KEY_OVERHEAD_BYTES = 65;
+
 /** Data for a specific slot-based expiry policy (null when data is unavailable) */
 interface SlotExpiryPolicyData {
   activeSlots: number | null;
@@ -198,39 +204,56 @@ export function useStateExpiryData(): UseStateExpiryDataResult {
       const slotExpiryByPolicy = {} as Record<ExpiryPolicy, SlotExpiryPolicyData>;
       for (const policy of EXPIRY_POLICIES) {
         const policyData = slotExpiryMaps[policy].get(dateStr);
-        slotExpiryByPolicy[policy] = policyData
-          ? {
-              activeSlots: policyData.active_slots ?? null,
-              effectiveBytes: policyData.effective_bytes ?? null,
-            }
-          : {
-              activeSlots: null,
-              effectiveBytes: null,
-            };
+        if (policyData) {
+          const slots = policyData.active_slots;
+          const valueBytes = policyData.effective_bytes;
+          slotExpiryByPolicy[policy] = {
+            activeSlots: slots ?? null,
+            effectiveBytes:
+              slots !== null && slots !== undefined && valueBytes !== null && valueBytes !== undefined
+                ? slots * SLOT_KEY_OVERHEAD_BYTES + valueBytes
+                : null,
+          };
+        } else {
+          slotExpiryByPolicy[policy] = {
+            activeSlots: null,
+            effectiveBytes: null,
+          };
+        }
       }
 
       // Build contract expiry data for all policies
       const contractExpiryByPolicy = {} as Record<ExpiryPolicy, ContractExpiryPolicyData>;
       for (const policy of EXPIRY_POLICIES) {
         const policyData = contractExpiryMaps[policy].get(dateStr);
-        contractExpiryByPolicy[policy] = policyData
-          ? {
-              activeSlots: policyData.active_slots ?? null,
-              effectiveBytes: policyData.effective_bytes ?? null,
-              activeContracts: policyData.active_contracts ?? null,
-            }
-          : {
-              activeSlots: null,
-              effectiveBytes: null,
-              activeContracts: null,
-            };
+        if (policyData) {
+          const slots = policyData.active_slots;
+          const valueBytes = policyData.effective_bytes;
+          contractExpiryByPolicy[policy] = {
+            activeSlots: slots ?? null,
+            effectiveBytes:
+              slots !== null && slots !== undefined && valueBytes !== null && valueBytes !== undefined
+                ? slots * SLOT_KEY_OVERHEAD_BYTES + valueBytes
+                : null,
+            activeContracts: policyData.active_contracts ?? null,
+          };
+        } else {
+          contractExpiryByPolicy[policy] = {
+            activeSlots: null,
+            effectiveBytes: null,
+            activeContracts: null,
+          };
+        }
       }
+
+      const currentSlots = current.active_slots ?? 0;
+      const currentValueBytes = current.effective_bytes ?? 0;
 
       return {
         date,
         dateLabel: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        activeSlots: current.active_slots ?? 0,
-        effectiveBytes: current.effective_bytes ?? 0,
+        activeSlots: currentSlots,
+        effectiveBytes: currentSlots * SLOT_KEY_OVERHEAD_BYTES + currentValueBytes,
         slotExpiryData: slotExpiryByPolicy,
         contractExpiryData: contractExpiryByPolicy,
       };

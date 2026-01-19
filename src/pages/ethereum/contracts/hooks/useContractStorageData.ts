@@ -15,6 +15,12 @@ import type {
 export const EXPIRY_TYPES = ['slot', 'contract'] as const;
 export type ExpiryType = (typeof EXPIRY_TYPES)[number];
 
+/**
+ * Key overhead per storage slot in geth's snapshot structure.
+ * Each slot key = 1 (prefix) + 32 (account hash) + 32 (storage hash) = 65 bytes
+ */
+const SLOT_KEY_OVERHEAD_BYTES = 65;
+
 /** Available expiry policy options */
 export const EXPIRY_POLICIES = ['12m', '24m'] as const;
 export type ExpiryPolicy = (typeof EXPIRY_POLICIES)[number];
@@ -163,9 +169,11 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     const contractCurrentMap = new Map<string, { slots: number; bytes: number }>();
     currentData.forEach(item => {
       if (item.day_start_date) {
+        const slots = item.active_slots ?? 0;
+        const valueBytes = item.effective_bytes ?? 0;
         contractCurrentMap.set(item.day_start_date, {
-          slots: item.active_slots ?? 0,
-          bytes: item.effective_bytes ?? 0,
+          slots,
+          bytes: slots * SLOT_KEY_OVERHEAD_BYTES + valueBytes,
         });
       }
     });
@@ -182,9 +190,11 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     for (const policy of EXPIRY_POLICIES) {
       contractExpiryData[policy]?.forEach(item => {
         if (item.day_start_date) {
+          const slots = item.active_slots ?? 0;
+          const valueBytes = item.effective_bytes ?? 0;
           contractExpiryMaps[policy].set(item.day_start_date, {
-            slots: item.active_slots ?? 0,
-            bytes: item.effective_bytes ?? 0,
+            slots,
+            bytes: slots * SLOT_KEY_OVERHEAD_BYTES + valueBytes,
           });
         }
       });
@@ -194,9 +204,11 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     const slotCurrentMap = new Map<string, { slots: number; bytes: number }>();
     slotCurrentData?.forEach(item => {
       if (item.day_start_date) {
+        const slots = item.active_slots ?? 0;
+        const valueBytes = item.effective_bytes ?? 0;
         slotCurrentMap.set(item.day_start_date, {
-          slots: item.active_slots ?? 0,
-          bytes: item.effective_bytes ?? 0,
+          slots,
+          bytes: slots * SLOT_KEY_OVERHEAD_BYTES + valueBytes,
         });
       }
     });
@@ -213,9 +225,11 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     for (const policy of EXPIRY_POLICIES) {
       slotExpiryData[policy]?.forEach(item => {
         if (item.day_start_date) {
+          const slots = item.active_slots ?? 0;
+          const valueBytes = item.effective_bytes ?? 0;
           slotExpiryMaps[policy].set(item.day_start_date, {
-            slots: item.active_slots ?? 0,
-            bytes: item.effective_bytes ?? 0,
+            slots,
+            bytes: slots * SLOT_KEY_OVERHEAD_BYTES + valueBytes,
           });
         }
       });
