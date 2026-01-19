@@ -4,6 +4,7 @@ import { Card } from '@/components/Layout/Card';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
 import { Toggle } from '@/components/Forms/Toggle';
+import { useCanHover } from '@/hooks/useCanHover';
 import type { SlotProgressTimelineProps, TraceSpan } from './SlotProgressTimeline.types';
 import { SPAN_COLORS } from './constants';
 import { formatMs, msToPercent } from './utils';
@@ -15,28 +16,6 @@ import { TimelineLegend } from './TimelineLegend';
 
 const ROW_HEIGHT = 28;
 const LABEL_WIDTH = 280;
-
-/**
- * Hook to detect if the device supports hover interactions.
- * Returns false on touch-only devices (mobile/tablet).
- */
-function useCanHover(): boolean {
-  const [canHover, setCanHover] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    return window.matchMedia('(hover: hover)').matches;
-  });
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(hover: hover)');
-    setCanHover(mediaQuery.matches);
-
-    const handler = (e: MediaQueryListEvent): void => setCanHover(e.matches);
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
-  }, []);
-
-  return canHover;
-}
 
 /**
  * SlotProgressTimeline displays a Jaeger/OTLP-style trace view of slot events.
