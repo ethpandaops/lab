@@ -6,7 +6,7 @@ export function GeographicalChecklistSkeleton(): JSX.Element {
   return (
     <div className="space-y-6">
       {/* Stats skeleton */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5 4xl:grid-cols-6">
         {[...Array(5)].map((_, i) => (
           <LoadingContainer key={i} className="h-24 rounded-sm" />
         ))}

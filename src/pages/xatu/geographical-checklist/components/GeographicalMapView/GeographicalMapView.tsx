@@ -245,7 +245,7 @@ export function GeographicalMapView({ nodes, isLoading }: GeographicalMapViewPro
       >
         {selectedLocation && (
           <div className="max-h-[600px] overflow-y-auto">
-            <ul role="list" className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+            <ul role="list" className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
               {selectedLocation.nodes.map((node: ProcessedNode, index: number) => {
                 const countryFlag = node.meta_client_geo_country_code
                   ? getCountryFlag(node.meta_client_geo_country_code, '')

@@ -870,7 +870,7 @@ export function DetailPage(): JSX.Element {
                         <BlobPropagationChart blobPropagationData={blobPropagationData} />
                       </>
                     ) : (
-                      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+                      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 3xl:grid-cols-3 4xl:grid-cols-4">
                         <BlockPropagationChart blockPropagationData={blockPropagationData} />
                         <BlobPropagationChart blobPropagationData={blobPropagationData} />
                       </div>

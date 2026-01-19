@@ -27,6 +27,11 @@
  * Tier 2: Semantic tokens (application layer)
  */
 @theme inline {
+  /* ===== Custom Breakpoints ===== */
+  /* Ultrawide monitor support beyond default 2xl (1536px) */
+  --breakpoint-3xl: 120rem; /* 1920px */
+  --breakpoint-4xl: 160rem; /* 2560px */
+
   /* ===== TIER 1: Primitive Color Scales ===== */
 
   /* Terracotta - warm accent colors with balanced orange undertones */

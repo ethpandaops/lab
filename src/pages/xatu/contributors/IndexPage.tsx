@@ -48,7 +48,10 @@ export function IndexPage(): JSX.Element {
     return (
       <div className="mb-12">
         <h2 className="mb-6 text-xl/7 font-semibold text-foreground">{title}</h2>
-        <ul role="list" className="md: grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+        <ul
+          role="list"
+          className="md: grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5"
+        >
           {contributors.map(contributor => (
             <UserCard
               key={contributor.clientName}
@@ -123,7 +126,7 @@ export function IndexPage(): JSX.Element {
 
         <div className="mb-12">
           <h2 className="mb-6 text-xl/7 font-semibold text-foreground">Public Contributors</h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5">
             {Array.from({ length: 9 }).map((_, index) => (
               <UserCardSkeleton key={index} />
             ))}
