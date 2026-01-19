@@ -8,8 +8,9 @@ export function TableColGroup(): JSX.Element {
       <col />
       <col className="w-36" />
       <col className="w-20" />
-      <col className="w-[4.5rem]" />
-      <col className="w-[4.5rem]" />
+      <col className="w-16" />
+      <col className="w-18" />
+      <col className="w-18" />
     </colgroup>
   );
 }

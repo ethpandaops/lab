@@ -28,6 +28,19 @@ function formatBytes(bytes: number): string {
 }
 
 /**
+ * Format slot count to human-readable format (K, M)
+ */
+function formatSlots(slots: number): string {
+  if (slots >= 1_000_000) {
+    return `${(slots / 1_000_000).toFixed(2)}M`;
+  }
+  if (slots >= 1_000) {
+    return `${(slots / 1_000).toFixed(2)}K`;
+  }
+  return slots.toLocaleString();
+}
+
+/**
  * Calculate savings percentage between base and expiry bytes
  */
 function calculateSavings(baseBytes: number | undefined, expiryBytes: number | undefined): number | null {
@@ -41,7 +54,7 @@ function calculateSavings(baseBytes: number | undefined, expiryBytes: number | u
  */
 export function ContractRow({ item }: ContractRowProps): JSX.Element {
   const { contract, expiry12m, expiry24m } = item;
-  const { rank, contract_address, contract_name, account_owner, labels, effective_bytes } = contract;
+  const { rank, contract_address, contract_name, account_owner, labels, effective_bytes, active_slots } = contract;
 
   // Calculate savings percentages
   const savings1y = calculateSavings(effective_bytes, expiry12m?.effective_bytes);
@@ -89,6 +102,11 @@ export function ContractRow({ item }: ContractRowProps): JSX.Element {
         {formatBytes(effective_bytes ?? 0)}
       </td>
 
+      {/* Slots */}
+      <td className="px-2 py-1.5 text-right text-xs font-medium whitespace-nowrap text-muted tabular-nums">
+        {formatSlots(active_slots ?? 0)}
+      </td>
+
       {/* 1y Savings */}
       <td className="px-2 py-1.5 text-right text-xs font-semibold whitespace-nowrap tabular-nums">
         <span className={savings1y !== null ? 'text-emerald-500' : 'text-muted'}>
@@ -112,7 +130,7 @@ export function ContractRow({ item }: ContractRowProps): JSX.Element {
  */
 export function ContractCard({ item }: ContractRowProps): JSX.Element {
   const { contract, expiry12m, expiry24m } = item;
-  const { rank, contract_address, contract_name, account_owner, labels, effective_bytes } = contract;
+  const { rank, contract_address, contract_name, account_owner, labels, effective_bytes, active_slots } = contract;
 
   // Calculate savings percentages
   const savings1y = calculateSavings(effective_bytes, expiry12m?.effective_bytes);
@@ -155,6 +173,10 @@ export function ContractCard({ item }: ContractRowProps): JSX.Element {
             <div>
               <span className="text-muted">Size: </span>
               <span className="font-medium text-foreground tabular-nums">{formatBytes(effective_bytes ?? 0)}</span>
+            </div>
+            <div>
+              <span className="text-muted">Slots: </span>
+              <span className="font-medium text-foreground tabular-nums">{formatSlots(active_slots ?? 0)}</span>
             </div>
             <div>
               <span className="text-muted">1y: </span>

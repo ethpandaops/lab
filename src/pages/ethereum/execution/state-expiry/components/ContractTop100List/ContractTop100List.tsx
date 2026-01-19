@@ -40,6 +40,7 @@ export function ContractTop100List({ variant = 'contained' }: ContractTop100List
               <th className="px-2 py-1.5 text-left">Contract</th>
               <th className="px-2 py-1.5 text-left">Owner</th>
               <th className="px-2 py-1.5 text-right">Size</th>
+              <th className="px-2 py-1.5 text-right">Slots</th>
               <th className="px-2 py-1.5 text-right" title="Savings with 1 year expiry policy">
                 1y Expiry
               </th>
