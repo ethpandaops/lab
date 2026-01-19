@@ -260,61 +260,79 @@ export function IndexPage(): JSX.Element {
     };
   }, [data, selectedType, selectedPolicy, themeColors]);
 
-  const bytesTooltipFormatter = useCallback((params: unknown): string => {
-    const dataPoints = Array.isArray(params) ? params : [params];
-    let html = '';
+  const bytesTooltipFormatter = useCallback(
+    (params: unknown): string => {
+      const dataPoints = Array.isArray(params) ? params : [params];
+      let html = '';
 
-    if (dataPoints.length > 0 && dataPoints[0]) {
-      const firstPoint = dataPoints[0] as { axisValue?: string };
-      if (firstPoint.axisValue) {
-        html += `<div style="margin-bottom: 8px; font-weight: 600; font-size: 13px;">${firstPoint.axisValue}</div>`;
-      }
-    }
+      // Build selected series name for comparison
+      const selectedSeriesName = `${TYPE_LABELS[selectedType]} (${POLICY_LABELS_SHORT[selectedPolicy]})`;
 
-    dataPoints.forEach(point => {
-      const p = point as { marker?: string; seriesName?: string; value?: number | [number, number] };
-      if (p.marker && p.seriesName !== undefined) {
-        const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
-        if (yValue !== undefined && yValue !== null) {
-          html += `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">`;
-          html += p.marker;
-          html += `<span>${p.seriesName}:</span>`;
-          html += `<span style="font-weight: 600; min-width: 80px; text-align: right;">${formatSmartDecimal(yValue, 2)} GB</span>`;
-          html += `</div>`;
+      if (dataPoints.length > 0 && dataPoints[0]) {
+        const firstPoint = dataPoints[0] as { axisValue?: string };
+        if (firstPoint.axisValue) {
+          html += `<div style="margin-bottom: 8px; font-weight: 600; font-size: 13px;">${firstPoint.axisValue}</div>`;
         }
       }
-    });
 
-    return html;
-  }, []);
+      dataPoints.forEach(point => {
+        const p = point as { marker?: string; seriesName?: string; value?: number | [number, number] };
+        if (p.marker && p.seriesName !== undefined) {
+          const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+          if (yValue !== undefined && yValue !== null) {
+            const isCurrentState = p.seriesName === 'Current State';
+            const isSelected = p.seriesName === selectedSeriesName;
+            const opacity = isCurrentState || isSelected ? '1' : '0.4';
+            const fontWeight = isCurrentState || isSelected ? '600' : '400';
+            html += `<div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 4px; opacity: ${opacity};">`;
+            html += `<span style="display: flex; align-items: center; gap: 8px;">${p.marker}<span>${p.seriesName}</span></span>`;
+            html += `<span style="font-weight: ${fontWeight}; text-align: right; font-variant-numeric: tabular-nums;">${formatSmartDecimal(yValue, 2)} GB</span>`;
+            html += `</div>`;
+          }
+        }
+      });
 
-  const slotsTooltipFormatter = useCallback((params: unknown): string => {
-    const dataPoints = Array.isArray(params) ? params : [params];
-    let html = '';
+      return html;
+    },
+    [selectedType, selectedPolicy]
+  );
 
-    if (dataPoints.length > 0 && dataPoints[0]) {
-      const firstPoint = dataPoints[0] as { axisValue?: string };
-      if (firstPoint.axisValue) {
-        html += `<div style="margin-bottom: 8px; font-weight: 600; font-size: 13px;">${firstPoint.axisValue}</div>`;
-      }
-    }
+  const slotsTooltipFormatter = useCallback(
+    (params: unknown): string => {
+      const dataPoints = Array.isArray(params) ? params : [params];
+      let html = '';
 
-    dataPoints.forEach(point => {
-      const p = point as { marker?: string; seriesName?: string; value?: number | [number, number] };
-      if (p.marker && p.seriesName !== undefined) {
-        const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
-        if (yValue !== undefined && yValue !== null) {
-          html += `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">`;
-          html += p.marker;
-          html += `<span>${p.seriesName}:</span>`;
-          html += `<span style="font-weight: 600; min-width: 80px; text-align: right;">${formatStorageSlotCount(yValue)}</span>`;
-          html += `</div>`;
+      // Build selected series name for comparison
+      const selectedSeriesName = `${TYPE_LABELS[selectedType]} (${POLICY_LABELS_SHORT[selectedPolicy]})`;
+
+      if (dataPoints.length > 0 && dataPoints[0]) {
+        const firstPoint = dataPoints[0] as { axisValue?: string };
+        if (firstPoint.axisValue) {
+          html += `<div style="margin-bottom: 8px; font-weight: 600; font-size: 13px;">${firstPoint.axisValue}</div>`;
         }
       }
-    });
 
-    return html;
-  }, []);
+      dataPoints.forEach(point => {
+        const p = point as { marker?: string; seriesName?: string; value?: number | [number, number] };
+        if (p.marker && p.seriesName !== undefined) {
+          const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+          if (yValue !== undefined && yValue !== null) {
+            const isCurrentState = p.seriesName === 'Current State';
+            const isSelected = p.seriesName === selectedSeriesName;
+            const opacity = isCurrentState || isSelected ? '1' : '0.4';
+            const fontWeight = isCurrentState || isSelected ? '600' : '400';
+            html += `<div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 4px; opacity: ${opacity};">`;
+            html += `<span style="display: flex; align-items: center; gap: 8px;">${p.marker}<span>${p.seriesName}</span></span>`;
+            html += `<span style="font-weight: ${fontWeight}; text-align: right; font-variant-numeric: tabular-nums;">${formatStorageSlotCount(yValue)}</span>`;
+            html += `</div>`;
+          }
+        }
+      });
+
+      return html;
+    },
+    [selectedType, selectedPolicy]
+  );
 
   const handlePolicySelect = useCallback((type: ExpiryType, policy: ExpiryPolicy) => {
     setSelectedType(type);
@@ -471,7 +489,7 @@ export function IndexPage(): JSX.Element {
                       }}
                       yAxis={{
                         name: 'Size (GB)',
-                        formatter: (value: number) => value.toFixed(4),
+                        formatter: (value: number) => value.toFixed(0),
                       }}
                       height={inModal ? 600 : 280}
                       showLegend={false}
@@ -484,7 +502,7 @@ export function IndexPage(): JSX.Element {
                 </PopoutCard>
 
                 <PopoutCard
-                  title="Active Storage Slots"
+                  title="Storage Slots"
                   subtitle="Current vs expiry policy"
                   downloadFilename="state-expiry-active-slots"
                 >
@@ -500,10 +518,10 @@ export function IndexPage(): JSX.Element {
                         name: 'Slots',
                         formatter: (value: number) => {
                           if (value >= 1_000_000) {
-                            return `${(value / 1_000_000).toFixed(4)}M`;
+                            return `${(value / 1_000_000).toFixed(0)}M`;
                           }
                           if (value >= 1_000) {
-                            return `${(value / 1_000).toFixed(4)}K`;
+                            return `${(value / 1_000).toFixed(0)}K`;
                           }
                           return value.toFixed(0);
                         },

@@ -1,14 +1,7 @@
 import { type JSX, useMemo, useCallback, useState } from 'react';
 import { useParams } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import {
-  CubeIcon,
-  CursorArrowRaysIcon,
-  DocumentTextIcon,
-  ClockIcon,
-  ArrowDownIcon,
-  SparklesIcon,
-} from '@heroicons/react/24/outline';
+import { CubeIcon, CursorArrowRaysIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import { dimContractOwnerServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { Container } from '@/components/Layout/Container';
 import { Card } from '@/components/Layout/Card';
@@ -19,12 +12,6 @@ import { formatSmartDecimal, hexToRgba } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useContractStorageData, EXPIRY_POLICIES, EXPIRY_TYPES, type ExpiryPolicy, type ExpiryType } from './hooks';
 import { ContractInfoCard, ContractInfoCardSkeleton, ContractStateExpirySkeleton } from './components';
-
-/** Display labels for expiry policies */
-const POLICY_LABELS: Record<ExpiryPolicy, string> = {
-  '12m': '1 Year',
-  '24m': '2 Year',
-};
 
 /** Short labels for chart series */
 const POLICY_LABELS_SHORT: Record<ExpiryPolicy, string> = {
@@ -212,60 +199,6 @@ export function ContractPage(): JSX.Element {
     return result;
   }, [latestData]);
 
-  // Current selection savings for stats panels
-  const selectedSavings = useMemo(() => {
-    if (!latestData) return null;
-
-    const currentBytes = latestData.effectiveBytes;
-    const currentSlots = latestData.activeSlots;
-
-    if (currentBytes === null || currentSlots === null) return null;
-
-    const policyData =
-      selectedType === 'slot' ? latestData.slotExpiryData[selectedPolicy] : latestData.expiryData[selectedPolicy];
-
-    if (policyData.effectiveBytes === null || policyData.activeSlots === null) return null;
-
-    // For contract-based expiry, use binary 0%/100% (whole contract expires or stays active)
-    // For slot-based expiry, use actual percentage
-    let afterBytes: number;
-    let afterSlots: number;
-    let bytesSaved: number;
-    let slotsSaved: number;
-    let bytesPercent: number;
-    let slotsPercent: number;
-
-    if (selectedType === 'contract') {
-      // Binary: either 0 (expired) or same as current (active)
-      const isExpired = policyData.effectiveBytes === 0;
-      afterBytes = isExpired ? 0 : currentBytes;
-      afterSlots = isExpired ? 0 : currentSlots;
-      bytesSaved = isExpired ? currentBytes : 0;
-      slotsSaved = isExpired ? currentSlots : 0;
-      bytesPercent = isExpired ? 100 : 0;
-      slotsPercent = isExpired ? 100 : 0;
-    } else {
-      // Slot-based: actual values and percentages
-      afterBytes = policyData.effectiveBytes;
-      afterSlots = policyData.activeSlots;
-      bytesSaved = currentBytes - afterBytes;
-      slotsSaved = currentSlots - afterSlots;
-      bytesPercent = currentBytes > 0 ? (bytesSaved / currentBytes) * 100 : 0;
-      slotsPercent = currentSlots > 0 ? (slotsSaved / currentSlots) * 100 : 0;
-    }
-
-    return {
-      currentBytes,
-      currentSlots,
-      afterBytes,
-      afterSlots,
-      bytesSaved,
-      bytesPercent,
-      slotsSaved,
-      slotsPercent,
-    };
-  }, [latestData, selectedType, selectedPolicy]);
-
   // Chart data - show all policies with selected one highlighted
   const chartData = useMemo(() => {
     if (!data || data.length === 0) return null;
@@ -402,6 +335,9 @@ export function ContractPage(): JSX.Element {
       const dataPoints = Array.isArray(params) ? params : [params];
       let html = '';
 
+      // Build selected series name for comparison
+      const selectedSeriesName = `${TYPE_LABELS[selectedType]} (${POLICY_LABELS_SHORT[selectedPolicy]})`;
+
       if (dataPoints.length > 0 && dataPoints[0]) {
         const firstPoint = dataPoints[0] as { axisValue?: string };
         if (firstPoint.axisValue) {
@@ -415,10 +351,13 @@ export function ContractPage(): JSX.Element {
           const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
           if (yValue !== undefined && yValue !== null) {
             const unit = chartData?.bytesUnit ?? 'MB';
-            html += `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">`;
-            html += p.marker;
-            html += `<span>${p.seriesName}:</span>`;
-            html += `<span style="font-weight: 600; min-width: 80px; text-align: right;">${formatSmartDecimal(yValue, 2)} ${unit}</span>`;
+            const isCurrentState = p.seriesName === 'Current State';
+            const isSelected = p.seriesName === selectedSeriesName;
+            const opacity = isCurrentState || isSelected ? '1' : '0.4';
+            const fontWeight = isCurrentState || isSelected ? '600' : '400';
+            html += `<div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 4px; opacity: ${opacity};">`;
+            html += `<span style="display: flex; align-items: center; gap: 8px;">${p.marker}<span>${p.seriesName}</span></span>`;
+            html += `<span style="font-weight: ${fontWeight}; text-align: right; font-variant-numeric: tabular-nums;">${formatSmartDecimal(yValue, 2)} ${unit}</span>`;
             html += `</div>`;
           }
         }
@@ -426,36 +365,45 @@ export function ContractPage(): JSX.Element {
 
       return html;
     },
-    [chartData?.bytesUnit]
+    [chartData?.bytesUnit, selectedType, selectedPolicy]
   );
 
-  const slotsTooltipFormatter = useCallback((params: unknown): string => {
-    const dataPoints = Array.isArray(params) ? params : [params];
-    let html = '';
+  const slotsTooltipFormatter = useCallback(
+    (params: unknown): string => {
+      const dataPoints = Array.isArray(params) ? params : [params];
+      let html = '';
 
-    if (dataPoints.length > 0 && dataPoints[0]) {
-      const firstPoint = dataPoints[0] as { axisValue?: string };
-      if (firstPoint.axisValue) {
-        html += `<div style="margin-bottom: 8px; font-weight: 600; font-size: 13px;">${firstPoint.axisValue}</div>`;
-      }
-    }
+      // Build selected series name for comparison
+      const selectedSeriesName = `${TYPE_LABELS[selectedType]} (${POLICY_LABELS_SHORT[selectedPolicy]})`;
 
-    dataPoints.forEach(point => {
-      const p = point as { marker?: string; seriesName?: string; value?: number | [number, number] };
-      if (p.marker && p.seriesName !== undefined) {
-        const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
-        if (yValue !== undefined && yValue !== null) {
-          html += `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">`;
-          html += p.marker;
-          html += `<span>${p.seriesName}:</span>`;
-          html += `<span style="font-weight: 600; min-width: 80px; text-align: right;">${formatStorageSlotCount(yValue)}</span>`;
-          html += `</div>`;
+      if (dataPoints.length > 0 && dataPoints[0]) {
+        const firstPoint = dataPoints[0] as { axisValue?: string };
+        if (firstPoint.axisValue) {
+          html += `<div style="margin-bottom: 8px; font-weight: 600; font-size: 13px;">${firstPoint.axisValue}</div>`;
         }
       }
-    });
 
-    return html;
-  }, []);
+      dataPoints.forEach(point => {
+        const p = point as { marker?: string; seriesName?: string; value?: number | [number, number] };
+        if (p.marker && p.seriesName !== undefined) {
+          const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+          if (yValue !== undefined && yValue !== null) {
+            const isCurrentState = p.seriesName === 'Current State';
+            const isSelected = p.seriesName === selectedSeriesName;
+            const opacity = isCurrentState || isSelected ? '1' : '0.4';
+            const fontWeight = isCurrentState || isSelected ? '600' : '400';
+            html += `<div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 4px; opacity: ${opacity};">`;
+            html += `<span style="display: flex; align-items: center; gap: 8px;">${p.marker}<span>${p.seriesName}</span></span>`;
+            html += `<span style="font-weight: ${fontWeight}; text-align: right; font-variant-numeric: tabular-nums;">${formatStorageSlotCount(yValue)}</span>`;
+            html += `</div>`;
+          }
+        }
+      });
+
+      return html;
+    },
+    [selectedType, selectedPolicy]
+  );
 
   const handlePolicySelect = useCallback((type: ExpiryType, policy: ExpiryPolicy) => {
     setSelectedType(type);
@@ -482,8 +430,6 @@ export function ContractPage(): JSX.Element {
       }
     }
   }, []);
-
-  const selectedColor = TYPE_COLORS[selectedType];
 
   return (
     <Container>
@@ -533,133 +479,68 @@ export function ContractPage(): JSX.Element {
           )}
 
           {/* Data-dependent content */}
-          {!isLoading && chartData && selectedSavings && (
-            <>
-              {/* Summary Cards */}
-              <div className="grid gap-2 md:grid-cols-3 md:gap-3">
-                {/* Current State */}
-                <Card className="border-l-2 border-l-muted/50 p-2 md:p-3">
-                  <p className="flex items-center gap-1 text-xs font-medium tracking-wide text-muted uppercase">
-                    <CubeIcon className="size-3" />
-                    <span>Current State</span>
-                  </p>
-                  <p className="mt-1 text-base font-bold text-foreground tabular-nums md:text-lg">
-                    {formatBytes(selectedSavings.currentBytes)}
-                  </p>
-                  <p className="mt-0.5 text-xs text-muted tabular-nums">
-                    {formatStorageSlotCount(selectedSavings.currentSlots)} slots
-                  </p>
-                </Card>
+          {!isLoading && chartData && (
+            <div className="grid gap-4 md:grid-cols-2">
+              <PopoutCard
+                title="Storage Size"
+                subtitle="Current vs expiry policy"
+                downloadFilename={`contract-storage-size-${address.slice(0, 10)}`}
+              >
+                {({ inModal }) => (
+                  <MultiLineChart
+                    series={chartData.bytesSeries}
+                    xAxis={{
+                      type: 'category',
+                      labels: chartData.labels,
+                      name: 'Date',
+                    }}
+                    yAxis={{
+                      name: `Size (${chartData.bytesUnit})`,
+                      max: chartData.bytesYMax,
+                      formatter: (value: number) => value.toFixed(0),
+                    }}
+                    height={inModal ? 600 : 280}
+                    showLegend={false}
+                    enableDataZoom={true}
+                    tooltipFormatter={bytesTooltipFormatter}
+                    syncGroup={inModal ? undefined : 'contract-storage'}
+                    onSeriesClick={handleSeriesClick}
+                    markLines={resurrectionMarkLines}
+                  />
+                )}
+              </PopoutCard>
 
-                {/* After Expiry */}
-                <div className="border-l-2" style={{ borderLeftColor: selectedColor }}>
-                  <Card className="border-l-0 p-2 md:p-3">
-                    <p
-                      className="flex items-center gap-1 text-xs font-medium tracking-wide uppercase"
-                      style={{ color: selectedColor }}
-                    >
-                      <ClockIcon className="size-3" />
-                      <span>
-                        {POLICY_LABELS[selectedPolicy]} {TYPE_LABELS[selectedType]}
-                      </span>
-                    </p>
-                    <p className="mt-1 text-base font-bold tabular-nums md:text-lg" style={{ color: selectedColor }}>
-                      {formatBytes(selectedSavings.afterBytes)}
-                    </p>
-                    <p className="mt-0.5 text-xs tabular-nums" style={{ color: `${selectedColor}99` }}>
-                      {formatStorageSlotCount(selectedSavings.afterSlots)} slots
-                    </p>
-                  </Card>
-                </div>
-
-                {/* Difference */}
-                <Card className="border-l-2 border-l-emerald-500 p-2 md:p-3">
-                  <p className="flex items-center gap-1 text-xs font-medium tracking-wide text-emerald-600 uppercase dark:text-emerald-400">
-                    <SparklesIcon className="size-3" />
-                    <span>Difference</span>
-                  </p>
-                  <div className="mt-1 flex items-baseline gap-1">
-                    <p className="text-base font-bold text-emerald-600 tabular-nums md:text-lg dark:text-emerald-400">
-                      -{formatBytes(selectedSavings.bytesSaved)} ({selectedSavings.bytesPercent.toFixed(1)}%)
-                    </p>
-                    <ArrowDownIcon className="size-3 text-emerald-600 dark:text-emerald-400" />
-                  </div>
-                  <p className="mt-0.5 text-xs text-emerald-600/70 tabular-nums dark:text-emerald-400/70">
-                    {formatStorageSlotCount(selectedSavings.slotsSaved)} slots (
-                    {selectedSavings.slotsPercent.toFixed(1)}% reduction)
-                  </p>
-                </Card>
-              </div>
-
-              {/* Charts */}
-              <div className="grid gap-4 md:grid-cols-2">
-                <PopoutCard
-                  title="Storage Size"
-                  subtitle="Current vs expiry policy"
-                  downloadFilename={`contract-storage-size-${address.slice(0, 10)}`}
-                >
-                  {({ inModal }) => (
-                    <MultiLineChart
-                      series={chartData.bytesSeries}
-                      xAxis={{
-                        type: 'category',
-                        labels: chartData.labels,
-                        name: 'Date',
-                      }}
-                      yAxis={{
-                        name: `Size (${chartData.bytesUnit})`,
-                        max: chartData.bytesYMax,
-                        formatter: (value: number) => value.toFixed(2),
-                      }}
-                      height={inModal ? 600 : 280}
-                      showLegend={false}
-                      enableDataZoom={true}
-                      tooltipFormatter={bytesTooltipFormatter}
-                      syncGroup={inModal ? undefined : 'contract-storage'}
-                      onSeriesClick={handleSeriesClick}
-                      markLines={resurrectionMarkLines}
-                    />
-                  )}
-                </PopoutCard>
-
-                <PopoutCard
-                  title="Active Storage Slots"
-                  subtitle="Current vs expiry policy"
-                  downloadFilename={`contract-storage-slots-${address.slice(0, 10)}`}
-                >
-                  {({ inModal }) => (
-                    <MultiLineChart
-                      series={chartData.slotsSeries}
-                      xAxis={{
-                        type: 'category',
-                        labels: chartData.labels,
-                        name: 'Date',
-                      }}
-                      yAxis={{
-                        name: 'Slots',
-                        max: chartData.slotsYMax,
-                        formatter: (value: number) => {
-                          if (value >= 1_000_000) {
-                            return `${(value / 1_000_000).toFixed(2)}M`;
-                          }
-                          if (value >= 1_000) {
-                            return `${(value / 1_000).toFixed(2)}K`;
-                          }
-                          return value.toFixed(0);
-                        },
-                      }}
-                      height={inModal ? 600 : 280}
-                      showLegend={false}
-                      enableDataZoom={true}
-                      tooltipFormatter={slotsTooltipFormatter}
-                      syncGroup={inModal ? undefined : 'contract-storage'}
-                      onSeriesClick={handleSeriesClick}
-                      markLines={resurrectionMarkLines}
-                    />
-                  )}
-                </PopoutCard>
-              </div>
-            </>
+              <PopoutCard
+                title="Storage Slots"
+                subtitle="Current vs expiry policy"
+                downloadFilename={`contract-storage-slots-${address.slice(0, 10)}`}
+              >
+                {({ inModal }) => (
+                  <MultiLineChart
+                    series={chartData.slotsSeries}
+                    xAxis={{
+                      type: 'category',
+                      labels: chartData.labels,
+                      name: 'Date',
+                    }}
+                    yAxis={{
+                      name: 'Slots',
+                      max: chartData.slotsYMax,
+                      formatter: (value: number) => {
+                        return value.toFixed(0);
+                      },
+                    }}
+                    height={inModal ? 600 : 280}
+                    showLegend={false}
+                    enableDataZoom={true}
+                    tooltipFormatter={slotsTooltipFormatter}
+                    syncGroup={inModal ? undefined : 'contract-storage'}
+                    onSeriesClick={handleSeriesClick}
+                    markLines={resurrectionMarkLines}
+                  />
+                )}
+              </PopoutCard>
+            </div>
           )}
         </div>
       )}
