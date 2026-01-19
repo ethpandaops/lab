@@ -4,6 +4,7 @@ import { Card } from '@/components/Layout/Card';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
 import { Toggle } from '@/components/Forms/Toggle';
+import { useCanHover } from '@/hooks/useCanHover';
 import type { SlotProgressTimelineProps, TraceSpan } from './SlotProgressTimeline.types';
 import { SPAN_COLORS } from './constants';
 import { formatMs, msToPercent } from './utils';
@@ -38,6 +39,7 @@ export function SlotProgressTimeline({
   contributor,
   onContributorChange,
 }: SlotProgressTimelineProps): JSX.Element {
+  const canHover = useCanHover();
   const [hoveredSpan, setHoveredSpan] = useState<TraceSpan | null>(null);
   const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
   const [collapsedSpans, setCollapsedSpans] = useState<Set<string>>(new Set());
@@ -122,22 +124,31 @@ export function SlotProgressTimeline({
     hasInitializedCollapsed.current = false;
   }, [selectedUsername]);
 
-  // Handle mouse events for tooltip
-  const handleMouseEnter = useCallback((span: TraceSpan) => {
-    setHoveredSpan(span);
-  }, []);
+  // Handle mouse events for tooltip (disabled on touch devices)
+  const handleMouseEnter = useCallback(
+    (span: TraceSpan) => {
+      if (!canHover) return;
+      setHoveredSpan(span);
+    },
+    [canHover]
+  );
 
   const handleMouseLeave = useCallback(() => {
+    if (!canHover) return;
     setHoveredSpan(null);
     setMousePos(null);
-  }, []);
+  }, [canHover]);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-    }
-  }, []);
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!canHover) return;
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+      }
+    },
+    [canHover]
+  );
 
   // Loading state
   if (isLoading || executionLoading) {
@@ -173,8 +184,20 @@ export function SlotProgressTimeline({
     ...availableUsernames.map(username => ({ value: username, label: username })),
   ];
 
-  // Filter spans by collapsed state
-  const visibleSpans = spans.filter(span => !span.parentId || !collapsedSpans.has(span.parentId));
+  // Filter spans by collapsed state - hide if any ancestor is collapsed
+  // Build a lookup map for O(1) parent access
+  const spanById = new Map(spans.map(s => [s.id, s]));
+  const visibleSpans = spans.filter(span => {
+    if (!span.parentId) return true;
+
+    // Walk up the ancestry chain to check if any ancestor is collapsed
+    let currentParentId: string | undefined = span.parentId;
+    while (currentParentId) {
+      if (collapsedSpans.has(currentParentId)) return false;
+      currentParentId = spanById.get(currentParentId)?.parentId;
+    }
+    return true;
+  });
 
   return (
     <Card>
