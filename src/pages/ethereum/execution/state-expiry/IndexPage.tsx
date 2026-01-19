@@ -367,7 +367,9 @@ export function IndexPage(): JSX.Element {
               </PopoverPanel>
             </Popover>
           </div>
-          <p className="mt-0.5 text-sm text-muted">Impact of expiring unused storage after inactivity periods</p>
+          <p className="mt-0.5 text-sm text-muted">
+            Impact of expiring unused contract storage after inactivity periods
+          </p>
         </div>
 
         {/* Compact legend chips with popovers - visible below lg */}

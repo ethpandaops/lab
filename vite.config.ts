@@ -33,9 +33,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'https://lab.ethpandaops.io:443',
         changeOrigin: true,
-        secure: false,
+        secure: true,
       },
     },
   },

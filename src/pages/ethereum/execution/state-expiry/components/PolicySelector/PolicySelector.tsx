@@ -39,7 +39,7 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
 
         {/* Current header */}
         <div className="flex items-center justify-center gap-1 border-r border-b border-border/30 p-1.5 sm:p-2 lg:p-2.5">
-          <span className="text-[10px] font-bold text-muted sm:text-xs lg:text-sm">Current</span>
+          <span className="text-[10px] font-bold text-muted sm:text-xs lg:text-sm">Current Contract Storage</span>
           <Popover className="relative">
             <PopoverButton
               variant="blank"
@@ -51,8 +51,8 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
             />
             <PopoverPanel anchor="bottom start" className="w-56 p-2.5">
               <p className="text-xs/5 text-muted">
-                <span className="font-semibold text-foreground">Effective bytes</span> measures actual data stored,
-                excluding leading zeros. Each storage slot is maximum 32 bytes.
+                <span className="font-semibold text-foreground">Per-slot size</span> = 65 bytes (key overhead) + value
+                bytes (leading zeros removed). Based on go-ethereum&apos;s snapshot structure.
               </p>
             </PopoverPanel>
           </Popover>
