@@ -3,6 +3,7 @@ import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/
 import clsx from 'clsx';
 import { Container } from '@/components/Layout/Container';
 import { Card } from '@/components/Layout/Card';
+import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { formatSmartDecimal } from '@/utils';
 import { useStateSizeData, useStateDelta, type DeltaTimeframe } from './hooks';
@@ -313,26 +314,30 @@ export function IndexPage(): JSX.Element {
           </div>
 
           {/* Main Chart */}
-          <Card rounded className="p-6">
-            <MultiLineChart
-              title="Historical State Growth"
-              subtitle="Daily snapshot of Ethereum state components (stacked)"
-              series={chartData.series}
-              xAxis={{
-                type: 'category',
-                labels: chartData.labels,
-                name: 'Date',
-              }}
-              yAxis={{
-                name: 'Size (GB)',
-                min: 0,
-              }}
-              height={480}
-              showLegend={true}
-              enableDataZoom={true}
-              tooltipFormatter={tooltipFormatter}
-            />
-          </Card>
+          <PopoutCard
+            title="Historical State Growth"
+            subtitle="Daily snapshot of Ethereum state components (stacked)"
+            downloadFilename="state-growth-historical"
+          >
+            {({ inModal }) => (
+              <MultiLineChart
+                series={chartData.series}
+                xAxis={{
+                  type: 'category',
+                  labels: chartData.labels,
+                  name: 'Date',
+                }}
+                yAxis={{
+                  name: 'Size (GB)',
+                  min: 0,
+                }}
+                height={inModal ? 600 : 480}
+                showLegend={true}
+                enableDataZoom={true}
+                tooltipFormatter={tooltipFormatter}
+              />
+            )}
+          </PopoutCard>
         </div>
       )}
     </Container>

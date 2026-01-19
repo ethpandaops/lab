@@ -582,26 +582,28 @@ export function ContractPage(): JSX.Element {
                   subtitle="Current vs expiry policy"
                   downloadFilename={`contract-storage-size-${address.slice(0, 10)}`}
                 >
-                  <MultiLineChart
-                    series={chartData.bytesSeries}
-                    xAxis={{
-                      type: 'category',
-                      labels: chartData.labels,
-                      name: 'Date',
-                    }}
-                    yAxis={{
-                      name: `Size (${chartData.bytesUnit})`,
-                      max: chartData.bytesYMax,
-                      formatter: (value: number) => value.toFixed(2),
-                    }}
-                    height={280}
-                    showLegend={false}
-                    enableDataZoom={true}
-                    tooltipFormatter={bytesTooltipFormatter}
-                    syncGroup="contract-storage"
-                    onSeriesClick={handleSeriesClick}
-                    markLines={resurrectionMarkLines}
-                  />
+                  {({ inModal }) => (
+                    <MultiLineChart
+                      series={chartData.bytesSeries}
+                      xAxis={{
+                        type: 'category',
+                        labels: chartData.labels,
+                        name: 'Date',
+                      }}
+                      yAxis={{
+                        name: `Size (${chartData.bytesUnit})`,
+                        max: chartData.bytesYMax,
+                        formatter: (value: number) => value.toFixed(2),
+                      }}
+                      height={inModal ? 600 : 280}
+                      showLegend={false}
+                      enableDataZoom={true}
+                      tooltipFormatter={bytesTooltipFormatter}
+                      syncGroup={inModal ? undefined : 'contract-storage'}
+                      onSeriesClick={handleSeriesClick}
+                      markLines={resurrectionMarkLines}
+                    />
+                  )}
                 </PopoutCard>
 
                 <PopoutCard
@@ -609,34 +611,36 @@ export function ContractPage(): JSX.Element {
                   subtitle="Current vs expiry policy"
                   downloadFilename={`contract-storage-slots-${address.slice(0, 10)}`}
                 >
-                  <MultiLineChart
-                    series={chartData.slotsSeries}
-                    xAxis={{
-                      type: 'category',
-                      labels: chartData.labels,
-                      name: 'Date',
-                    }}
-                    yAxis={{
-                      name: 'Slots',
-                      max: chartData.slotsYMax,
-                      formatter: (value: number) => {
-                        if (value >= 1_000_000) {
-                          return `${(value / 1_000_000).toFixed(2)}M`;
-                        }
-                        if (value >= 1_000) {
-                          return `${(value / 1_000).toFixed(2)}K`;
-                        }
-                        return value.toFixed(0);
-                      },
-                    }}
-                    height={280}
-                    showLegend={false}
-                    enableDataZoom={true}
-                    tooltipFormatter={slotsTooltipFormatter}
-                    syncGroup="contract-storage"
-                    onSeriesClick={handleSeriesClick}
-                    markLines={resurrectionMarkLines}
-                  />
+                  {({ inModal }) => (
+                    <MultiLineChart
+                      series={chartData.slotsSeries}
+                      xAxis={{
+                        type: 'category',
+                        labels: chartData.labels,
+                        name: 'Date',
+                      }}
+                      yAxis={{
+                        name: 'Slots',
+                        max: chartData.slotsYMax,
+                        formatter: (value: number) => {
+                          if (value >= 1_000_000) {
+                            return `${(value / 1_000_000).toFixed(2)}M`;
+                          }
+                          if (value >= 1_000) {
+                            return `${(value / 1_000).toFixed(2)}K`;
+                          }
+                          return value.toFixed(0);
+                        },
+                      }}
+                      height={inModal ? 600 : 280}
+                      showLegend={false}
+                      enableDataZoom={true}
+                      tooltipFormatter={slotsTooltipFormatter}
+                      syncGroup={inModal ? undefined : 'contract-storage'}
+                      onSeriesClick={handleSeriesClick}
+                      markLines={resurrectionMarkLines}
+                    />
+                  )}
                 </PopoutCard>
               </div>
             </>
