@@ -575,24 +575,26 @@ export function IndexPage(): JSX.Element {
                   subtitle="Current vs expiry policy"
                   downloadFilename="state-expiry-storage-size"
                 >
-                  <MultiLineChart
-                    series={chartData.bytesSeries}
-                    xAxis={{
-                      type: 'category',
-                      labels: chartData.labels,
-                      name: 'Date',
-                    }}
-                    yAxis={{
-                      name: 'Size (GB)',
-                      formatter: (value: number) => value.toFixed(4),
-                    }}
-                    height={280}
-                    showLegend={false}
-                    enableDataZoom={true}
-                    tooltipFormatter={bytesTooltipFormatter}
-                    syncGroup="state-expiry"
-                    onSeriesClick={handleSeriesClick}
-                  />
+                  {({ inModal }) => (
+                    <MultiLineChart
+                      series={chartData.bytesSeries}
+                      xAxis={{
+                        type: 'category',
+                        labels: chartData.labels,
+                        name: 'Date',
+                      }}
+                      yAxis={{
+                        name: 'Size (GB)',
+                        formatter: (value: number) => value.toFixed(4),
+                      }}
+                      height={inModal ? 600 : 280}
+                      showLegend={false}
+                      enableDataZoom={true}
+                      tooltipFormatter={bytesTooltipFormatter}
+                      syncGroup={inModal ? undefined : 'state-expiry'}
+                      onSeriesClick={handleSeriesClick}
+                    />
+                  )}
                 </PopoutCard>
 
                 <PopoutCard
@@ -600,32 +602,34 @@ export function IndexPage(): JSX.Element {
                   subtitle="Current vs expiry policy"
                   downloadFilename="state-expiry-active-slots"
                 >
-                  <MultiLineChart
-                    series={chartData.slotsSeries}
-                    xAxis={{
-                      type: 'category',
-                      labels: chartData.labels,
-                      name: 'Date',
-                    }}
-                    yAxis={{
-                      name: 'Slots',
-                      formatter: (value: number) => {
-                        if (value >= 1_000_000) {
-                          return `${(value / 1_000_000).toFixed(4)}M`;
-                        }
-                        if (value >= 1_000) {
-                          return `${(value / 1_000).toFixed(4)}K`;
-                        }
-                        return value.toFixed(0);
-                      },
-                    }}
-                    height={280}
-                    showLegend={false}
-                    enableDataZoom={true}
-                    tooltipFormatter={slotsTooltipFormatter}
-                    syncGroup="state-expiry"
-                    onSeriesClick={handleSeriesClick}
-                  />
+                  {({ inModal }) => (
+                    <MultiLineChart
+                      series={chartData.slotsSeries}
+                      xAxis={{
+                        type: 'category',
+                        labels: chartData.labels,
+                        name: 'Date',
+                      }}
+                      yAxis={{
+                        name: 'Slots',
+                        formatter: (value: number) => {
+                          if (value >= 1_000_000) {
+                            return `${(value / 1_000_000).toFixed(4)}M`;
+                          }
+                          if (value >= 1_000) {
+                            return `${(value / 1_000).toFixed(4)}K`;
+                          }
+                          return value.toFixed(0);
+                        },
+                      }}
+                      height={inModal ? 600 : 280}
+                      showLegend={false}
+                      enableDataZoom={true}
+                      tooltipFormatter={slotsTooltipFormatter}
+                      syncGroup={inModal ? undefined : 'state-expiry'}
+                      onSeriesClick={handleSeriesClick}
+                    />
+                  )}
                 </PopoutCard>
               </div>
 
