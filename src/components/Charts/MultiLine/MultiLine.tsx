@@ -99,8 +99,9 @@ export function MultiLineChart({
   const chartWrapperRef = useRef<ReactEChartsCore | null>(null);
   // Store the chart instance for sync cleanup
   const chartInstanceRef = useRef<EChartsInstance | null>(null);
-  // Store dataZoom state to preserve zoom when legend toggles series visibility
-  const dataZoomStateRef = useRef<{ start: number; end: number } | null>(null);
+  // Store dataZoom state to preserve zoom across data updates and legend toggles
+  // Using state (not ref) ensures zoom range is included in the option config
+  const [zoomRange, setZoomRange] = useState({ start: 0, end: 100 });
 
   // Get shared crosshairs context for sync registration
   const crosshairsContext = useContext(SharedCrosshairsContext);
@@ -114,8 +115,8 @@ export function MultiLineChart({
         crosshairsContext.registerChart(syncGroup, echartsInstance);
       }
 
-      // Track dataZoom changes to preserve zoom state when legend toggles series
-      // Must be attached here because chartInstanceRef is not available during effect mount
+      // Track dataZoom changes to preserve zoom state across data updates and legend toggles
+      // Using state ensures the zoom range is included in the option config on re-renders
       if (enableDataZoom) {
         const handleDataZoom = (): void => {
           const option = echartsInstance.getOption() as {
@@ -123,7 +124,15 @@ export function MultiLineChart({
           };
           const dz = option.dataZoom?.[0];
           if (dz && typeof dz.start === 'number' && typeof dz.end === 'number') {
-            dataZoomStateRef.current = { start: dz.start, end: dz.end };
+            const newStart = dz.start;
+            const newEnd = dz.end;
+            // Only update state if values changed significantly (prevents infinite loops)
+            setZoomRange(prev => {
+              if (Math.abs(prev.start - newStart) < 0.01 && Math.abs(prev.end - newEnd) < 0.01) {
+                return prev; // No change, return same reference
+              }
+              return { start: newStart, end: newEnd };
+            });
           }
         };
         echartsInstance.on('datazoom', handleDataZoom);
@@ -367,26 +376,6 @@ export function MultiLineChart({
     aggregateSeriesName,
     showAggregate,
   ]);
-
-  // Restore dataZoom state after chart option changes
-  // This handles: legend toggles, data refetches, any re-render that resets zoom
-  useEffect(() => {
-    const instance = chartInstanceRef.current;
-    if (!instance || !enableDataZoom || !dataZoomStateRef.current) return;
-
-    // Use setTimeout to ensure this runs after the chart option update
-    const timeoutId = setTimeout(() => {
-      if (dataZoomStateRef.current) {
-        instance.dispatchAction({
-          type: 'dataZoom',
-          start: dataZoomStateRef.current.start,
-          end: dataZoomStateRef.current.end,
-        });
-      }
-    }, 0);
-
-    return () => clearTimeout(timeoutId);
-  }, [displayedSeries, enableDataZoom]);
 
   // Build complete option
   // Memoize based on actual data that should trigger re-animation
@@ -803,6 +792,8 @@ export function MultiLineChart({
               zoomOnMouseWheel: true,
               moveOnMouseWheel: false,
               moveOnMouseMove: true,
+              start: zoomRange.start,
+              end: zoomRange.end,
             },
             {
               type: 'slider' as const,
@@ -810,6 +801,8 @@ export function MultiLineChart({
               filterMode: 'none' as const,
               height: 20,
               bottom: 10,
+              start: zoomRange.start,
+              end: zoomRange.end,
               borderColor: themeColors.border,
               backgroundColor: 'transparent',
               fillerColor: hexToRgba(themeColors.primary, 0.2),
@@ -849,6 +842,7 @@ export function MultiLineChart({
     tooltipTrigger,
     tooltipMode,
     enableDataZoom,
+    zoomRange,
     connectNulls,
     extendedPalette,
     relativeSlots,
