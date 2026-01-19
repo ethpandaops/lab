@@ -11,7 +11,7 @@ import type {
   FctMevBidHighestValueByBuilderChunked50Ms,
 } from '@/api/types.gen';
 import { SLOT_DURATION_MS, MAX_REASONABLE_SEEN_TIME_MS } from './constants';
-import { formatMs, classificationToCategory, filterOutliers } from './utils';
+import { formatMs, classificationToCategory, calculateOutlierBounds } from './utils';
 import type { TraceSpan } from './SlotProgressTimeline.types';
 
 interface UseTraceSpansOptions {
@@ -455,31 +455,38 @@ function buildBlockProposalSpans(
 ): void {
   if (nodeTimelines.length === 0) return;
 
-  // Calculate overall timing bounds
-  const allStartTimes = nodeTimelines.map(n => n.blockReceivedMs);
-  const allEndTimes = nodeTimelines.map(n => {
-    // Find the latest event for each node
+  // Calculate end time for each node
+  const getNodeEndTime = (n: NodeTimeline): number => {
     const times = [n.blockReceivedMs];
     if (n.headUpdatedMs !== null) times.push(n.headUpdatedMs);
     if (n.execution) times.push(n.execution.endMs);
     if (n.daCompleteMs !== null) times.push(n.daCompleteMs);
     return Math.max(...times);
-  });
+  };
 
-  const firstSeenMs = Math.min(...allStartTimes);
-  let lastEventMs = Math.max(...allEndTimes);
-
-  // Apply outlier filtering for parent span
-  if (excludeOutliers && allEndTimes.length >= 4) {
-    const filteredEndTimes = filterOutliers(allEndTimes);
-    if (filteredEndTimes.length > 0) {
-      lastEventMs = Math.max(...filteredEndTimes);
+  // Filter out outlier nodes when excludeOutliers is enabled
+  let filteredTimelines = nodeTimelines;
+  if (excludeOutliers && nodeTimelines.length >= 4) {
+    const allEndTimes = nodeTimelines.map(getNodeEndTime);
+    const bounds = calculateOutlierBounds(allEndTimes);
+    if (bounds) {
+      filteredTimelines = nodeTimelines.filter(n => {
+        const endTime = getNodeEndTime(n);
+        return endTime <= bounds.upper;
+      });
     }
   }
 
-  // Group by country
+  // Use filtered timelines for all calculations
+  const allStartTimes = filteredTimelines.map(n => n.blockReceivedMs);
+  const allEndTimes = filteredTimelines.map(getNodeEndTime);
+
+  const firstSeenMs = Math.min(...allStartTimes);
+  const lastEventMs = Math.max(...allEndTimes);
+
+  // Group by country (using filtered timelines)
   const byCountry = new Map<string, NodeTimeline[]>();
-  for (const timeline of nodeTimelines) {
+  for (const timeline of filteredTimelines) {
     const existing = byCountry.get(timeline.country) || [];
     existing.push(timeline);
     byCountry.set(timeline.country, existing);
@@ -501,8 +508,8 @@ function buildBlockProposalSpans(
     category: 'propagation',
     depth: 1,
     details: selectedUsername
-      ? `${selectedUsername}: ${nodeTimelines.length} node${nodeTimelines.length !== 1 ? 's' : ''} processed block`
-      : `Block proposal lifecycle across ${nodeTimelines.length} nodes in ${sortedCountries.length} countries`,
+      ? `${selectedUsername}: ${filteredTimelines.length} node${filteredTimelines.length !== 1 ? 's' : ''} processed block`
+      : `Block proposal lifecycle across ${filteredTimelines.length} nodes in ${sortedCountries.length} countries`,
     isLate: lastEventMs > ATTESTATION_DEADLINE_MS,
     collapsible: sortedCountries.length > 0,
     defaultCollapsed: false,
@@ -517,21 +524,8 @@ function buildBlockProposalSpans(
 
     // Calculate country span bounds
     const countryFirstSeen = Math.min(...sortedNodes.map(n => n.blockReceivedMs));
-    const countryEndTimes = sortedNodes.map(n => {
-      const times = [n.blockReceivedMs];
-      if (n.headUpdatedMs !== null) times.push(n.headUpdatedMs);
-      if (n.execution) times.push(n.execution.endMs);
-      if (n.daCompleteMs !== null) times.push(n.daCompleteMs);
-      return Math.max(...times);
-    });
-
-    let countryLastEvent = Math.max(...countryEndTimes);
-    if (excludeOutliers && countryEndTimes.length >= 4) {
-      const filteredTimes = filterOutliers(countryEndTimes);
-      if (filteredTimes.length > 0) {
-        countryLastEvent = Math.max(...filteredTimes);
-      }
-    }
+    const countryEndTimes = sortedNodes.map(getNodeEndTime);
+    const countryLastEvent = Math.max(...countryEndTimes);
 
     // Country span
     result.push({
@@ -659,7 +653,7 @@ function buildBlockProposalSpans(
 
         result.push({
           id: daSpanId,
-          label: `Data Availability (${columnCount})`,
+          label: 'Data Availability',
           startMs: daStartMs,
           endMs: timeline.daCompleteMs,
           category: 'column',
@@ -669,7 +663,6 @@ function buildBlockProposalSpans(
           parentId: nodeId,
           collapsible: columnCount > 1,
           defaultCollapsed: true,
-          // nodeCount omitted - already shown in label
         });
 
         // Add child spans for each individual column/blob (only if multiple)

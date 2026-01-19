@@ -17,6 +17,28 @@ const ROW_HEIGHT = 28;
 const LABEL_WIDTH = 280;
 
 /**
+ * Hook to detect if the device supports hover interactions.
+ * Returns false on touch-only devices (mobile/tablet).
+ */
+function useCanHover(): boolean {
+  const [canHover, setCanHover] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return window.matchMedia('(hover: hover)').matches;
+  });
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(hover: hover)');
+    setCanHover(mediaQuery.matches);
+
+    const handler = (e: MediaQueryListEvent): void => setCanHover(e.matches);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  return canHover;
+}
+
+/**
  * SlotProgressTimeline displays a Jaeger/OTLP-style trace view of slot events.
  *
  * Shows hierarchical spans for:
@@ -38,6 +60,7 @@ export function SlotProgressTimeline({
   contributor,
   onContributorChange,
 }: SlotProgressTimelineProps): JSX.Element {
+  const canHover = useCanHover();
   const [hoveredSpan, setHoveredSpan] = useState<TraceSpan | null>(null);
   const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
   const [collapsedSpans, setCollapsedSpans] = useState<Set<string>>(new Set());
@@ -122,22 +145,31 @@ export function SlotProgressTimeline({
     hasInitializedCollapsed.current = false;
   }, [selectedUsername]);
 
-  // Handle mouse events for tooltip
-  const handleMouseEnter = useCallback((span: TraceSpan) => {
-    setHoveredSpan(span);
-  }, []);
+  // Handle mouse events for tooltip (disabled on touch devices)
+  const handleMouseEnter = useCallback(
+    (span: TraceSpan) => {
+      if (!canHover) return;
+      setHoveredSpan(span);
+    },
+    [canHover]
+  );
 
   const handleMouseLeave = useCallback(() => {
+    if (!canHover) return;
     setHoveredSpan(null);
     setMousePos(null);
-  }, []);
+  }, [canHover]);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-    }
-  }, []);
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!canHover) return;
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+      }
+    },
+    [canHover]
+  );
 
   // Loading state
   if (isLoading || executionLoading) {
@@ -173,8 +205,20 @@ export function SlotProgressTimeline({
     ...availableUsernames.map(username => ({ value: username, label: username })),
   ];
 
-  // Filter spans by collapsed state
-  const visibleSpans = spans.filter(span => !span.parentId || !collapsedSpans.has(span.parentId));
+  // Filter spans by collapsed state - hide if any ancestor is collapsed
+  // Build a lookup map for O(1) parent access
+  const spanById = new Map(spans.map(s => [s.id, s]));
+  const visibleSpans = spans.filter(span => {
+    if (!span.parentId) return true;
+
+    // Walk up the ancestry chain to check if any ancestor is collapsed
+    let currentParentId: string | undefined = span.parentId;
+    while (currentParentId) {
+      if (collapsedSpans.has(currentParentId)) return false;
+      currentParentId = spanById.get(currentParentId)?.parentId;
+    }
+    return true;
+  });
 
   return (
     <Card>
