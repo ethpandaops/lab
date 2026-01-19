@@ -6,6 +6,10 @@ export interface PolicyData {
   bytesPercent: number | null;
   /** Percentage savings for slots (null if no data) */
   slotsPercent: number | null;
+  /** Resulting bytes after expiry (null if no data) */
+  afterBytes: number | null;
+  /** Resulting slots after expiry (null if no data) */
+  afterSlots: number | null;
 }
 
 /** Configuration for a single expiry type (row) */
@@ -74,6 +78,14 @@ export interface PolicySelectorProps<TType extends string, TPolicy extends strin
   savingsData: Record<TType, Record<TPolicy, PolicyData>>;
   /** Configuration for the selector */
   config: PolicySelectorConfig<TType, TPolicy>;
+  /** Current state bytes (baseline) */
+  currentBytes: number | null;
+  /** Current state slots (baseline) */
+  currentSlots: number | null;
+  /** Formatter for bytes display */
+  formatBytes: (bytes: number) => string;
+  /** Formatter for slots display */
+  formatSlots: (slots: number) => string;
   /** Optional className for customization */
   className?: string;
 }

@@ -151,15 +151,23 @@ export function ContractPage(): JSX.Element {
   const savingsData = useMemo(() => {
     const result: Record<
       ExpiryType,
-      Record<ExpiryPolicy, { bytesPercent: number | null; slotsPercent: number | null }>
+      Record<
+        ExpiryPolicy,
+        {
+          bytesPercent: number | null;
+          slotsPercent: number | null;
+          afterBytes: number | null;
+          afterSlots: number | null;
+        }
+      >
     > = {
       slot: {
-        '12m': { bytesPercent: null, slotsPercent: null },
-        '24m': { bytesPercent: null, slotsPercent: null },
+        '12m': { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null },
+        '24m': { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null },
       },
       contract: {
-        '12m': { bytesPercent: null, slotsPercent: null },
-        '24m': { bytesPercent: null, slotsPercent: null },
+        '12m': { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null },
+        '24m': { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null },
       },
     };
 
@@ -177,10 +185,12 @@ export function ContractPage(): JSX.Element {
       if (policyData.effectiveBytes !== null && currentBytes > 0) {
         const bytesSaved = currentBytes - policyData.effectiveBytes;
         result.slot[policy].bytesPercent = (bytesSaved / currentBytes) * 100;
+        result.slot[policy].afterBytes = policyData.effectiveBytes;
       }
       if (policyData.activeSlots !== null && currentSlots > 0) {
         const slotsSaved = currentSlots - policyData.activeSlots;
         result.slot[policy].slotsPercent = (slotsSaved / currentSlots) * 100;
+        result.slot[policy].afterSlots = policyData.activeSlots;
       }
     }
 
@@ -191,9 +201,11 @@ export function ContractPage(): JSX.Element {
       if (policyData.effectiveBytes !== null) {
         // If any data remains, contract is active (0% savings); if all expired, 100% savings
         result.contract[policy].bytesPercent = policyData.effectiveBytes === 0 ? 100 : 0;
+        result.contract[policy].afterBytes = policyData.effectiveBytes;
       }
       if (policyData.activeSlots !== null) {
         result.contract[policy].slotsPercent = policyData.activeSlots === 0 ? 100 : 0;
+        result.contract[policy].afterSlots = policyData.activeSlots;
       }
     }
 
@@ -504,6 +516,10 @@ export function ContractPage(): JSX.Element {
             onSelect={handlePolicySelect}
             savingsData={savingsData}
             config={POLICY_SELECTOR_CONFIG}
+            currentBytes={latestData?.effectiveBytes ?? null}
+            currentSlots={latestData?.activeSlots ?? null}
+            formatBytes={formatBytes}
+            formatSlots={formatStorageSlotCount}
           />
 
           {/* Skeleton for data-dependent content */}
