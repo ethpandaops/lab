@@ -1,4 +1,4 @@
-import type { SeriesData, MarkLineConfig } from './MultiLine.types';
+import type { MarkLineConfig, SeriesData } from './MultiLine.types';
 import type { ForkInfo } from '@/utils/forks';
 import type { ExecutionForks, BlobScheduleItem } from '@/hooks/useConfig';
 import { epochToTimestamp } from '@/utils/beacon';
@@ -179,9 +179,9 @@ export function createForkMarkLines(options: ForkMarkLinesOptions): MarkLineConf
     if (labels.includes(forkLabel)) {
       markLines.push({
         xValue: forkLabel,
-        label: fork.combinedName?.toUpperCase() ?? fork.displayName,
+        label: (fork.combinedName ?? fork.displayName).toUpperCase(),
         labelPosition: 'end',
-        color: '#9ca3af',
+        color: '#8b5cf6', // Purple for consensus forks
         lineStyle: 'dashed',
         lineWidth: 1,
       });
@@ -236,7 +236,7 @@ export function createExecutionForkMarkLines(options: ExecutionForkMarkLinesOpti
         xValue: forkLabel,
         label: displayName,
         labelPosition: 'end',
-        color: '#9ca3af',
+        color: '#f59e0b', // Amber for execution forks
         lineStyle: 'dashed',
         lineWidth: 1,
       });
@@ -291,7 +291,7 @@ export function createBlobScheduleMarkLines(options: BlobScheduleMarkLinesOption
         xValue: blobLabel,
         label: `BPO${index + 1}`,
         labelPosition: 'end',
-        color: '#9ca3af',
+        color: '#10b981', // Green for blob schedule
         lineStyle: 'dashed',
         lineWidth: 1,
       });

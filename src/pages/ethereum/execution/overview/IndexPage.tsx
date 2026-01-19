@@ -11,6 +11,7 @@ import {
 } from '@/components/Charts/MultiLine';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useForks } from '@/hooks/useForks';
+import { Toggle } from '@/components/Forms/Toggle';
 import clsx from 'clsx';
 import {
   fctExecutionTpsHourlyServiceListOptions,
@@ -61,6 +62,7 @@ import {
  */
 export function IndexPage(): JSX.Element {
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('7d');
+  const [showAnnotations, setShowAnnotations] = useState(true);
   const config = TIME_RANGE_CONFIG[timePeriod];
   const isDaily = config.dataType === 'daily';
 
@@ -696,6 +698,12 @@ export function IndexPage(): JSX.Element {
             </button>
           ))}
         </div>
+
+        {/* Annotations Toggle */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted">Show Forks</span>
+          <Toggle checked={showAnnotations} onChange={setShowAnnotations} size="small" />
+        </div>
       </div>
 
       {isLoading && <ExecutionOverviewSkeleton />}
@@ -729,8 +737,8 @@ export function IndexPage(): JSX.Element {
                   legendPosition="top"
                   enableDataZoom
                   tooltipFormatter={tpsTooltipFormatter}
-                  markLines={forkMarkLines}
-                  syncGroup="execution-overview"
+                  markLines={showAnnotations ? forkMarkLines : []}
+                  syncGroup={inModal ? undefined : 'execution-overview'}
                 />
               )}
             </PopoutCard>
@@ -770,8 +778,8 @@ export function IndexPage(): JSX.Element {
                   legendPosition="top"
                   enableDataZoom
                   tooltipFormatter={transactionsTooltipFormatter}
-                  markLines={forkMarkLines}
-                  syncGroup="execution-overview"
+                  markLines={showAnnotations ? forkMarkLines : []}
+                  syncGroup={inModal ? undefined : 'execution-overview'}
                 />
               )}
             </PopoutCard>
@@ -809,8 +817,8 @@ export function IndexPage(): JSX.Element {
                   legendPosition="top"
                   enableDataZoom
                   tooltipFormatter={gasTooltipFormatter}
-                  markLines={forkMarkLines}
-                  syncGroup="execution-overview"
+                  markLines={showAnnotations ? forkMarkLines : []}
+                  syncGroup={inModal ? undefined : 'execution-overview'}
                 />
               )}
             </PopoutCard>
@@ -851,8 +859,8 @@ export function IndexPage(): JSX.Element {
                   legendPosition="top"
                   enableDataZoom
                   tooltipFormatter={signallingTooltipFormatter}
-                  markLines={signallingForkMarkLines}
-                  syncGroup="execution-overview"
+                  markLines={showAnnotations ? signallingForkMarkLines : []}
+                  syncGroup={inModal ? undefined : 'execution-overview'}
                 />
               )}
             </PopoutCard>

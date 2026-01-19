@@ -216,7 +216,16 @@ export interface MarkLineConfig {
    * Position of the label
    * @default 'end'
    */
-  labelPosition?: 'start' | 'middle' | 'end';
+  labelPosition?:
+    | 'start'
+    | 'middle'
+    | 'end'
+    | 'insideStartTop'
+    | 'insideStartBottom'
+    | 'insideMiddleTop'
+    | 'insideMiddleBottom'
+    | 'insideEndTop'
+    | 'insideEndBottom';
   /**
    * Line color (hex or rgb)
    */
@@ -231,6 +240,16 @@ export interface MarkLineConfig {
    * @default 1
    */
   lineWidth?: number;
+  /**
+   * Horizontal text alignment for label
+   * @default 'center'
+   */
+  align?: 'left' | 'center' | 'right';
+  /**
+   * Distance offset from the line [horizontal, vertical]
+   * Note: For vertical markLines, only vertical (index 1) works reliably
+   */
+  distance?: [number, number];
 }
 
 /**
