@@ -17,6 +17,12 @@ interface ContractTop100ListProps {
   variant?: 'contained' | 'full';
 }
 
+/**
+ * Key overhead per storage slot in geth's snapshot structure.
+ * Each slot key = 1 (prefix) + 32 (account hash) + 32 (storage hash) = 65 bytes
+ */
+const SLOT_KEY_OVERHEAD_BYTES = 65;
+
 /** Calculate savings percentage */
 function calculateSavings(baseBytes: number | undefined, expiryBytes: number | undefined): number | null {
   if (baseBytes === undefined || expiryBytes === undefined || baseBytes === 0) return null;
@@ -31,8 +37,9 @@ function sortData(data: ContractTop100Item[], column: SortColumn, direction: Sor
 
     switch (column) {
       case 'size':
-        aVal = a.contract.effective_bytes ?? 0;
-        bVal = b.contract.effective_bytes ?? 0;
+        // Include key overhead in size calculation
+        aVal = (a.contract.active_slots ?? 0) * SLOT_KEY_OVERHEAD_BYTES + (a.contract.effective_bytes ?? 0);
+        bVal = (b.contract.active_slots ?? 0) * SLOT_KEY_OVERHEAD_BYTES + (b.contract.effective_bytes ?? 0);
         break;
       case 'slots':
         aVal = a.contract.active_slots ?? 0;

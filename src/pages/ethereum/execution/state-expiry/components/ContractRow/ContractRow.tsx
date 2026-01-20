@@ -4,6 +4,12 @@ import { Badge } from '@/components/Elements/Badge';
 import { getLabelColor } from '@/pages/ethereum/contracts/utils';
 import type { ContractTop100Item } from '../../hooks';
 
+/**
+ * Key overhead per storage slot in geth's snapshot structure.
+ * Each slot key = 1 (prefix) + 32 (account hash) + 32 (storage hash) = 65 bytes
+ */
+const SLOT_KEY_OVERHEAD_BYTES = 65;
+
 interface ContractRowProps {
   item: ContractTop100Item;
   /** Display index (1-based position in current sorted list) */
@@ -95,9 +101,9 @@ export function ContractRow({ item, index }: ContractRowProps): JSX.Element {
         <span className="block truncate text-xs text-muted">{account_owner ?? '—'}</span>
       </td>
 
-      {/* Size */}
+      {/* Size (includes 65-byte key overhead per slot) */}
       <td className="px-2 py-1.5 text-right text-xs font-medium whitespace-nowrap text-muted tabular-nums">
-        {formatBytes(effective_bytes ?? 0)}
+        {formatBytes((active_slots ?? 0) * SLOT_KEY_OVERHEAD_BYTES + (effective_bytes ?? 0))}
       </td>
 
       {/* Slots */}
@@ -170,7 +176,9 @@ export function ContractCard({ item, index }: ContractRowProps): JSX.Element {
           <div className="mt-2 flex items-center gap-4 text-xs">
             <div>
               <span className="text-muted">Size: </span>
-              <span className="font-medium text-foreground tabular-nums">{formatBytes(effective_bytes ?? 0)}</span>
+              <span className="font-medium text-foreground tabular-nums">
+                {formatBytes((active_slots ?? 0) * SLOT_KEY_OVERHEAD_BYTES + (effective_bytes ?? 0))}
+              </span>
             </div>
             <div>
               <span className="text-muted">Slots: </span>

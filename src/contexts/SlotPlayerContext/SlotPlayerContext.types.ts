@@ -347,8 +347,7 @@ export interface SlotPlayerMetaContextValue {
  * @see useSlotPlayerMeta - For loading/error state
  */
 export interface SlotPlayerContextValue
-  extends
-    SlotPlayerProgressContextValue,
+  extends SlotPlayerProgressContextValue,
     SlotPlayerStateContextValue,
     SlotPlayerConfigContextValue,
     SlotPlayerMetaContextValue {
