@@ -4,8 +4,16 @@ import { Badge } from '@/components/Elements/Badge';
 import { getLabelColor } from '@/pages/ethereum/contracts/utils';
 import type { ContractTop100Item } from '../../hooks';
 
+/**
+ * Key overhead per storage slot in geth's snapshot structure.
+ * Each slot key = 1 (prefix) + 32 (account hash) + 32 (storage hash) = 65 bytes
+ */
+const SLOT_KEY_OVERHEAD_BYTES = 65;
+
 interface ContractRowProps {
   item: ContractTop100Item;
+  /** Display index (1-based position in current sorted list) */
+  index: number;
 }
 
 /**
@@ -28,6 +36,19 @@ function formatBytes(bytes: number): string {
 }
 
 /**
+ * Format slot count to human-readable format (K, M)
+ */
+function formatSlots(slots: number): string {
+  if (slots >= 1_000_000) {
+    return `${(slots / 1_000_000).toFixed(2)}M`;
+  }
+  if (slots >= 1_000) {
+    return `${(slots / 1_000).toFixed(2)}K`;
+  }
+  return slots.toLocaleString();
+}
+
+/**
  * Calculate savings percentage between base and expiry bytes
  */
 function calculateSavings(baseBytes: number | undefined, expiryBytes: number | undefined): number | null {
@@ -37,11 +58,11 @@ function calculateSavings(baseBytes: number | undefined, expiryBytes: number | u
 
 /**
  * Table row for the top 100 contracts list (desktop view).
- * Displays rank, contract name/address with category badge, owner, size, and expiry savings.
+ * Displays index, contract name/address with category badge, owner, size, and expiry savings.
  */
-export function ContractRow({ item }: ContractRowProps): JSX.Element {
+export function ContractRow({ item, index }: ContractRowProps): JSX.Element {
   const { contract, expiry12m, expiry24m } = item;
-  const { rank, contract_address, contract_name, account_owner, labels, effective_bytes } = contract;
+  const { contract_address, contract_name, account_owner, labels, effective_bytes, active_slots } = contract;
 
   // Calculate savings percentages
   const savings1y = calculateSavings(effective_bytes, expiry12m?.effective_bytes);
@@ -49,15 +70,11 @@ export function ContractRow({ item }: ContractRowProps): JSX.Element {
 
   return (
     <tr className="group transition-colors hover:bg-muted/30">
-      {/* Rank */}
+      {/* Index */}
       <td className="px-2 py-1.5 text-center whitespace-nowrap">
-        <Link
-          to="/ethereum/contracts/$address"
-          params={{ address: contract_address ?? '' }}
-          className="flex size-5 items-center justify-center rounded-xs bg-primary/10 text-xs font-bold text-primary"
-        >
-          {rank}
-        </Link>
+        <span className="flex size-5 items-center justify-center rounded-xs bg-primary/10 text-xs font-bold text-primary">
+          {index}
+        </span>
       </td>
 
       {/* Contract name/address with category badge */}
@@ -84,9 +101,14 @@ export function ContractRow({ item }: ContractRowProps): JSX.Element {
         <span className="block truncate text-xs text-muted">{account_owner ?? '—'}</span>
       </td>
 
-      {/* Size */}
+      {/* Size (includes 65-byte key overhead per slot) */}
       <td className="px-2 py-1.5 text-right text-xs font-medium whitespace-nowrap text-muted tabular-nums">
-        {formatBytes(effective_bytes ?? 0)}
+        {formatBytes((active_slots ?? 0) * SLOT_KEY_OVERHEAD_BYTES + (effective_bytes ?? 0))}
+      </td>
+
+      {/* Slots */}
+      <td className="px-2 py-1.5 text-right text-xs font-medium whitespace-nowrap text-muted tabular-nums">
+        {formatSlots(active_slots ?? 0)}
       </td>
 
       {/* 1y Savings */}
@@ -110,9 +132,9 @@ export function ContractRow({ item }: ContractRowProps): JSX.Element {
  * Card layout for the top 100 contracts list (mobile view).
  * Displays contract info in a compact, stacked card format.
  */
-export function ContractCard({ item }: ContractRowProps): JSX.Element {
+export function ContractCard({ item, index }: ContractRowProps): JSX.Element {
   const { contract, expiry12m, expiry24m } = item;
-  const { rank, contract_address, contract_name, account_owner, labels, effective_bytes } = contract;
+  const { contract_address, contract_name, account_owner, labels, effective_bytes, active_slots } = contract;
 
   // Calculate savings percentages
   const savings1y = calculateSavings(effective_bytes, expiry12m?.effective_bytes);
@@ -125,9 +147,9 @@ export function ContractCard({ item }: ContractRowProps): JSX.Element {
       className="block border-b border-border/50 px-3 py-3 transition-colors hover:bg-muted/30"
     >
       <div className="flex items-start gap-3">
-        {/* Rank badge */}
+        {/* Index badge */}
         <div className="flex size-7 shrink-0 items-center justify-center rounded-xs bg-primary/10 text-sm font-bold text-primary">
-          {rank}
+          {index}
         </div>
 
         {/* Contract info */}
@@ -154,7 +176,13 @@ export function ContractCard({ item }: ContractRowProps): JSX.Element {
           <div className="mt-2 flex items-center gap-4 text-xs">
             <div>
               <span className="text-muted">Size: </span>
-              <span className="font-medium text-foreground tabular-nums">{formatBytes(effective_bytes ?? 0)}</span>
+              <span className="font-medium text-foreground tabular-nums">
+                {formatBytes((active_slots ?? 0) * SLOT_KEY_OVERHEAD_BYTES + (effective_bytes ?? 0))}
+              </span>
+            </div>
+            <div>
+              <span className="text-muted">Slots: </span>
+              <span className="font-medium text-foreground tabular-nums">{formatSlots(active_slots ?? 0)}</span>
             </div>
             <div>
               <span className="text-muted">1y: </span>

@@ -4,9 +4,7 @@ import {
   CursorArrowRaysIcon,
   DocumentTextIcon,
   ClockIcon,
-  ArrowDownIcon,
   InformationCircleIcon,
-  SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { Container } from '@/components/Layout/Container';
 import { Card } from '@/components/Layout/Card';
@@ -17,12 +15,6 @@ import { formatSmartDecimal, hexToRgba } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useStateExpiryData, EXPIRY_POLICIES, EXPIRY_TYPES, type ExpiryPolicy, type ExpiryType } from './hooks';
 import { PolicySelector, type PolicySelectorConfig, StateExpirySkeleton, ContractTop100List } from './components';
-
-/** Display labels for expiry policies */
-const POLICY_LABELS: Record<ExpiryPolicy, string> = {
-  '12m': '1 Year',
-  '24m': '2 Year',
-};
 
 /** Short labels for chart series */
 const POLICY_LABELS_SHORT: Record<ExpiryPolicy, string> = {
@@ -133,19 +125,27 @@ export function IndexPage(): JSX.Element {
   const [selectedType, setSelectedType] = useState<ExpiryType>('slot');
   const themeColors = useThemeColors();
 
-  // Calculate savings data for the policy selector matrix
+  // Calculate savings data for the policy selector matrix (includes actual values for enhanced cells)
   const savingsData = useMemo(() => {
     const result: Record<
       ExpiryType,
-      Record<ExpiryPolicy, { bytesPercent: number | null; slotsPercent: number | null }>
+      Record<
+        ExpiryPolicy,
+        {
+          bytesPercent: number | null;
+          slotsPercent: number | null;
+          afterBytes: number | null;
+          afterSlots: number | null;
+        }
+      >
     > = {
       slot: {
-        '12m': { bytesPercent: null, slotsPercent: null },
-        '24m': { bytesPercent: null, slotsPercent: null },
+        '12m': { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null },
+        '24m': { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null },
       },
       contract: {
-        '12m': { bytesPercent: null, slotsPercent: null },
-        '24m': { bytesPercent: null, slotsPercent: null },
+        '12m': { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null },
+        '24m': { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null },
       },
     };
 
@@ -163,10 +163,12 @@ export function IndexPage(): JSX.Element {
           if (policyData.effectiveBytes !== null && point.effectiveBytes > 0) {
             const bytesSaved = point.effectiveBytes - policyData.effectiveBytes;
             result[type][policy].bytesPercent = (bytesSaved / point.effectiveBytes) * 100;
+            result[type][policy].afterBytes = policyData.effectiveBytes;
           }
           if (policyData.activeSlots !== null && point.activeSlots > 0) {
             const slotsSaved = point.activeSlots - policyData.activeSlots;
             result[type][policy].slotsPercent = (slotsSaved / point.activeSlots) * 100;
+            result[type][policy].afterSlots = policyData.activeSlots;
           }
         }
       }
@@ -175,36 +177,12 @@ export function IndexPage(): JSX.Element {
     return result;
   }, [data]);
 
-  // Current selection savings
-  const selectedSavings = useMemo(() => {
-    if (!data || data.length === 0) return null;
-
-    // Find latest data point with data for selected policy
-    for (let i = data.length - 1; i >= 0; i--) {
-      const point = data[i];
-      const policyData =
-        selectedType === 'slot' ? point.slotExpiryData[selectedPolicy] : point.contractExpiryData[selectedPolicy];
-
-      if (policyData.effectiveBytes !== null && policyData.activeSlots !== null) {
-        const bytesSaved = point.effectiveBytes - policyData.effectiveBytes;
-        const bytesPercent = point.effectiveBytes > 0 ? (bytesSaved / point.effectiveBytes) * 100 : 0;
-        const slotsSaved = point.activeSlots - policyData.activeSlots;
-        const slotsPercent = point.activeSlots > 0 ? (slotsSaved / point.activeSlots) * 100 : 0;
-
-        return {
-          currentBytes: point.effectiveBytes,
-          currentSlots: point.activeSlots,
-          afterBytes: policyData.effectiveBytes,
-          afterSlots: policyData.activeSlots,
-          bytesSaved,
-          bytesPercent,
-          slotsSaved,
-          slotsPercent,
-        };
-      }
-    }
-    return null;
-  }, [data, selectedType, selectedPolicy]);
+  // Get current state (baseline) from latest data point
+  const currentState = useMemo(() => {
+    if (!data || data.length === 0) return { bytes: null, slots: null };
+    const latest = data[data.length - 1];
+    return { bytes: latest.effectiveBytes, slots: latest.activeSlots };
+  }, [data]);
 
   // Chart data - show all policies with selected one highlighted
   const chartData = useMemo(() => {
@@ -282,61 +260,79 @@ export function IndexPage(): JSX.Element {
     };
   }, [data, selectedType, selectedPolicy, themeColors]);
 
-  const bytesTooltipFormatter = useCallback((params: unknown): string => {
-    const dataPoints = Array.isArray(params) ? params : [params];
-    let html = '';
+  const bytesTooltipFormatter = useCallback(
+    (params: unknown): string => {
+      const dataPoints = Array.isArray(params) ? params : [params];
+      let html = '';
 
-    if (dataPoints.length > 0 && dataPoints[0]) {
-      const firstPoint = dataPoints[0] as { axisValue?: string };
-      if (firstPoint.axisValue) {
-        html += `<div style="margin-bottom: 8px; font-weight: 600; font-size: 13px;">${firstPoint.axisValue}</div>`;
-      }
-    }
+      // Build selected series name for comparison
+      const selectedSeriesName = `${TYPE_LABELS[selectedType]} (${POLICY_LABELS_SHORT[selectedPolicy]})`;
 
-    dataPoints.forEach(point => {
-      const p = point as { marker?: string; seriesName?: string; value?: number | [number, number] };
-      if (p.marker && p.seriesName !== undefined) {
-        const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
-        if (yValue !== undefined && yValue !== null) {
-          html += `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">`;
-          html += p.marker;
-          html += `<span>${p.seriesName}:</span>`;
-          html += `<span style="font-weight: 600; min-width: 80px; text-align: right;">${formatSmartDecimal(yValue, 2)} GB</span>`;
-          html += `</div>`;
+      if (dataPoints.length > 0 && dataPoints[0]) {
+        const firstPoint = dataPoints[0] as { axisValue?: string };
+        if (firstPoint.axisValue) {
+          html += `<div style="margin-bottom: 8px; font-weight: 600; font-size: 13px;">${firstPoint.axisValue}</div>`;
         }
       }
-    });
 
-    return html;
-  }, []);
+      dataPoints.forEach(point => {
+        const p = point as { marker?: string; seriesName?: string; value?: number | [number, number] };
+        if (p.marker && p.seriesName !== undefined) {
+          const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+          if (yValue !== undefined && yValue !== null) {
+            const isCurrentState = p.seriesName === 'Current State';
+            const isSelected = p.seriesName === selectedSeriesName;
+            const opacity = isCurrentState || isSelected ? '1' : '0.4';
+            const fontWeight = isCurrentState || isSelected ? '600' : '400';
+            html += `<div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 4px; opacity: ${opacity};">`;
+            html += `<span style="display: flex; align-items: center; gap: 8px;">${p.marker}<span>${p.seriesName}</span></span>`;
+            html += `<span style="font-weight: ${fontWeight}; text-align: right; font-variant-numeric: tabular-nums;">${formatSmartDecimal(yValue, 2)} GB</span>`;
+            html += `</div>`;
+          }
+        }
+      });
 
-  const slotsTooltipFormatter = useCallback((params: unknown): string => {
-    const dataPoints = Array.isArray(params) ? params : [params];
-    let html = '';
+      return html;
+    },
+    [selectedType, selectedPolicy]
+  );
 
-    if (dataPoints.length > 0 && dataPoints[0]) {
-      const firstPoint = dataPoints[0] as { axisValue?: string };
-      if (firstPoint.axisValue) {
-        html += `<div style="margin-bottom: 8px; font-weight: 600; font-size: 13px;">${firstPoint.axisValue}</div>`;
-      }
-    }
+  const slotsTooltipFormatter = useCallback(
+    (params: unknown): string => {
+      const dataPoints = Array.isArray(params) ? params : [params];
+      let html = '';
 
-    dataPoints.forEach(point => {
-      const p = point as { marker?: string; seriesName?: string; value?: number | [number, number] };
-      if (p.marker && p.seriesName !== undefined) {
-        const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
-        if (yValue !== undefined && yValue !== null) {
-          html += `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">`;
-          html += p.marker;
-          html += `<span>${p.seriesName}:</span>`;
-          html += `<span style="font-weight: 600; min-width: 80px; text-align: right;">${formatStorageSlotCount(yValue)}</span>`;
-          html += `</div>`;
+      // Build selected series name for comparison
+      const selectedSeriesName = `${TYPE_LABELS[selectedType]} (${POLICY_LABELS_SHORT[selectedPolicy]})`;
+
+      if (dataPoints.length > 0 && dataPoints[0]) {
+        const firstPoint = dataPoints[0] as { axisValue?: string };
+        if (firstPoint.axisValue) {
+          html += `<div style="margin-bottom: 8px; font-weight: 600; font-size: 13px;">${firstPoint.axisValue}</div>`;
         }
       }
-    });
 
-    return html;
-  }, []);
+      dataPoints.forEach(point => {
+        const p = point as { marker?: string; seriesName?: string; value?: number | [number, number] };
+        if (p.marker && p.seriesName !== undefined) {
+          const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+          if (yValue !== undefined && yValue !== null) {
+            const isCurrentState = p.seriesName === 'Current State';
+            const isSelected = p.seriesName === selectedSeriesName;
+            const opacity = isCurrentState || isSelected ? '1' : '0.4';
+            const fontWeight = isCurrentState || isSelected ? '600' : '400';
+            html += `<div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 4px; opacity: ${opacity};">`;
+            html += `<span style="display: flex; align-items: center; gap: 8px;">${p.marker}<span>${p.seriesName}</span></span>`;
+            html += `<span style="font-weight: ${fontWeight}; text-align: right; font-variant-numeric: tabular-nums;">${formatStorageSlotCount(yValue)}</span>`;
+            html += `</div>`;
+          }
+        }
+      });
+
+      return html;
+    },
+    [selectedType, selectedPolicy]
+  );
 
   const handlePolicySelect = useCallback((type: ExpiryType, policy: ExpiryPolicy) => {
     setSelectedType(type);
@@ -364,8 +360,6 @@ export function IndexPage(): JSX.Element {
     }
   }, []);
 
-  const selectedColor = TYPE_COLORS[selectedType];
-
   return (
     <Container>
       {/* Header */}
@@ -380,7 +374,7 @@ export function IndexPage(): JSX.Element {
                 leadingIcon={
                   <InformationCircleIcon className="size-5 text-muted transition-colors hover:text-foreground" />
                 }
-                className="!p-0"
+                className="p-0!"
               />
               <PopoverPanel anchor="bottom start" className="w-80 p-3">
                 <p className="text-xs/5 text-muted">
@@ -391,7 +385,9 @@ export function IndexPage(): JSX.Element {
               </PopoverPanel>
             </Popover>
           </div>
-          <p className="mt-0.5 text-sm text-muted">Impact of expiring unused storage after inactivity periods</p>
+          <p className="mt-0.5 text-sm text-muted">
+            Impact of expiring unused contract storage after inactivity periods
+          </p>
         </div>
 
         {/* Compact legend chips with popovers - visible below lg */}
@@ -455,120 +451,28 @@ export function IndexPage(): JSX.Element {
           {/* Call to action - always visible */}
           <div className="inline-flex items-center gap-2 rounded-sm border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary">
             <CursorArrowRaysIcon className="size-4 shrink-0" />
-            <span>Select an expiry policy below to see how much storage could be reclaimed</span>
+            <span>Select an expiry policy below to see how much storage could be removed</span>
           </div>
 
-          {/* Policy Selector - always visible */}
+          {/* Policy Selector - integrated with current state and resulting values */}
           <PolicySelector
             selectedType={selectedType}
             selectedPolicy={selectedPolicy}
             onSelect={handlePolicySelect}
             savingsData={savingsData}
             config={POLICY_SELECTOR_CONFIG}
+            currentBytes={currentState.bytes}
+            currentSlots={currentState.slots}
+            formatBytes={formatBytes}
+            formatSlots={formatStorageSlotCount}
           />
 
           {/* Skeleton for data-dependent content */}
           {isLoading && <StateExpirySkeleton />}
 
-          {/* Data-dependent content */}
-          {chartData && selectedSavings && (
+          {/* Charts - data dependent */}
+          {chartData && (
             <>
-              {/* Summary Cards */}
-              <div className="grid gap-2 md:grid-cols-3 md:gap-3">
-                {/* Current State */}
-                <Card className="border-l-2 border-l-muted/50 p-2 md:p-3">
-                  <p className="flex items-center gap-1 text-xs font-medium tracking-wide text-muted uppercase">
-                    <CubeIcon className="size-3" />
-                    <span>Current State</span>
-                  </p>
-                  <div className="mt-1 flex items-center gap-1">
-                    <p className="text-base font-bold text-foreground tabular-nums md:text-lg">
-                      {formatBytes(selectedSavings.currentBytes)}
-                    </p>
-                    <Popover className="relative">
-                      <PopoverButton
-                        variant="blank"
-                        iconOnly
-                        leadingIcon={
-                          <InformationCircleIcon className="size-3.5 text-muted/50 transition-colors hover:text-muted" />
-                        }
-                        className="!p-0"
-                      />
-                      <PopoverPanel anchor="bottom start" className="w-56 p-2.5">
-                        <p className="text-xs/5 text-muted">
-                          <span className="font-semibold text-foreground">Effective bytes</span> measures actual data
-                          stored, excluding leading zeros. Each storage slot is 32 bytes.
-                        </p>
-                      </PopoverPanel>
-                    </Popover>
-                  </div>
-                  <p className="mt-0.5 text-xs text-muted tabular-nums">
-                    {formatStorageSlotCount(selectedSavings.currentSlots)} slots
-                  </p>
-                </Card>
-
-                {/* After Expiry */}
-                <div className="border-l-2" style={{ borderLeftColor: selectedColor }}>
-                  <Card className="border-l-0 p-2 md:p-3">
-                    <p
-                      className="flex items-center gap-1 text-xs font-medium tracking-wide uppercase"
-                      style={{ color: selectedColor }}
-                    >
-                      <ClockIcon className="size-3" />
-                      <span>
-                        {POLICY_LABELS[selectedPolicy]} {TYPE_LABELS[selectedType]}
-                      </span>
-                    </p>
-                    <div className="mt-1 flex items-center gap-1">
-                      <p className="text-base font-bold tabular-nums md:text-lg" style={{ color: selectedColor }}>
-                        {formatBytes(selectedSavings.afterBytes)}
-                      </p>
-                      <Popover className="relative">
-                        <PopoverButton
-                          variant="blank"
-                          iconOnly
-                          leadingIcon={
-                            <InformationCircleIcon
-                              className="size-3.5 transition-colors"
-                              style={{ color: `${selectedColor}50` }}
-                            />
-                          }
-                          className="!p-0 hover:opacity-80"
-                        />
-                        <PopoverPanel anchor="bottom start" className="w-56 p-2.5">
-                          <p className="text-xs/5 text-muted">
-                            <span className="font-semibold text-foreground">Effective bytes</span> measures actual data
-                            stored, excluding leading zeros. Each storage slot is 32 bytes.
-                          </p>
-                        </PopoverPanel>
-                      </Popover>
-                    </div>
-                    <p className="mt-0.5 text-xs tabular-nums" style={{ color: `${selectedColor}99` }}>
-                      {formatStorageSlotCount(selectedSavings.afterSlots)} slots
-                    </p>
-                  </Card>
-                </div>
-
-                {/* Difference */}
-                <Card className="border-l-2 border-l-emerald-500 p-2 md:p-3">
-                  <p className="flex items-center gap-1 text-xs font-medium tracking-wide text-emerald-600 uppercase dark:text-emerald-400">
-                    <SparklesIcon className="size-3" />
-                    <span>Difference</span>
-                  </p>
-                  <div className="mt-1 flex items-baseline gap-1">
-                    <p className="text-base font-bold text-emerald-600 tabular-nums md:text-lg dark:text-emerald-400">
-                      -{formatBytes(selectedSavings.bytesSaved)} ({selectedSavings.bytesPercent.toFixed(1)}%)
-                    </p>
-                    <ArrowDownIcon className="size-3 text-emerald-600 dark:text-emerald-400" />
-                  </div>
-                  <p className="mt-0.5 text-xs text-emerald-600/70 tabular-nums dark:text-emerald-400/70">
-                    {formatStorageSlotCount(selectedSavings.slotsSaved)} slots (
-                    {selectedSavings.slotsPercent.toFixed(1)}% reduction)
-                  </p>
-                </Card>
-              </div>
-
-              {/* Charts */}
               <div className="grid gap-4 md:grid-cols-2">
                 <PopoutCard
                   title="Storage Size"
@@ -585,7 +489,7 @@ export function IndexPage(): JSX.Element {
                       }}
                       yAxis={{
                         name: 'Size (GB)',
-                        formatter: (value: number) => value.toFixed(4),
+                        formatter: (value: number) => value.toFixed(0),
                       }}
                       height={inModal ? 600 : 280}
                       showLegend={false}
@@ -598,7 +502,7 @@ export function IndexPage(): JSX.Element {
                 </PopoutCard>
 
                 <PopoutCard
-                  title="Active Storage Slots"
+                  title="Storage Slots"
                   subtitle="Current vs expiry policy"
                   downloadFilename="state-expiry-active-slots"
                 >
@@ -614,10 +518,10 @@ export function IndexPage(): JSX.Element {
                         name: 'Slots',
                         formatter: (value: number) => {
                           if (value >= 1_000_000) {
-                            return `${(value / 1_000_000).toFixed(4)}M`;
+                            return `${(value / 1_000_000).toFixed(0)}M`;
                           }
                           if (value >= 1_000) {
-                            return `${(value / 1_000).toFixed(4)}K`;
+                            return `${(value / 1_000).toFixed(0)}K`;
                           }
                           return value.toFixed(0);
                         },

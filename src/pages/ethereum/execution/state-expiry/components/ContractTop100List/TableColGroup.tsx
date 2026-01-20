@@ -4,12 +4,20 @@ import { type JSX } from 'react';
 export function TableColGroup(): JSX.Element {
   return (
     <colgroup>
-      <col className="w-10" />
+      {/* # */}
+      <col className="w-9" />
+      {/* Contract */}
       <col />
-      <col className="w-36" />
+      {/* Owner */}
+      <col className="w-28" />
+      {/* Size */}
+      <col className="w-22" />
+      {/* Slots */}
       <col className="w-20" />
-      <col className="w-[4.5rem]" />
-      <col className="w-[4.5rem]" />
+      {/* 1y Expiry */}
+      <col className="w-20" />
+      {/* 2y Expiry */}
+      <col className="w-20" />
     </colgroup>
   );
 }
