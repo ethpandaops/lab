@@ -207,9 +207,14 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
                           >
                             → {formatBytes(data.afterBytes!)}
                           </span>
-                          {/* Tertiary: Slots (only for selected) */}
-                          {isSelected && data.afterSlots !== null && (
-                            <span className="mt-0.5 text-[9px] text-muted tabular-nums lg:text-[10px]">
+                          {/* Tertiary: Slots */}
+                          {data.afterSlots !== null && (
+                            <span
+                              className={clsx(
+                                'mt-0.5 text-[9px] tabular-nums lg:text-[10px]',
+                                isSelected ? typeConf.textColor : 'text-muted'
+                              )}
+                            >
                               {formatSlots(data.afterSlots)} slots
                             </span>
                           )}
