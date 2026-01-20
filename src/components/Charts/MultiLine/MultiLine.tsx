@@ -594,9 +594,9 @@ export function MultiLineChart({
                     rotate: -90,
                     align: 'left',
                     offset: [0, -2],
-                    color: ml.color ?? themeColors.muted,
+                    color: hexToRgba(ml.color ?? themeColors.muted, 0.7),
                     fontSize: 11,
-                    backgroundColor: themeColors.surface,
+                    backgroundColor: 'transparent',
                     padding: [2, 4],
                   },
                   lineStyle: {
