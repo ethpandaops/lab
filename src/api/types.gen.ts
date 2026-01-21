@@ -106,6 +106,25 @@ export type DimContractOwner = {
   updated_date_time?: number;
 };
 
+export type DimFunctionSignature = {
+  /**
+   * Whether this signature comes from a verified contract source
+   */
+  has_verified_contract?: boolean;
+  /**
+   * Function signature name (e.g., transfer(address,uint256))
+   */
+  name?: string;
+  /**
+   * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix)
+   */
+  selector?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type DimNode = {
   /**
    * Additional attributes of the node
@@ -4123,6 +4142,13 @@ export type GetDimContractOwnerResponse = {
 };
 
 /**
+ * Response for getting a single dim_function_signature record
+ */
+export type GetDimFunctionSignatureResponse = {
+  item?: DimFunctionSignature;
+};
+
+/**
  * Response for getting a single dim_node record
  */
 export type GetDimNodeResponse = {
@@ -5023,6 +5049,27 @@ export type GetIntStorageSlotStateWithExpiryByBlockResponse = {
  */
 export type GetIntStorageSlotStateWithExpiryResponse = {
   item?: IntStorageSlotStateWithExpiry;
+};
+
+/**
+ * Response for getting a single int_transaction_call_frame_opcode_gas record
+ */
+export type GetIntTransactionCallFrameOpcodeGasResponse = {
+  item?: IntTransactionCallFrameOpcodeGas;
+};
+
+/**
+ * Response for getting a single int_transaction_call_frame record
+ */
+export type GetIntTransactionCallFrameResponse = {
+  item?: IntTransactionCallFrame;
+};
+
+/**
+ * Response for getting a single int_transaction_opcode_gas record
+ */
+export type GetIntTransactionOpcodeGasResponse = {
+  item?: IntTransactionOpcodeGas;
 };
 
 /**
@@ -7143,6 +7190,171 @@ export type IntStorageSlotStateWithExpiryByBlock = {
   updated_date_time?: number;
 };
 
+export type IntTransactionCallFrame = {
+  /**
+   * The block number containing this transaction
+   */
+  block_number?: number;
+  /**
+   * Sequential frame ID within the transaction (0 = root)
+   */
+  call_frame_id?: number;
+  /**
+   * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2)
+   */
+  call_type?: string;
+  /**
+   * Call depth (0 = root transaction execution)
+   */
+  depth?: number;
+  /**
+   * Number of opcodes that resulted in errors
+   */
+  error_count?: number;
+  /**
+   * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces.
+   */
+  function_selector?: string | null;
+  /**
+   * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs.
+   */
+  gas?: number;
+  /**
+   * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas.
+   */
+  gas_cumulative?: number;
+  /**
+   * Total accumulated refund. Only populated for root frame (refund applied once at tx end).
+   */
+  gas_refund?: number | null;
+  /**
+   * Intrinsic tx cost (21000 + calldata). Only populated for root frame (call_frame_id=0).
+   */
+  intrinsic_gas?: number | null;
+  /**
+   * Number of opcodes executed in this frame
+   */
+  opcode_count?: number;
+  /**
+   * Parent frame ID (NULL for root frame)
+   */
+  parent_call_frame_id?: number | null;
+  /**
+   * Contract address being called (hex encoded with 0x prefix)
+   */
+  target_address?: string | null;
+  /**
+   * The transaction hash (hex encoded with 0x prefix)
+   */
+  transaction_hash?: string;
+  /**
+   * Position of the transaction within the block
+   */
+  transaction_index?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntTransactionCallFrameOpcodeGas = {
+  /**
+   * The block number containing the transaction
+   */
+  block_number?: number;
+  /**
+   * Sequential frame ID within transaction (0 = root)
+   */
+  call_frame_id?: number;
+  /**
+   * Number of times this opcode was executed in this frame
+   */
+  count?: number;
+  /**
+   * Number of times this opcode resulted in an error in this frame
+   */
+  error_count?: number;
+  /**
+   * Gas consumed by this opcode in this frame. sum(gas) = frame gas
+   */
+  gas?: number;
+  /**
+   * For CALL opcodes: includes all descendant frame gas. For others: same as gas
+   */
+  gas_cumulative?: number;
+  /**
+   * The name of the network
+   */
+  meta_network_name?: string;
+  /**
+   * The EVM opcode name (e.g., SLOAD, ADD, CALL)
+   */
+  opcode?: string;
+  /**
+   * The transaction hash (hex encoded with 0x prefix)
+   */
+  transaction_hash?: string;
+  /**
+   * The index of the transaction within the block
+   */
+  transaction_index?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntTransactionOpcodeGas = {
+  /**
+   * The block number containing the transaction
+   */
+  block_number?: number;
+  /**
+   * Number of times this opcode was executed in the transaction
+   */
+  count?: number;
+  /**
+   * Number of times this opcode resulted in an error
+   */
+  error_count?: number;
+  /**
+   * Gas consumed by this opcode. sum(gas) = transaction executed gas
+   */
+  gas?: number;
+  /**
+   * For CALL opcodes: includes all descendant frame gas. For others: same as gas
+   */
+  gas_cumulative?: number;
+  /**
+   * Maximum call stack depth for this opcode
+   */
+  max_depth?: number;
+  /**
+   * The name of the network
+   */
+  meta_network_name?: string;
+  /**
+   * Minimum call stack depth for this opcode
+   */
+  min_depth?: number;
+  /**
+   * The EVM opcode name (e.g., SLOAD, ADD, CALL)
+   */
+  opcode?: string;
+  /**
+   * The transaction hash (hex encoded with 0x prefix)
+   */
+  transaction_hash?: string;
+  /**
+   * The index of the transaction within the block
+   */
+  transaction_index?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 /**
  * Response for listing admin_cbt_incremental records
  */
@@ -7193,6 +7405,20 @@ export type ListDimContractOwnerResponse = {
    * The list of dim_contract_owner.
    */
   dim_contract_owner?: Array<DimContractOwner>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing dim_function_signature records
+ */
+export type ListDimFunctionSignatureResponse = {
+  /**
+   * The list of dim_function_signature.
+   */
+  dim_function_signature?: Array<DimFunctionSignature>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -9006,6 +9232,48 @@ export type ListIntStorageSlotStateWithExpiryResponse = {
 };
 
 /**
+ * Response for listing int_transaction_call_frame_opcode_gas records
+ */
+export type ListIntTransactionCallFrameOpcodeGasResponse = {
+  /**
+   * The list of int_transaction_call_frame_opcode_gas.
+   */
+  int_transaction_call_frame_opcode_gas?: Array<IntTransactionCallFrameOpcodeGas>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_transaction_call_frame records
+ */
+export type ListIntTransactionCallFrameResponse = {
+  /**
+   * The list of int_transaction_call_frame.
+   */
+  int_transaction_call_frame?: Array<IntTransactionCallFrame>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_transaction_opcode_gas records
+ */
+export type ListIntTransactionOpcodeGasResponse = {
+  /**
+   * The list of int_transaction_opcode_gas.
+   */
+  int_transaction_opcode_gas?: Array<IntTransactionOpcodeGas>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).
  */
 export type Status = {
@@ -10197,6 +10465,198 @@ export type DimContractOwnerServiceGetResponses = {
 
 export type DimContractOwnerServiceGetResponse =
   DimContractOwnerServiceGetResponses[keyof DimContractOwnerServiceGetResponses];
+
+export type DimFunctionSignatureServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: eq)
+     */
+    selector_eq?: string;
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: ne)
+     */
+    selector_ne?: string;
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: contains)
+     */
+    selector_contains?: string;
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: starts_with)
+     */
+    selector_starts_with?: string;
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: ends_with)
+     */
+    selector_ends_with?: string;
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: like)
+     */
+    selector_like?: string;
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: not_like)
+     */
+    selector_not_like?: string;
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    selector_in_values?: string;
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    selector_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: eq)
+     */
+    name_eq?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: ne)
+     */
+    name_ne?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: contains)
+     */
+    name_contains?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: starts_with)
+     */
+    name_starts_with?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: ends_with)
+     */
+    name_ends_with?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: like)
+     */
+    name_like?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: not_like)
+     */
+    name_not_like?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: in_values) (comma-separated list)
+     */
+    name_in_values?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: not_in_values) (comma-separated list)
+     */
+    name_not_in_values?: string;
+    /**
+     * Whether this signature comes from a verified contract source (filter: eq)
+     */
+    has_verified_contract_eq?: boolean;
+    /**
+     * Whether this signature comes from a verified contract source (filter: ne)
+     */
+    has_verified_contract_ne?: boolean;
+    /**
+     * The maximum number of dim_function_signature to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListDimFunctionSignature` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/dim_function_signature';
+};
+
+export type DimFunctionSignatureServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimFunctionSignatureServiceListError =
+  DimFunctionSignatureServiceListErrors[keyof DimFunctionSignatureServiceListErrors];
+
+export type DimFunctionSignatureServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListDimFunctionSignatureResponse;
+};
+
+export type DimFunctionSignatureServiceListResponse =
+  DimFunctionSignatureServiceListResponses[keyof DimFunctionSignatureServiceListResponses];
+
+export type DimFunctionSignatureServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix)
+     */
+    selector: string;
+  };
+  query?: never;
+  url: '/api/v1/dim_function_signature/{selector}';
+};
+
+export type DimFunctionSignatureServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimFunctionSignatureServiceGetError =
+  DimFunctionSignatureServiceGetErrors[keyof DimFunctionSignatureServiceGetErrors];
+
+export type DimFunctionSignatureServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetDimFunctionSignatureResponse;
+};
+
+export type DimFunctionSignatureServiceGetResponse =
+  DimFunctionSignatureServiceGetResponses[keyof DimFunctionSignatureServiceGetResponses];
 
 export type DimNodeServiceListData = {
   body?: never;
@@ -72313,3 +72773,1739 @@ export type IntStorageSlotStateWithExpiryByBlockServiceGetResponses = {
 
 export type IntStorageSlotStateWithExpiryByBlockServiceGetResponse =
   IntStorageSlotStateWithExpiryByBlockServiceGetResponses[keyof IntStorageSlotStateWithExpiryByBlockServiceGetResponses];
+
+export type IntTransactionCallFrameServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number containing this transaction (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number containing this transaction (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number containing this transaction (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number containing this transaction (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number containing this transaction (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number containing this transaction (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number containing this transaction (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number containing this transaction (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number containing this transaction (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number containing this transaction (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: eq)
+     */
+    transaction_hash_eq?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ne)
+     */
+    transaction_hash_ne?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: contains)
+     */
+    transaction_hash_contains?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    transaction_hash_starts_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    transaction_hash_ends_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: like)
+     */
+    transaction_hash_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_like)
+     */
+    transaction_hash_not_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    transaction_hash_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    transaction_hash_not_in_values?: string;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: eq)
+     */
+    call_frame_id_eq?: number;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: ne)
+     */
+    call_frame_id_ne?: number;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: lt)
+     */
+    call_frame_id_lt?: number;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: lte)
+     */
+    call_frame_id_lte?: number;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: gt)
+     */
+    call_frame_id_gt?: number;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: gte)
+     */
+    call_frame_id_gte?: number;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: between_min)
+     */
+    call_frame_id_between_min?: number;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: between_max_value)
+     */
+    call_frame_id_between_max_value?: number;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: in_values) (comma-separated list)
+     */
+    call_frame_id_in_values?: string;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: not_in_values) (comma-separated list)
+     */
+    call_frame_id_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Position of the transaction within the block (filter: eq)
+     */
+    transaction_index_eq?: number;
+    /**
+     * Position of the transaction within the block (filter: ne)
+     */
+    transaction_index_ne?: number;
+    /**
+     * Position of the transaction within the block (filter: lt)
+     */
+    transaction_index_lt?: number;
+    /**
+     * Position of the transaction within the block (filter: lte)
+     */
+    transaction_index_lte?: number;
+    /**
+     * Position of the transaction within the block (filter: gt)
+     */
+    transaction_index_gt?: number;
+    /**
+     * Position of the transaction within the block (filter: gte)
+     */
+    transaction_index_gte?: number;
+    /**
+     * Position of the transaction within the block (filter: between_min)
+     */
+    transaction_index_between_min?: number;
+    /**
+     * Position of the transaction within the block (filter: between_max_value)
+     */
+    transaction_index_between_max_value?: number;
+    /**
+     * Position of the transaction within the block (filter: in_values) (comma-separated list)
+     */
+    transaction_index_in_values?: string;
+    /**
+     * Position of the transaction within the block (filter: not_in_values) (comma-separated list)
+     */
+    transaction_index_not_in_values?: string;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: eq)
+     */
+    parent_call_frame_id_eq?: number;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: ne)
+     */
+    parent_call_frame_id_ne?: number;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: lt)
+     */
+    parent_call_frame_id_lt?: number;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: lte)
+     */
+    parent_call_frame_id_lte?: number;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: gt)
+     */
+    parent_call_frame_id_gt?: number;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: gte)
+     */
+    parent_call_frame_id_gte?: number;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: between_min)
+     */
+    parent_call_frame_id_between_min?: number;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: between_max_value)
+     */
+    parent_call_frame_id_between_max_value?: number;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: in_values) (comma-separated list)
+     */
+    parent_call_frame_id_in_values?: string;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: not_in_values) (comma-separated list)
+     */
+    parent_call_frame_id_not_in_values?: string;
+    /**
+     * Call depth (0 = root transaction execution) (filter: eq)
+     */
+    depth_eq?: number;
+    /**
+     * Call depth (0 = root transaction execution) (filter: ne)
+     */
+    depth_ne?: number;
+    /**
+     * Call depth (0 = root transaction execution) (filter: lt)
+     */
+    depth_lt?: number;
+    /**
+     * Call depth (0 = root transaction execution) (filter: lte)
+     */
+    depth_lte?: number;
+    /**
+     * Call depth (0 = root transaction execution) (filter: gt)
+     */
+    depth_gt?: number;
+    /**
+     * Call depth (0 = root transaction execution) (filter: gte)
+     */
+    depth_gte?: number;
+    /**
+     * Call depth (0 = root transaction execution) (filter: between_min)
+     */
+    depth_between_min?: number;
+    /**
+     * Call depth (0 = root transaction execution) (filter: between_max_value)
+     */
+    depth_between_max_value?: number;
+    /**
+     * Call depth (0 = root transaction execution) (filter: in_values) (comma-separated list)
+     */
+    depth_in_values?: string;
+    /**
+     * Call depth (0 = root transaction execution) (filter: not_in_values) (comma-separated list)
+     */
+    depth_not_in_values?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: eq)
+     */
+    target_address_eq?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: ne)
+     */
+    target_address_ne?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: contains)
+     */
+    target_address_contains?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    target_address_starts_with?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    target_address_ends_with?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: like)
+     */
+    target_address_like?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: not_like)
+     */
+    target_address_not_like?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    target_address_in_values?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    target_address_not_in_values?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: eq)
+     */
+    call_type_eq?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: ne)
+     */
+    call_type_ne?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: contains)
+     */
+    call_type_contains?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: starts_with)
+     */
+    call_type_starts_with?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: ends_with)
+     */
+    call_type_ends_with?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: like)
+     */
+    call_type_like?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: not_like)
+     */
+    call_type_not_like?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: in_values) (comma-separated list)
+     */
+    call_type_in_values?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: not_in_values) (comma-separated list)
+     */
+    call_type_not_in_values?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: eq)
+     */
+    function_selector_eq?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: ne)
+     */
+    function_selector_ne?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: contains)
+     */
+    function_selector_contains?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: starts_with)
+     */
+    function_selector_starts_with?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: ends_with)
+     */
+    function_selector_ends_with?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: like)
+     */
+    function_selector_like?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: not_like)
+     */
+    function_selector_not_like?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: in_values) (comma-separated list)
+     */
+    function_selector_in_values?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: not_in_values) (comma-separated list)
+     */
+    function_selector_not_in_values?: string;
+    /**
+     * Number of opcodes executed in this frame (filter: eq)
+     */
+    opcode_count_eq?: number;
+    /**
+     * Number of opcodes executed in this frame (filter: ne)
+     */
+    opcode_count_ne?: number;
+    /**
+     * Number of opcodes executed in this frame (filter: lt)
+     */
+    opcode_count_lt?: number;
+    /**
+     * Number of opcodes executed in this frame (filter: lte)
+     */
+    opcode_count_lte?: number;
+    /**
+     * Number of opcodes executed in this frame (filter: gt)
+     */
+    opcode_count_gt?: number;
+    /**
+     * Number of opcodes executed in this frame (filter: gte)
+     */
+    opcode_count_gte?: number;
+    /**
+     * Number of opcodes executed in this frame (filter: between_min)
+     */
+    opcode_count_between_min?: number;
+    /**
+     * Number of opcodes executed in this frame (filter: between_max_value)
+     */
+    opcode_count_between_max_value?: number;
+    /**
+     * Number of opcodes executed in this frame (filter: in_values) (comma-separated list)
+     */
+    opcode_count_in_values?: string;
+    /**
+     * Number of opcodes executed in this frame (filter: not_in_values) (comma-separated list)
+     */
+    opcode_count_not_in_values?: string;
+    /**
+     * Number of opcodes that resulted in errors (filter: eq)
+     */
+    error_count_eq?: number;
+    /**
+     * Number of opcodes that resulted in errors (filter: ne)
+     */
+    error_count_ne?: number;
+    /**
+     * Number of opcodes that resulted in errors (filter: lt)
+     */
+    error_count_lt?: number;
+    /**
+     * Number of opcodes that resulted in errors (filter: lte)
+     */
+    error_count_lte?: number;
+    /**
+     * Number of opcodes that resulted in errors (filter: gt)
+     */
+    error_count_gt?: number;
+    /**
+     * Number of opcodes that resulted in errors (filter: gte)
+     */
+    error_count_gte?: number;
+    /**
+     * Number of opcodes that resulted in errors (filter: between_min)
+     */
+    error_count_between_min?: number;
+    /**
+     * Number of opcodes that resulted in errors (filter: between_max_value)
+     */
+    error_count_between_max_value?: number;
+    /**
+     * Number of opcodes that resulted in errors (filter: in_values) (comma-separated list)
+     */
+    error_count_in_values?: string;
+    /**
+     * Number of opcodes that resulted in errors (filter: not_in_values) (comma-separated list)
+     */
+    error_count_not_in_values?: string;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: eq)
+     */
+    gas_eq?: number;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: ne)
+     */
+    gas_ne?: number;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: lt)
+     */
+    gas_lt?: number;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: lte)
+     */
+    gas_lte?: number;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: gt)
+     */
+    gas_gt?: number;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: gte)
+     */
+    gas_gte?: number;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: between_min)
+     */
+    gas_between_min?: number;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: between_max_value)
+     */
+    gas_between_max_value?: number;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: in_values) (comma-separated list)
+     */
+    gas_in_values?: string;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: not_in_values) (comma-separated list)
+     */
+    gas_not_in_values?: string;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: eq)
+     */
+    gas_cumulative_eq?: number;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: ne)
+     */
+    gas_cumulative_ne?: number;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: lt)
+     */
+    gas_cumulative_lt?: number;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: lte)
+     */
+    gas_cumulative_lte?: number;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: gt)
+     */
+    gas_cumulative_gt?: number;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: gte)
+     */
+    gas_cumulative_gte?: number;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: between_min)
+     */
+    gas_cumulative_between_min?: number;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: between_max_value)
+     */
+    gas_cumulative_between_max_value?: number;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: in_values) (comma-separated list)
+     */
+    gas_cumulative_in_values?: string;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: not_in_values) (comma-separated list)
+     */
+    gas_cumulative_not_in_values?: string;
+    /**
+     * Total accumulated refund. Only populated for root frame (refund applied once at tx end). (filter: eq)
+     */
+    gas_refund_eq?: number;
+    /**
+     * Total accumulated refund. Only populated for root frame (refund applied once at tx end). (filter: ne)
+     */
+    gas_refund_ne?: number;
+    /**
+     * Total accumulated refund. Only populated for root frame (refund applied once at tx end). (filter: lt)
+     */
+    gas_refund_lt?: number;
+    /**
+     * Total accumulated refund. Only populated for root frame (refund applied once at tx end). (filter: lte)
+     */
+    gas_refund_lte?: number;
+    /**
+     * Total accumulated refund. Only populated for root frame (refund applied once at tx end). (filter: gt)
+     */
+    gas_refund_gt?: number;
+    /**
+     * Total accumulated refund. Only populated for root frame (refund applied once at tx end). (filter: gte)
+     */
+    gas_refund_gte?: number;
+    /**
+     * Total accumulated refund. Only populated for root frame (refund applied once at tx end). (filter: between_min)
+     */
+    gas_refund_between_min?: number;
+    /**
+     * Total accumulated refund. Only populated for root frame (refund applied once at tx end). (filter: between_max_value)
+     */
+    gas_refund_between_max_value?: number;
+    /**
+     * Total accumulated refund. Only populated for root frame (refund applied once at tx end). (filter: in_values) (comma-separated list)
+     */
+    gas_refund_in_values?: string;
+    /**
+     * Total accumulated refund. Only populated for root frame (refund applied once at tx end). (filter: not_in_values) (comma-separated list)
+     */
+    gas_refund_not_in_values?: string;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame (call_frame_id=0). (filter: eq)
+     */
+    intrinsic_gas_eq?: number;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame (call_frame_id=0). (filter: ne)
+     */
+    intrinsic_gas_ne?: number;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame (call_frame_id=0). (filter: lt)
+     */
+    intrinsic_gas_lt?: number;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame (call_frame_id=0). (filter: lte)
+     */
+    intrinsic_gas_lte?: number;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame (call_frame_id=0). (filter: gt)
+     */
+    intrinsic_gas_gt?: number;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame (call_frame_id=0). (filter: gte)
+     */
+    intrinsic_gas_gte?: number;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame (call_frame_id=0). (filter: between_min)
+     */
+    intrinsic_gas_between_min?: number;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame (call_frame_id=0). (filter: between_max_value)
+     */
+    intrinsic_gas_between_max_value?: number;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame (call_frame_id=0). (filter: in_values) (comma-separated list)
+     */
+    intrinsic_gas_in_values?: string;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame (call_frame_id=0). (filter: not_in_values) (comma-separated list)
+     */
+    intrinsic_gas_not_in_values?: string;
+    /**
+     * The maximum number of int_transaction_call_frame to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntTransactionCallFrame` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_transaction_call_frame';
+};
+
+export type IntTransactionCallFrameServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntTransactionCallFrameServiceListError =
+  IntTransactionCallFrameServiceListErrors[keyof IntTransactionCallFrameServiceListErrors];
+
+export type IntTransactionCallFrameServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntTransactionCallFrameResponse;
+};
+
+export type IntTransactionCallFrameServiceListResponse =
+  IntTransactionCallFrameServiceListResponses[keyof IntTransactionCallFrameServiceListResponses];
+
+export type IntTransactionCallFrameServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number containing this transaction
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_transaction_call_frame/{block_number}';
+};
+
+export type IntTransactionCallFrameServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntTransactionCallFrameServiceGetError =
+  IntTransactionCallFrameServiceGetErrors[keyof IntTransactionCallFrameServiceGetErrors];
+
+export type IntTransactionCallFrameServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntTransactionCallFrameResponse;
+};
+
+export type IntTransactionCallFrameServiceGetResponse =
+  IntTransactionCallFrameServiceGetResponses[keyof IntTransactionCallFrameServiceGetResponses];
+
+export type IntTransactionCallFrameOpcodeGasServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number containing the transaction (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number containing the transaction (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number containing the transaction (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number containing the transaction (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number containing the transaction (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number containing the transaction (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number containing the transaction (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number containing the transaction (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number containing the transaction (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number containing the transaction (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: eq)
+     */
+    transaction_hash_eq?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ne)
+     */
+    transaction_hash_ne?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: contains)
+     */
+    transaction_hash_contains?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    transaction_hash_starts_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    transaction_hash_ends_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: like)
+     */
+    transaction_hash_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_like)
+     */
+    transaction_hash_not_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    transaction_hash_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    transaction_hash_not_in_values?: string;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: eq)
+     */
+    call_frame_id_eq?: number;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: ne)
+     */
+    call_frame_id_ne?: number;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: lt)
+     */
+    call_frame_id_lt?: number;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: lte)
+     */
+    call_frame_id_lte?: number;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: gt)
+     */
+    call_frame_id_gt?: number;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: gte)
+     */
+    call_frame_id_gte?: number;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: between_min)
+     */
+    call_frame_id_between_min?: number;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: between_max_value)
+     */
+    call_frame_id_between_max_value?: number;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: in_values) (comma-separated list)
+     */
+    call_frame_id_in_values?: string;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: not_in_values) (comma-separated list)
+     */
+    call_frame_id_not_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: eq)
+     */
+    opcode_eq?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ne)
+     */
+    opcode_ne?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: contains)
+     */
+    opcode_contains?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: starts_with)
+     */
+    opcode_starts_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ends_with)
+     */
+    opcode_ends_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: like)
+     */
+    opcode_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_like)
+     */
+    opcode_not_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: in_values) (comma-separated list)
+     */
+    opcode_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_in_values) (comma-separated list)
+     */
+    opcode_not_in_values?: string;
+    /**
+     * The name of the network (filter: eq)
+     */
+    meta_network_name_eq?: string;
+    /**
+     * The name of the network (filter: ne)
+     */
+    meta_network_name_ne?: string;
+    /**
+     * The name of the network (filter: contains)
+     */
+    meta_network_name_contains?: string;
+    /**
+     * The name of the network (filter: starts_with)
+     */
+    meta_network_name_starts_with?: string;
+    /**
+     * The name of the network (filter: ends_with)
+     */
+    meta_network_name_ends_with?: string;
+    /**
+     * The name of the network (filter: like)
+     */
+    meta_network_name_like?: string;
+    /**
+     * The name of the network (filter: not_like)
+     */
+    meta_network_name_not_like?: string;
+    /**
+     * The name of the network (filter: in_values) (comma-separated list)
+     */
+    meta_network_name_in_values?: string;
+    /**
+     * The name of the network (filter: not_in_values) (comma-separated list)
+     */
+    meta_network_name_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The index of the transaction within the block (filter: eq)
+     */
+    transaction_index_eq?: number;
+    /**
+     * The index of the transaction within the block (filter: ne)
+     */
+    transaction_index_ne?: number;
+    /**
+     * The index of the transaction within the block (filter: lt)
+     */
+    transaction_index_lt?: number;
+    /**
+     * The index of the transaction within the block (filter: lte)
+     */
+    transaction_index_lte?: number;
+    /**
+     * The index of the transaction within the block (filter: gt)
+     */
+    transaction_index_gt?: number;
+    /**
+     * The index of the transaction within the block (filter: gte)
+     */
+    transaction_index_gte?: number;
+    /**
+     * The index of the transaction within the block (filter: between_min)
+     */
+    transaction_index_between_min?: number;
+    /**
+     * The index of the transaction within the block (filter: between_max_value)
+     */
+    transaction_index_between_max_value?: number;
+    /**
+     * The index of the transaction within the block (filter: in_values) (comma-separated list)
+     */
+    transaction_index_in_values?: string;
+    /**
+     * The index of the transaction within the block (filter: not_in_values) (comma-separated list)
+     */
+    transaction_index_not_in_values?: string;
+    /**
+     * Number of times this opcode was executed in this frame (filter: eq)
+     */
+    count_eq?: number;
+    /**
+     * Number of times this opcode was executed in this frame (filter: ne)
+     */
+    count_ne?: number;
+    /**
+     * Number of times this opcode was executed in this frame (filter: lt)
+     */
+    count_lt?: number;
+    /**
+     * Number of times this opcode was executed in this frame (filter: lte)
+     */
+    count_lte?: number;
+    /**
+     * Number of times this opcode was executed in this frame (filter: gt)
+     */
+    count_gt?: number;
+    /**
+     * Number of times this opcode was executed in this frame (filter: gte)
+     */
+    count_gte?: number;
+    /**
+     * Number of times this opcode was executed in this frame (filter: between_min)
+     */
+    count_between_min?: number;
+    /**
+     * Number of times this opcode was executed in this frame (filter: between_max_value)
+     */
+    count_between_max_value?: number;
+    /**
+     * Number of times this opcode was executed in this frame (filter: in_values) (comma-separated list)
+     */
+    count_in_values?: string;
+    /**
+     * Number of times this opcode was executed in this frame (filter: not_in_values) (comma-separated list)
+     */
+    count_not_in_values?: string;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: eq)
+     */
+    gas_eq?: number;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: ne)
+     */
+    gas_ne?: number;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: lt)
+     */
+    gas_lt?: number;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: lte)
+     */
+    gas_lte?: number;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: gt)
+     */
+    gas_gt?: number;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: gte)
+     */
+    gas_gte?: number;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: between_min)
+     */
+    gas_between_min?: number;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: between_max_value)
+     */
+    gas_between_max_value?: number;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: in_values) (comma-separated list)
+     */
+    gas_in_values?: string;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: not_in_values) (comma-separated list)
+     */
+    gas_not_in_values?: string;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: eq)
+     */
+    gas_cumulative_eq?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: ne)
+     */
+    gas_cumulative_ne?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: lt)
+     */
+    gas_cumulative_lt?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: lte)
+     */
+    gas_cumulative_lte?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: gt)
+     */
+    gas_cumulative_gt?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: gte)
+     */
+    gas_cumulative_gte?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: between_min)
+     */
+    gas_cumulative_between_min?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: between_max_value)
+     */
+    gas_cumulative_between_max_value?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: in_values) (comma-separated list)
+     */
+    gas_cumulative_in_values?: string;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: not_in_values) (comma-separated list)
+     */
+    gas_cumulative_not_in_values?: string;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: eq)
+     */
+    error_count_eq?: number;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: ne)
+     */
+    error_count_ne?: number;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: lt)
+     */
+    error_count_lt?: number;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: lte)
+     */
+    error_count_lte?: number;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: gt)
+     */
+    error_count_gt?: number;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: gte)
+     */
+    error_count_gte?: number;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: between_min)
+     */
+    error_count_between_min?: number;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: between_max_value)
+     */
+    error_count_between_max_value?: number;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: in_values) (comma-separated list)
+     */
+    error_count_in_values?: string;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: not_in_values) (comma-separated list)
+     */
+    error_count_not_in_values?: string;
+    /**
+     * The maximum number of int_transaction_call_frame_opcode_gas to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntTransactionCallFrameOpcodeGas` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_transaction_call_frame_opcode_gas';
+};
+
+export type IntTransactionCallFrameOpcodeGasServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntTransactionCallFrameOpcodeGasServiceListError =
+  IntTransactionCallFrameOpcodeGasServiceListErrors[keyof IntTransactionCallFrameOpcodeGasServiceListErrors];
+
+export type IntTransactionCallFrameOpcodeGasServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntTransactionCallFrameOpcodeGasResponse;
+};
+
+export type IntTransactionCallFrameOpcodeGasServiceListResponse =
+  IntTransactionCallFrameOpcodeGasServiceListResponses[keyof IntTransactionCallFrameOpcodeGasServiceListResponses];
+
+export type IntTransactionCallFrameOpcodeGasServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number containing the transaction
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_transaction_call_frame_opcode_gas/{block_number}';
+};
+
+export type IntTransactionCallFrameOpcodeGasServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntTransactionCallFrameOpcodeGasServiceGetError =
+  IntTransactionCallFrameOpcodeGasServiceGetErrors[keyof IntTransactionCallFrameOpcodeGasServiceGetErrors];
+
+export type IntTransactionCallFrameOpcodeGasServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntTransactionCallFrameOpcodeGasResponse;
+};
+
+export type IntTransactionCallFrameOpcodeGasServiceGetResponse =
+  IntTransactionCallFrameOpcodeGasServiceGetResponses[keyof IntTransactionCallFrameOpcodeGasServiceGetResponses];
+
+export type IntTransactionOpcodeGasServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number containing the transaction (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number containing the transaction (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number containing the transaction (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number containing the transaction (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number containing the transaction (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number containing the transaction (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number containing the transaction (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number containing the transaction (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number containing the transaction (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number containing the transaction (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: eq)
+     */
+    transaction_hash_eq?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ne)
+     */
+    transaction_hash_ne?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: contains)
+     */
+    transaction_hash_contains?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    transaction_hash_starts_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    transaction_hash_ends_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: like)
+     */
+    transaction_hash_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_like)
+     */
+    transaction_hash_not_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    transaction_hash_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    transaction_hash_not_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: eq)
+     */
+    opcode_eq?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ne)
+     */
+    opcode_ne?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: contains)
+     */
+    opcode_contains?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: starts_with)
+     */
+    opcode_starts_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ends_with)
+     */
+    opcode_ends_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: like)
+     */
+    opcode_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_like)
+     */
+    opcode_not_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: in_values) (comma-separated list)
+     */
+    opcode_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_in_values) (comma-separated list)
+     */
+    opcode_not_in_values?: string;
+    /**
+     * The name of the network (filter: eq)
+     */
+    meta_network_name_eq?: string;
+    /**
+     * The name of the network (filter: ne)
+     */
+    meta_network_name_ne?: string;
+    /**
+     * The name of the network (filter: contains)
+     */
+    meta_network_name_contains?: string;
+    /**
+     * The name of the network (filter: starts_with)
+     */
+    meta_network_name_starts_with?: string;
+    /**
+     * The name of the network (filter: ends_with)
+     */
+    meta_network_name_ends_with?: string;
+    /**
+     * The name of the network (filter: like)
+     */
+    meta_network_name_like?: string;
+    /**
+     * The name of the network (filter: not_like)
+     */
+    meta_network_name_not_like?: string;
+    /**
+     * The name of the network (filter: in_values) (comma-separated list)
+     */
+    meta_network_name_in_values?: string;
+    /**
+     * The name of the network (filter: not_in_values) (comma-separated list)
+     */
+    meta_network_name_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The index of the transaction within the block (filter: eq)
+     */
+    transaction_index_eq?: number;
+    /**
+     * The index of the transaction within the block (filter: ne)
+     */
+    transaction_index_ne?: number;
+    /**
+     * The index of the transaction within the block (filter: lt)
+     */
+    transaction_index_lt?: number;
+    /**
+     * The index of the transaction within the block (filter: lte)
+     */
+    transaction_index_lte?: number;
+    /**
+     * The index of the transaction within the block (filter: gt)
+     */
+    transaction_index_gt?: number;
+    /**
+     * The index of the transaction within the block (filter: gte)
+     */
+    transaction_index_gte?: number;
+    /**
+     * The index of the transaction within the block (filter: between_min)
+     */
+    transaction_index_between_min?: number;
+    /**
+     * The index of the transaction within the block (filter: between_max_value)
+     */
+    transaction_index_between_max_value?: number;
+    /**
+     * The index of the transaction within the block (filter: in_values) (comma-separated list)
+     */
+    transaction_index_in_values?: string;
+    /**
+     * The index of the transaction within the block (filter: not_in_values) (comma-separated list)
+     */
+    transaction_index_not_in_values?: string;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: eq)
+     */
+    count_eq?: number;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: ne)
+     */
+    count_ne?: number;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: lt)
+     */
+    count_lt?: number;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: lte)
+     */
+    count_lte?: number;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: gt)
+     */
+    count_gt?: number;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: gte)
+     */
+    count_gte?: number;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: between_min)
+     */
+    count_between_min?: number;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: between_max_value)
+     */
+    count_between_max_value?: number;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: in_values) (comma-separated list)
+     */
+    count_in_values?: string;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: not_in_values) (comma-separated list)
+     */
+    count_not_in_values?: string;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: eq)
+     */
+    gas_eq?: number;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: ne)
+     */
+    gas_ne?: number;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: lt)
+     */
+    gas_lt?: number;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: lte)
+     */
+    gas_lte?: number;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: gt)
+     */
+    gas_gt?: number;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: gte)
+     */
+    gas_gte?: number;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: between_min)
+     */
+    gas_between_min?: number;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: between_max_value)
+     */
+    gas_between_max_value?: number;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: in_values) (comma-separated list)
+     */
+    gas_in_values?: string;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: not_in_values) (comma-separated list)
+     */
+    gas_not_in_values?: string;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: eq)
+     */
+    gas_cumulative_eq?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: ne)
+     */
+    gas_cumulative_ne?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: lt)
+     */
+    gas_cumulative_lt?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: lte)
+     */
+    gas_cumulative_lte?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: gt)
+     */
+    gas_cumulative_gt?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: gte)
+     */
+    gas_cumulative_gte?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: between_min)
+     */
+    gas_cumulative_between_min?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: between_max_value)
+     */
+    gas_cumulative_between_max_value?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: in_values) (comma-separated list)
+     */
+    gas_cumulative_in_values?: string;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: not_in_values) (comma-separated list)
+     */
+    gas_cumulative_not_in_values?: string;
+    /**
+     * Minimum call stack depth for this opcode (filter: eq)
+     */
+    min_depth_eq?: number;
+    /**
+     * Minimum call stack depth for this opcode (filter: ne)
+     */
+    min_depth_ne?: number;
+    /**
+     * Minimum call stack depth for this opcode (filter: lt)
+     */
+    min_depth_lt?: number;
+    /**
+     * Minimum call stack depth for this opcode (filter: lte)
+     */
+    min_depth_lte?: number;
+    /**
+     * Minimum call stack depth for this opcode (filter: gt)
+     */
+    min_depth_gt?: number;
+    /**
+     * Minimum call stack depth for this opcode (filter: gte)
+     */
+    min_depth_gte?: number;
+    /**
+     * Minimum call stack depth for this opcode (filter: between_min)
+     */
+    min_depth_between_min?: number;
+    /**
+     * Minimum call stack depth for this opcode (filter: between_max_value)
+     */
+    min_depth_between_max_value?: number;
+    /**
+     * Minimum call stack depth for this opcode (filter: in_values) (comma-separated list)
+     */
+    min_depth_in_values?: string;
+    /**
+     * Minimum call stack depth for this opcode (filter: not_in_values) (comma-separated list)
+     */
+    min_depth_not_in_values?: string;
+    /**
+     * Maximum call stack depth for this opcode (filter: eq)
+     */
+    max_depth_eq?: number;
+    /**
+     * Maximum call stack depth for this opcode (filter: ne)
+     */
+    max_depth_ne?: number;
+    /**
+     * Maximum call stack depth for this opcode (filter: lt)
+     */
+    max_depth_lt?: number;
+    /**
+     * Maximum call stack depth for this opcode (filter: lte)
+     */
+    max_depth_lte?: number;
+    /**
+     * Maximum call stack depth for this opcode (filter: gt)
+     */
+    max_depth_gt?: number;
+    /**
+     * Maximum call stack depth for this opcode (filter: gte)
+     */
+    max_depth_gte?: number;
+    /**
+     * Maximum call stack depth for this opcode (filter: between_min)
+     */
+    max_depth_between_min?: number;
+    /**
+     * Maximum call stack depth for this opcode (filter: between_max_value)
+     */
+    max_depth_between_max_value?: number;
+    /**
+     * Maximum call stack depth for this opcode (filter: in_values) (comma-separated list)
+     */
+    max_depth_in_values?: string;
+    /**
+     * Maximum call stack depth for this opcode (filter: not_in_values) (comma-separated list)
+     */
+    max_depth_not_in_values?: string;
+    /**
+     * Number of times this opcode resulted in an error (filter: eq)
+     */
+    error_count_eq?: number;
+    /**
+     * Number of times this opcode resulted in an error (filter: ne)
+     */
+    error_count_ne?: number;
+    /**
+     * Number of times this opcode resulted in an error (filter: lt)
+     */
+    error_count_lt?: number;
+    /**
+     * Number of times this opcode resulted in an error (filter: lte)
+     */
+    error_count_lte?: number;
+    /**
+     * Number of times this opcode resulted in an error (filter: gt)
+     */
+    error_count_gt?: number;
+    /**
+     * Number of times this opcode resulted in an error (filter: gte)
+     */
+    error_count_gte?: number;
+    /**
+     * Number of times this opcode resulted in an error (filter: between_min)
+     */
+    error_count_between_min?: number;
+    /**
+     * Number of times this opcode resulted in an error (filter: between_max_value)
+     */
+    error_count_between_max_value?: number;
+    /**
+     * Number of times this opcode resulted in an error (filter: in_values) (comma-separated list)
+     */
+    error_count_in_values?: string;
+    /**
+     * Number of times this opcode resulted in an error (filter: not_in_values) (comma-separated list)
+     */
+    error_count_not_in_values?: string;
+    /**
+     * The maximum number of int_transaction_opcode_gas to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntTransactionOpcodeGas` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_transaction_opcode_gas';
+};
+
+export type IntTransactionOpcodeGasServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntTransactionOpcodeGasServiceListError =
+  IntTransactionOpcodeGasServiceListErrors[keyof IntTransactionOpcodeGasServiceListErrors];
+
+export type IntTransactionOpcodeGasServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntTransactionOpcodeGasResponse;
+};
+
+export type IntTransactionOpcodeGasServiceListResponse =
+  IntTransactionOpcodeGasServiceListResponses[keyof IntTransactionOpcodeGasServiceListResponses];
+
+export type IntTransactionOpcodeGasServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number containing the transaction
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_transaction_opcode_gas/{block_number}';
+};
+
+export type IntTransactionOpcodeGasServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntTransactionOpcodeGasServiceGetError =
+  IntTransactionOpcodeGasServiceGetErrors[keyof IntTransactionOpcodeGasServiceGetErrors];
+
+export type IntTransactionOpcodeGasServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntTransactionOpcodeGasResponse;
+};
+
+export type IntTransactionOpcodeGasServiceGetResponse =
+  IntTransactionOpcodeGasServiceGetResponses[keyof IntTransactionOpcodeGasServiceGetResponses];

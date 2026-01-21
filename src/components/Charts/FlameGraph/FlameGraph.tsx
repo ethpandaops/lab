@@ -1,7 +1,17 @@
-import React, { type JSX, useMemo, useState, useCallback } from 'react';
+import React, { type JSX, useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import clsx from 'clsx';
 import type { FlameGraphProps, FlameGraphNode, FlattenedNode, FlameGraphColorMap } from './FlameGraph.types';
 import { EVM_CALL_TYPE_COLORS } from './FlameGraph.types';
+
+/**
+ * Tooltip offset from cursor
+ */
+const TOOLTIP_OFFSET = 12;
+
+/**
+ * Viewport padding to keep tooltip away from edges
+ */
+const VIEWPORT_PADDING = 16;
 
 // Default colors
 const DEFAULT_COLOR = { bg: 'bg-slate-500', hover: 'hover:bg-slate-400' };
@@ -139,7 +149,8 @@ export function FlameGraph({
   defaultColor = DEFAULT_COLOR,
   errorColor = ERROR_COLOR,
   minWidthPercent = 0.5,
-  height = 400,
+  height,
+  minHeight = 100,
   rowHeight = 24,
   showLabels = true,
   title,
@@ -149,9 +160,16 @@ export function FlameGraph({
   renderTooltip,
 }: FlameGraphProps): JSX.Element {
   const [hoveredNode, setHoveredNode] = useState<FlameGraphNode | null>(null);
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   // Flatten tree and calculate layout
-  const { maxDepth, rows, categories } = useMemo(() => {
+  const {
+    maxDepth: _maxDepth,
+    rows,
+    categories,
+  } = useMemo(() => {
     if (!data) {
       return { maxDepth: 0, rows: [] as FlattenedNode[][], categories: new Set<string>() };
     }
@@ -182,14 +200,48 @@ export function FlameGraph({
   // Determine if we should show legend
   const shouldShowLegend = showLegend ?? (colorMap && categories.size > 0);
 
+  // Calculate smart tooltip position to keep it within viewport
+  useEffect(() => {
+    if (!hoveredNode || !tooltipRef.current) return;
+
+    const tooltip = tooltipRef.current;
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let x = mousePosition.x + TOOLTIP_OFFSET;
+    let y = mousePosition.y + TOOLTIP_OFFSET;
+
+    // Check right edge - flip to left side if needed
+    if (x + tooltipRect.width + VIEWPORT_PADDING > viewportWidth) {
+      x = mousePosition.x - tooltipRect.width - TOOLTIP_OFFSET;
+    }
+
+    // Check bottom edge - flip to above cursor if needed
+    if (y + tooltipRect.height + VIEWPORT_PADDING > viewportHeight) {
+      y = mousePosition.y - tooltipRect.height - TOOLTIP_OFFSET;
+    }
+
+    // Ensure we don't go off the left or top edges
+    x = Math.max(VIEWPORT_PADDING, x);
+    y = Math.max(VIEWPORT_PADDING, y);
+
+    setTooltipPosition({ x, y });
+  }, [mousePosition, hoveredNode]);
+
   // Handle mouse events
   const handleMouseEnter = useCallback(
-    (node: FlameGraphNode) => {
+    (node: FlameGraphNode, event: React.MouseEvent) => {
       setHoveredNode(node);
+      setMousePosition({ x: event.clientX, y: event.clientY });
       onNodeHover?.(node);
     },
     [onNodeHover]
   );
+
+  const handleMouseMove = useCallback((event: React.MouseEvent) => {
+    setMousePosition({ x: event.clientX, y: event.clientY });
+  }, []);
 
   const handleMouseLeave = useCallback(() => {
     setHoveredNode(null);
@@ -208,14 +260,12 @@ export function FlameGraph({
     return (
       <div
         className="flex items-center justify-center rounded-sm border border-border bg-surface text-muted"
-        style={{ height }}
+        style={{ height: height ?? minHeight }}
       >
         No data available
       </div>
     );
   }
-
-  const calculatedHeight = Math.max(height, (maxDepth + 1) * rowHeight + 60);
 
   return (
     <div className="w-full">
@@ -231,11 +281,8 @@ export function FlameGraph({
       )}
 
       {/* Flame Graph Container */}
-      <div
-        className="relative w-full overflow-x-auto rounded-sm border border-border bg-surface"
-        style={{ height: calculatedHeight }}
-      >
-        <div className="relative min-w-full p-2" style={{ minHeight: calculatedHeight - 4 }}>
+      <div className="relative w-full overflow-hidden rounded-sm border border-border bg-surface">
+        <div className="relative min-w-full p-2">
           {rows.map((row, rowIndex) => (
             <div
               key={rowIndex}
@@ -268,9 +315,9 @@ export function FlameGraph({
                       height: rowHeight - 2,
                     }}
                     onClick={() => handleClick(flatNode.node)}
-                    onMouseEnter={() => handleMouseEnter(flatNode.node)}
+                    onMouseEnter={e => handleMouseEnter(flatNode.node, e)}
+                    onMouseMove={handleMouseMove}
                     onMouseLeave={handleMouseLeave}
-                    title={`${flatNode.node.label} - ${valueFormatter(flatNode.node.value)}${valueUnit ? ` ${valueUnit}` : ''}`}
                   >
                     {showLabels && flatNode.widthPercent > 3 && (
                       <span className="truncate font-mono text-xs">
@@ -288,52 +335,120 @@ export function FlameGraph({
 
         {/* Tooltip */}
         {hoveredNode && (
-          <div className="pointer-events-none fixed right-4 bottom-4 z-50 max-w-xs rounded-sm border border-border bg-background p-3 shadow-lg">
+          <div
+            ref={tooltipRef}
+            className="pointer-events-none fixed z-50 max-w-md min-w-72 overflow-hidden rounded-sm border border-border bg-background shadow-lg"
+            style={{
+              left: tooltipPosition.x,
+              top: tooltipPosition.y,
+            }}
+          >
             {renderTooltip ? (
               renderTooltip(hoveredNode)
             ) : (
               <>
-                <div className="mb-2 font-mono text-sm font-medium text-foreground">{hoveredNode.label}</div>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                  <span className="text-muted">Total:</span>
-                  <span className="text-foreground">
-                    {hoveredNode.value.toLocaleString()}
-                    {valueUnit && ` ${valueUnit}`}
-                  </span>
-
-                  {hoveredNode.selfValue !== undefined && (
-                    <>
-                      <span className="text-muted">Self:</span>
-                      <span className="text-foreground">
-                        {hoveredNode.selfValue.toLocaleString()}
-                        {valueUnit && ` ${valueUnit}`}
-                      </span>
-                    </>
+                {/* Header */}
+                <div className="border-b border-border bg-surface/50 px-3 py-2">
+                  <div className="text-base/5 font-medium text-foreground">{hoveredNode.label}</div>
+                  {/* Target name prominently displayed */}
+                  {typeof hoveredNode.metadata?.targetName === 'string' && hoveredNode.metadata.targetName && (
+                    <div className="mt-0.5 text-sm text-muted">{hoveredNode.metadata.targetName}</div>
                   )}
-
+                  {/* Colored call type badge */}
                   {hoveredNode.category && (
-                    <>
-                      <span className="text-muted">Type:</span>
-                      <span className="text-foreground">{hoveredNode.category}</span>
-                    </>
+                    <span
+                      className={clsx(
+                        'mt-1.5 inline-block rounded-xs px-1.5 py-0.5 text-xs font-medium text-white',
+                        colorMap?.[hoveredNode.category]?.bg ?? 'bg-slate-500'
+                      )}
+                    >
+                      {hoveredNode.category}
+                    </span>
+                  )}
+                </div>
+
+                <div className="p-3">
+                  {/* Gas Section */}
+                  <div className="mb-3">
+                    <div className="mb-1.5 text-xs font-semibold tracking-wide text-primary uppercase">Gas</div>
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="flex items-center gap-2 text-muted">
+                          <span className="size-0.5 rounded-full bg-blue-500" />
+                          Total
+                        </span>
+                        <span className="font-mono text-foreground">
+                          {hoveredNode.value.toLocaleString()}
+                          {valueUnit && ` ${valueUnit}`}
+                        </span>
+                      </div>
+                      {hoveredNode.selfValue !== undefined && (
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="flex items-center gap-2 text-muted">
+                            <span className="size-0.5 rounded-full bg-green-500" />
+                            Self
+                          </span>
+                          <span className="font-mono text-foreground">
+                            {hoveredNode.selfValue.toLocaleString()}
+                            {valueUnit && ` ${valueUnit}`}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Details Section */}
+                  {hoveredNode.metadata && Object.keys(hoveredNode.metadata).length > 0 && (
+                    <div>
+                      <div className="mb-1.5 text-xs font-semibold tracking-wide text-primary uppercase">Details</div>
+                      <div className="space-y-1">
+                        {Object.entries(hoveredNode.metadata).map(([key, value]) => {
+                          // Skip null/undefined values, targetName (shown in header), and internal IDs
+                          if (value === null || value === undefined || key === 'targetName' || key === 'callFrameId')
+                            return null;
+                          // Format the key name nicely
+                          const displayKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+                          // Format the value based on type
+                          let displayValue: React.ReactNode;
+                          const stringValue = typeof value === 'string' ? value : String(value);
+                          const isLongValue = stringValue.length > 24;
+
+                          if (typeof value === 'number') {
+                            displayValue = <span className="font-mono">{value.toLocaleString()}</span>;
+                          } else if (typeof value === 'string' && value.startsWith('0x')) {
+                            // Ethereum address or hash - truncate in middle
+                            displayValue = (
+                              <span className="font-mono" title={value}>
+                                {value.length > 16 ? `${value.slice(0, 10)}...${value.slice(-6)}` : value}
+                              </span>
+                            );
+                          } else if (isLongValue) {
+                            // Long string values - truncate with tooltip
+                            displayValue = (
+                              <span className="font-mono" title={stringValue}>
+                                {stringValue.slice(0, 20)}...
+                              </span>
+                            );
+                          } else {
+                            displayValue = stringValue;
+                          }
+                          return (
+                            <div key={key} className="flex items-center justify-between gap-4 text-xs">
+                              <span className="shrink-0 text-muted">{displayKey}</span>
+                              <span className="text-right text-foreground">{displayValue}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                   )}
 
-                  {/* Render metadata fields */}
-                  {hoveredNode.metadata &&
-                    Object.entries(hoveredNode.metadata).map(([key, value]) => (
-                      <React.Fragment key={key}>
-                        <span className="text-muted capitalize">{key}:</span>
-                        <span className="text-foreground">
-                          {typeof value === 'number' ? value.toLocaleString() : String(value)}
-                        </span>
-                      </React.Fragment>
-                    ))}
-
+                  {/* Error indicator */}
                   {hoveredNode.hasError && (
-                    <>
-                      <span className="text-muted">Status:</span>
-                      <span className="text-danger">Error</span>
-                    </>
+                    <div className="mt-3 flex items-center gap-2 rounded-xs bg-danger/10 px-2 py-1.5 text-xs text-danger">
+                      <span className="size-1.5 rounded-full bg-danger" />
+                      <span>Error in this call</span>
+                    </div>
                   )}
                 </div>
               </>

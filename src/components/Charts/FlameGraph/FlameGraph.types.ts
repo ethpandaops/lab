@@ -106,10 +106,16 @@ export interface FlameGraphProps {
   minWidthPercent?: number;
 
   /**
-   * Height of the chart container in pixels
-   * @default 400
+   * Fixed height of the chart container in pixels.
+   * If not provided, height is calculated dynamically based on tree depth.
    */
   height?: number;
+
+  /**
+   * Minimum height when using dynamic height calculation
+   * @default 100
+   */
+  minHeight?: number;
 
   /**
    * Height of each row in pixels

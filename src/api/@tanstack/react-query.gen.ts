@@ -12,6 +12,8 @@ import {
   dimBlockBlobSubmitterServiceList,
   dimContractOwnerServiceGet,
   dimContractOwnerServiceList,
+  dimFunctionSignatureServiceGet,
+  dimFunctionSignatureServiceList,
   dimNodeServiceGet,
   dimNodeServiceList,
   fctAddressAccessChunked10000ServiceGet,
@@ -270,6 +272,12 @@ import {
   intStorageSlotStateWithExpiryByBlockServiceList,
   intStorageSlotStateWithExpiryServiceGet,
   intStorageSlotStateWithExpiryServiceList,
+  intTransactionCallFrameOpcodeGasServiceGet,
+  intTransactionCallFrameOpcodeGasServiceList,
+  intTransactionCallFrameServiceGet,
+  intTransactionCallFrameServiceList,
+  intTransactionOpcodeGasServiceGet,
+  intTransactionOpcodeGasServiceList,
   type Options,
 } from '../sdk.gen';
 import type {
@@ -297,6 +305,12 @@ import type {
   DimContractOwnerServiceListData,
   DimContractOwnerServiceListError,
   DimContractOwnerServiceListResponse,
+  DimFunctionSignatureServiceGetData,
+  DimFunctionSignatureServiceGetError,
+  DimFunctionSignatureServiceGetResponse,
+  DimFunctionSignatureServiceListData,
+  DimFunctionSignatureServiceListError,
+  DimFunctionSignatureServiceListResponse,
   DimNodeServiceGetData,
   DimNodeServiceGetError,
   DimNodeServiceGetResponse,
@@ -1071,6 +1085,24 @@ import type {
   IntStorageSlotStateWithExpiryServiceListData,
   IntStorageSlotStateWithExpiryServiceListError,
   IntStorageSlotStateWithExpiryServiceListResponse,
+  IntTransactionCallFrameOpcodeGasServiceGetData,
+  IntTransactionCallFrameOpcodeGasServiceGetError,
+  IntTransactionCallFrameOpcodeGasServiceGetResponse,
+  IntTransactionCallFrameOpcodeGasServiceListData,
+  IntTransactionCallFrameOpcodeGasServiceListError,
+  IntTransactionCallFrameOpcodeGasServiceListResponse,
+  IntTransactionCallFrameServiceGetData,
+  IntTransactionCallFrameServiceGetError,
+  IntTransactionCallFrameServiceGetResponse,
+  IntTransactionCallFrameServiceListData,
+  IntTransactionCallFrameServiceListError,
+  IntTransactionCallFrameServiceListResponse,
+  IntTransactionOpcodeGasServiceGetData,
+  IntTransactionOpcodeGasServiceGetError,
+  IntTransactionOpcodeGasServiceGetResponse,
+  IntTransactionOpcodeGasServiceListData,
+  IntTransactionOpcodeGasServiceListError,
+  IntTransactionOpcodeGasServiceListResponse,
 } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
@@ -1326,6 +1358,60 @@ export const dimContractOwnerServiceGetOptions = (options: Options<DimContractOw
       return data;
     },
     queryKey: dimContractOwnerServiceGetQueryKey(options),
+  });
+
+export const dimFunctionSignatureServiceListQueryKey = (options?: Options<DimFunctionSignatureServiceListData>) =>
+  createQueryKey('dimFunctionSignatureServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimFunctionSignatureServiceListOptions = (options?: Options<DimFunctionSignatureServiceListData>) =>
+  queryOptions<
+    DimFunctionSignatureServiceListResponse,
+    DimFunctionSignatureServiceListError,
+    DimFunctionSignatureServiceListResponse,
+    ReturnType<typeof dimFunctionSignatureServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimFunctionSignatureServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimFunctionSignatureServiceListQueryKey(options),
+  });
+
+export const dimFunctionSignatureServiceGetQueryKey = (options: Options<DimFunctionSignatureServiceGetData>) =>
+  createQueryKey('dimFunctionSignatureServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by selector
+ */
+export const dimFunctionSignatureServiceGetOptions = (options: Options<DimFunctionSignatureServiceGetData>) =>
+  queryOptions<
+    DimFunctionSignatureServiceGetResponse,
+    DimFunctionSignatureServiceGetError,
+    DimFunctionSignatureServiceGetResponse,
+    ReturnType<typeof dimFunctionSignatureServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimFunctionSignatureServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimFunctionSignatureServiceGetQueryKey(options),
   });
 
 export const dimNodeServiceListQueryKey = (options?: Options<DimNodeServiceListData>) =>
@@ -8821,4 +8907,172 @@ export const intStorageSlotStateWithExpiryByBlockServiceGetOptions = (
       return data;
     },
     queryKey: intStorageSlotStateWithExpiryByBlockServiceGetQueryKey(options),
+  });
+
+export const intTransactionCallFrameServiceListQueryKey = (options?: Options<IntTransactionCallFrameServiceListData>) =>
+  createQueryKey('intTransactionCallFrameServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intTransactionCallFrameServiceListOptions = (options?: Options<IntTransactionCallFrameServiceListData>) =>
+  queryOptions<
+    IntTransactionCallFrameServiceListResponse,
+    IntTransactionCallFrameServiceListError,
+    IntTransactionCallFrameServiceListResponse,
+    ReturnType<typeof intTransactionCallFrameServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intTransactionCallFrameServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intTransactionCallFrameServiceListQueryKey(options),
+  });
+
+export const intTransactionCallFrameServiceGetQueryKey = (options: Options<IntTransactionCallFrameServiceGetData>) =>
+  createQueryKey('intTransactionCallFrameServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intTransactionCallFrameServiceGetOptions = (options: Options<IntTransactionCallFrameServiceGetData>) =>
+  queryOptions<
+    IntTransactionCallFrameServiceGetResponse,
+    IntTransactionCallFrameServiceGetError,
+    IntTransactionCallFrameServiceGetResponse,
+    ReturnType<typeof intTransactionCallFrameServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intTransactionCallFrameServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intTransactionCallFrameServiceGetQueryKey(options),
+  });
+
+export const intTransactionCallFrameOpcodeGasServiceListQueryKey = (
+  options?: Options<IntTransactionCallFrameOpcodeGasServiceListData>
+) => createQueryKey('intTransactionCallFrameOpcodeGasServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intTransactionCallFrameOpcodeGasServiceListOptions = (
+  options?: Options<IntTransactionCallFrameOpcodeGasServiceListData>
+) =>
+  queryOptions<
+    IntTransactionCallFrameOpcodeGasServiceListResponse,
+    IntTransactionCallFrameOpcodeGasServiceListError,
+    IntTransactionCallFrameOpcodeGasServiceListResponse,
+    ReturnType<typeof intTransactionCallFrameOpcodeGasServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intTransactionCallFrameOpcodeGasServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intTransactionCallFrameOpcodeGasServiceListQueryKey(options),
+  });
+
+export const intTransactionCallFrameOpcodeGasServiceGetQueryKey = (
+  options: Options<IntTransactionCallFrameOpcodeGasServiceGetData>
+) => createQueryKey('intTransactionCallFrameOpcodeGasServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intTransactionCallFrameOpcodeGasServiceGetOptions = (
+  options: Options<IntTransactionCallFrameOpcodeGasServiceGetData>
+) =>
+  queryOptions<
+    IntTransactionCallFrameOpcodeGasServiceGetResponse,
+    IntTransactionCallFrameOpcodeGasServiceGetError,
+    IntTransactionCallFrameOpcodeGasServiceGetResponse,
+    ReturnType<typeof intTransactionCallFrameOpcodeGasServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intTransactionCallFrameOpcodeGasServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intTransactionCallFrameOpcodeGasServiceGetQueryKey(options),
+  });
+
+export const intTransactionOpcodeGasServiceListQueryKey = (options?: Options<IntTransactionOpcodeGasServiceListData>) =>
+  createQueryKey('intTransactionOpcodeGasServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intTransactionOpcodeGasServiceListOptions = (options?: Options<IntTransactionOpcodeGasServiceListData>) =>
+  queryOptions<
+    IntTransactionOpcodeGasServiceListResponse,
+    IntTransactionOpcodeGasServiceListError,
+    IntTransactionOpcodeGasServiceListResponse,
+    ReturnType<typeof intTransactionOpcodeGasServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intTransactionOpcodeGasServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intTransactionOpcodeGasServiceListQueryKey(options),
+  });
+
+export const intTransactionOpcodeGasServiceGetQueryKey = (options: Options<IntTransactionOpcodeGasServiceGetData>) =>
+  createQueryKey('intTransactionOpcodeGasServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intTransactionOpcodeGasServiceGetOptions = (options: Options<IntTransactionOpcodeGasServiceGetData>) =>
+  queryOptions<
+    IntTransactionOpcodeGasServiceGetResponse,
+    IntTransactionOpcodeGasServiceGetError,
+    IntTransactionOpcodeGasServiceGetResponse,
+    ReturnType<typeof intTransactionOpcodeGasServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intTransactionOpcodeGasServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intTransactionOpcodeGasServiceGetQueryKey(options),
   });

@@ -27,6 +27,12 @@ import type {
   DimContractOwnerServiceListData,
   DimContractOwnerServiceListErrors,
   DimContractOwnerServiceListResponses,
+  DimFunctionSignatureServiceGetData,
+  DimFunctionSignatureServiceGetErrors,
+  DimFunctionSignatureServiceGetResponses,
+  DimFunctionSignatureServiceListData,
+  DimFunctionSignatureServiceListErrors,
+  DimFunctionSignatureServiceListResponses,
   DimNodeServiceGetData,
   DimNodeServiceGetErrors,
   DimNodeServiceGetResponses,
@@ -801,6 +807,24 @@ import type {
   IntStorageSlotStateWithExpiryServiceListData,
   IntStorageSlotStateWithExpiryServiceListErrors,
   IntStorageSlotStateWithExpiryServiceListResponses,
+  IntTransactionCallFrameOpcodeGasServiceGetData,
+  IntTransactionCallFrameOpcodeGasServiceGetErrors,
+  IntTransactionCallFrameOpcodeGasServiceGetResponses,
+  IntTransactionCallFrameOpcodeGasServiceListData,
+  IntTransactionCallFrameOpcodeGasServiceListErrors,
+  IntTransactionCallFrameOpcodeGasServiceListResponses,
+  IntTransactionCallFrameServiceGetData,
+  IntTransactionCallFrameServiceGetErrors,
+  IntTransactionCallFrameServiceGetResponses,
+  IntTransactionCallFrameServiceListData,
+  IntTransactionCallFrameServiceListErrors,
+  IntTransactionCallFrameServiceListResponses,
+  IntTransactionOpcodeGasServiceGetData,
+  IntTransactionOpcodeGasServiceGetErrors,
+  IntTransactionOpcodeGasServiceGetResponses,
+  IntTransactionOpcodeGasServiceListData,
+  IntTransactionOpcodeGasServiceListErrors,
+  IntTransactionOpcodeGasServiceListResponses,
 } from './types.gen';
 import {
   zAdminCbtIncrementalServiceGetData,
@@ -819,6 +843,10 @@ import {
   zDimContractOwnerServiceGetResponse,
   zDimContractOwnerServiceListData,
   zDimContractOwnerServiceListResponse,
+  zDimFunctionSignatureServiceGetData,
+  zDimFunctionSignatureServiceGetResponse,
+  zDimFunctionSignatureServiceListData,
+  zDimFunctionSignatureServiceListResponse,
   zDimNodeServiceGetData,
   zDimNodeServiceGetResponse,
   zDimNodeServiceListData,
@@ -1335,6 +1363,18 @@ import {
   zIntStorageSlotStateWithExpiryServiceGetResponse,
   zIntStorageSlotStateWithExpiryServiceListData,
   zIntStorageSlotStateWithExpiryServiceListResponse,
+  zIntTransactionCallFrameOpcodeGasServiceGetData,
+  zIntTransactionCallFrameOpcodeGasServiceGetResponse,
+  zIntTransactionCallFrameOpcodeGasServiceListData,
+  zIntTransactionCallFrameOpcodeGasServiceListResponse,
+  zIntTransactionCallFrameServiceGetData,
+  zIntTransactionCallFrameServiceGetResponse,
+  zIntTransactionCallFrameServiceListData,
+  zIntTransactionCallFrameServiceListResponse,
+  zIntTransactionOpcodeGasServiceGetData,
+  zIntTransactionOpcodeGasServiceGetResponse,
+  zIntTransactionOpcodeGasServiceListData,
+  zIntTransactionOpcodeGasServiceListResponse,
 } from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<
@@ -1497,6 +1537,44 @@ export const dimContractOwnerServiceGet = <ThrowOnError extends boolean = false>
     requestValidator: async data => await zDimContractOwnerServiceGetData.parseAsync(data),
     responseValidator: async data => await zDimContractOwnerServiceGetResponse.parseAsync(data),
     url: '/api/v1/dim_contract_owner/{contract_address}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimFunctionSignatureServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<DimFunctionSignatureServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    DimFunctionSignatureServiceListResponses,
+    DimFunctionSignatureServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zDimFunctionSignatureServiceListData.parseAsync(data),
+    responseValidator: async data => await zDimFunctionSignatureServiceListResponse.parseAsync(data),
+    url: '/api/v1/dim_function_signature',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by selector
+ */
+export const dimFunctionSignatureServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<DimFunctionSignatureServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    DimFunctionSignatureServiceGetResponses,
+    DimFunctionSignatureServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zDimFunctionSignatureServiceGetData.parseAsync(data),
+    responseValidator: async data => await zDimFunctionSignatureServiceGetResponse.parseAsync(data),
+    url: '/api/v1/dim_function_signature/{selector}',
     ...options,
   });
 
@@ -6374,5 +6452,119 @@ export const intStorageSlotStateWithExpiryByBlockServiceGet = <ThrowOnError exte
     requestValidator: async data => await zIntStorageSlotStateWithExpiryByBlockServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntStorageSlotStateWithExpiryByBlockServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_state_with_expiry_by_block/{expiry_policy}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intTransactionCallFrameServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntTransactionCallFrameServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntTransactionCallFrameServiceListResponses,
+    IntTransactionCallFrameServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionCallFrameServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionCallFrameServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_call_frame',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intTransactionCallFrameServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntTransactionCallFrameServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntTransactionCallFrameServiceGetResponses,
+    IntTransactionCallFrameServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionCallFrameServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionCallFrameServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_call_frame/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intTransactionCallFrameOpcodeGasServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntTransactionCallFrameOpcodeGasServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntTransactionCallFrameOpcodeGasServiceListResponses,
+    IntTransactionCallFrameOpcodeGasServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionCallFrameOpcodeGasServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionCallFrameOpcodeGasServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_call_frame_opcode_gas',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intTransactionCallFrameOpcodeGasServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntTransactionCallFrameOpcodeGasServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntTransactionCallFrameOpcodeGasServiceGetResponses,
+    IntTransactionCallFrameOpcodeGasServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionCallFrameOpcodeGasServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionCallFrameOpcodeGasServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_call_frame_opcode_gas/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intTransactionOpcodeGasServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntTransactionOpcodeGasServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntTransactionOpcodeGasServiceListResponses,
+    IntTransactionOpcodeGasServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionOpcodeGasServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionOpcodeGasServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_opcode_gas',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intTransactionOpcodeGasServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntTransactionOpcodeGasServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntTransactionOpcodeGasServiceGetResponses,
+    IntTransactionOpcodeGasServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionOpcodeGasServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionOpcodeGasServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_opcode_gas/{block_number}',
     ...options,
   });
