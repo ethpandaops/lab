@@ -60,6 +60,8 @@ import {
   fctBlockMevHeadServiceList,
   fctBlockMevServiceGet,
   fctBlockMevServiceList,
+  fctBlockOpcodeGasServiceGet,
+  fctBlockOpcodeGasServiceList,
   fctBlockProposerEntityServiceGet,
   fctBlockProposerEntityServiceList,
   fctBlockProposerHeadServiceGet,
@@ -449,6 +451,12 @@ import type {
   FctBlockMevServiceListData,
   FctBlockMevServiceListError,
   FctBlockMevServiceListResponse,
+  FctBlockOpcodeGasServiceGetData,
+  FctBlockOpcodeGasServiceGetError,
+  FctBlockOpcodeGasServiceGetResponse,
+  FctBlockOpcodeGasServiceListData,
+  FctBlockOpcodeGasServiceListError,
+  FctBlockOpcodeGasServiceListResponse,
   FctBlockProposerEntityServiceGetData,
   FctBlockProposerEntityServiceGetError,
   FctBlockProposerEntityServiceGetResponse,
@@ -2798,6 +2806,60 @@ export const fctBlockMevHeadServiceGetOptions = (options: Options<FctBlockMevHea
       return data;
     },
     queryKey: fctBlockMevHeadServiceGetQueryKey(options),
+  });
+
+export const fctBlockOpcodeGasServiceListQueryKey = (options?: Options<FctBlockOpcodeGasServiceListData>) =>
+  createQueryKey('fctBlockOpcodeGasServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockOpcodeGasServiceListOptions = (options?: Options<FctBlockOpcodeGasServiceListData>) =>
+  queryOptions<
+    FctBlockOpcodeGasServiceListResponse,
+    FctBlockOpcodeGasServiceListError,
+    FctBlockOpcodeGasServiceListResponse,
+    ReturnType<typeof fctBlockOpcodeGasServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockOpcodeGasServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockOpcodeGasServiceListQueryKey(options),
+  });
+
+export const fctBlockOpcodeGasServiceGetQueryKey = (options: Options<FctBlockOpcodeGasServiceGetData>) =>
+  createQueryKey('fctBlockOpcodeGasServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const fctBlockOpcodeGasServiceGetOptions = (options: Options<FctBlockOpcodeGasServiceGetData>) =>
+  queryOptions<
+    FctBlockOpcodeGasServiceGetResponse,
+    FctBlockOpcodeGasServiceGetError,
+    FctBlockOpcodeGasServiceGetResponse,
+    ReturnType<typeof fctBlockOpcodeGasServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockOpcodeGasServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockOpcodeGasServiceGetQueryKey(options),
   });
 
 export const fctBlockProposerServiceListQueryKey = (options?: Options<FctBlockProposerServiceListData>) =>

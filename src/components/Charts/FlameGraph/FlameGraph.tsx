@@ -1,4 +1,5 @@
 import React, { type JSX, useMemo, useState, useCallback, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import type { FlameGraphProps, FlameGraphNode, FlattenedNode, FlameGraphColorMap } from './FlameGraph.types';
 import { EVM_CALL_TYPE_COLORS } from './FlameGraph.types';
@@ -157,6 +158,7 @@ export function FlameGraph({
   valueUnit,
   valueFormatter = defaultValueFormatter,
   showLegend,
+  legendExtra,
   renderTooltip,
 }: FlameGraphProps): JSX.Element {
   const [hoveredNode, setHoveredNode] = useState<FlameGraphNode | null>(null);
@@ -332,12 +334,14 @@ export function FlameGraph({
             </div>
           ))}
         </div>
+      </div>
 
-        {/* Tooltip */}
-        {hoveredNode && (
+      {/* Tooltip - rendered via portal to escape stacking contexts */}
+      {hoveredNode &&
+        createPortal(
           <div
             ref={tooltipRef}
-            className="pointer-events-none fixed z-50 max-w-md min-w-72 overflow-hidden rounded-sm border border-border bg-background shadow-lg"
+            className="pointer-events-none fixed z-[9999] max-w-md min-w-72 overflow-hidden rounded-sm border border-border bg-background shadow-lg"
             style={{
               left: tooltipPosition.x,
               top: tooltipPosition.y,
@@ -372,21 +376,11 @@ export function FlameGraph({
                   <div className="mb-3">
                     <div className="mb-1.5 text-xs font-semibold tracking-wide text-primary uppercase">Gas</div>
                     <div className="space-y-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="flex items-center gap-2 text-muted">
-                          <span className="size-0.5 rounded-full bg-blue-500" />
-                          Total
-                        </span>
-                        <span className="font-mono text-foreground">
-                          {hoveredNode.value.toLocaleString()}
-                          {valueUnit && ` ${valueUnit}`}
-                        </span>
-                      </div>
                       {hoveredNode.selfValue !== undefined && (
                         <div className="flex items-center justify-between text-xs">
                           <span className="flex items-center gap-2 text-muted">
                             <span className="size-0.5 rounded-full bg-green-500" />
-                            Self
+                            Gas
                           </span>
                           <span className="font-mono text-foreground">
                             {hoveredNode.selfValue.toLocaleString()}
@@ -394,6 +388,16 @@ export function FlameGraph({
                           </span>
                         </div>
                       )}
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="flex items-center gap-2 text-muted">
+                          <span className="size-0.5 rounded-full bg-blue-500" />
+                          Cumulative
+                        </span>
+                        <span className="font-mono text-foreground">
+                          {hoveredNode.value.toLocaleString()}
+                          {valueUnit && ` ${valueUnit}`}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
@@ -453,28 +457,35 @@ export function FlameGraph({
                 </div>
               </>
             )}
-          </div>
+          </div>,
+          document.body
         )}
-      </div>
 
-      {/* Legend */}
-      {shouldShowLegend && colorMap && (
-        <div className="mt-3 flex flex-wrap gap-3 text-xs">
-          <span className="text-muted">Categories:</span>
-          {Array.from(categories).map(cat => {
-            const colors = colorMap[cat];
-            if (!colors) return null;
-            return (
-              <span key={cat} className="flex items-center gap-1">
-                <span className={clsx('size-3 rounded-xs', colors.bg)} />
-                <span className="text-foreground">{cat}</span>
+      {/* Legend and extra content */}
+      {(shouldShowLegend || legendExtra) && (
+        <div className="mt-3 flex items-center justify-between gap-4">
+          {shouldShowLegend && colorMap ? (
+            <div className="flex flex-wrap gap-3 text-xs">
+              <span className="text-muted">Categories:</span>
+              {Array.from(categories).map(cat => {
+                const colors = colorMap[cat];
+                if (!colors) return null;
+                return (
+                  <span key={cat} className="flex items-center gap-1">
+                    <span className={clsx('size-3 rounded-xs', colors.bg)} />
+                    <span className="text-foreground">{cat}</span>
+                  </span>
+                );
+              })}
+              <span className="flex items-center gap-1">
+                <span className={clsx('size-3 rounded-xs', errorColor.bg)} />
+                <span className="text-foreground">Error</span>
               </span>
-            );
-          })}
-          <span className="flex items-center gap-1">
-            <span className={clsx('size-3 rounded-xs', errorColor.bg)} />
-            <span className="text-foreground">Error</span>
-          </span>
+            </div>
+          ) : (
+            <div />
+          )}
+          {legendExtra}
         </div>
       )}
     </div>

@@ -171,6 +171,12 @@ import type {
   FctBlockMevServiceListData,
   FctBlockMevServiceListErrors,
   FctBlockMevServiceListResponses,
+  FctBlockOpcodeGasServiceGetData,
+  FctBlockOpcodeGasServiceGetErrors,
+  FctBlockOpcodeGasServiceGetResponses,
+  FctBlockOpcodeGasServiceListData,
+  FctBlockOpcodeGasServiceListErrors,
+  FctBlockOpcodeGasServiceListResponses,
   FctBlockProposerEntityServiceGetData,
   FctBlockProposerEntityServiceGetErrors,
   FctBlockProposerEntityServiceGetResponses,
@@ -939,6 +945,10 @@ import {
   zFctBlockMevServiceGetResponse,
   zFctBlockMevServiceListData,
   zFctBlockMevServiceListResponse,
+  zFctBlockOpcodeGasServiceGetData,
+  zFctBlockOpcodeGasServiceGetResponse,
+  zFctBlockOpcodeGasServiceListData,
+  zFctBlockOpcodeGasServiceListResponse,
   zFctBlockProposerEntityServiceGetData,
   zFctBlockProposerEntityServiceGetResponse,
   zFctBlockProposerEntityServiceListData,
@@ -2454,6 +2464,42 @@ export const fctBlockMevHeadServiceGet = <ThrowOnError extends boolean = false>(
     url: '/api/v1/fct_block_mev_head/{slot_start_date_time}',
     ...options,
   });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockOpcodeGasServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockOpcodeGasServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockOpcodeGasServiceListResponses,
+    FctBlockOpcodeGasServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockOpcodeGasServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockOpcodeGasServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_opcode_gas',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const fctBlockOpcodeGasServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockOpcodeGasServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<FctBlockOpcodeGasServiceGetResponses, FctBlockOpcodeGasServiceGetErrors, ThrowOnError>(
+    {
+      requestValidator: async data => await zFctBlockOpcodeGasServiceGetData.parseAsync(data),
+      responseValidator: async data => await zFctBlockOpcodeGasServiceGetResponse.parseAsync(data),
+      url: '/api/v1/fct_block_opcode_gas/{block_number}',
+      ...options,
+    }
+  );
 
 /**
  * List records

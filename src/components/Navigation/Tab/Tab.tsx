@@ -35,8 +35,8 @@ export function Tab({ children, badge, className, hash }: TabProps): React.JSX.E
         )
       }
       onClick={() => {
-        if (hash) {
-          window.history.replaceState(null, '', `#${hash}`);
+        if (hash && window.location.hash !== `#${hash}`) {
+          window.history.pushState(null, '', `#${hash}`);
         }
       }}
     >

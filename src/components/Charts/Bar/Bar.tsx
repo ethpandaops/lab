@@ -64,6 +64,7 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
     animationDuration = 300,
     tooltipFormatter,
     categoryLabelInterval = 'auto',
+    valueAxisLabelFormatter,
   },
   ref
 ): JSX.Element {
@@ -117,6 +118,7 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
       axisLabel: {
         color: themeColors.muted,
         fontSize: 11,
+        formatter: valueAxisLabelFormatter,
       },
       splitLine: {
         show: false,
@@ -230,6 +232,7 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
     animationDuration,
     tooltipFormatter,
     categoryLabelInterval,
+    valueAxisLabelFormatter,
     themeColors.foreground,
     themeColors.border,
     themeColors.muted,

@@ -153,6 +153,12 @@ export interface FlameGraphProps {
   showLegend?: boolean;
 
   /**
+   * Extra content to render on the right side of the legend row
+   * Useful for adding controls like view toggles
+   */
+  legendExtra?: React.ReactNode;
+
+  /**
    * Custom tooltip renderer
    * If provided, replaces the default tooltip
    */

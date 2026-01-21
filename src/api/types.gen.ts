@@ -1475,6 +1475,37 @@ export type FctBlockMevHead = {
   value?: string | null;
 };
 
+export type FctBlockOpcodeGas = {
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Total execution count of this opcode across all transactions in the block
+   */
+  count?: number;
+  /**
+   * Number of times this opcode resulted in an error across all transactions
+   */
+  error_count?: number;
+  /**
+   * Total gas consumed by this opcode across all transactions in the block
+   */
+  gas?: number;
+  /**
+   * The name of the network
+   */
+  meta_network_name?: string;
+  /**
+   * The EVM opcode name (e.g., SLOAD, ADD, CALL)
+   */
+  opcode?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type FctBlockProposer = {
   /**
    * The beacon block root hash. Null if a block was never seen by a sentry, aka "missed"
@@ -4307,6 +4338,13 @@ export type GetFctBlockMevHeadResponse = {
  */
 export type GetFctBlockMevResponse = {
   item?: FctBlockMev;
+};
+
+/**
+ * Response for getting a single fct_block_opcode_gas record
+ */
+export type GetFctBlockOpcodeGasResponse = {
+  item?: FctBlockOpcodeGas;
 };
 
 /**
@@ -7741,6 +7779,20 @@ export type ListFctBlockMevResponse = {
    * The list of fct_block_mev.
    */
   fct_block_mev?: Array<FctBlockMev>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_opcode_gas records
+ */
+export type ListFctBlockOpcodeGasResponse = {
+  /**
+   * The list of fct_block_opcode_gas.
+   */
+  fct_block_opcode_gas?: Array<FctBlockOpcodeGas>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -24239,6 +24291,350 @@ export type FctBlockMevHeadServiceGetResponses = {
 
 export type FctBlockMevHeadServiceGetResponse =
   FctBlockMevHeadServiceGetResponses[keyof FctBlockMevHeadServiceGetResponses];
+
+export type FctBlockOpcodeGasServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: eq)
+     */
+    opcode_eq?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ne)
+     */
+    opcode_ne?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: contains)
+     */
+    opcode_contains?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: starts_with)
+     */
+    opcode_starts_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ends_with)
+     */
+    opcode_ends_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: like)
+     */
+    opcode_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_like)
+     */
+    opcode_not_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: in_values) (comma-separated list)
+     */
+    opcode_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_in_values) (comma-separated list)
+     */
+    opcode_not_in_values?: string;
+    /**
+     * The name of the network (filter: eq)
+     */
+    meta_network_name_eq?: string;
+    /**
+     * The name of the network (filter: ne)
+     */
+    meta_network_name_ne?: string;
+    /**
+     * The name of the network (filter: contains)
+     */
+    meta_network_name_contains?: string;
+    /**
+     * The name of the network (filter: starts_with)
+     */
+    meta_network_name_starts_with?: string;
+    /**
+     * The name of the network (filter: ends_with)
+     */
+    meta_network_name_ends_with?: string;
+    /**
+     * The name of the network (filter: like)
+     */
+    meta_network_name_like?: string;
+    /**
+     * The name of the network (filter: not_like)
+     */
+    meta_network_name_not_like?: string;
+    /**
+     * The name of the network (filter: in_values) (comma-separated list)
+     */
+    meta_network_name_in_values?: string;
+    /**
+     * The name of the network (filter: not_in_values) (comma-separated list)
+     */
+    meta_network_name_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: eq)
+     */
+    count_eq?: number;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: ne)
+     */
+    count_ne?: number;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: lt)
+     */
+    count_lt?: number;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: lte)
+     */
+    count_lte?: number;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: gt)
+     */
+    count_gt?: number;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: gte)
+     */
+    count_gte?: number;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: between_min)
+     */
+    count_between_min?: number;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: between_max_value)
+     */
+    count_between_max_value?: number;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: in_values) (comma-separated list)
+     */
+    count_in_values?: string;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: not_in_values) (comma-separated list)
+     */
+    count_not_in_values?: string;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: eq)
+     */
+    gas_eq?: number;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: ne)
+     */
+    gas_ne?: number;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: lt)
+     */
+    gas_lt?: number;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: lte)
+     */
+    gas_lte?: number;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: gt)
+     */
+    gas_gt?: number;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: gte)
+     */
+    gas_gte?: number;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: between_min)
+     */
+    gas_between_min?: number;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: between_max_value)
+     */
+    gas_between_max_value?: number;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: in_values) (comma-separated list)
+     */
+    gas_in_values?: string;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: not_in_values) (comma-separated list)
+     */
+    gas_not_in_values?: string;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: eq)
+     */
+    error_count_eq?: number;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: ne)
+     */
+    error_count_ne?: number;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: lt)
+     */
+    error_count_lt?: number;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: lte)
+     */
+    error_count_lte?: number;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: gt)
+     */
+    error_count_gt?: number;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: gte)
+     */
+    error_count_gte?: number;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: between_min)
+     */
+    error_count_between_min?: number;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: between_max_value)
+     */
+    error_count_between_max_value?: number;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: in_values) (comma-separated list)
+     */
+    error_count_in_values?: string;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: not_in_values) (comma-separated list)
+     */
+    error_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_opcode_gas to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockOpcodeGas` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_opcode_gas';
+};
+
+export type FctBlockOpcodeGasServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockOpcodeGasServiceListError =
+  FctBlockOpcodeGasServiceListErrors[keyof FctBlockOpcodeGasServiceListErrors];
+
+export type FctBlockOpcodeGasServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockOpcodeGasResponse;
+};
+
+export type FctBlockOpcodeGasServiceListResponse =
+  FctBlockOpcodeGasServiceListResponses[keyof FctBlockOpcodeGasServiceListResponses];
+
+export type FctBlockOpcodeGasServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_opcode_gas/{block_number}';
+};
+
+export type FctBlockOpcodeGasServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockOpcodeGasServiceGetError =
+  FctBlockOpcodeGasServiceGetErrors[keyof FctBlockOpcodeGasServiceGetErrors];
+
+export type FctBlockOpcodeGasServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockOpcodeGasResponse;
+};
+
+export type FctBlockOpcodeGasServiceGetResponse =
+  FctBlockOpcodeGasServiceGetResponses[keyof FctBlockOpcodeGasServiceGetResponses];
 
 export type FctBlockProposerServiceListData = {
   body?: never;
