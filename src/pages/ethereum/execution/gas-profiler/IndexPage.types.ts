@@ -28,8 +28,8 @@ export const gasProfilerBlockSearchSchema = z.object({
  * Zod schema for TX detail page search parameters
  */
 export const gasProfilerTxSearchSchema = z.object({
-  // Required: block number for efficient API queries
-  block: z.coerce.number(),
+  // Optional: block number for efficient API queries (can be resolved from tx hash)
+  block: z.coerce.number().optional(),
   // Selected frame ID (if drilling into specific frame)
   frame: z.coerce.number().optional(),
   // View mode for opcode panel

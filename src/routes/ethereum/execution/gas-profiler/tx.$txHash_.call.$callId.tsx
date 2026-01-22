@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { CallPage } from '@/pages/ethereum/execution/gas-profiler';
 
 const callSearchSchema = z.object({
-  block: z.coerce.number(),
+  block: z.coerce.number().optional(),
 });
 
 export const Route = createFileRoute('/ethereum/execution/gas-profiler/tx/$txHash_/call/$callId')({

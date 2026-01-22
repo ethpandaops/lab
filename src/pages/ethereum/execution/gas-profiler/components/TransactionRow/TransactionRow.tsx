@@ -65,7 +65,6 @@ export function TransactionRow({
   // Fetch full transaction data when expanded
   const { data: txData, isLoading: txLoading } = useTransactionGasData({
     transactionHash: isExpanded ? transaction.transactionHash : null,
-    blockNumber: isExpanded ? blockNumber : null,
   });
 
   // Navigate to call page when a frame is clicked

@@ -48,8 +48,8 @@ export interface CallTraceViewProps {
   functionSignatures: Record<string, { name?: string | null }>;
   /** Transaction hash for navigation */
   txHash: string;
-  /** Block number for navigation */
-  blockNumber: number;
+  /** Block number for navigation (optional - can be omitted if unknown) */
+  blockNumber?: number | null;
   /** Total gas for percentage calculation */
   totalGas: number;
   /** Per-call-frame opcode stats for badges (call_frame_id -> stats) */

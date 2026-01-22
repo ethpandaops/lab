@@ -559,7 +559,7 @@ export function BlockPage(): JSX.Element {
   }
 
   // Block not found or out of bounds
-  if (!data || !bounds) {
+  if (!data || !bounds || blockNumber < bounds.min || blockNumber > bounds.max) {
     return (
       <Container>
         <Header
@@ -569,8 +569,17 @@ export function BlockPage(): JSX.Element {
         <Alert
           variant="warning"
           title="Block not available"
-          description={`Block ${blockNumber} is not in the indexed range (${bounds?.min ?? '?'} - ${bounds?.max ?? '?'})`}
+          description={`Block ${formatGas(blockNumber)} is not in the indexed range (${bounds ? formatGas(bounds.min) : '?'} - ${bounds ? formatGas(bounds.max) : '?'})`}
         />
+        <div className="mt-4">
+          <Link
+            to="/ethereum/execution/gas-profiler"
+            className="flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
+          >
+            <ArrowLeftIcon className="size-4" />
+            Back to Gas Profiler
+          </Link>
+        </div>
       </Container>
     );
   }

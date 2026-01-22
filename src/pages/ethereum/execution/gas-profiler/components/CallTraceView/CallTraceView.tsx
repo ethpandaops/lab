@@ -125,7 +125,7 @@ function OpcodeBreakdownView({
   cumulativeGas: number;
   txHash: string;
   callId: number;
-  blockNumber: number;
+  blockNumber?: number | null;
   onClose: () => void;
 }): JSX.Element {
   const navigate = useNavigate();
@@ -198,7 +198,7 @@ function OpcodeBreakdownView({
             navigate({
               to: '/ethereum/execution/gas-profiler/tx/$txHash/call/$callId',
               params: { txHash, callId: String(callId) },
-              search: { block: blockNumber },
+              search: blockNumber ? { block: blockNumber } : {},
               hash: 'opcodes',
             });
           }}
@@ -248,7 +248,7 @@ function TraceRow({
   ancestors: boolean[]; // true if ancestor at that depth is last child
   totalGas: number;
   txHash: string;
-  blockNumber: number;
+  blockNumber?: number | null;
   expandedNodes: Set<number>;
   onToggleExpand: (id: number) => void;
   allOpcodeStats?: Map<number, CallFrameOpcodeStats>;
@@ -337,7 +337,7 @@ function TraceRow({
       navigate({
         to: '/ethereum/execution/gas-profiler/tx/$txHash/call/$callId',
         params: { txHash, callId: String(callId) },
-        search: { block: blockNumber },
+        search: blockNumber ? { block: blockNumber } : {},
       });
     }
   }, [navigate, txHash, callId, blockNumber, frame.call_type, onCloseOpcodeBreakdown]);

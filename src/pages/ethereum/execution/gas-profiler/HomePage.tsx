@@ -3,22 +3,23 @@ import { useSearch, useNavigate, Link } from '@tanstack/react-router';
 import ReactECharts from 'echarts-for-react';
 import {
   MagnifyingGlassIcon,
-  ArrowRightIcon,
-  ExclamationTriangleIcon,
   CubeIcon,
   FireIcon,
   DocumentTextIcon,
-  CircleStackIcon,
   CpuChipIcon,
-  ArrowsRightLeftIcon,
-  BeakerIcon,
+  ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
 import { Alert } from '@/components/Feedback/Alert';
+import { Input } from '@/components/Forms/Input';
+import { Button } from '@/components/Elements/Button';
+import { CardChain, type CardChainItem } from '@/components/DataDisplay/CardChain';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { MultiLineChart, createStatisticSeries, createBandSeries } from '@/components/Charts/MultiLine';
 import { useBlockTransactions } from './hooks/useBlockTransactions';
+import { useRecentBlocks } from './hooks/useRecentBlocks';
 import { GasProfilerSkeleton } from './components';
 import type { GasProfilerHomeSearch } from './IndexPage.types';
 
@@ -91,12 +92,37 @@ const DUMMY_OPCODE_CATEGORIES = [
 /**
  * Gas trend over blocks (DUMMY DATA)
  * TODO: Replace with API call to /api/gas-profiler/network/gas-trend
+ * Matches TPS/Opcodes data structure with statistics and bands
  */
-const DUMMY_GAS_TREND = Array.from({ length: 50 }, (_, i) => ({
-  block: 24_243_714 + i,
-  gasUsed: 10_000_000 + Math.random() * 20_000_000,
-  txCount: 50 + Math.floor(Math.random() * 150),
-}));
+const DUMMY_GAS_TREND = Array.from({ length: 50 }, (_, i) => {
+  // Generate realistic-looking gas usage data with variation
+  const baseValue = 15_000_000 + Math.sin(i * 0.25) * 5_000_000;
+  const avg = baseValue + Math.random() * 2_000_000;
+  const movingAvg = baseValue + Math.sin(i * 0.15) * 3_000_000;
+  const median = avg - 500_000 + Math.random() * 1_000_000;
+
+  // Bands
+  const min = avg * 0.5 + Math.random() * 2_000_000;
+  const max = avg * 1.5 + Math.random() * 5_000_000;
+  const p5 = avg * 0.7 + Math.random() * 1_000_000;
+  const p95 = avg * 1.3 + Math.random() * 2_000_000;
+  const lowerBand = avg * 0.85;
+  const upperBand = avg * 1.15;
+
+  return {
+    // Use timestamp for x-axis (hourly intervals)
+    timestamp: 1737500400 + i * 3600, // Jan 22, 2025 + i hours
+    avg,
+    movingAvg,
+    median,
+    min,
+    max,
+    p5,
+    p95,
+    lowerBand,
+    upperBand,
+  };
+});
 
 /**
  * Call type distribution (DUMMY DATA)
@@ -123,55 +149,39 @@ const DUMMY_COMPLEXITY = [
 ];
 
 /**
- * Top gas-consuming contracts (DUMMY DATA)
- * TODO: Replace with API call to /api/gas-profiler/network/top-contracts
+ * Opcodes per second over time (DUMMY DATA)
+ * TODO: Replace with API call to /api/gas-profiler/network/opcodes-per-second
+ * Matches TPS data structure with statistics and bands
  */
-const DUMMY_TOP_CONTRACTS = [
-  {
-    address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-    name: 'Uniswap V2: Router',
-    gasUsed: 456_780_000,
-    txCount: 125_000,
-  },
-  {
-    address: '0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45',
-    name: 'Uniswap V3: Router',
-    gasUsed: 398_200_000,
-    txCount: 98_000,
-  },
-  {
-    address: '0xDef1C0ded9bec7F1a1670819833240f027b25EfF',
-    name: '0x: Exchange Proxy',
-    gasUsed: 234_100_000,
-    txCount: 67_000,
-  },
-  {
-    address: '0x1111111254EEB25477B68fb85Ed929f73A960582',
-    name: '1inch V5: Router',
-    gasUsed: 198_450_000,
-    txCount: 54_000,
-  },
-  {
-    address: '0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD',
-    name: 'Uniswap Universal Router',
-    gasUsed: 167_890_000,
-    txCount: 45_000,
-  },
-];
+const DUMMY_OPCODES_PER_SECOND = Array.from({ length: 50 }, (_, i) => {
+  // Generate realistic-looking opcodes per second data with variation
+  const baseValue = 900_000 + Math.sin(i * 0.3) * 100_000;
+  const avg = baseValue + Math.random() * 50_000;
+  const movingAvg = baseValue + Math.sin(i * 0.2) * 80_000;
+  const median = avg - 10_000 + Math.random() * 20_000;
 
-/**
- * Storage access statistics (DUMMY DATA)
- * TODO: Replace with API call to /api/gas-profiler/network/storage-stats
- */
-const DUMMY_STORAGE_STATS = {
-  totalSloads: 4_250_000,
-  totalSstores: 890_000,
-  coldAccesses: 1_250_000,
-  warmAccesses: 3_890_000,
-  uniqueSlots: 2_340_000,
-  avgSloadsPerTx: 12.4,
-  avgSstoresPerTx: 2.6,
-};
+  // Bands
+  const min = avg * 0.6 + Math.random() * 50_000;
+  const max = avg * 1.4 + Math.random() * 100_000;
+  const p5 = avg * 0.75 + Math.random() * 30_000;
+  const p95 = avg * 1.25 + Math.random() * 50_000;
+  const lowerBand = avg * 0.85;
+  const upperBand = avg * 1.15;
+
+  return {
+    // Use timestamp for x-axis (hourly intervals starting from a base time)
+    timestamp: 1737500400 + i * 3600, // Jan 22, 2025 + i hours
+    avg,
+    movingAvg,
+    median,
+    min,
+    max,
+    p5,
+    p95,
+    lowerBand,
+    upperBand,
+  };
+});
 
 // ============================================================================
 // COMPONENT
@@ -188,12 +198,55 @@ export function HomePage(): JSX.Element {
   // Search input states
   const [searchInput, setSearchInput] = useState('');
   const [searchError, setSearchError] = useState<string | null>(null);
-  const [blockInput, setBlockInput] = useState('');
+  const [blocksOffset, setBlocksOffset] = useState(0);
 
-  // Fetch latest block data
-  const { data, isLoading, error, bounds, boundsLoading } = useBlockTransactions({
+  // Fetch bounds to validate block range
+  const { error, bounds, boundsLoading } = useBlockTransactions({
     blockNumber: null,
   });
+
+  // Fetch recent blocks for visualization
+  const {
+    blocks: recentBlocks,
+    isLoading: recentBlocksLoading,
+    hasOlderBlocks,
+    isAtLatest,
+  } = useRecentBlocks({ count: 6, offset: blocksOffset });
+
+  // Navigate to older/newer blocks
+  const handleLoadOlderBlocks = useCallback(() => {
+    setBlocksOffset(prev => prev + 6);
+  }, []);
+
+  const handleLoadNewerBlocks = useCallback(() => {
+    setBlocksOffset(prev => Math.max(0, prev - 6));
+  }, []);
+
+  // Transform recent blocks to CardChainItem format
+  const recentBlockItems = useMemo<CardChainItem[]>(() => {
+    if (!recentBlocks.length) return [];
+
+    // Calculate max gas in current view for relative fill
+    const maxGasInView = Math.max(...recentBlocks.map(b => b.gasUsed));
+
+    return recentBlocks.map((block, index) => {
+      const isNewest = index === recentBlocks.length - 1;
+      const isActuallyLatest = isNewest && isAtLatest;
+      const gasPercentage = maxGasInView > 0 ? (block.gasUsed / maxGasInView) * 100 : 0;
+
+      return {
+        id: block.blockNumber,
+        label: 'Block',
+        value: block.blockNumber,
+        stats: [
+          { label: 'Gas', value: formatCompact(block.gasUsed) },
+          { label: 'Opcodes', value: formatCompact(block.opcodeCount) },
+        ],
+        fillPercentage: gasPercentage,
+        isHighlighted: isActuallyLatest,
+      };
+    });
+  }, [recentBlocks, isAtLatest]);
 
   // Handle quick search from URL
   useEffect(() => {
@@ -212,33 +265,39 @@ export function HomePage(): JSX.Element {
   const handleSearch = useCallback(() => {
     setSearchError(null);
 
-    if (isValidBlockNumber(searchInput) && !searchInput.startsWith('0x')) {
+    // Strip commas from input (for copy-pasted numbers like "24,245,080")
+    const cleanedInput = searchInput.replace(/,/g, '');
+
+    if (isValidBlockNumber(cleanedInput) && !cleanedInput.startsWith('0x')) {
+      const blockNum = parseInt(cleanedInput, 10);
+
+      // Validate block is within indexed bounds
+      if (bounds) {
+        if (blockNum < bounds.min || blockNum > bounds.max) {
+          setSearchError(
+            `Block ${formatGas(blockNum)} is outside indexed range (${formatGas(bounds.min)} - ${formatGas(bounds.max)})`
+          );
+          return;
+        }
+      }
+
       navigate({
         to: '/ethereum/execution/gas-profiler/block/$blockNumber',
-        params: { blockNumber: searchInput },
+        params: { blockNumber: cleanedInput },
       });
       return;
     }
 
-    if (isValidTxHash(searchInput)) {
-      if (!blockInput) {
-        setSearchError('Please enter the block number for this transaction');
-        return;
-      }
-      if (!isValidBlockNumber(blockInput)) {
-        setSearchError('Invalid block number');
-        return;
-      }
+    if (isValidTxHash(cleanedInput)) {
       navigate({
         to: '/ethereum/execution/gas-profiler/tx/$txHash',
-        params: { txHash: searchInput },
-        search: { block: parseInt(blockInput, 10) },
+        params: { txHash: cleanedInput },
       });
       return;
     }
 
     setSearchError('Enter a valid transaction hash (0x...) or block number');
-  }, [searchInput, blockInput, navigate]);
+  }, [searchInput, navigate, bounds]);
 
   const handleKeyPress = useCallback(
     (e: React.KeyboardEvent) => {
@@ -248,8 +307,6 @@ export function HomePage(): JSX.Element {
     },
     [handleSearch]
   );
-
-  const showBlockInput = searchInput.length > 2 && searchInput.startsWith('0x');
 
   // ============================================================================
   // CHART OPTIONS
@@ -345,61 +402,60 @@ export function HomePage(): JSX.Element {
     [colors]
   );
 
-  // Gas Trend Area Chart
-  const gasTrendOption = useMemo(
-    () => ({
-      grid: { left: 50, right: 20, top: 10, bottom: 30 },
-      xAxis: {
-        type: 'category',
-        data: DUMMY_GAS_TREND.map(d => d.block),
-        axisLine: { show: true, lineStyle: { color: colors.border } },
-        axisLabel: { show: false },
-        splitLine: { show: false },
-      },
-      yAxis: {
-        type: 'value',
-        axisLine: { show: true, lineStyle: { color: colors.border } },
-        splitLine: { show: false },
-        axisLabel: {
-          color: colors.muted,
-          formatter: (value: number) => formatCompact(value),
-        },
-      },
+  // Gas Trend chart config using MultiLineChart
+  const gasTrendConfig = useMemo(() => {
+    const data = DUMMY_GAS_TREND;
+
+    // Extract arrays for each metric
+    const avgValues = data.map(d => d.avg);
+    const movingAvgValues = data.map(d => d.movingAvg);
+    const medianValues = data.map(d => d.median);
+    const minValues = data.map(d => d.min);
+    const maxValues = data.map(d => d.max);
+    const p5Values = data.map(d => d.p5);
+    const p95Values = data.map(d => d.p95);
+    const lowerBandValues = data.map(d => d.lowerBand);
+    const upperBandValues = data.map(d => d.upperBand);
+    const timestamps = data.map(d => d.timestamp);
+
+    return {
+      timestamps,
       series: [
-        {
-          type: 'line',
-          data: DUMMY_GAS_TREND.map(d => d.gasUsed),
-          smooth: true,
-          symbol: 'none',
-          lineStyle: { color: colors.primary, width: 2 },
-          areaStyle: {
-            color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [
-                { offset: 0, color: `${colors.primary}40` },
-                { offset: 1, color: `${colors.primary}05` },
-              ],
-            },
-          },
-        },
+        createStatisticSeries('Average', avgValues, {
+          color: '#10b981',
+          lineWidth: 2.5,
+          group: 'Statistics',
+        }),
+        createStatisticSeries('Moving Avg', movingAvgValues, {
+          color: '#06b6d4',
+          lineWidth: 2,
+          group: 'Statistics',
+        }),
+        createStatisticSeries('Median', medianValues, {
+          color: '#a855f7',
+          lineWidth: 1.5,
+          lineStyle: 'dotted',
+          group: 'Statistics',
+        }),
+        ...createBandSeries('Bollinger', 'gas-bollinger', lowerBandValues, upperBandValues, {
+          color: '#f59e0b',
+          opacity: 0.15,
+          group: 'Bands',
+          initiallyVisible: false,
+        }),
+        ...createBandSeries('P5/P95', 'gas-percentile', p5Values, p95Values, {
+          color: '#6366f1',
+          opacity: 0.1,
+          group: 'Bands',
+        }),
+        ...createBandSeries('Min/Max', 'gas-minmax', minValues, maxValues, {
+          color: '#64748b',
+          opacity: 0.06,
+          group: 'Bands',
+        }),
       ],
-      tooltip: {
-        trigger: 'axis',
-        backgroundColor: colors.surface,
-        borderColor: colors.border,
-        textStyle: { color: colors.foreground },
-        formatter: (params: { name: string; value: number }[]) => {
-          const d = DUMMY_GAS_TREND.find(t => t.block === parseInt(params[0].name));
-          return `Block ${params[0].name}<br/>Gas: ${formatGas(params[0].value)}<br/>TXs: ${d?.txCount ?? 0}`;
-        },
-      },
-    }),
-    [colors]
-  );
+    };
+  }, []);
 
   // Call Types Donut Chart
   const callTypesOption = useMemo(
@@ -490,6 +546,61 @@ export function HomePage(): JSX.Element {
     [colors]
   );
 
+  // Opcodes Per Second chart config using MultiLineChart
+  const opcodesPerSecondConfig = useMemo(() => {
+    const data = DUMMY_OPCODES_PER_SECOND;
+
+    // Extract arrays for each metric
+    const avgValues = data.map(d => d.avg);
+    const movingAvgValues = data.map(d => d.movingAvg);
+    const medianValues = data.map(d => d.median);
+    const minValues = data.map(d => d.min);
+    const maxValues = data.map(d => d.max);
+    const p5Values = data.map(d => d.p5);
+    const p95Values = data.map(d => d.p95);
+    const lowerBandValues = data.map(d => d.lowerBand);
+    const upperBandValues = data.map(d => d.upperBand);
+    const timestamps = data.map(d => d.timestamp);
+
+    return {
+      timestamps,
+      series: [
+        createStatisticSeries('Average', avgValues, {
+          color: '#10b981',
+          lineWidth: 2.5,
+          group: 'Statistics',
+        }),
+        createStatisticSeries('Moving Avg', movingAvgValues, {
+          color: '#06b6d4',
+          lineWidth: 2,
+          group: 'Statistics',
+        }),
+        createStatisticSeries('Median', medianValues, {
+          color: '#a855f7',
+          lineWidth: 1.5,
+          lineStyle: 'dotted',
+          group: 'Statistics',
+        }),
+        ...createBandSeries('Bollinger', 'ops-bollinger', lowerBandValues, upperBandValues, {
+          color: '#f59e0b',
+          opacity: 0.15,
+          group: 'Bands',
+          initiallyVisible: false,
+        }),
+        ...createBandSeries('P5/P95', 'ops-percentile', p5Values, p95Values, {
+          color: '#6366f1',
+          opacity: 0.1,
+          group: 'Bands',
+        }),
+        ...createBandSeries('Min/Max', 'ops-minmax', minValues, maxValues, {
+          color: '#64748b',
+          opacity: 0.06,
+          group: 'Bands',
+        }),
+      ],
+    };
+  }, []);
+
   // Loading state
   if (boundsLoading) {
     return (
@@ -504,7 +615,7 @@ export function HomePage(): JSX.Element {
   }
 
   // Error state
-  if (error && !data) {
+  if (error) {
     return (
       <Container>
         <Header
@@ -543,41 +654,29 @@ export function HomePage(): JSX.Element {
       />
 
       {/* Search Section */}
-      <Card className="mb-6 p-4">
-        <div className="flex items-center gap-4">
-          <MagnifyingGlassIcon className="size-5 text-muted" />
-          <input
+      <div className="mb-6">
+        <Input
+          error={!!searchError}
+          errorMessage={searchError ?? undefined}
+          helperText={!searchError ? `Indexed range: ${formatGas(bounds.min)} - ${formatGas(bounds.max)}` : undefined}
+        >
+          <Input.Leading>
+            <MagnifyingGlassIcon />
+          </Input.Leading>
+          <Input.Field
             type="text"
             value={searchInput}
             onChange={e => setSearchInput(e.target.value)}
             onKeyDown={handleKeyPress}
             placeholder="Search by transaction hash (0x...) or block number"
-            className="flex-1 bg-transparent text-sm text-foreground placeholder-muted focus:outline-none"
           />
-          {showBlockInput && (
-            <input
-              type="text"
-              value={blockInput}
-              onChange={e => setBlockInput(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder="Block #"
-              className="w-28 rounded-xs border border-border bg-background px-2 py-1 text-sm text-foreground placeholder-muted focus:border-primary focus:outline-none"
-            />
-          )}
-          <button
-            onClick={handleSearch}
-            className="rounded-xs bg-primary px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
-          >
-            Search
-          </button>
-        </div>
-        {searchError && (
-          <div className="mt-2 flex items-center gap-2 text-sm text-danger">
-            <ExclamationTriangleIcon className="size-4" />
-            {searchError}
-          </div>
-        )}
-      </Card>
+          <Input.Trailing type="button">
+            <Button size="sm" onClick={handleSearch}>
+              Search
+            </Button>
+          </Input.Trailing>
+        </Input>
+      </div>
 
       {/* Key Stats Row */}
       <div className="mb-6 grid grid-cols-4 gap-4">
@@ -627,6 +726,28 @@ export function HomePage(): JSX.Element {
         </Card>
       </div>
 
+      {/* Recent Blocks Chain Visualization */}
+      <CardChain
+        className="mb-6"
+        items={recentBlockItems}
+        isLoading={recentBlocksLoading}
+        skeletonCount={6}
+        onLoadPrevious={handleLoadOlderBlocks}
+        onLoadNext={handleLoadNewerBlocks}
+        hasPreviousItems={hasOlderBlocks}
+        hasNextItems={!isAtLatest}
+        renderItemWrapper={(item, _index, children) => (
+          <Link
+            key={item.id}
+            to="/ethereum/execution/gas-profiler/block/$blockNumber"
+            params={{ blockNumber: String(item.id) }}
+            className="group relative flex-1"
+          >
+            {children}
+          </Link>
+        )}
+      />
+
       {/* Main Charts Grid */}
       <div className="mb-6 grid grid-cols-2 gap-6">
         {/* Top Opcodes */}
@@ -654,17 +775,57 @@ export function HomePage(): JSX.Element {
         </Card>
       </div>
 
-      {/* Gas Trend */}
-      <Card className="mb-6 p-4">
-        <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-sm font-medium text-foreground">Gas Usage Trend</h3>
-          <span className="text-xs text-muted">Last {DUMMY_GAS_TREND.length} blocks</span>
-        </div>
-        <ReactECharts option={gasTrendOption} style={{ height: 120 }} />
-      </Card>
+      {/* Time Series Charts Row */}
+      <div className="mb-6 grid grid-cols-2 gap-6">
+        {/* Gas Trend */}
+        <Card className="p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <h3 className="text-sm font-medium text-foreground">Gas Usage Trend</h3>
+            <span className="text-xs text-muted">Last {DUMMY_GAS_TREND.length} hours</span>
+          </div>
+          <MultiLineChart
+            series={gasTrendConfig.series}
+            xAxis={{
+              type: 'time',
+              timestamps: gasTrendConfig.timestamps,
+            }}
+            yAxis={{
+              name: 'Gas Used',
+              formatter: (value: number) => formatCompact(value),
+            }}
+            height={200}
+            showLegend
+            legendPosition="top"
+            enableDataZoom
+          />
+        </Card>
+
+        {/* Opcodes Per Second */}
+        <Card className="p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <h3 className="text-sm font-medium text-foreground">Opcodes Per Second</h3>
+            <span className="text-xs text-muted">Last {DUMMY_OPCODES_PER_SECOND.length} hours</span>
+          </div>
+          <MultiLineChart
+            series={opcodesPerSecondConfig.series}
+            xAxis={{
+              type: 'time',
+              timestamps: opcodesPerSecondConfig.timestamps,
+            }}
+            yAxis={{
+              name: 'Ops/sec',
+              formatter: (value: number) => formatCompact(value),
+            }}
+            height={200}
+            showLegend
+            legendPosition="top"
+            enableDataZoom
+          />
+        </Card>
+      </div>
 
       {/* Secondary Charts Row */}
-      <div className="mb-6 grid grid-cols-3 gap-6">
+      <div className="mb-6 grid grid-cols-2 gap-6">
         {/* Call Types */}
         <Card className="p-4">
           <h3 className="mb-2 text-sm font-medium text-foreground">Call Type Distribution</h3>
@@ -678,161 +839,7 @@ export function HomePage(): JSX.Element {
           <p className="mb-3 text-xs text-muted">Distribution by call depth</p>
           <ReactECharts option={complexityOption} style={{ height: 200 }} />
         </Card>
-
-        {/* Storage Stats */}
-        <Card className="p-4">
-          <h3 className="mb-2 text-sm font-medium text-foreground">Storage Access</h3>
-          <p className="mb-3 text-xs text-muted">SLOAD/SSTORE patterns (EIP-2929 relevant)</p>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CircleStackIcon className="size-4 text-primary" />
-                <span className="text-sm text-muted">Total SLOADs</span>
-              </div>
-              <span className="font-mono text-sm text-foreground">{formatGas(DUMMY_STORAGE_STATS.totalSloads)}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <ArrowsRightLeftIcon className="size-4 text-warning" />
-                <span className="text-sm text-muted">Total SSTOREs</span>
-              </div>
-              <span className="font-mono text-sm text-foreground">{formatGas(DUMMY_STORAGE_STATS.totalSstores)}</span>
-            </div>
-            <div className="h-px bg-border" />
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted">Cold Accesses</span>
-              <span className="font-mono text-sm text-foreground">{formatGas(DUMMY_STORAGE_STATS.coldAccesses)}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted">Warm Accesses</span>
-              <span className="font-mono text-sm text-foreground">{formatGas(DUMMY_STORAGE_STATS.warmAccesses)}</span>
-            </div>
-            <div className="h-px bg-border" />
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted">Cold/Warm Ratio</span>
-              <span className="font-mono text-sm text-primary">
-                {((DUMMY_STORAGE_STATS.coldAccesses / DUMMY_STORAGE_STATS.warmAccesses) * 100).toFixed(1)}%
-              </span>
-            </div>
-          </div>
-        </Card>
       </div>
-
-      {/* Top Contracts Table */}
-      <Card className="mb-6 p-4">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <h3 className="text-sm font-medium text-foreground">Top Gas-Consuming Contracts</h3>
-            <p className="text-xs text-muted">Which contracts are responsible for the most gas usage</p>
-          </div>
-          <span className="rounded-xs bg-amber-500/10 px-2 py-0.5 text-xs text-amber-500">Network-wide</span>
-        </div>
-        <div className="overflow-hidden rounded-xs border border-border">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-border bg-surface/50">
-                <th className="px-4 py-2 text-left text-xs font-medium text-muted">Contract</th>
-                <th className="px-4 py-2 text-right text-xs font-medium text-muted">Gas Used</th>
-                <th className="px-4 py-2 text-right text-xs font-medium text-muted">TX Count</th>
-                <th className="px-4 py-2 text-right text-xs font-medium text-muted">Avg Gas/TX</th>
-              </tr>
-            </thead>
-            <tbody>
-              {DUMMY_TOP_CONTRACTS.map((contract, i) => (
-                <tr key={contract.address} className={i % 2 === 0 ? 'bg-background' : 'bg-surface/20'}>
-                  <td className="px-4 py-2">
-                    <div className="font-medium text-foreground">{contract.name}</div>
-                    <div className="font-mono text-xs text-muted">{contract.address.slice(0, 20)}...</div>
-                  </td>
-                  <td className="px-4 py-2 text-right font-mono text-sm text-foreground">
-                    {formatGas(contract.gasUsed)}
-                  </td>
-                  <td className="px-4 py-2 text-right font-mono text-sm text-muted">{formatGas(contract.txCount)}</td>
-                  <td className="px-4 py-2 text-right font-mono text-sm text-muted">
-                    {formatGas(Math.round(contract.gasUsed / contract.txCount))}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-
-      {/* Latest Block Preview */}
-      {data && (
-        <Card className="p-4">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <BeakerIcon className="size-5 text-primary" />
-              <h3 className="text-sm font-medium text-foreground">Latest Block #{formatGas(data.blockNumber)}</h3>
-            </div>
-            <Link
-              to="/ethereum/execution/gas-profiler/block/$blockNumber"
-              params={{ blockNumber: String(data.blockNumber) }}
-              className="flex items-center gap-1 text-sm text-primary transition-colors hover:text-primary/80"
-            >
-              View Full Block
-              <ArrowRightIcon className="size-4" />
-            </Link>
-          </div>
-
-          <div className="mb-4 grid grid-cols-3 gap-4">
-            <div className="rounded-xs bg-surface/50 p-3 text-center">
-              <div className="text-lg font-semibold text-foreground">{data.transactionCount}</div>
-              <div className="text-xs text-muted">Transactions</div>
-            </div>
-            <div className="rounded-xs bg-surface/50 p-3 text-center">
-              <div className="text-lg font-semibold text-foreground">{formatGas(data.totalGasUsed)}</div>
-              <div className="text-xs text-muted">Total Gas</div>
-            </div>
-            <div className="rounded-xs bg-surface/50 p-3 text-center">
-              <div className="text-lg font-semibold text-foreground">
-                {data.transactions.filter(tx => tx.hasErrors).length}
-              </div>
-              <div className="text-xs text-muted">Failed TXs</div>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="mb-2 text-xs font-medium text-muted">Top Transactions by Gas</h4>
-            <div className="space-y-1">
-              {[...data.transactions]
-                .sort((a, b) => b.totalGasUsed - a.totalGasUsed)
-                .slice(0, 5)
-                .map(tx => {
-                  const gasPercentage = (tx.totalGasUsed / data.totalGasUsed) * 100;
-                  return (
-                    <Link
-                      key={tx.transactionHash}
-                      to="/ethereum/execution/gas-profiler/tx/$txHash"
-                      params={{ txHash: tx.transactionHash }}
-                      search={{ block: data.blockNumber }}
-                      className="flex items-center justify-between rounded-xs px-2 py-1.5 transition-colors hover:bg-surface"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="font-mono text-sm text-foreground">{tx.transactionHash.slice(0, 14)}...</span>
-                        {tx.targetName && <span className="text-xs text-muted">→ {tx.targetName}</span>}
-                        {tx.hasErrors && <ExclamationTriangleIcon className="size-4 text-danger" />}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-sm text-foreground">{formatGas(tx.totalGasUsed)}</span>
-                        <span className="text-xs text-muted">({gasPercentage.toFixed(1)}%)</span>
-                      </div>
-                    </Link>
-                  );
-                })}
-            </div>
-          </div>
-        </Card>
-      )}
-
-      {/* Loading indicator */}
-      {isLoading && (
-        <div className="flex items-center justify-center py-8">
-          <div className="size-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <span className="ml-2 text-sm text-muted">Loading latest block...</span>
-        </div>
-      )}
 
       {/* API Needed Notice */}
       <div className="mt-6 rounded-xs border border-dashed border-amber-500/50 bg-amber-500/5 p-4">
@@ -852,16 +859,14 @@ export function HomePage(): JSX.Element {
                 • <code className="text-amber-500/80">GET /network/gas-trend</code> - Gas per block time series
               </li>
               <li>
+                • <code className="text-amber-500/80">GET /network/opcodes-per-second</code> - Opcodes per second time
+                series
+              </li>
+              <li>
                 • <code className="text-amber-500/80">GET /network/call-types</code> - Call type distribution
               </li>
               <li>
                 • <code className="text-amber-500/80">GET /network/complexity</code> - TX complexity histogram
-              </li>
-              <li>
-                • <code className="text-amber-500/80">GET /network/top-contracts</code> - Top gas-consuming contracts
-              </li>
-              <li>
-                • <code className="text-amber-500/80">GET /network/storage-stats</code> - Storage access statistics
               </li>
             </ul>
           </div>

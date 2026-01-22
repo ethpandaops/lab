@@ -16,8 +16,8 @@ export interface OpcodeBreakdown {
 }
 
 export interface UseCallFrameOpcodesOptions {
-  /** Block number containing the transaction */
-  blockNumber: number;
+  /** Block number containing the transaction (optional) */
+  blockNumber?: number | null;
   /** Transaction hash */
   transactionHash: string;
   /** Call frame ID to fetch opcodes for */
@@ -77,7 +77,7 @@ export function useCallFrameOpcodes({
 
       return breakdown;
     },
-    enabled: enabled && !!currentNetwork && !!transactionHash && callFrameId > 0,
+    enabled: enabled && !!currentNetwork && !!transactionHash && !!blockNumber && callFrameId > 0,
   });
 
   return {

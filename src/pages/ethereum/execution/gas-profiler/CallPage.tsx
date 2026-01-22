@@ -1,5 +1,5 @@
 import { type JSX, useMemo, useCallback, useState, useEffect } from 'react';
-import { useParams, useSearch, Link } from '@tanstack/react-router';
+import { useParams, Link } from '@tanstack/react-router';
 import { Tab as HeadlessTab } from '@headlessui/react';
 import {
   ArrowLeftIcon,
@@ -66,20 +66,11 @@ function getCallTypeStyles(callType: string): { bg: string; text: string; border
   }
 }
 
-interface FrameSearchParams {
-  block: number;
-}
-
 /**
  * Call detail page - full gas analysis for a specific call
  */
 export function CallPage(): JSX.Element {
   const { txHash, callId } = useParams({ from: '/ethereum/execution/gas-profiler/tx/$txHash_/call/$callId' });
-  const search = useSearch({
-    from: '/ethereum/execution/gas-profiler/tx/$txHash_/call/$callId',
-  }) as FrameSearchParams;
-
-  const blockNumber = search.block;
   const callIdNum = parseInt(callId, 10);
 
   const [copied, setCopied] = useState(false);
@@ -91,10 +82,12 @@ export function CallPage(): JSX.Element {
     error,
   } = useTransactionGasData({
     transactionHash: txHash,
-    blockNumber,
   });
 
-  // Fetch frame-specific opcodes
+  // Block number derived from transaction data
+  const blockNumber = txData?.metadata.blockNumber ?? null;
+
+  // Fetch frame-specific opcodes (only when we have blockNumber)
   const { data: frameOpcodes, isLoading: frameOpcodesLoading } = useFrameOpcodes({
     blockNumber,
     transactionHash: txHash,
@@ -265,6 +258,29 @@ export function CallPage(): JSX.Element {
     );
   }
 
+  // Transaction not found
+  if (!txData) {
+    return (
+      <Container>
+        <Header title="Call Details" description="Call gas analysis" />
+        <Alert
+          variant="warning"
+          title="Transaction not found"
+          description="This transaction is not in the indexed data. It may be too old or too recent for the current index range."
+        />
+        <div className="mt-4">
+          <Link
+            to="/ethereum/execution/gas-profiler"
+            className="flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
+          >
+            <ArrowLeftIcon className="size-4" />
+            Back to Gas Profiler
+          </Link>
+        </div>
+      </Container>
+    );
+  }
+
   // Frame not found
   if (!currentFrame) {
     return (
@@ -275,6 +291,16 @@ export function CallPage(): JSX.Element {
           title="Call not found"
           description={`Call ${callId} was not found in this transaction.`}
         />
+        <div className="mt-4">
+          <Link
+            to="/ethereum/execution/gas-profiler/tx/$txHash"
+            params={{ txHash }}
+            className="flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
+          >
+            <ArrowLeftIcon className="size-4" />
+            Back to Transaction
+          </Link>
+        </div>
       </Container>
     );
   }

@@ -62,8 +62,6 @@ export interface TransactionGasData {
 export interface UseTransactionGasDataOptions {
   /** Transaction hash to fetch data for */
   transactionHash: string | null;
-  /** Block number containing the transaction (required for efficient queries) */
-  blockNumber: number | null;
 }
 
 export interface UseTransactionGasDataResult {
@@ -330,23 +328,19 @@ function extractMetadata(frames: IntTransactionCallFrame[]): TransactionMetadata
 /**
  * Hook to fetch transaction gas profiling data
  */
-export function useTransactionGasData({
-  transactionHash,
-  blockNumber,
-}: UseTransactionGasDataOptions): UseTransactionGasDataResult {
+export function useTransactionGasData({ transactionHash }: UseTransactionGasDataOptions): UseTransactionGasDataResult {
   const { currentNetwork } = useNetwork();
 
   const queries = useQueries({
     queries: [
       // Fetch call frames for the transaction
       {
-        queryKey: ['gas-profiler', 'call-frames', transactionHash, blockNumber],
+        queryKey: ['gas-profiler', 'call-frames', transactionHash],
         queryFn: ({ signal }) =>
           fetchAllPages<IntTransactionCallFrame>(
             intTransactionCallFrameServiceList,
             {
               query: {
-                block_number_eq: blockNumber!,
                 transaction_hash_eq: transactionHash!,
                 order_by: 'call_frame_id ASC',
                 page_size: 10000,
@@ -355,17 +349,16 @@ export function useTransactionGasData({
             'int_transaction_call_frame',
             signal
           ),
-        enabled: !!currentNetwork && !!transactionHash && !!blockNumber,
+        enabled: !!currentNetwork && !!transactionHash,
       },
       // Fetch opcode gas data for the transaction
       {
-        queryKey: ['gas-profiler', 'opcode-gas', transactionHash, blockNumber],
+        queryKey: ['gas-profiler', 'opcode-gas', transactionHash],
         queryFn: ({ signal }) =>
           fetchAllPages<IntTransactionOpcodeGas>(
             intTransactionOpcodeGasServiceList,
             {
               query: {
-                block_number_eq: blockNumber!,
                 transaction_hash_eq: transactionHash!,
                 order_by: 'gas DESC',
                 page_size: 10000,
@@ -374,17 +367,16 @@ export function useTransactionGasData({
             'int_transaction_opcode_gas',
             signal
           ),
-        enabled: !!currentNetwork && !!transactionHash && !!blockNumber,
+        enabled: !!currentNetwork && !!transactionHash,
       },
       // Fetch per-call-frame opcode gas data for badges (only interesting opcodes)
       {
-        queryKey: ['gas-profiler', 'call-frame-opcode-gas', transactionHash, blockNumber],
+        queryKey: ['gas-profiler', 'call-frame-opcode-gas', transactionHash],
         queryFn: ({ signal }) =>
           fetchAllPages<IntTransactionCallFrameOpcodeGas>(
             intTransactionCallFrameOpcodeGasServiceList,
             {
               query: {
-                block_number_eq: blockNumber!,
                 transaction_hash_eq: transactionHash!,
                 // Only fetch opcodes we display badges for
                 opcode_in_values: 'SSTORE,SLOAD,LOG0,LOG1,LOG2,LOG3,LOG4,CREATE,CREATE2,SELFDESTRUCT',
@@ -394,7 +386,7 @@ export function useTransactionGasData({
             'int_transaction_call_frame_opcode_gas',
             signal
           ),
-        enabled: !!currentNetwork && !!transactionHash && !!blockNumber,
+        enabled: !!currentNetwork && !!transactionHash,
       },
     ],
   });

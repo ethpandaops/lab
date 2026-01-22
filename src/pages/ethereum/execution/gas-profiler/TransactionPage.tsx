@@ -1,5 +1,5 @@
 import { type JSX, useState, useCallback, useEffect, useMemo } from 'react';
-import { useParams, useSearch, useNavigate, Link } from '@tanstack/react-router';
+import { useParams, useNavigate, Link } from '@tanstack/react-router';
 import { Tab as HeadlessTab } from '@headlessui/react';
 import {
   ArrowLeftIcon,
@@ -37,7 +37,7 @@ import {
 import type { ContractInteractionItem, TopGasItem, CallFrameData } from './components';
 import { getCallLabel } from './hooks/useTransactionGasData';
 import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory } from './utils';
-import type { CallTreeNode, GasProfilerTxSearch, OpcodeStats } from './IndexPage.types';
+import type { CallTreeNode, OpcodeStats } from './IndexPage.types';
 
 /**
  * Format gas value with comma separators
@@ -63,23 +63,22 @@ async function copyToClipboard(text: string): Promise<boolean> {
  */
 export function TransactionPage(): JSX.Element {
   const { txHash } = useParams({ from: '/ethereum/execution/gas-profiler/tx/$txHash' });
-  const search = useSearch({ from: '/ethereum/execution/gas-profiler/tx/$txHash' }) as GasProfilerTxSearch;
   const navigate = useNavigate({ from: '/ethereum/execution/gas-profiler/tx/$txHash' });
-
-  const blockNumber = search.block;
 
   // State for copy feedback
   const [copied, setCopied] = useState(false);
 
-  // Fetch transaction data
+  // Fetch transaction data by tx hash (block number derived from response)
   const {
     data: txData,
     isLoading,
     error,
   } = useTransactionGasData({
     transactionHash: txHash,
-    blockNumber,
   });
+
+  // Block number is derived from transaction data
+  const blockNumber = txData?.metadata.blockNumber ?? null;
 
   // Get contract owners from txData for name lookup (memoized to avoid dependency issues)
   const contractOwners = useMemo(() => txData?.contractOwners ?? {}, [txData?.contractOwners]);
@@ -445,8 +444,17 @@ export function TransactionPage(): JSX.Element {
         <Alert
           variant="warning"
           title="Transaction not found"
-          description="This transaction is not in the indexed data. Make sure the block number is correct."
+          description="This transaction is not in the indexed data. It may be too old or too recent for the current index range."
         />
+        <div className="mt-4">
+          <Link
+            to="/ethereum/execution/gas-profiler"
+            className="flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
+          >
+            <ArrowLeftIcon className="size-4" />
+            Back to Gas Profiler
+          </Link>
+        </div>
       </Container>
     );
   }
@@ -464,14 +472,24 @@ export function TransactionPage(): JSX.Element {
 
       {/* Back link + External links */}
       <div className="mb-6 flex items-center justify-between">
-        <Link
-          to="/ethereum/execution/gas-profiler/block/$blockNumber"
-          params={{ blockNumber: String(blockNumber) }}
-          className="flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
-        >
-          <ArrowLeftIcon className="size-4" />
-          Back to Block {formatGas(blockNumber)}
-        </Link>
+        {blockNumber ? (
+          <Link
+            to="/ethereum/execution/gas-profiler/block/$blockNumber"
+            params={{ blockNumber: String(blockNumber) }}
+            className="flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
+          >
+            <ArrowLeftIcon className="size-4" />
+            Back to Block {formatGas(blockNumber)}
+          </Link>
+        ) : (
+          <Link
+            to="/ethereum/execution/gas-profiler"
+            className="flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
+          >
+            <ArrowLeftIcon className="size-4" />
+            Back to Gas Profiler
+          </Link>
+        )}
         <div className="flex items-center gap-2">
           <a
             href={`https://etherscan.io/tx/${txHash}`}
