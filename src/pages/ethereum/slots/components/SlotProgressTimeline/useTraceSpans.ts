@@ -130,6 +130,24 @@ export function useTraceSpans({
     // Attestations
     buildAttestationSpans(result, attestations);
 
+    // Enforce invariant: every parent span must fully cover all its children's
+    // rendered bounds. The renderer applies Math.max(widthPercent, 0.5) minimum,
+    // which equals 60ms at 12s scale. Account for that so narrow spans (like 30ms
+    // point-in-time events) don't visually overflow their parent.
+    const MIN_RENDER_WIDTH_MS = (0.5 / 100) * SLOT_DURATION_MS; // 0.5% minimum render width in ms
+    const spanMap = new Map(result.map(s => [s.id, s]));
+    const byDepth = [...result].sort((a, b) => b.depth - a.depth);
+    for (const span of byDepth) {
+      if (span.parentId) {
+        const parent = spanMap.get(span.parentId);
+        if (parent) {
+          const renderedEnd = span.startMs + Math.max(span.endMs - span.startMs, MIN_RENDER_WIDTH_MS);
+          if (span.startMs < parent.startMs) parent.startMs = span.startMs;
+          if (renderedEnd > parent.endMs) parent.endMs = renderedEnd;
+        }
+      }
+    }
+
     return result;
   }, [
     blockPropagation,
@@ -170,7 +188,8 @@ function buildMevSpans(
 
   const firstBidTime = sortedBids[0].chunk_slot_start_diff ?? 0;
   const lastBidTime = sortedBids[sortedBids.length - 1].chunk_slot_start_diff ?? 0;
-  const mevEndTime = blockFirstSeenMs !== null ? blockFirstSeenMs : lastBidTime + 50;
+  // Parent must cover all child spans: use the later of block first seen or last bid + chunk offset
+  const mevEndTime = Math.max(blockFirstSeenMs ?? 0, lastBidTime + 50);
 
   const bidsByBuilder = new Map<string, { count: number; firstTime: number; lastTime: number; maxValue: string }>();
   for (const bid of validBids) {
