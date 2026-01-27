@@ -27,7 +27,7 @@ export function ThemeProvider({ children, themeOverride }: ThemeProviderProps): 
   // Determine effective theme - URL override takes precedence
   const effectiveTheme = themeOverride ?? theme;
 
-  // Apply theme to document
+  // Apply theme to document and update theme-color meta tag
   useEffect(() => {
     const root = document.documentElement;
     // Remove all theme classes first
@@ -37,6 +37,13 @@ export function ThemeProvider({ children, themeOverride }: ThemeProviderProps): 
       root.classList.add('dark');
     } else if (effectiveTheme === 'star') {
       root.classList.add('star');
+    }
+
+    // Update theme-color meta tag for Safari/browser chrome
+    const themeColors: Record<Theme, string> = { light: '#efeee5', dark: '#1a1a1a', star: '#000a1a' };
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      meta.setAttribute('content', themeColors[effectiveTheme]);
     }
   }, [effectiveTheme]);
 
