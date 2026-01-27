@@ -126,8 +126,8 @@ export function IndexPage(): JSX.Element {
             <Tab>getBlobs</Tab>
           </ScrollableTabs>
 
-          {/* Reference Nodes Filter - positioned on the right */}
-          <div className="absolute right-0 bottom-0 flex items-center gap-2 pb-2">
+          {/* Reference Nodes Filter - below tabs on mobile, absolute right on sm+ */}
+          <div className="mt-3 flex items-center gap-2 sm:absolute sm:right-0 sm:bottom-0 sm:mt-0 sm:pb-2">
             <button
               type="button"
               onClick={() => setReferenceNodesOnly(!referenceNodesOnly)}
