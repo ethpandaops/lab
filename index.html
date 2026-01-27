@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="theme-color" content="#efeee5" />
     <style>
       /* Critical CSS - Inline for instant rendering */
       body:not(.react-loaded) * {
@@ -32,22 +33,31 @@
     <script>
       // Initialize theme before React mounts to prevent FOUC
       (function () {
-        const theme = localStorage.getItem('theme');
+        var themeColors = { light: '#efeee5', dark: '#1a1a1a', star: '#000a1a' };
+        var theme = localStorage.getItem('theme');
+        var resolved = 'light';
 
         // Handle explicit theme from localStorage
         if (theme === 'dark') {
           document.documentElement.classList.add('dark');
+          resolved = 'dark';
         } else if (theme === 'star') {
           document.documentElement.classList.add('star');
+          resolved = 'star';
         } else if (theme === 'light') {
           // Light theme is default, no class needed
         } else {
           // No theme set, use system preference
-          const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           if (isDark) {
             document.documentElement.classList.add('dark');
+            resolved = 'dark';
           }
         }
+
+        // Set theme-color meta tag to match resolved theme
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', themeColors[resolved]);
       })();
     </script>
   </head>
