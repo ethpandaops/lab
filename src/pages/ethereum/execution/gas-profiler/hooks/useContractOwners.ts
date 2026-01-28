@@ -24,9 +24,24 @@ export interface UseContractOwnersResult {
   error: Error | null;
 }
 
+/** Maximum addresses per batch to avoid URL length limits */
+const BATCH_SIZE = 50;
+
+/**
+ * Splits an array into chunks of specified size
+ */
+function chunk<T>(array: T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
+}
+
 /**
  * Hook to fetch contract owner data for a list of addresses.
  * Returns a map of lowercase addresses to their owner data for efficient lookup.
+ * Automatically batches requests to avoid URL length limits.
  */
 export function useContractOwners({ addresses, enabled = true }: UseContractOwnersOptions): UseContractOwnersResult {
   // Normalize and deduplicate addresses
@@ -39,26 +54,34 @@ export function useContractOwners({ addresses, enabled = true }: UseContractOwne
         return {};
       }
 
-      // API accepts comma-separated values for the in_values filter
-      const addressesParam = uniqueAddresses.join(',');
+      // Split addresses into batches to avoid URL length limits
+      const batches = chunk(uniqueAddresses, BATCH_SIZE);
+      const ownerMap: ContractOwnerMap = {};
 
-      const owners = await fetchAllPages<DimContractOwner>(
-        dimContractOwnerServiceList,
-        {
-          query: {
-            contract_address_in_values: addressesParam,
-            page_size: 10000,
-          },
-        },
-        'dim_contract_owner',
-        signal
+      // Fetch all batches in parallel
+      const batchResults = await Promise.all(
+        batches.map(async batchAddresses => {
+          const addressesParam = batchAddresses.join(',');
+          return fetchAllPages<DimContractOwner>(
+            dimContractOwnerServiceList,
+            {
+              query: {
+                contract_address_in_values: addressesParam,
+                page_size: 10000,
+              },
+            },
+            'dim_contract_owner',
+            signal
+          );
+        })
       );
 
-      // Build a map for efficient lookup
-      const ownerMap: ContractOwnerMap = {};
-      for (const owner of owners) {
-        if (owner.contract_address) {
-          ownerMap[owner.contract_address.toLowerCase()] = owner;
+      // Combine results from all batches
+      for (const owners of batchResults) {
+        for (const owner of owners) {
+          if (owner.contract_address) {
+            ownerMap[owner.contract_address.toLowerCase()] = owner;
+          }
         }
       }
 

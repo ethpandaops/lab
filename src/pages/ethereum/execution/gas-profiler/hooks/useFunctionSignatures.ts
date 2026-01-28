@@ -24,9 +24,24 @@ export interface UseFunctionSignaturesResult {
   error: Error | null;
 }
 
+/** Maximum selectors per batch to avoid URL length limits */
+const BATCH_SIZE = 100;
+
+/**
+ * Splits an array into chunks of specified size
+ */
+function chunk<T>(array: T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
+}
+
 /**
  * Hook to fetch function signature data for a list of selectors.
  * Returns a map of lowercase selectors to their signature data for efficient lookup.
+ * Automatically batches requests to avoid URL length limits.
  */
 export function useFunctionSignatures({
   selectors,
@@ -42,26 +57,34 @@ export function useFunctionSignatures({
         return {};
       }
 
-      // API accepts comma-separated values for the in_values filter
-      const selectorsParam = uniqueSelectors.join(',');
+      // Split selectors into batches to avoid URL length limits
+      const batches = chunk(uniqueSelectors, BATCH_SIZE);
+      const signatureMap: FunctionSignatureMap = {};
 
-      const signatures = await fetchAllPages<DimFunctionSignature>(
-        dimFunctionSignatureServiceList,
-        {
-          query: {
-            selector_in_values: selectorsParam,
-            page_size: 10000,
-          },
-        },
-        'dim_function_signature',
-        signal
+      // Fetch all batches in parallel
+      const batchResults = await Promise.all(
+        batches.map(async batchSelectors => {
+          const selectorsParam = batchSelectors.join(',');
+          return fetchAllPages<DimFunctionSignature>(
+            dimFunctionSignatureServiceList,
+            {
+              query: {
+                selector_in_values: selectorsParam,
+                page_size: 10000,
+              },
+            },
+            'dim_function_signature',
+            signal
+          );
+        })
       );
 
-      // Build a map for efficient lookup
-      const signatureMap: FunctionSignatureMap = {};
-      for (const sig of signatures) {
-        if (sig.selector) {
-          signatureMap[sig.selector.toLowerCase()] = sig;
+      // Combine results from all batches
+      for (const signatures of batchResults) {
+        for (const sig of signatures) {
+          if (sig.selector) {
+            signatureMap[sig.selector.toLowerCase()] = sig;
+          }
         }
       }
 

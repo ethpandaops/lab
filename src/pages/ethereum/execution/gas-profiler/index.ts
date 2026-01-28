@@ -4,5 +4,9 @@ export { BlockPage } from './BlockPage';
 export { TransactionPage } from './TransactionPage';
 export { CallPage } from './CallPage';
 
+// Constants
+export { TIME_RANGE_CONFIG, TIME_PERIOD_OPTIONS } from './constants';
+export type { TimePeriod, ChartConfig } from './constants';
+
 // Legacy export for backwards compatibility
 export { IndexPage } from './IndexPage';

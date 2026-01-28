@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { fctBlockOpcodeGasServiceList } from '@/api/sdk.gen';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { intBlockOpcodeGasServiceList } from '@/api/sdk.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
 
@@ -22,7 +22,10 @@ export interface UseRecentBlocksOptions {
 
 export interface UseRecentBlocksResult {
   blocks: BlockSummary[];
+  /** True only on initial load (no data yet) */
   isLoading: boolean;
+  /** True when fetching new data (including background refetch) */
+  isFetching: boolean;
   error: Error | null;
   /** Whether there are older blocks available to load */
   hasOlderBlocks: boolean;
@@ -34,13 +37,13 @@ export interface UseRecentBlocksResult {
 
 /**
  * Hook to fetch lightweight summary data for recent blocks.
- * Uses fct_block_opcode_gas for efficient per-block gas totals.
+ * Uses int_block_opcode_gas for efficient per-block gas totals.
  */
 export function useRecentBlocks({ count = 6, offset = 0 }: UseRecentBlocksOptions = {}): UseRecentBlocksResult {
   const { currentNetwork } = useNetwork();
 
-  // Get bounds from fct_block_opcode_gas table
-  const { data: bounds, isLoading: boundsLoading } = useTableBounds('fct_block_opcode_gas');
+  // Get bounds from int_block_opcode_gas table
+  const { data: bounds, isLoading: boundsLoading } = useTableBounds('int_block_opcode_gas');
 
   // Calculate the block range we want (with offset from latest)
   const maxBlock = bounds?.max ? bounds.max - offset : null;
@@ -50,11 +53,12 @@ export function useRecentBlocks({ count = 6, offset = 0 }: UseRecentBlocksOption
   const {
     data: opcodeGasData,
     isLoading: dataLoading,
+    isFetching: dataFetching,
     error,
   } = useQuery({
     queryKey: ['gas-profiler', 'recent-blocks-gas', minBlock, maxBlock],
     queryFn: async ({ signal }) => {
-      const response = await fctBlockOpcodeGasServiceList({
+      const response = await intBlockOpcodeGasServiceList({
         query: {
           block_number_gte: minBlock!,
           block_number_lte: maxBlock!,
@@ -62,10 +66,11 @@ export function useRecentBlocks({ count = 6, offset = 0 }: UseRecentBlocksOption
         },
         signal,
       });
-      return response.data?.fct_block_opcode_gas ?? [];
+      return response.data?.int_block_opcode_gas ?? [];
     },
     enabled: !!currentNetwork && minBlock !== null && maxBlock !== null,
     staleTime: 30_000, // 30 seconds
+    placeholderData: keepPreviousData, // Keep showing previous data while new data loads
   });
 
   // Aggregate gas and opcode count by block
@@ -96,6 +101,7 @@ export function useRecentBlocks({ count = 6, offset = 0 }: UseRecentBlocksOption
   return {
     blocks,
     isLoading: boundsLoading || dataLoading,
+    isFetching: dataFetching,
     error: error as Error | null,
     hasOlderBlocks,
     isAtLatest,

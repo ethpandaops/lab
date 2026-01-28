@@ -110,21 +110,16 @@ function createTransactionSummaries(
     const targetAddress = rootFrame?.target_address ?? null;
     const targetName = targetAddress ? (contractOwners[targetAddress.toLowerCase()]?.contract_name ?? null) : null;
 
-    // receipt_gas = intrinsic_gas + gas_cumulative - capped_refund
-    // EIP-3529: refunds are capped at 20% of total gas consumed
-    const intrinsicGas = rootFrame?.intrinsic_gas ?? 0;
-    const gasCumulative = rootFrame?.gas_cumulative ?? 0;
-    const gasRefund = rootFrame?.gas_refund ?? 0;
-    const gasBeforeRefund = intrinsicGas + gasCumulative;
-    const cappedRefund = Math.min(gasRefund, Math.floor(gasBeforeRefund / 5));
-    const totalGas = gasBeforeRefund - cappedRefund;
+    // Use receipt_gas_used directly - this is the source of truth from transaction receipt
+    // For failed txs: gas_refund and intrinsic_gas will be NULL
+    const totalGas = rootFrame?.receipt_gas_used ?? 0;
 
     summaries.push({
       transactionHash: hash,
       transactionIndex: rootFrame?.transaction_index ?? 0,
       totalGasUsed: totalGas,
       intrinsicGas: rootFrame?.intrinsic_gas ?? null,
-      gasRefund,
+      gasRefund: rootFrame?.gas_refund ?? 0,
       frameCount: txFrames.length,
       maxDepth,
       hasErrors,

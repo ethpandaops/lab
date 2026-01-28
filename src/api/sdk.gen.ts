@@ -171,12 +171,6 @@ import type {
   FctBlockMevServiceListData,
   FctBlockMevServiceListErrors,
   FctBlockMevServiceListResponses,
-  FctBlockOpcodeGasServiceGetData,
-  FctBlockOpcodeGasServiceGetErrors,
-  FctBlockOpcodeGasServiceGetResponses,
-  FctBlockOpcodeGasServiceListData,
-  FctBlockOpcodeGasServiceListErrors,
-  FctBlockOpcodeGasServiceListResponses,
   FctBlockProposerEntityServiceGetData,
   FctBlockProposerEntityServiceGetErrors,
   FctBlockProposerEntityServiceGetResponses,
@@ -429,6 +423,30 @@ import type {
   FctNodeActiveLast24hServiceListData,
   FctNodeActiveLast24hServiceListErrors,
   FctNodeActiveLast24hServiceListResponses,
+  FctOpcodeGasByOpcodeDailyServiceGetData,
+  FctOpcodeGasByOpcodeDailyServiceGetErrors,
+  FctOpcodeGasByOpcodeDailyServiceGetResponses,
+  FctOpcodeGasByOpcodeDailyServiceListData,
+  FctOpcodeGasByOpcodeDailyServiceListErrors,
+  FctOpcodeGasByOpcodeDailyServiceListResponses,
+  FctOpcodeGasByOpcodeHourlyServiceGetData,
+  FctOpcodeGasByOpcodeHourlyServiceGetErrors,
+  FctOpcodeGasByOpcodeHourlyServiceGetResponses,
+  FctOpcodeGasByOpcodeHourlyServiceListData,
+  FctOpcodeGasByOpcodeHourlyServiceListErrors,
+  FctOpcodeGasByOpcodeHourlyServiceListResponses,
+  FctOpcodeOpsDailyServiceGetData,
+  FctOpcodeOpsDailyServiceGetErrors,
+  FctOpcodeOpsDailyServiceGetResponses,
+  FctOpcodeOpsDailyServiceListData,
+  FctOpcodeOpsDailyServiceListErrors,
+  FctOpcodeOpsDailyServiceListResponses,
+  FctOpcodeOpsHourlyServiceGetData,
+  FctOpcodeOpsHourlyServiceGetErrors,
+  FctOpcodeOpsHourlyServiceGetResponses,
+  FctOpcodeOpsHourlyServiceListData,
+  FctOpcodeOpsHourlyServiceListErrors,
+  FctOpcodeOpsHourlyServiceListResponses,
   FctPreparedBlockServiceGetData,
   FctPreparedBlockServiceGetErrors,
   FctPreparedBlockServiceGetResponses,
@@ -561,6 +579,12 @@ import type {
   IntBlockMevCanonicalServiceListData,
   IntBlockMevCanonicalServiceListErrors,
   IntBlockMevCanonicalServiceListResponses,
+  IntBlockOpcodeGasServiceGetData,
+  IntBlockOpcodeGasServiceGetErrors,
+  IntBlockOpcodeGasServiceGetResponses,
+  IntBlockOpcodeGasServiceListData,
+  IntBlockOpcodeGasServiceListErrors,
+  IntBlockOpcodeGasServiceListResponses,
   IntBlockProposerCanonicalServiceGetData,
   IntBlockProposerCanonicalServiceGetErrors,
   IntBlockProposerCanonicalServiceGetResponses,
@@ -945,10 +969,6 @@ import {
   zFctBlockMevServiceGetResponse,
   zFctBlockMevServiceListData,
   zFctBlockMevServiceListResponse,
-  zFctBlockOpcodeGasServiceGetData,
-  zFctBlockOpcodeGasServiceGetResponse,
-  zFctBlockOpcodeGasServiceListData,
-  zFctBlockOpcodeGasServiceListResponse,
   zFctBlockProposerEntityServiceGetData,
   zFctBlockProposerEntityServiceGetResponse,
   zFctBlockProposerEntityServiceListData,
@@ -1117,6 +1137,22 @@ import {
   zFctNodeActiveLast24hServiceGetResponse,
   zFctNodeActiveLast24hServiceListData,
   zFctNodeActiveLast24hServiceListResponse,
+  zFctOpcodeGasByOpcodeDailyServiceGetData,
+  zFctOpcodeGasByOpcodeDailyServiceGetResponse,
+  zFctOpcodeGasByOpcodeDailyServiceListData,
+  zFctOpcodeGasByOpcodeDailyServiceListResponse,
+  zFctOpcodeGasByOpcodeHourlyServiceGetData,
+  zFctOpcodeGasByOpcodeHourlyServiceGetResponse,
+  zFctOpcodeGasByOpcodeHourlyServiceListData,
+  zFctOpcodeGasByOpcodeHourlyServiceListResponse,
+  zFctOpcodeOpsDailyServiceGetData,
+  zFctOpcodeOpsDailyServiceGetResponse,
+  zFctOpcodeOpsDailyServiceListData,
+  zFctOpcodeOpsDailyServiceListResponse,
+  zFctOpcodeOpsHourlyServiceGetData,
+  zFctOpcodeOpsHourlyServiceGetResponse,
+  zFctOpcodeOpsHourlyServiceListData,
+  zFctOpcodeOpsHourlyServiceListResponse,
   zFctPreparedBlockServiceGetData,
   zFctPreparedBlockServiceGetResponse,
   zFctPreparedBlockServiceListData,
@@ -1205,6 +1241,10 @@ import {
   zIntBlockMevCanonicalServiceGetResponse,
   zIntBlockMevCanonicalServiceListData,
   zIntBlockMevCanonicalServiceListResponse,
+  zIntBlockOpcodeGasServiceGetData,
+  zIntBlockOpcodeGasServiceGetResponse,
+  zIntBlockOpcodeGasServiceListData,
+  zIntBlockOpcodeGasServiceListResponse,
   zIntBlockProposerCanonicalServiceGetData,
   zIntBlockProposerCanonicalServiceGetResponse,
   zIntBlockProposerCanonicalServiceListData,
@@ -2464,42 +2504,6 @@ export const fctBlockMevHeadServiceGet = <ThrowOnError extends boolean = false>(
     url: '/api/v1/fct_block_mev_head/{slot_start_date_time}',
     ...options,
   });
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const fctBlockOpcodeGasServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockOpcodeGasServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctBlockOpcodeGasServiceListResponses,
-    FctBlockOpcodeGasServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockOpcodeGasServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlockOpcodeGasServiceListResponse.parseAsync(data),
-    url: '/api/v1/fct_block_opcode_gas',
-    ...options,
-  });
-
-/**
- * Get record
- *
- * Retrieve a single record by block_number
- */
-export const fctBlockOpcodeGasServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockOpcodeGasServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<FctBlockOpcodeGasServiceGetResponses, FctBlockOpcodeGasServiceGetErrors, ThrowOnError>(
-    {
-      requestValidator: async data => await zFctBlockOpcodeGasServiceGetData.parseAsync(data),
-      responseValidator: async data => await zFctBlockOpcodeGasServiceGetResponse.parseAsync(data),
-      url: '/api/v1/fct_block_opcode_gas/{block_number}',
-      ...options,
-    }
-  );
 
 /**
  * List records
@@ -4077,6 +4081,156 @@ export const fctNodeActiveLast24hServiceGet = <ThrowOnError extends boolean = fa
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctOpcodeGasByOpcodeDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctOpcodeGasByOpcodeDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctOpcodeGasByOpcodeDailyServiceListResponses,
+    FctOpcodeGasByOpcodeDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeGasByOpcodeDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeGasByOpcodeDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_gas_by_opcode_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctOpcodeGasByOpcodeDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctOpcodeGasByOpcodeDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctOpcodeGasByOpcodeDailyServiceGetResponses,
+    FctOpcodeGasByOpcodeDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeGasByOpcodeDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeGasByOpcodeDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_gas_by_opcode_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctOpcodeGasByOpcodeHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctOpcodeGasByOpcodeHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctOpcodeGasByOpcodeHourlyServiceListResponses,
+    FctOpcodeGasByOpcodeHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeGasByOpcodeHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeGasByOpcodeHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_gas_by_opcode_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctOpcodeGasByOpcodeHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctOpcodeGasByOpcodeHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctOpcodeGasByOpcodeHourlyServiceGetResponses,
+    FctOpcodeGasByOpcodeHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeGasByOpcodeHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeGasByOpcodeHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_gas_by_opcode_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctOpcodeOpsDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctOpcodeOpsDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctOpcodeOpsDailyServiceListResponses,
+    FctOpcodeOpsDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeOpsDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeOpsDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_ops_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctOpcodeOpsDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctOpcodeOpsDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<FctOpcodeOpsDailyServiceGetResponses, FctOpcodeOpsDailyServiceGetErrors, ThrowOnError>(
+    {
+      requestValidator: async data => await zFctOpcodeOpsDailyServiceGetData.parseAsync(data),
+      responseValidator: async data => await zFctOpcodeOpsDailyServiceGetResponse.parseAsync(data),
+      url: '/api/v1/fct_opcode_ops_daily/{day_start_date}',
+      ...options,
+    }
+  );
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctOpcodeOpsHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctOpcodeOpsHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctOpcodeOpsHourlyServiceListResponses,
+    FctOpcodeOpsHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeOpsHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeOpsHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_ops_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctOpcodeOpsHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctOpcodeOpsHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctOpcodeOpsHourlyServiceGetResponses,
+    FctOpcodeOpsHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeOpsHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeOpsHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_ops_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctPreparedBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPreparedBlockServiceListData, ThrowOnError>
 ) =>
@@ -4909,6 +5063,42 @@ export const intBlockMevCanonicalServiceGet = <ThrowOnError extends boolean = fa
     url: '/api/v1/int_block_mev_canonical/{slot_start_date_time}',
     ...options,
   });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intBlockOpcodeGasServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntBlockOpcodeGasServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntBlockOpcodeGasServiceListResponses,
+    IntBlockOpcodeGasServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockOpcodeGasServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntBlockOpcodeGasServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_block_opcode_gas',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intBlockOpcodeGasServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntBlockOpcodeGasServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<IntBlockOpcodeGasServiceGetResponses, IntBlockOpcodeGasServiceGetErrors, ThrowOnError>(
+    {
+      requestValidator: async data => await zIntBlockOpcodeGasServiceGetData.parseAsync(data),
+      responseValidator: async data => await zIntBlockOpcodeGasServiceGetResponse.parseAsync(data),
+      url: '/api/v1/int_block_opcode_gas/{block_number}',
+      ...options,
+    }
+  );
 
 /**
  * List records

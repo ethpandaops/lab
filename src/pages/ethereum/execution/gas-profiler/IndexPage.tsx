@@ -188,15 +188,6 @@ export function IndexPage(): JSX.Element {
         />
       )}
 
-      {/* Loading overlay for block changes */}
-      {isLoading && data && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/50 backdrop-blur-xs">
-          <Card className="flex items-center gap-3 p-4">
-            <div className="size-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-            <span className="text-sm text-foreground">Loading block...</span>
-          </Card>
-        </div>
-      )}
     </Container>
   );
 }

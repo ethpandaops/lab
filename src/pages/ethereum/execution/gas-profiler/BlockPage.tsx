@@ -24,7 +24,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
 import { TenderlyIcon } from '@/components/Ethereum/TenderlyIcon';
 import { GasTooltip } from '@/components/DataDisplay/GasTooltip';
-import { fctBlockOpcodeGasServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import { intBlockOpcodeGasServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { useBlockTransactions, type TransactionSummary } from './hooks/useBlockTransactions';
 import {
   GasProfilerSkeleton,
@@ -141,7 +141,7 @@ export function BlockPage(): JSX.Element {
 
   // Fetch block opcode gas data (all opcodes for block-wide aggregation)
   const { data: opcodeData } = useQuery({
-    ...fctBlockOpcodeGasServiceListOptions({
+    ...intBlockOpcodeGasServiceListOptions({
       query: {
         block_number_eq: blockNumber,
         order_by: 'gas DESC',
@@ -222,8 +222,8 @@ export function BlockPage(): JSX.Element {
 
   // Block opcode data (from API) - transformed for OpcodeAnalysis component
   const opcodeStats = useMemo(() => {
-    if (!opcodeData?.fct_block_opcode_gas) return [];
-    return opcodeData.fct_block_opcode_gas.map(op => ({
+    if (!opcodeData?.int_block_opcode_gas) return [];
+    return opcodeData.int_block_opcode_gas.map(op => ({
       opcode: op.opcode ?? 'UNKNOWN',
       totalGas: op.gas ?? 0,
       count: op.count ?? 0,
@@ -1113,15 +1113,6 @@ export function BlockPage(): JSX.Element {
         </HeadlessTab.Panels>
       </HeadlessTab.Group>
 
-      {/* Loading overlay for block changes */}
-      {isLoading && data && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/50 backdrop-blur-xs">
-          <Card className="flex items-center gap-3 p-4">
-            <div className="size-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-            <span className="text-sm text-foreground">Loading block...</span>
-          </Card>
-        </div>
-      )}
     </Container>
   );
 }

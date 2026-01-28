@@ -296,20 +296,14 @@ function extractMetadata(frames: IntTransactionCallFrame[]): TransactionMetadata
   const rootFrame = frames.find(f => f.parent_call_frame_id === null || f.parent_call_frame_id === undefined);
   const firstFrame = frames[0];
 
-  // EVM execution gas from root frame (does NOT include intrinsic)
+  // Use receipt_gas_used directly - this is the source of truth from transaction receipt
+  // For failed txs: gas_refund and intrinsic_gas will be NULL
+  const receiptGasUsed = rootFrame?.receipt_gas_used ?? 0;
   const evmGasUsed = rootFrame?.gas_cumulative ?? 0;
   const intrinsicGas = rootFrame?.intrinsic_gas ?? null;
-  const gasRefund = rootFrame?.gas_refund ?? 0;
+  const gasRefund = rootFrame?.gas_refund ?? null;
   const hasErrors = frames.some(f => (f.error_count ?? 0) > 0);
   const maxDepth = Math.max(...frames.map(f => f.depth ?? 0));
-
-  // Total gas consumed = intrinsic + EVM execution
-  const totalGasConsumed = (intrinsicGas ?? 0) + evmGasUsed;
-
-  // Receipt gas = total consumed - refund (capped at 20% of total)
-  const maxRefund = Math.floor(totalGasConsumed / 5); // 20% cap per EIP-3529
-  const effectiveRefund = Math.min(gasRefund, maxRefund);
-  const receiptGasUsed = totalGasConsumed - effectiveRefund;
 
   return {
     transactionHash: firstFrame?.transaction_hash ?? '',
@@ -319,7 +313,7 @@ function extractMetadata(frames: IntTransactionCallFrame[]): TransactionMetadata
     receiptGasUsed,
     intrinsicGas,
     evmGasUsed,
-    gasRefund: effectiveRefund, // Use capped refund (20% of total per EIP-3529)
+    gasRefund: gasRefund ?? 0,
     frameCount: frames.length,
     maxDepth,
   };
