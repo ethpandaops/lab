@@ -1112,7 +1112,6 @@ export function BlockPage(): JSX.Element {
           )}
         </HeadlessTab.Panels>
       </HeadlessTab.Group>
-
     </Container>
   );
 }

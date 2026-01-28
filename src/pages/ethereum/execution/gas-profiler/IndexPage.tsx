@@ -187,7 +187,6 @@ export function IndexPage(): JSX.Element {
           blockNumber={data.blockNumber}
         />
       )}
-
     </Container>
   );
 }

@@ -200,7 +200,7 @@ export function HomePage(): JSX.Element {
   const {
     blocks: recentBlocks,
     isLoading: recentBlocksLoading,
-    isFetching: recentBlocksFetching,
+    isFetching: _recentBlocksFetching,
     hasOlderBlocks,
     isAtLatest,
   } = useRecentBlocks({ count: 6, offset: blocksOffset });
