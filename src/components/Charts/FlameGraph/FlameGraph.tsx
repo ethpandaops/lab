@@ -1,6 +1,7 @@
 import React, { type JSX, useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
+import { ChevronRightIcon, ChevronDownIcon, ChevronUpIcon, HomeIcon, EllipsisHorizontalIcon } from '@heroicons/react/20/solid';
 import type { FlameGraphProps, FlameGraphNode, FlattenedNode, FlameGraphColorMap } from './FlameGraph.types';
 import { EVM_CALL_TYPE_COLORS } from './FlameGraph.types';
 
@@ -119,27 +120,7 @@ function getCategories(node: FlameGraphNode, categories: Set<string> = new Set()
  * - Color indicates category/type
  * - Depth shows hierarchy
  *
- * Can be used for call trees, file systems, org charts, profiling data, etc.
- *
- * @example
- * ```tsx
- * // EVM call tree
- * <FlameGraph
- *   data={callTree}
- *   colorMap={EVM_CALL_TYPE_COLORS}
- *   title="Call Tree"
- *   valueUnit="gas"
- * />
- *
- * // File system usage
- * <FlameGraph
- *   data={fileTree}
- *   colorMap={FILE_TYPE_COLORS}
- *   title="Disk Usage"
- *   valueUnit="bytes"
- *   valueFormatter={(v) => formatBytes(v)}
- * />
- * ```
+ * Supports zoom/drill-down: click a node to zoom in, use breadcrumbs to zoom out.
  */
 export function FlameGraph({
   data,
@@ -165,20 +146,71 @@ export function FlameGraph({
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [legendExpanded, setLegendExpanded] = useState(false);
 
-  // Flatten tree and calculate layout
+  // Zoom state: track the path of zoomed node IDs (not objects, which become stale)
+  const [zoomPathIds, setZoomPathIds] = useState<string[]>([]);
+
+  // Find a node by ID in the tree
+  const findNodeById = useCallback((node: FlameGraphNode | null, id: string): FlameGraphNode | null => {
+    if (!node) return null;
+    if (node.id === id) return node;
+    if (node.children) {
+      for (const child of node.children) {
+        const found = findNodeById(child, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  }, []);
+
+  // Find the path from root to a node (returns array of IDs including the target)
+  const findPathToNode = useCallback((root: FlameGraphNode | null, targetId: string, path: string[] = []): string[] | null => {
+    if (!root) return null;
+    if (root.id === targetId) return [...path, root.id];
+    if (root.children) {
+      for (const child of root.children) {
+        const found = findPathToNode(child, targetId, [...path, root.id]);
+        if (found) return found;
+      }
+    }
+    return null;
+  }, []);
+
+  // Resolve zoom path IDs to actual nodes from the current tree
+  const zoomPath = useMemo(() => {
+    if (!data) return [];
+    return zoomPathIds
+      .map(id => findNodeById(data, id))
+      .filter((node): node is FlameGraphNode => node !== null);
+  }, [zoomPathIds, data, findNodeById]);
+
+  // The currently zoomed node (last in resolved path, or root if empty)
+  const zoomedNode = useMemo(() => {
+    if (zoomPath.length === 0) return data;
+    return zoomPath[zoomPath.length - 1];
+  }, [zoomPath, data]);
+
+  // Reset zoom only when the root node changes (not when children change, e.g., opcodes toggled)
+  const rootId = data?.id;
+  useEffect(() => {
+    setZoomPathIds([]);
+  }, [rootId]);
+
+  // Flatten tree and calculate layout from the zoomed node
   const {
     maxDepth: _maxDepth,
     rows,
     categories,
   } = useMemo(() => {
-    if (!data) {
+    if (!zoomedNode) {
       return { maxDepth: 0, rows: [] as FlattenedNode[][], categories: new Set<string>() };
     }
 
-    const nodes = flattenTree(data, data.value);
-    const depth = getMaxDepth(data);
-    const cats = getCategories(data);
+    const nodes = flattenTree(zoomedNode, zoomedNode.value);
+    const depth = getMaxDepth(zoomedNode);
+    // Get categories from the full tree for consistent legend
+    const cats = data ? getCategories(data) : new Set<string>();
 
     // Group nodes by depth (row)
     const rowMap = new Map<number, FlattenedNode[]>();
@@ -197,7 +229,7 @@ export function FlameGraph({
       rows: rowArray,
       categories: cats,
     };
-  }, [data]);
+  }, [zoomedNode, data]);
 
   // Determine if we should show legend
   const shouldShowLegend = showLegend ?? (colorMap && categories.size > 0);
@@ -250,12 +282,43 @@ export function FlameGraph({
     onNodeHover?.(null);
   }, [onNodeHover]);
 
+  // Handle click - zoom in if node has children, or call onNodeClick for leaf nodes
   const handleClick = useCallback(
     (node: FlameGraphNode) => {
-      onNodeClick?.(node);
+      // If node has children, zoom into it
+      if (node.children && node.children.length > 0) {
+        // Don't re-zoom if clicking the already-zoomed root
+        if (zoomedNode && node.id === zoomedNode.id) {
+          // Clicking the zoomed root does nothing (use breadcrumbs to go back)
+          return;
+        }
+        // Build full path from root to clicked node (for proper breadcrumbs)
+        const fullPath = findPathToNode(data, node.id);
+        if (fullPath) {
+          // Remove the root from the path (it's represented by the home icon)
+          setZoomPathIds(fullPath.slice(1));
+        } else {
+          // Fallback: just add the clicked node
+          setZoomPathIds(prev => [...prev, node.id]);
+        }
+      } else {
+        // Leaf node - call the external handler if provided
+        onNodeClick?.(node);
+      }
     },
-    [onNodeClick]
+    [zoomedNode, onNodeClick, data, findPathToNode]
   );
+
+  // Handle breadcrumb navigation
+  const handleBreadcrumbClick = useCallback((index: number) => {
+    if (index === -1) {
+      // Click on root - reset zoom
+      setZoomPathIds([]);
+    } else {
+      // Click on a breadcrumb - zoom to that level
+      setZoomPathIds(prev => prev.slice(0, index + 1));
+    }
+  }, []);
 
   // Empty state
   if (!data) {
@@ -269,18 +332,135 @@ export function FlameGraph({
     );
   }
 
+  // Check if we're zoomed in
+  const isZoomed = zoomPath.length > 0;
+
   return (
     <div className="w-full">
-      {/* Header */}
-      {title && (
-        <div className="mb-3 flex items-center justify-between">
-          <span className="text-sm font-medium text-foreground">{title}</span>
-          <span className="text-xs text-muted">
-            Total: {valueFormatter(data.value)}
-            {valueUnit && ` ${valueUnit}`}
-          </span>
+      {/* Controls bar - always visible */}
+      <div className="mb-2 flex items-center justify-between gap-4">
+        {/* Left side: Breadcrumbs */}
+        <div className="flex min-w-0 flex-1 items-center gap-1 text-sm">
+          {isZoomed ? (
+            <div className="flex min-w-0 items-center gap-1">
+              {/* Root/Home */}
+              <button
+                onClick={() => handleBreadcrumbClick(-1)}
+                className="flex shrink-0 items-center gap-1 text-muted transition-colors hover:text-foreground"
+                title="Back to root"
+              >
+                <HomeIcon className="size-4" />
+              </button>
+
+              {/* Collapsed middle items (if path > 2) */}
+              {zoomPath.length > 2 && (
+                <>
+                  <ChevronRightIcon className="size-3 shrink-0 text-border" />
+                  <div className="group relative">
+                    <button className="flex items-center gap-1 rounded-xs border border-border bg-surface/50 px-1.5 py-0.5 text-xs text-muted hover:border-primary/50 hover:text-foreground">
+                      <EllipsisHorizontalIcon className="size-3.5" />
+                      <span>{zoomPath.length - 2}</span>
+                    </button>
+                    {/* Dropdown on hover */}
+                    <div className="absolute top-full left-0 z-50 hidden min-w-56 pt-1 group-hover:block">
+                      <div className="rounded-xs border border-border bg-background p-2 shadow-lg">
+                        <div className="mb-1.5 border-b border-border pb-1.5 text-xs text-muted">Full path</div>
+                        <div className="space-y-1 text-xs">
+                          <button
+                            onClick={() => handleBreadcrumbClick(-1)}
+                            className="block w-full rounded-xs px-2 py-1 text-left text-muted hover:bg-surface hover:text-foreground"
+                          >
+                            Root
+                          </button>
+                          {zoomPath.map((node, index) => {
+                            const isLast = index === zoomPath.length - 1;
+                            const nodeColors = colorMap?.[node.category ?? ''];
+                            return (
+                              <button
+                                key={node.id}
+                                onClick={() => handleBreadcrumbClick(index)}
+                                className={clsx(
+                                  'flex w-full items-center gap-2 rounded-xs px-2 py-1 text-left',
+                                  isLast ? 'bg-primary/10 text-foreground' : 'text-muted hover:bg-surface hover:text-foreground'
+                                )}
+                              >
+                                {node.category && nodeColors && (
+                                  <span className={clsx('rounded-xs px-1.5 py-0.5 text-[10px] font-medium text-white', nodeColors.bg)}>
+                                    {node.category}
+                                  </span>
+                                )}
+                                <span className="truncate">{node.label}</span>
+                                <span className="ml-auto shrink-0 text-muted">d{index + 1}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Parent (second-to-last, if exists) */}
+              {zoomPath.length > 1 && (
+                <>
+                  <ChevronRightIcon className="size-3 shrink-0 text-border" />
+                  {(() => {
+                    const parent = zoomPath[zoomPath.length - 2];
+                    const parentColors = colorMap?.[parent.category ?? ''];
+                    return (
+                      <button
+                        onClick={() => handleBreadcrumbClick(zoomPath.length - 2)}
+                        className="flex shrink-0 items-center gap-1.5 text-muted transition-colors hover:text-foreground"
+                        title={parent.label}
+                      >
+                        {parent.category && parentColors && (
+                          <span className={clsx('rounded-xs px-1.5 py-0.5 text-[10px] font-medium text-white', parentColors.bg)}>
+                            {parent.category}
+                          </span>
+                        )}
+                        <span className="max-w-24 truncate">{parent.label}</span>
+                      </button>
+                    );
+                  })()}
+                </>
+              )}
+
+              {/* Current (last) */}
+              <ChevronRightIcon className="size-3 shrink-0 text-border" />
+              {(() => {
+                const current = zoomPath[zoomPath.length - 1];
+                const currentColors = colorMap?.[current.category ?? ''];
+                return (
+                  <span className="flex shrink-0 items-center gap-1.5 font-medium text-foreground" title={current.label}>
+                    {current.category && currentColors && (
+                      <span className={clsx('rounded-xs px-1.5 py-0.5 text-[10px] font-medium text-white', currentColors.bg)}>
+                        {current.category}
+                      </span>
+                    )}
+                    <span className="max-w-32 truncate">{current.label}</span>
+                  </span>
+                );
+              })()}
+            </div>
+          ) : (
+            title && <span className="font-medium text-foreground">{title}</span>
+          )}
         </div>
-      )}
+
+        {/* Right side: Controls */}
+        <div className="flex shrink-0 items-center gap-2">
+          {isZoomed && (
+            <button
+              onClick={() => setZoomPathIds([])}
+              className="rounded-xs bg-surface px-2 py-1 text-xs text-muted transition-colors hover:bg-primary/10 hover:text-foreground"
+            >
+              Reset Zoom
+            </button>
+          )}
+          {legendExtra}
+        </div>
+      </div>
 
       {/* Flame Graph Container */}
       <div className="relative w-full overflow-hidden rounded-sm border border-border bg-surface">
@@ -299,17 +479,21 @@ export function FlameGraph({
 
                 const isSelected = flatNode.node.id === selectedNodeId;
                 const isHovered = flatNode.node.id === hoveredNode?.id;
+                const isZoomedRoot = flatNode.depth === 0 && isZoomed;
+                const hasChildren = flatNode.node.children && flatNode.node.children.length > 0;
                 const colors = getNodeColors(flatNode.node, colorMap, defaultColor, errorColor);
 
                 return (
                   <div
                     key={flatNode.node.id}
                     className={clsx(
-                      'absolute flex cursor-pointer items-center overflow-hidden rounded-xs px-1 text-xs text-white transition-all',
+                      'absolute flex items-center overflow-hidden rounded-xs px-1 text-xs text-white transition-all',
                       colors.bg,
-                      colors.hover,
+                      // Only show hover effect if clickable (has children or is not zoomed root)
+                      hasChildren && !isZoomedRoot && colors.hover,
+                      hasChildren && !isZoomedRoot ? 'cursor-pointer' : 'cursor-default',
                       isSelected && 'ring-2 ring-primary ring-offset-1',
-                      isHovered && 'brightness-110'
+                      isHovered && hasChildren && !isZoomedRoot && 'brightness-110'
                     )}
                     style={{
                       left: `${flatNode.startPercent}%`,
@@ -324,7 +508,7 @@ export function FlameGraph({
                     {showLabels && flatNode.widthPercent > 3 && (
                       <span className="truncate font-mono text-xs">
                         {flatNode.widthPercent > 8
-                          ? `${flatNode.node.label} (${valueFormatter(flatNode.node.value)})`
+                          ? `${flatNode.node.label} - ${valueFormatter(flatNode.node.value)}`
                           : flatNode.node.label}
                       </span>
                     )}
@@ -407,9 +591,20 @@ export function FlameGraph({
                       <div className="mb-1.5 text-xs font-semibold tracking-wide text-primary uppercase">Details</div>
                       <div className="space-y-1">
                         {Object.entries(hoveredNode.metadata).map(([key, value]) => {
-                          // Skip null/undefined values, targetName (shown in header), and internal IDs
-                          if (value === null || value === undefined || key === 'targetName' || key === 'callFrameId')
-                            return null;
+                          // Skip null/undefined/zero values and internal/redundant fields
+                          if (value === null || value === undefined) return null;
+                          if (value === 0 || value === -1) return null;
+                          // Skip fields shown elsewhere or internal flags
+                          const skipKeys = [
+                            'targetName', // shown in header
+                            'callFrameId', // internal ID
+                            'callType', // shown as category badge
+                            'isOpcode', // internal flag
+                            'depth', // not useful in tooltip
+                            'functionSelector', // too technical
+                            'gasRefund', // usually null/0
+                          ];
+                          if (skipKeys.includes(key)) return null;
                           // Format the key name nicely
                           const displayKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
                           // Format the value based on type
@@ -447,6 +642,11 @@ export function FlameGraph({
                     </div>
                   )}
 
+                  {/* Click hint for zoomable nodes */}
+                  {hoveredNode.children && hoveredNode.children.length > 0 && (
+                    <div className="mt-3 text-center text-xs text-muted">Click to zoom in</div>
+                  )}
+
                   {/* Error indicator */}
                   {hoveredNode.hasError && (
                     <div className="mt-3 flex items-center gap-2 rounded-xs bg-danger/10 px-2 py-1.5 text-xs text-danger">
@@ -461,31 +661,40 @@ export function FlameGraph({
           document.body
         )}
 
-      {/* Legend and extra content */}
-      {(shouldShowLegend || legendExtra) && (
-        <div className="mt-3 flex items-center justify-between gap-4">
-          {shouldShowLegend && colorMap ? (
-            <div className="flex flex-wrap gap-3 text-xs">
-              <span className="text-muted">Categories:</span>
-              {Array.from(categories).map(cat => {
-                const colors = colorMap[cat];
-                if (!colors) return null;
-                return (
-                  <span key={cat} className="flex items-center gap-1">
-                    <span className={clsx('size-3 rounded-xs', colors.bg)} />
-                    <span className="text-foreground">{cat}</span>
-                  </span>
-                );
-              })}
+      {/* Collapsible Legend */}
+      {shouldShowLegend && colorMap && (
+        <div className="mt-2">
+          <button
+            onClick={() => setLegendExpanded(!legendExpanded)}
+            className="flex items-center gap-1 text-xs text-muted transition-colors hover:text-foreground"
+          >
+            {legendExpanded ? (
+              <ChevronUpIcon className="size-4" />
+            ) : (
+              <ChevronDownIcon className="size-4" />
+            )}
+            <span>Legend ({categories.size} categories)</span>
+          </button>
+          {legendExpanded && (
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+              {Array.from(categories)
+                .sort()
+                .map(cat => {
+                  const colors = colorMap[cat];
+                  if (!colors) return null;
+                  return (
+                    <span key={cat} className="flex items-center gap-1">
+                      <span className={clsx('size-2.5 rounded-xs', colors.bg)} />
+                      <span className="text-foreground">{cat}</span>
+                    </span>
+                  );
+                })}
               <span className="flex items-center gap-1">
-                <span className={clsx('size-3 rounded-xs', errorColor.bg)} />
+                <span className={clsx('size-2.5 rounded-xs', errorColor.bg)} />
                 <span className="text-foreground">Error</span>
               </span>
             </div>
-          ) : (
-            <div />
           )}
-          {legendExtra}
         </div>
       )}
     </div>

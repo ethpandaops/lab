@@ -23,6 +23,7 @@ import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
 import { TenderlyIcon } from '@/components/Ethereum/TenderlyIcon';
 import { PhalconIcon } from '@/components/Ethereum/PhalconIcon';
 import { useTransactionGasData } from './hooks/useTransactionGasData';
+import { useAllCallFrameOpcodes } from './hooks/useAllCallFrameOpcodes';
 import {
   CallTreeSection,
   OpcodeAnalysis,
@@ -68,6 +69,9 @@ export function TransactionPage(): JSX.Element {
   // State for copy feedback
   const [copied, setCopied] = useState(false);
 
+  // State for showing opcodes in flame graph (on by default)
+  const [showOpcodes, setShowOpcodes] = useState(true);
+
   // Fetch transaction data by tx hash (block number derived from response)
   const {
     data: txData,
@@ -75,6 +79,15 @@ export function TransactionPage(): JSX.Element {
     error,
   } = useTransactionGasData({
     transactionHash: txHash,
+  });
+
+  // Fetch all opcode data for flame graph (only when toggle is enabled)
+  const {
+    data: opcodeMap,
+    isLoading: isLoadingOpcodes,
+  } = useAllCallFrameOpcodes({
+    transactionHash: txHash,
+    enabled: showOpcodes,
   });
 
   // Block number is derived from transaction data
@@ -542,7 +555,7 @@ export function TransactionPage(): JSX.Element {
             </div>
             <div>
               <div className="text-xl font-semibold text-foreground">{callFrameData.length}</div>
-              <div className="text-xs text-muted">Calls</div>
+              <div className="text-xs text-muted">Internal Tx's</div>
             </div>
           </div>
         </Card>
@@ -578,7 +591,7 @@ export function TransactionPage(): JSX.Element {
           <Tab hash="overview">Overview</Tab>
           {!isSimpleTransfer && callTypeChartData.length > 0 && <Tab hash="trace">Trace</Tab>}
           {!isSimpleTransfer && <Tab hash="opcodes">Opcodes</Tab>}
-          {!isSimpleTransfer && callTypeChartData.length > 0 && <Tab hash="calls">Calls</Tab>}
+          {!isSimpleTransfer && callTypeChartData.length > 0 && <Tab hash="calls">Internal Txs</Tab>}
           {contractCounts.direct > 0 && <Tab hash="contracts">Contracts</Tab>}
         </HeadlessTab.List>
 
@@ -673,7 +686,15 @@ export function TransactionPage(): JSX.Element {
             ) : (
               callTree && (
                 <div className="mb-6">
-                  <CallTreeSection callTree={callTree} onFrameSelect={handleFrameSelect} title="Call Tree" />
+                  <CallTreeSection
+                    callTree={callTree}
+                    onFrameSelect={handleFrameSelect}
+                    title="Call Tree"
+                    showOpcodes={showOpcodes}
+                    onShowOpcodesChange={setShowOpcodes}
+                    opcodeMap={opcodeMap}
+                    isLoadingOpcodes={isLoadingOpcodes}
+                  />
                 </div>
               )
             )}
@@ -737,15 +758,15 @@ export function TransactionPage(): JSX.Element {
             </HeadlessTab.Panel>
           )}
 
-          {/* Calls Tab - only show if not a simple transfer and there are calls */}
+          {/* Internal Txs Tab - only show if not a simple transfer and there are internal txs */}
           {!isSimpleTransfer && callTypeChartData.length > 0 && (
             <HeadlessTab.Panel>
-              {/* Top Contracts + Top Calls */}
+              {/* Top Contracts + Top Internal Txs */}
               <div className="mb-6 grid grid-cols-2 gap-6">
                 <TopContractsByGasChart contracts={topContractsByGas} totalGas={totalCallGas} maxContracts={10} />
                 <TopItemsByGasTable
-                  title="Top Calls by Gas"
-                  subtitle="Which calls consumed the most gas?"
+                  title="Top Internal Txs by Gas"
+                  subtitle="Which internal txs consumed the most gas?"
                   items={topCallsItems}
                   totalGas={totalCallGas}
                   compactCount={5}
@@ -755,14 +776,14 @@ export function TransactionPage(): JSX.Element {
                 />
               </div>
 
-              {/* Call Type Distribution */}
+              {/* Internal Tx Type Distribution */}
               <div className="grid grid-cols-2 gap-6">
                 <CategoryPieChart
                   data={callTypeChartData}
                   colorMap={CALL_TYPE_COLORS}
-                  title="Call Type Distribution"
-                  subtitle="How many calls of each type?"
-                  percentLabel="of calls"
+                  title="Internal Tx Type Distribution"
+                  subtitle="How many of each type?"
+                  percentLabel="of internal txs"
                   emptyMessage="No call data"
                   innerRadius={50}
                   outerRadius={75}
@@ -771,9 +792,9 @@ export function TransactionPage(): JSX.Element {
                 <CategoryPieChart
                   data={callTypeGasChartData}
                   colorMap={CALL_TYPE_COLORS}
-                  title="Gas by Call Type"
-                  subtitle="How much gas did each call type consume?"
-                  percentLabel="of call gas"
+                  title="Gas by Internal Tx Type"
+                  subtitle="How much gas did each type consume?"
+                  percentLabel="of internal tx gas"
                   emptyMessage="No call data"
                   innerRadius={50}
                   outerRadius={75}

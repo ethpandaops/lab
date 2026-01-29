@@ -7502,7 +7502,7 @@ export type IntTransactionCallFrame = {
    */
   function_selector?: string | null;
   /**
-   * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas.
+   * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs.
    */
   gas?: number;
   /**
@@ -7510,7 +7510,7 @@ export type IntTransactionCallFrame = {
    */
   gas_cumulative?: number;
   /**
-   * Total accumulated refund. Only populated for root frame, only for successful txs.
+   * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure).
    */
   gas_refund?: number | null;
   /**
@@ -7526,7 +7526,7 @@ export type IntTransactionCallFrame = {
    */
   parent_call_frame_id?: number | null;
   /**
-   * Actual gas used from transaction receipt. Only populated for root frame. Source of truth for total gas display.
+   * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display.
    */
   receipt_gas_used?: number | null;
   /**
@@ -75363,43 +75363,43 @@ export type IntTransactionCallFrameServiceListData = {
      */
     error_count_not_in_values?: string;
     /**
-     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. (filter: eq)
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: eq)
      */
     gas_eq?: number;
     /**
-     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. (filter: ne)
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: ne)
      */
     gas_ne?: number;
     /**
-     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. (filter: lt)
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: lt)
      */
     gas_lt?: number;
     /**
-     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. (filter: lte)
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: lte)
      */
     gas_lte?: number;
     /**
-     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. (filter: gt)
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: gt)
      */
     gas_gt?: number;
     /**
-     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. (filter: gte)
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: gte)
      */
     gas_gte?: number;
     /**
-     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. (filter: between_min)
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: between_min)
      */
     gas_between_min?: number;
     /**
-     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. (filter: between_max_value)
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: between_max_value)
      */
     gas_between_max_value?: number;
     /**
-     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. (filter: in_values) (comma-separated list)
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: in_values) (comma-separated list)
      */
     gas_in_values?: string;
     /**
-     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. (filter: not_in_values) (comma-separated list)
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: not_in_values) (comma-separated list)
      */
     gas_not_in_values?: string;
     /**
@@ -75443,43 +75443,43 @@ export type IntTransactionCallFrameServiceListData = {
      */
     gas_cumulative_not_in_values?: string;
     /**
-     * Total accumulated refund. Only populated for root frame, only for successful txs. (filter: eq)
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: eq)
      */
     gas_refund_eq?: number;
     /**
-     * Total accumulated refund. Only populated for root frame, only for successful txs. (filter: ne)
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: ne)
      */
     gas_refund_ne?: number;
     /**
-     * Total accumulated refund. Only populated for root frame, only for successful txs. (filter: lt)
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: lt)
      */
     gas_refund_lt?: number;
     /**
-     * Total accumulated refund. Only populated for root frame, only for successful txs. (filter: lte)
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: lte)
      */
     gas_refund_lte?: number;
     /**
-     * Total accumulated refund. Only populated for root frame, only for successful txs. (filter: gt)
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: gt)
      */
     gas_refund_gt?: number;
     /**
-     * Total accumulated refund. Only populated for root frame, only for successful txs. (filter: gte)
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: gte)
      */
     gas_refund_gte?: number;
     /**
-     * Total accumulated refund. Only populated for root frame, only for successful txs. (filter: between_min)
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: between_min)
      */
     gas_refund_between_min?: number;
     /**
-     * Total accumulated refund. Only populated for root frame, only for successful txs. (filter: between_max_value)
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: between_max_value)
      */
     gas_refund_between_max_value?: number;
     /**
-     * Total accumulated refund. Only populated for root frame, only for successful txs. (filter: in_values) (comma-separated list)
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: in_values) (comma-separated list)
      */
     gas_refund_in_values?: string;
     /**
-     * Total accumulated refund. Only populated for root frame, only for successful txs. (filter: not_in_values) (comma-separated list)
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: not_in_values) (comma-separated list)
      */
     gas_refund_not_in_values?: string;
     /**
@@ -75523,43 +75523,43 @@ export type IntTransactionCallFrameServiceListData = {
      */
     intrinsic_gas_not_in_values?: string;
     /**
-     * Actual gas used from transaction receipt. Only populated for root frame. Source of truth for total gas display. (filter: eq)
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: eq)
      */
     receipt_gas_used_eq?: number;
     /**
-     * Actual gas used from transaction receipt. Only populated for root frame. Source of truth for total gas display. (filter: ne)
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: ne)
      */
     receipt_gas_used_ne?: number;
     /**
-     * Actual gas used from transaction receipt. Only populated for root frame. Source of truth for total gas display. (filter: lt)
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: lt)
      */
     receipt_gas_used_lt?: number;
     /**
-     * Actual gas used from transaction receipt. Only populated for root frame. Source of truth for total gas display. (filter: lte)
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: lte)
      */
     receipt_gas_used_lte?: number;
     /**
-     * Actual gas used from transaction receipt. Only populated for root frame. Source of truth for total gas display. (filter: gt)
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: gt)
      */
     receipt_gas_used_gt?: number;
     /**
-     * Actual gas used from transaction receipt. Only populated for root frame. Source of truth for total gas display. (filter: gte)
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: gte)
      */
     receipt_gas_used_gte?: number;
     /**
-     * Actual gas used from transaction receipt. Only populated for root frame. Source of truth for total gas display. (filter: between_min)
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: between_min)
      */
     receipt_gas_used_between_min?: number;
     /**
-     * Actual gas used from transaction receipt. Only populated for root frame. Source of truth for total gas display. (filter: between_max_value)
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: between_max_value)
      */
     receipt_gas_used_between_max_value?: number;
     /**
-     * Actual gas used from transaction receipt. Only populated for root frame. Source of truth for total gas display. (filter: in_values) (comma-separated list)
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: in_values) (comma-separated list)
      */
     receipt_gas_used_in_values?: string;
     /**
-     * Actual gas used from transaction receipt. Only populated for root frame. Source of truth for total gas display. (filter: not_in_values) (comma-separated list)
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: not_in_values) (comma-separated list)
      */
     receipt_gas_used_not_in_values?: string;
     /**

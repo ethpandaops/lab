@@ -67,7 +67,7 @@ function getCallTypeStyles(callType: string): { bg: string; text: string; border
 }
 
 /**
- * Call detail page - full gas analysis for a specific call
+ * Internal tx detail page - full gas analysis for a specific internal transaction
  */
 export function CallPage(): JSX.Element {
   const { txHash, callId } = useParams({ from: '/ethereum/execution/gas-profiler/tx/$txHash_/call/$callId' });
@@ -242,7 +242,7 @@ export function CallPage(): JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title="Call Details" description="Call gas analysis" />
+        <Header title="Internal Tx Details" description="Internal tx gas analysis" />
         <GasProfilerSkeleton />
       </Container>
     );
@@ -252,8 +252,8 @@ export function CallPage(): JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header title="Call Details" description="Call gas analysis" />
-        <Alert variant="error" title="Error loading call" description={error.message} />
+        <Header title="Internal Tx Details" description="Internal tx gas analysis" />
+        <Alert variant="error" title="Error loading internal tx" description={error.message} />
       </Container>
     );
   }
@@ -262,7 +262,7 @@ export function CallPage(): JSX.Element {
   if (!txData) {
     return (
       <Container>
-        <Header title="Call Details" description="Call gas analysis" />
+        <Header title="Internal Tx Details" description="Internal tx gas analysis" />
         <Alert
           variant="warning"
           title="Transaction not found"
@@ -285,11 +285,11 @@ export function CallPage(): JSX.Element {
   if (!currentFrame) {
     return (
       <Container>
-        <Header title="Call Details" description="Call gas analysis" />
+        <Header title="Internal Tx Details" description="Internal tx gas analysis" />
         <Alert
           variant="warning"
-          title="Call not found"
-          description={`Call ${callId} was not found in this transaction.`}
+          title="Internal tx not found"
+          description={`Internal tx ${callId} was not found in this transaction.`}
         />
         <div className="mt-4">
           <Link
@@ -311,9 +311,9 @@ export function CallPage(): JSX.Element {
 
   return (
     <Container>
-      <Header title="Call Details" description="Call gas analysis" />
+      <Header title="Internal Tx Details" description="Internal tx gas analysis" />
 
-      {/* Call Path Navigation */}
+      {/* Internal Tx Path Navigation */}
       <div className="mb-6 flex items-center justify-between text-sm">
         <div className="flex items-center gap-2">
           <Link
@@ -344,7 +344,7 @@ export function CallPage(): JSX.Element {
                 {/* Dropdown on hover */}
                 <div className="absolute top-full left-0 z-50 hidden min-w-56 pt-1 group-hover:block">
                   <div className="rounded-xs border border-border bg-background p-2 shadow-lg">
-                    <div className="mb-1.5 border-b border-border pb-1.5 text-xs text-muted">Full call path</div>
+                    <div className="mb-1.5 border-b border-border pb-1.5 text-xs text-muted">Full internal tx path</div>
                     <div className="space-y-1 text-xs">
                       <Link
                         to="/ethereum/execution/gas-profiler/tx/$txHash"
@@ -519,7 +519,7 @@ export function CallPage(): JSX.Element {
             </div>
             <div>
               <div className="text-xl font-semibold text-foreground">{childFrames.length}</div>
-              <div className="text-xs text-muted">Sub-Calls</div>
+              <div className="text-xs text-muted">Child Internal Txs</div>
             </div>
           </div>
         </Card>
@@ -547,13 +547,13 @@ export function CallPage(): JSX.Element {
         <HeadlessTab.Panels>
           {/* Overview Tab */}
           <HeadlessTab.Panel>
-            {/* Call Gas Breakdown */}
+            {/* Internal Tx Gas Breakdown */}
             <Card className="mb-6 overflow-hidden">
               {/* Header row */}
               <div className="flex items-center justify-between px-4 py-3">
-                <h3 className="text-sm font-medium text-foreground">Call Gas Breakdown</h3>
+                <h3 className="text-sm font-medium text-foreground">Internal Tx Gas Breakdown</h3>
                 <span className="text-xs text-muted">
-                  Call #{currentFrame.call_frame_id} • Depth {currentFrame.depth}
+                  Internal Tx #{currentFrame.call_frame_id} • Depth {currentFrame.depth}
                 </span>
               </div>
 
@@ -568,7 +568,7 @@ export function CallPage(): JSX.Element {
                       tooltip: <GasTooltip type="self" context="call" size="md" />,
                     },
                     {
-                      label: 'Child Calls',
+                      label: 'Child Internal Txs',
                       value: childGas,
                       color: 'purple',
                       operator: '+',
@@ -584,7 +584,7 @@ export function CallPage(): JSX.Element {
                 />
               </div>
 
-              {/* Call details - subtle inline display */}
+              {/* Internal tx details - subtle inline display */}
               <div className="border-t border-border px-4 py-2 text-center">
                 <div className="inline-flex items-center gap-2">
                   <span
@@ -653,7 +653,7 @@ export function CallPage(): JSX.Element {
                 data={opcodeCategoryData}
                 colorMap={CATEGORY_COLORS}
                 title="Gas by Opcode Category"
-                subtitle="Where was this call's gas spent?"
+                subtitle="Where was this internal tx's gas spent?"
                 percentLabel="of self gas"
                 loading={frameOpcodesLoading}
                 emptyMessage="No opcode data"
@@ -676,7 +676,7 @@ export function CallPage(): JSX.Element {
               <OpcodeAnalysis opcodeStats={frameOpcodes} />
             ) : (
               <Card className="p-8 text-center">
-                <p className="text-muted">No opcode data available for this call</p>
+                <p className="text-muted">No opcode data available for this internal tx</p>
               </Card>
             )}
           </HeadlessTab.Panel>

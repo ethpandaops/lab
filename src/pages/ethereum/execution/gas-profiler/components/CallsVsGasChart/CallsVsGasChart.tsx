@@ -8,7 +8,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
  * Data point for the scatter chart
  */
 export interface CallsVsGasDataPoint {
-  /** Number of call frames */
+  /** Number of calls (call frames) */
   calls: number;
   /** Gas used */
   gas: number;
@@ -17,6 +17,14 @@ export interface CallsVsGasDataPoint {
 export interface CallsVsGasChartProps {
   /** Array of data points (transactions or call frames) */
   data: CallsVsGasDataPoint[];
+  /** Card title (default: "Calls vs Gas") */
+  title?: string;
+  /** Card subtitle (default: "Do more calls use more gas?") */
+  subtitle?: string;
+  /** X-axis label (default: "Calls") */
+  xAxisLabel?: string;
+  /** Tooltip label for count (default: "calls") */
+  tooltipLabel?: string;
 }
 
 /**
@@ -41,9 +49,15 @@ function formatCompact(value: number): string {
  *
  * Used on:
  * - BlockPage: Shows calls vs gas for all transactions in a block
- * - TransactionPage: Shows calls vs gas for contracts within a transaction
+ * - TransactionPage: Shows internal txs vs gas for contracts within a transaction
  */
-export function CallsVsGasChart({ data }: CallsVsGasChartProps): JSX.Element {
+export function CallsVsGasChart({
+  data,
+  title = 'Calls vs Gas',
+  subtitle = 'Do more calls use more gas?',
+  xAxisLabel = 'Calls',
+  tooltipLabel = 'calls',
+}: CallsVsGasChartProps): JSX.Element {
   const colors = useThemeColors();
   const [useLogScale, setUseLogScale] = useState(true);
 
@@ -59,7 +73,7 @@ export function CallsVsGasChart({ data }: CallsVsGasChartProps): JSX.Element {
       grid: { left: 60, right: 20, top: 20, bottom: 40 },
       xAxis: {
         type: useLogScale ? 'log' : 'value',
-        name: useLogScale ? 'Calls (log)' : 'Calls',
+        name: useLogScale ? `${xAxisLabel} (log)` : xAxisLabel,
         nameLocation: 'center',
         nameGap: 25,
         nameTextStyle: { color: colors.muted, fontSize: 11 },
@@ -98,14 +112,14 @@ export function CallsVsGasChart({ data }: CallsVsGasChartProps): JSX.Element {
         textStyle: { color: colors.foreground },
         formatter: (params: { value: [number, number] }) => {
           const [calls, gas] = params.value;
-          return `<strong>${calls}</strong> calls<br/><strong>${formatGas(gas)}</strong> gas used`;
+          return `<strong>${calls}</strong> ${tooltipLabel}<br/><strong>${formatGas(gas)}</strong> gas used`;
         },
       },
     };
-  }, [data, colors, useLogScale]);
+  }, [data, colors, useLogScale, xAxisLabel, tooltipLabel]);
 
   return (
-    <PopoutCard title="Calls vs Gas" subtitle="Do more contract calls use more gas?">
+    <PopoutCard title={title} subtitle={subtitle}>
       {({ inModal }) =>
         data.length > 0 ? (
           <div>

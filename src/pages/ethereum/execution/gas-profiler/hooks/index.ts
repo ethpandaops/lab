@@ -13,6 +13,13 @@ export type {
 } from './useBlockTransactions';
 export { useFrameOpcodes } from './useFrameOpcodes';
 export type { UseFrameOpcodesOptions, UseFrameOpcodesResult } from './useFrameOpcodes';
+export { useAllCallFrameOpcodes } from './useAllCallFrameOpcodes';
+export type {
+  AllCallFrameOpcodesMap,
+  CallFrameOpcodeData,
+  UseAllCallFrameOpcodesOptions,
+  UseAllCallFrameOpcodesResult,
+} from './useAllCallFrameOpcodes';
 export { useContractOwners } from './useContractOwners';
 export type { UseContractOwnersOptions, UseContractOwnersResult, ContractOwnerMap } from './useContractOwners';
 export { useFunctionSignatures } from './useFunctionSignatures';

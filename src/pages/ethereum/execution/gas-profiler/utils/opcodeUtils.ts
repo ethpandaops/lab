@@ -172,3 +172,54 @@ export function getOpcodeCategory(opcode: string): string {
 
   return 'Other';
 }
+
+/**
+ * Hex to Tailwind class mapping for FlameGraph compatibility
+ */
+const HEX_TO_TAILWIND: Record<string, { bg: string; hover: string }> = {
+  '#f59e0b': { bg: 'bg-amber-500', hover: 'hover:bg-amber-400' },
+  '#8b5cf6': { bg: 'bg-violet-500', hover: 'hover:bg-violet-400' },
+  '#06b6d4': { bg: 'bg-cyan-500', hover: 'hover:bg-cyan-400' },
+  '#14b8a6': { bg: 'bg-teal-500', hover: 'hover:bg-teal-400' },
+  '#6b7280': { bg: 'bg-gray-500', hover: 'hover:bg-gray-400' },
+  '#3b82f6': { bg: 'bg-blue-500', hover: 'hover:bg-blue-400' },
+  '#a855f7': { bg: 'bg-purple-500', hover: 'hover:bg-purple-400' },
+  '#22c55e': { bg: 'bg-green-500', hover: 'hover:bg-green-400' },
+  '#ef4444': { bg: 'bg-red-500', hover: 'hover:bg-red-400' },
+  '#ec4899': { bg: 'bg-pink-500', hover: 'hover:bg-pink-400' },
+  '#f97316': { bg: 'bg-orange-500', hover: 'hover:bg-orange-400' },
+  '#64748b': { bg: 'bg-slate-500', hover: 'hover:bg-slate-400' },
+  '#78716c': { bg: 'bg-stone-500', hover: 'hover:bg-stone-400' },
+  '#84cc16': { bg: 'bg-lime-500', hover: 'hover:bg-lime-400' },
+  '#eab308': { bg: 'bg-yellow-500', hover: 'hover:bg-yellow-400' },
+  '#0ea5e9': { bg: 'bg-sky-500', hover: 'hover:bg-sky-400' },
+  '#9ca3af': { bg: 'bg-gray-400', hover: 'hover:bg-gray-300' },
+};
+
+/**
+ * FlameGraph color map for call types (derived from CALL_TYPE_COLORS)
+ */
+export const FLAME_GRAPH_CALL_TYPE_COLORS: Record<string, { bg: string; hover: string }> = Object.fromEntries(
+  Object.entries(CALL_TYPE_COLORS).map(([key, hex]) => [
+    key,
+    HEX_TO_TAILWIND[hex] ?? { bg: 'bg-gray-500', hover: 'hover:bg-gray-400' },
+  ])
+);
+
+/**
+ * FlameGraph color map for opcode categories (derived from CATEGORY_COLORS)
+ */
+export const FLAME_GRAPH_CATEGORY_COLORS: Record<string, { bg: string; hover: string }> = Object.fromEntries(
+  Object.entries(CATEGORY_COLORS).map(([key, hex]) => [
+    key,
+    HEX_TO_TAILWIND[hex] ?? { bg: 'bg-gray-500', hover: 'hover:bg-gray-400' },
+  ])
+);
+
+/**
+ * Combined FlameGraph color map for call types + opcode categories
+ */
+export const FLAME_GRAPH_COMBINED_COLORS: Record<string, { bg: string; hover: string }> = {
+  ...FLAME_GRAPH_CALL_TYPE_COLORS,
+  ...FLAME_GRAPH_CATEGORY_COLORS,
+};

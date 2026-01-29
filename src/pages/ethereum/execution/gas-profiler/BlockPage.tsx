@@ -94,7 +94,7 @@ function filterAndSortTransactions(
 }
 
 // Tab hash values for URL-based navigation
-const BLOCK_TAB_HASHES = ['overview', 'opcodes', 'calls', 'transactions', 'contracts'] as const;
+const BLOCK_TAB_HASHES = ['overview', 'opcodes', 'transactions', 'calls', 'contracts'] as const;
 
 /**
  * Block detail page - shows all transactions in a block with analytics
@@ -715,9 +715,9 @@ export function BlockPage(): JSX.Element {
         <HeadlessTab.List className="mb-6 flex gap-1 border-b border-border">
           <Tab hash="overview">Overview</Tab>
           <Tab hash="opcodes">Opcodes</Tab>
+          <Tab hash="transactions">Transactions</Tab>
           <Tab hash="calls">Calls</Tab>
-          <Tab hash="transactions">Transactions ({data.transactionCount})</Tab>
-          {data.allContractsByGas.length > 0 && <Tab hash="contracts">Contracts ({data.allContractsByGas.length})</Tab>}
+          {data.allContractsByGas.length > 0 && <Tab hash="contracts">Contracts</Tab>}
         </HeadlessTab.List>
 
         <HeadlessTab.Panels>
@@ -806,7 +806,7 @@ export function BlockPage(): JSX.Element {
                   count: data.transactions.length,
                   label: 'Transactions',
                   onClick: () => {
-                    setSelectedTabIndex(3);
+                    setSelectedTabIndex(2);
                     window.history.pushState(null, '', '#transactions');
                   },
                 }}
@@ -854,54 +854,6 @@ export function BlockPage(): JSX.Element {
                 <p className="text-muted">No opcode data available</p>
               </Card>
             )}
-          </HeadlessTab.Panel>
-
-          {/* Calls Tab */}
-          <HeadlessTab.Panel>
-            {/* Top Contracts + Calls vs Gas */}
-            <div className="mb-6 grid grid-cols-2 gap-6">
-              <TopContractsByGasChart
-                contracts={data.topContractsByGas.map(c => ({
-                  address: c.address,
-                  name: c.name,
-                  gas: c.gas,
-                }))}
-                totalGas={totalBlockGas}
-                maxContracts={10}
-              />
-              <CallsVsGasChart
-                data={data.transactions.map(tx => ({
-                  calls: tx.frameCount,
-                  gas: tx.totalGasUsed,
-                }))}
-              />
-            </div>
-
-            {/* Call Type Distribution */}
-            <div className="grid grid-cols-2 gap-6">
-              <CategoryPieChart
-                data={callTypeChartData}
-                colorMap={CALL_TYPE_COLORS}
-                title="Call Type Distribution"
-                subtitle="How many calls of each type?"
-                percentLabel="of calls"
-                emptyMessage="No call data"
-                innerRadius={50}
-                outerRadius={75}
-                height={280}
-              />
-              <CategoryPieChart
-                data={callTypeGasChartData}
-                colorMap={CALL_TYPE_COLORS}
-                title="Gas by Call Type"
-                subtitle="How much gas did each call type consume?"
-                percentLabel="of call gas"
-                emptyMessage="No call data"
-                innerRadius={50}
-                outerRadius={75}
-                height={280}
-              />
-            </div>
           </HeadlessTab.Panel>
 
           {/* Transactions Tab */}
@@ -1069,6 +1021,54 @@ export function BlockPage(): JSX.Element {
                 )}
               </div>
             )}
+          </HeadlessTab.Panel>
+
+          {/* Calls Tab */}
+          <HeadlessTab.Panel>
+            {/* Top Contracts + Calls vs Gas */}
+            <div className="mb-6 grid grid-cols-2 gap-6">
+              <TopContractsByGasChart
+                contracts={data.topContractsByGas.map(c => ({
+                  address: c.address,
+                  name: c.name,
+                  gas: c.gas,
+                }))}
+                totalGas={totalBlockGas}
+                maxContracts={10}
+              />
+              <CallsVsGasChart
+                data={data.transactions.map(tx => ({
+                  calls: tx.frameCount,
+                  gas: tx.totalGasUsed,
+                }))}
+              />
+            </div>
+
+            {/* Call Type Distribution */}
+            <div className="grid grid-cols-2 gap-6">
+              <CategoryPieChart
+                data={callTypeChartData}
+                colorMap={CALL_TYPE_COLORS}
+                title="Call Type Distribution"
+                subtitle="How many calls of each type?"
+                percentLabel="of calls"
+                emptyMessage="No call data"
+                innerRadius={50}
+                outerRadius={75}
+                height={280}
+              />
+              <CategoryPieChart
+                data={callTypeGasChartData}
+                colorMap={CALL_TYPE_COLORS}
+                title="Gas by Call Type"
+                subtitle="How much gas did each call type consume?"
+                percentLabel="of call gas"
+                emptyMessage="No call data"
+                innerRadius={50}
+                outerRadius={75}
+                height={280}
+              />
+            </div>
           </HeadlessTab.Panel>
 
           {/* Contracts Tab */}
