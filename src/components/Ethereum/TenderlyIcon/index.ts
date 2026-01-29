@@ -1,0 +1,1 @@
+export { TenderlyIcon } from './TenderlyIcon';

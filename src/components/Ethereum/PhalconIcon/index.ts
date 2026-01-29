@@ -1,0 +1,1 @@
+export { PhalconIcon } from './PhalconIcon';

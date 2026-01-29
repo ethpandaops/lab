@@ -106,6 +106,25 @@ export type DimContractOwner = {
   updated_date_time?: number;
 };
 
+export type DimFunctionSignature = {
+  /**
+   * Whether this signature comes from a verified contract source
+   */
+  has_verified_contract?: boolean;
+  /**
+   * Function signature name (e.g., transfer(address,uint256))
+   */
+  name?: string;
+  /**
+   * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix)
+   */
+  selector?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type DimNode = {
   /**
    * Additional attributes of the node
@@ -3725,6 +3744,226 @@ export type FctNodeActiveLast24h = {
   username?: string;
 };
 
+export type FctOpcodeGasByOpcodeDaily = {
+  /**
+   * Average executions per block
+   */
+  avg_count_per_block?: number;
+  /**
+   * Average gas per block
+   */
+  avg_gas_per_block?: number;
+  /**
+   * Average gas per execution
+   */
+  avg_gas_per_execution?: number;
+  /**
+   * Number of blocks containing this opcode in this day
+   */
+  block_count?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * The EVM opcode name (e.g., SLOAD, ADD, CALL)
+   */
+  opcode?: string;
+  /**
+   * Total execution count of this opcode in this day
+   */
+  total_count?: number;
+  /**
+   * Total error count for this opcode in this day
+   */
+  total_error_count?: number;
+  /**
+   * Total gas consumed by this opcode in this day
+   */
+  total_gas?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctOpcodeGasByOpcodeHourly = {
+  /**
+   * Average executions per block
+   */
+  avg_count_per_block?: number;
+  /**
+   * Average gas per block
+   */
+  avg_gas_per_block?: number;
+  /**
+   * Average gas per execution
+   */
+  avg_gas_per_execution?: number;
+  /**
+   * Number of blocks containing this opcode in this hour
+   */
+  block_count?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * The EVM opcode name (e.g., SLOAD, ADD, CALL)
+   */
+  opcode?: string;
+  /**
+   * Total execution count of this opcode in this hour
+   */
+  total_count?: number;
+  /**
+   * Total error count for this opcode in this hour
+   */
+  total_error_count?: number;
+  /**
+   * Total gas consumed by this opcode in this hour
+   */
+  total_gas?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctOpcodeOpsDaily = {
+  /**
+   * Average opcodes per second using actual block time gaps
+   */
+  avg_ops?: number;
+  /**
+   * Number of blocks in this day
+   */
+  block_count?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Lower Bollinger band (avg - 2*stddev)
+   */
+  lower_band_ops?: number;
+  /**
+   * Maximum per-block ops/sec
+   */
+  max_ops?: number;
+  /**
+   * Minimum per-block ops/sec
+   */
+  min_ops?: number;
+  /**
+   * Moving average ops/sec (7-day window)
+   */
+  moving_avg_ops?: number;
+  /**
+   * 5th percentile ops/sec
+   */
+  p05_ops?: number;
+  /**
+   * 50th percentile (median) ops/sec
+   */
+  p50_ops?: number;
+  /**
+   * 95th percentile ops/sec
+   */
+  p95_ops?: number;
+  /**
+   * Standard deviation of ops/sec
+   */
+  stddev_ops?: number;
+  /**
+   * Total gas consumed by opcodes in this day
+   */
+  total_gas?: number;
+  /**
+   * Total opcode executions in this day
+   */
+  total_opcode_count?: number;
+  /**
+   * Total actual seconds covered by blocks (sum of block time gaps)
+   */
+  total_seconds?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_ops?: number;
+};
+
+export type FctOpcodeOpsHourly = {
+  /**
+   * Average opcodes per second using actual block time gaps
+   */
+  avg_ops?: number;
+  /**
+   * Number of blocks in this hour
+   */
+  block_count?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Lower Bollinger band (avg - 2*stddev)
+   */
+  lower_band_ops?: number;
+  /**
+   * Maximum per-block ops/sec
+   */
+  max_ops?: number;
+  /**
+   * Minimum per-block ops/sec
+   */
+  min_ops?: number;
+  /**
+   * Moving average ops/sec (6-hour window)
+   */
+  moving_avg_ops?: number;
+  /**
+   * 5th percentile ops/sec
+   */
+  p05_ops?: number;
+  /**
+   * 50th percentile (median) ops/sec
+   */
+  p50_ops?: number;
+  /**
+   * 95th percentile ops/sec
+   */
+  p95_ops?: number;
+  /**
+   * Standard deviation of ops/sec
+   */
+  stddev_ops?: number;
+  /**
+   * Total gas consumed by opcodes in this hour
+   */
+  total_gas?: number;
+  /**
+   * Total opcode executions in this hour
+   */
+  total_opcode_count?: number;
+  /**
+   * Total actual seconds covered by blocks (sum of block time gaps)
+   */
+  total_seconds?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_ops?: number;
+};
+
 export type FctPreparedBlock = {
   /**
    * The total bytes of the beacon block payload
@@ -4120,6 +4359,13 @@ export type GetDimBlockBlobSubmitterResponse = {
  */
 export type GetDimContractOwnerResponse = {
   item?: DimContractOwner;
+};
+
+/**
+ * Response for getting a single dim_function_signature record
+ */
+export type GetDimFunctionSignatureResponse = {
+  item?: DimFunctionSignature;
 };
 
 /**
@@ -4578,6 +4824,34 @@ export type GetFctNodeActiveLast24hResponse = {
 };
 
 /**
+ * Response for getting a single fct_opcode_gas_by_opcode_daily record
+ */
+export type GetFctOpcodeGasByOpcodeDailyResponse = {
+  item?: FctOpcodeGasByOpcodeDaily;
+};
+
+/**
+ * Response for getting a single fct_opcode_gas_by_opcode_hourly record
+ */
+export type GetFctOpcodeGasByOpcodeHourlyResponse = {
+  item?: FctOpcodeGasByOpcodeHourly;
+};
+
+/**
+ * Response for getting a single fct_opcode_ops_daily record
+ */
+export type GetFctOpcodeOpsDailyResponse = {
+  item?: FctOpcodeOpsDaily;
+};
+
+/**
+ * Response for getting a single fct_opcode_ops_hourly record
+ */
+export type GetFctOpcodeOpsHourlyResponse = {
+  item?: FctOpcodeOpsHourly;
+};
+
+/**
  * Response for getting a single fct_prepared_block record
  */
 export type GetFctPreparedBlockResponse = {
@@ -4729,6 +5003,13 @@ export type GetIntBlockCanonicalResponse = {
  */
 export type GetIntBlockMevCanonicalResponse = {
   item?: IntBlockMevCanonical;
+};
+
+/**
+ * Response for getting a single int_block_opcode_gas record
+ */
+export type GetIntBlockOpcodeGasResponse = {
+  item?: IntBlockOpcodeGas;
 };
 
 /**
@@ -5023,6 +5304,27 @@ export type GetIntStorageSlotStateWithExpiryByBlockResponse = {
  */
 export type GetIntStorageSlotStateWithExpiryResponse = {
   item?: IntStorageSlotStateWithExpiry;
+};
+
+/**
+ * Response for getting a single int_transaction_call_frame_opcode_gas record
+ */
+export type GetIntTransactionCallFrameOpcodeGasResponse = {
+  item?: IntTransactionCallFrameOpcodeGas;
+};
+
+/**
+ * Response for getting a single int_transaction_call_frame record
+ */
+export type GetIntTransactionCallFrameResponse = {
+  item?: IntTransactionCallFrame;
+};
+
+/**
+ * Response for getting a single int_transaction_opcode_gas record
+ */
+export type GetIntTransactionOpcodeGasResponse = {
+  item?: IntTransactionOpcodeGas;
 };
 
 /**
@@ -5575,6 +5877,37 @@ export type IntBlockMevCanonical = {
    * The transaction value in wei
    */
   value?: string | null;
+};
+
+export type IntBlockOpcodeGas = {
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Total execution count of this opcode across all transactions in the block
+   */
+  count?: number;
+  /**
+   * Number of times this opcode resulted in an error across all transactions
+   */
+  error_count?: number;
+  /**
+   * Total gas consumed by this opcode across all transactions in the block
+   */
+  gas?: number;
+  /**
+   * The name of the network
+   */
+  meta_network_name?: string;
+  /**
+   * The EVM opcode name (e.g., SLOAD, ADD, CALL)
+   */
+  opcode?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
 };
 
 export type IntBlockProposerCanonical = {
@@ -7143,6 +7476,175 @@ export type IntStorageSlotStateWithExpiryByBlock = {
   updated_date_time?: number;
 };
 
+export type IntTransactionCallFrame = {
+  /**
+   * The block number containing this transaction
+   */
+  block_number?: number;
+  /**
+   * Sequential frame ID within the transaction (0 = root)
+   */
+  call_frame_id?: number;
+  /**
+   * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2)
+   */
+  call_type?: string;
+  /**
+   * Call depth (0 = root transaction execution)
+   */
+  depth?: number;
+  /**
+   * Number of opcodes that resulted in errors
+   */
+  error_count?: number;
+  /**
+   * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces.
+   */
+  function_selector?: string | null;
+  /**
+   * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs.
+   */
+  gas?: number;
+  /**
+   * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas.
+   */
+  gas_cumulative?: number;
+  /**
+   * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure).
+   */
+  gas_refund?: number | null;
+  /**
+   * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs.
+   */
+  intrinsic_gas?: number | null;
+  /**
+   * Number of opcodes executed in this frame
+   */
+  opcode_count?: number;
+  /**
+   * Parent frame ID (NULL for root frame)
+   */
+  parent_call_frame_id?: number | null;
+  /**
+   * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display.
+   */
+  receipt_gas_used?: number | null;
+  /**
+   * Contract address being called (hex encoded with 0x prefix)
+   */
+  target_address?: string | null;
+  /**
+   * The transaction hash (hex encoded with 0x prefix)
+   */
+  transaction_hash?: string;
+  /**
+   * Position of the transaction within the block
+   */
+  transaction_index?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntTransactionCallFrameOpcodeGas = {
+  /**
+   * The block number containing the transaction
+   */
+  block_number?: number;
+  /**
+   * Sequential frame ID within transaction (0 = root)
+   */
+  call_frame_id?: number;
+  /**
+   * Number of times this opcode was executed in this frame
+   */
+  count?: number;
+  /**
+   * Number of times this opcode resulted in an error in this frame
+   */
+  error_count?: number;
+  /**
+   * Gas consumed by this opcode in this frame. sum(gas) = frame gas
+   */
+  gas?: number;
+  /**
+   * For CALL opcodes: includes all descendant frame gas. For others: same as gas
+   */
+  gas_cumulative?: number;
+  /**
+   * The name of the network
+   */
+  meta_network_name?: string;
+  /**
+   * The EVM opcode name (e.g., SLOAD, ADD, CALL)
+   */
+  opcode?: string;
+  /**
+   * The transaction hash (hex encoded with 0x prefix)
+   */
+  transaction_hash?: string;
+  /**
+   * The index of the transaction within the block
+   */
+  transaction_index?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntTransactionOpcodeGas = {
+  /**
+   * The block number containing the transaction
+   */
+  block_number?: number;
+  /**
+   * Number of times this opcode was executed in the transaction
+   */
+  count?: number;
+  /**
+   * Number of times this opcode resulted in an error
+   */
+  error_count?: number;
+  /**
+   * Gas consumed by this opcode. sum(gas) = transaction executed gas
+   */
+  gas?: number;
+  /**
+   * For CALL opcodes: includes all descendant frame gas. For others: same as gas
+   */
+  gas_cumulative?: number;
+  /**
+   * Maximum call stack depth for this opcode
+   */
+  max_depth?: number;
+  /**
+   * The name of the network
+   */
+  meta_network_name?: string;
+  /**
+   * Minimum call stack depth for this opcode
+   */
+  min_depth?: number;
+  /**
+   * The EVM opcode name (e.g., SLOAD, ADD, CALL)
+   */
+  opcode?: string;
+  /**
+   * The transaction hash (hex encoded with 0x prefix)
+   */
+  transaction_hash?: string;
+  /**
+   * The index of the transaction within the block
+   */
+  transaction_index?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 /**
  * Response for listing admin_cbt_incremental records
  */
@@ -7193,6 +7695,20 @@ export type ListDimContractOwnerResponse = {
    * The list of dim_contract_owner.
    */
   dim_contract_owner?: Array<DimContractOwner>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing dim_function_signature records
+ */
+export type ListDimFunctionSignatureResponse = {
+  /**
+   * The list of dim_function_signature.
+   */
+  dim_function_signature?: Array<DimFunctionSignature>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -8110,6 +8626,62 @@ export type ListFctNodeActiveLast24hResponse = {
 };
 
 /**
+ * Response for listing fct_opcode_gas_by_opcode_daily records
+ */
+export type ListFctOpcodeGasByOpcodeDailyResponse = {
+  /**
+   * The list of fct_opcode_gas_by_opcode_daily.
+   */
+  fct_opcode_gas_by_opcode_daily?: Array<FctOpcodeGasByOpcodeDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_opcode_gas_by_opcode_hourly records
+ */
+export type ListFctOpcodeGasByOpcodeHourlyResponse = {
+  /**
+   * The list of fct_opcode_gas_by_opcode_hourly.
+   */
+  fct_opcode_gas_by_opcode_hourly?: Array<FctOpcodeGasByOpcodeHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_opcode_ops_daily records
+ */
+export type ListFctOpcodeOpsDailyResponse = {
+  /**
+   * The list of fct_opcode_ops_daily.
+   */
+  fct_opcode_ops_daily?: Array<FctOpcodeOpsDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_opcode_ops_hourly records
+ */
+export type ListFctOpcodeOpsHourlyResponse = {
+  /**
+   * The list of fct_opcode_ops_hourly.
+   */
+  fct_opcode_ops_hourly?: Array<FctOpcodeOpsHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_prepared_block records
  */
 export type ListFctPreparedBlockResponse = {
@@ -8411,6 +8983,20 @@ export type ListIntBlockMevCanonicalResponse = {
    * The list of int_block_mev_canonical.
    */
   int_block_mev_canonical?: Array<IntBlockMevCanonical>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_block_opcode_gas records
+ */
+export type ListIntBlockOpcodeGasResponse = {
+  /**
+   * The list of int_block_opcode_gas.
+   */
+  int_block_opcode_gas?: Array<IntBlockOpcodeGas>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -8999,6 +9585,48 @@ export type ListIntStorageSlotStateWithExpiryResponse = {
    * The list of int_storage_slot_state_with_expiry.
    */
   int_storage_slot_state_with_expiry?: Array<IntStorageSlotStateWithExpiry>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_transaction_call_frame_opcode_gas records
+ */
+export type ListIntTransactionCallFrameOpcodeGasResponse = {
+  /**
+   * The list of int_transaction_call_frame_opcode_gas.
+   */
+  int_transaction_call_frame_opcode_gas?: Array<IntTransactionCallFrameOpcodeGas>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_transaction_call_frame records
+ */
+export type ListIntTransactionCallFrameResponse = {
+  /**
+   * The list of int_transaction_call_frame.
+   */
+  int_transaction_call_frame?: Array<IntTransactionCallFrame>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_transaction_opcode_gas records
+ */
+export type ListIntTransactionOpcodeGasResponse = {
+  /**
+   * The list of int_transaction_opcode_gas.
+   */
+  int_transaction_opcode_gas?: Array<IntTransactionOpcodeGas>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -10197,6 +10825,198 @@ export type DimContractOwnerServiceGetResponses = {
 
 export type DimContractOwnerServiceGetResponse =
   DimContractOwnerServiceGetResponses[keyof DimContractOwnerServiceGetResponses];
+
+export type DimFunctionSignatureServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: eq)
+     */
+    selector_eq?: string;
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: ne)
+     */
+    selector_ne?: string;
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: contains)
+     */
+    selector_contains?: string;
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: starts_with)
+     */
+    selector_starts_with?: string;
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: ends_with)
+     */
+    selector_ends_with?: string;
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: like)
+     */
+    selector_like?: string;
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: not_like)
+     */
+    selector_not_like?: string;
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    selector_in_values?: string;
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    selector_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: eq)
+     */
+    name_eq?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: ne)
+     */
+    name_ne?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: contains)
+     */
+    name_contains?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: starts_with)
+     */
+    name_starts_with?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: ends_with)
+     */
+    name_ends_with?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: like)
+     */
+    name_like?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: not_like)
+     */
+    name_not_like?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: in_values) (comma-separated list)
+     */
+    name_in_values?: string;
+    /**
+     * Function signature name (e.g., transfer(address,uint256)) (filter: not_in_values) (comma-separated list)
+     */
+    name_not_in_values?: string;
+    /**
+     * Whether this signature comes from a verified contract source (filter: eq)
+     */
+    has_verified_contract_eq?: boolean;
+    /**
+     * Whether this signature comes from a verified contract source (filter: ne)
+     */
+    has_verified_contract_ne?: boolean;
+    /**
+     * The maximum number of dim_function_signature to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListDimFunctionSignature` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/dim_function_signature';
+};
+
+export type DimFunctionSignatureServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimFunctionSignatureServiceListError =
+  DimFunctionSignatureServiceListErrors[keyof DimFunctionSignatureServiceListErrors];
+
+export type DimFunctionSignatureServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListDimFunctionSignatureResponse;
+};
+
+export type DimFunctionSignatureServiceListResponse =
+  DimFunctionSignatureServiceListResponses[keyof DimFunctionSignatureServiceListResponses];
+
+export type DimFunctionSignatureServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Function selector (first 4 bytes of keccak256 hash, hex encoded with 0x prefix)
+     */
+    selector: string;
+  };
+  query?: never;
+  url: '/api/v1/dim_function_signature/{selector}';
+};
+
+export type DimFunctionSignatureServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimFunctionSignatureServiceGetError =
+  DimFunctionSignatureServiceGetErrors[keyof DimFunctionSignatureServiceGetErrors];
+
+export type DimFunctionSignatureServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetDimFunctionSignatureResponse;
+};
+
+export type DimFunctionSignatureServiceGetResponse =
+  DimFunctionSignatureServiceGetResponses[keyof DimFunctionSignatureServiceGetResponses];
 
 export type DimNodeServiceListData = {
   body?: never;
@@ -46173,6 +46993,1422 @@ export type FctNodeActiveLast24hServiceGetResponses = {
 export type FctNodeActiveLast24hServiceGetResponse =
   FctNodeActiveLast24hServiceGetResponses[keyof FctNodeActiveLast24hServiceGetResponses];
 
+export type FctOpcodeGasByOpcodeDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: eq)
+     */
+    opcode_eq?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ne)
+     */
+    opcode_ne?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: contains)
+     */
+    opcode_contains?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: starts_with)
+     */
+    opcode_starts_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ends_with)
+     */
+    opcode_ends_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: like)
+     */
+    opcode_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_like)
+     */
+    opcode_not_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: in_values) (comma-separated list)
+     */
+    opcode_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_in_values) (comma-separated list)
+     */
+    opcode_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks containing this opcode in this day (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks containing this opcode in this day (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks containing this opcode in this day (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks containing this opcode in this day (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks containing this opcode in this day (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks containing this opcode in this day (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks containing this opcode in this day (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks containing this opcode in this day (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks containing this opcode in this day (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks containing this opcode in this day (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total execution count of this opcode in this day (filter: eq)
+     */
+    total_count_eq?: number;
+    /**
+     * Total execution count of this opcode in this day (filter: ne)
+     */
+    total_count_ne?: number;
+    /**
+     * Total execution count of this opcode in this day (filter: lt)
+     */
+    total_count_lt?: number;
+    /**
+     * Total execution count of this opcode in this day (filter: lte)
+     */
+    total_count_lte?: number;
+    /**
+     * Total execution count of this opcode in this day (filter: gt)
+     */
+    total_count_gt?: number;
+    /**
+     * Total execution count of this opcode in this day (filter: gte)
+     */
+    total_count_gte?: number;
+    /**
+     * Total execution count of this opcode in this day (filter: between_min)
+     */
+    total_count_between_min?: number;
+    /**
+     * Total execution count of this opcode in this day (filter: between_max_value)
+     */
+    total_count_between_max_value?: number;
+    /**
+     * Total execution count of this opcode in this day (filter: in_values) (comma-separated list)
+     */
+    total_count_in_values?: string;
+    /**
+     * Total execution count of this opcode in this day (filter: not_in_values) (comma-separated list)
+     */
+    total_count_not_in_values?: string;
+    /**
+     * Total gas consumed by this opcode in this day (filter: eq)
+     */
+    total_gas_eq?: number;
+    /**
+     * Total gas consumed by this opcode in this day (filter: ne)
+     */
+    total_gas_ne?: number;
+    /**
+     * Total gas consumed by this opcode in this day (filter: lt)
+     */
+    total_gas_lt?: number;
+    /**
+     * Total gas consumed by this opcode in this day (filter: lte)
+     */
+    total_gas_lte?: number;
+    /**
+     * Total gas consumed by this opcode in this day (filter: gt)
+     */
+    total_gas_gt?: number;
+    /**
+     * Total gas consumed by this opcode in this day (filter: gte)
+     */
+    total_gas_gte?: number;
+    /**
+     * Total gas consumed by this opcode in this day (filter: between_min)
+     */
+    total_gas_between_min?: number;
+    /**
+     * Total gas consumed by this opcode in this day (filter: between_max_value)
+     */
+    total_gas_between_max_value?: number;
+    /**
+     * Total gas consumed by this opcode in this day (filter: in_values) (comma-separated list)
+     */
+    total_gas_in_values?: string;
+    /**
+     * Total gas consumed by this opcode in this day (filter: not_in_values) (comma-separated list)
+     */
+    total_gas_not_in_values?: string;
+    /**
+     * Total error count for this opcode in this day (filter: eq)
+     */
+    total_error_count_eq?: number;
+    /**
+     * Total error count for this opcode in this day (filter: ne)
+     */
+    total_error_count_ne?: number;
+    /**
+     * Total error count for this opcode in this day (filter: lt)
+     */
+    total_error_count_lt?: number;
+    /**
+     * Total error count for this opcode in this day (filter: lte)
+     */
+    total_error_count_lte?: number;
+    /**
+     * Total error count for this opcode in this day (filter: gt)
+     */
+    total_error_count_gt?: number;
+    /**
+     * Total error count for this opcode in this day (filter: gte)
+     */
+    total_error_count_gte?: number;
+    /**
+     * Total error count for this opcode in this day (filter: between_min)
+     */
+    total_error_count_between_min?: number;
+    /**
+     * Total error count for this opcode in this day (filter: between_max_value)
+     */
+    total_error_count_between_max_value?: number;
+    /**
+     * Total error count for this opcode in this day (filter: in_values) (comma-separated list)
+     */
+    total_error_count_in_values?: string;
+    /**
+     * Total error count for this opcode in this day (filter: not_in_values) (comma-separated list)
+     */
+    total_error_count_not_in_values?: string;
+    /**
+     * Filter avg_count_per_block using value
+     */
+    avg_count_per_block_value?: number;
+    /**
+     * Filter avg_gas_per_block using value
+     */
+    avg_gas_per_block_value?: number;
+    /**
+     * Filter avg_gas_per_execution using value
+     */
+    avg_gas_per_execution_value?: number;
+    /**
+     * The maximum number of fct_opcode_gas_by_opcode_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctOpcodeGasByOpcodeDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_opcode_gas_by_opcode_daily';
+};
+
+export type FctOpcodeGasByOpcodeDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctOpcodeGasByOpcodeDailyServiceListError =
+  FctOpcodeGasByOpcodeDailyServiceListErrors[keyof FctOpcodeGasByOpcodeDailyServiceListErrors];
+
+export type FctOpcodeGasByOpcodeDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctOpcodeGasByOpcodeDailyResponse;
+};
+
+export type FctOpcodeGasByOpcodeDailyServiceListResponse =
+  FctOpcodeGasByOpcodeDailyServiceListResponses[keyof FctOpcodeGasByOpcodeDailyServiceListResponses];
+
+export type FctOpcodeGasByOpcodeDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_opcode_gas_by_opcode_daily/{day_start_date}';
+};
+
+export type FctOpcodeGasByOpcodeDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctOpcodeGasByOpcodeDailyServiceGetError =
+  FctOpcodeGasByOpcodeDailyServiceGetErrors[keyof FctOpcodeGasByOpcodeDailyServiceGetErrors];
+
+export type FctOpcodeGasByOpcodeDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctOpcodeGasByOpcodeDailyResponse;
+};
+
+export type FctOpcodeGasByOpcodeDailyServiceGetResponse =
+  FctOpcodeGasByOpcodeDailyServiceGetResponses[keyof FctOpcodeGasByOpcodeDailyServiceGetResponses];
+
+export type FctOpcodeGasByOpcodeHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: eq)
+     */
+    opcode_eq?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ne)
+     */
+    opcode_ne?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: contains)
+     */
+    opcode_contains?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: starts_with)
+     */
+    opcode_starts_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ends_with)
+     */
+    opcode_ends_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: like)
+     */
+    opcode_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_like)
+     */
+    opcode_not_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: in_values) (comma-separated list)
+     */
+    opcode_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_in_values) (comma-separated list)
+     */
+    opcode_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks containing this opcode in this hour (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks containing this opcode in this hour (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks containing this opcode in this hour (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks containing this opcode in this hour (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks containing this opcode in this hour (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks containing this opcode in this hour (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks containing this opcode in this hour (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks containing this opcode in this hour (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks containing this opcode in this hour (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks containing this opcode in this hour (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total execution count of this opcode in this hour (filter: eq)
+     */
+    total_count_eq?: number;
+    /**
+     * Total execution count of this opcode in this hour (filter: ne)
+     */
+    total_count_ne?: number;
+    /**
+     * Total execution count of this opcode in this hour (filter: lt)
+     */
+    total_count_lt?: number;
+    /**
+     * Total execution count of this opcode in this hour (filter: lte)
+     */
+    total_count_lte?: number;
+    /**
+     * Total execution count of this opcode in this hour (filter: gt)
+     */
+    total_count_gt?: number;
+    /**
+     * Total execution count of this opcode in this hour (filter: gte)
+     */
+    total_count_gte?: number;
+    /**
+     * Total execution count of this opcode in this hour (filter: between_min)
+     */
+    total_count_between_min?: number;
+    /**
+     * Total execution count of this opcode in this hour (filter: between_max_value)
+     */
+    total_count_between_max_value?: number;
+    /**
+     * Total execution count of this opcode in this hour (filter: in_values) (comma-separated list)
+     */
+    total_count_in_values?: string;
+    /**
+     * Total execution count of this opcode in this hour (filter: not_in_values) (comma-separated list)
+     */
+    total_count_not_in_values?: string;
+    /**
+     * Total gas consumed by this opcode in this hour (filter: eq)
+     */
+    total_gas_eq?: number;
+    /**
+     * Total gas consumed by this opcode in this hour (filter: ne)
+     */
+    total_gas_ne?: number;
+    /**
+     * Total gas consumed by this opcode in this hour (filter: lt)
+     */
+    total_gas_lt?: number;
+    /**
+     * Total gas consumed by this opcode in this hour (filter: lte)
+     */
+    total_gas_lte?: number;
+    /**
+     * Total gas consumed by this opcode in this hour (filter: gt)
+     */
+    total_gas_gt?: number;
+    /**
+     * Total gas consumed by this opcode in this hour (filter: gte)
+     */
+    total_gas_gte?: number;
+    /**
+     * Total gas consumed by this opcode in this hour (filter: between_min)
+     */
+    total_gas_between_min?: number;
+    /**
+     * Total gas consumed by this opcode in this hour (filter: between_max_value)
+     */
+    total_gas_between_max_value?: number;
+    /**
+     * Total gas consumed by this opcode in this hour (filter: in_values) (comma-separated list)
+     */
+    total_gas_in_values?: string;
+    /**
+     * Total gas consumed by this opcode in this hour (filter: not_in_values) (comma-separated list)
+     */
+    total_gas_not_in_values?: string;
+    /**
+     * Total error count for this opcode in this hour (filter: eq)
+     */
+    total_error_count_eq?: number;
+    /**
+     * Total error count for this opcode in this hour (filter: ne)
+     */
+    total_error_count_ne?: number;
+    /**
+     * Total error count for this opcode in this hour (filter: lt)
+     */
+    total_error_count_lt?: number;
+    /**
+     * Total error count for this opcode in this hour (filter: lte)
+     */
+    total_error_count_lte?: number;
+    /**
+     * Total error count for this opcode in this hour (filter: gt)
+     */
+    total_error_count_gt?: number;
+    /**
+     * Total error count for this opcode in this hour (filter: gte)
+     */
+    total_error_count_gte?: number;
+    /**
+     * Total error count for this opcode in this hour (filter: between_min)
+     */
+    total_error_count_between_min?: number;
+    /**
+     * Total error count for this opcode in this hour (filter: between_max_value)
+     */
+    total_error_count_between_max_value?: number;
+    /**
+     * Total error count for this opcode in this hour (filter: in_values) (comma-separated list)
+     */
+    total_error_count_in_values?: string;
+    /**
+     * Total error count for this opcode in this hour (filter: not_in_values) (comma-separated list)
+     */
+    total_error_count_not_in_values?: string;
+    /**
+     * Filter avg_count_per_block using value
+     */
+    avg_count_per_block_value?: number;
+    /**
+     * Filter avg_gas_per_block using value
+     */
+    avg_gas_per_block_value?: number;
+    /**
+     * Filter avg_gas_per_execution using value
+     */
+    avg_gas_per_execution_value?: number;
+    /**
+     * The maximum number of fct_opcode_gas_by_opcode_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctOpcodeGasByOpcodeHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_opcode_gas_by_opcode_hourly';
+};
+
+export type FctOpcodeGasByOpcodeHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctOpcodeGasByOpcodeHourlyServiceListError =
+  FctOpcodeGasByOpcodeHourlyServiceListErrors[keyof FctOpcodeGasByOpcodeHourlyServiceListErrors];
+
+export type FctOpcodeGasByOpcodeHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctOpcodeGasByOpcodeHourlyResponse;
+};
+
+export type FctOpcodeGasByOpcodeHourlyServiceListResponse =
+  FctOpcodeGasByOpcodeHourlyServiceListResponses[keyof FctOpcodeGasByOpcodeHourlyServiceListResponses];
+
+export type FctOpcodeGasByOpcodeHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_opcode_gas_by_opcode_hourly/{hour_start_date_time}';
+};
+
+export type FctOpcodeGasByOpcodeHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctOpcodeGasByOpcodeHourlyServiceGetError =
+  FctOpcodeGasByOpcodeHourlyServiceGetErrors[keyof FctOpcodeGasByOpcodeHourlyServiceGetErrors];
+
+export type FctOpcodeGasByOpcodeHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctOpcodeGasByOpcodeHourlyResponse;
+};
+
+export type FctOpcodeGasByOpcodeHourlyServiceGetResponse =
+  FctOpcodeGasByOpcodeHourlyServiceGetResponses[keyof FctOpcodeGasByOpcodeHourlyServiceGetResponses];
+
+export type FctOpcodeOpsDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks in this day (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks in this day (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks in this day (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks in this day (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks in this day (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks in this day (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks in this day (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks in this day (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks in this day (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks in this day (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total opcode executions in this day (filter: eq)
+     */
+    total_opcode_count_eq?: number;
+    /**
+     * Total opcode executions in this day (filter: ne)
+     */
+    total_opcode_count_ne?: number;
+    /**
+     * Total opcode executions in this day (filter: lt)
+     */
+    total_opcode_count_lt?: number;
+    /**
+     * Total opcode executions in this day (filter: lte)
+     */
+    total_opcode_count_lte?: number;
+    /**
+     * Total opcode executions in this day (filter: gt)
+     */
+    total_opcode_count_gt?: number;
+    /**
+     * Total opcode executions in this day (filter: gte)
+     */
+    total_opcode_count_gte?: number;
+    /**
+     * Total opcode executions in this day (filter: between_min)
+     */
+    total_opcode_count_between_min?: number;
+    /**
+     * Total opcode executions in this day (filter: between_max_value)
+     */
+    total_opcode_count_between_max_value?: number;
+    /**
+     * Total opcode executions in this day (filter: in_values) (comma-separated list)
+     */
+    total_opcode_count_in_values?: string;
+    /**
+     * Total opcode executions in this day (filter: not_in_values) (comma-separated list)
+     */
+    total_opcode_count_not_in_values?: string;
+    /**
+     * Total gas consumed by opcodes in this day (filter: eq)
+     */
+    total_gas_eq?: number;
+    /**
+     * Total gas consumed by opcodes in this day (filter: ne)
+     */
+    total_gas_ne?: number;
+    /**
+     * Total gas consumed by opcodes in this day (filter: lt)
+     */
+    total_gas_lt?: number;
+    /**
+     * Total gas consumed by opcodes in this day (filter: lte)
+     */
+    total_gas_lte?: number;
+    /**
+     * Total gas consumed by opcodes in this day (filter: gt)
+     */
+    total_gas_gt?: number;
+    /**
+     * Total gas consumed by opcodes in this day (filter: gte)
+     */
+    total_gas_gte?: number;
+    /**
+     * Total gas consumed by opcodes in this day (filter: between_min)
+     */
+    total_gas_between_min?: number;
+    /**
+     * Total gas consumed by opcodes in this day (filter: between_max_value)
+     */
+    total_gas_between_max_value?: number;
+    /**
+     * Total gas consumed by opcodes in this day (filter: in_values) (comma-separated list)
+     */
+    total_gas_in_values?: string;
+    /**
+     * Total gas consumed by opcodes in this day (filter: not_in_values) (comma-separated list)
+     */
+    total_gas_not_in_values?: string;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: eq)
+     */
+    total_seconds_eq?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: ne)
+     */
+    total_seconds_ne?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: lt)
+     */
+    total_seconds_lt?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: lte)
+     */
+    total_seconds_lte?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: gt)
+     */
+    total_seconds_gt?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: gte)
+     */
+    total_seconds_gte?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: between_min)
+     */
+    total_seconds_between_min?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: between_max_value)
+     */
+    total_seconds_between_max_value?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: in_values) (comma-separated list)
+     */
+    total_seconds_in_values?: string;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: not_in_values) (comma-separated list)
+     */
+    total_seconds_not_in_values?: string;
+    /**
+     * Filter avg_ops using value
+     */
+    avg_ops_value?: number;
+    /**
+     * Filter min_ops using value
+     */
+    min_ops_value?: number;
+    /**
+     * Filter max_ops using value
+     */
+    max_ops_value?: number;
+    /**
+     * Filter p05_ops using value
+     */
+    p05_ops_value?: number;
+    /**
+     * Filter p50_ops using value
+     */
+    p50_ops_value?: number;
+    /**
+     * Filter p95_ops using value
+     */
+    p95_ops_value?: number;
+    /**
+     * Filter stddev_ops using value
+     */
+    stddev_ops_value?: number;
+    /**
+     * Filter upper_band_ops using value
+     */
+    upper_band_ops_value?: number;
+    /**
+     * Filter lower_band_ops using value
+     */
+    lower_band_ops_value?: number;
+    /**
+     * Filter moving_avg_ops using value
+     */
+    moving_avg_ops_value?: number;
+    /**
+     * The maximum number of fct_opcode_ops_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctOpcodeOpsDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_opcode_ops_daily';
+};
+
+export type FctOpcodeOpsDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctOpcodeOpsDailyServiceListError =
+  FctOpcodeOpsDailyServiceListErrors[keyof FctOpcodeOpsDailyServiceListErrors];
+
+export type FctOpcodeOpsDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctOpcodeOpsDailyResponse;
+};
+
+export type FctOpcodeOpsDailyServiceListResponse =
+  FctOpcodeOpsDailyServiceListResponses[keyof FctOpcodeOpsDailyServiceListResponses];
+
+export type FctOpcodeOpsDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_opcode_ops_daily/{day_start_date}';
+};
+
+export type FctOpcodeOpsDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctOpcodeOpsDailyServiceGetError =
+  FctOpcodeOpsDailyServiceGetErrors[keyof FctOpcodeOpsDailyServiceGetErrors];
+
+export type FctOpcodeOpsDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctOpcodeOpsDailyResponse;
+};
+
+export type FctOpcodeOpsDailyServiceGetResponse =
+  FctOpcodeOpsDailyServiceGetResponses[keyof FctOpcodeOpsDailyServiceGetResponses];
+
+export type FctOpcodeOpsHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks in this hour (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks in this hour (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks in this hour (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks in this hour (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks in this hour (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks in this hour (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks in this hour (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks in this hour (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks in this hour (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks in this hour (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total opcode executions in this hour (filter: eq)
+     */
+    total_opcode_count_eq?: number;
+    /**
+     * Total opcode executions in this hour (filter: ne)
+     */
+    total_opcode_count_ne?: number;
+    /**
+     * Total opcode executions in this hour (filter: lt)
+     */
+    total_opcode_count_lt?: number;
+    /**
+     * Total opcode executions in this hour (filter: lte)
+     */
+    total_opcode_count_lte?: number;
+    /**
+     * Total opcode executions in this hour (filter: gt)
+     */
+    total_opcode_count_gt?: number;
+    /**
+     * Total opcode executions in this hour (filter: gte)
+     */
+    total_opcode_count_gte?: number;
+    /**
+     * Total opcode executions in this hour (filter: between_min)
+     */
+    total_opcode_count_between_min?: number;
+    /**
+     * Total opcode executions in this hour (filter: between_max_value)
+     */
+    total_opcode_count_between_max_value?: number;
+    /**
+     * Total opcode executions in this hour (filter: in_values) (comma-separated list)
+     */
+    total_opcode_count_in_values?: string;
+    /**
+     * Total opcode executions in this hour (filter: not_in_values) (comma-separated list)
+     */
+    total_opcode_count_not_in_values?: string;
+    /**
+     * Total gas consumed by opcodes in this hour (filter: eq)
+     */
+    total_gas_eq?: number;
+    /**
+     * Total gas consumed by opcodes in this hour (filter: ne)
+     */
+    total_gas_ne?: number;
+    /**
+     * Total gas consumed by opcodes in this hour (filter: lt)
+     */
+    total_gas_lt?: number;
+    /**
+     * Total gas consumed by opcodes in this hour (filter: lte)
+     */
+    total_gas_lte?: number;
+    /**
+     * Total gas consumed by opcodes in this hour (filter: gt)
+     */
+    total_gas_gt?: number;
+    /**
+     * Total gas consumed by opcodes in this hour (filter: gte)
+     */
+    total_gas_gte?: number;
+    /**
+     * Total gas consumed by opcodes in this hour (filter: between_min)
+     */
+    total_gas_between_min?: number;
+    /**
+     * Total gas consumed by opcodes in this hour (filter: between_max_value)
+     */
+    total_gas_between_max_value?: number;
+    /**
+     * Total gas consumed by opcodes in this hour (filter: in_values) (comma-separated list)
+     */
+    total_gas_in_values?: string;
+    /**
+     * Total gas consumed by opcodes in this hour (filter: not_in_values) (comma-separated list)
+     */
+    total_gas_not_in_values?: string;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: eq)
+     */
+    total_seconds_eq?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: ne)
+     */
+    total_seconds_ne?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: lt)
+     */
+    total_seconds_lt?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: lte)
+     */
+    total_seconds_lte?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: gt)
+     */
+    total_seconds_gt?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: gte)
+     */
+    total_seconds_gte?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: between_min)
+     */
+    total_seconds_between_min?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: between_max_value)
+     */
+    total_seconds_between_max_value?: number;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: in_values) (comma-separated list)
+     */
+    total_seconds_in_values?: string;
+    /**
+     * Total actual seconds covered by blocks (sum of block time gaps) (filter: not_in_values) (comma-separated list)
+     */
+    total_seconds_not_in_values?: string;
+    /**
+     * Filter avg_ops using value
+     */
+    avg_ops_value?: number;
+    /**
+     * Filter min_ops using value
+     */
+    min_ops_value?: number;
+    /**
+     * Filter max_ops using value
+     */
+    max_ops_value?: number;
+    /**
+     * Filter p05_ops using value
+     */
+    p05_ops_value?: number;
+    /**
+     * Filter p50_ops using value
+     */
+    p50_ops_value?: number;
+    /**
+     * Filter p95_ops using value
+     */
+    p95_ops_value?: number;
+    /**
+     * Filter stddev_ops using value
+     */
+    stddev_ops_value?: number;
+    /**
+     * Filter upper_band_ops using value
+     */
+    upper_band_ops_value?: number;
+    /**
+     * Filter lower_band_ops using value
+     */
+    lower_band_ops_value?: number;
+    /**
+     * Filter moving_avg_ops using value
+     */
+    moving_avg_ops_value?: number;
+    /**
+     * The maximum number of fct_opcode_ops_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctOpcodeOpsHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_opcode_ops_hourly';
+};
+
+export type FctOpcodeOpsHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctOpcodeOpsHourlyServiceListError =
+  FctOpcodeOpsHourlyServiceListErrors[keyof FctOpcodeOpsHourlyServiceListErrors];
+
+export type FctOpcodeOpsHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctOpcodeOpsHourlyResponse;
+};
+
+export type FctOpcodeOpsHourlyServiceListResponse =
+  FctOpcodeOpsHourlyServiceListResponses[keyof FctOpcodeOpsHourlyServiceListResponses];
+
+export type FctOpcodeOpsHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_opcode_ops_hourly/{hour_start_date_time}';
+};
+
+export type FctOpcodeOpsHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctOpcodeOpsHourlyServiceGetError =
+  FctOpcodeOpsHourlyServiceGetErrors[keyof FctOpcodeOpsHourlyServiceGetErrors];
+
+export type FctOpcodeOpsHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctOpcodeOpsHourlyResponse;
+};
+
+export type FctOpcodeOpsHourlyServiceGetResponse =
+  FctOpcodeOpsHourlyServiceGetResponses[keyof FctOpcodeOpsHourlyServiceGetResponses];
+
 export type FctPreparedBlockServiceListData = {
   body?: never;
   path?: never;
@@ -55751,6 +57987,350 @@ export type IntBlockMevCanonicalServiceGetResponses = {
 
 export type IntBlockMevCanonicalServiceGetResponse =
   IntBlockMevCanonicalServiceGetResponses[keyof IntBlockMevCanonicalServiceGetResponses];
+
+export type IntBlockOpcodeGasServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: eq)
+     */
+    opcode_eq?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ne)
+     */
+    opcode_ne?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: contains)
+     */
+    opcode_contains?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: starts_with)
+     */
+    opcode_starts_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ends_with)
+     */
+    opcode_ends_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: like)
+     */
+    opcode_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_like)
+     */
+    opcode_not_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: in_values) (comma-separated list)
+     */
+    opcode_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_in_values) (comma-separated list)
+     */
+    opcode_not_in_values?: string;
+    /**
+     * The name of the network (filter: eq)
+     */
+    meta_network_name_eq?: string;
+    /**
+     * The name of the network (filter: ne)
+     */
+    meta_network_name_ne?: string;
+    /**
+     * The name of the network (filter: contains)
+     */
+    meta_network_name_contains?: string;
+    /**
+     * The name of the network (filter: starts_with)
+     */
+    meta_network_name_starts_with?: string;
+    /**
+     * The name of the network (filter: ends_with)
+     */
+    meta_network_name_ends_with?: string;
+    /**
+     * The name of the network (filter: like)
+     */
+    meta_network_name_like?: string;
+    /**
+     * The name of the network (filter: not_like)
+     */
+    meta_network_name_not_like?: string;
+    /**
+     * The name of the network (filter: in_values) (comma-separated list)
+     */
+    meta_network_name_in_values?: string;
+    /**
+     * The name of the network (filter: not_in_values) (comma-separated list)
+     */
+    meta_network_name_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: eq)
+     */
+    count_eq?: number;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: ne)
+     */
+    count_ne?: number;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: lt)
+     */
+    count_lt?: number;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: lte)
+     */
+    count_lte?: number;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: gt)
+     */
+    count_gt?: number;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: gte)
+     */
+    count_gte?: number;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: between_min)
+     */
+    count_between_min?: number;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: between_max_value)
+     */
+    count_between_max_value?: number;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: in_values) (comma-separated list)
+     */
+    count_in_values?: string;
+    /**
+     * Total execution count of this opcode across all transactions in the block (filter: not_in_values) (comma-separated list)
+     */
+    count_not_in_values?: string;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: eq)
+     */
+    gas_eq?: number;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: ne)
+     */
+    gas_ne?: number;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: lt)
+     */
+    gas_lt?: number;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: lte)
+     */
+    gas_lte?: number;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: gt)
+     */
+    gas_gt?: number;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: gte)
+     */
+    gas_gte?: number;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: between_min)
+     */
+    gas_between_min?: number;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: between_max_value)
+     */
+    gas_between_max_value?: number;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: in_values) (comma-separated list)
+     */
+    gas_in_values?: string;
+    /**
+     * Total gas consumed by this opcode across all transactions in the block (filter: not_in_values) (comma-separated list)
+     */
+    gas_not_in_values?: string;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: eq)
+     */
+    error_count_eq?: number;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: ne)
+     */
+    error_count_ne?: number;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: lt)
+     */
+    error_count_lt?: number;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: lte)
+     */
+    error_count_lte?: number;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: gt)
+     */
+    error_count_gt?: number;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: gte)
+     */
+    error_count_gte?: number;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: between_min)
+     */
+    error_count_between_min?: number;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: between_max_value)
+     */
+    error_count_between_max_value?: number;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: in_values) (comma-separated list)
+     */
+    error_count_in_values?: string;
+    /**
+     * Number of times this opcode resulted in an error across all transactions (filter: not_in_values) (comma-separated list)
+     */
+    error_count_not_in_values?: string;
+    /**
+     * The maximum number of int_block_opcode_gas to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntBlockOpcodeGas` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_block_opcode_gas';
+};
+
+export type IntBlockOpcodeGasServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntBlockOpcodeGasServiceListError =
+  IntBlockOpcodeGasServiceListErrors[keyof IntBlockOpcodeGasServiceListErrors];
+
+export type IntBlockOpcodeGasServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntBlockOpcodeGasResponse;
+};
+
+export type IntBlockOpcodeGasServiceListResponse =
+  IntBlockOpcodeGasServiceListResponses[keyof IntBlockOpcodeGasServiceListResponses];
+
+export type IntBlockOpcodeGasServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_block_opcode_gas/{block_number}';
+};
+
+export type IntBlockOpcodeGasServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntBlockOpcodeGasServiceGetError =
+  IntBlockOpcodeGasServiceGetErrors[keyof IntBlockOpcodeGasServiceGetErrors];
+
+export type IntBlockOpcodeGasServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntBlockOpcodeGasResponse;
+};
+
+export type IntBlockOpcodeGasServiceGetResponse =
+  IntBlockOpcodeGasServiceGetResponses[keyof IntBlockOpcodeGasServiceGetResponses];
 
 export type IntBlockProposerCanonicalServiceListData = {
   body?: never;
@@ -72313,3 +74893,1779 @@ export type IntStorageSlotStateWithExpiryByBlockServiceGetResponses = {
 
 export type IntStorageSlotStateWithExpiryByBlockServiceGetResponse =
   IntStorageSlotStateWithExpiryByBlockServiceGetResponses[keyof IntStorageSlotStateWithExpiryByBlockServiceGetResponses];
+
+export type IntTransactionCallFrameServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number containing this transaction (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number containing this transaction (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number containing this transaction (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number containing this transaction (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number containing this transaction (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number containing this transaction (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number containing this transaction (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number containing this transaction (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number containing this transaction (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number containing this transaction (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: eq)
+     */
+    transaction_hash_eq?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ne)
+     */
+    transaction_hash_ne?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: contains)
+     */
+    transaction_hash_contains?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    transaction_hash_starts_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    transaction_hash_ends_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: like)
+     */
+    transaction_hash_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_like)
+     */
+    transaction_hash_not_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    transaction_hash_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    transaction_hash_not_in_values?: string;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: eq)
+     */
+    call_frame_id_eq?: number;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: ne)
+     */
+    call_frame_id_ne?: number;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: lt)
+     */
+    call_frame_id_lt?: number;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: lte)
+     */
+    call_frame_id_lte?: number;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: gt)
+     */
+    call_frame_id_gt?: number;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: gte)
+     */
+    call_frame_id_gte?: number;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: between_min)
+     */
+    call_frame_id_between_min?: number;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: between_max_value)
+     */
+    call_frame_id_between_max_value?: number;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: in_values) (comma-separated list)
+     */
+    call_frame_id_in_values?: string;
+    /**
+     * Sequential frame ID within the transaction (0 = root) (filter: not_in_values) (comma-separated list)
+     */
+    call_frame_id_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Position of the transaction within the block (filter: eq)
+     */
+    transaction_index_eq?: number;
+    /**
+     * Position of the transaction within the block (filter: ne)
+     */
+    transaction_index_ne?: number;
+    /**
+     * Position of the transaction within the block (filter: lt)
+     */
+    transaction_index_lt?: number;
+    /**
+     * Position of the transaction within the block (filter: lte)
+     */
+    transaction_index_lte?: number;
+    /**
+     * Position of the transaction within the block (filter: gt)
+     */
+    transaction_index_gt?: number;
+    /**
+     * Position of the transaction within the block (filter: gte)
+     */
+    transaction_index_gte?: number;
+    /**
+     * Position of the transaction within the block (filter: between_min)
+     */
+    transaction_index_between_min?: number;
+    /**
+     * Position of the transaction within the block (filter: between_max_value)
+     */
+    transaction_index_between_max_value?: number;
+    /**
+     * Position of the transaction within the block (filter: in_values) (comma-separated list)
+     */
+    transaction_index_in_values?: string;
+    /**
+     * Position of the transaction within the block (filter: not_in_values) (comma-separated list)
+     */
+    transaction_index_not_in_values?: string;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: eq)
+     */
+    parent_call_frame_id_eq?: number;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: ne)
+     */
+    parent_call_frame_id_ne?: number;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: lt)
+     */
+    parent_call_frame_id_lt?: number;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: lte)
+     */
+    parent_call_frame_id_lte?: number;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: gt)
+     */
+    parent_call_frame_id_gt?: number;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: gte)
+     */
+    parent_call_frame_id_gte?: number;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: between_min)
+     */
+    parent_call_frame_id_between_min?: number;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: between_max_value)
+     */
+    parent_call_frame_id_between_max_value?: number;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: in_values) (comma-separated list)
+     */
+    parent_call_frame_id_in_values?: string;
+    /**
+     * Parent frame ID (NULL for root frame) (filter: not_in_values) (comma-separated list)
+     */
+    parent_call_frame_id_not_in_values?: string;
+    /**
+     * Call depth (0 = root transaction execution) (filter: eq)
+     */
+    depth_eq?: number;
+    /**
+     * Call depth (0 = root transaction execution) (filter: ne)
+     */
+    depth_ne?: number;
+    /**
+     * Call depth (0 = root transaction execution) (filter: lt)
+     */
+    depth_lt?: number;
+    /**
+     * Call depth (0 = root transaction execution) (filter: lte)
+     */
+    depth_lte?: number;
+    /**
+     * Call depth (0 = root transaction execution) (filter: gt)
+     */
+    depth_gt?: number;
+    /**
+     * Call depth (0 = root transaction execution) (filter: gte)
+     */
+    depth_gte?: number;
+    /**
+     * Call depth (0 = root transaction execution) (filter: between_min)
+     */
+    depth_between_min?: number;
+    /**
+     * Call depth (0 = root transaction execution) (filter: between_max_value)
+     */
+    depth_between_max_value?: number;
+    /**
+     * Call depth (0 = root transaction execution) (filter: in_values) (comma-separated list)
+     */
+    depth_in_values?: string;
+    /**
+     * Call depth (0 = root transaction execution) (filter: not_in_values) (comma-separated list)
+     */
+    depth_not_in_values?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: eq)
+     */
+    target_address_eq?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: ne)
+     */
+    target_address_ne?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: contains)
+     */
+    target_address_contains?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    target_address_starts_with?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    target_address_ends_with?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: like)
+     */
+    target_address_like?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: not_like)
+     */
+    target_address_not_like?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    target_address_in_values?: string;
+    /**
+     * Contract address being called (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    target_address_not_in_values?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: eq)
+     */
+    call_type_eq?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: ne)
+     */
+    call_type_ne?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: contains)
+     */
+    call_type_contains?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: starts_with)
+     */
+    call_type_starts_with?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: ends_with)
+     */
+    call_type_ends_with?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: like)
+     */
+    call_type_like?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: not_like)
+     */
+    call_type_not_like?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: in_values) (comma-separated list)
+     */
+    call_type_in_values?: string;
+    /**
+     * Type of call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: not_in_values) (comma-separated list)
+     */
+    call_type_not_in_values?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: eq)
+     */
+    function_selector_eq?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: ne)
+     */
+    function_selector_ne?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: contains)
+     */
+    function_selector_contains?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: starts_with)
+     */
+    function_selector_starts_with?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: ends_with)
+     */
+    function_selector_ends_with?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: like)
+     */
+    function_selector_like?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: not_like)
+     */
+    function_selector_not_like?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: in_values) (comma-separated list)
+     */
+    function_selector_in_values?: string;
+    /**
+     * Function selector (first 4 bytes of call input, hex encoded with 0x prefix). Populated for all frames from traces. (filter: not_in_values) (comma-separated list)
+     */
+    function_selector_not_in_values?: string;
+    /**
+     * Number of opcodes executed in this frame (filter: eq)
+     */
+    opcode_count_eq?: number;
+    /**
+     * Number of opcodes executed in this frame (filter: ne)
+     */
+    opcode_count_ne?: number;
+    /**
+     * Number of opcodes executed in this frame (filter: lt)
+     */
+    opcode_count_lt?: number;
+    /**
+     * Number of opcodes executed in this frame (filter: lte)
+     */
+    opcode_count_lte?: number;
+    /**
+     * Number of opcodes executed in this frame (filter: gt)
+     */
+    opcode_count_gt?: number;
+    /**
+     * Number of opcodes executed in this frame (filter: gte)
+     */
+    opcode_count_gte?: number;
+    /**
+     * Number of opcodes executed in this frame (filter: between_min)
+     */
+    opcode_count_between_min?: number;
+    /**
+     * Number of opcodes executed in this frame (filter: between_max_value)
+     */
+    opcode_count_between_max_value?: number;
+    /**
+     * Number of opcodes executed in this frame (filter: in_values) (comma-separated list)
+     */
+    opcode_count_in_values?: string;
+    /**
+     * Number of opcodes executed in this frame (filter: not_in_values) (comma-separated list)
+     */
+    opcode_count_not_in_values?: string;
+    /**
+     * Number of opcodes that resulted in errors (filter: eq)
+     */
+    error_count_eq?: number;
+    /**
+     * Number of opcodes that resulted in errors (filter: ne)
+     */
+    error_count_ne?: number;
+    /**
+     * Number of opcodes that resulted in errors (filter: lt)
+     */
+    error_count_lt?: number;
+    /**
+     * Number of opcodes that resulted in errors (filter: lte)
+     */
+    error_count_lte?: number;
+    /**
+     * Number of opcodes that resulted in errors (filter: gt)
+     */
+    error_count_gt?: number;
+    /**
+     * Number of opcodes that resulted in errors (filter: gte)
+     */
+    error_count_gte?: number;
+    /**
+     * Number of opcodes that resulted in errors (filter: between_min)
+     */
+    error_count_between_min?: number;
+    /**
+     * Number of opcodes that resulted in errors (filter: between_max_value)
+     */
+    error_count_between_max_value?: number;
+    /**
+     * Number of opcodes that resulted in errors (filter: in_values) (comma-separated list)
+     */
+    error_count_in_values?: string;
+    /**
+     * Number of opcodes that resulted in errors (filter: not_in_values) (comma-separated list)
+     */
+    error_count_not_in_values?: string;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: eq)
+     */
+    gas_eq?: number;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: ne)
+     */
+    gas_ne?: number;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: lt)
+     */
+    gas_lt?: number;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: lte)
+     */
+    gas_lte?: number;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: gt)
+     */
+    gas_gt?: number;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: gte)
+     */
+    gas_gte?: number;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: between_min)
+     */
+    gas_between_min?: number;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: between_max_value)
+     */
+    gas_between_max_value?: number;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: in_values) (comma-separated list)
+     */
+    gas_in_values?: string;
+    /**
+     * Gas consumed by this frame only, excludes child frames. sum(gas) = EVM execution gas. This is "self" gas in flame graphs. (filter: not_in_values) (comma-separated list)
+     */
+    gas_not_in_values?: string;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: eq)
+     */
+    gas_cumulative_eq?: number;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: ne)
+     */
+    gas_cumulative_ne?: number;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: lt)
+     */
+    gas_cumulative_lt?: number;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: lte)
+     */
+    gas_cumulative_lte?: number;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: gt)
+     */
+    gas_cumulative_gt?: number;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: gte)
+     */
+    gas_cumulative_gte?: number;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: between_min)
+     */
+    gas_cumulative_between_min?: number;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: between_max_value)
+     */
+    gas_cumulative_between_max_value?: number;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: in_values) (comma-separated list)
+     */
+    gas_cumulative_in_values?: string;
+    /**
+     * Gas consumed by this frame + all descendants. Root frame value = total EVM execution gas. (filter: not_in_values) (comma-separated list)
+     */
+    gas_cumulative_not_in_values?: string;
+    /**
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: eq)
+     */
+    gas_refund_eq?: number;
+    /**
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: ne)
+     */
+    gas_refund_ne?: number;
+    /**
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: lt)
+     */
+    gas_refund_lt?: number;
+    /**
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: lte)
+     */
+    gas_refund_lte?: number;
+    /**
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: gt)
+     */
+    gas_refund_gt?: number;
+    /**
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: gte)
+     */
+    gas_refund_gte?: number;
+    /**
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: between_min)
+     */
+    gas_refund_between_min?: number;
+    /**
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: between_max_value)
+     */
+    gas_refund_between_max_value?: number;
+    /**
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: in_values) (comma-separated list)
+     */
+    gas_refund_in_values?: string;
+    /**
+     * Total accumulated refund. Only populated for root frame, only for successful txs (refund not applied on failure). (filter: not_in_values) (comma-separated list)
+     */
+    gas_refund_not_in_values?: string;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: eq)
+     */
+    intrinsic_gas_eq?: number;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: ne)
+     */
+    intrinsic_gas_ne?: number;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: lt)
+     */
+    intrinsic_gas_lt?: number;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: lte)
+     */
+    intrinsic_gas_lte?: number;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: gt)
+     */
+    intrinsic_gas_gt?: number;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: gte)
+     */
+    intrinsic_gas_gte?: number;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: between_min)
+     */
+    intrinsic_gas_between_min?: number;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: between_max_value)
+     */
+    intrinsic_gas_between_max_value?: number;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: in_values) (comma-separated list)
+     */
+    intrinsic_gas_in_values?: string;
+    /**
+     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: not_in_values) (comma-separated list)
+     */
+    intrinsic_gas_not_in_values?: string;
+    /**
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: eq)
+     */
+    receipt_gas_used_eq?: number;
+    /**
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: ne)
+     */
+    receipt_gas_used_ne?: number;
+    /**
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: lt)
+     */
+    receipt_gas_used_lt?: number;
+    /**
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: lte)
+     */
+    receipt_gas_used_lte?: number;
+    /**
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: gt)
+     */
+    receipt_gas_used_gt?: number;
+    /**
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: gte)
+     */
+    receipt_gas_used_gte?: number;
+    /**
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: between_min)
+     */
+    receipt_gas_used_between_min?: number;
+    /**
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: between_max_value)
+     */
+    receipt_gas_used_between_max_value?: number;
+    /**
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: in_values) (comma-separated list)
+     */
+    receipt_gas_used_in_values?: string;
+    /**
+     * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: not_in_values) (comma-separated list)
+     */
+    receipt_gas_used_not_in_values?: string;
+    /**
+     * The maximum number of int_transaction_call_frame to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntTransactionCallFrame` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_transaction_call_frame';
+};
+
+export type IntTransactionCallFrameServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntTransactionCallFrameServiceListError =
+  IntTransactionCallFrameServiceListErrors[keyof IntTransactionCallFrameServiceListErrors];
+
+export type IntTransactionCallFrameServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntTransactionCallFrameResponse;
+};
+
+export type IntTransactionCallFrameServiceListResponse =
+  IntTransactionCallFrameServiceListResponses[keyof IntTransactionCallFrameServiceListResponses];
+
+export type IntTransactionCallFrameServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number containing this transaction
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_transaction_call_frame/{block_number}';
+};
+
+export type IntTransactionCallFrameServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntTransactionCallFrameServiceGetError =
+  IntTransactionCallFrameServiceGetErrors[keyof IntTransactionCallFrameServiceGetErrors];
+
+export type IntTransactionCallFrameServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntTransactionCallFrameResponse;
+};
+
+export type IntTransactionCallFrameServiceGetResponse =
+  IntTransactionCallFrameServiceGetResponses[keyof IntTransactionCallFrameServiceGetResponses];
+
+export type IntTransactionCallFrameOpcodeGasServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number containing the transaction (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number containing the transaction (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number containing the transaction (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number containing the transaction (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number containing the transaction (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number containing the transaction (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number containing the transaction (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number containing the transaction (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number containing the transaction (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number containing the transaction (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: eq)
+     */
+    transaction_hash_eq?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ne)
+     */
+    transaction_hash_ne?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: contains)
+     */
+    transaction_hash_contains?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    transaction_hash_starts_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    transaction_hash_ends_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: like)
+     */
+    transaction_hash_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_like)
+     */
+    transaction_hash_not_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    transaction_hash_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    transaction_hash_not_in_values?: string;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: eq)
+     */
+    call_frame_id_eq?: number;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: ne)
+     */
+    call_frame_id_ne?: number;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: lt)
+     */
+    call_frame_id_lt?: number;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: lte)
+     */
+    call_frame_id_lte?: number;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: gt)
+     */
+    call_frame_id_gt?: number;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: gte)
+     */
+    call_frame_id_gte?: number;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: between_min)
+     */
+    call_frame_id_between_min?: number;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: between_max_value)
+     */
+    call_frame_id_between_max_value?: number;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: in_values) (comma-separated list)
+     */
+    call_frame_id_in_values?: string;
+    /**
+     * Sequential frame ID within transaction (0 = root) (filter: not_in_values) (comma-separated list)
+     */
+    call_frame_id_not_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: eq)
+     */
+    opcode_eq?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ne)
+     */
+    opcode_ne?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: contains)
+     */
+    opcode_contains?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: starts_with)
+     */
+    opcode_starts_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ends_with)
+     */
+    opcode_ends_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: like)
+     */
+    opcode_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_like)
+     */
+    opcode_not_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: in_values) (comma-separated list)
+     */
+    opcode_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_in_values) (comma-separated list)
+     */
+    opcode_not_in_values?: string;
+    /**
+     * The name of the network (filter: eq)
+     */
+    meta_network_name_eq?: string;
+    /**
+     * The name of the network (filter: ne)
+     */
+    meta_network_name_ne?: string;
+    /**
+     * The name of the network (filter: contains)
+     */
+    meta_network_name_contains?: string;
+    /**
+     * The name of the network (filter: starts_with)
+     */
+    meta_network_name_starts_with?: string;
+    /**
+     * The name of the network (filter: ends_with)
+     */
+    meta_network_name_ends_with?: string;
+    /**
+     * The name of the network (filter: like)
+     */
+    meta_network_name_like?: string;
+    /**
+     * The name of the network (filter: not_like)
+     */
+    meta_network_name_not_like?: string;
+    /**
+     * The name of the network (filter: in_values) (comma-separated list)
+     */
+    meta_network_name_in_values?: string;
+    /**
+     * The name of the network (filter: not_in_values) (comma-separated list)
+     */
+    meta_network_name_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The index of the transaction within the block (filter: eq)
+     */
+    transaction_index_eq?: number;
+    /**
+     * The index of the transaction within the block (filter: ne)
+     */
+    transaction_index_ne?: number;
+    /**
+     * The index of the transaction within the block (filter: lt)
+     */
+    transaction_index_lt?: number;
+    /**
+     * The index of the transaction within the block (filter: lte)
+     */
+    transaction_index_lte?: number;
+    /**
+     * The index of the transaction within the block (filter: gt)
+     */
+    transaction_index_gt?: number;
+    /**
+     * The index of the transaction within the block (filter: gte)
+     */
+    transaction_index_gte?: number;
+    /**
+     * The index of the transaction within the block (filter: between_min)
+     */
+    transaction_index_between_min?: number;
+    /**
+     * The index of the transaction within the block (filter: between_max_value)
+     */
+    transaction_index_between_max_value?: number;
+    /**
+     * The index of the transaction within the block (filter: in_values) (comma-separated list)
+     */
+    transaction_index_in_values?: string;
+    /**
+     * The index of the transaction within the block (filter: not_in_values) (comma-separated list)
+     */
+    transaction_index_not_in_values?: string;
+    /**
+     * Number of times this opcode was executed in this frame (filter: eq)
+     */
+    count_eq?: number;
+    /**
+     * Number of times this opcode was executed in this frame (filter: ne)
+     */
+    count_ne?: number;
+    /**
+     * Number of times this opcode was executed in this frame (filter: lt)
+     */
+    count_lt?: number;
+    /**
+     * Number of times this opcode was executed in this frame (filter: lte)
+     */
+    count_lte?: number;
+    /**
+     * Number of times this opcode was executed in this frame (filter: gt)
+     */
+    count_gt?: number;
+    /**
+     * Number of times this opcode was executed in this frame (filter: gte)
+     */
+    count_gte?: number;
+    /**
+     * Number of times this opcode was executed in this frame (filter: between_min)
+     */
+    count_between_min?: number;
+    /**
+     * Number of times this opcode was executed in this frame (filter: between_max_value)
+     */
+    count_between_max_value?: number;
+    /**
+     * Number of times this opcode was executed in this frame (filter: in_values) (comma-separated list)
+     */
+    count_in_values?: string;
+    /**
+     * Number of times this opcode was executed in this frame (filter: not_in_values) (comma-separated list)
+     */
+    count_not_in_values?: string;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: eq)
+     */
+    gas_eq?: number;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: ne)
+     */
+    gas_ne?: number;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: lt)
+     */
+    gas_lt?: number;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: lte)
+     */
+    gas_lte?: number;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: gt)
+     */
+    gas_gt?: number;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: gte)
+     */
+    gas_gte?: number;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: between_min)
+     */
+    gas_between_min?: number;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: between_max_value)
+     */
+    gas_between_max_value?: number;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: in_values) (comma-separated list)
+     */
+    gas_in_values?: string;
+    /**
+     * Gas consumed by this opcode in this frame. sum(gas) = frame gas (filter: not_in_values) (comma-separated list)
+     */
+    gas_not_in_values?: string;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: eq)
+     */
+    gas_cumulative_eq?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: ne)
+     */
+    gas_cumulative_ne?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: lt)
+     */
+    gas_cumulative_lt?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: lte)
+     */
+    gas_cumulative_lte?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: gt)
+     */
+    gas_cumulative_gt?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: gte)
+     */
+    gas_cumulative_gte?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: between_min)
+     */
+    gas_cumulative_between_min?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: between_max_value)
+     */
+    gas_cumulative_between_max_value?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: in_values) (comma-separated list)
+     */
+    gas_cumulative_in_values?: string;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: not_in_values) (comma-separated list)
+     */
+    gas_cumulative_not_in_values?: string;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: eq)
+     */
+    error_count_eq?: number;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: ne)
+     */
+    error_count_ne?: number;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: lt)
+     */
+    error_count_lt?: number;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: lte)
+     */
+    error_count_lte?: number;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: gt)
+     */
+    error_count_gt?: number;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: gte)
+     */
+    error_count_gte?: number;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: between_min)
+     */
+    error_count_between_min?: number;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: between_max_value)
+     */
+    error_count_between_max_value?: number;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: in_values) (comma-separated list)
+     */
+    error_count_in_values?: string;
+    /**
+     * Number of times this opcode resulted in an error in this frame (filter: not_in_values) (comma-separated list)
+     */
+    error_count_not_in_values?: string;
+    /**
+     * The maximum number of int_transaction_call_frame_opcode_gas to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntTransactionCallFrameOpcodeGas` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_transaction_call_frame_opcode_gas';
+};
+
+export type IntTransactionCallFrameOpcodeGasServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntTransactionCallFrameOpcodeGasServiceListError =
+  IntTransactionCallFrameOpcodeGasServiceListErrors[keyof IntTransactionCallFrameOpcodeGasServiceListErrors];
+
+export type IntTransactionCallFrameOpcodeGasServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntTransactionCallFrameOpcodeGasResponse;
+};
+
+export type IntTransactionCallFrameOpcodeGasServiceListResponse =
+  IntTransactionCallFrameOpcodeGasServiceListResponses[keyof IntTransactionCallFrameOpcodeGasServiceListResponses];
+
+export type IntTransactionCallFrameOpcodeGasServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number containing the transaction
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_transaction_call_frame_opcode_gas/{block_number}';
+};
+
+export type IntTransactionCallFrameOpcodeGasServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntTransactionCallFrameOpcodeGasServiceGetError =
+  IntTransactionCallFrameOpcodeGasServiceGetErrors[keyof IntTransactionCallFrameOpcodeGasServiceGetErrors];
+
+export type IntTransactionCallFrameOpcodeGasServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntTransactionCallFrameOpcodeGasResponse;
+};
+
+export type IntTransactionCallFrameOpcodeGasServiceGetResponse =
+  IntTransactionCallFrameOpcodeGasServiceGetResponses[keyof IntTransactionCallFrameOpcodeGasServiceGetResponses];
+
+export type IntTransactionOpcodeGasServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number containing the transaction (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number containing the transaction (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number containing the transaction (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number containing the transaction (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number containing the transaction (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number containing the transaction (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number containing the transaction (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number containing the transaction (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number containing the transaction (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number containing the transaction (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: eq)
+     */
+    transaction_hash_eq?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ne)
+     */
+    transaction_hash_ne?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: contains)
+     */
+    transaction_hash_contains?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    transaction_hash_starts_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    transaction_hash_ends_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: like)
+     */
+    transaction_hash_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_like)
+     */
+    transaction_hash_not_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    transaction_hash_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    transaction_hash_not_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: eq)
+     */
+    opcode_eq?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ne)
+     */
+    opcode_ne?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: contains)
+     */
+    opcode_contains?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: starts_with)
+     */
+    opcode_starts_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ends_with)
+     */
+    opcode_ends_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: like)
+     */
+    opcode_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_like)
+     */
+    opcode_not_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: in_values) (comma-separated list)
+     */
+    opcode_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_in_values) (comma-separated list)
+     */
+    opcode_not_in_values?: string;
+    /**
+     * The name of the network (filter: eq)
+     */
+    meta_network_name_eq?: string;
+    /**
+     * The name of the network (filter: ne)
+     */
+    meta_network_name_ne?: string;
+    /**
+     * The name of the network (filter: contains)
+     */
+    meta_network_name_contains?: string;
+    /**
+     * The name of the network (filter: starts_with)
+     */
+    meta_network_name_starts_with?: string;
+    /**
+     * The name of the network (filter: ends_with)
+     */
+    meta_network_name_ends_with?: string;
+    /**
+     * The name of the network (filter: like)
+     */
+    meta_network_name_like?: string;
+    /**
+     * The name of the network (filter: not_like)
+     */
+    meta_network_name_not_like?: string;
+    /**
+     * The name of the network (filter: in_values) (comma-separated list)
+     */
+    meta_network_name_in_values?: string;
+    /**
+     * The name of the network (filter: not_in_values) (comma-separated list)
+     */
+    meta_network_name_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The index of the transaction within the block (filter: eq)
+     */
+    transaction_index_eq?: number;
+    /**
+     * The index of the transaction within the block (filter: ne)
+     */
+    transaction_index_ne?: number;
+    /**
+     * The index of the transaction within the block (filter: lt)
+     */
+    transaction_index_lt?: number;
+    /**
+     * The index of the transaction within the block (filter: lte)
+     */
+    transaction_index_lte?: number;
+    /**
+     * The index of the transaction within the block (filter: gt)
+     */
+    transaction_index_gt?: number;
+    /**
+     * The index of the transaction within the block (filter: gte)
+     */
+    transaction_index_gte?: number;
+    /**
+     * The index of the transaction within the block (filter: between_min)
+     */
+    transaction_index_between_min?: number;
+    /**
+     * The index of the transaction within the block (filter: between_max_value)
+     */
+    transaction_index_between_max_value?: number;
+    /**
+     * The index of the transaction within the block (filter: in_values) (comma-separated list)
+     */
+    transaction_index_in_values?: string;
+    /**
+     * The index of the transaction within the block (filter: not_in_values) (comma-separated list)
+     */
+    transaction_index_not_in_values?: string;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: eq)
+     */
+    count_eq?: number;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: ne)
+     */
+    count_ne?: number;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: lt)
+     */
+    count_lt?: number;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: lte)
+     */
+    count_lte?: number;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: gt)
+     */
+    count_gt?: number;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: gte)
+     */
+    count_gte?: number;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: between_min)
+     */
+    count_between_min?: number;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: between_max_value)
+     */
+    count_between_max_value?: number;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: in_values) (comma-separated list)
+     */
+    count_in_values?: string;
+    /**
+     * Number of times this opcode was executed in the transaction (filter: not_in_values) (comma-separated list)
+     */
+    count_not_in_values?: string;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: eq)
+     */
+    gas_eq?: number;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: ne)
+     */
+    gas_ne?: number;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: lt)
+     */
+    gas_lt?: number;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: lte)
+     */
+    gas_lte?: number;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: gt)
+     */
+    gas_gt?: number;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: gte)
+     */
+    gas_gte?: number;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: between_min)
+     */
+    gas_between_min?: number;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: between_max_value)
+     */
+    gas_between_max_value?: number;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: in_values) (comma-separated list)
+     */
+    gas_in_values?: string;
+    /**
+     * Gas consumed by this opcode. sum(gas) = transaction executed gas (filter: not_in_values) (comma-separated list)
+     */
+    gas_not_in_values?: string;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: eq)
+     */
+    gas_cumulative_eq?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: ne)
+     */
+    gas_cumulative_ne?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: lt)
+     */
+    gas_cumulative_lt?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: lte)
+     */
+    gas_cumulative_lte?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: gt)
+     */
+    gas_cumulative_gt?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: gte)
+     */
+    gas_cumulative_gte?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: between_min)
+     */
+    gas_cumulative_between_min?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: between_max_value)
+     */
+    gas_cumulative_between_max_value?: number;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: in_values) (comma-separated list)
+     */
+    gas_cumulative_in_values?: string;
+    /**
+     * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: not_in_values) (comma-separated list)
+     */
+    gas_cumulative_not_in_values?: string;
+    /**
+     * Minimum call stack depth for this opcode (filter: eq)
+     */
+    min_depth_eq?: number;
+    /**
+     * Minimum call stack depth for this opcode (filter: ne)
+     */
+    min_depth_ne?: number;
+    /**
+     * Minimum call stack depth for this opcode (filter: lt)
+     */
+    min_depth_lt?: number;
+    /**
+     * Minimum call stack depth for this opcode (filter: lte)
+     */
+    min_depth_lte?: number;
+    /**
+     * Minimum call stack depth for this opcode (filter: gt)
+     */
+    min_depth_gt?: number;
+    /**
+     * Minimum call stack depth for this opcode (filter: gte)
+     */
+    min_depth_gte?: number;
+    /**
+     * Minimum call stack depth for this opcode (filter: between_min)
+     */
+    min_depth_between_min?: number;
+    /**
+     * Minimum call stack depth for this opcode (filter: between_max_value)
+     */
+    min_depth_between_max_value?: number;
+    /**
+     * Minimum call stack depth for this opcode (filter: in_values) (comma-separated list)
+     */
+    min_depth_in_values?: string;
+    /**
+     * Minimum call stack depth for this opcode (filter: not_in_values) (comma-separated list)
+     */
+    min_depth_not_in_values?: string;
+    /**
+     * Maximum call stack depth for this opcode (filter: eq)
+     */
+    max_depth_eq?: number;
+    /**
+     * Maximum call stack depth for this opcode (filter: ne)
+     */
+    max_depth_ne?: number;
+    /**
+     * Maximum call stack depth for this opcode (filter: lt)
+     */
+    max_depth_lt?: number;
+    /**
+     * Maximum call stack depth for this opcode (filter: lte)
+     */
+    max_depth_lte?: number;
+    /**
+     * Maximum call stack depth for this opcode (filter: gt)
+     */
+    max_depth_gt?: number;
+    /**
+     * Maximum call stack depth for this opcode (filter: gte)
+     */
+    max_depth_gte?: number;
+    /**
+     * Maximum call stack depth for this opcode (filter: between_min)
+     */
+    max_depth_between_min?: number;
+    /**
+     * Maximum call stack depth for this opcode (filter: between_max_value)
+     */
+    max_depth_between_max_value?: number;
+    /**
+     * Maximum call stack depth for this opcode (filter: in_values) (comma-separated list)
+     */
+    max_depth_in_values?: string;
+    /**
+     * Maximum call stack depth for this opcode (filter: not_in_values) (comma-separated list)
+     */
+    max_depth_not_in_values?: string;
+    /**
+     * Number of times this opcode resulted in an error (filter: eq)
+     */
+    error_count_eq?: number;
+    /**
+     * Number of times this opcode resulted in an error (filter: ne)
+     */
+    error_count_ne?: number;
+    /**
+     * Number of times this opcode resulted in an error (filter: lt)
+     */
+    error_count_lt?: number;
+    /**
+     * Number of times this opcode resulted in an error (filter: lte)
+     */
+    error_count_lte?: number;
+    /**
+     * Number of times this opcode resulted in an error (filter: gt)
+     */
+    error_count_gt?: number;
+    /**
+     * Number of times this opcode resulted in an error (filter: gte)
+     */
+    error_count_gte?: number;
+    /**
+     * Number of times this opcode resulted in an error (filter: between_min)
+     */
+    error_count_between_min?: number;
+    /**
+     * Number of times this opcode resulted in an error (filter: between_max_value)
+     */
+    error_count_between_max_value?: number;
+    /**
+     * Number of times this opcode resulted in an error (filter: in_values) (comma-separated list)
+     */
+    error_count_in_values?: string;
+    /**
+     * Number of times this opcode resulted in an error (filter: not_in_values) (comma-separated list)
+     */
+    error_count_not_in_values?: string;
+    /**
+     * The maximum number of int_transaction_opcode_gas to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntTransactionOpcodeGas` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_transaction_opcode_gas';
+};
+
+export type IntTransactionOpcodeGasServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntTransactionOpcodeGasServiceListError =
+  IntTransactionOpcodeGasServiceListErrors[keyof IntTransactionOpcodeGasServiceListErrors];
+
+export type IntTransactionOpcodeGasServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntTransactionOpcodeGasResponse;
+};
+
+export type IntTransactionOpcodeGasServiceListResponse =
+  IntTransactionOpcodeGasServiceListResponses[keyof IntTransactionOpcodeGasServiceListResponses];
+
+export type IntTransactionOpcodeGasServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number containing the transaction
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_transaction_opcode_gas/{block_number}';
+};
+
+export type IntTransactionOpcodeGasServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntTransactionOpcodeGasServiceGetError =
+  IntTransactionOpcodeGasServiceGetErrors[keyof IntTransactionOpcodeGasServiceGetErrors];
+
+export type IntTransactionOpcodeGasServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntTransactionOpcodeGasResponse;
+};
+
+export type IntTransactionOpcodeGasServiceGetResponse =
+  IntTransactionOpcodeGasServiceGetResponses[keyof IntTransactionOpcodeGasServiceGetResponses];
