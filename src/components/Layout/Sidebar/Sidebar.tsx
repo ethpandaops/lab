@@ -173,7 +173,8 @@ const ethereumExecutionPages: NavItem[] = [
   { name: 'Overview', to: '/ethereum/execution/overview', icon: PresentationChartLineIcon },
   { name: 'Timings', to: '/ethereum/execution/timings', icon: ClockIcon },
   { name: 'Payloads', to: '/ethereum/execution/payloads', icon: CubeIcon },
-  { name: 'Gas Profiler', to: '/ethereum/execution/gas-profiler', icon: FireIcon },
+  // Hidden while backfilling - route still accessible directly at /ethereum/execution/gas-profiler
+  // { name: 'Gas Profiler', to: '/ethereum/execution/gas-profiler', icon: FireIcon },
   { name: 'State Growth', to: '/ethereum/execution/state-growth', icon: ServerStackIcon },
   { name: 'State Expiry', to: '/ethereum/execution/state-expiry', icon: ArchiveBoxXMarkIcon },
   { name: 'Contracts', to: '/ethereum/contracts', icon: DocumentTextIcon },
