@@ -22,6 +22,7 @@ import {
   createExecutionForkMarkLines,
   createBlobScheduleMarkLines,
 } from '@/components/Charts/MultiLine';
+import { BarChart } from '@/components/Charts/Bar';
 import {
   fctOpcodeOpsHourlyServiceListOptions,
   fctOpcodeOpsDailyServiceListOptions,
@@ -31,7 +32,7 @@ import {
 import type { FctOpcodeOpsHourly, FctOpcodeOpsDaily } from '@/api/types.gen';
 import { useTableBounds } from '@/hooks/useBounds';
 import { useRecentBlocks } from './hooks/useRecentBlocks';
-import { GasProfilerSkeleton, CategoryPieChart, OpcodeAnalysis } from './components';
+import { GasProfilerSkeleton, OpcodeAnalysis } from './components';
 import { type TimePeriod, TIME_RANGE_CONFIG, TIME_PERIOD_OPTIONS } from './constants';
 import { getOpcodeCategory, CATEGORY_COLORS } from './utils';
 import type { GasProfilerHomeSearch } from './IndexPage.types';
@@ -296,13 +297,13 @@ export function HomePage(): JSX.Element {
       .sort((a, b) => b.totalGas - a.totalGas);
   }, [isDaily, opcodeGasDailyQuery.data, opcodeGasHourlyQuery.data]);
 
-  // Aggregate gas by category across the time period
+  // Aggregate gas by category across the time period (top 8 + Other for bar chart)
   const gasByCategoryData = useMemo(() => {
     const records = isDaily
       ? opcodeGasDailyQuery.data?.fct_opcode_gas_by_opcode_daily
       : opcodeGasHourlyQuery.data?.fct_opcode_gas_by_opcode_hourly;
 
-    if (!records?.length) return [];
+    if (!records?.length) return { labels: [], data: [], total: 0 };
 
     // Aggregate gas by category
     const categoryMap = new Map<string, number>();
@@ -312,8 +313,28 @@ export function HomePage(): JSX.Element {
       categoryMap.set(category, (categoryMap.get(category) ?? 0) + (r.total_gas ?? 0));
     }
 
-    // Convert to array and sort by gas (matching CategoryPieChart expected format)
-    return [...categoryMap.entries()].map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+    // Sort by gas descending
+    const sorted = [...categoryMap.entries()].sort((a, b) => b[1] - a[1]);
+    const total = sorted.reduce((sum, [, val]) => sum + val, 0);
+
+    // Take top 12, group rest as "Other"
+    const MAX_CATEGORIES = 12;
+    const top = sorted.slice(0, MAX_CATEGORIES);
+    const rest = sorted.slice(MAX_CATEGORIES);
+    const otherValue = rest.reduce((sum, [, val]) => sum + val, 0);
+
+    // Build final list (reversed so largest is at top in horizontal bar chart)
+    const final = otherValue > 0 ? [...top, ['Other', otherValue] as [string, number]] : top;
+    const reversed = final.reverse();
+
+    return {
+      labels: reversed.map(([name]) => name),
+      data: reversed.map(([name, value]) => ({
+        value,
+        color: name === 'Other' ? '#6b7280' : (CATEGORY_COLORS[name] ?? '#6b7280'),
+      })),
+      total,
+    };
   }, [isDaily, opcodeGasDailyQuery.data, opcodeGasHourlyQuery.data]);
 
   // Navigate to older/newer blocks
@@ -425,10 +446,20 @@ export function HomePage(): JSX.Element {
     const upperBandValues: (number | null)[] = [];
 
     for (const r of opcodeOpsRecords) {
-      // Use string labels for category axis (matching gas chart pattern)
-      const label = isDaily
-        ? ((r as FctOpcodeOpsDaily).day_start_date ?? '')
-        : String((r as FctOpcodeOpsHourly).hour_start_date_time ?? '');
+      // Format labels for display: daily uses date string as-is, hourly formats timestamp
+      let label: string;
+      if (isDaily) {
+        label = (r as FctOpcodeOpsDaily).day_start_date ?? '';
+      } else {
+        const ts = (r as FctOpcodeOpsHourly).hour_start_date_time ?? 0;
+        const date = new Date(ts * 1000);
+        label = date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: '2-digit',
+          timeZone: 'UTC',
+        });
+      }
 
       labels.push(label);
       avgValues.push(r.avg_ops ?? null);
@@ -519,9 +550,19 @@ export function HomePage(): JSX.Element {
 
       const recordsByKey = new Map<string, FctOpcodeOpsHourly | FctOpcodeOpsDaily>();
       for (const r of opcodeOpsRecords) {
-        const key = isDaily
-          ? ((r as FctOpcodeOpsDaily).day_start_date ?? '')
-          : String((r as FctOpcodeOpsHourly).hour_start_date_time ?? '');
+        let key: string;
+        if (isDaily) {
+          key = (r as FctOpcodeOpsDaily).day_start_date ?? '';
+        } else {
+          const ts = (r as FctOpcodeOpsHourly).hour_start_date_time ?? 0;
+          const date = new Date(ts * 1000);
+          key = date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: '2-digit',
+            timeZone: 'UTC',
+          });
+        }
         recordsByKey.set(key, r);
       }
 
@@ -764,16 +805,42 @@ export function HomePage(): JSX.Element {
         </PopoutCard>
 
         {/* Gas by Category */}
-        <CategoryPieChart
-          data={gasByCategoryData}
-          colorMap={CATEGORY_COLORS}
+        <PopoutCard
           title="Gas by Category"
           subtitle={`Opcode category distribution (${timePeriod})`}
-          percentLabel="of EVM gas"
-          loading={isOpcodeGasLoading}
-          emptyMessage="No opcode category data"
-          height={320}
-        />
+          anchorId="gas-by-category"
+          modalSize="full"
+        >
+          {({ inModal }) =>
+            isOpcodeGasLoading ? (
+              <div className="flex h-[420px] items-center justify-center">
+                <div className="animate-pulse text-muted">Loading category data...</div>
+              </div>
+            ) : gasByCategoryData.labels.length > 0 ? (
+              <BarChart
+                data={gasByCategoryData.data}
+                labels={gasByCategoryData.labels}
+                orientation="horizontal"
+                height={inModal ? 500 : 420}
+                showLabel
+                labelFormatter={(params: { value: number }) => {
+                  const pct = gasByCategoryData.total > 0 ? (params.value / gasByCategoryData.total) * 100 : 0;
+                  return `${pct.toFixed(1)}%`;
+                }}
+                barWidth="70%"
+                valueAxisLabelFormatter={formatCompact}
+                tooltipFormatter={(params: unknown) => {
+                  const arr = Array.isArray(params) ? params : [params];
+                  const p = arr[0] as { name?: string; value?: number };
+                  const pct = gasByCategoryData.total > 0 ? ((p.value ?? 0) / gasByCategoryData.total) * 100 : 0;
+                  return `<strong>${p.name}</strong><br/>Gas: ${formatGas(p.value ?? 0)}<br/>${pct.toFixed(1)}% of total`;
+                }}
+              />
+            ) : (
+              <div className="flex h-[420px] items-center justify-center text-muted">No category data available</div>
+            )
+          }
+        </PopoutCard>
       </div>
 
       {/* Opcode Analysis - Charts by Gas and Count */}

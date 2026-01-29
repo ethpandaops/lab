@@ -34,6 +34,10 @@ export interface CategoryPieChartProps {
   innerRadius?: number;
   /** Outer radius percentage (default: 70) */
   outerRadius?: number;
+  /** Minimum percentage threshold - items below this are grouped into "Other" (default: 2) */
+  minPercentage?: number;
+  /** Maximum number of slices before grouping rest into "Other" (default: 8) */
+  maxSlices?: number;
 }
 
 /**
@@ -62,11 +66,42 @@ export function CategoryPieChart({
   emptyMessage = 'No data available',
   innerRadius = 40,
   outerRadius = 70,
+  minPercentage = 2,
+  maxSlices = 8,
 }: CategoryPieChartProps): JSX.Element {
   const colors = useThemeColors();
 
-  const chartOption = useMemo(() => {
+  // Process data to group small slices into "Other"
+  const processedData = useMemo(() => {
     const total = data.reduce((sum, d) => sum + d.value, 0);
+    if (total === 0) return data;
+
+    // Sort by value descending
+    const sorted = [...data].sort((a, b) => b.value - a.value);
+
+    // Separate items that meet threshold vs those that don't
+    const kept: CategoryPieChartItem[] = [];
+    let otherValue = 0;
+
+    for (const item of sorted) {
+      const pct = (item.value / total) * 100;
+      if (kept.length < maxSlices && pct >= minPercentage) {
+        kept.push(item);
+      } else {
+        otherValue += item.value;
+      }
+    }
+
+    // Add "Other" slice if there's anything grouped
+    if (otherValue > 0) {
+      kept.push({ name: 'Other', value: otherValue });
+    }
+
+    return kept;
+  }, [data, minPercentage, maxSlices]);
+
+  const chartOption = useMemo(() => {
+    const total = processedData.reduce((sum, d) => sum + d.value, 0);
 
     return {
       series: [
@@ -74,10 +109,10 @@ export function CategoryPieChart({
           type: 'pie',
           radius: [`${innerRadius}%`, `${outerRadius}%`],
           center: ['50%', '50%'],
-          data: data.map(d => ({
+          data: processedData.map(d => ({
             name: d.name,
             value: d.value,
-            itemStyle: { color: colorMap[d.name] ?? colors.muted },
+            itemStyle: { color: d.name === 'Other' ? '#6b7280' : (colorMap[d.name] ?? colors.muted) },
           })),
           label: {
             show: true,
@@ -98,7 +133,7 @@ export function CategoryPieChart({
         },
       },
     };
-  }, [data, colorMap, colors, innerRadius, outerRadius, percentLabel]);
+  }, [processedData, colorMap, colors, innerRadius, outerRadius, percentLabel]);
 
   const titleWithTotal = totalLabel ? `${title}` : title;
   const subtitleWithTotal = totalLabel ? `${subtitle} · ${totalLabel}` : subtitle;

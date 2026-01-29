@@ -66,7 +66,11 @@ export function TopContractsByGasChart({
             labels={chartData.labels}
             orientation="horizontal"
             height={Math.max(inModal ? 400 : 200, chartData.labels.length * 28)}
-            showLabel={false}
+            showLabel
+            labelFormatter={(params: { value: number }) => {
+              const pct = totalGas > 0 ? (params.value / totalGas) * 100 : 0;
+              return `${pct.toFixed(1)}%`;
+            }}
             barWidth="60%"
             valueAxisLabelFormatter={formatCompact}
             tooltipFormatter={(params: unknown) => {
