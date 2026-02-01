@@ -7,6 +7,7 @@
     "build": "tsc -b && vite build --mode production",
     "preview": "vite preview",
     "test": "pnpm test:unit && pnpm test:storybook",
+    "verify:skill-md": "node scripts/verify-skill-md.cjs",
     "test:unit": "vitest run --no-ui --config vitest.config.unit.ts",
     "test:unit:watch": "vitest --no-ui --config vitest.config.unit.ts",
     "test:storybook": "vitest run --no-ui --config vitest.config.ts",
