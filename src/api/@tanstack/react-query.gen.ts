@@ -238,6 +238,8 @@ import {
   intCustodyProbeOrderBySlotServiceList,
   intCustodyProbeServiceGet,
   intCustodyProbeServiceList,
+  intEngineGetBlobsServiceGet,
+  intEngineGetBlobsServiceList,
   intEngineNewPayloadServiceGet,
   intEngineNewPayloadServiceList,
   intExecutionBlockByDateServiceGet,
@@ -993,6 +995,12 @@ import type {
   IntCustodyProbeServiceListData,
   IntCustodyProbeServiceListError,
   IntCustodyProbeServiceListResponse,
+  IntEngineGetBlobsServiceGetData,
+  IntEngineGetBlobsServiceGetError,
+  IntEngineGetBlobsServiceGetResponse,
+  IntEngineGetBlobsServiceListData,
+  IntEngineGetBlobsServiceListError,
+  IntEngineGetBlobsServiceListResponse,
   IntEngineNewPayloadServiceGetData,
   IntEngineNewPayloadServiceGetError,
   IntEngineNewPayloadServiceGetResponse,
@@ -7973,6 +7981,60 @@ export const intCustodyProbeOrderBySlotServiceGetOptions = (
       return data;
     },
     queryKey: intCustodyProbeOrderBySlotServiceGetQueryKey(options),
+  });
+
+export const intEngineGetBlobsServiceListQueryKey = (options?: Options<IntEngineGetBlobsServiceListData>) =>
+  createQueryKey('intEngineGetBlobsServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intEngineGetBlobsServiceListOptions = (options?: Options<IntEngineGetBlobsServiceListData>) =>
+  queryOptions<
+    IntEngineGetBlobsServiceListResponse,
+    IntEngineGetBlobsServiceListError,
+    IntEngineGetBlobsServiceListResponse,
+    ReturnType<typeof intEngineGetBlobsServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intEngineGetBlobsServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intEngineGetBlobsServiceListQueryKey(options),
+  });
+
+export const intEngineGetBlobsServiceGetQueryKey = (options: Options<IntEngineGetBlobsServiceGetData>) =>
+  createQueryKey('intEngineGetBlobsServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intEngineGetBlobsServiceGetOptions = (options: Options<IntEngineGetBlobsServiceGetData>) =>
+  queryOptions<
+    IntEngineGetBlobsServiceGetResponse,
+    IntEngineGetBlobsServiceGetError,
+    IntEngineGetBlobsServiceGetResponse,
+    ReturnType<typeof intEngineGetBlobsServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intEngineGetBlobsServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intEngineGetBlobsServiceGetQueryKey(options),
   });
 
 export const intEngineNewPayloadServiceListQueryKey = (options?: Options<IntEngineNewPayloadServiceListData>) =>

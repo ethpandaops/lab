@@ -1,5 +1,6 @@
 import { type JSX, useMemo, useCallback, useState, useEffect } from 'react';
 import { useParams, Link } from '@tanstack/react-router';
+import { Route } from '@/routes/ethereum/execution/gas-profiler/tx.$txHash_.call.$callId';
 import { Tab as HeadlessTab } from '@headlessui/react';
 import {
   ArrowLeftIcon,
@@ -71,21 +72,24 @@ function getCallTypeStyles(callType: string): { bg: string; text: string; border
  */
 export function CallPage(): JSX.Element {
   const { txHash, callId } = useParams({ from: '/ethereum/execution/gas-profiler/tx/$txHash_/call/$callId' });
+  const { block: blockFromSearch } = Route.useSearch();
   const callIdNum = parseInt(callId, 10);
 
   const [copied, setCopied] = useState(false);
 
   // Fetch all transaction data
+  // Pass blockNumber from URL search params for efficient partition-based filtering
   const {
     data: txData,
     isLoading,
     error,
   } = useTransactionGasData({
     transactionHash: txHash,
+    blockNumber: blockFromSearch,
   });
 
-  // Block number derived from transaction data
-  const blockNumber = txData?.metadata.blockNumber ?? null;
+  // Block number: prefer from response (source of truth), fall back to URL param
+  const blockNumber = txData?.metadata.blockNumber ?? blockFromSearch ?? null;
 
   // Fetch frame-specific opcodes (only when we have blockNumber)
   const { data: frameOpcodes, isLoading: frameOpcodesLoading } = useFrameOpcodes({

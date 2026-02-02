@@ -705,6 +705,12 @@ import type {
   IntCustodyProbeServiceListData,
   IntCustodyProbeServiceListErrors,
   IntCustodyProbeServiceListResponses,
+  IntEngineGetBlobsServiceGetData,
+  IntEngineGetBlobsServiceGetErrors,
+  IntEngineGetBlobsServiceGetResponses,
+  IntEngineGetBlobsServiceListData,
+  IntEngineGetBlobsServiceListErrors,
+  IntEngineGetBlobsServiceListResponses,
   IntEngineNewPayloadServiceGetData,
   IntEngineNewPayloadServiceGetErrors,
   IntEngineNewPayloadServiceGetResponses,
@@ -1325,6 +1331,10 @@ import {
   zIntCustodyProbeServiceGetResponse,
   zIntCustodyProbeServiceListData,
   zIntCustodyProbeServiceListResponse,
+  zIntEngineGetBlobsServiceGetData,
+  zIntEngineGetBlobsServiceGetResponse,
+  zIntEngineGetBlobsServiceListData,
+  zIntEngineGetBlobsServiceListResponse,
   zIntEngineNewPayloadServiceGetData,
   zIntEngineNewPayloadServiceGetResponse,
   zIntEngineNewPayloadServiceListData,
@@ -5854,6 +5864,42 @@ export const intCustodyProbeOrderBySlotServiceGet = <ThrowOnError extends boolea
     url: '/api/v1/int_custody_probe_order_by_slot/{slot_start_date_time}',
     ...options,
   });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intEngineGetBlobsServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntEngineGetBlobsServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntEngineGetBlobsServiceListResponses,
+    IntEngineGetBlobsServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntEngineGetBlobsServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntEngineGetBlobsServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_engine_get_blobs',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intEngineGetBlobsServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntEngineGetBlobsServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<IntEngineGetBlobsServiceGetResponses, IntEngineGetBlobsServiceGetErrors, ThrowOnError>(
+    {
+      requestValidator: async data => await zIntEngineGetBlobsServiceGetData.parseAsync(data),
+      responseValidator: async data => await zIntEngineGetBlobsServiceGetResponse.parseAsync(data),
+      url: '/api/v1/int_engine_get_blobs/{slot_start_date_time}',
+      ...options,
+    }
+  );
 
 /**
  * List records

@@ -5153,6 +5153,13 @@ export type GetIntCustodyProbeResponse = {
 };
 
 /**
+ * Response for getting a single int_engine_get_blobs record
+ */
+export type GetIntEngineGetBlobsResponse = {
+  item?: IntEngineGetBlobs;
+};
+
+/**
  * Response for getting a single int_engine_new_payload record
  */
 export type GetIntEngineNewPayloadResponse = {
@@ -6720,6 +6727,141 @@ export type IntCustodyProbeOrderBySlot = {
    * Username extracted from client name
    */
   username?: string;
+};
+
+export type IntEngineGetBlobs = {
+  /**
+   * Root of the parent beacon block (hex encoded with 0x prefix)
+   */
+  block_parent_root?: string;
+  /**
+   * Root of the beacon block (hex encoded with 0x prefix)
+   */
+  block_root?: string;
+  /**
+   * How long the engine_getBlobs call took in milliseconds
+   */
+  duration_ms?: number;
+  /**
+   * Epoch number derived from the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Error message when the call fails
+   */
+  error_message?: string | null;
+  /**
+   * When the sentry received the event
+   */
+  event_date_time?: number;
+  /**
+   * Autonomous system number of the client that generated the event
+   */
+  meta_client_geo_autonomous_system_number?: number | null;
+  /**
+   * Autonomous system organization of the client that generated the event
+   */
+  meta_client_geo_autonomous_system_organization?: string | null;
+  /**
+   * City of the client that generated the event
+   */
+  meta_client_geo_city?: string;
+  /**
+   * Continent code of the client that generated the event
+   */
+  meta_client_geo_continent_code?: string;
+  /**
+   * Country of the client that generated the event
+   */
+  meta_client_geo_country?: string;
+  /**
+   * Country code of the client that generated the event
+   */
+  meta_client_geo_country_code?: string;
+  /**
+   * Latitude of the client that generated the event
+   */
+  meta_client_geo_latitude?: number | null;
+  /**
+   * Longitude of the client that generated the event
+   */
+  meta_client_geo_longitude?: number | null;
+  /**
+   * Implementation of the client that generated the event
+   */
+  meta_client_implementation?: string;
+  /**
+   * Name of the client that generated the event
+   */
+  meta_client_name?: string;
+  /**
+   * Version of the client that generated the event
+   */
+  meta_client_version?: string;
+  /**
+   * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Full execution client version string from web3_clientVersion RPC
+   */
+  meta_execution_version?: string;
+  /**
+   * Version of the engine_getBlobs method
+   */
+  method_version?: string;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
+  /**
+   * Validator index of the block proposer
+   */
+  proposer_index?: number;
+  /**
+   * Number of blobs requested (length of versioned_hashes array)
+   */
+  requested_count?: number;
+  /**
+   * When the engine_getBlobs call was initiated
+   */
+  requested_date_time?: number;
+  /**
+   * Indexes of the returned blobs
+   */
+  returned_blob_indexes?: Array<number>;
+  /**
+   * Number of blobs actually returned
+   */
+  returned_count?: number;
+  /**
+   * Slot number of the beacon block containing the blobs
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Source of the engine event
+   */
+  source?: string;
+  /**
+   * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR)
+   */
+  status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Versioned hashes of the requested blobs
+   */
+  versioned_hashes?: Array<string>;
 };
 
 export type IntEngineNewPayload = {
@@ -9277,6 +9419,20 @@ export type ListIntCustodyProbeResponse = {
    * The list of int_custody_probe.
    */
   int_custody_probe?: Array<IntCustodyProbe>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_engine_get_blobs records
+ */
+export type ListIntEngineGetBlobsResponse = {
+  /**
+   * The list of int_engine_get_blobs.
+   */
+  int_engine_get_blobs?: Array<IntEngineGetBlobs>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -66721,6 +66877,1242 @@ export type IntCustodyProbeOrderBySlotServiceGetResponses = {
 
 export type IntCustodyProbeOrderBySlotServiceGetResponse =
   IntCustodyProbeOrderBySlotServiceGetResponses[keyof IntCustodyProbeOrderBySlotServiceGetResponses];
+
+export type IntEngineGetBlobsServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * Root of the beacon block (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * Name of the client that generated the event (filter: eq)
+     */
+    meta_client_name_eq?: string;
+    /**
+     * Name of the client that generated the event (filter: ne)
+     */
+    meta_client_name_ne?: string;
+    /**
+     * Name of the client that generated the event (filter: contains)
+     */
+    meta_client_name_contains?: string;
+    /**
+     * Name of the client that generated the event (filter: starts_with)
+     */
+    meta_client_name_starts_with?: string;
+    /**
+     * Name of the client that generated the event (filter: ends_with)
+     */
+    meta_client_name_ends_with?: string;
+    /**
+     * Name of the client that generated the event (filter: like)
+     */
+    meta_client_name_like?: string;
+    /**
+     * Name of the client that generated the event (filter: not_like)
+     */
+    meta_client_name_not_like?: string;
+    /**
+     * Name of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_name_in_values?: string;
+    /**
+     * Name of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_name_not_in_values?: string;
+    /**
+     * When the sentry received the event (filter: eq)
+     */
+    event_date_time_eq?: number;
+    /**
+     * When the sentry received the event (filter: ne)
+     */
+    event_date_time_ne?: number;
+    /**
+     * When the sentry received the event (filter: lt)
+     */
+    event_date_time_lt?: number;
+    /**
+     * When the sentry received the event (filter: lte)
+     */
+    event_date_time_lte?: number;
+    /**
+     * When the sentry received the event (filter: gt)
+     */
+    event_date_time_gt?: number;
+    /**
+     * When the sentry received the event (filter: gte)
+     */
+    event_date_time_gte?: number;
+    /**
+     * When the sentry received the event (filter: between_min)
+     */
+    event_date_time_between_min?: number;
+    /**
+     * When the sentry received the event (filter: between_max_value)
+     */
+    event_date_time_between_max_value?: number;
+    /**
+     * When the sentry received the event (filter: in_values) (comma-separated list)
+     */
+    event_date_time_in_values?: string;
+    /**
+     * When the sentry received the event (filter: not_in_values) (comma-separated list)
+     */
+    event_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * When the engine_getBlobs call was initiated (filter: eq)
+     */
+    requested_date_time_eq?: number;
+    /**
+     * When the engine_getBlobs call was initiated (filter: ne)
+     */
+    requested_date_time_ne?: number;
+    /**
+     * When the engine_getBlobs call was initiated (filter: lt)
+     */
+    requested_date_time_lt?: number;
+    /**
+     * When the engine_getBlobs call was initiated (filter: lte)
+     */
+    requested_date_time_lte?: number;
+    /**
+     * When the engine_getBlobs call was initiated (filter: gt)
+     */
+    requested_date_time_gt?: number;
+    /**
+     * When the engine_getBlobs call was initiated (filter: gte)
+     */
+    requested_date_time_gte?: number;
+    /**
+     * When the engine_getBlobs call was initiated (filter: between_min)
+     */
+    requested_date_time_between_min?: number;
+    /**
+     * When the engine_getBlobs call was initiated (filter: between_max_value)
+     */
+    requested_date_time_between_max_value?: number;
+    /**
+     * When the engine_getBlobs call was initiated (filter: in_values) (comma-separated list)
+     */
+    requested_date_time_in_values?: string;
+    /**
+     * When the engine_getBlobs call was initiated (filter: not_in_values) (comma-separated list)
+     */
+    requested_date_time_not_in_values?: string;
+    /**
+     * How long the engine_getBlobs call took in milliseconds (filter: eq)
+     */
+    duration_ms_eq?: number;
+    /**
+     * How long the engine_getBlobs call took in milliseconds (filter: ne)
+     */
+    duration_ms_ne?: number;
+    /**
+     * How long the engine_getBlobs call took in milliseconds (filter: lt)
+     */
+    duration_ms_lt?: number;
+    /**
+     * How long the engine_getBlobs call took in milliseconds (filter: lte)
+     */
+    duration_ms_lte?: number;
+    /**
+     * How long the engine_getBlobs call took in milliseconds (filter: gt)
+     */
+    duration_ms_gt?: number;
+    /**
+     * How long the engine_getBlobs call took in milliseconds (filter: gte)
+     */
+    duration_ms_gte?: number;
+    /**
+     * How long the engine_getBlobs call took in milliseconds (filter: between_min)
+     */
+    duration_ms_between_min?: number;
+    /**
+     * How long the engine_getBlobs call took in milliseconds (filter: between_max_value)
+     */
+    duration_ms_between_max_value?: number;
+    /**
+     * How long the engine_getBlobs call took in milliseconds (filter: in_values) (comma-separated list)
+     */
+    duration_ms_in_values?: string;
+    /**
+     * How long the engine_getBlobs call took in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    duration_ms_not_in_values?: string;
+    /**
+     * Slot number of the beacon block containing the blobs (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * Slot number of the beacon block containing the blobs (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * Slot number of the beacon block containing the blobs (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * Slot number of the beacon block containing the blobs (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * Slot number of the beacon block containing the blobs (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * Slot number of the beacon block containing the blobs (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * Slot number of the beacon block containing the blobs (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * Slot number of the beacon block containing the blobs (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * Slot number of the beacon block containing the blobs (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * Slot number of the beacon block containing the blobs (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * Epoch number derived from the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * Epoch number derived from the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * Epoch number derived from the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * Epoch number derived from the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * Epoch number derived from the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * Epoch number derived from the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * Epoch number derived from the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * Epoch number derived from the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * Epoch number derived from the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * Epoch number derived from the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: eq)
+     */
+    block_parent_root_eq?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: ne)
+     */
+    block_parent_root_ne?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: contains)
+     */
+    block_parent_root_contains?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    block_parent_root_starts_with?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    block_parent_root_ends_with?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: like)
+     */
+    block_parent_root_like?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: not_like)
+     */
+    block_parent_root_not_like?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    block_parent_root_in_values?: string;
+    /**
+     * Root of the parent beacon block (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    block_parent_root_not_in_values?: string;
+    /**
+     * Validator index of the block proposer (filter: eq)
+     */
+    proposer_index_eq?: number;
+    /**
+     * Validator index of the block proposer (filter: ne)
+     */
+    proposer_index_ne?: number;
+    /**
+     * Validator index of the block proposer (filter: lt)
+     */
+    proposer_index_lt?: number;
+    /**
+     * Validator index of the block proposer (filter: lte)
+     */
+    proposer_index_lte?: number;
+    /**
+     * Validator index of the block proposer (filter: gt)
+     */
+    proposer_index_gt?: number;
+    /**
+     * Validator index of the block proposer (filter: gte)
+     */
+    proposer_index_gte?: number;
+    /**
+     * Validator index of the block proposer (filter: between_min)
+     */
+    proposer_index_between_min?: number;
+    /**
+     * Validator index of the block proposer (filter: between_max_value)
+     */
+    proposer_index_between_max_value?: number;
+    /**
+     * Validator index of the block proposer (filter: in_values) (comma-separated list)
+     */
+    proposer_index_in_values?: string;
+    /**
+     * Validator index of the block proposer (filter: not_in_values) (comma-separated list)
+     */
+    proposer_index_not_in_values?: string;
+    /**
+     * Number of blobs requested (length of versioned_hashes array) (filter: eq)
+     */
+    requested_count_eq?: number;
+    /**
+     * Number of blobs requested (length of versioned_hashes array) (filter: ne)
+     */
+    requested_count_ne?: number;
+    /**
+     * Number of blobs requested (length of versioned_hashes array) (filter: lt)
+     */
+    requested_count_lt?: number;
+    /**
+     * Number of blobs requested (length of versioned_hashes array) (filter: lte)
+     */
+    requested_count_lte?: number;
+    /**
+     * Number of blobs requested (length of versioned_hashes array) (filter: gt)
+     */
+    requested_count_gt?: number;
+    /**
+     * Number of blobs requested (length of versioned_hashes array) (filter: gte)
+     */
+    requested_count_gte?: number;
+    /**
+     * Number of blobs requested (length of versioned_hashes array) (filter: between_min)
+     */
+    requested_count_between_min?: number;
+    /**
+     * Number of blobs requested (length of versioned_hashes array) (filter: between_max_value)
+     */
+    requested_count_between_max_value?: number;
+    /**
+     * Number of blobs requested (length of versioned_hashes array) (filter: in_values) (comma-separated list)
+     */
+    requested_count_in_values?: string;
+    /**
+     * Number of blobs requested (length of versioned_hashes array) (filter: not_in_values) (comma-separated list)
+     */
+    requested_count_not_in_values?: string;
+    /**
+     * Versioned hashes of the requested blobs (filter: has)
+     */
+    versioned_hashes_has?: string;
+    /**
+     * Versioned hashes of the requested blobs (filter: has_all_values)
+     */
+    versioned_hashes_has_all_values?: Array<string>;
+    /**
+     * Versioned hashes of the requested blobs (filter: has_any_values)
+     */
+    versioned_hashes_has_any_values?: Array<string>;
+    /**
+     * Versioned hashes of the requested blobs (filter: length_eq)
+     */
+    versioned_hashes_length_eq?: number;
+    /**
+     * Versioned hashes of the requested blobs (filter: length_gt)
+     */
+    versioned_hashes_length_gt?: number;
+    /**
+     * Versioned hashes of the requested blobs (filter: length_gte)
+     */
+    versioned_hashes_length_gte?: number;
+    /**
+     * Versioned hashes of the requested blobs (filter: length_lt)
+     */
+    versioned_hashes_length_lt?: number;
+    /**
+     * Versioned hashes of the requested blobs (filter: length_lte)
+     */
+    versioned_hashes_length_lte?: number;
+    /**
+     * Number of blobs actually returned (filter: eq)
+     */
+    returned_count_eq?: number;
+    /**
+     * Number of blobs actually returned (filter: ne)
+     */
+    returned_count_ne?: number;
+    /**
+     * Number of blobs actually returned (filter: lt)
+     */
+    returned_count_lt?: number;
+    /**
+     * Number of blobs actually returned (filter: lte)
+     */
+    returned_count_lte?: number;
+    /**
+     * Number of blobs actually returned (filter: gt)
+     */
+    returned_count_gt?: number;
+    /**
+     * Number of blobs actually returned (filter: gte)
+     */
+    returned_count_gte?: number;
+    /**
+     * Number of blobs actually returned (filter: between_min)
+     */
+    returned_count_between_min?: number;
+    /**
+     * Number of blobs actually returned (filter: between_max_value)
+     */
+    returned_count_between_max_value?: number;
+    /**
+     * Number of blobs actually returned (filter: in_values) (comma-separated list)
+     */
+    returned_count_in_values?: string;
+    /**
+     * Number of blobs actually returned (filter: not_in_values) (comma-separated list)
+     */
+    returned_count_not_in_values?: string;
+    /**
+     * Indexes of the returned blobs (filter: has)
+     */
+    returned_blob_indexes_has?: number;
+    /**
+     * Indexes of the returned blobs (filter: has_all_values)
+     */
+    returned_blob_indexes_has_all_values?: Array<number>;
+    /**
+     * Indexes of the returned blobs (filter: has_any_values)
+     */
+    returned_blob_indexes_has_any_values?: Array<number>;
+    /**
+     * Indexes of the returned blobs (filter: length_eq)
+     */
+    returned_blob_indexes_length_eq?: number;
+    /**
+     * Indexes of the returned blobs (filter: length_gt)
+     */
+    returned_blob_indexes_length_gt?: number;
+    /**
+     * Indexes of the returned blobs (filter: length_gte)
+     */
+    returned_blob_indexes_length_gte?: number;
+    /**
+     * Indexes of the returned blobs (filter: length_lt)
+     */
+    returned_blob_indexes_length_lt?: number;
+    /**
+     * Indexes of the returned blobs (filter: length_lte)
+     */
+    returned_blob_indexes_length_lte?: number;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: like)
+     */
+    status_like?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * Engine API response status (SUCCESS, PARTIAL, EMPTY, UNSUPPORTED, ERROR) (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
+     * Error message when the call fails (filter: eq)
+     */
+    error_message_eq?: string;
+    /**
+     * Error message when the call fails (filter: ne)
+     */
+    error_message_ne?: string;
+    /**
+     * Error message when the call fails (filter: contains)
+     */
+    error_message_contains?: string;
+    /**
+     * Error message when the call fails (filter: starts_with)
+     */
+    error_message_starts_with?: string;
+    /**
+     * Error message when the call fails (filter: ends_with)
+     */
+    error_message_ends_with?: string;
+    /**
+     * Error message when the call fails (filter: like)
+     */
+    error_message_like?: string;
+    /**
+     * Error message when the call fails (filter: not_like)
+     */
+    error_message_not_like?: string;
+    /**
+     * Error message when the call fails (filter: in_values) (comma-separated list)
+     */
+    error_message_in_values?: string;
+    /**
+     * Error message when the call fails (filter: not_in_values) (comma-separated list)
+     */
+    error_message_not_in_values?: string;
+    /**
+     * Version of the engine_getBlobs method (filter: eq)
+     */
+    method_version_eq?: string;
+    /**
+     * Version of the engine_getBlobs method (filter: ne)
+     */
+    method_version_ne?: string;
+    /**
+     * Version of the engine_getBlobs method (filter: contains)
+     */
+    method_version_contains?: string;
+    /**
+     * Version of the engine_getBlobs method (filter: starts_with)
+     */
+    method_version_starts_with?: string;
+    /**
+     * Version of the engine_getBlobs method (filter: ends_with)
+     */
+    method_version_ends_with?: string;
+    /**
+     * Version of the engine_getBlobs method (filter: like)
+     */
+    method_version_like?: string;
+    /**
+     * Version of the engine_getBlobs method (filter: not_like)
+     */
+    method_version_not_like?: string;
+    /**
+     * Version of the engine_getBlobs method (filter: in_values) (comma-separated list)
+     */
+    method_version_in_values?: string;
+    /**
+     * Version of the engine_getBlobs method (filter: not_in_values) (comma-separated list)
+     */
+    method_version_not_in_values?: string;
+    /**
+     * Source of the engine event (filter: eq)
+     */
+    source_eq?: string;
+    /**
+     * Source of the engine event (filter: ne)
+     */
+    source_ne?: string;
+    /**
+     * Source of the engine event (filter: contains)
+     */
+    source_contains?: string;
+    /**
+     * Source of the engine event (filter: starts_with)
+     */
+    source_starts_with?: string;
+    /**
+     * Source of the engine event (filter: ends_with)
+     */
+    source_ends_with?: string;
+    /**
+     * Source of the engine event (filter: like)
+     */
+    source_like?: string;
+    /**
+     * Source of the engine event (filter: not_like)
+     */
+    source_not_like?: string;
+    /**
+     * Source of the engine event (filter: in_values) (comma-separated list)
+     */
+    source_in_values?: string;
+    /**
+     * Source of the engine event (filter: not_in_values) (comma-separated list)
+     */
+    source_not_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Implementation of the client that generated the event (filter: eq)
+     */
+    meta_client_implementation_eq?: string;
+    /**
+     * Implementation of the client that generated the event (filter: ne)
+     */
+    meta_client_implementation_ne?: string;
+    /**
+     * Implementation of the client that generated the event (filter: contains)
+     */
+    meta_client_implementation_contains?: string;
+    /**
+     * Implementation of the client that generated the event (filter: starts_with)
+     */
+    meta_client_implementation_starts_with?: string;
+    /**
+     * Implementation of the client that generated the event (filter: ends_with)
+     */
+    meta_client_implementation_ends_with?: string;
+    /**
+     * Implementation of the client that generated the event (filter: like)
+     */
+    meta_client_implementation_like?: string;
+    /**
+     * Implementation of the client that generated the event (filter: not_like)
+     */
+    meta_client_implementation_not_like?: string;
+    /**
+     * Implementation of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_implementation_in_values?: string;
+    /**
+     * Implementation of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_implementation_not_in_values?: string;
+    /**
+     * Version of the client that generated the event (filter: eq)
+     */
+    meta_client_version_eq?: string;
+    /**
+     * Version of the client that generated the event (filter: ne)
+     */
+    meta_client_version_ne?: string;
+    /**
+     * Version of the client that generated the event (filter: contains)
+     */
+    meta_client_version_contains?: string;
+    /**
+     * Version of the client that generated the event (filter: starts_with)
+     */
+    meta_client_version_starts_with?: string;
+    /**
+     * Version of the client that generated the event (filter: ends_with)
+     */
+    meta_client_version_ends_with?: string;
+    /**
+     * Version of the client that generated the event (filter: like)
+     */
+    meta_client_version_like?: string;
+    /**
+     * Version of the client that generated the event (filter: not_like)
+     */
+    meta_client_version_not_like?: string;
+    /**
+     * Version of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_version_in_values?: string;
+    /**
+     * Version of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_version_not_in_values?: string;
+    /**
+     * City of the client that generated the event (filter: eq)
+     */
+    meta_client_geo_city_eq?: string;
+    /**
+     * City of the client that generated the event (filter: ne)
+     */
+    meta_client_geo_city_ne?: string;
+    /**
+     * City of the client that generated the event (filter: contains)
+     */
+    meta_client_geo_city_contains?: string;
+    /**
+     * City of the client that generated the event (filter: starts_with)
+     */
+    meta_client_geo_city_starts_with?: string;
+    /**
+     * City of the client that generated the event (filter: ends_with)
+     */
+    meta_client_geo_city_ends_with?: string;
+    /**
+     * City of the client that generated the event (filter: like)
+     */
+    meta_client_geo_city_like?: string;
+    /**
+     * City of the client that generated the event (filter: not_like)
+     */
+    meta_client_geo_city_not_like?: string;
+    /**
+     * City of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_city_in_values?: string;
+    /**
+     * City of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_city_not_in_values?: string;
+    /**
+     * Country of the client that generated the event (filter: eq)
+     */
+    meta_client_geo_country_eq?: string;
+    /**
+     * Country of the client that generated the event (filter: ne)
+     */
+    meta_client_geo_country_ne?: string;
+    /**
+     * Country of the client that generated the event (filter: contains)
+     */
+    meta_client_geo_country_contains?: string;
+    /**
+     * Country of the client that generated the event (filter: starts_with)
+     */
+    meta_client_geo_country_starts_with?: string;
+    /**
+     * Country of the client that generated the event (filter: ends_with)
+     */
+    meta_client_geo_country_ends_with?: string;
+    /**
+     * Country of the client that generated the event (filter: like)
+     */
+    meta_client_geo_country_like?: string;
+    /**
+     * Country of the client that generated the event (filter: not_like)
+     */
+    meta_client_geo_country_not_like?: string;
+    /**
+     * Country of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_country_in_values?: string;
+    /**
+     * Country of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_country_not_in_values?: string;
+    /**
+     * Country code of the client that generated the event (filter: eq)
+     */
+    meta_client_geo_country_code_eq?: string;
+    /**
+     * Country code of the client that generated the event (filter: ne)
+     */
+    meta_client_geo_country_code_ne?: string;
+    /**
+     * Country code of the client that generated the event (filter: contains)
+     */
+    meta_client_geo_country_code_contains?: string;
+    /**
+     * Country code of the client that generated the event (filter: starts_with)
+     */
+    meta_client_geo_country_code_starts_with?: string;
+    /**
+     * Country code of the client that generated the event (filter: ends_with)
+     */
+    meta_client_geo_country_code_ends_with?: string;
+    /**
+     * Country code of the client that generated the event (filter: like)
+     */
+    meta_client_geo_country_code_like?: string;
+    /**
+     * Country code of the client that generated the event (filter: not_like)
+     */
+    meta_client_geo_country_code_not_like?: string;
+    /**
+     * Country code of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_country_code_in_values?: string;
+    /**
+     * Country code of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_country_code_not_in_values?: string;
+    /**
+     * Continent code of the client that generated the event (filter: eq)
+     */
+    meta_client_geo_continent_code_eq?: string;
+    /**
+     * Continent code of the client that generated the event (filter: ne)
+     */
+    meta_client_geo_continent_code_ne?: string;
+    /**
+     * Continent code of the client that generated the event (filter: contains)
+     */
+    meta_client_geo_continent_code_contains?: string;
+    /**
+     * Continent code of the client that generated the event (filter: starts_with)
+     */
+    meta_client_geo_continent_code_starts_with?: string;
+    /**
+     * Continent code of the client that generated the event (filter: ends_with)
+     */
+    meta_client_geo_continent_code_ends_with?: string;
+    /**
+     * Continent code of the client that generated the event (filter: like)
+     */
+    meta_client_geo_continent_code_like?: string;
+    /**
+     * Continent code of the client that generated the event (filter: not_like)
+     */
+    meta_client_geo_continent_code_not_like?: string;
+    /**
+     * Continent code of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_continent_code_in_values?: string;
+    /**
+     * Continent code of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_continent_code_not_in_values?: string;
+    /**
+     * Filter meta_client_geo_latitude using value
+     */
+    meta_client_geo_latitude_value?: number;
+    /**
+     * Filter meta_client_geo_longitude using value
+     */
+    meta_client_geo_longitude_value?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: eq)
+     */
+    meta_client_geo_autonomous_system_number_eq?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: ne)
+     */
+    meta_client_geo_autonomous_system_number_ne?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: lt)
+     */
+    meta_client_geo_autonomous_system_number_lt?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: lte)
+     */
+    meta_client_geo_autonomous_system_number_lte?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: gt)
+     */
+    meta_client_geo_autonomous_system_number_gt?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: gte)
+     */
+    meta_client_geo_autonomous_system_number_gte?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: between_min)
+     */
+    meta_client_geo_autonomous_system_number_between_min?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: between_max_value)
+     */
+    meta_client_geo_autonomous_system_number_between_max_value?: number;
+    /**
+     * Autonomous system number of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_autonomous_system_number_in_values?: string;
+    /**
+     * Autonomous system number of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_autonomous_system_number_not_in_values?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: eq)
+     */
+    meta_client_geo_autonomous_system_organization_eq?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: ne)
+     */
+    meta_client_geo_autonomous_system_organization_ne?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: contains)
+     */
+    meta_client_geo_autonomous_system_organization_contains?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: starts_with)
+     */
+    meta_client_geo_autonomous_system_organization_starts_with?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: ends_with)
+     */
+    meta_client_geo_autonomous_system_organization_ends_with?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: like)
+     */
+    meta_client_geo_autonomous_system_organization_like?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: not_like)
+     */
+    meta_client_geo_autonomous_system_organization_not_like?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_autonomous_system_organization_in_values?: string;
+    /**
+     * Autonomous system organization of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_autonomous_system_organization_not_in_values?: string;
+    /**
+     * The maximum number of int_engine_get_blobs to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntEngineGetBlobs` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_engine_get_blobs';
+};
+
+export type IntEngineGetBlobsServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntEngineGetBlobsServiceListError =
+  IntEngineGetBlobsServiceListErrors[keyof IntEngineGetBlobsServiceListErrors];
+
+export type IntEngineGetBlobsServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntEngineGetBlobsResponse;
+};
+
+export type IntEngineGetBlobsServiceListResponse =
+  IntEngineGetBlobsServiceListResponses[keyof IntEngineGetBlobsServiceListResponses];
+
+export type IntEngineGetBlobsServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/int_engine_get_blobs/{slot_start_date_time}';
+};
+
+export type IntEngineGetBlobsServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntEngineGetBlobsServiceGetError =
+  IntEngineGetBlobsServiceGetErrors[keyof IntEngineGetBlobsServiceGetErrors];
+
+export type IntEngineGetBlobsServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntEngineGetBlobsResponse;
+};
+
+export type IntEngineGetBlobsServiceGetResponse =
+  IntEngineGetBlobsServiceGetResponses[keyof IntEngineGetBlobsServiceGetResponses];
 
 export type IntEngineNewPayloadServiceListData = {
   body?: never;

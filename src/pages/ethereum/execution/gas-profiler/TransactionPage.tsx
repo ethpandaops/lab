@@ -1,5 +1,6 @@
 import { type JSX, useState, useCallback, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from '@tanstack/react-router';
+import { Route } from '@/routes/ethereum/execution/gas-profiler/tx.$txHash';
 import { Tab as HeadlessTab } from '@headlessui/react';
 import {
   ArrowLeftIcon,
@@ -64,6 +65,7 @@ async function copyToClipboard(text: string): Promise<boolean> {
  */
 export function TransactionPage(): JSX.Element {
   const { txHash } = useParams({ from: '/ethereum/execution/gas-profiler/tx/$txHash' });
+  const { block: blockFromSearch } = Route.useSearch();
   const navigate = useNavigate({ from: '/ethereum/execution/gas-profiler/tx/$txHash' });
 
   // State for copy feedback
@@ -72,26 +74,26 @@ export function TransactionPage(): JSX.Element {
   // State for showing opcodes in flame graph (on by default)
   const [showOpcodes, setShowOpcodes] = useState(true);
 
-  // Fetch transaction data by tx hash (block number derived from response)
+  // Fetch transaction data by tx hash
+  // Pass blockNumber from URL search params for efficient partition-based filtering
   const {
     data: txData,
     isLoading,
     error,
   } = useTransactionGasData({
     transactionHash: txHash,
+    blockNumber: blockFromSearch,
   });
 
   // Fetch all opcode data for flame graph (only when toggle is enabled)
-  const {
-    data: opcodeMap,
-    isLoading: isLoadingOpcodes,
-  } = useAllCallFrameOpcodes({
+  const { data: opcodeMap, isLoading: isLoadingOpcodes } = useAllCallFrameOpcodes({
     transactionHash: txHash,
+    blockNumber: blockFromSearch,
     enabled: showOpcodes,
   });
 
-  // Block number is derived from transaction data
-  const blockNumber = txData?.metadata.blockNumber ?? null;
+  // Block number: prefer from response (source of truth), fall back to URL param
+  const blockNumber = txData?.metadata.blockNumber ?? blockFromSearch ?? null;
 
   // Get contract owners from txData for name lookup (memoized to avoid dependency issues)
   const contractOwners = useMemo(() => txData?.contractOwners ?? {}, [txData?.contractOwners]);

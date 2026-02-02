@@ -23,6 +23,8 @@ export type AllCallFrameOpcodesMap = Map<number, CallFrameOpcodeData[]>;
 export interface UseAllCallFrameOpcodesOptions {
   /** Transaction hash to fetch data for */
   transactionHash: string | null;
+  /** Block number for efficient API queries (uses partition key) */
+  blockNumber?: number | null;
   /** Whether to enable the query (use for toggle) */
   enabled?: boolean;
 }
@@ -43,18 +45,21 @@ export interface UseAllCallFrameOpcodesResult {
  */
 export function useAllCallFrameOpcodes({
   transactionHash,
+  blockNumber,
   enabled = true,
 }: UseAllCallFrameOpcodesOptions): UseAllCallFrameOpcodesResult {
   const { currentNetwork } = useNetwork();
 
   const query = useQuery({
-    queryKey: ['gas-profiler', 'all-call-frame-opcodes', transactionHash],
+    queryKey: ['gas-profiler', 'all-call-frame-opcodes', transactionHash, blockNumber],
     queryFn: ({ signal }) =>
       fetchAllPages<IntTransactionCallFrameOpcodeGas>(
         intTransactionCallFrameOpcodeGasServiceList,
         {
           query: {
             transaction_hash_eq: transactionHash!,
+            // Include block_number for efficient partition-based filtering with FINAL
+            ...(blockNumber ? { block_number_eq: blockNumber } : {}),
             order_by: 'gas DESC',
             page_size: 10000,
           },
