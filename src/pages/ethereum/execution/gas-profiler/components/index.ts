@@ -25,3 +25,4 @@ export { CallFrameRow } from './CallFrameRow';
 export type { CallFrameRowProps, CallFrameData } from './CallFrameRow';
 export { CallTraceView } from './CallTraceView';
 export type { CallTraceViewProps, EnrichedCallFrame, CallFrameExtendedData } from './CallTraceView';
+export { BlockOpcodeHeatmap } from './BlockOpcodeHeatmap';

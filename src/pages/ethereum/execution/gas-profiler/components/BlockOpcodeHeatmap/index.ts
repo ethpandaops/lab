@@ -1,0 +1,1 @@
+export { BlockOpcodeHeatmap } from './BlockOpcodeHeatmap';

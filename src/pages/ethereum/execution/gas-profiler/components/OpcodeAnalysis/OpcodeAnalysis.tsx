@@ -1,4 +1,5 @@
-import { type JSX, useMemo, useState, useRef } from 'react';
+import { type JSX, useMemo, useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { BarChart } from '@/components/Charts/Bar';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { CATEGORY_COLORS, getOpcodeCategory } from '../../utils';
@@ -25,6 +26,8 @@ export interface OpcodeAnalysisProps {
   showCharts?: boolean;
   /** Whether to show the table (default: true) */
   showTable?: boolean;
+  /** Whether to show the heatmap visualization (default: false) */
+  showHeatmap?: boolean;
 }
 
 function formatGas(value: number): string {
@@ -155,6 +158,174 @@ function OpcodeByCountChart({
         `;
       }}
     />
+  );
+}
+
+/**
+ * Opcode heatmap - opcodes grouped by category, single row showing gas intensity
+ */
+function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JSX.Element {
+  const [hoveredOpcode, setHoveredOpcode] = useState<string | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
+  const cellRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+
+  // Update tooltip position when hovered opcode changes
+  useEffect(() => {
+    if (hoveredOpcode && cellRefs.current.has(hoveredOpcode)) {
+      const cell = cellRefs.current.get(hoveredOpcode)!;
+      const rect = cell.getBoundingClientRect();
+      setTooltipPosition({
+        top: rect.top - 8,
+        left: rect.left + rect.width / 2,
+      });
+    }
+  }, [hoveredOpcode]);
+
+  const setCellRef = useCallback((opcode: string, el: HTMLDivElement | null) => {
+    if (el) {
+      cellRefs.current.set(opcode, el);
+    } else {
+      cellRefs.current.delete(opcode);
+    }
+  }, []);
+
+  // Group opcodes by category and calculate totals
+  const { categoryGroups, maxGas, totalGas } = useMemo(() => {
+    const categoryMap = new Map<string, { opcode: string; gas: number; count: number }[]>();
+
+    for (const stat of opcodeStats) {
+      const category = getOpcodeCategory(stat.opcode);
+      if (!categoryMap.has(category)) {
+        categoryMap.set(category, []);
+      }
+      categoryMap.get(category)!.push({
+        opcode: stat.opcode,
+        gas: stat.totalGas,
+        count: stat.count,
+      });
+    }
+
+    // Sort categories by total gas descending
+    const groups = [...categoryMap.entries()]
+      .map(([category, opcodes]) => ({
+        category,
+        opcodes: opcodes.sort((a, b) => b.gas - a.gas), // Sort opcodes by gas within category
+        totalGas: opcodes.reduce((sum, o) => sum + o.gas, 0),
+      }))
+      .sort((a, b) => b.totalGas - a.totalGas);
+
+    const maxGas = Math.max(...opcodeStats.map(s => s.totalGas));
+    const totalGas = opcodeStats.reduce((sum, s) => sum + s.totalGas, 0);
+
+    return { categoryGroups: groups, maxGas, totalGas };
+  }, [opcodeStats]);
+
+  if (categoryGroups.length === 0) return <div className="text-center text-muted">No data</div>;
+
+  // Calculate color intensity (using indigo gradient like the HeatmapChart)
+  const getColorIntensity = (gas: number): string => {
+    const ratio = maxGas > 0 ? gas / maxGas : 0;
+    // Indigo gradient: light to dark
+    if (ratio === 0) return 'bg-indigo-50 dark:bg-indigo-950/30';
+    if (ratio < 0.1) return 'bg-indigo-100 dark:bg-indigo-900/40';
+    if (ratio < 0.25) return 'bg-indigo-200 dark:bg-indigo-800/50';
+    if (ratio < 0.4) return 'bg-indigo-300 dark:bg-indigo-700/60';
+    if (ratio < 0.55) return 'bg-indigo-400 dark:bg-indigo-600/70';
+    if (ratio < 0.7) return 'bg-indigo-500 dark:bg-indigo-500';
+    if (ratio < 0.85) return 'bg-indigo-600 dark:bg-indigo-400';
+    return 'bg-indigo-700 dark:bg-indigo-300';
+  };
+
+  return (
+    <div className="w-full">
+      {/* Legend */}
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2 text-xs text-muted">
+          <span>Low</span>
+          <div className="flex gap-px">
+            <div className="size-3 bg-indigo-100 dark:bg-indigo-900/40" />
+            <div className="size-3 bg-indigo-200 dark:bg-indigo-800/50" />
+            <div className="size-3 bg-indigo-300 dark:bg-indigo-700/60" />
+            <div className="size-3 bg-indigo-400 dark:bg-indigo-600/70" />
+            <div className="size-3 bg-indigo-500 dark:bg-indigo-500" />
+            <div className="size-3 bg-indigo-600 dark:bg-indigo-400" />
+            <div className="size-3 bg-indigo-700 dark:bg-indigo-300" />
+          </div>
+          <span>High</span>
+        </div>
+        <div className="text-xs text-muted">{opcodeStats.length} opcodes</div>
+      </div>
+
+      {/* Heatmap grid */}
+      <div className="flex gap-4 overflow-x-auto">
+        {categoryGroups.map(({ category, opcodes }) => (
+          <div key={category} className="shrink-0">
+            {/* Category header */}
+            <div
+              className="mb-2 truncate text-center text-xs font-medium"
+              style={{ color: CATEGORY_COLORS[category] ?? CATEGORY_COLORS.Other }}
+            >
+              {category}
+            </div>
+
+            {/* Opcode cells */}
+            <div className="flex gap-px">
+              {opcodes.map(({ opcode, gas }) => {
+                const isHovered = hoveredOpcode === opcode;
+
+                return (
+                  <div key={opcode} className="flex flex-col items-center">
+                    {/* Cell */}
+                    <div
+                      ref={el => setCellRef(opcode, el)}
+                      className={`size-6 cursor-pointer transition-all ${getColorIntensity(gas)} ${isHovered ? 'ring-2 ring-foreground' : ''}`}
+                      onMouseEnter={() => setHoveredOpcode(opcode)}
+                      onMouseLeave={() => setHoveredOpcode(null)}
+                    />
+
+                    {/* Opcode label (vertical using writing-mode) */}
+                    <div
+                      className="mt-1 whitespace-nowrap font-mono text-[10px] text-muted"
+                      style={{ writingMode: 'vertical-rl' }}
+                    >
+                      {opcode}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Tooltip via portal */}
+      {hoveredOpcode &&
+        (() => {
+          const stat = opcodeStats.find(s => s.opcode === hoveredOpcode);
+          if (!stat) return null;
+          const pct = totalGas > 0 ? ((stat.totalGas / totalGas) * 100).toFixed(1) : '0';
+          const category = getOpcodeCategory(hoveredOpcode);
+
+          return createPortal(
+            <div
+              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-xs border border-border bg-background px-3 py-2 text-xs shadow-lg"
+              style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
+            >
+              <div className="font-mono font-semibold">{hoveredOpcode}</div>
+              <div className="mt-1 text-muted" style={{ color: CATEGORY_COLORS[category] }}>
+                {category}
+              </div>
+              <div className="mt-1">
+                <strong>{formatGas(stat.totalGas)}</strong> gas ({pct}%)
+              </div>
+              <div className="text-muted">{stat.count.toLocaleString()} executions</div>
+              {/* Arrow */}
+              <div className="absolute -bottom-1 left-1/2 size-2 -translate-x-1/2 rotate-45 border-r border-b border-border bg-background" />
+            </div>,
+            document.body
+          );
+        })()}
+    </div>
   );
 }
 
@@ -314,6 +485,7 @@ export function OpcodeAnalysis({
   showHeader = true,
   showCharts = true,
   showTable = true,
+  showHeatmap = false,
 }: OpcodeAnalysisProps): JSX.Element {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -342,6 +514,13 @@ export function OpcodeAnalysis({
             )}
           </PopoutCard>
         </div>
+      )}
+
+      {/* Heatmap - full width */}
+      {showHeatmap && (
+        <PopoutCard title="Opcode Heatmap" subtitle="Gas consumption by category and opcode" allowContentOverflow>
+          {() => <OpcodeHeatmapChart opcodeStats={opcodeStats} />}
+        </PopoutCard>
       )}
 
       {/* Full-width table */}

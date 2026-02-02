@@ -38,10 +38,11 @@ import {
   TopItemsByGasTable,
   GasHistogram,
   TRANSACTION_BUCKETS,
+  BlockOpcodeHeatmap,
 } from './components';
 import type { ContractInteractionItem, TopGasItem } from './components';
 import { useNetwork } from '@/hooks/useNetwork';
-import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory, getEffectiveGasRefund } from './utils';
+import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory } from './utils';
 import type { GasProfilerBlockSearch } from './IndexPage.types';
 
 /**
@@ -851,6 +852,19 @@ export function BlockPage(): JSX.Element {
                 percentLabel="of executions"
                 emptyMessage="No opcode data"
                 height={280}
+              />
+            </div>
+
+            {/* Block-wide opcode heatmap - with toggle for per-transaction view */}
+            <div className="mb-6">
+              <BlockOpcodeHeatmap
+                blockNumber={blockNumber}
+                opcodeStats={opcodeStats}
+                transactions={data.transactions.map(tx => ({
+                  transactionHash: tx.transactionHash,
+                  transactionIndex: tx.transactionIndex,
+                  targetName: tx.targetName,
+                }))}
               />
             </div>
 

@@ -17,7 +17,7 @@ const sizeClasses = {
   lg: 'w-full max-w-[32rem]', // 512px
   xl: 'w-full max-w-[56rem]', // 896px (increased from 672px for wider aspect ratio)
   full: 'w-full max-w-[80rem]', // 1280px
-  fullscreen: 'w-[90vw] max-h-[90vh]', // 90% of viewport
+  fullscreen: 'w-[calc(100vw-2rem)] h-[calc(100dvh-2rem)]', // True fullscreen with minimal margin
 };
 
 /**

@@ -21,7 +21,6 @@ import {
   SignalIcon,
   CircleStackIcon,
   MagnifyingGlassIcon,
-  FireIcon,
 } from '@heroicons/react/24/outline';
 import { NetworkSelect } from '@/components/Ethereum/NetworkSelect';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';

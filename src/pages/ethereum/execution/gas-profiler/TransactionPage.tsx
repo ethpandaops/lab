@@ -486,7 +486,7 @@ export function TransactionPage(): JSX.Element {
   const isSimpleTransfer = metadata.evmGasUsed === 0;
 
   // Calculate effective gas refund based on fork rules (EIP-3529 changed cap from 50% to 20%)
-  const { effectiveRefund, isCapped, isPostLondon } = getEffectiveGasRefund(
+  const { effectiveRefund, isPostLondon } = getEffectiveGasRefund(
     metadata.gasRefund,
     metadata.receiptGasUsed,
     metadata.blockNumber,
@@ -618,7 +618,7 @@ export function TransactionPage(): JSX.Element {
               {/* Header row */}
               <div className="flex items-center justify-between px-4 py-3">
                 <h3 className="text-sm font-medium text-foreground">Transaction Gas Breakdown</h3>
-                <span className="text-xs text-muted">Position #{metadata.transactionIndex} in block</span>
+                <span className="text-xs text-muted">Position #{metadata.transactionIndex + 1} in block</span>
               </div>
 
               {/* Gas Formula */}
@@ -736,7 +736,7 @@ export function TransactionPage(): JSX.Element {
               {/* Opcode bar charts (by gas and by count) */}
               {txData.opcodeStats.length > 0 && (
                 <div className="mb-6">
-                  <OpcodeAnalysis opcodeStats={txData.opcodeStats} showTable={false} />
+                  <OpcodeAnalysis opcodeStats={txData.opcodeStats} showTable={false} showHeatmap />
                 </div>
               )}
 
