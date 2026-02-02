@@ -106,10 +106,16 @@ export interface FlameGraphProps {
   minWidthPercent?: number;
 
   /**
-   * Height of the chart container in pixels
-   * @default 400
+   * Fixed height of the chart container in pixels.
+   * If not provided, height is calculated dynamically based on tree depth.
    */
   height?: number;
+
+  /**
+   * Minimum height when using dynamic height calculation
+   * @default 100
+   */
+  minHeight?: number;
 
   /**
    * Height of each row in pixels
@@ -147,6 +153,12 @@ export interface FlameGraphProps {
   showLegend?: boolean;
 
   /**
+   * Extra content to render on the right side of the legend row
+   * Useful for adding controls like view toggles
+   */
+  legendExtra?: React.ReactNode;
+
+  /**
    * Custom tooltip renderer
    * If provided, replaces the default tooltip
    */
@@ -178,6 +190,38 @@ export const EVM_CALL_TYPE_COLORS: FlameGraphColorMap = {
   CALLCODE: { bg: 'bg-indigo-500', hover: 'hover:bg-indigo-400' },
   CREATE: { bg: 'bg-orange-500', hover: 'hover:bg-orange-400' },
   CREATE2: { bg: 'bg-amber-500', hover: 'hover:bg-amber-400' },
+};
+
+/**
+ * EVM opcode category colors (for opcode-level flame graphs)
+ */
+export const EVM_OPCODE_CATEGORY_COLORS: FlameGraphColorMap = {
+  // Opcode categories
+  Math: { bg: 'bg-amber-500', hover: 'hover:bg-amber-400' },
+  Comparisons: { bg: 'bg-violet-500', hover: 'hover:bg-violet-400' },
+  Logic: { bg: 'bg-cyan-500', hover: 'hover:bg-cyan-400' },
+  'Bit Ops': { bg: 'bg-teal-500', hover: 'hover:bg-teal-400' },
+  Misc: { bg: 'bg-gray-500', hover: 'hover:bg-gray-400' },
+  'Ethereum State': { bg: 'bg-blue-500', hover: 'hover:bg-blue-400' },
+  Pop: { bg: 'bg-fuchsia-500', hover: 'hover:bg-fuchsia-400' },
+  Memory: { bg: 'bg-green-500', hover: 'hover:bg-green-400' },
+  Storage: { bg: 'bg-red-500', hover: 'hover:bg-red-400' },
+  Jump: { bg: 'bg-pink-500', hover: 'hover:bg-pink-400' },
+  'Transient Storage': { bg: 'bg-orange-500', hover: 'hover:bg-orange-400' },
+  Push: { bg: 'bg-slate-500', hover: 'hover:bg-slate-400' },
+  Dup: { bg: 'bg-stone-500', hover: 'hover:bg-stone-400' },
+  Swap: { bg: 'bg-lime-500', hover: 'hover:bg-lime-400' },
+  Log: { bg: 'bg-yellow-500', hover: 'hover:bg-yellow-400' },
+  Contract: { bg: 'bg-sky-500', hover: 'hover:bg-sky-400' },
+  Other: { bg: 'bg-gray-400', hover: 'hover:bg-gray-300' },
+};
+
+/**
+ * Combined EVM colors for call types + opcode categories
+ */
+export const EVM_COMBINED_COLORS: FlameGraphColorMap = {
+  ...EVM_CALL_TYPE_COLORS,
+  ...EVM_OPCODE_CATEGORY_COLORS,
 };
 
 /**

@@ -39,20 +39,40 @@ export async function fetchAllPages<T>(
 ): Promise<T[]> {
   const allData: T[] = [];
   let pageToken: string | undefined;
+  let pageCount = 0;
+  const MAX_PAGES = 100; // Safety limit
 
   do {
-    const response = await fetchFn({
-      ...params,
-      query: {
-        ...params.query,
-        ...(pageToken && { page_token: pageToken }),
-      },
-      signal,
-      throwOnError: true,
-    });
+    pageCount++;
+
+    if (pageCount > MAX_PAGES) {
+      console.warn(`fetchAllPages [${dataKey}] exceeded ${MAX_PAGES} pages, breaking`);
+      break;
+    }
+
+    let response;
+    try {
+      response = await fetchFn({
+        ...params,
+        query: {
+          ...params.query,
+          ...(pageToken && { page_token: pageToken }),
+        },
+        signal,
+        throwOnError: true,
+      });
+    } catch (err) {
+      // AbortError is expected when React Query cancels requests on unmount
+      if (err instanceof Error && err.name === 'AbortError') {
+        throw err;
+      }
+      console.error(`fetchAllPages [${dataKey}] fetch error:`, err);
+      throw err;
+    }
 
     const responseData = response.data as Record<string, unknown>;
     const pageData = responseData[dataKey] as T[] | undefined;
+
     if (pageData) {
       allData.push(...pageData);
     }

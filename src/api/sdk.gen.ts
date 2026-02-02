@@ -27,6 +27,12 @@ import type {
   DimContractOwnerServiceListData,
   DimContractOwnerServiceListErrors,
   DimContractOwnerServiceListResponses,
+  DimFunctionSignatureServiceGetData,
+  DimFunctionSignatureServiceGetErrors,
+  DimFunctionSignatureServiceGetResponses,
+  DimFunctionSignatureServiceListData,
+  DimFunctionSignatureServiceListErrors,
+  DimFunctionSignatureServiceListResponses,
   DimNodeServiceGetData,
   DimNodeServiceGetErrors,
   DimNodeServiceGetResponses,
@@ -417,6 +423,30 @@ import type {
   FctNodeActiveLast24hServiceListData,
   FctNodeActiveLast24hServiceListErrors,
   FctNodeActiveLast24hServiceListResponses,
+  FctOpcodeGasByOpcodeDailyServiceGetData,
+  FctOpcodeGasByOpcodeDailyServiceGetErrors,
+  FctOpcodeGasByOpcodeDailyServiceGetResponses,
+  FctOpcodeGasByOpcodeDailyServiceListData,
+  FctOpcodeGasByOpcodeDailyServiceListErrors,
+  FctOpcodeGasByOpcodeDailyServiceListResponses,
+  FctOpcodeGasByOpcodeHourlyServiceGetData,
+  FctOpcodeGasByOpcodeHourlyServiceGetErrors,
+  FctOpcodeGasByOpcodeHourlyServiceGetResponses,
+  FctOpcodeGasByOpcodeHourlyServiceListData,
+  FctOpcodeGasByOpcodeHourlyServiceListErrors,
+  FctOpcodeGasByOpcodeHourlyServiceListResponses,
+  FctOpcodeOpsDailyServiceGetData,
+  FctOpcodeOpsDailyServiceGetErrors,
+  FctOpcodeOpsDailyServiceGetResponses,
+  FctOpcodeOpsDailyServiceListData,
+  FctOpcodeOpsDailyServiceListErrors,
+  FctOpcodeOpsDailyServiceListResponses,
+  FctOpcodeOpsHourlyServiceGetData,
+  FctOpcodeOpsHourlyServiceGetErrors,
+  FctOpcodeOpsHourlyServiceGetResponses,
+  FctOpcodeOpsHourlyServiceListData,
+  FctOpcodeOpsHourlyServiceListErrors,
+  FctOpcodeOpsHourlyServiceListResponses,
   FctPreparedBlockServiceGetData,
   FctPreparedBlockServiceGetErrors,
   FctPreparedBlockServiceGetResponses,
@@ -549,6 +579,12 @@ import type {
   IntBlockMevCanonicalServiceListData,
   IntBlockMevCanonicalServiceListErrors,
   IntBlockMevCanonicalServiceListResponses,
+  IntBlockOpcodeGasServiceGetData,
+  IntBlockOpcodeGasServiceGetErrors,
+  IntBlockOpcodeGasServiceGetResponses,
+  IntBlockOpcodeGasServiceListData,
+  IntBlockOpcodeGasServiceListErrors,
+  IntBlockOpcodeGasServiceListResponses,
   IntBlockProposerCanonicalServiceGetData,
   IntBlockProposerCanonicalServiceGetErrors,
   IntBlockProposerCanonicalServiceGetResponses,
@@ -669,6 +705,12 @@ import type {
   IntCustodyProbeServiceListData,
   IntCustodyProbeServiceListErrors,
   IntCustodyProbeServiceListResponses,
+  IntEngineGetBlobsServiceGetData,
+  IntEngineGetBlobsServiceGetErrors,
+  IntEngineGetBlobsServiceGetResponses,
+  IntEngineGetBlobsServiceListData,
+  IntEngineGetBlobsServiceListErrors,
+  IntEngineGetBlobsServiceListResponses,
   IntEngineNewPayloadServiceGetData,
   IntEngineNewPayloadServiceGetErrors,
   IntEngineNewPayloadServiceGetResponses,
@@ -801,6 +843,24 @@ import type {
   IntStorageSlotStateWithExpiryServiceListData,
   IntStorageSlotStateWithExpiryServiceListErrors,
   IntStorageSlotStateWithExpiryServiceListResponses,
+  IntTransactionCallFrameOpcodeGasServiceGetData,
+  IntTransactionCallFrameOpcodeGasServiceGetErrors,
+  IntTransactionCallFrameOpcodeGasServiceGetResponses,
+  IntTransactionCallFrameOpcodeGasServiceListData,
+  IntTransactionCallFrameOpcodeGasServiceListErrors,
+  IntTransactionCallFrameOpcodeGasServiceListResponses,
+  IntTransactionCallFrameServiceGetData,
+  IntTransactionCallFrameServiceGetErrors,
+  IntTransactionCallFrameServiceGetResponses,
+  IntTransactionCallFrameServiceListData,
+  IntTransactionCallFrameServiceListErrors,
+  IntTransactionCallFrameServiceListResponses,
+  IntTransactionOpcodeGasServiceGetData,
+  IntTransactionOpcodeGasServiceGetErrors,
+  IntTransactionOpcodeGasServiceGetResponses,
+  IntTransactionOpcodeGasServiceListData,
+  IntTransactionOpcodeGasServiceListErrors,
+  IntTransactionOpcodeGasServiceListResponses,
 } from './types.gen';
 import {
   zAdminCbtIncrementalServiceGetData,
@@ -819,6 +879,10 @@ import {
   zDimContractOwnerServiceGetResponse,
   zDimContractOwnerServiceListData,
   zDimContractOwnerServiceListResponse,
+  zDimFunctionSignatureServiceGetData,
+  zDimFunctionSignatureServiceGetResponse,
+  zDimFunctionSignatureServiceListData,
+  zDimFunctionSignatureServiceListResponse,
   zDimNodeServiceGetData,
   zDimNodeServiceGetResponse,
   zDimNodeServiceListData,
@@ -1079,6 +1143,22 @@ import {
   zFctNodeActiveLast24hServiceGetResponse,
   zFctNodeActiveLast24hServiceListData,
   zFctNodeActiveLast24hServiceListResponse,
+  zFctOpcodeGasByOpcodeDailyServiceGetData,
+  zFctOpcodeGasByOpcodeDailyServiceGetResponse,
+  zFctOpcodeGasByOpcodeDailyServiceListData,
+  zFctOpcodeGasByOpcodeDailyServiceListResponse,
+  zFctOpcodeGasByOpcodeHourlyServiceGetData,
+  zFctOpcodeGasByOpcodeHourlyServiceGetResponse,
+  zFctOpcodeGasByOpcodeHourlyServiceListData,
+  zFctOpcodeGasByOpcodeHourlyServiceListResponse,
+  zFctOpcodeOpsDailyServiceGetData,
+  zFctOpcodeOpsDailyServiceGetResponse,
+  zFctOpcodeOpsDailyServiceListData,
+  zFctOpcodeOpsDailyServiceListResponse,
+  zFctOpcodeOpsHourlyServiceGetData,
+  zFctOpcodeOpsHourlyServiceGetResponse,
+  zFctOpcodeOpsHourlyServiceListData,
+  zFctOpcodeOpsHourlyServiceListResponse,
   zFctPreparedBlockServiceGetData,
   zFctPreparedBlockServiceGetResponse,
   zFctPreparedBlockServiceListData,
@@ -1167,6 +1247,10 @@ import {
   zIntBlockMevCanonicalServiceGetResponse,
   zIntBlockMevCanonicalServiceListData,
   zIntBlockMevCanonicalServiceListResponse,
+  zIntBlockOpcodeGasServiceGetData,
+  zIntBlockOpcodeGasServiceGetResponse,
+  zIntBlockOpcodeGasServiceListData,
+  zIntBlockOpcodeGasServiceListResponse,
   zIntBlockProposerCanonicalServiceGetData,
   zIntBlockProposerCanonicalServiceGetResponse,
   zIntBlockProposerCanonicalServiceListData,
@@ -1247,6 +1331,10 @@ import {
   zIntCustodyProbeServiceGetResponse,
   zIntCustodyProbeServiceListData,
   zIntCustodyProbeServiceListResponse,
+  zIntEngineGetBlobsServiceGetData,
+  zIntEngineGetBlobsServiceGetResponse,
+  zIntEngineGetBlobsServiceListData,
+  zIntEngineGetBlobsServiceListResponse,
   zIntEngineNewPayloadServiceGetData,
   zIntEngineNewPayloadServiceGetResponse,
   zIntEngineNewPayloadServiceListData,
@@ -1335,6 +1423,18 @@ import {
   zIntStorageSlotStateWithExpiryServiceGetResponse,
   zIntStorageSlotStateWithExpiryServiceListData,
   zIntStorageSlotStateWithExpiryServiceListResponse,
+  zIntTransactionCallFrameOpcodeGasServiceGetData,
+  zIntTransactionCallFrameOpcodeGasServiceGetResponse,
+  zIntTransactionCallFrameOpcodeGasServiceListData,
+  zIntTransactionCallFrameOpcodeGasServiceListResponse,
+  zIntTransactionCallFrameServiceGetData,
+  zIntTransactionCallFrameServiceGetResponse,
+  zIntTransactionCallFrameServiceListData,
+  zIntTransactionCallFrameServiceListResponse,
+  zIntTransactionOpcodeGasServiceGetData,
+  zIntTransactionOpcodeGasServiceGetResponse,
+  zIntTransactionOpcodeGasServiceListData,
+  zIntTransactionOpcodeGasServiceListResponse,
 } from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<
@@ -1497,6 +1597,44 @@ export const dimContractOwnerServiceGet = <ThrowOnError extends boolean = false>
     requestValidator: async data => await zDimContractOwnerServiceGetData.parseAsync(data),
     responseValidator: async data => await zDimContractOwnerServiceGetResponse.parseAsync(data),
     url: '/api/v1/dim_contract_owner/{contract_address}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimFunctionSignatureServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<DimFunctionSignatureServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    DimFunctionSignatureServiceListResponses,
+    DimFunctionSignatureServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zDimFunctionSignatureServiceListData.parseAsync(data),
+    responseValidator: async data => await zDimFunctionSignatureServiceListResponse.parseAsync(data),
+    url: '/api/v1/dim_function_signature',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by selector
+ */
+export const dimFunctionSignatureServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<DimFunctionSignatureServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    DimFunctionSignatureServiceGetResponses,
+    DimFunctionSignatureServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zDimFunctionSignatureServiceGetData.parseAsync(data),
+    responseValidator: async data => await zDimFunctionSignatureServiceGetResponse.parseAsync(data),
+    url: '/api/v1/dim_function_signature/{selector}',
     ...options,
   });
 
@@ -3953,6 +4091,156 @@ export const fctNodeActiveLast24hServiceGet = <ThrowOnError extends boolean = fa
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctOpcodeGasByOpcodeDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctOpcodeGasByOpcodeDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctOpcodeGasByOpcodeDailyServiceListResponses,
+    FctOpcodeGasByOpcodeDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeGasByOpcodeDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeGasByOpcodeDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_gas_by_opcode_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctOpcodeGasByOpcodeDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctOpcodeGasByOpcodeDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctOpcodeGasByOpcodeDailyServiceGetResponses,
+    FctOpcodeGasByOpcodeDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeGasByOpcodeDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeGasByOpcodeDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_gas_by_opcode_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctOpcodeGasByOpcodeHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctOpcodeGasByOpcodeHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctOpcodeGasByOpcodeHourlyServiceListResponses,
+    FctOpcodeGasByOpcodeHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeGasByOpcodeHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeGasByOpcodeHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_gas_by_opcode_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctOpcodeGasByOpcodeHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctOpcodeGasByOpcodeHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctOpcodeGasByOpcodeHourlyServiceGetResponses,
+    FctOpcodeGasByOpcodeHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeGasByOpcodeHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeGasByOpcodeHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_gas_by_opcode_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctOpcodeOpsDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctOpcodeOpsDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctOpcodeOpsDailyServiceListResponses,
+    FctOpcodeOpsDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeOpsDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeOpsDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_ops_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctOpcodeOpsDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctOpcodeOpsDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<FctOpcodeOpsDailyServiceGetResponses, FctOpcodeOpsDailyServiceGetErrors, ThrowOnError>(
+    {
+      requestValidator: async data => await zFctOpcodeOpsDailyServiceGetData.parseAsync(data),
+      responseValidator: async data => await zFctOpcodeOpsDailyServiceGetResponse.parseAsync(data),
+      url: '/api/v1/fct_opcode_ops_daily/{day_start_date}',
+      ...options,
+    }
+  );
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctOpcodeOpsHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctOpcodeOpsHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctOpcodeOpsHourlyServiceListResponses,
+    FctOpcodeOpsHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeOpsHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeOpsHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_ops_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctOpcodeOpsHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctOpcodeOpsHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctOpcodeOpsHourlyServiceGetResponses,
+    FctOpcodeOpsHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeOpsHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeOpsHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_ops_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctPreparedBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPreparedBlockServiceListData, ThrowOnError>
 ) =>
@@ -4791,6 +5079,42 @@ export const intBlockMevCanonicalServiceGet = <ThrowOnError extends boolean = fa
  *
  * Retrieve paginated results with optional filtering
  */
+export const intBlockOpcodeGasServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntBlockOpcodeGasServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntBlockOpcodeGasServiceListResponses,
+    IntBlockOpcodeGasServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockOpcodeGasServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntBlockOpcodeGasServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_block_opcode_gas',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intBlockOpcodeGasServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntBlockOpcodeGasServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<IntBlockOpcodeGasServiceGetResponses, IntBlockOpcodeGasServiceGetErrors, ThrowOnError>(
+    {
+      requestValidator: async data => await zIntBlockOpcodeGasServiceGetData.parseAsync(data),
+      responseValidator: async data => await zIntBlockOpcodeGasServiceGetResponse.parseAsync(data),
+      url: '/api/v1/int_block_opcode_gas/{block_number}',
+      ...options,
+    }
+  );
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const intBlockProposerCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBlockProposerCanonicalServiceListData, ThrowOnError>
 ) =>
@@ -5540,6 +5864,42 @@ export const intCustodyProbeOrderBySlotServiceGet = <ThrowOnError extends boolea
     url: '/api/v1/int_custody_probe_order_by_slot/{slot_start_date_time}',
     ...options,
   });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intEngineGetBlobsServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntEngineGetBlobsServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntEngineGetBlobsServiceListResponses,
+    IntEngineGetBlobsServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntEngineGetBlobsServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntEngineGetBlobsServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_engine_get_blobs',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intEngineGetBlobsServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntEngineGetBlobsServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<IntEngineGetBlobsServiceGetResponses, IntEngineGetBlobsServiceGetErrors, ThrowOnError>(
+    {
+      requestValidator: async data => await zIntEngineGetBlobsServiceGetData.parseAsync(data),
+      responseValidator: async data => await zIntEngineGetBlobsServiceGetResponse.parseAsync(data),
+      url: '/api/v1/int_engine_get_blobs/{slot_start_date_time}',
+      ...options,
+    }
+  );
 
 /**
  * List records
@@ -6374,5 +6734,119 @@ export const intStorageSlotStateWithExpiryByBlockServiceGet = <ThrowOnError exte
     requestValidator: async data => await zIntStorageSlotStateWithExpiryByBlockServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntStorageSlotStateWithExpiryByBlockServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_state_with_expiry_by_block/{expiry_policy}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intTransactionCallFrameServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntTransactionCallFrameServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntTransactionCallFrameServiceListResponses,
+    IntTransactionCallFrameServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionCallFrameServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionCallFrameServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_call_frame',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intTransactionCallFrameServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntTransactionCallFrameServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntTransactionCallFrameServiceGetResponses,
+    IntTransactionCallFrameServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionCallFrameServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionCallFrameServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_call_frame/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intTransactionCallFrameOpcodeGasServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntTransactionCallFrameOpcodeGasServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntTransactionCallFrameOpcodeGasServiceListResponses,
+    IntTransactionCallFrameOpcodeGasServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionCallFrameOpcodeGasServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionCallFrameOpcodeGasServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_call_frame_opcode_gas',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intTransactionCallFrameOpcodeGasServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntTransactionCallFrameOpcodeGasServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntTransactionCallFrameOpcodeGasServiceGetResponses,
+    IntTransactionCallFrameOpcodeGasServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionCallFrameOpcodeGasServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionCallFrameOpcodeGasServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_call_frame_opcode_gas/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intTransactionOpcodeGasServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntTransactionOpcodeGasServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntTransactionOpcodeGasServiceListResponses,
+    IntTransactionOpcodeGasServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionOpcodeGasServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionOpcodeGasServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_opcode_gas',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intTransactionOpcodeGasServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntTransactionOpcodeGasServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntTransactionOpcodeGasServiceGetResponses,
+    IntTransactionOpcodeGasServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionOpcodeGasServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionOpcodeGasServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_opcode_gas/{block_number}',
     ...options,
   });

@@ -12,6 +12,8 @@ import {
   dimBlockBlobSubmitterServiceList,
   dimContractOwnerServiceGet,
   dimContractOwnerServiceList,
+  dimFunctionSignatureServiceGet,
+  dimFunctionSignatureServiceList,
   dimNodeServiceGet,
   dimNodeServiceList,
   fctAddressAccessChunked10000ServiceGet,
@@ -142,6 +144,14 @@ import {
   fctMevBidHighestValueByBuilderChunked50MsServiceList,
   fctNodeActiveLast24hServiceGet,
   fctNodeActiveLast24hServiceList,
+  fctOpcodeGasByOpcodeDailyServiceGet,
+  fctOpcodeGasByOpcodeDailyServiceList,
+  fctOpcodeGasByOpcodeHourlyServiceGet,
+  fctOpcodeGasByOpcodeHourlyServiceList,
+  fctOpcodeOpsDailyServiceGet,
+  fctOpcodeOpsDailyServiceList,
+  fctOpcodeOpsHourlyServiceGet,
+  fctOpcodeOpsHourlyServiceList,
   fctPreparedBlockServiceGet,
   fctPreparedBlockServiceList,
   fctStorageSlotStateByAddressDailyServiceGet,
@@ -186,6 +196,8 @@ import {
   intBlockCanonicalServiceList,
   intBlockMevCanonicalServiceGet,
   intBlockMevCanonicalServiceList,
+  intBlockOpcodeGasServiceGet,
+  intBlockOpcodeGasServiceList,
   intBlockProposerCanonicalServiceGet,
   intBlockProposerCanonicalServiceList,
   intContractStorageExpiry12mServiceGet,
@@ -226,6 +238,8 @@ import {
   intCustodyProbeOrderBySlotServiceList,
   intCustodyProbeServiceGet,
   intCustodyProbeServiceList,
+  intEngineGetBlobsServiceGet,
+  intEngineGetBlobsServiceList,
   intEngineNewPayloadServiceGet,
   intEngineNewPayloadServiceList,
   intExecutionBlockByDateServiceGet,
@@ -270,6 +284,12 @@ import {
   intStorageSlotStateWithExpiryByBlockServiceList,
   intStorageSlotStateWithExpiryServiceGet,
   intStorageSlotStateWithExpiryServiceList,
+  intTransactionCallFrameOpcodeGasServiceGet,
+  intTransactionCallFrameOpcodeGasServiceList,
+  intTransactionCallFrameServiceGet,
+  intTransactionCallFrameServiceList,
+  intTransactionOpcodeGasServiceGet,
+  intTransactionOpcodeGasServiceList,
   type Options,
 } from '../sdk.gen';
 import type {
@@ -297,6 +317,12 @@ import type {
   DimContractOwnerServiceListData,
   DimContractOwnerServiceListError,
   DimContractOwnerServiceListResponse,
+  DimFunctionSignatureServiceGetData,
+  DimFunctionSignatureServiceGetError,
+  DimFunctionSignatureServiceGetResponse,
+  DimFunctionSignatureServiceListData,
+  DimFunctionSignatureServiceListError,
+  DimFunctionSignatureServiceListResponse,
   DimNodeServiceGetData,
   DimNodeServiceGetError,
   DimNodeServiceGetResponse,
@@ -687,6 +713,30 @@ import type {
   FctNodeActiveLast24hServiceListData,
   FctNodeActiveLast24hServiceListError,
   FctNodeActiveLast24hServiceListResponse,
+  FctOpcodeGasByOpcodeDailyServiceGetData,
+  FctOpcodeGasByOpcodeDailyServiceGetError,
+  FctOpcodeGasByOpcodeDailyServiceGetResponse,
+  FctOpcodeGasByOpcodeDailyServiceListData,
+  FctOpcodeGasByOpcodeDailyServiceListError,
+  FctOpcodeGasByOpcodeDailyServiceListResponse,
+  FctOpcodeGasByOpcodeHourlyServiceGetData,
+  FctOpcodeGasByOpcodeHourlyServiceGetError,
+  FctOpcodeGasByOpcodeHourlyServiceGetResponse,
+  FctOpcodeGasByOpcodeHourlyServiceListData,
+  FctOpcodeGasByOpcodeHourlyServiceListError,
+  FctOpcodeGasByOpcodeHourlyServiceListResponse,
+  FctOpcodeOpsDailyServiceGetData,
+  FctOpcodeOpsDailyServiceGetError,
+  FctOpcodeOpsDailyServiceGetResponse,
+  FctOpcodeOpsDailyServiceListData,
+  FctOpcodeOpsDailyServiceListError,
+  FctOpcodeOpsDailyServiceListResponse,
+  FctOpcodeOpsHourlyServiceGetData,
+  FctOpcodeOpsHourlyServiceGetError,
+  FctOpcodeOpsHourlyServiceGetResponse,
+  FctOpcodeOpsHourlyServiceListData,
+  FctOpcodeOpsHourlyServiceListError,
+  FctOpcodeOpsHourlyServiceListResponse,
   FctPreparedBlockServiceGetData,
   FctPreparedBlockServiceGetError,
   FctPreparedBlockServiceGetResponse,
@@ -819,6 +869,12 @@ import type {
   IntBlockMevCanonicalServiceListData,
   IntBlockMevCanonicalServiceListError,
   IntBlockMevCanonicalServiceListResponse,
+  IntBlockOpcodeGasServiceGetData,
+  IntBlockOpcodeGasServiceGetError,
+  IntBlockOpcodeGasServiceGetResponse,
+  IntBlockOpcodeGasServiceListData,
+  IntBlockOpcodeGasServiceListError,
+  IntBlockOpcodeGasServiceListResponse,
   IntBlockProposerCanonicalServiceGetData,
   IntBlockProposerCanonicalServiceGetError,
   IntBlockProposerCanonicalServiceGetResponse,
@@ -939,6 +995,12 @@ import type {
   IntCustodyProbeServiceListData,
   IntCustodyProbeServiceListError,
   IntCustodyProbeServiceListResponse,
+  IntEngineGetBlobsServiceGetData,
+  IntEngineGetBlobsServiceGetError,
+  IntEngineGetBlobsServiceGetResponse,
+  IntEngineGetBlobsServiceListData,
+  IntEngineGetBlobsServiceListError,
+  IntEngineGetBlobsServiceListResponse,
   IntEngineNewPayloadServiceGetData,
   IntEngineNewPayloadServiceGetError,
   IntEngineNewPayloadServiceGetResponse,
@@ -1071,6 +1133,24 @@ import type {
   IntStorageSlotStateWithExpiryServiceListData,
   IntStorageSlotStateWithExpiryServiceListError,
   IntStorageSlotStateWithExpiryServiceListResponse,
+  IntTransactionCallFrameOpcodeGasServiceGetData,
+  IntTransactionCallFrameOpcodeGasServiceGetError,
+  IntTransactionCallFrameOpcodeGasServiceGetResponse,
+  IntTransactionCallFrameOpcodeGasServiceListData,
+  IntTransactionCallFrameOpcodeGasServiceListError,
+  IntTransactionCallFrameOpcodeGasServiceListResponse,
+  IntTransactionCallFrameServiceGetData,
+  IntTransactionCallFrameServiceGetError,
+  IntTransactionCallFrameServiceGetResponse,
+  IntTransactionCallFrameServiceListData,
+  IntTransactionCallFrameServiceListError,
+  IntTransactionCallFrameServiceListResponse,
+  IntTransactionOpcodeGasServiceGetData,
+  IntTransactionOpcodeGasServiceGetError,
+  IntTransactionOpcodeGasServiceGetResponse,
+  IntTransactionOpcodeGasServiceListData,
+  IntTransactionOpcodeGasServiceListError,
+  IntTransactionOpcodeGasServiceListResponse,
 } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
@@ -1326,6 +1406,60 @@ export const dimContractOwnerServiceGetOptions = (options: Options<DimContractOw
       return data;
     },
     queryKey: dimContractOwnerServiceGetQueryKey(options),
+  });
+
+export const dimFunctionSignatureServiceListQueryKey = (options?: Options<DimFunctionSignatureServiceListData>) =>
+  createQueryKey('dimFunctionSignatureServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimFunctionSignatureServiceListOptions = (options?: Options<DimFunctionSignatureServiceListData>) =>
+  queryOptions<
+    DimFunctionSignatureServiceListResponse,
+    DimFunctionSignatureServiceListError,
+    DimFunctionSignatureServiceListResponse,
+    ReturnType<typeof dimFunctionSignatureServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimFunctionSignatureServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimFunctionSignatureServiceListQueryKey(options),
+  });
+
+export const dimFunctionSignatureServiceGetQueryKey = (options: Options<DimFunctionSignatureServiceGetData>) =>
+  createQueryKey('dimFunctionSignatureServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by selector
+ */
+export const dimFunctionSignatureServiceGetOptions = (options: Options<DimFunctionSignatureServiceGetData>) =>
+  queryOptions<
+    DimFunctionSignatureServiceGetResponse,
+    DimFunctionSignatureServiceGetError,
+    DimFunctionSignatureServiceGetResponse,
+    ReturnType<typeof dimFunctionSignatureServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimFunctionSignatureServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimFunctionSignatureServiceGetQueryKey(options),
   });
 
 export const dimNodeServiceListQueryKey = (options?: Options<DimNodeServiceListData>) =>
@@ -5105,6 +5239,232 @@ export const fctNodeActiveLast24hServiceGetOptions = (options: Options<FctNodeAc
     queryKey: fctNodeActiveLast24hServiceGetQueryKey(options),
   });
 
+export const fctOpcodeGasByOpcodeDailyServiceListQueryKey = (
+  options?: Options<FctOpcodeGasByOpcodeDailyServiceListData>
+) => createQueryKey('fctOpcodeGasByOpcodeDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctOpcodeGasByOpcodeDailyServiceListOptions = (
+  options?: Options<FctOpcodeGasByOpcodeDailyServiceListData>
+) =>
+  queryOptions<
+    FctOpcodeGasByOpcodeDailyServiceListResponse,
+    FctOpcodeGasByOpcodeDailyServiceListError,
+    FctOpcodeGasByOpcodeDailyServiceListResponse,
+    ReturnType<typeof fctOpcodeGasByOpcodeDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctOpcodeGasByOpcodeDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctOpcodeGasByOpcodeDailyServiceListQueryKey(options),
+  });
+
+export const fctOpcodeGasByOpcodeDailyServiceGetQueryKey = (
+  options: Options<FctOpcodeGasByOpcodeDailyServiceGetData>
+) => createQueryKey('fctOpcodeGasByOpcodeDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctOpcodeGasByOpcodeDailyServiceGetOptions = (options: Options<FctOpcodeGasByOpcodeDailyServiceGetData>) =>
+  queryOptions<
+    FctOpcodeGasByOpcodeDailyServiceGetResponse,
+    FctOpcodeGasByOpcodeDailyServiceGetError,
+    FctOpcodeGasByOpcodeDailyServiceGetResponse,
+    ReturnType<typeof fctOpcodeGasByOpcodeDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctOpcodeGasByOpcodeDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctOpcodeGasByOpcodeDailyServiceGetQueryKey(options),
+  });
+
+export const fctOpcodeGasByOpcodeHourlyServiceListQueryKey = (
+  options?: Options<FctOpcodeGasByOpcodeHourlyServiceListData>
+) => createQueryKey('fctOpcodeGasByOpcodeHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctOpcodeGasByOpcodeHourlyServiceListOptions = (
+  options?: Options<FctOpcodeGasByOpcodeHourlyServiceListData>
+) =>
+  queryOptions<
+    FctOpcodeGasByOpcodeHourlyServiceListResponse,
+    FctOpcodeGasByOpcodeHourlyServiceListError,
+    FctOpcodeGasByOpcodeHourlyServiceListResponse,
+    ReturnType<typeof fctOpcodeGasByOpcodeHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctOpcodeGasByOpcodeHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctOpcodeGasByOpcodeHourlyServiceListQueryKey(options),
+  });
+
+export const fctOpcodeGasByOpcodeHourlyServiceGetQueryKey = (
+  options: Options<FctOpcodeGasByOpcodeHourlyServiceGetData>
+) => createQueryKey('fctOpcodeGasByOpcodeHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctOpcodeGasByOpcodeHourlyServiceGetOptions = (
+  options: Options<FctOpcodeGasByOpcodeHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctOpcodeGasByOpcodeHourlyServiceGetResponse,
+    FctOpcodeGasByOpcodeHourlyServiceGetError,
+    FctOpcodeGasByOpcodeHourlyServiceGetResponse,
+    ReturnType<typeof fctOpcodeGasByOpcodeHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctOpcodeGasByOpcodeHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctOpcodeGasByOpcodeHourlyServiceGetQueryKey(options),
+  });
+
+export const fctOpcodeOpsDailyServiceListQueryKey = (options?: Options<FctOpcodeOpsDailyServiceListData>) =>
+  createQueryKey('fctOpcodeOpsDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctOpcodeOpsDailyServiceListOptions = (options?: Options<FctOpcodeOpsDailyServiceListData>) =>
+  queryOptions<
+    FctOpcodeOpsDailyServiceListResponse,
+    FctOpcodeOpsDailyServiceListError,
+    FctOpcodeOpsDailyServiceListResponse,
+    ReturnType<typeof fctOpcodeOpsDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctOpcodeOpsDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctOpcodeOpsDailyServiceListQueryKey(options),
+  });
+
+export const fctOpcodeOpsDailyServiceGetQueryKey = (options: Options<FctOpcodeOpsDailyServiceGetData>) =>
+  createQueryKey('fctOpcodeOpsDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctOpcodeOpsDailyServiceGetOptions = (options: Options<FctOpcodeOpsDailyServiceGetData>) =>
+  queryOptions<
+    FctOpcodeOpsDailyServiceGetResponse,
+    FctOpcodeOpsDailyServiceGetError,
+    FctOpcodeOpsDailyServiceGetResponse,
+    ReturnType<typeof fctOpcodeOpsDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctOpcodeOpsDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctOpcodeOpsDailyServiceGetQueryKey(options),
+  });
+
+export const fctOpcodeOpsHourlyServiceListQueryKey = (options?: Options<FctOpcodeOpsHourlyServiceListData>) =>
+  createQueryKey('fctOpcodeOpsHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctOpcodeOpsHourlyServiceListOptions = (options?: Options<FctOpcodeOpsHourlyServiceListData>) =>
+  queryOptions<
+    FctOpcodeOpsHourlyServiceListResponse,
+    FctOpcodeOpsHourlyServiceListError,
+    FctOpcodeOpsHourlyServiceListResponse,
+    ReturnType<typeof fctOpcodeOpsHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctOpcodeOpsHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctOpcodeOpsHourlyServiceListQueryKey(options),
+  });
+
+export const fctOpcodeOpsHourlyServiceGetQueryKey = (options: Options<FctOpcodeOpsHourlyServiceGetData>) =>
+  createQueryKey('fctOpcodeOpsHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctOpcodeOpsHourlyServiceGetOptions = (options: Options<FctOpcodeOpsHourlyServiceGetData>) =>
+  queryOptions<
+    FctOpcodeOpsHourlyServiceGetResponse,
+    FctOpcodeOpsHourlyServiceGetError,
+    FctOpcodeOpsHourlyServiceGetResponse,
+    ReturnType<typeof fctOpcodeOpsHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctOpcodeOpsHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctOpcodeOpsHourlyServiceGetQueryKey(options),
+  });
+
 export const fctPreparedBlockServiceListQueryKey = (options?: Options<FctPreparedBlockServiceListData>) =>
   createQueryKey('fctPreparedBlockServiceList', options);
 
@@ -6383,6 +6743,60 @@ export const intBlockMevCanonicalServiceGetOptions = (options: Options<IntBlockM
     queryKey: intBlockMevCanonicalServiceGetQueryKey(options),
   });
 
+export const intBlockOpcodeGasServiceListQueryKey = (options?: Options<IntBlockOpcodeGasServiceListData>) =>
+  createQueryKey('intBlockOpcodeGasServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intBlockOpcodeGasServiceListOptions = (options?: Options<IntBlockOpcodeGasServiceListData>) =>
+  queryOptions<
+    IntBlockOpcodeGasServiceListResponse,
+    IntBlockOpcodeGasServiceListError,
+    IntBlockOpcodeGasServiceListResponse,
+    ReturnType<typeof intBlockOpcodeGasServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockOpcodeGasServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockOpcodeGasServiceListQueryKey(options),
+  });
+
+export const intBlockOpcodeGasServiceGetQueryKey = (options: Options<IntBlockOpcodeGasServiceGetData>) =>
+  createQueryKey('intBlockOpcodeGasServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intBlockOpcodeGasServiceGetOptions = (options: Options<IntBlockOpcodeGasServiceGetData>) =>
+  queryOptions<
+    IntBlockOpcodeGasServiceGetResponse,
+    IntBlockOpcodeGasServiceGetError,
+    IntBlockOpcodeGasServiceGetResponse,
+    ReturnType<typeof intBlockOpcodeGasServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockOpcodeGasServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockOpcodeGasServiceGetQueryKey(options),
+  });
+
 export const intBlockProposerCanonicalServiceListQueryKey = (
   options?: Options<IntBlockProposerCanonicalServiceListData>
 ) => createQueryKey('intBlockProposerCanonicalServiceList', options);
@@ -7567,6 +7981,60 @@ export const intCustodyProbeOrderBySlotServiceGetOptions = (
       return data;
     },
     queryKey: intCustodyProbeOrderBySlotServiceGetQueryKey(options),
+  });
+
+export const intEngineGetBlobsServiceListQueryKey = (options?: Options<IntEngineGetBlobsServiceListData>) =>
+  createQueryKey('intEngineGetBlobsServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intEngineGetBlobsServiceListOptions = (options?: Options<IntEngineGetBlobsServiceListData>) =>
+  queryOptions<
+    IntEngineGetBlobsServiceListResponse,
+    IntEngineGetBlobsServiceListError,
+    IntEngineGetBlobsServiceListResponse,
+    ReturnType<typeof intEngineGetBlobsServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intEngineGetBlobsServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intEngineGetBlobsServiceListQueryKey(options),
+  });
+
+export const intEngineGetBlobsServiceGetQueryKey = (options: Options<IntEngineGetBlobsServiceGetData>) =>
+  createQueryKey('intEngineGetBlobsServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intEngineGetBlobsServiceGetOptions = (options: Options<IntEngineGetBlobsServiceGetData>) =>
+  queryOptions<
+    IntEngineGetBlobsServiceGetResponse,
+    IntEngineGetBlobsServiceGetError,
+    IntEngineGetBlobsServiceGetResponse,
+    ReturnType<typeof intEngineGetBlobsServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intEngineGetBlobsServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intEngineGetBlobsServiceGetQueryKey(options),
   });
 
 export const intEngineNewPayloadServiceListQueryKey = (options?: Options<IntEngineNewPayloadServiceListData>) =>
@@ -8821,4 +9289,172 @@ export const intStorageSlotStateWithExpiryByBlockServiceGetOptions = (
       return data;
     },
     queryKey: intStorageSlotStateWithExpiryByBlockServiceGetQueryKey(options),
+  });
+
+export const intTransactionCallFrameServiceListQueryKey = (options?: Options<IntTransactionCallFrameServiceListData>) =>
+  createQueryKey('intTransactionCallFrameServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intTransactionCallFrameServiceListOptions = (options?: Options<IntTransactionCallFrameServiceListData>) =>
+  queryOptions<
+    IntTransactionCallFrameServiceListResponse,
+    IntTransactionCallFrameServiceListError,
+    IntTransactionCallFrameServiceListResponse,
+    ReturnType<typeof intTransactionCallFrameServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intTransactionCallFrameServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intTransactionCallFrameServiceListQueryKey(options),
+  });
+
+export const intTransactionCallFrameServiceGetQueryKey = (options: Options<IntTransactionCallFrameServiceGetData>) =>
+  createQueryKey('intTransactionCallFrameServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intTransactionCallFrameServiceGetOptions = (options: Options<IntTransactionCallFrameServiceGetData>) =>
+  queryOptions<
+    IntTransactionCallFrameServiceGetResponse,
+    IntTransactionCallFrameServiceGetError,
+    IntTransactionCallFrameServiceGetResponse,
+    ReturnType<typeof intTransactionCallFrameServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intTransactionCallFrameServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intTransactionCallFrameServiceGetQueryKey(options),
+  });
+
+export const intTransactionCallFrameOpcodeGasServiceListQueryKey = (
+  options?: Options<IntTransactionCallFrameOpcodeGasServiceListData>
+) => createQueryKey('intTransactionCallFrameOpcodeGasServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intTransactionCallFrameOpcodeGasServiceListOptions = (
+  options?: Options<IntTransactionCallFrameOpcodeGasServiceListData>
+) =>
+  queryOptions<
+    IntTransactionCallFrameOpcodeGasServiceListResponse,
+    IntTransactionCallFrameOpcodeGasServiceListError,
+    IntTransactionCallFrameOpcodeGasServiceListResponse,
+    ReturnType<typeof intTransactionCallFrameOpcodeGasServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intTransactionCallFrameOpcodeGasServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intTransactionCallFrameOpcodeGasServiceListQueryKey(options),
+  });
+
+export const intTransactionCallFrameOpcodeGasServiceGetQueryKey = (
+  options: Options<IntTransactionCallFrameOpcodeGasServiceGetData>
+) => createQueryKey('intTransactionCallFrameOpcodeGasServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intTransactionCallFrameOpcodeGasServiceGetOptions = (
+  options: Options<IntTransactionCallFrameOpcodeGasServiceGetData>
+) =>
+  queryOptions<
+    IntTransactionCallFrameOpcodeGasServiceGetResponse,
+    IntTransactionCallFrameOpcodeGasServiceGetError,
+    IntTransactionCallFrameOpcodeGasServiceGetResponse,
+    ReturnType<typeof intTransactionCallFrameOpcodeGasServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intTransactionCallFrameOpcodeGasServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intTransactionCallFrameOpcodeGasServiceGetQueryKey(options),
+  });
+
+export const intTransactionOpcodeGasServiceListQueryKey = (options?: Options<IntTransactionOpcodeGasServiceListData>) =>
+  createQueryKey('intTransactionOpcodeGasServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intTransactionOpcodeGasServiceListOptions = (options?: Options<IntTransactionOpcodeGasServiceListData>) =>
+  queryOptions<
+    IntTransactionOpcodeGasServiceListResponse,
+    IntTransactionOpcodeGasServiceListError,
+    IntTransactionOpcodeGasServiceListResponse,
+    ReturnType<typeof intTransactionOpcodeGasServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intTransactionOpcodeGasServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intTransactionOpcodeGasServiceListQueryKey(options),
+  });
+
+export const intTransactionOpcodeGasServiceGetQueryKey = (options: Options<IntTransactionOpcodeGasServiceGetData>) =>
+  createQueryKey('intTransactionOpcodeGasServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intTransactionOpcodeGasServiceGetOptions = (options: Options<IntTransactionOpcodeGasServiceGetData>) =>
+  queryOptions<
+    IntTransactionOpcodeGasServiceGetResponse,
+    IntTransactionOpcodeGasServiceGetError,
+    IntTransactionOpcodeGasServiceGetResponse,
+    ReturnType<typeof intTransactionOpcodeGasServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intTransactionOpcodeGasServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intTransactionOpcodeGasServiceGetQueryKey(options),
   });

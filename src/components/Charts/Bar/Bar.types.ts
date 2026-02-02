@@ -125,4 +125,9 @@ export interface BarChartProps {
    * @default 'auto'
    */
   categoryLabelInterval?: number | 'auto';
+  /**
+   * Formatter for value axis labels
+   * @default undefined (uses default number formatting)
+   */
+  valueAxisLabelFormatter?: (value: number) => string;
 }
