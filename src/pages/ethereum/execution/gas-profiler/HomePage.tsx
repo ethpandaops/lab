@@ -29,6 +29,7 @@ import {
   fctOpcodeGasByOpcodeHourlyServiceListOptions,
   fctOpcodeGasByOpcodeDailyServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
+import { intTransactionCallFrameServiceList } from '@/api/sdk.gen';
 import type { FctOpcodeOpsHourly, FctOpcodeOpsDaily } from '@/api/types.gen';
 import { useTableBounds } from '@/hooks/useBounds';
 import { useRecentBlocks } from './hooks/useRecentBlocks';
@@ -192,6 +193,7 @@ export function HomePage(): JSX.Element {
   // Search input states
   const [searchInput, setSearchInput] = useState('');
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
   const [blocksOffset, setBlocksOffset] = useState(0);
 
   // Fetch bounds to validate block range (lightweight - just bounds, no block data)
@@ -385,7 +387,7 @@ export function HomePage(): JSX.Element {
   }, [search.tx, search.block, navigate]);
 
   // Handle search submission
-  const handleSearch = useCallback(() => {
+  const handleSearch = useCallback(async () => {
     setSearchError(null);
     const cleanedInput = searchInput.replace(/,/g, '');
 
@@ -407,10 +409,39 @@ export function HomePage(): JSX.Element {
     }
 
     if (isValidTxHash(cleanedInput)) {
-      navigate({
-        to: '/ethereum/execution/gas-profiler/tx/$txHash',
-        params: { txHash: cleanedInput },
-      });
+      // Look up the block number for this transaction to enable faster queries
+      setIsSearching(true);
+      try {
+        const { data } = await intTransactionCallFrameServiceList({
+          query: {
+            transaction_hash_eq: cleanedInput,
+            page_size: 1,
+          },
+        });
+
+        const blockNumber = data?.int_transaction_call_frame?.[0]?.block_number;
+
+        if (blockNumber) {
+          navigate({
+            to: '/ethereum/execution/gas-profiler/tx/$txHash',
+            params: { txHash: cleanedInput },
+            search: { block: blockNumber },
+          });
+        } else {
+          // Transaction not found in indexed data
+          setSearchError(
+            `Transaction not found in indexed range (blocks ${formatGas(bounds?.min ?? 0)} - ${formatGas(bounds?.max ?? 0)})`
+          );
+        }
+      } catch {
+        // On error, navigate without block number (fallback to slower query)
+        navigate({
+          to: '/ethereum/execution/gas-profiler/tx/$txHash',
+          params: { txHash: cleanedInput },
+        });
+      } finally {
+        setIsSearching(false);
+      }
       return;
     }
 
@@ -675,10 +706,16 @@ export function HomePage(): JSX.Element {
         <Input
           error={!!searchError}
           errorMessage={searchError ?? undefined}
-          helperText={!searchError ? `Indexed range: ${formatGas(bounds.min)} - ${formatGas(bounds.max)}` : undefined}
+          helperText={
+            isSearching
+              ? 'Looking up transaction...'
+              : !searchError
+                ? `Indexed range: ${formatGas(bounds.min)} - ${formatGas(bounds.max)}`
+                : undefined
+          }
         >
           <Input.Leading>
-            <MagnifyingGlassIcon />
+            <MagnifyingGlassIcon className={isSearching ? 'animate-pulse' : ''} />
           </Input.Leading>
           <Input.Field
             type="text"
@@ -686,10 +723,11 @@ export function HomePage(): JSX.Element {
             onChange={e => setSearchInput(e.target.value)}
             onKeyDown={handleKeyPress}
             placeholder="Search by transaction hash (0x...) or block number"
+            disabled={isSearching}
           />
           <Input.Trailing type="button">
-            <Button size="sm" onClick={handleSearch}>
-              Search
+            <Button size="sm" onClick={handleSearch} disabled={isSearching}>
+              {isSearching ? 'Searching...' : 'Search'}
             </Button>
           </Input.Trailing>
         </Input>
