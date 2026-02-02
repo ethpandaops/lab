@@ -285,7 +285,7 @@ function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JS
 
                     {/* Opcode label (vertical using writing-mode) */}
                     <div
-                      className="mt-1 whitespace-nowrap font-mono text-[10px] text-muted"
+                      className="mt-1 font-mono text-[10px] whitespace-nowrap text-muted"
                       style={{ writingMode: 'vertical-rl' }}
                     >
                       {opcode}
@@ -308,7 +308,7 @@ function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JS
 
           return createPortal(
             <div
-              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-xs border border-border bg-background px-3 py-2 text-xs shadow-lg"
+              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap shadow-lg"
               style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
             >
               <div className="font-mono font-semibold">{hoveredOpcode}</div>

@@ -170,7 +170,7 @@ function BlockViewHeatmap({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JSX.
 
                     {/* Opcode label (vertical using writing-mode) */}
                     <div
-                      className="mt-1 whitespace-nowrap font-mono text-[10px] text-muted"
+                      className="mt-1 font-mono text-[10px] whitespace-nowrap text-muted"
                       style={{ writingMode: 'vertical-rl' }}
                     >
                       {opcode}
@@ -193,7 +193,7 @@ function BlockViewHeatmap({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JSX.
 
           return createPortal(
             <div
-              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-xs border border-border bg-background px-3 py-2 text-xs shadow-lg"
+              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap shadow-lg"
               style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
             >
               <div className="font-mono font-semibold">{hoveredOpcode}</div>
@@ -226,7 +226,16 @@ function TransactionsViewHeatmap({
 }: {
   blockNumber: number;
   transactions?: BlockOpcodeHeatmapProps['transactions'];
-  opcodeData: { int_transaction_opcode_gas?: Array<{ transaction_hash?: string; opcode?: string; gas?: number; count?: number }> } | undefined;
+  opcodeData:
+    | {
+        int_transaction_opcode_gas?: Array<{
+          transaction_hash?: string;
+          opcode?: string;
+          gas?: number;
+          count?: number;
+        }>;
+      }
+    | undefined;
   isLoading: boolean;
   inModal?: boolean;
 }): JSX.Element {
@@ -243,7 +252,6 @@ function TransactionsViewHeatmap({
       headerRefs.current.delete(category);
     }
   }, []);
-
 
   // Update tooltip position when hovered cell changes
   useEffect(() => {
@@ -271,7 +279,12 @@ function TransactionsViewHeatmap({
   // Process data into heatmap structure
   const { txRows, categoryGroups, maxGas, opcodeGasMap } = useMemo(() => {
     if (!opcodeData?.int_transaction_opcode_gas?.length) {
-      return { txRows: [], categoryGroups: [], maxGas: 0, opcodeGasMap: new Map<string, Map<string, { gas: number; count: number }>>() };
+      return {
+        txRows: [],
+        categoryGroups: [],
+        maxGas: 0,
+        opcodeGasMap: new Map<string, Map<string, { gas: number; count: number }>>(),
+      };
     }
 
     const opcodeGasMap = new Map<string, Map<string, { gas: number; count: number }>>();
@@ -347,17 +360,13 @@ function TransactionsViewHeatmap({
 
   if (isLoading) {
     return (
-      <div className="flex h-40 items-center justify-center text-muted">
-        Loading per-transaction opcode data...
-      </div>
+      <div className="flex h-40 items-center justify-center text-muted">Loading per-transaction opcode data...</div>
     );
   }
 
   if (txRows.length === 0 || categoryGroups.length === 0) {
     return (
-      <div className="flex h-40 items-center justify-center text-muted">
-        No per-transaction opcode data available
-      </div>
+      <div className="flex h-40 items-center justify-center text-muted">No per-transaction opcode data available</div>
     );
   }
 
@@ -368,7 +377,7 @@ function TransactionsViewHeatmap({
       <Legend opcodeCount={allOpcodesOrdered.length} />
 
       {/* Heatmap grid with sticky row headers and max height */}
-      <div className={`overflow-y-auto overflow-x-auto ${inModal ? 'flex-1' : 'max-h-96'}`}>
+      <div className={`overflow-x-auto overflow-y-auto ${inModal ? 'flex-1' : 'max-h-96'}`}>
         <div className="inline-flex min-w-full">
           {/* Row headers (transaction labels) - sticky */}
           <div className="sticky left-0 z-10 shrink-0 pr-2">
@@ -406,7 +415,7 @@ function TransactionsViewHeatmap({
                   {opcodes.map(opcode => (
                     <div key={opcode} className="flex w-6 justify-center">
                       <span
-                        className="whitespace-nowrap font-mono text-[10px] text-muted"
+                        className="font-mono text-[10px] whitespace-nowrap text-muted"
                         style={{ writingMode: 'vertical-rl' }}
                       >
                         {opcode}
@@ -459,7 +468,7 @@ function TransactionsViewHeatmap({
 
           return createPortal(
             <div
-              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-xs border border-border bg-background px-3 py-2 text-xs shadow-lg"
+              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap shadow-lg"
               style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
             >
               <div className="font-mono font-semibold">{hoveredCell.opcode}</div>
@@ -504,18 +513,15 @@ export function BlockOpcodeHeatmap({ blockNumber, opcodeStats, transactions }: B
   if (opcodeStats.length === 0) {
     return (
       <PopoutCard title="Opcode Heatmap" subtitle="Gas consumption by category and opcode">
-        {() => (
-          <div className="flex h-20 items-center justify-center text-muted">
-            No opcode data available
-          </div>
-        )}
+        {() => <div className="flex h-20 items-center justify-center text-muted">No opcode data available</div>}
       </PopoutCard>
     );
   }
 
-  const subtitle = viewMode === 'block'
-    ? 'Gas consumption by category and opcode'
-    : `${transactions?.length ?? 0} transactions × opcodes`;
+  const subtitle =
+    viewMode === 'block'
+      ? 'Gas consumption by category and opcode'
+      : `${transactions?.length ?? 0} transactions × opcodes`;
 
   return (
     <PopoutCard title="Opcode Heatmap" subtitle={subtitle} allowContentOverflow modalSize="fullscreen">
@@ -527,9 +533,7 @@ export function BlockOpcodeHeatmap({ blockNumber, opcodeStats, transactions }: B
             <button
               onClick={() => setViewMode('block')}
               className={`rounded-xs px-2 py-1 text-xs transition-colors ${
-                viewMode === 'block'
-                  ? 'bg-primary text-white'
-                  : 'bg-surface text-muted hover:text-foreground'
+                viewMode === 'block' ? 'bg-primary text-white' : 'bg-surface text-muted hover:text-foreground'
               }`}
             >
               Block
@@ -537,9 +541,7 @@ export function BlockOpcodeHeatmap({ blockNumber, opcodeStats, transactions }: B
             <button
               onClick={() => setViewMode('transactions')}
               className={`rounded-xs px-2 py-1 text-xs transition-colors ${
-                viewMode === 'transactions'
-                  ? 'bg-primary text-white'
-                  : 'bg-surface text-muted hover:text-foreground'
+                viewMode === 'transactions' ? 'bg-primary text-white' : 'bg-surface text-muted hover:text-foreground'
               }`}
             >
               By Transaction

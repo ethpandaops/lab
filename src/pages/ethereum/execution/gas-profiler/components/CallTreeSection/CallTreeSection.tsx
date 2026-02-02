@@ -5,11 +5,7 @@ import type { FlameGraphNode } from '@/components/Charts/FlameGraph/FlameGraph.t
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import type { CallTreeNode } from '../../IndexPage.types';
 import type { AllCallFrameOpcodesMap } from '../../hooks/useAllCallFrameOpcodes';
-import {
-  addOpcodesToCallTree,
-  FLAME_GRAPH_CALL_TYPE_COLORS,
-  FLAME_GRAPH_COMBINED_COLORS,
-} from '../../utils';
+import { addOpcodesToCallTree, FLAME_GRAPH_CALL_TYPE_COLORS, FLAME_GRAPH_COMBINED_COLORS } from '../../utils';
 
 export interface CallTreeSectionProps {
   /** Call tree data for the FlameGraph */

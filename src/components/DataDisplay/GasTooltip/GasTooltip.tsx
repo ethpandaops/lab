@@ -26,7 +26,14 @@ const SIZE_CLASSES = {
  * <GasTooltip type="evm" customContent={<div>Custom explanation</div>} />
  * ```
  */
-export function GasTooltip({ type, context, customContent, size = 'sm', className, capPercent }: GasTooltipProps): JSX.Element {
+export function GasTooltip({
+  type,
+  context,
+  customContent,
+  size = 'sm',
+  className,
+  capPercent,
+}: GasTooltipProps): JSX.Element {
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);

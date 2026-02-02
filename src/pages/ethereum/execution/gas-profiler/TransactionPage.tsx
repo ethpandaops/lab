@@ -570,7 +570,7 @@ export function TransactionPage(): JSX.Element {
             </div>
             <div>
               <div className="text-xl font-semibold text-foreground">{callFrameData.length}</div>
-              <div className="text-xs text-muted">Internal Tx's</div>
+              <div className="text-xs text-muted">Internal Txs</div>
             </div>
           </div>
         </Card>
@@ -643,7 +643,9 @@ export function TransactionPage(): JSX.Element {
                       value: effectiveRefund,
                       color: 'green',
                       operator: '-',
-                      tooltip: <GasTooltip type="refund" context="transaction" size="md" capPercent={refundCapPercent} />,
+                      tooltip: (
+                        <GasTooltip type="refund" context="transaction" size="md" capPercent={refundCapPercent} />
+                      ),
                     },
                   ]}
                   result={{

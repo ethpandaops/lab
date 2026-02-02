@@ -1,7 +1,13 @@
 import React, { type JSX, useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
-import { ChevronRightIcon, ChevronDownIcon, ChevronUpIcon, HomeIcon, EllipsisHorizontalIcon } from '@heroicons/react/20/solid';
+import {
+  ChevronRightIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  HomeIcon,
+  EllipsisHorizontalIcon,
+} from '@heroicons/react/20/solid';
 import type { FlameGraphProps, FlameGraphNode, FlattenedNode, FlameGraphColorMap } from './FlameGraph.types';
 import { EVM_CALL_TYPE_COLORS } from './FlameGraph.types';
 
@@ -165,24 +171,25 @@ export function FlameGraph({
   }, []);
 
   // Find the path from root to a node (returns array of IDs including the target)
-  const findPathToNode = useCallback((root: FlameGraphNode | null, targetId: string, path: string[] = []): string[] | null => {
-    if (!root) return null;
-    if (root.id === targetId) return [...path, root.id];
-    if (root.children) {
-      for (const child of root.children) {
-        const found = findPathToNode(child, targetId, [...path, root.id]);
-        if (found) return found;
+  const findPathToNode = useCallback(
+    (root: FlameGraphNode | null, targetId: string, path: string[] = []): string[] | null => {
+      if (!root) return null;
+      if (root.id === targetId) return [...path, root.id];
+      if (root.children) {
+        for (const child of root.children) {
+          const found = findPathToNode(child, targetId, [...path, root.id]);
+          if (found) return found;
+        }
       }
-    }
-    return null;
-  }, []);
+      return null;
+    },
+    []
+  );
 
   // Resolve zoom path IDs to actual nodes from the current tree
   const zoomPath = useMemo(() => {
     if (!data) return [];
-    return zoomPathIds
-      .map(id => findNodeById(data, id))
-      .filter((node): node is FlameGraphNode => node !== null);
+    return zoomPathIds.map(id => findNodeById(data, id)).filter((node): node is FlameGraphNode => node !== null);
   }, [zoomPathIds, data, findNodeById]);
 
   // The currently zoomed node (last in resolved path, or root if empty)
@@ -381,11 +388,18 @@ export function FlameGraph({
                                 onClick={() => handleBreadcrumbClick(index)}
                                 className={clsx(
                                   'flex w-full items-center gap-2 rounded-xs px-2 py-1 text-left',
-                                  isLast ? 'bg-primary/10 text-foreground' : 'text-muted hover:bg-surface hover:text-foreground'
+                                  isLast
+                                    ? 'bg-primary/10 text-foreground'
+                                    : 'text-muted hover:bg-surface hover:text-foreground'
                                 )}
                               >
                                 {node.category && nodeColors && (
-                                  <span className={clsx('rounded-xs px-1.5 py-0.5 text-[10px] font-medium text-white', nodeColors.bg)}>
+                                  <span
+                                    className={clsx(
+                                      'rounded-xs px-1.5 py-0.5 text-[10px] font-medium text-white',
+                                      nodeColors.bg
+                                    )}
+                                  >
                                     {node.category}
                                   </span>
                                 )}
@@ -415,7 +429,12 @@ export function FlameGraph({
                         title={parent.label}
                       >
                         {parent.category && parentColors && (
-                          <span className={clsx('rounded-xs px-1.5 py-0.5 text-[10px] font-medium text-white', parentColors.bg)}>
+                          <span
+                            className={clsx(
+                              'rounded-xs px-1.5 py-0.5 text-[10px] font-medium text-white',
+                              parentColors.bg
+                            )}
+                          >
                             {parent.category}
                           </span>
                         )}
@@ -432,9 +451,17 @@ export function FlameGraph({
                 const current = zoomPath[zoomPath.length - 1];
                 const currentColors = colorMap?.[current.category ?? ''];
                 return (
-                  <span className="flex shrink-0 items-center gap-1.5 font-medium text-foreground" title={current.label}>
+                  <span
+                    className="flex shrink-0 items-center gap-1.5 font-medium text-foreground"
+                    title={current.label}
+                  >
                     {current.category && currentColors && (
-                      <span className={clsx('rounded-xs px-1.5 py-0.5 text-[10px] font-medium text-white', currentColors.bg)}>
+                      <span
+                        className={clsx(
+                          'rounded-xs px-1.5 py-0.5 text-[10px] font-medium text-white',
+                          currentColors.bg
+                        )}
+                      >
                         {current.category}
                       </span>
                     )}
@@ -668,11 +695,7 @@ export function FlameGraph({
             onClick={() => setLegendExpanded(!legendExpanded)}
             className="flex items-center gap-1 text-xs text-muted transition-colors hover:text-foreground"
           >
-            {legendExpanded ? (
-              <ChevronUpIcon className="size-4" />
-            ) : (
-              <ChevronDownIcon className="size-4" />
-            )}
+            {legendExpanded ? <ChevronUpIcon className="size-4" /> : <ChevronDownIcon className="size-4" />}
             <span>Legend ({categories.size} categories)</span>
           </button>
           {legendExpanded && (
