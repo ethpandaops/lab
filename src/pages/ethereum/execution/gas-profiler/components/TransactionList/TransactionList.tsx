@@ -1,5 +1,6 @@
 import { type JSX } from 'react';
 import { Card } from '@/components/Layout/Card';
+import type { Network } from '@/hooks/useConfig/useConfig.types';
 import type { TransactionSummary } from '../../hooks/useBlockTransactions';
 import { TransactionRow } from '../TransactionRow';
 
@@ -12,6 +13,8 @@ export interface TransactionListProps {
   onTransactionClick: (txHash: string) => void;
   /** Block number for linking to transaction detail */
   blockNumber: number;
+  /** Network configuration for fork-aware calculations */
+  network: Network | null;
 }
 
 /**
@@ -29,6 +32,7 @@ export function TransactionList({
   expandedTxHash,
   onTransactionClick,
   blockNumber,
+  network,
 }: TransactionListProps): JSX.Element {
   if (transactions.length === 0) {
     return (
@@ -63,6 +67,7 @@ export function TransactionList({
             isExpanded={expandedTxHash === tx.transactionHash}
             onClick={() => onTransactionClick(tx.transactionHash)}
             formatGas={formatGas}
+            network={network}
           />
         ))}
       </div>

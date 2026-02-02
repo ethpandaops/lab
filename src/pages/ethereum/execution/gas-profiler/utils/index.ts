@@ -8,3 +8,4 @@ export {
   FLAME_GRAPH_COMBINED_COLORS,
 } from './opcodeUtils';
 export { addOpcodesToCallTree, isOpcodeNode } from './callTreeWithOpcodes';
+export { getEffectiveGasRefund } from './gasRefund';

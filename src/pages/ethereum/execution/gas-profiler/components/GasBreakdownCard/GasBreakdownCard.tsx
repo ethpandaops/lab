@@ -1,11 +1,15 @@
 import { type JSX, useMemo } from 'react';
 import { StackedBar } from '@/components/Charts/StackedBar';
 import { Card } from '@/components/Layout/Card';
+import type { Network } from '@/hooks/useConfig/useConfig.types';
 import type { TransactionMetadata } from '../../IndexPage.types';
+import { getEffectiveGasRefund } from '../../utils';
 
 export interface GasBreakdownCardProps {
   /** Transaction metadata with gas values */
   metadata: TransactionMetadata;
+  /** Network configuration for fork-aware refund calculation */
+  network: Network | null;
 }
 
 /**
@@ -18,7 +22,7 @@ function formatGas(value: number): string {
 /**
  * Gas breakdown visualization card showing intrinsic, EVM, and refund breakdown
  */
-export function GasBreakdownCard({ metadata }: GasBreakdownCardProps): JSX.Element {
+export function GasBreakdownCard({ metadata, network }: GasBreakdownCardProps): JSX.Element {
   const segments = useMemo(() => {
     const result = [];
 
@@ -48,15 +52,19 @@ export function GasBreakdownCard({ metadata }: GasBreakdownCardProps): JSX.Eleme
   // Calculate total before refund
   const totalBeforeRefund = (metadata.intrinsicGas ?? 0) + metadata.evmGasUsed;
 
-  // Calculate effective refund (capped at 20%)
-  const maxRefund = Math.floor(totalBeforeRefund / 5);
-  const effectiveRefund = Math.min(metadata.gasRefund, maxRefund);
-  const refundCapped = metadata.gasRefund > maxRefund;
+  // Calculate effective refund based on fork rules (EIP-3529 changed cap from 50% to 20%)
+  const { effectiveRefund, isCapped, isPostLondon } = getEffectiveGasRefund(
+    metadata.gasRefund,
+    metadata.receiptGasUsed,
+    metadata.blockNumber,
+    network
+  );
 
-  // Format footer text
+  // Format footer text with fork-appropriate cap description
+  const capPercent = isPostLondon ? '20%' : '50%';
   const refundText =
     metadata.gasRefund > 0
-      ? `Refund: -${formatGas(effectiveRefund)}${refundCapped ? ' (capped at 20%)' : ''}`
+      ? `Refund: -${formatGas(effectiveRefund)}${isCapped ? ` (capped at ${capPercent})` : ''}`
       : undefined;
 
   return (

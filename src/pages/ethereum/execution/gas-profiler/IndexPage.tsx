@@ -4,6 +4,7 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
 import { Card } from '@/components/Layout/Card';
+import { useNetwork } from '@/hooks/useNetwork';
 import { useBlockTransactions } from './hooks/useBlockTransactions';
 import { BlockHeader, TransactionList, GasProfilerSkeleton, TransactionSearchInput } from './components';
 
@@ -45,6 +46,9 @@ export function IndexPage(): JSX.Element {
 
   // Show search modal
   const [showSearch, setShowSearch] = useState(false);
+
+  // Get current network for fork-aware calculations
+  const { currentNetwork } = useNetwork();
 
   // Fetch block transactions
   const { data, isLoading, error, bounds, boundsLoading } = useBlockTransactions({
@@ -185,6 +189,7 @@ export function IndexPage(): JSX.Element {
           expandedTxHash={expandedTxHash}
           onTransactionClick={handleTransactionClick}
           blockNumber={data.blockNumber}
+          network={currentNetwork}
         />
       )}
     </Container>

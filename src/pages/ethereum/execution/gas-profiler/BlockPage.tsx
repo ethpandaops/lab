@@ -40,7 +40,8 @@ import {
   TRANSACTION_BUCKETS,
 } from './components';
 import type { ContractInteractionItem, TopGasItem } from './components';
-import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory } from './utils';
+import { useNetwork } from '@/hooks/useNetwork';
+import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory, getEffectiveGasRefund } from './utils';
 import type { GasProfilerBlockSearch } from './IndexPage.types';
 
 /**
@@ -106,6 +107,7 @@ export function BlockPage(): JSX.Element {
   const search = useSearch({ from: '/ethereum/execution/gas-profiler/block/$blockNumber' }) as GasProfilerBlockSearch;
   const navigate = useNavigate({ from: '/ethereum/execution/gas-profiler/block/$blockNumber' });
   const colors = useThemeColors();
+  const { currentNetwork } = useNetwork();
 
   const blockNumber = parseInt(blockNumberParam, 10);
 
@@ -511,6 +513,12 @@ export function BlockPage(): JSX.Element {
     return { totalIntrinsic, totalEvm, totalRefund, totalReceipt };
   }, [data?.transactions]);
 
+  // Determine refund cap percentage based on fork (London changed from 50% to 20%)
+  const refundCapPercent = useMemo(() => {
+    const londonBlock = currentNetwork?.forks?.execution?.london?.block ?? 0;
+    return blockNumber >= londonBlock ? '20%' : '50%';
+  }, [blockNumber, currentNetwork]);
+
   // Top transactions by gas as TopGasItem[] for the reusable table component
   const topTransactionsItems = useMemo((): TopGasItem[] => {
     if (!data?.transactions?.length) return [];
@@ -750,7 +758,7 @@ export function BlockPage(): JSX.Element {
                       value: blockGasBreakdown.totalRefund,
                       color: 'green',
                       operator: '-',
-                      tooltip: <GasTooltip type="refund" context="block" size="md" />,
+                      tooltip: <GasTooltip type="refund" context="block" size="md" capPercent={refundCapPercent} />,
                     },
                   ]}
                   result={{

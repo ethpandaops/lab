@@ -26,12 +26,20 @@ const SIZE_CLASSES = {
  * <GasTooltip type="evm" customContent={<div>Custom explanation</div>} />
  * ```
  */
-export function GasTooltip({ type, context, customContent, size = 'sm', className }: GasTooltipProps): JSX.Element {
+export function GasTooltip({ type, context, customContent, size = 'sm', className, capPercent }: GasTooltipProps): JSX.Element {
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const explanations = getGasExplanations(context);
-  const explanation = explanations[type];
+
+  // Get base explanation and override refund description if capPercent is provided
+  let explanation = explanations[type];
+  if (type === 'refund' && capPercent) {
+    explanation = {
+      ...explanation,
+      description: `Gas returned for storage cleanup operations (SSTORE setting to zero). Capped at ${capPercent} of total gas used.`,
+    };
+  }
 
   const handleMouseEnter = useCallback(() => setIsVisible(true), []);
   const handleMouseLeave = useCallback(() => setIsVisible(false), []);

@@ -22,6 +22,8 @@ export interface GasTooltipProps {
   size?: 'sm' | 'md' | 'lg';
   /** Custom class name */
   className?: string;
+  /** Cap percentage for refund tooltip (e.g., "20%" or "50%") - used for fork-aware display */
+  capPercent?: string;
 }
 
 /**

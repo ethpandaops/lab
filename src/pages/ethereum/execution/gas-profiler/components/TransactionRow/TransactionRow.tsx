@@ -2,6 +2,7 @@ import { type JSX, useCallback } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { ChevronDownIcon, ChevronRightIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
+import type { Network } from '@/hooks/useConfig/useConfig.types';
 import type { TransactionSummary } from '../../hooks/useBlockTransactions';
 import { useTransactionGasData } from '../../hooks/useTransactionGasData';
 import { CallTreeSection } from '../CallTreeSection';
@@ -22,6 +23,8 @@ export interface TransactionRowProps {
   onClick: () => void;
   /** Gas formatting function */
   formatGas: (value: number) => string;
+  /** Network configuration for fork-aware calculations */
+  network: Network | null;
 }
 
 /**
@@ -59,6 +62,7 @@ export function TransactionRow({
   isExpanded,
   onClick,
   formatGas,
+  network,
 }: TransactionRowProps): JSX.Element {
   const navigate = useNavigate();
 
@@ -157,7 +161,7 @@ export function TransactionRow({
           {txData && (
             <div className="space-y-4">
               {/* Gas breakdown */}
-              <GasBreakdownCard metadata={txData.metadata} />
+              <GasBreakdownCard metadata={txData.metadata} network={network} />
 
               {/* Call tree */}
               <CallTreeSection callTree={txData.callTree} onFrameSelect={handleFrameSelect} />

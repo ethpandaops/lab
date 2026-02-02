@@ -38,7 +38,8 @@ import {
 } from './components';
 import type { ContractInteractionItem, TopGasItem, CallFrameData } from './components';
 import { getCallLabel } from './hooks/useTransactionGasData';
-import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory } from './utils';
+import { useNetwork } from '@/hooks/useNetwork';
+import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory, getEffectiveGasRefund } from './utils';
 import type { CallTreeNode, OpcodeStats } from './IndexPage.types';
 
 /**
@@ -91,6 +92,9 @@ export function TransactionPage(): JSX.Element {
     blockNumber: blockFromSearch,
     enabled: showOpcodes,
   });
+
+  // Get network for fork-aware gas refund calculation
+  const { currentNetwork } = useNetwork();
 
   // Block number: prefer from response (source of truth), fall back to URL param
   const blockNumber = txData?.metadata.blockNumber ?? blockFromSearch ?? null;
@@ -481,6 +485,15 @@ export function TransactionPage(): JSX.Element {
   // Detect simple ETH transfers (no EVM execution, just intrinsic gas)
   const isSimpleTransfer = metadata.evmGasUsed === 0;
 
+  // Calculate effective gas refund based on fork rules (EIP-3529 changed cap from 50% to 20%)
+  const { effectiveRefund, isCapped, isPostLondon } = getEffectiveGasRefund(
+    metadata.gasRefund,
+    metadata.receiptGasUsed,
+    metadata.blockNumber,
+    currentNetwork
+  );
+  const refundCapPercent = isPostLondon ? '20%' : '50%';
+
   return (
     <Container>
       <Header title={`TX ${txHash.slice(0, 10)}...${txHash.slice(-8)}`} description="Transaction gas analysis" />
@@ -627,10 +640,10 @@ export function TransactionPage(): JSX.Element {
                     },
                     {
                       label: 'Refund',
-                      value: metadata.gasRefund ?? 0,
+                      value: effectiveRefund,
                       color: 'green',
                       operator: '-',
-                      tooltip: <GasTooltip type="refund" context="transaction" size="md" />,
+                      tooltip: <GasTooltip type="refund" context="transaction" size="md" capPercent={refundCapPercent} />,
                     },
                   ]}
                   result={{
