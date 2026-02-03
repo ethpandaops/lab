@@ -11,9 +11,6 @@ import {
   FireIcon,
   ArrowsPointingOutIcon,
   DocumentTextIcon,
-  CubeIcon,
-  ArrowsRightLeftIcon,
-  QueueListIcon,
 } from '@heroicons/react/24/outline';
 import ReactECharts from 'echarts-for-react';
 import { Tab } from '@/components/Navigation/Tab';
@@ -22,7 +19,6 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
 import { Alert } from '@/components/Feedback/Alert';
-import { InfoBox } from '@/components/Feedback/InfoBox';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
@@ -40,7 +36,7 @@ import {
   CallTraceView,
   ContractCallTree,
 } from './components';
-import type { TopGasItem, CallFrameData } from './components';
+import type { TopGasItem, CallFrameData, ContractTreeNode } from './components';
 import { getCallLabel } from './hooks/useTransactionGasData';
 import { useNetwork } from '@/hooks/useNetwork';
 import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory, getEffectiveGasRefund } from './utils';
@@ -168,21 +164,21 @@ export function TransactionPage(): JSX.Element {
   // Get function signatures from txData for method name lookup
   const functionSignatures = useMemo(() => txData?.functionSignatures ?? {}, [txData?.functionSignatures]);
 
-  // Contract tree node type
-  interface ContractTreeNode {
+  // Contract gas node type (for aggregated contract view, not call tree)
+  interface ContractGasNode {
     address: string;
     name: string | null;
     callTypes: string[];
     selfGas: number;
     totalGas: number;
     callCount: number;
-    implementations: ContractTreeNode[];
+    implementations: ContractGasNode[];
     isImplementation: boolean;
     firstCallFrameId: number | null; // For click-through to call detail
   }
 
   // Build contract tree with implementations nested under proxies
-  const contractTree = useMemo((): ContractTreeNode[] => {
+  const contractTree = useMemo((): ContractGasNode[] => {
     if (!txData?.callFrames) return [];
 
     const frames = txData.callFrames;
@@ -242,7 +238,7 @@ export function TransactionPage(): JSX.Element {
     }
 
     // Third pass: build tree nodes
-    const nodeMap = new Map<string, ContractTreeNode>();
+    const nodeMap = new Map<string, ContractGasNode>();
 
     contractMap.forEach((data, address) => {
       const callTypesArr = [...data.callTypes];
@@ -262,7 +258,7 @@ export function TransactionPage(): JSX.Element {
     });
 
     // Fourth pass: nest implementations under proxies
-    const topLevel: ContractTreeNode[] = [];
+    const topLevel: ContractGasNode[] = [];
 
     nodeMap.forEach((node, address) => {
       const proxyAddress = implToProxy.get(address);

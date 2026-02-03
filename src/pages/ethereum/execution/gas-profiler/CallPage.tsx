@@ -21,8 +21,9 @@ import { Alert } from '@/components/Feedback/Alert';
 import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
 import { TenderlyIcon } from '@/components/Ethereum/TenderlyIcon';
 import { PhalconIcon } from '@/components/Ethereum/PhalconIcon';
-import { useTransactionGasData, getCallLabel } from './hooks/useTransactionGasData';
+import { useTransactionGasData, getCallLabel, type CallFrameOpcodeStats } from './hooks/useTransactionGasData';
 import { useFrameOpcodes } from './hooks/useFrameOpcodes';
+import { useAllCallFrameOpcodes } from './hooks/useAllCallFrameOpcodes';
 import type { ContractOwnerMap } from './hooks/useContractOwners';
 import type { FunctionSignatureMap } from './hooks/useFunctionSignatures';
 import { GasProfilerSkeleton, OpcodeAnalysis, CategoryPieChart, GasFormula, CallTraceView } from './components';
@@ -87,6 +88,68 @@ export function CallPage(): JSX.Element {
     transactionHash: txHash,
     blockNumber: blockFromSearch,
   });
+
+  // Fetch all opcode data for badge stats on call trace
+  const { data: opcodeMap } = useAllCallFrameOpcodes({
+    transactionHash: txHash,
+    blockNumber: blockFromSearch,
+    enabled: true,
+  });
+
+  // Derive badge stats from full opcode data (SSTORE, SLOAD, LOG*, CREATE*, SELFDESTRUCT)
+  const callFrameOpcodeStats = useMemo((): Map<number, CallFrameOpcodeStats> => {
+    const statsMap = new Map<number, CallFrameOpcodeStats>();
+    if (!opcodeMap) return statsMap;
+
+    for (const [frameId, opcodes] of opcodeMap) {
+      const stats: CallFrameOpcodeStats = {
+        sstoreCount: 0,
+        sstoreGas: 0,
+        sloadCount: 0,
+        sloadGas: 0,
+        logCount: 0,
+        logGas: 0,
+        createCount: 0,
+        selfdestructCount: 0,
+        hasError: false,
+      };
+
+      for (const op of opcodes) {
+        const opcode = op.opcode.toUpperCase();
+        if (opcode === 'SSTORE') {
+          stats.sstoreCount += op.count;
+          stats.sstoreGas += op.gas;
+        } else if (opcode === 'SLOAD') {
+          stats.sloadCount += op.count;
+          stats.sloadGas += op.gas;
+        } else if (opcode.startsWith('LOG')) {
+          stats.logCount += op.count;
+          stats.logGas += op.gas;
+        } else if (opcode === 'CREATE' || opcode === 'CREATE2') {
+          stats.createCount += op.count;
+        } else if (opcode === 'SELFDESTRUCT') {
+          stats.selfdestructCount += op.count;
+        }
+        if (op.errorCount > 0) {
+          stats.hasError = true;
+        }
+      }
+
+      // Only add to map if there's something interesting
+      if (
+        stats.sstoreCount > 0 ||
+        stats.sloadCount > 0 ||
+        stats.logCount > 0 ||
+        stats.createCount > 0 ||
+        stats.selfdestructCount > 0 ||
+        stats.hasError
+      ) {
+        statsMap.set(frameId, stats);
+      }
+    }
+
+    return statsMap;
+  }, [opcodeMap]);
 
   // Block number: prefer from response (source of truth), fall back to URL param
   const blockNumber = txData?.metadata.blockNumber ?? blockFromSearch ?? null;
@@ -640,7 +703,7 @@ export function CallPage(): JSX.Element {
                 txHash={txHash}
                 blockNumber={blockNumber}
                 totalGas={cumulativeGas}
-                opcodeStats={txData?.callFrameOpcodeStats}
+                opcodeStats={callFrameOpcodeStats}
               />
             ) : (
               <Card className="p-8 text-center">
