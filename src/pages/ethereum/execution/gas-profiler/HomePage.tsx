@@ -30,8 +30,8 @@ import {
   fctOpcodeGasByOpcodeDailyServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import type { FctOpcodeOpsHourly, FctOpcodeOpsDaily } from '@/api/types.gen';
-import { useTableBounds } from '@/hooks/useBounds';
 import { useRecentBlocks } from './hooks/useRecentBlocks';
+import { useGasProfilerBounds } from './hooks/useGasProfilerBounds';
 import { GasProfilerSkeleton, OpcodeAnalysis } from './components';
 import { type TimePeriod, TIME_RANGE_CONFIG, TIME_PERIOD_OPTIONS } from './constants';
 import { getOpcodeCategory, CATEGORY_COLORS } from './utils';
@@ -194,8 +194,8 @@ export function HomePage(): JSX.Element {
   const [searchError, setSearchError] = useState<string | null>(null);
   const [blocksOffset, setBlocksOffset] = useState(0);
 
-  // Fetch bounds to validate block range (lightweight - just bounds, no block data)
-  const { data: bounds, isLoading: boundsLoading, error } = useTableBounds('int_transaction_call_frame');
+  // Fetch bounds to validate block range - uses intersection of all gas profiler tables
+  const { data: bounds, isLoading: boundsLoading, error } = useGasProfilerBounds();
 
   // Fetch recent blocks for visualization
   const {

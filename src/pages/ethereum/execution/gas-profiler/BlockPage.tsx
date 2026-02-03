@@ -1192,6 +1192,7 @@ export function BlockPage(): JSX.Element {
                   transactionIndex: tx.transactionIndex,
                   targetName: tx.targetName,
                 }))}
+                defaultViewMode="transactions"
               />
             </div>
 
