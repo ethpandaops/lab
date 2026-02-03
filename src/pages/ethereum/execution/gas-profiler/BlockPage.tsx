@@ -38,6 +38,7 @@ import {
   GasHistogram,
   TRANSACTION_BUCKETS,
   BlockOpcodeHeatmap,
+  ContractActionPopover,
 } from './components';
 import type { ContractInteractionItem, TopGasItem } from './components';
 import { useNetwork } from '@/hooks/useNetwork';
@@ -118,6 +119,16 @@ export function BlockPage(): JSX.Element {
   // Local state for table sorting (avoids scroll reset from URL param changes)
   const [sortField, setSortField] = useState<TransactionSortField>('gas');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+
+  // State for contract action popover
+  const [contractPopover, setContractPopover] = useState<{
+    address: string;
+    name: string | null;
+    gas: number;
+    percentage: number;
+    position: { x: number; y: number };
+    txHash?: string;
+  } | null>(null);
 
   // Tab state based on URL hash
   const getTabIndexFromHash = useCallback(() => {
@@ -615,39 +626,7 @@ export function BlockPage(): JSX.Element {
         },
       ],
       tooltip: {
-        backgroundColor: colors.background,
-        borderColor: colors.border,
-        padding: 12,
-        appendToBody: true,
-        formatter: (params: {
-          name: string;
-          value: number;
-          data: { address: string; callCount: number; callTypes: string[] };
-        }) => {
-          const pct = ((params.value / totalBlockGas) * 100).toFixed(2);
-          const d = params.data;
-
-          if (!d.address) {
-            return `<div>
-              <div style="font-weight: 600; color: ${colors.foreground};">${params.name}</div>
-              <div style="margin-top: 8px; color: ${colors.muted};">
-                ${formatGas(params.value)} gas (${pct}%)
-              </div>
-            </div>`;
-          }
-
-          return `<div>
-            <div style="font-weight: 600; color: ${colors.foreground};">${params.name}</div>
-            <div style="margin-top: 4px; font-family: monospace; font-size: 11px; color: ${colors.muted};">
-              ${d.address.slice(0, 10)}...${d.address.slice(-8)}
-            </div>
-            <div style="margin-top: 8px;">
-              <div style="color: ${colors.muted};">Gas: <span style="color: ${colors.foreground}; font-weight: 600;">${formatGas(params.value)}</span> (${pct}%)</div>
-              <div style="color: ${colors.muted};">Calls: <span style="color: ${colors.foreground};">${d.callCount}</span></div>
-              <div style="color: ${colors.muted};">Types: <span style="color: ${colors.foreground};">${d.callTypes.join(', ')}</span></div>
-            </div>
-          </div>`;
-        },
+        show: false,
       },
     };
   }, [data?.allContractsByGas, colors, totalBlockGas]);
@@ -845,17 +824,35 @@ export function BlockPage(): JSX.Element {
     };
   }, [data?.txContractFlows, colors]);
 
-  // Click handler for contracts treemap - navigate to first tx that called the contract
-  const handleContractTreemapClick = (params: { data?: { firstTxHash?: string | null } }) => {
-    const txHash = params.data?.firstTxHash;
-    if (txHash) {
-      navigate({
-        to: '/ethereum/execution/gas-profiler/tx/$txHash',
-        params: { txHash },
-        search: { block: blockNumber },
-      });
-    }
+  // Click handler for contracts treemap - show popover with options
+  const handleContractTreemapClick = (params: {
+    event?: { event?: MouseEvent };
+    data?: { address?: string; name?: string; value?: number; firstTxHash?: string | null };
+  }) => {
+    const address = params.data?.address;
+    if (!address) return; // Ignore "Other" segment
+
+    const mouseEvent = params.event?.event;
+    const x = mouseEvent?.clientX ?? 0;
+    const y = mouseEvent?.clientY ?? 0;
+
+    const gas = params.data?.value ?? 0;
+    const percentage = totalBlockGas > 0 ? (gas / totalBlockGas) * 100 : 0;
+
+    setContractPopover({
+      address,
+      name: params.data?.name ?? null,
+      gas,
+      percentage,
+      position: { x, y },
+      txHash: params.data?.firstTxHash ?? undefined,
+    });
   };
+
+  // Close contract popover
+  const handleClosePopover = useCallback(() => {
+    setContractPopover(null);
+  }, []);
 
   // Click handler for Sankey diagram - navigate to transaction page
   const handleSankeyClick = (params: { data?: { txHash?: string }; dataType?: string }) => {
@@ -1470,6 +1467,20 @@ export function BlockPage(): JSX.Element {
           </HeadlessTab.Panel>
         </HeadlessTab.Panels>
       </HeadlessTab.Group>
+
+      {/* Contract Action Popover */}
+      {contractPopover && (
+        <ContractActionPopover
+          address={contractPopover.address}
+          contractName={contractPopover.name}
+          gas={contractPopover.gas}
+          percentage={contractPopover.percentage}
+          position={contractPopover.position}
+          onClose={handleClosePopover}
+          txHash={contractPopover.txHash}
+          blockNumber={blockNumber}
+        />
+      )}
     </Container>
   );
 }

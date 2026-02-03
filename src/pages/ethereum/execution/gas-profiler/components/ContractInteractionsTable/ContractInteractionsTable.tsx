@@ -2,6 +2,7 @@ import React, { type JSX, useState, useCallback, useEffect, useMemo } from 'reac
 import { ChevronRightIcon, ChevronDownIcon, CogIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import type { ContractInteractionsTableProps, ContractInteractionItem } from './ContractInteractionsTable.types';
+import { ContractStorageButton } from '../ContractStorageButton';
 
 /**
  * Sort field options for contracts table
@@ -145,6 +146,11 @@ function ContractRow({
           })}
         </div>
       </td>
+      <td className="px-2 py-2">
+        {contract.address && contract.address !== 'unknown' && (
+          <ContractStorageButton address={contract.address} size="sm" />
+        )}
+      </td>
     </tr>
   );
 }
@@ -222,6 +228,11 @@ function ImplementationRow({
             );
           })}
         </div>
+      </td>
+      <td className="px-2 py-2">
+        {contract.address && contract.address !== 'unknown' && (
+          <ContractStorageButton address={contract.address} size="sm" />
+        )}
       </td>
     </tr>
   );
@@ -351,6 +362,7 @@ export function ContractInteractionsTable({
               <th className="px-4 py-3.5 text-left text-sm font-semibold whitespace-nowrap text-foreground">
                 Call Types
               </th>
+              <th className="w-12 px-2 py-3.5" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border bg-surface">

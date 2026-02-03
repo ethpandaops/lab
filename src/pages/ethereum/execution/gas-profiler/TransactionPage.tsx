@@ -34,9 +34,9 @@ import {
   GasFormula,
   TopItemsByGasTable,
   CallTraceView,
-  ContractCallTree,
+  ContractActionPopover,
 } from './components';
-import type { TopGasItem, CallFrameData, ContractTreeNode } from './components';
+import type { TopGasItem, CallFrameData } from './components';
 import { getCallLabel } from './hooks/useTransactionGasData';
 import { useNetwork } from '@/hooks/useNetwork';
 import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory, getEffectiveGasRefund } from './utils';
@@ -74,6 +74,16 @@ export function TransactionPage(): JSX.Element {
 
   // State for showing opcodes in flame graph (on by default)
   const [showOpcodes, setShowOpcodes] = useState(true);
+
+  // State for contract action popover
+  const [contractPopover, setContractPopover] = useState<{
+    address: string;
+    name: string | null;
+    gas: number;
+    percentage: number;
+    position: { x: number; y: number };
+    callFrameId?: number;
+  } | null>(null);
 
   // Fetch transaction data by tx hash
   // Pass blockNumber from URL search params for efficient partition-based filtering
@@ -306,46 +316,6 @@ export function TransactionPage(): JSX.Element {
     return { total: direct + implementation, direct, implementation };
   }, [contractTree]);
 
-  // Build hierarchical contract call tree (follows actual call hierarchy)
-  // Build contract call tree - one node per call frame (no aggregation)
-  const contractCallTree = useMemo((): ContractTreeNode | null => {
-    if (!txData?.callFrames?.length) return null;
-
-    const frames = txData.callFrames;
-
-    // Find root frame
-    const rootFrame = frames.find(f => f.depth === 0);
-    if (!rootFrame || !rootFrame.target_address) return null;
-
-    // Build tree recursively - each frame becomes its own node
-    const buildNode = (frame: (typeof frames)[0]): ContractTreeNode => {
-      const addrLower = frame.target_address?.toLowerCase() ?? '';
-      const name = contractOwners[addrLower]?.contract_name ?? null;
-
-      // Find all direct children of this frame
-      const childFrames = frames.filter(f => f.parent_call_frame_id === frame.call_frame_id);
-
-      // Sort children by execution order (call_frame_id ascending)
-      const sortedChildren = [...childFrames].sort((a, b) => (a.call_frame_id ?? 0) - (b.call_frame_id ?? 0));
-
-      // Build child nodes recursively
-      const children = sortedChildren.map(childFrame => buildNode(childFrame));
-
-      return {
-        address: frame.target_address ?? '',
-        name,
-        gas: frame.gas_cumulative ?? 0,
-        selfGas: frame.gas ?? 0,
-        callType: frame.call_type || 'CALL',
-        callFrameId: frame.call_frame_id ?? 0,
-        children,
-        depth: frame.depth ?? 0,
-      };
-    };
-
-    return buildNode(rootFrame);
-  }, [txData?.callFrames, contractOwners]);
-
   // Calculate call type distribution (excluding root frame which has empty call_type)
   const callTypeDistribution = useMemo(() => {
     if (!txData?.callFrames) return [];
@@ -531,6 +501,39 @@ export function TransactionPage(): JSX.Element {
     return txData.opcodeStats.reduce((sum: number, op: OpcodeStats) => sum + op.totalGas, 0);
   }, [txData?.opcodeStats]);
 
+  // Handle treemap click - show popover instead of direct navigation
+  const handleTreemapClick = useCallback(
+    (params: {
+      event?: { event?: MouseEvent };
+      data?: { address?: string; name?: string; value?: number; firstCallFrameId?: number | null };
+    }) => {
+      const address = params.data?.address;
+      if (!address) return; // Ignore "Other" segment
+
+      const mouseEvent = params.event?.event;
+      const x = mouseEvent?.clientX ?? 0;
+      const y = mouseEvent?.clientY ?? 0;
+
+      const gas = params.data?.value ?? 0;
+      const percentage = totalEvmGas > 0 ? (gas / totalEvmGas) * 100 : 0;
+
+      setContractPopover({
+        address,
+        name: params.data?.name ?? null,
+        gas,
+        percentage,
+        position: { x, y },
+        callFrameId: params.data?.firstCallFrameId ?? undefined,
+      });
+    },
+    [totalEvmGas]
+  );
+
+  // Close contract popover
+  const handleClosePopover = useCallback(() => {
+    setContractPopover(null);
+  }, []);
+
   // Internal call count for header stats
   // callFrameData already excludes root (filtered by call_type), so use length directly
   const internalCallCount = callFrameData.length;
@@ -541,11 +544,16 @@ export function TransactionPage(): JSX.Element {
 
     // Flatten contracts (include implementations)
     // Use selfGas for all contracts to avoid double-counting (totalGas includes implementation gas)
-    const allContracts: { address: string; name: string | null; gas: number }[] = [];
+    const allContracts: { address: string; name: string | null; gas: number; firstCallFrameId: number | null }[] = [];
     for (const c of contractTree) {
-      allContracts.push({ address: c.address, name: c.name, gas: c.selfGas });
+      allContracts.push({ address: c.address, name: c.name, gas: c.selfGas, firstCallFrameId: c.firstCallFrameId });
       for (const impl of c.implementations) {
-        allContracts.push({ address: impl.address, name: impl.name, gas: impl.selfGas });
+        allContracts.push({
+          address: impl.address,
+          name: impl.name,
+          gas: impl.selfGas,
+          firstCallFrameId: impl.firstCallFrameId,
+        });
       }
     }
 
@@ -557,6 +565,7 @@ export function TransactionPage(): JSX.Element {
       name: c.name || `${c.address.slice(0, 6)}...${c.address.slice(-4)}`,
       value: c.gas,
       address: c.address,
+      firstCallFrameId: c.firstCallFrameId,
       itemStyle: {
         color: [
           colors.primary,
@@ -578,6 +587,7 @@ export function TransactionPage(): JSX.Element {
         name: `Other (${sortedContracts.length - 20} contracts)`,
         value: otherGas,
         address: '',
+        firstCallFrameId: null,
         itemStyle: { color: colors.muted },
       });
     }
@@ -612,19 +622,7 @@ export function TransactionPage(): JSX.Element {
         },
       ],
       tooltip: {
-        trigger: 'item',
-        backgroundColor: colors.background,
-        borderColor: colors.border,
-        borderWidth: 1,
-        padding: [8, 12],
-        textStyle: { color: colors.foreground, fontSize: 12 },
-        formatter: (params: { name: string; value: number; data?: { address?: string } }) => {
-          const pct = ((params.value / totalEvmGas) * 100).toFixed(2);
-          const addr = params.data?.address;
-          return `<div style="font-weight: 600; margin-bottom: 4px;">${params.name}</div>
-            ${addr ? `<div style="font-size: 10px; color: ${colors.muted}; margin-bottom: 4px;">${addr}</div>` : ''}
-            <div>${params.value.toLocaleString()} gas (${pct}%)</div>`;
-        },
+        show: false,
       },
     };
   }, [contractTree, totalEvmGas, colors]);
@@ -981,8 +979,9 @@ export function TransactionPage(): JSX.Element {
                     {({ inModal }) => (
                       <ReactECharts
                         option={contractTreemapOption}
-                        style={{ height: inModal ? 500 : 280 }}
+                        style={{ height: inModal ? 500 : 280, cursor: 'pointer' }}
                         opts={{ renderer: 'canvas' }}
+                        onEvents={{ click: handleTreemapClick }}
                       />
                     )}
                   </PopoutCard>
@@ -1024,17 +1023,36 @@ export function TransactionPage(): JSX.Element {
                   />
                 </div>
 
-                {/* Contract Call Hierarchy */}
-                <ContractCallTree
-                  root={contractCallTree}
+                {/* Execution Trace */}
+                <CallTraceView
+                  callFrames={txData.callFrames}
+                  contractOwners={contractOwners}
+                  functionSignatures={functionSignatures}
+                  txHash={txHash}
+                  blockNumber={blockNumber}
                   totalGas={metadata.receiptGasUsed}
-                  onCallFrameClick={handleContractClick}
+                  opcodeStats={callFrameOpcodeStats}
                 />
               </div>
             </HeadlessTab.Panel>
           )}
         </HeadlessTab.Panels>
       </HeadlessTab.Group>
+
+      {/* Contract Action Popover */}
+      {contractPopover && (
+        <ContractActionPopover
+          address={contractPopover.address}
+          contractName={contractPopover.name}
+          gas={contractPopover.gas}
+          percentage={contractPopover.percentage}
+          position={contractPopover.position}
+          onClose={handleClosePopover}
+          txHash={txHash}
+          blockNumber={blockNumber ?? undefined}
+          callFrameId={contractPopover.callFrameId}
+        />
+      )}
     </Container>
   );
 }

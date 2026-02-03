@@ -26,7 +26,14 @@ import { useFrameOpcodes } from './hooks/useFrameOpcodes';
 import { useAllCallFrameOpcodes } from './hooks/useAllCallFrameOpcodes';
 import type { ContractOwnerMap } from './hooks/useContractOwners';
 import type { FunctionSignatureMap } from './hooks/useFunctionSignatures';
-import { GasProfilerSkeleton, OpcodeAnalysis, CategoryPieChart, GasFormula, CallTraceView } from './components';
+import {
+  GasProfilerSkeleton,
+  OpcodeAnalysis,
+  CategoryPieChart,
+  GasFormula,
+  CallTraceView,
+  ContractStorageCTA,
+} from './components';
 import { CATEGORY_COLORS, getOpcodeCategory } from './utils';
 import type { IntTransactionCallFrame } from '@/api/types.gen';
 
@@ -693,6 +700,16 @@ export function CallPage(): JSX.Element {
                 </div>
               </div>
             </Card>
+
+            {/* Contract Storage CTA */}
+            {currentFrame.target_address && (
+              <div className="mb-6">
+                <ContractStorageCTA
+                  address={currentFrame.target_address}
+                  contractName={contractOwners[currentFrame.target_address.toLowerCase()]?.contract_name}
+                />
+              </div>
+            )}
 
             {/* Execution Trace */}
             {descendantFrames.length > 0 ? (
