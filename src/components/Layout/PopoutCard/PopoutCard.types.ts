@@ -105,4 +105,9 @@ export interface PopoutCardProps {
    * Only used when appendMetadataToDownload is true.
    */
   downloadMetadataNetwork?: string;
+  /**
+   * Custom actions to render in the header, between the title/subtitle and the built-in icons.
+   * Useful for view toggles, filters, or other controls.
+   */
+  headerActions?: ReactNode;
 }

@@ -75,6 +75,7 @@ export function PopoutCard({
   downloadMetadataTitle,
   downloadMetadataSubtitle,
   downloadMetadataNetwork,
+  headerActions,
 }: PopoutCardProps): JSX.Element {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -261,6 +262,9 @@ export function PopoutCard({
                 {subtitle && <p className="text-sm text-muted dark:text-muted">{subtitle}</p>}
               </div>
 
+              {/* Custom header actions */}
+              {headerActions && !showLogo && <div className="shrink-0">{headerActions}</div>}
+
               {/* Action buttons - hidden during screenshot, replaced with logo */}
               {showLogo ? (
                 <div className="shrink-0">
@@ -331,6 +335,8 @@ export function PopoutCard({
         title={
           <div className="flex w-full items-center justify-between gap-4">
             <span className="truncate">{title}</span>
+            {/* Custom header actions */}
+            {headerActions && !showModalLogo && <div className="shrink-0">{headerActions}</div>}
             {/* Show logo or dropdown in modal title */}
             {showModalLogo ? (
               <div className="shrink-0">

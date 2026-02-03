@@ -26,3 +26,5 @@ export type { CallFrameRowProps, CallFrameData } from './CallFrameRow';
 export { CallTraceView } from './CallTraceView';
 export type { CallTraceViewProps, EnrichedCallFrame, CallFrameExtendedData } from './CallTraceView';
 export { BlockOpcodeHeatmap } from './BlockOpcodeHeatmap';
+export { ContractCallTree } from './ContractCallTree';
+export type { ContractTreeNode } from './ContractCallTree';

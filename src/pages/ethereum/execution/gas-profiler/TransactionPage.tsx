@@ -11,19 +11,24 @@ import {
   FireIcon,
   ArrowsPointingOutIcon,
   DocumentTextIcon,
-  InformationCircleIcon,
-  CogIcon,
+  CubeIcon,
+  ArrowsRightLeftIcon,
+  QueueListIcon,
 } from '@heroicons/react/24/outline';
+import ReactECharts from 'echarts-for-react';
 import { Tab } from '@/components/Navigation/Tab';
 import { GasTooltip } from '@/components/DataDisplay/GasTooltip';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
 import { Alert } from '@/components/Feedback/Alert';
+import { InfoBox } from '@/components/Feedback/InfoBox';
+import { PopoutCard } from '@/components/Layout/PopoutCard';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
 import { TenderlyIcon } from '@/components/Ethereum/TenderlyIcon';
 import { PhalconIcon } from '@/components/Ethereum/PhalconIcon';
-import { useTransactionGasData } from './hooks/useTransactionGasData';
+import { useTransactionGasData, type CallFrameOpcodeStats } from './hooks/useTransactionGasData';
 import { useAllCallFrameOpcodes } from './hooks/useAllCallFrameOpcodes';
 import {
   CallTreeSection,
@@ -31,12 +36,11 @@ import {
   GasProfilerSkeleton,
   CategoryPieChart,
   GasFormula,
-  ContractInteractionsTable,
   TopItemsByGasTable,
   CallTraceView,
-  TopContractsByGasChart,
+  ContractCallTree,
 } from './components';
-import type { ContractInteractionItem, TopGasItem, CallFrameData } from './components';
+import type { TopGasItem, CallFrameData } from './components';
 import { getCallLabel } from './hooks/useTransactionGasData';
 import { useNetwork } from '@/hooks/useNetwork';
 import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory, getEffectiveGasRefund } from './utils';
@@ -86,15 +90,74 @@ export function TransactionPage(): JSX.Element {
     blockNumber: blockFromSearch,
   });
 
-  // Fetch all opcode data for flame graph (only when toggle is enabled)
+  // Fetch all opcode data - used for both flame graph visualization AND badge stats
+  // Single fetch instead of separate calls for badges vs flame graph
   const { data: opcodeMap, isLoading: isLoadingOpcodes } = useAllCallFrameOpcodes({
     transactionHash: txHash,
     blockNumber: blockFromSearch,
-    enabled: showOpcodes,
+    enabled: true, // Always fetch - eliminates duplicate API call for badge data
   });
+
+  // Derive badge stats from full opcode data (SSTORE, SLOAD, LOG*, CREATE*, SELFDESTRUCT)
+  const callFrameOpcodeStats = useMemo((): Map<number, CallFrameOpcodeStats> => {
+    const statsMap = new Map<number, CallFrameOpcodeStats>();
+    if (!opcodeMap) return statsMap;
+
+    for (const [frameId, opcodes] of opcodeMap) {
+      const stats: CallFrameOpcodeStats = {
+        sstoreCount: 0,
+        sstoreGas: 0,
+        sloadCount: 0,
+        sloadGas: 0,
+        logCount: 0,
+        logGas: 0,
+        createCount: 0,
+        selfdestructCount: 0,
+        hasError: false,
+      };
+
+      for (const op of opcodes) {
+        const opcode = op.opcode.toUpperCase();
+        if (opcode === 'SSTORE') {
+          stats.sstoreCount += op.count;
+          stats.sstoreGas += op.gas;
+        } else if (opcode === 'SLOAD') {
+          stats.sloadCount += op.count;
+          stats.sloadGas += op.gas;
+        } else if (opcode.startsWith('LOG')) {
+          stats.logCount += op.count;
+          stats.logGas += op.gas;
+        } else if (opcode === 'CREATE' || opcode === 'CREATE2') {
+          stats.createCount += op.count;
+        } else if (opcode === 'SELFDESTRUCT') {
+          stats.selfdestructCount += op.count;
+        }
+        if (op.errorCount > 0) {
+          stats.hasError = true;
+        }
+      }
+
+      // Only add to map if there's something interesting
+      if (
+        stats.sstoreCount > 0 ||
+        stats.sloadCount > 0 ||
+        stats.logCount > 0 ||
+        stats.createCount > 0 ||
+        stats.selfdestructCount > 0 ||
+        stats.hasError
+      ) {
+        statsMap.set(frameId, stats);
+      }
+    }
+
+    return statsMap;
+  }, [opcodeMap]);
 
   // Get network for fork-aware gas refund calculation
   const { currentNetwork } = useNetwork();
+
+  // Get theme colors for charts
+  const colors = useThemeColors();
 
   // Block number: prefer from response (source of truth), fall back to URL param
   const blockNumber = txData?.metadata.blockNumber ?? blockFromSearch ?? null;
@@ -155,16 +218,16 @@ export function TransactionPage(): JSX.Element {
     >();
 
     for (const frame of frames) {
-      // Skip root frame (empty call_type)
-      if (!frame.call_type) continue;
       const addr = frame.target_address ?? 'unknown';
+      // Use 'CALL' as default for root frame (which has empty call_type)
+      const callType = frame.call_type || 'CALL';
 
       const frameGas = frame.gas ?? 0;
       const existing = contractMap.get(addr);
       if (existing) {
         existing.selfGas += frameGas;
         existing.callCount += 1;
-        if (frame.call_type) existing.callTypes.add(frame.call_type);
+        existing.callTypes.add(callType);
       } else {
         const ownerName = contractOwners[addr.toLowerCase()]?.contract_name ?? null;
         contractMap.set(addr, {
@@ -172,7 +235,7 @@ export function TransactionPage(): JSX.Element {
           name: ownerName,
           selfGas: frameGas,
           callCount: 1,
-          callTypes: new Set(frame.call_type ? [frame.call_type] : []),
+          callTypes: new Set([callType]),
           firstCallFrameId: frame.call_frame_id ?? null,
         });
       }
@@ -247,6 +310,46 @@ export function TransactionPage(): JSX.Element {
     return { total: direct + implementation, direct, implementation };
   }, [contractTree]);
 
+  // Build hierarchical contract call tree (follows actual call hierarchy)
+  // Build contract call tree - one node per call frame (no aggregation)
+  const contractCallTree = useMemo((): ContractTreeNode | null => {
+    if (!txData?.callFrames?.length) return null;
+
+    const frames = txData.callFrames;
+
+    // Find root frame
+    const rootFrame = frames.find(f => f.depth === 0);
+    if (!rootFrame || !rootFrame.target_address) return null;
+
+    // Build tree recursively - each frame becomes its own node
+    const buildNode = (frame: (typeof frames)[0]): ContractTreeNode => {
+      const addrLower = frame.target_address?.toLowerCase() ?? '';
+      const name = contractOwners[addrLower]?.contract_name ?? null;
+
+      // Find all direct children of this frame
+      const childFrames = frames.filter(f => f.parent_call_frame_id === frame.call_frame_id);
+
+      // Sort children by execution order (call_frame_id ascending)
+      const sortedChildren = [...childFrames].sort((a, b) => (a.call_frame_id ?? 0) - (b.call_frame_id ?? 0));
+
+      // Build child nodes recursively
+      const children = sortedChildren.map(childFrame => buildNode(childFrame));
+
+      return {
+        address: frame.target_address ?? '',
+        name,
+        gas: frame.gas_cumulative ?? 0,
+        selfGas: frame.gas ?? 0,
+        callType: frame.call_type || 'CALL',
+        callFrameId: frame.call_frame_id ?? 0,
+        children,
+        depth: frame.depth ?? 0,
+      };
+    };
+
+    return buildNode(rootFrame);
+  }, [txData?.callFrames, contractOwners]);
+
   // Calculate call type distribution (excluding root frame which has empty call_type)
   const callTypeDistribution = useMemo(() => {
     if (!txData?.callFrames) return [];
@@ -309,15 +412,6 @@ export function TransactionPage(): JSX.Element {
   const callTypeGasChartData = useMemo(() => {
     return callTypeDistribution.map(d => ({ name: d.type, value: d.gasUsed }));
   }, [callTypeDistribution]);
-
-  // Top contracts by gas for the chart component
-  const topContractsByGas = useMemo(() => {
-    return contractTree.map(c => ({
-      address: c.address,
-      name: c.name,
-      gas: c.totalGas,
-    }));
-  }, [contractTree]);
 
   // Top calls by gas as TopGasItem[] for the reusable table component
   // Uses self gas (excludes children) to show which calls directly consumed the most gas
@@ -435,6 +529,110 @@ export function TransactionPage(): JSX.Element {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [getInitialTabIndex]);
 
+  // Total EVM gas (memoized, used by treemap)
+  const totalEvmGas = useMemo(() => {
+    if (!txData?.opcodeStats) return 0;
+    return txData.opcodeStats.reduce((sum: number, op: OpcodeStats) => sum + op.totalGas, 0);
+  }, [txData?.opcodeStats]);
+
+  // Internal call count for header stats
+  // callFrameData already excludes root (filtered by call_type), so use length directly
+  const internalCallCount = callFrameData.length;
+
+  // Treemap for contract gas distribution
+  const contractTreemapOption = useMemo(() => {
+    if (!contractTree.length || !totalEvmGas) return {};
+
+    // Flatten contracts (include implementations)
+    // Use selfGas for all contracts to avoid double-counting (totalGas includes implementation gas)
+    const allContracts: { address: string; name: string | null; gas: number }[] = [];
+    for (const c of contractTree) {
+      allContracts.push({ address: c.address, name: c.name, gas: c.selfGas });
+      for (const impl of c.implementations) {
+        allContracts.push({ address: impl.address, name: impl.name, gas: impl.selfGas });
+      }
+    }
+
+    const sortedContracts = [...allContracts].sort((a, b) => b.gas - a.gas);
+    const topContracts = sortedContracts.slice(0, 20);
+    const otherGas = sortedContracts.slice(20).reduce((sum, c) => sum + c.gas, 0);
+
+    const treeData = topContracts.map((c, i) => ({
+      name: c.name || `${c.address.slice(0, 6)}...${c.address.slice(-4)}`,
+      value: c.gas,
+      address: c.address,
+      itemStyle: {
+        color: [
+          colors.primary,
+          '#22c55e',
+          '#f59e0b',
+          '#8b5cf6',
+          '#ec4899',
+          '#06b6d4',
+          '#84cc16',
+          '#f97316',
+          '#6366f1',
+          '#14b8a6',
+        ][i % 10],
+      },
+    }));
+
+    if (otherGas > 0) {
+      treeData.push({
+        name: `Other (${sortedContracts.length - 20} contracts)`,
+        value: otherGas,
+        address: '',
+        itemStyle: { color: colors.muted },
+      });
+    }
+
+    return {
+      series: [
+        {
+          type: 'treemap',
+          data: treeData,
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          roam: false,
+          nodeClick: false,
+          breadcrumb: { show: false },
+          label: {
+            show: true,
+            formatter: (params: { name: string; value: number }) => {
+              const pct = ((params.value / totalEvmGas) * 100).toFixed(1);
+              return `${params.name}\n${pct}%`;
+            },
+            color: '#fff',
+            fontSize: 11,
+            overflow: 'truncate',
+          },
+          itemStyle: {
+            borderColor: colors.background,
+            borderWidth: 2,
+            gapWidth: 2,
+          },
+        },
+      ],
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: colors.background,
+        borderColor: colors.border,
+        borderWidth: 1,
+        padding: [8, 12],
+        textStyle: { color: colors.foreground, fontSize: 12 },
+        formatter: (params: { name: string; value: number; data?: { address?: string } }) => {
+          const pct = ((params.value / totalEvmGas) * 100).toFixed(2);
+          const addr = params.data?.address;
+          return `<div style="font-weight: 600; margin-bottom: 4px;">${params.name}</div>
+            ${addr ? `<div style="font-size: 10px; color: ${colors.muted}; margin-bottom: 4px;">${addr}</div>` : ''}
+            <div>${params.value.toLocaleString()} gas (${pct}%)</div>`;
+        },
+      },
+    };
+  }, [contractTree, totalEvmGas, colors]);
+
   // Loading state
   if (isLoading) {
     return (
@@ -480,7 +678,6 @@ export function TransactionPage(): JSX.Element {
 
   const { metadata, callTree } = txData;
   const isSuccess = metadata.status === 'success';
-  const totalEvmGas = txData.opcodeStats.reduce((sum: number, op: OpcodeStats) => sum + op.totalGas, 0);
 
   // Detect simple ETH transfers (no EVM execution, just intrinsic gas)
   const isSimpleTransfer = metadata.evmGasUsed === 0;
@@ -569,7 +766,7 @@ export function TransactionPage(): JSX.Element {
               <CodeBracketIcon className="size-5 text-cyan-500" />
             </div>
             <div>
-              <div className="text-xl font-semibold text-foreground">{callFrameData.length}</div>
+              <div className="text-xl font-semibold text-foreground">{internalCallCount}</div>
               <div className="text-xs text-muted">Internal Txs</div>
             </div>
           </div>
@@ -593,7 +790,7 @@ export function TransactionPage(): JSX.Element {
               <DocumentTextIcon className="size-5 text-warning" />
             </div>
             <div>
-              <div className="text-xl font-semibold text-foreground">{contractCounts.direct}</div>
+              <div className="text-xl font-semibold text-foreground">{contractCounts.total}</div>
               <div className="text-xs text-muted">Contracts</div>
             </div>
           </div>
@@ -607,7 +804,6 @@ export function TransactionPage(): JSX.Element {
           {!isSimpleTransfer && callTypeChartData.length > 0 && <Tab hash="trace">Trace</Tab>}
           {!isSimpleTransfer && <Tab hash="opcodes">Opcodes</Tab>}
           {!isSimpleTransfer && callTypeChartData.length > 0 && <Tab hash="calls">Internal Txs</Tab>}
-          {contractCounts.direct > 0 && <Tab hash="contracts">Contracts</Tab>}
         </HeadlessTab.List>
 
         <HeadlessTab.Panels>
@@ -618,7 +814,7 @@ export function TransactionPage(): JSX.Element {
               {/* Header row */}
               <div className="flex items-center justify-between px-4 py-3">
                 <h3 className="text-sm font-medium text-foreground">Transaction Gas Breakdown</h3>
-                <span className="text-xs text-muted">Position #{metadata.transactionIndex + 1} in block</span>
+                <span className="text-xs text-muted">Position #{metadata.transactionIndex} in block</span>
               </div>
 
               {/* Gas Formula */}
@@ -727,7 +923,7 @@ export function TransactionPage(): JSX.Element {
                 txHash={txHash}
                 blockNumber={blockNumber}
                 totalGas={totalCallGas}
-                opcodeStats={txData.callFrameOpcodeStats}
+                opcodeStats={callFrameOpcodeStats}
               />
             </HeadlessTab.Panel>
           )}
@@ -778,113 +974,65 @@ export function TransactionPage(): JSX.Element {
           {/* Internal Txs Tab - only show if not a simple transfer and there are internal txs */}
           {!isSimpleTransfer && callTypeChartData.length > 0 && (
             <HeadlessTab.Panel>
-              {/* Top Contracts + Top Internal Txs */}
-              <div className="mb-6 grid grid-cols-2 gap-6">
-                <TopContractsByGasChart contracts={topContractsByGas} totalGas={totalCallGas} maxContracts={10} />
-                <TopItemsByGasTable
-                  title="Top Internal Txs by Gas"
-                  subtitle="Which internal txs consumed the most gas?"
-                  items={topCallsItems}
-                  totalGas={totalCallGas}
-                  compactCount={5}
-                  modalCount={10}
-                  columns={{ first: 'Type', second: 'Target' }}
-                  onItemClick={item => handleContractClick(item.id as number)}
-                />
-              </div>
-
-              {/* Internal Tx Type Distribution */}
-              <div className="grid grid-cols-2 gap-6">
-                <CategoryPieChart
-                  data={callTypeChartData}
-                  colorMap={CALL_TYPE_COLORS}
-                  title="Internal Tx Type Distribution"
-                  subtitle="How many of each type?"
-                  percentLabel="of internal txs"
-                  emptyMessage="No call data"
-                  innerRadius={50}
-                  outerRadius={75}
-                  height={280}
-                />
-                <CategoryPieChart
-                  data={callTypeGasChartData}
-                  colorMap={CALL_TYPE_COLORS}
-                  title="Gas by Internal Tx Type"
-                  subtitle="How much gas did each type consume?"
-                  percentLabel="of internal tx gas"
-                  emptyMessage="No call data"
-                  innerRadius={50}
-                  outerRadius={75}
-                  height={280}
-                />
-              </div>
-            </HeadlessTab.Panel>
-          )}
-
-          {/* Contracts Tab - only render if there are contracts */}
-          {contractCounts.direct > 0 && (
-            <HeadlessTab.Panel>
-              <div>
-                {/* Header */}
-                <div className="mb-4 flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-medium text-foreground">Contract Interactions</h3>
-                      <div className="group relative">
-                        <InformationCircleIcon className="size-4 cursor-help text-muted" />
-                        <div className="pointer-events-none absolute top-full left-0 z-50 mt-2 hidden w-72 rounded-sm border border-border bg-background p-2 text-xs text-muted shadow-lg group-hover:block">
-                          Shows contracts in a tree view. Delegated contracts (
-                          <CogIcon className="inline size-3" />) run code on behalf of a proxy contract - this is where
-                          gas is actually spent.
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-xs text-muted">All contracts involved in this transaction</p>
-                  </div>
-                  <span className="text-xs text-muted">
-                    {contractCounts.direct} contracts
-                    {contractCounts.implementation > 0 && ` · ${contractCounts.implementation} delegated`}
-                  </span>
+              <div className="space-y-6">
+                {/* Gas Distribution + Top Internal Txs */}
+                <div className="grid grid-cols-2 gap-6">
+                  <PopoutCard
+                    title="Gas by Contract"
+                    subtitle="Total gas per contract (all calls to same address combined)"
+                    modalSize="xl"
+                  >
+                    {({ inModal }) => (
+                      <ReactECharts
+                        option={contractTreemapOption}
+                        style={{ height: inModal ? 500 : 280 }}
+                        opts={{ renderer: 'canvas' }}
+                      />
+                    )}
+                  </PopoutCard>
+                  <TopItemsByGasTable
+                    title="Top Calls by Gas"
+                    subtitle="Individual calls ranked by gas (same contract may appear multiple times)"
+                    items={topCallsItems}
+                    totalGas={totalCallGas}
+                    compactCount={5}
+                    modalCount={10}
+                    columns={{ first: 'Type', second: 'Target' }}
+                    onItemClick={item => handleContractClick(item.id as number)}
+                  />
                 </div>
 
-                <ContractInteractionsTable
-                  contracts={contractTree.map(
-                    (c): ContractInteractionItem => ({
-                      address: c.address,
-                      name: c.name,
-                      gas: c.totalGas,
-                      callCount: c.callCount,
-                      callTypes: c.callTypes,
-                      isImplementation: c.isImplementation,
-                      implementations: c.implementations.map(impl => ({
-                        address: impl.address,
-                        name: impl.name,
-                        gas: impl.selfGas,
-                        callCount: impl.callCount,
-                        callTypes: impl.callTypes,
-                        isImplementation: true,
-                      })),
-                    })
-                  )}
-                  totalGas={totalEvmGas}
-                  onContractClick={(contract: ContractInteractionItem) => {
-                    // Find the original contract tree node to get firstCallFrameId
-                    const treeNode = contractTree.find(c => c.address === contract.address);
-                    if (treeNode?.firstCallFrameId !== null && treeNode?.firstCallFrameId !== undefined) {
-                      handleContractClick(treeNode.firstCallFrameId);
-                      return;
-                    }
-                    // Check implementations
-                    for (const parent of contractTree) {
-                      const impl = parent.implementations.find(i => i.address === contract.address);
-                      if (impl?.firstCallFrameId !== null && impl?.firstCallFrameId !== undefined) {
-                        handleContractClick(impl.firstCallFrameId);
-                        return;
-                      }
-                    }
-                  }}
-                  percentLabel="% of EVM"
-                  showImplementations
+                {/* Internal Tx Type Distribution */}
+                <div className="grid grid-cols-2 gap-6">
+                  <CategoryPieChart
+                    data={callTypeChartData}
+                    colorMap={CALL_TYPE_COLORS}
+                    title="Internal Tx Type Distribution"
+                    subtitle="How many of each type?"
+                    percentLabel="of internal txs"
+                    emptyMessage="No call data"
+                    innerRadius={50}
+                    outerRadius={75}
+                    height={280}
+                  />
+                  <CategoryPieChart
+                    data={callTypeGasChartData}
+                    colorMap={CALL_TYPE_COLORS}
+                    title="Gas by Internal Tx Type"
+                    subtitle="How much gas did each type consume?"
+                    percentLabel="of internal tx gas"
+                    emptyMessage="No call data"
+                    innerRadius={50}
+                    outerRadius={75}
+                    height={280}
+                  />
+                </div>
+
+                {/* Contract Call Hierarchy */}
+                <ContractCallTree
+                  root={contractCallTree}
+                  totalGas={metadata.receiptGasUsed}
+                  onCallFrameClick={handleContractClick}
                 />
               </div>
             </HeadlessTab.Panel>

@@ -2,8 +2,10 @@ import { type JSX, useMemo, useState, useRef, useEffect, useCallback } from 'rea
 import { createPortal } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { intTransactionOpcodeGasServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import { intTransactionOpcodeGasServiceList } from '@/api/sdk.gen';
+import type { IntTransactionOpcodeGas } from '@/api/types.gen';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
+import { fetchAllPages } from '@/utils/api-pagination';
 import { CATEGORY_COLORS, getOpcodeCategory } from '../../utils';
 
 /**
@@ -500,13 +502,24 @@ export function BlockOpcodeHeatmap({ blockNumber, opcodeStats, transactions }: B
   const [viewMode, setViewMode] = useState<ViewMode>('block');
 
   // Only fetch per-transaction data when in transactions view
+  // Uses fetchAllPages to handle pagination for large blocks
   const { data: opcodeData, isLoading } = useQuery({
-    ...intTransactionOpcodeGasServiceListOptions({
-      query: {
-        block_number_eq: blockNumber,
-        page_size: 10000,
-      },
-    }),
+    queryKey: ['int-transaction-opcode-gas-all', blockNumber],
+    queryFn: async ({ signal }) => {
+      const allData = await fetchAllPages<IntTransactionOpcodeGas>(
+        intTransactionOpcodeGasServiceList,
+        {
+          query: {
+            block_number_eq: blockNumber,
+            page_size: 10000,
+          },
+        },
+        'int_transaction_opcode_gas',
+        signal
+      );
+      // Wrap in expected shape for TransactionsViewHeatmap
+      return { int_transaction_opcode_gas: allData };
+    },
     enabled: viewMode === 'transactions' && !isNaN(blockNumber),
   });
 
@@ -523,31 +536,42 @@ export function BlockOpcodeHeatmap({ blockNumber, opcodeStats, transactions }: B
       ? 'Gas consumption by category and opcode'
       : `${transactions?.length ?? 0} transactions × opcodes`;
 
+  // View mode toggle component (rendered in header)
+  const viewModeToggle = (
+    <div className="inline-flex overflow-hidden rounded-xs border border-border">
+      <button
+        onClick={() => setViewMode('block')}
+        className={`px-3 py-1 text-xs font-medium transition-colors ${
+          viewMode === 'block'
+            ? 'bg-primary text-white'
+            : 'bg-surface text-muted hover:bg-surface/80 hover:text-foreground'
+        }`}
+      >
+        Block
+      </button>
+      <button
+        onClick={() => setViewMode('transactions')}
+        className={`border-l border-border px-3 py-1 text-xs font-medium transition-colors ${
+          viewMode === 'transactions'
+            ? 'bg-primary text-white'
+            : 'bg-surface text-muted hover:bg-surface/80 hover:text-foreground'
+        }`}
+      >
+        By Transaction
+      </button>
+    </div>
+  );
+
   return (
-    <PopoutCard title="Opcode Heatmap" subtitle={subtitle} allowContentOverflow modalSize="fullscreen">
+    <PopoutCard
+      title="Opcode Heatmap"
+      subtitle={subtitle}
+      allowContentOverflow
+      modalSize="fullscreen"
+      headerActions={viewModeToggle}
+    >
       {({ inModal }) => (
         <div className={inModal ? 'flex h-full w-full flex-col' : 'w-full'}>
-          {/* View mode toggle */}
-          <div className="mb-4 flex items-center gap-2">
-            <span className="text-xs text-muted">View:</span>
-            <button
-              onClick={() => setViewMode('block')}
-              className={`rounded-xs px-2 py-1 text-xs transition-colors ${
-                viewMode === 'block' ? 'bg-primary text-white' : 'bg-surface text-muted hover:text-foreground'
-              }`}
-            >
-              Block
-            </button>
-            <button
-              onClick={() => setViewMode('transactions')}
-              className={`rounded-xs px-2 py-1 text-xs transition-colors ${
-                viewMode === 'transactions' ? 'bg-primary text-white' : 'bg-surface text-muted hover:text-foreground'
-              }`}
-            >
-              By Transaction
-            </button>
-          </div>
-
           {viewMode === 'block' ? (
             <BlockViewHeatmap opcodeStats={opcodeStats} />
           ) : (

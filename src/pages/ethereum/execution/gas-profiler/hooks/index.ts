@@ -8,6 +8,7 @@ export { useBlockTransactions } from './useBlockTransactions';
 export type {
   BlockData,
   TransactionSummary,
+  TxContractFlow,
   UseBlockTransactionsOptions,
   UseBlockTransactionsResult,
 } from './useBlockTransactions';
