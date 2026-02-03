@@ -36,6 +36,8 @@ interface BlockOpcodeHeatmapProps {
     transactionIndex: number;
     targetName?: string | null;
   }>;
+  /** Default view mode (default: 'block') */
+  defaultViewMode?: ViewMode;
 }
 
 /**
@@ -498,8 +500,13 @@ function TransactionsViewHeatmap({
 /**
  * Block-level opcode heatmap with toggle between block aggregate and per-transaction views
  */
-export function BlockOpcodeHeatmap({ blockNumber, opcodeStats, transactions }: BlockOpcodeHeatmapProps): JSX.Element {
-  const [viewMode, setViewMode] = useState<ViewMode>('block');
+export function BlockOpcodeHeatmap({
+  blockNumber,
+  opcodeStats,
+  transactions,
+  defaultViewMode = 'block',
+}: BlockOpcodeHeatmapProps): JSX.Element {
+  const [viewMode, setViewMode] = useState<ViewMode>(defaultViewMode);
 
   // Only fetch per-transaction data when in transactions view
   // Uses fetchAllPages to handle pagination for large blocks

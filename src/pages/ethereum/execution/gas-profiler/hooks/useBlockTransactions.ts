@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { intTransactionCallFrameServiceList } from '@/api/sdk.gen';
 import type { IntTransactionCallFrame } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { useTableBounds } from '@/hooks/useBounds';
 import { fetchAllPages } from '@/utils/api-pagination';
+import { useGasProfilerBounds } from './useGasProfilerBounds';
 import { useContractOwners, type ContractOwnerMap } from './useContractOwners';
 
 /**
@@ -156,8 +156,8 @@ function createTransactionSummaries(
 export function useBlockTransactions({ blockNumber }: UseBlockTransactionsOptions): UseBlockTransactionsResult {
   const { currentNetwork } = useNetwork();
 
-  // Get bounds to know the available block range
-  const { data: bounds, isLoading: boundsLoading } = useTableBounds('int_transaction_call_frame');
+  // Get bounds to know the available block range (intersection of all gas profiler tables)
+  const { data: bounds, isLoading: boundsLoading } = useGasProfilerBounds();
 
   // Determine which block to fetch
   const targetBlock = blockNumber ?? bounds?.max ?? null;

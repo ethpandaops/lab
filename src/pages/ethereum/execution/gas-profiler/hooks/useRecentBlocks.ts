@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { intBlockOpcodeGasServiceList } from '@/api/sdk.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { useTableBounds } from '@/hooks/useBounds';
+import { useGasProfilerBounds } from './useGasProfilerBounds';
 
 /**
  * Lightweight block summary for Recent Blocks visualization
@@ -42,8 +42,8 @@ export interface UseRecentBlocksResult {
 export function useRecentBlocks({ count = 6, offset = 0 }: UseRecentBlocksOptions = {}): UseRecentBlocksResult {
   const { currentNetwork } = useNetwork();
 
-  // Get bounds from int_block_opcode_gas table
-  const { data: bounds, isLoading: boundsLoading } = useTableBounds('int_block_opcode_gas');
+  // Get bounds (intersection of all gas profiler tables)
+  const { data: bounds, isLoading: boundsLoading } = useGasProfilerBounds();
 
   // Calculate the block range we want (with offset from latest)
   const maxBlock = bounds?.max ? bounds.max - offset : null;
