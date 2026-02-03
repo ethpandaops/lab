@@ -1,0 +1,1 @@
+export { ContractStorageButton } from './ContractStorageButton';

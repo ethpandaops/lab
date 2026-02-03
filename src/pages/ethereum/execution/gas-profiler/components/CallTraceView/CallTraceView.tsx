@@ -3,6 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { ChevronRightIcon, ChevronDownIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import type { CallTraceViewProps, EnrichedCallFrame, CallFrameExtendedData } from './CallTraceView.types';
+import { ContractStorageButton } from '../ContractStorageButton';
 import type { CallFrameOpcodeStats } from '../../hooks/useTransactionGasData';
 import { useCallFrameOpcodes, type OpcodeBreakdown } from '../../hooks/useCallFrameOpcodes';
 import { getOpcodeCategory, CATEGORY_COLORS } from '../../utils/opcodeUtils';
@@ -512,19 +513,24 @@ function TraceRow({
         {/* Spacer */}
         <span className="flex-1" />
 
+        {/* Storage link */}
+        {frame.target_address && <ContractStorageButton address={frame.target_address} size="sm" />}
+
         {/* Opcode breakdown toggle - only for actual calls (not root) */}
         {frame.call_type && (
           <button
             onClick={handleOpcodeToggle}
             className={clsx(
-              'flex size-6 shrink-0 items-center justify-center rounded-sm border transition-colors',
+              'group/opcode relative flex size-6 shrink-0 items-center justify-center rounded-sm border transition-colors',
               isOpcodeExpanded
                 ? 'border-primary/50 bg-primary/20 text-primary'
                 : 'border-border bg-surface/50 text-muted hover:border-primary/30 hover:bg-surface hover:text-foreground'
             )}
-            title="Show opcode breakdown"
           >
             <ChartBarIcon className="size-4" />
+            <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted shadow-lg group-hover/opcode:block">
+              {isOpcodeExpanded ? 'Hide opcode breakdown' : 'Show opcode breakdown'}
+            </span>
           </button>
         )}
 
