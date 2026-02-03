@@ -1377,11 +1377,7 @@ export function BlockPage(): JSX.Element {
             <div className="space-y-6">
               {/* Gas by Contract Treemap + Calls vs Gas scatter */}
               <div className="grid grid-cols-2 gap-6">
-                <PopoutCard
-                  title="Gas by Contract"
-                  subtitle="Top 30 contracts by gas consumption"
-                  modalSize="xl"
-                >
+                <PopoutCard title="Gas by Contract" subtitle="Top 30 contracts by gas consumption" modalSize="xl">
                   {({ inModal }) => (
                     <ReactECharts
                       option={contractTreemapOption}

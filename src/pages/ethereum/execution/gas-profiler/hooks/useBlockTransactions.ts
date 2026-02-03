@@ -343,9 +343,7 @@ export function useBlockTransactions({ blockNumber }: UseBlockTransactionsOption
       }
     }
     // Filter out 0-gas flows (calls to EOAs) and sort by gas descending
-    const txContractFlows = [...txContractFlowMap.values()]
-      .filter(flow => flow.gas > 0)
-      .sort((a, b) => b.gas - a.gas);
+    const txContractFlows = [...txContractFlowMap.values()].filter(flow => flow.gas > 0).sort((a, b) => b.gas - a.gas);
 
     return {
       blockNumber: targetBlock,
