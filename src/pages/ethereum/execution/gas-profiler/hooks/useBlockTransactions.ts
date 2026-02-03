@@ -47,6 +47,19 @@ export interface ContractGasData {
 }
 
 /**
+ * Transaction to contract flow data for Sankey diagrams
+ */
+export interface TxContractFlow {
+  txHash: string;
+  txIndex: number;
+  txName: string | null;
+  contractAddress: string;
+  contractName: string | null;
+  gas: number;
+  callCount: number;
+}
+
+/**
  * Block data with transaction summaries
  */
 export interface BlockData {
@@ -62,6 +75,8 @@ export interface BlockData {
   topContractsByGas: ContractGasData[];
   /** All contracts by gas consumption (for Contracts tab) */
   allContractsByGas: ContractGasData[];
+  /** Transaction to contract flow data for Sankey visualization */
+  txContractFlows: TxContractFlow[];
 }
 
 export interface UseBlockTransactionsOptions {
@@ -217,7 +232,9 @@ export function useBlockTransactions({ blockNumber }: UseBlockTransactionsOption
     // Aggregate call type distribution from ALL call frames (not just root)
     const callTypeMap = new Map<string, { count: number; gasUsed: number }>();
     for (const frame of frames) {
-      // Skip root frames that have no call_type (transaction entry point)
+      // Skip root frames (transaction entry points, not internal calls)
+      // Root frames always have call_frame_id = 0
+      if (frame.call_frame_id === 0) continue;
       if (!frame.call_type) continue;
       const ct = frame.call_type;
       const frameGas = frame.gas ?? 0;
@@ -247,7 +264,9 @@ export function useBlockTransactions({ blockNumber }: UseBlockTransactionsOption
       }
     >();
     for (const frame of frames) {
-      // Skip root frames that have no call_type (transaction entry point, not a contract call)
+      // Skip root frames (transaction entry points, not internal calls)
+      // Root frames always have call_frame_id = 0
+      if (frame.call_frame_id === 0) continue;
       if (!frame.call_type) continue;
 
       const addr = frame.target_address;
@@ -273,8 +292,11 @@ export function useBlockTransactions({ blockNumber }: UseBlockTransactionsOption
       }
     }
 
-    // Sort by gas descending
+    // Sort by gas descending and filter out 0-gas entries
+    // 0-gas entries are typically calls to EOAs (no code to execute) and don't
+    // provide useful gas profiling information
     const allContractsByGas: ContractGasData[] = [...contractGasMap.entries()]
+      .filter(([, data]) => data.gas > 0)
       .sort((a, b) => b[1].gas - a[1].gas)
       .map(([address, data]) => ({
         address,
@@ -288,6 +310,41 @@ export function useBlockTransactions({ blockNumber }: UseBlockTransactionsOption
     // Top 10 for charts
     const topContractsByGas = allContractsByGas.slice(0, 10);
 
+    // Build transaction-to-contract flow data for Sankey visualization
+    // Group by (txHash, contractAddress) to get gas flow between each tx and contract
+    const txContractFlowMap = new Map<string, TxContractFlow>();
+    for (const frame of frames) {
+      // Skip root frames (transaction entry points, not internal calls)
+      // Root frames always have call_frame_id = 0
+      if (frame.call_frame_id === 0) continue;
+      if (!frame.call_type) continue;
+      const addr = frame.target_address;
+      if (!addr) continue;
+
+      const txHash = frame.transaction_hash ?? '';
+      const key = `${txHash}:${addr}`;
+      const selfGas = frame.gas ?? 0;
+
+      const existing = txContractFlowMap.get(key);
+      if (existing) {
+        existing.gas += selfGas;
+        existing.callCount += 1;
+      } else {
+        const txSummary = transactions.find(t => t.transactionHash === txHash);
+        txContractFlowMap.set(key, {
+          txHash,
+          txIndex: txSummary?.transactionIndex ?? 0,
+          txName: txSummary?.targetName ?? null,
+          contractAddress: addr,
+          contractName: contractOwners[addr.toLowerCase()]?.contract_name ?? null,
+          gas: selfGas,
+          callCount: 1,
+        });
+      }
+    }
+    // Filter out 0-gas flows (calls to EOAs) and sort by gas descending
+    const txContractFlows = [...txContractFlowMap.values()].filter(flow => flow.gas > 0).sort((a, b) => b.gas - a.gas);
+
     return {
       blockNumber: targetBlock,
       transactions,
@@ -297,6 +354,7 @@ export function useBlockTransactions({ blockNumber }: UseBlockTransactionsOption
       totalCallFrames: frames.filter(f => f.call_type).length,
       topContractsByGas,
       allContractsByGas,
+      txContractFlows,
     };
   }, [frames, targetBlock, contractOwners]);
 

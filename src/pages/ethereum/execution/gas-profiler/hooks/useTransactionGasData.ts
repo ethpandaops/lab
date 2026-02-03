@@ -1,15 +1,7 @@
 import { useMemo } from 'react';
 import { useQueries } from '@tanstack/react-query';
-import {
-  intTransactionCallFrameServiceList,
-  intTransactionOpcodeGasServiceList,
-  intTransactionCallFrameOpcodeGasServiceList,
-} from '@/api/sdk.gen';
-import type {
-  IntTransactionCallFrame,
-  IntTransactionOpcodeGas,
-  IntTransactionCallFrameOpcodeGas,
-} from '@/api/types.gen';
+import { intTransactionCallFrameServiceList, intTransactionOpcodeGasServiceList } from '@/api/sdk.gen';
+import type { IntTransactionCallFrame, IntTransactionOpcodeGas } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import type { TransactionMetadata, CallTreeNode, OpcodeStats } from '../IndexPage.types';
@@ -55,8 +47,6 @@ export interface TransactionGasData {
   contractOwners: ContractOwnerMap;
   /** Function signature data for name lookup */
   functionSignatures: FunctionSignatureMap;
-  /** Per-call-frame opcode stats for badges (call_frame_id -> stats) */
-  callFrameOpcodeStats: Map<number, CallFrameOpcodeStats>;
 }
 
 export interface UseTransactionGasDataOptions {
@@ -228,64 +218,6 @@ function calculateOpcodeStats(opcodeGas: IntTransactionOpcodeGas[]): OpcodeStats
 }
 
 /**
- * Process per-call-frame opcode data into stats for UI badges
- */
-function processCallFrameOpcodeStats(
-  opcodeData: IntTransactionCallFrameOpcodeGas[]
-): Map<number, CallFrameOpcodeStats> {
-  const statsMap = new Map<number, CallFrameOpcodeStats>();
-
-  for (const item of opcodeData) {
-    const frameId = item.call_frame_id ?? 0;
-    const opcode = item.opcode?.toUpperCase() ?? '';
-    const count = item.count ?? 0;
-    const gas = item.gas ?? 0;
-    const errorCount = item.error_count ?? 0;
-
-    // Get or create stats for this frame
-    let stats = statsMap.get(frameId);
-    if (!stats) {
-      stats = {
-        sstoreCount: 0,
-        sstoreGas: 0,
-        sloadCount: 0,
-        sloadGas: 0,
-        logCount: 0,
-        logGas: 0,
-        createCount: 0,
-        selfdestructCount: 0,
-        hasError: false,
-      };
-      statsMap.set(frameId, stats);
-    }
-
-    // Categorize the opcode
-    if (opcode === 'SSTORE') {
-      stats.sstoreCount += count;
-      stats.sstoreGas += gas;
-    } else if (opcode === 'SLOAD') {
-      stats.sloadCount += count;
-      stats.sloadGas += gas;
-    } else if (opcode.startsWith('LOG')) {
-      // LOG0, LOG1, LOG2, LOG3, LOG4
-      stats.logCount += count;
-      stats.logGas += gas;
-    } else if (opcode === 'CREATE' || opcode === 'CREATE2') {
-      stats.createCount += count;
-    } else if (opcode === 'SELFDESTRUCT') {
-      stats.selfdestructCount += count;
-    }
-
-    // Track errors
-    if (errorCount > 0) {
-      stats.hasError = true;
-    }
-  }
-
-  return statsMap;
-}
-
-/**
  * Extract transaction metadata from call frames
  *
  * Gas semantics:
@@ -372,31 +304,10 @@ export function useTransactionGasData({
           ),
         enabled: !!currentNetwork && !!transactionHash,
       },
-      // Fetch per-call-frame opcode gas data for badges (only interesting opcodes)
-      {
-        queryKey: ['gas-profiler', 'call-frame-opcode-gas', transactionHash, blockNumber],
-        queryFn: ({ signal }) =>
-          fetchAllPages<IntTransactionCallFrameOpcodeGas>(
-            intTransactionCallFrameOpcodeGasServiceList,
-            {
-              query: {
-                transaction_hash_eq: transactionHash!,
-                // Include block_number for efficient partition-based filtering with FINAL
-                ...(blockNumber ? { block_number_eq: blockNumber } : {}),
-                // Only fetch opcodes we display badges for
-                opcode_in_values: 'SSTORE,SLOAD,LOG0,LOG1,LOG2,LOG3,LOG4,CREATE,CREATE2,SELFDESTRUCT',
-                page_size: 10000,
-              },
-            },
-            'int_transaction_call_frame_opcode_gas',
-            signal
-          ),
-        enabled: !!currentNetwork && !!transactionHash,
-      },
     ],
   });
 
-  const [callFramesQuery, opcodeGasQuery, callFrameOpcodeGasQuery] = queries;
+  const [callFramesQuery, opcodeGasQuery] = queries;
 
   // Extract unique contract addresses from call frames for contract owner lookup
   const contractAddresses = useMemo(() => {
@@ -431,7 +342,6 @@ export function useTransactionGasData({
 
     const callFrames = callFramesQuery.data;
     const opcodeGas = opcodeGasQuery.data ?? [];
-    const callFrameOpcodeGas = callFrameOpcodeGasQuery.data ?? [];
 
     return {
       callFrames,
@@ -441,17 +351,8 @@ export function useTransactionGasData({
       opcodeStats: calculateOpcodeStats(opcodeGas),
       contractOwners,
       functionSignatures,
-      callFrameOpcodeStats: processCallFrameOpcodeStats(callFrameOpcodeGas),
     };
-  }, [
-    isLoading,
-    error,
-    callFramesQuery.data,
-    opcodeGasQuery.data,
-    callFrameOpcodeGasQuery.data,
-    contractOwners,
-    functionSignatures,
-  ]);
+  }, [isLoading, error, callFramesQuery.data, opcodeGasQuery.data, contractOwners, functionSignatures]);
 
   return { data, isLoading, error };
 }

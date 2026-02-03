@@ -33,7 +33,6 @@ import {
   CategoryPieChart,
   GasFormula,
   ContractInteractionsTable,
-  TopContractsByGasChart,
   CallsVsGasChart,
   TopItemsByGasTable,
   GasHistogram,
@@ -96,7 +95,7 @@ function filterAndSortTransactions(
 }
 
 // Tab hash values for URL-based navigation
-const BLOCK_TAB_HASHES = ['overview', 'opcodes', 'transactions', 'calls', 'contracts'] as const;
+const BLOCK_TAB_HASHES = ['overview', 'opcodes', 'transactions', 'calls'] as const;
 
 /**
  * Block detail page - shows all transactions in a block with analytics
@@ -339,7 +338,7 @@ export function BlockPage(): JSX.Element {
           top: 0,
           bottom: 0,
           roam: false,
-          nodeClick: 'link',
+          nodeClick: false,
           breadcrumb: { show: false },
           label: {
             show: true,
@@ -541,6 +540,335 @@ export function BlockPage(): JSX.Element {
     return data.transactions.map(tx => tx.totalGasUsed);
   }, [data?.transactions]);
 
+  // Contract treemap data
+  const contractTreemapOption = useMemo(() => {
+    if (!data?.allContractsByGas?.length || !totalBlockGas) return {};
+
+    const sortedContracts = [...data.allContractsByGas].sort((a, b) => b.gas - a.gas);
+    const topContracts = sortedContracts.slice(0, 30);
+    const otherGas = sortedContracts.slice(30).reduce((sum, c) => sum + c.gas, 0);
+
+    const treeData = topContracts.map((c, i) => ({
+      name: c.name || `${c.address.slice(0, 6)}...${c.address.slice(-4)}`,
+      value: c.gas,
+      address: c.address,
+      callCount: c.callCount,
+      callTypes: c.callTypes,
+      firstTxHash: c.firstTxHash,
+      itemStyle: {
+        color: [
+          colors.primary,
+          '#22c55e',
+          '#f59e0b',
+          '#8b5cf6',
+          '#ec4899',
+          '#06b6d4',
+          '#84cc16',
+          '#f97316',
+          '#6366f1',
+          '#14b8a6',
+        ][i % 10],
+      },
+    }));
+
+    if (otherGas > 0) {
+      treeData.push({
+        name: `Other (${sortedContracts.length - 30} contracts)`,
+        value: otherGas,
+        address: '',
+        callCount: 0,
+        callTypes: [],
+        firstTxHash: null,
+        itemStyle: { color: colors.muted },
+      });
+    }
+
+    return {
+      series: [
+        {
+          type: 'treemap',
+          data: treeData,
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          roam: false,
+          nodeClick: false,
+          breadcrumb: { show: false },
+          label: {
+            show: true,
+            formatter: (params: { name: string; value: number }) => {
+              const pct = ((params.value / totalBlockGas) * 100).toFixed(1);
+              return `${params.name}\n${pct}%`;
+            },
+            color: '#fff',
+            fontSize: 11,
+            overflow: 'truncate',
+            ellipsis: '...',
+          },
+          itemStyle: {
+            borderColor: colors.background,
+            borderWidth: 2,
+            gapWidth: 1,
+          },
+          visibleMin: 300,
+        },
+      ],
+      tooltip: {
+        backgroundColor: colors.background,
+        borderColor: colors.border,
+        padding: 12,
+        appendToBody: true,
+        formatter: (params: {
+          name: string;
+          value: number;
+          data: { address: string; callCount: number; callTypes: string[] };
+        }) => {
+          const pct = ((params.value / totalBlockGas) * 100).toFixed(2);
+          const d = params.data;
+
+          if (!d.address) {
+            return `<div>
+              <div style="font-weight: 600; color: ${colors.foreground};">${params.name}</div>
+              <div style="margin-top: 8px; color: ${colors.muted};">
+                ${formatGas(params.value)} gas (${pct}%)
+              </div>
+            </div>`;
+          }
+
+          return `<div>
+            <div style="font-weight: 600; color: ${colors.foreground};">${params.name}</div>
+            <div style="margin-top: 4px; font-family: monospace; font-size: 11px; color: ${colors.muted};">
+              ${d.address.slice(0, 10)}...${d.address.slice(-8)}
+            </div>
+            <div style="margin-top: 8px;">
+              <div style="color: ${colors.muted};">Gas: <span style="color: ${colors.foreground}; font-weight: 600;">${formatGas(params.value)}</span> (${pct}%)</div>
+              <div style="color: ${colors.muted};">Calls: <span style="color: ${colors.foreground};">${d.callCount}</span></div>
+              <div style="color: ${colors.muted};">Types: <span style="color: ${colors.foreground};">${d.callTypes.join(', ')}</span></div>
+            </div>
+          </div>`;
+        },
+      },
+    };
+  }, [data?.allContractsByGas, colors, totalBlockGas]);
+
+  // Count of flows shown in Sankey
+  const sankeyFlowCount = useMemo(() => {
+    if (!data?.txContractFlows?.length) return 0;
+    return Math.min(data.txContractFlows.length, 15);
+  }, [data?.txContractFlows]);
+
+  // Sankey diagram showing tx → contract flow
+  const contractFlowSankeyOption = useMemo(() => {
+    if (!data?.txContractFlows?.length) return {};
+
+    // Take only top 15 flows by gas for readability
+    const topFlows = data.txContractFlows.slice(0, 15);
+
+    // Get unique transactions and contracts from the top flows
+    const txSet = new Set<string>();
+    const contractSet = new Set<string>();
+    for (const flow of topFlows) {
+      txSet.add(flow.txHash);
+      contractSet.add(flow.contractAddress);
+    }
+
+    // Build node list: transactions on left, contracts on right
+    const nodes: { name: string; txHash?: string; itemStyle?: { color: string } }[] = [];
+    const txNodeMap = new Map<string, number>();
+    const contractNodeMap = new Map<string, number>();
+
+    // Add transaction nodes (sorted by total gas for that tx)
+    const txGasMap = new Map<string, number>();
+    for (const flow of topFlows) {
+      txGasMap.set(flow.txHash, (txGasMap.get(flow.txHash) ?? 0) + flow.gas);
+    }
+    const sortedTxs = [...txSet].sort((a, b) => (txGasMap.get(b) ?? 0) - (txGasMap.get(a) ?? 0));
+
+    let nodeIdx = 0;
+    for (const txHash of sortedTxs) {
+      const flow = topFlows.find(f => f.txHash === txHash);
+      const label = flow?.txName
+        ? `TX ${flow.txIndex}: ${flow.txName.slice(0, 20)}${flow.txName.length > 20 ? '...' : ''}`
+        : `TX ${flow?.txIndex ?? '?'}`;
+      nodes.push({ name: label, txHash, itemStyle: { color: colors.primary } });
+      txNodeMap.set(txHash, nodeIdx++);
+    }
+
+    // Add contract nodes (sorted by total gas for that contract)
+    // Find the first txHash that called each contract for navigation
+    const contractGasMap = new Map<string, number>();
+    const contractFirstTx = new Map<string, string>();
+    for (const flow of topFlows) {
+      contractGasMap.set(flow.contractAddress, (contractGasMap.get(flow.contractAddress) ?? 0) + flow.gas);
+      if (!contractFirstTx.has(flow.contractAddress)) {
+        contractFirstTx.set(flow.contractAddress, flow.txHash);
+      }
+    }
+    const sortedContracts = [...contractSet].sort(
+      (a, b) => (contractGasMap.get(b) ?? 0) - (contractGasMap.get(a) ?? 0)
+    );
+
+    for (const addr of sortedContracts) {
+      const flow = topFlows.find(f => f.contractAddress === addr);
+      const name = flow?.contractName;
+      const label = name
+        ? `${name.slice(0, 25)}${name.length > 25 ? '...' : ''}`
+        : `${addr.slice(0, 8)}...${addr.slice(-6)}`;
+      nodes.push({ name: label, txHash: contractFirstTx.get(addr), itemStyle: { color: '#22c55e' } });
+      contractNodeMap.set(addr, nodeIdx++);
+    }
+
+    // Build links with source/target names for tooltip
+    const links = topFlows.map(flow => {
+      const sourceIdx = txNodeMap.get(flow.txHash)!;
+      const targetIdx = contractNodeMap.get(flow.contractAddress)!;
+      return {
+        source: sourceIdx,
+        target: targetIdx,
+        value: flow.gas,
+        sourceName: nodes[sourceIdx].name,
+        targetName: nodes[targetIdx].name,
+        callCount: flow.callCount,
+        txHash: flow.txHash,
+      };
+    });
+
+    const totalFlowGas = topFlows.reduce((sum, f) => sum + f.gas, 0);
+
+    return {
+      series: [
+        {
+          type: 'sankey',
+          layout: 'none',
+          emphasis: {
+            focus: 'adjacency',
+            lineStyle: {
+              opacity: 0.7,
+            },
+          },
+          nodeAlign: 'justify',
+          orient: 'horizontal',
+          data: nodes,
+          links,
+          left: '5%',
+          right: '12%',
+          top: 15,
+          bottom: 15,
+          nodeWidth: 14,
+          nodeGap: 14,
+          draggable: false,
+          lineStyle: {
+            color: 'gradient',
+            opacity: 0.35,
+            curveness: 0.5,
+          },
+          itemStyle: {
+            borderWidth: 0,
+            borderRadius: 2,
+          },
+          label: {
+            show: true,
+            color: colors.foreground,
+            fontSize: 11,
+            fontWeight: 500,
+            position: 'left',
+            align: 'right',
+            distance: 8,
+          },
+          levels: [
+            {
+              depth: 0,
+              itemStyle: {
+                color: colors.primary,
+                shadowBlur: 4,
+                shadowColor: 'rgba(0,0,0,0.1)',
+              },
+              label: {
+                position: 'left',
+                align: 'right',
+                color: colors.foreground,
+              },
+            },
+            {
+              depth: 1,
+              itemStyle: {
+                color: '#10b981',
+                shadowBlur: 4,
+                shadowColor: 'rgba(0,0,0,0.1)',
+              },
+              label: {
+                position: 'right',
+                align: 'left',
+                color: colors.foreground,
+              },
+            },
+          ],
+        },
+      ],
+      tooltip: {
+        backgroundColor: colors.background,
+        borderColor: colors.border,
+        borderRadius: 8,
+        padding: [12, 16],
+        appendToBody: true,
+        extraCssText: 'box-shadow: 0 4px 12px rgba(0,0,0,0.15);',
+        formatter: (params: {
+          dataType: string;
+          name: string;
+          value: number;
+          data: { sourceName?: string; targetName?: string; callCount?: number; name?: string };
+        }) => {
+          if (params.dataType === 'edge') {
+            const d = params.data;
+            const pct = ((params.value / totalFlowGas) * 100).toFixed(1);
+            return `<div style="min-width: 180px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                <span style="color: ${colors.primary}; font-weight: 600;">${d.sourceName}</span>
+                <span style="color: ${colors.muted};">→</span>
+                <span style="color: #10b981; font-weight: 600;">${d.targetName}</span>
+              </div>
+              <div style="display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 12px;">
+                <span style="color: ${colors.muted};">Gas</span>
+                <span style="color: ${colors.foreground}; font-weight: 600; text-align: right;">${formatGas(params.value)} <span style="color: ${colors.muted}; font-weight: 400;">(${pct}%)</span></span>
+                <span style="color: ${colors.muted};">Calls</span>
+                <span style="color: ${colors.foreground}; font-weight: 500; text-align: right;">${d.callCount}</span>
+              </div>
+            </div>`;
+          }
+          // Node tooltip
+          const isContract = params.name?.startsWith('0x') || params.data.name?.startsWith('0x');
+          const nodeColor = isContract ? '#10b981' : colors.primary;
+          return `<div style="font-weight: 600; color: ${nodeColor};">${params.data.name ?? params.name}</div>`;
+        },
+      },
+    };
+  }, [data?.txContractFlows, colors]);
+
+  // Click handler for contracts treemap - navigate to first tx that called the contract
+  const handleContractTreemapClick = (params: { data?: { firstTxHash?: string | null } }) => {
+    const txHash = params.data?.firstTxHash;
+    if (txHash) {
+      navigate({
+        to: '/ethereum/execution/gas-profiler/tx/$txHash',
+        params: { txHash },
+        search: { block: blockNumber },
+      });
+    }
+  };
+
+  // Click handler for Sankey diagram - navigate to transaction page
+  const handleSankeyClick = (params: { data?: { txHash?: string }; dataType?: string }) => {
+    const txHash = params.data?.txHash;
+    if (txHash) {
+      navigate({
+        to: '/ethereum/execution/gas-profiler/tx/$txHash',
+        params: { txHash },
+        search: { block: blockNumber },
+      });
+    }
+  };
+
   // Loading state
   if (boundsLoading || (isLoading && !data)) {
     return (
@@ -726,7 +1054,6 @@ export function BlockPage(): JSX.Element {
           <Tab hash="opcodes">Opcodes</Tab>
           <Tab hash="transactions">Transactions</Tab>
           <Tab hash="calls">Calls</Tab>
-          {data.allContractsByGas.length > 0 && <Tab hash="contracts">Contracts</Tab>}
         </HeadlessTab.List>
 
         <HeadlessTab.Panels>
@@ -1045,67 +1372,75 @@ export function BlockPage(): JSX.Element {
             )}
           </HeadlessTab.Panel>
 
-          {/* Calls Tab */}
+          {/* Calls Tab - consolidated calls and contracts analysis */}
           <HeadlessTab.Panel>
-            {/* Top Contracts + Calls vs Gas */}
-            <div className="mb-6 grid grid-cols-2 gap-6">
-              <TopContractsByGasChart
-                contracts={data.topContractsByGas.map(c => ({
-                  address: c.address,
-                  name: c.name,
-                  gas: c.gas,
-                }))}
-                totalGas={totalBlockGas}
-                maxContracts={10}
-              />
-              <CallsVsGasChart
-                data={data.transactions.map(tx => ({
-                  calls: tx.frameCount,
-                  gas: tx.totalGasUsed,
-                }))}
-              />
-            </div>
+            <div className="space-y-6">
+              {/* Gas by Contract Treemap + Calls vs Gas scatter */}
+              <div className="grid grid-cols-2 gap-6">
+                <PopoutCard title="Gas by Contract" subtitle="Top 30 contracts by gas consumption" modalSize="xl">
+                  {({ inModal }) => (
+                    <ReactECharts
+                      option={contractTreemapOption}
+                      style={{ height: inModal ? 500 : 280, cursor: 'pointer' }}
+                      opts={{ renderer: 'canvas' }}
+                      onEvents={{ click: handleContractTreemapClick }}
+                    />
+                  )}
+                </PopoutCard>
+                <CallsVsGasChart
+                  data={data.transactions.map(tx => ({
+                    calls: tx.frameCount,
+                    gas: tx.totalGasUsed,
+                  }))}
+                />
+              </div>
 
-            {/* Call Type Distribution */}
-            <div className="grid grid-cols-2 gap-6">
-              <CategoryPieChart
-                data={callTypeChartData}
-                colorMap={CALL_TYPE_COLORS}
-                title="Call Type Distribution"
-                subtitle="How many calls of each type?"
-                percentLabel="of calls"
-                emptyMessage="No call data"
-                innerRadius={50}
-                outerRadius={75}
-                height={280}
-              />
-              <CategoryPieChart
-                data={callTypeGasChartData}
-                colorMap={CALL_TYPE_COLORS}
-                title="Gas by Call Type"
-                subtitle="How much gas did each call type consume?"
-                percentLabel="of call gas"
-                emptyMessage="No call data"
-                innerRadius={50}
-                outerRadius={75}
-                height={280}
-              />
-            </div>
-          </HeadlessTab.Panel>
+              {/* Call Type Distribution */}
+              <div className="grid grid-cols-2 gap-6">
+                <CategoryPieChart
+                  data={callTypeChartData}
+                  colorMap={CALL_TYPE_COLORS}
+                  title="Call Type Distribution"
+                  subtitle="How many calls of each type?"
+                  percentLabel="of calls"
+                  emptyMessage="No call data"
+                  innerRadius={50}
+                  outerRadius={75}
+                  height={280}
+                />
+                <CategoryPieChart
+                  data={callTypeGasChartData}
+                  colorMap={CALL_TYPE_COLORS}
+                  title="Gas by Call Type"
+                  subtitle="How much gas did each call type consume?"
+                  percentLabel="of call gas"
+                  emptyMessage="No call data"
+                  innerRadius={50}
+                  outerRadius={75}
+                  height={280}
+                />
+              </div>
 
-          {/* Contracts Tab */}
-          {data.allContractsByGas.length > 0 && (
-            <HeadlessTab.Panel>
-              <div>
-                {/* Header with filter toggle */}
-                <div className="mb-4 flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm font-medium text-foreground">Contract Interactions</h3>
-                    <p className="text-xs text-muted">Unique contracts involved in EVM execution</p>
-                  </div>
-                  <span className="text-xs text-muted">{data.allContractsByGas.length} contracts</span>
-                </div>
+              {/* Transaction → Contract Flow Sankey */}
+              {data.txContractFlows.length > 0 && (
+                <PopoutCard
+                  title="Transaction → Contract Flow"
+                  subtitle={`Top ${sankeyFlowCount} contract calls by gas`}
+                  modalSize="full"
+                >
+                  {({ inModal }) => (
+                    <ReactECharts
+                      option={contractFlowSankeyOption}
+                      style={{ height: inModal ? 550 : 320, width: '100%', cursor: 'pointer' }}
+                      opts={{ renderer: 'canvas' }}
+                      onEvents={{ click: handleSankeyClick }}
+                    />
+                  )}
+                </PopoutCard>
+              )}
 
+              {/* Contracts Table */}
+              {data.allContractsByGas.length > 0 && (
                 <ContractInteractionsTable
                   contracts={data.allContractsByGas.map(
                     (c): ContractInteractionItem => ({
@@ -1129,9 +1464,9 @@ export function BlockPage(): JSX.Element {
                   }}
                   percentLabel="% of Block"
                 />
-              </div>
-            </HeadlessTab.Panel>
-          )}
+              )}
+            </div>
+          </HeadlessTab.Panel>
         </HeadlessTab.Panels>
       </HeadlessTab.Group>
     </Container>
