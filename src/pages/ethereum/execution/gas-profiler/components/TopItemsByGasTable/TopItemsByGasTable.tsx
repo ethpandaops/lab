@@ -83,7 +83,7 @@ export function TopItemsByGasTable({
   viewAll,
   columns = { first: '#', second: 'Item' },
 }: TopItemsByGasTableProps): JSX.Element {
-  const renderRow = (item: TopGasItem) => {
+  const renderRow = (item: TopGasItem): JSX.Element => {
     const pct = totalGas > 0 ? (item.gas / totalGas) * 100 : 0;
 
     const identifierContent = (

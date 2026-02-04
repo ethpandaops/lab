@@ -140,8 +140,11 @@ function buildCallTree(
     // Detect contract creation:
     // 1. New data: call_type = 'CREATE' (from transformation)
     // 2. Old data fallback: root frame (depth 0) with no target_address
-    const isContractCreation = frame.call_type === 'CREATE' ||
-      (!frame.target_address && !frame.call_type && (frame.depth === 0 || frame.depth === null || frame.depth === undefined));
+    const isContractCreation =
+      frame.call_type === 'CREATE' ||
+      (!frame.target_address &&
+        !frame.call_type &&
+        (frame.depth === 0 || frame.depth === null || frame.depth === undefined));
 
     // Look up contract name from dim_contract_owner
     const owner = frame.target_address ? contractOwners[frame.target_address.toLowerCase()] : undefined;
@@ -154,11 +157,17 @@ function buildCallTree(
 
     // Build label: prioritize function name > contract name > truncated address
     // For contract creation without target_address, use 'CREATE' as the fallback
-    const fallbackLabel = (isContractCreation && !frame.target_address) ? 'CREATE' : 'Root';
-    const label = getCallLabel(frame.target_address, functionSelector, contractOwners, functionSignatures, fallbackLabel);
+    const fallbackLabel = isContractCreation && !frame.target_address ? 'CREATE' : 'Root';
+    const label = getCallLabel(
+      frame.target_address,
+      functionSelector,
+      contractOwners,
+      functionSignatures,
+      fallbackLabel
+    );
 
     // For contract creation, ensure call type is 'CREATE'
-    const effectiveCallType = isContractCreation ? 'CREATE' : (frame.call_type || 'CALL');
+    const effectiveCallType = isContractCreation ? 'CREATE' : frame.call_type || 'CALL';
 
     const node: CallTreeNode = {
       id: String(frame.call_frame_id ?? 0),
@@ -253,8 +262,7 @@ function extractMetadata(frames: IntTransactionCallFrame[]): TransactionMetadata
   // Detect contract creation:
   // 1. New data: call_type = 'CREATE' (from transformation)
   // 2. Old data fallback: root frame with no target_address and no call_type
-  const isContractCreation = rootFrame?.call_type === 'CREATE' ||
-    (!rootFrame?.target_address && !rootFrame?.call_type);
+  const isContractCreation = rootFrame?.call_type === 'CREATE' || (!rootFrame?.target_address && !rootFrame?.call_type);
 
   return {
     transactionHash: firstFrame?.transaction_hash ?? '',

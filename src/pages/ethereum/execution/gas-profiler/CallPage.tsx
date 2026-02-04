@@ -382,9 +382,10 @@ export function CallPage(): JSX.Element {
   // Detect contract creation
   // 1. New data: call_type = 'CREATE' (from transformation)
   // 2. Old data fallback: root frame (depth 0) with no target_address and no call_type
-  const isContractCreation = currentFrame.call_type === 'CREATE' ||
+  const isContractCreation =
+    currentFrame.call_type === 'CREATE' ||
     (!currentFrame.target_address && !currentFrame.call_type && currentFrame.depth === 0);
-  const effectiveCallType = isContractCreation ? 'CREATE' : (currentFrame.call_type || 'CALL');
+  const effectiveCallType = isContractCreation ? 'CREATE' : currentFrame.call_type || 'CALL';
   const callTypeStyles = getCallTypeStyles(effectiveCallType);
   const selfGas = currentFrame.gas ?? 0;
   const cumulativeGas = currentFrame.gas_cumulative ?? 0;
@@ -438,7 +439,7 @@ export function CallPage(): JSX.Element {
                         const isLast = index === breadcrumbPath.length - 1;
                         // Detect contract creation for this frame
                         const frameIsContractCreation = !frame.target_address && frame.depth === 0;
-                        const frameCallType = frameIsContractCreation ? 'CREATE' : (frame.call_type || 'CALL');
+                        const frameCallType = frameIsContractCreation ? 'CREATE' : frame.call_type || 'CALL';
                         const frameStyles = getCallTypeStyles(frameCallType);
                         const frameName = getCallLabel(
                           frame.target_address,
@@ -487,7 +488,7 @@ export function CallPage(): JSX.Element {
               {(() => {
                 const parent = breadcrumbPath[breadcrumbPath.length - 2];
                 const parentIsContractCreation = !parent.target_address && parent.depth === 0;
-                const parentCallType = parentIsContractCreation ? 'CREATE' : (parent.call_type || 'CALL');
+                const parentCallType = parentIsContractCreation ? 'CREATE' : parent.call_type || 'CALL';
                 const parentStyles = getCallTypeStyles(parentCallType);
                 const parentName = getCallLabel(
                   parent.target_address,
@@ -517,7 +518,7 @@ export function CallPage(): JSX.Element {
             const current = breadcrumbPath[breadcrumbPath.length - 1];
             if (!current) return null;
             const currentIsContractCreation = !current.target_address && current.depth === 0;
-            const currentCallType = currentIsContractCreation ? 'CREATE' : (current.call_type || 'CALL');
+            const currentCallType = currentIsContractCreation ? 'CREATE' : current.call_type || 'CALL';
             const currentStyles = getCallTypeStyles(currentCallType);
             const currentBreadcrumbName = getCallLabel(
               current.target_address,

@@ -297,8 +297,8 @@ function TraceRow({
   // Detect contract creation - must be before hooks that use it
   // 1. New data: call_type = 'CREATE' (from transformation)
   // 2. Old data fallback: root frame (depth 0) with no target_address and no call_type
-  const isContractCreation = frame.call_type === 'CREATE' ||
-    (!frame.target_address && !frame.call_type && frame.depth === 0);
+  const isContractCreation =
+    frame.call_type === 'CREATE' || (!frame.target_address && !frame.call_type && frame.depth === 0);
 
   const callTypeStyles = getCallTypeStyles(frame.call_type ?? 'CALL');
   // Show cumulative gas (self + children) like Phalcon does

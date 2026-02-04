@@ -350,7 +350,7 @@ function TransactionsViewHeatmap({
     const elements = Array.from(headerRefs.current.values());
     if (elements.length === 0) return;
 
-    const updateMaxHeight = () => {
+    const updateMaxHeight = (): void => {
       const maxHeight = Math.max(...elements.map(el => el.offsetHeight));
       setHeaderHeight(maxHeight);
     };
