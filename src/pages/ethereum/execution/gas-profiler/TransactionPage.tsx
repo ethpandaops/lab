@@ -755,7 +755,7 @@ export function TransactionPage(): JSX.Element {
       </div>
 
       {/* Quick Stats Row - Always visible */}
-      <div className="mb-6 grid grid-cols-4 gap-4">
+      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="rounded-xs bg-primary/10 p-2">
@@ -956,7 +956,7 @@ export function TransactionPage(): JSX.Element {
               )}
 
               {/* Category pie charts */}
-              <div className="mb-6 grid grid-cols-2 gap-6">
+              <div className="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <CategoryPieChart
                   data={opcodeCategoryData}
                   colorMap={CATEGORY_COLORS}
@@ -993,7 +993,7 @@ export function TransactionPage(): JSX.Element {
             <HeadlessTab.Panel>
               <div className="space-y-6">
                 {/* Gas Distribution + Top Internal Txs */}
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <PopoutCard
                     title="Gas by Contract"
                     subtitle="Total gas per contract (all calls to same address combined)"
@@ -1021,7 +1021,7 @@ export function TransactionPage(): JSX.Element {
                 </div>
 
                 {/* Internal Tx Type Distribution */}
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <CategoryPieChart
                     data={callTypeChartData}
                     colorMap={CALL_TYPE_COLORS}

@@ -930,7 +930,7 @@ export function BlockPage(): JSX.Element {
       />
 
       {/* Back link and block navigation */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <Link
           to="/ethereum/execution/gas-profiler"
           className="flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
@@ -939,60 +939,64 @@ export function BlockPage(): JSX.Element {
           Gas Profiler Home
         </Link>
 
-        <div className="flex items-center gap-2">
-          <a
-            href={`https://etherscan.io/block/${blockNumber}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
-            title="View on Etherscan"
-          >
-            <EtherscanIcon className="size-4" />
-          </a>
-          <a
-            href={`https://dashboard.tenderly.co/block/1/${blockNumber}/txs`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
-            title="View on Tenderly"
-          >
-            <TenderlyIcon className="size-4" />
-          </a>
+        <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-start">
+          <div className="flex items-center gap-2">
+            <a
+              href={`https://etherscan.io/block/${blockNumber}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
+              title="View on Etherscan"
+            >
+              <EtherscanIcon className="size-4" />
+            </a>
+            <a
+              href={`https://dashboard.tenderly.co/block/1/${blockNumber}/txs`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
+              title="View on Tenderly"
+            >
+              <TenderlyIcon className="size-4" />
+            </a>
+          </div>
 
-          <div className="h-4 w-px bg-border" />
+          <div className="hidden h-4 w-px bg-border sm:block" />
 
-          <Link
-            to="/ethereum/execution/gas-profiler/block/$blockNumber"
-            params={{ blockNumber: String(blockNumber - 1) }}
-            disabled={!canGoPrev}
-            className={clsx(
-              'flex items-center gap-1 rounded-xs px-2 py-1 text-sm transition-colors',
-              canGoPrev ? 'text-muted hover:bg-surface hover:text-foreground' : 'cursor-not-allowed text-muted/50'
-            )}
-          >
-            <ChevronLeftIcon className="size-4" />
-            Prev
-          </Link>
-          <span className="text-xs text-muted">
-            {formatGas(bounds.min)} - {formatGas(bounds.max)}
-          </span>
-          <Link
-            to="/ethereum/execution/gas-profiler/block/$blockNumber"
-            params={{ blockNumber: String(blockNumber + 1) }}
-            disabled={!canGoNext}
-            className={clsx(
-              'flex items-center gap-1 rounded-xs px-2 py-1 text-sm transition-colors',
-              canGoNext ? 'text-muted hover:bg-surface hover:text-foreground' : 'cursor-not-allowed text-muted/50'
-            )}
-          >
-            Next
-            <ChevronRightIcon className="size-4" />
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/ethereum/execution/gas-profiler/block/$blockNumber"
+              params={{ blockNumber: String(blockNumber - 1) }}
+              disabled={!canGoPrev}
+              className={clsx(
+                'flex items-center gap-1 rounded-xs px-2 py-1 text-sm transition-colors',
+                canGoPrev ? 'text-muted hover:bg-surface hover:text-foreground' : 'cursor-not-allowed text-muted/50'
+              )}
+            >
+              <ChevronLeftIcon className="size-4" />
+              Prev
+            </Link>
+            <span className="text-xs text-muted">
+              {formatGas(bounds.min)} - {formatGas(bounds.max)}
+            </span>
+            <Link
+              to="/ethereum/execution/gas-profiler/block/$blockNumber"
+              params={{ blockNumber: String(blockNumber + 1) }}
+              disabled={!canGoNext}
+              className={clsx(
+                'flex items-center gap-1 rounded-xs px-2 py-1 text-sm transition-colors',
+                canGoNext ? 'text-muted hover:bg-surface hover:text-foreground' : 'cursor-not-allowed text-muted/50'
+              )}
+            >
+              Next
+              <ChevronRightIcon className="size-4" />
+            </Link>
+          </div>
         </div>
       </div>
 
       {/* Block Summary - Always visible */}
-      <div className="mb-6 grid grid-cols-4 gap-4">
+      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="rounded-xs bg-primary/10 p-2">
@@ -1121,7 +1125,7 @@ export function BlockPage(): JSX.Element {
             </PopoutCard>
 
             {/* Top Transactions + Gas Histogram Row */}
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <TopItemsByGasTable
                 title="Top Transactions by Gas"
                 subtitle="Which transactions consumed the most gas?"
@@ -1158,7 +1162,7 @@ export function BlockPage(): JSX.Element {
           {/* Opcodes Tab */}
           <HeadlessTab.Panel>
             {/* Category pie charts */}
-            <div className="mb-6 grid grid-cols-2 gap-6">
+            <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
               <CategoryPieChart
                 data={opcodeCategoryData}
                 colorMap={CATEGORY_COLORS}
@@ -1374,7 +1378,7 @@ export function BlockPage(): JSX.Element {
           <HeadlessTab.Panel>
             <div className="space-y-6">
               {/* Gas by Contract Treemap + Calls vs Gas scatter */}
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <PopoutCard title="Gas by Contract" subtitle="Top 30 contracts by gas consumption" modalSize="xl">
                   {({ inModal }) => (
                     <ReactECharts
@@ -1394,7 +1398,7 @@ export function BlockPage(): JSX.Element {
               </div>
 
               {/* Call Type Distribution */}
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <CategoryPieChart
                   data={callTypeChartData}
                   colorMap={CALL_TYPE_COLORS}

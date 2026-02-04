@@ -395,13 +395,13 @@ export function CallPage(): JSX.Element {
       <Header title="Internal Tx Details" description="Internal tx gas analysis" />
 
       {/* Internal Tx Path Navigation */}
-      <div className="mb-6 flex items-center justify-between text-sm">
-        <div className="flex items-center gap-2">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-sm">
+        <div className="flex min-w-0 items-center gap-2">
           <Link
             to="/ethereum/execution/gas-profiler/tx/$txHash"
             params={{ txHash }}
             search={{ block: blockNumber }}
-            className="text-muted hover:text-foreground"
+            className="shrink-0 text-muted hover:text-foreground"
           >
             <ArrowLeftIcon className="size-4" />
           </Link>
@@ -413,14 +413,16 @@ export function CallPage(): JSX.Element {
           >
             TX
           </Link>
-          {breadcrumbPath.length > 2 && (
+          {/* Path dropdown - always visible on mobile, collapsed-only on desktop */}
+          {breadcrumbPath.length > 0 && (
             <>
-              <ChevronRightIcon className="size-3 text-border" />
-              {/* Expandable dropdown for collapsed items */}
-              <div className="group relative">
+              <ChevronRightIcon className={`size-3 text-border ${breadcrumbPath.length <= 2 ? 'sm:hidden' : ''}`} />
+              <div className={`group relative ${breadcrumbPath.length <= 2 ? 'sm:hidden' : ''}`}>
                 <button className="flex items-center gap-1 rounded-xs border border-border bg-surface/50 px-1.5 py-0.5 text-xs text-muted hover:border-primary/50 hover:text-foreground">
                   <EllipsisHorizontalIcon className="size-3.5" />
-                  <span>{breadcrumbPath.length - 2}</span>
+                  {/* Mobile: show total depth, Desktop: show collapsed count */}
+                  <span className="sm:hidden">{breadcrumbPath.length}</span>
+                  {breadcrumbPath.length > 2 && <span className="hidden sm:inline">{breadcrumbPath.length - 2}</span>}
                 </button>
                 {/* Dropdown on hover */}
                 <div className="absolute top-full left-0 z-50 hidden min-w-56 pt-1 group-hover:block">
@@ -437,7 +439,6 @@ export function CallPage(): JSX.Element {
                       </Link>
                       {breadcrumbPath.map((frame, index) => {
                         const isLast = index === breadcrumbPath.length - 1;
-                        // Detect contract creation for this frame
                         const frameIsContractCreation = !frame.target_address && frame.depth === 0;
                         const frameCallType = frameIsContractCreation ? 'CREATE' : frame.call_type || 'CALL';
                         const frameStyles = getCallTypeStyles(frameCallType);
@@ -481,9 +482,9 @@ export function CallPage(): JSX.Element {
               </div>
             </>
           )}
-          {/* Parent (if exists) */}
+          {/* Parent (if exists) - desktop only */}
           {breadcrumbPath.length > 1 && (
-            <>
+            <span className="hidden items-center gap-2 sm:inline-flex">
               <ChevronRightIcon className="size-3 text-border" />
               {(() => {
                 const parent = breadcrumbPath[breadcrumbPath.length - 2];
@@ -511,9 +512,9 @@ export function CallPage(): JSX.Element {
                   </Link>
                 );
               })()}
-            </>
+            </span>
           )}
-          {/* Current */}
+          {/* Current - desktop only */}
           {(() => {
             const current = breadcrumbPath[breadcrumbPath.length - 1];
             if (!current) return null;
@@ -528,7 +529,7 @@ export function CallPage(): JSX.Element {
               currentIsContractCreation ? 'Contract Creation' : 'Unknown'
             );
             return (
-              <>
+              <span className="hidden items-center gap-2 sm:inline-flex">
                 <ChevronRightIcon className="size-3 text-border" />
                 <span className="flex items-center gap-1.5">
                   <span className={`rounded-xs px-1 py-0.5 text-xs ${currentStyles.bg} ${currentStyles.text}`}>
@@ -536,7 +537,7 @@ export function CallPage(): JSX.Element {
                   </span>
                   <span className="max-w-40 truncate font-medium text-foreground">{currentBreadcrumbName}</span>
                 </span>
-              </>
+              </span>
             );
           })()}
         </div>
@@ -575,7 +576,7 @@ export function CallPage(): JSX.Element {
       </div>
 
       {/* Quick Stats Row - Always visible */}
-      <div className="mb-6 grid grid-cols-4 gap-4">
+      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="rounded-xs bg-amber-500/10 p-2">
@@ -674,7 +675,7 @@ export function CallPage(): JSX.Element {
 
               {/* Internal tx details - subtle inline display */}
               <div className="border-t border-border px-4 py-2 text-center">
-                <div className="inline-flex items-center gap-2">
+                <div className="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
                   <span
                     className={`rounded-xs px-1.5 py-0.5 text-xs font-medium ${callTypeStyles.bg} ${callTypeStyles.text}`}
                   >
@@ -706,9 +707,9 @@ export function CallPage(): JSX.Element {
                   {currentFrame.function_selector &&
                     functionSignatures[currentFrame.function_selector.toLowerCase()]?.name && (
                       <>
-                        <span className="text-muted">•</span>
+                        <span className="hidden text-muted sm:inline">•</span>
                         <span className="text-xs text-muted">fn </span>
-                        <code className="font-mono text-xs text-muted">
+                        <code className="truncate font-mono text-xs text-muted">
                           {functionSignatures[currentFrame.function_selector.toLowerCase()]?.name}
                         </code>
                       </>
@@ -748,7 +749,7 @@ export function CallPage(): JSX.Element {
           {/* Opcodes Tab */}
           <HeadlessTab.Panel>
             {/* Opcode Categories */}
-            <div className="mb-6 grid grid-cols-2 gap-6">
+            <div className="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
               <CategoryPieChart
                 data={opcodeCategoryData}
                 colorMap={CATEGORY_COLORS}

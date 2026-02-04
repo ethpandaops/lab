@@ -34,7 +34,11 @@ export const Route = createFileRoute('/ethereum/execution/gas-profiler/block/$bl
       },
       {
         property: 'og:image',
-        content: `${import.meta.env.VITE_BASE_URL}/images/ethereum/execution/gas-profiler.png`,
+        content: `${import.meta.env.VITE_BASE_URL}/images/ethereum/gas-profiling.png`,
+      },
+      {
+        name: 'twitter:image',
+        content: `${import.meta.env.VITE_BASE_URL}/images/ethereum/gas-profiling.png`,
       },
     ],
   }),

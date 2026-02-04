@@ -685,7 +685,7 @@ export function HomePage(): JSX.Element {
             value={searchInput}
             onChange={e => setSearchInput(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder="Search by transaction hash (0x...) or block number"
+            placeholder="Tx hash or block number"
           />
           <Input.Trailing type="button">
             <Button size="sm" onClick={handleSearch}>
@@ -705,16 +705,23 @@ export function HomePage(): JSX.Element {
         onLoadNext={handleLoadNewerBlocks}
         hasPreviousItems={hasOlderBlocks}
         hasNextItems={!isAtLatest}
-        renderItemWrapper={(item, _index, children) => (
-          <Link
-            key={item.id}
-            to="/ethereum/execution/gas-profiler/block/$blockNumber"
-            params={{ blockNumber: String(item.id) }}
-            className="group relative flex-1"
-          >
-            {children}
-          </Link>
-        )}
+        renderItemWrapper={(item, index, children) => {
+          const fromEnd = recentBlockItems.length - 1 - index;
+          return (
+            <Link
+              key={item.id}
+              to="/ethereum/execution/gas-profiler/block/$blockNumber"
+              params={{ blockNumber: String(item.id) }}
+              className={clsx(
+                'group relative flex-1',
+                fromEnd >= 3 && 'hidden lg:block',
+                fromEnd >= 1 && fromEnd < 3 && 'hidden sm:block'
+              )}
+            >
+              {children}
+            </Link>
+          );
+        }}
       />
 
       {/* ============================================================================
@@ -764,7 +771,7 @@ export function HomePage(): JSX.Element {
       </div>
 
       {/* Time Series Charts Row */}
-      <div className="mb-6 grid grid-cols-2 gap-6">
+      <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Opcodes Per Second */}
         <PopoutCard
           title="Opcodes Per Second"

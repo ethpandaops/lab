@@ -501,7 +501,7 @@ export function OpcodeAnalysis({
     <div className="space-y-6">
       {/* Two charts side by side */}
       {showCharts && (
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <PopoutCard title="Opcodes by Gas" subtitle="Top opcodes by gas consumption">
             {({ inModal }) => (
               <OpcodeByGasChart opcodeStats={opcodeStats} maxOpcodes={maxOpcodes} minHeight={inModal ? 400 : 280} />
