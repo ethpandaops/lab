@@ -108,47 +108,91 @@ function defaultFormatter(value: number): string {
  */
 export function GasFormula({ segments, result, formatter = defaultFormatter }: GasFormulaProps): JSX.Element {
   return (
-    <div className="flex items-center justify-center gap-2">
-      {segments.map((segment, index) => {
-        const colorClasses = getColorClasses(segment.color);
-        const valueColor = getValueColor(segment.color);
+    <>
+      {/* Mobile: vertical stacked layout */}
+      <div className="space-y-1.5 sm:hidden">
+        {segments.map((segment, index) => {
+          const colorClasses = getColorClasses(segment.color);
+          const valueColor = getValueColor(segment.color);
 
-        return (
-          <div key={`segment-${index}`} className="contents">
-            {/* Operator (if not first segment) */}
-            {segment.operator && (
-              <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-background text-lg font-medium text-muted">
-                {segment.operator === '-' ? '−' : '+'}
-              </div>
-            )}
-
-            {/* Segment box */}
+          return (
             <div
-              className={`flex-1 rounded-sm border ${colorClasses.border} ${colorClasses.bg} px-3 py-2.5 text-center`}
+              key={`mobile-segment-${index}`}
+              className={`flex items-center justify-between rounded-xs border-l-2 ${colorClasses.border} ${colorClasses.bg} px-3 py-2`}
             >
-              <div className={`flex items-center justify-center gap-1 text-xs ${colorClasses.text}`}>
-                {segment.label}
+              <div className="flex items-center gap-2">
+                {segment.operator ? (
+                  <span className="w-4 text-center text-sm font-medium text-muted">
+                    {segment.operator === '-' ? '−' : '+'}
+                  </span>
+                ) : (
+                  <span className="w-4" />
+                )}
+                <span className={`text-xs font-medium ${colorClasses.text}`}>{segment.label}</span>
                 {segment.tooltip}
               </div>
-              <div className={`font-mono text-xl font-semibold ${valueColor}`}>{formatter(segment.value)}</div>
+              <span className={`font-mono text-sm font-semibold ${valueColor}`}>{formatter(segment.value)}</span>
             </div>
+          );
+        })}
+
+        {/* Divider */}
+        <div className="border-t border-border" />
+
+        {/* Result row */}
+        <div className="flex items-center justify-between rounded-xs border-l-2 border-primary/40 bg-primary/5 px-3 py-2.5">
+          <div className="flex items-center gap-2">
+            <span className="w-4 text-center text-sm font-bold text-primary">=</span>
+            <span className="text-xs font-medium text-primary">{result.label}</span>
+            {result.tooltip}
           </div>
-        );
-      })}
-
-      {/* Equals sign */}
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-primary/50 bg-primary/10 text-lg font-bold text-primary">
-        =
-      </div>
-
-      {/* Result box */}
-      <div className="flex-1 rounded-sm border-2 border-primary/40 bg-primary/5 px-3 py-2.5 text-center">
-        <div className="flex items-center justify-center gap-1 text-xs text-primary">
-          {result.label}
-          {result.tooltip}
+          <span className="font-mono text-sm font-semibold text-foreground">{formatter(result.value)}</span>
         </div>
-        <div className="font-mono text-xl font-semibold text-foreground">{formatter(result.value)}</div>
       </div>
-    </div>
+
+      {/* Desktop: horizontal formula layout */}
+      <div className="hidden sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-2">
+        {segments.map((segment, index) => {
+          const colorClasses = getColorClasses(segment.color);
+          const valueColor = getValueColor(segment.color);
+
+          return (
+            <div key={`segment-${index}`} className="contents">
+              {/* Operator (if not first segment) */}
+              {segment.operator && (
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-background text-lg font-medium text-muted">
+                  {segment.operator === '-' ? '−' : '+'}
+                </div>
+              )}
+
+              {/* Segment box */}
+              <div
+                className={`min-w-0 flex-1 basis-24 rounded-sm border ${colorClasses.border} ${colorClasses.bg} px-3 py-2.5 text-center`}
+              >
+                <div className={`flex items-center justify-center gap-1 text-xs ${colorClasses.text}`}>
+                  {segment.label}
+                  {segment.tooltip}
+                </div>
+                <div className={`font-mono text-xl font-semibold ${valueColor}`}>{formatter(segment.value)}</div>
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Equals sign */}
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-primary/50 bg-primary/10 text-lg font-bold text-primary">
+          =
+        </div>
+
+        {/* Result box */}
+        <div className="min-w-0 flex-1 basis-24 rounded-sm border-2 border-primary/40 bg-primary/5 px-3 py-2.5 text-center">
+          <div className="flex items-center justify-center gap-1 text-xs text-primary">
+            {result.label}
+            {result.tooltip}
+          </div>
+          <div className="font-mono text-xl font-semibold text-foreground">{formatter(result.value)}</div>
+        </div>
+      </div>
+    </>
   );
 }

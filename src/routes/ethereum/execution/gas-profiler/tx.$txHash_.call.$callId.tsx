@@ -13,6 +13,14 @@ export const Route = createFileRoute('/ethereum/execution/gas-profiler/tx/$txHas
     meta: [
       { title: `Call Details | ${import.meta.env.VITE_BASE_TITLE}` },
       { name: 'description', content: 'Detailed gas analysis for a specific call' },
+      {
+        property: 'og:image',
+        content: `${import.meta.env.VITE_BASE_URL}/images/ethereum/gas-profiling.png`,
+      },
+      {
+        name: 'twitter:image',
+        content: `${import.meta.env.VITE_BASE_URL}/images/ethereum/gas-profiling.png`,
+      },
     ],
   }),
 });
