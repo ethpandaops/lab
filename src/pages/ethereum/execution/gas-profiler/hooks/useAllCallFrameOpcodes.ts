@@ -23,8 +23,8 @@ export type AllCallFrameOpcodesMap = Map<number, CallFrameOpcodeData[]>;
 export interface UseAllCallFrameOpcodesOptions {
   /** Transaction hash to fetch data for */
   transactionHash: string | null;
-  /** Block number for efficient API queries (uses partition key) */
-  blockNumber?: number | null;
+  /** Block number for efficient API queries (matches primary key prefix) */
+  blockNumber: number | null;
   /** Whether to enable the query (use for toggle) */
   enabled?: boolean;
 }
@@ -58,8 +58,7 @@ export function useAllCallFrameOpcodes({
         {
           query: {
             transaction_hash_eq: transactionHash!,
-            // Include block_number for efficient partition-based filtering with FINAL
-            ...(blockNumber ? { block_number_eq: blockNumber } : {}),
+            block_number_eq: blockNumber!,
             order_by: 'gas DESC',
             page_size: 10000,
           },
@@ -67,7 +66,7 @@ export function useAllCallFrameOpcodes({
         'int_transaction_call_frame_opcode_gas',
         signal
       ),
-    enabled: !!currentNetwork && !!transactionHash && enabled,
+    enabled: !!currentNetwork && !!transactionHash && !!blockNumber && enabled,
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 

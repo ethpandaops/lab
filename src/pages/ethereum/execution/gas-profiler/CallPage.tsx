@@ -86,21 +86,24 @@ export function CallPage(): JSX.Element {
   const [copied, setCopied] = useState(false);
 
   // Fetch all transaction data
-  // Pass blockNumber from URL search params for efficient partition-based filtering
+  // Requires blockFromSearch to match ClickHouse primary key prefix for efficient queries
   const {
     data: txData,
     isLoading,
     error,
   } = useTransactionGasData({
-    transactionHash: txHash,
+    transactionHash: blockFromSearch ? txHash : null,
     blockNumber: blockFromSearch,
   });
 
+  // Resolve block number: prefer API response (source of truth), fall back to URL param
+  const blockNumber = txData?.metadata.blockNumber ?? blockFromSearch ?? null;
+
   // Fetch all opcode data for badge stats on call trace
+  // Requires blockNumber to match ClickHouse primary key prefix for efficient queries
   const { data: opcodeMap } = useAllCallFrameOpcodes({
-    transactionHash: txHash,
-    blockNumber: blockFromSearch,
-    enabled: true,
+    transactionHash: blockFromSearch ? txHash : null,
+    blockNumber,
   });
 
   // Derive badge stats from full opcode data (SSTORE, SLOAD, LOG*, CREATE*, SELFDESTRUCT)
@@ -157,9 +160,6 @@ export function CallPage(): JSX.Element {
 
     return statsMap;
   }, [opcodeMap]);
-
-  // Block number: prefer from response (source of truth), fall back to URL param
-  const blockNumber = txData?.metadata.blockNumber ?? blockFromSearch ?? null;
 
   // Fetch frame-specific opcodes (only when we have blockNumber)
   const { data: frameOpcodes, isLoading: frameOpcodesLoading } = useFrameOpcodes({
@@ -311,6 +311,29 @@ export function CallPage(): JSX.Element {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [getTabIndexFromHash]);
+
+  // Missing block context (direct URL access without ?block= param)
+  if (!blockFromSearch) {
+    return (
+      <Container>
+        <Header title="Internal Tx Details" description="Internal tx gas analysis" />
+        <Alert
+          variant="warning"
+          title="Block context required"
+          description="This transaction link is missing block context. Please search for the transaction through the gas profiler to load it efficiently."
+        />
+        <div className="mt-4">
+          <Link
+            to="/ethereum/execution/gas-profiler"
+            className="flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
+          >
+            <ArrowLeftIcon className="size-4" />
+            Back to Gas Profiler
+          </Link>
+        </div>
+      </Container>
+    );
+  }
 
   // Loading state
   if (isLoading) {

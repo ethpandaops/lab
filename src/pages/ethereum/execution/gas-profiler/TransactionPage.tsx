@@ -86,22 +86,25 @@ export function TransactionPage(): JSX.Element {
   } | null>(null);
 
   // Fetch transaction data by tx hash
-  // Pass blockNumber from URL search params for efficient partition-based filtering
+  // Requires blockFromSearch to match ClickHouse primary key prefix for efficient queries
   const {
     data: txData,
     isLoading,
     error,
   } = useTransactionGasData({
-    transactionHash: txHash,
+    transactionHash: blockFromSearch ? txHash : null,
     blockNumber: blockFromSearch,
   });
 
+  // Resolve block number: prefer API response (source of truth), fall back to URL param
+  const blockNumber = txData?.metadata.blockNumber ?? blockFromSearch ?? null;
+
   // Fetch all opcode data - used for both flame graph visualization AND badge stats
   // Single fetch instead of separate calls for badges vs flame graph
+  // Requires blockNumber to match ClickHouse primary key prefix for efficient queries
   const { data: opcodeMap, isLoading: isLoadingOpcodes } = useAllCallFrameOpcodes({
-    transactionHash: txHash,
-    blockNumber: blockFromSearch,
-    enabled: true, // Always fetch - eliminates duplicate API call for badge data
+    transactionHash: blockFromSearch ? txHash : null,
+    blockNumber,
   });
 
   // Derive badge stats from full opcode data (SSTORE, SLOAD, LOG*, CREATE*, SELFDESTRUCT)
@@ -164,9 +167,6 @@ export function TransactionPage(): JSX.Element {
 
   // Get theme colors for charts
   const colors = useThemeColors();
-
-  // Block number: prefer from response (source of truth), fall back to URL param
-  const blockNumber = txData?.metadata.blockNumber ?? blockFromSearch ?? null;
 
   // Get contract owners from txData for name lookup (memoized to avoid dependency issues)
   const contractOwners = useMemo(() => txData?.contractOwners ?? {}, [txData?.contractOwners]);
@@ -640,6 +640,29 @@ export function TransactionPage(): JSX.Element {
       },
     };
   }, [contractTree, totalEvmGas, colors]);
+
+  // Missing block context (direct URL access without ?block= param)
+  if (!blockFromSearch) {
+    return (
+      <Container>
+        <Header title={`TX ${txHash.slice(0, 10)}...${txHash.slice(-8)}`} description="Transaction gas analysis" />
+        <Alert
+          variant="warning"
+          title="Block context required"
+          description="This transaction link is missing block context. Please search for the transaction through the gas profiler to load it efficiently."
+        />
+        <div className="mt-4">
+          <Link
+            to="/ethereum/execution/gas-profiler"
+            className="flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
+          >
+            <ArrowLeftIcon className="size-4" />
+            Back to Gas Profiler
+          </Link>
+        </div>
+      </Container>
+    );
+  }
 
   // Loading state
   if (isLoading) {

@@ -67,8 +67,10 @@ export function TransactionRow({
   const navigate = useNavigate();
 
   // Fetch full transaction data when expanded
+  // Always pass blockNumber to match ClickHouse primary key prefix for efficient queries
   const { data: txData, isLoading: txLoading } = useTransactionGasData({
     transactionHash: isExpanded ? transaction.transactionHash : null,
+    blockNumber,
   });
 
   // Navigate to call page when a frame is clicked

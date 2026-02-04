@@ -52,7 +52,7 @@ export interface TransactionGasData {
 export interface UseTransactionGasDataOptions {
   /** Transaction hash to fetch data for */
   transactionHash: string | null;
-  /** Block number for efficient API queries (uses partition key) */
+  /** Block number for efficient API queries (matches primary key prefix). Should always be provided when known. */
   blockNumber?: number | null;
 }
 
@@ -299,7 +299,6 @@ export function useTransactionGasData({
             {
               query: {
                 transaction_hash_eq: transactionHash!,
-                // Include block_number for efficient partition-based filtering with FINAL
                 ...(blockNumber ? { block_number_eq: blockNumber } : {}),
                 order_by: 'call_frame_id ASC',
                 page_size: 10000,
@@ -319,7 +318,6 @@ export function useTransactionGasData({
             {
               query: {
                 transaction_hash_eq: transactionHash!,
-                // Include block_number for efficient partition-based filtering with FINAL
                 ...(blockNumber ? { block_number_eq: blockNumber } : {}),
                 order_by: 'gas DESC',
                 page_size: 10000,
