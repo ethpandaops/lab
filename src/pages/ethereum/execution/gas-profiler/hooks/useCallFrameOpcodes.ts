@@ -77,7 +77,7 @@ export function useCallFrameOpcodes({
 
       return breakdown;
     },
-    enabled: enabled && !!currentNetwork && !!transactionHash && !!blockNumber && callFrameId > 0,
+    enabled: enabled && !!currentNetwork && !!transactionHash && !!blockNumber && callFrameId >= 0,
   });
 
   return {

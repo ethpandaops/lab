@@ -379,7 +379,13 @@ export function CallPage(): JSX.Element {
     );
   }
 
-  const callTypeStyles = getCallTypeStyles(currentFrame.call_type ?? 'CALL');
+  // Detect contract creation
+  // 1. New data: call_type = 'CREATE' (from transformation)
+  // 2. Old data fallback: root frame (depth 0) with no target_address and no call_type
+  const isContractCreation = currentFrame.call_type === 'CREATE' ||
+    (!currentFrame.target_address && !currentFrame.call_type && currentFrame.depth === 0);
+  const effectiveCallType = isContractCreation ? 'CREATE' : (currentFrame.call_type || 'CALL');
+  const callTypeStyles = getCallTypeStyles(effectiveCallType);
   const selfGas = currentFrame.gas ?? 0;
   const cumulativeGas = currentFrame.gas_cumulative ?? 0;
 
@@ -430,13 +436,16 @@ export function CallPage(): JSX.Element {
                       </Link>
                       {breadcrumbPath.map((frame, index) => {
                         const isLast = index === breadcrumbPath.length - 1;
-                        const frameStyles = getCallTypeStyles(frame.call_type ?? 'CALL');
+                        // Detect contract creation for this frame
+                        const frameIsContractCreation = !frame.target_address && frame.depth === 0;
+                        const frameCallType = frameIsContractCreation ? 'CREATE' : (frame.call_type || 'CALL');
+                        const frameStyles = getCallTypeStyles(frameCallType);
                         const frameName = getCallLabel(
                           frame.target_address,
                           frame.function_selector,
                           contractOwners,
                           functionSignatures,
-                          'Unknown'
+                          frameIsContractCreation ? 'Contract Creation' : 'Unknown'
                         );
                         return isLast ? (
                           <div
@@ -444,7 +453,7 @@ export function CallPage(): JSX.Element {
                             className="flex items-center gap-2 rounded-xs bg-primary/10 px-2 py-1"
                           >
                             <span className={`rounded-xs px-1 py-0.5 text-xs ${frameStyles.bg} ${frameStyles.text}`}>
-                              {frame.call_type}
+                              {frameCallType}
                             </span>
                             <span className="truncate text-foreground">{frameName}</span>
                             <span className="ml-auto text-muted">d{frame.depth}</span>
@@ -458,7 +467,7 @@ export function CallPage(): JSX.Element {
                             className="flex items-center gap-2 rounded-xs px-2 py-1 text-muted hover:bg-surface hover:text-foreground"
                           >
                             <span className={`rounded-xs px-1 py-0.5 text-xs ${frameStyles.bg} ${frameStyles.text}`}>
-                              {frame.call_type}
+                              {frameCallType}
                             </span>
                             <span className="truncate">{frameName}</span>
                             <span className="ml-auto">d{frame.depth}</span>
@@ -477,13 +486,15 @@ export function CallPage(): JSX.Element {
               <ChevronRightIcon className="size-3 text-border" />
               {(() => {
                 const parent = breadcrumbPath[breadcrumbPath.length - 2];
-                const parentStyles = getCallTypeStyles(parent.call_type ?? 'CALL');
+                const parentIsContractCreation = !parent.target_address && parent.depth === 0;
+                const parentCallType = parentIsContractCreation ? 'CREATE' : (parent.call_type || 'CALL');
+                const parentStyles = getCallTypeStyles(parentCallType);
                 const parentName = getCallLabel(
                   parent.target_address,
                   parent.function_selector,
                   contractOwners,
                   functionSignatures,
-                  'Unknown'
+                  parentIsContractCreation ? 'Contract Creation' : 'Unknown'
                 );
                 return (
                   <Link
@@ -493,7 +504,7 @@ export function CallPage(): JSX.Element {
                     className="flex items-center gap-1.5 text-muted hover:text-foreground"
                   >
                     <span className={`rounded-xs px-1 py-0.5 text-xs ${parentStyles.bg} ${parentStyles.text}`}>
-                      {parent.call_type}
+                      {parentCallType}
                     </span>
                     <span className="max-w-32 truncate">{parentName}</span>
                   </Link>
@@ -505,20 +516,22 @@ export function CallPage(): JSX.Element {
           {(() => {
             const current = breadcrumbPath[breadcrumbPath.length - 1];
             if (!current) return null;
-            const currentStyles = getCallTypeStyles(current.call_type ?? 'CALL');
+            const currentIsContractCreation = !current.target_address && current.depth === 0;
+            const currentCallType = currentIsContractCreation ? 'CREATE' : (current.call_type || 'CALL');
+            const currentStyles = getCallTypeStyles(currentCallType);
             const currentBreadcrumbName = getCallLabel(
               current.target_address,
               current.function_selector,
               contractOwners,
               functionSignatures,
-              'Unknown'
+              currentIsContractCreation ? 'Contract Creation' : 'Unknown'
             );
             return (
               <>
                 <ChevronRightIcon className="size-3 text-border" />
                 <span className="flex items-center gap-1.5">
                   <span className={`rounded-xs px-1 py-0.5 text-xs ${currentStyles.bg} ${currentStyles.text}`}>
-                    {current.call_type}
+                    {currentCallType}
                   </span>
                   <span className="max-w-40 truncate font-medium text-foreground">{currentBreadcrumbName}</span>
                 </span>
@@ -664,9 +677,9 @@ export function CallPage(): JSX.Element {
                   <span
                     className={`rounded-xs px-1.5 py-0.5 text-xs font-medium ${callTypeStyles.bg} ${callTypeStyles.text}`}
                   >
-                    {currentFrame.call_type ?? 'CALL'}
+                    {effectiveCallType}
                   </span>
-                  {currentFrame.target_address && (
+                  {currentFrame.target_address ? (
                     <>
                       {contractOwners[currentFrame.target_address.toLowerCase()]?.contract_name ? (
                         <span className="text-xs text-muted">
@@ -686,7 +699,9 @@ export function CallPage(): JSX.Element {
                       </button>
                       {copied && <span className="text-xs text-success">Copied!</span>}
                     </>
-                  )}
+                  ) : isContractCreation ? (
+                    <span className="text-xs text-muted">Contract Creation</span>
+                  ) : null}
                   {currentFrame.function_selector &&
                     functionSignatures[currentFrame.function_selector.toLowerCase()]?.name && (
                       <>
