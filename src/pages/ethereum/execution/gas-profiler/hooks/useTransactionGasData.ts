@@ -137,6 +137,15 @@ function buildCallTree(
 
   // First pass: create all nodes
   for (const frame of frames) {
+    // Detect contract creation:
+    // 1. New data: call_type = 'CREATE' (from transformation)
+    // 2. Old data fallback: root frame (depth 0) with no target_address
+    const isContractCreation =
+      frame.call_type === 'CREATE' ||
+      (!frame.target_address &&
+        !frame.call_type &&
+        (frame.depth === 0 || frame.depth === null || frame.depth === undefined));
+
     // Look up contract name from dim_contract_owner
     const owner = frame.target_address ? contractOwners[frame.target_address.toLowerCase()] : undefined;
     const targetName = owner?.contract_name ?? null;
@@ -147,14 +156,25 @@ function buildCallTree(
     const functionName = functionSig?.name ?? null;
 
     // Build label: prioritize function name > contract name > truncated address
-    const label = getCallLabel(frame.target_address, functionSelector, contractOwners, functionSignatures);
+    // For contract creation without target_address, use 'CREATE' as the fallback
+    const fallbackLabel = isContractCreation && !frame.target_address ? 'CREATE' : 'Root';
+    const label = getCallLabel(
+      frame.target_address,
+      functionSelector,
+      contractOwners,
+      functionSignatures,
+      fallbackLabel
+    );
+
+    // For contract creation, ensure call type is 'CREATE'
+    const effectiveCallType = isContractCreation ? 'CREATE' : frame.call_type || 'CALL';
 
     const node: CallTreeNode = {
       id: String(frame.call_frame_id ?? 0),
       label,
       value: frame.gas_cumulative ?? 0,
       selfValue: frame.gas ?? 0,
-      category: frame.call_type ?? 'CALL',
+      category: effectiveCallType,
       hasError: (frame.error_count ?? 0) > 0,
       children: [],
       metadata: {
@@ -163,7 +183,7 @@ function buildCallTree(
         targetName,
         functionSelector,
         functionName,
-        callType: frame.call_type ?? 'CALL',
+        callType: effectiveCallType,
         depth: frame.depth ?? 0,
         opcodeCount: frame.opcode_count ?? 0,
         gasRefund: frame.gas_refund ?? null,
@@ -239,6 +259,11 @@ function extractMetadata(frames: IntTransactionCallFrame[]): TransactionMetadata
   const hasErrors = frames.some(f => (f.error_count ?? 0) > 0);
   const maxDepth = Math.max(...frames.map(f => f.depth ?? 0));
 
+  // Detect contract creation:
+  // 1. New data: call_type = 'CREATE' (from transformation)
+  // 2. Old data fallback: root frame with no target_address and no call_type
+  const isContractCreation = rootFrame?.call_type === 'CREATE' || (!rootFrame?.target_address && !rootFrame?.call_type);
+
   return {
     transactionHash: firstFrame?.transaction_hash ?? '',
     blockNumber: firstFrame?.block_number ?? 0,
@@ -250,6 +275,7 @@ function extractMetadata(frames: IntTransactionCallFrame[]): TransactionMetadata
     gasRefund: gasRefund ?? 0,
     frameCount: frames.length,
     maxDepth,
+    isContractCreation,
   };
 }
 

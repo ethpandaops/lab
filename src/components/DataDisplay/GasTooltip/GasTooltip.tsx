@@ -33,18 +33,26 @@ export function GasTooltip({
   size = 'sm',
   className,
   capPercent,
+  isContractCreation,
 }: GasTooltipProps): JSX.Element {
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const explanations = getGasExplanations(context);
 
-  // Get base explanation and override refund description if capPercent is provided
+  // Get base explanation and override based on context
   let explanation = explanations[type];
   if (type === 'refund' && capPercent) {
     explanation = {
       ...explanation,
       description: `Gas returned for storage cleanup operations (SSTORE setting to zero). Capped at ${capPercent} of total gas used.`,
+    };
+  }
+  if (type === 'intrinsic' && isContractCreation) {
+    explanation = {
+      ...explanation,
+      description:
+        'Base transaction cost charged before execution. Includes: 21,000 base + 32,000 contract creation + calldata cost (4 gas per zero byte, 16 per non-zero) + access list cost. For failed transactions, this may be unavailable.',
     };
   }
 

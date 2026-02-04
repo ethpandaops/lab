@@ -24,6 +24,8 @@ export interface GasTooltipProps {
   className?: string;
   /** Cap percentage for refund tooltip (e.g., "20%" or "50%") - used for fork-aware display */
   capPercent?: string;
+  /** Whether this is a contract creation transaction - affects intrinsic gas explanation */
+  isContractCreation?: boolean;
 }
 
 /**

@@ -83,10 +83,14 @@ function flattenTree(
   ];
 
   if (node.children && node.children.length > 0) {
-    let childStart = startPercent;
+    // Accumulate child values as integers (exact addition) rather than
+    // floating point percentages to avoid accumulation errors that cause
+    // children to visually overflow their parent's width.
+    let cumulativeChildValue = 0;
     for (const child of node.children) {
+      const childStart = startPercent + (cumulativeChildValue / rootValue) * 100;
       result.push(...flattenTree(child, rootValue, depth + 1, childStart, node));
-      childStart += (child.value / rootValue) * 100;
+      cumulativeChildValue += child.value;
     }
   }
 
@@ -495,7 +499,7 @@ export function FlameGraph({
           {rows.map((row, rowIndex) => (
             <div
               key={rowIndex}
-              className="relative flex w-full"
+              className="relative flex w-full overflow-hidden"
               style={{ height: rowHeight, marginTop: rowIndex > 0 ? 1 : 0 }}
             >
               {row.map(flatNode => {

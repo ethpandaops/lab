@@ -294,6 +294,12 @@ function TraceRow({
     onHighlightChange({ address: null, functionSelector: null });
   }, [onHighlightChange]);
 
+  // Detect contract creation - must be before hooks that use it
+  // 1. New data: call_type = 'CREATE' (from transformation)
+  // 2. Old data fallback: root frame (depth 0) with no target_address and no call_type
+  const isContractCreation =
+    frame.call_type === 'CREATE' || (!frame.target_address && !frame.call_type && frame.depth === 0);
+
   const callTypeStyles = getCallTypeStyles(frame.call_type ?? 'CALL');
   // Show cumulative gas (self + children) like Phalcon does
   const cumulativeGas = frame.gas_cumulative ?? 0;
@@ -304,7 +310,7 @@ function TraceRow({
     blockNumber,
     transactionHash: txHash,
     callFrameId: callId,
-    enabled: isOpcodeExpanded && !!frame.call_type, // Only fetch when expanded and has call_type
+    enabled: isOpcodeExpanded && (!!frame.call_type || isContractCreation), // Fetch for calls and contract creation
   });
 
   const handleOpcodeToggle = useCallback(
@@ -331,7 +337,8 @@ function TraceRow({
   }, [depth, isLast, ancestors]);
 
   const handleClick = useCallback(() => {
-    if (frame.call_type) {
+    // Navigate for regular calls or contract creation
+    if (frame.call_type || isContractCreation) {
       // Close any open opcode breakdown before navigating
       onCloseOpcodeBreakdown();
       // Navigate to call page
@@ -341,7 +348,7 @@ function TraceRow({
         search: blockNumber ? { block: blockNumber } : {},
       });
     }
-  }, [navigate, txHash, callId, blockNumber, frame.call_type, onCloseOpcodeBreakdown]);
+  }, [navigate, txHash, callId, blockNumber, frame.call_type, isContractCreation, onCloseOpcodeBreakdown]);
 
   const handleToggle = useCallback(
     (e: React.MouseEvent) => {
@@ -355,14 +362,18 @@ function TraceRow({
   const displayLabel =
     node.functionName ||
     node.contractName ||
-    (frame.target_address ? `${frame.target_address.slice(0, 10)}...${frame.target_address.slice(-8)}` : 'Unknown');
+    (frame.target_address
+      ? `${frame.target_address.slice(0, 10)}...${frame.target_address.slice(-8)}`
+      : isContractCreation
+        ? 'Contract Creation'
+        : 'Unknown');
 
   return (
     <>
       <div
         className={clsx(
           'group flex items-center gap-2 border-b border-border/30 px-3 py-1.5 font-mono text-sm',
-          frame.call_type && 'cursor-pointer hover:bg-surface/50',
+          (frame.call_type || isContractCreation) && 'cursor-pointer hover:bg-surface/50',
           hasError && 'bg-danger/5'
         )}
         onClick={handleClick}
@@ -386,15 +397,15 @@ function TraceRow({
         <span className="w-4 shrink-0 text-xs text-muted">{depth}</span>
 
         {/* Call type badge */}
-        {frame.call_type && (
+        {(frame.call_type || isContractCreation) && (
           <span
             className={clsx(
               'shrink-0 rounded-xs px-1.5 py-0.5 text-xs font-medium',
-              callTypeStyles.bg,
-              callTypeStyles.text
+              isContractCreation ? 'bg-orange-500/20 text-orange-400' : callTypeStyles.bg,
+              isContractCreation ? '' : callTypeStyles.text
             )}
           >
-            {frame.call_type}
+            {isContractCreation ? 'CREATE' : frame.call_type}
           </span>
         )}
 

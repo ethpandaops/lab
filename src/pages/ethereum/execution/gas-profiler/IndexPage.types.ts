@@ -81,6 +81,8 @@ export interface TransactionMetadata {
   gasRefund: number;
   frameCount: number;
   maxDepth: number;
+  /** Whether this is a contract creation transaction (CREATE) */
+  isContractCreation: boolean;
 }
 
 /**

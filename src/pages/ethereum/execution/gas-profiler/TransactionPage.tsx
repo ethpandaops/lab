@@ -174,6 +174,20 @@ export function TransactionPage(): JSX.Element {
   // Get function signatures from txData for method name lookup
   const functionSignatures = useMemo(() => txData?.functionSignatures ?? {}, [txData?.functionSignatures]);
 
+  // Calculate code deposit gas for CREATE transactions
+  // Code deposit = EVM gas - sum of all opcode gas (the difference is bytecode storage cost)
+  const codeDepositGas = useMemo(() => {
+    if (!txData?.metadata.isContractCreation || !opcodeMap) return 0;
+
+    // Sum all opcode gas for the root frame (call_frame_id = 0)
+    const rootOpcodes = opcodeMap.get(0) ?? [];
+    const totalOpcodeGas = rootOpcodes.reduce((sum, op) => sum + op.gas, 0);
+
+    // Code deposit is the difference between total EVM gas and opcode gas
+    const codeDeposit = txData.metadata.evmGasUsed - totalOpcodeGas;
+    return codeDeposit > 0 ? codeDeposit : 0;
+  }, [txData?.metadata.isContractCreation, txData?.metadata.evmGasUsed, opcodeMap]);
+
   // Contract gas node type (for aggregated contract view, not call tree)
   interface ContractGasNode {
     address: string;
@@ -795,7 +809,7 @@ export function TransactionPage(): JSX.Element {
       <HeadlessTab.Group selectedIndex={selectedTabIndex} onChange={setSelectedTabIndex}>
         <HeadlessTab.List className="mb-6 flex gap-1 border-b border-border">
           <Tab hash="overview">Overview</Tab>
-          {!isSimpleTransfer && callTypeChartData.length > 0 && <Tab hash="trace">Trace</Tab>}
+          {!isSimpleTransfer && <Tab hash="trace">Trace</Tab>}
           {!isSimpleTransfer && <Tab hash="opcodes">Opcodes</Tab>}
           {!isSimpleTransfer && callTypeChartData.length > 0 && <Tab hash="calls">Internal Txs</Tab>}
         </HeadlessTab.List>
@@ -819,7 +833,14 @@ export function TransactionPage(): JSX.Element {
                       label: 'Intrinsic',
                       value: metadata.intrinsicGas ?? 0,
                       color: 'blue',
-                      tooltip: <GasTooltip type="intrinsic" context="transaction" size="md" />,
+                      tooltip: (
+                        <GasTooltip
+                          type="intrinsic"
+                          context="transaction"
+                          size="md"
+                          isContractCreation={metadata.isContractCreation}
+                        />
+                      ),
                     },
                     {
                       label: 'EVM Execution',
@@ -901,14 +922,16 @@ export function TransactionPage(): JSX.Element {
                     onShowOpcodesChange={setShowOpcodes}
                     opcodeMap={opcodeMap}
                     isLoadingOpcodes={isLoadingOpcodes}
+                    isContractCreation={metadata.isContractCreation}
+                    codeDepositGas={codeDepositGas}
                   />
                 </div>
               )
             )}
           </HeadlessTab.Panel>
 
-          {/* Trace Tab - hierarchical execution tree view */}
-          {!isSimpleTransfer && callTypeChartData.length > 0 && (
+          {/* Trace Tab - hierarchical execution tree view (includes single-frame CREATE txs) */}
+          {!isSimpleTransfer && (
             <HeadlessTab.Panel>
               <CallTraceView
                 callFrames={txData.callFrames}
