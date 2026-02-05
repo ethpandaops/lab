@@ -86,13 +86,13 @@ export function CallPage(): JSX.Element {
   const [copied, setCopied] = useState(false);
 
   // Fetch all transaction data
-  // Requires blockFromSearch to match ClickHouse primary key prefix for efficient queries
+  // blockNumber is optional - ClickHouse projection p_by_transaction allows efficient tx hash lookups
   const {
     data: txData,
     isLoading,
     error,
   } = useTransactionGasData({
-    transactionHash: blockFromSearch ? txHash : null,
+    transactionHash: txHash,
     blockNumber: blockFromSearch,
   });
 
@@ -100,9 +100,9 @@ export function CallPage(): JSX.Element {
   const blockNumber = txData?.metadata.blockNumber ?? blockFromSearch ?? null;
 
   // Fetch all opcode data for badge stats on call trace
-  // Requires blockNumber to match ClickHouse primary key prefix for efficient queries
+  // blockNumber is optional - ClickHouse projection allows efficient tx hash lookups
   const { data: opcodeMap } = useAllCallFrameOpcodes({
-    transactionHash: blockFromSearch ? txHash : null,
+    transactionHash: txHash,
     blockNumber,
   });
 
@@ -311,29 +311,6 @@ export function CallPage(): JSX.Element {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [getTabIndexFromHash]);
-
-  // Missing block context (direct URL access without ?block= param)
-  if (!blockFromSearch) {
-    return (
-      <Container>
-        <Header title="Internal Tx Details" description="Internal tx gas analysis" />
-        <Alert
-          variant="warning"
-          title="Block context required"
-          description="This transaction link is missing block context. Please search for the transaction through the gas profiler to load it efficiently."
-        />
-        <div className="mt-4">
-          <Link
-            to="/ethereum/execution/gas-profiler"
-            className="flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
-          >
-            <ArrowLeftIcon className="size-4" />
-            Back to Gas Profiler
-          </Link>
-        </div>
-      </Container>
-    );
-  }
 
   // Loading state
   if (isLoading) {
