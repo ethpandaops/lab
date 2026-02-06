@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useQueries } from '@tanstack/react-query';
+import { useQuery, useQueries } from '@tanstack/react-query';
 import { intTransactionCallFrameServiceList, intTransactionOpcodeGasServiceList } from '@/api/sdk.gen';
 import type { IntTransactionCallFrame, IntTransactionOpcodeGas } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
@@ -52,7 +52,7 @@ export interface TransactionGasData {
 export interface UseTransactionGasDataOptions {
   /** Transaction hash to fetch data for */
   transactionHash: string | null;
-  /** Block number for efficient API queries (matches primary key prefix). Should always be provided when known. */
+  /** Block number for API queries. Optional - if not provided, will be resolved via a lightweight lookup to int_transaction_call_frame (which has a projection for efficient tx hash queries). */
   blockNumber?: number | null;
 }
 
@@ -284,10 +284,35 @@ function extractMetadata(frames: IntTransactionCallFrame[]): TransactionMetadata
  */
 export function useTransactionGasData({
   transactionHash,
-  blockNumber,
+  blockNumber: providedBlockNumber,
 }: UseTransactionGasDataOptions): UseTransactionGasDataResult {
   const { currentNetwork } = useNetwork();
 
+  // Step 1: If block number not provided, fetch it via a lightweight lookup
+  // int_transaction_call_frame has a projection (p_by_transaction) that allows efficient tx hash lookups
+  const blockLookupQuery = useQuery({
+    queryKey: ['gas-profiler', 'block-lookup', transactionHash],
+    queryFn: async ({ signal }) => {
+      const response = await intTransactionCallFrameServiceList({
+        query: {
+          transaction_hash_eq: transactionHash!,
+          page_size: 1,
+        },
+        signal,
+        throwOnError: true,
+      });
+      const items = response.data?.int_transaction_call_frame ?? [];
+      if (items.length === 0) return null;
+      return items[0].block_number ?? null;
+    },
+    enabled: !!currentNetwork && !!transactionHash && providedBlockNumber == null,
+    staleTime: Infinity, // Block number for a tx never changes
+  });
+
+  // Resolved block number: use provided or fetched
+  const blockNumber = providedBlockNumber ?? blockLookupQuery.data ?? null;
+
+  // Step 2: Fetch full data once we have block number
   const queries = useQueries({
     queries: [
       // Fetch call frames for the transaction
@@ -299,7 +324,7 @@ export function useTransactionGasData({
             {
               query: {
                 transaction_hash_eq: transactionHash!,
-                ...(blockNumber ? { block_number_eq: blockNumber } : {}),
+                block_number_eq: blockNumber!,
                 order_by: 'call_frame_id ASC',
                 page_size: 10000,
               },
@@ -307,7 +332,7 @@ export function useTransactionGasData({
             'int_transaction_call_frame',
             signal
           ),
-        enabled: !!currentNetwork && !!transactionHash,
+        enabled: !!currentNetwork && !!transactionHash && blockNumber != null,
       },
       // Fetch opcode gas data for the transaction
       {
@@ -318,7 +343,7 @@ export function useTransactionGasData({
             {
               query: {
                 transaction_hash_eq: transactionHash!,
-                ...(blockNumber ? { block_number_eq: blockNumber } : {}),
+                block_number_eq: blockNumber!,
                 order_by: 'gas DESC',
                 page_size: 10000,
               },
@@ -326,7 +351,7 @@ export function useTransactionGasData({
             'int_transaction_opcode_gas',
             signal
           ),
-        enabled: !!currentNetwork && !!transactionHash,
+        enabled: !!currentNetwork && !!transactionHash && blockNumber != null,
       },
     ],
   });
@@ -357,8 +382,9 @@ export function useTransactionGasData({
     enabled: functionSelectors.length > 0,
   });
 
-  const isLoading = queries.some(q => q.isLoading) || contractOwnersLoading || functionSignaturesLoading;
-  const error = queries.find(q => q.error)?.error as Error | null;
+  const isLoading =
+    blockLookupQuery.isLoading || queries.some(q => q.isLoading) || contractOwnersLoading || functionSignaturesLoading;
+  const error = blockLookupQuery.error ?? (queries.find(q => q.error)?.error as Error | null);
 
   const data = useMemo<TransactionGasData | null>(() => {
     if (isLoading || error) return null;

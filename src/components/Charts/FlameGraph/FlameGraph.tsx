@@ -161,6 +161,9 @@ export function FlameGraph({
   // Zoom state: track the path of zoomed node IDs (not objects, which become stale)
   const [zoomPathIds, setZoomPathIds] = useState<string[]>([]);
 
+  // Simple fade animation state for smooth zoom transitions
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
   // Find a node by ID in the tree
   const findNodeById = useCallback((node: FlameGraphNode | null, id: string): FlameGraphNode | null => {
     if (!node) return null;
@@ -293,6 +296,25 @@ export function FlameGraph({
     onNodeHover?.(null);
   }, [onNodeHover]);
 
+  // Helper to perform zoom with fade animation
+  const animateZoom = useCallback(
+    (newZoomPathIds: string[]) => {
+      if (isTransitioning) return;
+
+      setIsTransitioning(true);
+
+      // After fade out completes, update zoom and fade back in
+      setTimeout(() => {
+        setZoomPathIds(newZoomPathIds);
+        // Small delay before removing transition state to allow new content to render
+        requestAnimationFrame(() => {
+          setIsTransitioning(false);
+        });
+      }, 150); // Half of total transition time
+    },
+    [isTransitioning]
+  );
+
   // Handle click - zoom in if node has children, or call onNodeClick for leaf nodes
   const handleClick = useCallback(
     (node: FlameGraphNode) => {
@@ -303,33 +325,35 @@ export function FlameGraph({
           // Clicking the zoomed root does nothing (use breadcrumbs to go back)
           return;
         }
+
         // Build full path from root to clicked node (for proper breadcrumbs)
         const fullPath = findPathToNode(data, node.id);
         if (fullPath) {
-          // Remove the root from the path (it's represented by the home icon)
-          setZoomPathIds(fullPath.slice(1));
+          animateZoom(fullPath.slice(1));
         } else {
-          // Fallback: just add the clicked node
-          setZoomPathIds(prev => [...prev, node.id]);
+          animateZoom([...zoomPathIds, node.id]);
         }
       } else {
         // Leaf node - call the external handler if provided
         onNodeClick?.(node);
       }
     },
-    [zoomedNode, onNodeClick, data, findPathToNode]
+    [zoomedNode, onNodeClick, data, findPathToNode, animateZoom, zoomPathIds]
   );
 
   // Handle breadcrumb navigation
-  const handleBreadcrumbClick = useCallback((index: number) => {
-    if (index === -1) {
-      // Click on root - reset zoom
-      setZoomPathIds([]);
-    } else {
-      // Click on a breadcrumb - zoom to that level
-      setZoomPathIds(prev => prev.slice(0, index + 1));
-    }
-  }, []);
+  const handleBreadcrumbClick = useCallback(
+    (index: number) => {
+      if (index === -1) {
+        // Click on root - reset zoom
+        animateZoom([]);
+      } else {
+        // Click on a breadcrumb - zoom to that level
+        animateZoom(zoomPathIds.slice(0, index + 1));
+      }
+    },
+    [animateZoom, zoomPathIds]
+  );
 
   // Empty state
   if (!data) {
@@ -483,7 +507,7 @@ export function FlameGraph({
         <div className="flex shrink-0 items-center gap-2">
           {isZoomed && (
             <button
-              onClick={() => setZoomPathIds([])}
+              onClick={() => animateZoom([])}
               className="rounded-xs bg-surface px-2 py-1 text-xs text-muted transition-colors hover:bg-primary/10 hover:text-foreground"
             >
               Reset Zoom
@@ -495,7 +519,9 @@ export function FlameGraph({
 
       {/* Flame Graph Container */}
       <div className="relative w-full overflow-hidden rounded-sm border border-border bg-surface">
-        <div className="relative min-w-full p-2">
+        <div
+          className={clsx('relative min-w-full p-2 transition-opacity duration-150', isTransitioning && 'opacity-0')}
+        >
           {rows.map((row, rowIndex) => (
             <div
               key={rowIndex}
@@ -518,7 +544,7 @@ export function FlameGraph({
                   <div
                     key={flatNode.node.id}
                     className={clsx(
-                      'absolute flex items-center overflow-hidden rounded-xs px-1 text-xs text-white transition-all',
+                      'absolute flex items-center overflow-hidden rounded-xs px-1 text-xs text-white',
                       colors.bg,
                       // Only show hover effect if clickable (has children or is not zoomed root)
                       hasChildren && !isZoomedRoot && colors.hover,
