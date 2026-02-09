@@ -1,4 +1,5 @@
 import { createBandSeries, createStatisticSeries } from '@/components/Charts/MultiLine';
+import type { SeriesData } from '@/components/Charts/MultiLine';
 import type {
   FctBlobCountByHourly,
   FctBlobCountByDaily,
@@ -6,8 +7,13 @@ import type {
   FctAttestationParticipationRateDaily,
   FctHeadVoteCorrectnessRateHourly,
   FctHeadVoteCorrectnessRateDaily,
+  FctReorgByHourly,
+  FctReorgByDaily,
 } from '@/api/types.gen';
-import { formatDailyDate, formatHourlyDate } from '@/pages/ethereum/execution/overview/utils';
+import {
+  formatDailyDate,
+  formatHourlyDate,
+} from '@/pages/ethereum/execution/overview/utils';
 import type { ChartConfig } from './constants';
 
 // Re-export shared utilities from execution overview
@@ -139,10 +145,7 @@ export function buildAttestationParticipationChartConfig(
 
   const labels = unifiedKeys.map(k => (isDaily ? formatDailyDate(k) : formatHourlyDate(Number(k))));
 
-  const getValue = (
-    k: string,
-    field: keyof FctAttestationParticipationRateHourly & keyof FctAttestationParticipationRateDaily
-  ) => {
+  const getValue = (k: string, field: keyof FctAttestationParticipationRateHourly & keyof FctAttestationParticipationRateDaily) => {
     const r = byKey.get(k);
     return r ? Math.max(0, (r as Record<string, number>)[field] ?? 0) : null;
   };
@@ -220,55 +223,77 @@ export function buildHeadVoteCorrectnessChartConfig(
   return {
     labels,
     series: [
-      createStatisticSeries(
-        'Average',
-        unifiedKeys.map(k => getValue(k, 'avg_head_vote_rate')),
-        {
-          color: '#10b981',
-          lineWidth: 2.5,
-          group: 'Statistics',
-        }
-      ),
-      createStatisticSeries(
-        'Moving Avg',
-        unifiedKeys.map(k => getValue(k, 'moving_avg_head_vote_rate')),
-        {
-          color: '#06b6d4',
-          lineWidth: 2,
-          group: 'Statistics',
-        }
-      ),
-      createStatisticSeries(
-        'Median',
-        unifiedKeys.map(k => getValue(k, 'p50_head_vote_rate')),
-        {
-          color: '#a855f7',
-          lineWidth: 1.5,
-          lineStyle: 'dotted',
-          group: 'Statistics',
-        }
-      ),
-      ...createBandSeries(
-        'Bollinger',
-        'hv-bollinger',
+      createStatisticSeries('Average', unifiedKeys.map(k => getValue(k, 'avg_head_vote_rate')), {
+        color: '#10b981',
+        lineWidth: 2.5,
+        group: 'Statistics',
+      }),
+      createStatisticSeries('Moving Avg', unifiedKeys.map(k => getValue(k, 'moving_avg_head_vote_rate')), {
+        color: '#06b6d4',
+        lineWidth: 2,
+        group: 'Statistics',
+      }),
+      createStatisticSeries('Median', unifiedKeys.map(k => getValue(k, 'p50_head_vote_rate')), {
+        color: '#a855f7',
+        lineWidth: 1.5,
+        lineStyle: 'dotted',
+        group: 'Statistics',
+      }),
+      ...createBandSeries('Bollinger', 'hv-bollinger',
         unifiedKeys.map(k => getValue(k, 'lower_band_head_vote_rate')),
         unifiedKeys.map(k => getValue(k, 'upper_band_head_vote_rate')),
-        { color: '#f59e0b', opacity: 0.15, group: 'Bands', initiallyVisible: false }
+        { color: '#f59e0b', opacity: 0.15, group: 'Bands', initiallyVisible: false },
       ),
-      ...createBandSeries(
-        'P5/P95',
-        'hv-percentile',
+      ...createBandSeries('P5/P95', 'hv-percentile',
         unifiedKeys.map(k => getValue(k, 'p05_head_vote_rate')),
         unifiedKeys.map(k => getValue(k, 'p95_head_vote_rate')),
-        { color: '#6366f1', opacity: 0.1, group: 'Bands' }
+        { color: '#6366f1', opacity: 0.1, group: 'Bands' },
       ),
-      ...createBandSeries(
-        'Min/Max',
-        'hv-minmax',
+      ...createBandSeries('Min/Max', 'hv-minmax',
         unifiedKeys.map(k => getValue(k, 'min_head_vote_rate')),
         unifiedKeys.map(k => getValue(k, 'max_head_vote_rate')),
-        { color: '#64748b', opacity: 0.06, group: 'Bands' }
+        { color: '#64748b', opacity: 0.06, group: 'Bands' },
       ),
     ],
   };
+}
+
+const DEPTH_COLORS = ['#f43f5e', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#8b5cf6', '#ec4899'];
+
+/** Builds stacked area chart config from reorg records grouped by depth */
+export function buildReorgChartConfig(
+  records: (FctReorgByHourly | FctReorgByDaily)[],
+  unifiedKeys: string[],
+  isDaily: boolean
+): ChartConfig {
+  const labels = unifiedKeys.map(k => (isDaily ? formatDailyDate(k) : formatHourlyDate(Number(k))));
+
+  // Group records by time key, then by depth
+  const byKeyAndDepth = new Map<string, Map<number, number>>();
+  const allDepths = new Set<number>();
+
+  for (const r of records) {
+    const key = isDaily
+      ? ((r as FctReorgByDaily).day_start_date ?? '')
+      : String((r as FctReorgByHourly).hour_start_date_time ?? '');
+    const depth = r.depth ?? 1;
+    const count = r.reorg_count ?? 0;
+
+    allDepths.add(depth);
+    if (!byKeyAndDepth.has(key)) byKeyAndDepth.set(key, new Map());
+    byKeyAndDepth.get(key)!.set(depth, count);
+  }
+
+  const sortedDepths = [...allDepths].sort((a, b) => a - b);
+
+  const series: SeriesData[] = sortedDepths.map((depth, i) => ({
+    name: `Depth ${depth}`,
+    data: unifiedKeys.map(k => byKeyAndDepth.get(k)?.get(depth) ?? 0),
+    color: DEPTH_COLORS[i % DEPTH_COLORS.length],
+    showArea: true,
+    stack: 'reorgs',
+    group: 'Depth',
+  }));
+
+  return { labels, series };
 }
