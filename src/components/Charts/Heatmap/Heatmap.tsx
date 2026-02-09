@@ -2,7 +2,13 @@ import type React from 'react';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { HeatmapChart as EChartsHeatmap } from 'echarts/charts';
-import { GridComponent, TooltipComponent, TitleComponent, VisualMapComponent } from 'echarts/components';
+import {
+  GridComponent,
+  TooltipComponent,
+  TitleComponent,
+  VisualMapComponent,
+  MarkAreaComponent,
+} from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import colors from 'tailwindcss/colors';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -10,7 +16,15 @@ import { resolveCssColorToHex } from '@/utils/color';
 import type { HeatmapChartProps } from './Heatmap.types';
 
 // Register ECharts components
-echarts.use([EChartsHeatmap, GridComponent, TooltipComponent, TitleComponent, VisualMapComponent, CanvasRenderer]);
+echarts.use([
+  EChartsHeatmap,
+  GridComponent,
+  TooltipComponent,
+  TitleComponent,
+  VisualMapComponent,
+  MarkAreaComponent,
+  CanvasRenderer,
+]);
 
 /**
  * HeatmapChart - A heatmap chart component using ECharts
@@ -47,14 +61,31 @@ export function HeatmapChart({
   tooltipFormatter,
   xAxisShowOnlyMinMax = false,
   yAxisShowOnlyMinMax = false,
+  xAxisInterval = 'auto',
+  xAxisLabelRotate = 0,
   grid,
   emphasisDisabled = true,
   visualMapText,
+  onEvents,
+  emptyColor,
+  highlightedRow,
+  yAxisInverse = false,
 }: HeatmapChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
 
   // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
   const convertedColorGradient = colorGradient.map(color => resolveCssColorToHex(color));
+  const resolvedEmptyColor = emptyColor ? resolveCssColorToHex(emptyColor) : undefined;
+
+  // Split data: real values go through the visual map, sentinel (-1) cells render with fixed emptyColor.
+  // This prevents the continuous visualMap from clamping -1 to the min color.
+  const NO_DATA_SENTINEL = -1;
+  const realData = emptyColor ? data.filter(d => d[2] !== NO_DATA_SENTINEL) : data;
+  const emptyData = emptyColor ? data.filter(d => d[2] === NO_DATA_SENTINEL) : [];
+
+  const hasHighlight = highlightedRow !== undefined && highlightedRow >= 0 && highlightedRow < yLabels.length;
+  // Highlight overlay series index: after main heatmap (0) and optional no-data series (1)
+  const highlightSeriesIndex = 1 + (emptyData.length > 0 ? 1 : 0);
 
   const option = {
     animation: true,
@@ -72,11 +103,12 @@ export function HeatmapChart({
           top: 8,
         }
       : undefined,
-    grid: grid ?? {
+    grid: {
       top: title ? 40 : 16,
       right: showVisualMap ? 90 : 24,
       bottom: 50,
       left: 60,
+      ...grid,
     },
     xAxis: {
       type: 'category',
@@ -103,13 +135,15 @@ export function HeatmapChart({
       },
       axisLabel: {
         color: themeColors.muted,
-        fontSize: 12,
-        interval: xAxisShowOnlyMinMax ? (index: number) => index === 0 || index === xLabels.length - 1 : undefined,
+        fontSize: 10,
+        rotate: xAxisLabelRotate,
+        interval: xAxisShowOnlyMinMax ? (index: number) => index === 0 || index === xLabels.length - 1 : xAxisInterval,
       },
     },
     yAxis: {
       type: 'category',
       data: yLabels,
+      inverse: yAxisInverse,
       name: yAxisTitle,
       nameLocation: 'middle',
       nameGap: 50,
@@ -136,45 +170,72 @@ export function HeatmapChart({
         interval: yAxisShowOnlyMinMax ? (index: number) => index === 0 || index === yLabels.length - 1 : undefined,
       },
     },
-    visualMap:
+    visualMap: [
       visualMapType === 'piecewise' && piecewisePieces
         ? {
-            type: 'piecewise',
+            type: 'piecewise' as const,
             pieces: piecewisePieces,
-            orient: 'vertical',
+            orient: 'vertical' as const,
             right: 10,
             top: 'center',
             show: showVisualMap,
+            seriesIndex: 0,
             textStyle: {
               color: themeColors.foreground,
               fontSize: 12,
             },
+            ...(resolvedEmptyColor && { outOfRange: { color: resolvedEmptyColor } }),
           }
         : {
-            type: 'continuous',
+            type: 'continuous' as const,
             min: min ?? Math.min(...data.map(d => d[2])),
             max: max ?? Math.max(...data.map(d => d[2])),
             calculable: false,
-            orient: 'vertical',
+            orient: 'vertical' as const,
             right: 10,
             top: 'center',
             show: showVisualMap,
+            seriesIndex: 0,
             inRange: {
               color: convertedColorGradient,
             },
+            ...(resolvedEmptyColor && { outOfRange: { color: resolvedEmptyColor } }),
             textStyle: {
               color: themeColors.foreground,
               fontSize: 12,
             },
             text: visualMapText ?? ['4s', '0s'],
             itemWidth: 15,
-            itemHeight: 100,
+            itemHeight: Math.min(100, (typeof height === 'number' ? height : 400) * 0.4),
           },
+      // Dummy visual map for the no-data series so ECharts doesn't error
+      ...(emptyData.length > 0
+        ? [
+            {
+              type: 'piecewise' as const,
+              show: false,
+              seriesIndex: 1,
+              pieces: [{ min: -2, max: 0, color: resolvedEmptyColor ?? themeColors.background }],
+            },
+          ]
+        : []),
+      // Dummy visual map for the highlight overlay series
+      ...(hasHighlight
+        ? [
+            {
+              type: 'piecewise' as const,
+              show: false,
+              seriesIndex: highlightSeriesIndex,
+              pieces: [{ min: 0, max: 0, color: 'transparent' }],
+            },
+          ]
+        : []),
+    ],
     series: [
       {
         name: 'Heatmap',
         type: 'heatmap',
-        data,
+        data: realData,
         label: {
           show: showLabel,
           color: themeColors.foreground,
@@ -202,6 +263,49 @@ export function HeatmapChart({
           },
         },
       },
+      // Separate series for no-data sentinel cells so they bypass the visual map entirely
+      ...(emptyData.length > 0
+        ? [
+            {
+              name: 'No Data',
+              type: 'heatmap' as const,
+              data: emptyData,
+              label: { show: false },
+              itemStyle: {
+                color: resolvedEmptyColor,
+                ...(showCellBorders && {
+                  borderColor: themeColors.background,
+                  borderWidth: 2,
+                }),
+                ...(cellBorderConfig && {
+                  borderColor: cellBorderConfig.borderColor ?? themeColors.background,
+                  borderWidth: cellBorderConfig.borderWidth ?? 2,
+                }),
+              },
+              emphasis: { disabled: true },
+            },
+          ]
+        : []),
+      // Row highlight band as a separate overlay series so it renders above heatmap cells
+      ...(hasHighlight
+        ? [
+            {
+              type: 'heatmap' as const,
+              data: [],
+              z: 10,
+              silent: true,
+              markArea: {
+                silent: true,
+                itemStyle: {
+                  color: resolveCssColorToHex(themeColors.primary) + '30',
+                  borderColor: resolveCssColorToHex(themeColors.primary) + '80',
+                  borderWidth: 2,
+                },
+                data: [[{ yAxis: yLabels[highlightedRow] }, { yAxis: yLabels[highlightedRow] }]],
+              },
+            },
+          ]
+        : []),
     ],
     tooltip: {
       trigger: 'item',
@@ -230,6 +334,7 @@ export function HeatmapChart({
         style={{ height, width: '100%', minHeight: height }}
         notMerge={false}
         lazyUpdate={true}
+        onEvents={onEvents}
       />
     </div>
   );

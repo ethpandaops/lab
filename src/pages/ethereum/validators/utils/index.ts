@@ -1,0 +1,1 @@
+export { generateValidatorReport } from './generateReport';
