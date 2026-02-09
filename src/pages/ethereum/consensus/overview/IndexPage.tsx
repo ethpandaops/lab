@@ -16,8 +16,15 @@ import clsx from 'clsx';
 import {
   fctBlobCountByHourlyServiceListOptions,
   fctBlobCountByDailyServiceListOptions,
+  fctAttestationParticipationRateHourlyServiceListOptions,
+  fctAttestationParticipationRateDailyServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
-import type { FctBlobCountByHourly, FctBlobCountByDaily } from '@/api/types.gen';
+import type {
+  FctBlobCountByHourly,
+  FctBlobCountByDaily,
+  FctAttestationParticipationRateHourly,
+  FctAttestationParticipationRateDaily,
+} from '@/api/types.gen';
 import { ConsensusOverviewSkeleton } from './components';
 import { type TimePeriod, TIME_RANGE_CONFIG, TIME_PERIOD_OPTIONS } from './constants';
 import {
@@ -26,6 +33,7 @@ import {
   buildTooltipHtml,
   formatBand,
   buildBlobCountChartConfig,
+  buildAttestationParticipationChartConfig,
   type TooltipSection,
 } from './utils';
 
@@ -66,6 +74,23 @@ export function IndexPage(): JSX.Element {
     enabled: isDaily,
   });
 
+  const attnHourlyQuery = useQuery({
+    ...fctAttestationParticipationRateHourlyServiceListOptions({
+      query: {
+        hour_start_date_time_gte: startTimestamp,
+        order_by: 'hour_start_date_time asc',
+        page_size: config.pageSize,
+      },
+    }),
+    enabled: !isDaily,
+  });
+  const attnDailyQuery = useQuery({
+    ...fctAttestationParticipationRateDailyServiceListOptions({
+      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: config.pageSize },
+    }),
+    enabled: isDaily,
+  });
+
   // --- Records ---
 
   const blobRecords = useMemo(
@@ -76,7 +101,15 @@ export function IndexPage(): JSX.Element {
     [isDaily, blobDailyQuery.data, blobHourlyQuery.data]
   );
 
-  // --- Unified time keys ---
+  const attnRecords = useMemo(
+    () =>
+      isDaily
+        ? [...(attnDailyQuery.data?.fct_attestation_participation_rate_daily ?? [])].reverse()
+        : attnHourlyQuery.data?.fct_attestation_participation_rate_hourly,
+    [isDaily, attnDailyQuery.data, attnHourlyQuery.data]
+  );
+
+  // --- Unified time keys from all datasets ---
 
   const unifiedTimeKeys = useMemo(() => {
     const allKeys = new Set<string>();
@@ -90,19 +123,25 @@ export function IndexPage(): JSX.Element {
 
     if (!isDaily) {
       addHourlyKeys(blobRecords as FctBlobCountByHourly[] | undefined);
+      addHourlyKeys(attnRecords as FctAttestationParticipationRateHourly[] | undefined);
     } else {
       addDailyKeys(blobRecords as FctBlobCountByDaily[] | undefined);
+      addDailyKeys(attnRecords as FctAttestationParticipationRateDaily[] | undefined);
     }
 
     allKeys.delete('');
     const sortedKeys = [...allKeys].sort();
     return fillTimeKeys(sortedKeys, isDaily);
-  }, [blobRecords, isDaily]);
+  }, [blobRecords, attnRecords, isDaily]);
 
   // --- Loading & error ---
 
-  const isLoading = isDaily ? blobDailyQuery.isLoading : blobHourlyQuery.isLoading;
-  const error = isDaily ? blobDailyQuery.error : blobHourlyQuery.error;
+  const hourlyLoading = blobHourlyQuery.isLoading || attnHourlyQuery.isLoading;
+  const dailyLoading = blobDailyQuery.isLoading || attnDailyQuery.isLoading;
+  const isLoading = isDaily ? dailyLoading : hourlyLoading;
+  const error = isDaily
+    ? (blobDailyQuery.error ?? attnDailyQuery.error)
+    : (blobHourlyQuery.error ?? attnHourlyQuery.error);
 
   // --- Chart configs ---
 
@@ -111,9 +150,14 @@ export function IndexPage(): JSX.Element {
     return buildBlobCountChartConfig(blobRecords, unifiedTimeKeys, isDaily);
   }, [blobRecords, unifiedTimeKeys, isDaily]);
 
+  const attnChartConfig = useMemo(() => {
+    if (!attnRecords?.length || !unifiedTimeKeys.length) return null;
+    return buildAttestationParticipationChartConfig(attnRecords, unifiedTimeKeys, isDaily);
+  }, [attnRecords, unifiedTimeKeys, isDaily]);
+
   // --- Fork mark lines ---
 
-  const chartLabels = blobChartConfig?.labels ?? [];
+  const chartLabels = blobChartConfig?.labels ?? attnChartConfig?.labels ?? [];
 
   const consensusForkMarkLines = useMemo(() => {
     if (!currentNetwork || !allForks.length) return [];
@@ -243,6 +287,26 @@ export function IndexPage(): JSX.Element {
     [makeStatsTooltipFormatter, blobRecords]
   );
 
+  const attnTooltipFormatter = useMemo(
+    () =>
+      makeStatsTooltipFormatter(
+        attnRecords as Record<string, unknown>[] | undefined,
+        {
+          avg: 'avg_participation_rate',
+          movingAvg: 'moving_avg_participation_rate',
+          median: 'p50_participation_rate',
+          lowerBand: 'lower_band_participation_rate',
+          upperBand: 'upper_band_participation_rate',
+          p05: 'p05_participation_rate',
+          p95: 'p95_participation_rate',
+          min: 'min_participation_rate',
+          max: 'max_participation_rate',
+        },
+        '%'
+      ),
+    [makeStatsTooltipFormatter, attnRecords]
+  );
+
   // --- Subtitles ---
 
   const makeSub = (metric: string) =>
@@ -310,6 +374,31 @@ export function IndexPage(): JSX.Element {
                   legendPosition="top"
                   enableDataZoom
                   tooltipFormatter={blobTooltipFormatter}
+                  markLines={showAnnotations ? forkMarkLines : []}
+                  syncGroup={inModal ? undefined : 'consensus-overview'}
+                />
+              )}
+            </PopoutCard>
+          )}
+
+          {/* Attestation Participation Rate */}
+          {attnChartConfig && (
+            <PopoutCard
+              title="Attestation Participation Rate"
+              subtitle={makeSub('attestation participation rate')}
+              anchorId="attestation-participation-chart"
+              modalSize="full"
+            >
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={attnChartConfig.series}
+                  xAxis={{ type: 'category', labels: attnChartConfig.labels, name: 'Date' }}
+                  yAxis={{ name: 'Participation Rate (%)', min: 0, max: 100 }}
+                  height={inModal ? 600 : 400}
+                  showLegend
+                  legendPosition="top"
+                  enableDataZoom
+                  tooltipFormatter={attnTooltipFormatter}
                   markLines={showAnnotations ? forkMarkLines : []}
                   syncGroup={inModal ? undefined : 'consensus-overview'}
                 />
