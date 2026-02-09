@@ -111,6 +111,16 @@ export interface HeatmapChartProps {
    */
   yAxisShowOnlyMinMax?: boolean;
   /**
+   * X-axis label interval. 0 = show all labels, 'auto' = let ECharts decide
+   * @default 'auto'
+   */
+  xAxisInterval?: number | 'auto' | ((index: number, value: string) => boolean);
+  /**
+   * Rotate X-axis labels by this many degrees
+   * @default 0
+   */
+  xAxisLabelRotate?: number;
+  /**
    * Whether to merge new options with existing chart (false) or replace entirely (true)
    * Set to false for better performance when updating frequently
    * @default false
@@ -141,4 +151,22 @@ export interface HeatmapChartProps {
    * @example ['12s', '0s']
    */
   visualMapText?: [string, string];
+  /**
+   * ECharts event handlers. Keys are event names (e.g., 'click').
+   */
+  onEvents?: Record<string, (params: Record<string, unknown>) => void>;
+  /**
+   * Color for cells with values outside the visual map range (e.g., no-data sentinel cells).
+   * Pass a CSS color string; it will be resolved to hex for ECharts compatibility.
+   */
+  emptyColor?: string;
+  /**
+   * Y-axis index to highlight with a background band. undefined or -1 = none.
+   */
+  highlightedRow?: number;
+  /**
+   * Reverse the y-axis so the first label appears at the top instead of the bottom.
+   * @default false
+   */
+  yAxisInverse?: boolean;
 }

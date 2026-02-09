@@ -8,7 +8,7 @@ const meta: Meta<typeof HeatmapChart> = {
   component: HeatmapChart,
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-[600px] rounded-xs bg-surface p-6">
         <Story />
       </div>
     ),
@@ -270,7 +270,7 @@ export const GitHubContributions: Story = {
  */
 export const WithFormatter: Story = {
   args: {
-    title: 'Temperature Map (°C)',
+    title: 'Temperature Map',
     data: [
       [0, 0, 18.5],
       [0, 1, 22.3],
@@ -377,5 +377,283 @@ export const NoLegend: Story = {
     ],
     xLabels: ['a', 'b', 'c'],
     yLabels: ['Morning', 'Afternoon', 'Evening'],
+  },
+};
+
+/**
+ * Heatmap with no-data sentinel cells rendered in a distinct empty color.
+ * Cells with value -1 are treated as "no data" and rendered separately
+ * from the color gradient, using a dual visualMap + series approach.
+ */
+export const WithEmptyData: Story = {
+  args: {
+    title: 'Sparse Data with Gaps',
+    data: [
+      [0, 0, 5],
+      [0, 1, -1],
+      [0, 2, 3],
+      [1, 0, -1],
+      [1, 1, 4],
+      [1, 2, -1],
+      [2, 0, 2],
+      [2, 1, -1],
+      [2, 2, 8],
+      [3, 0, -1],
+      [3, 1, 6],
+      [3, 2, 1],
+      [4, 0, 7],
+      [4, 1, -1],
+      [4, 2, -1],
+    ],
+    xLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+    yLabels: ['Morning', 'Afternoon', 'Evening'],
+    emptyColor: colors.gray[800],
+    showLabel: true,
+    showCellBorders: true,
+    visualMapText: ['High', 'Low'],
+  },
+};
+
+/**
+ * Row highlight band using markArea. The `highlightedRow` prop
+ * draws a semi-transparent band behind the specified y-axis row.
+ */
+export const HighlightedRow: Story = {
+  render: () => {
+    const [highlighted, setHighlighted] = useState(1);
+    const yLabels = ['Server 1', 'Server 2', 'Server 3', 'Server 4'];
+    const xLabels = ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'];
+
+    const data: [number, number, number][] = [];
+    for (let x = 0; x < xLabels.length; x++) {
+      for (let y = 0; y < yLabels.length; y++) {
+        data.push([x, y, Math.floor(Math.random() * 100)]);
+      }
+    }
+
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex gap-2">
+          {yLabels.map((label, i) => (
+            <button
+              key={label}
+              className={`rounded-xs px-3 py-1 text-sm ${
+                highlighted === i ? 'bg-primary text-white' : 'bg-surface text-foreground'
+              }`}
+              onClick={() => setHighlighted(i)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <HeatmapChart
+          title="Server Load (click to highlight)"
+          data={data}
+          xLabels={xLabels}
+          yLabels={yLabels}
+          height={300}
+          highlightedRow={highlighted}
+          colorGradient={[colors.green[100], colors.yellow[300], colors.red[500]]}
+          showLabel={true}
+          visualMapText={['100%', '0%']}
+        />
+      </div>
+    );
+  },
+};
+
+/**
+ * Inverted y-axis so the first label appears at the top.
+ */
+export const InversedYAxis: Story = {
+  args: {
+    title: 'Validators (top-down)',
+    yAxisInverse: true,
+    showLabel: true,
+    data: [
+      [0, 0, 100],
+      [0, 1, 95],
+      [0, 2, 88],
+      [0, 3, 72],
+      [1, 0, 98],
+      [1, 1, 90],
+      [1, 2, 85],
+      [1, 3, 60],
+      [2, 0, 100],
+      [2, 1, 92],
+      [2, 2, 78],
+      [2, 3, 55],
+    ],
+    xLabels: ['Epoch 1', 'Epoch 2', 'Epoch 3'],
+    yLabels: ['Validator 0', 'Validator 1', 'Validator 2', 'Validator 3'],
+    colorGradient: [colors.red[400], colors.yellow[300], colors.green[500]],
+    visualMapText: ['100%', '0%'],
+  },
+};
+
+/**
+ * Rotated x-axis labels for long label text or dense axes.
+ */
+export const RotatedLabels: Story = {
+  args: {
+    title: 'Rotated X-Axis Labels',
+    xAxisLabelRotate: 45,
+    grid: { bottom: 80 },
+    data: [
+      [0, 0, 3],
+      [0, 1, 7],
+      [1, 0, 5],
+      [1, 1, 2],
+      [2, 0, 8],
+      [2, 1, 4],
+      [3, 0, 1],
+      [3, 1, 9],
+      [4, 0, 6],
+      [4, 1, 3],
+    ],
+    xLabels: ['2025-01-01', '2025-01-02', '2025-01-03', '2025-01-04', '2025-01-05'],
+    yLabels: ['Metric A', 'Metric B'],
+    showLabel: true,
+    xAxisInterval: 0,
+  },
+};
+
+/**
+ * Piecewise visual map with discrete color ranges instead of a continuous gradient.
+ */
+export const PiecewiseVisualMap: Story = {
+  args: {
+    title: 'Latency Buckets',
+    visualMapType: 'piecewise',
+    piecewisePieces: [
+      { min: 0, max: 100, color: colors.green[500], label: '< 100ms' },
+      { min: 100, max: 500, color: colors.yellow[400], label: '100-500ms' },
+      { min: 500, max: 1000, color: colors.orange[500], label: '500ms-1s' },
+      { min: 1000, color: colors.red[500], label: '> 1s' },
+    ],
+    data: [
+      [0, 0, 50],
+      [0, 1, 120],
+      [0, 2, 800],
+      [1, 0, 200],
+      [1, 1, 90],
+      [1, 2, 1500],
+      [2, 0, 300],
+      [2, 1, 600],
+      [2, 2, 45],
+      [3, 0, 1200],
+      [3, 1, 80],
+      [3, 2, 350],
+    ],
+    xLabels: ['Node A', 'Node B', 'Node C', 'Node D'],
+    yLabels: ['P50', 'P95', 'P99'],
+    showLabel: true,
+    formatValue: (value: number) => (value >= 1000 ? `${(value / 1000).toFixed(1)}s` : `${value}ms`),
+  },
+};
+
+/**
+ * Cell borders and custom border configuration for visual cell separation.
+ */
+export const CellBorders: Story = {
+  args: {
+    title: 'With Cell Borders',
+    showCellBorders: true,
+    showLabel: true,
+    data: [
+      [0, 0, 5],
+      [0, 1, 1],
+      [0, 2, 0],
+      [1, 0, 1],
+      [1, 1, 4],
+      [1, 2, 3],
+      [2, 0, 2],
+      [2, 1, 5],
+      [2, 2, 3],
+    ],
+    xLabels: ['a', 'b', 'c'],
+    yLabels: ['Morning', 'Afternoon', 'Evening'],
+  },
+};
+
+/**
+ * Axis titles and min/max-only axis labels for compact layouts.
+ */
+export const AxisTitlesAndMinMax: Story = {
+  render: () => {
+    const xLabels = Array.from({ length: 20 }, (_, i) => `${i}`);
+    const yLabels = Array.from({ length: 10 }, (_, i) => `V${i}`);
+
+    const data: [number, number, number][] = [];
+    for (let x = 0; x < xLabels.length; x++) {
+      for (let y = 0; y < yLabels.length; y++) {
+        data.push([x, y, Math.floor(Math.random() * 12)]);
+      }
+    }
+
+    return (
+      <HeatmapChart
+        title="Slot Time Distribution"
+        data={data}
+        xLabels={xLabels}
+        yLabels={yLabels}
+        xAxisTitle="Slot"
+        yAxisTitle="Validator Index"
+        xAxisShowOnlyMinMax
+        yAxisShowOnlyMinMax
+        height={400}
+        visualMapText={['12s', '0s']}
+        grid={{ left: 80 }}
+      />
+    );
+  },
+};
+
+/**
+ * Click events on heatmap cells. Open the browser console to see event output.
+ */
+export const WithClickEvents: Story = {
+  render: () => {
+    const [lastClick, setLastClick] = useState<string>('Click a cell...');
+    const xLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+    const yLabels = ['Morning', 'Afternoon', 'Evening'];
+
+    const data: [number, number, number][] = [
+      [0, 0, 5],
+      [0, 1, 1],
+      [0, 2, 3],
+      [1, 0, 2],
+      [1, 1, 4],
+      [1, 2, 7],
+      [2, 0, 6],
+      [2, 1, 3],
+      [2, 2, 1],
+      [3, 0, 8],
+      [3, 1, 2],
+      [3, 2, 5],
+      [4, 0, 4],
+      [4, 1, 6],
+      [4, 2, 9],
+    ];
+
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="rounded-xs bg-background px-4 py-2 font-mono text-sm text-muted">{lastClick}</div>
+        <HeatmapChart
+          title="Clickable Heatmap"
+          data={data}
+          xLabels={xLabels}
+          yLabels={yLabels}
+          height={300}
+          emphasisDisabled={false}
+          onEvents={{
+            click: (params: Record<string, unknown>) => {
+              const value = params.value as [number, number, number];
+              setLastClick(`Clicked: ${xLabels[value[0]]} ${yLabels[value[1]]} = ${value[2]}`);
+            },
+          }}
+        />
+      </div>
+    );
   },
 };
