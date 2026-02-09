@@ -9,6 +9,14 @@ import type {
   FctHeadVoteCorrectnessRateDaily,
   FctReorgByHourly,
   FctReorgByDaily,
+  FctMissedSlotRateHourly,
+  FctMissedSlotRateDaily,
+  FctBlockProposalStatusHourly,
+  FctBlockProposalStatusDaily,
+  FctAttestationInclusionDelayHourly,
+  FctAttestationInclusionDelayDaily,
+  FctProposerRewardHourly,
+  FctProposerRewardDaily,
 } from '@/api/types.gen';
 import {
   formatDailyDate,
@@ -41,7 +49,8 @@ export const formatBlobBand = formatBand;
 export function buildBlobCountChartConfig(
   records: (FctBlobCountByHourly | FctBlobCountByDaily)[],
   unifiedKeys: string[],
-  isDaily: boolean
+  isDaily: boolean,
+  maxBlobValues?: (number | null)[]
 ): ChartConfig {
   const byKey = new Map<string, FctBlobCountByHourly | FctBlobCountByDaily>();
   for (const r of records) {
@@ -90,43 +99,53 @@ export function buildBlobCountChartConfig(
     return r ? Math.max(0, r.moving_avg_blob_count ?? 0) : null;
   });
 
-  return {
-    labels,
-    series: [
-      createStatisticSeries('Average', avgValues, {
-        color: '#10b981',
-        lineWidth: 2.5,
-        group: 'Statistics',
-      }),
-      createStatisticSeries('Moving Avg', movingAvgValues, {
-        color: '#06b6d4',
+  const series: SeriesData[] = [
+    createStatisticSeries('Average', avgValues, {
+      color: '#10b981',
+      lineWidth: 2.5,
+      group: 'Statistics',
+    }),
+    createStatisticSeries('Moving Avg', movingAvgValues, {
+      color: '#06b6d4',
+      lineWidth: 2,
+      group: 'Statistics',
+    }),
+    createStatisticSeries('Median', medianValues, {
+      color: '#a855f7',
+      lineWidth: 1.5,
+      lineStyle: 'dotted',
+      group: 'Statistics',
+    }),
+    ...createBandSeries('Bollinger', 'blob-bollinger', lowerBandValues, upperBandValues, {
+      color: '#f59e0b',
+      opacity: 0.15,
+      group: 'Bands',
+      initiallyVisible: false,
+    }),
+    ...createBandSeries('P5/P95', 'blob-percentile', p5Values, p95Values, {
+      color: '#6366f1',
+      opacity: 0.1,
+      group: 'Bands',
+    }),
+    ...createBandSeries('Min/Max', 'blob-minmax', minValues, maxValues, {
+      color: '#64748b',
+      opacity: 0.06,
+      group: 'Bands',
+    }),
+  ];
+
+  if (maxBlobValues?.length) {
+    series.push(
+      createStatisticSeries('Max Blobs', maxBlobValues, {
+        color: '#ef4444',
         lineWidth: 2,
+        lineStyle: 'dashed',
         group: 'Statistics',
-      }),
-      createStatisticSeries('Median', medianValues, {
-        color: '#a855f7',
-        lineWidth: 1.5,
-        lineStyle: 'dotted',
-        group: 'Statistics',
-      }),
-      ...createBandSeries('Bollinger', 'blob-bollinger', lowerBandValues, upperBandValues, {
-        color: '#f59e0b',
-        opacity: 0.15,
-        group: 'Bands',
-        initiallyVisible: false,
-      }),
-      ...createBandSeries('P5/P95', 'blob-percentile', p5Values, p95Values, {
-        color: '#6366f1',
-        opacity: 0.1,
-        group: 'Bands',
-      }),
-      ...createBandSeries('Min/Max', 'blob-minmax', minValues, maxValues, {
-        color: '#64748b',
-        opacity: 0.06,
-        group: 'Bands',
-      }),
-    ],
-  };
+      })
+    );
+  }
+
+  return { labels, series };
 }
 
 /** Builds chart series config from attestation participation rate records aligned to unified time keys */
@@ -296,4 +315,207 @@ export function buildReorgChartConfig(
   }));
 
   return { labels, series };
+}
+
+/** Builds chart config for missed slot rate (simple: rate + moving avg) */
+export function buildMissedSlotRateChartConfig(
+  records: (FctMissedSlotRateHourly | FctMissedSlotRateDaily)[],
+  unifiedKeys: string[],
+  isDaily: boolean
+): ChartConfig {
+  const byKey = new Map<string, FctMissedSlotRateHourly | FctMissedSlotRateDaily>();
+  for (const r of records) {
+    const key = isDaily
+      ? ((r as FctMissedSlotRateDaily).day_start_date ?? '')
+      : String((r as FctMissedSlotRateHourly).hour_start_date_time ?? '');
+    byKey.set(key, r);
+  }
+
+  const labels = unifiedKeys.map(k => (isDaily ? formatDailyDate(k) : formatHourlyDate(Number(k))));
+
+  const rateValues = unifiedKeys.map(k => {
+    const r = byKey.get(k);
+    return r?.missed_rate != null ? Math.max(0, r.missed_rate) : null;
+  });
+  const movingAvgValues = unifiedKeys.map(k => {
+    const r = byKey.get(k);
+    return r?.moving_avg_missed_rate != null ? Math.max(0, r.moving_avg_missed_rate) : null;
+  });
+
+  return {
+    labels,
+    series: [
+      createStatisticSeries('Missed Rate', rateValues, {
+        color: '#f43f5e',
+        lineWidth: 2.5,
+        group: 'Statistics',
+      }),
+      createStatisticSeries('Moving Avg', movingAvgValues, {
+        color: '#06b6d4',
+        lineWidth: 2,
+        group: 'Statistics',
+      }),
+    ],
+  };
+}
+
+const STATUS_COLORS: Record<string, string> = {
+  canonical: '#22c55e',
+  orphaned: '#f59e0b',
+  missed: '#f43f5e',
+};
+
+/** Builds stacked area chart config from block proposal status records grouped by status */
+export function buildBlockProposalStatusChartConfig(
+  records: (FctBlockProposalStatusHourly | FctBlockProposalStatusDaily)[],
+  unifiedKeys: string[],
+  isDaily: boolean
+): ChartConfig {
+  const labels = unifiedKeys.map(k => (isDaily ? formatDailyDate(k) : formatHourlyDate(Number(k))));
+
+  const byKeyAndStatus = new Map<string, Map<string, number>>();
+  const allStatuses = new Set<string>();
+
+  for (const r of records) {
+    const key = isDaily
+      ? ((r as FctBlockProposalStatusDaily).day_start_date ?? '')
+      : String((r as FctBlockProposalStatusHourly).hour_start_date_time ?? '');
+    const status = r.status ?? 'unknown';
+    const count = r.slot_count ?? 0;
+
+    allStatuses.add(status);
+    if (!byKeyAndStatus.has(key)) byKeyAndStatus.set(key, new Map());
+    byKeyAndStatus.get(key)!.set(status, count);
+  }
+
+  const sortedStatuses = [...allStatuses].sort();
+
+  const series: SeriesData[] = sortedStatuses.map(status => ({
+    name: status.charAt(0).toUpperCase() + status.slice(1),
+    data: unifiedKeys.map(k => byKeyAndStatus.get(k)?.get(status) ?? 0),
+    color: STATUS_COLORS[status] ?? '#94a3b8',
+    showArea: true,
+    stack: 'proposal-status',
+    group: 'Status',
+  }));
+
+  return { labels, series };
+}
+
+/** Builds chart config for attestation inclusion delay (full statistical) */
+export function buildAttestationInclusionDelayChartConfig(
+  records: (FctAttestationInclusionDelayHourly | FctAttestationInclusionDelayDaily)[],
+  unifiedKeys: string[],
+  isDaily: boolean
+): ChartConfig {
+  const byKey = new Map<string, FctAttestationInclusionDelayHourly | FctAttestationInclusionDelayDaily>();
+  for (const r of records) {
+    const key = isDaily
+      ? ((r as FctAttestationInclusionDelayDaily).day_start_date ?? '')
+      : String((r as FctAttestationInclusionDelayHourly).hour_start_date_time ?? '');
+    byKey.set(key, r);
+  }
+
+  const labels = unifiedKeys.map(k => (isDaily ? formatDailyDate(k) : formatHourlyDate(Number(k))));
+
+  const getValue = (k: string, field: string) => {
+    const r = byKey.get(k);
+    return r ? Math.max(0, (r as Record<string, number>)[field] ?? 0) : null;
+  };
+
+  return {
+    labels,
+    series: [
+      createStatisticSeries('Average', unifiedKeys.map(k => getValue(k, 'avg_inclusion_delay')), {
+        color: '#10b981',
+        lineWidth: 2.5,
+        group: 'Statistics',
+      }),
+      createStatisticSeries('Moving Avg', unifiedKeys.map(k => getValue(k, 'moving_avg_inclusion_delay')), {
+        color: '#06b6d4',
+        lineWidth: 2,
+        group: 'Statistics',
+      }),
+      createStatisticSeries('Median', unifiedKeys.map(k => getValue(k, 'p50_inclusion_delay')), {
+        color: '#a855f7',
+        lineWidth: 1.5,
+        lineStyle: 'dotted',
+        group: 'Statistics',
+      }),
+      ...createBandSeries('Bollinger', 'id-bollinger',
+        unifiedKeys.map(k => getValue(k, 'lower_band_inclusion_delay')),
+        unifiedKeys.map(k => getValue(k, 'upper_band_inclusion_delay')),
+        { color: '#f59e0b', opacity: 0.15, group: 'Bands', initiallyVisible: false },
+      ),
+      ...createBandSeries('P5/P95', 'id-percentile',
+        unifiedKeys.map(k => getValue(k, 'p05_inclusion_delay')),
+        unifiedKeys.map(k => getValue(k, 'p95_inclusion_delay')),
+        { color: '#6366f1', opacity: 0.1, group: 'Bands' },
+      ),
+      ...createBandSeries('Min/Max', 'id-minmax',
+        unifiedKeys.map(k => getValue(k, 'min_inclusion_delay')),
+        unifiedKeys.map(k => getValue(k, 'max_inclusion_delay')),
+        { color: '#64748b', opacity: 0.06, group: 'Bands' },
+      ),
+    ],
+  };
+}
+
+/** Builds chart config for proposer reward / MEV (full statistical) */
+export function buildProposerRewardChartConfig(
+  records: (FctProposerRewardHourly | FctProposerRewardDaily)[],
+  unifiedKeys: string[],
+  isDaily: boolean
+): ChartConfig {
+  const byKey = new Map<string, FctProposerRewardHourly | FctProposerRewardDaily>();
+  for (const r of records) {
+    const key = isDaily
+      ? ((r as FctProposerRewardDaily).day_start_date ?? '')
+      : String((r as FctProposerRewardHourly).hour_start_date_time ?? '');
+    byKey.set(key, r);
+  }
+
+  const labels = unifiedKeys.map(k => (isDaily ? formatDailyDate(k) : formatHourlyDate(Number(k))));
+
+  const getValue = (k: string, field: string) => {
+    const r = byKey.get(k);
+    return r ? Math.max(0, (r as Record<string, number>)[field] ?? 0) : null;
+  };
+
+  return {
+    labels,
+    series: [
+      createStatisticSeries('Average', unifiedKeys.map(k => getValue(k, 'avg_reward_eth')), {
+        color: '#10b981',
+        lineWidth: 2.5,
+        group: 'Statistics',
+      }),
+      createStatisticSeries('Moving Avg', unifiedKeys.map(k => getValue(k, 'moving_avg_reward_eth')), {
+        color: '#06b6d4',
+        lineWidth: 2,
+        group: 'Statistics',
+      }),
+      createStatisticSeries('Median', unifiedKeys.map(k => getValue(k, 'p50_reward_eth')), {
+        color: '#a855f7',
+        lineWidth: 1.5,
+        lineStyle: 'dotted',
+        group: 'Statistics',
+      }),
+      ...createBandSeries('Bollinger', 'pr-bollinger',
+        unifiedKeys.map(k => getValue(k, 'lower_band_reward_eth')),
+        unifiedKeys.map(k => getValue(k, 'upper_band_reward_eth')),
+        { color: '#f59e0b', opacity: 0.15, group: 'Bands', initiallyVisible: false },
+      ),
+      ...createBandSeries('P5/P95', 'pr-percentile',
+        unifiedKeys.map(k => getValue(k, 'p05_reward_eth')),
+        unifiedKeys.map(k => getValue(k, 'p95_reward_eth')),
+        { color: '#6366f1', opacity: 0.1, group: 'Bands' },
+      ),
+      ...createBandSeries('Min/Max', 'pr-minmax',
+        unifiedKeys.map(k => getValue(k, 'min_reward_eth')),
+        unifiedKeys.map(k => getValue(k, 'max_reward_eth')),
+        { color: '#64748b', opacity: 0.06, group: 'Bands' },
+      ),
+    ],
+  };
 }

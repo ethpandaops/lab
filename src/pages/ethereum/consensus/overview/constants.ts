@@ -1,10 +1,11 @@
 import type { SeriesData } from '@/components/Charts/MultiLine';
 
 /** Available time period options for chart display */
-export type TimePeriod = '7d' | '30d' | '90d' | '180d' | '1y' | '2y' | 'all';
+export type TimePeriod = '24h' | '7d' | '30d' | '90d' | '180d' | '1y' | '2y' | 'all';
 
 /** Configuration for each time range option */
 export const TIME_RANGE_CONFIG = {
+  '24h': { days: 1, dataType: 'hourly' as const, pageSize: 24 },
   '7d': { days: 7, dataType: 'hourly' as const, pageSize: 168 },
   '30d': { days: 30, dataType: 'hourly' as const, pageSize: 720 },
   '90d': { days: 90, dataType: 'hourly' as const, pageSize: 2160 },
@@ -22,6 +23,7 @@ export interface ChartConfig {
 
 /** Time period selector options for UI rendering */
 export const TIME_PERIOD_OPTIONS = [
+  { value: '24h', label: '24h' },
   { value: '7d', label: '7d' },
   { value: '30d', label: '30d' },
   { value: '90d', label: '90d' },
