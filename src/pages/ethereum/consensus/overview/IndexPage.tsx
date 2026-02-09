@@ -18,12 +18,16 @@ import {
   fctBlobCountByDailyServiceListOptions,
   fctAttestationParticipationRateHourlyServiceListOptions,
   fctAttestationParticipationRateDailyServiceListOptions,
+  fctHeadVoteCorrectnessRateHourlyServiceListOptions,
+  fctHeadVoteCorrectnessRateDailyServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import type {
   FctBlobCountByHourly,
   FctBlobCountByDaily,
   FctAttestationParticipationRateHourly,
   FctAttestationParticipationRateDaily,
+  FctHeadVoteCorrectnessRateHourly,
+  FctHeadVoteCorrectnessRateDaily,
 } from '@/api/types.gen';
 import { ConsensusOverviewSkeleton } from './components';
 import { type TimePeriod, TIME_RANGE_CONFIG, TIME_PERIOD_OPTIONS } from './constants';
@@ -34,6 +38,7 @@ import {
   formatBand,
   buildBlobCountChartConfig,
   buildAttestationParticipationChartConfig,
+  buildHeadVoteCorrectnessChartConfig,
   type TooltipSection,
 } from './utils';
 
@@ -91,6 +96,23 @@ export function IndexPage(): JSX.Element {
     enabled: isDaily,
   });
 
+  const hvHourlyQuery = useQuery({
+    ...fctHeadVoteCorrectnessRateHourlyServiceListOptions({
+      query: {
+        hour_start_date_time_gte: startTimestamp,
+        order_by: 'hour_start_date_time asc',
+        page_size: config.pageSize,
+      },
+    }),
+    enabled: !isDaily,
+  });
+  const hvDailyQuery = useQuery({
+    ...fctHeadVoteCorrectnessRateDailyServiceListOptions({
+      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: config.pageSize },
+    }),
+    enabled: isDaily,
+  });
+
   // --- Records ---
 
   const blobRecords = useMemo(
@@ -109,6 +131,14 @@ export function IndexPage(): JSX.Element {
     [isDaily, attnDailyQuery.data, attnHourlyQuery.data]
   );
 
+  const hvRecords = useMemo(
+    () =>
+      isDaily
+        ? [...(hvDailyQuery.data?.fct_head_vote_correctness_rate_daily ?? [])].reverse()
+        : hvHourlyQuery.data?.fct_head_vote_correctness_rate_hourly,
+    [isDaily, hvDailyQuery.data, hvHourlyQuery.data]
+  );
+
   // --- Unified time keys from all datasets ---
 
   const unifiedTimeKeys = useMemo(() => {
@@ -124,24 +154,26 @@ export function IndexPage(): JSX.Element {
     if (!isDaily) {
       addHourlyKeys(blobRecords as FctBlobCountByHourly[] | undefined);
       addHourlyKeys(attnRecords as FctAttestationParticipationRateHourly[] | undefined);
+      addHourlyKeys(hvRecords as FctHeadVoteCorrectnessRateHourly[] | undefined);
     } else {
       addDailyKeys(blobRecords as FctBlobCountByDaily[] | undefined);
       addDailyKeys(attnRecords as FctAttestationParticipationRateDaily[] | undefined);
+      addDailyKeys(hvRecords as FctHeadVoteCorrectnessRateDaily[] | undefined);
     }
 
     allKeys.delete('');
     const sortedKeys = [...allKeys].sort();
     return fillTimeKeys(sortedKeys, isDaily);
-  }, [blobRecords, attnRecords, isDaily]);
+  }, [blobRecords, attnRecords, hvRecords, isDaily]);
 
   // --- Loading & error ---
 
-  const hourlyLoading = blobHourlyQuery.isLoading || attnHourlyQuery.isLoading;
-  const dailyLoading = blobDailyQuery.isLoading || attnDailyQuery.isLoading;
+  const hourlyLoading = blobHourlyQuery.isLoading || attnHourlyQuery.isLoading || hvHourlyQuery.isLoading;
+  const dailyLoading = blobDailyQuery.isLoading || attnDailyQuery.isLoading || hvDailyQuery.isLoading;
   const isLoading = isDaily ? dailyLoading : hourlyLoading;
   const error = isDaily
-    ? (blobDailyQuery.error ?? attnDailyQuery.error)
-    : (blobHourlyQuery.error ?? attnHourlyQuery.error);
+    ? (blobDailyQuery.error ?? attnDailyQuery.error ?? hvDailyQuery.error)
+    : (blobHourlyQuery.error ?? attnHourlyQuery.error ?? hvHourlyQuery.error);
 
   // --- Chart configs ---
 
@@ -155,9 +187,14 @@ export function IndexPage(): JSX.Element {
     return buildAttestationParticipationChartConfig(attnRecords, unifiedTimeKeys, isDaily);
   }, [attnRecords, unifiedTimeKeys, isDaily]);
 
+  const hvChartConfig = useMemo(() => {
+    if (!hvRecords?.length || !unifiedTimeKeys.length) return null;
+    return buildHeadVoteCorrectnessChartConfig(hvRecords, unifiedTimeKeys, isDaily);
+  }, [hvRecords, unifiedTimeKeys, isDaily]);
+
   // --- Fork mark lines ---
 
-  const chartLabels = blobChartConfig?.labels ?? attnChartConfig?.labels ?? [];
+  const chartLabels = blobChartConfig?.labels ?? attnChartConfig?.labels ?? hvChartConfig?.labels ?? [];
 
   const consensusForkMarkLines = useMemo(() => {
     if (!currentNetwork || !allForks.length) return [];
@@ -307,6 +344,26 @@ export function IndexPage(): JSX.Element {
     [makeStatsTooltipFormatter, attnRecords]
   );
 
+  const hvTooltipFormatter = useMemo(
+    () =>
+      makeStatsTooltipFormatter(
+        hvRecords as Record<string, unknown>[] | undefined,
+        {
+          avg: 'avg_head_vote_rate',
+          movingAvg: 'moving_avg_head_vote_rate',
+          median: 'p50_head_vote_rate',
+          lowerBand: 'lower_band_head_vote_rate',
+          upperBand: 'upper_band_head_vote_rate',
+          p05: 'p05_head_vote_rate',
+          p95: 'p95_head_vote_rate',
+          min: 'min_head_vote_rate',
+          max: 'max_head_vote_rate',
+        },
+        '%'
+      ),
+    [makeStatsTooltipFormatter, hvRecords]
+  );
+
   // --- Subtitles ---
 
   const makeSub = (metric: string) =>
@@ -399,6 +456,31 @@ export function IndexPage(): JSX.Element {
                   legendPosition="top"
                   enableDataZoom
                   tooltipFormatter={attnTooltipFormatter}
+                  markLines={showAnnotations ? forkMarkLines : []}
+                  syncGroup={inModal ? undefined : 'consensus-overview'}
+                />
+              )}
+            </PopoutCard>
+          )}
+
+          {/* Head Vote Correctness Rate */}
+          {hvChartConfig && (
+            <PopoutCard
+              title="Head Vote Correctness"
+              subtitle={makeSub('head vote correctness rate')}
+              anchorId="head-vote-correctness-chart"
+              modalSize="full"
+            >
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={hvChartConfig.series}
+                  xAxis={{ type: 'category', labels: hvChartConfig.labels, name: 'Date' }}
+                  yAxis={{ name: 'Head Vote Rate (%)', min: 0, max: 100 }}
+                  height={inModal ? 600 : 400}
+                  showLegend
+                  legendPosition="top"
+                  enableDataZoom
+                  tooltipFormatter={hvTooltipFormatter}
                   markLines={showAnnotations ? forkMarkLines : []}
                   syncGroup={inModal ? undefined : 'consensus-overview'}
                 />
