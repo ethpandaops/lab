@@ -4,6 +4,8 @@ import type {
   FctBlobCountByDaily,
   FctAttestationParticipationRateHourly,
   FctAttestationParticipationRateDaily,
+  FctHeadVoteCorrectnessRateHourly,
+  FctHeadVoteCorrectnessRateDaily,
 } from '@/api/types.gen';
 import { formatDailyDate, formatHourlyDate } from '@/pages/ethereum/execution/overview/utils';
 import type { ChartConfig } from './constants';
@@ -190,6 +192,83 @@ export function buildAttestationParticipationChartConfig(
         opacity: 0.06,
         group: 'Bands',
       }),
+    ],
+  };
+}
+
+/** Builds chart series config from head vote correctness rate records */
+export function buildHeadVoteCorrectnessChartConfig(
+  records: (FctHeadVoteCorrectnessRateHourly | FctHeadVoteCorrectnessRateDaily)[],
+  unifiedKeys: string[],
+  isDaily: boolean
+): ChartConfig {
+  const byKey = new Map<string, FctHeadVoteCorrectnessRateHourly | FctHeadVoteCorrectnessRateDaily>();
+  for (const r of records) {
+    const key = isDaily
+      ? ((r as FctHeadVoteCorrectnessRateDaily).day_start_date ?? '')
+      : String((r as FctHeadVoteCorrectnessRateHourly).hour_start_date_time ?? '');
+    byKey.set(key, r);
+  }
+
+  const labels = unifiedKeys.map(k => (isDaily ? formatDailyDate(k) : formatHourlyDate(Number(k))));
+
+  const getValue = (k: string, field: string) => {
+    const r = byKey.get(k);
+    return r ? Math.max(0, (r as Record<string, number>)[field] ?? 0) : null;
+  };
+
+  return {
+    labels,
+    series: [
+      createStatisticSeries(
+        'Average',
+        unifiedKeys.map(k => getValue(k, 'avg_head_vote_rate')),
+        {
+          color: '#10b981',
+          lineWidth: 2.5,
+          group: 'Statistics',
+        }
+      ),
+      createStatisticSeries(
+        'Moving Avg',
+        unifiedKeys.map(k => getValue(k, 'moving_avg_head_vote_rate')),
+        {
+          color: '#06b6d4',
+          lineWidth: 2,
+          group: 'Statistics',
+        }
+      ),
+      createStatisticSeries(
+        'Median',
+        unifiedKeys.map(k => getValue(k, 'p50_head_vote_rate')),
+        {
+          color: '#a855f7',
+          lineWidth: 1.5,
+          lineStyle: 'dotted',
+          group: 'Statistics',
+        }
+      ),
+      ...createBandSeries(
+        'Bollinger',
+        'hv-bollinger',
+        unifiedKeys.map(k => getValue(k, 'lower_band_head_vote_rate')),
+        unifiedKeys.map(k => getValue(k, 'upper_band_head_vote_rate')),
+        { color: '#f59e0b', opacity: 0.15, group: 'Bands', initiallyVisible: false }
+      ),
+      ...createBandSeries(
+        'P5/P95',
+        'hv-percentile',
+        unifiedKeys.map(k => getValue(k, 'p05_head_vote_rate')),
+        unifiedKeys.map(k => getValue(k, 'p95_head_vote_rate')),
+        { color: '#6366f1', opacity: 0.1, group: 'Bands' }
+      ),
+      ...createBandSeries(
+        'Min/Max',
+        'hv-minmax',
+        unifiedKeys.map(k => getValue(k, 'min_head_vote_rate')),
+        unifiedKeys.map(k => getValue(k, 'max_head_vote_rate')),
+        { color: '#64748b', opacity: 0.06, group: 'Bands' }
+      ),
     ],
   };
 }
