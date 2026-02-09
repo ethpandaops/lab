@@ -1,5 +1,10 @@
 import { createBandSeries, createStatisticSeries } from '@/components/Charts/MultiLine';
-import type { FctBlobCountByHourly, FctBlobCountByDaily } from '@/api/types.gen';
+import type {
+  FctBlobCountByHourly,
+  FctBlobCountByDaily,
+  FctAttestationParticipationRateHourly,
+  FctAttestationParticipationRateDaily,
+} from '@/api/types.gen';
 import { formatDailyDate, formatHourlyDate } from '@/pages/ethereum/execution/overview/utils';
 import type { ChartConfig } from './constants';
 
@@ -108,6 +113,79 @@ export function buildBlobCountChartConfig(
         group: 'Bands',
       }),
       ...createBandSeries('Min/Max', 'blob-minmax', minValues, maxValues, {
+        color: '#64748b',
+        opacity: 0.06,
+        group: 'Bands',
+      }),
+    ],
+  };
+}
+
+/** Builds chart series config from attestation participation rate records aligned to unified time keys */
+export function buildAttestationParticipationChartConfig(
+  records: (FctAttestationParticipationRateHourly | FctAttestationParticipationRateDaily)[],
+  unifiedKeys: string[],
+  isDaily: boolean
+): ChartConfig {
+  const byKey = new Map<string, FctAttestationParticipationRateHourly | FctAttestationParticipationRateDaily>();
+  for (const r of records) {
+    const key = isDaily
+      ? ((r as FctAttestationParticipationRateDaily).day_start_date ?? '')
+      : String((r as FctAttestationParticipationRateHourly).hour_start_date_time ?? '');
+    byKey.set(key, r);
+  }
+
+  const labels = unifiedKeys.map(k => (isDaily ? formatDailyDate(k) : formatHourlyDate(Number(k))));
+
+  const getValue = (
+    k: string,
+    field: keyof FctAttestationParticipationRateHourly & keyof FctAttestationParticipationRateDaily
+  ) => {
+    const r = byKey.get(k);
+    return r ? Math.max(0, (r as Record<string, number>)[field] ?? 0) : null;
+  };
+
+  const avgValues = unifiedKeys.map(k => getValue(k, 'avg_participation_rate'));
+  const movingAvgValues = unifiedKeys.map(k => getValue(k, 'moving_avg_participation_rate'));
+  const medianValues = unifiedKeys.map(k => getValue(k, 'p50_participation_rate'));
+  const lowerBandValues = unifiedKeys.map(k => getValue(k, 'lower_band_participation_rate'));
+  const upperBandValues = unifiedKeys.map(k => getValue(k, 'upper_band_participation_rate'));
+  const p5Values = unifiedKeys.map(k => getValue(k, 'p05_participation_rate'));
+  const p95Values = unifiedKeys.map(k => getValue(k, 'p95_participation_rate'));
+  const minValues = unifiedKeys.map(k => getValue(k, 'min_participation_rate'));
+  const maxValues = unifiedKeys.map(k => getValue(k, 'max_participation_rate'));
+
+  return {
+    labels,
+    series: [
+      createStatisticSeries('Average', avgValues, {
+        color: '#10b981',
+        lineWidth: 2.5,
+        group: 'Statistics',
+      }),
+      createStatisticSeries('Moving Avg', movingAvgValues, {
+        color: '#06b6d4',
+        lineWidth: 2,
+        group: 'Statistics',
+      }),
+      createStatisticSeries('Median', medianValues, {
+        color: '#a855f7',
+        lineWidth: 1.5,
+        lineStyle: 'dotted',
+        group: 'Statistics',
+      }),
+      ...createBandSeries('Bollinger', 'attn-bollinger', lowerBandValues, upperBandValues, {
+        color: '#f59e0b',
+        opacity: 0.15,
+        group: 'Bands',
+        initiallyVisible: false,
+      }),
+      ...createBandSeries('P5/P95', 'attn-percentile', p5Values, p95Values, {
+        color: '#6366f1',
+        opacity: 0.1,
+        group: 'Bands',
+      }),
+      ...createBandSeries('Min/Max', 'attn-minmax', minValues, maxValues, {
         color: '#64748b',
         opacity: 0.06,
         group: 'Bands',
