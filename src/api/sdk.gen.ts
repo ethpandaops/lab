@@ -105,6 +105,18 @@ import type {
   FctAttestationFirstSeenChunked50MsServiceListData,
   FctAttestationFirstSeenChunked50MsServiceListErrors,
   FctAttestationFirstSeenChunked50MsServiceListResponses,
+  FctAttestationInclusionDelayDailyServiceGetData,
+  FctAttestationInclusionDelayDailyServiceGetErrors,
+  FctAttestationInclusionDelayDailyServiceGetResponses,
+  FctAttestationInclusionDelayDailyServiceListData,
+  FctAttestationInclusionDelayDailyServiceListErrors,
+  FctAttestationInclusionDelayDailyServiceListResponses,
+  FctAttestationInclusionDelayHourlyServiceGetData,
+  FctAttestationInclusionDelayHourlyServiceGetErrors,
+  FctAttestationInclusionDelayHourlyServiceGetResponses,
+  FctAttestationInclusionDelayHourlyServiceListData,
+  FctAttestationInclusionDelayHourlyServiceListErrors,
+  FctAttestationInclusionDelayHourlyServiceListResponses,
   FctAttestationLivenessByEntityHeadServiceGetData,
   FctAttestationLivenessByEntityHeadServiceGetErrors,
   FctAttestationLivenessByEntityHeadServiceGetResponses,
@@ -195,6 +207,18 @@ import type {
   FctBlockMevServiceListData,
   FctBlockMevServiceListErrors,
   FctBlockMevServiceListResponses,
+  FctBlockProposalStatusDailyServiceGetData,
+  FctBlockProposalStatusDailyServiceGetErrors,
+  FctBlockProposalStatusDailyServiceGetResponses,
+  FctBlockProposalStatusDailyServiceListData,
+  FctBlockProposalStatusDailyServiceListErrors,
+  FctBlockProposalStatusDailyServiceListResponses,
+  FctBlockProposalStatusHourlyServiceGetData,
+  FctBlockProposalStatusHourlyServiceGetErrors,
+  FctBlockProposalStatusHourlyServiceGetResponses,
+  FctBlockProposalStatusHourlyServiceListData,
+  FctBlockProposalStatusHourlyServiceListErrors,
+  FctBlockProposalStatusHourlyServiceListResponses,
   FctBlockProposerEntityServiceGetData,
   FctBlockProposerEntityServiceGetErrors,
   FctBlockProposerEntityServiceGetResponses,
@@ -453,6 +477,18 @@ import type {
   FctMevBidHighestValueByBuilderChunked50MsServiceListData,
   FctMevBidHighestValueByBuilderChunked50MsServiceListErrors,
   FctMevBidHighestValueByBuilderChunked50MsServiceListResponses,
+  FctMissedSlotRateDailyServiceGetData,
+  FctMissedSlotRateDailyServiceGetErrors,
+  FctMissedSlotRateDailyServiceGetResponses,
+  FctMissedSlotRateDailyServiceListData,
+  FctMissedSlotRateDailyServiceListErrors,
+  FctMissedSlotRateDailyServiceListResponses,
+  FctMissedSlotRateHourlyServiceGetData,
+  FctMissedSlotRateHourlyServiceGetErrors,
+  FctMissedSlotRateHourlyServiceGetResponses,
+  FctMissedSlotRateHourlyServiceListData,
+  FctMissedSlotRateHourlyServiceListErrors,
+  FctMissedSlotRateHourlyServiceListResponses,
   FctNodeActiveLast24hServiceGetData,
   FctNodeActiveLast24hServiceGetErrors,
   FctNodeActiveLast24hServiceGetResponses,
@@ -489,6 +525,18 @@ import type {
   FctPreparedBlockServiceListData,
   FctPreparedBlockServiceListErrors,
   FctPreparedBlockServiceListResponses,
+  FctProposerRewardDailyServiceGetData,
+  FctProposerRewardDailyServiceGetErrors,
+  FctProposerRewardDailyServiceGetResponses,
+  FctProposerRewardDailyServiceListData,
+  FctProposerRewardDailyServiceListErrors,
+  FctProposerRewardDailyServiceListResponses,
+  FctProposerRewardHourlyServiceGetData,
+  FctProposerRewardHourlyServiceGetErrors,
+  FctProposerRewardHourlyServiceGetResponses,
+  FctProposerRewardHourlyServiceListData,
+  FctProposerRewardHourlyServiceListErrors,
+  FctProposerRewardHourlyServiceListResponses,
   FctReorgByDailyServiceGetData,
   FctReorgByDailyServiceGetErrors,
   FctReorgByDailyServiceGetResponses,
@@ -979,6 +1027,14 @@ import {
   zFctAttestationFirstSeenChunked50MsServiceGetResponse,
   zFctAttestationFirstSeenChunked50MsServiceListData,
   zFctAttestationFirstSeenChunked50MsServiceListResponse,
+  zFctAttestationInclusionDelayDailyServiceGetData,
+  zFctAttestationInclusionDelayDailyServiceGetResponse,
+  zFctAttestationInclusionDelayDailyServiceListData,
+  zFctAttestationInclusionDelayDailyServiceListResponse,
+  zFctAttestationInclusionDelayHourlyServiceGetData,
+  zFctAttestationInclusionDelayHourlyServiceGetResponse,
+  zFctAttestationInclusionDelayHourlyServiceListData,
+  zFctAttestationInclusionDelayHourlyServiceListResponse,
   zFctAttestationLivenessByEntityHeadServiceGetData,
   zFctAttestationLivenessByEntityHeadServiceGetResponse,
   zFctAttestationLivenessByEntityHeadServiceListData,
@@ -1039,6 +1095,14 @@ import {
   zFctBlockMevServiceGetResponse,
   zFctBlockMevServiceListData,
   zFctBlockMevServiceListResponse,
+  zFctBlockProposalStatusDailyServiceGetData,
+  zFctBlockProposalStatusDailyServiceGetResponse,
+  zFctBlockProposalStatusDailyServiceListData,
+  zFctBlockProposalStatusDailyServiceListResponse,
+  zFctBlockProposalStatusHourlyServiceGetData,
+  zFctBlockProposalStatusHourlyServiceGetResponse,
+  zFctBlockProposalStatusHourlyServiceListData,
+  zFctBlockProposalStatusHourlyServiceListResponse,
   zFctBlockProposerEntityServiceGetData,
   zFctBlockProposerEntityServiceGetResponse,
   zFctBlockProposerEntityServiceListData,
@@ -1211,6 +1275,14 @@ import {
   zFctMevBidHighestValueByBuilderChunked50MsServiceGetResponse,
   zFctMevBidHighestValueByBuilderChunked50MsServiceListData,
   zFctMevBidHighestValueByBuilderChunked50MsServiceListResponse,
+  zFctMissedSlotRateDailyServiceGetData,
+  zFctMissedSlotRateDailyServiceGetResponse,
+  zFctMissedSlotRateDailyServiceListData,
+  zFctMissedSlotRateDailyServiceListResponse,
+  zFctMissedSlotRateHourlyServiceGetData,
+  zFctMissedSlotRateHourlyServiceGetResponse,
+  zFctMissedSlotRateHourlyServiceListData,
+  zFctMissedSlotRateHourlyServiceListResponse,
   zFctNodeActiveLast24hServiceGetData,
   zFctNodeActiveLast24hServiceGetResponse,
   zFctNodeActiveLast24hServiceListData,
@@ -1235,6 +1307,14 @@ import {
   zFctPreparedBlockServiceGetResponse,
   zFctPreparedBlockServiceListData,
   zFctPreparedBlockServiceListResponse,
+  zFctProposerRewardDailyServiceGetData,
+  zFctProposerRewardDailyServiceGetResponse,
+  zFctProposerRewardDailyServiceListData,
+  zFctProposerRewardDailyServiceListResponse,
+  zFctProposerRewardHourlyServiceGetData,
+  zFctProposerRewardHourlyServiceGetResponse,
+  zFctProposerRewardHourlyServiceListData,
+  zFctProposerRewardHourlyServiceListResponse,
   zFctReorgByDailyServiceGetData,
   zFctReorgByDailyServiceGetResponse,
   zFctReorgByDailyServiceListData,
@@ -2177,6 +2257,82 @@ export const fctAttestationFirstSeenChunked50MsServiceGet = <ThrowOnError extend
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctAttestationInclusionDelayDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationInclusionDelayDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctAttestationInclusionDelayDailyServiceListResponses,
+    FctAttestationInclusionDelayDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationInclusionDelayDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationInclusionDelayDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_inclusion_delay_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctAttestationInclusionDelayDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationInclusionDelayDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctAttestationInclusionDelayDailyServiceGetResponses,
+    FctAttestationInclusionDelayDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationInclusionDelayDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationInclusionDelayDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_inclusion_delay_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctAttestationInclusionDelayHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationInclusionDelayHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctAttestationInclusionDelayHourlyServiceListResponses,
+    FctAttestationInclusionDelayHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationInclusionDelayHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationInclusionDelayHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_inclusion_delay_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctAttestationInclusionDelayHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationInclusionDelayHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctAttestationInclusionDelayHourlyServiceGetResponses,
+    FctAttestationInclusionDelayHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationInclusionDelayHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationInclusionDelayHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_inclusion_delay_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctAttestationLivenessByEntityHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationLivenessByEntityHeadServiceListData, ThrowOnError>
 ) =>
@@ -2744,6 +2900,82 @@ export const fctBlockMevHeadServiceGet = <ThrowOnError extends boolean = false>(
     requestValidator: async data => await zFctBlockMevHeadServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockMevHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_mev_head/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockProposalStatusDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockProposalStatusDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockProposalStatusDailyServiceListResponses,
+    FctBlockProposalStatusDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockProposalStatusDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposalStatusDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_proposal_status_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockProposalStatusDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockProposalStatusDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockProposalStatusDailyServiceGetResponses,
+    FctBlockProposalStatusDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockProposalStatusDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposalStatusDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_proposal_status_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockProposalStatusHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockProposalStatusHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockProposalStatusHourlyServiceListResponses,
+    FctBlockProposalStatusHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockProposalStatusHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposalStatusHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_proposal_status_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctBlockProposalStatusHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockProposalStatusHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockProposalStatusHourlyServiceGetResponses,
+    FctBlockProposalStatusHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockProposalStatusHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposalStatusHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_proposal_status_hourly/{hour_start_date_time}',
     ...options,
   });
 
@@ -4361,6 +4593,82 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceGet = <ThrowOnError
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctMissedSlotRateDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctMissedSlotRateDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctMissedSlotRateDailyServiceListResponses,
+    FctMissedSlotRateDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctMissedSlotRateDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctMissedSlotRateDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_missed_slot_rate_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctMissedSlotRateDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctMissedSlotRateDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctMissedSlotRateDailyServiceGetResponses,
+    FctMissedSlotRateDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctMissedSlotRateDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctMissedSlotRateDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_missed_slot_rate_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctMissedSlotRateHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctMissedSlotRateHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctMissedSlotRateHourlyServiceListResponses,
+    FctMissedSlotRateHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctMissedSlotRateHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctMissedSlotRateHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_missed_slot_rate_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctMissedSlotRateHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctMissedSlotRateHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctMissedSlotRateHourlyServiceGetResponses,
+    FctMissedSlotRateHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctMissedSlotRateHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctMissedSlotRateHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_missed_slot_rate_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctNodeActiveLast24hServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctNodeActiveLast24hServiceListData, ThrowOnError>
 ) =>
@@ -4575,6 +4883,82 @@ export const fctPreparedBlockServiceGet = <ThrowOnError extends boolean = false>
     requestValidator: async data => await zFctPreparedBlockServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctPreparedBlockServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_prepared_block/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctProposerRewardDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctProposerRewardDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctProposerRewardDailyServiceListResponses,
+    FctProposerRewardDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctProposerRewardDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctProposerRewardDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_proposer_reward_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctProposerRewardDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctProposerRewardDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctProposerRewardDailyServiceGetResponses,
+    FctProposerRewardDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctProposerRewardDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctProposerRewardDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_proposer_reward_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctProposerRewardHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctProposerRewardHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctProposerRewardHourlyServiceListResponses,
+    FctProposerRewardHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctProposerRewardHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctProposerRewardHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_proposer_reward_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctProposerRewardHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctProposerRewardHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctProposerRewardHourlyServiceGetResponses,
+    FctProposerRewardHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctProposerRewardHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctProposerRewardHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_proposer_reward_hourly/{hour_start_date_time}',
     ...options,
   });
 
