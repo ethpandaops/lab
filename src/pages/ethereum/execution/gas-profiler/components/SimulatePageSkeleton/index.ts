@@ -1,0 +1,1 @@
+export { SimulatePageSkeleton } from './SimulatePageSkeleton';

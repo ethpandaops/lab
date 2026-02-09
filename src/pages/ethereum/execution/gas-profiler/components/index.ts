@@ -29,3 +29,5 @@ export { BlockOpcodeHeatmap } from './BlockOpcodeHeatmap';
 export { ContractStorageButton } from './ContractStorageButton';
 export { ContractStorageCTA } from './ContractStorageCTA';
 export { ContractActionPopover } from './ContractActionPopover';
+export { SimulatePageSkeleton } from './SimulatePageSkeleton';
+export { SimulatorHelpDialog } from './SimulatorHelpDialog';
