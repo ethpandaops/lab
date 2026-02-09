@@ -59,6 +59,7 @@ import { Route as EthereumExecutionPayloadsIndexRouteImport } from './routes/eth
 import { Route as EthereumExecutionGasProfilerIndexRouteImport } from './routes/ethereum/execution/gas-profiler/index'
 import { Route as EthereumDataAvailabilityProbesIndexRouteImport } from './routes/ethereum/data-availability/probes/index'
 import { Route as EthereumDataAvailabilityCustodyIndexRouteImport } from './routes/ethereum/data-availability/custody/index'
+import { Route as EthereumExecutionGasProfilerSimulateRouteImport } from './routes/ethereum/execution/gas-profiler/simulate'
 import { Route as EthereumExecutionGasProfilerTxTxHashRouteImport } from './routes/ethereum/execution/gas-profiler/tx.$txHash'
 import { Route as EthereumExecutionGasProfilerBlockBlockNumberRouteImport } from './routes/ethereum/execution/gas-profiler/block.$blockNumber'
 import { Route as EthereumExecutionGasProfilerTxTxHashCallCallIdRouteImport } from './routes/ethereum/execution/gas-profiler/tx.$txHash_.call.$callId'
@@ -333,6 +334,12 @@ const EthereumDataAvailabilityCustodyIndexRoute =
     path: '/',
     getParentRoute: () => EthereumDataAvailabilityCustodyRoute,
   } as any)
+const EthereumExecutionGasProfilerSimulateRoute =
+  EthereumExecutionGasProfilerSimulateRouteImport.update({
+    id: '/simulate',
+    path: '/simulate',
+    getParentRoute: () => EthereumExecutionGasProfilerRoute,
+  } as any)
 const EthereumExecutionGasProfilerTxTxHashRoute =
   EthereumExecutionGasProfilerTxTxHashRouteImport.update({
     id: '/tx/$txHash',
@@ -398,6 +405,7 @@ export interface FileRoutesByFullPath {
   '/ethereum/forks/': typeof EthereumForksIndexRoute
   '/ethereum/slots/': typeof EthereumSlotsIndexRoute
   '/xatu/contributors/': typeof XatuContributorsIndexRoute
+  '/ethereum/execution/gas-profiler/simulate': typeof EthereumExecutionGasProfilerSimulateRoute
   '/ethereum/data-availability/custody/': typeof EthereumDataAvailabilityCustodyIndexRoute
   '/ethereum/data-availability/probes/': typeof EthereumDataAvailabilityProbesIndexRoute
   '/ethereum/execution/gas-profiler/': typeof EthereumExecutionGasProfilerIndexRoute
@@ -441,6 +449,7 @@ export interface FileRoutesByTo {
   '/ethereum/forks': typeof EthereumForksIndexRoute
   '/ethereum/slots': typeof EthereumSlotsIndexRoute
   '/xatu/contributors': typeof XatuContributorsIndexRoute
+  '/ethereum/execution/gas-profiler/simulate': typeof EthereumExecutionGasProfilerSimulateRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyIndexRoute
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesIndexRoute
   '/ethereum/execution/gas-profiler': typeof EthereumExecutionGasProfilerIndexRoute
@@ -497,6 +506,7 @@ export interface FileRoutesById {
   '/ethereum/forks/': typeof EthereumForksIndexRoute
   '/ethereum/slots/': typeof EthereumSlotsIndexRoute
   '/xatu/contributors/': typeof XatuContributorsIndexRoute
+  '/ethereum/execution/gas-profiler/simulate': typeof EthereumExecutionGasProfilerSimulateRoute
   '/ethereum/data-availability/custody/': typeof EthereumDataAvailabilityCustodyIndexRoute
   '/ethereum/data-availability/probes/': typeof EthereumDataAvailabilityProbesIndexRoute
   '/ethereum/execution/gas-profiler/': typeof EthereumExecutionGasProfilerIndexRoute
@@ -554,6 +564,7 @@ export interface FileRouteTypes {
     | '/ethereum/forks/'
     | '/ethereum/slots/'
     | '/xatu/contributors/'
+    | '/ethereum/execution/gas-profiler/simulate'
     | '/ethereum/data-availability/custody/'
     | '/ethereum/data-availability/probes/'
     | '/ethereum/execution/gas-profiler/'
@@ -597,6 +608,7 @@ export interface FileRouteTypes {
     | '/ethereum/forks'
     | '/ethereum/slots'
     | '/xatu/contributors'
+    | '/ethereum/execution/gas-profiler/simulate'
     | '/ethereum/data-availability/custody'
     | '/ethereum/data-availability/probes'
     | '/ethereum/execution/gas-profiler'
@@ -652,6 +664,7 @@ export interface FileRouteTypes {
     | '/ethereum/forks/'
     | '/ethereum/slots/'
     | '/xatu/contributors/'
+    | '/ethereum/execution/gas-profiler/simulate'
     | '/ethereum/data-availability/custody/'
     | '/ethereum/data-availability/probes/'
     | '/ethereum/execution/gas-profiler/'
@@ -1027,6 +1040,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumDataAvailabilityCustodyIndexRouteImport
       parentRoute: typeof EthereumDataAvailabilityCustodyRoute
     }
+    '/ethereum/execution/gas-profiler/simulate': {
+      id: '/ethereum/execution/gas-profiler/simulate'
+      path: '/simulate'
+      fullPath: '/ethereum/execution/gas-profiler/simulate'
+      preLoaderRoute: typeof EthereumExecutionGasProfilerSimulateRouteImport
+      parentRoute: typeof EthereumExecutionGasProfilerRoute
+    }
     '/ethereum/execution/gas-profiler/tx/$txHash': {
       id: '/ethereum/execution/gas-profiler/tx/$txHash'
       path: '/tx/$txHash'
@@ -1140,6 +1160,7 @@ const EthereumEpochsRouteWithChildren = EthereumEpochsRoute._addFileChildren(
 )
 
 interface EthereumExecutionGasProfilerRouteChildren {
+  EthereumExecutionGasProfilerSimulateRoute: typeof EthereumExecutionGasProfilerSimulateRoute
   EthereumExecutionGasProfilerIndexRoute: typeof EthereumExecutionGasProfilerIndexRoute
   EthereumExecutionGasProfilerBlockBlockNumberRoute: typeof EthereumExecutionGasProfilerBlockBlockNumberRoute
   EthereumExecutionGasProfilerTxTxHashRoute: typeof EthereumExecutionGasProfilerTxTxHashRoute
@@ -1148,6 +1169,8 @@ interface EthereumExecutionGasProfilerRouteChildren {
 
 const EthereumExecutionGasProfilerRouteChildren: EthereumExecutionGasProfilerRouteChildren =
   {
+    EthereumExecutionGasProfilerSimulateRoute:
+      EthereumExecutionGasProfilerSimulateRoute,
     EthereumExecutionGasProfilerIndexRoute:
       EthereumExecutionGasProfilerIndexRoute,
     EthereumExecutionGasProfilerBlockBlockNumberRoute:
