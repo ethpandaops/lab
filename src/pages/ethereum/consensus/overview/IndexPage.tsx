@@ -12,6 +12,7 @@ import {
 import { useNetwork } from '@/hooks/useNetwork';
 import { useForks } from '@/hooks/useForks';
 import { Toggle } from '@/components/Forms/Toggle';
+import { epochToTimestamp } from '@/utils/beacon';
 import clsx from 'clsx';
 import {
   fctBlobCountByHourlyServiceListOptions,
@@ -22,6 +23,14 @@ import {
   fctHeadVoteCorrectnessRateDailyServiceListOptions,
   fctReorgByHourlyServiceListOptions,
   fctReorgByDailyServiceListOptions,
+  fctMissedSlotRateHourlyServiceListOptions,
+  fctMissedSlotRateDailyServiceListOptions,
+  fctBlockProposalStatusHourlyServiceListOptions,
+  fctBlockProposalStatusDailyServiceListOptions,
+  fctAttestationInclusionDelayHourlyServiceListOptions,
+  fctAttestationInclusionDelayDailyServiceListOptions,
+  fctProposerRewardHourlyServiceListOptions,
+  fctProposerRewardDailyServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import type {
   FctBlobCountByHourly,
@@ -32,6 +41,14 @@ import type {
   FctHeadVoteCorrectnessRateDaily,
   FctReorgByHourly,
   FctReorgByDaily,
+  FctMissedSlotRateHourly,
+  FctMissedSlotRateDaily,
+  FctBlockProposalStatusHourly,
+  FctBlockProposalStatusDaily,
+  FctAttestationInclusionDelayHourly,
+  FctAttestationInclusionDelayDaily,
+  FctProposerRewardHourly,
+  FctProposerRewardDaily,
 } from '@/api/types.gen';
 import { ConsensusOverviewSkeleton } from './components';
 import { type TimePeriod, TIME_RANGE_CONFIG, TIME_PERIOD_OPTIONS } from './constants';
@@ -44,6 +61,10 @@ import {
   buildAttestationParticipationChartConfig,
   buildHeadVoteCorrectnessChartConfig,
   buildReorgChartConfig,
+  buildMissedSlotRateChartConfig,
+  buildBlockProposalStatusChartConfig,
+  buildAttestationInclusionDelayChartConfig,
+  buildProposerRewardChartConfig,
   type TooltipSection,
 } from './utils';
 
@@ -119,6 +140,58 @@ export function IndexPage(): JSX.Element {
     enabled: isDaily,
   });
 
+  const missedSlotHourlyQuery = useQuery({
+    ...fctMissedSlotRateHourlyServiceListOptions({
+      query: { hour_start_date_time_gte: startTimestamp, order_by: 'hour_start_date_time asc', page_size: config.pageSize },
+    }),
+    enabled: !isDaily,
+  });
+  const missedSlotDailyQuery = useQuery({
+    ...fctMissedSlotRateDailyServiceListOptions({
+      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: config.pageSize },
+    }),
+    enabled: isDaily,
+  });
+
+  const proposalStatusHourlyQuery = useQuery({
+    ...fctBlockProposalStatusHourlyServiceListOptions({
+      query: { hour_start_date_time_gte: startTimestamp, order_by: 'hour_start_date_time asc', page_size: config.pageSize },
+    }),
+    enabled: !isDaily,
+  });
+  const proposalStatusDailyQuery = useQuery({
+    ...fctBlockProposalStatusDailyServiceListOptions({
+      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: config.pageSize },
+    }),
+    enabled: isDaily,
+  });
+
+  const inclusionDelayHourlyQuery = useQuery({
+    ...fctAttestationInclusionDelayHourlyServiceListOptions({
+      query: { hour_start_date_time_gte: startTimestamp, order_by: 'hour_start_date_time asc', page_size: config.pageSize },
+    }),
+    enabled: !isDaily,
+  });
+  const inclusionDelayDailyQuery = useQuery({
+    ...fctAttestationInclusionDelayDailyServiceListOptions({
+      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: config.pageSize },
+    }),
+    enabled: isDaily,
+  });
+
+  const proposerRewardHourlyQuery = useQuery({
+    ...fctProposerRewardHourlyServiceListOptions({
+      query: { hour_start_date_time_gte: startTimestamp, order_by: 'hour_start_date_time asc', page_size: config.pageSize },
+    }),
+    enabled: !isDaily,
+  });
+  const proposerRewardDailyQuery = useQuery({
+    ...fctProposerRewardDailyServiceListOptions({
+      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: config.pageSize },
+    }),
+    enabled: isDaily,
+  });
+
   // --- Records ---
 
   const blobRecords = useMemo(
@@ -149,6 +222,34 @@ export function IndexPage(): JSX.Element {
     [isDaily, reorgDailyQuery.data, reorgHourlyQuery.data]
   );
 
+  const missedSlotRecords = useMemo(
+    () => isDaily
+      ? [...(missedSlotDailyQuery.data?.fct_missed_slot_rate_daily ?? [])].reverse()
+      : missedSlotHourlyQuery.data?.fct_missed_slot_rate_hourly,
+    [isDaily, missedSlotDailyQuery.data, missedSlotHourlyQuery.data]
+  );
+
+  const proposalStatusRecords = useMemo(
+    () => isDaily
+      ? [...(proposalStatusDailyQuery.data?.fct_block_proposal_status_daily ?? [])].reverse()
+      : proposalStatusHourlyQuery.data?.fct_block_proposal_status_hourly,
+    [isDaily, proposalStatusDailyQuery.data, proposalStatusHourlyQuery.data]
+  );
+
+  const inclusionDelayRecords = useMemo(
+    () => isDaily
+      ? [...(inclusionDelayDailyQuery.data?.fct_attestation_inclusion_delay_daily ?? [])].reverse()
+      : inclusionDelayHourlyQuery.data?.fct_attestation_inclusion_delay_hourly,
+    [isDaily, inclusionDelayDailyQuery.data, inclusionDelayHourlyQuery.data]
+  );
+
+  const proposerRewardRecords = useMemo(
+    () => isDaily
+      ? [...(proposerRewardDailyQuery.data?.fct_proposer_reward_daily ?? [])].reverse()
+      : proposerRewardHourlyQuery.data?.fct_proposer_reward_hourly,
+    [isDaily, proposerRewardDailyQuery.data, proposerRewardHourlyQuery.data]
+  );
+
   // --- Unified time keys from all datasets ---
 
   const unifiedTimeKeys = useMemo(() => {
@@ -166,33 +267,77 @@ export function IndexPage(): JSX.Element {
       addHourlyKeys(attnRecords as FctAttestationParticipationRateHourly[] | undefined);
       addHourlyKeys(hvRecords as FctHeadVoteCorrectnessRateHourly[] | undefined);
       addHourlyKeys(reorgRecords as FctReorgByHourly[] | undefined);
+      addHourlyKeys(missedSlotRecords as FctMissedSlotRateHourly[] | undefined);
+      addHourlyKeys(proposalStatusRecords as FctBlockProposalStatusHourly[] | undefined);
+      addHourlyKeys(inclusionDelayRecords as FctAttestationInclusionDelayHourly[] | undefined);
+      addHourlyKeys(proposerRewardRecords as FctProposerRewardHourly[] | undefined);
     } else {
       addDailyKeys(blobRecords as FctBlobCountByDaily[] | undefined);
       addDailyKeys(attnRecords as FctAttestationParticipationRateDaily[] | undefined);
       addDailyKeys(hvRecords as FctHeadVoteCorrectnessRateDaily[] | undefined);
       addDailyKeys(reorgRecords as FctReorgByDaily[] | undefined);
+      addDailyKeys(missedSlotRecords as FctMissedSlotRateDaily[] | undefined);
+      addDailyKeys(proposalStatusRecords as FctBlockProposalStatusDaily[] | undefined);
+      addDailyKeys(inclusionDelayRecords as FctAttestationInclusionDelayDaily[] | undefined);
+      addDailyKeys(proposerRewardRecords as FctProposerRewardDaily[] | undefined);
     }
 
     allKeys.delete('');
     const sortedKeys = [...allKeys].sort();
     return fillTimeKeys(sortedKeys, isDaily);
-  }, [blobRecords, attnRecords, hvRecords, reorgRecords, isDaily]);
+  }, [blobRecords, attnRecords, hvRecords, reorgRecords, missedSlotRecords, proposalStatusRecords, inclusionDelayRecords, proposerRewardRecords, isDaily]);
 
   // --- Loading & error ---
 
-  const hourlyLoading = blobHourlyQuery.isLoading || attnHourlyQuery.isLoading || hvHourlyQuery.isLoading || reorgHourlyQuery.isLoading;
-  const dailyLoading = blobDailyQuery.isLoading || attnDailyQuery.isLoading || hvDailyQuery.isLoading || reorgDailyQuery.isLoading;
+  const hourlyLoading = blobHourlyQuery.isLoading || attnHourlyQuery.isLoading || hvHourlyQuery.isLoading || reorgHourlyQuery.isLoading
+    || missedSlotHourlyQuery.isLoading || proposalStatusHourlyQuery.isLoading || inclusionDelayHourlyQuery.isLoading || proposerRewardHourlyQuery.isLoading;
+  const dailyLoading = blobDailyQuery.isLoading || attnDailyQuery.isLoading || hvDailyQuery.isLoading || reorgDailyQuery.isLoading
+    || missedSlotDailyQuery.isLoading || proposalStatusDailyQuery.isLoading || inclusionDelayDailyQuery.isLoading || proposerRewardDailyQuery.isLoading;
   const isLoading = isDaily ? dailyLoading : hourlyLoading;
   const error = isDaily
-    ? blobDailyQuery.error ?? attnDailyQuery.error ?? hvDailyQuery.error ?? reorgDailyQuery.error
-    : blobHourlyQuery.error ?? attnHourlyQuery.error ?? hvHourlyQuery.error ?? reorgHourlyQuery.error;
+    ? blobDailyQuery.error ?? attnDailyQuery.error ?? hvDailyQuery.error ?? reorgDailyQuery.error ?? missedSlotDailyQuery.error ?? proposalStatusDailyQuery.error ?? inclusionDelayDailyQuery.error ?? proposerRewardDailyQuery.error
+    : blobHourlyQuery.error ?? attnHourlyQuery.error ?? hvHourlyQuery.error ?? reorgHourlyQuery.error ?? missedSlotHourlyQuery.error ?? proposalStatusHourlyQuery.error ?? inclusionDelayHourlyQuery.error ?? proposerRewardHourlyQuery.error;
+
+  // --- Max blob values for reference line ---
+
+  const maxBlobValues = useMemo(() => {
+    if (!currentNetwork?.blob_schedule?.length || !currentNetwork.genesis_time || !unifiedTimeKeys.length) return undefined;
+
+    const schedule = currentNetwork.blob_schedule;
+    const genesisTime = currentNetwork.genesis_time;
+
+    // Build sorted schedule with timestamps
+    const sortedSchedule = [...schedule]
+      .map(item => ({
+        timestamp: item.timestamp ?? epochToTimestamp(item.epoch, genesisTime),
+        maxBlobs: item.max_blobs_per_block,
+      }))
+      .sort((a, b) => a.timestamp - b.timestamp);
+
+    return unifiedTimeKeys.map(key => {
+      const ts = isDaily
+        ? Math.floor(new Date(key).getTime() / 1000)
+        : Number(key);
+
+      // Find the active schedule item for this timestamp
+      let activeMaxBlobs: number | null = null;
+      for (const item of sortedSchedule) {
+        if (ts >= item.timestamp) {
+          activeMaxBlobs = item.maxBlobs;
+        } else {
+          break;
+        }
+      }
+      return activeMaxBlobs;
+    });
+  }, [currentNetwork, unifiedTimeKeys, isDaily]);
 
   // --- Chart configs ---
 
   const blobChartConfig = useMemo(() => {
     if (!blobRecords?.length || !unifiedTimeKeys.length) return null;
-    return buildBlobCountChartConfig(blobRecords, unifiedTimeKeys, isDaily);
-  }, [blobRecords, unifiedTimeKeys, isDaily]);
+    return buildBlobCountChartConfig(blobRecords, unifiedTimeKeys, isDaily, maxBlobValues);
+  }, [blobRecords, unifiedTimeKeys, isDaily, maxBlobValues]);
 
   const attnChartConfig = useMemo(() => {
     if (!attnRecords?.length || !unifiedTimeKeys.length) return null;
@@ -209,9 +354,29 @@ export function IndexPage(): JSX.Element {
     return buildReorgChartConfig(reorgRecords, unifiedTimeKeys, isDaily);
   }, [reorgRecords, unifiedTimeKeys, isDaily]);
 
+  const missedSlotChartConfig = useMemo(() => {
+    if (!missedSlotRecords?.length || !unifiedTimeKeys.length) return null;
+    return buildMissedSlotRateChartConfig(missedSlotRecords, unifiedTimeKeys, isDaily);
+  }, [missedSlotRecords, unifiedTimeKeys, isDaily]);
+
+  const proposalStatusChartConfig = useMemo(() => {
+    if (!proposalStatusRecords?.length || !unifiedTimeKeys.length) return null;
+    return buildBlockProposalStatusChartConfig(proposalStatusRecords, unifiedTimeKeys, isDaily);
+  }, [proposalStatusRecords, unifiedTimeKeys, isDaily]);
+
+  const inclusionDelayChartConfig = useMemo(() => {
+    if (!inclusionDelayRecords?.length || !unifiedTimeKeys.length) return null;
+    return buildAttestationInclusionDelayChartConfig(inclusionDelayRecords, unifiedTimeKeys, isDaily);
+  }, [inclusionDelayRecords, unifiedTimeKeys, isDaily]);
+
+  const proposerRewardChartConfig = useMemo(() => {
+    if (!proposerRewardRecords?.length || !unifiedTimeKeys.length) return null;
+    return buildProposerRewardChartConfig(proposerRewardRecords, unifiedTimeKeys, isDaily);
+  }, [proposerRewardRecords, unifiedTimeKeys, isDaily]);
+
   // --- Fork mark lines ---
 
-  const chartLabels = blobChartConfig?.labels ?? attnChartConfig?.labels ?? hvChartConfig?.labels ?? reorgChartConfig?.labels ?? [];
+  const chartLabels = blobChartConfig?.labels ?? attnChartConfig?.labels ?? hvChartConfig?.labels ?? reorgChartConfig?.labels ?? missedSlotChartConfig?.labels ?? [];
 
   const consensusForkMarkLines = useMemo(() => {
     if (!currentNetwork || !allForks.length) return [];
@@ -359,6 +524,104 @@ export function IndexPage(): JSX.Element {
     [reorgRecords, unifiedTimeKeys, isDaily]
   );
 
+  const missedSlotTooltipFormatter = useCallback(
+    (params: unknown): string => {
+      if (!missedSlotRecords?.length || !unifiedTimeKeys.length) return '';
+
+      const recordsByKey = new Map<string, FctMissedSlotRateHourly | FctMissedSlotRateDaily>();
+      for (const r of missedSlotRecords) {
+        const key = isDaily
+          ? ((r as FctMissedSlotRateDaily).day_start_date ?? '')
+          : String((r as FctMissedSlotRateHourly).hour_start_date_time ?? '');
+        recordsByKey.set(key, r);
+      }
+
+      const dataPoints = Array.isArray(params) ? params : [params];
+      if (!dataPoints.length) return '';
+      const firstPoint = dataPoints[0] as { dataIndex?: number };
+      if (firstPoint.dataIndex === undefined) return '';
+      const timeKey = unifiedTimeKeys[firstPoint.dataIndex];
+      if (!timeKey) return '';
+      const record = recordsByKey.get(timeKey);
+      if (!record) return '';
+
+      const dateValue = isDaily ? timeKey : Number(timeKey);
+      const dateStr = formatTooltipDate(dateValue, isDaily);
+
+      const sections: TooltipSection[] = [{
+        title: `MISSED SLOTS (${record.missed_count ?? 0} / ${record.slot_count ?? 0})`,
+        items: [
+          { color: '#f43f5e', label: 'Missed Rate', value: `${(record.missed_rate ?? 0).toFixed(2)}%` },
+          { color: '#06b6d4', label: 'Moving Avg', value: `${(record.moving_avg_missed_rate ?? 0).toFixed(2)}%` },
+        ],
+      }];
+
+      return buildTooltipHtml(dateStr, sections);
+    },
+    [missedSlotRecords, unifiedTimeKeys, isDaily]
+  );
+
+  const proposalStatusTooltipFormatter = useCallback(
+    (params: unknown): string => {
+      if (!proposalStatusRecords?.length || !unifiedTimeKeys.length) return '';
+
+      const dataPoints = Array.isArray(params) ? params : [params];
+      if (!dataPoints.length) return '';
+      const firstPoint = dataPoints[0] as { dataIndex?: number };
+      if (firstPoint.dataIndex === undefined) return '';
+      const timeKey = unifiedTimeKeys[firstPoint.dataIndex];
+      if (!timeKey) return '';
+
+      const dateValue = isDaily ? timeKey : Number(timeKey);
+      const dateStr = formatTooltipDate(dateValue, isDaily);
+
+      const STATUS_COLORS: Record<string, string> = { canonical: '#22c55e', orphaned: '#f59e0b', missed: '#f43f5e' };
+      const statusCounts = new Map<string, number>();
+      for (const r of proposalStatusRecords) {
+        const rKey = isDaily
+          ? ((r as FctBlockProposalStatusDaily).day_start_date ?? '')
+          : String((r as FctBlockProposalStatusHourly).hour_start_date_time ?? '');
+        if (rKey === timeKey) {
+          statusCounts.set(r.status ?? 'unknown', r.slot_count ?? 0);
+        }
+      }
+
+      const total = [...statusCounts.values()].reduce((s, c) => s + c, 0);
+      const sortedStatuses = [...statusCounts.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+
+      const sections: TooltipSection[] = [{
+        title: `PROPOSAL STATUS (${total} total)`,
+        items: sortedStatuses.map(([status, count]) => ({
+          color: STATUS_COLORS[status] ?? '#94a3b8',
+          label: status.charAt(0).toUpperCase() + status.slice(1),
+          value: String(count),
+          style: 'area' as const,
+        })),
+      }];
+
+      return buildTooltipHtml(dateStr, sections);
+    },
+    [proposalStatusRecords, unifiedTimeKeys, isDaily]
+  );
+
+  const inclusionDelayTooltipFormatter = useMemo(
+    () => makeStatsTooltipFormatter(
+      inclusionDelayRecords as Record<string, unknown>[] | undefined,
+      { avg: 'avg_inclusion_delay', movingAvg: 'moving_avg_inclusion_delay', median: 'p50_inclusion_delay', lowerBand: 'lower_band_inclusion_delay', upperBand: 'upper_band_inclusion_delay', p05: 'p05_inclusion_delay', p95: 'p95_inclusion_delay', min: 'min_inclusion_delay', max: 'max_inclusion_delay' },
+      ' slots'
+    ),
+    [makeStatsTooltipFormatter, inclusionDelayRecords]
+  );
+
+  const proposerRewardTooltipFormatter = useMemo(
+    () => makeStatsTooltipFormatter(
+      proposerRewardRecords as Record<string, unknown>[] | undefined,
+      { avg: 'avg_reward_eth', movingAvg: 'moving_avg_reward_eth', median: 'p50_reward_eth', lowerBand: 'lower_band_reward_eth', upperBand: 'upper_band_reward_eth', p05: 'p05_reward_eth', p95: 'p95_reward_eth', min: 'min_reward_eth', max: 'max_reward_eth' },
+      ' ETH'
+    ),
+    [makeStatsTooltipFormatter, proposerRewardRecords]
+  );
+
   // --- Subtitles ---
 
   const makeSub = (metric: string) =>
@@ -473,6 +736,78 @@ export function IndexPage(): JSX.Element {
                   height={inModal ? 600 : 400}
                   showLegend legendPosition="top" enableDataZoom
                   tooltipFormatter={reorgTooltipFormatter}
+                  markLines={showAnnotations ? forkMarkLines : []}
+                  syncGroup={inModal ? undefined : 'consensus-overview'}
+                />
+              )}
+            </PopoutCard>
+          )}
+
+          {/* Missed Slot Rate */}
+          {missedSlotChartConfig && (
+            <PopoutCard title="Missed Slot Rate" subtitle={makeSub('missed slot rate')} anchorId="missed-slot-rate-chart" modalSize="full">
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={missedSlotChartConfig.series}
+                  xAxis={{ type: 'category', labels: missedSlotChartConfig.labels, name: 'Date' }}
+                  yAxis={{ name: 'Missed Rate (%)', min: 0 }}
+                  height={inModal ? 600 : 400}
+                  showLegend legendPosition="top" enableDataZoom
+                  tooltipFormatter={missedSlotTooltipFormatter}
+                  markLines={showAnnotations ? forkMarkLines : []}
+                  syncGroup={inModal ? undefined : 'consensus-overview'}
+                />
+              )}
+            </PopoutCard>
+          )}
+
+          {/* Block Proposal Status */}
+          {proposalStatusChartConfig && (
+            <PopoutCard title="Block Proposal Status" subtitle={isDaily ? 'Daily block proposal outcomes' : `Hourly block proposal outcomes over ${config.days} days`} anchorId="block-proposal-status-chart" modalSize="full">
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={proposalStatusChartConfig.series}
+                  xAxis={{ type: 'category', labels: proposalStatusChartConfig.labels, name: 'Date' }}
+                  yAxis={{ name: 'Slot Count', min: 0 }}
+                  height={inModal ? 600 : 400}
+                  showLegend legendPosition="top" enableDataZoom
+                  tooltipFormatter={proposalStatusTooltipFormatter}
+                  markLines={showAnnotations ? forkMarkLines : []}
+                  syncGroup={inModal ? undefined : 'consensus-overview'}
+                />
+              )}
+            </PopoutCard>
+          )}
+
+          {/* Attestation Inclusion Delay */}
+          {inclusionDelayChartConfig && (
+            <PopoutCard title="Attestation Inclusion Delay" subtitle={makeSub('attestation inclusion delay')} anchorId="inclusion-delay-chart" modalSize="full">
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={inclusionDelayChartConfig.series}
+                  xAxis={{ type: 'category', labels: inclusionDelayChartConfig.labels, name: 'Date' }}
+                  yAxis={{ name: 'Inclusion Delay (slots)', min: 0 }}
+                  height={inModal ? 600 : 400}
+                  showLegend legendPosition="top" enableDataZoom
+                  tooltipFormatter={inclusionDelayTooltipFormatter}
+                  markLines={showAnnotations ? forkMarkLines : []}
+                  syncGroup={inModal ? undefined : 'consensus-overview'}
+                />
+              )}
+            </PopoutCard>
+          )}
+
+          {/* Proposer Reward (MEV Relay) */}
+          {proposerRewardChartConfig && (
+            <PopoutCard title="Proposer Reward (MEV Relay)" subtitle={makeSub('MEV proposer reward')} anchorId="proposer-reward-chart" modalSize="full">
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={proposerRewardChartConfig.series}
+                  xAxis={{ type: 'category', labels: proposerRewardChartConfig.labels, name: 'Date' }}
+                  yAxis={{ name: 'Reward (ETH)', min: 0 }}
+                  height={inModal ? 600 : 400}
+                  showLegend legendPosition="top" enableDataZoom
+                  tooltipFormatter={proposerRewardTooltipFormatter}
                   markLines={showAnnotations ? forkMarkLines : []}
                   syncGroup={inModal ? undefined : 'consensus-overview'}
                 />
