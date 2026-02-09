@@ -1,0 +1,117 @@
+import { createBandSeries, createStatisticSeries } from '@/components/Charts/MultiLine';
+import type { FctBlobCountByHourly, FctBlobCountByDaily } from '@/api/types.gen';
+import { formatDailyDate, formatHourlyDate } from '@/pages/ethereum/execution/overview/utils';
+import type { ChartConfig } from './constants';
+
+// Re-export shared utilities from execution overview
+export {
+  fillTimeKeys,
+  formatHourlyDate,
+  formatDailyDate,
+  formatTooltipDate,
+  buildTooltipHtml,
+  type TooltipItem,
+  type TooltipSection,
+} from '@/pages/ethereum/execution/overview/utils';
+
+/** Formats a band range */
+export function formatBand(lower: number | undefined, upper: number | undefined): string {
+  const l = lower ?? 0;
+  const u = upper ?? 0;
+  return `${l.toFixed(2)} – ${u.toFixed(2)}`;
+}
+
+/** @deprecated Use formatBand instead */
+export const formatBlobBand = formatBand;
+
+/** Builds chart series config from blob count records aligned to unified time keys */
+export function buildBlobCountChartConfig(
+  records: (FctBlobCountByHourly | FctBlobCountByDaily)[],
+  unifiedKeys: string[],
+  isDaily: boolean
+): ChartConfig {
+  const byKey = new Map<string, FctBlobCountByHourly | FctBlobCountByDaily>();
+  for (const r of records) {
+    const key = isDaily
+      ? ((r as FctBlobCountByDaily).day_start_date ?? '')
+      : String((r as FctBlobCountByHourly).hour_start_date_time ?? '');
+    byKey.set(key, r);
+  }
+
+  const labels = unifiedKeys.map(k => (isDaily ? formatDailyDate(k) : formatHourlyDate(Number(k))));
+
+  const minValues = unifiedKeys.map(k => {
+    const r = byKey.get(k);
+    return r ? Math.max(0, r.min_blob_count ?? 0) : null;
+  });
+  const maxValues = unifiedKeys.map(k => {
+    const r = byKey.get(k);
+    return r ? Math.max(0, r.max_blob_count ?? 0) : null;
+  });
+  const p5Values = unifiedKeys.map(k => {
+    const r = byKey.get(k);
+    return r ? Math.max(0, r.p05_blob_count ?? 0) : null;
+  });
+  const p95Values = unifiedKeys.map(k => {
+    const r = byKey.get(k);
+    return r ? Math.max(0, r.p95_blob_count ?? 0) : null;
+  });
+  const lowerBandValues = unifiedKeys.map(k => {
+    const r = byKey.get(k);
+    return r ? Math.max(0, r.lower_band_blob_count ?? 0) : null;
+  });
+  const upperBandValues = unifiedKeys.map(k => {
+    const r = byKey.get(k);
+    return r ? Math.max(0, r.upper_band_blob_count ?? 0) : null;
+  });
+  const avgValues = unifiedKeys.map(k => {
+    const r = byKey.get(k);
+    return r ? Math.max(0, r.avg_blob_count ?? 0) : null;
+  });
+  const medianValues = unifiedKeys.map(k => {
+    const r = byKey.get(k);
+    return r ? Math.max(0, r.p50_blob_count ?? 0) : null;
+  });
+  const movingAvgValues = unifiedKeys.map(k => {
+    const r = byKey.get(k);
+    return r ? Math.max(0, r.moving_avg_blob_count ?? 0) : null;
+  });
+
+  return {
+    labels,
+    series: [
+      createStatisticSeries('Average', avgValues, {
+        color: '#10b981',
+        lineWidth: 2.5,
+        group: 'Statistics',
+      }),
+      createStatisticSeries('Moving Avg', movingAvgValues, {
+        color: '#06b6d4',
+        lineWidth: 2,
+        group: 'Statistics',
+      }),
+      createStatisticSeries('Median', medianValues, {
+        color: '#a855f7',
+        lineWidth: 1.5,
+        lineStyle: 'dotted',
+        group: 'Statistics',
+      }),
+      ...createBandSeries('Bollinger', 'blob-bollinger', lowerBandValues, upperBandValues, {
+        color: '#f59e0b',
+        opacity: 0.15,
+        group: 'Bands',
+        initiallyVisible: false,
+      }),
+      ...createBandSeries('P5/P95', 'blob-percentile', p5Values, p95Values, {
+        color: '#6366f1',
+        opacity: 0.1,
+        group: 'Bands',
+      }),
+      ...createBandSeries('Min/Max', 'blob-minmax', minValues, maxValues, {
+        color: '#64748b',
+        opacity: 0.06,
+        group: 'Bands',
+      }),
+    ],
+  };
+}

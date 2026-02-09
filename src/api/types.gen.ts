@@ -613,6 +613,234 @@ export type FctAttestationObservationByNode = {
   username?: string;
 };
 
+export type FctAttestationParticipationRateDaily = {
+  /**
+   * Average participation rate (%)
+   */
+  avg_participation_rate?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Lower Bollinger band (avg - 2*stddev)
+   */
+  lower_band_participation_rate?: number;
+  /**
+   * Maximum participation rate (%)
+   */
+  max_participation_rate?: number;
+  /**
+   * Minimum participation rate (%)
+   */
+  min_participation_rate?: number;
+  /**
+   * Moving average participation rate (7-day window)
+   */
+  moving_avg_participation_rate?: number;
+  /**
+   * 5th percentile participation rate
+   */
+  p05_participation_rate?: number;
+  /**
+   * 50th percentile (median) participation rate
+   */
+  p50_participation_rate?: number;
+  /**
+   * 95th percentile participation rate
+   */
+  p95_participation_rate?: number;
+  /**
+   * Number of slots in this day
+   */
+  slot_count?: number;
+  /**
+   * Standard deviation of participation rate
+   */
+  stddev_participation_rate?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_participation_rate?: number;
+};
+
+export type FctAttestationParticipationRateHourly = {
+  /**
+   * Average participation rate (%)
+   */
+  avg_participation_rate?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Lower Bollinger band (avg - 2*stddev)
+   */
+  lower_band_participation_rate?: number;
+  /**
+   * Maximum participation rate (%)
+   */
+  max_participation_rate?: number;
+  /**
+   * Minimum participation rate (%)
+   */
+  min_participation_rate?: number;
+  /**
+   * Moving average participation rate (6-hour window)
+   */
+  moving_avg_participation_rate?: number;
+  /**
+   * 5th percentile participation rate
+   */
+  p05_participation_rate?: number;
+  /**
+   * 50th percentile (median) participation rate
+   */
+  p50_participation_rate?: number;
+  /**
+   * 95th percentile participation rate
+   */
+  p95_participation_rate?: number;
+  /**
+   * Number of slots in this hour
+   */
+  slot_count?: number;
+  /**
+   * Standard deviation of participation rate
+   */
+  stddev_participation_rate?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_participation_rate?: number;
+};
+
+export type FctBlobCountByDaily = {
+  /**
+   * Average blob count per slot
+   */
+  avg_blob_count?: number;
+  /**
+   * Number of slots with blobs in this day
+   */
+  block_count?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Lower Bollinger band (avg - 2*stddev)
+   */
+  lower_band_blob_count?: number;
+  /**
+   * Maximum blob count in a slot
+   */
+  max_blob_count?: number;
+  /**
+   * Minimum blob count in a slot
+   */
+  min_blob_count?: number;
+  /**
+   * Moving average blob count (7-day window)
+   */
+  moving_avg_blob_count?: number;
+  /**
+   * 5th percentile blob count
+   */
+  p05_blob_count?: number;
+  /**
+   * 50th percentile (median) blob count
+   */
+  p50_blob_count?: number;
+  /**
+   * 95th percentile blob count
+   */
+  p95_blob_count?: number;
+  /**
+   * Standard deviation of blob count
+   */
+  stddev_blob_count?: number;
+  /**
+   * Total blobs in this day
+   */
+  total_blobs?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_blob_count?: number;
+};
+
+export type FctBlobCountByHourly = {
+  /**
+   * Average blob count per slot
+   */
+  avg_blob_count?: number;
+  /**
+   * Number of slots with blobs in this hour
+   */
+  block_count?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Lower Bollinger band (avg - 2*stddev)
+   */
+  lower_band_blob_count?: number;
+  /**
+   * Maximum blob count in a slot
+   */
+  max_blob_count?: number;
+  /**
+   * Minimum blob count in a slot
+   */
+  min_blob_count?: number;
+  /**
+   * Moving average blob count (6-hour window)
+   */
+  moving_avg_blob_count?: number;
+  /**
+   * 5th percentile blob count
+   */
+  p05_blob_count?: number;
+  /**
+   * 50th percentile (median) blob count
+   */
+  p50_blob_count?: number;
+  /**
+   * 95th percentile blob count
+   */
+  p95_blob_count?: number;
+  /**
+   * Standard deviation of blob count
+   */
+  stddev_blob_count?: number;
+  /**
+   * Total blobs in this hour
+   */
+  total_blobs?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_blob_count?: number;
+};
+
 export type FctBlock = {
   /**
    * The root hash of the beacon block
@@ -3560,6 +3788,116 @@ export type FctHeadFirstSeenByNode = {
   username?: string;
 };
 
+export type FctHeadVoteCorrectnessRateDaily = {
+  /**
+   * Average head vote correctness rate (%)
+   */
+  avg_head_vote_rate?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Lower Bollinger band (avg - 2*stddev)
+   */
+  lower_band_head_vote_rate?: number;
+  /**
+   * Maximum head vote correctness rate (%)
+   */
+  max_head_vote_rate?: number;
+  /**
+   * Minimum head vote correctness rate (%)
+   */
+  min_head_vote_rate?: number;
+  /**
+   * Moving average head vote correctness rate (7-day window)
+   */
+  moving_avg_head_vote_rate?: number;
+  /**
+   * 5th percentile head vote correctness rate
+   */
+  p05_head_vote_rate?: number;
+  /**
+   * 50th percentile (median) head vote correctness rate
+   */
+  p50_head_vote_rate?: number;
+  /**
+   * 95th percentile head vote correctness rate
+   */
+  p95_head_vote_rate?: number;
+  /**
+   * Number of slots in this day
+   */
+  slot_count?: number;
+  /**
+   * Standard deviation of head vote correctness rate
+   */
+  stddev_head_vote_rate?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_head_vote_rate?: number;
+};
+
+export type FctHeadVoteCorrectnessRateHourly = {
+  /**
+   * Average head vote correctness rate (%)
+   */
+  avg_head_vote_rate?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Lower Bollinger band (avg - 2*stddev)
+   */
+  lower_band_head_vote_rate?: number;
+  /**
+   * Maximum head vote correctness rate (%)
+   */
+  max_head_vote_rate?: number;
+  /**
+   * Minimum head vote correctness rate (%)
+   */
+  min_head_vote_rate?: number;
+  /**
+   * Moving average head vote correctness rate (6-hour window)
+   */
+  moving_avg_head_vote_rate?: number;
+  /**
+   * 5th percentile head vote correctness rate
+   */
+  p05_head_vote_rate?: number;
+  /**
+   * 50th percentile (median) head vote correctness rate
+   */
+  p50_head_vote_rate?: number;
+  /**
+   * 95th percentile head vote correctness rate
+   */
+  p95_head_vote_rate?: number;
+  /**
+   * Number of slots in this hour
+   */
+  slot_count?: number;
+  /**
+   * Standard deviation of head vote correctness rate
+   */
+  stddev_head_vote_rate?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_head_vote_rate?: number;
+};
+
 export type FctMevBidCountByBuilder = {
   /**
    * The total number of bids from the builder
@@ -4055,6 +4393,44 @@ export type FctPreparedBlock = {
   updated_date_time?: number;
 };
 
+export type FctReorgByDaily = {
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Reorg depth (number of consecutive orphaned slots)
+   */
+  depth?: number;
+  /**
+   * Number of reorg events at this depth
+   */
+  reorg_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctReorgByHourly = {
+  /**
+   * Reorg depth (number of consecutive orphaned slots)
+   */
+  depth?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Number of reorg events at this depth
+   */
+  reorg_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type FctStorageSlotStateByAddressDaily = {
   /**
    * Cumulative count of active storage slots at end of day
@@ -4467,6 +4843,34 @@ export type GetFctAttestationObservationByNodeResponse = {
 };
 
 /**
+ * Response for getting a single fct_attestation_participation_rate_daily record
+ */
+export type GetFctAttestationParticipationRateDailyResponse = {
+  item?: FctAttestationParticipationRateDaily;
+};
+
+/**
+ * Response for getting a single fct_attestation_participation_rate_hourly record
+ */
+export type GetFctAttestationParticipationRateHourlyResponse = {
+  item?: FctAttestationParticipationRateHourly;
+};
+
+/**
+ * Response for getting a single fct_blob_count_by_daily record
+ */
+export type GetFctBlobCountByDailyResponse = {
+  item?: FctBlobCountByDaily;
+};
+
+/**
+ * Response for getting a single fct_blob_count_by_hourly record
+ */
+export type GetFctBlobCountByHourlyResponse = {
+  item?: FctBlobCountByHourly;
+};
+
+/**
  * Response for getting a single fct_block_blob_count_head record
  */
 export type GetFctBlockBlobCountHeadResponse = {
@@ -4796,6 +5200,20 @@ export type GetFctHeadFirstSeenByNodeResponse = {
 };
 
 /**
+ * Response for getting a single fct_head_vote_correctness_rate_daily record
+ */
+export type GetFctHeadVoteCorrectnessRateDailyResponse = {
+  item?: FctHeadVoteCorrectnessRateDaily;
+};
+
+/**
+ * Response for getting a single fct_head_vote_correctness_rate_hourly record
+ */
+export type GetFctHeadVoteCorrectnessRateHourlyResponse = {
+  item?: FctHeadVoteCorrectnessRateHourly;
+};
+
+/**
  * Response for getting a single fct_mev_bid_count_by_builder record
  */
 export type GetFctMevBidCountByBuilderResponse = {
@@ -4856,6 +5274,20 @@ export type GetFctOpcodeOpsHourlyResponse = {
  */
 export type GetFctPreparedBlockResponse = {
   item?: FctPreparedBlock;
+};
+
+/**
+ * Response for getting a single fct_reorg_by_daily record
+ */
+export type GetFctReorgByDailyResponse = {
+  item?: FctReorgByDaily;
+};
+
+/**
+ * Response for getting a single fct_reorg_by_hourly record
+ */
+export type GetFctReorgByHourlyResponse = {
+  item?: FctReorgByHourly;
 };
 
 /**
@@ -7758,17 +8190,9 @@ export type IntTransactionOpcodeGas = {
    */
   gas_cumulative?: number;
   /**
-   * Maximum call stack depth for this opcode
-   */
-  max_depth?: number;
-  /**
    * The name of the network
    */
   meta_network_name?: string;
-  /**
-   * Minimum call stack depth for this opcode
-   */
-  min_depth?: number;
   /**
    * The EVM opcode name (e.g., SLOAD, ADD, CALL)
    */
@@ -8047,6 +8471,62 @@ export type ListFctAttestationObservationByNodeResponse = {
    * The list of fct_attestation_observation_by_node.
    */
   fct_attestation_observation_by_node?: Array<FctAttestationObservationByNode>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_attestation_participation_rate_daily records
+ */
+export type ListFctAttestationParticipationRateDailyResponse = {
+  /**
+   * The list of fct_attestation_participation_rate_daily.
+   */
+  fct_attestation_participation_rate_daily?: Array<FctAttestationParticipationRateDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_attestation_participation_rate_hourly records
+ */
+export type ListFctAttestationParticipationRateHourlyResponse = {
+  /**
+   * The list of fct_attestation_participation_rate_hourly.
+   */
+  fct_attestation_participation_rate_hourly?: Array<FctAttestationParticipationRateHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_blob_count_by_daily records
+ */
+export type ListFctBlobCountByDailyResponse = {
+  /**
+   * The list of fct_blob_count_by_daily.
+   */
+  fct_blob_count_by_daily?: Array<FctBlobCountByDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_blob_count_by_hourly records
+ */
+export type ListFctBlobCountByHourlyResponse = {
+  /**
+   * The list of fct_blob_count_by_hourly.
+   */
+  fct_blob_count_by_hourly?: Array<FctBlobCountByHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -8712,6 +9192,34 @@ export type ListFctHeadFirstSeenByNodeResponse = {
 };
 
 /**
+ * Response for listing fct_head_vote_correctness_rate_daily records
+ */
+export type ListFctHeadVoteCorrectnessRateDailyResponse = {
+  /**
+   * The list of fct_head_vote_correctness_rate_daily.
+   */
+  fct_head_vote_correctness_rate_daily?: Array<FctHeadVoteCorrectnessRateDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_head_vote_correctness_rate_hourly records
+ */
+export type ListFctHeadVoteCorrectnessRateHourlyResponse = {
+  /**
+   * The list of fct_head_vote_correctness_rate_hourly.
+   */
+  fct_head_vote_correctness_rate_hourly?: Array<FctHeadVoteCorrectnessRateHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_mev_bid_count_by_builder records
  */
 export type ListFctMevBidCountByBuilderResponse = {
@@ -8831,6 +9339,34 @@ export type ListFctPreparedBlockResponse = {
    * The list of fct_prepared_block.
    */
   fct_prepared_block?: Array<FctPreparedBlock>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_reorg_by_daily records
+ */
+export type ListFctReorgByDailyResponse = {
+  /**
+   * The list of fct_reorg_by_daily.
+   */
+  fct_reorg_by_daily?: Array<FctReorgByDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_reorg_by_hourly records
+ */
+export type ListFctReorgByHourlyResponse = {
+  /**
+   * The list of fct_reorg_by_hourly.
+   */
+  fct_reorg_by_hourly?: Array<FctReorgByHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -16437,6 +16973,1150 @@ export type FctAttestationObservationByNodeServiceGetResponses = {
 
 export type FctAttestationObservationByNodeServiceGetResponse =
   FctAttestationObservationByNodeServiceGetResponses[keyof FctAttestationObservationByNodeServiceGetResponses];
+
+export type FctAttestationParticipationRateDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of slots in this day (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Number of slots in this day (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Number of slots in this day (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Number of slots in this day (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Number of slots in this day (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Number of slots in this day (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Number of slots in this day (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Number of slots in this day (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Number of slots in this day (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Number of slots in this day (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Filter avg_participation_rate using value
+     */
+    avg_participation_rate_value?: number;
+    /**
+     * Filter min_participation_rate using value
+     */
+    min_participation_rate_value?: number;
+    /**
+     * Filter max_participation_rate using value
+     */
+    max_participation_rate_value?: number;
+    /**
+     * Filter p05_participation_rate using value
+     */
+    p05_participation_rate_value?: number;
+    /**
+     * Filter p50_participation_rate using value
+     */
+    p50_participation_rate_value?: number;
+    /**
+     * Filter p95_participation_rate using value
+     */
+    p95_participation_rate_value?: number;
+    /**
+     * Filter stddev_participation_rate using value
+     */
+    stddev_participation_rate_value?: number;
+    /**
+     * Filter upper_band_participation_rate using value
+     */
+    upper_band_participation_rate_value?: number;
+    /**
+     * Filter lower_band_participation_rate using value
+     */
+    lower_band_participation_rate_value?: number;
+    /**
+     * Filter moving_avg_participation_rate using value
+     */
+    moving_avg_participation_rate_value?: number;
+    /**
+     * The maximum number of fct_attestation_participation_rate_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctAttestationParticipationRateDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_attestation_participation_rate_daily';
+};
+
+export type FctAttestationParticipationRateDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationParticipationRateDailyServiceListError =
+  FctAttestationParticipationRateDailyServiceListErrors[keyof FctAttestationParticipationRateDailyServiceListErrors];
+
+export type FctAttestationParticipationRateDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctAttestationParticipationRateDailyResponse;
+};
+
+export type FctAttestationParticipationRateDailyServiceListResponse =
+  FctAttestationParticipationRateDailyServiceListResponses[keyof FctAttestationParticipationRateDailyServiceListResponses];
+
+export type FctAttestationParticipationRateDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_attestation_participation_rate_daily/{day_start_date}';
+};
+
+export type FctAttestationParticipationRateDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationParticipationRateDailyServiceGetError =
+  FctAttestationParticipationRateDailyServiceGetErrors[keyof FctAttestationParticipationRateDailyServiceGetErrors];
+
+export type FctAttestationParticipationRateDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctAttestationParticipationRateDailyResponse;
+};
+
+export type FctAttestationParticipationRateDailyServiceGetResponse =
+  FctAttestationParticipationRateDailyServiceGetResponses[keyof FctAttestationParticipationRateDailyServiceGetResponses];
+
+export type FctAttestationParticipationRateHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of slots in this hour (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Number of slots in this hour (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Number of slots in this hour (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Number of slots in this hour (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Number of slots in this hour (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Number of slots in this hour (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Number of slots in this hour (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Number of slots in this hour (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Number of slots in this hour (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Number of slots in this hour (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Filter avg_participation_rate using value
+     */
+    avg_participation_rate_value?: number;
+    /**
+     * Filter min_participation_rate using value
+     */
+    min_participation_rate_value?: number;
+    /**
+     * Filter max_participation_rate using value
+     */
+    max_participation_rate_value?: number;
+    /**
+     * Filter p05_participation_rate using value
+     */
+    p05_participation_rate_value?: number;
+    /**
+     * Filter p50_participation_rate using value
+     */
+    p50_participation_rate_value?: number;
+    /**
+     * Filter p95_participation_rate using value
+     */
+    p95_participation_rate_value?: number;
+    /**
+     * Filter stddev_participation_rate using value
+     */
+    stddev_participation_rate_value?: number;
+    /**
+     * Filter upper_band_participation_rate using value
+     */
+    upper_band_participation_rate_value?: number;
+    /**
+     * Filter lower_band_participation_rate using value
+     */
+    lower_band_participation_rate_value?: number;
+    /**
+     * Filter moving_avg_participation_rate using value
+     */
+    moving_avg_participation_rate_value?: number;
+    /**
+     * The maximum number of fct_attestation_participation_rate_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctAttestationParticipationRateHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_attestation_participation_rate_hourly';
+};
+
+export type FctAttestationParticipationRateHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationParticipationRateHourlyServiceListError =
+  FctAttestationParticipationRateHourlyServiceListErrors[keyof FctAttestationParticipationRateHourlyServiceListErrors];
+
+export type FctAttestationParticipationRateHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctAttestationParticipationRateHourlyResponse;
+};
+
+export type FctAttestationParticipationRateHourlyServiceListResponse =
+  FctAttestationParticipationRateHourlyServiceListResponses[keyof FctAttestationParticipationRateHourlyServiceListResponses];
+
+export type FctAttestationParticipationRateHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_attestation_participation_rate_hourly/{hour_start_date_time}';
+};
+
+export type FctAttestationParticipationRateHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationParticipationRateHourlyServiceGetError =
+  FctAttestationParticipationRateHourlyServiceGetErrors[keyof FctAttestationParticipationRateHourlyServiceGetErrors];
+
+export type FctAttestationParticipationRateHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctAttestationParticipationRateHourlyResponse;
+};
+
+export type FctAttestationParticipationRateHourlyServiceGetResponse =
+  FctAttestationParticipationRateHourlyServiceGetResponses[keyof FctAttestationParticipationRateHourlyServiceGetResponses];
+
+export type FctBlobCountByDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of slots with blobs in this day (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of slots with blobs in this day (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of slots with blobs in this day (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of slots with blobs in this day (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of slots with blobs in this day (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of slots with blobs in this day (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of slots with blobs in this day (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of slots with blobs in this day (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of slots with blobs in this day (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of slots with blobs in this day (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total blobs in this day (filter: eq)
+     */
+    total_blobs_eq?: number;
+    /**
+     * Total blobs in this day (filter: ne)
+     */
+    total_blobs_ne?: number;
+    /**
+     * Total blobs in this day (filter: lt)
+     */
+    total_blobs_lt?: number;
+    /**
+     * Total blobs in this day (filter: lte)
+     */
+    total_blobs_lte?: number;
+    /**
+     * Total blobs in this day (filter: gt)
+     */
+    total_blobs_gt?: number;
+    /**
+     * Total blobs in this day (filter: gte)
+     */
+    total_blobs_gte?: number;
+    /**
+     * Total blobs in this day (filter: between_min)
+     */
+    total_blobs_between_min?: number;
+    /**
+     * Total blobs in this day (filter: between_max_value)
+     */
+    total_blobs_between_max_value?: number;
+    /**
+     * Total blobs in this day (filter: in_values) (comma-separated list)
+     */
+    total_blobs_in_values?: string;
+    /**
+     * Total blobs in this day (filter: not_in_values) (comma-separated list)
+     */
+    total_blobs_not_in_values?: string;
+    /**
+     * Filter avg_blob_count using value
+     */
+    avg_blob_count_value?: number;
+    /**
+     * Minimum blob count in a slot (filter: eq)
+     */
+    min_blob_count_eq?: number;
+    /**
+     * Minimum blob count in a slot (filter: ne)
+     */
+    min_blob_count_ne?: number;
+    /**
+     * Minimum blob count in a slot (filter: lt)
+     */
+    min_blob_count_lt?: number;
+    /**
+     * Minimum blob count in a slot (filter: lte)
+     */
+    min_blob_count_lte?: number;
+    /**
+     * Minimum blob count in a slot (filter: gt)
+     */
+    min_blob_count_gt?: number;
+    /**
+     * Minimum blob count in a slot (filter: gte)
+     */
+    min_blob_count_gte?: number;
+    /**
+     * Minimum blob count in a slot (filter: between_min)
+     */
+    min_blob_count_between_min?: number;
+    /**
+     * Minimum blob count in a slot (filter: between_max_value)
+     */
+    min_blob_count_between_max_value?: number;
+    /**
+     * Minimum blob count in a slot (filter: in_values) (comma-separated list)
+     */
+    min_blob_count_in_values?: string;
+    /**
+     * Minimum blob count in a slot (filter: not_in_values) (comma-separated list)
+     */
+    min_blob_count_not_in_values?: string;
+    /**
+     * Maximum blob count in a slot (filter: eq)
+     */
+    max_blob_count_eq?: number;
+    /**
+     * Maximum blob count in a slot (filter: ne)
+     */
+    max_blob_count_ne?: number;
+    /**
+     * Maximum blob count in a slot (filter: lt)
+     */
+    max_blob_count_lt?: number;
+    /**
+     * Maximum blob count in a slot (filter: lte)
+     */
+    max_blob_count_lte?: number;
+    /**
+     * Maximum blob count in a slot (filter: gt)
+     */
+    max_blob_count_gt?: number;
+    /**
+     * Maximum blob count in a slot (filter: gte)
+     */
+    max_blob_count_gte?: number;
+    /**
+     * Maximum blob count in a slot (filter: between_min)
+     */
+    max_blob_count_between_min?: number;
+    /**
+     * Maximum blob count in a slot (filter: between_max_value)
+     */
+    max_blob_count_between_max_value?: number;
+    /**
+     * Maximum blob count in a slot (filter: in_values) (comma-separated list)
+     */
+    max_blob_count_in_values?: string;
+    /**
+     * Maximum blob count in a slot (filter: not_in_values) (comma-separated list)
+     */
+    max_blob_count_not_in_values?: string;
+    /**
+     * Filter p05_blob_count using value
+     */
+    p05_blob_count_value?: number;
+    /**
+     * Filter p50_blob_count using value
+     */
+    p50_blob_count_value?: number;
+    /**
+     * Filter p95_blob_count using value
+     */
+    p95_blob_count_value?: number;
+    /**
+     * Filter stddev_blob_count using value
+     */
+    stddev_blob_count_value?: number;
+    /**
+     * Filter upper_band_blob_count using value
+     */
+    upper_band_blob_count_value?: number;
+    /**
+     * Filter lower_band_blob_count using value
+     */
+    lower_band_blob_count_value?: number;
+    /**
+     * Filter moving_avg_blob_count using value
+     */
+    moving_avg_blob_count_value?: number;
+    /**
+     * The maximum number of fct_blob_count_by_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlobCountByDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_blob_count_by_daily';
+};
+
+export type FctBlobCountByDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlobCountByDailyServiceListError =
+  FctBlobCountByDailyServiceListErrors[keyof FctBlobCountByDailyServiceListErrors];
+
+export type FctBlobCountByDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlobCountByDailyResponse;
+};
+
+export type FctBlobCountByDailyServiceListResponse =
+  FctBlobCountByDailyServiceListResponses[keyof FctBlobCountByDailyServiceListResponses];
+
+export type FctBlobCountByDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_blob_count_by_daily/{day_start_date}';
+};
+
+export type FctBlobCountByDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlobCountByDailyServiceGetError =
+  FctBlobCountByDailyServiceGetErrors[keyof FctBlobCountByDailyServiceGetErrors];
+
+export type FctBlobCountByDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlobCountByDailyResponse;
+};
+
+export type FctBlobCountByDailyServiceGetResponse =
+  FctBlobCountByDailyServiceGetResponses[keyof FctBlobCountByDailyServiceGetResponses];
+
+export type FctBlobCountByHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of slots with blobs in this hour (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of slots with blobs in this hour (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of slots with blobs in this hour (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of slots with blobs in this hour (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of slots with blobs in this hour (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of slots with blobs in this hour (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of slots with blobs in this hour (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of slots with blobs in this hour (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of slots with blobs in this hour (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of slots with blobs in this hour (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total blobs in this hour (filter: eq)
+     */
+    total_blobs_eq?: number;
+    /**
+     * Total blobs in this hour (filter: ne)
+     */
+    total_blobs_ne?: number;
+    /**
+     * Total blobs in this hour (filter: lt)
+     */
+    total_blobs_lt?: number;
+    /**
+     * Total blobs in this hour (filter: lte)
+     */
+    total_blobs_lte?: number;
+    /**
+     * Total blobs in this hour (filter: gt)
+     */
+    total_blobs_gt?: number;
+    /**
+     * Total blobs in this hour (filter: gte)
+     */
+    total_blobs_gte?: number;
+    /**
+     * Total blobs in this hour (filter: between_min)
+     */
+    total_blobs_between_min?: number;
+    /**
+     * Total blobs in this hour (filter: between_max_value)
+     */
+    total_blobs_between_max_value?: number;
+    /**
+     * Total blobs in this hour (filter: in_values) (comma-separated list)
+     */
+    total_blobs_in_values?: string;
+    /**
+     * Total blobs in this hour (filter: not_in_values) (comma-separated list)
+     */
+    total_blobs_not_in_values?: string;
+    /**
+     * Filter avg_blob_count using value
+     */
+    avg_blob_count_value?: number;
+    /**
+     * Minimum blob count in a slot (filter: eq)
+     */
+    min_blob_count_eq?: number;
+    /**
+     * Minimum blob count in a slot (filter: ne)
+     */
+    min_blob_count_ne?: number;
+    /**
+     * Minimum blob count in a slot (filter: lt)
+     */
+    min_blob_count_lt?: number;
+    /**
+     * Minimum blob count in a slot (filter: lte)
+     */
+    min_blob_count_lte?: number;
+    /**
+     * Minimum blob count in a slot (filter: gt)
+     */
+    min_blob_count_gt?: number;
+    /**
+     * Minimum blob count in a slot (filter: gte)
+     */
+    min_blob_count_gte?: number;
+    /**
+     * Minimum blob count in a slot (filter: between_min)
+     */
+    min_blob_count_between_min?: number;
+    /**
+     * Minimum blob count in a slot (filter: between_max_value)
+     */
+    min_blob_count_between_max_value?: number;
+    /**
+     * Minimum blob count in a slot (filter: in_values) (comma-separated list)
+     */
+    min_blob_count_in_values?: string;
+    /**
+     * Minimum blob count in a slot (filter: not_in_values) (comma-separated list)
+     */
+    min_blob_count_not_in_values?: string;
+    /**
+     * Maximum blob count in a slot (filter: eq)
+     */
+    max_blob_count_eq?: number;
+    /**
+     * Maximum blob count in a slot (filter: ne)
+     */
+    max_blob_count_ne?: number;
+    /**
+     * Maximum blob count in a slot (filter: lt)
+     */
+    max_blob_count_lt?: number;
+    /**
+     * Maximum blob count in a slot (filter: lte)
+     */
+    max_blob_count_lte?: number;
+    /**
+     * Maximum blob count in a slot (filter: gt)
+     */
+    max_blob_count_gt?: number;
+    /**
+     * Maximum blob count in a slot (filter: gte)
+     */
+    max_blob_count_gte?: number;
+    /**
+     * Maximum blob count in a slot (filter: between_min)
+     */
+    max_blob_count_between_min?: number;
+    /**
+     * Maximum blob count in a slot (filter: between_max_value)
+     */
+    max_blob_count_between_max_value?: number;
+    /**
+     * Maximum blob count in a slot (filter: in_values) (comma-separated list)
+     */
+    max_blob_count_in_values?: string;
+    /**
+     * Maximum blob count in a slot (filter: not_in_values) (comma-separated list)
+     */
+    max_blob_count_not_in_values?: string;
+    /**
+     * Filter p05_blob_count using value
+     */
+    p05_blob_count_value?: number;
+    /**
+     * Filter p50_blob_count using value
+     */
+    p50_blob_count_value?: number;
+    /**
+     * Filter p95_blob_count using value
+     */
+    p95_blob_count_value?: number;
+    /**
+     * Filter stddev_blob_count using value
+     */
+    stddev_blob_count_value?: number;
+    /**
+     * Filter upper_band_blob_count using value
+     */
+    upper_band_blob_count_value?: number;
+    /**
+     * Filter lower_band_blob_count using value
+     */
+    lower_band_blob_count_value?: number;
+    /**
+     * Filter moving_avg_blob_count using value
+     */
+    moving_avg_blob_count_value?: number;
+    /**
+     * The maximum number of fct_blob_count_by_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlobCountByHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_blob_count_by_hourly';
+};
+
+export type FctBlobCountByHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlobCountByHourlyServiceListError =
+  FctBlobCountByHourlyServiceListErrors[keyof FctBlobCountByHourlyServiceListErrors];
+
+export type FctBlobCountByHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlobCountByHourlyResponse;
+};
+
+export type FctBlobCountByHourlyServiceListResponse =
+  FctBlobCountByHourlyServiceListResponses[keyof FctBlobCountByHourlyServiceListResponses];
+
+export type FctBlobCountByHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_blob_count_by_hourly/{hour_start_date_time}';
+};
+
+export type FctBlobCountByHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlobCountByHourlyServiceGetError =
+  FctBlobCountByHourlyServiceGetErrors[keyof FctBlobCountByHourlyServiceGetErrors];
+
+export type FctBlobCountByHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlobCountByHourlyResponse;
+};
+
+export type FctBlobCountByHourlyServiceGetResponse =
+  FctBlobCountByHourlyServiceGetResponses[keyof FctBlobCountByHourlyServiceGetResponses];
 
 export type FctBlockServiceListData = {
   body?: never;
@@ -45293,6 +46973,466 @@ export type FctHeadFirstSeenByNodeServiceGetResponses = {
 export type FctHeadFirstSeenByNodeServiceGetResponse =
   FctHeadFirstSeenByNodeServiceGetResponses[keyof FctHeadFirstSeenByNodeServiceGetResponses];
 
+export type FctHeadVoteCorrectnessRateDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of slots in this day (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Number of slots in this day (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Number of slots in this day (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Number of slots in this day (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Number of slots in this day (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Number of slots in this day (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Number of slots in this day (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Number of slots in this day (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Number of slots in this day (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Number of slots in this day (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Filter avg_head_vote_rate using value
+     */
+    avg_head_vote_rate_value?: number;
+    /**
+     * Filter min_head_vote_rate using value
+     */
+    min_head_vote_rate_value?: number;
+    /**
+     * Filter max_head_vote_rate using value
+     */
+    max_head_vote_rate_value?: number;
+    /**
+     * Filter p05_head_vote_rate using value
+     */
+    p05_head_vote_rate_value?: number;
+    /**
+     * Filter p50_head_vote_rate using value
+     */
+    p50_head_vote_rate_value?: number;
+    /**
+     * Filter p95_head_vote_rate using value
+     */
+    p95_head_vote_rate_value?: number;
+    /**
+     * Filter stddev_head_vote_rate using value
+     */
+    stddev_head_vote_rate_value?: number;
+    /**
+     * Filter upper_band_head_vote_rate using value
+     */
+    upper_band_head_vote_rate_value?: number;
+    /**
+     * Filter lower_band_head_vote_rate using value
+     */
+    lower_band_head_vote_rate_value?: number;
+    /**
+     * Filter moving_avg_head_vote_rate using value
+     */
+    moving_avg_head_vote_rate_value?: number;
+    /**
+     * The maximum number of fct_head_vote_correctness_rate_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctHeadVoteCorrectnessRateDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_head_vote_correctness_rate_daily';
+};
+
+export type FctHeadVoteCorrectnessRateDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctHeadVoteCorrectnessRateDailyServiceListError =
+  FctHeadVoteCorrectnessRateDailyServiceListErrors[keyof FctHeadVoteCorrectnessRateDailyServiceListErrors];
+
+export type FctHeadVoteCorrectnessRateDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctHeadVoteCorrectnessRateDailyResponse;
+};
+
+export type FctHeadVoteCorrectnessRateDailyServiceListResponse =
+  FctHeadVoteCorrectnessRateDailyServiceListResponses[keyof FctHeadVoteCorrectnessRateDailyServiceListResponses];
+
+export type FctHeadVoteCorrectnessRateDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_head_vote_correctness_rate_daily/{day_start_date}';
+};
+
+export type FctHeadVoteCorrectnessRateDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctHeadVoteCorrectnessRateDailyServiceGetError =
+  FctHeadVoteCorrectnessRateDailyServiceGetErrors[keyof FctHeadVoteCorrectnessRateDailyServiceGetErrors];
+
+export type FctHeadVoteCorrectnessRateDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctHeadVoteCorrectnessRateDailyResponse;
+};
+
+export type FctHeadVoteCorrectnessRateDailyServiceGetResponse =
+  FctHeadVoteCorrectnessRateDailyServiceGetResponses[keyof FctHeadVoteCorrectnessRateDailyServiceGetResponses];
+
+export type FctHeadVoteCorrectnessRateHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of slots in this hour (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Number of slots in this hour (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Number of slots in this hour (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Number of slots in this hour (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Number of slots in this hour (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Number of slots in this hour (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Number of slots in this hour (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Number of slots in this hour (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Number of slots in this hour (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Number of slots in this hour (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Filter avg_head_vote_rate using value
+     */
+    avg_head_vote_rate_value?: number;
+    /**
+     * Filter min_head_vote_rate using value
+     */
+    min_head_vote_rate_value?: number;
+    /**
+     * Filter max_head_vote_rate using value
+     */
+    max_head_vote_rate_value?: number;
+    /**
+     * Filter p05_head_vote_rate using value
+     */
+    p05_head_vote_rate_value?: number;
+    /**
+     * Filter p50_head_vote_rate using value
+     */
+    p50_head_vote_rate_value?: number;
+    /**
+     * Filter p95_head_vote_rate using value
+     */
+    p95_head_vote_rate_value?: number;
+    /**
+     * Filter stddev_head_vote_rate using value
+     */
+    stddev_head_vote_rate_value?: number;
+    /**
+     * Filter upper_band_head_vote_rate using value
+     */
+    upper_band_head_vote_rate_value?: number;
+    /**
+     * Filter lower_band_head_vote_rate using value
+     */
+    lower_band_head_vote_rate_value?: number;
+    /**
+     * Filter moving_avg_head_vote_rate using value
+     */
+    moving_avg_head_vote_rate_value?: number;
+    /**
+     * The maximum number of fct_head_vote_correctness_rate_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctHeadVoteCorrectnessRateHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_head_vote_correctness_rate_hourly';
+};
+
+export type FctHeadVoteCorrectnessRateHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctHeadVoteCorrectnessRateHourlyServiceListError =
+  FctHeadVoteCorrectnessRateHourlyServiceListErrors[keyof FctHeadVoteCorrectnessRateHourlyServiceListErrors];
+
+export type FctHeadVoteCorrectnessRateHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctHeadVoteCorrectnessRateHourlyResponse;
+};
+
+export type FctHeadVoteCorrectnessRateHourlyServiceListResponse =
+  FctHeadVoteCorrectnessRateHourlyServiceListResponses[keyof FctHeadVoteCorrectnessRateHourlyServiceListResponses];
+
+export type FctHeadVoteCorrectnessRateHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_head_vote_correctness_rate_hourly/{hour_start_date_time}';
+};
+
+export type FctHeadVoteCorrectnessRateHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctHeadVoteCorrectnessRateHourlyServiceGetError =
+  FctHeadVoteCorrectnessRateHourlyServiceGetErrors[keyof FctHeadVoteCorrectnessRateHourlyServiceGetErrors];
+
+export type FctHeadVoteCorrectnessRateHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctHeadVoteCorrectnessRateHourlyResponse;
+};
+
+export type FctHeadVoteCorrectnessRateHourlyServiceGetResponse =
+  FctHeadVoteCorrectnessRateHourlyServiceGetResponses[keyof FctHeadVoteCorrectnessRateHourlyServiceGetResponses];
+
 export type FctMevBidCountByBuilderServiceListData = {
   body?: never;
   path?: never;
@@ -49471,6 +51611,463 @@ export type FctPreparedBlockServiceGetResponses = {
 
 export type FctPreparedBlockServiceGetResponse =
   FctPreparedBlockServiceGetResponses[keyof FctPreparedBlockServiceGetResponses];
+
+export type FctReorgByDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: eq)
+     */
+    depth_eq?: number;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: ne)
+     */
+    depth_ne?: number;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: lt)
+     */
+    depth_lt?: number;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: lte)
+     */
+    depth_lte?: number;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: gt)
+     */
+    depth_gt?: number;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: gte)
+     */
+    depth_gte?: number;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: between_min)
+     */
+    depth_between_min?: number;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: between_max_value)
+     */
+    depth_between_max_value?: number;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: in_values) (comma-separated list)
+     */
+    depth_in_values?: string;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: not_in_values) (comma-separated list)
+     */
+    depth_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of reorg events at this depth (filter: eq)
+     */
+    reorg_count_eq?: number;
+    /**
+     * Number of reorg events at this depth (filter: ne)
+     */
+    reorg_count_ne?: number;
+    /**
+     * Number of reorg events at this depth (filter: lt)
+     */
+    reorg_count_lt?: number;
+    /**
+     * Number of reorg events at this depth (filter: lte)
+     */
+    reorg_count_lte?: number;
+    /**
+     * Number of reorg events at this depth (filter: gt)
+     */
+    reorg_count_gt?: number;
+    /**
+     * Number of reorg events at this depth (filter: gte)
+     */
+    reorg_count_gte?: number;
+    /**
+     * Number of reorg events at this depth (filter: between_min)
+     */
+    reorg_count_between_min?: number;
+    /**
+     * Number of reorg events at this depth (filter: between_max_value)
+     */
+    reorg_count_between_max_value?: number;
+    /**
+     * Number of reorg events at this depth (filter: in_values) (comma-separated list)
+     */
+    reorg_count_in_values?: string;
+    /**
+     * Number of reorg events at this depth (filter: not_in_values) (comma-separated list)
+     */
+    reorg_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_reorg_by_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctReorgByDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_reorg_by_daily';
+};
+
+export type FctReorgByDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctReorgByDailyServiceListError = FctReorgByDailyServiceListErrors[keyof FctReorgByDailyServiceListErrors];
+
+export type FctReorgByDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctReorgByDailyResponse;
+};
+
+export type FctReorgByDailyServiceListResponse =
+  FctReorgByDailyServiceListResponses[keyof FctReorgByDailyServiceListResponses];
+
+export type FctReorgByDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_reorg_by_daily/{day_start_date}';
+};
+
+export type FctReorgByDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctReorgByDailyServiceGetError = FctReorgByDailyServiceGetErrors[keyof FctReorgByDailyServiceGetErrors];
+
+export type FctReorgByDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctReorgByDailyResponse;
+};
+
+export type FctReorgByDailyServiceGetResponse =
+  FctReorgByDailyServiceGetResponses[keyof FctReorgByDailyServiceGetResponses];
+
+export type FctReorgByHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: eq)
+     */
+    depth_eq?: number;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: ne)
+     */
+    depth_ne?: number;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: lt)
+     */
+    depth_lt?: number;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: lte)
+     */
+    depth_lte?: number;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: gt)
+     */
+    depth_gt?: number;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: gte)
+     */
+    depth_gte?: number;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: between_min)
+     */
+    depth_between_min?: number;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: between_max_value)
+     */
+    depth_between_max_value?: number;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: in_values) (comma-separated list)
+     */
+    depth_in_values?: string;
+    /**
+     * Reorg depth (number of consecutive orphaned slots) (filter: not_in_values) (comma-separated list)
+     */
+    depth_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of reorg events at this depth (filter: eq)
+     */
+    reorg_count_eq?: number;
+    /**
+     * Number of reorg events at this depth (filter: ne)
+     */
+    reorg_count_ne?: number;
+    /**
+     * Number of reorg events at this depth (filter: lt)
+     */
+    reorg_count_lt?: number;
+    /**
+     * Number of reorg events at this depth (filter: lte)
+     */
+    reorg_count_lte?: number;
+    /**
+     * Number of reorg events at this depth (filter: gt)
+     */
+    reorg_count_gt?: number;
+    /**
+     * Number of reorg events at this depth (filter: gte)
+     */
+    reorg_count_gte?: number;
+    /**
+     * Number of reorg events at this depth (filter: between_min)
+     */
+    reorg_count_between_min?: number;
+    /**
+     * Number of reorg events at this depth (filter: between_max_value)
+     */
+    reorg_count_between_max_value?: number;
+    /**
+     * Number of reorg events at this depth (filter: in_values) (comma-separated list)
+     */
+    reorg_count_in_values?: string;
+    /**
+     * Number of reorg events at this depth (filter: not_in_values) (comma-separated list)
+     */
+    reorg_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_reorg_by_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctReorgByHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_reorg_by_hourly';
+};
+
+export type FctReorgByHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctReorgByHourlyServiceListError =
+  FctReorgByHourlyServiceListErrors[keyof FctReorgByHourlyServiceListErrors];
+
+export type FctReorgByHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctReorgByHourlyResponse;
+};
+
+export type FctReorgByHourlyServiceListResponse =
+  FctReorgByHourlyServiceListResponses[keyof FctReorgByHourlyServiceListResponses];
+
+export type FctReorgByHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_reorg_by_hourly/{hour_start_date_time}';
+};
+
+export type FctReorgByHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctReorgByHourlyServiceGetError = FctReorgByHourlyServiceGetErrors[keyof FctReorgByHourlyServiceGetErrors];
+
+export type FctReorgByHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctReorgByHourlyResponse;
+};
+
+export type FctReorgByHourlyServiceGetResponse =
+  FctReorgByHourlyServiceGetResponses[keyof FctReorgByHourlyServiceGetResponses];
 
 export type FctStorageSlotStateByAddressDailyServiceListData = {
   body?: never;
@@ -77874,86 +80471,6 @@ export type IntTransactionOpcodeGasServiceListData = {
      * For CALL opcodes: includes all descendant frame gas. For others: same as gas (filter: not_in_values) (comma-separated list)
      */
     gas_cumulative_not_in_values?: string;
-    /**
-     * Minimum call stack depth for this opcode (filter: eq)
-     */
-    min_depth_eq?: number;
-    /**
-     * Minimum call stack depth for this opcode (filter: ne)
-     */
-    min_depth_ne?: number;
-    /**
-     * Minimum call stack depth for this opcode (filter: lt)
-     */
-    min_depth_lt?: number;
-    /**
-     * Minimum call stack depth for this opcode (filter: lte)
-     */
-    min_depth_lte?: number;
-    /**
-     * Minimum call stack depth for this opcode (filter: gt)
-     */
-    min_depth_gt?: number;
-    /**
-     * Minimum call stack depth for this opcode (filter: gte)
-     */
-    min_depth_gte?: number;
-    /**
-     * Minimum call stack depth for this opcode (filter: between_min)
-     */
-    min_depth_between_min?: number;
-    /**
-     * Minimum call stack depth for this opcode (filter: between_max_value)
-     */
-    min_depth_between_max_value?: number;
-    /**
-     * Minimum call stack depth for this opcode (filter: in_values) (comma-separated list)
-     */
-    min_depth_in_values?: string;
-    /**
-     * Minimum call stack depth for this opcode (filter: not_in_values) (comma-separated list)
-     */
-    min_depth_not_in_values?: string;
-    /**
-     * Maximum call stack depth for this opcode (filter: eq)
-     */
-    max_depth_eq?: number;
-    /**
-     * Maximum call stack depth for this opcode (filter: ne)
-     */
-    max_depth_ne?: number;
-    /**
-     * Maximum call stack depth for this opcode (filter: lt)
-     */
-    max_depth_lt?: number;
-    /**
-     * Maximum call stack depth for this opcode (filter: lte)
-     */
-    max_depth_lte?: number;
-    /**
-     * Maximum call stack depth for this opcode (filter: gt)
-     */
-    max_depth_gt?: number;
-    /**
-     * Maximum call stack depth for this opcode (filter: gte)
-     */
-    max_depth_gte?: number;
-    /**
-     * Maximum call stack depth for this opcode (filter: between_min)
-     */
-    max_depth_between_min?: number;
-    /**
-     * Maximum call stack depth for this opcode (filter: between_max_value)
-     */
-    max_depth_between_max_value?: number;
-    /**
-     * Maximum call stack depth for this opcode (filter: in_values) (comma-separated list)
-     */
-    max_depth_in_values?: string;
-    /**
-     * Maximum call stack depth for this opcode (filter: not_in_values) (comma-separated list)
-     */
-    max_depth_not_in_values?: string;
     /**
      * Number of times this opcode resulted in an error (filter: eq)
      */
