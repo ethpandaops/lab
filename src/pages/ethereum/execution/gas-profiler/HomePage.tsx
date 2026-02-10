@@ -9,7 +9,8 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Divider } from '@/components/Layout/Divider';
 import { Alert } from '@/components/Feedback/Alert';
 import { Input } from '@/components/Forms/Input';
-import { Toggle } from '@/components/Forms/Toggle';
+// TODO: Re-enable when fork annotation data is available
+// import { Toggle } from '@/components/Forms/Toggle';
 import { Button } from '@/components/Elements/Button';
 import { CardChain, type CardChainItem } from '@/components/DataDisplay/CardChain';
 import { useNetwork } from '@/hooks/useNetwork';
@@ -185,7 +186,9 @@ export function HomePage(): JSX.Element {
 
   // Time period state
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('7d');
-  const [showAnnotations, setShowAnnotations] = useState(true);
+  // TODO: Re-enable when fork annotation data is available
+  // const [showAnnotations, setShowAnnotations] = useState(true);
+  const showAnnotations = true;
   const config = TIME_RANGE_CONFIG[timePeriod];
   const isDaily = config.dataType === 'daily';
 
@@ -670,37 +673,40 @@ export function HomePage(): JSX.Element {
           Real-time block exploration and transaction/block search
           ============================================================================ */}
 
-      {/* Search Input */}
-      <div className="mb-6">
-        <Input
-          error={!!searchError}
-          errorMessage={searchError ?? undefined}
-          helperText={!searchError ? `Indexed range: ${formatGas(bounds.min)} - ${formatGas(bounds.max)}` : undefined}
-        >
-          <Input.Leading>
-            <MagnifyingGlassIcon />
-          </Input.Leading>
-          <Input.Field
-            type="text"
-            value={searchInput}
-            onChange={e => setSearchInput(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder="Tx hash or block number"
-          />
-          <Input.Trailing type="button">
-            <div className="flex gap-2">
+      {/* Search Input + Simulate */}
+      <div className="mb-6 flex items-start gap-4">
+        <div className="flex-1">
+          <Input
+            error={!!searchError}
+            errorMessage={searchError ?? undefined}
+            helperText={!searchError ? `Indexed range: ${formatGas(bounds.min)} - ${formatGas(bounds.max)}` : undefined}
+          >
+            <Input.Leading>
+              <MagnifyingGlassIcon />
+            </Input.Leading>
+            <Input.Field
+              type="text"
+              value={searchInput}
+              onChange={e => setSearchInput(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder="Tx hash or block number"
+            />
+            <Input.Trailing type="button">
               <Button size="sm" onClick={handleSearch}>
                 Search
               </Button>
-              <Link to="/ethereum/execution/gas-profiler/simulate">
-                <Button size="sm" variant="soft">
-                  <BeakerIcon className="mr-1 size-4" />
-                  Simulate
-                </Button>
-              </Link>
-            </div>
-          </Input.Trailing>
-        </Input>
+            </Input.Trailing>
+          </Input>
+        </div>
+        <div className="flex items-center gap-3 pt-1">
+          <div className="h-8 w-px bg-border" />
+          <Link to="/ethereum/execution/gas-profiler/simulate">
+            <Button size="sm" variant="soft">
+              <BeakerIcon className="mr-1.5 size-4" />
+              Simulate
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Recent Blocks Chain Visualization */}
@@ -772,10 +778,12 @@ export function HomePage(): JSX.Element {
           ))}
         </div>
 
+        {/* TODO: Enable when fork annotation data is available
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted">Show Forks</span>
           <Toggle checked={showAnnotations} onChange={setShowAnnotations} size="small" />
         </div>
+        */}
       </div>
 
       {/* Time Series Charts Row */}

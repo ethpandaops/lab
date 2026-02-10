@@ -281,10 +281,6 @@ export function SimulatePage(): JSX.Element {
               />
             </Input>
 
-            <div className="mt-2 text-xs text-muted">
-              Indexed range: {formatGas(bounds.min)} - {formatGas(bounds.max)}
-            </div>
-
             <Button
               className="mt-4 w-full"
               onClick={handleSimulate}

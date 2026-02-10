@@ -24,9 +24,10 @@ export interface ChartConfig {
 export const TIME_PERIOD_OPTIONS = [
   { value: '7d' as const, label: '7d' },
   { value: '30d' as const, label: '30d' },
-  { value: '90d' as const, label: '90d' },
-  { value: '180d' as const, label: '180d' },
-  { value: '1y' as const, label: '1y' },
-  { value: '2y' as const, label: '2y' },
+  // TODO: Enable when data is available
+  // { value: '90d' as const, label: '90d' },
+  // { value: '180d' as const, label: '180d' },
+  // { value: '1y' as const, label: '1y' },
+  // { value: '2y' as const, label: '2y' },
   { value: 'all' as const, label: 'All' },
 ] as const;
