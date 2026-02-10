@@ -1,0 +1,1 @@
+export { InstrumentsSection } from './InstrumentsSection';

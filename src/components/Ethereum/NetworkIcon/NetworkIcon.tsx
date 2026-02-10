@@ -65,20 +65,25 @@ export function NetworkIcon({ networkName, className }: NetworkIconProps): JSX.E
     );
   }
 
-  // Emoji icons: render in a flex container for proper centering
-  // Use the className for sizing the container, and scale emoji to fit
+  // Emoji icons: @container lets the emoji scale with the container via cqw units
   if (icon?.type === 'emoji') {
     return (
-      <span className={clsx('inline-flex items-center justify-center', className || 'size-6')} aria-hidden="true">
-        <span className="text-[1.1em] leading-none">{icon.content}</span>
+      <span
+        className={clsx('@container inline-flex items-center justify-center', className || 'size-6')}
+        aria-hidden="true"
+      >
+        <span className="text-[70cqw] leading-none">{icon.content}</span>
       </span>
     );
   }
 
   // Fallback for unknown networks
   return (
-    <span className={clsx('inline-flex items-center justify-center', className || 'size-6')} aria-hidden="true">
-      <span className="text-[1.1em] leading-none">🧪</span>
+    <span
+      className={clsx('@container inline-flex items-center justify-center', className || 'size-6')}
+      aria-hidden="true"
+    >
+      <span className="text-[70cqw] leading-none">🧪</span>
     </span>
   );
 }
