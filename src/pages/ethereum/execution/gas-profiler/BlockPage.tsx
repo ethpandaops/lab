@@ -3,6 +3,7 @@ import { useParams, useSearch, useNavigate, Link } from '@tanstack/react-router'
 import { Tab as HeadlessTab } from '@headlessui/react';
 import {
   ArrowLeftIcon,
+  BeakerIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   FunnelIcon,
@@ -1050,12 +1051,22 @@ export function BlockPage(): JSX.Element {
 
       {/* Tabbed Content */}
       <HeadlessTab.Group selectedIndex={selectedTabIndex} onChange={setSelectedTabIndex}>
-        <HeadlessTab.List className="mb-6 flex gap-1 border-b border-border">
-          <Tab hash="overview">Overview</Tab>
-          <Tab hash="opcodes">Opcodes</Tab>
-          <Tab hash="transactions">Transactions</Tab>
-          <Tab hash="calls">Calls</Tab>
-        </HeadlessTab.List>
+        <div className="mb-6 flex items-center justify-between border-b border-border">
+          <HeadlessTab.List className="flex gap-1">
+            <Tab hash="overview">Overview</Tab>
+            <Tab hash="opcodes">Opcodes</Tab>
+            <Tab hash="transactions">Transactions</Tab>
+            <Tab hash="calls">Calls</Tab>
+          </HeadlessTab.List>
+          <Link
+            to="/ethereum/execution/gas-profiler/simulate"
+            search={{ block: blockNumber }}
+            className="mb-1 flex items-center gap-1.5 rounded-xs px-3 py-1.5 text-sm text-muted transition-colors hover:bg-primary/10 hover:text-primary"
+          >
+            <BeakerIcon className="size-4" />
+            Simulate
+          </Link>
+        </div>
 
         <HeadlessTab.Panels>
           {/* Overview Tab */}
