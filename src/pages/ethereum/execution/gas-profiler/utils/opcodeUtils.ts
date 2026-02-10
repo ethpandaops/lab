@@ -34,10 +34,11 @@ export const OPCODE_CATEGORIES: Record<string, string> = {
   SHL: 'Bit Ops',
   SHR: 'Bit Ops',
   SAR: 'Bit Ops',
+  CLZ: 'Bit Ops', // Count Leading Zeros
 
-  // Misc (0x20)
-  SHA3: 'Misc',
-  KECCAK256: 'Misc', // Alias for SHA3
+  // Hashing (0x20)
+  SHA3: 'Hashing',
+  KECCAK256: 'Hashing', // Alias for SHA3
 
   // Ethereum State (0x30-0x48)
   ADDRESS: 'Ethereum State',
@@ -124,6 +125,7 @@ export const CATEGORY_COLORS: Record<string, string> = {
   Comparisons: '#8b5cf6', // purple
   Logic: '#06b6d4', // cyan
   'Bit Ops': '#14b8a6', // teal
+  Hashing: '#6366f1', // indigo
   Misc: '#6b7280', // gray
   'Ethereum State': '#3b82f6', // blue
   Pop: '#a855f7', // violet
@@ -150,6 +152,50 @@ export const CALL_TYPE_COLORS: Record<string, string> = {
   CREATE2: '#f97316',
   CALLCODE: '#ec4899',
 };
+
+/**
+ * Determine if a gas schedule item is a parameter (modifier/component)
+ * vs an actual EVM opcode.
+ *
+ * Parameters are cost components like SLOAD_COLD, CREATE_DATA, CALL_VALUE_XFER
+ * Opcodes are actual EVM instructions like SLOAD, CREATE, CALL
+ */
+export function isGasParameter(name: string): boolean {
+  // Known parameter suffixes (cold/warm access, data costs, special modifiers)
+  const parameterSuffixes = [
+    '_COLD',
+    '_WARM',
+    '_SET',
+    '_RESET',
+    '_CLEAR',
+    '_DATA',
+    '_WORD',
+    '_BYTE',
+    '_TOPIC',
+    '_XFER',
+    '_NEW_ACCOUNT',
+    '_BY_SELFDESTRUCT',
+  ];
+
+  // Check for parameter suffixes
+  if (parameterSuffixes.some(suffix => name.endsWith(suffix))) {
+    return true;
+  }
+
+  // Known standalone parameters (not opcodes)
+  const standaloneParameters = [
+    'MEMORY', // Memory expansion cost
+    'COPY', // Per-word copy cost
+    'INIT_CODE_WORD', // Per-word init code cost
+    'REFUND_SSTORE_CLEARS', // Refund amount
+  ];
+
+  if (standaloneParameters.includes(name)) {
+    return true;
+  }
+
+  return false;
+}
 
 /**
  * Get category for an opcode or gas parameter
@@ -187,14 +233,11 @@ export function getOpcodeCategory(opcode: string): string {
   // Math parameters (EXP_BYTE)
   if (opcode.startsWith('EXP')) return 'Math';
 
-  // Misc/Hashing parameters (KECCAK256_WORD)
-  if (opcode.startsWith('KECCAK')) return 'Misc';
+  // Hashing parameters (KECCAK256_WORD)
+  if (opcode.startsWith('KECCAK')) return 'Hashing';
 
   // Memory parameters (MEMORY, COPY, MCOPY_WORD)
   if (opcode === 'MEMORY' || opcode === 'COPY' || opcode.startsWith('MCOPY')) return 'Memory';
-
-  // Bit operations (CLZ - count leading zeros)
-  if (opcode === 'CLZ') return 'Bit Ops';
 
   return 'Other';
 }
@@ -204,6 +247,7 @@ export function getOpcodeCategory(opcode: string): string {
  */
 const HEX_TO_TAILWIND: Record<string, { bg: string; hover: string }> = {
   '#f59e0b': { bg: 'bg-amber-500', hover: 'hover:bg-amber-400' },
+  '#6366f1': { bg: 'bg-indigo-500', hover: 'hover:bg-indigo-400' },
   '#8b5cf6': { bg: 'bg-violet-500', hover: 'hover:bg-violet-400' },
   '#06b6d4': { bg: 'bg-cyan-500', hover: 'hover:bg-cyan-400' },
   '#14b8a6': { bg: 'bg-teal-500', hover: 'hover:bg-teal-400' },

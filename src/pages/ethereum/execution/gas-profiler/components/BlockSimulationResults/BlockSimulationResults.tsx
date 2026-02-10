@@ -117,17 +117,20 @@ function CallErrorList({ errors, variant, className }: CallErrorListProps): JSX.
 }
 
 /**
- * Tooltip wrapper for bar sections with portal-based positioning
+ * Portal-based tooltip component for inline elements
  */
-interface BarTooltipProps {
+interface TooltipProps {
   title: string;
-  description: string;
+  /** Description can be a string or JSX for rich formatting */
+  description: React.ReactNode;
   children: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
+  /** Width class for tooltip (default: w-56) */
+  width?: string;
 }
 
-function BarTooltip({ title, description, children, className, style }: BarTooltipProps): JSX.Element {
+function Tooltip({ title, description, children, className, style, width = 'w-56' }: TooltipProps): JSX.Element {
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const ref = useRef<HTMLDivElement>(null);
@@ -145,11 +148,14 @@ function BarTooltip({ title, description, children, className, style }: BarToolt
   const tooltipContent = isVisible && (
     <div
       role="tooltip"
-      className="pointer-events-none fixed z-[9999] w-56 -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background p-3 shadow-lg"
+      className={clsx(
+        'pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background p-3 shadow-lg',
+        width
+      )}
       style={{ top: position.top, left: position.left }}
     >
-      <div className="mb-1 text-sm font-medium text-foreground">{title}</div>
-      <div className="text-xs text-muted">{description}</div>
+      <div className="mb-1.5 text-sm font-medium text-foreground">{title}</div>
+      <div className="text-xs/5 text-muted">{description}</div>
       <div className="absolute -bottom-1 left-1/2 size-2 -translate-x-1/2 rotate-45 border-r border-b border-border bg-background" />
     </div>
   );
@@ -157,7 +163,7 @@ function BarTooltip({ title, description, children, className, style }: BarToolt
   return (
     <div
       ref={ref}
-      className={className}
+      className={clsx('inline-flex', className)}
       style={style}
       onMouseEnter={() => setIsVisible(true)}
       onMouseLeave={() => setIsVisible(false)}
@@ -367,7 +373,7 @@ export function BlockSimulationResults({ result, className }: BlockSimulationRes
                 {/* Visual gas bar */}
                 <div className="relative h-4 overflow-hidden rounded-full bg-border">
                   {/* Simulated gas fill */}
-                  <BarTooltip
+                  <Tooltip
                     title="Simulated Gas"
                     description={`${formatGas(result.simulated.gasUsed)} (${Math.round((result.simulated.gasUsed / result.simulated.gasLimit) * 100)}% of limit)`}
                     className={clsx(
@@ -383,9 +389,9 @@ export function BlockSimulationResults({ result, className }: BlockSimulationRes
                     }}
                   >
                     <div className="h-full w-full" />
-                  </BarTooltip>
+                  </Tooltip>
                   {/* Original gas marker */}
-                  <BarTooltip
+                  <Tooltip
                     title="Original Gas"
                     description={`${formatGas(result.original.gasUsed)} (${Math.round((result.original.gasUsed / result.simulated.gasLimit) * 100)}% of limit)`}
                     className="absolute top-0 z-10 h-full w-2 bg-foreground/60"
@@ -395,10 +401,10 @@ export function BlockSimulationResults({ result, className }: BlockSimulationRes
                     }}
                   >
                     <div className="h-full w-full" />
-                  </BarTooltip>
+                  </Tooltip>
                   {/* Unused capacity */}
                   {result.simulated.gasUsed < result.simulated.gasLimit && (
-                    <BarTooltip
+                    <Tooltip
                       title="Remaining Capacity"
                       description={`${formatGas(result.simulated.gasLimit - result.simulated.gasUsed)} (${100 - Math.round((result.simulated.gasUsed / result.simulated.gasLimit) * 100)}% available)`}
                       className="absolute top-0 right-0 h-full"
@@ -407,16 +413,16 @@ export function BlockSimulationResults({ result, className }: BlockSimulationRes
                       }}
                     >
                       <div className="h-full w-full" />
-                    </BarTooltip>
+                    </Tooltip>
                   )}
                   {/* 100% limit marker */}
-                  <BarTooltip
+                  <Tooltip
                     title="Gas Limit"
                     description={formatGas(result.simulated.gasLimit)}
                     className="absolute top-0 right-0 z-20 h-full w-1 bg-foreground/40"
                   >
                     <div className="h-full w-full" />
-                  </BarTooltip>
+                  </Tooltip>
                 </div>
 
                 {/* Limit status */}
@@ -447,22 +453,62 @@ export function BlockSimulationResults({ result, className }: BlockSimulationRes
                   divergenceSummary.statusChanges > 0 ||
                   divergenceSummary.additionalReverts !== 0 ? (
                     <>
-                      <span className="flex items-center gap-1.5 text-amber-500">
-                        <ArrowsRightLeftIcon className="size-4" />
-                        <span className="font-medium">{divergenceSummary.divergedCount} diverged</span>
-                      </span>
-                      {divergenceSummary.statusChanges > 0 && (
-                        <span className="text-muted">
-                          {divergenceSummary.statusChanges} status change
-                          {divergenceSummary.statusChanges !== 1 ? 's' : ''}
+                      <Tooltip
+                        title="Execution Divergence"
+                        description="Transactions where the simulated execution path differed from the original due to gas cost changes affecting control flow."
+                        width="w-64"
+                      >
+                        <span className="flex cursor-help items-center gap-1.5 text-amber-500">
+                          <ArrowsRightLeftIcon className="size-4" />
+                          <span className="font-medium">{divergenceSummary.divergedCount} diverged</span>
                         </span>
+                      </Tooltip>
+                      {divergenceSummary.statusChanges > 0 && (
+                        <Tooltip
+                          title="Transaction Status Changes"
+                          description="Transactions where the top-level outcome changed (success ↔ failed). This is the final transaction status, not internal calls."
+                          width="w-64"
+                        >
+                          <span className="cursor-help text-muted underline decoration-dotted underline-offset-2">
+                            {divergenceSummary.statusChanges} tx status change
+                            {divergenceSummary.statusChanges !== 1 ? 's' : ''}
+                          </span>
+                        </Tooltip>
                       )}
                       {divergenceSummary.additionalReverts !== 0 && (
-                        <span className="text-muted">
-                          {divergenceSummary.additionalReverts > 0 ? '+' : ''}
-                          {divergenceSummary.additionalReverts} revert
-                          {Math.abs(divergenceSummary.additionalReverts) !== 1 ? 's' : ''}
-                        </span>
+                        <Tooltip
+                          title="Internal Call Reverts"
+                          description={
+                            <div className="space-y-2">
+                              <p>Change in nested call failures across all transactions.</p>
+                              <div className="flex items-center gap-2 rounded-xs bg-surface/50 px-2 py-1.5 font-mono">
+                                <span>{divergenceSummary.totalOriginalReverts}</span>
+                                <span className="text-muted">→</span>
+                                <span
+                                  className={
+                                    divergenceSummary.additionalReverts > 0 ? 'text-red-400' : 'text-green-400'
+                                  }
+                                >
+                                  {divergenceSummary.totalSimulatedReverts}
+                                </span>
+                                <span className="text-muted">
+                                  ({divergenceSummary.additionalReverts > 0 ? '+' : ''}
+                                  {divergenceSummary.additionalReverts})
+                                </span>
+                              </div>
+                              <p className="text-muted/80">
+                                Internal CALL/DELEGATECALL/STATICCALL failures, not top-level tx status.
+                              </p>
+                            </div>
+                          }
+                          width="w-64"
+                        >
+                          <span className="cursor-help text-muted underline decoration-dotted underline-offset-2">
+                            {divergenceSummary.additionalReverts > 0 ? '+' : ''}
+                            {divergenceSummary.additionalReverts} internal revert
+                            {Math.abs(divergenceSummary.additionalReverts) !== 1 ? 's' : ''}
+                          </span>
+                        </Tooltip>
                       )}
                     </>
                   ) : (
@@ -564,12 +610,18 @@ export function BlockSimulationResults({ result, className }: BlockSimulationRes
                       </span>
                       Diverged
                     </span>
-                    <span className="flex items-center gap-1">
-                      <span className="flex size-4 items-center justify-center rounded-full bg-red-500/20 text-[10px] font-bold text-red-500">
-                        E
+                    <Tooltip
+                      title="Internal Call Errors"
+                      description="Shows original→simulated internal revert counts. These are nested CALL failures, not top-level tx status."
+                      width="w-56"
+                    >
+                      <span className="flex cursor-help items-center gap-1">
+                        <span className="flex size-4 items-center justify-center rounded-full bg-red-500/20 text-[10px] font-bold text-red-500">
+                          E
+                        </span>
+                        <span className="underline decoration-dotted underline-offset-2">Errors (orig→sim)</span>
                       </span>
-                      Errors
-                    </span>
+                    </Tooltip>
                   </div>
                   <span className="text-xs text-muted">{result.transactions.length} transactions</span>
                 </div>
@@ -633,12 +685,37 @@ export function BlockSimulationResults({ result, className }: BlockSimulationRes
                                     </span>
                                   )}
                                   {hasErrors && (
-                                    <span
-                                      className="flex size-4 items-center justify-center rounded-full bg-red-500/20 text-[10px] font-bold text-red-500"
-                                      title="Call errors occurred"
+                                    <Tooltip
+                                      title="Internal Call Reverts"
+                                      description={
+                                        <span>
+                                          Nested calls that reverted within this transaction. Click row to see details.
+                                        </span>
+                                      }
+                                      width="w-56"
                                     >
-                                      E
-                                    </span>
+                                      <span className="flex cursor-help items-center gap-1">
+                                        <span className="flex size-4 items-center justify-center rounded-full bg-red-500/20 text-[10px] font-bold text-red-500">
+                                          E
+                                        </span>
+                                        {(tx.originalReverts > 0 || tx.simulatedReverts > 0) && (
+                                          <span className="font-mono text-[10px] text-muted">
+                                            {tx.originalReverts}→
+                                            <span
+                                              className={
+                                                tx.simulatedReverts > tx.originalReverts
+                                                  ? 'text-red-400'
+                                                  : tx.simulatedReverts < tx.originalReverts
+                                                    ? 'text-green-400'
+                                                    : ''
+                                              }
+                                            >
+                                              {tx.simulatedReverts}
+                                            </span>
+                                          </span>
+                                        )}
+                                      </span>
+                                    </Tooltip>
                                   )}
                                 </div>
                               </td>

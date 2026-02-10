@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
 import { Button } from '@/components/Elements/Button';
 import type { GasSchedule, GasScheduleDefaults } from '../../SimulatePage.types';
-import { getOpcodeCategory, CATEGORY_COLORS } from '../../utils/opcodeUtils';
+import { getOpcodeCategory, isGasParameter, CATEGORY_COLORS } from '../../utils/opcodeUtils';
 
 /**
  * Info tooltip component with portal-based positioning
@@ -262,6 +262,7 @@ const CATEGORY_ORDER = [
   'Transient Storage',
   'Contract',
   'Ethereum State',
+  'Hashing',
   'Log',
   'Math',
   'Comparisons',
@@ -286,23 +287,31 @@ const CATEGORY_ORDER = [
  */
 export function GasScheduleEditor({ schedule, defaults, onChange, className }: GasScheduleEditorProps): JSX.Element {
   // Build groups dynamically from defaults (API response)
+  // Each group has opcodes (actual EVM instructions) and parameters (cost modifiers)
   const groups = useMemo(() => {
-    const categoryMap = new Map<string, { name: string; color: string; params: string[] }>();
+    const categoryMap = new Map<string, { name: string; color: string; opcodes: string[]; parameters: string[] }>();
 
-    // Group all parameters by category
+    // Group all items by category, separating opcodes from parameters
     for (const key of Object.keys(defaults.parameters)) {
       const category = getOpcodeCategory(key);
       const color = CATEGORY_COLORS[category] || CATEGORY_COLORS.Other;
 
       if (!categoryMap.has(category)) {
-        categoryMap.set(category, { name: category, color, params: [] });
+        categoryMap.set(category, { name: category, color, opcodes: [], parameters: [] });
       }
-      categoryMap.get(category)!.params.push(key);
+
+      const group = categoryMap.get(category)!;
+      if (isGasParameter(key)) {
+        group.parameters.push(key);
+      } else {
+        group.opcodes.push(key);
+      }
     }
 
-    // Sort parameters within each category
+    // Sort items within each category
     for (const group of categoryMap.values()) {
-      group.params.sort();
+      group.opcodes.sort();
+      group.parameters.sort();
     }
 
     // Sort categories by predefined order
@@ -344,16 +353,24 @@ export function GasScheduleEditor({ schedule, defaults, onChange, className }: G
     onChange({});
   }, [onChange]);
 
-  // Get modified count for a specific group
-  const getGroupModifiedCount = useCallback(
-    (params: string[]): number => {
-      return params.filter(key => {
+  // Get modified count for a list of keys
+  const getModifiedCount = useCallback(
+    (keys: string[]): number => {
+      return keys.filter(key => {
         const value = schedule[key];
         const defaultParam = defaults.parameters[key];
         return value !== undefined && defaultParam && value !== defaultParam.value;
       }).length;
     },
     [schedule, defaults]
+  );
+
+  // Get modified count for a group (opcodes + parameters)
+  const getGroupModifiedCount = useCallback(
+    (group: { opcodes: string[]; parameters: string[] }): number => {
+      return getModifiedCount([...group.opcodes, ...group.parameters]);
+    },
+    [getModifiedCount]
   );
 
   return (
@@ -378,21 +395,56 @@ export function GasScheduleEditor({ schedule, defaults, onChange, className }: G
             name={group.name}
             color={group.color}
             defaultExpanded={false}
-            modifiedCount={getGroupModifiedCount(group.params)}
+            modifiedCount={getGroupModifiedCount(group)}
           >
-            {group.params.map(key => {
-              const param = defaults.parameters[key];
-              return (
-                <GasParameterSlider
-                  key={key}
-                  name={key}
-                  value={schedule[key]}
-                  defaultValue={param?.value ?? 0}
-                  description={param?.description}
-                  onChange={value => handleParameterChange(key, value)}
-                />
-              );
-            })}
+            {/* Opcodes sub-section - more prominent */}
+            {group.opcodes.length > 0 && (
+              <div className="mb-3 rounded-xs border border-primary/20 bg-primary/5 p-3">
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="text-[10px] font-bold tracking-wider text-primary uppercase">Opcodes</span>
+                  <div className="h-px flex-1 bg-primary/20" />
+                </div>
+                <div className="space-y-1">
+                  {group.opcodes.map(key => {
+                    const param = defaults.parameters[key];
+                    return (
+                      <GasParameterSlider
+                        key={key}
+                        name={key}
+                        value={schedule[key]}
+                        defaultValue={param?.value ?? 0}
+                        description={param?.description}
+                        onChange={value => handleParameterChange(key, value)}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            {/* Parameters sub-section - subtle */}
+            {group.parameters.length > 0 && (
+              <div className="rounded-xs border border-border/50 bg-surface/30 p-3">
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="text-[10px] font-semibold tracking-wider text-muted uppercase">Parameters</span>
+                  <div className="h-px flex-1 bg-border/50" />
+                </div>
+                <div className="space-y-1">
+                  {group.parameters.map(key => {
+                    const param = defaults.parameters[key];
+                    return (
+                      <GasParameterSlider
+                        key={key}
+                        name={key}
+                        value={schedule[key]}
+                        defaultValue={param?.value ?? 0}
+                        description={param?.description}
+                        onChange={value => handleParameterChange(key, value)}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </GasParameterSection>
         ))}
       </div>
