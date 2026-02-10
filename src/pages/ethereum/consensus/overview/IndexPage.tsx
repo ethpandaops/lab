@@ -2,6 +2,7 @@ import { type JSX, useMemo, useCallback, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Container } from '@/components/Layout/Container';
 import { Card } from '@/components/Layout/Card';
+import { Header } from '@/components/Layout/Header';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import {
   MultiLineChart,
@@ -65,6 +66,8 @@ import {
   buildBlockProposalStatusChartConfig,
   buildAttestationInclusionDelayChartConfig,
   buildProposerRewardChartConfig,
+  DEPTH_COLORS,
+  STATUS_COLORS,
   type TooltipSection,
 } from './utils';
 
@@ -655,7 +658,6 @@ export function IndexPage(): JSX.Element {
       }
 
       const total = [...depthCounts.values()].reduce((s, c) => s + c, 0);
-      const DEPTH_COLORS = ['#f43f5e', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#8b5cf6', '#ec4899'];
       const sortedDepths = [...depthCounts.entries()].sort((a, b) => a[0] - b[0]);
 
       const sections: TooltipSection[] = [
@@ -728,7 +730,6 @@ export function IndexPage(): JSX.Element {
       const dateValue = isDaily ? timeKey : Number(timeKey);
       const dateStr = formatTooltipDate(dateValue, isDaily);
 
-      const STATUS_COLORS: Record<string, string> = { canonical: '#22c55e', orphaned: '#f59e0b', missed: '#f43f5e' };
       const statusCounts = new Map<string, number>();
       for (const r of proposalStatusRecords) {
         const rKey = isDaily
@@ -744,13 +745,15 @@ export function IndexPage(): JSX.Element {
 
       const sections: TooltipSection[] = [
         {
-          title: `PROPOSAL STATUS (${total} total)`,
-          items: sortedStatuses.map(([status, count]) => ({
-            color: STATUS_COLORS[status] ?? '#94a3b8',
-            label: status.charAt(0).toUpperCase() + status.slice(1),
-            value: String(count),
-            style: 'area' as const,
-          })),
+          title: `PROPOSAL STATUS (${total} slots)`,
+          items: sortedStatuses.map(([status, count]) => {
+            const rate = total > 0 ? ((count / total) * 100).toFixed(2) : '0.00';
+            return {
+              color: STATUS_COLORS[status] ?? '#94a3b8',
+              label: status.charAt(0).toUpperCase() + status.slice(1),
+              value: `${rate}% (${count})`,
+            };
+          }),
         },
       ];
 
@@ -806,10 +809,7 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      <div className="mb-8">
-        <h1 className="text-4xl/tight font-bold text-foreground">Consensus Overview</h1>
-        <p className="mt-1 text-muted">Ethereum consensus layer metrics</p>
-      </div>
+      <Header title="Consensus Overview" description="Ethereum consensus layer metrics" showAccent={false} />
 
       {/* Time Period Selector */}
       <div className="mb-6 flex flex-wrap items-center gap-6">
@@ -847,7 +847,7 @@ export function IndexPage(): JSX.Element {
 
       {/* Charts */}
       {!isLoading && (
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 3xl:grid-cols-3">
           {/* Blob Count */}
           {blobChartConfig && (
             <PopoutCard
@@ -861,7 +861,7 @@ export function IndexPage(): JSX.Element {
                   series={blobChartConfig.series}
                   xAxis={{ type: 'category', labels: blobChartConfig.labels, name: 'Date' }}
                   yAxis={{ name: 'Blobs', min: 0 }}
-                  height={inModal ? 600 : 400}
+                  height={inModal ? 600 : 280}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
@@ -886,7 +886,7 @@ export function IndexPage(): JSX.Element {
                   series={attnChartConfig.series}
                   xAxis={{ type: 'category', labels: attnChartConfig.labels, name: 'Date' }}
                   yAxis={{ name: 'Participation Rate (%)', min: 0, max: 100 }}
-                  height={inModal ? 600 : 400}
+                  height={inModal ? 600 : 280}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
@@ -911,7 +911,7 @@ export function IndexPage(): JSX.Element {
                   series={hvChartConfig.series}
                   xAxis={{ type: 'category', labels: hvChartConfig.labels, name: 'Date' }}
                   yAxis={{ name: 'Head Vote Rate (%)', min: 0, max: 100 }}
-                  height={inModal ? 600 : 400}
+                  height={inModal ? 600 : 280}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
@@ -936,7 +936,7 @@ export function IndexPage(): JSX.Element {
                   series={reorgChartConfig.series}
                   xAxis={{ type: 'category', labels: reorgChartConfig.labels, name: 'Date' }}
                   yAxis={{ name: 'Reorg Count', min: 0 }}
-                  height={inModal ? 600 : 400}
+                  height={inModal ? 600 : 280}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
@@ -961,7 +961,7 @@ export function IndexPage(): JSX.Element {
                   series={missedSlotChartConfig.series}
                   xAxis={{ type: 'category', labels: missedSlotChartConfig.labels, name: 'Date' }}
                   yAxis={{ name: 'Missed Rate (%)', min: 0 }}
-                  height={inModal ? 600 : 400}
+                  height={inModal ? 600 : 280}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
@@ -978,7 +978,9 @@ export function IndexPage(): JSX.Element {
             <PopoutCard
               title="Block Proposal Status"
               subtitle={
-                isDaily ? 'Daily block proposal outcomes' : `Hourly block proposal outcomes over ${config.days} days`
+                isDaily
+                  ? 'Daily block proposal outcome rates'
+                  : `Hourly block proposal outcome rates over ${config.days} days`
               }
               anchorId="block-proposal-status-chart"
               modalSize="full"
@@ -987,8 +989,8 @@ export function IndexPage(): JSX.Element {
                 <MultiLineChart
                   series={proposalStatusChartConfig.series}
                   xAxis={{ type: 'category', labels: proposalStatusChartConfig.labels, name: 'Date' }}
-                  yAxis={{ name: 'Slot Count', min: 0 }}
-                  height={inModal ? 600 : 400}
+                  yAxis={{ name: 'Rate (%)', min: 0, max: 100 }}
+                  height={inModal ? 600 : 280}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
@@ -1013,7 +1015,7 @@ export function IndexPage(): JSX.Element {
                   series={inclusionDelayChartConfig.series}
                   xAxis={{ type: 'category', labels: inclusionDelayChartConfig.labels, name: 'Date' }}
                   yAxis={{ name: 'Inclusion Delay (slots)', min: 0 }}
-                  height={inModal ? 600 : 400}
+                  height={inModal ? 600 : 280}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
@@ -1038,7 +1040,7 @@ export function IndexPage(): JSX.Element {
                   series={proposerRewardChartConfig.series}
                   xAxis={{ type: 'category', labels: proposerRewardChartConfig.labels, name: 'Date' }}
                   yAxis={{ name: 'Reward (ETH)', min: 0 }}
-                  height={inModal ? 600 : 400}
+                  height={inModal ? 600 : 280}
                   showLegend
                   legendPosition="top"
                   enableDataZoom

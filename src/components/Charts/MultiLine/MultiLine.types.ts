@@ -114,6 +114,11 @@ export interface SeriesData {
     symbolSize?: number;
   };
   /**
+   * Chart type for this series
+   * @default 'line'
+   */
+  seriesType?: 'line' | 'bar';
+  /**
    * Legend group name - series with the same group will be grouped together in the legend
    * Groups are displayed in the order they first appear in the series array
    */

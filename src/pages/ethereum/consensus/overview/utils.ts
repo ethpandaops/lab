@@ -295,7 +295,7 @@ export function buildHeadVoteCorrectnessChartConfig(
   };
 }
 
-const DEPTH_COLORS = ['#f43f5e', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#8b5cf6', '#ec4899'];
+export const DEPTH_COLORS = ['#f43f5e', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#8b5cf6', '#ec4899'];
 
 /** Builds stacked area chart config from reorg records grouped by depth */
 export function buildReorgChartConfig(
@@ -327,7 +327,7 @@ export function buildReorgChartConfig(
     name: `Depth ${depth}`,
     data: unifiedKeys.map(k => byKeyAndDepth.get(k)?.get(depth) ?? 0),
     color: DEPTH_COLORS[i % DEPTH_COLORS.length],
-    showArea: true,
+    seriesType: 'bar' as const,
     stack: 'reorgs',
     group: 'Depth',
   }));
@@ -377,13 +377,13 @@ export function buildMissedSlotRateChartConfig(
   };
 }
 
-const STATUS_COLORS: Record<string, string> = {
+export const STATUS_COLORS: Record<string, string> = {
   canonical: '#22c55e',
   orphaned: '#f59e0b',
   missed: '#f43f5e',
 };
 
-/** Builds stacked area chart config from block proposal status records grouped by status */
+/** Builds line chart config from block proposal status records as rates (% of total) */
 export function buildBlockProposalStatusChartConfig(
   records: (FctBlockProposalStatusHourly | FctBlockProposalStatusDaily)[],
   unifiedKeys: string[],
@@ -408,12 +408,25 @@ export function buildBlockProposalStatusChartConfig(
 
   const sortedStatuses = [...allStatuses].sort();
 
+  // Compute total per time key for rate calculation
+  const totalsByKey = new Map<string, number>();
+  for (const key of unifiedKeys) {
+    const statusMap = byKeyAndStatus.get(key);
+    if (statusMap) {
+      let total = 0;
+      for (const count of statusMap.values()) total += count;
+      totalsByKey.set(key, total);
+    }
+  }
+
   const series: SeriesData[] = sortedStatuses.map(status => ({
     name: status.charAt(0).toUpperCase() + status.slice(1),
-    data: unifiedKeys.map(k => byKeyAndStatus.get(k)?.get(status) ?? 0),
+    data: unifiedKeys.map(k => {
+      const count = byKeyAndStatus.get(k)?.get(status) ?? 0;
+      const total = totalsByKey.get(k) ?? 0;
+      return total > 0 ? Number(((count / total) * 100).toFixed(2)) : null;
+    }),
     color: STATUS_COLORS[status] ?? '#94a3b8',
-    showArea: true,
-    stack: 'proposal-status',
     group: 'Status',
   }));
 

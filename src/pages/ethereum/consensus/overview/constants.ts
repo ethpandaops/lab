@@ -7,8 +7,8 @@ export type TimePeriod = '24h' | '7d' | '30d' | '90d' | '180d' | '1y' | '2y' | '
 export const TIME_RANGE_CONFIG = {
   '24h': { days: 1, dataType: 'hourly' as const, pageSize: 24 },
   '7d': { days: 7, dataType: 'hourly' as const, pageSize: 168 },
-  '30d': { days: 30, dataType: 'hourly' as const, pageSize: 720 },
-  '90d': { days: 90, dataType: 'hourly' as const, pageSize: 2160 },
+  '30d': { days: 30, dataType: 'daily' as const, pageSize: 30 },
+  '90d': { days: 90, dataType: 'daily' as const, pageSize: 90 },
   '180d': { days: 180, dataType: 'daily' as const, pageSize: 180 },
   '1y': { days: 365, dataType: 'daily' as const, pageSize: 365 },
   '2y': { days: 730, dataType: 'daily' as const, pageSize: 730 },
