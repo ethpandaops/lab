@@ -150,27 +150,21 @@ export function HeroSection(): JSX.Element {
 
       {/* Content */}
       <div className="relative z-10 px-6 py-24 text-center sm:px-12 lg:px-20">
-        <p className="animate-fade-in text-xs/4 font-semibold tracking-[0.25em] text-primary uppercase">
-          Ethereum Infrastructure
-        </p>
-
-        <div className="mx-auto mt-5 h-px w-10 animate-fade-in-delay bg-primary/60" />
-
-        <h1 className="mt-8 animate-fade-in-delay-2">
+        <h1 className="animate-fade-in">
           <span className="block text-lg font-light tracking-wide text-foreground/60 sm:text-xl lg:text-2xl">The</span>
           <span className="mt-1 block text-[clamp(4rem,12vw,11rem)] leading-[0.85] font-black tracking-tighter text-foreground">
             Lab
           </span>
         </h1>
 
-        <div className="mt-8 flex animate-fade-in-delay-3 items-center justify-center gap-2.5">
+        <div className="mt-8 flex animate-fade-in-delay items-center justify-center gap-2.5">
           <img src="/images/lab.png" alt="" className="size-5 opacity-60" />
           <span className="text-[11px]/3 font-medium tracking-[0.2em] text-muted uppercase">by ethPandaOps</span>
         </div>
 
         {/* Network instrument panels */}
         {(staticNets.length > 0 || devnets.length > 0) && (
-          <div className="mx-auto mt-12 flex max-w-4xl animate-fade-in-delay-4 flex-col items-center gap-3">
+          <div className="mx-auto mt-12 flex max-w-4xl animate-fade-in-delay-2 flex-col items-center gap-3">
             {staticNets.length > 0 && (
               <div className="flex flex-wrap justify-center gap-3">
                 {staticNets.map(network => (
