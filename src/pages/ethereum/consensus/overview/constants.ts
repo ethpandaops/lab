@@ -1,7 +1,14 @@
+import { z } from 'zod';
 import type { SeriesData } from '@/components/Charts/MultiLine';
 
 /** Available time period options for chart display */
 export type TimePeriod = '24h' | '7d' | '30d' | '90d' | '180d' | '1y' | '2y' | 'all';
+
+/** Zod schema for consensus overview search params */
+export const consensusOverviewSearchSchema = z.object({
+  t: z.enum(['24h', '7d', '30d', '90d', '180d', '1y', '2y', 'all']).optional(),
+});
+export type ConsensusOverviewSearch = z.infer<typeof consensusOverviewSearchSchema>;
 
 /** Configuration for each time range option */
 export const TIME_RANGE_CONFIG = {

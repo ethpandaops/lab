@@ -1,8 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { IndexPage } from '@/pages/ethereum/consensus/overview';
+import { consensusOverviewSearchSchema } from '@/pages/ethereum/consensus/overview/constants';
 
 export const Route = createFileRoute('/ethereum/consensus/overview')({
   component: IndexPage,
+  validateSearch: consensusOverviewSearchSchema,
   beforeLoad: () => ({
     getBreadcrumb: () => ({ label: 'Overview', clickable: false }),
   }),

@@ -184,8 +184,8 @@ export function HomePage(): JSX.Element {
   const { currentNetwork } = useNetwork();
   const { allForks } = useForks();
 
-  // Time period state
-  const [timePeriod, setTimePeriod] = useState<TimePeriod>('7d');
+  // Time period from URL search params
+  const timePeriod: TimePeriod = search.t ?? '7d';
   // TODO: Re-enable when fork annotation data is available
   // const [showAnnotations, setShowAnnotations] = useState(true);
   const showAnnotations = true;
@@ -765,7 +765,7 @@ export function HomePage(): JSX.Element {
             <button
               key={value}
               type="button"
-              onClick={() => setTimePeriod(value)}
+              onClick={() => navigate({ search: prev => ({ ...prev, t: value }), replace: true })}
               className={clsx(
                 'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
                 timePeriod === value
