@@ -6,7 +6,7 @@ export const Route = createFileRoute('/ethereum/execution/gas-profiler/simulate'
   component: SimulatePage,
   validateSearch: gasProfilerSimulateSearchSchema,
   beforeLoad: () => ({
-    getBreadcrumb: () => ({ show: false }),
+    getBreadcrumb: () => ({ label: 'Simulate' }),
   }),
   head: () => ({
     meta: [
