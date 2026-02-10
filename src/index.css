@@ -209,6 +209,22 @@
   --animate-fade-in-delay: fade-in 0.8s ease-out 0.2s forwards;
   --animate-fade-in-delay-2: fade-in 0.8s ease-out 0.4s forwards;
   --animate-fade-in-delay-3: fade-in 0.8s ease-out 0.6s forwards;
+  --animate-fade-in-delay-4: fade-in 0.8s ease-out 0.8s forwards;
+  --animate-fade-in-delay-5: fade-in 0.8s ease-out 1s forwards;
+  --animate-fade-in-delay-6: fade-in 0.8s ease-out 1.2s forwards;
+  --animate-scroll-travel: scroll-travel 2s ease-in-out infinite;
+
+  @keyframes scroll-travel {
+    0%,
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    50% {
+      opacity: 0.3;
+      transform: translateY(8px);
+    }
+  }
 
   @keyframes shimmer {
     0% {
@@ -340,7 +356,10 @@
   .animate-fade-in,
   .animate-fade-in-delay,
   .animate-fade-in-delay-2,
-  .animate-fade-in-delay-3 {
+  .animate-fade-in-delay-3,
+  .animate-fade-in-delay-4,
+  .animate-fade-in-delay-5,
+  .animate-fade-in-delay-6 {
     opacity: 0;
   }
 
@@ -352,5 +371,30 @@
 
   .scrollbar-hide::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
+  }
+}
+
+/* Digit flip animations for scoreboard display.
+ * Placed outside @theme inline so they're always emitted
+ * (keyframes inside @theme are only output when referenced by a token). */
+@keyframes digit-out {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes digit-in {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }

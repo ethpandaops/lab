@@ -119,6 +119,7 @@ function Map2DChartComponent({
   // Create a memoized function to generate scatter series config
   const createScatterSeries = useCallback(
     (data: Array<{ name?: string; value: number[] }>) => ({
+      id: 'scatter-points',
       type: 'scatter',
       coordinateSystem: 'geo',
       zlevel: 3,
@@ -222,21 +223,14 @@ function Map2DChartComponent({
       nodes: point.nodes,
     }));
 
-    // Use cached scatter series index (routes don't change after init)
-    const scatterSeriesIndex = routes.length > 0 ? 1 : 0;
-
-    // Build minimal series update array
-    const seriesUpdate: (Record<string, unknown> | null)[] = [];
-    for (let i = 0; i <= scatterSeriesIndex; i++) {
-      seriesUpdate.push(i === scatterSeriesIndex ? { data: pointData } : null);
-    }
-
-    // Update chart with lazy update enabled for better performance
-    chart.setOption({ series: seriesUpdate }, { notMerge: false, lazyUpdate: true });
+    // Update the scatter series by stable ID to avoid index mismatches
+    // when stories or props toggle route series on/off.
+    chart.setOption({ series: [{ id: 'scatter-points', data: pointData }] }, { notMerge: false, lazyUpdate: true });
   }, [points, mapLoaded, resetKey, routes.length]);
 
-  // Prepare initial options - only calculated once on mount
-  // We update data via setOption in useEffect, so option should never recalculate
+  // Prepare initial options.
+  // Route and geo settings must update when related props change, while point data
+  // is still streamed via setOption in the points effect above.
   const option = useMemo(() => {
     // Don't create option until map is loaded to avoid accessing undefined map data
     if (!mapLoaded) {
@@ -326,8 +320,19 @@ function Map2DChartComponent({
       },
       series,
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapLoaded]); // Only recalculate when map loads - after that we update via setOption
+  }, [
+    mapLoaded,
+    routes,
+    showEffect,
+    lineColor,
+    title,
+    roam,
+    createScatterSeries,
+    themeColors.primary,
+    themeColors.foreground,
+    themeColors.muted,
+    themeColors.border,
+  ]);
 
   // Handle chart events for hover panel
   const onEvents = useMemo(
