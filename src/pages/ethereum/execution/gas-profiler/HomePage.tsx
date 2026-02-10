@@ -186,9 +186,13 @@ export function HomePage(): JSX.Element {
 
   // Time period from URL search params
   const timePeriod: TimePeriod = search.t ?? '7d';
+<<<<<<< HEAD
   // TODO: Re-enable when fork annotation data is available
   // const [showAnnotations, setShowAnnotations] = useState(true);
   const showAnnotations = true;
+=======
+  const [showAnnotations, setShowAnnotations] = useState(true);
+>>>>>>> 970f76f1831fc675b4f63895567851e56744e1ba
   const config = TIME_RANGE_CONFIG[timePeriod];
   const isDaily = config.dataType === 'daily';
 

@@ -39,6 +39,18 @@ import type {
   DimNodeServiceListData,
   DimNodeServiceListErrors,
   DimNodeServiceListResponses,
+  DimValidatorPubkeyServiceGetData,
+  DimValidatorPubkeyServiceGetErrors,
+  DimValidatorPubkeyServiceGetResponses,
+  DimValidatorPubkeyServiceListData,
+  DimValidatorPubkeyServiceListErrors,
+  DimValidatorPubkeyServiceListResponses,
+  DimValidatorStatusServiceGetData,
+  DimValidatorStatusServiceGetErrors,
+  DimValidatorStatusServiceGetResponses,
+  DimValidatorStatusServiceListData,
+  DimValidatorStatusServiceListErrors,
+  DimValidatorStatusServiceListResponses,
   FctAddressAccessChunked10000ServiceGetData,
   FctAddressAccessChunked10000ServiceGetErrors,
   FctAddressAccessChunked10000ServiceGetResponses,
@@ -141,6 +153,24 @@ import type {
   FctAttestationParticipationRateHourlyServiceListData,
   FctAttestationParticipationRateHourlyServiceListErrors,
   FctAttestationParticipationRateHourlyServiceListResponses,
+  FctAttestationVoteCorrectnessByValidatorDailyServiceGetData,
+  FctAttestationVoteCorrectnessByValidatorDailyServiceGetErrors,
+  FctAttestationVoteCorrectnessByValidatorDailyServiceGetResponses,
+  FctAttestationVoteCorrectnessByValidatorDailyServiceListData,
+  FctAttestationVoteCorrectnessByValidatorDailyServiceListErrors,
+  FctAttestationVoteCorrectnessByValidatorDailyServiceListResponses,
+  FctAttestationVoteCorrectnessByValidatorHourlyServiceGetData,
+  FctAttestationVoteCorrectnessByValidatorHourlyServiceGetErrors,
+  FctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponses,
+  FctAttestationVoteCorrectnessByValidatorHourlyServiceListData,
+  FctAttestationVoteCorrectnessByValidatorHourlyServiceListErrors,
+  FctAttestationVoteCorrectnessByValidatorHourlyServiceListResponses,
+  FctAttestationVoteCorrectnessByValidatorServiceGetData,
+  FctAttestationVoteCorrectnessByValidatorServiceGetErrors,
+  FctAttestationVoteCorrectnessByValidatorServiceGetResponses,
+  FctAttestationVoteCorrectnessByValidatorServiceListData,
+  FctAttestationVoteCorrectnessByValidatorServiceListErrors,
+  FctAttestationVoteCorrectnessByValidatorServiceListResponses,
   FctBlobCountByDailyServiceGetData,
   FctBlobCountByDailyServiceGetErrors,
   FctBlobCountByDailyServiceGetResponses,
@@ -219,6 +249,12 @@ import type {
   FctBlockProposalStatusHourlyServiceListData,
   FctBlockProposalStatusHourlyServiceListErrors,
   FctBlockProposalStatusHourlyServiceListResponses,
+  FctBlockProposerByValidatorServiceGetData,
+  FctBlockProposerByValidatorServiceGetErrors,
+  FctBlockProposerByValidatorServiceGetResponses,
+  FctBlockProposerByValidatorServiceListData,
+  FctBlockProposerByValidatorServiceListErrors,
+  FctBlockProposerByValidatorServiceListResponses,
   FctBlockProposerEntityServiceGetData,
   FctBlockProposerEntityServiceGetErrors,
   FctBlockProposerEntityServiceGetResponses,
@@ -609,6 +645,42 @@ import type {
   FctStorageSlotTop100BySlotsServiceListData,
   FctStorageSlotTop100BySlotsServiceListErrors,
   FctStorageSlotTop100BySlotsServiceListResponses,
+  FctSyncCommitteeParticipationByValidatorDailyServiceGetData,
+  FctSyncCommitteeParticipationByValidatorDailyServiceGetErrors,
+  FctSyncCommitteeParticipationByValidatorDailyServiceGetResponses,
+  FctSyncCommitteeParticipationByValidatorDailyServiceListData,
+  FctSyncCommitteeParticipationByValidatorDailyServiceListErrors,
+  FctSyncCommitteeParticipationByValidatorDailyServiceListResponses,
+  FctSyncCommitteeParticipationByValidatorHourlyServiceGetData,
+  FctSyncCommitteeParticipationByValidatorHourlyServiceGetErrors,
+  FctSyncCommitteeParticipationByValidatorHourlyServiceGetResponses,
+  FctSyncCommitteeParticipationByValidatorHourlyServiceListData,
+  FctSyncCommitteeParticipationByValidatorHourlyServiceListErrors,
+  FctSyncCommitteeParticipationByValidatorHourlyServiceListResponses,
+  FctSyncCommitteeParticipationByValidatorServiceGetData,
+  FctSyncCommitteeParticipationByValidatorServiceGetErrors,
+  FctSyncCommitteeParticipationByValidatorServiceGetResponses,
+  FctSyncCommitteeParticipationByValidatorServiceListData,
+  FctSyncCommitteeParticipationByValidatorServiceListErrors,
+  FctSyncCommitteeParticipationByValidatorServiceListResponses,
+  FctValidatorBalanceDailyServiceGetData,
+  FctValidatorBalanceDailyServiceGetErrors,
+  FctValidatorBalanceDailyServiceGetResponses,
+  FctValidatorBalanceDailyServiceListData,
+  FctValidatorBalanceDailyServiceListErrors,
+  FctValidatorBalanceDailyServiceListResponses,
+  FctValidatorBalanceHourlyServiceGetData,
+  FctValidatorBalanceHourlyServiceGetErrors,
+  FctValidatorBalanceHourlyServiceGetResponses,
+  FctValidatorBalanceHourlyServiceListData,
+  FctValidatorBalanceHourlyServiceListErrors,
+  FctValidatorBalanceHourlyServiceListResponses,
+  FctValidatorBalanceServiceGetData,
+  FctValidatorBalanceServiceGetErrors,
+  FctValidatorBalanceServiceGetResponses,
+  FctValidatorBalanceServiceListData,
+  FctValidatorBalanceServiceListErrors,
+  FctValidatorBalanceServiceListResponses,
   IntAddressFirstAccessServiceGetData,
   IntAddressFirstAccessServiceGetErrors,
   IntAddressFirstAccessServiceGetResponses,
@@ -983,6 +1055,14 @@ import {
   zDimNodeServiceGetResponse,
   zDimNodeServiceListData,
   zDimNodeServiceListResponse,
+  zDimValidatorPubkeyServiceGetData,
+  zDimValidatorPubkeyServiceGetResponse,
+  zDimValidatorPubkeyServiceListData,
+  zDimValidatorPubkeyServiceListResponse,
+  zDimValidatorStatusServiceGetData,
+  zDimValidatorStatusServiceGetResponse,
+  zDimValidatorStatusServiceListData,
+  zDimValidatorStatusServiceListResponse,
   zFctAddressAccessChunked10000ServiceGetData,
   zFctAddressAccessChunked10000ServiceGetResponse,
   zFctAddressAccessChunked10000ServiceListData,
@@ -1051,6 +1131,18 @@ import {
   zFctAttestationParticipationRateHourlyServiceGetResponse,
   zFctAttestationParticipationRateHourlyServiceListData,
   zFctAttestationParticipationRateHourlyServiceListResponse,
+  zFctAttestationVoteCorrectnessByValidatorDailyServiceGetData,
+  zFctAttestationVoteCorrectnessByValidatorDailyServiceGetResponse,
+  zFctAttestationVoteCorrectnessByValidatorDailyServiceListData,
+  zFctAttestationVoteCorrectnessByValidatorDailyServiceListResponse,
+  zFctAttestationVoteCorrectnessByValidatorHourlyServiceGetData,
+  zFctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponse,
+  zFctAttestationVoteCorrectnessByValidatorHourlyServiceListData,
+  zFctAttestationVoteCorrectnessByValidatorHourlyServiceListResponse,
+  zFctAttestationVoteCorrectnessByValidatorServiceGetData,
+  zFctAttestationVoteCorrectnessByValidatorServiceGetResponse,
+  zFctAttestationVoteCorrectnessByValidatorServiceListData,
+  zFctAttestationVoteCorrectnessByValidatorServiceListResponse,
   zFctBlobCountByDailyServiceGetData,
   zFctBlobCountByDailyServiceGetResponse,
   zFctBlobCountByDailyServiceListData,
@@ -1103,6 +1195,10 @@ import {
   zFctBlockProposalStatusHourlyServiceGetResponse,
   zFctBlockProposalStatusHourlyServiceListData,
   zFctBlockProposalStatusHourlyServiceListResponse,
+  zFctBlockProposerByValidatorServiceGetData,
+  zFctBlockProposerByValidatorServiceGetResponse,
+  zFctBlockProposerByValidatorServiceListData,
+  zFctBlockProposerByValidatorServiceListResponse,
   zFctBlockProposerEntityServiceGetData,
   zFctBlockProposerEntityServiceGetResponse,
   zFctBlockProposerEntityServiceListData,
@@ -1363,6 +1459,30 @@ import {
   zFctStorageSlotTop100BySlotsServiceGetResponse,
   zFctStorageSlotTop100BySlotsServiceListData,
   zFctStorageSlotTop100BySlotsServiceListResponse,
+  zFctSyncCommitteeParticipationByValidatorDailyServiceGetData,
+  zFctSyncCommitteeParticipationByValidatorDailyServiceGetResponse,
+  zFctSyncCommitteeParticipationByValidatorDailyServiceListData,
+  zFctSyncCommitteeParticipationByValidatorDailyServiceListResponse,
+  zFctSyncCommitteeParticipationByValidatorHourlyServiceGetData,
+  zFctSyncCommitteeParticipationByValidatorHourlyServiceGetResponse,
+  zFctSyncCommitteeParticipationByValidatorHourlyServiceListData,
+  zFctSyncCommitteeParticipationByValidatorHourlyServiceListResponse,
+  zFctSyncCommitteeParticipationByValidatorServiceGetData,
+  zFctSyncCommitteeParticipationByValidatorServiceGetResponse,
+  zFctSyncCommitteeParticipationByValidatorServiceListData,
+  zFctSyncCommitteeParticipationByValidatorServiceListResponse,
+  zFctValidatorBalanceDailyServiceGetData,
+  zFctValidatorBalanceDailyServiceGetResponse,
+  zFctValidatorBalanceDailyServiceListData,
+  zFctValidatorBalanceDailyServiceListResponse,
+  zFctValidatorBalanceHourlyServiceGetData,
+  zFctValidatorBalanceHourlyServiceGetResponse,
+  zFctValidatorBalanceHourlyServiceListData,
+  zFctValidatorBalanceHourlyServiceListResponse,
+  zFctValidatorBalanceServiceGetData,
+  zFctValidatorBalanceServiceGetResponse,
+  zFctValidatorBalanceServiceListData,
+  zFctValidatorBalanceServiceListResponse,
   zIntAddressFirstAccessServiceGetData,
   zIntAddressFirstAccessServiceGetResponse,
   zIntAddressFirstAccessServiceListData,
@@ -1825,6 +1945,82 @@ export const dimNodeServiceGet = <ThrowOnError extends boolean = false>(
     requestValidator: async data => await zDimNodeServiceGetData.parseAsync(data),
     responseValidator: async data => await zDimNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/dim_node/{validator_index}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimValidatorPubkeyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<DimValidatorPubkeyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    DimValidatorPubkeyServiceListResponses,
+    DimValidatorPubkeyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zDimValidatorPubkeyServiceListData.parseAsync(data),
+    responseValidator: async data => await zDimValidatorPubkeyServiceListResponse.parseAsync(data),
+    url: '/api/v1/dim_validator_pubkey',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by pubkey
+ */
+export const dimValidatorPubkeyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<DimValidatorPubkeyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    DimValidatorPubkeyServiceGetResponses,
+    DimValidatorPubkeyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zDimValidatorPubkeyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zDimValidatorPubkeyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/dim_validator_pubkey/{pubkey}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimValidatorStatusServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<DimValidatorStatusServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    DimValidatorStatusServiceListResponses,
+    DimValidatorStatusServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zDimValidatorStatusServiceListData.parseAsync(data),
+    responseValidator: async data => await zDimValidatorStatusServiceListResponse.parseAsync(data),
+    url: '/api/v1/dim_validator_status',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const dimValidatorStatusServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<DimValidatorStatusServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    DimValidatorStatusServiceGetResponses,
+    DimValidatorStatusServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zDimValidatorStatusServiceGetData.parseAsync(data),
+    responseValidator: async data => await zDimValidatorStatusServiceGetResponse.parseAsync(data),
+    url: '/api/v1/dim_validator_status/{validator_index}',
     ...options,
   });
 
@@ -2485,6 +2681,128 @@ export const fctAttestationParticipationRateHourlyServiceGet = <ThrowOnError ext
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctAttestationVoteCorrectnessByValidatorServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationVoteCorrectnessByValidatorServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctAttestationVoteCorrectnessByValidatorServiceListResponses,
+    FctAttestationVoteCorrectnessByValidatorServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationVoteCorrectnessByValidatorServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByValidatorServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_validator',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctAttestationVoteCorrectnessByValidatorServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationVoteCorrectnessByValidatorServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctAttestationVoteCorrectnessByValidatorServiceGetResponses,
+    FctAttestationVoteCorrectnessByValidatorServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationVoteCorrectnessByValidatorServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationVoteCorrectnessByValidatorServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_validator/{validator_index}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctAttestationVoteCorrectnessByValidatorDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationVoteCorrectnessByValidatorDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctAttestationVoteCorrectnessByValidatorDailyServiceListResponses,
+    FctAttestationVoteCorrectnessByValidatorDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctAttestationVoteCorrectnessByValidatorDailyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByValidatorDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_validator_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctAttestationVoteCorrectnessByValidatorDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationVoteCorrectnessByValidatorDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctAttestationVoteCorrectnessByValidatorDailyServiceGetResponses,
+    FctAttestationVoteCorrectnessByValidatorDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationVoteCorrectnessByValidatorDailyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByValidatorDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_validator_daily/{validator_index}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctAttestationVoteCorrectnessByValidatorHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationVoteCorrectnessByValidatorHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctAttestationVoteCorrectnessByValidatorHourlyServiceListResponses,
+    FctAttestationVoteCorrectnessByValidatorHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctAttestationVoteCorrectnessByValidatorHourlyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByValidatorHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_validator_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctAttestationVoteCorrectnessByValidatorHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationVoteCorrectnessByValidatorHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponses,
+    FctAttestationVoteCorrectnessByValidatorHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctAttestationVoteCorrectnessByValidatorHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_validator_hourly/{validator_index}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctBlobCountByDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlobCountByDailyServiceListData, ThrowOnError>
 ) =>
@@ -3010,6 +3328,44 @@ export const fctBlockProposerServiceGet = <ThrowOnError extends boolean = false>
     requestValidator: async data => await zFctBlockProposerServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockProposerServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockProposerByValidatorServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockProposerByValidatorServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockProposerByValidatorServiceListResponses,
+    FctBlockProposerByValidatorServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockProposerByValidatorServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposerByValidatorServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_proposer_by_validator',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctBlockProposerByValidatorServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockProposerByValidatorServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockProposerByValidatorServiceGetResponses,
+    FctBlockProposerByValidatorServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockProposerByValidatorServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposerByValidatorServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_proposer_by_validator/{validator_index}',
     ...options,
   });
 
@@ -5411,6 +5767,242 @@ export const fctStorageSlotTop100BySlotsServiceGet = <ThrowOnError extends boole
     requestValidator: async data => await zFctStorageSlotTop100BySlotsServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctStorageSlotTop100BySlotsServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_top_100_by_slots/{rank}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctSyncCommitteeParticipationByValidatorServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctSyncCommitteeParticipationByValidatorServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctSyncCommitteeParticipationByValidatorServiceListResponses,
+    FctSyncCommitteeParticipationByValidatorServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctSyncCommitteeParticipationByValidatorServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctSyncCommitteeParticipationByValidatorServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_sync_committee_participation_by_validator',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctSyncCommitteeParticipationByValidatorServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctSyncCommitteeParticipationByValidatorServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctSyncCommitteeParticipationByValidatorServiceGetResponses,
+    FctSyncCommitteeParticipationByValidatorServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctSyncCommitteeParticipationByValidatorServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctSyncCommitteeParticipationByValidatorServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_sync_committee_participation_by_validator/{validator_index}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctSyncCommitteeParticipationByValidatorDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctSyncCommitteeParticipationByValidatorDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctSyncCommitteeParticipationByValidatorDailyServiceListResponses,
+    FctSyncCommitteeParticipationByValidatorDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctSyncCommitteeParticipationByValidatorDailyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctSyncCommitteeParticipationByValidatorDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_sync_committee_participation_by_validator_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctSyncCommitteeParticipationByValidatorDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctSyncCommitteeParticipationByValidatorDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctSyncCommitteeParticipationByValidatorDailyServiceGetResponses,
+    FctSyncCommitteeParticipationByValidatorDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctSyncCommitteeParticipationByValidatorDailyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctSyncCommitteeParticipationByValidatorDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_sync_committee_participation_by_validator_daily/{validator_index}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctSyncCommitteeParticipationByValidatorHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctSyncCommitteeParticipationByValidatorHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctSyncCommitteeParticipationByValidatorHourlyServiceListResponses,
+    FctSyncCommitteeParticipationByValidatorHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctSyncCommitteeParticipationByValidatorHourlyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctSyncCommitteeParticipationByValidatorHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_sync_committee_participation_by_validator_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctSyncCommitteeParticipationByValidatorHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctSyncCommitteeParticipationByValidatorHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctSyncCommitteeParticipationByValidatorHourlyServiceGetResponses,
+    FctSyncCommitteeParticipationByValidatorHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctSyncCommitteeParticipationByValidatorHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctSyncCommitteeParticipationByValidatorHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_sync_committee_participation_by_validator_hourly/{validator_index}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctValidatorBalanceServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctValidatorBalanceServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctValidatorBalanceServiceListResponses,
+    FctValidatorBalanceServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctValidatorBalanceServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctValidatorBalanceServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_validator_balance',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctValidatorBalanceServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctValidatorBalanceServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctValidatorBalanceServiceGetResponses,
+    FctValidatorBalanceServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctValidatorBalanceServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctValidatorBalanceServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_validator_balance/{validator_index}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctValidatorBalanceDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctValidatorBalanceDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctValidatorBalanceDailyServiceListResponses,
+    FctValidatorBalanceDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctValidatorBalanceDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctValidatorBalanceDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_validator_balance_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctValidatorBalanceDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctValidatorBalanceDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctValidatorBalanceDailyServiceGetResponses,
+    FctValidatorBalanceDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctValidatorBalanceDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctValidatorBalanceDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_validator_balance_daily/{validator_index}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctValidatorBalanceHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctValidatorBalanceHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctValidatorBalanceHourlyServiceListResponses,
+    FctValidatorBalanceHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctValidatorBalanceHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctValidatorBalanceHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_validator_balance_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctValidatorBalanceHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctValidatorBalanceHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctValidatorBalanceHourlyServiceGetResponses,
+    FctValidatorBalanceHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctValidatorBalanceHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctValidatorBalanceHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_validator_balance_hourly/{validator_index}',
     ...options,
   });
 
