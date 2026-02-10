@@ -1,4 +1,5 @@
 import { type JSX, useMemo, useCallback, useState } from 'react';
+import { useSearch, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Container } from '@/components/Layout/Container';
 import { Card } from '@/components/Layout/Card';
@@ -75,7 +76,9 @@ import {
  * IndexPage - Consensus Overview page
  */
 export function IndexPage(): JSX.Element {
-  const [timePeriod, setTimePeriod] = useState<TimePeriod>('7d');
+  const navigate = useNavigate({ from: '/ethereum/consensus/overview' });
+  const { t } = useSearch({ from: '/ethereum/consensus/overview' });
+  const timePeriod: TimePeriod = t ?? '7d';
   const [showAnnotations, setShowAnnotations] = useState(true);
   const config = TIME_RANGE_CONFIG[timePeriod];
   const isDaily = config.dataType === 'daily';
@@ -832,7 +835,7 @@ export function IndexPage(): JSX.Element {
             <button
               key={value}
               type="button"
-              onClick={() => setTimePeriod(value)}
+              onClick={() => navigate({ search: prev => ({ ...prev, t: value }), replace: true })}
               className={clsx(
                 'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
                 timePeriod === value
