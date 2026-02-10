@@ -380,28 +380,42 @@ export function IndexPage(): JSX.Element {
       proposerRewardHourlyQuery.error);
 
   // --- Max blob values for reference line ---
+  // Base limits from consensus forks + BPO overrides from blob_schedule
 
   const maxBlobValues = useMemo(() => {
-    if (!currentNetwork?.blob_schedule?.length || !currentNetwork.genesis_time || !unifiedTimeKeys.length)
-      return undefined;
+    if (!currentNetwork?.genesis_time || !currentNetwork?.forks?.consensus || !unifiedTimeKeys.length) return undefined;
 
-    const schedule = currentNetwork.blob_schedule;
     const genesisTime = currentNetwork.genesis_time;
+    const consensus = currentNetwork.forks.consensus;
 
-    // Build sorted schedule with timestamps
-    const sortedSchedule = [...schedule]
-      .map(item => ({
-        timestamp: item.timestamp ?? epochToTimestamp(item.epoch, genesisTime),
-        maxBlobs: item.max_blobs_per_block,
-      }))
-      .sort((a, b) => a.timestamp - b.timestamp);
+    // Start with base fork blob limits
+    const schedule: { timestamp: number; maxBlobs: number }[] = [];
+    if (consensus.deneb) {
+      schedule.push({ timestamp: epochToTimestamp(consensus.deneb.epoch, genesisTime), maxBlobs: 6 });
+    }
+    if (consensus.electra) {
+      schedule.push({ timestamp: epochToTimestamp(consensus.electra.epoch, genesisTime), maxBlobs: 9 });
+    }
+
+    // Layer on BPO (Blob Parameter-Only) overrides from blob_schedule
+    if (currentNetwork.blob_schedule?.length) {
+      for (const item of currentNetwork.blob_schedule) {
+        schedule.push({
+          timestamp: item.timestamp ?? epochToTimestamp(item.epoch, genesisTime),
+          maxBlobs: item.max_blobs_per_block,
+        });
+      }
+    }
+
+    schedule.sort((a, b) => a.timestamp - b.timestamp);
+
+    if (!schedule.length) return undefined;
 
     return unifiedTimeKeys.map(key => {
       const ts = isDaily ? Math.floor(new Date(key).getTime() / 1000) : Number(key);
 
-      // Find the active schedule item for this timestamp
       let activeMaxBlobs: number | null = null;
-      for (const item of sortedSchedule) {
+      for (const item of schedule) {
         if (ts >= item.timestamp) {
           activeMaxBlobs = item.maxBlobs;
         } else {
