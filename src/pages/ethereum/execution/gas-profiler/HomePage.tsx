@@ -2,7 +2,7 @@ import { type JSX, useState, useCallback, useEffect, useMemo } from 'react';
 import { useSearch, useNavigate, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { MagnifyingGlassIcon, ChartBarIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, ChartBarIcon, BeakerIcon } from '@heroicons/react/24/outline';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
@@ -688,9 +688,17 @@ export function HomePage(): JSX.Element {
             placeholder="Tx hash or block number"
           />
           <Input.Trailing type="button">
-            <Button size="sm" onClick={handleSearch}>
-              Search
-            </Button>
+            <div className="flex gap-2">
+              <Button size="sm" onClick={handleSearch}>
+                Search
+              </Button>
+              <Link to="/ethereum/execution/gas-profiler/simulate">
+                <Button size="sm" variant="soft">
+                  <BeakerIcon className="mr-1 size-4" />
+                  Simulate
+                </Button>
+              </Link>
+            </div>
           </Input.Trailing>
         </Input>
       </div>

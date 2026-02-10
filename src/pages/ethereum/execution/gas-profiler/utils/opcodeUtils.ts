@@ -152,7 +152,9 @@ export const CALL_TYPE_COLORS: Record<string, string> = {
 };
 
 /**
- * Get category for an opcode
+ * Get category for an opcode or gas parameter
+ *
+ * Handles both opcodes (SLOAD, CALL) and gas parameters (SLOAD_COLD, CALL_VALUE_XFER)
  */
 export function getOpcodeCategory(opcode: string): string {
   // Direct lookup first
@@ -167,8 +169,32 @@ export function getOpcodeCategory(opcode: string): string {
   // Swap opcodes (SWAP1-SWAP16)
   if (opcode.startsWith('SWAP')) return 'Swap';
 
-  // Log opcodes (fallback for any LOG variants)
+  // Log opcodes and gas params (LOG0-4, LOG_DATA, LOG_TOPIC)
   if (opcode.startsWith('LOG')) return 'Log';
+
+  // Storage gas parameters (SLOAD_COLD, SLOAD_WARM, SSTORE_SET, SSTORE_RESET)
+  if (opcode.startsWith('SLOAD') || opcode.startsWith('SSTORE')) return 'Storage';
+
+  // Transient storage gas parameters (TLOAD, TSTORE)
+  if (opcode.startsWith('TLOAD') || opcode.startsWith('TSTORE')) return 'Transient Storage';
+
+  // Call gas parameters (CALL_COLD, CALL_NEW_ACCOUNT, CALL_VALUE_XFER)
+  if (opcode.startsWith('CALL')) return 'Contract';
+
+  // Contract creation parameters (CREATE_BY_SELFDESTRUCT, INIT_CODE_WORD)
+  if (opcode.startsWith('CREATE') || opcode === 'INIT_CODE_WORD') return 'Contract';
+
+  // Math parameters (EXP_BYTE)
+  if (opcode.startsWith('EXP')) return 'Math';
+
+  // Misc/Hashing parameters (KECCAK256_WORD)
+  if (opcode.startsWith('KECCAK')) return 'Misc';
+
+  // Memory parameters (MEMORY, COPY, MCOPY_WORD)
+  if (opcode === 'MEMORY' || opcode === 'COPY' || opcode.startsWith('MCOPY')) return 'Memory';
+
+  // Bit operations (CLZ - count leading zeros)
+  if (opcode === 'CLZ') return 'Bit Ops';
 
   return 'Other';
 }
