@@ -117,10 +117,22 @@ export function SimulatePage(): JSX.Element {
     }
   }, [blockNumber, search.block, navigate]);
 
-  // Reset gas schedule overrides when debounced block number changes (fork may differ)
+  // When new gas schedule defaults load, filter out any user overrides that don't exist in the new fork
+  // This preserves user changes while removing params that aren't valid for the new block's fork
   useEffect(() => {
-    setGasSchedule({});
-  }, [debouncedBlockNumber]);
+    if (gasScheduleDefaults) {
+      setGasSchedule(prev => {
+        const validKeys = Object.keys(gasScheduleDefaults.parameters);
+        const filtered: GasSchedule = {};
+        for (const [key, value] of Object.entries(prev)) {
+          if (validKeys.includes(key) && value !== undefined) {
+            filtered[key] = value;
+          }
+        }
+        return filtered;
+      });
+    }
+  }, [gasScheduleDefaults]);
 
   // Handle input change
   const handleInputChange = useCallback(

@@ -359,15 +359,13 @@ export function GasScheduleEditor({ schedule, defaults, onChange, className }: G
   return (
     <Card className={clsx('overflow-hidden', className)}>
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-border bg-surface/30 px-4 py-3">
-        <div>
-          <h3 className="text-sm font-medium text-foreground">Gas Schedule</h3>
-          <p className="mt-0.5 text-xs text-muted">Adjust gas costs to simulate repricing</p>
-        </div>
+      <div className="border-b border-border bg-surface/30 px-4 py-3">
+        <h3 className="text-sm font-medium text-foreground">Gas Schedule</h3>
+        <p className="mt-0.5 text-xs text-muted">Adjust gas costs to simulate repricing</p>
         {modifiedCount > 0 && (
-          <Button variant="soft" size="sm" onClick={handleResetAll}>
+          <Button variant="soft" size="sm" onClick={handleResetAll} className="mt-3 w-full">
             <ArrowPathIcon className="mr-1.5 size-3.5" />
-            Reset All ({modifiedCount})
+            Reset ({modifiedCount})
           </Button>
         )}
       </div>
