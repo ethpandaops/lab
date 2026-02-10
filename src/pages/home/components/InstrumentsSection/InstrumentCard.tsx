@@ -34,6 +34,7 @@ function FeaturedCard({ instrument }: InstrumentCardProps): JSX.Element {
         'translate-y-4 opacity-0 transition-all duration-500 ease-out',
         'border border-border/30 bg-linear-to-br from-surface via-surface to-primary/[0.04]',
         'hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/[0.1]',
+        'focus:outline-hidden focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
         'data-[revealed]:translate-y-0 data-[revealed]:opacity-100',
         'data-[revealed]:delay-[calc(var(--reveal-index,0)*70ms)]'
       )}
@@ -77,6 +78,7 @@ function MediumCard({ instrument }: InstrumentCardProps): JSX.Element {
         'translate-y-4 opacity-0 transition-all duration-500 ease-out',
         'border border-border/30 bg-surface',
         'hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/[0.06]',
+        'focus:outline-hidden focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
         'data-[revealed]:translate-y-0 data-[revealed]:opacity-100',
         'data-[revealed]:delay-[calc(var(--reveal-index,0)*70ms)]'
       )}
@@ -114,6 +116,7 @@ function StandardCard({ instrument }: InstrumentCardProps): JSX.Element {
         'translate-y-4 opacity-0 transition-all duration-500 ease-out',
         'border border-transparent bg-surface/60',
         'hover:border-border/40 hover:bg-surface',
+        'focus:outline-hidden focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
         'data-[revealed]:translate-y-0 data-[revealed]:opacity-100',
         'data-[revealed]:delay-[calc(var(--reveal-index,0)*70ms)]'
       )}

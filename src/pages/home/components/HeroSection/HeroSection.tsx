@@ -1,5 +1,5 @@
-import { type JSX, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { type JSX, useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from '@tanstack/react-router';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
 import { type Network } from '@/hooks/useConfig/useConfig.types';
 import { useNetwork } from '@/hooks/useNetwork';
@@ -66,11 +66,11 @@ function SlotDisplay({ slot }: { slot: number }): JSX.Element {
 function NetworkCard({
   network,
   now,
-  onClick,
+  onSelectNetwork,
 }: {
   network: Network;
   now: number;
-  onClick: (n: Network) => void;
+  onSelectNetwork: (network: Network) => void;
 }): JSX.Element {
   const slot = getCurrentSlot(network.genesis_time, now);
   const epoch = Math.floor(slot / SLOTS_PER_EPOCH);
@@ -78,10 +78,11 @@ function NetworkCard({
   const forkLabel = activeFork?.combinedName ?? activeFork?.displayName ?? 'Unknown';
 
   return (
-    <button
-      type="button"
-      onClick={() => onClick(network)}
-      className="group flex w-44 cursor-pointer flex-col items-center gap-2.5 rounded-sm border border-border/30 bg-surface px-5 py-5 text-center transition-all duration-200 hover:border-primary/25 sm:w-48"
+    <Link
+      to="/ethereum/live"
+      search={{ network: network.name === 'mainnet' ? undefined : network.name }}
+      onClick={() => onSelectNetwork(network)}
+      className="group flex w-44 cursor-pointer flex-col items-center gap-2.5 rounded-sm border border-border/30 bg-surface px-5 py-5 text-center transition-all duration-200 hover:border-primary/25 focus:outline-hidden focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:w-48"
     >
       <NetworkIcon networkName={network.name} className="size-12" />
       <div className="flex items-center gap-1.5">
@@ -93,7 +94,7 @@ function NetworkCard({
         <span className="text-[8px]/3 font-medium tracking-[0.2em] text-muted/40 uppercase">Slot</span>
         <SlotDisplay slot={slot} />
       </div>
-    </button>
+    </Link>
   );
 }
 
@@ -112,16 +113,7 @@ function useNow(): number {
 /** Hero section — observatory entrance with instrument readout panels. */
 export function HeroSection(): JSX.Element {
   const { networks, setCurrentNetwork } = useNetwork();
-  const navigate = useNavigate();
   const now = useNow();
-
-  const goToNetwork = useCallback(
-    (network: Network) => {
-      setCurrentNetwork(network);
-      void navigate({ to: '/ethereum/live' });
-    },
-    [setCurrentNetwork, navigate]
-  );
 
   const { staticNets, devnets } = useMemo(() => {
     const s = networks
@@ -168,7 +160,7 @@ export function HeroSection(): JSX.Element {
             {staticNets.length > 0 && (
               <div className="flex flex-wrap justify-center gap-3">
                 {staticNets.map(network => (
-                  <NetworkCard key={network.name} network={network} now={now} onClick={goToNetwork} />
+                  <NetworkCard key={network.name} network={network} now={now} onSelectNetwork={setCurrentNetwork} />
                 ))}
               </div>
             )}
@@ -179,7 +171,7 @@ export function HeroSection(): JSX.Element {
                 </span>
                 <div className="flex flex-wrap justify-center gap-3">
                   {devnets.map(network => (
-                    <NetworkCard key={network.name} network={network} now={now} onClick={goToNetwork} />
+                    <NetworkCard key={network.name} network={network} now={now} onSelectNetwork={setCurrentNetwork} />
                   ))}
                 </div>
               </>
