@@ -10,6 +10,7 @@ import {
   ChevronRightIcon,
   CubeIcon,
   DocumentTextIcon,
+  FireIcon,
   PlayCircleIcon,
   PresentationChartLineIcon,
   Square3Stack3DIcon,
