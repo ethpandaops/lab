@@ -4,7 +4,7 @@ import type { EChartsInstance } from 'echarts-for-react/lib';
 import type ReactEChartsCore from 'echarts-for-react/lib/core';
 import ReactEChartsComponent from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
-import { LineChart as EChartsLine } from 'echarts/charts';
+import { LineChart as EChartsLine, BarChart as EChartsBar } from 'echarts/charts';
 import {
   GridComponent,
   TooltipComponent,
@@ -23,6 +23,7 @@ import type { MultiLineChartProps } from './MultiLine.types';
 // Register ECharts components
 echarts.use([
   EChartsLine,
+  EChartsBar,
   GridComponent,
   TooltipComponent,
   TitleComponent,
@@ -477,9 +478,11 @@ export function MultiLineChart({
       const originalIndex = series.indexOf(s);
       const seriesColor = s.color || extendedPalette[originalIndex % extendedPalette.length];
 
+      const chartType = s.seriesType ?? 'line';
+
       const baseConfig = {
         name: s.name,
-        type: 'line' as const,
+        type: chartType as 'line' | 'bar',
         data: s.data,
         smooth: s.smooth ?? false,
         step: s.step ?? false,
@@ -952,9 +955,8 @@ export function MultiLineChart({
       {/* Interactive Legend Controls - Top */}
       {showLegend && !useNativeLegend && series.length > 1 && legendPosition === 'top' && (
         <div className="mb-4 border-b border-border pb-4">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-sm/6 font-medium text-muted">Series:</span>
-            {enableAggregateToggle && (
+          {enableAggregateToggle && (
+            <div className="mb-2 flex items-center justify-end">
               <button
                 onClick={() => setShowAggregate(!showAggregate)}
                 className={`rounded-sm px-2 py-1 text-xs/5 transition-colors ${
@@ -963,8 +965,8 @@ export function MultiLineChart({
               >
                 {showAggregate ? '✓' : '○'} {aggregateSeriesName}
               </button>
-            )}
-          </div>
+            </div>
+          )}
           <div className="max-h-[200px] overflow-y-auto">
             {(() => {
               const legendSeries = series.filter(
@@ -1051,9 +1053,8 @@ export function MultiLineChart({
       {/* Interactive Legend Controls - Bottom */}
       {showLegend && !useNativeLegend && series.length > 1 && legendPosition === 'bottom' && (
         <div className="mt-4 border-t border-border pt-4">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-sm/6 font-medium text-muted">Series:</span>
-            {enableAggregateToggle && (
+          {enableAggregateToggle && (
+            <div className="mb-2 flex items-center justify-end">
               <button
                 onClick={() => setShowAggregate(!showAggregate)}
                 className={`rounded-sm px-2 py-1 text-xs/5 transition-colors ${
@@ -1062,8 +1063,8 @@ export function MultiLineChart({
               >
                 {showAggregate ? '✓' : '○'} {aggregateSeriesName}
               </button>
-            )}
-          </div>
+            </div>
+          )}
           <div className="max-h-[200px] overflow-y-auto">
             {(() => {
               const legendSeries = series.filter(
