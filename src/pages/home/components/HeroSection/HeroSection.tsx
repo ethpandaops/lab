@@ -3,57 +3,10 @@ import { useNavigate } from '@tanstack/react-router';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
 import { type Network } from '@/hooks/useConfig/useConfig.types';
 import { useNetwork } from '@/hooks/useNetwork';
-import { SECONDS_PER_SLOT } from '@/utils/beacon';
+import { SECONDS_PER_SLOT, SLOTS_PER_EPOCH } from '@/utils/beacon';
+import { getActiveFork } from '@/utils/forks';
+import { NETWORK_ORDER } from '@/utils/networks';
 import { formatSlot } from '@/utils/number';
-
-/** Networks considered static/permanent — displayed prominently. */
-const STATIC_NETWORKS = ['mainnet', 'holesky', 'sepolia', 'hoodi'];
-
-/** Ordered list of consensus fork names, oldest to newest. */
-const CONSENSUS_FORK_ORDER = [
-  'phase0',
-  'altair',
-  'bellatrix',
-  'capella',
-  'deneb',
-  'electra',
-  'fulu',
-  'glaos',
-  'fusaka',
-] as const;
-
-/** Map CL fork names to their well-known combined hard fork names. */
-const FORK_DISPLAY_NAMES: Record<string, string> = {
-  bellatrix: 'The Merge',
-  capella: 'Shapella',
-  deneb: 'Dencun',
-  electra: 'Pectra',
-  fulu: 'Fusaka',
-  glaos: 'Glamsterdam',
-  fusaka: 'Fusaka',
-};
-
-/** Derive the latest activated consensus fork key from a network. */
-function getLatestForkKey(network: Network): string {
-  const now = Math.floor(Date.now() / 1000);
-  let latest = 'phase0';
-
-  for (const fork of CONSENSUS_FORK_ORDER) {
-    const f = network.forks.consensus[fork];
-    if (!f) continue;
-    if (f.epoch < 1_000_000_000 && (!f.timestamp || f.timestamp <= now)) {
-      latest = fork;
-    }
-  }
-
-  return latest;
-}
-
-/** Get the display name for a network's latest fork. */
-function getLatestForkName(network: Network): string {
-  const key = getLatestForkKey(network);
-  return FORK_DISPLAY_NAMES[key] ?? key;
-}
 
 /** Compute the current slot for a network from its genesis time. */
 function getCurrentSlot(genesisTime: number, now: number): number {
@@ -77,7 +30,7 @@ function FlipDigit({ digit }: { digit: string }): JSX.Element {
   }, [digit]);
 
   return (
-    <span className="relative inline-flex h-5 w-3.5 items-center justify-center overflow-hidden rounded-[2px] bg-foreground/[0.06]">
+    <span className="relative inline-flex h-5 w-3.5 items-center justify-center overflow-hidden rounded-[2px] bg-foreground/[0.05]">
       {outgoing !== null && (
         <span
           className="absolute inset-0 flex items-center justify-center"
@@ -119,21 +72,23 @@ function NetworkCard({
   now: number;
   onClick: (n: Network) => void;
 }): JSX.Element {
-  const fork = getLatestForkName(network);
   const slot = getCurrentSlot(network.genesis_time, now);
+  const epoch = Math.floor(slot / SLOTS_PER_EPOCH);
+  const activeFork = getActiveFork(network, epoch);
+  const forkLabel = activeFork?.combinedName ?? activeFork?.displayName ?? 'Unknown';
 
   return (
     <button
       type="button"
       onClick={() => onClick(network)}
-      className="group flex w-44 cursor-pointer flex-col items-center gap-2.5 rounded-sm border border-transparent bg-foreground/[0.03] px-5 py-5 text-center transition-all duration-200 hover:border-primary/25 hover:bg-foreground/[0.06] sm:w-48"
+      className="group flex w-44 cursor-pointer flex-col items-center gap-2.5 rounded-sm border border-border/30 bg-surface px-5 py-5 text-center transition-all duration-200 hover:border-primary/25 sm:w-48"
     >
       <NetworkIcon networkName={network.name} className="size-12" />
       <div className="flex items-center gap-1.5">
         <span className="size-1.5 rounded-full bg-success transition-shadow duration-200 group-hover:shadow-[0_0_6px_var(--color-success)]" />
         <span className="text-sm/4 font-semibold tracking-tight text-foreground">{network.display_name}</span>
       </div>
-      <span className="text-[10px]/3 font-medium tracking-wide text-muted uppercase">{fork}</span>
+      <span className="text-[10px]/3 font-medium tracking-wide text-muted uppercase">{forkLabel}</span>
       <div className="flex flex-col items-center gap-1">
         <span className="text-[8px]/3 font-medium tracking-[0.2em] text-muted/40 uppercase">Slot</span>
         <SlotDisplay slot={slot} />
@@ -170,9 +125,9 @@ export function HeroSection(): JSX.Element {
 
   const { staticNets, devnets } = useMemo(() => {
     const s = networks
-      .filter(n => STATIC_NETWORKS.includes(n.name))
-      .sort((a, b) => STATIC_NETWORKS.indexOf(a.name) - STATIC_NETWORKS.indexOf(b.name));
-    const d = networks.filter(n => !STATIC_NETWORKS.includes(n.name));
+      .filter(n => NETWORK_ORDER.includes(n.name))
+      .sort((a, b) => NETWORK_ORDER.indexOf(a.name) - NETWORK_ORDER.indexOf(b.name));
+    const d = networks.filter(n => !NETWORK_ORDER.includes(n.name));
     return { staticNets: s, devnets: d };
   }, [networks]);
 

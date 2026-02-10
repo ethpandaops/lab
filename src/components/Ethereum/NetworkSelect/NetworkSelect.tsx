@@ -2,9 +2,8 @@ import { type JSX, useMemo } from 'react';
 import { useNetwork, type Network } from '@/hooks/useNetwork';
 import { SelectMenu, type SelectMenuOption } from '@/components/Forms/SelectMenu';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
+import { NETWORK_ORDER } from '@/utils/networks';
 import type { NetworkSelectProps } from './NetworkSelect.types';
-
-const NETWORK_ORDER = ['mainnet', 'holesky', 'sepolia', 'hoodi'];
 
 /**
  * Sorts networks by the predefined order, then alphabetically for any remaining networks.
