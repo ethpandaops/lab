@@ -30,7 +30,7 @@ function FlipDigit({ digit }: { digit: string }): JSX.Element {
   }, [digit]);
 
   return (
-    <span className="relative inline-flex h-5 w-3.5 items-center justify-center overflow-hidden rounded-[2px] bg-foreground/[0.05]">
+    <span className="relative inline-flex h-4 w-3 items-center justify-center overflow-hidden rounded-[2px] bg-foreground/[0.05] sm:h-5 sm:w-3.5">
       {outgoing !== null && (
         <span
           className="absolute inset-0 flex items-center justify-center"
@@ -54,7 +54,7 @@ function SlotDisplay({ slot }: { slot: number }): JSX.Element {
   const digits = formatSlot(slot).split('');
 
   return (
-    <span className="inline-flex gap-0.5 text-[11px]/4 text-muted/70 tabular-nums transition-colors duration-200 group-hover:text-muted">
+    <span className="inline-flex gap-0.5 text-[9px]/3 text-muted/70 tabular-nums transition-colors duration-200 group-hover:text-muted sm:text-[11px]/4">
       {digits.map((d, i) => (
         <FlipDigit key={`p${digits.length - 1 - i}`} digit={d} />
       ))}
@@ -82,12 +82,14 @@ function NetworkCard({
       to="/ethereum/live"
       search={{ network: network.name === 'mainnet' ? undefined : network.name }}
       onClick={() => onSelectNetwork(network)}
-      className="group flex w-44 cursor-pointer flex-col items-center gap-2.5 rounded-sm border border-border/30 bg-surface px-5 py-5 text-center transition-all duration-200 hover:border-primary/25 focus:outline-hidden focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:w-48"
+      className="group flex w-36 cursor-pointer flex-col items-center gap-1.5 rounded-sm border border-border/30 bg-surface px-3 py-3 text-center transition-all duration-200 hover:border-primary/25 focus:outline-hidden focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:w-44 sm:gap-2.5 sm:px-5 sm:py-5 lg:w-48"
     >
-      <NetworkIcon networkName={network.name} className="size-12" />
+      <NetworkIcon networkName={network.name} className="size-8 sm:size-12" />
       <div className="flex items-center gap-1.5">
         <span className="size-1.5 rounded-full bg-success transition-shadow duration-200 group-hover:shadow-[0_0_6px_var(--color-success)]" />
-        <span className="text-sm/4 font-semibold tracking-tight text-foreground">{network.display_name}</span>
+        <span className="text-xs/4 font-semibold tracking-tight text-foreground sm:text-sm/4">
+          {network.display_name}
+        </span>
       </div>
       <span className="text-[10px]/3 font-medium tracking-wide text-muted uppercase">{forkLabel}</span>
       <div className="flex flex-col items-center gap-1">
@@ -124,7 +126,7 @@ export function HeroSection(): JSX.Element {
   }, [networks]);
 
   return (
-    <div className="relative flex min-h-dvh flex-col justify-center overflow-hidden">
+    <div className="relative flex min-h-dvh flex-col justify-start overflow-hidden lg:justify-center">
       {/* Atmosphere: single centered glow behind title */}
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div className="absolute top-1/2 left-1/2 h-[60%] w-[50%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/[0.04] blur-[120px]" />
@@ -141,7 +143,7 @@ export function HeroSection(): JSX.Element {
       />
 
       {/* Content */}
-      <div className="relative z-10 px-6 py-24 text-center sm:px-12 lg:px-20">
+      <div className="relative z-10 px-4 py-8 text-center sm:px-12 sm:py-12 lg:px-20 lg:py-24">
         <h1 className="animate-fade-in">
           <span className="block text-lg font-light tracking-wide text-foreground/60 sm:text-xl lg:text-2xl">The</span>
           <span className="mt-1 block text-[clamp(4rem,12vw,11rem)] leading-[0.85] font-black tracking-tighter text-foreground">
@@ -149,14 +151,14 @@ export function HeroSection(): JSX.Element {
           </span>
         </h1>
 
-        <div className="mt-8 flex animate-fade-in-delay items-center justify-center gap-2.5">
+        <div className="mt-4 flex animate-fade-in-delay items-center justify-center gap-2.5 sm:mt-6 lg:mt-8">
           <img src="/images/lab.png" alt="" className="size-5 opacity-60" />
           <span className="text-[11px]/3 font-medium tracking-[0.2em] text-muted uppercase">by ethPandaOps</span>
         </div>
 
         {/* Network instrument panels */}
         {(staticNets.length > 0 || devnets.length > 0) && (
-          <div className="mx-auto mt-12 flex max-w-4xl animate-fade-in-delay-2 flex-col items-center gap-3">
+          <div className="mx-auto mt-6 flex max-w-4xl animate-fade-in-delay-2 flex-col items-center gap-3 sm:mt-8 lg:mt-12">
             {staticNets.length > 0 && (
               <div className="flex flex-wrap justify-center gap-3">
                 {staticNets.map(network => (
