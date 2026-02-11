@@ -1024,7 +1024,7 @@ export type FctAttestationVoteCorrectnessByValidatorHourly = {
   validator_index?: number;
 };
 
-export type FctBlobCountByDaily = {
+export type FctBlobCountDaily = {
   /**
    * Average blob count per slot
    */
@@ -1083,7 +1083,7 @@ export type FctBlobCountByDaily = {
   upper_band_blob_count?: number;
 };
 
-export type FctBlobCountByHourly = {
+export type FctBlobCountHourly = {
   /**
    * Average blob count per slot
    */
@@ -3455,6 +3455,10 @@ export type FctEngineNewPayloadWinrateDaily = {
    */
   meta_execution_implementation?: string;
   /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
+  /**
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
@@ -3473,6 +3477,10 @@ export type FctEngineNewPayloadWinrateHourly = {
    * Execution client implementation name (e.g., Reth, Nethermind, Besu)
    */
   meta_execution_implementation?: string;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
   /**
    * Timestamp when the record was last updated
    */
@@ -4981,7 +4989,7 @@ export type FctProposerRewardHourly = {
   upper_band_reward_eth?: number;
 };
 
-export type FctReorgByDaily = {
+export type FctReorgDaily = {
   /**
    * Start of the day period
    */
@@ -5000,7 +5008,7 @@ export type FctReorgByDaily = {
   updated_date_time?: number;
 };
 
-export type FctReorgByHourly = {
+export type FctReorgHourly = {
   /**
    * Reorg depth (number of consecutive orphaned slots)
    */
@@ -5708,17 +5716,17 @@ export type GetFctAttestationVoteCorrectnessByValidatorResponse = {
 };
 
 /**
- * Response for getting a single fct_blob_count_by_daily record
+ * Response for getting a single fct_blob_count_daily record
  */
-export type GetFctBlobCountByDailyResponse = {
-  item?: FctBlobCountByDaily;
+export type GetFctBlobCountDailyResponse = {
+  item?: FctBlobCountDaily;
 };
 
 /**
- * Response for getting a single fct_blob_count_by_hourly record
+ * Response for getting a single fct_blob_count_hourly record
  */
-export type GetFctBlobCountByHourlyResponse = {
-  item?: FctBlobCountByHourly;
+export type GetFctBlobCountHourlyResponse = {
+  item?: FctBlobCountHourly;
 };
 
 /**
@@ -6191,17 +6199,17 @@ export type GetFctProposerRewardHourlyResponse = {
 };
 
 /**
- * Response for getting a single fct_reorg_by_daily record
+ * Response for getting a single fct_reorg_daily record
  */
-export type GetFctReorgByDailyResponse = {
-  item?: FctReorgByDaily;
+export type GetFctReorgDailyResponse = {
+  item?: FctReorgDaily;
 };
 
 /**
- * Response for getting a single fct_reorg_by_hourly record
+ * Response for getting a single fct_reorg_hourly record
  */
-export type GetFctReorgByHourlyResponse = {
-  item?: FctReorgByHourly;
+export type GetFctReorgHourlyResponse = {
+  item?: FctReorgHourly;
 };
 
 /**
@@ -6545,6 +6553,13 @@ export type GetIntCustodyProbeResponse = {
  */
 export type GetIntEngineGetBlobsResponse = {
   item?: IntEngineGetBlobs;
+};
+
+/**
+ * Response for getting a single int_engine_new_payload_fastest record
+ */
+export type GetIntEngineNewPayloadFastestResponse = {
+  item?: IntEngineNewPayloadFastest;
 };
 
 /**
@@ -8411,6 +8426,53 @@ export type IntEngineNewPayload = {
   validation_error?: string | null;
 };
 
+export type IntEngineNewPayloadFastest = {
+  /**
+   * Execution block hash (hex encoded with 0x prefix)
+   */
+  block_hash?: string;
+  /**
+   * Duration of the fastest engine_newPayload call in milliseconds
+   */
+  duration_ms?: number;
+  /**
+   * Epoch number derived from the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Name of the client that generated the event
+   */
+  meta_client_name?: string;
+  /**
+   * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Full execution client version string from web3_clientVersion RPC
+   */
+  meta_execution_version?: string;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
+  /**
+   * Slot number of the beacon block containing the payload
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type IntExecutionBlockByDate = {
   /**
    * The block timestamp
@@ -9560,13 +9622,13 @@ export type ListFctAttestationVoteCorrectnessByValidatorResponse = {
 };
 
 /**
- * Response for listing fct_blob_count_by_daily records
+ * Response for listing fct_blob_count_daily records
  */
-export type ListFctBlobCountByDailyResponse = {
+export type ListFctBlobCountDailyResponse = {
   /**
-   * The list of fct_blob_count_by_daily.
+   * The list of fct_blob_count_daily.
    */
-  fct_blob_count_by_daily?: Array<FctBlobCountByDaily>;
+  fct_blob_count_daily?: Array<FctBlobCountDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -9574,13 +9636,13 @@ export type ListFctBlobCountByDailyResponse = {
 };
 
 /**
- * Response for listing fct_blob_count_by_hourly records
+ * Response for listing fct_blob_count_hourly records
  */
-export type ListFctBlobCountByHourlyResponse = {
+export type ListFctBlobCountHourlyResponse = {
   /**
-   * The list of fct_blob_count_by_hourly.
+   * The list of fct_blob_count_hourly.
    */
-  fct_blob_count_by_hourly?: Array<FctBlobCountByHourly>;
+  fct_blob_count_hourly?: Array<FctBlobCountHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -10526,13 +10588,13 @@ export type ListFctProposerRewardHourlyResponse = {
 };
 
 /**
- * Response for listing fct_reorg_by_daily records
+ * Response for listing fct_reorg_daily records
  */
-export type ListFctReorgByDailyResponse = {
+export type ListFctReorgDailyResponse = {
   /**
-   * The list of fct_reorg_by_daily.
+   * The list of fct_reorg_daily.
    */
-  fct_reorg_by_daily?: Array<FctReorgByDaily>;
+  fct_reorg_daily?: Array<FctReorgDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -10540,13 +10602,13 @@ export type ListFctReorgByDailyResponse = {
 };
 
 /**
- * Response for listing fct_reorg_by_hourly records
+ * Response for listing fct_reorg_hourly records
  */
-export type ListFctReorgByHourlyResponse = {
+export type ListFctReorgHourlyResponse = {
   /**
-   * The list of fct_reorg_by_hourly.
+   * The list of fct_reorg_hourly.
    */
-  fct_reorg_by_hourly?: Array<FctReorgByHourly>;
+  fct_reorg_hourly?: Array<FctReorgHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -11233,6 +11295,20 @@ export type ListIntEngineGetBlobsResponse = {
    * The list of int_engine_get_blobs.
    */
   int_engine_get_blobs?: Array<IntEngineGetBlobs>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_engine_new_payload_fastest records
+ */
+export type ListIntEngineNewPayloadFastestResponse = {
+  /**
+   * The list of int_engine_new_payload_fastest.
+   */
+  int_engine_new_payload_fastest?: Array<IntEngineNewPayloadFastest>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -21030,7 +21106,7 @@ export type FctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponses = 
 export type FctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponse =
   FctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponses[keyof FctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponses];
 
-export type FctBlobCountByDailyServiceListData = {
+export type FctBlobCountDailyServiceListData = {
   body?: never;
   path?: never;
   query?: {
@@ -21303,11 +21379,11 @@ export type FctBlobCountByDailyServiceListData = {
      */
     moving_avg_blob_count_value?: number;
     /**
-     * The maximum number of fct_blob_count_by_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of fct_blob_count_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListFctBlobCountByDaily` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListFctBlobCountDaily` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -21315,30 +21391,30 @@ export type FctBlobCountByDailyServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/fct_blob_count_by_daily';
+  url: '/api/v1/fct_blob_count_daily';
 };
 
-export type FctBlobCountByDailyServiceListErrors = {
+export type FctBlobCountDailyServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctBlobCountByDailyServiceListError =
-  FctBlobCountByDailyServiceListErrors[keyof FctBlobCountByDailyServiceListErrors];
+export type FctBlobCountDailyServiceListError =
+  FctBlobCountDailyServiceListErrors[keyof FctBlobCountDailyServiceListErrors];
 
-export type FctBlobCountByDailyServiceListResponses = {
+export type FctBlobCountDailyServiceListResponses = {
   /**
    * OK
    */
-  200: ListFctBlobCountByDailyResponse;
+  200: ListFctBlobCountDailyResponse;
 };
 
-export type FctBlobCountByDailyServiceListResponse =
-  FctBlobCountByDailyServiceListResponses[keyof FctBlobCountByDailyServiceListResponses];
+export type FctBlobCountDailyServiceListResponse =
+  FctBlobCountDailyServiceListResponses[keyof FctBlobCountDailyServiceListResponses];
 
-export type FctBlobCountByDailyServiceGetData = {
+export type FctBlobCountDailyServiceGetData = {
   body?: never;
   path: {
     /**
@@ -21347,30 +21423,30 @@ export type FctBlobCountByDailyServiceGetData = {
     day_start_date: string;
   };
   query?: never;
-  url: '/api/v1/fct_blob_count_by_daily/{day_start_date}';
+  url: '/api/v1/fct_blob_count_daily/{day_start_date}';
 };
 
-export type FctBlobCountByDailyServiceGetErrors = {
+export type FctBlobCountDailyServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctBlobCountByDailyServiceGetError =
-  FctBlobCountByDailyServiceGetErrors[keyof FctBlobCountByDailyServiceGetErrors];
+export type FctBlobCountDailyServiceGetError =
+  FctBlobCountDailyServiceGetErrors[keyof FctBlobCountDailyServiceGetErrors];
 
-export type FctBlobCountByDailyServiceGetResponses = {
+export type FctBlobCountDailyServiceGetResponses = {
   /**
    * OK
    */
-  200: GetFctBlobCountByDailyResponse;
+  200: GetFctBlobCountDailyResponse;
 };
 
-export type FctBlobCountByDailyServiceGetResponse =
-  FctBlobCountByDailyServiceGetResponses[keyof FctBlobCountByDailyServiceGetResponses];
+export type FctBlobCountDailyServiceGetResponse =
+  FctBlobCountDailyServiceGetResponses[keyof FctBlobCountDailyServiceGetResponses];
 
-export type FctBlobCountByHourlyServiceListData = {
+export type FctBlobCountHourlyServiceListData = {
   body?: never;
   path?: never;
   query?: {
@@ -21647,11 +21723,11 @@ export type FctBlobCountByHourlyServiceListData = {
      */
     moving_avg_blob_count_value?: number;
     /**
-     * The maximum number of fct_blob_count_by_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of fct_blob_count_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListFctBlobCountByHourly` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListFctBlobCountHourly` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -21659,30 +21735,30 @@ export type FctBlobCountByHourlyServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/fct_blob_count_by_hourly';
+  url: '/api/v1/fct_blob_count_hourly';
 };
 
-export type FctBlobCountByHourlyServiceListErrors = {
+export type FctBlobCountHourlyServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctBlobCountByHourlyServiceListError =
-  FctBlobCountByHourlyServiceListErrors[keyof FctBlobCountByHourlyServiceListErrors];
+export type FctBlobCountHourlyServiceListError =
+  FctBlobCountHourlyServiceListErrors[keyof FctBlobCountHourlyServiceListErrors];
 
-export type FctBlobCountByHourlyServiceListResponses = {
+export type FctBlobCountHourlyServiceListResponses = {
   /**
    * OK
    */
-  200: ListFctBlobCountByHourlyResponse;
+  200: ListFctBlobCountHourlyResponse;
 };
 
-export type FctBlobCountByHourlyServiceListResponse =
-  FctBlobCountByHourlyServiceListResponses[keyof FctBlobCountByHourlyServiceListResponses];
+export type FctBlobCountHourlyServiceListResponse =
+  FctBlobCountHourlyServiceListResponses[keyof FctBlobCountHourlyServiceListResponses];
 
-export type FctBlobCountByHourlyServiceGetData = {
+export type FctBlobCountHourlyServiceGetData = {
   body?: never;
   path: {
     /**
@@ -21691,28 +21767,28 @@ export type FctBlobCountByHourlyServiceGetData = {
     hour_start_date_time: number;
   };
   query?: never;
-  url: '/api/v1/fct_blob_count_by_hourly/{hour_start_date_time}';
+  url: '/api/v1/fct_blob_count_hourly/{hour_start_date_time}';
 };
 
-export type FctBlobCountByHourlyServiceGetErrors = {
+export type FctBlobCountHourlyServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctBlobCountByHourlyServiceGetError =
-  FctBlobCountByHourlyServiceGetErrors[keyof FctBlobCountByHourlyServiceGetErrors];
+export type FctBlobCountHourlyServiceGetError =
+  FctBlobCountHourlyServiceGetErrors[keyof FctBlobCountHourlyServiceGetErrors];
 
-export type FctBlobCountByHourlyServiceGetResponses = {
+export type FctBlobCountHourlyServiceGetResponses = {
   /**
    * OK
    */
-  200: GetFctBlobCountByHourlyResponse;
+  200: GetFctBlobCountHourlyResponse;
 };
 
-export type FctBlobCountByHourlyServiceGetResponse =
-  FctBlobCountByHourlyServiceGetResponses[keyof FctBlobCountByHourlyServiceGetResponses];
+export type FctBlobCountHourlyServiceGetResponse =
+  FctBlobCountHourlyServiceGetResponses[keyof FctBlobCountHourlyServiceGetResponses];
 
 export type FctBlockServiceListData = {
   body?: never;
@@ -44788,6 +44864,42 @@ export type FctEngineNewPayloadWinrateDailyServiceListData = {
      */
     day_start_date_not_in_values?: string;
     /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
      * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: eq)
      */
     meta_execution_implementation_eq?: string;
@@ -45015,6 +45127,42 @@ export type FctEngineNewPayloadWinrateHourlyServiceListData = {
      * Start of the hour period (filter: not_in_values) (comma-separated list)
      */
     hour_start_date_time_not_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
     /**
      * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: eq)
      */
@@ -57476,7 +57624,7 @@ export type FctProposerRewardHourlyServiceGetResponses = {
 export type FctProposerRewardHourlyServiceGetResponse =
   FctProposerRewardHourlyServiceGetResponses[keyof FctProposerRewardHourlyServiceGetResponses];
 
-export type FctReorgByDailyServiceListData = {
+export type FctReorgDailyServiceListData = {
   body?: never;
   path?: never;
   query?: {
@@ -57637,11 +57785,11 @@ export type FctReorgByDailyServiceListData = {
      */
     reorg_count_not_in_values?: string;
     /**
-     * The maximum number of fct_reorg_by_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of fct_reorg_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListFctReorgByDaily` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListFctReorgDaily` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -57649,29 +57797,29 @@ export type FctReorgByDailyServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/fct_reorg_by_daily';
+  url: '/api/v1/fct_reorg_daily';
 };
 
-export type FctReorgByDailyServiceListErrors = {
+export type FctReorgDailyServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctReorgByDailyServiceListError = FctReorgByDailyServiceListErrors[keyof FctReorgByDailyServiceListErrors];
+export type FctReorgDailyServiceListError = FctReorgDailyServiceListErrors[keyof FctReorgDailyServiceListErrors];
 
-export type FctReorgByDailyServiceListResponses = {
+export type FctReorgDailyServiceListResponses = {
   /**
    * OK
    */
-  200: ListFctReorgByDailyResponse;
+  200: ListFctReorgDailyResponse;
 };
 
-export type FctReorgByDailyServiceListResponse =
-  FctReorgByDailyServiceListResponses[keyof FctReorgByDailyServiceListResponses];
+export type FctReorgDailyServiceListResponse =
+  FctReorgDailyServiceListResponses[keyof FctReorgDailyServiceListResponses];
 
-export type FctReorgByDailyServiceGetData = {
+export type FctReorgDailyServiceGetData = {
   body?: never;
   path: {
     /**
@@ -57680,29 +57828,28 @@ export type FctReorgByDailyServiceGetData = {
     day_start_date: string;
   };
   query?: never;
-  url: '/api/v1/fct_reorg_by_daily/{day_start_date}';
+  url: '/api/v1/fct_reorg_daily/{day_start_date}';
 };
 
-export type FctReorgByDailyServiceGetErrors = {
+export type FctReorgDailyServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctReorgByDailyServiceGetError = FctReorgByDailyServiceGetErrors[keyof FctReorgByDailyServiceGetErrors];
+export type FctReorgDailyServiceGetError = FctReorgDailyServiceGetErrors[keyof FctReorgDailyServiceGetErrors];
 
-export type FctReorgByDailyServiceGetResponses = {
+export type FctReorgDailyServiceGetResponses = {
   /**
    * OK
    */
-  200: GetFctReorgByDailyResponse;
+  200: GetFctReorgDailyResponse;
 };
 
-export type FctReorgByDailyServiceGetResponse =
-  FctReorgByDailyServiceGetResponses[keyof FctReorgByDailyServiceGetResponses];
+export type FctReorgDailyServiceGetResponse = FctReorgDailyServiceGetResponses[keyof FctReorgDailyServiceGetResponses];
 
-export type FctReorgByHourlyServiceListData = {
+export type FctReorgHourlyServiceListData = {
   body?: never;
   path?: never;
   query?: {
@@ -57867,11 +58014,11 @@ export type FctReorgByHourlyServiceListData = {
      */
     reorg_count_not_in_values?: string;
     /**
-     * The maximum number of fct_reorg_by_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of fct_reorg_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListFctReorgByHourly` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListFctReorgHourly` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -57879,30 +58026,29 @@ export type FctReorgByHourlyServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/fct_reorg_by_hourly';
+  url: '/api/v1/fct_reorg_hourly';
 };
 
-export type FctReorgByHourlyServiceListErrors = {
+export type FctReorgHourlyServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctReorgByHourlyServiceListError =
-  FctReorgByHourlyServiceListErrors[keyof FctReorgByHourlyServiceListErrors];
+export type FctReorgHourlyServiceListError = FctReorgHourlyServiceListErrors[keyof FctReorgHourlyServiceListErrors];
 
-export type FctReorgByHourlyServiceListResponses = {
+export type FctReorgHourlyServiceListResponses = {
   /**
    * OK
    */
-  200: ListFctReorgByHourlyResponse;
+  200: ListFctReorgHourlyResponse;
 };
 
-export type FctReorgByHourlyServiceListResponse =
-  FctReorgByHourlyServiceListResponses[keyof FctReorgByHourlyServiceListResponses];
+export type FctReorgHourlyServiceListResponse =
+  FctReorgHourlyServiceListResponses[keyof FctReorgHourlyServiceListResponses];
 
-export type FctReorgByHourlyServiceGetData = {
+export type FctReorgHourlyServiceGetData = {
   body?: never;
   path: {
     /**
@@ -57911,27 +58057,27 @@ export type FctReorgByHourlyServiceGetData = {
     hour_start_date_time: number;
   };
   query?: never;
-  url: '/api/v1/fct_reorg_by_hourly/{hour_start_date_time}';
+  url: '/api/v1/fct_reorg_hourly/{hour_start_date_time}';
 };
 
-export type FctReorgByHourlyServiceGetErrors = {
+export type FctReorgHourlyServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctReorgByHourlyServiceGetError = FctReorgByHourlyServiceGetErrors[keyof FctReorgByHourlyServiceGetErrors];
+export type FctReorgHourlyServiceGetError = FctReorgHourlyServiceGetErrors[keyof FctReorgHourlyServiceGetErrors];
 
-export type FctReorgByHourlyServiceGetResponses = {
+export type FctReorgHourlyServiceGetResponses = {
   /**
    * OK
    */
-  200: GetFctReorgByHourlyResponse;
+  200: GetFctReorgHourlyResponse;
 };
 
-export type FctReorgByHourlyServiceGetResponse =
-  FctReorgByHourlyServiceGetResponses[keyof FctReorgByHourlyServiceGetResponses];
+export type FctReorgHourlyServiceGetResponse =
+  FctReorgHourlyServiceGetResponses[keyof FctReorgHourlyServiceGetResponses];
 
 export type FctStorageSlotStateByAddressDailyServiceListData = {
   body?: never;
@@ -80298,6 +80444,498 @@ export type IntEngineNewPayloadServiceGetResponses = {
 
 export type IntEngineNewPayloadServiceGetResponse =
   IntEngineNewPayloadServiceGetResponses[keyof IntEngineNewPayloadServiceGetResponses];
+
+export type IntEngineNewPayloadFastestServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * Slot number of the beacon block containing the payload (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * Slot number of the beacon block containing the payload (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * Slot number of the beacon block containing the payload (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * Slot number of the beacon block containing the payload (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * Slot number of the beacon block containing the payload (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * Slot number of the beacon block containing the payload (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * Slot number of the beacon block containing the payload (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * Slot number of the beacon block containing the payload (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * Slot number of the beacon block containing the payload (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * Slot number of the beacon block containing the payload (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Epoch number derived from the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * Epoch number derived from the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * Epoch number derived from the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * Epoch number derived from the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * Epoch number derived from the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * Epoch number derived from the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * Epoch number derived from the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * Epoch number derived from the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * Epoch number derived from the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * Epoch number derived from the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: eq)
+     */
+    block_hash_eq?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: ne)
+     */
+    block_hash_ne?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: contains)
+     */
+    block_hash_contains?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    block_hash_starts_with?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    block_hash_ends_with?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: like)
+     */
+    block_hash_like?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: not_like)
+     */
+    block_hash_not_like?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    block_hash_in_values?: string;
+    /**
+     * Execution block hash (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    block_hash_not_in_values?: string;
+    /**
+     * Duration of the fastest engine_newPayload call in milliseconds (filter: eq)
+     */
+    duration_ms_eq?: number;
+    /**
+     * Duration of the fastest engine_newPayload call in milliseconds (filter: ne)
+     */
+    duration_ms_ne?: number;
+    /**
+     * Duration of the fastest engine_newPayload call in milliseconds (filter: lt)
+     */
+    duration_ms_lt?: number;
+    /**
+     * Duration of the fastest engine_newPayload call in milliseconds (filter: lte)
+     */
+    duration_ms_lte?: number;
+    /**
+     * Duration of the fastest engine_newPayload call in milliseconds (filter: gt)
+     */
+    duration_ms_gt?: number;
+    /**
+     * Duration of the fastest engine_newPayload call in milliseconds (filter: gte)
+     */
+    duration_ms_gte?: number;
+    /**
+     * Duration of the fastest engine_newPayload call in milliseconds (filter: between_min)
+     */
+    duration_ms_between_min?: number;
+    /**
+     * Duration of the fastest engine_newPayload call in milliseconds (filter: between_max_value)
+     */
+    duration_ms_between_max_value?: number;
+    /**
+     * Duration of the fastest engine_newPayload call in milliseconds (filter: in_values) (comma-separated list)
+     */
+    duration_ms_in_values?: string;
+    /**
+     * Duration of the fastest engine_newPayload call in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    duration_ms_not_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Name of the client that generated the event (filter: eq)
+     */
+    meta_client_name_eq?: string;
+    /**
+     * Name of the client that generated the event (filter: ne)
+     */
+    meta_client_name_ne?: string;
+    /**
+     * Name of the client that generated the event (filter: contains)
+     */
+    meta_client_name_contains?: string;
+    /**
+     * Name of the client that generated the event (filter: starts_with)
+     */
+    meta_client_name_starts_with?: string;
+    /**
+     * Name of the client that generated the event (filter: ends_with)
+     */
+    meta_client_name_ends_with?: string;
+    /**
+     * Name of the client that generated the event (filter: like)
+     */
+    meta_client_name_like?: string;
+    /**
+     * Name of the client that generated the event (filter: not_like)
+     */
+    meta_client_name_not_like?: string;
+    /**
+     * Name of the client that generated the event (filter: in_values) (comma-separated list)
+     */
+    meta_client_name_in_values?: string;
+    /**
+     * Name of the client that generated the event (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_name_not_in_values?: string;
+    /**
+     * The maximum number of int_engine_new_payload_fastest to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntEngineNewPayloadFastest` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_engine_new_payload_fastest';
+};
+
+export type IntEngineNewPayloadFastestServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntEngineNewPayloadFastestServiceListError =
+  IntEngineNewPayloadFastestServiceListErrors[keyof IntEngineNewPayloadFastestServiceListErrors];
+
+export type IntEngineNewPayloadFastestServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntEngineNewPayloadFastestResponse;
+};
+
+export type IntEngineNewPayloadFastestServiceListResponse =
+  IntEngineNewPayloadFastestServiceListResponses[keyof IntEngineNewPayloadFastestServiceListResponses];
+
+export type IntEngineNewPayloadFastestServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/int_engine_new_payload_fastest/{slot_start_date_time}';
+};
+
+export type IntEngineNewPayloadFastestServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntEngineNewPayloadFastestServiceGetError =
+  IntEngineNewPayloadFastestServiceGetErrors[keyof IntEngineNewPayloadFastestServiceGetErrors];
+
+export type IntEngineNewPayloadFastestServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntEngineNewPayloadFastestResponse;
+};
+
+export type IntEngineNewPayloadFastestServiceGetResponse =
+  IntEngineNewPayloadFastestServiceGetResponses[keyof IntEngineNewPayloadFastestServiceGetResponses];
 
 export type IntExecutionBlockByDateServiceListData = {
   body?: never;

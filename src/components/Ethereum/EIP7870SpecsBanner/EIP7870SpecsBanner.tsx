@@ -10,7 +10,7 @@ import type { EIP7870SpecsBannerProps } from './EIP7870SpecsBanner.types';
  * Shows cluster specs with option to expand for full details.
  */
 export function EIP7870SpecsBanner({ className }: EIP7870SpecsBannerProps): JSX.Element {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <div className={clsx('rounded-xs border border-border bg-surface/50', className)}>

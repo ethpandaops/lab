@@ -8,6 +8,7 @@ import {
   fctEngineGetBlobsByElClientHourlyServiceList,
   fctEngineGetBlobsDurationChunked50MsServiceList,
   fctEngineNewPayloadWinrateHourlyServiceList,
+  intEngineNewPayloadFastestServiceList,
 } from '@/api/sdk.gen';
 import type {
   FctEngineNewPayloadByElClient,
@@ -17,6 +18,7 @@ import type {
   FctEngineGetBlobsByElClientHourly,
   FctEngineGetBlobsDurationChunked50Ms,
   FctEngineNewPayloadWinrateHourly,
+  IntEngineNewPayloadFastest,
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
@@ -41,8 +43,11 @@ export interface EngineTimingsData {
   // getBlobs duration histogram
   getBlobsDurationHistogram: FctEngineGetBlobsDurationChunked50Ms[];
 
-  // newPayload winrate (hourly)
+  // newPayload winrate (hourly aggregated)
   winrateHourly: FctEngineNewPayloadWinrateHourly[];
+
+  // newPayload winrate (per-slot, for short time ranges)
+  winratePerSlot: IntEngineNewPayloadFastest[];
 }
 
 export type ActiveTab = 'newPayload' | 'getBlobs';
@@ -239,8 +244,9 @@ export function useEngineTimingsData({
         enabled: !!currentNetwork && fetchBlobs && fetchPerSlotData,
       },
       // newPayload winrate (hourly) - which EL client had fastest newPayload per slot
+      // Must apply refNodeFilter to avoid double-counting across node_classes
       {
-        queryKey: ['engine-timings', 'winrate-hourly', hourlyStart, hourlyEnd],
+        queryKey: ['engine-timings', 'winrate-hourly', hourlyStart, hourlyEnd, referenceNodesOnly],
         queryFn: ({ signal }) =>
           fetchAllPages<FctEngineNewPayloadWinrateHourly>(
             fctEngineNewPayloadWinrateHourlyServiceList,
@@ -250,12 +256,33 @@ export function useEngineTimingsData({
                 hour_start_date_time_lt: hourlyEnd,
                 order_by: 'hour_start_date_time ASC',
                 page_size: 10000,
+                ...refNodeFilter,
               },
             },
             'fct_engine_new_payload_winrate_hourly',
             signal
           ),
-        enabled: !!currentNetwork,
+        enabled: !!currentNetwork && !fetchPerSlotData,
+      },
+      // newPayload winrate (per-slot) - raw fastest client per slot for short ranges
+      {
+        queryKey: ['engine-timings', 'winrate-per-slot', hourlyStart, hourlyEnd, referenceNodesOnly],
+        queryFn: ({ signal }) =>
+          fetchAllPages<IntEngineNewPayloadFastest>(
+            intEngineNewPayloadFastestServiceList,
+            {
+              query: {
+                slot_start_date_time_gte: hourlyStart,
+                slot_start_date_time_lt: hourlyEnd,
+                order_by: 'slot_start_date_time ASC',
+                page_size: 10000,
+                ...refNodeFilter,
+              },
+            },
+            'int_engine_new_payload_fastest',
+            signal
+          ),
+        enabled: !!currentNetwork && fetchPerSlotData,
       },
     ],
   });
@@ -269,6 +296,7 @@ export function useEngineTimingsData({
     getBlobsByElClientHourlyQuery,
     getBlobsDurationHistogramQuery,
     winrateHourlyQuery,
+    winratePerSlotQuery,
   ] = queries;
 
   // Check loading state for newPayload queries (first 3)
@@ -293,6 +321,7 @@ export function useEngineTimingsData({
           getBlobsByElClientHourly: getBlobsByElClientHourlyQuery.data ?? [],
           getBlobsDurationHistogram: getBlobsDurationHistogramQuery.data ?? [],
           winrateHourly: winrateHourlyQuery.data ?? [],
+          winratePerSlot: winratePerSlotQuery.data ?? [],
         }
       : null;
 

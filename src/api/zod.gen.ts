@@ -1345,7 +1345,7 @@ export const zFctAttestationVoteCorrectnessByValidatorHourly = z.object({
   ),
 });
 
-export const zFctBlobCountByDaily = z.object({
+export const zFctBlobCountDaily = z.object({
   avg_blob_count: z.optional(z.number()),
   block_count: z.optional(
     z
@@ -1399,7 +1399,7 @@ export const zFctBlobCountByDaily = z.object({
   upper_band_blob_count: z.optional(z.number()),
 });
 
-export const zFctBlobCountByHourly = z.object({
+export const zFctBlobCountHourly = z.object({
   avg_blob_count: z.optional(z.number()),
   block_count: z.optional(
     z
@@ -5008,6 +5008,7 @@ export const zFctEngineNewPayloadDurationChunked50Ms = z.object({
 export const zFctEngineNewPayloadWinrateDaily = z.object({
   day_start_date: z.optional(z.string()),
   meta_execution_implementation: z.optional(z.string()),
+  node_class: z.optional(z.string()),
   updated_date_time: z.optional(
     z
       .int()
@@ -5036,6 +5037,7 @@ export const zFctEngineNewPayloadWinrateHourly = z.object({
       )
   ),
   meta_execution_implementation: z.optional(z.string()),
+  node_class: z.optional(z.string()),
   updated_date_time: z.optional(
     z
       .int()
@@ -7060,7 +7062,7 @@ export const zFctProposerRewardHourly = z.object({
   upper_band_reward_eth: z.optional(z.number()),
 });
 
-export const zFctReorgByDaily = z.object({
+export const zFctReorgDaily = z.object({
   day_start_date: z.optional(z.string()),
   depth: z.optional(
     z
@@ -7088,7 +7090,7 @@ export const zFctReorgByDaily = z.object({
   ),
 });
 
-export const zFctReorgByHourly = z.object({
+export const zFctReorgHourly = z.object({
   depth: z.optional(
     z
       .int()
@@ -8147,17 +8149,17 @@ export const zGetFctAttestationVoteCorrectnessByValidatorResponse = z.object({
 });
 
 /**
- * Response for getting a single fct_blob_count_by_daily record
+ * Response for getting a single fct_blob_count_daily record
  */
-export const zGetFctBlobCountByDailyResponse = z.object({
-  item: z.optional(zFctBlobCountByDaily),
+export const zGetFctBlobCountDailyResponse = z.object({
+  item: z.optional(zFctBlobCountDaily),
 });
 
 /**
- * Response for getting a single fct_blob_count_by_hourly record
+ * Response for getting a single fct_blob_count_hourly record
  */
-export const zGetFctBlobCountByHourlyResponse = z.object({
-  item: z.optional(zFctBlobCountByHourly),
+export const zGetFctBlobCountHourlyResponse = z.object({
+  item: z.optional(zFctBlobCountHourly),
 });
 
 /**
@@ -8630,17 +8632,17 @@ export const zGetFctProposerRewardHourlyResponse = z.object({
 });
 
 /**
- * Response for getting a single fct_reorg_by_daily record
+ * Response for getting a single fct_reorg_daily record
  */
-export const zGetFctReorgByDailyResponse = z.object({
-  item: z.optional(zFctReorgByDaily),
+export const zGetFctReorgDailyResponse = z.object({
+  item: z.optional(zFctReorgDaily),
 });
 
 /**
- * Response for getting a single fct_reorg_by_hourly record
+ * Response for getting a single fct_reorg_hourly record
  */
-export const zGetFctReorgByHourlyResponse = z.object({
-  item: z.optional(zFctReorgByHourly),
+export const zGetFctReorgHourlyResponse = z.object({
+  item: z.optional(zFctReorgHourly),
 });
 
 /**
@@ -11329,6 +11331,71 @@ export const zGetIntEngineNewPayloadResponse = z.object({
   item: z.optional(zIntEngineNewPayload),
 });
 
+export const zIntEngineNewPayloadFastest = z.object({
+  block_hash: z.optional(z.string()),
+  duration_ms: z.optional(
+    z.coerce
+      .bigint()
+      .check(
+        z.minimum(BigInt('0'), { error: 'Invalid value: Expected uint64 to be >= 0' }),
+        z.maximum(BigInt('18446744073709551615'), {
+          error: 'Invalid value: Expected uint64 to be <= 18446744073709551615',
+        })
+      )
+  ),
+  epoch: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  epoch_start_date_time: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  meta_client_name: z.optional(z.string()),
+  meta_execution_implementation: z.optional(z.string()),
+  meta_execution_version: z.optional(z.string()),
+  node_class: z.optional(z.string()),
+  slot: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  slot_start_date_time: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  updated_date_time: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+});
+
+/**
+ * Response for getting a single int_engine_new_payload_fastest record
+ */
+export const zGetIntEngineNewPayloadFastestResponse = z.object({
+  item: z.optional(zIntEngineNewPayloadFastest),
+});
+
 export const zIntExecutionBlockByDate = z.object({
   block_date_time: z.optional(
     z.coerce
@@ -13008,18 +13075,18 @@ export const zListFctAttestationVoteCorrectnessByValidatorResponse = z.object({
 });
 
 /**
- * Response for listing fct_blob_count_by_daily records
+ * Response for listing fct_blob_count_daily records
  */
-export const zListFctBlobCountByDailyResponse = z.object({
-  fct_blob_count_by_daily: z.optional(z.array(zFctBlobCountByDaily)),
+export const zListFctBlobCountDailyResponse = z.object({
+  fct_blob_count_daily: z.optional(z.array(zFctBlobCountDaily)),
   next_page_token: z.optional(z.string()),
 });
 
 /**
- * Response for listing fct_blob_count_by_hourly records
+ * Response for listing fct_blob_count_hourly records
  */
-export const zListFctBlobCountByHourlyResponse = z.object({
-  fct_blob_count_by_hourly: z.optional(z.array(zFctBlobCountByHourly)),
+export const zListFctBlobCountHourlyResponse = z.object({
+  fct_blob_count_hourly: z.optional(z.array(zFctBlobCountHourly)),
   next_page_token: z.optional(z.string()),
 });
 
@@ -13568,18 +13635,18 @@ export const zListFctProposerRewardHourlyResponse = z.object({
 });
 
 /**
- * Response for listing fct_reorg_by_daily records
+ * Response for listing fct_reorg_daily records
  */
-export const zListFctReorgByDailyResponse = z.object({
-  fct_reorg_by_daily: z.optional(z.array(zFctReorgByDaily)),
+export const zListFctReorgDailyResponse = z.object({
+  fct_reorg_daily: z.optional(z.array(zFctReorgDaily)),
   next_page_token: z.optional(z.string()),
 });
 
 /**
- * Response for listing fct_reorg_by_hourly records
+ * Response for listing fct_reorg_hourly records
  */
-export const zListFctReorgByHourlyResponse = z.object({
-  fct_reorg_by_hourly: z.optional(z.array(zFctReorgByHourly)),
+export const zListFctReorgHourlyResponse = z.object({
+  fct_reorg_hourly: z.optional(z.array(zFctReorgHourly)),
   next_page_token: z.optional(z.string()),
 });
 
@@ -13980,6 +14047,14 @@ export const zListIntCustodyProbeResponse = z.object({
  */
 export const zListIntEngineGetBlobsResponse = z.object({
   int_engine_get_blobs: z.optional(z.array(zIntEngineGetBlobs)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing int_engine_new_payload_fastest records
+ */
+export const zListIntEngineNewPayloadFastestResponse = z.object({
+  int_engine_new_payload_fastest: z.optional(z.array(zIntEngineNewPayloadFastest)),
   next_page_token: z.optional(z.string()),
 });
 
@@ -25247,7 +25322,7 @@ export const zFctAttestationVoteCorrectnessByValidatorHourlyServiceGetData = z.o
 export const zFctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponse =
   zGetFctAttestationVoteCorrectnessByValidatorHourlyResponse;
 
-export const zFctBlobCountByDailyServiceListData = z.object({
+export const zFctBlobCountDailyServiceListData = z.object({
   body: z.optional(z.never()),
   path: z.optional(z.never()),
   query: z.optional(
@@ -25632,9 +25707,9 @@ export const zFctBlobCountByDailyServiceListData = z.object({
 /**
  * OK
  */
-export const zFctBlobCountByDailyServiceListResponse = zListFctBlobCountByDailyResponse;
+export const zFctBlobCountDailyServiceListResponse = zListFctBlobCountDailyResponse;
 
-export const zFctBlobCountByDailyServiceGetData = z.object({
+export const zFctBlobCountDailyServiceGetData = z.object({
   body: z.optional(z.never()),
   path: z.object({
     day_start_date: z.string(),
@@ -25645,9 +25720,9 @@ export const zFctBlobCountByDailyServiceGetData = z.object({
 /**
  * OK
  */
-export const zFctBlobCountByDailyServiceGetResponse = zGetFctBlobCountByDailyResponse;
+export const zFctBlobCountDailyServiceGetResponse = zGetFctBlobCountDailyResponse;
 
-export const zFctBlobCountByHourlyServiceListData = z.object({
+export const zFctBlobCountHourlyServiceListData = z.object({
   body: z.optional(z.never()),
   path: z.optional(z.never()),
   query: z.optional(
@@ -26089,9 +26164,9 @@ export const zFctBlobCountByHourlyServiceListData = z.object({
 /**
  * OK
  */
-export const zFctBlobCountByHourlyServiceListResponse = zListFctBlobCountByHourlyResponse;
+export const zFctBlobCountHourlyServiceListResponse = zListFctBlobCountHourlyResponse;
 
-export const zFctBlobCountByHourlyServiceGetData = z.object({
+export const zFctBlobCountHourlyServiceGetData = z.object({
   body: z.optional(z.never()),
   path: z.object({
     hour_start_date_time: z
@@ -26107,7 +26182,7 @@ export const zFctBlobCountByHourlyServiceGetData = z.object({
 /**
  * OK
  */
-export const zFctBlobCountByHourlyServiceGetResponse = zGetFctBlobCountByHourlyResponse;
+export const zFctBlobCountHourlyServiceGetResponse = zGetFctBlobCountHourlyResponse;
 
 export const zFctBlockServiceListData = z.object({
   body: z.optional(z.never()),
@@ -55352,6 +55427,15 @@ export const zFctEngineNewPayloadWinrateDailyServiceListData = z.object({
       day_start_date_not_like: z.optional(z.string()),
       day_start_date_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
       day_start_date_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      node_class_eq: z.optional(z.string()),
+      node_class_ne: z.optional(z.string()),
+      node_class_contains: z.optional(z.string()),
+      node_class_starts_with: z.optional(z.string()),
+      node_class_ends_with: z.optional(z.string()),
+      node_class_like: z.optional(z.string()),
+      node_class_not_like: z.optional(z.string()),
+      node_class_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      node_class_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
       meta_execution_implementation_eq: z.optional(z.string()),
       meta_execution_implementation_ne: z.optional(z.string()),
       meta_execution_implementation_contains: z.optional(z.string()),
@@ -55596,6 +55680,15 @@ export const zFctEngineNewPayloadWinrateHourlyServiceListData = z.object({
       ),
       hour_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
       hour_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      node_class_eq: z.optional(z.string()),
+      node_class_ne: z.optional(z.string()),
+      node_class_contains: z.optional(z.string()),
+      node_class_starts_with: z.optional(z.string()),
+      node_class_ends_with: z.optional(z.string()),
+      node_class_like: z.optional(z.string()),
+      node_class_not_like: z.optional(z.string()),
+      node_class_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      node_class_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
       meta_execution_implementation_eq: z.optional(z.string()),
       meta_execution_implementation_ne: z.optional(z.string()),
       meta_execution_implementation_contains: z.optional(z.string()),
@@ -71783,7 +71876,7 @@ export const zFctProposerRewardHourlyServiceGetData = z.object({
  */
 export const zFctProposerRewardHourlyServiceGetResponse = zGetFctProposerRewardHourlyResponse;
 
-export const zFctReorgByDailyServiceListData = z.object({
+export const zFctReorgDailyServiceListData = z.object({
   body: z.optional(z.never()),
   path: z.optional(z.never()),
   query: z.optional(
@@ -72012,9 +72105,9 @@ export const zFctReorgByDailyServiceListData = z.object({
 /**
  * OK
  */
-export const zFctReorgByDailyServiceListResponse = zListFctReorgByDailyResponse;
+export const zFctReorgDailyServiceListResponse = zListFctReorgDailyResponse;
 
-export const zFctReorgByDailyServiceGetData = z.object({
+export const zFctReorgDailyServiceGetData = z.object({
   body: z.optional(z.never()),
   path: z.object({
     day_start_date: z.string(),
@@ -72025,9 +72118,9 @@ export const zFctReorgByDailyServiceGetData = z.object({
 /**
  * OK
  */
-export const zFctReorgByDailyServiceGetResponse = zGetFctReorgByDailyResponse;
+export const zFctReorgDailyServiceGetResponse = zGetFctReorgDailyResponse;
 
-export const zFctReorgByHourlyServiceListData = z.object({
+export const zFctReorgHourlyServiceListData = z.object({
   body: z.optional(z.never()),
   path: z.optional(z.never()),
   query: z.optional(
@@ -72313,9 +72406,9 @@ export const zFctReorgByHourlyServiceListData = z.object({
 /**
  * OK
  */
-export const zFctReorgByHourlyServiceListResponse = zListFctReorgByHourlyResponse;
+export const zFctReorgHourlyServiceListResponse = zListFctReorgHourlyResponse;
 
-export const zFctReorgByHourlyServiceGetData = z.object({
+export const zFctReorgHourlyServiceGetData = z.object({
   body: z.optional(z.never()),
   path: z.object({
     hour_start_date_time: z
@@ -72331,7 +72424,7 @@ export const zFctReorgByHourlyServiceGetData = z.object({
 /**
  * OK
  */
-export const zFctReorgByHourlyServiceGetResponse = zGetFctReorgByHourlyResponse;
+export const zFctReorgHourlyServiceGetResponse = zGetFctReorgHourlyResponse;
 
 export const zFctStorageSlotStateByAddressDailyServiceListData = z.object({
   body: z.optional(z.never()),
@@ -98527,6 +98620,505 @@ export const zIntEngineNewPayloadServiceGetData = z.object({
  * OK
  */
 export const zIntEngineNewPayloadServiceGetResponse = zGetIntEngineNewPayloadResponse;
+
+export const zIntEngineNewPayloadFastestServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      slot_start_date_time_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      slot_start_date_time_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      slot_start_date_time_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      slot_start_date_time_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      slot_start_date_time_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      slot_start_date_time_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      slot_start_date_time_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      slot_start_date_time_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      slot_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      slot_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      slot_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      slot_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      slot_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      slot_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      slot_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      slot_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      slot_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      node_class_eq: z.optional(z.string()),
+      node_class_ne: z.optional(z.string()),
+      node_class_contains: z.optional(z.string()),
+      node_class_starts_with: z.optional(z.string()),
+      node_class_ends_with: z.optional(z.string()),
+      node_class_like: z.optional(z.string()),
+      node_class_not_like: z.optional(z.string()),
+      node_class_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      node_class_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      updated_date_time_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      epoch_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      epoch_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      epoch_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      epoch_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      epoch_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      epoch_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      epoch_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      epoch_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      epoch_start_date_time_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      epoch_start_date_time_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      epoch_start_date_time_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      epoch_start_date_time_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      epoch_start_date_time_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      epoch_start_date_time_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      epoch_start_date_time_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      epoch_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_hash_eq: z.optional(z.string()),
+      block_hash_ne: z.optional(z.string()),
+      block_hash_contains: z.optional(z.string()),
+      block_hash_starts_with: z.optional(z.string()),
+      block_hash_ends_with: z.optional(z.string()),
+      block_hash_like: z.optional(z.string()),
+      block_hash_not_like: z.optional(z.string()),
+      block_hash_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_hash_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      duration_ms_eq: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('0'), { error: 'Invalid value: Expected uint64 to be >= 0' }),
+            z.maximum(BigInt('18446744073709551615'), {
+              error: 'Invalid value: Expected uint64 to be <= 18446744073709551615',
+            })
+          )
+      ),
+      duration_ms_ne: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('0'), { error: 'Invalid value: Expected uint64 to be >= 0' }),
+            z.maximum(BigInt('18446744073709551615'), {
+              error: 'Invalid value: Expected uint64 to be <= 18446744073709551615',
+            })
+          )
+      ),
+      duration_ms_lt: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('0'), { error: 'Invalid value: Expected uint64 to be >= 0' }),
+            z.maximum(BigInt('18446744073709551615'), {
+              error: 'Invalid value: Expected uint64 to be <= 18446744073709551615',
+            })
+          )
+      ),
+      duration_ms_lte: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('0'), { error: 'Invalid value: Expected uint64 to be >= 0' }),
+            z.maximum(BigInt('18446744073709551615'), {
+              error: 'Invalid value: Expected uint64 to be <= 18446744073709551615',
+            })
+          )
+      ),
+      duration_ms_gt: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('0'), { error: 'Invalid value: Expected uint64 to be >= 0' }),
+            z.maximum(BigInt('18446744073709551615'), {
+              error: 'Invalid value: Expected uint64 to be <= 18446744073709551615',
+            })
+          )
+      ),
+      duration_ms_gte: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('0'), { error: 'Invalid value: Expected uint64 to be >= 0' }),
+            z.maximum(BigInt('18446744073709551615'), {
+              error: 'Invalid value: Expected uint64 to be <= 18446744073709551615',
+            })
+          )
+      ),
+      duration_ms_between_min: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('0'), { error: 'Invalid value: Expected uint64 to be >= 0' }),
+            z.maximum(BigInt('18446744073709551615'), {
+              error: 'Invalid value: Expected uint64 to be <= 18446744073709551615',
+            })
+          )
+      ),
+      duration_ms_between_max_value: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('0'), { error: 'Invalid value: Expected uint64 to be >= 0' }),
+            z.maximum(BigInt('18446744073709551615'), {
+              error: 'Invalid value: Expected uint64 to be <= 18446744073709551615',
+            })
+          )
+      ),
+      duration_ms_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      duration_ms_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      meta_execution_implementation_eq: z.optional(z.string()),
+      meta_execution_implementation_ne: z.optional(z.string()),
+      meta_execution_implementation_contains: z.optional(z.string()),
+      meta_execution_implementation_starts_with: z.optional(z.string()),
+      meta_execution_implementation_ends_with: z.optional(z.string()),
+      meta_execution_implementation_like: z.optional(z.string()),
+      meta_execution_implementation_not_like: z.optional(z.string()),
+      meta_execution_implementation_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_execution_implementation_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_execution_version_eq: z.optional(z.string()),
+      meta_execution_version_ne: z.optional(z.string()),
+      meta_execution_version_contains: z.optional(z.string()),
+      meta_execution_version_starts_with: z.optional(z.string()),
+      meta_execution_version_ends_with: z.optional(z.string()),
+      meta_execution_version_like: z.optional(z.string()),
+      meta_execution_version_not_like: z.optional(z.string()),
+      meta_execution_version_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_execution_version_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_name_eq: z.optional(z.string()),
+      meta_client_name_ne: z.optional(z.string()),
+      meta_client_name_contains: z.optional(z.string()),
+      meta_client_name_starts_with: z.optional(z.string()),
+      meta_client_name_ends_with: z.optional(z.string()),
+      meta_client_name_like: z.optional(z.string()),
+      meta_client_name_not_like: z.optional(z.string()),
+      meta_client_name_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_name_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      page_size: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }),
+            z.maximum(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' })
+          )
+      ),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntEngineNewPayloadFastestServiceListResponse = zListIntEngineNewPayloadFastestResponse;
+
+export const zIntEngineNewPayloadFastestServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    slot_start_date_time: z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      ),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntEngineNewPayloadFastestServiceGetResponse = zGetIntEngineNewPayloadFastestResponse;
 
 export const zIntExecutionBlockByDateServiceListData = z.object({
   body: z.optional(z.never()),

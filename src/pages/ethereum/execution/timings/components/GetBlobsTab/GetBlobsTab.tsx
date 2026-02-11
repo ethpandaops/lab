@@ -593,7 +593,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                     formatter: (value: number | string) => {
                       const date = new Date(Number(value));
                       // 7 days: show date only
-                      if (timeRange === '7days') {
+                      if (timeRange === '7days' || timeRange === '31days') {
                         return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
                       }
                       // 24 hours or less: show time only
@@ -658,7 +658,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                     formatter: (value: number | string) => {
                       const date = new Date(Number(value));
                       // 7 days: show date only
-                      if (timeRange === '7days') {
+                      if (timeRange === '7days' || timeRange === '31days') {
                         return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
                       }
                       // 24 hours or less: show time only

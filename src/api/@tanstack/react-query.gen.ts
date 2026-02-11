@@ -60,10 +60,10 @@ import {
   fctAttestationVoteCorrectnessByValidatorHourlyServiceList,
   fctAttestationVoteCorrectnessByValidatorServiceGet,
   fctAttestationVoteCorrectnessByValidatorServiceList,
-  fctBlobCountByDailyServiceGet,
-  fctBlobCountByDailyServiceList,
-  fctBlobCountByHourlyServiceGet,
-  fctBlobCountByHourlyServiceList,
+  fctBlobCountDailyServiceGet,
+  fctBlobCountDailyServiceList,
+  fctBlobCountHourlyServiceGet,
+  fctBlobCountHourlyServiceList,
   fctBlockBlobCountHeadServiceGet,
   fctBlockBlobCountHeadServiceList,
   fctBlockBlobCountServiceGet,
@@ -198,10 +198,10 @@ import {
   fctProposerRewardDailyServiceList,
   fctProposerRewardHourlyServiceGet,
   fctProposerRewardHourlyServiceList,
-  fctReorgByDailyServiceGet,
-  fctReorgByDailyServiceList,
-  fctReorgByHourlyServiceGet,
-  fctReorgByHourlyServiceList,
+  fctReorgDailyServiceGet,
+  fctReorgDailyServiceList,
+  fctReorgHourlyServiceGet,
+  fctReorgHourlyServiceList,
   fctStorageSlotStateByAddressDailyServiceGet,
   fctStorageSlotStateByAddressDailyServiceList,
   fctStorageSlotStateByAddressHourlyServiceGet,
@@ -300,6 +300,8 @@ import {
   intCustodyProbeServiceList,
   intEngineGetBlobsServiceGet,
   intEngineGetBlobsServiceList,
+  intEngineNewPayloadFastestServiceGet,
+  intEngineNewPayloadFastestServiceList,
   intEngineNewPayloadServiceGet,
   intEngineNewPayloadServiceList,
   intExecutionBlockByDateServiceGet,
@@ -521,18 +523,18 @@ import type {
   FctAttestationVoteCorrectnessByValidatorServiceListData,
   FctAttestationVoteCorrectnessByValidatorServiceListError,
   FctAttestationVoteCorrectnessByValidatorServiceListResponse,
-  FctBlobCountByDailyServiceGetData,
-  FctBlobCountByDailyServiceGetError,
-  FctBlobCountByDailyServiceGetResponse,
-  FctBlobCountByDailyServiceListData,
-  FctBlobCountByDailyServiceListError,
-  FctBlobCountByDailyServiceListResponse,
-  FctBlobCountByHourlyServiceGetData,
-  FctBlobCountByHourlyServiceGetError,
-  FctBlobCountByHourlyServiceGetResponse,
-  FctBlobCountByHourlyServiceListData,
-  FctBlobCountByHourlyServiceListError,
-  FctBlobCountByHourlyServiceListResponse,
+  FctBlobCountDailyServiceGetData,
+  FctBlobCountDailyServiceGetError,
+  FctBlobCountDailyServiceGetResponse,
+  FctBlobCountDailyServiceListData,
+  FctBlobCountDailyServiceListError,
+  FctBlobCountDailyServiceListResponse,
+  FctBlobCountHourlyServiceGetData,
+  FctBlobCountHourlyServiceGetError,
+  FctBlobCountHourlyServiceGetResponse,
+  FctBlobCountHourlyServiceListData,
+  FctBlobCountHourlyServiceListError,
+  FctBlobCountHourlyServiceListResponse,
   FctBlockBlobCountHeadServiceGetData,
   FctBlockBlobCountHeadServiceGetError,
   FctBlockBlobCountHeadServiceGetResponse,
@@ -935,18 +937,18 @@ import type {
   FctProposerRewardHourlyServiceListData,
   FctProposerRewardHourlyServiceListError,
   FctProposerRewardHourlyServiceListResponse,
-  FctReorgByDailyServiceGetData,
-  FctReorgByDailyServiceGetError,
-  FctReorgByDailyServiceGetResponse,
-  FctReorgByDailyServiceListData,
-  FctReorgByDailyServiceListError,
-  FctReorgByDailyServiceListResponse,
-  FctReorgByHourlyServiceGetData,
-  FctReorgByHourlyServiceGetError,
-  FctReorgByHourlyServiceGetResponse,
-  FctReorgByHourlyServiceListData,
-  FctReorgByHourlyServiceListError,
-  FctReorgByHourlyServiceListResponse,
+  FctReorgDailyServiceGetData,
+  FctReorgDailyServiceGetError,
+  FctReorgDailyServiceGetResponse,
+  FctReorgDailyServiceListData,
+  FctReorgDailyServiceListError,
+  FctReorgDailyServiceListResponse,
+  FctReorgHourlyServiceGetData,
+  FctReorgHourlyServiceGetError,
+  FctReorgHourlyServiceGetResponse,
+  FctReorgHourlyServiceListData,
+  FctReorgHourlyServiceListError,
+  FctReorgHourlyServiceListResponse,
   FctStorageSlotStateByAddressDailyServiceGetData,
   FctStorageSlotStateByAddressDailyServiceGetError,
   FctStorageSlotStateByAddressDailyServiceGetResponse,
@@ -1241,6 +1243,12 @@ import type {
   IntEngineGetBlobsServiceListData,
   IntEngineGetBlobsServiceListError,
   IntEngineGetBlobsServiceListResponse,
+  IntEngineNewPayloadFastestServiceGetData,
+  IntEngineNewPayloadFastestServiceGetError,
+  IntEngineNewPayloadFastestServiceGetResponse,
+  IntEngineNewPayloadFastestServiceListData,
+  IntEngineNewPayloadFastestServiceListError,
+  IntEngineNewPayloadFastestServiceListResponse,
   IntEngineNewPayloadServiceGetData,
   IntEngineNewPayloadServiceGetError,
   IntEngineNewPayloadServiceGetResponse,
@@ -3058,23 +3066,23 @@ export const fctAttestationVoteCorrectnessByValidatorHourlyServiceGetOptions = (
     queryKey: fctAttestationVoteCorrectnessByValidatorHourlyServiceGetQueryKey(options),
   });
 
-export const fctBlobCountByDailyServiceListQueryKey = (options?: Options<FctBlobCountByDailyServiceListData>) =>
-  createQueryKey('fctBlobCountByDailyServiceList', options);
+export const fctBlobCountDailyServiceListQueryKey = (options?: Options<FctBlobCountDailyServiceListData>) =>
+  createQueryKey('fctBlobCountDailyServiceList', options);
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlobCountByDailyServiceListOptions = (options?: Options<FctBlobCountByDailyServiceListData>) =>
+export const fctBlobCountDailyServiceListOptions = (options?: Options<FctBlobCountDailyServiceListData>) =>
   queryOptions<
-    FctBlobCountByDailyServiceListResponse,
-    FctBlobCountByDailyServiceListError,
-    FctBlobCountByDailyServiceListResponse,
-    ReturnType<typeof fctBlobCountByDailyServiceListQueryKey>
+    FctBlobCountDailyServiceListResponse,
+    FctBlobCountDailyServiceListError,
+    FctBlobCountDailyServiceListResponse,
+    ReturnType<typeof fctBlobCountDailyServiceListQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctBlobCountByDailyServiceList({
+      const { data } = await fctBlobCountDailyServiceList({
         ...options,
         ...queryKey[0],
         signal,
@@ -3082,26 +3090,26 @@ export const fctBlobCountByDailyServiceListOptions = (options?: Options<FctBlobC
       });
       return data;
     },
-    queryKey: fctBlobCountByDailyServiceListQueryKey(options),
+    queryKey: fctBlobCountDailyServiceListQueryKey(options),
   });
 
-export const fctBlobCountByDailyServiceGetQueryKey = (options: Options<FctBlobCountByDailyServiceGetData>) =>
-  createQueryKey('fctBlobCountByDailyServiceGet', options);
+export const fctBlobCountDailyServiceGetQueryKey = (options: Options<FctBlobCountDailyServiceGetData>) =>
+  createQueryKey('fctBlobCountDailyServiceGet', options);
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctBlobCountByDailyServiceGetOptions = (options: Options<FctBlobCountByDailyServiceGetData>) =>
+export const fctBlobCountDailyServiceGetOptions = (options: Options<FctBlobCountDailyServiceGetData>) =>
   queryOptions<
-    FctBlobCountByDailyServiceGetResponse,
-    FctBlobCountByDailyServiceGetError,
-    FctBlobCountByDailyServiceGetResponse,
-    ReturnType<typeof fctBlobCountByDailyServiceGetQueryKey>
+    FctBlobCountDailyServiceGetResponse,
+    FctBlobCountDailyServiceGetError,
+    FctBlobCountDailyServiceGetResponse,
+    ReturnType<typeof fctBlobCountDailyServiceGetQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctBlobCountByDailyServiceGet({
+      const { data } = await fctBlobCountDailyServiceGet({
         ...options,
         ...queryKey[0],
         signal,
@@ -3109,26 +3117,26 @@ export const fctBlobCountByDailyServiceGetOptions = (options: Options<FctBlobCou
       });
       return data;
     },
-    queryKey: fctBlobCountByDailyServiceGetQueryKey(options),
+    queryKey: fctBlobCountDailyServiceGetQueryKey(options),
   });
 
-export const fctBlobCountByHourlyServiceListQueryKey = (options?: Options<FctBlobCountByHourlyServiceListData>) =>
-  createQueryKey('fctBlobCountByHourlyServiceList', options);
+export const fctBlobCountHourlyServiceListQueryKey = (options?: Options<FctBlobCountHourlyServiceListData>) =>
+  createQueryKey('fctBlobCountHourlyServiceList', options);
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlobCountByHourlyServiceListOptions = (options?: Options<FctBlobCountByHourlyServiceListData>) =>
+export const fctBlobCountHourlyServiceListOptions = (options?: Options<FctBlobCountHourlyServiceListData>) =>
   queryOptions<
-    FctBlobCountByHourlyServiceListResponse,
-    FctBlobCountByHourlyServiceListError,
-    FctBlobCountByHourlyServiceListResponse,
-    ReturnType<typeof fctBlobCountByHourlyServiceListQueryKey>
+    FctBlobCountHourlyServiceListResponse,
+    FctBlobCountHourlyServiceListError,
+    FctBlobCountHourlyServiceListResponse,
+    ReturnType<typeof fctBlobCountHourlyServiceListQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctBlobCountByHourlyServiceList({
+      const { data } = await fctBlobCountHourlyServiceList({
         ...options,
         ...queryKey[0],
         signal,
@@ -3136,26 +3144,26 @@ export const fctBlobCountByHourlyServiceListOptions = (options?: Options<FctBlob
       });
       return data;
     },
-    queryKey: fctBlobCountByHourlyServiceListQueryKey(options),
+    queryKey: fctBlobCountHourlyServiceListQueryKey(options),
   });
 
-export const fctBlobCountByHourlyServiceGetQueryKey = (options: Options<FctBlobCountByHourlyServiceGetData>) =>
-  createQueryKey('fctBlobCountByHourlyServiceGet', options);
+export const fctBlobCountHourlyServiceGetQueryKey = (options: Options<FctBlobCountHourlyServiceGetData>) =>
+  createQueryKey('fctBlobCountHourlyServiceGet', options);
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctBlobCountByHourlyServiceGetOptions = (options: Options<FctBlobCountByHourlyServiceGetData>) =>
+export const fctBlobCountHourlyServiceGetOptions = (options: Options<FctBlobCountHourlyServiceGetData>) =>
   queryOptions<
-    FctBlobCountByHourlyServiceGetResponse,
-    FctBlobCountByHourlyServiceGetError,
-    FctBlobCountByHourlyServiceGetResponse,
-    ReturnType<typeof fctBlobCountByHourlyServiceGetQueryKey>
+    FctBlobCountHourlyServiceGetResponse,
+    FctBlobCountHourlyServiceGetError,
+    FctBlobCountHourlyServiceGetResponse,
+    ReturnType<typeof fctBlobCountHourlyServiceGetQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctBlobCountByHourlyServiceGet({
+      const { data } = await fctBlobCountHourlyServiceGet({
         ...options,
         ...queryKey[0],
         signal,
@@ -3163,7 +3171,7 @@ export const fctBlobCountByHourlyServiceGetOptions = (options: Options<FctBlobCo
       });
       return data;
     },
-    queryKey: fctBlobCountByHourlyServiceGetQueryKey(options),
+    queryKey: fctBlobCountHourlyServiceGetQueryKey(options),
   });
 
 export const fctBlockServiceListQueryKey = (options?: Options<FctBlockServiceListData>) =>
@@ -7031,23 +7039,23 @@ export const fctProposerRewardHourlyServiceGetOptions = (options: Options<FctPro
     queryKey: fctProposerRewardHourlyServiceGetQueryKey(options),
   });
 
-export const fctReorgByDailyServiceListQueryKey = (options?: Options<FctReorgByDailyServiceListData>) =>
-  createQueryKey('fctReorgByDailyServiceList', options);
+export const fctReorgDailyServiceListQueryKey = (options?: Options<FctReorgDailyServiceListData>) =>
+  createQueryKey('fctReorgDailyServiceList', options);
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctReorgByDailyServiceListOptions = (options?: Options<FctReorgByDailyServiceListData>) =>
+export const fctReorgDailyServiceListOptions = (options?: Options<FctReorgDailyServiceListData>) =>
   queryOptions<
-    FctReorgByDailyServiceListResponse,
-    FctReorgByDailyServiceListError,
-    FctReorgByDailyServiceListResponse,
-    ReturnType<typeof fctReorgByDailyServiceListQueryKey>
+    FctReorgDailyServiceListResponse,
+    FctReorgDailyServiceListError,
+    FctReorgDailyServiceListResponse,
+    ReturnType<typeof fctReorgDailyServiceListQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctReorgByDailyServiceList({
+      const { data } = await fctReorgDailyServiceList({
         ...options,
         ...queryKey[0],
         signal,
@@ -7055,26 +7063,26 @@ export const fctReorgByDailyServiceListOptions = (options?: Options<FctReorgByDa
       });
       return data;
     },
-    queryKey: fctReorgByDailyServiceListQueryKey(options),
+    queryKey: fctReorgDailyServiceListQueryKey(options),
   });
 
-export const fctReorgByDailyServiceGetQueryKey = (options: Options<FctReorgByDailyServiceGetData>) =>
-  createQueryKey('fctReorgByDailyServiceGet', options);
+export const fctReorgDailyServiceGetQueryKey = (options: Options<FctReorgDailyServiceGetData>) =>
+  createQueryKey('fctReorgDailyServiceGet', options);
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctReorgByDailyServiceGetOptions = (options: Options<FctReorgByDailyServiceGetData>) =>
+export const fctReorgDailyServiceGetOptions = (options: Options<FctReorgDailyServiceGetData>) =>
   queryOptions<
-    FctReorgByDailyServiceGetResponse,
-    FctReorgByDailyServiceGetError,
-    FctReorgByDailyServiceGetResponse,
-    ReturnType<typeof fctReorgByDailyServiceGetQueryKey>
+    FctReorgDailyServiceGetResponse,
+    FctReorgDailyServiceGetError,
+    FctReorgDailyServiceGetResponse,
+    ReturnType<typeof fctReorgDailyServiceGetQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctReorgByDailyServiceGet({
+      const { data } = await fctReorgDailyServiceGet({
         ...options,
         ...queryKey[0],
         signal,
@@ -7082,26 +7090,26 @@ export const fctReorgByDailyServiceGetOptions = (options: Options<FctReorgByDail
       });
       return data;
     },
-    queryKey: fctReorgByDailyServiceGetQueryKey(options),
+    queryKey: fctReorgDailyServiceGetQueryKey(options),
   });
 
-export const fctReorgByHourlyServiceListQueryKey = (options?: Options<FctReorgByHourlyServiceListData>) =>
-  createQueryKey('fctReorgByHourlyServiceList', options);
+export const fctReorgHourlyServiceListQueryKey = (options?: Options<FctReorgHourlyServiceListData>) =>
+  createQueryKey('fctReorgHourlyServiceList', options);
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctReorgByHourlyServiceListOptions = (options?: Options<FctReorgByHourlyServiceListData>) =>
+export const fctReorgHourlyServiceListOptions = (options?: Options<FctReorgHourlyServiceListData>) =>
   queryOptions<
-    FctReorgByHourlyServiceListResponse,
-    FctReorgByHourlyServiceListError,
-    FctReorgByHourlyServiceListResponse,
-    ReturnType<typeof fctReorgByHourlyServiceListQueryKey>
+    FctReorgHourlyServiceListResponse,
+    FctReorgHourlyServiceListError,
+    FctReorgHourlyServiceListResponse,
+    ReturnType<typeof fctReorgHourlyServiceListQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctReorgByHourlyServiceList({
+      const { data } = await fctReorgHourlyServiceList({
         ...options,
         ...queryKey[0],
         signal,
@@ -7109,26 +7117,26 @@ export const fctReorgByHourlyServiceListOptions = (options?: Options<FctReorgByH
       });
       return data;
     },
-    queryKey: fctReorgByHourlyServiceListQueryKey(options),
+    queryKey: fctReorgHourlyServiceListQueryKey(options),
   });
 
-export const fctReorgByHourlyServiceGetQueryKey = (options: Options<FctReorgByHourlyServiceGetData>) =>
-  createQueryKey('fctReorgByHourlyServiceGet', options);
+export const fctReorgHourlyServiceGetQueryKey = (options: Options<FctReorgHourlyServiceGetData>) =>
+  createQueryKey('fctReorgHourlyServiceGet', options);
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctReorgByHourlyServiceGetOptions = (options: Options<FctReorgByHourlyServiceGetData>) =>
+export const fctReorgHourlyServiceGetOptions = (options: Options<FctReorgHourlyServiceGetData>) =>
   queryOptions<
-    FctReorgByHourlyServiceGetResponse,
-    FctReorgByHourlyServiceGetError,
-    FctReorgByHourlyServiceGetResponse,
-    ReturnType<typeof fctReorgByHourlyServiceGetQueryKey>
+    FctReorgHourlyServiceGetResponse,
+    FctReorgHourlyServiceGetError,
+    FctReorgHourlyServiceGetResponse,
+    ReturnType<typeof fctReorgHourlyServiceGetQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctReorgByHourlyServiceGet({
+      const { data } = await fctReorgHourlyServiceGet({
         ...options,
         ...queryKey[0],
         signal,
@@ -7136,7 +7144,7 @@ export const fctReorgByHourlyServiceGetOptions = (options: Options<FctReorgByHou
       });
       return data;
     },
-    queryKey: fctReorgByHourlyServiceGetQueryKey(options),
+    queryKey: fctReorgHourlyServiceGetQueryKey(options),
   });
 
 export const fctStorageSlotStateByAddressDailyServiceListQueryKey = (
@@ -10058,6 +10066,66 @@ export const intEngineNewPayloadServiceGetOptions = (options: Options<IntEngineN
       return data;
     },
     queryKey: intEngineNewPayloadServiceGetQueryKey(options),
+  });
+
+export const intEngineNewPayloadFastestServiceListQueryKey = (
+  options?: Options<IntEngineNewPayloadFastestServiceListData>
+) => createQueryKey('intEngineNewPayloadFastestServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intEngineNewPayloadFastestServiceListOptions = (
+  options?: Options<IntEngineNewPayloadFastestServiceListData>
+) =>
+  queryOptions<
+    IntEngineNewPayloadFastestServiceListResponse,
+    IntEngineNewPayloadFastestServiceListError,
+    IntEngineNewPayloadFastestServiceListResponse,
+    ReturnType<typeof intEngineNewPayloadFastestServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intEngineNewPayloadFastestServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intEngineNewPayloadFastestServiceListQueryKey(options),
+  });
+
+export const intEngineNewPayloadFastestServiceGetQueryKey = (
+  options: Options<IntEngineNewPayloadFastestServiceGetData>
+) => createQueryKey('intEngineNewPayloadFastestServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intEngineNewPayloadFastestServiceGetOptions = (
+  options: Options<IntEngineNewPayloadFastestServiceGetData>
+) =>
+  queryOptions<
+    IntEngineNewPayloadFastestServiceGetResponse,
+    IntEngineNewPayloadFastestServiceGetError,
+    IntEngineNewPayloadFastestServiceGetResponse,
+    ReturnType<typeof intEngineNewPayloadFastestServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intEngineNewPayloadFastestServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intEngineNewPayloadFastestServiceGetQueryKey(options),
   });
 
 export const intExecutionBlockByDateServiceListQueryKey = (options?: Options<IntExecutionBlockByDateServiceListData>) =>
