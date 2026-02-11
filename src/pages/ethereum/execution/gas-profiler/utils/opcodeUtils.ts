@@ -138,6 +138,9 @@ export const CATEGORY_COLORS: Record<string, string> = {
   Swap: '#84cc16', // lime
   Log: '#eab308', // yellow
   Contract: '#0ea5e9', // sky
+  'Precompiles (Fixed)': '#10b981', // emerald
+  'Precompiles (Variable)': '#059669', // emerald-600
+  Precompiles: '#10b981', // emerald - used for opcode breakdown chart
   Other: '#9ca3af', // gray-400
 };
 
@@ -182,6 +185,11 @@ export function isGasParameter(name: string): boolean {
     return true;
   }
 
+  // Precompile gas parameters (PC_SHA256_BASE, PC_ECREC, etc.)
+  if (name.startsWith('PC_')) {
+    return true;
+  }
+
   // Known standalone parameters (not opcodes)
   const standaloneParameters = [
     'MEMORY', // Memory expansion cost
@@ -205,6 +213,9 @@ export function isGasParameter(name: string): boolean {
 export function getOpcodeCategory(opcode: string): string {
   // Direct lookup first
   if (OPCODE_CATEGORIES[opcode]) return OPCODE_CATEGORIES[opcode];
+
+  // Precompile gas entries (PC_SHA256, PC_ECREC, etc.)
+  if (opcode.startsWith('PC_')) return 'Precompiles';
 
   // Push opcodes (PUSH0-PUSH32)
   if (opcode.startsWith('PUSH')) return 'Push';
@@ -263,6 +274,8 @@ const HEX_TO_TAILWIND: Record<string, { bg: string; hover: string }> = {
   '#84cc16': { bg: 'bg-lime-500', hover: 'hover:bg-lime-400' },
   '#eab308': { bg: 'bg-yellow-500', hover: 'hover:bg-yellow-400' },
   '#0ea5e9': { bg: 'bg-sky-500', hover: 'hover:bg-sky-400' },
+  '#10b981': { bg: 'bg-emerald-500', hover: 'hover:bg-emerald-400' },
+  '#059669': { bg: 'bg-emerald-600', hover: 'hover:bg-emerald-500' },
   '#9ca3af': { bg: 'bg-gray-400', hover: 'hover:bg-gray-300' },
 };
 

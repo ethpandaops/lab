@@ -414,7 +414,7 @@ function OpcodeRow({ op, maxGas }: { op: OpcodeRowData; maxGas: number }): JSX.E
 
   return (
     <Tooltip
-      title={op.opcode}
+      title={op.opcode.startsWith('PC_') ? op.opcode.slice(3) : op.opcode}
       width="w-auto"
       description={
         <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 whitespace-nowrap">
@@ -442,7 +442,9 @@ function OpcodeRow({ op, maxGas }: { op: OpcodeRowData; maxGas: number }): JSX.E
         {/* Main row — mirrors category header pattern */}
         <div className="flex items-center gap-2">
           <div className="size-2 shrink-0 rounded-full" style={{ backgroundColor: op.categoryColor }} />
-          <span className="font-mono text-xs font-semibold text-foreground">{op.opcode}</span>
+          <span className="font-mono text-xs font-semibold text-foreground">
+            {op.opcode.startsWith('PC_') ? op.opcode.slice(3) : op.opcode}
+          </span>
           {hasCountChange && (
             <span className="font-mono text-[11px] text-muted tabular-nums">
               {formatGas(op.originalCount)} &rarr; {formatGas(op.simulatedCount)} execs
@@ -551,7 +553,8 @@ function OpcodeBreakdownSection({
                 <div className="size-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
                 <span className="text-xs font-semibold text-foreground">{cat.name}</span>
                 <span className="text-xs text-muted">
-                  ({cat.opcodes.length} opcode{cat.opcodes.length !== 1 ? 's' : ''})
+                  ({cat.opcodes.length} {cat.name === 'Precompiles' ? 'contract' : 'opcode'}
+                  {cat.opcodes.length !== 1 ? 's' : ''})
                 </span>
                 <div className="flex-1" />
                 <span className="mr-1 font-mono text-xs text-muted tabular-nums">
@@ -1033,7 +1036,7 @@ export function BlockSimulationResultsV2({
         <div className="flex items-center justify-between gap-4 border-b border-border">
           <ScrollableTabs className="border-b-0">
             <Tab>Summary</Tab>
-            <Tab>Opcode Breakdown</Tab>
+            <Tab>Gas Breakdown</Tab>
             <Tab>Transactions</Tab>
           </ScrollableTabs>
           <div className="flex items-center gap-2 pb-2">
