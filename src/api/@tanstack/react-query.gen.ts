@@ -16,6 +16,10 @@ import {
   dimFunctionSignatureServiceList,
   dimNodeServiceGet,
   dimNodeServiceList,
+  dimValidatorPubkeyServiceGet,
+  dimValidatorPubkeyServiceList,
+  dimValidatorStatusServiceGet,
+  dimValidatorStatusServiceList,
   fctAddressAccessChunked10000ServiceGet,
   fctAddressAccessChunked10000ServiceList,
   fctAddressAccessTotalServiceGet,
@@ -50,10 +54,16 @@ import {
   fctAttestationParticipationRateDailyServiceList,
   fctAttestationParticipationRateHourlyServiceGet,
   fctAttestationParticipationRateHourlyServiceList,
-  fctBlobCountByDailyServiceGet,
-  fctBlobCountByDailyServiceList,
-  fctBlobCountByHourlyServiceGet,
-  fctBlobCountByHourlyServiceList,
+  fctAttestationVoteCorrectnessByValidatorDailyServiceGet,
+  fctAttestationVoteCorrectnessByValidatorDailyServiceList,
+  fctAttestationVoteCorrectnessByValidatorHourlyServiceGet,
+  fctAttestationVoteCorrectnessByValidatorHourlyServiceList,
+  fctAttestationVoteCorrectnessByValidatorServiceGet,
+  fctAttestationVoteCorrectnessByValidatorServiceList,
+  fctBlobCountDailyServiceGet,
+  fctBlobCountDailyServiceList,
+  fctBlobCountHourlyServiceGet,
+  fctBlobCountHourlyServiceList,
   fctBlockBlobCountHeadServiceGet,
   fctBlockBlobCountHeadServiceList,
   fctBlockBlobCountServiceGet,
@@ -76,6 +86,8 @@ import {
   fctBlockProposalStatusDailyServiceList,
   fctBlockProposalStatusHourlyServiceGet,
   fctBlockProposalStatusHourlyServiceList,
+  fctBlockProposerByValidatorServiceGet,
+  fctBlockProposerByValidatorServiceList,
   fctBlockProposerEntityServiceGet,
   fctBlockProposerEntityServiceList,
   fctBlockProposerHeadServiceGet,
@@ -182,10 +194,10 @@ import {
   fctProposerRewardDailyServiceList,
   fctProposerRewardHourlyServiceGet,
   fctProposerRewardHourlyServiceList,
-  fctReorgByDailyServiceGet,
-  fctReorgByDailyServiceList,
-  fctReorgByHourlyServiceGet,
-  fctReorgByHourlyServiceList,
+  fctReorgDailyServiceGet,
+  fctReorgDailyServiceList,
+  fctReorgHourlyServiceGet,
+  fctReorgHourlyServiceList,
   fctStorageSlotStateByAddressDailyServiceGet,
   fctStorageSlotStateByAddressDailyServiceList,
   fctStorageSlotStateByAddressHourlyServiceGet,
@@ -206,6 +218,18 @@ import {
   fctStorageSlotTop100ByBytesServiceList,
   fctStorageSlotTop100BySlotsServiceGet,
   fctStorageSlotTop100BySlotsServiceList,
+  fctSyncCommitteeParticipationByValidatorDailyServiceGet,
+  fctSyncCommitteeParticipationByValidatorDailyServiceList,
+  fctSyncCommitteeParticipationByValidatorHourlyServiceGet,
+  fctSyncCommitteeParticipationByValidatorHourlyServiceList,
+  fctSyncCommitteeParticipationByValidatorServiceGet,
+  fctSyncCommitteeParticipationByValidatorServiceList,
+  fctValidatorBalanceDailyServiceGet,
+  fctValidatorBalanceDailyServiceList,
+  fctValidatorBalanceHourlyServiceGet,
+  fctValidatorBalanceHourlyServiceList,
+  fctValidatorBalanceServiceGet,
+  fctValidatorBalanceServiceList,
   intAddressFirstAccessServiceGet,
   intAddressFirstAccessServiceList,
   intAddressLastAccessServiceGet,
@@ -361,6 +385,18 @@ import type {
   DimNodeServiceListData,
   DimNodeServiceListError,
   DimNodeServiceListResponse,
+  DimValidatorPubkeyServiceGetData,
+  DimValidatorPubkeyServiceGetError,
+  DimValidatorPubkeyServiceGetResponse,
+  DimValidatorPubkeyServiceListData,
+  DimValidatorPubkeyServiceListError,
+  DimValidatorPubkeyServiceListResponse,
+  DimValidatorStatusServiceGetData,
+  DimValidatorStatusServiceGetError,
+  DimValidatorStatusServiceGetResponse,
+  DimValidatorStatusServiceListData,
+  DimValidatorStatusServiceListError,
+  DimValidatorStatusServiceListResponse,
   FctAddressAccessChunked10000ServiceGetData,
   FctAddressAccessChunked10000ServiceGetError,
   FctAddressAccessChunked10000ServiceGetResponse,
@@ -463,18 +499,36 @@ import type {
   FctAttestationParticipationRateHourlyServiceListData,
   FctAttestationParticipationRateHourlyServiceListError,
   FctAttestationParticipationRateHourlyServiceListResponse,
-  FctBlobCountByDailyServiceGetData,
-  FctBlobCountByDailyServiceGetError,
-  FctBlobCountByDailyServiceGetResponse,
-  FctBlobCountByDailyServiceListData,
-  FctBlobCountByDailyServiceListError,
-  FctBlobCountByDailyServiceListResponse,
-  FctBlobCountByHourlyServiceGetData,
-  FctBlobCountByHourlyServiceGetError,
-  FctBlobCountByHourlyServiceGetResponse,
-  FctBlobCountByHourlyServiceListData,
-  FctBlobCountByHourlyServiceListError,
-  FctBlobCountByHourlyServiceListResponse,
+  FctAttestationVoteCorrectnessByValidatorDailyServiceGetData,
+  FctAttestationVoteCorrectnessByValidatorDailyServiceGetError,
+  FctAttestationVoteCorrectnessByValidatorDailyServiceGetResponse,
+  FctAttestationVoteCorrectnessByValidatorDailyServiceListData,
+  FctAttestationVoteCorrectnessByValidatorDailyServiceListError,
+  FctAttestationVoteCorrectnessByValidatorDailyServiceListResponse,
+  FctAttestationVoteCorrectnessByValidatorHourlyServiceGetData,
+  FctAttestationVoteCorrectnessByValidatorHourlyServiceGetError,
+  FctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponse,
+  FctAttestationVoteCorrectnessByValidatorHourlyServiceListData,
+  FctAttestationVoteCorrectnessByValidatorHourlyServiceListError,
+  FctAttestationVoteCorrectnessByValidatorHourlyServiceListResponse,
+  FctAttestationVoteCorrectnessByValidatorServiceGetData,
+  FctAttestationVoteCorrectnessByValidatorServiceGetError,
+  FctAttestationVoteCorrectnessByValidatorServiceGetResponse,
+  FctAttestationVoteCorrectnessByValidatorServiceListData,
+  FctAttestationVoteCorrectnessByValidatorServiceListError,
+  FctAttestationVoteCorrectnessByValidatorServiceListResponse,
+  FctBlobCountDailyServiceGetData,
+  FctBlobCountDailyServiceGetError,
+  FctBlobCountDailyServiceGetResponse,
+  FctBlobCountDailyServiceListData,
+  FctBlobCountDailyServiceListError,
+  FctBlobCountDailyServiceListResponse,
+  FctBlobCountHourlyServiceGetData,
+  FctBlobCountHourlyServiceGetError,
+  FctBlobCountHourlyServiceGetResponse,
+  FctBlobCountHourlyServiceListData,
+  FctBlobCountHourlyServiceListError,
+  FctBlobCountHourlyServiceListResponse,
   FctBlockBlobCountHeadServiceGetData,
   FctBlockBlobCountHeadServiceGetError,
   FctBlockBlobCountHeadServiceGetResponse,
@@ -541,6 +595,12 @@ import type {
   FctBlockProposalStatusHourlyServiceListData,
   FctBlockProposalStatusHourlyServiceListError,
   FctBlockProposalStatusHourlyServiceListResponse,
+  FctBlockProposerByValidatorServiceGetData,
+  FctBlockProposerByValidatorServiceGetError,
+  FctBlockProposerByValidatorServiceGetResponse,
+  FctBlockProposerByValidatorServiceListData,
+  FctBlockProposerByValidatorServiceListError,
+  FctBlockProposerByValidatorServiceListResponse,
   FctBlockProposerEntityServiceGetData,
   FctBlockProposerEntityServiceGetError,
   FctBlockProposerEntityServiceGetResponse,
@@ -859,18 +919,18 @@ import type {
   FctProposerRewardHourlyServiceListData,
   FctProposerRewardHourlyServiceListError,
   FctProposerRewardHourlyServiceListResponse,
-  FctReorgByDailyServiceGetData,
-  FctReorgByDailyServiceGetError,
-  FctReorgByDailyServiceGetResponse,
-  FctReorgByDailyServiceListData,
-  FctReorgByDailyServiceListError,
-  FctReorgByDailyServiceListResponse,
-  FctReorgByHourlyServiceGetData,
-  FctReorgByHourlyServiceGetError,
-  FctReorgByHourlyServiceGetResponse,
-  FctReorgByHourlyServiceListData,
-  FctReorgByHourlyServiceListError,
-  FctReorgByHourlyServiceListResponse,
+  FctReorgDailyServiceGetData,
+  FctReorgDailyServiceGetError,
+  FctReorgDailyServiceGetResponse,
+  FctReorgDailyServiceListData,
+  FctReorgDailyServiceListError,
+  FctReorgDailyServiceListResponse,
+  FctReorgHourlyServiceGetData,
+  FctReorgHourlyServiceGetError,
+  FctReorgHourlyServiceGetResponse,
+  FctReorgHourlyServiceListData,
+  FctReorgHourlyServiceListError,
+  FctReorgHourlyServiceListResponse,
   FctStorageSlotStateByAddressDailyServiceGetData,
   FctStorageSlotStateByAddressDailyServiceGetError,
   FctStorageSlotStateByAddressDailyServiceGetResponse,
@@ -931,6 +991,42 @@ import type {
   FctStorageSlotTop100BySlotsServiceListData,
   FctStorageSlotTop100BySlotsServiceListError,
   FctStorageSlotTop100BySlotsServiceListResponse,
+  FctSyncCommitteeParticipationByValidatorDailyServiceGetData,
+  FctSyncCommitteeParticipationByValidatorDailyServiceGetError,
+  FctSyncCommitteeParticipationByValidatorDailyServiceGetResponse,
+  FctSyncCommitteeParticipationByValidatorDailyServiceListData,
+  FctSyncCommitteeParticipationByValidatorDailyServiceListError,
+  FctSyncCommitteeParticipationByValidatorDailyServiceListResponse,
+  FctSyncCommitteeParticipationByValidatorHourlyServiceGetData,
+  FctSyncCommitteeParticipationByValidatorHourlyServiceGetError,
+  FctSyncCommitteeParticipationByValidatorHourlyServiceGetResponse,
+  FctSyncCommitteeParticipationByValidatorHourlyServiceListData,
+  FctSyncCommitteeParticipationByValidatorHourlyServiceListError,
+  FctSyncCommitteeParticipationByValidatorHourlyServiceListResponse,
+  FctSyncCommitteeParticipationByValidatorServiceGetData,
+  FctSyncCommitteeParticipationByValidatorServiceGetError,
+  FctSyncCommitteeParticipationByValidatorServiceGetResponse,
+  FctSyncCommitteeParticipationByValidatorServiceListData,
+  FctSyncCommitteeParticipationByValidatorServiceListError,
+  FctSyncCommitteeParticipationByValidatorServiceListResponse,
+  FctValidatorBalanceDailyServiceGetData,
+  FctValidatorBalanceDailyServiceGetError,
+  FctValidatorBalanceDailyServiceGetResponse,
+  FctValidatorBalanceDailyServiceListData,
+  FctValidatorBalanceDailyServiceListError,
+  FctValidatorBalanceDailyServiceListResponse,
+  FctValidatorBalanceHourlyServiceGetData,
+  FctValidatorBalanceHourlyServiceGetError,
+  FctValidatorBalanceHourlyServiceGetResponse,
+  FctValidatorBalanceHourlyServiceListData,
+  FctValidatorBalanceHourlyServiceListError,
+  FctValidatorBalanceHourlyServiceListResponse,
+  FctValidatorBalanceServiceGetData,
+  FctValidatorBalanceServiceGetError,
+  FctValidatorBalanceServiceGetResponse,
+  FctValidatorBalanceServiceListData,
+  FctValidatorBalanceServiceListError,
+  FctValidatorBalanceServiceListResponse,
   IntAddressFirstAccessServiceGetData,
   IntAddressFirstAccessServiceGetError,
   IntAddressFirstAccessServiceGetResponse,
@@ -1642,6 +1738,114 @@ export const dimNodeServiceGetOptions = (options: Options<DimNodeServiceGetData>
       return data;
     },
     queryKey: dimNodeServiceGetQueryKey(options),
+  });
+
+export const dimValidatorPubkeyServiceListQueryKey = (options?: Options<DimValidatorPubkeyServiceListData>) =>
+  createQueryKey('dimValidatorPubkeyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimValidatorPubkeyServiceListOptions = (options?: Options<DimValidatorPubkeyServiceListData>) =>
+  queryOptions<
+    DimValidatorPubkeyServiceListResponse,
+    DimValidatorPubkeyServiceListError,
+    DimValidatorPubkeyServiceListResponse,
+    ReturnType<typeof dimValidatorPubkeyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimValidatorPubkeyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimValidatorPubkeyServiceListQueryKey(options),
+  });
+
+export const dimValidatorPubkeyServiceGetQueryKey = (options: Options<DimValidatorPubkeyServiceGetData>) =>
+  createQueryKey('dimValidatorPubkeyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by pubkey
+ */
+export const dimValidatorPubkeyServiceGetOptions = (options: Options<DimValidatorPubkeyServiceGetData>) =>
+  queryOptions<
+    DimValidatorPubkeyServiceGetResponse,
+    DimValidatorPubkeyServiceGetError,
+    DimValidatorPubkeyServiceGetResponse,
+    ReturnType<typeof dimValidatorPubkeyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimValidatorPubkeyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimValidatorPubkeyServiceGetQueryKey(options),
+  });
+
+export const dimValidatorStatusServiceListQueryKey = (options?: Options<DimValidatorStatusServiceListData>) =>
+  createQueryKey('dimValidatorStatusServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimValidatorStatusServiceListOptions = (options?: Options<DimValidatorStatusServiceListData>) =>
+  queryOptions<
+    DimValidatorStatusServiceListResponse,
+    DimValidatorStatusServiceListError,
+    DimValidatorStatusServiceListResponse,
+    ReturnType<typeof dimValidatorStatusServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimValidatorStatusServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimValidatorStatusServiceListQueryKey(options),
+  });
+
+export const dimValidatorStatusServiceGetQueryKey = (options: Options<DimValidatorStatusServiceGetData>) =>
+  createQueryKey('dimValidatorStatusServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const dimValidatorStatusServiceGetOptions = (options: Options<DimValidatorStatusServiceGetData>) =>
+  queryOptions<
+    DimValidatorStatusServiceGetResponse,
+    DimValidatorStatusServiceGetError,
+    DimValidatorStatusServiceGetResponse,
+    ReturnType<typeof dimValidatorStatusServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimValidatorStatusServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimValidatorStatusServiceGetQueryKey(options),
   });
 
 export const fctAddressAccessChunked10000ServiceListQueryKey = (
@@ -2658,23 +2862,26 @@ export const fctAttestationParticipationRateHourlyServiceGetOptions = (
     queryKey: fctAttestationParticipationRateHourlyServiceGetQueryKey(options),
   });
 
-export const fctBlobCountByDailyServiceListQueryKey = (options?: Options<FctBlobCountByDailyServiceListData>) =>
-  createQueryKey('fctBlobCountByDailyServiceList', options);
+export const fctAttestationVoteCorrectnessByValidatorServiceListQueryKey = (
+  options?: Options<FctAttestationVoteCorrectnessByValidatorServiceListData>
+) => createQueryKey('fctAttestationVoteCorrectnessByValidatorServiceList', options);
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlobCountByDailyServiceListOptions = (options?: Options<FctBlobCountByDailyServiceListData>) =>
+export const fctAttestationVoteCorrectnessByValidatorServiceListOptions = (
+  options?: Options<FctAttestationVoteCorrectnessByValidatorServiceListData>
+) =>
   queryOptions<
-    FctBlobCountByDailyServiceListResponse,
-    FctBlobCountByDailyServiceListError,
-    FctBlobCountByDailyServiceListResponse,
-    ReturnType<typeof fctBlobCountByDailyServiceListQueryKey>
+    FctAttestationVoteCorrectnessByValidatorServiceListResponse,
+    FctAttestationVoteCorrectnessByValidatorServiceListError,
+    FctAttestationVoteCorrectnessByValidatorServiceListResponse,
+    ReturnType<typeof fctAttestationVoteCorrectnessByValidatorServiceListQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctBlobCountByDailyServiceList({
+      const { data } = await fctAttestationVoteCorrectnessByValidatorServiceList({
         ...options,
         ...queryKey[0],
         signal,
@@ -2682,26 +2889,203 @@ export const fctBlobCountByDailyServiceListOptions = (options?: Options<FctBlobC
       });
       return data;
     },
-    queryKey: fctBlobCountByDailyServiceListQueryKey(options),
+    queryKey: fctAttestationVoteCorrectnessByValidatorServiceListQueryKey(options),
   });
 
-export const fctBlobCountByDailyServiceGetQueryKey = (options: Options<FctBlobCountByDailyServiceGetData>) =>
-  createQueryKey('fctBlobCountByDailyServiceGet', options);
+export const fctAttestationVoteCorrectnessByValidatorServiceGetQueryKey = (
+  options: Options<FctAttestationVoteCorrectnessByValidatorServiceGetData>
+) => createQueryKey('fctAttestationVoteCorrectnessByValidatorServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctAttestationVoteCorrectnessByValidatorServiceGetOptions = (
+  options: Options<FctAttestationVoteCorrectnessByValidatorServiceGetData>
+) =>
+  queryOptions<
+    FctAttestationVoteCorrectnessByValidatorServiceGetResponse,
+    FctAttestationVoteCorrectnessByValidatorServiceGetError,
+    FctAttestationVoteCorrectnessByValidatorServiceGetResponse,
+    ReturnType<typeof fctAttestationVoteCorrectnessByValidatorServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteCorrectnessByValidatorServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteCorrectnessByValidatorServiceGetQueryKey(options),
+  });
+
+export const fctAttestationVoteCorrectnessByValidatorDailyServiceListQueryKey = (
+  options?: Options<FctAttestationVoteCorrectnessByValidatorDailyServiceListData>
+) => createQueryKey('fctAttestationVoteCorrectnessByValidatorDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctAttestationVoteCorrectnessByValidatorDailyServiceListOptions = (
+  options?: Options<FctAttestationVoteCorrectnessByValidatorDailyServiceListData>
+) =>
+  queryOptions<
+    FctAttestationVoteCorrectnessByValidatorDailyServiceListResponse,
+    FctAttestationVoteCorrectnessByValidatorDailyServiceListError,
+    FctAttestationVoteCorrectnessByValidatorDailyServiceListResponse,
+    ReturnType<typeof fctAttestationVoteCorrectnessByValidatorDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteCorrectnessByValidatorDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteCorrectnessByValidatorDailyServiceListQueryKey(options),
+  });
+
+export const fctAttestationVoteCorrectnessByValidatorDailyServiceGetQueryKey = (
+  options: Options<FctAttestationVoteCorrectnessByValidatorDailyServiceGetData>
+) => createQueryKey('fctAttestationVoteCorrectnessByValidatorDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctAttestationVoteCorrectnessByValidatorDailyServiceGetOptions = (
+  options: Options<FctAttestationVoteCorrectnessByValidatorDailyServiceGetData>
+) =>
+  queryOptions<
+    FctAttestationVoteCorrectnessByValidatorDailyServiceGetResponse,
+    FctAttestationVoteCorrectnessByValidatorDailyServiceGetError,
+    FctAttestationVoteCorrectnessByValidatorDailyServiceGetResponse,
+    ReturnType<typeof fctAttestationVoteCorrectnessByValidatorDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteCorrectnessByValidatorDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteCorrectnessByValidatorDailyServiceGetQueryKey(options),
+  });
+
+export const fctAttestationVoteCorrectnessByValidatorHourlyServiceListQueryKey = (
+  options?: Options<FctAttestationVoteCorrectnessByValidatorHourlyServiceListData>
+) => createQueryKey('fctAttestationVoteCorrectnessByValidatorHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctAttestationVoteCorrectnessByValidatorHourlyServiceListOptions = (
+  options?: Options<FctAttestationVoteCorrectnessByValidatorHourlyServiceListData>
+) =>
+  queryOptions<
+    FctAttestationVoteCorrectnessByValidatorHourlyServiceListResponse,
+    FctAttestationVoteCorrectnessByValidatorHourlyServiceListError,
+    FctAttestationVoteCorrectnessByValidatorHourlyServiceListResponse,
+    ReturnType<typeof fctAttestationVoteCorrectnessByValidatorHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteCorrectnessByValidatorHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteCorrectnessByValidatorHourlyServiceListQueryKey(options),
+  });
+
+export const fctAttestationVoteCorrectnessByValidatorHourlyServiceGetQueryKey = (
+  options: Options<FctAttestationVoteCorrectnessByValidatorHourlyServiceGetData>
+) => createQueryKey('fctAttestationVoteCorrectnessByValidatorHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctAttestationVoteCorrectnessByValidatorHourlyServiceGetOptions = (
+  options: Options<FctAttestationVoteCorrectnessByValidatorHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponse,
+    FctAttestationVoteCorrectnessByValidatorHourlyServiceGetError,
+    FctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponse,
+    ReturnType<typeof fctAttestationVoteCorrectnessByValidatorHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteCorrectnessByValidatorHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteCorrectnessByValidatorHourlyServiceGetQueryKey(options),
+  });
+
+export const fctBlobCountDailyServiceListQueryKey = (options?: Options<FctBlobCountDailyServiceListData>) =>
+  createQueryKey('fctBlobCountDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlobCountDailyServiceListOptions = (options?: Options<FctBlobCountDailyServiceListData>) =>
+  queryOptions<
+    FctBlobCountDailyServiceListResponse,
+    FctBlobCountDailyServiceListError,
+    FctBlobCountDailyServiceListResponse,
+    ReturnType<typeof fctBlobCountDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlobCountDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlobCountDailyServiceListQueryKey(options),
+  });
+
+export const fctBlobCountDailyServiceGetQueryKey = (options: Options<FctBlobCountDailyServiceGetData>) =>
+  createQueryKey('fctBlobCountDailyServiceGet', options);
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctBlobCountByDailyServiceGetOptions = (options: Options<FctBlobCountByDailyServiceGetData>) =>
+export const fctBlobCountDailyServiceGetOptions = (options: Options<FctBlobCountDailyServiceGetData>) =>
   queryOptions<
-    FctBlobCountByDailyServiceGetResponse,
-    FctBlobCountByDailyServiceGetError,
-    FctBlobCountByDailyServiceGetResponse,
-    ReturnType<typeof fctBlobCountByDailyServiceGetQueryKey>
+    FctBlobCountDailyServiceGetResponse,
+    FctBlobCountDailyServiceGetError,
+    FctBlobCountDailyServiceGetResponse,
+    ReturnType<typeof fctBlobCountDailyServiceGetQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctBlobCountByDailyServiceGet({
+      const { data } = await fctBlobCountDailyServiceGet({
         ...options,
         ...queryKey[0],
         signal,
@@ -2709,26 +3093,26 @@ export const fctBlobCountByDailyServiceGetOptions = (options: Options<FctBlobCou
       });
       return data;
     },
-    queryKey: fctBlobCountByDailyServiceGetQueryKey(options),
+    queryKey: fctBlobCountDailyServiceGetQueryKey(options),
   });
 
-export const fctBlobCountByHourlyServiceListQueryKey = (options?: Options<FctBlobCountByHourlyServiceListData>) =>
-  createQueryKey('fctBlobCountByHourlyServiceList', options);
+export const fctBlobCountHourlyServiceListQueryKey = (options?: Options<FctBlobCountHourlyServiceListData>) =>
+  createQueryKey('fctBlobCountHourlyServiceList', options);
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlobCountByHourlyServiceListOptions = (options?: Options<FctBlobCountByHourlyServiceListData>) =>
+export const fctBlobCountHourlyServiceListOptions = (options?: Options<FctBlobCountHourlyServiceListData>) =>
   queryOptions<
-    FctBlobCountByHourlyServiceListResponse,
-    FctBlobCountByHourlyServiceListError,
-    FctBlobCountByHourlyServiceListResponse,
-    ReturnType<typeof fctBlobCountByHourlyServiceListQueryKey>
+    FctBlobCountHourlyServiceListResponse,
+    FctBlobCountHourlyServiceListError,
+    FctBlobCountHourlyServiceListResponse,
+    ReturnType<typeof fctBlobCountHourlyServiceListQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctBlobCountByHourlyServiceList({
+      const { data } = await fctBlobCountHourlyServiceList({
         ...options,
         ...queryKey[0],
         signal,
@@ -2736,26 +3120,26 @@ export const fctBlobCountByHourlyServiceListOptions = (options?: Options<FctBlob
       });
       return data;
     },
-    queryKey: fctBlobCountByHourlyServiceListQueryKey(options),
+    queryKey: fctBlobCountHourlyServiceListQueryKey(options),
   });
 
-export const fctBlobCountByHourlyServiceGetQueryKey = (options: Options<FctBlobCountByHourlyServiceGetData>) =>
-  createQueryKey('fctBlobCountByHourlyServiceGet', options);
+export const fctBlobCountHourlyServiceGetQueryKey = (options: Options<FctBlobCountHourlyServiceGetData>) =>
+  createQueryKey('fctBlobCountHourlyServiceGet', options);
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctBlobCountByHourlyServiceGetOptions = (options: Options<FctBlobCountByHourlyServiceGetData>) =>
+export const fctBlobCountHourlyServiceGetOptions = (options: Options<FctBlobCountHourlyServiceGetData>) =>
   queryOptions<
-    FctBlobCountByHourlyServiceGetResponse,
-    FctBlobCountByHourlyServiceGetError,
-    FctBlobCountByHourlyServiceGetResponse,
-    ReturnType<typeof fctBlobCountByHourlyServiceGetQueryKey>
+    FctBlobCountHourlyServiceGetResponse,
+    FctBlobCountHourlyServiceGetError,
+    FctBlobCountHourlyServiceGetResponse,
+    ReturnType<typeof fctBlobCountHourlyServiceGetQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctBlobCountByHourlyServiceGet({
+      const { data } = await fctBlobCountHourlyServiceGet({
         ...options,
         ...queryKey[0],
         signal,
@@ -2763,7 +3147,7 @@ export const fctBlobCountByHourlyServiceGetOptions = (options: Options<FctBlobCo
       });
       return data;
     },
-    queryKey: fctBlobCountByHourlyServiceGetQueryKey(options),
+    queryKey: fctBlobCountHourlyServiceGetQueryKey(options),
   });
 
 export const fctBlockServiceListQueryKey = (options?: Options<FctBlockServiceListData>) =>
@@ -3496,6 +3880,66 @@ export const fctBlockProposerServiceGetOptions = (options: Options<FctBlockPropo
       return data;
     },
     queryKey: fctBlockProposerServiceGetQueryKey(options),
+  });
+
+export const fctBlockProposerByValidatorServiceListQueryKey = (
+  options?: Options<FctBlockProposerByValidatorServiceListData>
+) => createQueryKey('fctBlockProposerByValidatorServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockProposerByValidatorServiceListOptions = (
+  options?: Options<FctBlockProposerByValidatorServiceListData>
+) =>
+  queryOptions<
+    FctBlockProposerByValidatorServiceListResponse,
+    FctBlockProposerByValidatorServiceListError,
+    FctBlockProposerByValidatorServiceListResponse,
+    ReturnType<typeof fctBlockProposerByValidatorServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockProposerByValidatorServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockProposerByValidatorServiceListQueryKey(options),
+  });
+
+export const fctBlockProposerByValidatorServiceGetQueryKey = (
+  options: Options<FctBlockProposerByValidatorServiceGetData>
+) => createQueryKey('fctBlockProposerByValidatorServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctBlockProposerByValidatorServiceGetOptions = (
+  options: Options<FctBlockProposerByValidatorServiceGetData>
+) =>
+  queryOptions<
+    FctBlockProposerByValidatorServiceGetResponse,
+    FctBlockProposerByValidatorServiceGetError,
+    FctBlockProposerByValidatorServiceGetResponse,
+    ReturnType<typeof fctBlockProposerByValidatorServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockProposerByValidatorServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockProposerByValidatorServiceGetQueryKey(options),
   });
 
 export const fctBlockProposerEntityServiceListQueryKey = (options?: Options<FctBlockProposerEntityServiceListData>) =>
@@ -6451,23 +6895,23 @@ export const fctProposerRewardHourlyServiceGetOptions = (options: Options<FctPro
     queryKey: fctProposerRewardHourlyServiceGetQueryKey(options),
   });
 
-export const fctReorgByDailyServiceListQueryKey = (options?: Options<FctReorgByDailyServiceListData>) =>
-  createQueryKey('fctReorgByDailyServiceList', options);
+export const fctReorgDailyServiceListQueryKey = (options?: Options<FctReorgDailyServiceListData>) =>
+  createQueryKey('fctReorgDailyServiceList', options);
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctReorgByDailyServiceListOptions = (options?: Options<FctReorgByDailyServiceListData>) =>
+export const fctReorgDailyServiceListOptions = (options?: Options<FctReorgDailyServiceListData>) =>
   queryOptions<
-    FctReorgByDailyServiceListResponse,
-    FctReorgByDailyServiceListError,
-    FctReorgByDailyServiceListResponse,
-    ReturnType<typeof fctReorgByDailyServiceListQueryKey>
+    FctReorgDailyServiceListResponse,
+    FctReorgDailyServiceListError,
+    FctReorgDailyServiceListResponse,
+    ReturnType<typeof fctReorgDailyServiceListQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctReorgByDailyServiceList({
+      const { data } = await fctReorgDailyServiceList({
         ...options,
         ...queryKey[0],
         signal,
@@ -6475,26 +6919,26 @@ export const fctReorgByDailyServiceListOptions = (options?: Options<FctReorgByDa
       });
       return data;
     },
-    queryKey: fctReorgByDailyServiceListQueryKey(options),
+    queryKey: fctReorgDailyServiceListQueryKey(options),
   });
 
-export const fctReorgByDailyServiceGetQueryKey = (options: Options<FctReorgByDailyServiceGetData>) =>
-  createQueryKey('fctReorgByDailyServiceGet', options);
+export const fctReorgDailyServiceGetQueryKey = (options: Options<FctReorgDailyServiceGetData>) =>
+  createQueryKey('fctReorgDailyServiceGet', options);
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctReorgByDailyServiceGetOptions = (options: Options<FctReorgByDailyServiceGetData>) =>
+export const fctReorgDailyServiceGetOptions = (options: Options<FctReorgDailyServiceGetData>) =>
   queryOptions<
-    FctReorgByDailyServiceGetResponse,
-    FctReorgByDailyServiceGetError,
-    FctReorgByDailyServiceGetResponse,
-    ReturnType<typeof fctReorgByDailyServiceGetQueryKey>
+    FctReorgDailyServiceGetResponse,
+    FctReorgDailyServiceGetError,
+    FctReorgDailyServiceGetResponse,
+    ReturnType<typeof fctReorgDailyServiceGetQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctReorgByDailyServiceGet({
+      const { data } = await fctReorgDailyServiceGet({
         ...options,
         ...queryKey[0],
         signal,
@@ -6502,26 +6946,26 @@ export const fctReorgByDailyServiceGetOptions = (options: Options<FctReorgByDail
       });
       return data;
     },
-    queryKey: fctReorgByDailyServiceGetQueryKey(options),
+    queryKey: fctReorgDailyServiceGetQueryKey(options),
   });
 
-export const fctReorgByHourlyServiceListQueryKey = (options?: Options<FctReorgByHourlyServiceListData>) =>
-  createQueryKey('fctReorgByHourlyServiceList', options);
+export const fctReorgHourlyServiceListQueryKey = (options?: Options<FctReorgHourlyServiceListData>) =>
+  createQueryKey('fctReorgHourlyServiceList', options);
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctReorgByHourlyServiceListOptions = (options?: Options<FctReorgByHourlyServiceListData>) =>
+export const fctReorgHourlyServiceListOptions = (options?: Options<FctReorgHourlyServiceListData>) =>
   queryOptions<
-    FctReorgByHourlyServiceListResponse,
-    FctReorgByHourlyServiceListError,
-    FctReorgByHourlyServiceListResponse,
-    ReturnType<typeof fctReorgByHourlyServiceListQueryKey>
+    FctReorgHourlyServiceListResponse,
+    FctReorgHourlyServiceListError,
+    FctReorgHourlyServiceListResponse,
+    ReturnType<typeof fctReorgHourlyServiceListQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctReorgByHourlyServiceList({
+      const { data } = await fctReorgHourlyServiceList({
         ...options,
         ...queryKey[0],
         signal,
@@ -6529,26 +6973,26 @@ export const fctReorgByHourlyServiceListOptions = (options?: Options<FctReorgByH
       });
       return data;
     },
-    queryKey: fctReorgByHourlyServiceListQueryKey(options),
+    queryKey: fctReorgHourlyServiceListQueryKey(options),
   });
 
-export const fctReorgByHourlyServiceGetQueryKey = (options: Options<FctReorgByHourlyServiceGetData>) =>
-  createQueryKey('fctReorgByHourlyServiceGet', options);
+export const fctReorgHourlyServiceGetQueryKey = (options: Options<FctReorgHourlyServiceGetData>) =>
+  createQueryKey('fctReorgHourlyServiceGet', options);
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctReorgByHourlyServiceGetOptions = (options: Options<FctReorgByHourlyServiceGetData>) =>
+export const fctReorgHourlyServiceGetOptions = (options: Options<FctReorgHourlyServiceGetData>) =>
   queryOptions<
-    FctReorgByHourlyServiceGetResponse,
-    FctReorgByHourlyServiceGetError,
-    FctReorgByHourlyServiceGetResponse,
-    ReturnType<typeof fctReorgByHourlyServiceGetQueryKey>
+    FctReorgHourlyServiceGetResponse,
+    FctReorgHourlyServiceGetError,
+    FctReorgHourlyServiceGetResponse,
+    ReturnType<typeof fctReorgHourlyServiceGetQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctReorgByHourlyServiceGet({
+      const { data } = await fctReorgHourlyServiceGet({
         ...options,
         ...queryKey[0],
         signal,
@@ -6556,7 +7000,7 @@ export const fctReorgByHourlyServiceGetOptions = (options: Options<FctReorgByHou
       });
       return data;
     },
-    queryKey: fctReorgByHourlyServiceGetQueryKey(options),
+    queryKey: fctReorgHourlyServiceGetQueryKey(options),
   });
 
 export const fctStorageSlotStateByAddressDailyServiceListQueryKey = (
@@ -7157,6 +7601,355 @@ export const fctStorageSlotTop100BySlotsServiceGetOptions = (
       return data;
     },
     queryKey: fctStorageSlotTop100BySlotsServiceGetQueryKey(options),
+  });
+
+export const fctSyncCommitteeParticipationByValidatorServiceListQueryKey = (
+  options?: Options<FctSyncCommitteeParticipationByValidatorServiceListData>
+) => createQueryKey('fctSyncCommitteeParticipationByValidatorServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctSyncCommitteeParticipationByValidatorServiceListOptions = (
+  options?: Options<FctSyncCommitteeParticipationByValidatorServiceListData>
+) =>
+  queryOptions<
+    FctSyncCommitteeParticipationByValidatorServiceListResponse,
+    FctSyncCommitteeParticipationByValidatorServiceListError,
+    FctSyncCommitteeParticipationByValidatorServiceListResponse,
+    ReturnType<typeof fctSyncCommitteeParticipationByValidatorServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctSyncCommitteeParticipationByValidatorServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctSyncCommitteeParticipationByValidatorServiceListQueryKey(options),
+  });
+
+export const fctSyncCommitteeParticipationByValidatorServiceGetQueryKey = (
+  options: Options<FctSyncCommitteeParticipationByValidatorServiceGetData>
+) => createQueryKey('fctSyncCommitteeParticipationByValidatorServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctSyncCommitteeParticipationByValidatorServiceGetOptions = (
+  options: Options<FctSyncCommitteeParticipationByValidatorServiceGetData>
+) =>
+  queryOptions<
+    FctSyncCommitteeParticipationByValidatorServiceGetResponse,
+    FctSyncCommitteeParticipationByValidatorServiceGetError,
+    FctSyncCommitteeParticipationByValidatorServiceGetResponse,
+    ReturnType<typeof fctSyncCommitteeParticipationByValidatorServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctSyncCommitteeParticipationByValidatorServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctSyncCommitteeParticipationByValidatorServiceGetQueryKey(options),
+  });
+
+export const fctSyncCommitteeParticipationByValidatorDailyServiceListQueryKey = (
+  options?: Options<FctSyncCommitteeParticipationByValidatorDailyServiceListData>
+) => createQueryKey('fctSyncCommitteeParticipationByValidatorDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctSyncCommitteeParticipationByValidatorDailyServiceListOptions = (
+  options?: Options<FctSyncCommitteeParticipationByValidatorDailyServiceListData>
+) =>
+  queryOptions<
+    FctSyncCommitteeParticipationByValidatorDailyServiceListResponse,
+    FctSyncCommitteeParticipationByValidatorDailyServiceListError,
+    FctSyncCommitteeParticipationByValidatorDailyServiceListResponse,
+    ReturnType<typeof fctSyncCommitteeParticipationByValidatorDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctSyncCommitteeParticipationByValidatorDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctSyncCommitteeParticipationByValidatorDailyServiceListQueryKey(options),
+  });
+
+export const fctSyncCommitteeParticipationByValidatorDailyServiceGetQueryKey = (
+  options: Options<FctSyncCommitteeParticipationByValidatorDailyServiceGetData>
+) => createQueryKey('fctSyncCommitteeParticipationByValidatorDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctSyncCommitteeParticipationByValidatorDailyServiceGetOptions = (
+  options: Options<FctSyncCommitteeParticipationByValidatorDailyServiceGetData>
+) =>
+  queryOptions<
+    FctSyncCommitteeParticipationByValidatorDailyServiceGetResponse,
+    FctSyncCommitteeParticipationByValidatorDailyServiceGetError,
+    FctSyncCommitteeParticipationByValidatorDailyServiceGetResponse,
+    ReturnType<typeof fctSyncCommitteeParticipationByValidatorDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctSyncCommitteeParticipationByValidatorDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctSyncCommitteeParticipationByValidatorDailyServiceGetQueryKey(options),
+  });
+
+export const fctSyncCommitteeParticipationByValidatorHourlyServiceListQueryKey = (
+  options?: Options<FctSyncCommitteeParticipationByValidatorHourlyServiceListData>
+) => createQueryKey('fctSyncCommitteeParticipationByValidatorHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctSyncCommitteeParticipationByValidatorHourlyServiceListOptions = (
+  options?: Options<FctSyncCommitteeParticipationByValidatorHourlyServiceListData>
+) =>
+  queryOptions<
+    FctSyncCommitteeParticipationByValidatorHourlyServiceListResponse,
+    FctSyncCommitteeParticipationByValidatorHourlyServiceListError,
+    FctSyncCommitteeParticipationByValidatorHourlyServiceListResponse,
+    ReturnType<typeof fctSyncCommitteeParticipationByValidatorHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctSyncCommitteeParticipationByValidatorHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctSyncCommitteeParticipationByValidatorHourlyServiceListQueryKey(options),
+  });
+
+export const fctSyncCommitteeParticipationByValidatorHourlyServiceGetQueryKey = (
+  options: Options<FctSyncCommitteeParticipationByValidatorHourlyServiceGetData>
+) => createQueryKey('fctSyncCommitteeParticipationByValidatorHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctSyncCommitteeParticipationByValidatorHourlyServiceGetOptions = (
+  options: Options<FctSyncCommitteeParticipationByValidatorHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctSyncCommitteeParticipationByValidatorHourlyServiceGetResponse,
+    FctSyncCommitteeParticipationByValidatorHourlyServiceGetError,
+    FctSyncCommitteeParticipationByValidatorHourlyServiceGetResponse,
+    ReturnType<typeof fctSyncCommitteeParticipationByValidatorHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctSyncCommitteeParticipationByValidatorHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctSyncCommitteeParticipationByValidatorHourlyServiceGetQueryKey(options),
+  });
+
+export const fctValidatorBalanceServiceListQueryKey = (options?: Options<FctValidatorBalanceServiceListData>) =>
+  createQueryKey('fctValidatorBalanceServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctValidatorBalanceServiceListOptions = (options?: Options<FctValidatorBalanceServiceListData>) =>
+  queryOptions<
+    FctValidatorBalanceServiceListResponse,
+    FctValidatorBalanceServiceListError,
+    FctValidatorBalanceServiceListResponse,
+    ReturnType<typeof fctValidatorBalanceServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctValidatorBalanceServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctValidatorBalanceServiceListQueryKey(options),
+  });
+
+export const fctValidatorBalanceServiceGetQueryKey = (options: Options<FctValidatorBalanceServiceGetData>) =>
+  createQueryKey('fctValidatorBalanceServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctValidatorBalanceServiceGetOptions = (options: Options<FctValidatorBalanceServiceGetData>) =>
+  queryOptions<
+    FctValidatorBalanceServiceGetResponse,
+    FctValidatorBalanceServiceGetError,
+    FctValidatorBalanceServiceGetResponse,
+    ReturnType<typeof fctValidatorBalanceServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctValidatorBalanceServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctValidatorBalanceServiceGetQueryKey(options),
+  });
+
+export const fctValidatorBalanceDailyServiceListQueryKey = (
+  options?: Options<FctValidatorBalanceDailyServiceListData>
+) => createQueryKey('fctValidatorBalanceDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctValidatorBalanceDailyServiceListOptions = (
+  options?: Options<FctValidatorBalanceDailyServiceListData>
+) =>
+  queryOptions<
+    FctValidatorBalanceDailyServiceListResponse,
+    FctValidatorBalanceDailyServiceListError,
+    FctValidatorBalanceDailyServiceListResponse,
+    ReturnType<typeof fctValidatorBalanceDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctValidatorBalanceDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctValidatorBalanceDailyServiceListQueryKey(options),
+  });
+
+export const fctValidatorBalanceDailyServiceGetQueryKey = (options: Options<FctValidatorBalanceDailyServiceGetData>) =>
+  createQueryKey('fctValidatorBalanceDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctValidatorBalanceDailyServiceGetOptions = (options: Options<FctValidatorBalanceDailyServiceGetData>) =>
+  queryOptions<
+    FctValidatorBalanceDailyServiceGetResponse,
+    FctValidatorBalanceDailyServiceGetError,
+    FctValidatorBalanceDailyServiceGetResponse,
+    ReturnType<typeof fctValidatorBalanceDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctValidatorBalanceDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctValidatorBalanceDailyServiceGetQueryKey(options),
+  });
+
+export const fctValidatorBalanceHourlyServiceListQueryKey = (
+  options?: Options<FctValidatorBalanceHourlyServiceListData>
+) => createQueryKey('fctValidatorBalanceHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctValidatorBalanceHourlyServiceListOptions = (
+  options?: Options<FctValidatorBalanceHourlyServiceListData>
+) =>
+  queryOptions<
+    FctValidatorBalanceHourlyServiceListResponse,
+    FctValidatorBalanceHourlyServiceListError,
+    FctValidatorBalanceHourlyServiceListResponse,
+    ReturnType<typeof fctValidatorBalanceHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctValidatorBalanceHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctValidatorBalanceHourlyServiceListQueryKey(options),
+  });
+
+export const fctValidatorBalanceHourlyServiceGetQueryKey = (
+  options: Options<FctValidatorBalanceHourlyServiceGetData>
+) => createQueryKey('fctValidatorBalanceHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctValidatorBalanceHourlyServiceGetOptions = (options: Options<FctValidatorBalanceHourlyServiceGetData>) =>
+  queryOptions<
+    FctValidatorBalanceHourlyServiceGetResponse,
+    FctValidatorBalanceHourlyServiceGetError,
+    FctValidatorBalanceHourlyServiceGetResponse,
+    ReturnType<typeof fctValidatorBalanceHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctValidatorBalanceHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctValidatorBalanceHourlyServiceGetQueryKey(options),
   });
 
 export const intAddressFirstAccessServiceListQueryKey = (options?: Options<IntAddressFirstAccessServiceListData>) =>
