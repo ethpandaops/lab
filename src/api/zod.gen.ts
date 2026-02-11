@@ -11331,7 +11331,7 @@ export const zGetIntEngineNewPayloadResponse = z.object({
   item: z.optional(zIntEngineNewPayload),
 });
 
-export const zIntEngineNewPayloadFastestExecutionByNodeClass = z.object({
+export const zIntEngineNewPayloadFastest = z.object({
   block_hash: z.optional(z.string()),
   duration_ms: z.optional(
     z.coerce
@@ -11390,10 +11390,10 @@ export const zIntEngineNewPayloadFastestExecutionByNodeClass = z.object({
 });
 
 /**
- * Response for getting a single int_engine_new_payload_fastest_execution_by_node_class record
+ * Response for getting a single int_engine_new_payload_fastest record
  */
-export const zGetIntEngineNewPayloadFastestExecutionByNodeClassResponse = z.object({
-  item: z.optional(zIntEngineNewPayloadFastestExecutionByNodeClass),
+export const zGetIntEngineNewPayloadFastestResponse = z.object({
+  item: z.optional(zIntEngineNewPayloadFastest),
 });
 
 export const zIntExecutionBlockByDate = z.object({
@@ -14051,10 +14051,10 @@ export const zListIntEngineGetBlobsResponse = z.object({
 });
 
 /**
- * Response for listing int_engine_new_payload_fastest_execution_by_node_class records
+ * Response for listing int_engine_new_payload_fastest records
  */
-export const zListIntEngineNewPayloadFastestExecutionByNodeClassResponse = z.object({
-  int_engine_new_payload_fastest_execution_by_node_class: z.optional(z.array(zIntEngineNewPayloadFastestExecutionByNodeClass)),
+export const zListIntEngineNewPayloadFastestResponse = z.object({
+  int_engine_new_payload_fastest: z.optional(z.array(zIntEngineNewPayloadFastest)),
   next_page_token: z.optional(z.string()),
 });
 
@@ -98621,7 +98621,7 @@ export const zIntEngineNewPayloadServiceGetData = z.object({
  */
 export const zIntEngineNewPayloadServiceGetResponse = zGetIntEngineNewPayloadResponse;
 
-export const zIntEngineNewPayloadFastestExecutionByNodeClassServiceListData = z.object({
+export const zIntEngineNewPayloadFastestServiceListData = z.object({
   body: z.optional(z.never()),
   path: z.optional(z.never()),
   query: z.optional(
@@ -99100,9 +99100,9 @@ export const zIntEngineNewPayloadFastestExecutionByNodeClassServiceListData = z.
 /**
  * OK
  */
-export const zIntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse = zListIntEngineNewPayloadFastestExecutionByNodeClassResponse;
+export const zIntEngineNewPayloadFastestServiceListResponse = zListIntEngineNewPayloadFastestResponse;
 
-export const zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetData = z.object({
+export const zIntEngineNewPayloadFastestServiceGetData = z.object({
   body: z.optional(z.never()),
   path: z.object({
     slot_start_date_time: z
@@ -99118,7 +99118,7 @@ export const zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetData = z.o
 /**
  * OK
  */
-export const zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse = zGetIntEngineNewPayloadFastestExecutionByNodeClassResponse;
+export const zIntEngineNewPayloadFastestServiceGetResponse = zGetIntEngineNewPayloadFastestResponse;
 
 export const zIntExecutionBlockByDateServiceListData = z.object({
   body: z.optional(z.never()),

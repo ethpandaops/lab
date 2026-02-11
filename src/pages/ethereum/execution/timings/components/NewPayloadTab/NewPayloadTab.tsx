@@ -10,7 +10,7 @@ import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot, getExecutionClientColor } from '@/utils';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
-import type { FctEngineNewPayloadWinrateHourly, IntEngineNewPayloadFastestExecutionByNodeClass } from '@/api/types.gen';
+import type { FctEngineNewPayloadWinrateHourly, IntEngineNewPayloadFastest } from '@/api/types.gen';
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
 import { PER_SLOT_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
 import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
@@ -775,7 +775,7 @@ function WinrateSection({
   showPerSlot,
 }: {
   hourlyRecords: FctEngineNewPayloadWinrateHourly[];
-  perSlotRecords: IntEngineNewPayloadFastestExecutionByNodeClass[];
+  perSlotRecords: IntEngineNewPayloadFastest[];
   allClients: string[];
   timeRange: TimeRange;
   showPerSlot: boolean;

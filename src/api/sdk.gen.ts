@@ -891,12 +891,12 @@ import type {
   IntEngineGetBlobsServiceListData,
   IntEngineGetBlobsServiceListErrors,
   IntEngineGetBlobsServiceListResponses,
-  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetData,
-  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetErrors,
-  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses,
-  IntEngineNewPayloadFastestExecutionByNodeClassServiceListData,
-  IntEngineNewPayloadFastestExecutionByNodeClassServiceListErrors,
-  IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponses,
+  IntEngineNewPayloadFastestServiceGetData,
+  IntEngineNewPayloadFastestServiceGetErrors,
+  IntEngineNewPayloadFastestServiceGetResponses,
+  IntEngineNewPayloadFastestServiceListData,
+  IntEngineNewPayloadFastestServiceListErrors,
+  IntEngineNewPayloadFastestServiceListResponses,
   IntEngineNewPayloadServiceGetData,
   IntEngineNewPayloadServiceGetErrors,
   IntEngineNewPayloadServiceGetResponses,
@@ -1641,10 +1641,10 @@ import {
   zIntEngineGetBlobsServiceGetResponse,
   zIntEngineGetBlobsServiceListData,
   zIntEngineGetBlobsServiceListResponse,
-  zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetData,
-  zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse,
-  zIntEngineNewPayloadFastestExecutionByNodeClassServiceListData,
-  zIntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse,
+  zIntEngineNewPayloadFastestServiceGetData,
+  zIntEngineNewPayloadFastestServiceGetResponse,
+  zIntEngineNewPayloadFastestServiceListData,
+  zIntEngineNewPayloadFastestServiceListResponse,
   zIntEngineNewPayloadServiceGetData,
   zIntEngineNewPayloadServiceGetResponse,
   zIntEngineNewPayloadServiceListData,
@@ -7392,17 +7392,17 @@ export const intEngineNewPayloadServiceGet = <ThrowOnError extends boolean = fal
  *
  * Retrieve paginated results with optional filtering
  */
-export const intEngineNewPayloadFastestExecutionByNodeClassServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceListData, ThrowOnError>
+export const intEngineNewPayloadFastestServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntEngineNewPayloadFastestServiceListData, ThrowOnError>
 ) =>
   (options?.client ?? client).get<
-    IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponses,
-    IntEngineNewPayloadFastestExecutionByNodeClassServiceListErrors,
+    IntEngineNewPayloadFastestServiceListResponses,
+    IntEngineNewPayloadFastestServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => await zIntEngineNewPayloadFastestExecutionByNodeClassServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse.parseAsync(data),
-    url: '/api/v1/int_engine_new_payload_fastest_execution_by_node_class',
+    requestValidator: async data => await zIntEngineNewPayloadFastestServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntEngineNewPayloadFastestServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_engine_new_payload_fastest',
     ...options,
   });
 
@@ -7411,17 +7411,17 @@ export const intEngineNewPayloadFastestExecutionByNodeClassServiceList = <ThrowO
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intEngineNewPayloadFastestExecutionByNodeClassServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceGetData, ThrowOnError>
+export const intEngineNewPayloadFastestServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntEngineNewPayloadFastestServiceGetData, ThrowOnError>
 ) =>
   (options.client ?? client).get<
-    IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses,
-    IntEngineNewPayloadFastestExecutionByNodeClassServiceGetErrors,
+    IntEngineNewPayloadFastestServiceGetResponses,
+    IntEngineNewPayloadFastestServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => await zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse.parseAsync(data),
-    url: '/api/v1/int_engine_new_payload_fastest_execution_by_node_class/{slot_start_date_time}',
+    requestValidator: async data => await zIntEngineNewPayloadFastestServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntEngineNewPayloadFastestServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_engine_new_payload_fastest/{slot_start_date_time}',
     ...options,
   });
 

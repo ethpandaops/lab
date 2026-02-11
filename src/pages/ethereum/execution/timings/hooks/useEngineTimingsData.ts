@@ -8,7 +8,7 @@ import {
   fctEngineGetBlobsByElClientHourlyServiceList,
   fctEngineGetBlobsDurationChunked50MsServiceList,
   fctEngineNewPayloadWinrateHourlyServiceList,
-  intEngineNewPayloadFastestExecutionByNodeClassServiceList,
+  intEngineNewPayloadFastestServiceList,
 } from '@/api/sdk.gen';
 import type {
   FctEngineNewPayloadByElClient,
@@ -18,7 +18,7 @@ import type {
   FctEngineGetBlobsByElClientHourly,
   FctEngineGetBlobsDurationChunked50Ms,
   FctEngineNewPayloadWinrateHourly,
-  IntEngineNewPayloadFastestExecutionByNodeClass,
+  IntEngineNewPayloadFastest,
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
@@ -47,7 +47,7 @@ export interface EngineTimingsData {
   winrateHourly: FctEngineNewPayloadWinrateHourly[];
 
   // newPayload winrate (per-slot, for short time ranges)
-  winratePerSlot: IntEngineNewPayloadFastestExecutionByNodeClass[];
+  winratePerSlot: IntEngineNewPayloadFastest[];
 }
 
 export type ActiveTab = 'newPayload' | 'getBlobs';
@@ -268,8 +268,8 @@ export function useEngineTimingsData({
       {
         queryKey: ['engine-timings', 'winrate-per-slot', hourlyStart, hourlyEnd, referenceNodesOnly],
         queryFn: ({ signal }) =>
-          fetchAllPages<IntEngineNewPayloadFastestExecutionByNodeClass>(
-            intEngineNewPayloadFastestExecutionByNodeClassServiceList,
+          fetchAllPages<IntEngineNewPayloadFastest>(
+            intEngineNewPayloadFastestServiceList,
             {
               query: {
                 slot_start_date_time_gte: hourlyStart,
