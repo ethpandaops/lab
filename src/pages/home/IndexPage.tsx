@@ -3,7 +3,7 @@ import { HeroSection } from './components/HeroSection';
 
 export function IndexPage(): JSX.Element {
   return (
-    <div className="h-dvh overflow-hidden bg-background">
+    <div className="min-h-dvh bg-background lg:h-dvh lg:overflow-hidden">
       <HeroSection />
     </div>
   );
