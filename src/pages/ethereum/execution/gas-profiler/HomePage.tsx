@@ -192,7 +192,7 @@ export function HomePage(): JSX.Element {
   const { allForks } = useForks();
 
   // Time period from URL search params
-  const timePeriod: TimePeriod = search.t ?? '7d';
+  const timePeriod: TimePeriod = search.t ?? '72h';
   // TODO: Re-enable when fork annotation data is available
   // const [showAnnotations, setShowAnnotations] = useState(true);
   const showAnnotations = true;
