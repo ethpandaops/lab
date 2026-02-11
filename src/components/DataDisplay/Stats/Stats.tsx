@@ -18,8 +18,9 @@ export function Stats({ stats, title, className, gridClassName }: StatsProps): J
         )}
       >
         {stats.map(item => {
-          const hasCustomIcon = item.icon && item.iconColor;
-          const hasLegacyIcon = item.icon && !item.iconColor;
+          const Icon = item.icon;
+          const hasCustomIcon = Icon && item.iconColor;
+          const hasLegacyIcon = Icon && !item.iconColor;
 
           return (
             <Card
@@ -43,7 +44,7 @@ export function Stats({ stats, title, className, gridClassName }: StatsProps): J
                 {/* Legacy icon: solid bg-primary square */}
                 {hasLegacyIcon && (
                   <div className="absolute top-5 left-4 rounded-md bg-primary p-3 sm:top-6 sm:left-6">
-                    <item.icon aria-hidden="true" className="size-6 text-white" />
+                    <Icon aria-hidden="true" className="size-6 text-white" />
                   </div>
                 )}
 
@@ -54,7 +55,7 @@ export function Stats({ stats, title, className, gridClassName }: StatsProps): J
                       className="flex size-7 items-center justify-center rounded-sm"
                       style={{ backgroundColor: `${item.iconColor}18` }}
                     >
-                      <item.icon aria-hidden="true" className="size-4" style={{ color: item.iconColor }} />
+                      <Icon aria-hidden="true" className="size-4" style={{ color: item.iconColor }} />
                     </div>
                     <p className="truncate text-xs font-medium tracking-wide text-muted uppercase">{item.name}</p>
                   </div>
