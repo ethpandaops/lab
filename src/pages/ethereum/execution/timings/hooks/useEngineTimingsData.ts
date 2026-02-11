@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { useQueries } from '@tanstack/react-query';
+import { useMemo, useRef, useState } from 'react';
+import { useQueries, keepPreviousData } from '@tanstack/react-query';
 import {
   fctEngineNewPayloadByElClientServiceList,
   fctEngineNewPayloadByElClientHourlyServiceList,
@@ -134,6 +134,7 @@ export function useEngineTimingsData({
             signal
           ),
         enabled: !!currentNetwork && fetchPerSlotData,
+        placeholderData: keepPreviousData,
       },
       // newPayload hourly aggregations (true percentiles for summary table)
       // Use hour-aligned timestamps to include all overlapping hour buckets
@@ -155,6 +156,7 @@ export function useEngineTimingsData({
             signal
           ),
         enabled: !!currentNetwork,
+        placeholderData: keepPreviousData,
       },
       // newPayload duration histogram
       // Only fetched for short time ranges (histogram based on per-slot data)
@@ -177,6 +179,7 @@ export function useEngineTimingsData({
             signal
           ),
         enabled: !!currentNetwork && fetchPerSlotData,
+        placeholderData: keepPreviousData,
       },
       // getBlobs per-EL-client aggregations (includes per-slot data)
       // Only fetched for short time ranges to keep queries performant
@@ -199,6 +202,7 @@ export function useEngineTimingsData({
             signal
           ),
         enabled: !!currentNetwork && fetchBlobs && fetchPerSlotData,
+        placeholderData: keepPreviousData,
       },
       // getBlobs hourly aggregations (true percentiles for summary table)
       // Use hour-aligned timestamps to include all overlapping hour buckets
@@ -220,6 +224,7 @@ export function useEngineTimingsData({
             signal
           ),
         enabled: !!currentNetwork && fetchBlobs,
+        placeholderData: keepPreviousData,
       },
       // getBlobs duration histogram
       // Only fetched for short time ranges (histogram based on per-slot data)
@@ -242,6 +247,7 @@ export function useEngineTimingsData({
             signal
           ),
         enabled: !!currentNetwork && fetchBlobs && fetchPerSlotData,
+        placeholderData: keepPreviousData,
       },
       // newPayload winrate (hourly) - which EL client had fastest newPayload per slot
       // Must apply refNodeFilter to avoid double-counting across node_classes
@@ -263,6 +269,7 @@ export function useEngineTimingsData({
             signal
           ),
         enabled: !!currentNetwork && !fetchPerSlotData,
+        placeholderData: keepPreviousData,
       },
       // newPayload winrate (per-slot) - raw fastest client per slot for short ranges
       {
@@ -283,6 +290,7 @@ export function useEngineTimingsData({
             signal
           ),
         enabled: !!currentNetwork && fetchPerSlotData,
+        placeholderData: keepPreviousData,
       },
     ],
   });
@@ -303,16 +311,18 @@ export function useEngineTimingsData({
   const newPayloadQueries = queries.slice(0, 3);
   const blobQueries = queries.slice(3, 6);
 
-  const isLoading = newPayloadQueries.some(q => q.isLoading);
+  // Initial loading = no data has ever been fetched yet
+  const hasAnyNewPayloadData = newPayloadQueries.some(q => q.data !== undefined);
+  const isLoading = !hasAnyNewPayloadData && newPayloadQueries.some(q => q.isFetching);
   const isLoadingBlobs = blobQueries.some(q => q.isLoading);
 
   // Check for errors (only core queries - winrate is supplementary and shouldn't break the page)
   const coreQueries = [...newPayloadQueries, ...blobQueries];
   const error = coreQueries.find(q => q.error)?.error as Error | null;
 
-  // Build data object if newPayload is not loading and no errors
-  const data: EngineTimingsData | null =
-    !isLoading && !error
+  // Build data object whenever any query has data (stale data is fine during refetch)
+  const freshData: EngineTimingsData | null =
+    hasAnyNewPayloadData && !error
       ? {
           newPayloadByElClient: newPayloadByElClientQuery.data ?? [],
           newPayloadByElClientHourly: newPayloadByElClientHourlyQuery.data ?? [],
@@ -324,6 +334,15 @@ export function useEngineTimingsData({
           winratePerSlot: winratePerSlotQuery.data ?? [],
         }
       : null;
+
+  // Keep the last non-null data in a ref so the UI never flashes back to skeleton
+  // on time range changes (query key changes cause brief null data transitions)
+  const lastDataRef = useRef<EngineTimingsData | null>(null);
+  if (freshData !== null) {
+    lastDataRef.current = freshData;
+  }
+
+  const data = freshData ?? lastDataRef.current;
 
   return { data, isLoading, isLoadingBlobs, error };
 }

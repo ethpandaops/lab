@@ -49,48 +49,8 @@ export function IndexPage(): JSX.Element {
     activeTab,
   });
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <Container>
-        <Header
-          title="Engine API Timings"
-          description="CL-EL communication timing for engine_newPayload and engine_getBlobs"
-        />
-        <TimingsSkeleton />
-      </Container>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <Container>
-        <Header
-          title="Engine API Timings"
-          description="CL-EL communication timing for engine_newPayload and engine_getBlobs"
-        />
-        <Alert variant="error" title="Error loading timing data" description={error.message} />
-      </Container>
-    );
-  }
-
-  // No data state
-  if (!data) {
-    return (
-      <Container>
-        <Header
-          title="Engine API Timings"
-          description="CL-EL communication timing for engine_newPayload and engine_getBlobs"
-        />
-        <Alert
-          variant="warning"
-          title="No data available"
-          description="No engine timing data has been recorded yet. Data may still be collecting."
-        />
-      </Container>
-    );
-  }
+  // Show skeleton only on initial load (no data yet), not on time range changes
+  const showInitialSkeleton = isLoading && !data;
 
   return (
     <Container>
@@ -121,46 +81,58 @@ export function IndexPage(): JSX.Element {
       {/* Reference Node Info Dialog */}
       <ReferenceNodesInfoDialog open={showRefNodeInfo} onClose={() => setShowRefNodeInfo(false)} />
 
-      {/* Tabbed Content */}
-      <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
-        <div className="relative">
-          <ScrollableTabs>
-            <Tab>newPayload</Tab>
-            <Tab>getBlobs</Tab>
-          </ScrollableTabs>
+      {showInitialSkeleton ? (
+        <TimingsSkeleton />
+      ) : error ? (
+        <Alert variant="error" title="Error loading timing data" description={error.message} />
+      ) : !data ? (
+        <Alert
+          variant="warning"
+          title="No data available"
+          description="No engine timing data has been recorded yet. Data may still be collecting."
+        />
+      ) : (
+        /* Tabbed Content */
+        <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
+          <div className="relative">
+            <ScrollableTabs>
+              <Tab>newPayload</Tab>
+              <Tab>getBlobs</Tab>
+            </ScrollableTabs>
 
-          {/* Reference Nodes Filter - below tabs on mobile, absolute right on sm+ */}
-          <div className="mt-3 flex items-center gap-2 sm:absolute sm:right-0 sm:bottom-0 sm:mt-0 sm:pb-2">
-            <button
-              type="button"
-              onClick={() => setReferenceNodesOnly(!referenceNodesOnly)}
-              className="flex cursor-pointer items-center gap-2"
-            >
-              <Checkbox checked={referenceNodesOnly} onChange={setReferenceNodesOnly} />
-              <span className="text-sm text-foreground">Reference nodes only</span>
-            </button>
-            <button
-              onClick={() => setShowRefNodeInfo(true)}
-              className="rounded-xs p-0.5 text-muted transition-colors hover:text-foreground"
-              aria-label="Learn more about reference nodes"
-            >
-              <InformationCircleIcon className="size-4" />
-            </button>
+            {/* Reference Nodes Filter - below tabs on mobile, absolute right on sm+ */}
+            <div className="mt-3 flex items-center gap-2 sm:absolute sm:right-0 sm:bottom-0 sm:mt-0 sm:pb-2">
+              <button
+                type="button"
+                onClick={() => setReferenceNodesOnly(!referenceNodesOnly)}
+                className="flex cursor-pointer items-center gap-2"
+              >
+                <Checkbox checked={referenceNodesOnly} onChange={setReferenceNodesOnly} />
+                <span className="text-sm text-foreground">Reference nodes only</span>
+              </button>
+              <button
+                onClick={() => setShowRefNodeInfo(true)}
+                className="rounded-xs p-0.5 text-muted transition-colors hover:text-foreground"
+                aria-label="Learn more about reference nodes"
+              >
+                <InformationCircleIcon className="size-4" />
+              </button>
+            </div>
           </div>
-        </div>
 
-        <TabPanels className="mt-6">
-          {/* newPayload Tab */}
-          <TabPanel>
-            <NewPayloadTab data={data} timeRange={timeRange} />
-          </TabPanel>
+          <TabPanels className="mt-6">
+            {/* newPayload Tab */}
+            <TabPanel>
+              <NewPayloadTab data={data} timeRange={timeRange} />
+            </TabPanel>
 
-          {/* getBlobs Tab */}
-          <TabPanel>
-            <GetBlobsTab data={data} timeRange={timeRange} isLoading={isLoadingBlobs} />
-          </TabPanel>
-        </TabPanels>
-      </TabGroup>
+            {/* getBlobs Tab */}
+            <TabPanel>
+              <GetBlobsTab data={data} timeRange={timeRange} isLoading={isLoadingBlobs} />
+            </TabPanel>
+          </TabPanels>
+        </TabGroup>
+      )}
     </Container>
   );
 }
