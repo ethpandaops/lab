@@ -17,14 +17,14 @@ import { Toggle } from '@/components/Forms/Toggle';
 import { epochToTimestamp } from '@/utils/beacon';
 import clsx from 'clsx';
 import {
-  fctBlobCountByHourlyServiceListOptions,
-  fctBlobCountByDailyServiceListOptions,
+  fctBlobCountHourlyServiceListOptions,
+  fctBlobCountDailyServiceListOptions,
   fctAttestationParticipationRateHourlyServiceListOptions,
   fctAttestationParticipationRateDailyServiceListOptions,
   fctHeadVoteCorrectnessRateHourlyServiceListOptions,
   fctHeadVoteCorrectnessRateDailyServiceListOptions,
-  fctReorgByHourlyServiceListOptions,
-  fctReorgByDailyServiceListOptions,
+  fctReorgHourlyServiceListOptions,
+  fctReorgDailyServiceListOptions,
   fctMissedSlotRateHourlyServiceListOptions,
   fctMissedSlotRateDailyServiceListOptions,
   fctBlockProposalStatusHourlyServiceListOptions,
@@ -35,14 +35,14 @@ import {
   fctProposerRewardDailyServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import type {
-  FctBlobCountByHourly,
-  FctBlobCountByDaily,
+  FctBlobCountHourly,
+  FctBlobCountDaily,
   FctAttestationParticipationRateHourly,
   FctAttestationParticipationRateDaily,
   FctHeadVoteCorrectnessRateHourly,
   FctHeadVoteCorrectnessRateDaily,
-  FctReorgByHourly,
-  FctReorgByDaily,
+  FctReorgHourly,
+  FctReorgDaily,
   FctMissedSlotRateHourly,
   FctMissedSlotRateDaily,
   FctBlockProposalStatusHourly,
@@ -95,7 +95,7 @@ export function IndexPage(): JSX.Element {
   // --- Queries ---
 
   const blobHourlyQuery = useQuery({
-    ...fctBlobCountByHourlyServiceListOptions({
+    ...fctBlobCountHourlyServiceListOptions({
       query: {
         hour_start_date_time_gte: startTimestamp,
         order_by: 'hour_start_date_time asc',
@@ -105,7 +105,7 @@ export function IndexPage(): JSX.Element {
     enabled: !isDaily,
   });
   const blobDailyQuery = useQuery({
-    ...fctBlobCountByDailyServiceListOptions({
+    ...fctBlobCountDailyServiceListOptions({
       query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: config.pageSize },
     }),
     enabled: isDaily,
@@ -146,7 +146,7 @@ export function IndexPage(): JSX.Element {
   });
 
   const reorgHourlyQuery = useQuery({
-    ...fctReorgByHourlyServiceListOptions({
+    ...fctReorgHourlyServiceListOptions({
       query: {
         hour_start_date_time_gte: startTimestamp,
         order_by: 'hour_start_date_time asc',
@@ -156,7 +156,7 @@ export function IndexPage(): JSX.Element {
     enabled: !isDaily,
   });
   const reorgDailyQuery = useQuery({
-    ...fctReorgByDailyServiceListOptions({
+    ...fctReorgDailyServiceListOptions({
       query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: config.pageSize },
     }),
     enabled: isDaily,
@@ -235,8 +235,8 @@ export function IndexPage(): JSX.Element {
   const blobRecords = useMemo(
     () =>
       isDaily
-        ? [...(blobDailyQuery.data?.fct_blob_count_by_daily ?? [])].reverse()
-        : blobHourlyQuery.data?.fct_blob_count_by_hourly,
+        ? [...(blobDailyQuery.data?.fct_blob_count_daily ?? [])].reverse()
+        : blobHourlyQuery.data?.fct_blob_count_hourly,
     [isDaily, blobDailyQuery.data, blobHourlyQuery.data]
   );
 
@@ -258,9 +258,7 @@ export function IndexPage(): JSX.Element {
 
   const reorgRecords = useMemo(
     () =>
-      isDaily
-        ? [...(reorgDailyQuery.data?.fct_reorg_by_daily ?? [])].reverse()
-        : reorgHourlyQuery.data?.fct_reorg_by_hourly,
+      isDaily ? [...(reorgDailyQuery.data?.fct_reorg_daily ?? [])].reverse() : reorgHourlyQuery.data?.fct_reorg_hourly,
     [isDaily, reorgDailyQuery.data, reorgHourlyQuery.data]
   );
 
@@ -309,19 +307,19 @@ export function IndexPage(): JSX.Element {
     };
 
     if (!isDaily) {
-      addHourlyKeys(blobRecords as FctBlobCountByHourly[] | undefined);
+      addHourlyKeys(blobRecords as FctBlobCountHourly[] | undefined);
       addHourlyKeys(attnRecords as FctAttestationParticipationRateHourly[] | undefined);
       addHourlyKeys(hvRecords as FctHeadVoteCorrectnessRateHourly[] | undefined);
-      addHourlyKeys(reorgRecords as FctReorgByHourly[] | undefined);
+      addHourlyKeys(reorgRecords as FctReorgHourly[] | undefined);
       addHourlyKeys(missedSlotRecords as FctMissedSlotRateHourly[] | undefined);
       addHourlyKeys(proposalStatusRecords as FctBlockProposalStatusHourly[] | undefined);
       addHourlyKeys(inclusionDelayRecords as FctAttestationInclusionDelayHourly[] | undefined);
       addHourlyKeys(proposerRewardRecords as FctProposerRewardHourly[] | undefined);
     } else {
-      addDailyKeys(blobRecords as FctBlobCountByDaily[] | undefined);
+      addDailyKeys(blobRecords as FctBlobCountDaily[] | undefined);
       addDailyKeys(attnRecords as FctAttestationParticipationRateDaily[] | undefined);
       addDailyKeys(hvRecords as FctHeadVoteCorrectnessRateDaily[] | undefined);
-      addDailyKeys(reorgRecords as FctReorgByDaily[] | undefined);
+      addDailyKeys(reorgRecords as FctReorgDaily[] | undefined);
       addDailyKeys(missedSlotRecords as FctMissedSlotRateDaily[] | undefined);
       addDailyKeys(proposalStatusRecords as FctBlockProposalStatusDaily[] | undefined);
       addDailyKeys(inclusionDelayRecords as FctAttestationInclusionDelayDaily[] | undefined);
@@ -667,8 +665,8 @@ export function IndexPage(): JSX.Element {
       const depthCounts = new Map<number, number>();
       for (const r of reorgRecords) {
         const rKey = isDaily
-          ? ((r as FctReorgByDaily).day_start_date ?? '')
-          : String((r as FctReorgByHourly).hour_start_date_time ?? '');
+          ? ((r as FctReorgDaily).day_start_date ?? '')
+          : String((r as FctReorgHourly).hour_start_date_time ?? '');
         if (rKey === timeKey) {
           depthCounts.set(r.depth ?? 1, r.reorg_count ?? 0);
         }

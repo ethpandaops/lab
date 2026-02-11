@@ -1,14 +1,14 @@
 import { createBandSeries, createStatisticSeries } from '@/components/Charts/MultiLine';
 import type { SeriesData } from '@/components/Charts/MultiLine';
 import type {
-  FctBlobCountByHourly,
-  FctBlobCountByDaily,
+  FctBlobCountHourly,
+  FctBlobCountDaily,
   FctAttestationParticipationRateHourly,
   FctAttestationParticipationRateDaily,
   FctHeadVoteCorrectnessRateHourly,
   FctHeadVoteCorrectnessRateDaily,
-  FctReorgByHourly,
-  FctReorgByDaily,
+  FctReorgHourly,
+  FctReorgDaily,
   FctMissedSlotRateHourly,
   FctMissedSlotRateDaily,
   FctBlockProposalStatusHourly,
@@ -44,16 +44,16 @@ export const formatBlobBand = formatBand;
 
 /** Builds chart series config from blob count records aligned to unified time keys */
 export function buildBlobCountChartConfig(
-  records: (FctBlobCountByHourly | FctBlobCountByDaily)[],
+  records: (FctBlobCountHourly | FctBlobCountDaily)[],
   unifiedKeys: string[],
   isDaily: boolean,
   maxBlobValues?: (number | null)[]
 ): ChartConfig {
-  const byKey = new Map<string, FctBlobCountByHourly | FctBlobCountByDaily>();
+  const byKey = new Map<string, FctBlobCountHourly | FctBlobCountDaily>();
   for (const r of records) {
     const key = isDaily
-      ? ((r as FctBlobCountByDaily).day_start_date ?? '')
-      : String((r as FctBlobCountByHourly).hour_start_date_time ?? '');
+      ? ((r as FctBlobCountDaily).day_start_date ?? '')
+      : String((r as FctBlobCountHourly).hour_start_date_time ?? '');
     byKey.set(key, r);
   }
 
@@ -299,7 +299,7 @@ export const DEPTH_COLORS = ['#f43f5e', '#f97316', '#eab308', '#22c55e', '#06b6d
 
 /** Builds stacked area chart config from reorg records grouped by depth */
 export function buildReorgChartConfig(
-  records: (FctReorgByHourly | FctReorgByDaily)[],
+  records: (FctReorgHourly | FctReorgDaily)[],
   unifiedKeys: string[],
   isDaily: boolean
 ): ChartConfig {
@@ -311,8 +311,8 @@ export function buildReorgChartConfig(
 
   for (const r of records) {
     const key = isDaily
-      ? ((r as FctReorgByDaily).day_start_date ?? '')
-      : String((r as FctReorgByHourly).hour_start_date_time ?? '');
+      ? ((r as FctReorgDaily).day_start_date ?? '')
+      : String((r as FctReorgHourly).hour_start_date_time ?? '');
     const depth = r.depth ?? 1;
     const count = r.reorg_count ?? 0;
 
