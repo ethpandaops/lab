@@ -375,15 +375,16 @@ head: () => ({
 
 Theme uses a **two-tier color architecture** defined in `src/index.css`:
 
-**Tier 1:** Primitive scales (terracotta, sand, neutral) with 50-950 shades
-**Tier 2:** Semantic tokens that reference Tier 1
+**Tier 1:** Primitive scales (terracotta, sand, neutral) with 50-950 shades **Tier 2:** Semantic tokens that reference Tier 1
 
 **Available semantic tokens:**
+
 - `primary`, `secondary`, `accent` - Brand colors
 - `background`, `surface`, `foreground`, `muted`, `border` - UI colors
 - `success`, `warning`, `danger` - State colors
 
 **Usage in components:**
+
 ```tsx
 // ✅ Always use semantic tokens
 className="bg-primary text-foreground border-border"
@@ -419,21 +420,25 @@ decorators: [
 ### Visual Standards
 
 **Axis Lines:**
+
 - **ALWAYS** render both y-axis and x-axis lines unless specifically not needed
 - Set `axisLine: { show: true }` for both xAxis and yAxis
 
 **Grid Lines:**
+
 - **NEVER** render grid lines
 - Set `splitLine: { show: false }` for both xAxis and yAxis
 
 **Axis Ranges & Intervals:**
+
 - yMax/xMax must work with consistent, evenly-spaced intervals
 - ❌ BAD: `0, 200, 400, 600, 800, 1000, 1100` (inconsistent final interval)
 - ✅ GOOD: `0, 200, 400, 600, 800, 1000` OR `0, 250, 500, 750, 1000, 1250`
 - Prefer setting yMax/xMax with `splitNumber` and let ECharts calculate intervals automatically
-- Example: `yAxis: { max: 1000, splitNumber: 5 }` → generates [0, 200, 400, 600, 800, 1000]
+- Example: `yAxis: { max: 1000, splitNumber: 5 }` → generates \[0, 200, 400, 600, 800, 1000\]
 
 **Grid Padding:**
+
 - Minimize whitespace while ensuring labels are visible
 - **Use simple explicit padding values** and let ECharts handle label positioning:
   - Set `left`, `right`, `top`, `bottom` values
@@ -448,6 +453,7 @@ decorators: [
 - Wrappers should never override grid config unless they have very specific layout needs
 
 **Slot Time Formatting:**
+
 - When plotting slot time on xAxis:
   - **Title**: Must be "Slot Time (s)"
   - **Units**: Use seconds (not milliseconds)
@@ -458,17 +464,20 @@ decorators: [
 ### Component Architecture
 
 **Core Chart Components** (`src/components/Charts/`):
+
 - Define sensible defaults for all visual standards above
 - Provide consistent `gridConfig`, axis styling, and formatting
 - Should be production-ready without overrides
 
 **Wrapper Components** (page-scoped chart components):
+
 - **Defer to core components** for most settings
 - Only override when directly needed for page-specific requirements
-- **Do NOT override `gridConfig`** unless absolutely necessary
+- **Do NOT override** `gridConfig` unless absolutely necessary
 - Pass through props to core components rather than recreating configuration
 
 **Example Pattern:**
+
 ```tsx
 // ❌ BAD: Wrapper recreates all config
 <LineChart
@@ -489,6 +498,7 @@ decorators: [
 ### Shared Crosshairs
 
 Charts sharing the same x-axis can synchronize tooltips and crosshairs using the `syncGroup` prop:
+
 - Use `syncGroup="slot-time"` for charts with slot time x-axis (0-12s)
 - Use `syncGroup="slot-number"` for charts with slot number x-axis
 - Omit `syncGroup` for independent charts
@@ -498,6 +508,7 @@ Charts sharing the same x-axis can synchronize tooltips and crosshairs using the
 **Never use locale formatting** (no commas) - slots/epochs are blockchain identifiers.
 
 **UI displays** (tables, cards):
+
 ```tsx
 import { Slot, Epoch } from '@/components/Ethereum';
 <Slot slot={1234567} />        // Linked to detail page
@@ -505,6 +516,7 @@ import { Slot, Epoch } from '@/components/Ethereum';
 ```
 
 **String contexts** (titles, tooltips):
+
 ```tsx
 import { formatSlot, formatEpoch } from '@/utils';
 {formatSlot(slot)}   // "1234567"

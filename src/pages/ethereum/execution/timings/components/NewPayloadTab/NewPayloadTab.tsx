@@ -1,14 +1,16 @@
 import type { JSX } from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import clsx from 'clsx';
-import { Card } from '@/components/Layout/Card';
+import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { EIP7870SpecsBanner } from '@/components/Ethereum/EIP7870SpecsBanner';
-import { Stats } from '@/components/DataDisplay/Stats';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
+import type { SeriesData } from '@/components/Charts/MultiLine';
 import { BarChart } from '@/components/Charts/Bar';
 import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot, getExecutionClientColor } from '@/utils';
+import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import type { FctEngineNewPayloadWinrateHourly, IntEngineNewPayloadFastest } from '@/api/types.gen';
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
 import { PER_SLOT_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
 import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
@@ -23,7 +25,13 @@ export interface NewPayloadTabProps {
  */
 export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Element {
   const themeColors = useThemeColors();
-  const { newPayloadDurationHistogram, newPayloadByElClient, newPayloadByElClientHourly } = data;
+  const {
+    newPayloadDurationHistogram,
+    newPayloadByElClient,
+    newPayloadByElClientHourly,
+    winrateHourly,
+    winratePerSlot,
+  } = data;
 
   // Check if we should show per-slot charts (only for short time ranges)
   const showPerSlotCharts = PER_SLOT_CHART_RANGES.includes(timeRange);
@@ -40,40 +48,6 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
 
   // State for percentile toggle (P50 vs P95) in hourly duration chart
   const [selectedPercentile, setSelectedPercentile] = useState<'p50' | 'p95'>('p50');
-
-  // Calculate summary stats from hourly data (always available, accurate aggregations)
-  const aggregatedStats = (() => {
-    if (newPayloadByElClientHourly.length === 0) {
-      return { totalObservations: 0, validRate: '0', avgDuration: '0', p50Duration: '0' };
-    }
-
-    let totalObs = 0;
-    let invalidCount = 0;
-    let acceptedCount = 0;
-    let totalWeightedDuration = 0;
-    let totalWeightedP50 = 0;
-
-    newPayloadByElClientHourly.forEach(row => {
-      const obs = row.observation_count ?? 0;
-      totalObs += obs;
-      invalidCount += row.invalid_count ?? 0;
-      acceptedCount += row.accepted_count ?? 0;
-
-      // Duration stats (hourly data uses VALID status for duration metrics)
-      totalWeightedDuration += (row.avg_duration_ms ?? 0) * obs;
-      totalWeightedP50 += (row.p50_duration_ms ?? 0) * obs;
-    });
-
-    // Valid count is total minus invalid/accepted (hourly data doesn't track syncing/invalid_block_hash separately)
-    const validCount = totalObs - invalidCount - acceptedCount;
-    const validRate = totalObs > 0 ? ((validCount / totalObs) * 100).toFixed(1) : '0';
-    const avgDuration = totalObs > 0 ? (totalWeightedDuration / totalObs).toFixed(0) : '0';
-    const p50Duration = totalObs > 0 ? (totalWeightedP50 / totalObs).toFixed(0) : '0';
-
-    return { totalObservations: totalObs, validRate, avgDuration, p50Duration };
-  })();
-
-  const { totalObservations, validRate, avgDuration, p50Duration } = aggregatedStats;
 
   // Calculate slot bounds from per-EL-client data (which has per-slot granularity)
   // This avoids needing the slow newPayloadBySlot endpoint
@@ -425,56 +399,46 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
 
   return (
     <div className="space-y-6">
-      {/* Hardware specs banner */}
       <EIP7870SpecsBanner />
 
-      {/* Summary Stats */}
-      <Stats
-        stats={[
-          {
-            id: 'observations',
-            name: 'Observations',
-            value: totalObservations.toLocaleString(),
-          },
-          {
-            id: 'valid-rate',
-            name: 'Valid Rate',
-            value: `${validRate}%`,
-          },
-          {
-            id: 'avg-duration',
-            name: 'Avg Duration',
-            value: `${avgDuration} ms`,
-          },
-          {
-            id: 'p50-duration',
-            name: 'P50 Duration',
-            value: `${p50Duration} ms`,
-          },
-        ]}
+      {/* Execution Winrate — fastest client per slot */}
+      <WinrateSection
+        hourlyRecords={winrateHourly}
+        perSlotRecords={winratePerSlot}
+        allClients={[...new Set([...hourlyClientList, ...elClientList])]}
+        timeRange={timeRange}
+        showPerSlot={showPerSlotCharts}
       />
 
-      {/* Client Version Breakdown - only VALID status */}
-      <ClientVersionBreakdown
-        data={validPayloadByElClient}
-        hourlyData={newPayloadByElClientHourly}
+      {/* Client Version Breakdown — VALID status only */}
+      <PopoutCard
         title="EL Client Duration"
-        description="engine_newPayload duration (ms) by execution client and version"
-        hideObservations
-        hideRange
-      />
+        subtitle="engine_newPayload duration (ms) by execution client and version"
+        anchorId="client-duration"
+        modalSize="full"
+      >
+        {() => (
+          <ClientVersionBreakdown
+            data={validPayloadByElClient}
+            hourlyData={newPayloadByElClientHourly}
+            hideObservations
+            hideRange
+            noCard
+          />
+        )}
+      </PopoutCard>
 
-      {/* Per-slot charts - only for shorter time ranges */}
+      {/* Per-slot charts — short time ranges only */}
       {showPerSlotCharts && (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Per-Slot Duration by Client Chart */}
-          <Card>
-            <div className="p-4">
-              <h4 className="mb-2 text-base font-semibold text-foreground" id="slot-duration">
-                Per-Slot Duration by Client
-              </h4>
-              <p className="mb-4 text-sm text-muted">Median duration for each slot, grouped by execution client</p>
-              {hasClientData && slotDurationByClientSeries.some(s => s.data.length > 0) ? (
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <PopoutCard
+            title="Per-Slot Duration by Client"
+            subtitle="Median duration for each slot, grouped by execution client"
+            anchorId="slot-duration"
+            modalSize="full"
+          >
+            {({ inModal }) =>
+              hasClientData && slotDurationByClientSeries.some(s => s.data.length > 0) ? (
                 <MultiLineChart
                   series={slotDurationByClientSeries}
                   xAxis={{
@@ -484,27 +448,26 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                     max: maxSlot,
                     formatter: (value: number | string) => formatSlot(Number(value)),
                   }}
-                  yAxis={{
-                    name: 'Duration (ms)',
-                  }}
-                  height={300}
-                  showLegend={true}
-                  enableDataZoom={true}
+                  yAxis={{ name: 'Duration (ms)' }}
+                  height={inModal ? 600 : 300}
+                  showLegend
+                  enableDataZoom
                 />
               ) : (
                 <div className="flex h-[300px] items-center justify-center text-muted">No slot data available</div>
-              )}
-            </div>
-          </Card>
+              )
+            }
+          </PopoutCard>
 
-          {/* Block Complexity vs Duration by Client */}
-          <Card>
-            <div className="p-4">
-              <h4 className="mb-2 text-base font-semibold text-foreground">Block Complexity vs Duration</h4>
-              <p className="mb-4 text-sm text-muted">Gas used vs processing time, grouped by execution client</p>
-              {hasBlockComplexityData ? (
+          <PopoutCard
+            title="Block Complexity vs Duration"
+            subtitle="Gas used vs processing time, grouped by execution client"
+            anchorId="block-complexity"
+            modalSize="full"
+          >
+            {({ inModal }) =>
+              hasBlockComplexityData ? (
                 <>
-                  {/* Custom Series Legend - matching MultiLineChart style */}
                   <div className="mb-4 border-b border-border pb-4">
                     <div className="mb-2">
                       <span className="text-sm/6 font-medium text-muted">Series:</span>
@@ -524,7 +487,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                             )}
                           >
                             <span
-                              className="h-2 w-2 rounded-full"
+                              className="size-2 rounded-full"
                               style={{
                                 backgroundColor: isVisible ? s.color : 'transparent',
                                 border: `2px solid ${s.color}`,
@@ -541,7 +504,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                     scatterSeries={visibleBlockComplexitySeries}
                     xAxisTitle="Gas Used (millions)"
                     yAxisTitle="Duration (ms)"
-                    height={300}
+                    height={inModal ? 600 : 300}
                     showLegend={false}
                     tooltipFormatter={(params: unknown) => {
                       const p = params as { seriesName: string; data: [number, number] };
@@ -551,53 +514,53 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                 </>
               ) : (
                 <div className="flex h-[300px] items-center justify-center text-muted">No block data available</div>
-              )}
-            </div>
-          </Card>
+              )
+            }
+          </PopoutCard>
         </div>
       )}
 
-      {/* Hourly charts - only for longer time ranges */}
+      {/* Hourly charts — longer time ranges */}
       {!showPerSlotCharts && (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Hourly P50/P95 Duration */}
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           {hourlyTrendSeries.length > 0 && hourlyTrendSeries.some(s => s.data.length > 0) && (
-            <Card>
-              <div className="p-4">
-                <div className="mb-2 flex items-center justify-between">
-                  <h4 className="text-base font-semibold text-foreground">
-                    Hourly {selectedPercentile === 'p50' ? 'P50' : 'P95'} Duration by Client
-                  </h4>
-                  <div className="flex rounded-md border border-border">
-                    <button
-                      onClick={() => setSelectedPercentile('p50')}
-                      className={clsx(
-                        'px-3 py-1 text-xs font-medium transition-colors',
-                        selectedPercentile === 'p50'
-                          ? 'bg-primary text-white'
-                          : 'bg-transparent text-muted hover:text-foreground'
-                      )}
-                    >
-                      P50
-                    </button>
-                    <button
-                      onClick={() => setSelectedPercentile('p95')}
-                      className={clsx(
-                        'px-3 py-1 text-xs font-medium transition-colors',
-                        selectedPercentile === 'p95'
-                          ? 'bg-primary text-white'
-                          : 'bg-transparent text-muted hover:text-foreground'
-                      )}
-                    >
-                      P95
-                    </button>
-                  </div>
+            <PopoutCard
+              title={`Hourly ${selectedPercentile === 'p50' ? 'P50' : 'P95'} Duration by Client`}
+              subtitle={
+                selectedPercentile === 'p50'
+                  ? '50th percentile duration over time, grouped by execution client'
+                  : '95th percentile duration over time (tail latency)'
+              }
+              anchorId="hourly-duration"
+              modalSize="full"
+              headerActions={
+                <div className="flex rounded-sm border border-border">
+                  <button
+                    onClick={() => setSelectedPercentile('p50')}
+                    className={clsx(
+                      'px-3 py-1 text-xs font-medium transition-colors',
+                      selectedPercentile === 'p50'
+                        ? 'bg-primary text-white'
+                        : 'bg-transparent text-muted hover:text-foreground'
+                    )}
+                  >
+                    P50
+                  </button>
+                  <button
+                    onClick={() => setSelectedPercentile('p95')}
+                    className={clsx(
+                      'px-3 py-1 text-xs font-medium transition-colors',
+                      selectedPercentile === 'p95'
+                        ? 'bg-primary text-white'
+                        : 'bg-transparent text-muted hover:text-foreground'
+                    )}
+                  >
+                    P95
+                  </button>
                 </div>
-                <p className="mb-4 text-sm text-muted">
-                  {selectedPercentile === 'p50'
-                    ? '50th percentile duration over time, grouped by execution client'
-                    : '95th percentile duration over time (tail latency)'}
-                </p>
+              }
+            >
+              {({ inModal }) => (
                 <MultiLineChart
                   series={selectedPercentile === 'p50' ? hourlyTrendSeries : hourlyP95Series}
                   xAxis={{
@@ -607,7 +570,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                     max: hourlyMaxTime,
                     formatter: (value: number | string) => {
                       const date = new Date(Number(value));
-                      if (timeRange === '7days') {
+                      if (timeRange === '7days' || timeRange === '31days') {
                         return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
                       }
                       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -616,9 +579,9 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                   yAxis={{
                     name: `${selectedPercentile === 'p50' ? 'P50' : 'P95'} Duration (ms)`,
                   }}
-                  height={300}
-                  showLegend={true}
-                  enableDataZoom={true}
+                  height={inModal ? 600 : 300}
+                  showLegend
+                  enableDataZoom
                   tooltipFormatter={(params: unknown) => {
                     const dataPoints = Array.isArray(params) ? params : [params];
                     if (dataPoints.length === 0) return '';
@@ -648,16 +611,18 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                     return html;
                   }}
                 />
-              </div>
-            </Card>
+              )}
+            </PopoutCard>
           )}
 
-          {/* Valid Rate Over Time */}
           {validRateTrendSeries.length > 0 && validRateTrendSeries.some(s => s.data.length > 0) && (
-            <Card>
-              <div className="p-4">
-                <h4 className="mb-2 text-base font-semibold text-foreground">Valid Rate Over Time</h4>
-                <p className="mb-4 text-sm text-muted">Percentage of VALID responses per hour by client</p>
+            <PopoutCard
+              title="Valid Rate Over Time"
+              subtitle="Percentage of VALID responses per hour by client"
+              anchorId="valid-rate"
+              modalSize="full"
+            >
+              {({ inModal }) => (
                 <MultiLineChart
                   series={validRateTrendSeries}
                   xAxis={{
@@ -667,7 +632,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                     max: hourlyMaxTime,
                     formatter: (value: number | string) => {
                       const date = new Date(Number(value));
-                      if (timeRange === '7days') {
+                      if (timeRange === '7days' || timeRange === '31days') {
                         return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
                       }
                       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -679,8 +644,8 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                     max: 100,
                     formatter: (value: number) => `${value}%`,
                   }}
-                  height={300}
-                  showLegend={true}
+                  height={inModal ? 600 : 300}
+                  showLegend
                   tooltipFormatter={(params: unknown) => {
                     const dataPoints = Array.isArray(params) ? params : [params];
                     if (dataPoints.length === 0) return '';
@@ -710,44 +675,412 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                     return html;
                   }}
                 />
-              </div>
-            </Card>
+              )}
+            </PopoutCard>
           )}
         </div>
       )}
 
-      {/* Duration Histogram and Status Distribution - Side by Side (per-slot data) */}
+      {/* Duration Histogram and Status Distribution — per-slot data */}
       {showPerSlotCharts && (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Duration Histogram */}
-          <Card>
-            <div className="p-4">
-              <h4 className="mb-2 text-base font-semibold text-foreground" id="duration-histogram">
-                Duration Distribution (50ms buckets)
-              </h4>
-              <p className="mb-4 text-sm text-muted">Histogram of engine_newPayload call durations</p>
-              {histogramData.length > 0 ? (
-                <BarChart data={histogramData} labels={histogramLabels} color={themeColors.primary} height={300} />
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <PopoutCard
+            title="Duration Distribution (50ms buckets)"
+            subtitle="Histogram of engine_newPayload call durations"
+            anchorId="duration-histogram"
+            modalSize="full"
+          >
+            {({ inModal }) =>
+              histogramData.length > 0 ? (
+                <BarChart
+                  data={histogramData}
+                  labels={histogramLabels}
+                  color={themeColors.primary}
+                  height={inModal ? 600 : 300}
+                />
               ) : (
                 <div className="flex h-[300px] items-center justify-center text-muted">No histogram data available</div>
-              )}
-            </div>
-          </Card>
+              )
+            }
+          </PopoutCard>
 
-          {/* Status Breakdown */}
-          <Card>
-            <div className="p-4">
-              <h4 className="mb-2 text-base font-semibold text-foreground">Status Distribution</h4>
-              <p className="mb-4 text-sm text-muted">Breakdown of validation status responses</p>
-              {statusData.some(d => d.value > 0) ? (
-                <BarChart data={statusData} labels={statusLabels} height={300} orientation="horizontal" />
+          <PopoutCard
+            title="Status Distribution"
+            subtitle="Breakdown of validation status responses"
+            anchorId="status-distribution"
+            modalSize="full"
+          >
+            {({ inModal }) =>
+              statusData.some(d => d.value > 0) ? (
+                <BarChart
+                  data={statusData}
+                  labels={statusLabels}
+                  height={inModal ? 600 : 300}
+                  orientation="horizontal"
+                />
               ) : (
                 <div className="flex h-[300px] items-center justify-center text-muted">No status data available</div>
-              )}
-            </div>
-          </Card>
+              )
+            }
+          </PopoutCard>
         </div>
       )}
     </div>
   );
 }
+
+/** Standings entry for the podium */
+interface WinrateStanding {
+  implementation: string;
+  totalWins: number;
+  winRate: number;
+  color: string;
+  rank: number;
+}
+
+/** Normalize client names: lowercase + go-ethereum → geth */
+function normalizeClient(name: string): string {
+  const lower = name.toLowerCase();
+  return lower === 'go-ethereum' ? 'geth' : lower;
+}
+
+/** Build standings from a totals-by-impl map */
+function buildStandings(totalsByImpl: Map<string, number>, allClients: string[]): WinrateStanding[] {
+  const grandTotal = [...totalsByImpl.values()].reduce((s, c) => s + c, 0);
+
+  for (const client of allClients) {
+    const norm = normalizeClient(client);
+    if (!totalsByImpl.has(norm)) totalsByImpl.set(norm, 0);
+  }
+
+  const sorted = [...totalsByImpl.entries()]
+    .map(([impl, wins], i) => ({
+      implementation: impl,
+      totalWins: wins,
+      winRate: grandTotal > 0 ? Number(((wins / grandTotal) * 100).toFixed(1)) : 0,
+      color: getExecutionClientColor(impl, i),
+      rank: 0,
+    }))
+    .sort((a, b) => b.totalWins - a.totalWins);
+
+  let currentRank = 1;
+  for (let idx = 0; idx < sorted.length; idx++) {
+    if (idx > 0 && sorted[idx].totalWins < sorted[idx - 1].totalWins) {
+      currentRank = idx + 1;
+    }
+    sorted[idx].rank = currentRank;
+  }
+
+  return sorted;
+}
+
+/** Winrate chart + standings for engine_newPayload fastest client per slot */
+function WinrateSection({
+  hourlyRecords,
+  perSlotRecords,
+  allClients,
+  timeRange,
+  showPerSlot,
+}: {
+  hourlyRecords: FctEngineNewPayloadWinrateHourly[];
+  perSlotRecords: IntEngineNewPayloadFastest[];
+  allClients: string[];
+  timeRange: TimeRange;
+  showPerSlot: boolean;
+}): JSX.Element | null {
+  const { chartConfig, standings } = useMemo(() => {
+    if (showPerSlot) {
+      // Per-slot mode: each record is a winner for that slot+node_class
+      if (!perSlotRecords.length && !allClients.length) return { chartConfig: null, standings: [] };
+
+      // Group by slot → count wins per implementation, track timestamps
+      const bySlotAndImpl = new Map<number, Map<string, number>>();
+      const slotToTimestamp = new Map<number, number>();
+      const allImpls = new Set<string>();
+
+      for (const r of perSlotRecords) {
+        const slot = r.slot ?? 0;
+        const impl = normalizeClient(r.meta_execution_implementation ?? '');
+        if (!impl || !slot) continue;
+
+        allImpls.add(impl);
+        if (!bySlotAndImpl.has(slot)) bySlotAndImpl.set(slot, new Map());
+        const slotMap = bySlotAndImpl.get(slot)!;
+        slotMap.set(impl, (slotMap.get(impl) ?? 0) + 1);
+
+        if (!slotToTimestamp.has(slot) && r.slot_start_date_time) {
+          slotToTimestamp.set(slot, r.slot_start_date_time);
+        }
+      }
+
+      const sortedSlots = [...bySlotAndImpl.keys()].sort((a, b) => a - b);
+      if (!sortedSlots.length) return { chartConfig: null, standings: [] };
+
+      // Downsample slots into ~60 buckets for readable chart
+      const BUCKET_COUNT = 60;
+      const bucketSize = Math.max(1, Math.ceil(sortedSlots.length / BUCKET_COUNT));
+      const buckets: { label: string; implCounts: Map<string, number>; total: number }[] = [];
+
+      for (let i = 0; i < sortedSlots.length; i += bucketSize) {
+        const bucketSlots = sortedSlots.slice(i, i + bucketSize);
+        const implCounts = new Map<string, number>();
+        let total = 0;
+
+        for (const slot of bucketSlots) {
+          const slotMap = bySlotAndImpl.get(slot)!;
+          for (const [impl, count] of slotMap) {
+            implCounts.set(impl, (implCounts.get(impl) ?? 0) + count);
+            total += count;
+          }
+        }
+
+        // Use the timestamp of the first slot in the bucket for the label
+        const ts = slotToTimestamp.get(bucketSlots[0]) ?? 0;
+        const date = new Date(ts * 1000);
+        const label = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        buckets.push({ label, implCounts, total });
+      }
+
+      const labels = buckets.map(b => b.label);
+      const sortedImpls = [...allImpls].sort();
+      const series: SeriesData[] = sortedImpls.map((impl, i) => ({
+        name: impl,
+        data: buckets.map(b => {
+          const count = b.implCounts.get(impl) ?? 0;
+          return b.total > 0 ? Number(((count / b.total) * 100).toFixed(2)) : null;
+        }),
+        color: getExecutionClientColor(impl, i),
+        seriesType: 'bar' as const,
+        stack: 'winrate',
+      }));
+
+      // Standings from per-slot data
+      const totalsByImpl = new Map<string, number>();
+      for (const r of perSlotRecords) {
+        const impl = normalizeClient(r.meta_execution_implementation ?? '');
+        if (!impl) continue;
+        totalsByImpl.set(impl, (totalsByImpl.get(impl) ?? 0) + 1);
+      }
+
+      return { chartConfig: { labels, series }, standings: buildStandings(totalsByImpl, allClients) };
+    }
+
+    // Hourly mode (24h / 7d)
+    if (!hourlyRecords.length && !allClients.length) return { chartConfig: null, standings: [] };
+
+    const byHourAndImpl = new Map<number, Map<string, number>>();
+    const allImpls = new Set<string>();
+
+    for (const r of hourlyRecords) {
+      const hour = r.hour_start_date_time ?? 0;
+      const impl = normalizeClient(r.meta_execution_implementation ?? '');
+      const count = r.win_count ?? 0;
+      if (!impl || !hour) continue;
+
+      allImpls.add(impl);
+      if (!byHourAndImpl.has(hour)) byHourAndImpl.set(hour, new Map());
+      const hourMap = byHourAndImpl.get(hour)!;
+      hourMap.set(impl, (hourMap.get(impl) ?? 0) + count);
+    }
+
+    const sortedHours = [...byHourAndImpl.keys()].sort((a, b) => a - b);
+    if (!sortedHours.length) return { chartConfig: null, standings: [] };
+
+    const totalsByHour = new Map<number, number>();
+    for (const hour of sortedHours) {
+      const implMap = byHourAndImpl.get(hour)!;
+      let total = 0;
+      for (const count of implMap.values()) total += count;
+      totalsByHour.set(hour, total);
+    }
+
+    const labels = sortedHours.map(ts => {
+      const date = new Date(ts * 1000);
+      if (timeRange === '7days' || timeRange === '31days') {
+        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      }
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    });
+
+    const sortedImpls = [...allImpls].sort();
+    const series: SeriesData[] = sortedImpls.map((impl, i) => ({
+      name: impl,
+      data: sortedHours.map(hour => {
+        const count = byHourAndImpl.get(hour)?.get(impl) ?? 0;
+        const total = totalsByHour.get(hour) ?? 0;
+        return total > 0 ? Number(((count / total) * 100).toFixed(2)) : null;
+      }),
+      color: getExecutionClientColor(impl, i),
+      seriesType: 'bar' as const,
+      stack: 'winrate',
+    }));
+
+    const totalsByImpl = new Map<string, number>();
+    for (const r of hourlyRecords) {
+      const impl = normalizeClient(r.meta_execution_implementation ?? '');
+      if (!impl) continue;
+      totalsByImpl.set(impl, (totalsByImpl.get(impl) ?? 0) + (r.win_count ?? 0));
+    }
+
+    return { chartConfig: { labels, series }, standings: buildStandings(totalsByImpl, allClients) };
+  }, [hourlyRecords, perSlotRecords, allClients, timeRange, showPerSlot]);
+
+  if (!chartConfig && standings.length === 0) return null;
+
+  const totalSlots = standings.reduce((s, st) => s + st.totalWins, 0);
+  const maxWinRate = standings.length > 0 ? standings[0].winRate : 0;
+
+  return (
+    <PopoutCard
+      title="Execution Winrate"
+      subtitle="Which execution client had the fastest engine_newPayload per slot"
+      anchorId="winrate"
+      modalSize="full"
+    >
+      {({ inModal }) => (
+        <div className="flex flex-col gap-6 lg:flex-row">
+          {/* Chart — fills available space */}
+          <div className="min-w-0 flex-1">
+            {chartConfig ? (
+              <MultiLineChart
+                series={chartConfig.series}
+                xAxis={{ type: 'category', labels: chartConfig.labels, name: 'Time' }}
+                yAxis={{ name: 'Win Rate (%)', min: 0, max: 100 }}
+                height={inModal ? 600 : 350}
+                showLegend
+                enableDataZoom
+              />
+            ) : (
+              <div className="flex h-64 items-center justify-center text-sm text-muted">
+                Waiting for winrate data...
+              </div>
+            )}
+          </div>
+
+          {/* Standings */}
+          <div className="w-full shrink-0 lg:w-80">
+            <div className="flex flex-col gap-2">
+              {standings.map(standing => {
+                const medal = MEDAL_CONFIG[standing.rank];
+                const isLeader = standing.rank === 1;
+                const isTopThree = standing.rank <= 3;
+                const barWidth = maxWinRate > 0 ? (standing.winRate / maxWinRate) * 100 : 0;
+
+                return (
+                  <div
+                    key={standing.implementation}
+                    className={clsx(
+                      'relative overflow-hidden',
+                      isLeader ? 'rounded-sm border px-4 py-4' : 'rounded-xs px-3 py-2',
+                      isLeader ? 'border-amber-400/30' : '',
+                      !isLeader && isTopThree && medal ? medal.bg : '',
+                      !isTopThree ? 'bg-surface/20' : ''
+                    )}
+                    style={
+                      isLeader
+                        ? {
+                            background: `linear-gradient(135deg, ${standing.color}05 0%, ${standing.color}12 50%, ${standing.color}05 100%)`,
+                          }
+                        : undefined
+                    }
+                  >
+                    {/* Proportional fill bar */}
+                    <div
+                      className={clsx('absolute inset-y-0 left-0', isLeader ? 'rounded-sm' : 'rounded-xs')}
+                      style={{
+                        width: `${barWidth}%`,
+                        backgroundColor: standing.color,
+                        opacity: isLeader ? 0.12 : isTopThree ? 0.1 : 0.06,
+                      }}
+                    />
+
+                    {/* Left accent bar for top 3 */}
+                    {isTopThree && (
+                      <div
+                        className={clsx('absolute inset-y-0 left-0', isLeader ? 'w-1' : 'w-0.5')}
+                        style={{ backgroundColor: standing.color, opacity: isLeader ? 0.8 : 0.5 }}
+                      />
+                    )}
+
+                    <div className="relative flex items-center gap-3">
+                      {/* Medal / Rank */}
+                      <span
+                        className={clsx(
+                          'shrink-0 text-center',
+                          isLeader
+                            ? 'w-9 text-4xl leading-none'
+                            : isTopThree
+                              ? 'w-8 text-3xl leading-none'
+                              : 'w-5 text-sm/5'
+                        )}
+                      >
+                        {isTopThree && medal ? (
+                          medal.emoji
+                        ) : (
+                          <span className="text-xs/5 font-bold text-muted/50 tabular-nums">{standing.rank}</span>
+                        )}
+                      </span>
+
+                      {/* Logo */}
+                      <ClientLogo
+                        client={standing.implementation}
+                        size={isLeader ? 36 : isTopThree ? 24 : 18}
+                        className={clsx('shrink-0', !isTopThree && 'opacity-40')}
+                      />
+
+                      {/* Name + wins */}
+                      <div className="min-w-0 flex-1">
+                        <div
+                          className={clsx(
+                            'truncate font-semibold',
+                            isLeader
+                              ? 'text-base/5 text-foreground'
+                              : isTopThree
+                                ? 'text-sm/5 text-foreground'
+                                : 'text-xs/5 text-muted'
+                          )}
+                        >
+                          {standing.implementation}
+                        </div>
+                        {isTopThree && (
+                          <div className="text-[10px]/4 text-muted/60">{standing.totalWins.toLocaleString()} wins</div>
+                        )}
+                      </div>
+
+                      {/* Win rate */}
+                      <span
+                        className={clsx(
+                          'shrink-0 font-black tracking-tight tabular-nums',
+                          isLeader ? 'text-2xl/7 text-foreground' : '',
+                          !isLeader && isTopThree && medal ? `text-lg/6 ${medal.text}` : '',
+                          !isTopThree ? 'text-sm/5 font-bold text-muted/70' : ''
+                        )}
+                      >
+                        {standing.winRate > 0 ? `${standing.winRate}%` : '—'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Slot count */}
+            {totalSlots > 0 && (
+              <div className="mt-3 text-center text-[10px] text-muted/40 tabular-nums">
+                {totalSlots.toLocaleString()} slots analyzed
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </PopoutCard>
+  );
+}
+
+/** Medal styling per position (gold / silver / bronze) */
+const MEDAL_CONFIG: Record<number, { bg: string; text: string; emoji: string }> = {
+  1: { bg: 'bg-amber-400/10', text: 'text-amber-400', emoji: '🥇' },
+  2: { bg: 'bg-neutral-300/8', text: 'text-neutral-300', emoji: '🥈' },
+  3: { bg: 'bg-amber-600/8', text: 'text-amber-500', emoji: '🥉' },
+};

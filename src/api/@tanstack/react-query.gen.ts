@@ -138,6 +138,10 @@ import {
   fctEngineNewPayloadBySlotServiceList,
   fctEngineNewPayloadDurationChunked50MsServiceGet,
   fctEngineNewPayloadDurationChunked50MsServiceList,
+  fctEngineNewPayloadWinrateDailyServiceGet,
+  fctEngineNewPayloadWinrateDailyServiceList,
+  fctEngineNewPayloadWinrateHourlyServiceGet,
+  fctEngineNewPayloadWinrateHourlyServiceList,
   fctExecutionGasLimitDailyServiceGet,
   fctExecutionGasLimitDailyServiceList,
   fctExecutionGasLimitHourlyServiceGet,
@@ -296,6 +300,8 @@ import {
   intCustodyProbeServiceList,
   intEngineGetBlobsServiceGet,
   intEngineGetBlobsServiceList,
+  intEngineNewPayloadFastestServiceGet,
+  intEngineNewPayloadFastestServiceList,
   intEngineNewPayloadServiceGet,
   intEngineNewPayloadServiceList,
   intExecutionBlockByDateServiceGet,
@@ -751,6 +757,18 @@ import type {
   FctEngineNewPayloadDurationChunked50MsServiceListData,
   FctEngineNewPayloadDurationChunked50MsServiceListError,
   FctEngineNewPayloadDurationChunked50MsServiceListResponse,
+  FctEngineNewPayloadWinrateDailyServiceGetData,
+  FctEngineNewPayloadWinrateDailyServiceGetError,
+  FctEngineNewPayloadWinrateDailyServiceGetResponse,
+  FctEngineNewPayloadWinrateDailyServiceListData,
+  FctEngineNewPayloadWinrateDailyServiceListError,
+  FctEngineNewPayloadWinrateDailyServiceListResponse,
+  FctEngineNewPayloadWinrateHourlyServiceGetData,
+  FctEngineNewPayloadWinrateHourlyServiceGetError,
+  FctEngineNewPayloadWinrateHourlyServiceGetResponse,
+  FctEngineNewPayloadWinrateHourlyServiceListData,
+  FctEngineNewPayloadWinrateHourlyServiceListError,
+  FctEngineNewPayloadWinrateHourlyServiceListResponse,
   FctExecutionGasLimitDailyServiceGetData,
   FctExecutionGasLimitDailyServiceGetError,
   FctExecutionGasLimitDailyServiceGetResponse,
@@ -1225,6 +1243,12 @@ import type {
   IntEngineGetBlobsServiceListData,
   IntEngineGetBlobsServiceListError,
   IntEngineGetBlobsServiceListResponse,
+  IntEngineNewPayloadFastestServiceGetData,
+  IntEngineNewPayloadFastestServiceGetError,
+  IntEngineNewPayloadFastestServiceGetResponse,
+  IntEngineNewPayloadFastestServiceListData,
+  IntEngineNewPayloadFastestServiceListError,
+  IntEngineNewPayloadFastestServiceListResponse,
   IntEngineNewPayloadServiceGetData,
   IntEngineNewPayloadServiceGetError,
   IntEngineNewPayloadServiceGetResponse,
@@ -5300,6 +5324,126 @@ export const fctEngineNewPayloadDurationChunked50MsServiceGetOptions = (
       return data;
     },
     queryKey: fctEngineNewPayloadDurationChunked50MsServiceGetQueryKey(options),
+  });
+
+export const fctEngineNewPayloadWinrateDailyServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadWinrateDailyServiceListData>
+) => createQueryKey('fctEngineNewPayloadWinrateDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineNewPayloadWinrateDailyServiceListOptions = (
+  options?: Options<FctEngineNewPayloadWinrateDailyServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadWinrateDailyServiceListResponse,
+    FctEngineNewPayloadWinrateDailyServiceListError,
+    FctEngineNewPayloadWinrateDailyServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadWinrateDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadWinrateDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadWinrateDailyServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadWinrateDailyServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadWinrateDailyServiceGetData>
+) => createQueryKey('fctEngineNewPayloadWinrateDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadWinrateDailyServiceGetOptions = (
+  options: Options<FctEngineNewPayloadWinrateDailyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadWinrateDailyServiceGetResponse,
+    FctEngineNewPayloadWinrateDailyServiceGetError,
+    FctEngineNewPayloadWinrateDailyServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadWinrateDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadWinrateDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadWinrateDailyServiceGetQueryKey(options),
+  });
+
+export const fctEngineNewPayloadWinrateHourlyServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadWinrateHourlyServiceListData>
+) => createQueryKey('fctEngineNewPayloadWinrateHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineNewPayloadWinrateHourlyServiceListOptions = (
+  options?: Options<FctEngineNewPayloadWinrateHourlyServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadWinrateHourlyServiceListResponse,
+    FctEngineNewPayloadWinrateHourlyServiceListError,
+    FctEngineNewPayloadWinrateHourlyServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadWinrateHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadWinrateHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadWinrateHourlyServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadWinrateHourlyServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadWinrateHourlyServiceGetData>
+) => createQueryKey('fctEngineNewPayloadWinrateHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineNewPayloadWinrateHourlyServiceGetOptions = (
+  options: Options<FctEngineNewPayloadWinrateHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadWinrateHourlyServiceGetResponse,
+    FctEngineNewPayloadWinrateHourlyServiceGetError,
+    FctEngineNewPayloadWinrateHourlyServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadWinrateHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadWinrateHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadWinrateHourlyServiceGetQueryKey(options),
   });
 
 export const fctExecutionGasLimitDailyServiceListQueryKey = (
@@ -9922,6 +10066,66 @@ export const intEngineNewPayloadServiceGetOptions = (options: Options<IntEngineN
       return data;
     },
     queryKey: intEngineNewPayloadServiceGetQueryKey(options),
+  });
+
+export const intEngineNewPayloadFastestServiceListQueryKey = (
+  options?: Options<IntEngineNewPayloadFastestServiceListData>
+) => createQueryKey('intEngineNewPayloadFastestServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intEngineNewPayloadFastestServiceListOptions = (
+  options?: Options<IntEngineNewPayloadFastestServiceListData>
+) =>
+  queryOptions<
+    IntEngineNewPayloadFastestServiceListResponse,
+    IntEngineNewPayloadFastestServiceListError,
+    IntEngineNewPayloadFastestServiceListResponse,
+    ReturnType<typeof intEngineNewPayloadFastestServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intEngineNewPayloadFastestServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intEngineNewPayloadFastestServiceListQueryKey(options),
+  });
+
+export const intEngineNewPayloadFastestServiceGetQueryKey = (
+  options: Options<IntEngineNewPayloadFastestServiceGetData>
+) => createQueryKey('intEngineNewPayloadFastestServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intEngineNewPayloadFastestServiceGetOptions = (
+  options: Options<IntEngineNewPayloadFastestServiceGetData>
+) =>
+  queryOptions<
+    IntEngineNewPayloadFastestServiceGetResponse,
+    IntEngineNewPayloadFastestServiceGetError,
+    IntEngineNewPayloadFastestServiceGetResponse,
+    ReturnType<typeof intEngineNewPayloadFastestServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intEngineNewPayloadFastestServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intEngineNewPayloadFastestServiceGetQueryKey(options),
   });
 
 export const intExecutionBlockByDateServiceListQueryKey = (options?: Options<IntExecutionBlockByDateServiceListData>) =>

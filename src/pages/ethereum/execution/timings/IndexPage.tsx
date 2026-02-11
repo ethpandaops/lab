@@ -1,6 +1,8 @@
 import { type JSX, useState } from 'react';
+import clsx from 'clsx';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { useSearch, useNavigate } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Tab } from '@/components/Navigation/Tab';
@@ -13,15 +15,17 @@ import { TimingsSkeleton } from './components/TimingsSkeleton';
 import { NewPayloadTab } from './components/NewPayloadTab';
 import { GetBlobsTab } from './components/GetBlobsTab';
 import { ReferenceNodesInfoDialog } from './components/ReferenceNodesInfoDialog';
-import { TIME_RANGE_CONFIG, type TimeRange } from './IndexPage.types';
+import { DEFAULT_TIME_RANGE, TIME_RANGE_CONFIG, type TimeRange } from './IndexPage.types';
 
 /**
  * Engine API Timings page
  * Displays CL-EL communication timing data for engine_newPayload and engine_getBlobs API calls
  */
 export function IndexPage(): JSX.Element {
-  // Time range state - default to last 1 hour
-  const [timeRange, setTimeRange] = useState<TimeRange>('1hour');
+  // Time range from URL search params
+  const navigate = useNavigate({ from: '/ethereum/execution/timings/' });
+  const { range } = useSearch({ from: '/ethereum/execution/timings/' });
+  const timeRange: TimeRange = range ?? DEFAULT_TIME_RANGE;
 
   // Reference nodes filter - default to true (only ethPandaOps controlled fleet)
   const [referenceNodesOnly, setReferenceNodesOnly] = useState(true);
@@ -96,23 +100,22 @@ export function IndexPage(): JSX.Element {
       />
 
       {/* Time Range Selector */}
-      <div className="mb-6 flex items-center gap-4">
-        <span className="text-sm font-medium text-muted">Time Range:</span>
-        <div className="flex gap-2">
-          {(Object.keys(TIME_RANGE_CONFIG) as TimeRange[]).map(range => (
-            <button
-              key={range}
-              onClick={() => setTimeRange(range)}
-              className={`rounded-xs px-3 py-1.5 text-sm font-medium transition-colors ${
-                timeRange === range
-                  ? 'bg-primary text-white'
-                  : 'bg-surface text-muted hover:bg-surface/80 hover:text-foreground'
-              }`}
-            >
-              {TIME_RANGE_CONFIG[range].label}
-            </button>
-          ))}
-        </div>
+      <div className="mb-6 flex flex-wrap items-center gap-1.5">
+        {(Object.keys(TIME_RANGE_CONFIG) as TimeRange[]).map(r => (
+          <button
+            key={r}
+            type="button"
+            onClick={() => navigate({ search: prev => ({ ...prev, range: r }), replace: true })}
+            className={clsx(
+              'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
+              timeRange === r
+                ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
+                : 'bg-surface text-muted ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
+            )}
+          >
+            {TIME_RANGE_CONFIG[r].label}
+          </button>
+        ))}
       </div>
 
       {/* Reference Node Info Dialog */}

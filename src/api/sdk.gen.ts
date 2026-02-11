@@ -405,6 +405,18 @@ import type {
   FctEngineNewPayloadDurationChunked50MsServiceListData,
   FctEngineNewPayloadDurationChunked50MsServiceListErrors,
   FctEngineNewPayloadDurationChunked50MsServiceListResponses,
+  FctEngineNewPayloadWinrateDailyServiceGetData,
+  FctEngineNewPayloadWinrateDailyServiceGetErrors,
+  FctEngineNewPayloadWinrateDailyServiceGetResponses,
+  FctEngineNewPayloadWinrateDailyServiceListData,
+  FctEngineNewPayloadWinrateDailyServiceListErrors,
+  FctEngineNewPayloadWinrateDailyServiceListResponses,
+  FctEngineNewPayloadWinrateHourlyServiceGetData,
+  FctEngineNewPayloadWinrateHourlyServiceGetErrors,
+  FctEngineNewPayloadWinrateHourlyServiceGetResponses,
+  FctEngineNewPayloadWinrateHourlyServiceListData,
+  FctEngineNewPayloadWinrateHourlyServiceListErrors,
+  FctEngineNewPayloadWinrateHourlyServiceListResponses,
   FctExecutionGasLimitDailyServiceGetData,
   FctExecutionGasLimitDailyServiceGetErrors,
   FctExecutionGasLimitDailyServiceGetResponses,
@@ -879,6 +891,12 @@ import type {
   IntEngineGetBlobsServiceListData,
   IntEngineGetBlobsServiceListErrors,
   IntEngineGetBlobsServiceListResponses,
+  IntEngineNewPayloadFastestServiceGetData,
+  IntEngineNewPayloadFastestServiceGetErrors,
+  IntEngineNewPayloadFastestServiceGetResponses,
+  IntEngineNewPayloadFastestServiceListData,
+  IntEngineNewPayloadFastestServiceListErrors,
+  IntEngineNewPayloadFastestServiceListResponses,
   IntEngineNewPayloadServiceGetData,
   IntEngineNewPayloadServiceGetErrors,
   IntEngineNewPayloadServiceGetResponses,
@@ -1299,6 +1317,14 @@ import {
   zFctEngineNewPayloadDurationChunked50MsServiceGetResponse,
   zFctEngineNewPayloadDurationChunked50MsServiceListData,
   zFctEngineNewPayloadDurationChunked50MsServiceListResponse,
+  zFctEngineNewPayloadWinrateDailyServiceGetData,
+  zFctEngineNewPayloadWinrateDailyServiceGetResponse,
+  zFctEngineNewPayloadWinrateDailyServiceListData,
+  zFctEngineNewPayloadWinrateDailyServiceListResponse,
+  zFctEngineNewPayloadWinrateHourlyServiceGetData,
+  zFctEngineNewPayloadWinrateHourlyServiceGetResponse,
+  zFctEngineNewPayloadWinrateHourlyServiceListData,
+  zFctEngineNewPayloadWinrateHourlyServiceListResponse,
   zFctExecutionGasLimitDailyServiceGetData,
   zFctExecutionGasLimitDailyServiceGetResponse,
   zFctExecutionGasLimitDailyServiceListData,
@@ -1615,6 +1641,10 @@ import {
   zIntEngineGetBlobsServiceGetResponse,
   zIntEngineGetBlobsServiceListData,
   zIntEngineGetBlobsServiceListResponse,
+  zIntEngineNewPayloadFastestServiceGetData,
+  zIntEngineNewPayloadFastestServiceGetResponse,
+  zIntEngineNewPayloadFastestServiceListData,
+  zIntEngineNewPayloadFastestServiceListResponse,
   zIntEngineNewPayloadServiceGetData,
   zIntEngineNewPayloadServiceGetResponse,
   zIntEngineNewPayloadServiceListData,
@@ -4253,6 +4283,82 @@ export const fctEngineNewPayloadDurationChunked50MsServiceGet = <ThrowOnError ex
     requestValidator: async data => await zFctEngineNewPayloadDurationChunked50MsServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctEngineNewPayloadDurationChunked50MsServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_duration_chunked_50ms/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineNewPayloadWinrateDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadWinrateDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadWinrateDailyServiceListResponses,
+    FctEngineNewPayloadWinrateDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadWinrateDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadWinrateDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_winrate_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadWinrateDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadWinrateDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadWinrateDailyServiceGetResponses,
+    FctEngineNewPayloadWinrateDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadWinrateDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadWinrateDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_winrate_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineNewPayloadWinrateHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadWinrateHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadWinrateHourlyServiceListResponses,
+    FctEngineNewPayloadWinrateHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadWinrateHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadWinrateHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_winrate_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineNewPayloadWinrateHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadWinrateHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadWinrateHourlyServiceGetResponses,
+    FctEngineNewPayloadWinrateHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadWinrateHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadWinrateHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_winrate_hourly/{hour_start_date_time}',
     ...options,
   });
 
@@ -7278,6 +7384,44 @@ export const intEngineNewPayloadServiceGet = <ThrowOnError extends boolean = fal
     requestValidator: async data => await zIntEngineNewPayloadServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntEngineNewPayloadServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_engine_new_payload/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intEngineNewPayloadFastestServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntEngineNewPayloadFastestServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntEngineNewPayloadFastestServiceListResponses,
+    IntEngineNewPayloadFastestServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntEngineNewPayloadFastestServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntEngineNewPayloadFastestServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_engine_new_payload_fastest',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intEngineNewPayloadFastestServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntEngineNewPayloadFastestServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntEngineNewPayloadFastestServiceGetResponses,
+    IntEngineNewPayloadFastestServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntEngineNewPayloadFastestServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntEngineNewPayloadFastestServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_engine_new_payload_fastest/{slot_start_date_time}',
     ...options,
   });
 

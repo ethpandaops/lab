@@ -100,7 +100,7 @@ export function truncateAddress(pubkey?: string, startChars = 6, endChars = 4): 
 /**
  * Known execution client names
  */
-const EXECUTION_CLIENTS = ['geth', 'nethermind', 'besu', 'erigon', 'reth'] as const;
+const EXECUTION_CLIENTS = ['geth', 'nethermind', 'besu', 'erigon', 'reth', 'ethrex'] as const;
 
 /**
  * Official brand colors for Ethereum execution clients
@@ -112,6 +112,7 @@ export const EXECUTION_CLIENT_COLORS: Record<string, string> = {
   geth: '#707d91',
   'go-ethereum': '#707d91',
   erigon: '#f5ad73',
+  ethrex: '#8b5cf6',
 };
 
 /**
