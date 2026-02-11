@@ -8,5 +8,8 @@ export { CallPage } from './CallPage';
 export { TIME_RANGE_CONFIG, TIME_PERIOD_OPTIONS } from './constants';
 export type { TimePeriod, ChartConfig } from './constants';
 
+// Simulate
+export { SimulatePage } from './SimulatePage';
+
 // Legacy export for backwards compatibility
 export { IndexPage } from './IndexPage';

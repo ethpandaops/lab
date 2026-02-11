@@ -1,5 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { CursorArrowRaysIcon, EnvelopeOpenIcon, UsersIcon } from '@heroicons/react/24/outline';
+import {
+  CursorArrowRaysIcon,
+  EnvelopeOpenIcon,
+  UsersIcon,
+  FireIcon,
+  BoltIcon,
+  ArrowsRightLeftIcon,
+  ExclamationTriangleIcon,
+} from '@heroicons/react/24/outline';
 import { Stats } from './Stats';
 
 const meta = {
@@ -10,7 +18,7 @@ const meta = {
   },
   decorators: [
     Story => (
-      <div className="rounded-lg bg-surface p-6">
+      <div className="min-w-[600px] rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -238,6 +246,91 @@ export const SingleStat: Story = {
           to: '/',
           label: 'View breakdown',
         },
+      },
+    ],
+  },
+};
+
+/** Enhanced style with iconColor, valueClassName, subtitle, and accentColor */
+export const EnhancedStyle: Story = {
+  args: {
+    gridClassName: 'grid grid-cols-2 gap-3 lg:grid-cols-4',
+    stats: [
+      {
+        id: 'gas-impact',
+        name: 'Gas Impact',
+        value: '+59.8%',
+        icon: FireIcon,
+        iconColor: '#ef4444',
+        valueClassName: 'text-red-500',
+        subtitle: '111.4M → 178.0M',
+        accentColor: '#ef44444D',
+      },
+      {
+        id: 'transactions',
+        name: 'Transactions',
+        value: '1,357',
+        icon: BoltIcon,
+        iconColor: '#3b82f6',
+        subtitle: 'across 5 blocks',
+        accentColor: '#3b82f633',
+      },
+      {
+        id: 'diverged',
+        name: 'Diverged',
+        value: '641',
+        icon: ArrowsRightLeftIcon,
+        iconColor: '#f59e0b',
+        valueClassName: 'text-amber-500',
+        subtitle: '47.2% of txs',
+        accentColor: '#f59e0b33',
+      },
+      {
+        id: 'status',
+        name: 'Status Changes',
+        value: '633',
+        icon: ExclamationTriangleIcon,
+        iconColor: '#ef4444',
+        valueClassName: 'text-red-500',
+        subtitle: 'transactions changed outcome',
+        accentColor: '#ef444433',
+      },
+    ],
+  },
+};
+
+/** Enhanced style with all-green healthy state */
+export const EnhancedHealthy: Story = {
+  args: {
+    gridClassName: 'grid grid-cols-3 gap-3',
+    stats: [
+      {
+        id: 'diverged',
+        name: 'Diverged',
+        value: '0',
+        icon: ArrowsRightLeftIcon,
+        iconColor: '#22c55e',
+        subtitle: '0% of txs',
+        accentColor: '#22c55e33',
+      },
+      {
+        id: 'status',
+        name: 'Status Changes',
+        value: '0',
+        icon: ExclamationTriangleIcon,
+        iconColor: '#22c55e',
+        subtitle: 'all outcomes preserved',
+        accentColor: '#22c55e33',
+      },
+      {
+        id: 'reverts',
+        name: 'Internal Reverts',
+        value: '-12',
+        icon: CursorArrowRaysIcon,
+        iconColor: '#22c55e',
+        valueClassName: 'text-green-500',
+        subtitle: '24 → 12 total',
+        accentColor: '#22c55e33',
       },
     ],
   },
