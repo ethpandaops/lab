@@ -25,12 +25,18 @@ import {
 } from '@/components/Charts/MultiLine';
 import { BarChart } from '@/components/Charts/Bar';
 import {
-  fctOpcodeOpsHourlyServiceListOptions,
-  fctOpcodeOpsDailyServiceListOptions,
-  fctOpcodeGasByOpcodeHourlyServiceListOptions,
-  fctOpcodeGasByOpcodeDailyServiceListOptions,
-} from '@/api/@tanstack/react-query.gen';
-import type { FctOpcodeOpsHourly, FctOpcodeOpsDaily } from '@/api/types.gen';
+  fctOpcodeOpsHourlyServiceList,
+  fctOpcodeOpsDailyServiceList,
+  fctOpcodeGasByOpcodeHourlyServiceList,
+  fctOpcodeGasByOpcodeDailyServiceList,
+} from '@/api/sdk.gen';
+import type {
+  FctOpcodeOpsHourly,
+  FctOpcodeOpsDaily,
+  FctOpcodeGasByOpcodeHourly,
+  FctOpcodeGasByOpcodeDaily,
+} from '@/api/types.gen';
+import { fetchAllPages } from '@/utils/api-pagination';
 import { useRecentBlocks } from './hooks/useRecentBlocks';
 import { useGasProfilerBounds } from './hooks/useGasProfilerBounds';
 import { GasProfilerSkeleton, OpcodeAnalysis } from './components';
@@ -216,70 +222,111 @@ export function HomePage(): JSX.Element {
     return now - config.days * 24 * 60 * 60;
   }, [config.days]);
 
-  // Opcode Ops Per Second Queries (real data)
+  // Opcode Ops Per Second Queries (real data) - with pagination
   const opcodeOpsHourlyQuery = useQuery({
-    ...fctOpcodeOpsHourlyServiceListOptions({
-      query: {
-        hour_start_date_time_gte: startTimestamp,
-        order_by: 'hour_start_date_time asc',
-        page_size: config.pageSize,
-      },
-    }),
+    queryKey: ['gas-profiler', 'opcode-ops-hourly', startTimestamp, config.pageSize],
+    queryFn: ({ signal }) =>
+      fetchAllPages<FctOpcodeOpsHourly>(
+        fctOpcodeOpsHourlyServiceList,
+        {
+          query: {
+            hour_start_date_time_gte: startTimestamp,
+            order_by: 'hour_start_date_time asc',
+            page_size: config.pageSize,
+          },
+        },
+        'fct_opcode_ops_hourly',
+        signal
+      ),
     enabled: !isDaily,
   });
 
   const opcodeOpsDailyQuery = useQuery({
-    ...fctOpcodeOpsDailyServiceListOptions({
-      query: {
-        day_start_date_like: '20%',
-        order_by: 'day_start_date desc',
-        page_size: config.pageSize,
-      },
-    }),
+    queryKey: ['gas-profiler', 'opcode-ops-daily', config.pageSize],
+    queryFn: ({ signal }) =>
+      fetchAllPages<FctOpcodeOpsDaily>(
+        fctOpcodeOpsDailyServiceList,
+        {
+          query: {
+            day_start_date_like: '20%',
+            order_by: 'day_start_date desc',
+            page_size: config.pageSize,
+          },
+        },
+        'fct_opcode_ops_daily',
+        signal
+      ),
     enabled: isDaily,
   });
 
-  // Top Opcodes by Gas Queries (real data)
+  // Top Opcodes by Gas Queries (real data) - with pagination
   const opcodeGasHourlyQuery = useQuery({
-    ...fctOpcodeGasByOpcodeHourlyServiceListOptions({
-      query: {
-        hour_start_date_time_gte: startTimestamp,
-        order_by: 'total_gas desc',
-        page_size: 1000, // Get all opcodes for aggregation
-      },
-    }),
+    queryKey: ['gas-profiler', 'opcode-gas-hourly', startTimestamp],
+    queryFn: ({ signal }) =>
+      fetchAllPages<FctOpcodeGasByOpcodeHourly>(
+        fctOpcodeGasByOpcodeHourlyServiceList,
+        {
+          query: {
+            hour_start_date_time_gte: startTimestamp,
+            order_by: 'total_gas desc',
+            page_size: 10000,
+          },
+        },
+        'fct_opcode_gas_by_opcode_hourly',
+        signal
+      ),
     enabled: !isDaily,
   });
 
   const opcodeGasDailyQuery = useQuery({
-    ...fctOpcodeGasByOpcodeDailyServiceListOptions({
-      query: {
-        day_start_date_like: '20%',
-        order_by: 'total_gas desc',
-        page_size: 1000, // Get all opcodes for aggregation
-      },
-    }),
+    queryKey: ['gas-profiler', 'opcode-gas-daily'],
+    queryFn: ({ signal }) =>
+      fetchAllPages<FctOpcodeGasByOpcodeDaily>(
+        fctOpcodeGasByOpcodeDailyServiceList,
+        {
+          query: {
+            day_start_date_like: '20%',
+            order_by: 'total_gas desc',
+            page_size: 10000,
+          },
+        },
+        'fct_opcode_gas_by_opcode_daily',
+        signal
+      ),
     enabled: isDaily,
   });
 
-  // Opcode ops records
-  const opcodeOpsRecords = useMemo(
-    () =>
-      isDaily
-        ? [...(opcodeOpsDailyQuery.data?.fct_opcode_ops_daily ?? [])].reverse()
-        : opcodeOpsHourlyQuery.data?.fct_opcode_ops_hourly,
-    [isDaily, opcodeOpsDailyQuery.data, opcodeOpsHourlyQuery.data]
-  );
+  // Opcode ops records (fetchAllPages returns array directly)
+  // Filter by time period for daily data
+  const opcodeOpsRecords = useMemo(() => {
+    if (isDaily) {
+      const allRecords = [...(opcodeOpsDailyQuery.data ?? [])].reverse();
+      if (config.days === null) return allRecords; // 'all' - no filtering
+      // Filter to last N days
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - config.days);
+      const cutoffStr = cutoffDate.toISOString().split('T')[0]; // YYYY-MM-DD
+      return allRecords.filter(r => (r.day_start_date ?? '') >= cutoffStr);
+    }
+    return opcodeOpsHourlyQuery.data;
+  }, [isDaily, opcodeOpsDailyQuery.data, opcodeOpsHourlyQuery.data, config.days]);
 
-  // Aggregate opcodes for OpcodeAnalysis component
+  // Aggregate opcodes for OpcodeAnalysis component (fetchAllPages returns array directly)
+  // Filter by time period for daily data
   const opcodeStats = useMemo(() => {
-    const records = isDaily
-      ? opcodeGasDailyQuery.data?.fct_opcode_gas_by_opcode_daily
-      : opcodeGasHourlyQuery.data?.fct_opcode_gas_by_opcode_hourly;
+    let records = isDaily ? opcodeGasDailyQuery.data : opcodeGasHourlyQuery.data;
 
     if (!records?.length) return [];
 
-    // Aggregate gas by opcode across all time periods
+    // Filter daily records by time period
+    if (isDaily && config.days !== null) {
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - config.days);
+      const cutoffStr = cutoffDate.toISOString().split('T')[0];
+      records = records.filter(r => ((r as FctOpcodeGasByOpcodeDaily).day_start_date ?? '') >= cutoffStr);
+    }
+
+    // Aggregate gas by opcode across the filtered time period
     const opcodeMap = new Map<string, { totalGas: number; totalCount: number }>();
     for (const r of records) {
       if (!r.opcode) continue;
@@ -298,15 +345,22 @@ export function HomePage(): JSX.Element {
         count: data.totalCount,
       }))
       .sort((a, b) => b.totalGas - a.totalGas);
-  }, [isDaily, opcodeGasDailyQuery.data, opcodeGasHourlyQuery.data]);
+  }, [isDaily, opcodeGasDailyQuery.data, opcodeGasHourlyQuery.data, config.days]);
 
   // Aggregate gas by category across the time period (top 8 + Other for bar chart)
+  // Filter by time period for daily data
   const gasByCategoryData = useMemo(() => {
-    const records = isDaily
-      ? opcodeGasDailyQuery.data?.fct_opcode_gas_by_opcode_daily
-      : opcodeGasHourlyQuery.data?.fct_opcode_gas_by_opcode_hourly;
+    let records = isDaily ? opcodeGasDailyQuery.data : opcodeGasHourlyQuery.data;
 
     if (!records?.length) return { labels: [], data: [], total: 0 };
+
+    // Filter daily records by time period
+    if (isDaily && config.days !== null) {
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - config.days);
+      const cutoffStr = cutoffDate.toISOString().split('T')[0];
+      records = records.filter(r => ((r as FctOpcodeGasByOpcodeDaily).day_start_date ?? '') >= cutoffStr);
+    }
 
     // Aggregate gas by category
     const categoryMap = new Map<string, number>();
@@ -338,7 +392,7 @@ export function HomePage(): JSX.Element {
       })),
       total,
     };
-  }, [isDaily, opcodeGasDailyQuery.data, opcodeGasHourlyQuery.data]);
+  }, [isDaily, opcodeGasDailyQuery.data, opcodeGasHourlyQuery.data, config.days]);
 
   // Navigate to older/newer blocks
   const handleLoadOlderBlocks = useCallback(() => {

@@ -1,16 +1,18 @@
 import type { SeriesData } from '@/components/Charts/MultiLine';
 
 /** Available time period options for chart display */
-export type TimePeriod = '7d' | '30d' | '90d' | '180d' | '1y' | '2y' | 'all';
+export type TimePeriod = '24h' | '72h' | '7d' | '30d' | '90d' | '180d' | '1y' | '2y' | 'all';
 
 /** Configuration for each time range option */
 export const TIME_RANGE_CONFIG = {
-  '7d': { days: 7, dataType: 'hourly' as const, pageSize: 168 },
-  '30d': { days: 30, dataType: 'hourly' as const, pageSize: 720 },
-  '90d': { days: 90, dataType: 'hourly' as const, pageSize: 2160 },
-  '180d': { days: 180, dataType: 'daily' as const, pageSize: 180 },
-  '1y': { days: 365, dataType: 'daily' as const, pageSize: 365 },
-  '2y': { days: 730, dataType: 'daily' as const, pageSize: 730 },
+  '24h': { days: 1, dataType: 'hourly' as const, pageSize: 10000 },
+  '72h': { days: 3, dataType: 'hourly' as const, pageSize: 10000 },
+  '7d': { days: 7, dataType: 'daily' as const, pageSize: 10000 },
+  '30d': { days: 30, dataType: 'daily' as const, pageSize: 10000 },
+  '90d': { days: 90, dataType: 'daily' as const, pageSize: 10000 },
+  '180d': { days: 180, dataType: 'daily' as const, pageSize: 10000 },
+  '1y': { days: 365, dataType: 'daily' as const, pageSize: 10000 },
+  '2y': { days: 730, dataType: 'daily' as const, pageSize: 10000 },
   all: { days: null, dataType: 'daily' as const, pageSize: 10000 },
 } as const;
 
@@ -22,6 +24,9 @@ export interface ChartConfig {
 
 /** Time period selector options for UI rendering */
 export const TIME_PERIOD_OPTIONS = [
+  // TODO: Enable when hourly data is current
+  // { value: '24h' as const, label: '24h' },
+  // { value: '72h' as const, label: '72h' },
   { value: '7d' as const, label: '7d' },
   { value: '30d' as const, label: '30d' },
   // TODO: Enable when data is available
