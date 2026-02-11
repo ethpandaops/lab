@@ -3,12 +3,15 @@
 ## Commands
 
 ```bash
-pnpm dev
+pnpm dev                    # Dev server proxying to local backend (localhost:8080)
+BACKEND=production pnpm dev # Dev server proxying to production (lab.ethpandaops.io)
 pnpm lint
 pnpm test
 pnpm build
 pnpm storybook
 ```
+
+The `BACKEND` env var controls the API proxy target. Values: `local` (default), `production`, or any custom URL.
 
 ## Libraries
 

@@ -6,6 +6,14 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import path from 'path';
 import { generateHeadPlugin } from './vite-plugins/generate-head-plugin';
 
+const BACKENDS: Record<string, string> = {
+  local: 'http://localhost:8080',
+  production: 'https://lab.ethpandaops.io:443',
+};
+
+const backendKey = process.env.BACKEND ?? 'local';
+const backendTarget = BACKENDS[backendKey] ?? backendKey;
+
 // https://vite.dev/config/
 export default defineConfig({
   base: '/',
@@ -33,9 +41,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: backendTarget,
         changeOrigin: true,
-        secure: false,
+        secure: backendTarget.startsWith('https'),
       },
     },
   },
