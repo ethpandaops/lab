@@ -7,6 +7,7 @@ import {
   fctEngineGetBlobsByElClientServiceList,
   fctEngineGetBlobsByElClientHourlyServiceList,
   fctEngineGetBlobsDurationChunked50MsServiceList,
+  fctEngineNewPayloadWinrateHourlyServiceList,
 } from '@/api/sdk.gen';
 import type {
   FctEngineNewPayloadByElClient,
@@ -15,6 +16,7 @@ import type {
   FctEngineGetBlobsByElClient,
   FctEngineGetBlobsByElClientHourly,
   FctEngineGetBlobsDurationChunked50Ms,
+  FctEngineNewPayloadWinrateHourly,
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
@@ -38,6 +40,9 @@ export interface EngineTimingsData {
 
   // getBlobs duration histogram
   getBlobsDurationHistogram: FctEngineGetBlobsDurationChunked50Ms[];
+
+  // newPayload winrate (hourly)
+  winrateHourly: FctEngineNewPayloadWinrateHourly[];
 }
 
 export type ActiveTab = 'newPayload' | 'getBlobs';
@@ -233,6 +238,25 @@ export function useEngineTimingsData({
           ),
         enabled: !!currentNetwork && fetchBlobs && fetchPerSlotData,
       },
+      // newPayload winrate (hourly) - which EL client had fastest newPayload per slot
+      {
+        queryKey: ['engine-timings', 'winrate-hourly', hourlyStart, hourlyEnd],
+        queryFn: ({ signal }) =>
+          fetchAllPages<FctEngineNewPayloadWinrateHourly>(
+            fctEngineNewPayloadWinrateHourlyServiceList,
+            {
+              query: {
+                hour_start_date_time_gte: hourlyStart,
+                hour_start_date_time_lt: hourlyEnd,
+                order_by: 'hour_start_date_time ASC',
+                page_size: 10000,
+              },
+            },
+            'fct_engine_new_payload_winrate_hourly',
+            signal
+          ),
+        enabled: !!currentNetwork,
+      },
     ],
   });
 
@@ -244,17 +268,19 @@ export function useEngineTimingsData({
     getBlobsByElClientQuery,
     getBlobsByElClientHourlyQuery,
     getBlobsDurationHistogramQuery,
+    winrateHourlyQuery,
   ] = queries;
 
   // Check loading state for newPayload queries (first 3)
   const newPayloadQueries = queries.slice(0, 3);
-  const blobQueries = queries.slice(3);
+  const blobQueries = queries.slice(3, 6);
 
   const isLoading = newPayloadQueries.some(q => q.isLoading);
   const isLoadingBlobs = blobQueries.some(q => q.isLoading);
 
-  // Check for errors
-  const error = queries.find(q => q.error)?.error as Error | null;
+  // Check for errors (only core queries - winrate is supplementary and shouldn't break the page)
+  const coreQueries = [...newPayloadQueries, ...blobQueries];
+  const error = coreQueries.find(q => q.error)?.error as Error | null;
 
   // Build data object if newPayload is not loading and no errors
   const data: EngineTimingsData | null =
@@ -266,6 +292,7 @@ export function useEngineTimingsData({
           getBlobsByElClient: getBlobsByElClientQuery.data ?? [],
           getBlobsByElClientHourly: getBlobsByElClientHourlyQuery.data ?? [],
           getBlobsDurationHistogram: getBlobsDurationHistogramQuery.data ?? [],
+          winrateHourly: winrateHourlyQuery.data ?? [],
         }
       : null;
 

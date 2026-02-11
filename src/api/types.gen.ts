@@ -3445,6 +3445,44 @@ export type FctEngineNewPayloadDurationChunked50Ms = {
   valid_count?: number;
 };
 
+export type FctEngineNewPayloadWinrateDaily = {
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Execution client implementation name (e.g., Reth, Nethermind, Besu)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Number of slots where this client had the fastest engine_newPayload duration
+   */
+  win_count?: number;
+};
+
+export type FctEngineNewPayloadWinrateHourly = {
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Execution client implementation name (e.g., Reth, Nethermind, Besu)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Number of slots where this client had the fastest engine_newPayload duration
+   */
+  win_count?: number;
+};
+
 export type FctExecutionGasLimitDaily = {
   /**
    * Average gas limit per block
@@ -5940,6 +5978,20 @@ export type GetFctEngineNewPayloadBySlotResponse = {
  */
 export type GetFctEngineNewPayloadDurationChunked50MsResponse = {
   item?: FctEngineNewPayloadDurationChunked50Ms;
+};
+
+/**
+ * Response for getting a single fct_engine_new_payload_winrate_daily record
+ */
+export type GetFctEngineNewPayloadWinrateDailyResponse = {
+  item?: FctEngineNewPayloadWinrateDaily;
+};
+
+/**
+ * Response for getting a single fct_engine_new_payload_winrate_hourly record
+ */
+export type GetFctEngineNewPayloadWinrateHourlyResponse = {
+  item?: FctEngineNewPayloadWinrateHourly;
 };
 
 /**
@@ -10047,6 +10099,34 @@ export type ListFctEngineNewPayloadDurationChunked50MsResponse = {
    * The list of fct_engine_new_payload_duration_chunked_50ms.
    */
   fct_engine_new_payload_duration_chunked_50ms?: Array<FctEngineNewPayloadDurationChunked50Ms>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_new_payload_winrate_daily records
+ */
+export type ListFctEngineNewPayloadWinrateDailyResponse = {
+  /**
+   * The list of fct_engine_new_payload_winrate_daily.
+   */
+  fct_engine_new_payload_winrate_daily?: Array<FctEngineNewPayloadWinrateDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_new_payload_winrate_hourly records
+ */
+export type ListFctEngineNewPayloadWinrateHourlyResponse = {
+  /**
+   * The list of fct_engine_new_payload_winrate_hourly.
+   */
+  fct_engine_new_payload_winrate_hourly?: Array<FctEngineNewPayloadWinrateHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -44666,6 +44746,458 @@ export type FctEngineNewPayloadDurationChunked50MsServiceGetResponses = {
 
 export type FctEngineNewPayloadDurationChunked50MsServiceGetResponse =
   FctEngineNewPayloadDurationChunked50MsServiceGetResponses[keyof FctEngineNewPayloadDurationChunked50MsServiceGetResponses];
+
+export type FctEngineNewPayloadWinrateDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: eq)
+     */
+    win_count_eq?: number;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: ne)
+     */
+    win_count_ne?: number;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: lt)
+     */
+    win_count_lt?: number;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: lte)
+     */
+    win_count_lte?: number;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: gt)
+     */
+    win_count_gt?: number;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: gte)
+     */
+    win_count_gte?: number;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: between_min)
+     */
+    win_count_between_min?: number;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: between_max_value)
+     */
+    win_count_between_max_value?: number;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: in_values) (comma-separated list)
+     */
+    win_count_in_values?: string;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: not_in_values) (comma-separated list)
+     */
+    win_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_engine_new_payload_winrate_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadWinrateDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_winrate_daily';
+};
+
+export type FctEngineNewPayloadWinrateDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadWinrateDailyServiceListError =
+  FctEngineNewPayloadWinrateDailyServiceListErrors[keyof FctEngineNewPayloadWinrateDailyServiceListErrors];
+
+export type FctEngineNewPayloadWinrateDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadWinrateDailyResponse;
+};
+
+export type FctEngineNewPayloadWinrateDailyServiceListResponse =
+  FctEngineNewPayloadWinrateDailyServiceListResponses[keyof FctEngineNewPayloadWinrateDailyServiceListResponses];
+
+export type FctEngineNewPayloadWinrateDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_winrate_daily/{day_start_date}';
+};
+
+export type FctEngineNewPayloadWinrateDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadWinrateDailyServiceGetError =
+  FctEngineNewPayloadWinrateDailyServiceGetErrors[keyof FctEngineNewPayloadWinrateDailyServiceGetErrors];
+
+export type FctEngineNewPayloadWinrateDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadWinrateDailyResponse;
+};
+
+export type FctEngineNewPayloadWinrateDailyServiceGetResponse =
+  FctEngineNewPayloadWinrateDailyServiceGetResponses[keyof FctEngineNewPayloadWinrateDailyServiceGetResponses];
+
+export type FctEngineNewPayloadWinrateHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Reth, Nethermind, Besu) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: eq)
+     */
+    win_count_eq?: number;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: ne)
+     */
+    win_count_ne?: number;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: lt)
+     */
+    win_count_lt?: number;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: lte)
+     */
+    win_count_lte?: number;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: gt)
+     */
+    win_count_gt?: number;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: gte)
+     */
+    win_count_gte?: number;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: between_min)
+     */
+    win_count_between_min?: number;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: between_max_value)
+     */
+    win_count_between_max_value?: number;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: in_values) (comma-separated list)
+     */
+    win_count_in_values?: string;
+    /**
+     * Number of slots where this client had the fastest engine_newPayload duration (filter: not_in_values) (comma-separated list)
+     */
+    win_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_engine_new_payload_winrate_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadWinrateHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_winrate_hourly';
+};
+
+export type FctEngineNewPayloadWinrateHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadWinrateHourlyServiceListError =
+  FctEngineNewPayloadWinrateHourlyServiceListErrors[keyof FctEngineNewPayloadWinrateHourlyServiceListErrors];
+
+export type FctEngineNewPayloadWinrateHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadWinrateHourlyResponse;
+};
+
+export type FctEngineNewPayloadWinrateHourlyServiceListResponse =
+  FctEngineNewPayloadWinrateHourlyServiceListResponses[keyof FctEngineNewPayloadWinrateHourlyServiceListResponses];
+
+export type FctEngineNewPayloadWinrateHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_winrate_hourly/{hour_start_date_time}';
+};
+
+export type FctEngineNewPayloadWinrateHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadWinrateHourlyServiceGetError =
+  FctEngineNewPayloadWinrateHourlyServiceGetErrors[keyof FctEngineNewPayloadWinrateHourlyServiceGetErrors];
+
+export type FctEngineNewPayloadWinrateHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadWinrateHourlyResponse;
+};
+
+export type FctEngineNewPayloadWinrateHourlyServiceGetResponse =
+  FctEngineNewPayloadWinrateHourlyServiceGetResponses[keyof FctEngineNewPayloadWinrateHourlyServiceGetResponses];
 
 export type FctExecutionGasLimitDailyServiceListData = {
   body?: never;

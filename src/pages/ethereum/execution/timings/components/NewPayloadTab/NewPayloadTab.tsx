@@ -1,14 +1,16 @@
 import type { JSX } from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
 import { EIP7870SpecsBanner } from '@/components/Ethereum/EIP7870SpecsBanner';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
+import type { SeriesData } from '@/components/Charts/MultiLine';
 import { BarChart } from '@/components/Charts/Bar';
 import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot, getExecutionClientColor } from '@/utils';
+import type { FctEngineNewPayloadWinrateHourly } from '@/api/types.gen';
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
 import { PER_SLOT_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
 import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
@@ -23,7 +25,7 @@ export interface NewPayloadTabProps {
  */
 export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Element {
   const themeColors = useThemeColors();
-  const { newPayloadDurationHistogram, newPayloadByElClient, newPayloadByElClientHourly } = data;
+  const { newPayloadDurationHistogram, newPayloadByElClient, newPayloadByElClientHourly, winrateHourly } = data;
 
   // Check if we should show per-slot charts (only for short time ranges)
   const showPerSlotCharts = PER_SLOT_CHART_RANGES.includes(timeRange);
@@ -748,6 +750,176 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
           </Card>
         </div>
       )}
+
+      {/* Winrate Section */}
+      <WinrateSection records={winrateHourly} timeRange={timeRange} />
     </div>
+  );
+}
+
+/** Standings entry for the podium */
+interface WinrateStanding {
+  implementation: string;
+  totalWins: number;
+  winRate: number;
+  color: string;
+}
+
+/** Winrate chart + podium for engine_newPayload fastest client per slot */
+function WinrateSection({
+  records,
+  timeRange,
+}: {
+  records: FctEngineNewPayloadWinrateHourly[];
+  timeRange: TimeRange;
+}): JSX.Element | null {
+  const { chartConfig, standings } = useMemo(() => {
+    if (!records.length) return { chartConfig: null, standings: [] };
+
+    // Group by hour and implementation
+    const byHourAndImpl = new Map<number, Map<string, number>>();
+    const allImpls = new Set<string>();
+
+    for (const r of records) {
+      const hour = r.hour_start_date_time ?? 0;
+      const impl = r.meta_execution_implementation ?? '';
+      const count = r.win_count ?? 0;
+      if (!impl || !hour) continue;
+
+      allImpls.add(impl);
+      if (!byHourAndImpl.has(hour)) byHourAndImpl.set(hour, new Map());
+      byHourAndImpl.get(hour)!.set(impl, count);
+    }
+
+    const sortedHours = [...byHourAndImpl.keys()].sort((a, b) => a - b);
+    if (!sortedHours.length) return { chartConfig: null, standings: [] };
+
+    // Compute totals per hour for percentage calculation
+    const totalsByHour = new Map<number, number>();
+    for (const hour of sortedHours) {
+      const implMap = byHourAndImpl.get(hour)!;
+      let total = 0;
+      for (const count of implMap.values()) total += count;
+      totalsByHour.set(hour, total);
+    }
+
+    // Labels
+    const labels = sortedHours.map(ts => {
+      const date = new Date(ts * 1000);
+      if (timeRange === '7days') {
+        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      }
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    });
+
+    // Stacked bar series (percentages)
+    const sortedImpls = [...allImpls].sort();
+    const series: SeriesData[] = sortedImpls.map((impl, i) => ({
+      name: impl,
+      data: sortedHours.map(hour => {
+        const count = byHourAndImpl.get(hour)?.get(impl) ?? 0;
+        const total = totalsByHour.get(hour) ?? 0;
+        return total > 0 ? Number(((count / total) * 100).toFixed(2)) : null;
+      }),
+      color: getExecutionClientColor(impl, i),
+      seriesType: 'bar' as const,
+      stack: 'winrate',
+    }));
+
+    // Standings
+    const totalsByImpl = new Map<string, number>();
+    for (const r of records) {
+      const impl = r.meta_execution_implementation ?? '';
+      if (!impl) continue;
+      totalsByImpl.set(impl, (totalsByImpl.get(impl) ?? 0) + (r.win_count ?? 0));
+    }
+    const grandTotal = [...totalsByImpl.values()].reduce((s, c) => s + c, 0);
+
+    const standingsResult: WinrateStanding[] = [...totalsByImpl.entries()]
+      .map(([impl, wins], i) => ({
+        implementation: impl,
+        totalWins: wins,
+        winRate: grandTotal > 0 ? Number(((wins / grandTotal) * 100).toFixed(1)) : 0,
+        color: getExecutionClientColor(impl, i),
+      }))
+      .sort((a, b) => b.totalWins - a.totalWins);
+
+    return { chartConfig: { labels, series }, standings: standingsResult };
+  }, [records, timeRange]);
+
+  if (!chartConfig) return null;
+
+  const totalSlots = standings.reduce((s, st) => s + st.totalWins, 0);
+
+  const positionStyles = [
+    'text-amber-400', // gold
+    'text-neutral-400', // silver
+    'text-amber-700', // bronze
+  ];
+
+  return (
+    <Card>
+      <div className="p-4">
+        <h4 className="mb-2 text-base font-semibold text-foreground">Execution Winrate</h4>
+        <p className="mb-4 text-sm text-muted">Which execution client had the fastest engine_newPayload per slot</p>
+
+        <div className="flex flex-col gap-6 lg:flex-row">
+          <div className="min-w-0 flex-1">
+            <MultiLineChart
+              series={chartConfig.series}
+              xAxis={{ type: 'category', labels: chartConfig.labels, name: 'Time' }}
+              yAxis={{ name: 'Win Rate (%)', min: 0, max: 100 }}
+              height={300}
+              showLegend
+              enableDataZoom
+            />
+          </div>
+
+          {/* Podium */}
+          <div className="w-full shrink-0 lg:w-56">
+            <div className="mb-3 text-[10px] font-semibold tracking-wider text-muted/60 uppercase">
+              Overall Standings
+            </div>
+
+            <div className="flex flex-col gap-2">
+              {standings.map((standing, i) => (
+                <div
+                  key={standing.implementation}
+                  className={clsx(
+                    'flex items-center gap-3 rounded-sm px-3 py-2',
+                    i < 3 ? 'bg-surface ring-1 ring-border' : 'bg-surface/50'
+                  )}
+                >
+                  <span
+                    className={clsx(
+                      'w-5 text-center text-sm font-bold tabular-nums',
+                      positionStyles[i] ?? 'text-muted'
+                    )}
+                  >
+                    {i + 1}
+                  </span>
+                  <div className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: standing.color }} />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-medium text-foreground">{standing.implementation}</div>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <div className="text-sm font-semibold text-foreground tabular-nums">{standing.winRate}%</div>
+                    <div className="text-[10px] text-muted tabular-nums">
+                      {standing.totalWins.toLocaleString()} wins
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {totalSlots > 0 && (
+              <div className="mt-3 text-center text-[10px] text-muted/60">
+                Based on {totalSlots.toLocaleString()} slots
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </Card>
   );
 }
