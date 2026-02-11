@@ -265,6 +265,41 @@ export const GAS_PARAMETER_GROUPS: GasParameterGroup[] = [
       { key: 'KECCAK256_WORD', label: 'KECCAK256 Word', min: 0, max: 50, step: 1 },
     ],
   },
+  {
+    name: 'Precompiles (Fixed)',
+    color: '#10b981', // emerald
+    parameters: [
+      { key: 'PC_ECREC', label: 'ECRECOVER', min: 0, max: 20000, step: 100 },
+      { key: 'PC_BN254_ADD', label: 'BN254 Add', min: 0, max: 2000, step: 10 },
+      { key: 'PC_BN254_MUL', label: 'BN254 Mul', min: 0, max: 30000, step: 500 },
+      { key: 'PC_BLS12_G1ADD', label: 'BLS12 G1Add', min: 0, max: 5000, step: 25 },
+      { key: 'PC_BLS12_G2ADD', label: 'BLS12 G2Add', min: 0, max: 5000, step: 25 },
+      { key: 'PC_BLS12_MAP_FP_TO_G1', label: 'BLS12 MapFpToG1', min: 0, max: 30000, step: 500 },
+      { key: 'PC_BLS12_MAP_FP2_TO_G2', label: 'BLS12 MapFp2ToG2', min: 0, max: 100000, step: 1000 },
+      { key: 'PC_KZG_POINT_EVALUATION', label: 'KZG Point Eval', min: 0, max: 250000, step: 5000 },
+      { key: 'PC_P256VERIFY', label: 'P256 Verify', min: 0, max: 20000, step: 100 },
+    ],
+  },
+  {
+    name: 'Precompiles (Variable)',
+    color: '#059669', // emerald-600
+    parameters: [
+      { key: 'PC_SHA256_BASE', label: 'SHA256 Base', min: 0, max: 500, step: 5 },
+      { key: 'PC_SHA256_PER_WORD', label: 'SHA256 /Word', min: 0, max: 100, step: 1 },
+      { key: 'PC_RIPEMD160_BASE', label: 'RIPEMD160 Base', min: 0, max: 3000, step: 50 },
+      { key: 'PC_RIPEMD160_PER_WORD', label: 'RIPEMD160 /Word', min: 0, max: 500, step: 10 },
+      { key: 'PC_ID_BASE', label: 'Identity Base', min: 0, max: 100, step: 1 },
+      { key: 'PC_ID_PER_WORD', label: 'Identity /Word', min: 0, max: 50, step: 1 },
+      { key: 'PC_MODEXP_MIN_GAS', label: 'MODEXP Min Gas', min: 0, max: 2000, step: 10 },
+      { key: 'PC_BN254_PAIRING_BASE', label: 'BN254 Pairing Base', min: 0, max: 200000, step: 5000 },
+      { key: 'PC_BN254_PAIRING_PER_PAIR', label: 'BN254 Pairing /Pair', min: 0, max: 200000, step: 1000 },
+      { key: 'PC_BLAKE2F_PER_ROUND', label: 'BLAKE2F /Round', min: 0, max: 20, step: 1 },
+      { key: 'PC_BLS12_PAIRING_CHECK_BASE', label: 'BLS12 Pairing Base', min: 0, max: 200000, step: 5000 },
+      { key: 'PC_BLS12_PAIRING_CHECK_PER_PAIR', label: 'BLS12 Pairing /Pair', min: 0, max: 200000, step: 1000 },
+      { key: 'PC_BLS12_G1MSM_MUL_GAS', label: 'BLS12 G1MSM /Point', min: 0, max: 50000, step: 1000 },
+      { key: 'PC_BLS12_G2MSM_MUL_GAS', label: 'BLS12 G2MSM /Point', min: 0, max: 100000, step: 1000 },
+    ],
+  },
   // NOTE: Intrinsic gas (TX_BASE, TX_CREATE, TX_DATA_ZERO, TX_DATA_NONZERO) cannot be
   // customized - it's calculated at the protocol level before EVM execution begins.
 ];

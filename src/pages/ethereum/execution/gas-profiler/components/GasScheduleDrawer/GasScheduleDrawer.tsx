@@ -26,6 +26,8 @@ const CATEGORY_ORDER = [
   'Swap',
   'Memory',
   'Misc',
+  'Precompiles (Fixed)',
+  'Precompiles (Variable)',
   'Other',
 ];
 
@@ -476,10 +478,16 @@ export function GasScheduleDrawer({
                                           'truncate font-mono text-xs',
                                           isModified ? 'font-semibold text-primary' : 'text-foreground'
                                         )}
+                                        title={key}
                                       >
-                                        {key}
+                                        {key.startsWith('PC_') ? key.slice(3) : key}
                                       </span>
-                                      {param.description && <InfoTooltip title={key} description={param.description} />}
+                                      {param.description && (
+                                        <InfoTooltip
+                                          title={key.startsWith('PC_') ? key.slice(3) : key}
+                                          description={param.description}
+                                        />
+                                      )}
                                     </div>
 
                                     {/* Number Input */}
