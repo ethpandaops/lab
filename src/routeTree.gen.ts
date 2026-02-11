@@ -32,6 +32,7 @@ import { Route as EthereumEpochsRouteImport } from './routes/ethereum/epochs'
 import { Route as EthereumEntitiesRouteImport } from './routes/ethereum/entities'
 import { Route as EthereumDataAvailabilityRouteImport } from './routes/ethereum/data-availability'
 import { Route as EthereumContractsRouteImport } from './routes/ethereum/contracts'
+import { Route as EthereumConsensusRouteImport } from './routes/ethereum/consensus'
 import { Route as BeaconLocallyBuiltBlocksRouteImport } from './routes/beacon/locally-built-blocks'
 import { Route as XatuContributorsIndexRouteImport } from './routes/xatu/contributors/index'
 import { Route as EthereumValidatorsIndexRouteImport } from './routes/ethereum/validators/index'
@@ -55,6 +56,7 @@ import { Route as EthereumEntitiesEntityRouteImport } from './routes/ethereum/en
 import { Route as EthereumDataAvailabilityProbesRouteImport } from './routes/ethereum/data-availability/probes'
 import { Route as EthereumDataAvailabilityCustodyRouteImport } from './routes/ethereum/data-availability/custody'
 import { Route as EthereumContractsAddressRouteImport } from './routes/ethereum/contracts/$address'
+import { Route as EthereumConsensusOverviewRouteImport } from './routes/ethereum/consensus/overview'
 import { Route as BeaconSlotLiveRouteImport } from './routes/beacon/slot/live'
 import { Route as BeaconBlockProductionLiveRouteImport } from './routes/beacon/block-production/live'
 import { Route as EthereumExecutionTimingsIndexRouteImport } from './routes/ethereum/execution/timings/index'
@@ -186,6 +188,11 @@ const EthereumContractsRoute = EthereumContractsRouteImport.update({
   path: '/contracts',
   getParentRoute: () => EthereumRoute,
 } as any)
+const EthereumConsensusRoute = EthereumConsensusRouteImport.update({
+  id: '/consensus',
+  path: '/consensus',
+  getParentRoute: () => EthereumRoute,
+} as any)
 const BeaconLocallyBuiltBlocksRoute =
   BeaconLocallyBuiltBlocksRouteImport.update({
     id: '/beacon/locally-built-blocks',
@@ -312,6 +319,12 @@ const EthereumContractsAddressRoute =
     path: '/$address',
     getParentRoute: () => EthereumContractsRoute,
   } as any)
+const EthereumConsensusOverviewRoute =
+  EthereumConsensusOverviewRouteImport.update({
+    id: '/overview',
+    path: '/overview',
+    getParentRoute: () => EthereumConsensusRoute,
+  } as any)
 const BeaconSlotLiveRoute = BeaconSlotLiveRouteImport.update({
   id: '/beacon/slot/live',
   path: '/beacon/slot/live',
@@ -384,6 +397,7 @@ export interface FileRoutesByFullPath {
   '/experiments': typeof ExperimentsRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
   '/beacon/locally-built-blocks': typeof BeaconLocallyBuiltBlocksRoute
+  '/ethereum/consensus': typeof EthereumConsensusRouteWithChildren
   '/ethereum/contracts': typeof EthereumContractsRouteWithChildren
   '/ethereum/data-availability': typeof EthereumDataAvailabilityRouteWithChildren
   '/ethereum/entities': typeof EthereumEntitiesRouteWithChildren
@@ -405,6 +419,7 @@ export interface FileRoutesByFullPath {
   '/xatu-data': typeof XatuDataIndexRoute
   '/beacon/block-production/live': typeof BeaconBlockProductionLiveRoute
   '/beacon/slot/live': typeof BeaconSlotLiveRoute
+  '/ethereum/consensus/overview': typeof EthereumConsensusOverviewRoute
   '/ethereum/contracts/$address': typeof EthereumContractsAddressRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyRouteWithChildren
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesRouteWithChildren
@@ -442,6 +457,7 @@ export interface FileRoutesByTo {
   '/ethereum': typeof EthereumRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
   '/beacon/locally-built-blocks': typeof BeaconLocallyBuiltBlocksRoute
+  '/ethereum/consensus': typeof EthereumConsensusRouteWithChildren
   '/ethereum/data-availability': typeof EthereumDataAvailabilityRouteWithChildren
   '/ethereum/execution': typeof EthereumExecutionRouteWithChildren
   '/ethereum/live': typeof EthereumLiveRoute
@@ -456,6 +472,7 @@ export interface FileRoutesByTo {
   '/xatu-data': typeof XatuDataIndexRoute
   '/beacon/block-production/live': typeof BeaconBlockProductionLiveRoute
   '/beacon/slot/live': typeof BeaconSlotLiveRoute
+  '/ethereum/consensus/overview': typeof EthereumConsensusOverviewRoute
   '/ethereum/contracts/$address': typeof EthereumContractsAddressRoute
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
@@ -490,6 +507,7 @@ export interface FileRoutesById {
   '/experiments': typeof ExperimentsRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
   '/beacon/locally-built-blocks': typeof BeaconLocallyBuiltBlocksRoute
+  '/ethereum/consensus': typeof EthereumConsensusRouteWithChildren
   '/ethereum/contracts': typeof EthereumContractsRouteWithChildren
   '/ethereum/data-availability': typeof EthereumDataAvailabilityRouteWithChildren
   '/ethereum/entities': typeof EthereumEntitiesRouteWithChildren
@@ -511,6 +529,7 @@ export interface FileRoutesById {
   '/xatu-data/': typeof XatuDataIndexRoute
   '/beacon/block-production/live': typeof BeaconBlockProductionLiveRoute
   '/beacon/slot/live': typeof BeaconSlotLiveRoute
+  '/ethereum/consensus/overview': typeof EthereumConsensusOverviewRoute
   '/ethereum/contracts/$address': typeof EthereumContractsAddressRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyRouteWithChildren
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesRouteWithChildren
@@ -551,6 +570,7 @@ export interface FileRouteTypes {
     | '/experiments'
     | '/xatu'
     | '/beacon/locally-built-blocks'
+    | '/ethereum/consensus'
     | '/ethereum/contracts'
     | '/ethereum/data-availability'
     | '/ethereum/entities'
@@ -572,6 +592,7 @@ export interface FileRouteTypes {
     | '/xatu-data'
     | '/beacon/block-production/live'
     | '/beacon/slot/live'
+    | '/ethereum/consensus/overview'
     | '/ethereum/contracts/$address'
     | '/ethereum/data-availability/custody'
     | '/ethereum/data-availability/probes'
@@ -609,6 +630,7 @@ export interface FileRouteTypes {
     | '/ethereum'
     | '/xatu'
     | '/beacon/locally-built-blocks'
+    | '/ethereum/consensus'
     | '/ethereum/data-availability'
     | '/ethereum/execution'
     | '/ethereum/live'
@@ -623,6 +645,7 @@ export interface FileRouteTypes {
     | '/xatu-data'
     | '/beacon/block-production/live'
     | '/beacon/slot/live'
+    | '/ethereum/consensus/overview'
     | '/ethereum/contracts/$address'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
@@ -656,6 +679,7 @@ export interface FileRouteTypes {
     | '/experiments'
     | '/xatu'
     | '/beacon/locally-built-blocks'
+    | '/ethereum/consensus'
     | '/ethereum/contracts'
     | '/ethereum/data-availability'
     | '/ethereum/entities'
@@ -677,6 +701,7 @@ export interface FileRouteTypes {
     | '/xatu-data/'
     | '/beacon/block-production/live'
     | '/beacon/slot/live'
+    | '/ethereum/consensus/overview'
     | '/ethereum/contracts/$address'
     | '/ethereum/data-availability/custody'
     | '/ethereum/data-availability/probes'
@@ -886,6 +911,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumContractsRouteImport
       parentRoute: typeof EthereumRoute
     }
+    '/ethereum/consensus': {
+      id: '/ethereum/consensus'
+      path: '/consensus'
+      fullPath: '/ethereum/consensus'
+      preLoaderRoute: typeof EthereumConsensusRouteImport
+      parentRoute: typeof EthereumRoute
+    }
     '/beacon/locally-built-blocks': {
       id: '/beacon/locally-built-blocks'
       path: '/beacon/locally-built-blocks'
@@ -1047,6 +1079,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumContractsAddressRouteImport
       parentRoute: typeof EthereumContractsRoute
     }
+    '/ethereum/consensus/overview': {
+      id: '/ethereum/consensus/overview'
+      path: '/overview'
+      fullPath: '/ethereum/consensus/overview'
+      preLoaderRoute: typeof EthereumConsensusOverviewRouteImport
+      parentRoute: typeof EthereumConsensusRoute
+    }
     '/beacon/slot/live': {
       id: '/beacon/slot/live'
       path: '/beacon/slot/live'
@@ -1126,6 +1165,17 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface EthereumConsensusRouteChildren {
+  EthereumConsensusOverviewRoute: typeof EthereumConsensusOverviewRoute
+}
+
+const EthereumConsensusRouteChildren: EthereumConsensusRouteChildren = {
+  EthereumConsensusOverviewRoute: EthereumConsensusOverviewRoute,
+}
+
+const EthereumConsensusRouteWithChildren =
+  EthereumConsensusRoute._addFileChildren(EthereumConsensusRouteChildren)
 
 interface EthereumContractsRouteChildren {
   EthereumContractsAddressRoute: typeof EthereumContractsAddressRoute
@@ -1334,6 +1384,7 @@ const EthereumValidatorsRouteWithChildren =
   EthereumValidatorsRoute._addFileChildren(EthereumValidatorsRouteChildren)
 
 interface EthereumRouteChildren {
+  EthereumConsensusRoute: typeof EthereumConsensusRouteWithChildren
   EthereumContractsRoute: typeof EthereumContractsRouteWithChildren
   EthereumDataAvailabilityRoute: typeof EthereumDataAvailabilityRouteWithChildren
   EthereumEntitiesRoute: typeof EthereumEntitiesRouteWithChildren
@@ -1346,6 +1397,7 @@ interface EthereumRouteChildren {
 }
 
 const EthereumRouteChildren: EthereumRouteChildren = {
+  EthereumConsensusRoute: EthereumConsensusRouteWithChildren,
   EthereumContractsRoute: EthereumContractsRouteWithChildren,
   EthereumDataAvailabilityRoute: EthereumDataAvailabilityRouteWithChildren,
   EthereumEntitiesRoute: EthereumEntitiesRouteWithChildren,

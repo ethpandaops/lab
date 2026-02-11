@@ -157,6 +157,7 @@ interface NavItem {
 }
 
 const ethereumConsensusPages: NavItem[] = [
+  { name: 'Overview', to: '/ethereum/consensus/overview', icon: PresentationChartLineIcon },
   { name: 'Live', to: '/ethereum/live', icon: PlayCircleIcon },
   { name: 'Epochs', to: '/ethereum/epochs', icon: ClockIcon },
   { name: 'Slots', to: '/ethereum/slots', icon: Square3Stack3DIcon },

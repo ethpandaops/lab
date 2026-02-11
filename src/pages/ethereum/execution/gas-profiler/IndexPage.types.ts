@@ -9,6 +9,8 @@ export const gasProfilerHomeSearchSchema = z.object({
   tx: z.string().optional(),
   // Jump to specific block
   block: z.coerce.number().optional(),
+  // Time period for network analytics charts
+  t: z.enum(['7d', '30d', '90d', '180d', '1y', '2y', 'all']).optional(),
 });
 
 /**

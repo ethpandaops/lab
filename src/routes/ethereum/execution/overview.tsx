@@ -1,8 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { IndexPage } from '@/pages/ethereum/execution/overview';
+import { executionOverviewSearchSchema } from '@/pages/ethereum/execution/overview/constants';
 
 export const Route = createFileRoute('/ethereum/execution/overview')({
   component: IndexPage,
+  validateSearch: executionOverviewSearchSchema,
   beforeLoad: () => ({
     getBreadcrumb: () => ({ label: 'Overview', clickable: false }),
   }),
