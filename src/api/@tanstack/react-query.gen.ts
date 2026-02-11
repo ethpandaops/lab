@@ -300,8 +300,8 @@ import {
   intCustodyProbeServiceList,
   intEngineGetBlobsServiceGet,
   intEngineGetBlobsServiceList,
-  intEngineNewPayloadFastestServiceGet,
-  intEngineNewPayloadFastestServiceList,
+  intEngineNewPayloadFastestExecutionByNodeClassServiceGet,
+  intEngineNewPayloadFastestExecutionByNodeClassServiceList,
   intEngineNewPayloadServiceGet,
   intEngineNewPayloadServiceList,
   intExecutionBlockByDateServiceGet,
@@ -1243,12 +1243,12 @@ import type {
   IntEngineGetBlobsServiceListData,
   IntEngineGetBlobsServiceListError,
   IntEngineGetBlobsServiceListResponse,
-  IntEngineNewPayloadFastestServiceGetData,
-  IntEngineNewPayloadFastestServiceGetError,
-  IntEngineNewPayloadFastestServiceGetResponse,
-  IntEngineNewPayloadFastestServiceListData,
-  IntEngineNewPayloadFastestServiceListError,
-  IntEngineNewPayloadFastestServiceListResponse,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetData,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetError,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceListData,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceListError,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse,
   IntEngineNewPayloadServiceGetData,
   IntEngineNewPayloadServiceGetError,
   IntEngineNewPayloadServiceGetResponse,
@@ -10068,26 +10068,26 @@ export const intEngineNewPayloadServiceGetOptions = (options: Options<IntEngineN
     queryKey: intEngineNewPayloadServiceGetQueryKey(options),
   });
 
-export const intEngineNewPayloadFastestServiceListQueryKey = (
-  options?: Options<IntEngineNewPayloadFastestServiceListData>
-) => createQueryKey('intEngineNewPayloadFastestServiceList', options);
+export const intEngineNewPayloadFastestExecutionByNodeClassServiceListQueryKey = (
+  options?: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceListData>
+) => createQueryKey('intEngineNewPayloadFastestExecutionByNodeClassServiceList', options);
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intEngineNewPayloadFastestServiceListOptions = (
-  options?: Options<IntEngineNewPayloadFastestServiceListData>
+export const intEngineNewPayloadFastestExecutionByNodeClassServiceListOptions = (
+  options?: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceListData>
 ) =>
   queryOptions<
-    IntEngineNewPayloadFastestServiceListResponse,
-    IntEngineNewPayloadFastestServiceListError,
-    IntEngineNewPayloadFastestServiceListResponse,
-    ReturnType<typeof intEngineNewPayloadFastestServiceListQueryKey>
+    IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse,
+    IntEngineNewPayloadFastestExecutionByNodeClassServiceListError,
+    IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse,
+    ReturnType<typeof intEngineNewPayloadFastestExecutionByNodeClassServiceListQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await intEngineNewPayloadFastestServiceList({
+      const { data } = await intEngineNewPayloadFastestExecutionByNodeClassServiceList({
         ...options,
         ...queryKey[0],
         signal,
@@ -10095,29 +10095,29 @@ export const intEngineNewPayloadFastestServiceListOptions = (
       });
       return data;
     },
-    queryKey: intEngineNewPayloadFastestServiceListQueryKey(options),
+    queryKey: intEngineNewPayloadFastestExecutionByNodeClassServiceListQueryKey(options),
   });
 
-export const intEngineNewPayloadFastestServiceGetQueryKey = (
-  options: Options<IntEngineNewPayloadFastestServiceGetData>
-) => createQueryKey('intEngineNewPayloadFastestServiceGet', options);
+export const intEngineNewPayloadFastestExecutionByNodeClassServiceGetQueryKey = (
+  options: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceGetData>
+) => createQueryKey('intEngineNewPayloadFastestExecutionByNodeClassServiceGet', options);
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intEngineNewPayloadFastestServiceGetOptions = (
-  options: Options<IntEngineNewPayloadFastestServiceGetData>
+export const intEngineNewPayloadFastestExecutionByNodeClassServiceGetOptions = (
+  options: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceGetData>
 ) =>
   queryOptions<
-    IntEngineNewPayloadFastestServiceGetResponse,
-    IntEngineNewPayloadFastestServiceGetError,
-    IntEngineNewPayloadFastestServiceGetResponse,
-    ReturnType<typeof intEngineNewPayloadFastestServiceGetQueryKey>
+    IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse,
+    IntEngineNewPayloadFastestExecutionByNodeClassServiceGetError,
+    IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse,
+    ReturnType<typeof intEngineNewPayloadFastestExecutionByNodeClassServiceGetQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await intEngineNewPayloadFastestServiceGet({
+      const { data } = await intEngineNewPayloadFastestExecutionByNodeClassServiceGet({
         ...options,
         ...queryKey[0],
         signal,
@@ -10125,7 +10125,7 @@ export const intEngineNewPayloadFastestServiceGetOptions = (
       });
       return data;
     },
-    queryKey: intEngineNewPayloadFastestServiceGetQueryKey(options),
+    queryKey: intEngineNewPayloadFastestExecutionByNodeClassServiceGetQueryKey(options),
   });
 
 export const intExecutionBlockByDateServiceListQueryKey = (options?: Options<IntExecutionBlockByDateServiceListData>) =>

@@ -6556,10 +6556,10 @@ export type GetIntEngineGetBlobsResponse = {
 };
 
 /**
- * Response for getting a single int_engine_new_payload_fastest record
+ * Response for getting a single int_engine_new_payload_fastest_execution_by_node_class record
  */
-export type GetIntEngineNewPayloadFastestResponse = {
-  item?: IntEngineNewPayloadFastest;
+export type GetIntEngineNewPayloadFastestExecutionByNodeClassResponse = {
+  item?: IntEngineNewPayloadFastestExecutionByNodeClass;
 };
 
 /**
@@ -8426,7 +8426,7 @@ export type IntEngineNewPayload = {
   validation_error?: string | null;
 };
 
-export type IntEngineNewPayloadFastest = {
+export type IntEngineNewPayloadFastestExecutionByNodeClass = {
   /**
    * Execution block hash (hex encoded with 0x prefix)
    */
@@ -11302,13 +11302,13 @@ export type ListIntEngineGetBlobsResponse = {
 };
 
 /**
- * Response for listing int_engine_new_payload_fastest records
+ * Response for listing int_engine_new_payload_fastest_execution_by_node_class records
  */
-export type ListIntEngineNewPayloadFastestResponse = {
+export type ListIntEngineNewPayloadFastestExecutionByNodeClassResponse = {
   /**
-   * The list of int_engine_new_payload_fastest.
+   * The list of int_engine_new_payload_fastest_execution_by_node_class.
    */
-  int_engine_new_payload_fastest?: Array<IntEngineNewPayloadFastest>;
+  int_engine_new_payload_fastest_execution_by_node_class?: Array<IntEngineNewPayloadFastestExecutionByNodeClass>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -80445,7 +80445,7 @@ export type IntEngineNewPayloadServiceGetResponses = {
 export type IntEngineNewPayloadServiceGetResponse =
   IntEngineNewPayloadServiceGetResponses[keyof IntEngineNewPayloadServiceGetResponses];
 
-export type IntEngineNewPayloadFastestServiceListData = {
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceListData = {
   body?: never;
   path?: never;
   query?: {
@@ -80870,11 +80870,11 @@ export type IntEngineNewPayloadFastestServiceListData = {
      */
     meta_client_name_not_in_values?: string;
     /**
-     * The maximum number of int_engine_new_payload_fastest to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of int_engine_new_payload_fastest_execution_by_node_class to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListIntEngineNewPayloadFastest` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListIntEngineNewPayloadFastestExecutionByNodeClass` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -80882,30 +80882,30 @@ export type IntEngineNewPayloadFastestServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/int_engine_new_payload_fastest';
+  url: '/api/v1/int_engine_new_payload_fastest_execution_by_node_class';
 };
 
-export type IntEngineNewPayloadFastestServiceListErrors = {
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type IntEngineNewPayloadFastestServiceListError =
-  IntEngineNewPayloadFastestServiceListErrors[keyof IntEngineNewPayloadFastestServiceListErrors];
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceListError =
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceListErrors[keyof IntEngineNewPayloadFastestExecutionByNodeClassServiceListErrors];
 
-export type IntEngineNewPayloadFastestServiceListResponses = {
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponses = {
   /**
    * OK
    */
-  200: ListIntEngineNewPayloadFastestResponse;
+  200: ListIntEngineNewPayloadFastestExecutionByNodeClassResponse;
 };
 
-export type IntEngineNewPayloadFastestServiceListResponse =
-  IntEngineNewPayloadFastestServiceListResponses[keyof IntEngineNewPayloadFastestServiceListResponses];
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse =
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponses[keyof IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponses];
 
-export type IntEngineNewPayloadFastestServiceGetData = {
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceGetData = {
   body?: never;
   path: {
     /**
@@ -80914,28 +80914,28 @@ export type IntEngineNewPayloadFastestServiceGetData = {
     slot_start_date_time: number;
   };
   query?: never;
-  url: '/api/v1/int_engine_new_payload_fastest/{slot_start_date_time}';
+  url: '/api/v1/int_engine_new_payload_fastest_execution_by_node_class/{slot_start_date_time}';
 };
 
-export type IntEngineNewPayloadFastestServiceGetErrors = {
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type IntEngineNewPayloadFastestServiceGetError =
-  IntEngineNewPayloadFastestServiceGetErrors[keyof IntEngineNewPayloadFastestServiceGetErrors];
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceGetError =
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetErrors[keyof IntEngineNewPayloadFastestExecutionByNodeClassServiceGetErrors];
 
-export type IntEngineNewPayloadFastestServiceGetResponses = {
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses = {
   /**
    * OK
    */
-  200: GetIntEngineNewPayloadFastestResponse;
+  200: GetIntEngineNewPayloadFastestExecutionByNodeClassResponse;
 };
 
-export type IntEngineNewPayloadFastestServiceGetResponse =
-  IntEngineNewPayloadFastestServiceGetResponses[keyof IntEngineNewPayloadFastestServiceGetResponses];
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse =
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses[keyof IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses];
 
 export type IntExecutionBlockByDateServiceListData = {
   body?: never;
