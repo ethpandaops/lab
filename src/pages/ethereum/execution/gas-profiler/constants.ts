@@ -26,7 +26,7 @@ export interface ChartConfig {
 export const TIME_PERIOD_OPTIONS = [
   // TODO: Enable when hourly data is current
   // { value: '24h' as const, label: '24h' },
-  // { value: '72h' as const, label: '72h' },
+  { value: '72h' as const, label: '72h' },
   { value: '7d' as const, label: '7d' },
   { value: '30d' as const, label: '30d' },
   // TODO: Enable when data is available

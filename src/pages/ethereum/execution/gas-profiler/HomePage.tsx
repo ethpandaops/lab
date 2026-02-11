@@ -63,6 +63,7 @@ function formatTooltipDate(value: number | string, isDaily: boolean): string {
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
+    timeZone: 'UTC',
   });
 }
 
@@ -510,12 +511,26 @@ export function HomePage(): JSX.Element {
       } else {
         const ts = (r as FctOpcodeOpsHourly).hour_start_date_time ?? 0;
         const date = new Date(ts * 1000);
-        label = date.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: '2-digit',
-          timeZone: 'UTC',
-        });
+        if (timePeriod === '24h') {
+          label = date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            timeZone: 'UTC',
+          });
+        } else if (timePeriod === '72h') {
+          label = date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            timeZone: 'UTC',
+          });
+        } else {
+          label = date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: '2-digit',
+            timeZone: 'UTC',
+          });
+        }
       }
 
       labels.push(label);
@@ -567,7 +582,7 @@ export function HomePage(): JSX.Element {
         }),
       ],
     };
-  }, [opcodeOpsRecords, isDaily]);
+  }, [opcodeOpsRecords, isDaily, timePeriod]);
 
   // Fork annotation mark lines
   const forkMarkLines = useMemo(() => {
@@ -613,12 +628,26 @@ export function HomePage(): JSX.Element {
         } else {
           const ts = (r as FctOpcodeOpsHourly).hour_start_date_time ?? 0;
           const date = new Date(ts * 1000);
-          key = date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: '2-digit',
-            timeZone: 'UTC',
-          });
+          if (timePeriod === '24h') {
+            key = date.toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              timeZone: 'UTC',
+            });
+          } else if (timePeriod === '72h') {
+            key = date.toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              hour: 'numeric',
+              timeZone: 'UTC',
+            });
+          } else {
+            key = date.toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: '2-digit',
+              timeZone: 'UTC',
+            });
+          }
         }
         recordsByKey.set(key, r);
       }
@@ -666,7 +695,7 @@ export function HomePage(): JSX.Element {
 
       return buildTooltipHtml(dateStr, sections);
     },
-    [opcodeOpsRecords, opcodesPerSecondConfig, isDaily]
+    [opcodeOpsRecords, opcodesPerSecondConfig, isDaily, timePeriod]
   );
 
   // Loading states
@@ -860,7 +889,7 @@ export function HomePage(): JSX.Element {
                 xAxis={{
                   type: 'category',
                   labels: opcodesPerSecondConfig.labels,
-                  name: 'Date',
+                  name: timePeriod === '24h' ? 'Time (UTC)' : timePeriod === '72h' ? 'Date/Time (UTC)' : 'Date',
                 }}
                 yAxis={{
                   name: 'Ops/sec',
