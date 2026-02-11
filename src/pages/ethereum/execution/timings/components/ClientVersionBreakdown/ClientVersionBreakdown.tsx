@@ -87,6 +87,11 @@ interface AggregatedRow {
   avgBlobCount?: number;
 }
 
+interface ClientGroupedRow extends AggregatedRow {
+  otherVersions: AggregatedRow[];
+  versionCount: number;
+}
+
 type SortField = 'client' | 'version' | 'avgDuration' | 'p50Duration' | 'p95Duration' | 'observations' | 'avgBlobCount';
 type SortDirection = 'asc' | 'desc';
 
@@ -284,6 +289,9 @@ export function ClientVersionBreakdown({
   // Track which clients are expanded (for expandable mode)
   const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set());
 
+  // Track which client groups are expanded (for multi-version collapsing)
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+
   // Cluster specs modal state
   const [clusterSpecsOpen, setClusterSpecsOpen] = useState(false);
   const [selectedCluster, setSelectedCluster] = useState<string | null>(null);
@@ -457,14 +465,45 @@ export function ClientVersionBreakdown({
     return result;
   }, [data, hasHourlyData, hourlyAggregatedData, durationStatusFilter]);
 
+  // Group aggregated data by client, showing only the most-observed version per client
+  const clientGroupedData = useMemo(() => {
+    const clientMap = new Map<string, AggregatedRow[]>();
+
+    for (const row of aggregatedData) {
+      const existing = clientMap.get(row.client);
+      if (existing) {
+        existing.push(row);
+      } else {
+        clientMap.set(row.client, [row]);
+      }
+    }
+
+    const result: ClientGroupedRow[] = [];
+
+    clientMap.forEach(versions => {
+      // Sort by observation count descending — highest count is the "primary" version
+      const sorted = [...versions].sort((a, b) => b.observations - a.observations);
+      const primary = sorted[0];
+      const others = sorted.slice(1);
+
+      result.push({
+        ...primary,
+        otherVersions: others,
+        versionCount: versions.length,
+      });
+    });
+
+    return result;
+  }, [aggregatedData]);
+
   // Calculate max avg duration for color scaling
   const maxAvgDuration = useMemo(() => {
     return Math.max(...aggregatedData.map(r => r.avgDuration), 0);
   }, [aggregatedData]);
 
-  // Sort data
+  // Sort grouped data (one row per client, showing primary version)
   const sortedData = useMemo(() => {
-    return [...aggregatedData].sort((a, b) => {
+    return [...clientGroupedData].sort((a, b) => {
       let comparison = 0;
       switch (sortField) {
         case 'client':
@@ -491,7 +530,7 @@ export function ClientVersionBreakdown({
       }
       return sortDirection === 'asc' ? comparison : -comparison;
     });
-  }, [aggregatedData, sortField, sortDirection]);
+  }, [clientGroupedData, sortField, sortDirection]);
 
   const handleSort = (field: SortField): void => {
     if (sortField === field) {
@@ -592,10 +631,11 @@ export function ClientVersionBreakdown({
           </thead>
           <tbody className="divide-y divide-border bg-surface">
             {sortedData.map((row, index) => {
+              const isGroupExpanded = expandedGroups.has(row.client);
+              const hasMultipleVersions = row.versionCount > 1;
               const rowKey = `${row.client}-${row.version}`;
-              const isExpanded = expandedClients.has(rowKey);
-              const canExpand = expandable && slot !== undefined;
-              // Calculate column count for colspan
+              const isNodeExpanded = expandedClients.has(rowKey);
+              const canExpandNode = expandable && slot !== undefined;
               const colCount =
                 3 +
                 (hasHourlyData ? 2 : 0) +
@@ -603,34 +643,122 @@ export function ClientVersionBreakdown({
                 (showBlobCount ? 1 : 0) +
                 (hideObservations ? 0 : 1);
 
-              const handleRowClick = (): void => {
-                if (!canExpand) return;
-                setExpandedClients(prev => {
-                  const next = new Set(prev);
-                  if (next.has(rowKey)) {
-                    next.delete(rowKey);
-                  } else {
-                    next.add(rowKey);
-                  }
-                  return next;
-                });
+              const handlePrimaryRowClick = (): void => {
+                if (hasMultipleVersions) {
+                  setExpandedGroups(prev => {
+                    const next = new Set(prev);
+                    if (next.has(row.client)) {
+                      next.delete(row.client);
+                    } else {
+                      next.add(row.client);
+                    }
+                    return next;
+                  });
+                } else if (canExpandNode) {
+                  setExpandedClients(prev => {
+                    const next = new Set(prev);
+                    if (next.has(rowKey)) {
+                      next.delete(rowKey);
+                    } else {
+                      next.add(rowKey);
+                    }
+                    return next;
+                  });
+                }
               };
+
+              const isClickable = hasMultipleVersions || canExpandNode;
+              const showChevron = hasMultipleVersions || canExpandNode;
+              const chevronExpanded = hasMultipleVersions ? isGroupExpanded : isNodeExpanded;
+
+              const renderMetricCells = (metricRow: AggregatedRow): JSX.Element => (
+                <>
+                  <td className="px-3 py-3 text-right">
+                    {metricRow.avgDuration > 0 ? (
+                      <span
+                        className={clsx(
+                          'text-sm font-medium',
+                          getDurationColorClass(metricRow.avgDuration, maxAvgDuration)
+                        )}
+                      >
+                        {metricRow.avgDuration.toFixed(1)}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-muted">-</span>
+                    )}
+                  </td>
+                  {hasHourlyData && (
+                    <td className="px-3 py-3 text-right">
+                      {metricRow.p50Duration > 0 ? (
+                        <span
+                          className={clsx(
+                            'text-sm font-medium',
+                            getDurationColorClass(metricRow.p50Duration, maxAvgDuration)
+                          )}
+                        >
+                          {metricRow.p50Duration.toFixed(1)}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-muted">-</span>
+                      )}
+                    </td>
+                  )}
+                  {hasHourlyData && (
+                    <td className="px-3 py-3 text-right">
+                      {metricRow.p95Duration > 0 ? (
+                        <span
+                          className={clsx(
+                            'text-sm font-medium',
+                            getDurationColorClass(metricRow.p95Duration, maxAvgDuration)
+                          )}
+                        >
+                          {metricRow.p95Duration.toFixed(1)}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-muted">-</span>
+                      )}
+                    </td>
+                  )}
+                  {!hideRange && (
+                    <td className="px-3 py-3 text-right">
+                      {metricRow.maxDuration > 0 ? (
+                        <span className="text-sm text-muted">
+                          {metricRow.minDuration.toFixed(0)} – {metricRow.maxDuration.toFixed(0)} ms
+                        </span>
+                      ) : (
+                        <span className="text-sm text-muted">-</span>
+                      )}
+                    </td>
+                  )}
+                  {showBlobCount && (
+                    <td className="px-3 py-3 text-right">
+                      <span className="text-sm text-muted">{(metricRow.avgBlobCount ?? 0).toFixed(1)}</span>
+                    </td>
+                  )}
+                  {!hideObservations && (
+                    <td className="py-3 pr-4 pl-3 text-right">
+                      <span className="text-sm text-muted">{metricRow.observations.toLocaleString()}</span>
+                    </td>
+                  )}
+                </>
+              );
 
               return (
                 <React.Fragment key={`${row.client}-${row.version}-${index}`}>
+                  {/* Primary row */}
                   <tr
                     className={clsx(
                       'transition-colors hover:bg-background',
-                      canExpand && 'cursor-pointer',
-                      isExpanded && 'bg-background'
+                      isClickable && 'cursor-pointer',
+                      chevronExpanded && 'bg-background'
                     )}
-                    onClick={handleRowClick}
+                    onClick={handlePrimaryRowClick}
                   >
                     <td className="py-3 pr-3 pl-4">
                       <div className="flex items-center gap-2" title={row.client}>
-                        {canExpand && (
+                        {showChevron && (
                           <ChevronRightIcon
-                            className={clsx('size-4 text-muted transition-transform', isExpanded && 'rotate-90')}
+                            className={clsx('size-4 text-muted transition-transform', chevronExpanded && 'rotate-90')}
                           />
                         )}
                         <ClientLogo client={row.client} size={compactClient ? 24 : 20} />
@@ -639,76 +767,17 @@ export function ClientVersionBreakdown({
                     </td>
                     <td className="px-3 py-3">
                       <span className="font-mono text-sm text-muted">{row.version}</span>
-                    </td>
-                    <td className="px-3 py-3 text-right">
-                      {row.avgDuration > 0 ? (
-                        <span
-                          className={clsx(
-                            'text-sm font-medium',
-                            getDurationColorClass(row.avgDuration, maxAvgDuration)
-                          )}
-                        >
-                          {row.avgDuration.toFixed(1)}
+                      {hasMultipleVersions && (
+                        <span className="ml-2 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs text-primary">
+                          {row.versionCount} versions
                         </span>
-                      ) : (
-                        <span className="text-sm text-muted">-</span>
                       )}
                     </td>
-                    {hasHourlyData && (
-                      <td className="px-3 py-3 text-right">
-                        {row.p50Duration > 0 ? (
-                          <span
-                            className={clsx(
-                              'text-sm font-medium',
-                              getDurationColorClass(row.p50Duration, maxAvgDuration)
-                            )}
-                          >
-                            {row.p50Duration.toFixed(1)}
-                          </span>
-                        ) : (
-                          <span className="text-sm text-muted">-</span>
-                        )}
-                      </td>
-                    )}
-                    {hasHourlyData && (
-                      <td className="px-3 py-3 text-right">
-                        {row.p95Duration > 0 ? (
-                          <span
-                            className={clsx(
-                              'text-sm font-medium',
-                              getDurationColorClass(row.p95Duration, maxAvgDuration)
-                            )}
-                          >
-                            {row.p95Duration.toFixed(1)}
-                          </span>
-                        ) : (
-                          <span className="text-sm text-muted">-</span>
-                        )}
-                      </td>
-                    )}
-                    {!hideRange && (
-                      <td className="px-3 py-3 text-right">
-                        {row.maxDuration > 0 ? (
-                          <span className="text-sm text-muted">
-                            {row.minDuration.toFixed(0)} – {row.maxDuration.toFixed(0)} ms
-                          </span>
-                        ) : (
-                          <span className="text-sm text-muted">-</span>
-                        )}
-                      </td>
-                    )}
-                    {showBlobCount && (
-                      <td className="px-3 py-3 text-right">
-                        <span className="text-sm text-muted">{(row.avgBlobCount ?? 0).toFixed(1)}</span>
-                      </td>
-                    )}
-                    {!hideObservations && (
-                      <td className="py-3 pr-4 pl-3 text-right">
-                        <span className="text-sm text-muted">{row.observations.toLocaleString()}</span>
-                      </td>
-                    )}
+                    {renderMetricCells(row)}
                   </tr>
-                  {isExpanded && slot !== undefined && (
+
+                  {/* Per-node expansion for single-version clients */}
+                  {!hasMultipleVersions && isNodeExpanded && slot !== undefined && (
                     <ExpandedRowContent
                       slot={slot}
                       client={row.client}
@@ -716,6 +785,65 @@ export function ClientVersionBreakdown({
                       onClusterClick={handleClusterClick}
                     />
                   )}
+
+                  {/* Group expansion: other version sub-rows */}
+                  {hasMultipleVersions &&
+                    isGroupExpanded &&
+                    row.otherVersions.map((subRow, subIndex) => {
+                      const subRowKey = `${subRow.client}-${subRow.version}`;
+                      const isSubNodeExpanded = expandedClients.has(subRowKey);
+
+                      const handleSubRowClick = (): void => {
+                        if (!canExpandNode) return;
+                        setExpandedClients(prev => {
+                          const next = new Set(prev);
+                          if (next.has(subRowKey)) {
+                            next.delete(subRowKey);
+                          } else {
+                            next.add(subRowKey);
+                          }
+                          return next;
+                        });
+                      };
+
+                      return (
+                        <React.Fragment key={`sub-${subRow.client}-${subRow.version}-${subIndex}`}>
+                          <tr
+                            className={clsx(
+                              'bg-background/50 transition-colors hover:bg-background',
+                              canExpandNode && 'cursor-pointer',
+                              isSubNodeExpanded && 'bg-background'
+                            )}
+                            onClick={handleSubRowClick}
+                          >
+                            <td className="border-l-2 border-primary/30 py-3 pr-3 pl-10">
+                              <div className="flex items-center gap-2">
+                                {canExpandNode && (
+                                  <ChevronRightIcon
+                                    className={clsx(
+                                      'size-4 text-muted transition-transform',
+                                      isSubNodeExpanded && 'rotate-90'
+                                    )}
+                                  />
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-3 py-3">
+                              <span className="font-mono text-sm text-muted">{subRow.version}</span>
+                            </td>
+                            {renderMetricCells(subRow)}
+                          </tr>
+                          {isSubNodeExpanded && slot !== undefined && (
+                            <ExpandedRowContent
+                              slot={slot}
+                              client={subRow.client}
+                              colSpan={colCount}
+                              onClusterClick={handleClusterClick}
+                            />
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
                 </React.Fragment>
               );
             })}

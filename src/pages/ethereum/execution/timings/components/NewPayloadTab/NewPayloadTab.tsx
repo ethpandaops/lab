@@ -397,6 +397,56 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
 
   const hasClientData = elClientList.length > 0;
 
+  // Compute winrate from raw per-slot data when the dedicated winrate table is empty
+  // For 1h/6h views, the int_engine_new_payload_fastest table may not have data,
+  // so we derive the fastest client per slot from the already-fetched per-slot data
+  const computedWinratePerSlot = useMemo(() => {
+    if (winratePerSlot.length > 0 || !showPerSlotCharts || validPayloadByElClient.length === 0) {
+      return winratePerSlot;
+    }
+
+    // Aggregate by (slot, client) → weighted average duration
+    const slotClientAgg = new Map<
+      string,
+      { slot: number; client: string; totalDurObs: number; totalObs: number; timestamp: number }
+    >();
+
+    for (const r of validPayloadByElClient) {
+      const slot = r.slot ?? 0;
+      const client = (r.meta_execution_implementation ?? '').toLowerCase();
+      const duration = r.avg_duration_ms ?? 0;
+      const obs = r.observation_count ?? 0;
+      const timestamp = r.slot_start_date_time ?? 0;
+      if (!slot || !client || !obs || !duration) continue;
+
+      const key = `${slot}|${client}`;
+      const existing = slotClientAgg.get(key);
+      if (existing) {
+        existing.totalDurObs += duration * obs;
+        existing.totalObs += obs;
+      } else {
+        slotClientAgg.set(key, { slot, client, totalDurObs: duration * obs, totalObs: obs, timestamp });
+      }
+    }
+
+    // For each slot, find the client with the lowest weighted average duration
+    const slotWinner = new Map<number, { client: string; avgDuration: number; timestamp: number }>();
+
+    for (const agg of slotClientAgg.values()) {
+      const avgDuration = agg.totalDurObs / agg.totalObs;
+      const existing = slotWinner.get(agg.slot);
+      if (!existing || avgDuration < existing.avgDuration) {
+        slotWinner.set(agg.slot, { client: agg.client, avgDuration, timestamp: agg.timestamp });
+      }
+    }
+
+    return Array.from(slotWinner.entries()).map(([slot, data]) => ({
+      slot,
+      slot_start_date_time: data.timestamp,
+      meta_execution_implementation: data.client,
+    }));
+  }, [winratePerSlot, showPerSlotCharts, validPayloadByElClient]);
+
   return (
     <div className="space-y-6">
       <EIP7870SpecsBanner />
@@ -404,7 +454,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
       {/* Execution Winrate — fastest client per slot */}
       <WinrateSection
         hourlyRecords={winrateHourly}
-        perSlotRecords={winratePerSlot}
+        perSlotRecords={computedWinratePerSlot}
         allClients={[...new Set([...hourlyClientList, ...elClientList])]}
         timeRange={timeRange}
         showPerSlot={showPerSlotCharts}
@@ -788,10 +838,11 @@ function WinrateSection({
   timeRange: TimeRange;
   showPerSlot: boolean;
 }): JSX.Element | null {
-  const { chartConfig, standings } = useMemo(() => {
+  const { chartConfig, standings, tooltipLabels } = useMemo(() => {
     if (showPerSlot) {
       // Per-slot mode: each record is a winner for that slot+node_class
-      if (!perSlotRecords.length && !allClients.length) return { chartConfig: null, standings: [] };
+      if (!perSlotRecords.length && !allClients.length)
+        return { chartConfig: null, standings: [], tooltipLabels: [] as string[] };
 
       // Group by slot → count wins per implementation, track timestamps
       const bySlotAndImpl = new Map<number, Map<string, number>>();
@@ -819,7 +870,12 @@ function WinrateSection({
       // Downsample slots into ~60 buckets for readable chart
       const BUCKET_COUNT = 60;
       const bucketSize = Math.max(1, Math.ceil(sortedSlots.length / BUCKET_COUNT));
-      const buckets: { label: string; implCounts: Map<string, number>; total: number }[] = [];
+      const buckets: {
+        label: string;
+        tooltipLabel: string;
+        implCounts: Map<string, number>;
+        total: number;
+      }[] = [];
 
       for (let i = 0; i < sortedSlots.length; i += bucketSize) {
         const bucketSlots = sortedSlots.slice(i, i + bucketSize);
@@ -838,8 +894,9 @@ function WinrateSection({
         const ts = slotToTimestamp.get(bucketSlots[0]) ?? 0;
         const date = new Date(ts * 1000);
         const label = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const tooltipLabel = `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}, ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' })} UTC`;
 
-        buckets.push({ label, implCounts, total });
+        buckets.push({ label, tooltipLabel, implCounts, total });
       }
 
       const labels = buckets.map(b => b.label);
@@ -863,11 +920,18 @@ function WinrateSection({
         totalsByImpl.set(impl, (totalsByImpl.get(impl) ?? 0) + 1);
       }
 
-      return { chartConfig: { labels, series }, standings: buildStandings(totalsByImpl, allClients) };
+      const tooltipLabels = buckets.map(b => b.tooltipLabel);
+
+      return {
+        chartConfig: { labels, series },
+        standings: buildStandings(totalsByImpl, allClients),
+        tooltipLabels,
+      };
     }
 
     // Hourly mode (24h / 7d)
-    if (!hourlyRecords.length && !allClients.length) return { chartConfig: null, standings: [] };
+    if (!hourlyRecords.length && !allClients.length)
+      return { chartConfig: null, standings: [], tooltipLabels: [] as string[] };
 
     const byHourAndImpl = new Map<number, Map<string, number>>();
     const allImpls = new Set<string>();
@@ -903,6 +967,29 @@ function WinrateSection({
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     });
 
+    const tooltipLabels = sortedHours.map(ts => {
+      const date = new Date(ts * 1000);
+      const nextHour = new Date((ts + 3600) * 1000);
+      const dateStr = date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        timeZone: 'UTC',
+      });
+      const startTime = date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: 'UTC',
+      });
+      const endTime = nextHour.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: 'UTC',
+      });
+      return `${dateStr}, ${startTime} – ${endTime} UTC`;
+    });
+
     const sortedImpls = [...allImpls].sort();
     const series: SeriesData[] = sortedImpls.map((impl, i) => ({
       name: impl,
@@ -923,8 +1010,47 @@ function WinrateSection({
       totalsByImpl.set(impl, (totalsByImpl.get(impl) ?? 0) + (r.win_count ?? 0));
     }
 
-    return { chartConfig: { labels, series }, standings: buildStandings(totalsByImpl, allClients) };
+    return {
+      chartConfig: { labels, series },
+      standings: buildStandings(totalsByImpl, allClients),
+      tooltipLabels,
+    };
   }, [hourlyRecords, perSlotRecords, allClients, timeRange, showPerSlot]);
+
+  // Custom tooltip formatter that shows full timestamps instead of abbreviated axis labels
+  const winrateTooltipFormatter = useMemo(() => {
+    if (!tooltipLabels || tooltipLabels.length === 0) return undefined;
+
+    return (params: unknown): string => {
+      const dataPoints = Array.isArray(params) ? params : [params];
+      if (dataPoints.length === 0) return '';
+
+      const firstPoint = dataPoints[0] as { dataIndex?: number };
+      const idx = firstPoint?.dataIndex ?? 0;
+      const label = tooltipLabels[idx] ?? '';
+
+      let html = `<div style="margin-bottom: 4px; font-weight: 600;">${label}</div>`;
+
+      const sortedPoints = dataPoints
+        .map(point => {
+          const p = point as { marker?: string; seriesName?: string; value?: number | (number | null)[] };
+          const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+          return { ...p, yValue: yValue as number | null };
+        })
+        .filter(p => p.marker && p.seriesName && p.yValue !== null && p.yValue !== undefined && p.yValue !== 0)
+        .sort((a, b) => (b.yValue ?? 0) - (a.yValue ?? 0));
+
+      for (const p of sortedPoints) {
+        html += `<div style="display: flex; align-items: center; gap: 8px;">`;
+        html += p.marker;
+        html += `<span>${p.seriesName}:</span>`;
+        html += `<span style="font-weight: 600; margin-left: auto;">${Number(p.yValue).toFixed(1)}%</span>`;
+        html += `</div>`;
+      }
+
+      return html;
+    };
+  }, [tooltipLabels]);
 
   if (!chartConfig && standings.length === 0) return null;
 
@@ -950,6 +1076,7 @@ function WinrateSection({
                 height={inModal ? 600 : 350}
                 showLegend
                 enableDataZoom
+                tooltipFormatter={winrateTooltipFormatter}
               />
             ) : (
               <div className="flex h-64 items-center justify-center text-sm text-muted">
