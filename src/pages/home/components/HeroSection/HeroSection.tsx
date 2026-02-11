@@ -126,7 +126,7 @@ export function HeroSection(): JSX.Element {
   }, [networks]);
 
   return (
-    <div className="relative flex min-h-dvh flex-col justify-start overflow-hidden lg:justify-center">
+    <div className="relative flex min-h-dvh flex-col justify-start lg:justify-center lg:overflow-hidden">
       {/* Atmosphere: single centered glow behind title */}
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div className="absolute top-1/2 left-1/2 h-[60%] w-[50%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/[0.04] blur-[120px]" />
