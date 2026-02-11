@@ -359,9 +359,15 @@ export function MultiLineChart({
   // Use useMemo to create a new array reference only when filtering actually changes
   const displayedSeries = useMemo(() => {
     return series.filter(s => {
-      // Series with visible: false are always rendered (hidden from legend but part of chart)
-      // This is essential for stacked area bands where base series must render
-      if (s.visible === false) return true;
+      // Band base series (visible: false) should follow their companion width series' visibility
+      // so hidden bands don't force the y-axis range down with their lower-bound data
+      if (s.visible === false) {
+        if (s.stack && (showLegend || enableSeriesFilter)) {
+          const companion = series.find(c => c.stack === s.stack && c.visible !== false);
+          if (companion && !visibleSeries.has(companion.name)) return false;
+        }
+        return true;
+      }
       // Filter by visibility if legend or series filter is enabled
       if ((showLegend || enableSeriesFilter) && !visibleSeries.has(s.name)) return false;
       // Filter aggregate series if toggle is enabled and aggregate is hidden

@@ -875,7 +875,7 @@ export function IndexPage(): JSX.Element {
                 <MultiLineChart
                   series={blobChartConfig.series}
                   xAxis={{ type: 'category', labels: blobChartConfig.labels, name: 'Date' }}
-                  yAxis={{ name: 'Blobs', min: 0 }}
+                  yAxis={{ name: 'Blobs', min: 'dataMin' }}
                   height={inModal ? 600 : 280}
                   showLegend
                   legendPosition="top"
@@ -900,7 +900,7 @@ export function IndexPage(): JSX.Element {
                 <MultiLineChart
                   series={attnChartConfig.series}
                   xAxis={{ type: 'category', labels: attnChartConfig.labels, name: 'Date' }}
-                  yAxis={{ name: 'Participation Rate (%)', min: 0, max: 100 }}
+                  yAxis={{ name: 'Participation Rate (%)', min: 'dataMin' }}
                   height={inModal ? 600 : 280}
                   showLegend
                   legendPosition="top"
@@ -925,7 +925,7 @@ export function IndexPage(): JSX.Element {
                 <MultiLineChart
                   series={hvChartConfig.series}
                   xAxis={{ type: 'category', labels: hvChartConfig.labels, name: 'Date' }}
-                  yAxis={{ name: 'Head Vote Rate (%)', min: 0, max: 100 }}
+                  yAxis={{ name: 'Head Vote Rate (%)', min: 'dataMin' }}
                   height={inModal ? 600 : 280}
                   showLegend
                   legendPosition="top"
@@ -950,7 +950,7 @@ export function IndexPage(): JSX.Element {
                 <MultiLineChart
                   series={reorgChartConfig.series}
                   xAxis={{ type: 'category', labels: reorgChartConfig.labels, name: 'Date' }}
-                  yAxis={{ name: 'Reorg Count', min: 0 }}
+                  yAxis={{ name: 'Reorg Count', min: 'dataMin' }}
                   height={inModal ? 600 : 280}
                   showLegend
                   legendPosition="top"
@@ -975,7 +975,7 @@ export function IndexPage(): JSX.Element {
                 <MultiLineChart
                   series={missedSlotChartConfig.series}
                   xAxis={{ type: 'category', labels: missedSlotChartConfig.labels, name: 'Date' }}
-                  yAxis={{ name: 'Missed Rate (%)', min: 0 }}
+                  yAxis={{ name: 'Missed Rate (%)', min: 'dataMin' }}
                   height={inModal ? 600 : 280}
                   showLegend
                   legendPosition="top"
@@ -1004,7 +1004,7 @@ export function IndexPage(): JSX.Element {
                 <MultiLineChart
                   series={proposalStatusChartConfig.series}
                   xAxis={{ type: 'category', labels: proposalStatusChartConfig.labels, name: 'Date' }}
-                  yAxis={{ name: 'Rate (%)', min: 0, max: 100 }}
+                  yAxis={{ name: 'Rate (%)', min: 'dataMin' }}
                   height={inModal ? 600 : 280}
                   showLegend
                   legendPosition="top"
@@ -1029,7 +1029,7 @@ export function IndexPage(): JSX.Element {
                 <MultiLineChart
                   series={inclusionDelayChartConfig.series}
                   xAxis={{ type: 'category', labels: inclusionDelayChartConfig.labels, name: 'Date' }}
-                  yAxis={{ name: 'Inclusion Delay (slots)', min: 0 }}
+                  yAxis={{ name: 'Inclusion Delay (slots)', min: 'dataMin' }}
                   height={inModal ? 600 : 280}
                   showLegend
                   legendPosition="top"
@@ -1054,7 +1054,7 @@ export function IndexPage(): JSX.Element {
                 <MultiLineChart
                   series={proposerRewardChartConfig.series}
                   xAxis={{ type: 'category', labels: proposerRewardChartConfig.labels, name: 'Date' }}
-                  yAxis={{ name: 'Reward (ETH)', min: 0 }}
+                  yAxis={{ name: 'Reward (ETH)', min: 'dataMin' }}
                   height={inModal ? 600 : 280}
                   showLegend
                   legendPosition="top"

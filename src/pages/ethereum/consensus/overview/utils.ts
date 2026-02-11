@@ -128,6 +128,7 @@ export function buildBlobCountChartConfig(
       color: '#64748b',
       opacity: 0.06,
       group: 'Bands',
+      initiallyVisible: false,
     }),
   ];
 
@@ -213,6 +214,7 @@ export function buildAttestationParticipationChartConfig(
         color: '#64748b',
         opacity: 0.06,
         group: 'Bands',
+        initiallyVisible: false,
       }),
     ],
   };
@@ -289,7 +291,7 @@ export function buildHeadVoteCorrectnessChartConfig(
         'hv-minmax',
         unifiedKeys.map(k => getValue(k, 'min_head_vote_rate')),
         unifiedKeys.map(k => getValue(k, 'max_head_vote_rate')),
-        { color: '#64748b', opacity: 0.06, group: 'Bands' }
+        { color: '#64748b', opacity: 0.06, group: 'Bands', initiallyVisible: false }
       ),
     ],
   };
@@ -504,7 +506,7 @@ export function buildAttestationInclusionDelayChartConfig(
         'id-minmax',
         unifiedKeys.map(k => getValue(k, 'min_inclusion_delay')),
         unifiedKeys.map(k => getValue(k, 'max_inclusion_delay')),
-        { color: '#64748b', opacity: 0.06, group: 'Bands' }
+        { color: '#64748b', opacity: 0.06, group: 'Bands', initiallyVisible: false }
       ),
     ],
   };
@@ -581,7 +583,7 @@ export function buildProposerRewardChartConfig(
         'pr-minmax',
         unifiedKeys.map(k => getValue(k, 'min_reward_eth')),
         unifiedKeys.map(k => getValue(k, 'max_reward_eth')),
-        { color: '#64748b', opacity: 0.06, group: 'Bands' }
+        { color: '#64748b', opacity: 0.06, group: 'Bands', initiallyVisible: false }
       ),
     ],
   };
