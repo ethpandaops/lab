@@ -145,6 +145,12 @@ export function GasScheduleDrawer({
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
+  // Committed schedule - only updates when user finishes an interaction (mouseup/blur),
+  // not during drag or typing, to avoid layout shifts in Active Changes section
+  const [committedSchedule, setCommittedSchedule] = useState<GasSchedule>(schedule);
+  const scheduleRef = useRef(schedule);
+  scheduleRef.current = schedule;
+
   // Build category groups from defaults
   const groups = useMemo((): CategoryGroup[] => {
     const categoryMap = new Map<string, string[]>();
@@ -176,13 +182,13 @@ export function GasScheduleDrawer({
       });
   }, [defaults]);
 
-  // Get all modified entries
+  // Get all modified entries (uses committed schedule to avoid layout shifts during drag/type)
   const modifiedEntries = useMemo(() => {
-    return Object.entries(schedule).filter(([key, value]) => {
+    return Object.entries(committedSchedule).filter(([key, value]) => {
       const defaultParam = defaults.parameters[key];
       return value !== undefined && defaultParam && value !== defaultParam.value;
     });
-  }, [schedule, defaults]);
+  }, [committedSchedule, defaults]);
 
   // Handle individual parameter change
   const handleParamChange = useCallback(
@@ -214,6 +220,7 @@ export function GasScheduleDrawer({
         }
       }
       onChange(newSchedule);
+      setCommittedSchedule(newSchedule);
     },
     [schedule, defaults, onChange]
   );
@@ -221,6 +228,7 @@ export function GasScheduleDrawer({
   // Reset all
   const handleResetAll = useCallback(() => {
     onChange({});
+    setCommittedSchedule({});
   }, [onChange]);
 
   // Remove single override
@@ -229,9 +237,15 @@ export function GasScheduleDrawer({
       const newSchedule = { ...schedule };
       delete newSchedule[key];
       onChange(newSchedule);
+      setCommittedSchedule(newSchedule);
     },
     [schedule, onChange]
   );
+
+  // Commit the current schedule (called on slider release / input blur)
+  const commitSchedule = useCallback(() => {
+    setCommittedSchedule(scheduleRef.current);
+  }, []);
 
   // Filter groups by search and active category
   const filteredGroups = useMemo(() => {
@@ -245,19 +259,10 @@ export function GasScheduleDrawer({
       .filter(group => group.keys.length > 0);
   }, [groups, searchQuery, activeCategory]);
 
-  // Sort keys within each group: modified first, then alphabetical
-  const getSortedKeys = useCallback(
-    (keys: string[]): string[] => {
-      return [...keys].sort((a, b) => {
-        const aModified = schedule[a] !== undefined && schedule[a] !== defaults.parameters[a]?.value;
-        const bModified = schedule[b] !== undefined && schedule[b] !== defaults.parameters[b]?.value;
-        if (aModified && !bModified) return -1;
-        if (!aModified && bModified) return 1;
-        return a.localeCompare(b);
-      });
-    },
-    [schedule, defaults]
-  );
+  // Sort keys within each group alphabetically (stable order to avoid jumps during editing)
+  const getSortedKeys = useCallback((keys: string[]): string[] => {
+    return [...keys].sort((a, b) => a.localeCompare(b));
+  }, []);
 
   // Count modified in a category
   const getModifiedCount = useCallback(
@@ -298,7 +303,7 @@ export function GasScheduleDrawer({
                 leaveFrom="translate-x-0"
                 leaveTo="translate-x-full"
               >
-                <DialogPanel className="pointer-events-auto w-screen max-w-md">
+                <DialogPanel className="pointer-events-auto w-screen max-w-lg">
                   <div className="flex h-full flex-col overflow-y-auto bg-background shadow-xl">
                     {/* Header */}
                     <div className="border-b border-border px-4 py-4">
@@ -321,7 +326,7 @@ export function GasScheduleDrawer({
                           placeholder="Search opcodes..."
                           value={searchQuery}
                           onChange={e => setSearchQuery(e.target.value)}
-                          className="w-full bg-transparent text-sm text-foreground placeholder:text-muted focus:outline-hidden"
+                          className="w-full border-0 bg-transparent text-sm text-foreground placeholder:text-muted focus:ring-0 focus:outline-hidden"
                         />
                         {searchQuery && (
                           <button
@@ -488,6 +493,7 @@ export function GasScheduleDrawer({
                                         const val = Number(e.target.value);
                                         handleParamChange(key, val === param.value ? undefined : val);
                                       }}
+                                      onBlur={commitSchedule}
                                       className={clsx(
                                         'w-20 shrink-0 rounded-xs border bg-surface px-2 py-1 text-right font-mono text-xs focus:ring-1 focus:ring-primary focus:outline-hidden',
                                         isModified ? 'border-primary/30 text-primary' : 'border-border text-foreground'
@@ -505,6 +511,7 @@ export function GasScheduleDrawer({
                                         const val = Number(e.target.value);
                                         handleParamChange(key, val === param.value ? undefined : val);
                                       }}
+                                      onPointerUp={commitSchedule}
                                       className={clsx(
                                         'min-w-0 flex-1 cursor-pointer appearance-none bg-transparent',
                                         '[&::-webkit-slider-runnable-track]:h-1.5 [&::-webkit-slider-runnable-track]:rounded-xs [&::-webkit-slider-runnable-track]:bg-border',
