@@ -1000,7 +1000,11 @@ function WinrateSection({
                       <span
                         className={clsx(
                           'shrink-0 text-center',
-                          isLeader ? 'w-8 text-2xl' : isTopThree ? 'w-7 text-xl' : 'w-5 text-sm/5'
+                          isLeader
+                            ? 'w-9 text-4xl leading-none'
+                            : isTopThree
+                              ? 'w-8 text-3xl leading-none'
+                              : 'w-5 text-sm/5'
                         )}
                       >
                         {isTopThree && medal ? (
