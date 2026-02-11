@@ -2,6 +2,7 @@ import type { JSX } from 'react';
 import { useState } from 'react';
 import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
+import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { EIP7870SpecsBanner } from '@/components/Ethereum/EIP7870SpecsBanner';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
@@ -450,15 +451,23 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
       />
 
       {/* Client Version Breakdown - only SUCCESS status */}
-      <ClientVersionBreakdown
-        data={successBlobsByElClient}
-        hourlyData={getBlobsByElClientHourly}
+      <PopoutCard
         title="EL Client Duration"
-        description="engine_getBlobs duration (ms) by execution client and version"
-        showBlobCount
-        hideObservations
-        hideRange
-      />
+        subtitle="engine_getBlobs duration (ms) by execution client and version"
+        anchorId="client-duration"
+        modalSize="full"
+      >
+        {() => (
+          <ClientVersionBreakdown
+            data={successBlobsByElClient}
+            hourlyData={getBlobsByElClientHourly}
+            showBlobCount
+            hideObservations
+            hideRange
+            noCard
+          />
+        )}
+      </PopoutCard>
 
       {/* Per-slot charts (only for short time ranges) */}
       {showPerSlotCharts ? (

@@ -411,14 +411,22 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
       />
 
       {/* Client Version Breakdown — VALID status only */}
-      <ClientVersionBreakdown
-        data={validPayloadByElClient}
-        hourlyData={newPayloadByElClientHourly}
+      <PopoutCard
         title="EL Client Duration"
-        description="engine_newPayload duration (ms) by execution client and version"
-        hideObservations
-        hideRange
-      />
+        subtitle="engine_newPayload duration (ms) by execution client and version"
+        anchorId="client-duration"
+        modalSize="full"
+      >
+        {() => (
+          <ClientVersionBreakdown
+            data={validPayloadByElClient}
+            hourlyData={newPayloadByElClientHourly}
+            hideObservations
+            hideRange
+            noCard
+          />
+        )}
+      </PopoutCard>
 
       {/* Per-slot charts — short time ranges only */}
       {showPerSlotCharts && (
