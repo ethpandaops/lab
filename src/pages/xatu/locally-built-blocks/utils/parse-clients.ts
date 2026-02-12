@@ -1,12 +1,4 @@
-/**
- * Known execution client names
- */
-const EXECUTION_CLIENTS = ['geth', 'nethermind', 'besu', 'erigon', 'reth'] as const;
-
-/**
- * Known consensus client names
- */
-const CONSENSUS_CLIENTS = ['lighthouse', 'prysm', 'teku', 'nimbus', 'lodestar', 'grandine'] as const;
+import { CONSENSUS_CLIENTS, EXECUTION_CLIENTS } from '@/utils/ethereum';
 
 /**
  * Parse the meta_client_name to extract execution and consensus client names

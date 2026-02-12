@@ -6631,6 +6631,72 @@ export const zFctNodeActiveLast24h = z.object({
   username: z.optional(z.string()),
 });
 
+export const zFctNodeCpuUtilizationByProcess = z.object({
+  client_type: z.optional(z.string()),
+  max_core_pct: z.optional(z.number()),
+  mean_core_pct: z.optional(z.number()),
+  meta_client_name: z.optional(z.string()),
+  meta_network_name: z.optional(z.string()),
+  min_core_pct: z.optional(z.number()),
+  node_class: z.optional(z.string()),
+  pid: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  system_cores: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  updated_date_time: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  wallclock_slot: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  wallclock_slot_start_date_time: z.optional(
+    z.coerce
+      .bigint()
+      .check(
+        z.minimum(BigInt('-9223372036854775808'), {
+          error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+        }),
+        z.maximum(BigInt('9223372036854775807'), {
+          error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+        })
+      )
+  ),
+  window_start: z.optional(
+    z.coerce
+      .bigint()
+      .check(
+        z.minimum(BigInt('-9223372036854775808'), {
+          error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+        }),
+        z.maximum(BigInt('9223372036854775807'), {
+          error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+        })
+      )
+  ),
+});
+
 export const zFctOpcodeGasByOpcodeDaily = z.object({
   avg_count_per_block: z.optional(z.number()),
   avg_gas_per_block: z.optional(z.number()),
@@ -8583,6 +8649,13 @@ export const zGetFctNodeActiveLast24hResponse = z.object({
 });
 
 /**
+ * Response for getting a single fct_node_cpu_utilization_by_process record
+ */
+export const zGetFctNodeCpuUtilizationByProcessResponse = z.object({
+  item: z.optional(zFctNodeCpuUtilizationByProcess),
+});
+
+/**
  * Response for getting a single fct_opcode_gas_by_opcode_daily record
  */
 export const zGetFctOpcodeGasByOpcodeDailyResponse = z.object({
@@ -9690,6 +9763,113 @@ export const zIntBlockProposerCanonical = z.object({
  */
 export const zGetIntBlockProposerCanonicalResponse = z.object({
   item: z.optional(zIntBlockProposerCanonical),
+});
+
+export const zIntContractCreation = z.object({
+  block_number: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  contract_address: z.optional(z.string()),
+  deployer: z.optional(z.string()),
+  factory: z.optional(z.string()),
+  init_code_hash: z.optional(z.string()),
+  internal_index: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  transaction_hash: z.optional(z.string()),
+  transaction_index: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  updated_date_time: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+});
+
+/**
+ * Response for getting a single int_contract_creation record
+ */
+export const zGetIntContractCreationResponse = z.object({
+  item: z.optional(zIntContractCreation),
+});
+
+export const zIntContractSelfdestruct = z.object({
+  address: z.optional(z.string()),
+  beneficiary: z.optional(z.string()),
+  block_number: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  creation_block: z.optional(
+    z.union([
+      z
+        .int()
+        .check(
+          z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+          z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+        ),
+      z.null(),
+    ])
+  ),
+  creation_transaction_hash: z.optional(z.union([z.string(), z.null()])),
+  ephemeral: z.optional(z.boolean()),
+  internal_index: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  storage_cleared: z.optional(z.boolean()),
+  transaction_hash: z.optional(z.string()),
+  transaction_index: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  updated_date_time: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  value_transferred: z.optional(z.string()),
+});
+
+/**
+ * Response for getting a single int_contract_selfdestruct record
+ */
+export const zGetIntContractSelfdestructResponse = z.object({
+  item: z.optional(zIntContractSelfdestruct),
 });
 
 export const zIntContractStorageExpiry1m = z.object({
@@ -11331,7 +11511,7 @@ export const zGetIntEngineNewPayloadResponse = z.object({
   item: z.optional(zIntEngineNewPayload),
 });
 
-export const zIntEngineNewPayloadFastest = z.object({
+export const zIntEngineNewPayloadFastestExecutionByNodeClass = z.object({
   block_hash: z.optional(z.string()),
   duration_ms: z.optional(
     z.coerce
@@ -11390,10 +11570,10 @@ export const zIntEngineNewPayloadFastest = z.object({
 });
 
 /**
- * Response for getting a single int_engine_new_payload_fastest record
+ * Response for getting a single int_engine_new_payload_fastest_execution_by_node_class record
  */
-export const zGetIntEngineNewPayloadFastestResponse = z.object({
-  item: z.optional(zIntEngineNewPayloadFastest),
+export const zGetIntEngineNewPayloadFastestExecutionByNodeClassResponse = z.object({
+  item: z.optional(zIntEngineNewPayloadFastestExecutionByNodeClass),
 });
 
 export const zIntExecutionBlockByDate = z.object({
@@ -11434,6 +11614,53 @@ export const zIntExecutionBlockByDate = z.object({
  */
 export const zGetIntExecutionBlockByDateResponse = z.object({
   item: z.optional(zIntExecutionBlockByDate),
+});
+
+export const zIntStorageSelfdestructDiffs = z.object({
+  address: z.optional(z.string()),
+  block_number: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  from_value: z.optional(z.string()),
+  internal_index: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  slot: z.optional(z.string()),
+  to_value: z.optional(z.string()),
+  transaction_hash: z.optional(z.string()),
+  transaction_index: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  updated_date_time: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+});
+
+/**
+ * Response for getting a single int_storage_selfdestruct_diffs record
+ */
+export const zGetIntStorageSelfdestructDiffsResponse = z.object({
+  item: z.optional(zIntStorageSelfdestructDiffs),
 });
 
 export const zIntStorageSlotDiff = z.object({
@@ -13579,6 +13806,14 @@ export const zListFctNodeActiveLast24hResponse = z.object({
 });
 
 /**
+ * Response for listing fct_node_cpu_utilization_by_process records
+ */
+export const zListFctNodeCpuUtilizationByProcessResponse = z.object({
+  fct_node_cpu_utilization_by_process: z.optional(z.array(zFctNodeCpuUtilizationByProcess)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
  * Response for listing fct_opcode_gas_by_opcode_daily records
  */
 export const zListFctOpcodeGasByOpcodeDailyResponse = z.object({
@@ -13891,6 +14126,22 @@ export const zListIntBlockProposerCanonicalResponse = z.object({
 });
 
 /**
+ * Response for listing int_contract_creation records
+ */
+export const zListIntContractCreationResponse = z.object({
+  int_contract_creation: z.optional(z.array(zIntContractCreation)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing int_contract_selfdestruct records
+ */
+export const zListIntContractSelfdestructResponse = z.object({
+  int_contract_selfdestruct: z.optional(z.array(zIntContractSelfdestruct)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
  * Response for listing int_contract_storage_expiry_1m records
  */
 export const zListIntContractStorageExpiry1mResponse = z.object({
@@ -14051,10 +14302,12 @@ export const zListIntEngineGetBlobsResponse = z.object({
 });
 
 /**
- * Response for listing int_engine_new_payload_fastest records
+ * Response for listing int_engine_new_payload_fastest_execution_by_node_class records
  */
-export const zListIntEngineNewPayloadFastestResponse = z.object({
-  int_engine_new_payload_fastest: z.optional(z.array(zIntEngineNewPayloadFastest)),
+export const zListIntEngineNewPayloadFastestExecutionByNodeClassResponse = z.object({
+  int_engine_new_payload_fastest_execution_by_node_class: z.optional(
+    z.array(zIntEngineNewPayloadFastestExecutionByNodeClass)
+  ),
   next_page_token: z.optional(z.string()),
 });
 
@@ -14071,6 +14324,14 @@ export const zListIntEngineNewPayloadResponse = z.object({
  */
 export const zListIntExecutionBlockByDateResponse = z.object({
   int_execution_block_by_date: z.optional(z.array(zIntExecutionBlockByDate)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing int_storage_selfdestruct_diffs records
+ */
+export const zListIntStorageSelfdestructDiffsResponse = z.object({
+  int_storage_selfdestruct_diffs: z.optional(z.array(zIntStorageSelfdestructDiffs)),
   next_page_token: z.optional(z.string()),
 });
 
@@ -68705,6 +68966,551 @@ export const zFctNodeActiveLast24hServiceGetData = z.object({
  */
 export const zFctNodeActiveLast24hServiceGetResponse = zGetFctNodeActiveLast24hResponse;
 
+export const zFctNodeCpuUtilizationByProcessServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      wallclock_slot_start_date_time_eq: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('-9223372036854775808'), {
+              error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+            }),
+            z.maximum(BigInt('9223372036854775807'), {
+              error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+            })
+          )
+      ),
+      wallclock_slot_start_date_time_ne: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('-9223372036854775808'), {
+              error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+            }),
+            z.maximum(BigInt('9223372036854775807'), {
+              error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+            })
+          )
+      ),
+      wallclock_slot_start_date_time_lt: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('-9223372036854775808'), {
+              error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+            }),
+            z.maximum(BigInt('9223372036854775807'), {
+              error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+            })
+          )
+      ),
+      wallclock_slot_start_date_time_lte: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('-9223372036854775808'), {
+              error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+            }),
+            z.maximum(BigInt('9223372036854775807'), {
+              error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+            })
+          )
+      ),
+      wallclock_slot_start_date_time_gt: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('-9223372036854775808'), {
+              error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+            }),
+            z.maximum(BigInt('9223372036854775807'), {
+              error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+            })
+          )
+      ),
+      wallclock_slot_start_date_time_gte: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('-9223372036854775808'), {
+              error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+            }),
+            z.maximum(BigInt('9223372036854775807'), {
+              error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+            })
+          )
+      ),
+      wallclock_slot_start_date_time_between_min: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('-9223372036854775808'), {
+              error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+            }),
+            z.maximum(BigInt('9223372036854775807'), {
+              error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+            })
+          )
+      ),
+      wallclock_slot_start_date_time_between_max_value: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('-9223372036854775808'), {
+              error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+            }),
+            z.maximum(BigInt('9223372036854775807'), {
+              error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+            })
+          )
+      ),
+      wallclock_slot_start_date_time_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      wallclock_slot_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      meta_client_name_eq: z.optional(z.string()),
+      meta_client_name_ne: z.optional(z.string()),
+      meta_client_name_contains: z.optional(z.string()),
+      meta_client_name_starts_with: z.optional(z.string()),
+      meta_client_name_ends_with: z.optional(z.string()),
+      meta_client_name_like: z.optional(z.string()),
+      meta_client_name_not_like: z.optional(z.string()),
+      meta_client_name_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_name_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      client_type_eq: z.optional(z.string()),
+      client_type_ne: z.optional(z.string()),
+      client_type_contains: z.optional(z.string()),
+      client_type_starts_with: z.optional(z.string()),
+      client_type_ends_with: z.optional(z.string()),
+      client_type_like: z.optional(z.string()),
+      client_type_not_like: z.optional(z.string()),
+      client_type_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      client_type_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      pid_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      pid_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      pid_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      pid_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      pid_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      pid_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      pid_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      pid_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      pid_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      pid_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      window_start_eq: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('-9223372036854775808'), {
+              error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+            }),
+            z.maximum(BigInt('9223372036854775807'), {
+              error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+            })
+          )
+      ),
+      window_start_ne: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('-9223372036854775808'), {
+              error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+            }),
+            z.maximum(BigInt('9223372036854775807'), {
+              error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+            })
+          )
+      ),
+      window_start_lt: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('-9223372036854775808'), {
+              error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+            }),
+            z.maximum(BigInt('9223372036854775807'), {
+              error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+            })
+          )
+      ),
+      window_start_lte: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('-9223372036854775808'), {
+              error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+            }),
+            z.maximum(BigInt('9223372036854775807'), {
+              error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+            })
+          )
+      ),
+      window_start_gt: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('-9223372036854775808'), {
+              error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+            }),
+            z.maximum(BigInt('9223372036854775807'), {
+              error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+            })
+          )
+      ),
+      window_start_gte: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('-9223372036854775808'), {
+              error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+            }),
+            z.maximum(BigInt('9223372036854775807'), {
+              error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+            })
+          )
+      ),
+      window_start_between_min: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('-9223372036854775808'), {
+              error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+            }),
+            z.maximum(BigInt('9223372036854775807'), {
+              error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+            })
+          )
+      ),
+      window_start_between_max_value: z.optional(
+        z.coerce
+          .bigint()
+          .check(
+            z.minimum(BigInt('-9223372036854775808'), {
+              error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+            }),
+            z.maximum(BigInt('9223372036854775807'), {
+              error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+            })
+          )
+      ),
+      window_start_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      window_start_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      updated_date_time_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      wallclock_slot_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      wallclock_slot_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      wallclock_slot_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      wallclock_slot_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      wallclock_slot_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      wallclock_slot_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      wallclock_slot_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      wallclock_slot_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      wallclock_slot_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      wallclock_slot_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      meta_network_name_eq: z.optional(z.string()),
+      meta_network_name_ne: z.optional(z.string()),
+      meta_network_name_contains: z.optional(z.string()),
+      meta_network_name_starts_with: z.optional(z.string()),
+      meta_network_name_ends_with: z.optional(z.string()),
+      meta_network_name_like: z.optional(z.string()),
+      meta_network_name_not_like: z.optional(z.string()),
+      meta_network_name_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_network_name_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      system_cores_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      system_cores_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      system_cores_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      system_cores_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      system_cores_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      system_cores_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      system_cores_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      system_cores_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      system_cores_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      system_cores_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      mean_core_pct_value: z.optional(z.number()),
+      min_core_pct_value: z.optional(z.number()),
+      max_core_pct_value: z.optional(z.number()),
+      node_class_eq: z.optional(z.string()),
+      node_class_ne: z.optional(z.string()),
+      node_class_contains: z.optional(z.string()),
+      node_class_starts_with: z.optional(z.string()),
+      node_class_ends_with: z.optional(z.string()),
+      node_class_like: z.optional(z.string()),
+      node_class_not_like: z.optional(z.string()),
+      node_class_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      node_class_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      page_size: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }),
+            z.maximum(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' })
+          )
+      ),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zFctNodeCpuUtilizationByProcessServiceListResponse = zListFctNodeCpuUtilizationByProcessResponse;
+
+export const zFctNodeCpuUtilizationByProcessServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    wallclock_slot_start_date_time: z.coerce
+      .bigint()
+      .check(
+        z.minimum(BigInt('-9223372036854775808'), {
+          error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+        }),
+        z.maximum(BigInt('9223372036854775807'), {
+          error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+        })
+      ),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zFctNodeCpuUtilizationByProcessServiceGetResponse = zGetFctNodeCpuUtilizationByProcessResponse;
+
 export const zFctOpcodeGasByOpcodeDailyServiceListData = z.object({
   body: z.optional(z.never()),
   path: z.optional(z.never()),
@@ -86183,6 +86989,778 @@ export const zIntBlockProposerCanonicalServiceGetData = z.object({
  */
 export const zIntBlockProposerCanonicalServiceGetResponse = zGetIntBlockProposerCanonicalResponse;
 
+export const zIntContractCreationServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      block_number_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_number_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      contract_address_eq: z.optional(z.string()),
+      contract_address_ne: z.optional(z.string()),
+      contract_address_contains: z.optional(z.string()),
+      contract_address_starts_with: z.optional(z.string()),
+      contract_address_ends_with: z.optional(z.string()),
+      contract_address_like: z.optional(z.string()),
+      contract_address_not_like: z.optional(z.string()),
+      contract_address_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      contract_address_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      transaction_hash_eq: z.optional(z.string()),
+      transaction_hash_ne: z.optional(z.string()),
+      transaction_hash_contains: z.optional(z.string()),
+      transaction_hash_starts_with: z.optional(z.string()),
+      transaction_hash_ends_with: z.optional(z.string()),
+      transaction_hash_like: z.optional(z.string()),
+      transaction_hash_not_like: z.optional(z.string()),
+      transaction_hash_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      transaction_hash_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      updated_date_time_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      transaction_index_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      transaction_index_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      internal_index_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      internal_index_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      deployer_eq: z.optional(z.string()),
+      deployer_ne: z.optional(z.string()),
+      deployer_contains: z.optional(z.string()),
+      deployer_starts_with: z.optional(z.string()),
+      deployer_ends_with: z.optional(z.string()),
+      deployer_like: z.optional(z.string()),
+      deployer_not_like: z.optional(z.string()),
+      deployer_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      deployer_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      factory_eq: z.optional(z.string()),
+      factory_ne: z.optional(z.string()),
+      factory_contains: z.optional(z.string()),
+      factory_starts_with: z.optional(z.string()),
+      factory_ends_with: z.optional(z.string()),
+      factory_like: z.optional(z.string()),
+      factory_not_like: z.optional(z.string()),
+      factory_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      factory_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      init_code_hash_eq: z.optional(z.string()),
+      init_code_hash_ne: z.optional(z.string()),
+      init_code_hash_contains: z.optional(z.string()),
+      init_code_hash_starts_with: z.optional(z.string()),
+      init_code_hash_ends_with: z.optional(z.string()),
+      init_code_hash_like: z.optional(z.string()),
+      init_code_hash_not_like: z.optional(z.string()),
+      init_code_hash_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      init_code_hash_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      page_size: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }),
+            z.maximum(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' })
+          )
+      ),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntContractCreationServiceListResponse = zListIntContractCreationResponse;
+
+export const zIntContractCreationServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    block_number: z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      ),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntContractCreationServiceGetResponse = zGetIntContractCreationResponse;
+
+export const zIntContractSelfdestructServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      block_number_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_number_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      transaction_index_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      transaction_index_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      internal_index_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      internal_index_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      address_eq: z.optional(z.string()),
+      address_ne: z.optional(z.string()),
+      address_contains: z.optional(z.string()),
+      address_starts_with: z.optional(z.string()),
+      address_ends_with: z.optional(z.string()),
+      address_like: z.optional(z.string()),
+      address_not_like: z.optional(z.string()),
+      address_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      address_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      updated_date_time_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      transaction_hash_eq: z.optional(z.string()),
+      transaction_hash_ne: z.optional(z.string()),
+      transaction_hash_contains: z.optional(z.string()),
+      transaction_hash_starts_with: z.optional(z.string()),
+      transaction_hash_ends_with: z.optional(z.string()),
+      transaction_hash_like: z.optional(z.string()),
+      transaction_hash_not_like: z.optional(z.string()),
+      transaction_hash_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      transaction_hash_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      beneficiary_eq: z.optional(z.string()),
+      beneficiary_ne: z.optional(z.string()),
+      beneficiary_contains: z.optional(z.string()),
+      beneficiary_starts_with: z.optional(z.string()),
+      beneficiary_ends_with: z.optional(z.string()),
+      beneficiary_like: z.optional(z.string()),
+      beneficiary_not_like: z.optional(z.string()),
+      beneficiary_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      beneficiary_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      value_transferred_eq: z.optional(z.string()),
+      value_transferred_ne: z.optional(z.string()),
+      value_transferred_contains: z.optional(z.string()),
+      value_transferred_starts_with: z.optional(z.string()),
+      value_transferred_ends_with: z.optional(z.string()),
+      value_transferred_like: z.optional(z.string()),
+      value_transferred_not_like: z.optional(z.string()),
+      value_transferred_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      value_transferred_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      ephemeral_eq: z.optional(z.boolean()),
+      ephemeral_ne: z.optional(z.boolean()),
+      storage_cleared_eq: z.optional(z.boolean()),
+      storage_cleared_ne: z.optional(z.boolean()),
+      creation_block_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      creation_block_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      creation_block_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      creation_block_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      creation_block_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      creation_block_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      creation_block_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      creation_block_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      creation_block_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      creation_block_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      creation_transaction_hash_eq: z.optional(z.string()),
+      creation_transaction_hash_ne: z.optional(z.string()),
+      creation_transaction_hash_contains: z.optional(z.string()),
+      creation_transaction_hash_starts_with: z.optional(z.string()),
+      creation_transaction_hash_ends_with: z.optional(z.string()),
+      creation_transaction_hash_like: z.optional(z.string()),
+      creation_transaction_hash_not_like: z.optional(z.string()),
+      creation_transaction_hash_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      creation_transaction_hash_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      page_size: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }),
+            z.maximum(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' })
+          )
+      ),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntContractSelfdestructServiceListResponse = zListIntContractSelfdestructResponse;
+
+export const zIntContractSelfdestructServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    block_number: z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      ),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntContractSelfdestructServiceGetResponse = zGetIntContractSelfdestructResponse;
+
 export const zIntContractStorageExpiry1mServiceListData = z.object({
   body: z.optional(z.never()),
   path: z.optional(z.never()),
@@ -98621,7 +100199,7 @@ export const zIntEngineNewPayloadServiceGetData = z.object({
  */
 export const zIntEngineNewPayloadServiceGetResponse = zGetIntEngineNewPayloadResponse;
 
-export const zIntEngineNewPayloadFastestServiceListData = z.object({
+export const zIntEngineNewPayloadFastestExecutionByNodeClassServiceListData = z.object({
   body: z.optional(z.never()),
   path: z.optional(z.never()),
   query: z.optional(
@@ -99100,9 +100678,10 @@ export const zIntEngineNewPayloadFastestServiceListData = z.object({
 /**
  * OK
  */
-export const zIntEngineNewPayloadFastestServiceListResponse = zListIntEngineNewPayloadFastestResponse;
+export const zIntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse =
+  zListIntEngineNewPayloadFastestExecutionByNodeClassResponse;
 
-export const zIntEngineNewPayloadFastestServiceGetData = z.object({
+export const zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetData = z.object({
   body: z.optional(z.never()),
   path: z.object({
     slot_start_date_time: z
@@ -99118,7 +100697,8 @@ export const zIntEngineNewPayloadFastestServiceGetData = z.object({
 /**
  * OK
  */
-export const zIntEngineNewPayloadFastestServiceGetResponse = zGetIntEngineNewPayloadFastestResponse;
+export const zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse =
+  zGetIntEngineNewPayloadFastestExecutionByNodeClassResponse;
 
 export const zIntExecutionBlockByDateServiceListData = z.object({
   body: z.optional(z.never()),
@@ -99411,6 +100991,357 @@ export const zIntExecutionBlockByDateServiceGetData = z.object({
  * OK
  */
 export const zIntExecutionBlockByDateServiceGetResponse = zGetIntExecutionBlockByDateResponse;
+
+export const zIntStorageSelfdestructDiffsServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      block_number_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      block_number_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_number_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      transaction_hash_eq: z.optional(z.string()),
+      transaction_hash_ne: z.optional(z.string()),
+      transaction_hash_contains: z.optional(z.string()),
+      transaction_hash_starts_with: z.optional(z.string()),
+      transaction_hash_ends_with: z.optional(z.string()),
+      transaction_hash_like: z.optional(z.string()),
+      transaction_hash_not_like: z.optional(z.string()),
+      transaction_hash_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      transaction_hash_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      internal_index_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      internal_index_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      internal_index_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_eq: z.optional(z.string()),
+      slot_ne: z.optional(z.string()),
+      slot_contains: z.optional(z.string()),
+      slot_starts_with: z.optional(z.string()),
+      slot_ends_with: z.optional(z.string()),
+      slot_like: z.optional(z.string()),
+      slot_not_like: z.optional(z.string()),
+      slot_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      slot_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      updated_date_time_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      transaction_index_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      transaction_index_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      transaction_index_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      address_eq: z.optional(z.string()),
+      address_ne: z.optional(z.string()),
+      address_contains: z.optional(z.string()),
+      address_starts_with: z.optional(z.string()),
+      address_ends_with: z.optional(z.string()),
+      address_like: z.optional(z.string()),
+      address_not_like: z.optional(z.string()),
+      address_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      address_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      from_value_eq: z.optional(z.string()),
+      from_value_ne: z.optional(z.string()),
+      from_value_contains: z.optional(z.string()),
+      from_value_starts_with: z.optional(z.string()),
+      from_value_ends_with: z.optional(z.string()),
+      from_value_like: z.optional(z.string()),
+      from_value_not_like: z.optional(z.string()),
+      from_value_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      from_value_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      to_value_eq: z.optional(z.string()),
+      to_value_ne: z.optional(z.string()),
+      to_value_contains: z.optional(z.string()),
+      to_value_starts_with: z.optional(z.string()),
+      to_value_ends_with: z.optional(z.string()),
+      to_value_like: z.optional(z.string()),
+      to_value_not_like: z.optional(z.string()),
+      to_value_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      to_value_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      page_size: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }),
+            z.maximum(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' })
+          )
+      ),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntStorageSelfdestructDiffsServiceListResponse = zListIntStorageSelfdestructDiffsResponse;
+
+export const zIntStorageSelfdestructDiffsServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    block_number: z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      ),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntStorageSelfdestructDiffsServiceGetResponse = zGetIntStorageSelfdestructDiffsResponse;
 
 export const zIntStorageSlotDiffServiceListData = z.object({
   body: z.optional(z.never()),

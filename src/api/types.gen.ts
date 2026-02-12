@@ -4560,6 +4560,61 @@ export type FctNodeActiveLast24h = {
   username?: string;
 };
 
+export type FctNodeCpuUtilizationByProcess = {
+  /**
+   * Client type: CL or EL
+   */
+  client_type?: string;
+  /**
+   * Maximum CPU core utilization percentage (100pct = 1 core)
+   */
+  max_core_pct?: number;
+  /**
+   * Mean CPU core utilization percentage (100pct = 1 core)
+   */
+  mean_core_pct?: number;
+  /**
+   * Name of the observoor client that collected the data
+   */
+  meta_client_name?: string;
+  /**
+   * Ethereum network name
+   */
+  meta_network_name?: string;
+  /**
+   * Minimum CPU core utilization percentage (100pct = 1 core)
+   */
+  min_core_pct?: number;
+  /**
+   * Node classification for filtering (e.g. eip7870)
+   */
+  node_class?: string;
+  /**
+   * Process ID of the monitored client
+   */
+  pid?: number;
+  /**
+   * Total system CPU cores
+   */
+  system_cores?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The wallclock slot number
+   */
+  wallclock_slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  wallclock_slot_start_date_time?: number;
+  /**
+   * Start of the sub-slot aggregation window
+   */
+  window_start?: number;
+};
+
 export type FctOpcodeGasByOpcodeDaily = {
   /**
    * Average executions per block
@@ -6150,6 +6205,13 @@ export type GetFctNodeActiveLast24hResponse = {
 };
 
 /**
+ * Response for getting a single fct_node_cpu_utilization_by_process record
+ */
+export type GetFctNodeCpuUtilizationByProcessResponse = {
+  item?: FctNodeCpuUtilizationByProcess;
+};
+
+/**
  * Response for getting a single fct_opcode_gas_by_opcode_daily record
  */
 export type GetFctOpcodeGasByOpcodeDailyResponse = {
@@ -6416,6 +6478,20 @@ export type GetIntBlockProposerCanonicalResponse = {
 };
 
 /**
+ * Response for getting a single int_contract_creation record
+ */
+export type GetIntContractCreationResponse = {
+  item?: IntContractCreation;
+};
+
+/**
+ * Response for getting a single int_contract_selfdestruct record
+ */
+export type GetIntContractSelfdestructResponse = {
+  item?: IntContractSelfdestruct;
+};
+
+/**
  * Response for getting a single int_contract_storage_expiry_1m record
  */
 export type GetIntContractStorageExpiry1mResponse = {
@@ -6556,10 +6632,10 @@ export type GetIntEngineGetBlobsResponse = {
 };
 
 /**
- * Response for getting a single int_engine_new_payload_fastest record
+ * Response for getting a single int_engine_new_payload_fastest_execution_by_node_class record
  */
-export type GetIntEngineNewPayloadFastestResponse = {
-  item?: IntEngineNewPayloadFastest;
+export type GetIntEngineNewPayloadFastestExecutionByNodeClassResponse = {
+  item?: IntEngineNewPayloadFastestExecutionByNodeClass;
 };
 
 /**
@@ -6574,6 +6650,13 @@ export type GetIntEngineNewPayloadResponse = {
  */
 export type GetIntExecutionBlockByDateResponse = {
   item?: IntExecutionBlockByDate;
+};
+
+/**
+ * Response for getting a single int_storage_selfdestruct_diffs record
+ */
+export type GetIntStorageSelfdestructDiffsResponse = {
+  item?: IntStorageSelfdestructDiffs;
 };
 
 /**
@@ -7353,6 +7436,96 @@ export type IntBlockProposerCanonical = {
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
+};
+
+export type IntContractCreation = {
+  /**
+   * Block where contract was created
+   */
+  block_number?: number;
+  /**
+   * Address of created contract
+   */
+  contract_address?: string;
+  /**
+   * Address that deployed the contract
+   */
+  deployer?: string;
+  /**
+   * Factory contract address if applicable
+   */
+  factory?: string;
+  /**
+   * Hash of the initialization code
+   */
+  init_code_hash?: string;
+  /**
+   * Position within transaction
+   */
+  internal_index?: number;
+  /**
+   * Transaction hash
+   */
+  transaction_hash?: string;
+  /**
+   * Position in block
+   */
+  transaction_index?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractSelfdestruct = {
+  /**
+   * Contract that was destroyed
+   */
+  address?: string;
+  /**
+   * Address receiving the ETH
+   */
+  beneficiary?: string;
+  /**
+   * Block where SELFDESTRUCT occurred
+   */
+  block_number?: number;
+  /**
+   * Block where contract was created (if known)
+   */
+  creation_block?: number | null;
+  /**
+   * Transaction that created the contract (if known)
+   */
+  creation_transaction_hash?: string | null;
+  /**
+   * True if contract was created and destroyed in the same transaction - storage always cleared per EIP-6780
+   */
+  ephemeral?: boolean;
+  /**
+   * Position within transaction traces
+   */
+  internal_index?: number;
+  /**
+   * True if storage was cleared (pre-Shanghai OR ephemeral)
+   */
+  storage_cleared?: boolean;
+  /**
+   * Transaction hash
+   */
+  transaction_hash?: string;
+  /**
+   * Position in block
+   */
+  transaction_index?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Amount of ETH sent to beneficiary
+   */
+  value_transferred?: string;
 };
 
 export type IntContractStorageExpiry1m = {
@@ -8426,7 +8599,7 @@ export type IntEngineNewPayload = {
   validation_error?: string | null;
 };
 
-export type IntEngineNewPayloadFastest = {
+export type IntEngineNewPayloadFastestExecutionByNodeClass = {
   /**
    * Execution block hash (hex encoded with 0x prefix)
    */
@@ -8482,6 +8655,45 @@ export type IntExecutionBlockByDate = {
    * The block number
    */
   block_number?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntStorageSelfdestructDiffs = {
+  /**
+   * Contract address that was selfdestructed
+   */
+  address?: string;
+  /**
+   * Block where SELFDESTRUCT occurred
+   */
+  block_number?: number;
+  /**
+   * Value before clearing (last known value)
+   */
+  from_value?: string;
+  /**
+   * Internal index of the SELFDESTRUCT trace
+   */
+  internal_index?: number;
+  /**
+   * Storage slot key being cleared
+   */
+  slot?: string;
+  /**
+   * Value after clearing (always 0x00...00)
+   */
+  to_value?: string;
+  /**
+   * Transaction hash of the SELFDESTRUCT
+   */
+  transaction_hash?: string;
+  /**
+   * Transaction index within the block
+   */
+  transaction_index?: number;
   /**
    * Timestamp when the record was last updated
    */
@@ -10490,6 +10702,20 @@ export type ListFctNodeActiveLast24hResponse = {
 };
 
 /**
+ * Response for listing fct_node_cpu_utilization_by_process records
+ */
+export type ListFctNodeCpuUtilizationByProcessResponse = {
+  /**
+   * The list of fct_node_cpu_utilization_by_process.
+   */
+  fct_node_cpu_utilization_by_process?: Array<FctNodeCpuUtilizationByProcess>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_opcode_gas_by_opcode_daily records
  */
 export type ListFctOpcodeGasByOpcodeDailyResponse = {
@@ -11022,6 +11248,34 @@ export type ListIntBlockProposerCanonicalResponse = {
 };
 
 /**
+ * Response for listing int_contract_creation records
+ */
+export type ListIntContractCreationResponse = {
+  /**
+   * The list of int_contract_creation.
+   */
+  int_contract_creation?: Array<IntContractCreation>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_selfdestruct records
+ */
+export type ListIntContractSelfdestructResponse = {
+  /**
+   * The list of int_contract_selfdestruct.
+   */
+  int_contract_selfdestruct?: Array<IntContractSelfdestruct>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing int_contract_storage_expiry_1m records
  */
 export type ListIntContractStorageExpiry1mResponse = {
@@ -11302,13 +11556,13 @@ export type ListIntEngineGetBlobsResponse = {
 };
 
 /**
- * Response for listing int_engine_new_payload_fastest records
+ * Response for listing int_engine_new_payload_fastest_execution_by_node_class records
  */
-export type ListIntEngineNewPayloadFastestResponse = {
+export type ListIntEngineNewPayloadFastestExecutionByNodeClassResponse = {
   /**
-   * The list of int_engine_new_payload_fastest.
+   * The list of int_engine_new_payload_fastest_execution_by_node_class.
    */
-  int_engine_new_payload_fastest?: Array<IntEngineNewPayloadFastest>;
+  int_engine_new_payload_fastest_execution_by_node_class?: Array<IntEngineNewPayloadFastestExecutionByNodeClass>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -11337,6 +11591,20 @@ export type ListIntExecutionBlockByDateResponse = {
    * The list of int_execution_block_by_date.
    */
   int_execution_block_by_date?: Array<IntExecutionBlockByDate>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_storage_selfdestruct_diffs records
+ */
+export type ListIntStorageSelfdestructDiffsResponse = {
+  /**
+   * The list of int_storage_selfdestruct_diffs.
+   */
+  int_storage_selfdestruct_diffs?: Array<IntStorageSelfdestructDiffs>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -54833,6 +55101,474 @@ export type FctNodeActiveLast24hServiceGetResponses = {
 export type FctNodeActiveLast24hServiceGetResponse =
   FctNodeActiveLast24hServiceGetResponses[keyof FctNodeActiveLast24hServiceGetResponses];
 
+export type FctNodeCpuUtilizationByProcessServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    wallclock_slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    wallclock_slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    wallclock_slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    wallclock_slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    wallclock_slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    wallclock_slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    wallclock_slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    wallclock_slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    wallclock_slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    wallclock_slot_start_date_time_not_in_values?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: eq)
+     */
+    meta_client_name_eq?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: ne)
+     */
+    meta_client_name_ne?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: contains)
+     */
+    meta_client_name_contains?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: starts_with)
+     */
+    meta_client_name_starts_with?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: ends_with)
+     */
+    meta_client_name_ends_with?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: like)
+     */
+    meta_client_name_like?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: not_like)
+     */
+    meta_client_name_not_like?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: in_values) (comma-separated list)
+     */
+    meta_client_name_in_values?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_name_not_in_values?: string;
+    /**
+     * Client type: CL or EL (filter: eq)
+     */
+    client_type_eq?: string;
+    /**
+     * Client type: CL or EL (filter: ne)
+     */
+    client_type_ne?: string;
+    /**
+     * Client type: CL or EL (filter: contains)
+     */
+    client_type_contains?: string;
+    /**
+     * Client type: CL or EL (filter: starts_with)
+     */
+    client_type_starts_with?: string;
+    /**
+     * Client type: CL or EL (filter: ends_with)
+     */
+    client_type_ends_with?: string;
+    /**
+     * Client type: CL or EL (filter: like)
+     */
+    client_type_like?: string;
+    /**
+     * Client type: CL or EL (filter: not_like)
+     */
+    client_type_not_like?: string;
+    /**
+     * Client type: CL or EL (filter: in_values) (comma-separated list)
+     */
+    client_type_in_values?: string;
+    /**
+     * Client type: CL or EL (filter: not_in_values) (comma-separated list)
+     */
+    client_type_not_in_values?: string;
+    /**
+     * Process ID of the monitored client (filter: eq)
+     */
+    pid_eq?: number;
+    /**
+     * Process ID of the monitored client (filter: ne)
+     */
+    pid_ne?: number;
+    /**
+     * Process ID of the monitored client (filter: lt)
+     */
+    pid_lt?: number;
+    /**
+     * Process ID of the monitored client (filter: lte)
+     */
+    pid_lte?: number;
+    /**
+     * Process ID of the monitored client (filter: gt)
+     */
+    pid_gt?: number;
+    /**
+     * Process ID of the monitored client (filter: gte)
+     */
+    pid_gte?: number;
+    /**
+     * Process ID of the monitored client (filter: between_min)
+     */
+    pid_between_min?: number;
+    /**
+     * Process ID of the monitored client (filter: between_max_value)
+     */
+    pid_between_max_value?: number;
+    /**
+     * Process ID of the monitored client (filter: in_values) (comma-separated list)
+     */
+    pid_in_values?: string;
+    /**
+     * Process ID of the monitored client (filter: not_in_values) (comma-separated list)
+     */
+    pid_not_in_values?: string;
+    /**
+     * Start of the sub-slot aggregation window (filter: eq)
+     */
+    window_start_eq?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: ne)
+     */
+    window_start_ne?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: lt)
+     */
+    window_start_lt?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: lte)
+     */
+    window_start_lte?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: gt)
+     */
+    window_start_gt?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: gte)
+     */
+    window_start_gte?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: between_min)
+     */
+    window_start_between_min?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: between_max_value)
+     */
+    window_start_between_max_value?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: in_values) (comma-separated list)
+     */
+    window_start_in_values?: string;
+    /**
+     * Start of the sub-slot aggregation window (filter: not_in_values) (comma-separated list)
+     */
+    window_start_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The wallclock slot number (filter: eq)
+     */
+    wallclock_slot_eq?: number;
+    /**
+     * The wallclock slot number (filter: ne)
+     */
+    wallclock_slot_ne?: number;
+    /**
+     * The wallclock slot number (filter: lt)
+     */
+    wallclock_slot_lt?: number;
+    /**
+     * The wallclock slot number (filter: lte)
+     */
+    wallclock_slot_lte?: number;
+    /**
+     * The wallclock slot number (filter: gt)
+     */
+    wallclock_slot_gt?: number;
+    /**
+     * The wallclock slot number (filter: gte)
+     */
+    wallclock_slot_gte?: number;
+    /**
+     * The wallclock slot number (filter: between_min)
+     */
+    wallclock_slot_between_min?: number;
+    /**
+     * The wallclock slot number (filter: between_max_value)
+     */
+    wallclock_slot_between_max_value?: number;
+    /**
+     * The wallclock slot number (filter: in_values) (comma-separated list)
+     */
+    wallclock_slot_in_values?: string;
+    /**
+     * The wallclock slot number (filter: not_in_values) (comma-separated list)
+     */
+    wallclock_slot_not_in_values?: string;
+    /**
+     * Ethereum network name (filter: eq)
+     */
+    meta_network_name_eq?: string;
+    /**
+     * Ethereum network name (filter: ne)
+     */
+    meta_network_name_ne?: string;
+    /**
+     * Ethereum network name (filter: contains)
+     */
+    meta_network_name_contains?: string;
+    /**
+     * Ethereum network name (filter: starts_with)
+     */
+    meta_network_name_starts_with?: string;
+    /**
+     * Ethereum network name (filter: ends_with)
+     */
+    meta_network_name_ends_with?: string;
+    /**
+     * Ethereum network name (filter: like)
+     */
+    meta_network_name_like?: string;
+    /**
+     * Ethereum network name (filter: not_like)
+     */
+    meta_network_name_not_like?: string;
+    /**
+     * Ethereum network name (filter: in_values) (comma-separated list)
+     */
+    meta_network_name_in_values?: string;
+    /**
+     * Ethereum network name (filter: not_in_values) (comma-separated list)
+     */
+    meta_network_name_not_in_values?: string;
+    /**
+     * Total system CPU cores (filter: eq)
+     */
+    system_cores_eq?: number;
+    /**
+     * Total system CPU cores (filter: ne)
+     */
+    system_cores_ne?: number;
+    /**
+     * Total system CPU cores (filter: lt)
+     */
+    system_cores_lt?: number;
+    /**
+     * Total system CPU cores (filter: lte)
+     */
+    system_cores_lte?: number;
+    /**
+     * Total system CPU cores (filter: gt)
+     */
+    system_cores_gt?: number;
+    /**
+     * Total system CPU cores (filter: gte)
+     */
+    system_cores_gte?: number;
+    /**
+     * Total system CPU cores (filter: between_min)
+     */
+    system_cores_between_min?: number;
+    /**
+     * Total system CPU cores (filter: between_max_value)
+     */
+    system_cores_between_max_value?: number;
+    /**
+     * Total system CPU cores (filter: in_values) (comma-separated list)
+     */
+    system_cores_in_values?: string;
+    /**
+     * Total system CPU cores (filter: not_in_values) (comma-separated list)
+     */
+    system_cores_not_in_values?: string;
+    /**
+     * Filter mean_core_pct using value
+     */
+    mean_core_pct_value?: number;
+    /**
+     * Filter min_core_pct using value
+     */
+    min_core_pct_value?: number;
+    /**
+     * Filter max_core_pct using value
+     */
+    max_core_pct_value?: number;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * The maximum number of fct_node_cpu_utilization_by_process to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctNodeCpuUtilizationByProcess` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_node_cpu_utilization_by_process';
+};
+
+export type FctNodeCpuUtilizationByProcessServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctNodeCpuUtilizationByProcessServiceListError =
+  FctNodeCpuUtilizationByProcessServiceListErrors[keyof FctNodeCpuUtilizationByProcessServiceListErrors];
+
+export type FctNodeCpuUtilizationByProcessServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctNodeCpuUtilizationByProcessResponse;
+};
+
+export type FctNodeCpuUtilizationByProcessServiceListResponse =
+  FctNodeCpuUtilizationByProcessServiceListResponses[keyof FctNodeCpuUtilizationByProcessServiceListResponses];
+
+export type FctNodeCpuUtilizationByProcessServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    wallclock_slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_node_cpu_utilization_by_process/{wallclock_slot_start_date_time}';
+};
+
+export type FctNodeCpuUtilizationByProcessServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctNodeCpuUtilizationByProcessServiceGetError =
+  FctNodeCpuUtilizationByProcessServiceGetErrors[keyof FctNodeCpuUtilizationByProcessServiceGetErrors];
+
+export type FctNodeCpuUtilizationByProcessServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctNodeCpuUtilizationByProcessResponse;
+};
+
+export type FctNodeCpuUtilizationByProcessServiceGetResponse =
+  FctNodeCpuUtilizationByProcessServiceGetResponses[keyof FctNodeCpuUtilizationByProcessServiceGetResponses];
+
 export type FctOpcodeGasByOpcodeDailyServiceListData = {
   body?: never;
   path?: never;
@@ -69723,6 +70459,886 @@ export type IntBlockProposerCanonicalServiceGetResponses = {
 export type IntBlockProposerCanonicalServiceGetResponse =
   IntBlockProposerCanonicalServiceGetResponses[keyof IntBlockProposerCanonicalServiceGetResponses];
 
+export type IntContractCreationServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Block where contract was created (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * Block where contract was created (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * Block where contract was created (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * Block where contract was created (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * Block where contract was created (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * Block where contract was created (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * Block where contract was created (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * Block where contract was created (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * Block where contract was created (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * Block where contract was created (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * Address of created contract (filter: eq)
+     */
+    contract_address_eq?: string;
+    /**
+     * Address of created contract (filter: ne)
+     */
+    contract_address_ne?: string;
+    /**
+     * Address of created contract (filter: contains)
+     */
+    contract_address_contains?: string;
+    /**
+     * Address of created contract (filter: starts_with)
+     */
+    contract_address_starts_with?: string;
+    /**
+     * Address of created contract (filter: ends_with)
+     */
+    contract_address_ends_with?: string;
+    /**
+     * Address of created contract (filter: like)
+     */
+    contract_address_like?: string;
+    /**
+     * Address of created contract (filter: not_like)
+     */
+    contract_address_not_like?: string;
+    /**
+     * Address of created contract (filter: in_values) (comma-separated list)
+     */
+    contract_address_in_values?: string;
+    /**
+     * Address of created contract (filter: not_in_values) (comma-separated list)
+     */
+    contract_address_not_in_values?: string;
+    /**
+     * Transaction hash (filter: eq)
+     */
+    transaction_hash_eq?: string;
+    /**
+     * Transaction hash (filter: ne)
+     */
+    transaction_hash_ne?: string;
+    /**
+     * Transaction hash (filter: contains)
+     */
+    transaction_hash_contains?: string;
+    /**
+     * Transaction hash (filter: starts_with)
+     */
+    transaction_hash_starts_with?: string;
+    /**
+     * Transaction hash (filter: ends_with)
+     */
+    transaction_hash_ends_with?: string;
+    /**
+     * Transaction hash (filter: like)
+     */
+    transaction_hash_like?: string;
+    /**
+     * Transaction hash (filter: not_like)
+     */
+    transaction_hash_not_like?: string;
+    /**
+     * Transaction hash (filter: in_values) (comma-separated list)
+     */
+    transaction_hash_in_values?: string;
+    /**
+     * Transaction hash (filter: not_in_values) (comma-separated list)
+     */
+    transaction_hash_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Position in block (filter: eq)
+     */
+    transaction_index_eq?: number;
+    /**
+     * Position in block (filter: ne)
+     */
+    transaction_index_ne?: number;
+    /**
+     * Position in block (filter: lt)
+     */
+    transaction_index_lt?: number;
+    /**
+     * Position in block (filter: lte)
+     */
+    transaction_index_lte?: number;
+    /**
+     * Position in block (filter: gt)
+     */
+    transaction_index_gt?: number;
+    /**
+     * Position in block (filter: gte)
+     */
+    transaction_index_gte?: number;
+    /**
+     * Position in block (filter: between_min)
+     */
+    transaction_index_between_min?: number;
+    /**
+     * Position in block (filter: between_max_value)
+     */
+    transaction_index_between_max_value?: number;
+    /**
+     * Position in block (filter: in_values) (comma-separated list)
+     */
+    transaction_index_in_values?: string;
+    /**
+     * Position in block (filter: not_in_values) (comma-separated list)
+     */
+    transaction_index_not_in_values?: string;
+    /**
+     * Position within transaction (filter: eq)
+     */
+    internal_index_eq?: number;
+    /**
+     * Position within transaction (filter: ne)
+     */
+    internal_index_ne?: number;
+    /**
+     * Position within transaction (filter: lt)
+     */
+    internal_index_lt?: number;
+    /**
+     * Position within transaction (filter: lte)
+     */
+    internal_index_lte?: number;
+    /**
+     * Position within transaction (filter: gt)
+     */
+    internal_index_gt?: number;
+    /**
+     * Position within transaction (filter: gte)
+     */
+    internal_index_gte?: number;
+    /**
+     * Position within transaction (filter: between_min)
+     */
+    internal_index_between_min?: number;
+    /**
+     * Position within transaction (filter: between_max_value)
+     */
+    internal_index_between_max_value?: number;
+    /**
+     * Position within transaction (filter: in_values) (comma-separated list)
+     */
+    internal_index_in_values?: string;
+    /**
+     * Position within transaction (filter: not_in_values) (comma-separated list)
+     */
+    internal_index_not_in_values?: string;
+    /**
+     * Address that deployed the contract (filter: eq)
+     */
+    deployer_eq?: string;
+    /**
+     * Address that deployed the contract (filter: ne)
+     */
+    deployer_ne?: string;
+    /**
+     * Address that deployed the contract (filter: contains)
+     */
+    deployer_contains?: string;
+    /**
+     * Address that deployed the contract (filter: starts_with)
+     */
+    deployer_starts_with?: string;
+    /**
+     * Address that deployed the contract (filter: ends_with)
+     */
+    deployer_ends_with?: string;
+    /**
+     * Address that deployed the contract (filter: like)
+     */
+    deployer_like?: string;
+    /**
+     * Address that deployed the contract (filter: not_like)
+     */
+    deployer_not_like?: string;
+    /**
+     * Address that deployed the contract (filter: in_values) (comma-separated list)
+     */
+    deployer_in_values?: string;
+    /**
+     * Address that deployed the contract (filter: not_in_values) (comma-separated list)
+     */
+    deployer_not_in_values?: string;
+    /**
+     * Factory contract address if applicable (filter: eq)
+     */
+    factory_eq?: string;
+    /**
+     * Factory contract address if applicable (filter: ne)
+     */
+    factory_ne?: string;
+    /**
+     * Factory contract address if applicable (filter: contains)
+     */
+    factory_contains?: string;
+    /**
+     * Factory contract address if applicable (filter: starts_with)
+     */
+    factory_starts_with?: string;
+    /**
+     * Factory contract address if applicable (filter: ends_with)
+     */
+    factory_ends_with?: string;
+    /**
+     * Factory contract address if applicable (filter: like)
+     */
+    factory_like?: string;
+    /**
+     * Factory contract address if applicable (filter: not_like)
+     */
+    factory_not_like?: string;
+    /**
+     * Factory contract address if applicable (filter: in_values) (comma-separated list)
+     */
+    factory_in_values?: string;
+    /**
+     * Factory contract address if applicable (filter: not_in_values) (comma-separated list)
+     */
+    factory_not_in_values?: string;
+    /**
+     * Hash of the initialization code (filter: eq)
+     */
+    init_code_hash_eq?: string;
+    /**
+     * Hash of the initialization code (filter: ne)
+     */
+    init_code_hash_ne?: string;
+    /**
+     * Hash of the initialization code (filter: contains)
+     */
+    init_code_hash_contains?: string;
+    /**
+     * Hash of the initialization code (filter: starts_with)
+     */
+    init_code_hash_starts_with?: string;
+    /**
+     * Hash of the initialization code (filter: ends_with)
+     */
+    init_code_hash_ends_with?: string;
+    /**
+     * Hash of the initialization code (filter: like)
+     */
+    init_code_hash_like?: string;
+    /**
+     * Hash of the initialization code (filter: not_like)
+     */
+    init_code_hash_not_like?: string;
+    /**
+     * Hash of the initialization code (filter: in_values) (comma-separated list)
+     */
+    init_code_hash_in_values?: string;
+    /**
+     * Hash of the initialization code (filter: not_in_values) (comma-separated list)
+     */
+    init_code_hash_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_creation to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractCreation` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_creation';
+};
+
+export type IntContractCreationServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractCreationServiceListError =
+  IntContractCreationServiceListErrors[keyof IntContractCreationServiceListErrors];
+
+export type IntContractCreationServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractCreationResponse;
+};
+
+export type IntContractCreationServiceListResponse =
+  IntContractCreationServiceListResponses[keyof IntContractCreationServiceListResponses];
+
+export type IntContractCreationServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Block where contract was created
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_creation/{block_number}';
+};
+
+export type IntContractCreationServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractCreationServiceGetError =
+  IntContractCreationServiceGetErrors[keyof IntContractCreationServiceGetErrors];
+
+export type IntContractCreationServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractCreationResponse;
+};
+
+export type IntContractCreationServiceGetResponse =
+  IntContractCreationServiceGetResponses[keyof IntContractCreationServiceGetResponses];
+
+export type IntContractSelfdestructServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Block where SELFDESTRUCT occurred (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * Position in block (filter: eq)
+     */
+    transaction_index_eq?: number;
+    /**
+     * Position in block (filter: ne)
+     */
+    transaction_index_ne?: number;
+    /**
+     * Position in block (filter: lt)
+     */
+    transaction_index_lt?: number;
+    /**
+     * Position in block (filter: lte)
+     */
+    transaction_index_lte?: number;
+    /**
+     * Position in block (filter: gt)
+     */
+    transaction_index_gt?: number;
+    /**
+     * Position in block (filter: gte)
+     */
+    transaction_index_gte?: number;
+    /**
+     * Position in block (filter: between_min)
+     */
+    transaction_index_between_min?: number;
+    /**
+     * Position in block (filter: between_max_value)
+     */
+    transaction_index_between_max_value?: number;
+    /**
+     * Position in block (filter: in_values) (comma-separated list)
+     */
+    transaction_index_in_values?: string;
+    /**
+     * Position in block (filter: not_in_values) (comma-separated list)
+     */
+    transaction_index_not_in_values?: string;
+    /**
+     * Position within transaction traces (filter: eq)
+     */
+    internal_index_eq?: number;
+    /**
+     * Position within transaction traces (filter: ne)
+     */
+    internal_index_ne?: number;
+    /**
+     * Position within transaction traces (filter: lt)
+     */
+    internal_index_lt?: number;
+    /**
+     * Position within transaction traces (filter: lte)
+     */
+    internal_index_lte?: number;
+    /**
+     * Position within transaction traces (filter: gt)
+     */
+    internal_index_gt?: number;
+    /**
+     * Position within transaction traces (filter: gte)
+     */
+    internal_index_gte?: number;
+    /**
+     * Position within transaction traces (filter: between_min)
+     */
+    internal_index_between_min?: number;
+    /**
+     * Position within transaction traces (filter: between_max_value)
+     */
+    internal_index_between_max_value?: number;
+    /**
+     * Position within transaction traces (filter: in_values) (comma-separated list)
+     */
+    internal_index_in_values?: string;
+    /**
+     * Position within transaction traces (filter: not_in_values) (comma-separated list)
+     */
+    internal_index_not_in_values?: string;
+    /**
+     * Contract that was destroyed (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * Contract that was destroyed (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * Contract that was destroyed (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * Contract that was destroyed (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * Contract that was destroyed (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * Contract that was destroyed (filter: like)
+     */
+    address_like?: string;
+    /**
+     * Contract that was destroyed (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * Contract that was destroyed (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * Contract that was destroyed (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Transaction hash (filter: eq)
+     */
+    transaction_hash_eq?: string;
+    /**
+     * Transaction hash (filter: ne)
+     */
+    transaction_hash_ne?: string;
+    /**
+     * Transaction hash (filter: contains)
+     */
+    transaction_hash_contains?: string;
+    /**
+     * Transaction hash (filter: starts_with)
+     */
+    transaction_hash_starts_with?: string;
+    /**
+     * Transaction hash (filter: ends_with)
+     */
+    transaction_hash_ends_with?: string;
+    /**
+     * Transaction hash (filter: like)
+     */
+    transaction_hash_like?: string;
+    /**
+     * Transaction hash (filter: not_like)
+     */
+    transaction_hash_not_like?: string;
+    /**
+     * Transaction hash (filter: in_values) (comma-separated list)
+     */
+    transaction_hash_in_values?: string;
+    /**
+     * Transaction hash (filter: not_in_values) (comma-separated list)
+     */
+    transaction_hash_not_in_values?: string;
+    /**
+     * Address receiving the ETH (filter: eq)
+     */
+    beneficiary_eq?: string;
+    /**
+     * Address receiving the ETH (filter: ne)
+     */
+    beneficiary_ne?: string;
+    /**
+     * Address receiving the ETH (filter: contains)
+     */
+    beneficiary_contains?: string;
+    /**
+     * Address receiving the ETH (filter: starts_with)
+     */
+    beneficiary_starts_with?: string;
+    /**
+     * Address receiving the ETH (filter: ends_with)
+     */
+    beneficiary_ends_with?: string;
+    /**
+     * Address receiving the ETH (filter: like)
+     */
+    beneficiary_like?: string;
+    /**
+     * Address receiving the ETH (filter: not_like)
+     */
+    beneficiary_not_like?: string;
+    /**
+     * Address receiving the ETH (filter: in_values) (comma-separated list)
+     */
+    beneficiary_in_values?: string;
+    /**
+     * Address receiving the ETH (filter: not_in_values) (comma-separated list)
+     */
+    beneficiary_not_in_values?: string;
+    /**
+     * Amount of ETH sent to beneficiary (filter: eq)
+     */
+    value_transferred_eq?: string;
+    /**
+     * Amount of ETH sent to beneficiary (filter: ne)
+     */
+    value_transferred_ne?: string;
+    /**
+     * Amount of ETH sent to beneficiary (filter: contains)
+     */
+    value_transferred_contains?: string;
+    /**
+     * Amount of ETH sent to beneficiary (filter: starts_with)
+     */
+    value_transferred_starts_with?: string;
+    /**
+     * Amount of ETH sent to beneficiary (filter: ends_with)
+     */
+    value_transferred_ends_with?: string;
+    /**
+     * Amount of ETH sent to beneficiary (filter: like)
+     */
+    value_transferred_like?: string;
+    /**
+     * Amount of ETH sent to beneficiary (filter: not_like)
+     */
+    value_transferred_not_like?: string;
+    /**
+     * Amount of ETH sent to beneficiary (filter: in_values) (comma-separated list)
+     */
+    value_transferred_in_values?: string;
+    /**
+     * Amount of ETH sent to beneficiary (filter: not_in_values) (comma-separated list)
+     */
+    value_transferred_not_in_values?: string;
+    /**
+     * True if contract was created and destroyed in the same transaction - storage always cleared per EIP-6780 (filter: eq)
+     */
+    ephemeral_eq?: boolean;
+    /**
+     * True if contract was created and destroyed in the same transaction - storage always cleared per EIP-6780 (filter: ne)
+     */
+    ephemeral_ne?: boolean;
+    /**
+     * True if storage was cleared (pre-Shanghai OR ephemeral) (filter: eq)
+     */
+    storage_cleared_eq?: boolean;
+    /**
+     * True if storage was cleared (pre-Shanghai OR ephemeral) (filter: ne)
+     */
+    storage_cleared_ne?: boolean;
+    /**
+     * Block where contract was created (if known) (filter: eq)
+     */
+    creation_block_eq?: number;
+    /**
+     * Block where contract was created (if known) (filter: ne)
+     */
+    creation_block_ne?: number;
+    /**
+     * Block where contract was created (if known) (filter: lt)
+     */
+    creation_block_lt?: number;
+    /**
+     * Block where contract was created (if known) (filter: lte)
+     */
+    creation_block_lte?: number;
+    /**
+     * Block where contract was created (if known) (filter: gt)
+     */
+    creation_block_gt?: number;
+    /**
+     * Block where contract was created (if known) (filter: gte)
+     */
+    creation_block_gte?: number;
+    /**
+     * Block where contract was created (if known) (filter: between_min)
+     */
+    creation_block_between_min?: number;
+    /**
+     * Block where contract was created (if known) (filter: between_max_value)
+     */
+    creation_block_between_max_value?: number;
+    /**
+     * Block where contract was created (if known) (filter: in_values) (comma-separated list)
+     */
+    creation_block_in_values?: string;
+    /**
+     * Block where contract was created (if known) (filter: not_in_values) (comma-separated list)
+     */
+    creation_block_not_in_values?: string;
+    /**
+     * Transaction that created the contract (if known) (filter: eq)
+     */
+    creation_transaction_hash_eq?: string;
+    /**
+     * Transaction that created the contract (if known) (filter: ne)
+     */
+    creation_transaction_hash_ne?: string;
+    /**
+     * Transaction that created the contract (if known) (filter: contains)
+     */
+    creation_transaction_hash_contains?: string;
+    /**
+     * Transaction that created the contract (if known) (filter: starts_with)
+     */
+    creation_transaction_hash_starts_with?: string;
+    /**
+     * Transaction that created the contract (if known) (filter: ends_with)
+     */
+    creation_transaction_hash_ends_with?: string;
+    /**
+     * Transaction that created the contract (if known) (filter: like)
+     */
+    creation_transaction_hash_like?: string;
+    /**
+     * Transaction that created the contract (if known) (filter: not_like)
+     */
+    creation_transaction_hash_not_like?: string;
+    /**
+     * Transaction that created the contract (if known) (filter: in_values) (comma-separated list)
+     */
+    creation_transaction_hash_in_values?: string;
+    /**
+     * Transaction that created the contract (if known) (filter: not_in_values) (comma-separated list)
+     */
+    creation_transaction_hash_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_selfdestruct to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractSelfdestruct` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_selfdestruct';
+};
+
+export type IntContractSelfdestructServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractSelfdestructServiceListError =
+  IntContractSelfdestructServiceListErrors[keyof IntContractSelfdestructServiceListErrors];
+
+export type IntContractSelfdestructServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractSelfdestructResponse;
+};
+
+export type IntContractSelfdestructServiceListResponse =
+  IntContractSelfdestructServiceListResponses[keyof IntContractSelfdestructServiceListResponses];
+
+export type IntContractSelfdestructServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Block where SELFDESTRUCT occurred
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_selfdestruct/{block_number}';
+};
+
+export type IntContractSelfdestructServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractSelfdestructServiceGetError =
+  IntContractSelfdestructServiceGetErrors[keyof IntContractSelfdestructServiceGetErrors];
+
+export type IntContractSelfdestructServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractSelfdestructResponse;
+};
+
+export type IntContractSelfdestructServiceGetResponse =
+  IntContractSelfdestructServiceGetResponses[keyof IntContractSelfdestructServiceGetResponses];
+
 export type IntContractStorageExpiry1mServiceListData = {
   body?: never;
   path?: never;
@@ -80445,7 +82061,7 @@ export type IntEngineNewPayloadServiceGetResponses = {
 export type IntEngineNewPayloadServiceGetResponse =
   IntEngineNewPayloadServiceGetResponses[keyof IntEngineNewPayloadServiceGetResponses];
 
-export type IntEngineNewPayloadFastestServiceListData = {
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceListData = {
   body?: never;
   path?: never;
   query?: {
@@ -80870,11 +82486,11 @@ export type IntEngineNewPayloadFastestServiceListData = {
      */
     meta_client_name_not_in_values?: string;
     /**
-     * The maximum number of int_engine_new_payload_fastest to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of int_engine_new_payload_fastest_execution_by_node_class to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListIntEngineNewPayloadFastest` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListIntEngineNewPayloadFastestExecutionByNodeClass` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -80882,30 +82498,30 @@ export type IntEngineNewPayloadFastestServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/int_engine_new_payload_fastest';
+  url: '/api/v1/int_engine_new_payload_fastest_execution_by_node_class';
 };
 
-export type IntEngineNewPayloadFastestServiceListErrors = {
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type IntEngineNewPayloadFastestServiceListError =
-  IntEngineNewPayloadFastestServiceListErrors[keyof IntEngineNewPayloadFastestServiceListErrors];
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceListError =
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceListErrors[keyof IntEngineNewPayloadFastestExecutionByNodeClassServiceListErrors];
 
-export type IntEngineNewPayloadFastestServiceListResponses = {
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponses = {
   /**
    * OK
    */
-  200: ListIntEngineNewPayloadFastestResponse;
+  200: ListIntEngineNewPayloadFastestExecutionByNodeClassResponse;
 };
 
-export type IntEngineNewPayloadFastestServiceListResponse =
-  IntEngineNewPayloadFastestServiceListResponses[keyof IntEngineNewPayloadFastestServiceListResponses];
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse =
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponses[keyof IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponses];
 
-export type IntEngineNewPayloadFastestServiceGetData = {
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceGetData = {
   body?: never;
   path: {
     /**
@@ -80914,28 +82530,28 @@ export type IntEngineNewPayloadFastestServiceGetData = {
     slot_start_date_time: number;
   };
   query?: never;
-  url: '/api/v1/int_engine_new_payload_fastest/{slot_start_date_time}';
+  url: '/api/v1/int_engine_new_payload_fastest_execution_by_node_class/{slot_start_date_time}';
 };
 
-export type IntEngineNewPayloadFastestServiceGetErrors = {
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type IntEngineNewPayloadFastestServiceGetError =
-  IntEngineNewPayloadFastestServiceGetErrors[keyof IntEngineNewPayloadFastestServiceGetErrors];
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceGetError =
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetErrors[keyof IntEngineNewPayloadFastestExecutionByNodeClassServiceGetErrors];
 
-export type IntEngineNewPayloadFastestServiceGetResponses = {
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses = {
   /**
    * OK
    */
-  200: GetIntEngineNewPayloadFastestResponse;
+  200: GetIntEngineNewPayloadFastestExecutionByNodeClassResponse;
 };
 
-export type IntEngineNewPayloadFastestServiceGetResponse =
-  IntEngineNewPayloadFastestServiceGetResponses[keyof IntEngineNewPayloadFastestServiceGetResponses];
+export type IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse =
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses[keyof IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses];
 
 export type IntExecutionBlockByDateServiceListData = {
   body?: never;
@@ -81128,6 +82744,418 @@ export type IntExecutionBlockByDateServiceGetResponses = {
 
 export type IntExecutionBlockByDateServiceGetResponse =
   IntExecutionBlockByDateServiceGetResponses[keyof IntExecutionBlockByDateServiceGetResponses];
+
+export type IntStorageSelfdestructDiffsServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Block where SELFDESTRUCT occurred (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * Block where SELFDESTRUCT occurred (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * Transaction hash of the SELFDESTRUCT (filter: eq)
+     */
+    transaction_hash_eq?: string;
+    /**
+     * Transaction hash of the SELFDESTRUCT (filter: ne)
+     */
+    transaction_hash_ne?: string;
+    /**
+     * Transaction hash of the SELFDESTRUCT (filter: contains)
+     */
+    transaction_hash_contains?: string;
+    /**
+     * Transaction hash of the SELFDESTRUCT (filter: starts_with)
+     */
+    transaction_hash_starts_with?: string;
+    /**
+     * Transaction hash of the SELFDESTRUCT (filter: ends_with)
+     */
+    transaction_hash_ends_with?: string;
+    /**
+     * Transaction hash of the SELFDESTRUCT (filter: like)
+     */
+    transaction_hash_like?: string;
+    /**
+     * Transaction hash of the SELFDESTRUCT (filter: not_like)
+     */
+    transaction_hash_not_like?: string;
+    /**
+     * Transaction hash of the SELFDESTRUCT (filter: in_values) (comma-separated list)
+     */
+    transaction_hash_in_values?: string;
+    /**
+     * Transaction hash of the SELFDESTRUCT (filter: not_in_values) (comma-separated list)
+     */
+    transaction_hash_not_in_values?: string;
+    /**
+     * Internal index of the SELFDESTRUCT trace (filter: eq)
+     */
+    internal_index_eq?: number;
+    /**
+     * Internal index of the SELFDESTRUCT trace (filter: ne)
+     */
+    internal_index_ne?: number;
+    /**
+     * Internal index of the SELFDESTRUCT trace (filter: lt)
+     */
+    internal_index_lt?: number;
+    /**
+     * Internal index of the SELFDESTRUCT trace (filter: lte)
+     */
+    internal_index_lte?: number;
+    /**
+     * Internal index of the SELFDESTRUCT trace (filter: gt)
+     */
+    internal_index_gt?: number;
+    /**
+     * Internal index of the SELFDESTRUCT trace (filter: gte)
+     */
+    internal_index_gte?: number;
+    /**
+     * Internal index of the SELFDESTRUCT trace (filter: between_min)
+     */
+    internal_index_between_min?: number;
+    /**
+     * Internal index of the SELFDESTRUCT trace (filter: between_max_value)
+     */
+    internal_index_between_max_value?: number;
+    /**
+     * Internal index of the SELFDESTRUCT trace (filter: in_values) (comma-separated list)
+     */
+    internal_index_in_values?: string;
+    /**
+     * Internal index of the SELFDESTRUCT trace (filter: not_in_values) (comma-separated list)
+     */
+    internal_index_not_in_values?: string;
+    /**
+     * Storage slot key being cleared (filter: eq)
+     */
+    slot_eq?: string;
+    /**
+     * Storage slot key being cleared (filter: ne)
+     */
+    slot_ne?: string;
+    /**
+     * Storage slot key being cleared (filter: contains)
+     */
+    slot_contains?: string;
+    /**
+     * Storage slot key being cleared (filter: starts_with)
+     */
+    slot_starts_with?: string;
+    /**
+     * Storage slot key being cleared (filter: ends_with)
+     */
+    slot_ends_with?: string;
+    /**
+     * Storage slot key being cleared (filter: like)
+     */
+    slot_like?: string;
+    /**
+     * Storage slot key being cleared (filter: not_like)
+     */
+    slot_not_like?: string;
+    /**
+     * Storage slot key being cleared (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * Storage slot key being cleared (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Transaction index within the block (filter: eq)
+     */
+    transaction_index_eq?: number;
+    /**
+     * Transaction index within the block (filter: ne)
+     */
+    transaction_index_ne?: number;
+    /**
+     * Transaction index within the block (filter: lt)
+     */
+    transaction_index_lt?: number;
+    /**
+     * Transaction index within the block (filter: lte)
+     */
+    transaction_index_lte?: number;
+    /**
+     * Transaction index within the block (filter: gt)
+     */
+    transaction_index_gt?: number;
+    /**
+     * Transaction index within the block (filter: gte)
+     */
+    transaction_index_gte?: number;
+    /**
+     * Transaction index within the block (filter: between_min)
+     */
+    transaction_index_between_min?: number;
+    /**
+     * Transaction index within the block (filter: between_max_value)
+     */
+    transaction_index_between_max_value?: number;
+    /**
+     * Transaction index within the block (filter: in_values) (comma-separated list)
+     */
+    transaction_index_in_values?: string;
+    /**
+     * Transaction index within the block (filter: not_in_values) (comma-separated list)
+     */
+    transaction_index_not_in_values?: string;
+    /**
+     * Contract address that was selfdestructed (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * Contract address that was selfdestructed (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * Contract address that was selfdestructed (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * Contract address that was selfdestructed (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * Contract address that was selfdestructed (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * Contract address that was selfdestructed (filter: like)
+     */
+    address_like?: string;
+    /**
+     * Contract address that was selfdestructed (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * Contract address that was selfdestructed (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * Contract address that was selfdestructed (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * Value before clearing (last known value) (filter: eq)
+     */
+    from_value_eq?: string;
+    /**
+     * Value before clearing (last known value) (filter: ne)
+     */
+    from_value_ne?: string;
+    /**
+     * Value before clearing (last known value) (filter: contains)
+     */
+    from_value_contains?: string;
+    /**
+     * Value before clearing (last known value) (filter: starts_with)
+     */
+    from_value_starts_with?: string;
+    /**
+     * Value before clearing (last known value) (filter: ends_with)
+     */
+    from_value_ends_with?: string;
+    /**
+     * Value before clearing (last known value) (filter: like)
+     */
+    from_value_like?: string;
+    /**
+     * Value before clearing (last known value) (filter: not_like)
+     */
+    from_value_not_like?: string;
+    /**
+     * Value before clearing (last known value) (filter: in_values) (comma-separated list)
+     */
+    from_value_in_values?: string;
+    /**
+     * Value before clearing (last known value) (filter: not_in_values) (comma-separated list)
+     */
+    from_value_not_in_values?: string;
+    /**
+     * Value after clearing (always 0x00...00) (filter: eq)
+     */
+    to_value_eq?: string;
+    /**
+     * Value after clearing (always 0x00...00) (filter: ne)
+     */
+    to_value_ne?: string;
+    /**
+     * Value after clearing (always 0x00...00) (filter: contains)
+     */
+    to_value_contains?: string;
+    /**
+     * Value after clearing (always 0x00...00) (filter: starts_with)
+     */
+    to_value_starts_with?: string;
+    /**
+     * Value after clearing (always 0x00...00) (filter: ends_with)
+     */
+    to_value_ends_with?: string;
+    /**
+     * Value after clearing (always 0x00...00) (filter: like)
+     */
+    to_value_like?: string;
+    /**
+     * Value after clearing (always 0x00...00) (filter: not_like)
+     */
+    to_value_not_like?: string;
+    /**
+     * Value after clearing (always 0x00...00) (filter: in_values) (comma-separated list)
+     */
+    to_value_in_values?: string;
+    /**
+     * Value after clearing (always 0x00...00) (filter: not_in_values) (comma-separated list)
+     */
+    to_value_not_in_values?: string;
+    /**
+     * The maximum number of int_storage_selfdestruct_diffs to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntStorageSelfdestructDiffs` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_storage_selfdestruct_diffs';
+};
+
+export type IntStorageSelfdestructDiffsServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSelfdestructDiffsServiceListError =
+  IntStorageSelfdestructDiffsServiceListErrors[keyof IntStorageSelfdestructDiffsServiceListErrors];
+
+export type IntStorageSelfdestructDiffsServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntStorageSelfdestructDiffsResponse;
+};
+
+export type IntStorageSelfdestructDiffsServiceListResponse =
+  IntStorageSelfdestructDiffsServiceListResponses[keyof IntStorageSelfdestructDiffsServiceListResponses];
+
+export type IntStorageSelfdestructDiffsServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Block where SELFDESTRUCT occurred
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_storage_selfdestruct_diffs/{block_number}';
+};
+
+export type IntStorageSelfdestructDiffsServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntStorageSelfdestructDiffsServiceGetError =
+  IntStorageSelfdestructDiffsServiceGetErrors[keyof IntStorageSelfdestructDiffsServiceGetErrors];
+
+export type IntStorageSelfdestructDiffsServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntStorageSelfdestructDiffsResponse;
+};
+
+export type IntStorageSelfdestructDiffsServiceGetResponse =
+  IntStorageSelfdestructDiffsServiceGetResponses[keyof IntStorageSelfdestructDiffsServiceGetResponses];
 
 export type IntStorageSlotDiffServiceListData = {
   body?: never;
