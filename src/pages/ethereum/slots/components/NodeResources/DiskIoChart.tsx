@@ -33,6 +33,7 @@ function percentile(sorted: number[], p: number): number {
 }
 
 const BUCKET_SIZE = 0.25;
+const ALL_BUCKETS = Array.from({ length: 49 }, (_, i) => i * BUCKET_SIZE);
 const toBucket = (offsetSec: number): number => Math.round(offsetSec / BUCKET_SIZE) * BUCKET_SIZE;
 const avg = (arr: number[]): number => arr.reduce((s, v) => s + v, 0) / arr.length;
 
@@ -86,9 +87,7 @@ export function DiskIoChart({
     };
 
     const toPoints = (buckets: Map<number, number[]>): [number, number][] =>
-      Array.from(buckets.entries())
-        .sort(([a], [b]) => a - b)
-        .map(([t, vals]) => [t, avg(vals)] as [number, number]);
+      ALL_BUCKETS.map(t => [t, buckets.has(t) ? avg(buckets.get(t)!) : 0] as [number, number]);
 
     if (selectedNode) {
       const nodeData = data.filter(d => d.meta_client_name === selectedNode);
@@ -113,6 +112,7 @@ export function DiskIoChart({
         lineWidth: 2,
         showArea: true,
         areaOpacity: 0.08,
+        smooth: 0.4,
       });
       chartSeries.push({
         name: `${clLabel} Write`,
@@ -121,6 +121,7 @@ export function DiskIoChart({
         lineWidth: 1.5,
         lineStyle: 'dashed',
         showArea: false,
+        smooth: 0.4,
       });
       chartSeries.push({
         name: `${elLabel} Read`,
@@ -129,6 +130,7 @@ export function DiskIoChart({
         lineWidth: 2,
         showArea: true,
         areaOpacity: 0.08,
+        smooth: 0.4,
       });
       chartSeries.push({
         name: `${elLabel} Write`,
@@ -137,6 +139,7 @@ export function DiskIoChart({
         lineWidth: 1.5,
         lineStyle: 'dashed',
         showArea: false,
+        smooth: 0.4,
       });
     } else {
       const readData = data.filter(d => d.rw === 'read');
@@ -149,6 +152,7 @@ export function DiskIoChart({
         lineWidth: 2,
         showArea: true,
         areaOpacity: 0.08,
+        smooth: 0.4,
       });
       chartSeries.push({
         name: 'Write',
@@ -157,6 +161,7 @@ export function DiskIoChart({
         lineWidth: 2,
         showArea: true,
         areaOpacity: 0.08,
+        smooth: 0.4,
       });
     }
 

@@ -76,6 +76,7 @@ interface EChartsTooltipParam {
 }
 
 const BUCKET_SIZE = 0.25;
+const ALL_BUCKETS = Array.from({ length: 49 }, (_, i) => i * BUCKET_SIZE);
 const toBucket = (offsetSec: number): number => Math.round(offsetSec / BUCKET_SIZE) * BUCKET_SIZE;
 const avg = (arr: number[]): number => arr.reduce((s, v) => s + v, 0) / arr.length;
 
@@ -121,9 +122,7 @@ export function CpuUtilizationChart({
     };
 
     const toPoints = (buckets: Map<number, BucketAgg>, extract: (b: BucketAgg) => number[]): [number, number][] =>
-      Array.from(buckets.entries())
-        .sort(([a], [b]) => a - b)
-        .map(([t, b]) => [t, avg(extract(b))] as [number, number]);
+      ALL_BUCKETS.map(t => [t, buckets.has(t) ? avg(extract(buckets.get(t)!)) : 0] as [number, number]);
 
     const metricExtract = (b: BucketAgg): number[] => {
       switch (metric) {
@@ -160,6 +159,7 @@ export function CpuUtilizationChart({
         lineWidth: 2,
         showArea: true,
         areaOpacity: 0.08,
+        smooth: 0.4,
       });
 
       chartSeries.push({
@@ -169,6 +169,7 @@ export function CpuUtilizationChart({
         lineWidth: 2,
         showArea: true,
         areaOpacity: 0.08,
+        smooth: 0.4,
       });
 
       chartSeries.push({
@@ -179,6 +180,7 @@ export function CpuUtilizationChart({
         lineStyle: 'dashed',
         showArea: false,
         initiallyVisible: false,
+        smooth: 0.4,
       });
       chartSeries.push({
         name: `${elLabel} peak core`,
@@ -188,6 +190,7 @@ export function CpuUtilizationChart({
         lineStyle: 'dashed',
         showArea: false,
         initiallyVisible: false,
+        smooth: 0.4,
       });
     } else {
       const clData = data.filter(d => getClientLayer(d.client_type ?? '') === 'CL');
@@ -203,6 +206,7 @@ export function CpuUtilizationChart({
         lineWidth: 2,
         showArea: true,
         areaOpacity: 0.08,
+        smooth: 0.4,
       });
 
       chartSeries.push({
@@ -212,6 +216,7 @@ export function CpuUtilizationChart({
         lineWidth: 2,
         showArea: true,
         areaOpacity: 0.08,
+        smooth: 0.4,
       });
     }
 

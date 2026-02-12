@@ -10,7 +10,6 @@ const slotSearchSchema = z.object({
   node: z.string().optional(),
   metric: z.enum(['mean', 'min', 'max']).optional(),
   memMetric: z.enum(['vm_rss', 'rss_anon', 'rss_file', 'vm_swap']).optional(),
-  resourceTab: z.enum(['cpu', 'memory', 'disk', 'network']).optional(),
   refNodes: z.coerce.boolean().optional(),
 });
 

@@ -44,6 +44,7 @@ function percentile(sorted: number[], p: number): number {
 }
 
 const BUCKET_SIZE = 0.25;
+const ALL_BUCKETS = Array.from({ length: 49 }, (_, i) => i * BUCKET_SIZE);
 const toBucket = (offsetSec: number): number => Math.round(offsetSec / BUCKET_SIZE) * BUCKET_SIZE;
 const avg = (arr: number[]): number => arr.reduce((s, v) => s + v, 0) / arr.length;
 
@@ -103,11 +104,11 @@ export function NetworkIoChart({
         buckets.get(bucket)!.push(bytesToKB(d.io_bytes ?? 0));
       }
 
-      const points: [number, number][] = Array.from(buckets.entries())
-        .sort(([a], [b]) => a - b)
-        .map(([t, vals]) => [t, avg(vals)] as [number, number]);
+      if (buckets.size === 0) continue;
 
-      if (points.length === 0) continue;
+      const points: [number, number][] = ALL_BUCKETS.map(
+        t => [t, buckets.has(t) ? avg(buckets.get(t)!) : 0] as [number, number]
+      );
 
       const label = PORT_LABELS[port] ?? port;
       const color = CHART_CATEGORICAL_COLORS[i % CHART_CATEGORICAL_COLORS.length];
@@ -119,6 +120,7 @@ export function NetworkIoChart({
         lineWidth: 2,
         showArea: true,
         areaOpacity: 0.06,
+        smooth: 0.4,
         initiallyVisible: !HIDDEN_PORTS.has(port),
       });
     }

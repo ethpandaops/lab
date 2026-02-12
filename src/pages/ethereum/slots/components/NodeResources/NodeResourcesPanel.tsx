@@ -27,19 +27,11 @@ import {
   ANNOTATION_COLORS,
   type CpuMetric,
   type MemoryMetric,
-  type ResourceTab,
   type AnnotationType,
   type AnnotationEvent,
 } from './types';
 
 export type { CpuMetric } from './types';
-
-const RESOURCE_TABS: { value: ResourceTab; label: string }[] = [
-  { value: 'cpu', label: 'CPU' },
-  { value: 'memory', label: 'Memory' },
-  { value: 'disk', label: 'Disk I/O' },
-  { value: 'network', label: 'Network' },
-];
 
 function nodeMatches(cpuNodeName: string, eventNodeName: string): boolean {
   const short = cpuNodeName.split('/').pop() ?? cpuNodeName;
@@ -91,7 +83,6 @@ export function NodeResourcesPanel({
   const selectedNode = search.node ?? null;
   const metric: CpuMetric = search.metric ?? 'mean';
   const memMetric: MemoryMetric = search.memMetric ?? 'vm_rss';
-  const resourceTab: ResourceTab = search.resourceTab ?? 'cpu';
 
   const setReferenceNodesOnly = useCallback(
     (value: boolean) => {
@@ -138,19 +129,6 @@ export function NodeResourcesPanel({
         to: '/ethereum/slots/$slot',
         params: { slot: String(slot) },
         search: { ...search, memMetric: value === 'vm_rss' ? undefined : value },
-        replace: true,
-        resetScroll: false,
-      });
-    },
-    [navigate, slot, search]
-  );
-
-  const setResourceTab = useCallback(
-    (value: ResourceTab) => {
-      navigate({
-        to: '/ethereum/slots/$slot',
-        params: { slot: String(slot) },
-        search: { ...search, resourceTab: value === 'cpu' ? undefined : value },
         replace: true,
         resetScroll: false,
       });
@@ -389,22 +367,6 @@ export function NodeResourcesPanel({
           </div>
         </div>
 
-        {/* Resource type tabs */}
-        <div className="mt-3 flex gap-1 border-t border-border pt-3">
-          {RESOURCE_TABS.map(tab => (
-            <button
-              key={tab.value}
-              type="button"
-              onClick={() => setResourceTab(tab.value)}
-              className={`rounded-xs px-3 py-1.5 text-xs font-medium transition-colors ${
-                resourceTab === tab.value ? 'bg-foreground/10 text-foreground' : 'text-muted hover:text-foreground'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
         {/* Annotation toggles */}
         {availableAnnotations.length > 0 && (
           <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-border pt-3">
@@ -428,8 +390,8 @@ export function NodeResourcesPanel({
         )}
       </Card>
 
-      {/* Charts */}
-      {resourceTab === 'cpu' && (
+      {/* Charts – 2 per row */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <CpuUtilizationChart
           data={filteredCpuData}
           selectedNode={effectiveSelectedNode}
@@ -439,9 +401,6 @@ export function NodeResourcesPanel({
           annotations={annotations}
           enabledAnnotations={enabledAnnotations}
         />
-      )}
-
-      {resourceTab === 'memory' && (
         <MemoryUsageChart
           data={filteredMemoryData}
           selectedNode={effectiveSelectedNode}
@@ -451,9 +410,6 @@ export function NodeResourcesPanel({
           annotations={annotations}
           enabledAnnotations={enabledAnnotations}
         />
-      )}
-
-      {resourceTab === 'disk' && (
         <DiskIoChart
           data={filteredDiskData}
           selectedNode={effectiveSelectedNode}
@@ -461,9 +417,6 @@ export function NodeResourcesPanel({
           annotations={annotations}
           enabledAnnotations={enabledAnnotations}
         />
-      )}
-
-      {resourceTab === 'network' && (
         <NetworkIoChart
           data={filteredNetworkData}
           selectedNode={effectiveSelectedNode}
@@ -471,7 +424,7 @@ export function NodeResourcesPanel({
           annotations={annotations}
           enabledAnnotations={enabledAnnotations}
         />
-      )}
+      </div>
 
       <ReferenceNodesInfoDialog open={showRefNodeInfo} onClose={() => setShowRefNodeInfo(false)} />
     </div>
