@@ -6,7 +6,7 @@ import { Card } from '@/components/Layout/Card';
 import { Checkbox } from '@/components/Forms/Checkbox';
 import { ReferenceNodesInfoDialog } from '@/pages/ethereum/execution/timings/components/ReferenceNodesInfoDialog';
 import { extractClusterFromNodeName } from '@/constants/eip7870';
-import { CONSENSUS_CLIENTS_SET, EXECUTION_CLIENTS_SET } from '@/utils/ethereum';
+import { CONSENSUS_CLIENTS_SET, EXECUTION_CLIENTS_SET, getClientLayer } from '@/utils/ethereum';
 import { intEngineNewPayloadServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type {
   FctBlockFirstSeenByNode,
@@ -25,6 +25,16 @@ import {
 } from './types';
 
 export type { CpuMetric } from './types';
+
+function nodeMatches(cpuNodeName: string, eventNodeName: string): boolean {
+  const short = cpuNodeName.split('/').pop() ?? cpuNodeName;
+  return (
+    eventNodeName === short ||
+    eventNodeName === cpuNodeName ||
+    short.includes(eventNodeName) ||
+    eventNodeName.includes(short)
+  );
+}
 
 interface NodeResourcesPanelProps {
   slot: number;
@@ -137,9 +147,11 @@ export function NodeResourcesPanel({
       if (!name) continue;
 
       const existing = info.get(name) ?? { cl: '', el: '' };
-      if (CONSENSUS_CLIENTS_SET.has(clientType) && !existing.cl) {
+      const layer = getClientLayer(clientType);
+
+      if ((CONSENSUS_CLIENTS_SET.has(clientType) || layer === 'CL') && !existing.cl) {
         existing.cl = clientType;
-      } else if (EXECUTION_CLIENTS_SET.has(clientType) && !existing.el) {
+      } else if ((EXECUTION_CLIENTS_SET.has(clientType) || layer === 'EL') && !existing.el) {
         existing.el = clientType;
       }
       info.set(name, existing);
@@ -153,22 +165,32 @@ export function NodeResourcesPanel({
   // Build raw per-node annotation events (chart handles aggregation)
   const annotations = useMemo((): AnnotationEvent[] => {
     const events: AnnotationEvent[] = [];
+    const filteredNodeSet = new Set(nodeNames);
+    const isIncludedNode = (nodeName: string): boolean => {
+      if (filteredNodeSet.has(nodeName)) return true;
+      for (const filteredNodeName of filteredNodeSet) {
+        if (nodeMatches(filteredNodeName, nodeName)) return true;
+      }
+      return false;
+    };
 
     for (const p of blockPropagation) {
-      if (p.node_id) {
-        events.push({ type: 'block', timeMs: p.seen_slot_start_diff ?? 0, nodeName: p.node_id });
+      const nodeName = p.meta_client_name ?? p.node_id;
+      if (nodeName && isIncludedNode(nodeName)) {
+        events.push({ type: 'block', timeMs: p.seen_slot_start_diff ?? 0, nodeName });
       }
     }
 
     for (const p of headPropagation) {
-      if (p.node_id) {
-        events.push({ type: 'head', timeMs: p.seen_slot_start_diff ?? 0, nodeName: p.node_id });
+      const nodeName = p.meta_client_name ?? p.node_id;
+      if (nodeName && isIncludedNode(nodeName)) {
+        events.push({ type: 'head', timeMs: p.seen_slot_start_diff ?? 0, nodeName });
       }
     }
 
     const execItems = executionData?.int_engine_new_payload ?? [];
     for (const e of execItems) {
-      if (e.meta_client_name) {
+      if (e.meta_client_name && isIncludedNode(e.meta_client_name)) {
         const slotStartMs = (e.slot_start_date_time ?? 0) * 1000;
         const requestedMs = (e.requested_date_time ?? 0) / 1000;
         const startMs = requestedMs - slotStartMs;
@@ -186,8 +208,9 @@ export function NodeResourcesPanel({
     // Data columns: group by node, produce one range event per node
     const colsByNode = new Map<string, number[]>();
     for (const c of dataColumnPropagation) {
-      const nid = c.node_id ?? '';
+      const nid = c.meta_client_name ?? c.node_id ?? '';
       if (!nid) continue;
+      if (!isIncludedNode(nid)) continue;
       if (!colsByNode.has(nid)) colsByNode.set(nid, []);
       colsByNode.get(nid)!.push(c.seen_slot_start_diff ?? 0);
     }
@@ -204,7 +227,7 @@ export function NodeResourcesPanel({
     }
 
     return events;
-  }, [blockPropagation, headPropagation, dataColumnPropagation, executionData]);
+  }, [blockPropagation, headPropagation, dataColumnPropagation, executionData, nodeNames]);
 
   // Which annotation types have data (slot_phases is always available)
   const availableAnnotations = useMemo(() => {

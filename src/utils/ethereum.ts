@@ -114,6 +114,8 @@ export const EXECUTION_CLIENTS_SET = new Set<string>(EXECUTION_CLIENTS);
  */
 export function getClientLayer(clientType: string): 'CL' | 'EL' | null {
   const lower = clientType.toLowerCase();
+  if (lower === 'cl') return 'CL';
+  if (lower === 'el') return 'EL';
   if (CONSENSUS_CLIENTS_SET.has(lower)) return 'CL';
   if (EXECUTION_CLIENTS_SET.has(lower)) return 'EL';
   return null;
