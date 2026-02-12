@@ -1,5 +1,9 @@
 export type CpuMetric = 'mean' | 'min' | 'max';
 
+export type MemoryMetric = 'vm_rss' | 'rss_anon' | 'rss_file' | 'vm_swap';
+
+export type ResourceTab = 'cpu' | 'memory' | 'disk' | 'network';
+
 export type AnnotationType = 'block' | 'head' | 'execution' | 'data_columns' | 'slot_phases';
 
 export interface AnnotationEvent {

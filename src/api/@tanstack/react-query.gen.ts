@@ -186,6 +186,12 @@ import {
   fctNodeActiveLast24hServiceList,
   fctNodeCpuUtilizationByProcessServiceGet,
   fctNodeCpuUtilizationByProcessServiceList,
+  fctNodeDiskIoByProcessServiceGet,
+  fctNodeDiskIoByProcessServiceList,
+  fctNodeMemoryUsageByProcessServiceGet,
+  fctNodeMemoryUsageByProcessServiceList,
+  fctNodeNetworkIoByProcessServiceGet,
+  fctNodeNetworkIoByProcessServiceList,
   fctOpcodeGasByOpcodeDailyServiceGet,
   fctOpcodeGasByOpcodeDailyServiceList,
   fctOpcodeGasByOpcodeHourlyServiceGet,
@@ -909,6 +915,24 @@ import type {
   FctNodeCpuUtilizationByProcessServiceListData,
   FctNodeCpuUtilizationByProcessServiceListError,
   FctNodeCpuUtilizationByProcessServiceListResponse,
+  FctNodeDiskIoByProcessServiceGetData,
+  FctNodeDiskIoByProcessServiceGetError,
+  FctNodeDiskIoByProcessServiceGetResponse,
+  FctNodeDiskIoByProcessServiceListData,
+  FctNodeDiskIoByProcessServiceListError,
+  FctNodeDiskIoByProcessServiceListResponse,
+  FctNodeMemoryUsageByProcessServiceGetData,
+  FctNodeMemoryUsageByProcessServiceGetError,
+  FctNodeMemoryUsageByProcessServiceGetResponse,
+  FctNodeMemoryUsageByProcessServiceListData,
+  FctNodeMemoryUsageByProcessServiceListError,
+  FctNodeMemoryUsageByProcessServiceListResponse,
+  FctNodeNetworkIoByProcessServiceGetData,
+  FctNodeNetworkIoByProcessServiceGetError,
+  FctNodeNetworkIoByProcessServiceGetResponse,
+  FctNodeNetworkIoByProcessServiceListData,
+  FctNodeNetworkIoByProcessServiceListError,
+  FctNodeNetworkIoByProcessServiceListResponse,
   FctOpcodeGasByOpcodeDailyServiceGetData,
   FctOpcodeGasByOpcodeDailyServiceGetError,
   FctOpcodeGasByOpcodeDailyServiceGetResponse,
@@ -6741,6 +6765,178 @@ export const fctNodeCpuUtilizationByProcessServiceGetOptions = (
       return data;
     },
     queryKey: fctNodeCpuUtilizationByProcessServiceGetQueryKey(options),
+  });
+
+export const fctNodeDiskIoByProcessServiceListQueryKey = (options?: Options<FctNodeDiskIoByProcessServiceListData>) =>
+  createQueryKey('fctNodeDiskIoByProcessServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeDiskIoByProcessServiceListOptions = (options?: Options<FctNodeDiskIoByProcessServiceListData>) =>
+  queryOptions<
+    FctNodeDiskIoByProcessServiceListResponse,
+    FctNodeDiskIoByProcessServiceListError,
+    FctNodeDiskIoByProcessServiceListResponse,
+    ReturnType<typeof fctNodeDiskIoByProcessServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeDiskIoByProcessServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeDiskIoByProcessServiceListQueryKey(options),
+  });
+
+export const fctNodeDiskIoByProcessServiceGetQueryKey = (options: Options<FctNodeDiskIoByProcessServiceGetData>) =>
+  createQueryKey('fctNodeDiskIoByProcessServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by wallclock_slot_start_date_time
+ */
+export const fctNodeDiskIoByProcessServiceGetOptions = (options: Options<FctNodeDiskIoByProcessServiceGetData>) =>
+  queryOptions<
+    FctNodeDiskIoByProcessServiceGetResponse,
+    FctNodeDiskIoByProcessServiceGetError,
+    FctNodeDiskIoByProcessServiceGetResponse,
+    ReturnType<typeof fctNodeDiskIoByProcessServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeDiskIoByProcessServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeDiskIoByProcessServiceGetQueryKey(options),
+  });
+
+export const fctNodeMemoryUsageByProcessServiceListQueryKey = (
+  options?: Options<FctNodeMemoryUsageByProcessServiceListData>
+) => createQueryKey('fctNodeMemoryUsageByProcessServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeMemoryUsageByProcessServiceListOptions = (
+  options?: Options<FctNodeMemoryUsageByProcessServiceListData>
+) =>
+  queryOptions<
+    FctNodeMemoryUsageByProcessServiceListResponse,
+    FctNodeMemoryUsageByProcessServiceListError,
+    FctNodeMemoryUsageByProcessServiceListResponse,
+    ReturnType<typeof fctNodeMemoryUsageByProcessServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeMemoryUsageByProcessServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeMemoryUsageByProcessServiceListQueryKey(options),
+  });
+
+export const fctNodeMemoryUsageByProcessServiceGetQueryKey = (
+  options: Options<FctNodeMemoryUsageByProcessServiceGetData>
+) => createQueryKey('fctNodeMemoryUsageByProcessServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by wallclock_slot_start_date_time
+ */
+export const fctNodeMemoryUsageByProcessServiceGetOptions = (
+  options: Options<FctNodeMemoryUsageByProcessServiceGetData>
+) =>
+  queryOptions<
+    FctNodeMemoryUsageByProcessServiceGetResponse,
+    FctNodeMemoryUsageByProcessServiceGetError,
+    FctNodeMemoryUsageByProcessServiceGetResponse,
+    ReturnType<typeof fctNodeMemoryUsageByProcessServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeMemoryUsageByProcessServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeMemoryUsageByProcessServiceGetQueryKey(options),
+  });
+
+export const fctNodeNetworkIoByProcessServiceListQueryKey = (
+  options?: Options<FctNodeNetworkIoByProcessServiceListData>
+) => createQueryKey('fctNodeNetworkIoByProcessServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeNetworkIoByProcessServiceListOptions = (
+  options?: Options<FctNodeNetworkIoByProcessServiceListData>
+) =>
+  queryOptions<
+    FctNodeNetworkIoByProcessServiceListResponse,
+    FctNodeNetworkIoByProcessServiceListError,
+    FctNodeNetworkIoByProcessServiceListResponse,
+    ReturnType<typeof fctNodeNetworkIoByProcessServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeNetworkIoByProcessServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeNetworkIoByProcessServiceListQueryKey(options),
+  });
+
+export const fctNodeNetworkIoByProcessServiceGetQueryKey = (
+  options: Options<FctNodeNetworkIoByProcessServiceGetData>
+) => createQueryKey('fctNodeNetworkIoByProcessServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by wallclock_slot_start_date_time
+ */
+export const fctNodeNetworkIoByProcessServiceGetOptions = (options: Options<FctNodeNetworkIoByProcessServiceGetData>) =>
+  queryOptions<
+    FctNodeNetworkIoByProcessServiceGetResponse,
+    FctNodeNetworkIoByProcessServiceGetError,
+    FctNodeNetworkIoByProcessServiceGetResponse,
+    ReturnType<typeof fctNodeNetworkIoByProcessServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeNetworkIoByProcessServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeNetworkIoByProcessServiceGetQueryKey(options),
   });
 
 export const fctOpcodeGasByOpcodeDailyServiceListQueryKey = (

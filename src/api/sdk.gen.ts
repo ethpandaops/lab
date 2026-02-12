@@ -549,6 +549,24 @@ import type {
   FctNodeCpuUtilizationByProcessServiceListData,
   FctNodeCpuUtilizationByProcessServiceListErrors,
   FctNodeCpuUtilizationByProcessServiceListResponses,
+  FctNodeDiskIoByProcessServiceGetData,
+  FctNodeDiskIoByProcessServiceGetErrors,
+  FctNodeDiskIoByProcessServiceGetResponses,
+  FctNodeDiskIoByProcessServiceListData,
+  FctNodeDiskIoByProcessServiceListErrors,
+  FctNodeDiskIoByProcessServiceListResponses,
+  FctNodeMemoryUsageByProcessServiceGetData,
+  FctNodeMemoryUsageByProcessServiceGetErrors,
+  FctNodeMemoryUsageByProcessServiceGetResponses,
+  FctNodeMemoryUsageByProcessServiceListData,
+  FctNodeMemoryUsageByProcessServiceListErrors,
+  FctNodeMemoryUsageByProcessServiceListResponses,
+  FctNodeNetworkIoByProcessServiceGetData,
+  FctNodeNetworkIoByProcessServiceGetErrors,
+  FctNodeNetworkIoByProcessServiceGetResponses,
+  FctNodeNetworkIoByProcessServiceListData,
+  FctNodeNetworkIoByProcessServiceListErrors,
+  FctNodeNetworkIoByProcessServiceListResponses,
   FctOpcodeGasByOpcodeDailyServiceGetData,
   FctOpcodeGasByOpcodeDailyServiceGetErrors,
   FctOpcodeGasByOpcodeDailyServiceGetResponses,
@@ -1437,6 +1455,18 @@ import {
   zFctNodeCpuUtilizationByProcessServiceGetResponse,
   zFctNodeCpuUtilizationByProcessServiceListData,
   zFctNodeCpuUtilizationByProcessServiceListResponse,
+  zFctNodeDiskIoByProcessServiceGetData,
+  zFctNodeDiskIoByProcessServiceGetResponse,
+  zFctNodeDiskIoByProcessServiceListData,
+  zFctNodeDiskIoByProcessServiceListResponse,
+  zFctNodeMemoryUsageByProcessServiceGetData,
+  zFctNodeMemoryUsageByProcessServiceGetResponse,
+  zFctNodeMemoryUsageByProcessServiceListData,
+  zFctNodeMemoryUsageByProcessServiceListResponse,
+  zFctNodeNetworkIoByProcessServiceGetData,
+  zFctNodeNetworkIoByProcessServiceGetResponse,
+  zFctNodeNetworkIoByProcessServiceListData,
+  zFctNodeNetworkIoByProcessServiceListResponse,
   zFctOpcodeGasByOpcodeDailyServiceGetData,
   zFctOpcodeGasByOpcodeDailyServiceGetResponse,
   zFctOpcodeGasByOpcodeDailyServiceListData,
@@ -5237,6 +5267,120 @@ export const fctNodeCpuUtilizationByProcessServiceGet = <ThrowOnError extends bo
     requestValidator: async data => await zFctNodeCpuUtilizationByProcessServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctNodeCpuUtilizationByProcessServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_node_cpu_utilization_by_process/{wallclock_slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeDiskIoByProcessServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeDiskIoByProcessServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctNodeDiskIoByProcessServiceListResponses,
+    FctNodeDiskIoByProcessServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeDiskIoByProcessServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeDiskIoByProcessServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_disk_io_by_process',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by wallclock_slot_start_date_time
+ */
+export const fctNodeDiskIoByProcessServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeDiskIoByProcessServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctNodeDiskIoByProcessServiceGetResponses,
+    FctNodeDiskIoByProcessServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeDiskIoByProcessServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeDiskIoByProcessServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_disk_io_by_process/{wallclock_slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeMemoryUsageByProcessServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeMemoryUsageByProcessServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctNodeMemoryUsageByProcessServiceListResponses,
+    FctNodeMemoryUsageByProcessServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeMemoryUsageByProcessServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeMemoryUsageByProcessServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_memory_usage_by_process',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by wallclock_slot_start_date_time
+ */
+export const fctNodeMemoryUsageByProcessServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeMemoryUsageByProcessServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctNodeMemoryUsageByProcessServiceGetResponses,
+    FctNodeMemoryUsageByProcessServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeMemoryUsageByProcessServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeMemoryUsageByProcessServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_memory_usage_by_process/{wallclock_slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeNetworkIoByProcessServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeNetworkIoByProcessServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctNodeNetworkIoByProcessServiceListResponses,
+    FctNodeNetworkIoByProcessServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeNetworkIoByProcessServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeNetworkIoByProcessServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_network_io_by_process',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by wallclock_slot_start_date_time
+ */
+export const fctNodeNetworkIoByProcessServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeNetworkIoByProcessServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctNodeNetworkIoByProcessServiceGetResponses,
+    FctNodeNetworkIoByProcessServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeNetworkIoByProcessServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeNetworkIoByProcessServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_network_io_by_process/{wallclock_slot_start_date_time}',
     ...options,
   });
 

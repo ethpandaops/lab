@@ -14,17 +14,32 @@ import type {
   FctBlockDataColumnSidecarFirstSeenByNode,
 } from '@/api/types.gen';
 import { useSlotNodeResources } from '../../hooks/useSlotNodeResources';
+import { useSlotNodeMemory } from '../../hooks/useSlotNodeMemory';
+import { useSlotNodeDiskIo } from '../../hooks/useSlotNodeDiskIo';
+import { useSlotNodeNetworkIo } from '../../hooks/useSlotNodeNetworkIo';
 import { NodeSelector, type NodeClientInfo } from './NodeSelector';
 import { CpuUtilizationChart } from './CpuUtilizationChart';
+import { MemoryUsageChart } from './MemoryUsageChart';
+import { DiskIoChart } from './DiskIoChart';
+import { NetworkIoChart } from './NetworkIoChart';
 import {
   ANNOTATION_OPTIONS,
   ANNOTATION_COLORS,
   type CpuMetric,
+  type MemoryMetric,
+  type ResourceTab,
   type AnnotationType,
   type AnnotationEvent,
 } from './types';
 
 export type { CpuMetric } from './types';
+
+const RESOURCE_TABS: { value: ResourceTab; label: string }[] = [
+  { value: 'cpu', label: 'CPU' },
+  { value: 'memory', label: 'Memory' },
+  { value: 'disk', label: 'Disk I/O' },
+  { value: 'network', label: 'Network' },
+];
 
 function nodeMatches(cpuNodeName: string, eventNodeName: string): boolean {
   const short = cpuNodeName.split('/').pop() ?? cpuNodeName;
@@ -49,7 +64,11 @@ export function NodeResourcesPanel({
   headPropagation,
   dataColumnPropagation,
 }: NodeResourcesPanelProps): JSX.Element {
-  const { data, isLoading, error } = useSlotNodeResources(slot);
+  const { data: cpuData, isLoading: cpuLoading, error: cpuError } = useSlotNodeResources(slot);
+  const { data: memoryData } = useSlotNodeMemory(slot);
+  const { data: diskData } = useSlotNodeDiskIo(slot);
+  const { data: networkData } = useSlotNodeNetworkIo(slot);
+
   const search = useSearch({ from: '/ethereum/slots/$slot' });
   const navigate = useNavigate();
   const [showRefNodeInfo, setShowRefNodeInfo] = useState(false);
@@ -71,6 +90,8 @@ export function NodeResourcesPanel({
   const referenceNodesOnly = search.refNodes ?? false;
   const selectedNode = search.node ?? null;
   const metric: CpuMetric = search.metric ?? 'mean';
+  const memMetric: MemoryMetric = search.memMetric ?? 'vm_rss';
+  const resourceTab: ResourceTab = search.resourceTab ?? 'cpu';
 
   const setReferenceNodesOnly = useCallback(
     (value: boolean) => {
@@ -111,6 +132,32 @@ export function NodeResourcesPanel({
     [navigate, slot, search]
   );
 
+  const setMemMetric = useCallback(
+    (value: MemoryMetric) => {
+      navigate({
+        to: '/ethereum/slots/$slot',
+        params: { slot: String(slot) },
+        search: { ...search, memMetric: value === 'vm_rss' ? undefined : value },
+        replace: true,
+        resetScroll: false,
+      });
+    },
+    [navigate, slot, search]
+  );
+
+  const setResourceTab = useCallback(
+    (value: ResourceTab) => {
+      navigate({
+        to: '/ethereum/slots/$slot',
+        params: { slot: String(slot) },
+        search: { ...search, resourceTab: value === 'cpu' ? undefined : value },
+        replace: true,
+        resetScroll: false,
+      });
+    },
+    [navigate, slot, search]
+  );
+
   const toggleAnnotation = useCallback((type: AnnotationType) => {
     setEnabledAnnotations(prev => {
       const next = new Set(prev);
@@ -123,25 +170,49 @@ export function NodeResourcesPanel({
     });
   }, []);
 
-  // Filter data based on reference nodes toggle
-  const filteredData = useMemo(() => {
-    if (!data) return [];
-    if (!referenceNodesOnly) return data;
-    return data.filter(
+  // Filter CPU data based on reference nodes toggle
+  const filteredCpuData = useMemo(() => {
+    if (!cpuData) return [];
+    if (!referenceNodesOnly) return cpuData;
+    return cpuData.filter(
       d => d.node_class === 'eip7870' || extractClusterFromNodeName(d.meta_client_name ?? '') !== null
     );
-  }, [data, referenceNodesOnly]);
+  }, [cpuData, referenceNodesOnly]);
 
-  // Get unique node names from filtered data
+  const filteredMemoryData = useMemo(() => {
+    if (!memoryData) return [];
+    if (!referenceNodesOnly) return memoryData;
+    return memoryData.filter(
+      d => d.node_class === 'eip7870' || extractClusterFromNodeName(d.meta_client_name ?? '') !== null
+    );
+  }, [memoryData, referenceNodesOnly]);
+
+  const filteredDiskData = useMemo(() => {
+    if (!diskData) return [];
+    if (!referenceNodesOnly) return diskData;
+    return diskData.filter(
+      d => d.node_class === 'eip7870' || extractClusterFromNodeName(d.meta_client_name ?? '') !== null
+    );
+  }, [diskData, referenceNodesOnly]);
+
+  const filteredNetworkData = useMemo(() => {
+    if (!networkData) return [];
+    if (!referenceNodesOnly) return networkData;
+    return networkData.filter(
+      d => d.node_class === 'eip7870' || extractClusterFromNodeName(d.meta_client_name ?? '') !== null
+    );
+  }, [networkData, referenceNodesOnly]);
+
+  // Get unique node names from CPU data (primary source for node selector)
   const nodeNames = useMemo(() => {
-    const names = new Set(filteredData.map(d => d.meta_client_name).filter(Boolean) as string[]);
+    const names = new Set(filteredCpuData.map(d => d.meta_client_name).filter(Boolean) as string[]);
     return Array.from(names).sort();
-  }, [filteredData]);
+  }, [filteredCpuData]);
 
-  // Build node → {cl, el} client info map from the data
+  // Build node → {cl, el} client info map from the CPU data
   const nodeClientInfo = useMemo(() => {
     const info = new Map<string, NodeClientInfo>();
-    for (const d of filteredData) {
+    for (const d of filteredCpuData) {
       const name = d.meta_client_name;
       const clientType = d.client_type?.toLowerCase() ?? '';
       if (!name) continue;
@@ -157,7 +228,7 @@ export function NodeResourcesPanel({
       info.set(name, existing);
     }
     return info;
-  }, [filteredData]);
+  }, [filteredCpuData]);
 
   // Reset selected node if it's no longer in the filtered list
   const effectiveSelectedNode = selectedNode && nodeNames.includes(selectedNode) ? selectedNode : null;
@@ -235,12 +306,12 @@ export function NodeResourcesPanel({
     return ANNOTATION_OPTIONS.filter(o => o.value === 'slot_phases' || types.has(o.value));
   }, [annotations]);
 
-  if (isLoading) {
+  if (cpuLoading) {
     return (
       <Card>
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-foreground">Node Resources</h3>
-          <p className="text-sm text-muted">CPU utilization from observoor eBPF agent</p>
+          <p className="text-sm text-muted">Resource metrics from observoor eBPF agent</p>
         </div>
         <div className="space-y-3">
           <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30" />
@@ -250,17 +321,17 @@ export function NodeResourcesPanel({
     );
   }
 
-  if (error) {
+  if (cpuError) {
     return (
       <Card>
         <div className="py-8 text-center">
-          <p className="text-muted">Failed to load node resource data: {error.message}</p>
+          <p className="text-muted">Failed to load node resource data: {cpuError.message}</p>
         </div>
       </Card>
     );
   }
 
-  if (!data || data.length === 0) {
+  if (!cpuData || cpuData.length === 0) {
     return (
       <Card>
         <div className="py-8 text-center">
@@ -318,10 +389,26 @@ export function NodeResourcesPanel({
           </div>
         </div>
 
+        {/* Resource type tabs */}
+        <div className="mt-3 flex gap-1 border-t border-border pt-3">
+          {RESOURCE_TABS.map(tab => (
+            <button
+              key={tab.value}
+              type="button"
+              onClick={() => setResourceTab(tab.value)}
+              className={`rounded-xs px-3 py-1.5 text-xs font-medium transition-colors ${
+                resourceTab === tab.value ? 'bg-foreground/10 text-foreground' : 'text-muted hover:text-foreground'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         {/* Annotation toggles */}
         {availableAnnotations.length > 0 && (
           <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-border pt-3">
-            <span className="text-xs text-muted">Annotations{!effectiveSelectedNode && ' (min–p95)'}:</span>
+            <span className="text-xs text-muted">Annotations{!effectiveSelectedNode && ' (min\u2013p95)'}:</span>
             {availableAnnotations.map(opt => (
               <button
                 key={opt.value}
@@ -341,16 +428,50 @@ export function NodeResourcesPanel({
         )}
       </Card>
 
-      {/* Chart */}
-      <CpuUtilizationChart
-        data={filteredData}
-        selectedNode={effectiveSelectedNode}
-        metric={metric}
-        onMetricChange={setMetric}
-        slot={slot}
-        annotations={annotations}
-        enabledAnnotations={enabledAnnotations}
-      />
+      {/* Charts */}
+      {resourceTab === 'cpu' && (
+        <CpuUtilizationChart
+          data={filteredCpuData}
+          selectedNode={effectiveSelectedNode}
+          metric={metric}
+          onMetricChange={setMetric}
+          slot={slot}
+          annotations={annotations}
+          enabledAnnotations={enabledAnnotations}
+        />
+      )}
+
+      {resourceTab === 'memory' && (
+        <MemoryUsageChart
+          data={filteredMemoryData}
+          selectedNode={effectiveSelectedNode}
+          metric={memMetric}
+          onMetricChange={setMemMetric}
+          slot={slot}
+          annotations={annotations}
+          enabledAnnotations={enabledAnnotations}
+        />
+      )}
+
+      {resourceTab === 'disk' && (
+        <DiskIoChart
+          data={filteredDiskData}
+          selectedNode={effectiveSelectedNode}
+          slot={slot}
+          annotations={annotations}
+          enabledAnnotations={enabledAnnotations}
+        />
+      )}
+
+      {resourceTab === 'network' && (
+        <NetworkIoChart
+          data={filteredNetworkData}
+          selectedNode={effectiveSelectedNode}
+          slot={slot}
+          annotations={annotations}
+          enabledAnnotations={enabledAnnotations}
+        />
+      )}
 
       <ReferenceNodesInfoDialog open={showRefNodeInfo} onClose={() => setShowRefNodeInfo(false)} />
     </div>

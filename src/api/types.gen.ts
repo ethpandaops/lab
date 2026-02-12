@@ -4615,6 +4615,167 @@ export type FctNodeCpuUtilizationByProcess = {
   window_start?: number;
 };
 
+export type FctNodeDiskIoByProcess = {
+  /**
+   * Client type: CL or EL
+   */
+  client_type?: string;
+  /**
+   * Total bytes transferred across all devices in this window
+   */
+  io_bytes?: number;
+  /**
+   * Total I/O operations across all devices in this window
+   */
+  io_ops?: number;
+  /**
+   * Name of the observoor client that collected the data
+   */
+  meta_client_name?: string;
+  /**
+   * Ethereum network name
+   */
+  meta_network_name?: string;
+  /**
+   * Node classification for filtering (e.g. eip7870)
+   */
+  node_class?: string;
+  /**
+   * Process ID of the monitored client
+   */
+  pid?: number;
+  /**
+   * I/O direction: read or write
+   */
+  rw?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The wallclock slot number
+   */
+  wallclock_slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  wallclock_slot_start_date_time?: number;
+  /**
+   * Start of the sub-slot aggregation window
+   */
+  window_start?: number;
+};
+
+export type FctNodeMemoryUsageByProcess = {
+  /**
+   * Client type: CL or EL
+   */
+  client_type?: string;
+  /**
+   * Name of the observoor client that collected the data
+   */
+  meta_client_name?: string;
+  /**
+   * Ethereum network name
+   */
+  meta_network_name?: string;
+  /**
+   * Node classification for filtering (e.g. eip7870)
+   */
+  node_class?: string;
+  /**
+   * Process ID of the monitored client
+   */
+  pid?: number;
+  /**
+   * Anonymous RSS in bytes (heap, stack, anonymous mmap)
+   */
+  rss_anon_bytes?: number;
+  /**
+   * File-backed RSS in bytes (shared libraries, mmap files)
+   */
+  rss_file_bytes?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Resident set size in bytes (total physical memory used)
+   */
+  vm_rss_bytes?: number;
+  /**
+   * Swap usage in bytes
+   */
+  vm_swap_bytes?: number;
+  /**
+   * The wallclock slot number
+   */
+  wallclock_slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  wallclock_slot_start_date_time?: number;
+  /**
+   * Start of the sub-slot aggregation window
+   */
+  window_start?: number;
+};
+
+export type FctNodeNetworkIoByProcess = {
+  /**
+   * Client type: CL or EL
+   */
+  client_type?: string;
+  /**
+   * Traffic direction: tx or rx
+   */
+  direction?: string;
+  /**
+   * Total bytes transferred in this window
+   */
+  io_bytes?: number;
+  /**
+   * Total packet or event count in this window
+   */
+  io_count?: number;
+  /**
+   * Name of the observoor client that collected the data
+   */
+  meta_client_name?: string;
+  /**
+   * Ethereum network name
+   */
+  meta_network_name?: string;
+  /**
+   * Node classification for filtering (e.g. eip7870)
+   */
+  node_class?: string;
+  /**
+   * Process ID of the monitored client
+   */
+  pid?: number;
+  /**
+   * Port classification (e.g. cl_p2p_tcp, el_json_rpc, unknown)
+   */
+  port_label?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The wallclock slot number
+   */
+  wallclock_slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  wallclock_slot_start_date_time?: number;
+  /**
+   * Start of the sub-slot aggregation window
+   */
+  window_start?: number;
+};
+
 export type FctOpcodeGasByOpcodeDaily = {
   /**
    * Average executions per block
@@ -6209,6 +6370,27 @@ export type GetFctNodeActiveLast24hResponse = {
  */
 export type GetFctNodeCpuUtilizationByProcessResponse = {
   item?: FctNodeCpuUtilizationByProcess;
+};
+
+/**
+ * Response for getting a single fct_node_disk_io_by_process record
+ */
+export type GetFctNodeDiskIoByProcessResponse = {
+  item?: FctNodeDiskIoByProcess;
+};
+
+/**
+ * Response for getting a single fct_node_memory_usage_by_process record
+ */
+export type GetFctNodeMemoryUsageByProcessResponse = {
+  item?: FctNodeMemoryUsageByProcess;
+};
+
+/**
+ * Response for getting a single fct_node_network_io_by_process record
+ */
+export type GetFctNodeNetworkIoByProcessResponse = {
+  item?: FctNodeNetworkIoByProcess;
 };
 
 /**
@@ -10709,6 +10891,48 @@ export type ListFctNodeCpuUtilizationByProcessResponse = {
    * The list of fct_node_cpu_utilization_by_process.
    */
   fct_node_cpu_utilization_by_process?: Array<FctNodeCpuUtilizationByProcess>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_node_disk_io_by_process records
+ */
+export type ListFctNodeDiskIoByProcessResponse = {
+  /**
+   * The list of fct_node_disk_io_by_process.
+   */
+  fct_node_disk_io_by_process?: Array<FctNodeDiskIoByProcess>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_node_memory_usage_by_process records
+ */
+export type ListFctNodeMemoryUsageByProcessResponse = {
+  /**
+   * The list of fct_node_memory_usage_by_process.
+   */
+  fct_node_memory_usage_by_process?: Array<FctNodeMemoryUsageByProcess>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_node_network_io_by_process records
+ */
+export type ListFctNodeNetworkIoByProcessResponse = {
+  /**
+   * The list of fct_node_network_io_by_process.
+   */
+  fct_node_network_io_by_process?: Array<FctNodeNetworkIoByProcess>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -55568,6 +55792,1610 @@ export type FctNodeCpuUtilizationByProcessServiceGetResponses = {
 
 export type FctNodeCpuUtilizationByProcessServiceGetResponse =
   FctNodeCpuUtilizationByProcessServiceGetResponses[keyof FctNodeCpuUtilizationByProcessServiceGetResponses];
+
+export type FctNodeDiskIoByProcessServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    wallclock_slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    wallclock_slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    wallclock_slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    wallclock_slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    wallclock_slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    wallclock_slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    wallclock_slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    wallclock_slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    wallclock_slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    wallclock_slot_start_date_time_not_in_values?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: eq)
+     */
+    meta_client_name_eq?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: ne)
+     */
+    meta_client_name_ne?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: contains)
+     */
+    meta_client_name_contains?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: starts_with)
+     */
+    meta_client_name_starts_with?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: ends_with)
+     */
+    meta_client_name_ends_with?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: like)
+     */
+    meta_client_name_like?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: not_like)
+     */
+    meta_client_name_not_like?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: in_values) (comma-separated list)
+     */
+    meta_client_name_in_values?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_name_not_in_values?: string;
+    /**
+     * Client type: CL or EL (filter: eq)
+     */
+    client_type_eq?: string;
+    /**
+     * Client type: CL or EL (filter: ne)
+     */
+    client_type_ne?: string;
+    /**
+     * Client type: CL or EL (filter: contains)
+     */
+    client_type_contains?: string;
+    /**
+     * Client type: CL or EL (filter: starts_with)
+     */
+    client_type_starts_with?: string;
+    /**
+     * Client type: CL or EL (filter: ends_with)
+     */
+    client_type_ends_with?: string;
+    /**
+     * Client type: CL or EL (filter: like)
+     */
+    client_type_like?: string;
+    /**
+     * Client type: CL or EL (filter: not_like)
+     */
+    client_type_not_like?: string;
+    /**
+     * Client type: CL or EL (filter: in_values) (comma-separated list)
+     */
+    client_type_in_values?: string;
+    /**
+     * Client type: CL or EL (filter: not_in_values) (comma-separated list)
+     */
+    client_type_not_in_values?: string;
+    /**
+     * Process ID of the monitored client (filter: eq)
+     */
+    pid_eq?: number;
+    /**
+     * Process ID of the monitored client (filter: ne)
+     */
+    pid_ne?: number;
+    /**
+     * Process ID of the monitored client (filter: lt)
+     */
+    pid_lt?: number;
+    /**
+     * Process ID of the monitored client (filter: lte)
+     */
+    pid_lte?: number;
+    /**
+     * Process ID of the monitored client (filter: gt)
+     */
+    pid_gt?: number;
+    /**
+     * Process ID of the monitored client (filter: gte)
+     */
+    pid_gte?: number;
+    /**
+     * Process ID of the monitored client (filter: between_min)
+     */
+    pid_between_min?: number;
+    /**
+     * Process ID of the monitored client (filter: between_max_value)
+     */
+    pid_between_max_value?: number;
+    /**
+     * Process ID of the monitored client (filter: in_values) (comma-separated list)
+     */
+    pid_in_values?: string;
+    /**
+     * Process ID of the monitored client (filter: not_in_values) (comma-separated list)
+     */
+    pid_not_in_values?: string;
+    /**
+     * I/O direction: read or write (filter: eq)
+     */
+    rw_eq?: string;
+    /**
+     * I/O direction: read or write (filter: ne)
+     */
+    rw_ne?: string;
+    /**
+     * I/O direction: read or write (filter: contains)
+     */
+    rw_contains?: string;
+    /**
+     * I/O direction: read or write (filter: starts_with)
+     */
+    rw_starts_with?: string;
+    /**
+     * I/O direction: read or write (filter: ends_with)
+     */
+    rw_ends_with?: string;
+    /**
+     * I/O direction: read or write (filter: like)
+     */
+    rw_like?: string;
+    /**
+     * I/O direction: read or write (filter: not_like)
+     */
+    rw_not_like?: string;
+    /**
+     * I/O direction: read or write (filter: in_values) (comma-separated list)
+     */
+    rw_in_values?: string;
+    /**
+     * I/O direction: read or write (filter: not_in_values) (comma-separated list)
+     */
+    rw_not_in_values?: string;
+    /**
+     * Start of the sub-slot aggregation window (filter: eq)
+     */
+    window_start_eq?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: ne)
+     */
+    window_start_ne?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: lt)
+     */
+    window_start_lt?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: lte)
+     */
+    window_start_lte?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: gt)
+     */
+    window_start_gt?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: gte)
+     */
+    window_start_gte?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: between_min)
+     */
+    window_start_between_min?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: between_max_value)
+     */
+    window_start_between_max_value?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: in_values) (comma-separated list)
+     */
+    window_start_in_values?: string;
+    /**
+     * Start of the sub-slot aggregation window (filter: not_in_values) (comma-separated list)
+     */
+    window_start_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The wallclock slot number (filter: eq)
+     */
+    wallclock_slot_eq?: number;
+    /**
+     * The wallclock slot number (filter: ne)
+     */
+    wallclock_slot_ne?: number;
+    /**
+     * The wallclock slot number (filter: lt)
+     */
+    wallclock_slot_lt?: number;
+    /**
+     * The wallclock slot number (filter: lte)
+     */
+    wallclock_slot_lte?: number;
+    /**
+     * The wallclock slot number (filter: gt)
+     */
+    wallclock_slot_gt?: number;
+    /**
+     * The wallclock slot number (filter: gte)
+     */
+    wallclock_slot_gte?: number;
+    /**
+     * The wallclock slot number (filter: between_min)
+     */
+    wallclock_slot_between_min?: number;
+    /**
+     * The wallclock slot number (filter: between_max_value)
+     */
+    wallclock_slot_between_max_value?: number;
+    /**
+     * The wallclock slot number (filter: in_values) (comma-separated list)
+     */
+    wallclock_slot_in_values?: string;
+    /**
+     * The wallclock slot number (filter: not_in_values) (comma-separated list)
+     */
+    wallclock_slot_not_in_values?: string;
+    /**
+     * Ethereum network name (filter: eq)
+     */
+    meta_network_name_eq?: string;
+    /**
+     * Ethereum network name (filter: ne)
+     */
+    meta_network_name_ne?: string;
+    /**
+     * Ethereum network name (filter: contains)
+     */
+    meta_network_name_contains?: string;
+    /**
+     * Ethereum network name (filter: starts_with)
+     */
+    meta_network_name_starts_with?: string;
+    /**
+     * Ethereum network name (filter: ends_with)
+     */
+    meta_network_name_ends_with?: string;
+    /**
+     * Ethereum network name (filter: like)
+     */
+    meta_network_name_like?: string;
+    /**
+     * Ethereum network name (filter: not_like)
+     */
+    meta_network_name_not_like?: string;
+    /**
+     * Ethereum network name (filter: in_values) (comma-separated list)
+     */
+    meta_network_name_in_values?: string;
+    /**
+     * Ethereum network name (filter: not_in_values) (comma-separated list)
+     */
+    meta_network_name_not_in_values?: string;
+    /**
+     * Filter io_bytes using value
+     */
+    io_bytes_value?: number;
+    /**
+     * Total I/O operations across all devices in this window (filter: eq)
+     */
+    io_ops_eq?: number;
+    /**
+     * Total I/O operations across all devices in this window (filter: ne)
+     */
+    io_ops_ne?: number;
+    /**
+     * Total I/O operations across all devices in this window (filter: lt)
+     */
+    io_ops_lt?: number;
+    /**
+     * Total I/O operations across all devices in this window (filter: lte)
+     */
+    io_ops_lte?: number;
+    /**
+     * Total I/O operations across all devices in this window (filter: gt)
+     */
+    io_ops_gt?: number;
+    /**
+     * Total I/O operations across all devices in this window (filter: gte)
+     */
+    io_ops_gte?: number;
+    /**
+     * Total I/O operations across all devices in this window (filter: between_min)
+     */
+    io_ops_between_min?: number;
+    /**
+     * Total I/O operations across all devices in this window (filter: between_max_value)
+     */
+    io_ops_between_max_value?: number;
+    /**
+     * Total I/O operations across all devices in this window (filter: in_values) (comma-separated list)
+     */
+    io_ops_in_values?: string;
+    /**
+     * Total I/O operations across all devices in this window (filter: not_in_values) (comma-separated list)
+     */
+    io_ops_not_in_values?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * The maximum number of fct_node_disk_io_by_process to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctNodeDiskIoByProcess` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_node_disk_io_by_process';
+};
+
+export type FctNodeDiskIoByProcessServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctNodeDiskIoByProcessServiceListError =
+  FctNodeDiskIoByProcessServiceListErrors[keyof FctNodeDiskIoByProcessServiceListErrors];
+
+export type FctNodeDiskIoByProcessServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctNodeDiskIoByProcessResponse;
+};
+
+export type FctNodeDiskIoByProcessServiceListResponse =
+  FctNodeDiskIoByProcessServiceListResponses[keyof FctNodeDiskIoByProcessServiceListResponses];
+
+export type FctNodeDiskIoByProcessServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    wallclock_slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_node_disk_io_by_process/{wallclock_slot_start_date_time}';
+};
+
+export type FctNodeDiskIoByProcessServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctNodeDiskIoByProcessServiceGetError =
+  FctNodeDiskIoByProcessServiceGetErrors[keyof FctNodeDiskIoByProcessServiceGetErrors];
+
+export type FctNodeDiskIoByProcessServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctNodeDiskIoByProcessResponse;
+};
+
+export type FctNodeDiskIoByProcessServiceGetResponse =
+  FctNodeDiskIoByProcessServiceGetResponses[keyof FctNodeDiskIoByProcessServiceGetResponses];
+
+export type FctNodeMemoryUsageByProcessServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    wallclock_slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    wallclock_slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    wallclock_slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    wallclock_slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    wallclock_slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    wallclock_slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    wallclock_slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    wallclock_slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    wallclock_slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    wallclock_slot_start_date_time_not_in_values?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: eq)
+     */
+    meta_client_name_eq?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: ne)
+     */
+    meta_client_name_ne?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: contains)
+     */
+    meta_client_name_contains?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: starts_with)
+     */
+    meta_client_name_starts_with?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: ends_with)
+     */
+    meta_client_name_ends_with?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: like)
+     */
+    meta_client_name_like?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: not_like)
+     */
+    meta_client_name_not_like?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: in_values) (comma-separated list)
+     */
+    meta_client_name_in_values?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_name_not_in_values?: string;
+    /**
+     * Client type: CL or EL (filter: eq)
+     */
+    client_type_eq?: string;
+    /**
+     * Client type: CL or EL (filter: ne)
+     */
+    client_type_ne?: string;
+    /**
+     * Client type: CL or EL (filter: contains)
+     */
+    client_type_contains?: string;
+    /**
+     * Client type: CL or EL (filter: starts_with)
+     */
+    client_type_starts_with?: string;
+    /**
+     * Client type: CL or EL (filter: ends_with)
+     */
+    client_type_ends_with?: string;
+    /**
+     * Client type: CL or EL (filter: like)
+     */
+    client_type_like?: string;
+    /**
+     * Client type: CL or EL (filter: not_like)
+     */
+    client_type_not_like?: string;
+    /**
+     * Client type: CL or EL (filter: in_values) (comma-separated list)
+     */
+    client_type_in_values?: string;
+    /**
+     * Client type: CL or EL (filter: not_in_values) (comma-separated list)
+     */
+    client_type_not_in_values?: string;
+    /**
+     * Process ID of the monitored client (filter: eq)
+     */
+    pid_eq?: number;
+    /**
+     * Process ID of the monitored client (filter: ne)
+     */
+    pid_ne?: number;
+    /**
+     * Process ID of the monitored client (filter: lt)
+     */
+    pid_lt?: number;
+    /**
+     * Process ID of the monitored client (filter: lte)
+     */
+    pid_lte?: number;
+    /**
+     * Process ID of the monitored client (filter: gt)
+     */
+    pid_gt?: number;
+    /**
+     * Process ID of the monitored client (filter: gte)
+     */
+    pid_gte?: number;
+    /**
+     * Process ID of the monitored client (filter: between_min)
+     */
+    pid_between_min?: number;
+    /**
+     * Process ID of the monitored client (filter: between_max_value)
+     */
+    pid_between_max_value?: number;
+    /**
+     * Process ID of the monitored client (filter: in_values) (comma-separated list)
+     */
+    pid_in_values?: string;
+    /**
+     * Process ID of the monitored client (filter: not_in_values) (comma-separated list)
+     */
+    pid_not_in_values?: string;
+    /**
+     * Start of the sub-slot aggregation window (filter: eq)
+     */
+    window_start_eq?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: ne)
+     */
+    window_start_ne?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: lt)
+     */
+    window_start_lt?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: lte)
+     */
+    window_start_lte?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: gt)
+     */
+    window_start_gt?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: gte)
+     */
+    window_start_gte?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: between_min)
+     */
+    window_start_between_min?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: between_max_value)
+     */
+    window_start_between_max_value?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: in_values) (comma-separated list)
+     */
+    window_start_in_values?: string;
+    /**
+     * Start of the sub-slot aggregation window (filter: not_in_values) (comma-separated list)
+     */
+    window_start_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The wallclock slot number (filter: eq)
+     */
+    wallclock_slot_eq?: number;
+    /**
+     * The wallclock slot number (filter: ne)
+     */
+    wallclock_slot_ne?: number;
+    /**
+     * The wallclock slot number (filter: lt)
+     */
+    wallclock_slot_lt?: number;
+    /**
+     * The wallclock slot number (filter: lte)
+     */
+    wallclock_slot_lte?: number;
+    /**
+     * The wallclock slot number (filter: gt)
+     */
+    wallclock_slot_gt?: number;
+    /**
+     * The wallclock slot number (filter: gte)
+     */
+    wallclock_slot_gte?: number;
+    /**
+     * The wallclock slot number (filter: between_min)
+     */
+    wallclock_slot_between_min?: number;
+    /**
+     * The wallclock slot number (filter: between_max_value)
+     */
+    wallclock_slot_between_max_value?: number;
+    /**
+     * The wallclock slot number (filter: in_values) (comma-separated list)
+     */
+    wallclock_slot_in_values?: string;
+    /**
+     * The wallclock slot number (filter: not_in_values) (comma-separated list)
+     */
+    wallclock_slot_not_in_values?: string;
+    /**
+     * Ethereum network name (filter: eq)
+     */
+    meta_network_name_eq?: string;
+    /**
+     * Ethereum network name (filter: ne)
+     */
+    meta_network_name_ne?: string;
+    /**
+     * Ethereum network name (filter: contains)
+     */
+    meta_network_name_contains?: string;
+    /**
+     * Ethereum network name (filter: starts_with)
+     */
+    meta_network_name_starts_with?: string;
+    /**
+     * Ethereum network name (filter: ends_with)
+     */
+    meta_network_name_ends_with?: string;
+    /**
+     * Ethereum network name (filter: like)
+     */
+    meta_network_name_like?: string;
+    /**
+     * Ethereum network name (filter: not_like)
+     */
+    meta_network_name_not_like?: string;
+    /**
+     * Ethereum network name (filter: in_values) (comma-separated list)
+     */
+    meta_network_name_in_values?: string;
+    /**
+     * Ethereum network name (filter: not_in_values) (comma-separated list)
+     */
+    meta_network_name_not_in_values?: string;
+    /**
+     * Resident set size in bytes (total physical memory used) (filter: eq)
+     */
+    vm_rss_bytes_eq?: number;
+    /**
+     * Resident set size in bytes (total physical memory used) (filter: ne)
+     */
+    vm_rss_bytes_ne?: number;
+    /**
+     * Resident set size in bytes (total physical memory used) (filter: lt)
+     */
+    vm_rss_bytes_lt?: number;
+    /**
+     * Resident set size in bytes (total physical memory used) (filter: lte)
+     */
+    vm_rss_bytes_lte?: number;
+    /**
+     * Resident set size in bytes (total physical memory used) (filter: gt)
+     */
+    vm_rss_bytes_gt?: number;
+    /**
+     * Resident set size in bytes (total physical memory used) (filter: gte)
+     */
+    vm_rss_bytes_gte?: number;
+    /**
+     * Resident set size in bytes (total physical memory used) (filter: between_min)
+     */
+    vm_rss_bytes_between_min?: number;
+    /**
+     * Resident set size in bytes (total physical memory used) (filter: between_max_value)
+     */
+    vm_rss_bytes_between_max_value?: number;
+    /**
+     * Resident set size in bytes (total physical memory used) (filter: in_values) (comma-separated list)
+     */
+    vm_rss_bytes_in_values?: string;
+    /**
+     * Resident set size in bytes (total physical memory used) (filter: not_in_values) (comma-separated list)
+     */
+    vm_rss_bytes_not_in_values?: string;
+    /**
+     * Anonymous RSS in bytes (heap, stack, anonymous mmap) (filter: eq)
+     */
+    rss_anon_bytes_eq?: number;
+    /**
+     * Anonymous RSS in bytes (heap, stack, anonymous mmap) (filter: ne)
+     */
+    rss_anon_bytes_ne?: number;
+    /**
+     * Anonymous RSS in bytes (heap, stack, anonymous mmap) (filter: lt)
+     */
+    rss_anon_bytes_lt?: number;
+    /**
+     * Anonymous RSS in bytes (heap, stack, anonymous mmap) (filter: lte)
+     */
+    rss_anon_bytes_lte?: number;
+    /**
+     * Anonymous RSS in bytes (heap, stack, anonymous mmap) (filter: gt)
+     */
+    rss_anon_bytes_gt?: number;
+    /**
+     * Anonymous RSS in bytes (heap, stack, anonymous mmap) (filter: gte)
+     */
+    rss_anon_bytes_gte?: number;
+    /**
+     * Anonymous RSS in bytes (heap, stack, anonymous mmap) (filter: between_min)
+     */
+    rss_anon_bytes_between_min?: number;
+    /**
+     * Anonymous RSS in bytes (heap, stack, anonymous mmap) (filter: between_max_value)
+     */
+    rss_anon_bytes_between_max_value?: number;
+    /**
+     * Anonymous RSS in bytes (heap, stack, anonymous mmap) (filter: in_values) (comma-separated list)
+     */
+    rss_anon_bytes_in_values?: string;
+    /**
+     * Anonymous RSS in bytes (heap, stack, anonymous mmap) (filter: not_in_values) (comma-separated list)
+     */
+    rss_anon_bytes_not_in_values?: string;
+    /**
+     * File-backed RSS in bytes (shared libraries, mmap files) (filter: eq)
+     */
+    rss_file_bytes_eq?: number;
+    /**
+     * File-backed RSS in bytes (shared libraries, mmap files) (filter: ne)
+     */
+    rss_file_bytes_ne?: number;
+    /**
+     * File-backed RSS in bytes (shared libraries, mmap files) (filter: lt)
+     */
+    rss_file_bytes_lt?: number;
+    /**
+     * File-backed RSS in bytes (shared libraries, mmap files) (filter: lte)
+     */
+    rss_file_bytes_lte?: number;
+    /**
+     * File-backed RSS in bytes (shared libraries, mmap files) (filter: gt)
+     */
+    rss_file_bytes_gt?: number;
+    /**
+     * File-backed RSS in bytes (shared libraries, mmap files) (filter: gte)
+     */
+    rss_file_bytes_gte?: number;
+    /**
+     * File-backed RSS in bytes (shared libraries, mmap files) (filter: between_min)
+     */
+    rss_file_bytes_between_min?: number;
+    /**
+     * File-backed RSS in bytes (shared libraries, mmap files) (filter: between_max_value)
+     */
+    rss_file_bytes_between_max_value?: number;
+    /**
+     * File-backed RSS in bytes (shared libraries, mmap files) (filter: in_values) (comma-separated list)
+     */
+    rss_file_bytes_in_values?: string;
+    /**
+     * File-backed RSS in bytes (shared libraries, mmap files) (filter: not_in_values) (comma-separated list)
+     */
+    rss_file_bytes_not_in_values?: string;
+    /**
+     * Swap usage in bytes (filter: eq)
+     */
+    vm_swap_bytes_eq?: number;
+    /**
+     * Swap usage in bytes (filter: ne)
+     */
+    vm_swap_bytes_ne?: number;
+    /**
+     * Swap usage in bytes (filter: lt)
+     */
+    vm_swap_bytes_lt?: number;
+    /**
+     * Swap usage in bytes (filter: lte)
+     */
+    vm_swap_bytes_lte?: number;
+    /**
+     * Swap usage in bytes (filter: gt)
+     */
+    vm_swap_bytes_gt?: number;
+    /**
+     * Swap usage in bytes (filter: gte)
+     */
+    vm_swap_bytes_gte?: number;
+    /**
+     * Swap usage in bytes (filter: between_min)
+     */
+    vm_swap_bytes_between_min?: number;
+    /**
+     * Swap usage in bytes (filter: between_max_value)
+     */
+    vm_swap_bytes_between_max_value?: number;
+    /**
+     * Swap usage in bytes (filter: in_values) (comma-separated list)
+     */
+    vm_swap_bytes_in_values?: string;
+    /**
+     * Swap usage in bytes (filter: not_in_values) (comma-separated list)
+     */
+    vm_swap_bytes_not_in_values?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * The maximum number of fct_node_memory_usage_by_process to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctNodeMemoryUsageByProcess` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_node_memory_usage_by_process';
+};
+
+export type FctNodeMemoryUsageByProcessServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctNodeMemoryUsageByProcessServiceListError =
+  FctNodeMemoryUsageByProcessServiceListErrors[keyof FctNodeMemoryUsageByProcessServiceListErrors];
+
+export type FctNodeMemoryUsageByProcessServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctNodeMemoryUsageByProcessResponse;
+};
+
+export type FctNodeMemoryUsageByProcessServiceListResponse =
+  FctNodeMemoryUsageByProcessServiceListResponses[keyof FctNodeMemoryUsageByProcessServiceListResponses];
+
+export type FctNodeMemoryUsageByProcessServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    wallclock_slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_node_memory_usage_by_process/{wallclock_slot_start_date_time}';
+};
+
+export type FctNodeMemoryUsageByProcessServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctNodeMemoryUsageByProcessServiceGetError =
+  FctNodeMemoryUsageByProcessServiceGetErrors[keyof FctNodeMemoryUsageByProcessServiceGetErrors];
+
+export type FctNodeMemoryUsageByProcessServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctNodeMemoryUsageByProcessResponse;
+};
+
+export type FctNodeMemoryUsageByProcessServiceGetResponse =
+  FctNodeMemoryUsageByProcessServiceGetResponses[keyof FctNodeMemoryUsageByProcessServiceGetResponses];
+
+export type FctNodeNetworkIoByProcessServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    wallclock_slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    wallclock_slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    wallclock_slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    wallclock_slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    wallclock_slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    wallclock_slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    wallclock_slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    wallclock_slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    wallclock_slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    wallclock_slot_start_date_time_not_in_values?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: eq)
+     */
+    meta_client_name_eq?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: ne)
+     */
+    meta_client_name_ne?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: contains)
+     */
+    meta_client_name_contains?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: starts_with)
+     */
+    meta_client_name_starts_with?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: ends_with)
+     */
+    meta_client_name_ends_with?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: like)
+     */
+    meta_client_name_like?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: not_like)
+     */
+    meta_client_name_not_like?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: in_values) (comma-separated list)
+     */
+    meta_client_name_in_values?: string;
+    /**
+     * Name of the observoor client that collected the data (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_name_not_in_values?: string;
+    /**
+     * Client type: CL or EL (filter: eq)
+     */
+    client_type_eq?: string;
+    /**
+     * Client type: CL or EL (filter: ne)
+     */
+    client_type_ne?: string;
+    /**
+     * Client type: CL or EL (filter: contains)
+     */
+    client_type_contains?: string;
+    /**
+     * Client type: CL or EL (filter: starts_with)
+     */
+    client_type_starts_with?: string;
+    /**
+     * Client type: CL or EL (filter: ends_with)
+     */
+    client_type_ends_with?: string;
+    /**
+     * Client type: CL or EL (filter: like)
+     */
+    client_type_like?: string;
+    /**
+     * Client type: CL or EL (filter: not_like)
+     */
+    client_type_not_like?: string;
+    /**
+     * Client type: CL or EL (filter: in_values) (comma-separated list)
+     */
+    client_type_in_values?: string;
+    /**
+     * Client type: CL or EL (filter: not_in_values) (comma-separated list)
+     */
+    client_type_not_in_values?: string;
+    /**
+     * Process ID of the monitored client (filter: eq)
+     */
+    pid_eq?: number;
+    /**
+     * Process ID of the monitored client (filter: ne)
+     */
+    pid_ne?: number;
+    /**
+     * Process ID of the monitored client (filter: lt)
+     */
+    pid_lt?: number;
+    /**
+     * Process ID of the monitored client (filter: lte)
+     */
+    pid_lte?: number;
+    /**
+     * Process ID of the monitored client (filter: gt)
+     */
+    pid_gt?: number;
+    /**
+     * Process ID of the monitored client (filter: gte)
+     */
+    pid_gte?: number;
+    /**
+     * Process ID of the monitored client (filter: between_min)
+     */
+    pid_between_min?: number;
+    /**
+     * Process ID of the monitored client (filter: between_max_value)
+     */
+    pid_between_max_value?: number;
+    /**
+     * Process ID of the monitored client (filter: in_values) (comma-separated list)
+     */
+    pid_in_values?: string;
+    /**
+     * Process ID of the monitored client (filter: not_in_values) (comma-separated list)
+     */
+    pid_not_in_values?: string;
+    /**
+     * Port classification (e.g. cl_p2p_tcp, el_json_rpc, unknown) (filter: eq)
+     */
+    port_label_eq?: string;
+    /**
+     * Port classification (e.g. cl_p2p_tcp, el_json_rpc, unknown) (filter: ne)
+     */
+    port_label_ne?: string;
+    /**
+     * Port classification (e.g. cl_p2p_tcp, el_json_rpc, unknown) (filter: contains)
+     */
+    port_label_contains?: string;
+    /**
+     * Port classification (e.g. cl_p2p_tcp, el_json_rpc, unknown) (filter: starts_with)
+     */
+    port_label_starts_with?: string;
+    /**
+     * Port classification (e.g. cl_p2p_tcp, el_json_rpc, unknown) (filter: ends_with)
+     */
+    port_label_ends_with?: string;
+    /**
+     * Port classification (e.g. cl_p2p_tcp, el_json_rpc, unknown) (filter: like)
+     */
+    port_label_like?: string;
+    /**
+     * Port classification (e.g. cl_p2p_tcp, el_json_rpc, unknown) (filter: not_like)
+     */
+    port_label_not_like?: string;
+    /**
+     * Port classification (e.g. cl_p2p_tcp, el_json_rpc, unknown) (filter: in_values) (comma-separated list)
+     */
+    port_label_in_values?: string;
+    /**
+     * Port classification (e.g. cl_p2p_tcp, el_json_rpc, unknown) (filter: not_in_values) (comma-separated list)
+     */
+    port_label_not_in_values?: string;
+    /**
+     * Traffic direction: tx or rx (filter: eq)
+     */
+    direction_eq?: string;
+    /**
+     * Traffic direction: tx or rx (filter: ne)
+     */
+    direction_ne?: string;
+    /**
+     * Traffic direction: tx or rx (filter: contains)
+     */
+    direction_contains?: string;
+    /**
+     * Traffic direction: tx or rx (filter: starts_with)
+     */
+    direction_starts_with?: string;
+    /**
+     * Traffic direction: tx or rx (filter: ends_with)
+     */
+    direction_ends_with?: string;
+    /**
+     * Traffic direction: tx or rx (filter: like)
+     */
+    direction_like?: string;
+    /**
+     * Traffic direction: tx or rx (filter: not_like)
+     */
+    direction_not_like?: string;
+    /**
+     * Traffic direction: tx or rx (filter: in_values) (comma-separated list)
+     */
+    direction_in_values?: string;
+    /**
+     * Traffic direction: tx or rx (filter: not_in_values) (comma-separated list)
+     */
+    direction_not_in_values?: string;
+    /**
+     * Start of the sub-slot aggregation window (filter: eq)
+     */
+    window_start_eq?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: ne)
+     */
+    window_start_ne?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: lt)
+     */
+    window_start_lt?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: lte)
+     */
+    window_start_lte?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: gt)
+     */
+    window_start_gt?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: gte)
+     */
+    window_start_gte?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: between_min)
+     */
+    window_start_between_min?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: between_max_value)
+     */
+    window_start_between_max_value?: number;
+    /**
+     * Start of the sub-slot aggregation window (filter: in_values) (comma-separated list)
+     */
+    window_start_in_values?: string;
+    /**
+     * Start of the sub-slot aggregation window (filter: not_in_values) (comma-separated list)
+     */
+    window_start_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The wallclock slot number (filter: eq)
+     */
+    wallclock_slot_eq?: number;
+    /**
+     * The wallclock slot number (filter: ne)
+     */
+    wallclock_slot_ne?: number;
+    /**
+     * The wallclock slot number (filter: lt)
+     */
+    wallclock_slot_lt?: number;
+    /**
+     * The wallclock slot number (filter: lte)
+     */
+    wallclock_slot_lte?: number;
+    /**
+     * The wallclock slot number (filter: gt)
+     */
+    wallclock_slot_gt?: number;
+    /**
+     * The wallclock slot number (filter: gte)
+     */
+    wallclock_slot_gte?: number;
+    /**
+     * The wallclock slot number (filter: between_min)
+     */
+    wallclock_slot_between_min?: number;
+    /**
+     * The wallclock slot number (filter: between_max_value)
+     */
+    wallclock_slot_between_max_value?: number;
+    /**
+     * The wallclock slot number (filter: in_values) (comma-separated list)
+     */
+    wallclock_slot_in_values?: string;
+    /**
+     * The wallclock slot number (filter: not_in_values) (comma-separated list)
+     */
+    wallclock_slot_not_in_values?: string;
+    /**
+     * Ethereum network name (filter: eq)
+     */
+    meta_network_name_eq?: string;
+    /**
+     * Ethereum network name (filter: ne)
+     */
+    meta_network_name_ne?: string;
+    /**
+     * Ethereum network name (filter: contains)
+     */
+    meta_network_name_contains?: string;
+    /**
+     * Ethereum network name (filter: starts_with)
+     */
+    meta_network_name_starts_with?: string;
+    /**
+     * Ethereum network name (filter: ends_with)
+     */
+    meta_network_name_ends_with?: string;
+    /**
+     * Ethereum network name (filter: like)
+     */
+    meta_network_name_like?: string;
+    /**
+     * Ethereum network name (filter: not_like)
+     */
+    meta_network_name_not_like?: string;
+    /**
+     * Ethereum network name (filter: in_values) (comma-separated list)
+     */
+    meta_network_name_in_values?: string;
+    /**
+     * Ethereum network name (filter: not_in_values) (comma-separated list)
+     */
+    meta_network_name_not_in_values?: string;
+    /**
+     * Filter io_bytes using value
+     */
+    io_bytes_value?: number;
+    /**
+     * Total packet or event count in this window (filter: eq)
+     */
+    io_count_eq?: number;
+    /**
+     * Total packet or event count in this window (filter: ne)
+     */
+    io_count_ne?: number;
+    /**
+     * Total packet or event count in this window (filter: lt)
+     */
+    io_count_lt?: number;
+    /**
+     * Total packet or event count in this window (filter: lte)
+     */
+    io_count_lte?: number;
+    /**
+     * Total packet or event count in this window (filter: gt)
+     */
+    io_count_gt?: number;
+    /**
+     * Total packet or event count in this window (filter: gte)
+     */
+    io_count_gte?: number;
+    /**
+     * Total packet or event count in this window (filter: between_min)
+     */
+    io_count_between_min?: number;
+    /**
+     * Total packet or event count in this window (filter: between_max_value)
+     */
+    io_count_between_max_value?: number;
+    /**
+     * Total packet or event count in this window (filter: in_values) (comma-separated list)
+     */
+    io_count_in_values?: string;
+    /**
+     * Total packet or event count in this window (filter: not_in_values) (comma-separated list)
+     */
+    io_count_not_in_values?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for filtering (e.g. eip7870) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * The maximum number of fct_node_network_io_by_process to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctNodeNetworkIoByProcess` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_node_network_io_by_process';
+};
+
+export type FctNodeNetworkIoByProcessServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctNodeNetworkIoByProcessServiceListError =
+  FctNodeNetworkIoByProcessServiceListErrors[keyof FctNodeNetworkIoByProcessServiceListErrors];
+
+export type FctNodeNetworkIoByProcessServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctNodeNetworkIoByProcessResponse;
+};
+
+export type FctNodeNetworkIoByProcessServiceListResponse =
+  FctNodeNetworkIoByProcessServiceListResponses[keyof FctNodeNetworkIoByProcessServiceListResponses];
+
+export type FctNodeNetworkIoByProcessServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    wallclock_slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_node_network_io_by_process/{wallclock_slot_start_date_time}';
+};
+
+export type FctNodeNetworkIoByProcessServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctNodeNetworkIoByProcessServiceGetError =
+  FctNodeNetworkIoByProcessServiceGetErrors[keyof FctNodeNetworkIoByProcessServiceGetErrors];
+
+export type FctNodeNetworkIoByProcessServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctNodeNetworkIoByProcessResponse;
+};
+
+export type FctNodeNetworkIoByProcessServiceGetResponse =
+  FctNodeNetworkIoByProcessServiceGetResponses[keyof FctNodeNetworkIoByProcessServiceGetResponses];
 
 export type FctOpcodeGasByOpcodeDailyServiceListData = {
   body?: never;
