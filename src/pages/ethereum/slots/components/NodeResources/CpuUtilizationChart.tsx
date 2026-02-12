@@ -121,8 +121,22 @@ export function CpuUtilizationChart({
       return buckets;
     };
 
-    const toPoints = (buckets: Map<number, BucketAgg>, extract: (b: BucketAgg) => number[]): [number, number][] =>
-      ALL_BUCKETS.map(t => [t, buckets.has(t) ? avg(extract(buckets.get(t)!)) : 0] as [number, number]);
+    const toPoints = (buckets: Map<number, BucketAgg>, extract: (b: BucketAgg) => number[]): [number, number][] => {
+      const points: [number, number][] = ALL_BUCKETS.map(
+        t => [t, buckets.has(t) ? avg(extract(buckets.get(t)!)) : NaN] as [number, number]
+      );
+      // Gauge metric: forward-fill gaps, backward-fill leading empties
+      const firstKnown = points.find(p => !isNaN(p[1]))?.[1] ?? 0;
+      let last = firstKnown;
+      for (const p of points) {
+        if (isNaN(p[1])) {
+          p[1] = last;
+        } else {
+          last = p[1];
+        }
+      }
+      return points;
+    };
 
     const metricExtract = (b: BucketAgg): number[] => {
       switch (metric) {

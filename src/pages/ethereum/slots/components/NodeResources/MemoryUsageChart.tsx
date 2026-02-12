@@ -120,8 +120,22 @@ export function MemoryUsageChart({
       return buckets;
     };
 
-    const toPoints = (buckets: Map<number, number[]>): [number, number][] =>
-      ALL_BUCKETS.map(t => [t, buckets.has(t) ? avg(buckets.get(t)!) : 0] as [number, number]);
+    const toPoints = (buckets: Map<number, number[]>): [number, number][] => {
+      const points: [number, number][] = ALL_BUCKETS.map(
+        t => [t, buckets.has(t) ? avg(buckets.get(t)!) : NaN] as [number, number]
+      );
+      // Gauge metric: forward-fill gaps, backward-fill leading empties
+      const firstKnown = points.find(p => !isNaN(p[1]))?.[1] ?? 0;
+      let last = firstKnown;
+      for (const p of points) {
+        if (isNaN(p[1])) {
+          p[1] = last;
+        } else {
+          last = p[1];
+        }
+      }
+      return points;
+    };
 
     if (selectedNode) {
       const nodeData = data.filter(d => d.meta_client_name === selectedNode);
