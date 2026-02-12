@@ -169,6 +169,7 @@ interface ApiBlockSimulationResponse {
     simulatedReverts: number;
     originalErrors: CallError[] | null;
     simulatedErrors: CallError[] | null;
+    error?: string;
   }>;
   opcodeBreakdown: Record<
     string,
