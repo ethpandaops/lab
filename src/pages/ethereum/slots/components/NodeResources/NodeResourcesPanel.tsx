@@ -29,6 +29,7 @@ import {
   type MemoryMetric,
   type AnnotationType,
   type AnnotationEvent,
+  type HighlightRange,
 } from './types';
 
 export type { CpuMetric } from './types';
@@ -67,6 +68,7 @@ export function NodeResourcesPanel({
   const [enabledAnnotations, setEnabledAnnotations] = useState<Set<AnnotationType>>(
     () => new Set<AnnotationType>(['slot_phases', 'block', 'head', 'execution', 'data_columns'])
   );
+  const [highlight, setHighlight] = useState<HighlightRange | null>(null);
 
   // Always fetch execution timing data so the toggle can show availability
   const { data: executionData } = useQuery({
@@ -400,6 +402,8 @@ export function NodeResourcesPanel({
           slot={slot}
           annotations={annotations}
           enabledAnnotations={enabledAnnotations}
+          highlight={highlight}
+          onHighlight={setHighlight}
         />
         <MemoryUsageChart
           data={filteredMemoryData}
@@ -409,6 +413,8 @@ export function NodeResourcesPanel({
           slot={slot}
           annotations={annotations}
           enabledAnnotations={enabledAnnotations}
+          highlight={highlight}
+          onHighlight={setHighlight}
         />
         <DiskIoChart
           data={filteredDiskData}
@@ -416,6 +422,8 @@ export function NodeResourcesPanel({
           slot={slot}
           annotations={annotations}
           enabledAnnotations={enabledAnnotations}
+          highlight={highlight}
+          onHighlight={setHighlight}
         />
         <NetworkIoChart
           data={filteredNetworkData}
@@ -423,6 +431,8 @@ export function NodeResourcesPanel({
           slot={slot}
           annotations={annotations}
           enabledAnnotations={enabledAnnotations}
+          highlight={highlight}
+          onHighlight={setHighlight}
         />
       </div>
 

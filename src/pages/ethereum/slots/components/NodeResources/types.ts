@@ -24,6 +24,12 @@ export const ANNOTATION_COLORS: Record<AnnotationType, string> = {
   slot_phases: '#6b7280',
 };
 
+export interface HighlightRange {
+  startFrac: number;
+  widthFrac: number;
+  color: string;
+}
+
 export const ANNOTATION_OPTIONS: { value: AnnotationType; label: string; description: string }[] = [
   { value: 'slot_phases', label: 'Slot Phases', description: 'Block / Attestation / Aggregation phase boundaries' },
   { value: 'block', label: 'Block Arrival', description: 'When block gossip was received' },

@@ -1,11 +1,12 @@
-import { type JSX, useMemo } from 'react';
+import { type JSX, useCallback, useMemo, useState } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
-import type { SeriesData, MarkAreaConfig, MarkLineConfig } from '@/components/Charts/MultiLine/MultiLine.types';
+import type { SeriesData, MarkLineConfig } from '@/components/Charts/MultiLine/MultiLine.types';
 import { getDataVizColors } from '@/utils';
 import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
 import type { FctNodeNetworkIoByProcess } from '@/api/types.gen';
-import { ANNOTATION_COLORS, type AnnotationType, type AnnotationEvent } from './types';
+import { type AnnotationType, type AnnotationEvent, type HighlightRange } from './types';
+import { AnnotationSwimLanes } from './AnnotationSwimLanes';
 
 function usToSeconds(us: number): number {
   return us / 1_000_000;
@@ -31,18 +32,6 @@ const PORT_LABELS: Record<string, string> = {
   unknown: 'Unknown',
 };
 
-const MIN_AREA_WIDTH_SEC = 0.08;
-
-function nodeMatches(cpuNodeName: string, propNodeId: string): boolean {
-  const short = cpuNodeName.split('/').pop() ?? cpuNodeName;
-  return propNodeId === short || propNodeId === cpuNodeName || short.includes(propNodeId) || propNodeId.includes(short);
-}
-
-function percentile(sorted: number[], p: number): number {
-  const idx = Math.floor(sorted.length * p);
-  return sorted[Math.min(idx, sorted.length - 1)];
-}
-
 const BUCKET_SIZE = 0.25;
 const ALL_BUCKETS = Array.from({ length: 49 }, (_, i) => i * BUCKET_SIZE);
 const toBucket = (offsetSec: number): number => Math.round(offsetSec / BUCKET_SIZE) * BUCKET_SIZE;
@@ -54,6 +43,8 @@ interface NetworkIoChartProps {
   slot: number;
   annotations: AnnotationEvent[];
   enabledAnnotations: Set<AnnotationType>;
+  highlight: HighlightRange | null;
+  onHighlight: (range: HighlightRange | null) => void;
 }
 
 const PHASE_BOUNDARY_COLORS = ['#22d3ee', '#22c55e', '#f59e0b'];
@@ -71,8 +62,30 @@ export function NetworkIoChart({
   slot,
   annotations,
   enabledAnnotations,
+  highlight,
+  onHighlight,
 }: NetworkIoChartProps): JSX.Element {
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
+
+  const [gridOffsets, setGridOffsets] = useState({ left: 60, right: 24, height: 350 });
+  const handleChartReady = useCallback(
+    (instance: {
+      convertToPixel: (finder: { gridIndex: number }, value: number[]) => number[];
+      getDom: () => HTMLElement | null;
+    }) => {
+      try {
+        const px0 = instance.convertToPixel({ gridIndex: 0 }, [0, 0]);
+        const px12 = instance.convertToPixel({ gridIndex: 0 }, [12, 0]);
+        const width = instance.getDom()?.clientWidth ?? 0;
+        if (px0 && px12 && width > 0) {
+          setGridOffsets({ left: Math.round(px0[0]), right: Math.round(width - px12[0]), height: Math.round(px0[1]) });
+        }
+      } catch {
+        /* use defaults */
+      }
+    },
+    []
+  );
 
   const series = useMemo(() => {
     if (data.length === 0) return [] as SeriesData[];
@@ -128,76 +141,6 @@ export function NetworkIoChart({
     return chartSeries;
   }, [data, selectedNode, CHART_CATEGORICAL_COLORS]);
 
-  const markAreas = useMemo((): MarkAreaConfig[] => {
-    const areas: MarkAreaConfig[] = [];
-
-    if (selectedNode) {
-      for (const anno of annotations) {
-        if (!enabledAnnotations.has(anno.type)) continue;
-        if (!anno.nodeName || !nodeMatches(selectedNode, anno.nodeName)) continue;
-
-        const startSec = anno.timeMs / 1000;
-        if (startSec < 0 || startSec > 12) continue;
-        const color = ANNOTATION_COLORS[anno.type];
-        const hasRange = anno.endMs != null && Math.abs(anno.endMs - anno.timeMs) > 10;
-
-        if (hasRange) {
-          const endSec = Math.min(anno.endMs! / 1000, 12);
-          areas.push({ xStart: startSec, xEnd: endSec, color, opacity: 0.12 });
-        } else {
-          areas.push({
-            xStart: startSec - MIN_AREA_WIDTH_SEC / 2,
-            xEnd: startSec + MIN_AREA_WIDTH_SEC / 2,
-            color,
-            opacity: 0.3,
-          });
-        }
-      }
-    } else {
-      const byType = new Map<AnnotationType, AnnotationEvent[]>();
-      for (const anno of annotations) {
-        if (!enabledAnnotations.has(anno.type)) continue;
-        if (!byType.has(anno.type)) byType.set(anno.type, []);
-        byType.get(anno.type)!.push(anno);
-      }
-
-      for (const [type, events] of byType) {
-        const color = ANNOTATION_COLORS[type];
-        const hasRanges = events.some(e => e.endMs != null);
-
-        if (hasRanges) {
-          const starts = events.map(e => e.timeMs).sort((a, b) => a - b);
-          const ends = events.map(e => e.endMs ?? e.timeMs).sort((a, b) => a - b);
-          const startSec = starts[0] / 1000;
-          const endSec = percentile(ends, 0.95) / 1000;
-          if (startSec >= 0 && startSec <= 12) {
-            areas.push({ xStart: Math.max(0, startSec), xEnd: Math.min(12, endSec), color, opacity: 0.1 });
-          }
-        } else {
-          const times = events.map(e => e.timeMs).sort((a, b) => a - b);
-          const minSec = times[0] / 1000;
-          const p95Sec = percentile(times, 0.95) / 1000;
-          if (minSec >= 0 && p95Sec <= 12) {
-            const width = p95Sec - minSec;
-            if (width < MIN_AREA_WIDTH_SEC) {
-              const medSec = percentile(times, 0.5) / 1000;
-              areas.push({
-                xStart: medSec - MIN_AREA_WIDTH_SEC / 2,
-                xEnd: medSec + MIN_AREA_WIDTH_SEC / 2,
-                color,
-                opacity: 0.25,
-              });
-            } else {
-              areas.push({ xStart: minSec, xEnd: p95Sec, color, opacity: 0.1 });
-            }
-          }
-        }
-      }
-    }
-
-    return areas;
-  }, [annotations, enabledAnnotations, selectedNode]);
-
   const markLines = useMemo((): MarkLineConfig[] => {
     if (!enabledAnnotations.has('slot_phases')) return [];
 
@@ -247,51 +190,83 @@ export function NetworkIoChart({
   return (
     <PopoutCard title="Network I/O" subtitle={subtitle} modalSize="xl">
       {({ inModal }) => (
-        <MultiLineChart
-          series={series}
-          xAxis={{
-            type: 'value',
-            name: 'Slot Time (s)',
-            min: 0,
-            max: 12,
-            formatter: (v: number | string) => `${v}s`,
-          }}
-          yAxis={{
-            name: 'KB',
-            min: 0,
-            formatter: (v: number) => `${v.toFixed(0)} KB`,
-          }}
-          height={inModal ? 500 : 350}
-          showLegend
-          legendPosition="bottom"
-          markLines={markLines}
-          markAreas={markAreas}
-          syncGroup="slot-time"
-          tooltipFormatter={(params: unknown) => {
-            const items = (Array.isArray(params) ? params : [params]) as EChartsTooltipParam[];
-            if (items.length === 0) return '';
+        <>
+          <div className="relative">
+            <MultiLineChart
+              series={series}
+              xAxis={{
+                type: 'value',
+                name: 'Slot Time (s)',
+                min: 0,
+                max: 12,
+                formatter: (v: number | string) => `${v}s`,
+              }}
+              yAxis={{
+                name: 'KB',
+                min: 0,
+                formatter: (v: number) => `${v.toFixed(0)} KB`,
+              }}
+              height={inModal ? 500 : 350}
+              showLegend
+              legendPosition="bottom"
+              markLines={markLines}
+              syncGroup="slot-time"
+              onChartReady={handleChartReady}
+              tooltipFormatter={(params: unknown) => {
+                const items = (Array.isArray(params) ? params : [params]) as EChartsTooltipParam[];
+                if (items.length === 0) return '';
 
-            const first = items[0];
-            const xVal = Array.isArray(first.value) ? first.value[0] : first.axisValue;
-            const timeStr = typeof xVal === 'number' ? `${xVal.toFixed(2)}s` : `${xVal}s`;
+                const first = items[0];
+                const xVal = Array.isArray(first.value) ? first.value[0] : first.axisValue;
+                const timeStr = typeof xVal === 'number' ? `${xVal.toFixed(2)}s` : `${xVal}s`;
 
-            let html = `<div style="font-size:12px;min-width:160px">`;
-            html += `<div style="margin-bottom:4px;font-weight:600;color:var(--color-foreground)">${timeStr}</div>`;
+                let html = `<div style="font-size:12px;min-width:160px">`;
+                html += `<div style="margin-bottom:4px;font-weight:600;color:var(--color-foreground)">${timeStr}</div>`;
 
-            for (const p of items) {
-              const val = Array.isArray(p.value) ? p.value[1] : p.value;
-              if (val == null) continue;
-              html += `<div style="display:flex;align-items:center;gap:6px;margin:2px 0">`;
-              html += `${p.marker}`;
-              html += `<span style="flex:1">${p.seriesName}</span>`;
-              html += `<span style="font-weight:600">${Number(val).toFixed(1)} KB</span>`;
-              html += `</div>`;
-            }
+                for (const p of items) {
+                  const val = Array.isArray(p.value) ? p.value[1] : p.value;
+                  if (val == null) continue;
+                  html += `<div style="display:flex;align-items:center;gap:6px;margin:2px 0">`;
+                  html += `${p.marker}`;
+                  html += `<span style="flex:1">${p.seriesName}</span>`;
+                  html += `<span style="font-weight:600">${Number(val).toFixed(1)} KB</span>`;
+                  html += `</div>`;
+                }
 
-            html += `</div>`;
-            return html;
-          }}
-        />
+                html += `</div>`;
+                return html;
+              }}
+            />
+            {highlight && (
+              <div
+                className="pointer-events-none absolute top-0"
+                style={{
+                  left: gridOffsets.left,
+                  right: gridOffsets.right,
+                  height: gridOffsets.height,
+                }}
+              >
+                <div
+                  className="absolute inset-y-0"
+                  style={{
+                    left: `${highlight.startFrac * 100}%`,
+                    width: `${highlight.widthFrac * 100}%`,
+                    backgroundColor: highlight.color,
+                    opacity: 0.12,
+                  }}
+                />
+              </div>
+            )}
+          </div>
+          <AnnotationSwimLanes
+            annotations={annotations}
+            enabledAnnotations={enabledAnnotations}
+            selectedNode={selectedNode}
+            gridLeft={gridOffsets.left}
+            gridRight={gridOffsets.right}
+            onHighlight={onHighlight}
+          />
+        </>
       )}
     </PopoutCard>
   );

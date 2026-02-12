@@ -443,4 +443,9 @@ export interface MultiLineChartProps {
    * Renders semi-transparent colored rectangles spanning the full y-axis
    */
   markAreas?: MarkAreaConfig[];
+  /**
+   * Callback fired when the chart instance is ready
+   * Provides access to the underlying ECharts instance for advanced use cases
+   */
+  onChartReady?: (instance: import('echarts-for-react/lib').EChartsInstance) => void;
 }

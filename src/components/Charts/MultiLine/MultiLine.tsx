@@ -98,6 +98,7 @@ export function MultiLineChart({
   onSeriesClick,
   markLines,
   markAreas,
+  onChartReady: onChartReadyProp,
 }: MultiLineChartProps): React.JSX.Element {
   // Store ref to the ReactEChartsCore wrapper (not the instance) for click handling
   const chartWrapperRef = useRef<ReactEChartsCore | null>(null);
@@ -118,6 +119,7 @@ export function MultiLineChart({
       if (syncGroup && crosshairsContext) {
         crosshairsContext.registerChart(syncGroup, echartsInstance);
       }
+      onChartReadyProp?.(echartsInstance);
 
       // Track dataZoom changes to preserve zoom state across data updates and legend toggles
       // Using state ensures the zoom range is included in the option config on re-renders
@@ -142,7 +144,7 @@ export function MultiLineChart({
         echartsInstance.on('datazoom', handleDataZoom);
       }
     },
-    [syncGroup, crosshairsContext, enableDataZoom]
+    [syncGroup, crosshairsContext, enableDataZoom, onChartReadyProp]
   );
 
   // Cleanup sync registration on unmount or syncGroup change

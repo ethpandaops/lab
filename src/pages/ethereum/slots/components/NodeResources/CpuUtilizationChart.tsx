@@ -1,13 +1,14 @@
-import { type JSX, useMemo } from 'react';
+import { type JSX, useCallback, useMemo, useState } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
-import type { SeriesData, MarkAreaConfig, MarkLineConfig } from '@/components/Charts/MultiLine/MultiLine.types';
+import type { SeriesData, MarkLineConfig } from '@/components/Charts/MultiLine/MultiLine.types';
 import { getDataVizColors, getClientLayer } from '@/utils';
 import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
 import type { FctNodeCpuUtilizationByProcess } from '@/api/types.gen';
-import { ANNOTATION_COLORS, type CpuMetric, type AnnotationType, type AnnotationEvent } from './types';
+import { type CpuMetric, type AnnotationType, type AnnotationEvent, type HighlightRange } from './types';
+import { AnnotationSwimLanes } from './AnnotationSwimLanes';
 
 function usToSeconds(us: number): number {
   return us / 1_000_000;
@@ -34,20 +35,6 @@ const METRIC_OPTIONS = [
   { value: 'max' as CpuMetric, label: 'Max' },
 ];
 
-/** Minimum width in seconds for point-event areas so they're visible */
-const MIN_AREA_WIDTH_SEC = 0.08;
-
-/** Match a CPU node name to propagation node_id (fuzzy matching) */
-function nodeMatches(cpuNodeName: string, propNodeId: string): boolean {
-  const short = cpuNodeName.split('/').pop() ?? cpuNodeName;
-  return propNodeId === short || propNodeId === cpuNodeName || short.includes(propNodeId) || propNodeId.includes(short);
-}
-
-function percentile(sorted: number[], p: number): number {
-  const idx = Math.floor(sorted.length * p);
-  return sorted[Math.min(idx, sorted.length - 1)];
-}
-
 interface BucketAgg {
   meanVals: number[];
   minVals: number[];
@@ -63,6 +50,8 @@ interface CpuUtilizationChartProps {
   slot: number;
   annotations: AnnotationEvent[];
   enabledAnnotations: Set<AnnotationType>;
+  highlight: HighlightRange | null;
+  onHighlight: (range: HighlightRange | null) => void;
 }
 
 /** Slot phase boundary colors: cyan (block), green (attestation), amber (aggregation) */
@@ -88,8 +77,31 @@ export function CpuUtilizationChart({
   slot,
   annotations,
   enabledAnnotations,
+  highlight,
+  onHighlight,
 }: CpuUtilizationChartProps): JSX.Element {
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
+
+  const [gridOffsets, setGridOffsets] = useState({ left: 60, right: 24, height: 350 });
+  const handleChartReady = useCallback(
+    (instance: {
+      convertToPixel: (finder: { gridIndex: number }, value: number[]) => number[];
+      getDom: () => HTMLElement | null;
+    }) => {
+      try {
+        const px0 = instance.convertToPixel({ gridIndex: 0 }, [0, 0]);
+        const px12 = instance.convertToPixel({ gridIndex: 0 }, [12, 0]);
+        const width = instance.getDom()?.clientWidth ?? 0;
+        if (px0 && px12 && width > 0) {
+          // px0[1] = pixel Y of the x-axis from the top of the ECharts DOM
+          setGridOffsets({ left: Math.round(px0[0]), right: Math.round(width - px12[0]), height: Math.round(px0[1]) });
+        }
+      } catch {
+        /* use defaults */
+      }
+    },
+    []
+  );
 
   const { series, clClient, elClient } = useMemo(() => {
     if (data.length === 0) {
@@ -237,87 +249,6 @@ export function CpuUtilizationChart({
     return { series: chartSeries, clClient: resolvedClClient, elClient: resolvedElClient };
   }, [data, selectedNode, metric, CHART_CATEGORICAL_COLORS]);
 
-  // Convert annotations to markAreas (chart handles node matching + aggregation)
-  const markAreas = useMemo((): MarkAreaConfig[] => {
-    const areas: MarkAreaConfig[] = [];
-
-    if (selectedNode) {
-      // Single node: find matching events and render exact positions
-      for (const anno of annotations) {
-        if (!enabledAnnotations.has(anno.type)) continue;
-        if (!anno.nodeName || !nodeMatches(selectedNode, anno.nodeName)) continue;
-
-        const startSec = anno.timeMs / 1000;
-        if (startSec < 0 || startSec > 12) continue;
-        const color = ANNOTATION_COLORS[anno.type];
-        const hasRange = anno.endMs != null && Math.abs(anno.endMs - anno.timeMs) > 10;
-
-        if (hasRange) {
-          const endSec = Math.min(anno.endMs! / 1000, 12);
-          areas.push({ xStart: startSec, xEnd: endSec, color, opacity: 0.12 });
-        } else {
-          areas.push({
-            xStart: startSec - MIN_AREA_WIDTH_SEC / 2,
-            xEnd: startSec + MIN_AREA_WIDTH_SEC / 2,
-            color,
-            opacity: 0.3,
-          });
-        }
-      }
-    } else {
-      // Aggregate: compute min–p95 range per annotation type
-      const byType = new Map<AnnotationType, AnnotationEvent[]>();
-      for (const anno of annotations) {
-        if (!enabledAnnotations.has(anno.type)) continue;
-        if (!byType.has(anno.type)) byType.set(anno.type, []);
-        byType.get(anno.type)!.push(anno);
-      }
-
-      for (const [type, events] of byType) {
-        const color = ANNOTATION_COLORS[type];
-        const hasRanges = events.some(e => e.endMs != null);
-
-        if (hasRanges) {
-          // Range events (execution, data_columns): min of starts → p95 of ends
-          const starts = events.map(e => e.timeMs).sort((a, b) => a - b);
-          const ends = events.map(e => e.endMs ?? e.timeMs).sort((a, b) => a - b);
-          const startSec = starts[0] / 1000;
-          const endSec = percentile(ends, 0.95) / 1000;
-          if (startSec >= 0 && startSec <= 12) {
-            areas.push({
-              xStart: Math.max(0, startSec),
-              xEnd: Math.min(12, endSec),
-              color,
-              opacity: 0.1,
-            });
-          }
-        } else {
-          // Point events (block, head): min–p95 spread as area
-          const times = events.map(e => e.timeMs).sort((a, b) => a - b);
-          const minSec = times[0] / 1000;
-          const p95Sec = percentile(times, 0.95) / 1000;
-          if (minSec >= 0 && p95Sec <= 12) {
-            const width = p95Sec - minSec;
-            if (width < MIN_AREA_WIDTH_SEC) {
-              // Very tight spread: render as thin band at median
-              const medSec = percentile(times, 0.5) / 1000;
-              areas.push({
-                xStart: medSec - MIN_AREA_WIDTH_SEC / 2,
-                xEnd: medSec + MIN_AREA_WIDTH_SEC / 2,
-                color,
-                opacity: 0.25,
-              });
-            } else {
-              areas.push({ xStart: minSec, xEnd: p95Sec, color, opacity: 0.1 });
-            }
-          }
-        }
-      }
-    }
-
-    return areas;
-  }, [annotations, enabledAnnotations, selectedNode]);
-
   const markLines = useMemo((): MarkLineConfig[] => {
     if (!enabledAnnotations.has('slot_phases')) return [];
 
@@ -350,15 +281,12 @@ export function CpuUtilizationChart({
     ? `Slot ${slot} · ${shortNodeName} · % of all CPU cores`
     : `Slot ${slot} · ${METRIC_LABELS[metric]} across ${nodeCount} nodes · % of all CPU cores`;
 
-  const headerActions = selectedNode ? (
-    clClient || elClient ? (
-      <div className="flex items-center gap-1">
-        {clClient && <ClientLogo client={clClient} size={24} />}
-        {elClient && <ClientLogo client={elClient} size={24} />}
-      </div>
-    ) : undefined
-  ) : (
-    <SelectMenu value={metric} onChange={onMetricChange} options={METRIC_OPTIONS} expandToFit />
+  const headerActions = (
+    <div className="flex items-center gap-2">
+      {selectedNode && clClient && <ClientLogo client={clClient} size={24} />}
+      {selectedNode && elClient && <ClientLogo client={elClient} size={24} />}
+      <SelectMenu value={metric} onChange={onMetricChange} options={METRIC_OPTIONS} expandToFit />
+    </div>
   );
 
   if (data.length === 0) {
@@ -378,51 +306,83 @@ export function CpuUtilizationChart({
   return (
     <PopoutCard title="CPU Utilization" subtitle={subtitle} headerActions={headerActions} modalSize="xl">
       {({ inModal }) => (
-        <MultiLineChart
-          series={series}
-          xAxis={{
-            type: 'value',
-            name: 'Slot Time (s)',
-            min: 0,
-            max: 12,
-            formatter: (v: number | string) => `${v}s`,
-          }}
-          yAxis={{
-            name: '% of all cores',
-            min: 0,
-            formatter: (v: number) => `${v.toFixed(1)}%`,
-          }}
-          height={inModal ? 500 : 350}
-          showLegend
-          legendPosition="bottom"
-          markLines={markLines}
-          markAreas={markAreas}
-          syncGroup="slot-time"
-          tooltipFormatter={(params: unknown) => {
-            const items = (Array.isArray(params) ? params : [params]) as EChartsTooltipParam[];
-            if (items.length === 0) return '';
+        <>
+          <div className="relative">
+            <MultiLineChart
+              series={series}
+              xAxis={{
+                type: 'value',
+                name: 'Slot Time (s)',
+                min: 0,
+                max: 12,
+                formatter: (v: number | string) => `${v}s`,
+              }}
+              yAxis={{
+                name: '% of all cores',
+                min: 0,
+                formatter: (v: number) => `${v.toFixed(1)}%`,
+              }}
+              height={inModal ? 500 : 350}
+              showLegend
+              legendPosition="bottom"
+              markLines={markLines}
+              syncGroup="slot-time"
+              onChartReady={handleChartReady}
+              tooltipFormatter={(params: unknown) => {
+                const items = (Array.isArray(params) ? params : [params]) as EChartsTooltipParam[];
+                if (items.length === 0) return '';
 
-            const first = items[0];
-            const xVal = Array.isArray(first.value) ? first.value[0] : first.axisValue;
-            const timeStr = typeof xVal === 'number' ? `${xVal.toFixed(2)}s` : `${xVal}s`;
+                const first = items[0];
+                const xVal = Array.isArray(first.value) ? first.value[0] : first.axisValue;
+                const timeStr = typeof xVal === 'number' ? `${xVal.toFixed(2)}s` : `${xVal}s`;
 
-            let html = `<div style="font-size:12px;min-width:160px">`;
-            html += `<div style="margin-bottom:4px;font-weight:600;color:var(--color-foreground)">${timeStr}</div>`;
+                let html = `<div style="font-size:12px;min-width:160px">`;
+                html += `<div style="margin-bottom:4px;font-weight:600;color:var(--color-foreground)">${timeStr}</div>`;
 
-            for (const p of items) {
-              const val = Array.isArray(p.value) ? p.value[1] : p.value;
-              if (val == null) continue;
-              html += `<div style="display:flex;align-items:center;gap:6px;margin:2px 0">`;
-              html += `${p.marker}`;
-              html += `<span style="flex:1">${p.seriesName}</span>`;
-              html += `<span style="font-weight:600">${Number(val).toFixed(1)}%</span>`;
-              html += `</div>`;
-            }
+                for (const p of items) {
+                  const val = Array.isArray(p.value) ? p.value[1] : p.value;
+                  if (val == null) continue;
+                  html += `<div style="display:flex;align-items:center;gap:6px;margin:2px 0">`;
+                  html += `${p.marker}`;
+                  html += `<span style="flex:1">${p.seriesName}</span>`;
+                  html += `<span style="font-weight:600">${Number(val).toFixed(1)}%</span>`;
+                  html += `</div>`;
+                }
 
-            html += `</div>`;
-            return html;
-          }}
-        />
+                html += `</div>`;
+                return html;
+              }}
+            />
+            {highlight && (
+              <div
+                className="pointer-events-none absolute top-0"
+                style={{
+                  left: gridOffsets.left,
+                  right: gridOffsets.right,
+                  height: gridOffsets.height,
+                }}
+              >
+                <div
+                  className="absolute inset-y-0"
+                  style={{
+                    left: `${highlight.startFrac * 100}%`,
+                    width: `${highlight.widthFrac * 100}%`,
+                    backgroundColor: highlight.color,
+                    opacity: 0.12,
+                  }}
+                />
+              </div>
+            )}
+          </div>
+          <AnnotationSwimLanes
+            annotations={annotations}
+            enabledAnnotations={enabledAnnotations}
+            selectedNode={selectedNode}
+            gridLeft={gridOffsets.left}
+            gridRight={gridOffsets.right}
+            onHighlight={onHighlight}
+          />
+        </>
       )}
     </PopoutCard>
   );
