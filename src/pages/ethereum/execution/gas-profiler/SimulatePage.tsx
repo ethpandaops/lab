@@ -793,16 +793,12 @@ export function SimulatePage(): JSX.Element {
 
         {/* Advanced Options */}
         <div className="mt-4 flex items-center gap-2 border-t border-border pt-4">
-          <Checkbox
-            checked={useMaxGasLimit}
-            onChange={setUseMaxGasLimit}
-            disabled={isRunning}
-          />
+          <Checkbox checked={useMaxGasLimit} onChange={setUseMaxGasLimit} disabled={isRunning} />
           <button
             type="button"
             onClick={() => !isRunning && setUseMaxGasLimit(!useMaxGasLimit)}
             disabled={isRunning}
-            className={clsx('text-sm text-left', useMaxGasLimit ? 'text-foreground' : 'text-muted')}
+            className={clsx('text-left text-sm', useMaxGasLimit ? 'text-foreground' : 'text-muted')}
           >
             Use max gas limit for simulated execution
           </button>
@@ -1278,23 +1274,18 @@ export function SimulatePage(): JSX.Element {
       >
         <div className="space-y-3 text-sm text-muted">
           <p>
-            When gas prices change, transactions that succeeded under old pricing may run out of gas
-            under new pricing — not because the transaction logic is wrong, but because the original
-            gas limit was set for the old costs.
+            When gas prices change, transactions that succeeded under old pricing may run out of gas under new pricing —
+            not because the transaction logic is wrong, but because the original gas limit was set for the old costs.
           </p>
           <p>
-            With this option enabled, the simulated execution uses the maximum transaction gas limit
-            ({formatGas(MAX_TRANSACTION_GAS)} gas) instead of the original transaction&apos;s gas limit.
-            This prevents artificial out-of-gas failures and shows the true gas cost under the new
-            pricing.
+            With this option enabled, the simulated execution uses the maximum transaction gas limit (
+            {formatGas(MAX_TRANSACTION_GAS)} gas) instead of the original transaction&apos;s gas limit. This prevents
+            artificial out-of-gas failures and shows the true gas cost under the new pricing.
           </p>
-          <p>
-            The original execution always uses the real transaction gas limit, so you can still
-            compare the two.
-          </p>
+          <p>The original execution always uses the real transaction gas limit, so you can still compare the two.</p>
           <div className="rounded-xs border border-border bg-background px-3 py-2 text-xs">
-            <span className="font-medium text-foreground">Note:</span> This overrides each
-            transaction&apos;s individual gas limit, not the block gas limit.
+            <span className="font-medium text-foreground">Note:</span> This overrides each transaction&apos;s individual
+            gas limit, not the block gas limit.
           </div>
         </div>
       </Dialog>

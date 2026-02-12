@@ -416,7 +416,7 @@ export interface FileRoutesByFullPath {
   '/xatu/geographical-checklist': typeof XatuGeographicalChecklistRoute
   '/xatu/locally-built-blocks': typeof XatuLocallyBuiltBlocksRoute
   '/experiments/': typeof ExperimentsIndexRoute
-  '/xatu-data/': typeof XatuDataIndexRoute
+  '/xatu-data': typeof XatuDataIndexRoute
   '/beacon/block-production/live': typeof BeaconBlockProductionLiveRoute
   '/beacon/slot/live': typeof BeaconSlotLiveRoute
   '/ethereum/consensus/overview': typeof EthereumConsensusOverviewRoute
@@ -589,7 +589,7 @@ export interface FileRouteTypes {
     | '/xatu/geographical-checklist'
     | '/xatu/locally-built-blocks'
     | '/experiments/'
-    | '/xatu-data/'
+    | '/xatu-data'
     | '/beacon/block-production/live'
     | '/beacon/slot/live'
     | '/ethereum/consensus/overview'
@@ -781,7 +781,7 @@ declare module '@tanstack/react-router' {
     '/xatu-data/': {
       id: '/xatu-data/'
       path: '/xatu-data'
-      fullPath: '/xatu-data/'
+      fullPath: '/xatu-data'
       preLoaderRoute: typeof XatuDataIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
