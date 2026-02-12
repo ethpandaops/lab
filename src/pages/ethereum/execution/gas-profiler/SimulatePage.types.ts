@@ -300,8 +300,21 @@ export const GAS_PARAMETER_GROUPS: GasParameterGroup[] = [
       { key: 'PC_BLS12_G2MSM_MUL_GAS', label: 'BLS12 G2MSM /Point', min: 0, max: 100000, step: 1000 },
     ],
   },
-  // NOTE: Intrinsic gas (TX_BASE, TX_CREATE, TX_DATA_ZERO, TX_DATA_NONZERO) cannot be
-  // customized - it's calculated at the protocol level before EVM execution begins.
+  {
+    name: 'Intrinsic Gas',
+    color: '#d946ef', // fuchsia
+    parameters: [
+      { key: 'TX_BASE', label: 'TX Base', min: 0, max: 100000, step: 1000 },
+      { key: 'TX_CREATE_BASE', label: 'TX Create', min: 0, max: 200000, step: 1000 },
+      { key: 'TX_DATA_ZERO', label: 'Calldata Zero', min: 0, max: 50, step: 1 },
+      { key: 'TX_DATA_NONZERO', label: 'Calldata Non-Zero', min: 0, max: 200, step: 1 },
+      { key: 'TX_ACCESS_LIST_ADDR', label: 'Access List Addr', min: 0, max: 10000, step: 100 },
+      { key: 'TX_ACCESS_LIST_KEY', label: 'Access List Key', min: 0, max: 10000, step: 100 },
+      { key: 'TX_INIT_CODE_WORD', label: 'Init Code Word', min: 0, max: 20, step: 1 },
+      { key: 'TX_FLOOR_PER_TOKEN', label: 'Floor Per Token', min: 0, max: 50, step: 1 },
+      { key: 'TX_AUTH_COST', label: 'Auth Cost', min: 0, max: 100000, step: 1000 },
+    ],
+  },
 ];
 
 /**

@@ -9,6 +9,7 @@ import { getOpcodeCategory, CATEGORY_COLORS } from '../../utils/opcodeUtils';
 
 /** Category ordering for display */
 const CATEGORY_ORDER = [
+  'Intrinsic Gas',
   'Storage',
   'Transient Storage',
   'Contract',
