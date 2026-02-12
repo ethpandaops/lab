@@ -644,6 +644,7 @@ const InputBase = ({
 InputBase.displayName = 'Input';
 
 // Attach subcomponents to Input for compound component API
+// eslint-disable-next-line react-refresh/only-export-components
 export const Input = Object.assign(InputBase, {
   Leading: InputLeading,
   Trailing: InputTrailing,
