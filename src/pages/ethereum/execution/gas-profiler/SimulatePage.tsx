@@ -197,6 +197,7 @@ function transformApiResponse(response: ApiBlockSimulationResponse): BlockSimula
       simulatedReverts: tx.simulatedReverts,
       originalErrors: tx.originalErrors ?? [],
       simulatedErrors: tx.simulatedErrors ?? [],
+      error: tx.error,
     })),
     opcodeBreakdown: response.opcodeBreakdown,
   };

@@ -402,6 +402,8 @@ export interface TxSummary {
   originalErrors: CallError[];
   /** Errors from nested calls in simulated execution */
   simulatedErrors: CallError[];
+  /** Pre-execution error (e.g. "intrinsic gas too low") when execution fails before the EVM runs */
+  error?: string;
 }
 
 /**

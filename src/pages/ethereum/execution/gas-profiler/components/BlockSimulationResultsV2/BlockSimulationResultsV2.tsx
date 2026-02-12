@@ -367,7 +367,7 @@ function ExecutionHealthSection({
       subtitle:
         totalTransactions > 0 && divergenceSummary.divergedCount > 0
           ? `${((divergenceSummary.divergedCount / totalTransactions) * 100).toFixed(1)}% of txs`
-          : undefined,
+          : 'all paths unchanged',
       accentColor: `${divergedColor}33`,
     },
     {
@@ -622,8 +622,9 @@ function TransactionImpactView({
       all: transactions.length,
       diverged: transactions.filter(t => t.diverged).length,
       status: transactions.filter(t => t.originalStatus !== t.simulatedStatus).length,
-      errors: transactions.filter(t => (t.originalErrors?.length ?? 0) > 0 || (t.simulatedErrors?.length ?? 0) > 0)
-        .length,
+      errors: transactions.filter(
+        t => (t.originalErrors?.length ?? 0) > 0 || (t.simulatedErrors?.length ?? 0) > 0 || !!t.error
+      ).length,
     }),
     [transactions]
   );
@@ -639,7 +640,7 @@ function TransactionImpactView({
         txs = txs.filter(t => t.originalStatus !== t.simulatedStatus);
         break;
       case 'errors':
-        txs = txs.filter(t => (t.originalErrors?.length ?? 0) > 0 || (t.simulatedErrors?.length ?? 0) > 0);
+        txs = txs.filter(t => (t.originalErrors?.length ?? 0) > 0 || (t.simulatedErrors?.length ?? 0) > 0 || !!t.error);
         break;
     }
 
@@ -746,8 +747,9 @@ function TransactionImpactView({
         {filteredAndSorted.slice(0, visibleCount).map(tx => {
           const statusChanged = tx.originalStatus !== tx.simulatedStatus;
           const hasErrors = (tx.originalErrors?.length ?? 0) > 0 || (tx.simulatedErrors?.length ?? 0) > 0;
+          const hasPreExecError = !!tx.error;
           const isExpanded = expandedTxs.has(tx.hash);
-          const isNotable = statusChanged || tx.diverged || hasErrors;
+          const isNotable = statusChanged || tx.diverged || hasErrors || hasPreExecError;
           const absDelta = Math.abs(tx.simulatedGas - tx.originalGas);
 
           return (
@@ -868,6 +870,11 @@ function TransactionImpactView({
                       </dd>
                     </div>
                   </dl>
+
+                  {/* Pre-execution error (e.g. intrinsic gas too low) */}
+                  {hasPreExecError && (
+                    <Alert variant="error" title="Pre-execution error" description={tx.error} className="mt-3" />
+                  )}
 
                   {/* Error cards (if any) */}
                   {hasErrors && (
