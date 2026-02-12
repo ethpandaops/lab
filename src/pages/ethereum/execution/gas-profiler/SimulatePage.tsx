@@ -105,6 +105,19 @@ function getDeltaColor(percent: number): string {
   return 'text-muted';
 }
 
+/** Detect backend syncing errors (503 from the proxy). */
+function isSyncingError(error: unknown): boolean {
+  if (error instanceof Error) {
+    return error.message.includes('currently syncing');
+  }
+
+  if (typeof error === 'string') {
+    return error.includes('currently syncing');
+  }
+
+  return false;
+}
+
 function calculateAggregateStats(results: BlockSimulationResult[]): AggregateStats {
   const stats = results.reduce(
     (acc, result) => {
@@ -824,14 +837,37 @@ export function SimulatePage(): JSX.Element {
             Loading gas parameters...
           </div>
         )}
-        {defaultsError && (
-          <Alert
-            variant="error"
-            description={`Error loading gas schedule: ${defaultsError.message}`}
-            accentBorder
-            className="mt-3"
-          />
-        )}
+        {defaultsError &&
+          (isSyncingError(defaultsError) ? (
+            <div
+              className="mt-3 overflow-hidden rounded-sm border border-amber-400/30 dark:border-amber-500/20"
+              role="status"
+              aria-live="polite"
+            >
+              <div className="flex items-start gap-3 bg-amber-50/80 p-3.5 dark:bg-amber-500/5">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-xs bg-amber-100 dark:bg-amber-500/15">
+                  <ArrowPathIcon
+                    className="size-4 animate-spin text-amber-600 dark:text-amber-400"
+                    style={{ animationDuration: '2s' }}
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm/5 font-medium text-amber-800 dark:text-amber-200">Backend nodes are syncing</p>
+                  <p className="mt-0.5 text-xs/4 text-amber-700/70 dark:text-amber-300/60">
+                    The nodes serving this network are catching up with the chain. Check back shortly and try again.
+                  </p>
+                </div>
+              </div>
+              <div className="h-px animate-pulse bg-linear-to-r from-transparent via-amber-400/50 to-transparent" />
+            </div>
+          ) : (
+            <Alert
+              variant="error"
+              description={`Error loading gas schedule: ${defaultsError.message}`}
+              accentBorder
+              className="mt-3"
+            />
+          ))}
         {gasWarning && modifiedCount === 0 && (
           <Alert
             variant="warning"
@@ -946,7 +982,37 @@ export function SimulatePage(): JSX.Element {
       {/* Error */}
       {simState.status === 'error' && (
         <div className="mb-4">
-          <Alert variant="error" title="Simulation failed" description={simState.error ?? 'Unknown error'} />
+          {isSyncingError(simState.error) ? (
+            <Card className="overflow-hidden">
+              <div className="flex items-start gap-4 p-5" role="status" aria-live="polite">
+                <div className="relative flex size-10 shrink-0 items-center justify-center">
+                  <div
+                    className="absolute inset-0 animate-ping rounded-full bg-amber-400/15"
+                    style={{ animationDuration: '3s' }}
+                  />
+                  <div className="flex size-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-500/10">
+                    <ArrowPathIcon
+                      className="size-5 animate-spin text-amber-500 dark:text-amber-400"
+                      style={{ animationDuration: '2s' }}
+                    />
+                  </div>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-sm font-semibold text-foreground">Backend Syncing</h3>
+                  <p className="mt-1 text-sm/5 text-muted">
+                    The simulation was interrupted because all backend nodes for this network are currently syncing with
+                    the chain.
+                    {simState.completedBlocks > 0 &&
+                      ` ${simState.completedBlocks} of ${simState.totalBlocks} blocks completed before the interruption.`}{' '}
+                    Check back shortly and try again.
+                  </p>
+                </div>
+              </div>
+              <div className="h-px animate-pulse bg-linear-to-r from-transparent via-amber-400/40 to-transparent" />
+            </Card>
+          ) : (
+            <Alert variant="error" title="Simulation failed" description={simState.error ?? 'Unknown error'} />
+          )}
         </div>
       )}
 
