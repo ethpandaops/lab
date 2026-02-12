@@ -1128,7 +1128,9 @@ export function DetailPage(): JSX.Element {
             <TabPanel>
               <NodeResourcesPanel
                 slot={slot}
-                blockPropagationData={blockPropagationData}
+                blockPropagation={data.blockPropagation}
+                headPropagation={data.headPropagation}
+                dataColumnPropagation={data.dataColumnPropagation}
               />
             </TabPanel>
           </TabPanels>
