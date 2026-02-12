@@ -543,6 +543,12 @@ import type {
   FctNodeActiveLast24hServiceListData,
   FctNodeActiveLast24hServiceListErrors,
   FctNodeActiveLast24hServiceListResponses,
+  FctNodeCpuUtilizationServiceGetData,
+  FctNodeCpuUtilizationServiceGetErrors,
+  FctNodeCpuUtilizationServiceGetResponses,
+  FctNodeCpuUtilizationServiceListData,
+  FctNodeCpuUtilizationServiceListErrors,
+  FctNodeCpuUtilizationServiceListResponses,
   FctOpcodeGasByOpcodeDailyServiceGetData,
   FctOpcodeGasByOpcodeDailyServiceGetErrors,
   FctOpcodeGasByOpcodeDailyServiceGetResponses,
@@ -771,6 +777,18 @@ import type {
   IntBlockProposerCanonicalServiceListData,
   IntBlockProposerCanonicalServiceListErrors,
   IntBlockProposerCanonicalServiceListResponses,
+  IntContractCreationServiceGetData,
+  IntContractCreationServiceGetErrors,
+  IntContractCreationServiceGetResponses,
+  IntContractCreationServiceListData,
+  IntContractCreationServiceListErrors,
+  IntContractCreationServiceListResponses,
+  IntContractSelfdestructServiceGetData,
+  IntContractSelfdestructServiceGetErrors,
+  IntContractSelfdestructServiceGetResponses,
+  IntContractSelfdestructServiceListData,
+  IntContractSelfdestructServiceListErrors,
+  IntContractSelfdestructServiceListResponses,
   IntContractStorageExpiry12mServiceGetData,
   IntContractStorageExpiry12mServiceGetErrors,
   IntContractStorageExpiry12mServiceGetResponses,
@@ -891,12 +909,12 @@ import type {
   IntEngineGetBlobsServiceListData,
   IntEngineGetBlobsServiceListErrors,
   IntEngineGetBlobsServiceListResponses,
-  IntEngineNewPayloadFastestServiceGetData,
-  IntEngineNewPayloadFastestServiceGetErrors,
-  IntEngineNewPayloadFastestServiceGetResponses,
-  IntEngineNewPayloadFastestServiceListData,
-  IntEngineNewPayloadFastestServiceListErrors,
-  IntEngineNewPayloadFastestServiceListResponses,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetData,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetErrors,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceListData,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceListErrors,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponses,
   IntEngineNewPayloadServiceGetData,
   IntEngineNewPayloadServiceGetErrors,
   IntEngineNewPayloadServiceGetResponses,
@@ -909,6 +927,12 @@ import type {
   IntExecutionBlockByDateServiceListData,
   IntExecutionBlockByDateServiceListErrors,
   IntExecutionBlockByDateServiceListResponses,
+  IntStorageSelfdestructDiffsServiceGetData,
+  IntStorageSelfdestructDiffsServiceGetErrors,
+  IntStorageSelfdestructDiffsServiceGetResponses,
+  IntStorageSelfdestructDiffsServiceListData,
+  IntStorageSelfdestructDiffsServiceListErrors,
+  IntStorageSelfdestructDiffsServiceListResponses,
   IntStorageSlotDiffByAddressSlotServiceGetData,
   IntStorageSlotDiffByAddressSlotServiceGetErrors,
   IntStorageSlotDiffByAddressSlotServiceGetResponses,
@@ -1409,6 +1433,10 @@ import {
   zFctNodeActiveLast24hServiceGetResponse,
   zFctNodeActiveLast24hServiceListData,
   zFctNodeActiveLast24hServiceListResponse,
+  zFctNodeCpuUtilizationServiceGetData,
+  zFctNodeCpuUtilizationServiceGetResponse,
+  zFctNodeCpuUtilizationServiceListData,
+  zFctNodeCpuUtilizationServiceListResponse,
   zFctOpcodeGasByOpcodeDailyServiceGetData,
   zFctOpcodeGasByOpcodeDailyServiceGetResponse,
   zFctOpcodeGasByOpcodeDailyServiceListData,
@@ -1561,6 +1589,14 @@ import {
   zIntBlockProposerCanonicalServiceGetResponse,
   zIntBlockProposerCanonicalServiceListData,
   zIntBlockProposerCanonicalServiceListResponse,
+  zIntContractCreationServiceGetData,
+  zIntContractCreationServiceGetResponse,
+  zIntContractCreationServiceListData,
+  zIntContractCreationServiceListResponse,
+  zIntContractSelfdestructServiceGetData,
+  zIntContractSelfdestructServiceGetResponse,
+  zIntContractSelfdestructServiceListData,
+  zIntContractSelfdestructServiceListResponse,
   zIntContractStorageExpiry12mServiceGetData,
   zIntContractStorageExpiry12mServiceGetResponse,
   zIntContractStorageExpiry12mServiceListData,
@@ -1641,10 +1677,10 @@ import {
   zIntEngineGetBlobsServiceGetResponse,
   zIntEngineGetBlobsServiceListData,
   zIntEngineGetBlobsServiceListResponse,
-  zIntEngineNewPayloadFastestServiceGetData,
-  zIntEngineNewPayloadFastestServiceGetResponse,
-  zIntEngineNewPayloadFastestServiceListData,
-  zIntEngineNewPayloadFastestServiceListResponse,
+  zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetData,
+  zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse,
+  zIntEngineNewPayloadFastestExecutionByNodeClassServiceListData,
+  zIntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse,
   zIntEngineNewPayloadServiceGetData,
   zIntEngineNewPayloadServiceGetResponse,
   zIntEngineNewPayloadServiceListData,
@@ -1653,6 +1689,10 @@ import {
   zIntExecutionBlockByDateServiceGetResponse,
   zIntExecutionBlockByDateServiceListData,
   zIntExecutionBlockByDateServiceListResponse,
+  zIntStorageSelfdestructDiffsServiceGetData,
+  zIntStorageSelfdestructDiffsServiceGetResponse,
+  zIntStorageSelfdestructDiffsServiceListData,
+  zIntStorageSelfdestructDiffsServiceListResponse,
   zIntStorageSlotDiffByAddressSlotServiceGetData,
   zIntStorageSlotDiffByAddressSlotServiceGetResponse,
   zIntStorageSlotDiffByAddressSlotServiceListData,
@@ -5167,6 +5207,44 @@ export const fctNodeActiveLast24hServiceGet = <ThrowOnError extends boolean = fa
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctNodeCpuUtilizationServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeCpuUtilizationServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctNodeCpuUtilizationServiceListResponses,
+    FctNodeCpuUtilizationServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeCpuUtilizationServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeCpuUtilizationServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_cpu_utilization',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by wallclock_slot_start_date_time
+ */
+export const fctNodeCpuUtilizationServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeCpuUtilizationServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctNodeCpuUtilizationServiceGetResponses,
+    FctNodeCpuUtilizationServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeCpuUtilizationServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeCpuUtilizationServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_cpu_utilization/{wallclock_slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctOpcodeGasByOpcodeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctOpcodeGasByOpcodeDailyServiceListData, ThrowOnError>
 ) =>
@@ -6601,6 +6679,82 @@ export const intBlockProposerCanonicalServiceGet = <ThrowOnError extends boolean
  *
  * Retrieve paginated results with optional filtering
  */
+export const intContractCreationServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntContractCreationServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntContractCreationServiceListResponses,
+    IntContractCreationServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntContractCreationServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntContractCreationServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_contract_creation',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intContractCreationServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntContractCreationServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntContractCreationServiceGetResponses,
+    IntContractCreationServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntContractCreationServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntContractCreationServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_contract_creation/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intContractSelfdestructServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntContractSelfdestructServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntContractSelfdestructServiceListResponses,
+    IntContractSelfdestructServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntContractSelfdestructServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntContractSelfdestructServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_contract_selfdestruct',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intContractSelfdestructServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntContractSelfdestructServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntContractSelfdestructServiceGetResponses,
+    IntContractSelfdestructServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntContractSelfdestructServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntContractSelfdestructServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_contract_selfdestruct/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const intContractStorageExpiry1mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageExpiry1mServiceListData, ThrowOnError>
 ) =>
@@ -7392,17 +7546,19 @@ export const intEngineNewPayloadServiceGet = <ThrowOnError extends boolean = fal
  *
  * Retrieve paginated results with optional filtering
  */
-export const intEngineNewPayloadFastestServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntEngineNewPayloadFastestServiceListData, ThrowOnError>
+export const intEngineNewPayloadFastestExecutionByNodeClassServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceListData, ThrowOnError>
 ) =>
   (options?.client ?? client).get<
-    IntEngineNewPayloadFastestServiceListResponses,
-    IntEngineNewPayloadFastestServiceListErrors,
+    IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponses,
+    IntEngineNewPayloadFastestExecutionByNodeClassServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => await zIntEngineNewPayloadFastestServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntEngineNewPayloadFastestServiceListResponse.parseAsync(data),
-    url: '/api/v1/int_engine_new_payload_fastest',
+    requestValidator: async data =>
+      await zIntEngineNewPayloadFastestExecutionByNodeClassServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zIntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_engine_new_payload_fastest_execution_by_node_class',
     ...options,
   });
 
@@ -7411,17 +7567,19 @@ export const intEngineNewPayloadFastestServiceList = <ThrowOnError extends boole
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intEngineNewPayloadFastestServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntEngineNewPayloadFastestServiceGetData, ThrowOnError>
+export const intEngineNewPayloadFastestExecutionByNodeClassServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceGetData, ThrowOnError>
 ) =>
   (options.client ?? client).get<
-    IntEngineNewPayloadFastestServiceGetResponses,
-    IntEngineNewPayloadFastestServiceGetErrors,
+    IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses,
+    IntEngineNewPayloadFastestExecutionByNodeClassServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => await zIntEngineNewPayloadFastestServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntEngineNewPayloadFastestServiceGetResponse.parseAsync(data),
-    url: '/api/v1/int_engine_new_payload_fastest/{slot_start_date_time}',
+    requestValidator: async data =>
+      await zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_engine_new_payload_fastest_execution_by_node_class/{slot_start_date_time}',
     ...options,
   });
 
@@ -7460,6 +7618,44 @@ export const intExecutionBlockByDateServiceGet = <ThrowOnError extends boolean =
     requestValidator: async data => await zIntExecutionBlockByDateServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntExecutionBlockByDateServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_execution_block_by_date/{block_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intStorageSelfdestructDiffsServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntStorageSelfdestructDiffsServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntStorageSelfdestructDiffsServiceListResponses,
+    IntStorageSelfdestructDiffsServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntStorageSelfdestructDiffsServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntStorageSelfdestructDiffsServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_storage_selfdestruct_diffs',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intStorageSelfdestructDiffsServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntStorageSelfdestructDiffsServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntStorageSelfdestructDiffsServiceGetResponses,
+    IntStorageSelfdestructDiffsServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntStorageSelfdestructDiffsServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntStorageSelfdestructDiffsServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_storage_selfdestruct_diffs/{block_number}',
     ...options,
   });
 
