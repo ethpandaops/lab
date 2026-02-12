@@ -96,7 +96,7 @@ export function NetworkIoChart({
       // Bucket and aggregate tx+rx bytes
       const buckets = new Map<number, number[]>();
       for (const d of filteredPortData) {
-        const offset = usToSeconds((d.window_start ?? 0) - slotStartUs);
+        const offset = usToSeconds((d.window_start ?? 0) - slotStartUs) + BUCKET_SIZE;
         const bucket = toBucket(offset);
         if (bucket < 0 || bucket > 12) continue;
 

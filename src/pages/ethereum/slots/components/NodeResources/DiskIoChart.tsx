@@ -76,7 +76,7 @@ export function DiskIoChart({
     const bucketData = (items: FctNodeDiskIoByProcess[]): Map<number, number[]> => {
       const buckets = new Map<number, number[]>();
       for (const d of items) {
-        const offset = usToSeconds((d.window_start ?? 0) - slotStartUs);
+        const offset = usToSeconds((d.window_start ?? 0) - slotStartUs) + BUCKET_SIZE;
         const bucket = toBucket(offset);
         if (bucket < 0 || bucket > 12) continue;
 
