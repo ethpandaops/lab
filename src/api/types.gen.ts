@@ -4560,7 +4560,7 @@ export type FctNodeActiveLast24h = {
   username?: string;
 };
 
-export type FctNodeCpuUtilization = {
+export type FctNodeCpuUtilizationByProcess = {
   /**
    * Client type: CL or EL
    */
@@ -6205,10 +6205,10 @@ export type GetFctNodeActiveLast24hResponse = {
 };
 
 /**
- * Response for getting a single fct_node_cpu_utilization record
+ * Response for getting a single fct_node_cpu_utilization_by_process record
  */
-export type GetFctNodeCpuUtilizationResponse = {
-  item?: FctNodeCpuUtilization;
+export type GetFctNodeCpuUtilizationByProcessResponse = {
+  item?: FctNodeCpuUtilizationByProcess;
 };
 
 /**
@@ -10702,13 +10702,13 @@ export type ListFctNodeActiveLast24hResponse = {
 };
 
 /**
- * Response for listing fct_node_cpu_utilization records
+ * Response for listing fct_node_cpu_utilization_by_process records
  */
-export type ListFctNodeCpuUtilizationResponse = {
+export type ListFctNodeCpuUtilizationByProcessResponse = {
   /**
-   * The list of fct_node_cpu_utilization.
+   * The list of fct_node_cpu_utilization_by_process.
    */
-  fct_node_cpu_utilization?: Array<FctNodeCpuUtilization>;
+  fct_node_cpu_utilization_by_process?: Array<FctNodeCpuUtilizationByProcess>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -55101,7 +55101,7 @@ export type FctNodeActiveLast24hServiceGetResponses = {
 export type FctNodeActiveLast24hServiceGetResponse =
   FctNodeActiveLast24hServiceGetResponses[keyof FctNodeActiveLast24hServiceGetResponses];
 
-export type FctNodeCpuUtilizationServiceListData = {
+export type FctNodeCpuUtilizationByProcessServiceListData = {
   body?: never;
   path?: never;
   query?: {
@@ -55502,11 +55502,11 @@ export type FctNodeCpuUtilizationServiceListData = {
      */
     node_class_not_in_values?: string;
     /**
-     * The maximum number of fct_node_cpu_utilization to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     * The maximum number of fct_node_cpu_utilization_by_process to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
     /**
-     * A page token, received from a previous `ListFctNodeCpuUtilization` call. Provide this to retrieve the subsequent page.
+     * A page token, received from a previous `ListFctNodeCpuUtilizationByProcess` call. Provide this to retrieve the subsequent page.
      */
     page_token?: string;
     /**
@@ -55514,30 +55514,30 @@ export type FctNodeCpuUtilizationServiceListData = {
      */
     order_by?: string;
   };
-  url: '/api/v1/fct_node_cpu_utilization';
+  url: '/api/v1/fct_node_cpu_utilization_by_process';
 };
 
-export type FctNodeCpuUtilizationServiceListErrors = {
+export type FctNodeCpuUtilizationByProcessServiceListErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctNodeCpuUtilizationServiceListError =
-  FctNodeCpuUtilizationServiceListErrors[keyof FctNodeCpuUtilizationServiceListErrors];
+export type FctNodeCpuUtilizationByProcessServiceListError =
+  FctNodeCpuUtilizationByProcessServiceListErrors[keyof FctNodeCpuUtilizationByProcessServiceListErrors];
 
-export type FctNodeCpuUtilizationServiceListResponses = {
+export type FctNodeCpuUtilizationByProcessServiceListResponses = {
   /**
    * OK
    */
-  200: ListFctNodeCpuUtilizationResponse;
+  200: ListFctNodeCpuUtilizationByProcessResponse;
 };
 
-export type FctNodeCpuUtilizationServiceListResponse =
-  FctNodeCpuUtilizationServiceListResponses[keyof FctNodeCpuUtilizationServiceListResponses];
+export type FctNodeCpuUtilizationByProcessServiceListResponse =
+  FctNodeCpuUtilizationByProcessServiceListResponses[keyof FctNodeCpuUtilizationByProcessServiceListResponses];
 
-export type FctNodeCpuUtilizationServiceGetData = {
+export type FctNodeCpuUtilizationByProcessServiceGetData = {
   body?: never;
   path: {
     /**
@@ -55546,28 +55546,28 @@ export type FctNodeCpuUtilizationServiceGetData = {
     wallclock_slot_start_date_time: number;
   };
   query?: never;
-  url: '/api/v1/fct_node_cpu_utilization/{wallclock_slot_start_date_time}';
+  url: '/api/v1/fct_node_cpu_utilization_by_process/{wallclock_slot_start_date_time}';
 };
 
-export type FctNodeCpuUtilizationServiceGetErrors = {
+export type FctNodeCpuUtilizationByProcessServiceGetErrors = {
   /**
    * Default error response
    */
   default: Status;
 };
 
-export type FctNodeCpuUtilizationServiceGetError =
-  FctNodeCpuUtilizationServiceGetErrors[keyof FctNodeCpuUtilizationServiceGetErrors];
+export type FctNodeCpuUtilizationByProcessServiceGetError =
+  FctNodeCpuUtilizationByProcessServiceGetErrors[keyof FctNodeCpuUtilizationByProcessServiceGetErrors];
 
-export type FctNodeCpuUtilizationServiceGetResponses = {
+export type FctNodeCpuUtilizationByProcessServiceGetResponses = {
   /**
    * OK
    */
-  200: GetFctNodeCpuUtilizationResponse;
+  200: GetFctNodeCpuUtilizationByProcessResponse;
 };
 
-export type FctNodeCpuUtilizationServiceGetResponse =
-  FctNodeCpuUtilizationServiceGetResponses[keyof FctNodeCpuUtilizationServiceGetResponses];
+export type FctNodeCpuUtilizationByProcessServiceGetResponse =
+  FctNodeCpuUtilizationByProcessServiceGetResponses[keyof FctNodeCpuUtilizationByProcessServiceGetResponses];
 
 export type FctOpcodeGasByOpcodeDailyServiceListData = {
   body?: never;

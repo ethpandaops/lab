@@ -6631,7 +6631,7 @@ export const zFctNodeActiveLast24h = z.object({
   username: z.optional(z.string()),
 });
 
-export const zFctNodeCpuUtilization = z.object({
+export const zFctNodeCpuUtilizationByProcess = z.object({
   client_type: z.optional(z.string()),
   max_core_pct: z.optional(z.number()),
   mean_core_pct: z.optional(z.number()),
@@ -8649,10 +8649,10 @@ export const zGetFctNodeActiveLast24hResponse = z.object({
 });
 
 /**
- * Response for getting a single fct_node_cpu_utilization record
+ * Response for getting a single fct_node_cpu_utilization_by_process record
  */
-export const zGetFctNodeCpuUtilizationResponse = z.object({
-  item: z.optional(zFctNodeCpuUtilization),
+export const zGetFctNodeCpuUtilizationByProcessResponse = z.object({
+  item: z.optional(zFctNodeCpuUtilizationByProcess),
 });
 
 /**
@@ -13806,10 +13806,10 @@ export const zListFctNodeActiveLast24hResponse = z.object({
 });
 
 /**
- * Response for listing fct_node_cpu_utilization records
+ * Response for listing fct_node_cpu_utilization_by_process records
  */
-export const zListFctNodeCpuUtilizationResponse = z.object({
-  fct_node_cpu_utilization: z.optional(z.array(zFctNodeCpuUtilization)),
+export const zListFctNodeCpuUtilizationByProcessResponse = z.object({
+  fct_node_cpu_utilization_by_process: z.optional(z.array(zFctNodeCpuUtilizationByProcess)),
   next_page_token: z.optional(z.string()),
 });
 
@@ -68966,7 +68966,7 @@ export const zFctNodeActiveLast24hServiceGetData = z.object({
  */
 export const zFctNodeActiveLast24hServiceGetResponse = zGetFctNodeActiveLast24hResponse;
 
-export const zFctNodeCpuUtilizationServiceListData = z.object({
+export const zFctNodeCpuUtilizationByProcessServiceListData = z.object({
   body: z.optional(z.never()),
   path: z.optional(z.never()),
   query: z.optional(
@@ -69487,9 +69487,9 @@ export const zFctNodeCpuUtilizationServiceListData = z.object({
 /**
  * OK
  */
-export const zFctNodeCpuUtilizationServiceListResponse = zListFctNodeCpuUtilizationResponse;
+export const zFctNodeCpuUtilizationByProcessServiceListResponse = zListFctNodeCpuUtilizationByProcessResponse;
 
-export const zFctNodeCpuUtilizationServiceGetData = z.object({
+export const zFctNodeCpuUtilizationByProcessServiceGetData = z.object({
   body: z.optional(z.never()),
   path: z.object({
     wallclock_slot_start_date_time: z.coerce
@@ -69509,7 +69509,7 @@ export const zFctNodeCpuUtilizationServiceGetData = z.object({
 /**
  * OK
  */
-export const zFctNodeCpuUtilizationServiceGetResponse = zGetFctNodeCpuUtilizationResponse;
+export const zFctNodeCpuUtilizationByProcessServiceGetResponse = zGetFctNodeCpuUtilizationByProcessResponse;
 
 export const zFctOpcodeGasByOpcodeDailyServiceListData = z.object({
   body: z.optional(z.never()),

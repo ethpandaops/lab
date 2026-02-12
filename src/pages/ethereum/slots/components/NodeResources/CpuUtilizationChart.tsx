@@ -6,7 +6,7 @@ import { getDataVizColors, getClientLayer } from '@/utils';
 import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
-import type { FctNodeCpuUtilization } from '@/api/types.gen';
+import type { FctNodeCpuUtilizationByProcess } from '@/api/types.gen';
 import { ANNOTATION_COLORS, type CpuMetric, type AnnotationType, type AnnotationEvent } from './types';
 
 function usToSeconds(us: number): number {
@@ -56,7 +56,7 @@ interface BucketAgg {
 }
 
 interface CpuUtilizationChartProps {
-  data: FctNodeCpuUtilization[];
+  data: FctNodeCpuUtilizationByProcess[];
   selectedNode: string | null;
   metric: CpuMetric;
   onMetricChange: (metric: CpuMetric) => void;
@@ -100,7 +100,7 @@ export function CpuUtilizationChart({
     let resolvedClClient = '';
     let resolvedElClient = '';
 
-    const bucketData = (items: FctNodeCpuUtilization[]): Map<number, BucketAgg> => {
+    const bucketData = (items: FctNodeCpuUtilizationByProcess[]): Map<number, BucketAgg> => {
       const buckets = new Map<number, BucketAgg>();
       for (const d of items) {
         const offset = usToSeconds((d.window_start ?? 0) - slotStartUs);

@@ -543,12 +543,12 @@ import type {
   FctNodeActiveLast24hServiceListData,
   FctNodeActiveLast24hServiceListErrors,
   FctNodeActiveLast24hServiceListResponses,
-  FctNodeCpuUtilizationServiceGetData,
-  FctNodeCpuUtilizationServiceGetErrors,
-  FctNodeCpuUtilizationServiceGetResponses,
-  FctNodeCpuUtilizationServiceListData,
-  FctNodeCpuUtilizationServiceListErrors,
-  FctNodeCpuUtilizationServiceListResponses,
+  FctNodeCpuUtilizationByProcessServiceGetData,
+  FctNodeCpuUtilizationByProcessServiceGetErrors,
+  FctNodeCpuUtilizationByProcessServiceGetResponses,
+  FctNodeCpuUtilizationByProcessServiceListData,
+  FctNodeCpuUtilizationByProcessServiceListErrors,
+  FctNodeCpuUtilizationByProcessServiceListResponses,
   FctOpcodeGasByOpcodeDailyServiceGetData,
   FctOpcodeGasByOpcodeDailyServiceGetErrors,
   FctOpcodeGasByOpcodeDailyServiceGetResponses,
@@ -1433,10 +1433,10 @@ import {
   zFctNodeActiveLast24hServiceGetResponse,
   zFctNodeActiveLast24hServiceListData,
   zFctNodeActiveLast24hServiceListResponse,
-  zFctNodeCpuUtilizationServiceGetData,
-  zFctNodeCpuUtilizationServiceGetResponse,
-  zFctNodeCpuUtilizationServiceListData,
-  zFctNodeCpuUtilizationServiceListResponse,
+  zFctNodeCpuUtilizationByProcessServiceGetData,
+  zFctNodeCpuUtilizationByProcessServiceGetResponse,
+  zFctNodeCpuUtilizationByProcessServiceListData,
+  zFctNodeCpuUtilizationByProcessServiceListResponse,
   zFctOpcodeGasByOpcodeDailyServiceGetData,
   zFctOpcodeGasByOpcodeDailyServiceGetResponse,
   zFctOpcodeGasByOpcodeDailyServiceListData,
@@ -5207,17 +5207,17 @@ export const fctNodeActiveLast24hServiceGet = <ThrowOnError extends boolean = fa
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctNodeCpuUtilizationServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctNodeCpuUtilizationServiceListData, ThrowOnError>
+export const fctNodeCpuUtilizationByProcessServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeCpuUtilizationByProcessServiceListData, ThrowOnError>
 ) =>
   (options?.client ?? client).get<
-    FctNodeCpuUtilizationServiceListResponses,
-    FctNodeCpuUtilizationServiceListErrors,
+    FctNodeCpuUtilizationByProcessServiceListResponses,
+    FctNodeCpuUtilizationByProcessServiceListErrors,
     ThrowOnError
   >({
-    requestValidator: async data => await zFctNodeCpuUtilizationServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctNodeCpuUtilizationServiceListResponse.parseAsync(data),
-    url: '/api/v1/fct_node_cpu_utilization',
+    requestValidator: async data => await zFctNodeCpuUtilizationByProcessServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeCpuUtilizationByProcessServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_cpu_utilization_by_process',
     ...options,
   });
 
@@ -5226,17 +5226,17 @@ export const fctNodeCpuUtilizationServiceList = <ThrowOnError extends boolean = 
  *
  * Retrieve a single record by wallclock_slot_start_date_time
  */
-export const fctNodeCpuUtilizationServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctNodeCpuUtilizationServiceGetData, ThrowOnError>
+export const fctNodeCpuUtilizationByProcessServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeCpuUtilizationByProcessServiceGetData, ThrowOnError>
 ) =>
   (options.client ?? client).get<
-    FctNodeCpuUtilizationServiceGetResponses,
-    FctNodeCpuUtilizationServiceGetErrors,
+    FctNodeCpuUtilizationByProcessServiceGetResponses,
+    FctNodeCpuUtilizationByProcessServiceGetErrors,
     ThrowOnError
   >({
-    requestValidator: async data => await zFctNodeCpuUtilizationServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctNodeCpuUtilizationServiceGetResponse.parseAsync(data),
-    url: '/api/v1/fct_node_cpu_utilization/{wallclock_slot_start_date_time}',
+    requestValidator: async data => await zFctNodeCpuUtilizationByProcessServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeCpuUtilizationByProcessServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_cpu_utilization_by_process/{wallclock_slot_start_date_time}',
     ...options,
   });
 

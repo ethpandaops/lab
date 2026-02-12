@@ -184,8 +184,8 @@ import {
   fctMissedSlotRateHourlyServiceList,
   fctNodeActiveLast24hServiceGet,
   fctNodeActiveLast24hServiceList,
-  fctNodeCpuUtilizationServiceGet,
-  fctNodeCpuUtilizationServiceList,
+  fctNodeCpuUtilizationByProcessServiceGet,
+  fctNodeCpuUtilizationByProcessServiceList,
   fctOpcodeGasByOpcodeDailyServiceGet,
   fctOpcodeGasByOpcodeDailyServiceList,
   fctOpcodeGasByOpcodeHourlyServiceGet,
@@ -903,12 +903,12 @@ import type {
   FctNodeActiveLast24hServiceListData,
   FctNodeActiveLast24hServiceListError,
   FctNodeActiveLast24hServiceListResponse,
-  FctNodeCpuUtilizationServiceGetData,
-  FctNodeCpuUtilizationServiceGetError,
-  FctNodeCpuUtilizationServiceGetResponse,
-  FctNodeCpuUtilizationServiceListData,
-  FctNodeCpuUtilizationServiceListError,
-  FctNodeCpuUtilizationServiceListResponse,
+  FctNodeCpuUtilizationByProcessServiceGetData,
+  FctNodeCpuUtilizationByProcessServiceGetError,
+  FctNodeCpuUtilizationByProcessServiceGetResponse,
+  FctNodeCpuUtilizationByProcessServiceListData,
+  FctNodeCpuUtilizationByProcessServiceListError,
+  FctNodeCpuUtilizationByProcessServiceListResponse,
   FctOpcodeGasByOpcodeDailyServiceGetData,
   FctOpcodeGasByOpcodeDailyServiceGetError,
   FctOpcodeGasByOpcodeDailyServiceGetResponse,
@@ -6683,23 +6683,26 @@ export const fctNodeActiveLast24hServiceGetOptions = (options: Options<FctNodeAc
     queryKey: fctNodeActiveLast24hServiceGetQueryKey(options),
   });
 
-export const fctNodeCpuUtilizationServiceListQueryKey = (options?: Options<FctNodeCpuUtilizationServiceListData>) =>
-  createQueryKey('fctNodeCpuUtilizationServiceList', options);
+export const fctNodeCpuUtilizationByProcessServiceListQueryKey = (
+  options?: Options<FctNodeCpuUtilizationByProcessServiceListData>
+) => createQueryKey('fctNodeCpuUtilizationByProcessServiceList', options);
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctNodeCpuUtilizationServiceListOptions = (options?: Options<FctNodeCpuUtilizationServiceListData>) =>
+export const fctNodeCpuUtilizationByProcessServiceListOptions = (
+  options?: Options<FctNodeCpuUtilizationByProcessServiceListData>
+) =>
   queryOptions<
-    FctNodeCpuUtilizationServiceListResponse,
-    FctNodeCpuUtilizationServiceListError,
-    FctNodeCpuUtilizationServiceListResponse,
-    ReturnType<typeof fctNodeCpuUtilizationServiceListQueryKey>
+    FctNodeCpuUtilizationByProcessServiceListResponse,
+    FctNodeCpuUtilizationByProcessServiceListError,
+    FctNodeCpuUtilizationByProcessServiceListResponse,
+    ReturnType<typeof fctNodeCpuUtilizationByProcessServiceListQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctNodeCpuUtilizationServiceList({
+      const { data } = await fctNodeCpuUtilizationByProcessServiceList({
         ...options,
         ...queryKey[0],
         signal,
@@ -6707,26 +6710,29 @@ export const fctNodeCpuUtilizationServiceListOptions = (options?: Options<FctNod
       });
       return data;
     },
-    queryKey: fctNodeCpuUtilizationServiceListQueryKey(options),
+    queryKey: fctNodeCpuUtilizationByProcessServiceListQueryKey(options),
   });
 
-export const fctNodeCpuUtilizationServiceGetQueryKey = (options: Options<FctNodeCpuUtilizationServiceGetData>) =>
-  createQueryKey('fctNodeCpuUtilizationServiceGet', options);
+export const fctNodeCpuUtilizationByProcessServiceGetQueryKey = (
+  options: Options<FctNodeCpuUtilizationByProcessServiceGetData>
+) => createQueryKey('fctNodeCpuUtilizationByProcessServiceGet', options);
 
 /**
  * Get record
  *
  * Retrieve a single record by wallclock_slot_start_date_time
  */
-export const fctNodeCpuUtilizationServiceGetOptions = (options: Options<FctNodeCpuUtilizationServiceGetData>) =>
+export const fctNodeCpuUtilizationByProcessServiceGetOptions = (
+  options: Options<FctNodeCpuUtilizationByProcessServiceGetData>
+) =>
   queryOptions<
-    FctNodeCpuUtilizationServiceGetResponse,
-    FctNodeCpuUtilizationServiceGetError,
-    FctNodeCpuUtilizationServiceGetResponse,
-    ReturnType<typeof fctNodeCpuUtilizationServiceGetQueryKey>
+    FctNodeCpuUtilizationByProcessServiceGetResponse,
+    FctNodeCpuUtilizationByProcessServiceGetError,
+    FctNodeCpuUtilizationByProcessServiceGetResponse,
+    ReturnType<typeof fctNodeCpuUtilizationByProcessServiceGetQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctNodeCpuUtilizationServiceGet({
+      const { data } = await fctNodeCpuUtilizationByProcessServiceGet({
         ...options,
         ...queryKey[0],
         signal,
@@ -6734,7 +6740,7 @@ export const fctNodeCpuUtilizationServiceGetOptions = (options: Options<FctNodeC
       });
       return data;
     },
-    queryKey: fctNodeCpuUtilizationServiceGetQueryKey(options),
+    queryKey: fctNodeCpuUtilizationByProcessServiceGetQueryKey(options),
   });
 
 export const fctOpcodeGasByOpcodeDailyServiceListQueryKey = (

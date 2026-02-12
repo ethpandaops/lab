@@ -1,14 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import { fctNodeCpuUtilizationServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import { fctNodeCpuUtilizationByProcessServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { slotToTimestamp } from '@/utils/beacon';
-import type { FctNodeCpuUtilization } from '@/api/types.gen';
+import type { FctNodeCpuUtilizationByProcess } from '@/api/types.gen';
 
 /** cbt-api returns DateTime64(3) fields as microseconds */
 const SECONDS_TO_MICROSECONDS = 1_000_000;
 
 export interface UseSlotNodeResourcesResult {
-  data: FctNodeCpuUtilization[] | null;
+  data: FctNodeCpuUtilizationByProcess[] | null;
   isLoading: boolean;
   error: Error | null;
 }
@@ -19,7 +19,7 @@ export function useSlotNodeResources(slot: number): UseSlotNodeResourcesResult {
   const slotTimestampUs = slotTimestamp * SECONDS_TO_MICROSECONDS;
 
   const { data, isLoading, error } = useQuery({
-    ...fctNodeCpuUtilizationServiceListOptions({
+    ...fctNodeCpuUtilizationByProcessServiceListOptions({
       query: {
         wallclock_slot_start_date_time_eq: slotTimestampUs,
         page_size: 10000,
@@ -28,7 +28,7 @@ export function useSlotNodeResources(slot: number): UseSlotNodeResourcesResult {
     enabled: !!currentNetwork && slotTimestamp > 0,
   });
 
-  const cpuData = data?.fct_node_cpu_utilization ?? null;
+  const cpuData = data?.fct_node_cpu_utilization_by_process ?? null;
 
   return {
     data: cpuData,
