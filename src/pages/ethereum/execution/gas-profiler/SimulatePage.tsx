@@ -53,9 +53,6 @@ echarts.use([LineChart, BarChart, GridComponent, TooltipComponent, LegendCompone
 /** Maximum number of blocks that can be simulated in one range */
 const MAX_BLOCKS = 50;
 
-/** EIP-7825 maximum transaction gas limit (used when "use max gas limit" is enabled) */
-const MAX_TRANSACTION_GAS = 16_777_216;
-
 /** Available block count options */
 const BLOCK_COUNT_OPTIONS = [5, 10, 25, 50];
 
@@ -504,7 +501,7 @@ export function SimulatePage(): JSX.Element {
         body: JSON.stringify({
           blockNumber,
           gasSchedule: { overrides: gasSchedule },
-          ...(useMaxGasLimit && { simulatedGasLimit: MAX_TRANSACTION_GAS }),
+          ...(useMaxGasLimit && { maxGasLimit: true }),
         }),
       });
 
@@ -1224,7 +1221,18 @@ export function SimulatePage(): JSX.Element {
 
           {/* Reuse existing BlockSimulationResults */}
           <div className="p-4">
-            <BlockSimulationResultsV2 result={selectedResult} modifiedParams={modifiedParamNames} />
+            <BlockSimulationResultsV2
+              result={selectedResult}
+              modifiedParams={modifiedParamNames}
+              onEnableMaxGasLimit={
+                useMaxGasLimit
+                  ? undefined
+                  : () => {
+                      setUseMaxGasLimit(true);
+                      setGasLimitInfoOpen(true);
+                    }
+              }
+            />
           </div>
         </Card>
       )}
@@ -1278,15 +1286,11 @@ export function SimulatePage(): JSX.Element {
             not because the transaction logic is wrong, but because the original gas limit was set for the old costs.
           </p>
           <p>
-            With this option enabled, the simulated execution uses the maximum transaction gas limit (
-            {formatGas(MAX_TRANSACTION_GAS)} gas) instead of the original transaction&apos;s gas limit. This prevents
-            artificial out-of-gas failures and shows the true gas cost under the new pricing.
+            With this option enabled, the simulated execution lifts the transaction gas limit so it is no longer a
+            constraining factor. This prevents artificial out-of-gas failures and shows the true gas cost under the new
+            pricing.
           </p>
           <p>The original execution always uses the real transaction gas limit, so you can still compare the two.</p>
-          <div className="rounded-xs border border-border bg-background px-3 py-2 text-xs">
-            <span className="font-medium text-foreground">Note:</span> This overrides each transaction&apos;s individual
-            gas limit, not the block gas limit.
-          </div>
         </div>
       </Dialog>
     </Container>
