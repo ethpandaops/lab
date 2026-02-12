@@ -6,7 +6,7 @@ import { Card } from '@/components/Layout/Card';
 import { Checkbox } from '@/components/Forms/Checkbox';
 import { ReferenceNodesInfoDialog } from '@/pages/ethereum/execution/timings/components/ReferenceNodesInfoDialog';
 import { extractClusterFromNodeName } from '@/constants/eip7870';
-import { CONSENSUS_CLIENTS, EXECUTION_CLIENTS_SET } from '@/utils/ethereum';
+import { CONSENSUS_CLIENTS_SET, EXECUTION_CLIENTS_SET } from '@/utils/ethereum';
 import { intEngineNewPayloadServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type {
   FctBlockFirstSeenByNode,
@@ -137,7 +137,7 @@ export function NodeResourcesPanel({
       if (!name) continue;
 
       const existing = info.get(name) ?? { cl: '', el: '' };
-      if (CONSENSUS_CLIENTS.has(clientType) && !existing.cl) {
+      if (CONSENSUS_CLIENTS_SET.has(clientType) && !existing.cl) {
         existing.cl = clientType;
       } else if (EXECUTION_CLIENTS_SET.has(clientType) && !existing.el) {
         existing.el = clientType;

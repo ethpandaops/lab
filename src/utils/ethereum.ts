@@ -100,24 +100,24 @@ export function truncateAddress(pubkey?: string, startChars = 6, endChars = 4): 
 /**
  * Known consensus client names
  */
-export const CONSENSUS_CLIENTS = new Set(['lighthouse', 'lodestar', 'nimbus', 'prysm', 'teku', 'grandine']);
+export const CONSENSUS_CLIENTS = ['lighthouse', 'lodestar', 'nimbus', 'prysm', 'teku', 'grandine'] as const;
+export const CONSENSUS_CLIENTS_SET = new Set<string>(CONSENSUS_CLIENTS);
 
 /**
  * Known execution client names
  */
-export const EXECUTION_CLIENTS_SET = new Set(['besu', 'erigon', 'geth', 'nethermind', 'reth', 'ethrex']);
+export const EXECUTION_CLIENTS = ['geth', 'nethermind', 'besu', 'erigon', 'reth', 'ethrex'] as const;
+export const EXECUTION_CLIENTS_SET = new Set<string>(EXECUTION_CLIENTS);
 
 /**
  * Determine whether a client type string is a CL or EL client
  */
 export function getClientLayer(clientType: string): 'CL' | 'EL' | null {
   const lower = clientType.toLowerCase();
-  if (CONSENSUS_CLIENTS.has(lower)) return 'CL';
+  if (CONSENSUS_CLIENTS_SET.has(lower)) return 'CL';
   if (EXECUTION_CLIENTS_SET.has(lower)) return 'EL';
   return null;
 }
-
-const EXECUTION_CLIENTS = ['geth', 'nethermind', 'besu', 'erigon', 'reth', 'ethrex'] as const;
 
 /**
  * Official brand colors for Ethereum execution clients
