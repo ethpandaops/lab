@@ -351,6 +351,7 @@ export const GLAMSTERDAM_PRESET: Record<string, number> = {
   // EIP-8038: State access repricing (TBD - current values)
   SLOAD_COLD: 2100,
   SLOAD_WARM: 100,
+  SSTORE_RESET: 2900,
   CALL_COLD: 2600,
   TX_ACCESS_LIST_ADDR: 2400,
   TX_ACCESS_LIST_KEY: 1900,

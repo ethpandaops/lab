@@ -73,16 +73,18 @@ const EIP_SECTIONS: EipSection[] = [
     eip: 'EIP-8038',
     name: 'State Access Repricing',
     description:
-      'Reprices state access opcodes (SLOAD, CALL cold/warm). Values are still under discussion and may change.',
+      'Reprices state access opcodes (SLOAD, SSTORE, CALL cold/warm). Values are still under discussion and may change.',
     url: 'https://eips.ethereum.org/EIPS/eip-8038',
     placeholder: true,
     parameters: [
       { key: 'SLOAD_COLD', label: 'SLOAD Cold' },
       { key: 'SLOAD_WARM', label: 'SLOAD Warm' },
+      { key: 'SSTORE_RESET', label: 'SSTORE Reset' },
       { key: 'CALL_COLD', label: 'CALL Cold' },
       { key: 'TX_ACCESS_LIST_ADDR', label: 'Access List Addr' },
       { key: 'TX_ACCESS_LIST_KEY', label: 'Access List Key' },
     ],
+    note: 'SSTORE clear refund and EXTCODESIZE/EXTCODECOPY formula changes in this EIP cannot be simulated as parameter overrides.',
   },
 ];
 
