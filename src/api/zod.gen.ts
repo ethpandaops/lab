@@ -6634,7 +6634,6 @@ export const zFctNodeActiveLast24h = z.object({
 export const zFctNodeCpuUtilization = z.object({
   client_type: z.optional(z.string()),
   max_core_pct: z.optional(z.number()),
-  max_single_core_pct: z.optional(z.number()),
   mean_core_pct: z.optional(z.number()),
   meta_client_name: z.optional(z.string()),
   meta_network_name: z.optional(z.string()),
@@ -69462,7 +69461,6 @@ export const zFctNodeCpuUtilizationServiceListData = z.object({
       mean_core_pct_value: z.optional(z.number()),
       min_core_pct_value: z.optional(z.number()),
       max_core_pct_value: z.optional(z.number()),
-      max_single_core_pct_value: z.optional(z.number()),
       node_class_eq: z.optional(z.string()),
       node_class_ne: z.optional(z.string()),
       node_class_contains: z.optional(z.string()),

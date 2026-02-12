@@ -4570,10 +4570,6 @@ export type FctNodeCpuUtilization = {
    */
   max_core_pct?: number;
   /**
-   * Maximum single core utilization percentage (0-100pct)
-   */
-  max_single_core_pct?: number;
-  /**
    * Mean CPU core utilization percentage (100pct = 1 core)
    */
   mean_core_pct?: number;
@@ -55469,10 +55465,6 @@ export type FctNodeCpuUtilizationServiceListData = {
      * Filter max_core_pct using value
      */
     max_core_pct_value?: number;
-    /**
-     * Filter max_single_core_pct using value
-     */
-    max_single_core_pct_value?: number;
     /**
      * Node classification for filtering (e.g. eip7870) (filter: eq)
      */

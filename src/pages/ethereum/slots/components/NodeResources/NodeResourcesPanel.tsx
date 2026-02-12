@@ -67,12 +67,12 @@ export function NodeResourcesPanel({
       navigate({
         to: '/ethereum/slots/$slot',
         params: { slot: String(slot) },
-        search: prev => ({ ...prev, refNodes: value || undefined }),
+        search: { ...search, refNodes: value || undefined },
         replace: true,
         resetScroll: false,
       });
     },
-    [navigate, slot]
+    [navigate, slot, search]
   );
 
   const setSelectedNode = useCallback(
@@ -80,12 +80,12 @@ export function NodeResourcesPanel({
       navigate({
         to: '/ethereum/slots/$slot',
         params: { slot: String(slot) },
-        search: prev => ({ ...prev, node: value ?? undefined }),
+        search: { ...search, node: value ?? undefined },
         replace: true,
         resetScroll: false,
       });
     },
-    [navigate, slot]
+    [navigate, slot, search]
   );
 
   const setMetric = useCallback(
@@ -93,12 +93,12 @@ export function NodeResourcesPanel({
       navigate({
         to: '/ethereum/slots/$slot',
         params: { slot: String(slot) },
-        search: prev => ({ ...prev, metric: value === 'mean' ? undefined : value }),
+        search: { ...search, metric: value === 'mean' ? undefined : value },
         replace: true,
         resetScroll: false,
       });
     },
-    [navigate, slot]
+    [navigate, slot, search]
   );
 
   const toggleAnnotation = useCallback((type: AnnotationType) => {

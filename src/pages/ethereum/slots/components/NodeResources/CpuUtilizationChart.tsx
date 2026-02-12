@@ -65,6 +65,16 @@ interface CpuUtilizationChartProps {
   enabledAnnotations: Set<AnnotationType>;
 }
 
+/** Slot phase boundary colors: cyan (block), green (attestation), amber (aggregation) */
+const PHASE_BOUNDARY_COLORS = ['#22d3ee', '#22c55e', '#f59e0b'];
+
+interface EChartsTooltipParam {
+  marker: string;
+  seriesName: string;
+  value: [number, number] | number;
+  axisValue?: number | string;
+}
+
 const BUCKET_SIZE = 0.25;
 const toBucket = (offsetSec: number): number => Math.round(offsetSec / BUCKET_SIZE) * BUCKET_SIZE;
 const avg = (arr: number[]): number => arr.reduce((s, v) => s + v, 0) / arr.length;
@@ -289,10 +299,6 @@ export function CpuUtilizationChart({
     return areas;
   }, [annotations, enabledAnnotations, selectedNode]);
 
-  // Slot phase boundary markLines (e.g. attestation deadline at 4s, aggregation at 8s)
-  // Colors match the live slot view: cyan (block), green (attestation), amber (aggregation)
-  const PHASE_BOUNDARY_COLORS = ['#22d3ee', '#22c55e', '#f59e0b'];
-
   const markLines = useMemo((): MarkLineConfig[] => {
     if (!enabledAnnotations.has('slot_phases')) return [];
 
@@ -374,20 +380,17 @@ export function CpuUtilizationChart({
           markAreas={markAreas}
           syncGroup="slot-time"
           tooltipFormatter={(params: unknown) => {
-            const items = Array.isArray(params) ? params : [params];
+            const items = (Array.isArray(params) ? params : [params]) as EChartsTooltipParam[];
             if (items.length === 0) return '';
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const first = items[0] as any;
+            const first = items[0];
             const xVal = Array.isArray(first.value) ? first.value[0] : first.axisValue;
             const timeStr = typeof xVal === 'number' ? `${xVal.toFixed(2)}s` : `${xVal}s`;
 
             let html = `<div style="font-size:12px;min-width:160px">`;
             html += `<div style="margin-bottom:4px;font-weight:600;color:var(--color-foreground)">${timeStr}</div>`;
 
-            for (const item of items) {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const p = item as any;
+            for (const p of items) {
               const val = Array.isArray(p.value) ? p.value[1] : p.value;
               if (val == null) continue;
               html += `<div style="display:flex;align-items:center;gap:6px;margin:2px 0">`;
