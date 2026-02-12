@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createBandSeries, createStatisticSeries } from './utils';
+import { createBandSeries, createStatisticSeries } from './MultiLine.utils';
 
 describe('createBandSeries', () => {
   const lowerValues = [10, 20, 30];

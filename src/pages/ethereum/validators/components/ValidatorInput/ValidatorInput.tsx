@@ -1,6 +1,7 @@
 import type { JSX, ReactNode } from 'react';
 import { TagInput } from '@/components/Forms/TagInput';
 import type { TagValidationResult } from '@/components/Forms/TagInput';
+import { parseValidatorIndices } from './ValidatorInput.utils';
 
 interface ValidatorInputProps {
   /** Current list of validator tags (indices and pubkeys) */
@@ -33,42 +34,6 @@ function validateTag(value: string): TagValidationResult {
   }
   // Invalid
   return { valid: false, color: 'red' };
-}
-
-/**
- * Parse a list of tags to extract validator indices and pubkeys
- *
- * - A valid pubkey: starts with `0x`, followed by exactly 96 hex characters (total 98 chars)
- * - A valid index: non-negative integer
- * - Everything else: invalid
- */
-function parseValidatorIndices(tags: string[]): { valid: number[]; pubkeys: string[]; invalid: string[] } {
-  const valid: number[] = [];
-  const pubkeys: string[] = [];
-  const invalid: string[] = [];
-
-  for (const tag of tags) {
-    const trimmed = tag.trim();
-    if (!trimmed) continue;
-
-    if (PUBKEY_REGEX.test(trimmed)) {
-      pubkeys.push(trimmed);
-    } else {
-      const num = parseInt(trimmed, 10);
-      if (Number.isInteger(num) && num >= 0 && String(num) === trimmed) {
-        valid.push(num);
-      } else {
-        invalid.push(trimmed);
-      }
-    }
-  }
-
-  // Remove duplicates
-  return {
-    valid: [...new Set(valid)],
-    pubkeys: [...new Set(pubkeys.map(pk => pk.toLowerCase()))],
-    invalid: [...new Set(invalid)],
-  };
 }
 
 /**
@@ -136,5 +101,3 @@ export function ValidatorInput({
     />
   );
 }
-
-export { parseValidatorIndices };

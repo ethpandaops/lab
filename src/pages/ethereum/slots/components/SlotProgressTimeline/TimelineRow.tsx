@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 import clsx from 'clsx';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { SPAN_COLORS } from './constants';
-import { formatMs, msToPercent } from './utils';
+import { formatMs, msToPercent } from './SlotProgressTimeline.utils';
 import type { TraceSpan } from './SlotProgressTimeline.types';
 
 interface TimelineRowProps {

@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import clsx from 'clsx';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
-import { formatMs } from './utils';
+import { formatMs } from './SlotProgressTimeline.utils';
 import type { TraceSpan } from './SlotProgressTimeline.types';
 
 /** Formats version string with consistent "v" prefix, avoiding double "v" */
