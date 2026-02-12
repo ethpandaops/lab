@@ -142,12 +142,17 @@ export function DiskIoChart({
         smooth: 0.4,
       });
     } else {
-      const readData = data.filter(d => d.rw === 'read');
-      const writeData = data.filter(d => d.rw === 'write');
+      const clData = data.filter(d => getClientLayer(d.client_type ?? '') === 'CL');
+      const elData = data.filter(d => getClientLayer(d.client_type ?? '') === 'EL');
+
+      const clRead = clData.filter(d => d.rw === 'read');
+      const clWrite = clData.filter(d => d.rw === 'write');
+      const elRead = elData.filter(d => d.rw === 'read');
+      const elWrite = elData.filter(d => d.rw === 'write');
 
       chartSeries.push({
-        name: 'Read',
-        data: toPoints(bucketData(readData)),
+        name: 'CL Read',
+        data: toPoints(bucketData(clRead)),
         color: CHART_CATEGORICAL_COLORS[0],
         lineWidth: 2,
         showArea: true,
@@ -155,12 +160,30 @@ export function DiskIoChart({
         smooth: 0.4,
       });
       chartSeries.push({
-        name: 'Write',
-        data: toPoints(bucketData(writeData)),
+        name: 'CL Write',
+        data: toPoints(bucketData(clWrite)),
+        color: CHART_CATEGORICAL_COLORS[0],
+        lineWidth: 1.5,
+        lineStyle: 'dashed',
+        showArea: false,
+        smooth: 0.4,
+      });
+      chartSeries.push({
+        name: 'EL Read',
+        data: toPoints(bucketData(elRead)),
         color: CHART_CATEGORICAL_COLORS[1],
         lineWidth: 2,
         showArea: true,
         areaOpacity: 0.08,
+        smooth: 0.4,
+      });
+      chartSeries.push({
+        name: 'EL Write',
+        data: toPoints(bucketData(elWrite)),
+        color: CHART_CATEGORICAL_COLORS[1],
+        lineWidth: 1.5,
+        lineStyle: 'dashed',
+        showArea: false,
         smooth: 0.4,
       });
     }
