@@ -16,7 +16,7 @@ The `BACKEND` env var controls the API proxy target. Values: `local` (default), 
 ## Libraries
 
 - pnpm v10
-- node v22
+- node v24
 - vite v7
 - react v19
 - typescript v5

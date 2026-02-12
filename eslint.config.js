@@ -120,6 +120,13 @@ export default tseslint.config(
       'lab/validate-route-images': 'error',
     },
   },
+  // TanStack Router route files export both components and Route objects
+  {
+    files: ['src/routes/**/*.{ts,tsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
   storybook.configs['flat/recommended'],
   {
     files: ['**/.storybook/**/*.{js,ts}'],
