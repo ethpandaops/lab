@@ -15,6 +15,7 @@ import {
   ExclamationTriangleIcon,
   BoltIcon,
   CubeIcon,
+  InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
@@ -30,6 +31,8 @@ import { Stats } from '@/components/DataDisplay/Stats';
 import type { Stat } from '@/components/DataDisplay/Stats/Stats.types';
 import { Alert } from '@/components/Feedback/Alert';
 import { Input } from '@/components/Forms/Input';
+import { Checkbox } from '@/components/Forms/Checkbox';
+import { Dialog } from '@/components/Overlays/Dialog';
 import { Button } from '@/components/Elements/Button';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -49,6 +52,9 @@ echarts.use([LineChart, BarChart, GridComponent, TooltipComponent, LegendCompone
 
 /** Maximum number of blocks that can be simulated in one range */
 const MAX_BLOCKS = 50;
+
+/** EIP-7825 maximum transaction gas limit (used when "use max gas limit" is enabled) */
+const MAX_TRANSACTION_GAS = 16_777_216;
 
 /** Available block count options */
 const BLOCK_COUNT_OPTIONS = [5, 10, 25, 50];
@@ -224,6 +230,10 @@ export function SimulatePage(): JSX.Element {
 
   // Preset modal state
   const [presetModalOpen, setPresetModalOpen] = useState(false);
+
+  // Gas limit override state
+  const [useMaxGasLimit, setUseMaxGasLimit] = useState(false);
+  const [gasLimitInfoOpen, setGasLimitInfoOpen] = useState(false);
 
   // Selection state
   const [selectedBlockIndex, setSelectedBlockIndex] = useState<number | null>(null);
@@ -494,6 +504,7 @@ export function SimulatePage(): JSX.Element {
         body: JSON.stringify({
           blockNumber,
           gasSchedule: { overrides: gasSchedule },
+          ...(useMaxGasLimit && { simulatedGasLimit: MAX_TRANSACTION_GAS }),
         }),
       });
 
@@ -506,7 +517,7 @@ export function SimulatePage(): JSX.Element {
       const apiResult: ApiBlockSimulationResponse = await response.json();
       return transformApiResponse(apiResult);
     },
-    [gasSchedule, currentNetwork]
+    [gasSchedule, currentNetwork, useMaxGasLimit]
   );
 
   // Run the range simulation
@@ -778,6 +789,30 @@ export function SimulatePage(): JSX.Element {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Advanced Options */}
+        <div className="mt-4 flex items-center gap-2 border-t border-border pt-4">
+          <Checkbox
+            checked={useMaxGasLimit}
+            onChange={setUseMaxGasLimit}
+            disabled={isRunning}
+          />
+          <button
+            type="button"
+            onClick={() => !isRunning && setUseMaxGasLimit(!useMaxGasLimit)}
+            disabled={isRunning}
+            className={clsx('text-sm text-left', useMaxGasLimit ? 'text-foreground' : 'text-muted')}
+          >
+            Use max gas limit for simulated execution
+          </button>
+          <button
+            type="button"
+            onClick={() => setGasLimitInfoOpen(true)}
+            className="text-muted transition-colors hover:text-foreground"
+          >
+            <InformationCircleIcon className="size-4" />
+          </button>
         </div>
 
         {/* Validation / Loading / Error messages */}
@@ -1233,6 +1268,36 @@ export function SimulatePage(): JSX.Element {
         onCancel={handlePresetCancel}
         defaults={gasScheduleDefaults ?? null}
       />
+
+      {/* Gas Limit Info Dialog */}
+      <Dialog
+        open={gasLimitInfoOpen}
+        onClose={() => setGasLimitInfoOpen(false)}
+        title="Simulated Gas Limit Override"
+        size="sm"
+      >
+        <div className="space-y-3 text-sm text-muted">
+          <p>
+            When gas prices change, transactions that succeeded under old pricing may run out of gas
+            under new pricing — not because the transaction logic is wrong, but because the original
+            gas limit was set for the old costs.
+          </p>
+          <p>
+            With this option enabled, the simulated execution uses the maximum transaction gas limit
+            ({formatGas(MAX_TRANSACTION_GAS)} gas) instead of the original transaction&apos;s gas limit.
+            This prevents artificial out-of-gas failures and shows the true gas cost under the new
+            pricing.
+          </p>
+          <p>
+            The original execution always uses the real transaction gas limit, so you can still
+            compare the two.
+          </p>
+          <div className="rounded-xs border border-border bg-background px-3 py-2 text-xs">
+            <span className="font-medium text-foreground">Note:</span> This overrides each
+            transaction&apos;s individual gas limit, not the block gas limit.
+          </div>
+        </div>
+      </Dialog>
     </Container>
   );
 }
