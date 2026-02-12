@@ -10,7 +10,7 @@ import type {
   ContinentCode,
   NodeClassification,
 } from './useGeographicalData.types';
-import { CONTINENT_CONFIG, getContinentCode, getClassification } from './utils';
+import { CONTINENT_CONFIG, getContinentCode, getClassification } from './useGeographicalData.utils';
 import { getCountryFlag } from '@/utils';
 
 export function useGeographicalData(): UseGeographicalDataReturn {

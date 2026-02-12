@@ -87,7 +87,7 @@ function ThresholdInput({ label, value, onChange, min, max, step, unit, disabled
 export function ThresholdConfig({ values, onChange, disabled = false, className }: ThresholdConfigProps): JSX.Element {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleReset = () => {
+  const handleReset = (): void => {
     onChange(DEFAULT_THRESHOLDS);
   };
 

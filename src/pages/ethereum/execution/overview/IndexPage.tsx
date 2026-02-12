@@ -56,7 +56,7 @@ import {
   buildTransactionsChartConfig,
   type TooltipItem,
   type TooltipSection,
-} from './utils';
+} from './overview.utils';
 
 /**
  * IndexPage - Execution Overview page showing TPS, Gas Used, and Gas Limit charts

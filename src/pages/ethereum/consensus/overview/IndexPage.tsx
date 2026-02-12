@@ -70,7 +70,7 @@ import {
   DEPTH_COLORS,
   STATUS_COLORS,
   type TooltipSection,
-} from './utils';
+} from './overview.utils';
 
 /**
  * IndexPage - Consensus Overview page
@@ -299,10 +299,10 @@ export function IndexPage(): JSX.Element {
   const unifiedTimeKeys = useMemo(() => {
     const allKeys = new Set<string>();
 
-    const addHourlyKeys = (records: { hour_start_date_time?: number }[] | undefined) => {
+    const addHourlyKeys = (records: { hour_start_date_time?: number }[] | undefined): void => {
       records?.forEach(r => allKeys.add(String(r.hour_start_date_time ?? '')));
     };
-    const addDailyKeys = (records: { day_start_date?: string }[] | undefined) => {
+    const addDailyKeys = (records: { day_start_date?: string }[] | undefined): void => {
       records?.forEach(r => allKeys.add(r.day_start_date ?? ''));
     };
 
@@ -471,13 +471,16 @@ export function IndexPage(): JSX.Element {
 
   // --- Fork mark lines ---
 
-  const chartLabels =
-    blobChartConfig?.labels ??
-    attnChartConfig?.labels ??
-    hvChartConfig?.labels ??
-    reorgChartConfig?.labels ??
-    missedSlotChartConfig?.labels ??
-    [];
+  const chartLabels = useMemo(
+    () =>
+      blobChartConfig?.labels ??
+      attnChartConfig?.labels ??
+      hvChartConfig?.labels ??
+      reorgChartConfig?.labels ??
+      missedSlotChartConfig?.labels ??
+      [],
+    [blobChartConfig, attnChartConfig, hvChartConfig, reorgChartConfig, missedSlotChartConfig]
+  );
 
   const consensusForkMarkLines = useMemo(() => {
     if (!currentNetwork || !allForks.length) return [];
@@ -546,7 +549,7 @@ export function IndexPage(): JSX.Element {
 
         const dateValue = isDaily ? (record.day_start_date ?? '') : (record.hour_start_date_time ?? 0);
         const dateStr = formatTooltipDate(dateValue as string | number, isDaily);
-        const fmt = (v: unknown) => `${Number(v ?? 0).toFixed(2)}${unit}`;
+        const fmt = (v: unknown): string => `${Number(v ?? 0).toFixed(2)}${unit}`;
 
         const sections: TooltipSection[] = [
           {
@@ -819,7 +822,7 @@ export function IndexPage(): JSX.Element {
 
   // --- Subtitles ---
 
-  const makeSub = (metric: string) =>
+  const makeSub = (metric: string): string =>
     isDaily ? `Daily ${metric} with statistical bands` : `Hourly ${metric} over ${config.days} days`;
 
   return (

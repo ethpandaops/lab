@@ -18,7 +18,7 @@ import type {
   FctProposerRewardHourly,
   FctProposerRewardDaily,
 } from '@/api/types.gen';
-import { formatDailyDate, formatHourlyDate } from '@/pages/ethereum/execution/overview/utils';
+import { formatDailyDate, formatHourlyDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import type { ChartConfig } from './constants';
 
 // Re-export shared utilities from execution overview
@@ -30,7 +30,7 @@ export {
   buildTooltipHtml,
   type TooltipItem,
   type TooltipSection,
-} from '@/pages/ethereum/execution/overview/utils';
+} from '@/pages/ethereum/execution/overview/overview.utils';
 
 /** Formats a band range */
 export function formatBand(lower: number | undefined, upper: number | undefined): string {
@@ -165,7 +165,7 @@ export function buildAttestationParticipationChartConfig(
   const getValue = (
     k: string,
     field: keyof FctAttestationParticipationRateHourly & keyof FctAttestationParticipationRateDaily
-  ) => {
+  ): number | null => {
     const r = byKey.get(k);
     return r ? Math.max(0, (r as Record<string, number>)[field] ?? 0) : null;
   };
@@ -236,7 +236,7 @@ export function buildHeadVoteCorrectnessChartConfig(
 
   const labels = unifiedKeys.map(k => (isDaily ? formatDailyDate(k) : formatHourlyDate(Number(k))));
 
-  const getValue = (k: string, field: string) => {
+  const getValue = (k: string, field: string): number | null => {
     const r = byKey.get(k);
     return r ? Math.max(0, (r as Record<string, number>)[field] ?? 0) : null;
   };
@@ -451,7 +451,7 @@ export function buildAttestationInclusionDelayChartConfig(
 
   const labels = unifiedKeys.map(k => (isDaily ? formatDailyDate(k) : formatHourlyDate(Number(k))));
 
-  const getValue = (k: string, field: string) => {
+  const getValue = (k: string, field: string): number | null => {
     const r = byKey.get(k);
     return r ? Math.max(0, (r as Record<string, number>)[field] ?? 0) : null;
   };
@@ -528,7 +528,7 @@ export function buildProposerRewardChartConfig(
 
   const labels = unifiedKeys.map(k => (isDaily ? formatDailyDate(k) : formatHourlyDate(Number(k))));
 
-  const getValue = (k: string, field: string) => {
+  const getValue = (k: string, field: string): number | null => {
     const r = byKey.get(k);
     return r ? Math.max(0, (r as Record<string, number>)[field] ?? 0) : null;
   };

@@ -6,7 +6,7 @@ import { ClientSelect } from '@/components/Ethereum/ClientSelect';
 import { Button } from '@/components/Elements/Button';
 import type { FiltersDialogProps } from './FiltersDialog.types';
 import type { GeographicalFiltersFormData } from '../GeographicalFilters/GeographicalFilters.types';
-import { CONTINENT_CONFIG } from '../../hooks/useGeographicalData/utils';
+import { CONTINENT_CONFIG } from '../../hooks/useGeographicalData/useGeographicalData.utils';
 import type { ContinentCode } from '../../hooks/useGeographicalData/useGeographicalData.types';
 
 export function FiltersDialog({

@@ -7,7 +7,7 @@ import { Toggle } from '@/components/Forms/Toggle';
 import { useCanHover } from '@/hooks/useCanHover';
 import type { SlotProgressTimelineProps, TraceSpan } from './SlotProgressTimeline.types';
 import { SPAN_COLORS } from './constants';
-import { formatMs, msToPercent } from './utils';
+import { formatMs, msToPercent } from './SlotProgressTimeline.utils';
 import { useTraceSpans } from './useTraceSpans';
 import { TimelineHeader } from './TimelineHeader';
 import { TimelineGrid } from './TimelineGrid';

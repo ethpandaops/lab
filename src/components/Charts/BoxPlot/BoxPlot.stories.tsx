@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { BoxPlot } from './BoxPlot';
-import { calculateBoxPlotStats } from './utils';
+import { calculateBoxPlotStats } from './BoxPlot.utils';
 import type { BoxPlotStats } from './BoxPlot.types';
 
 const meta = {

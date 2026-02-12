@@ -829,7 +829,7 @@ export function BlockPage(): JSX.Element {
   const handleContractTreemapClick = (params: {
     event?: { event?: MouseEvent };
     data?: { address?: string; name?: string; value?: number; firstTxHash?: string | null };
-  }) => {
+  }): void => {
     const address = params.data?.address;
     if (!address) return; // Ignore "Other" segment
 
@@ -856,7 +856,7 @@ export function BlockPage(): JSX.Element {
   }, []);
 
   // Click handler for Sankey diagram - navigate to transaction page
-  const handleSankeyClick = (params: { data?: { txHash?: string }; dataType?: string }) => {
+  const handleSankeyClick = (params: { data?: { txHash?: string }; dataType?: string }): void => {
     const txHash = params.data?.txHash;
     if (txHash) {
       navigate({

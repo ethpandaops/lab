@@ -13,11 +13,11 @@ export {
   createExecutionForkMarkLines,
   createForkMarkLines,
   createStatisticSeries,
-} from './utils';
+} from './MultiLine.utils';
 export type {
   BandConfig,
   BlobScheduleMarkLinesOptions,
   ExecutionForkMarkLinesOptions,
   ForkMarkLinesOptions,
   StatisticConfig,
-} from './utils';
+} from './MultiLine.utils';

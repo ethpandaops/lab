@@ -569,7 +569,7 @@ export function SimulatePage(): JSX.Element {
       status: 'completed',
       currentBlock: null,
     }));
-  }, [startBlockNumber, blockCount, simulateSingleBlock]);
+  }, [startBlockNumber, blockCount, simulateSingleBlock, modifiedCount]);
 
   // Cancel simulation
   const handleCancel = useCallback(() => {

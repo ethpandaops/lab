@@ -11,7 +11,7 @@ import type {
   FctMevBidHighestValueByBuilderChunked50Ms,
 } from '@/api/types.gen';
 import { SLOT_DURATION_MS, MAX_REASONABLE_SEEN_TIME_MS } from './constants';
-import { formatMs, classificationToCategory, calculateOutlierBounds } from './utils';
+import { formatMs, classificationToCategory, calculateOutlierBounds } from './SlotProgressTimeline.utils';
 import type { TraceSpan } from './SlotProgressTimeline.types';
 
 interface UseTraceSpansOptions {
