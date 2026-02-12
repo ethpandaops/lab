@@ -22,19 +22,14 @@ function usToSeconds(us: number): number {
   return us / 1_000_000;
 }
 
-/** Get the normalized metric value (0-100% of total system) from a data point */
-function getMetricValue(d: FctNodeCpuUtilization, metric: CpuMetric): number {
-  const cores = d.system_cores ?? 1;
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/** Normalize a metric value to % of total system CPU */
+function normalizeToSystem(value: number, cores: number): number {
   const divisor = cores > 0 ? cores : 1;
-  switch (metric) {
-    case 'min':
-      return (d.min_core_pct ?? 0) / divisor;
-    case 'max':
-      return (d.max_core_pct ?? 0) / divisor;
-    case 'mean':
-    default:
-      return (d.mean_core_pct ?? 0) / divisor;
-  }
+  return value / divisor;
 }
 
 const METRIC_LABELS: Record<CpuMetric, string> = {
@@ -48,18 +43,32 @@ interface BlockArrival {
   node_id: string;
 }
 
+/** Aggregated bucket data for a single time window */
+interface BucketAgg {
+  meanVals: number[];
+  minVals: number[];
+  maxVals: number[];
+  coreVals: number[];
+}
+
 interface CpuUtilizationChartProps {
   data: FctNodeCpuUtilization[];
   selectedNode: string | null;
   blockPropagationData: BlockArrival[];
   metric: CpuMetric;
+  slot: number;
 }
+
+const BUCKET_SIZE = 0.25;
+const toBucket = (offsetSec: number): number => Math.round(offsetSec / BUCKET_SIZE) * BUCKET_SIZE;
+const avg = (arr: number[]): number => arr.reduce((s, v) => s + v, 0) / arr.length;
 
 export function CpuUtilizationChart({
   data,
   selectedNode,
   blockPropagationData,
   metric,
+  slot,
 }: CpuUtilizationChartProps): JSX.Element {
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
@@ -68,56 +77,68 @@ export function CpuUtilizationChart({
       return { series: [] as SeriesData[], markLines: [] as MarkLineConfig[], clClient: '', elClient: '' };
     }
 
-    // Derive slot start time from data (microseconds)
     const slotStartUs = Math.min(...data.map(d => d.wallclock_slot_start_date_time ?? 0).filter(v => v > 0));
-
     const chartSeries: SeriesData[] = [];
     let resolvedClClient = '';
     let resolvedElClient = '';
 
-    // Bucket size for time aggregation (seconds)
-    const BUCKET_SIZE = 0.25;
-    const toBucket = (offsetSec: number): number => Math.round(offsetSec / BUCKET_SIZE) * BUCKET_SIZE;
-
-    const buildLine = (
-      items: FctNodeCpuUtilization[],
-      label: string,
-      color: string,
-      getValue: CpuMetric | ((d: FctNodeCpuUtilization) => number),
-      opts?: {
-        lineWidth?: number;
-        showArea?: boolean;
-        areaOpacity?: number;
-        lineStyle?: 'solid' | 'dashed' | 'dotted';
-      }
-    ): void => {
-      const extractValue =
-        typeof getValue === 'function' ? getValue : (d: FctNodeCpuUtilization) => getMetricValue(d, getValue);
-
-      const byBucket = new Map<number, number[]>();
-      items.forEach(d => {
+    /** Bucket data points by time offset, collecting all metric values per bucket */
+    const bucketData = (items: FctNodeCpuUtilization[]): Map<number, BucketAgg> => {
+      const buckets = new Map<number, BucketAgg>();
+      for (const d of items) {
         const offset = usToSeconds((d.window_start ?? 0) - slotStartUs);
         const bucket = toBucket(offset);
-        if (bucket < 0 || bucket > 12) return;
-        if (!byBucket.has(bucket)) byBucket.set(bucket, []);
-        byBucket.get(bucket)!.push(extractValue(d));
+        if (bucket < 0 || bucket > 12) continue;
+
+        if (!buckets.has(bucket)) {
+          buckets.set(bucket, { meanVals: [], minVals: [], maxVals: [], coreVals: [] });
+        }
+        const b = buckets.get(bucket)!;
+        const cores = d.system_cores ?? 1;
+        b.meanVals.push(normalizeToSystem(d.mean_core_pct ?? 0, cores));
+        b.minVals.push(normalizeToSystem(d.min_core_pct ?? 0, cores));
+        b.maxVals.push(normalizeToSystem(d.max_core_pct ?? 0, cores));
+        b.coreVals.push(Math.min(d.max_core_pct ?? 0, 100));
+      }
+      return buckets;
+    };
+
+    /** Convert bucketed data to sorted [time, value] points */
+    const toPoints = (buckets: Map<number, BucketAgg>, extract: (b: BucketAgg) => number[]): [number, number][] =>
+      Array.from(buckets.entries())
+        .sort(([a], [b]) => a - b)
+        .map(([t, b]) => [t, avg(extract(b))] as [number, number]);
+
+    /** Add a band (min-max range) as two stacked series */
+    const addBand = (buckets: Map<number, BucketAgg>, stackId: string, color: string): void => {
+      const sorted = Array.from(buckets.entries()).sort(([a], [b]) => a - b);
+      const basePoints = sorted.map(([t, b]) => [t, avg(b.minVals)] as [number, number]);
+      const widthPoints = sorted.map(([t, b]) => {
+        const lo = avg(b.minVals);
+        const hi = avg(b.maxVals);
+        return [t, Math.max(0, hi - lo)] as [number, number];
       });
 
-      const points = Array.from(byBucket.entries())
-        .sort(([a], [b]) => a - b)
-        .map(([offset, values]) => [offset, values.reduce((s, v) => s + v, 0) / values.length] as [number, number]);
-
-      if (points.length > 0) {
-        chartSeries.push({
-          name: label,
-          data: points,
-          color,
-          lineWidth: opts?.lineWidth ?? 2,
-          showArea: opts?.showArea ?? true,
-          areaOpacity: opts?.areaOpacity ?? 0.08,
-          lineStyle: opts?.lineStyle,
-        });
-      }
+      chartSeries.push({
+        name: `_${stackId}_base`,
+        data: basePoints,
+        stack: stackId,
+        showArea: true,
+        areaOpacity: 0,
+        lineWidth: 0,
+        color,
+        visible: false,
+      });
+      chartSeries.push({
+        name: `_${stackId}_width`,
+        data: widthPoints,
+        stack: stackId,
+        showArea: true,
+        areaOpacity: 0.12,
+        lineWidth: 0,
+        color,
+        visible: false,
+      });
     };
 
     if (selectedNode) {
@@ -128,57 +149,90 @@ export function CpuUtilizationChart({
       resolvedClClient = clData[0]?.client_type ?? '';
       resolvedElClient = elData[0]?.client_type ?? '';
 
-      const clLabel = resolvedClClient || 'CL';
-      const elLabel = resolvedElClient || 'EL';
+      const clLabel = capitalize(resolvedClClient || 'CL');
+      const elLabel = capitalize(resolvedElClient || 'EL');
       const clColor = CHART_CATEGORICAL_COLORS[0];
       const elColor = CHART_CATEGORICAL_COLORS[1];
 
-      const coreExtract = (d: FctNodeCpuUtilization) => Math.min(d.max_core_pct ?? 0, 100);
+      const clBuckets = bucketData(clData);
+      const elBuckets = bucketData(elData);
 
-      // CL system utilization: mean (solid), min (dotted), max (dashed)
-      buildLine(clData, `${clLabel} sys mean`, clColor, 'mean', { lineWidth: 2, showArea: true, areaOpacity: 0.06 });
-      buildLine(clData, `${clLabel} sys min`, clColor, 'min', {
-        lineWidth: 1.5,
+      // CL: min-max band, then mean line on top
+      addBand(clBuckets, 'cl_range', clColor);
+      chartSeries.push({
+        name: `${clLabel}`,
+        data: toPoints(clBuckets, b => b.meanVals),
+        color: clColor,
+        lineWidth: 2,
         showArea: false,
-        lineStyle: 'dotted',
-      });
-      buildLine(clData, `${clLabel} sys max`, clColor, 'max', {
-        lineWidth: 1.5,
-        showArea: false,
-        lineStyle: 'dashed',
       });
 
-      // EL system utilization: mean (solid), min (dotted), max (dashed)
-      buildLine(elData, `${elLabel} sys mean`, elColor, 'mean', { lineWidth: 2, showArea: true, areaOpacity: 0.06 });
-      buildLine(elData, `${elLabel} sys min`, elColor, 'min', {
-        lineWidth: 1.5,
+      // EL: min-max band, then mean line on top
+      addBand(elBuckets, 'el_range', elColor);
+      chartSeries.push({
+        name: `${elLabel}`,
+        data: toPoints(elBuckets, b => b.meanVals),
+        color: elColor,
+        lineWidth: 2,
         showArea: false,
-        lineStyle: 'dotted',
-      });
-      buildLine(elData, `${elLabel} sys max`, elColor, 'max', {
-        lineWidth: 1.5,
-        showArea: false,
-        lineStyle: 'dashed',
       });
 
-      // Hottest single core per client (raw, not divided by system_cores)
-      const singleCoreColor = CHART_CATEGORICAL_COLORS[2] ?? '#e5a00d';
-      buildLine(clData, `${clLabel} hottest core`, singleCoreColor, coreExtract, {
+      // Busiest single core per client
+      chartSeries.push({
+        name: `${clLabel} peak core`,
+        data: toPoints(clBuckets, b => b.coreVals),
+        color: clColor,
         lineWidth: 1.5,
-        showArea: false,
         lineStyle: 'dashed',
-      });
-      buildLine(elData, `${elLabel} hottest core`, singleCoreColor, coreExtract, {
-        lineWidth: 1.5,
         showArea: false,
-        lineStyle: 'dotted',
+        initiallyVisible: false,
+      });
+      chartSeries.push({
+        name: `${elLabel} peak core`,
+        data: toPoints(elBuckets, b => b.coreVals),
+        color: elColor,
+        lineWidth: 1.5,
+        lineStyle: 'dashed',
+        showArea: false,
+        initiallyVisible: false,
       });
     } else {
+      // Aggregate view: CL/EL with selected metric
       const clData = data.filter(d => getClientLayer(d.client_type ?? '') === 'CL');
       const elData = data.filter(d => getClientLayer(d.client_type ?? '') === 'EL');
 
-      buildLine(clData, 'Consensus Layer', CHART_CATEGORICAL_COLORS[0], metric);
-      buildLine(elData, 'Execution Layer', CHART_CATEGORICAL_COLORS[1], metric);
+      const metricExtract = (b: BucketAgg): number[] => {
+        switch (metric) {
+          case 'min':
+            return b.minVals;
+          case 'max':
+            return b.maxVals;
+          case 'mean':
+          default:
+            return b.meanVals;
+        }
+      };
+
+      const clBuckets = bucketData(clData);
+      const elBuckets = bucketData(elData);
+
+      addBand(clBuckets, 'cl_range', CHART_CATEGORICAL_COLORS[0]);
+      chartSeries.push({
+        name: 'Consensus Layer',
+        data: toPoints(clBuckets, metricExtract),
+        color: CHART_CATEGORICAL_COLORS[0],
+        lineWidth: 2,
+        showArea: false,
+      });
+
+      addBand(elBuckets, 'el_range', CHART_CATEGORICAL_COLORS[1]);
+      chartSeries.push({
+        name: 'Execution Layer',
+        data: toPoints(elBuckets, metricExtract),
+        color: CHART_CATEGORICAL_COLORS[1],
+        lineWidth: 2,
+        showArea: false,
+      });
     }
 
     // Block arrival markLines
@@ -235,8 +289,8 @@ export function CpuUtilizationChart({
   const shortNodeName = selectedNode?.split('/').pop() ?? '';
 
   const subtitle = selectedNode
-    ? `${shortNodeName} · sys% = total system, hottest core = single core peak`
-    : `${METRIC_LABELS[metric]} across ${nodeCount} nodes · % of total system`;
+    ? `Slot ${slot} · ${shortNodeName} · shaded = min/max range, dashed = busiest core`
+    : `Slot ${slot} · ${METRIC_LABELS[metric]} across ${nodeCount} nodes · % of all CPU cores`;
 
   const headerActions =
     selectedNode && (clClient || elClient) ? (
@@ -273,7 +327,7 @@ export function CpuUtilizationChart({
             formatter: (v: number | string) => `${v}s`,
           }}
           yAxis={{
-            name: 'CPU %',
+            name: '% of all cores',
             min: 0,
             formatter: (v: number) => `${v.toFixed(1)}%`,
           }}
@@ -282,20 +336,24 @@ export function CpuUtilizationChart({
           legendPosition="bottom"
           markLines={markLines}
           syncGroup="slot-time"
-          valueDecimals={1}
           tooltipFormatter={(params: unknown) => {
             const items = Array.isArray(params) ? params : [params];
             if (items.length === 0) return '';
 
+            // Filter out hidden band series from tooltip
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const first = items[0] as any;
+            const visible = items.filter((p: any) => !String(p.seriesName).startsWith('_'));
+            if (visible.length === 0) return '';
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const first = visible[0] as any;
             const xVal = Array.isArray(first.value) ? first.value[0] : first.axisValue;
-            const timeStr = typeof xVal === 'number' ? `${xVal.toFixed(3)}s` : `${xVal}s`;
+            const timeStr = typeof xVal === 'number' ? `${xVal.toFixed(2)}s` : `${xVal}s`;
 
             let html = `<div style="font-size:12px;min-width:160px">`;
             html += `<div style="margin-bottom:4px;font-weight:600;color:var(--color-foreground)">${timeStr}</div>`;
 
-            for (const item of items) {
+            for (const item of visible) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const p = item as any;
               const val = Array.isArray(p.value) ? p.value[1] : p.value;

@@ -167,12 +167,7 @@ export function NodeResourcesPanel({ slot, blockPropagationData }: NodeResources
               nodeClientInfo={nodeClientInfo}
             />
             {!effectiveSelectedNode && (
-              <SelectMenu
-                value={metric}
-                onChange={setMetric}
-                options={METRIC_OPTIONS}
-                expandToFit
-              />
+              <SelectMenu value={metric} onChange={setMetric} options={METRIC_OPTIONS} expandToFit />
             )}
             <div className="flex items-center gap-2">
               <button
@@ -202,6 +197,7 @@ export function NodeResourcesPanel({ slot, blockPropagationData }: NodeResources
         selectedNode={effectiveSelectedNode}
         blockPropagationData={blockPropagationData}
         metric={metric}
+        slot={slot}
       />
 
       <ReferenceNodesInfoDialog open={showRefNodeInfo} onClose={() => setShowRefNodeInfo(false)} />
