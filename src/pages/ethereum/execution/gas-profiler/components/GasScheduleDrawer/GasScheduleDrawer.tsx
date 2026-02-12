@@ -326,7 +326,7 @@ export function GasScheduleDrawer({
                         <MagnifyingGlassIcon className="size-4 text-muted" />
                         <input
                           type="text"
-                          placeholder="Search opcodes..."
+                          placeholder="Search..."
                           value={searchQuery}
                           onChange={e => setSearchQuery(e.target.value)}
                           className="w-full border-0 bg-transparent text-sm text-foreground placeholder:text-muted focus:ring-0 focus:outline-hidden"
