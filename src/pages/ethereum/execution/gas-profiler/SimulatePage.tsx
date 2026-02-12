@@ -35,8 +35,10 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { GasScheduleDrawer } from './components/GasScheduleDrawer';
 import { BlockSimulationResultsV2 } from './components/BlockSimulationResultsV2';
+import { GlamsterdamPresetModal } from './components/GlamsterdamPresetModal';
 import { useGasSchedule } from './hooks/useGasSchedule';
 import type { GasSchedule, BlockSimulationResult, CallError } from './SimulatePage.types';
+import { GLAMSTERDAM_PRESET } from './SimulatePage.types';
 
 // Register ECharts components
 echarts.use([LineChart, BarChart, GridComponent, TooltipComponent, LegendComponent, CanvasRenderer]);
@@ -167,6 +169,7 @@ interface ApiBlockSimulationResponse {
     simulatedReverts: number;
     originalErrors: CallError[] | null;
     simulatedErrors: CallError[] | null;
+    error?: string;
   }>;
   opcodeBreakdown: Record<
     string,
@@ -195,6 +198,7 @@ function transformApiResponse(response: ApiBlockSimulationResponse): BlockSimula
       simulatedReverts: tx.simulatedReverts,
       originalErrors: tx.originalErrors ?? [],
       simulatedErrors: tx.simulatedErrors ?? [],
+      error: tx.error,
     })),
     opcodeBreakdown: response.opcodeBreakdown,
   };
@@ -217,6 +221,9 @@ export function SimulatePage(): JSX.Element {
 
   // Drawer state
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Preset modal state
+  const [presetModalOpen, setPresetModalOpen] = useState(false);
 
   // Selection state
   const [selectedBlockIndex, setSelectedBlockIndex] = useState<number | null>(null);
@@ -296,6 +303,12 @@ export function SimulatePage(): JSX.Element {
       return gasSchedule[key] !== undefined && defaultParam && gasSchedule[key] !== defaultParam.value;
     }).length;
   }, [gasSchedule, gasScheduleDefaults]);
+
+  // Check if Glamsterdam preset is currently applied
+  const isGlamsterdamApplied = useMemo(
+    () => Object.entries(GLAMSTERDAM_PRESET).every(([key, value]) => gasSchedule[key] === value),
+    [gasSchedule]
+  );
 
   // Aggregate stats from completed results
   const aggregateStats = useMemo(() => calculateAggregateStats(simState.results), [simState.results]);
@@ -601,6 +614,30 @@ export function SimulatePage(): JSX.Element {
 
   const modifiedParamNames = useMemo(() => modifiedEntries.map(([key]) => key), [modifiedEntries]);
 
+  // Pending simulate flag - triggers simulation on next render after preset is applied
+  const [pendingSimulate, setPendingSimulate] = useState(false);
+
+  // Auto-simulate after preset application
+  useEffect(() => {
+    if (pendingSimulate) {
+      setPendingSimulate(false);
+      handleSimulate();
+    }
+  }, [pendingSimulate, handleSimulate]);
+
+  // Handle preset modal "Apply & Simulate"
+  const handlePresetApplyAndSimulate = useCallback((presetValues: Record<string, number>) => {
+    setGasSchedule(presetValues as GasSchedule);
+    setGasWarning(false);
+    setPendingSimulate(true);
+  }, []);
+
+  // Handle preset modal "Cancel" - resets gas schedule to empty
+  const handlePresetCancel = useCallback(() => {
+    setGasSchedule({});
+    setGasWarning(false);
+  }, []);
+
   const isRunning = simState.status === 'running';
   const hasResults = simState.results.length > 0;
 
@@ -680,24 +717,42 @@ export function SimulatePage(): JSX.Element {
           {/* Gas Schedule */}
           <div>
             <label className="mb-1.5 block text-xs text-muted">Gas Schedule</label>
-            <button
-              type="button"
-              onClick={() => setDrawerOpen(true)}
-              disabled={!gasScheduleDefaults || isRunning}
-              className={clsx(
-                'flex items-center gap-2 rounded-xs border px-3 py-2 text-sm font-medium transition-colors',
-                modifiedCount > 0
-                  ? 'border-primary/30 bg-primary/10 text-primary'
-                  : 'border-border bg-surface text-muted hover:text-foreground',
-                (!gasScheduleDefaults || isRunning) && 'cursor-not-allowed opacity-50'
-              )}
-            >
-              <AdjustmentsHorizontalIcon className="size-4" />
-              Configure
-              {modifiedCount > 0 && (
-                <span className="rounded-full bg-primary px-1.5 py-0.5 text-xs text-white">{modifiedCount}</span>
-              )}
-            </button>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setPresetModalOpen(true)}
+                disabled={!gasScheduleDefaults || isRunning}
+                className={clsx(
+                  'flex items-center gap-1.5 rounded-xs border px-3 py-2 text-sm font-medium transition-colors',
+                  isGlamsterdamApplied
+                    ? 'border-primary/30 bg-primary/10 text-primary'
+                    : 'border-border bg-surface text-muted hover:border-primary/30 hover:bg-primary/10 hover:text-primary',
+                  (!gasScheduleDefaults || isRunning) && 'cursor-not-allowed opacity-50'
+                )}
+                title="Apply Glamsterdam (EIP-8007) gas schedule preset"
+              >
+                <BeakerIcon className="size-4" />
+                Glamsterdam
+              </button>
+              <button
+                type="button"
+                onClick={() => setDrawerOpen(true)}
+                disabled={!gasScheduleDefaults || isRunning}
+                className={clsx(
+                  'flex items-center gap-2 rounded-xs border px-3 py-2 text-sm font-medium transition-colors',
+                  modifiedCount > 0
+                    ? 'border-primary/30 bg-primary/10 text-primary'
+                    : 'border-border bg-surface text-muted hover:text-foreground',
+                  (!gasScheduleDefaults || isRunning) && 'cursor-not-allowed opacity-50'
+                )}
+              >
+                <AdjustmentsHorizontalIcon className="size-4" />
+                Configure
+                {modifiedCount > 0 && (
+                  <span className="rounded-full bg-primary px-1.5 py-0.5 text-xs text-white">{modifiedCount}</span>
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Actions */}
@@ -1169,6 +1224,15 @@ export function SimulatePage(): JSX.Element {
           onChange={handleScheduleChange}
         />
       )}
+
+      {/* Glamsterdam Preset Modal */}
+      <GlamsterdamPresetModal
+        open={presetModalOpen}
+        onClose={() => setPresetModalOpen(false)}
+        onApplyAndSimulate={handlePresetApplyAndSimulate}
+        onCancel={handlePresetCancel}
+        defaults={gasScheduleDefaults ?? null}
+      />
     </Container>
   );
 }

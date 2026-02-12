@@ -293,6 +293,7 @@ export const GAS_PARAMETER_GROUPS: GasParameterGroup[] = [
       { key: 'PC_MODEXP_MIN_GAS', label: 'MODEXP Min Gas', min: 0, max: 2000, step: 10 },
       { key: 'PC_BN254_PAIRING_BASE', label: 'BN254 Pairing Base', min: 0, max: 200000, step: 5000 },
       { key: 'PC_BN254_PAIRING_PER_PAIR', label: 'BN254 Pairing /Pair', min: 0, max: 200000, step: 1000 },
+      { key: 'PC_BLAKE2F_BASE', label: 'BLAKE2F Base', min: 0, max: 1000, step: 10 },
       { key: 'PC_BLAKE2F_PER_ROUND', label: 'BLAKE2F /Round', min: 0, max: 20, step: 1 },
       { key: 'PC_BLS12_PAIRING_CHECK_BASE', label: 'BLS12 Pairing Base', min: 0, max: 200000, step: 5000 },
       { key: 'PC_BLS12_PAIRING_CHECK_PER_PAIR', label: 'BLS12 Pairing /Pair', min: 0, max: 200000, step: 1000 },
@@ -316,6 +317,45 @@ export const GAS_PARAMETER_GROUPS: GasParameterGroup[] = [
     ],
   },
 ];
+
+/**
+ * Glamsterdam (EIP-8007) gas schedule preset.
+ * Applies all gas parameter changes proposed for the Glamsterdam fork.
+ *
+ * EIP-7904: Compute repricing (opcodes + precompiles)
+ * EIP-7976: Calldata floor cost increase
+ * EIP-2780: Transaction base cost reduction
+ * EIP-8038: State access repricing (TBD - using current values as placeholders)
+ */
+export const GLAMSTERDAM_PRESET: Record<string, number> = {
+  // EIP-7904: Compute repricing
+  DIV: 15,
+  SDIV: 20,
+  MOD: 12,
+  MULMOD: 11,
+  KECCAK256: 45,
+  PC_BLAKE2F_BASE: 170,
+  PC_BLAKE2F_PER_ROUND: 2,
+  PC_BLS12_G1ADD: 643,
+  PC_BLS12_G2ADD: 765,
+  PC_BN254_ADD: 314,
+  PC_BN254_PAIRING_PER_PAIR: 34103,
+  PC_KZG_POINT_EVALUATION: 89363,
+
+  // EIP-7976: Calldata floor
+  TX_FLOOR_PER_TOKEN: 15,
+
+  // EIP-2780: TX base cost
+  TX_BASE: 4500,
+
+  // EIP-8038: State access repricing (TBD - current values)
+  SLOAD_COLD: 2100,
+  SLOAD_WARM: 100,
+  SSTORE_RESET: 2900,
+  CALL_COLD: 2600,
+  TX_ACCESS_LIST_ADDR: 2400,
+  TX_ACCESS_LIST_KEY: 1900,
+};
 
 /**
  * Summary of gas usage (original or simulated)
@@ -362,6 +402,8 @@ export interface TxSummary {
   originalErrors: CallError[];
   /** Errors from nested calls in simulated execution */
   simulatedErrors: CallError[];
+  /** Pre-execution error (e.g. "intrinsic gas too low") when execution fails before the EVM runs */
+  error?: string;
 }
 
 /**
