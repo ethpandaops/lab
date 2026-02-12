@@ -1229,7 +1229,7 @@ export function SimulatePage(): JSX.Element {
         onClose={() => setPresetModalOpen(false)}
         onApplyAndSimulate={handlePresetApplyAndSimulate}
         onCancel={handlePresetCancel}
-        defaults={gasScheduleDefaults}
+        defaults={gasScheduleDefaults ?? null}
       />
     </Container>
   );

@@ -17,6 +17,8 @@ interface EipSection {
   parameters: { key: string; label: string }[];
   /** If true, values are placeholders (TBD) and shown with a muted indicator */
   placeholder?: boolean;
+  /** Additional note shown below parameters (e.g. to explain unsimulated parts of the EIP) */
+  note?: string;
 }
 
 /**
@@ -60,10 +62,12 @@ const EIP_SECTIONS: EipSection[] = [
   },
   {
     eip: 'EIP-2780',
-    name: 'Transaction Base Cost',
-    description: 'Reduces the base transaction cost from 21,000 to 4,500 gas, making simple transfers cheaper.',
+    name: 'Transaction Repricing',
+    description:
+      'Reprices transaction costs: reduces the base cost from 21,000 to 4,500, and restructures value transfer and cold account access pricing.',
     url: 'https://eips.ethereum.org/EIPS/eip-2780',
     parameters: [{ key: 'TX_BASE', label: 'TX Base' }],
+    note: 'This EIP also introduces structural changes (new account surcharge, cold account cost splitting by code presence, value transfer repricing) that cannot be simulated as parameter overrides.',
   },
   {
     eip: 'EIP-8038',
@@ -331,6 +335,14 @@ export function GlamsterdamPresetModal({
                 );
               })}
             </div>
+
+            {/* Optional note about unsimulated parts */}
+            {section.note && (
+              <div className="mt-2.5 flex items-start gap-2 rounded-xs bg-amber-500/5 px-3 py-2">
+                <ExclamationTriangleIcon className="mt-0.5 size-3.5 shrink-0 text-amber-500" />
+                <p className="text-[11px]/4 text-muted">{section.note}</p>
+              </div>
+            )}
           </div>
         ))}
 
