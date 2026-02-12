@@ -15,6 +15,7 @@ import {
   ExclamationTriangleIcon,
   BoltIcon,
   CubeIcon,
+  InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
@@ -30,6 +31,8 @@ import { Stats } from '@/components/DataDisplay/Stats';
 import type { Stat } from '@/components/DataDisplay/Stats/Stats.types';
 import { Alert } from '@/components/Feedback/Alert';
 import { Input } from '@/components/Forms/Input';
+import { Checkbox } from '@/components/Forms/Checkbox';
+import { Dialog } from '@/components/Overlays/Dialog';
 import { Button } from '@/components/Elements/Button';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -224,6 +227,10 @@ export function SimulatePage(): JSX.Element {
 
   // Preset modal state
   const [presetModalOpen, setPresetModalOpen] = useState(false);
+
+  // Gas limit override state
+  const [useMaxGasLimit, setUseMaxGasLimit] = useState(false);
+  const [gasLimitInfoOpen, setGasLimitInfoOpen] = useState(false);
 
   // Selection state
   const [selectedBlockIndex, setSelectedBlockIndex] = useState<number | null>(null);
@@ -494,6 +501,7 @@ export function SimulatePage(): JSX.Element {
         body: JSON.stringify({
           blockNumber,
           gasSchedule: { overrides: gasSchedule },
+          ...(useMaxGasLimit && { maxGasLimit: true }),
         }),
       });
 
@@ -506,7 +514,7 @@ export function SimulatePage(): JSX.Element {
       const apiResult: ApiBlockSimulationResponse = await response.json();
       return transformApiResponse(apiResult);
     },
-    [gasSchedule, currentNetwork]
+    [gasSchedule, currentNetwork, useMaxGasLimit]
   );
 
   // Run the range simulation
@@ -778,6 +786,26 @@ export function SimulatePage(): JSX.Element {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Advanced Options */}
+        <div className="mt-4 flex items-center gap-2 border-t border-border pt-4">
+          <Checkbox checked={useMaxGasLimit} onChange={setUseMaxGasLimit} disabled={isRunning} />
+          <button
+            type="button"
+            onClick={() => !isRunning && setUseMaxGasLimit(!useMaxGasLimit)}
+            disabled={isRunning}
+            className={clsx('text-left text-sm', useMaxGasLimit ? 'text-foreground' : 'text-muted')}
+          >
+            Use max gas limit for simulated execution
+          </button>
+          <button
+            type="button"
+            onClick={() => setGasLimitInfoOpen(true)}
+            className="text-muted transition-colors hover:text-foreground"
+          >
+            <InformationCircleIcon className="size-4" />
+          </button>
         </div>
 
         {/* Validation / Loading / Error messages */}
@@ -1193,7 +1221,18 @@ export function SimulatePage(): JSX.Element {
 
           {/* Reuse existing BlockSimulationResults */}
           <div className="p-4">
-            <BlockSimulationResultsV2 result={selectedResult} modifiedParams={modifiedParamNames} />
+            <BlockSimulationResultsV2
+              result={selectedResult}
+              modifiedParams={modifiedParamNames}
+              onEnableMaxGasLimit={
+                useMaxGasLimit
+                  ? undefined
+                  : () => {
+                      setUseMaxGasLimit(true);
+                      setGasLimitInfoOpen(true);
+                    }
+              }
+            />
           </div>
         </Card>
       )}
@@ -1233,6 +1272,27 @@ export function SimulatePage(): JSX.Element {
         onCancel={handlePresetCancel}
         defaults={gasScheduleDefaults ?? null}
       />
+
+      {/* Gas Limit Info Dialog */}
+      <Dialog
+        open={gasLimitInfoOpen}
+        onClose={() => setGasLimitInfoOpen(false)}
+        title="Simulated Gas Limit Override"
+        size="sm"
+      >
+        <div className="space-y-3 text-sm text-muted">
+          <p>
+            When gas prices change, transactions that succeeded under old pricing may run out of gas under new pricing —
+            not because the transaction logic is wrong, but because the original gas limit was set for the old costs.
+          </p>
+          <p>
+            With this option enabled, the simulated execution lifts the transaction gas limit so it is no longer a
+            constraining factor. This prevents artificial out-of-gas failures and shows the true gas cost under the new
+            pricing.
+          </p>
+          <p>The original execution always uses the real transaction gas limit, so you can still compare the two.</p>
+        </div>
+      </Dialog>
     </Container>
   );
 }

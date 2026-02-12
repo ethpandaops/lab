@@ -31,6 +31,8 @@ export interface BlockSimulationResultsV2Props {
   result: BlockSimulationResult;
   /** Names of gas params the user explicitly modified (e.g. ['SSTORE_SET', 'SLOAD_COLD']) */
   modifiedParams?: string[];
+  /** Callback to enable max gas limit and open the info modal. When provided, a hint is shown on pre-execution errors. */
+  onEnableMaxGasLimit?: () => void;
   className?: string;
 }
 
@@ -598,9 +600,11 @@ type TxSort = 'delta' | 'index' | 'gas';
 function TransactionImpactView({
   transactions,
   blockNumber,
+  onEnableMaxGasLimit,
 }: {
   transactions: TxSummary[];
   blockNumber: number;
+  onEnableMaxGasLimit?: () => void;
 }): JSX.Element {
   const [filter, setFilter] = useState<TxFilter>('all');
   const [sortBy, setSortBy] = useState<TxSort>('delta');
@@ -873,7 +877,27 @@ function TransactionImpactView({
 
                   {/* Pre-execution error (e.g. intrinsic gas too low) */}
                   {hasPreExecError && (
-                    <Alert variant="error" title="Pre-execution error" description={tx.error} className="mt-3" />
+                    <Alert
+                      variant="error"
+                      title="Pre-execution error"
+                      description={
+                        onEnableMaxGasLimit ? (
+                          <div>
+                            <div>{tx.error}</div>
+                            <button
+                              type="button"
+                              onClick={onEnableMaxGasLimit}
+                              className="mt-1 underline hover:no-underline"
+                            >
+                              Try with max gas limit enabled?
+                            </button>
+                          </div>
+                        ) : (
+                          tx.error
+                        )
+                      }
+                      className="mt-3"
+                    />
                   )}
 
                   {/* Error cards (if any) */}
@@ -957,6 +981,7 @@ function TransactionImpactView({
 export function BlockSimulationResultsV2({
   result,
   modifiedParams,
+  onEnableMaxGasLimit,
   className,
 }: BlockSimulationResultsV2Props): JSX.Element {
   // Overall gas delta
@@ -1105,7 +1130,11 @@ export function BlockSimulationResultsV2({
           {/* TRANSACTIONS TAB */}
           {/* ============================================================ */}
           <TabPanel>
-            <TransactionImpactView transactions={result.transactions} blockNumber={result.blockNumber} />
+            <TransactionImpactView
+              transactions={result.transactions}
+              blockNumber={result.blockNumber}
+              onEnableMaxGasLimit={onEnableMaxGasLimit}
+            />
           </TabPanel>
         </TabPanels>
       </TabGroup>
