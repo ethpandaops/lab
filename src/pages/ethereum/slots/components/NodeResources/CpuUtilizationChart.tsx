@@ -1,22 +1,13 @@
 import { type JSX, useMemo } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
-import type { SeriesData, MarkLineConfig } from '@/components/Charts/MultiLine/MultiLine.types';
-import { getDataVizColors } from '@/utils';
+import type { SeriesData, MarkAreaConfig, MarkLineConfig } from '@/components/Charts/MultiLine/MultiLine.types';
+import { getDataVizColors, getClientLayer } from '@/utils';
+import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { SelectMenu } from '@/components/Forms/SelectMenu';
 import type { FctNodeCpuUtilization } from '@/api/types.gen';
-import type { CpuMetric } from './NodeResourcesPanel';
-import type { AnnotationType, AnnotationEvent } from './types';
-
-const CL_CLIENTS = new Set(['lighthouse', 'lodestar', 'nimbus', 'prysm', 'teku', 'grandine']);
-const EL_CLIENTS = new Set(['besu', 'erigon', 'geth', 'nethermind', 'reth']);
-
-function getClientLayer(clientType: string): 'CL' | 'EL' | null {
-  const lower = clientType.toLowerCase();
-  if (CL_CLIENTS.has(lower)) return 'CL';
-  if (EL_CLIENTS.has(lower)) return 'EL';
-  return null;
-}
+import { ANNOTATION_COLORS, type CpuMetric, type AnnotationType, type AnnotationEvent } from './types';
 
 function usToSeconds(us: number): number {
   return us / 1_000_000;
@@ -37,19 +28,25 @@ const METRIC_LABELS: Record<CpuMetric, string> = {
   max: 'Max',
 };
 
-const ANNOTATION_COLORS: Record<AnnotationType, string> = {
-  block: '#f59e0b',
-  head: '#8b5cf6',
-  execution: '#ef4444',
-  data_columns: '#10b981',
-};
+const METRIC_OPTIONS = [
+  { value: 'mean' as CpuMetric, label: 'Mean' },
+  { value: 'min' as CpuMetric, label: 'Min' },
+  { value: 'max' as CpuMetric, label: 'Max' },
+];
 
-const ANNOTATION_LABELS: Record<AnnotationType, string> = {
-  block: 'Block',
-  head: 'Head',
-  execution: 'Exec',
-  data_columns: 'DA',
-};
+/** Minimum width in seconds for point-event areas so they're visible */
+const MIN_AREA_WIDTH_SEC = 0.08;
+
+/** Match a CPU node name to propagation node_id (fuzzy matching) */
+function nodeMatches(cpuNodeName: string, propNodeId: string): boolean {
+  const short = cpuNodeName.split('/').pop() ?? cpuNodeName;
+  return propNodeId === short || propNodeId === cpuNodeName || short.includes(propNodeId) || propNodeId.includes(short);
+}
+
+function percentile(sorted: number[], p: number): number {
+  const idx = Math.floor(sorted.length * p);
+  return sorted[Math.min(idx, sorted.length - 1)];
+}
 
 interface BucketAgg {
   meanVals: number[];
@@ -62,6 +59,7 @@ interface CpuUtilizationChartProps {
   data: FctNodeCpuUtilization[];
   selectedNode: string | null;
   metric: CpuMetric;
+  onMetricChange: (metric: CpuMetric) => void;
   slot: number;
   annotations: AnnotationEvent[];
   enabledAnnotations: Set<AnnotationType>;
@@ -75,15 +73,16 @@ export function CpuUtilizationChart({
   data,
   selectedNode,
   metric,
+  onMetricChange,
   slot,
   annotations,
   enabledAnnotations,
 }: CpuUtilizationChartProps): JSX.Element {
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
-  const { series, markLines, clClient, elClient } = useMemo(() => {
+  const { series, clClient, elClient } = useMemo(() => {
     if (data.length === 0) {
-      return { series: [] as SeriesData[], markLines: [] as MarkLineConfig[], clClient: '', elClient: '' };
+      return { series: [] as SeriesData[], clClient: '', elClient: '' };
     }
 
     const slotStartUs = Math.min(...data.map(d => d.wallclock_slot_start_date_time ?? 0).filter(v => v > 0));
@@ -144,7 +143,6 @@ export function CpuUtilizationChart({
       const clBuckets = bucketData(clData);
       const elBuckets = bucketData(elData);
 
-      // CL mean line with gradient fill
       chartSeries.push({
         name: clLabel,
         data: toPoints(clBuckets, b => b.meanVals),
@@ -154,7 +152,6 @@ export function CpuUtilizationChart({
         areaOpacity: 0.08,
       });
 
-      // EL mean line with gradient fill
       chartSeries.push({
         name: elLabel,
         data: toPoints(elBuckets, b => b.meanVals),
@@ -164,7 +161,6 @@ export function CpuUtilizationChart({
         areaOpacity: 0.08,
       });
 
-      // Peak core (hidden by default)
       chartSeries.push({
         name: `${clLabel} peak core`,
         data: toPoints(clBuckets, b => b.coreVals),
@@ -209,51 +205,118 @@ export function CpuUtilizationChart({
       });
     }
 
-    // Build annotation markLines
-    const chartMarkLines: MarkLineConfig[] = [];
+    return { series: chartSeries, clClient: resolvedClClient, elClient: resolvedElClient };
+  }, [data, selectedNode, metric, CHART_CATEGORICAL_COLORS]);
 
-    for (const anno of annotations) {
-      if (!enabledAnnotations.has(anno.type)) continue;
+  // Convert annotations to markAreas (chart handles node matching + aggregation)
+  const markAreas = useMemo((): MarkAreaConfig[] => {
+    const areas: MarkAreaConfig[] = [];
 
-      const timeSec = anno.timeMs / 1000;
-      if (timeSec < 0 || timeSec > 12) continue;
+    if (selectedNode) {
+      // Single node: find matching events and render exact positions
+      for (const anno of annotations) {
+        if (!enabledAnnotations.has(anno.type)) continue;
+        if (!anno.nodeName || !nodeMatches(selectedNode, anno.nodeName)) continue;
 
-      const color = ANNOTATION_COLORS[anno.type];
-      const prefix = ANNOTATION_LABELS[anno.type];
-      const label = anno.label ? `${prefix}: ${anno.label}` : prefix;
+        const startSec = anno.timeMs / 1000;
+        if (startSec < 0 || startSec > 12) continue;
+        const color = ANNOTATION_COLORS[anno.type];
+        const hasRange = anno.endMs != null && Math.abs(anno.endMs - anno.timeMs) > 10;
 
-      if (anno.endMs != null) {
-        // Range annotation: show start and end markLines
-        const endSec = anno.endMs / 1000;
-        if (endSec >= 0 && endSec <= 12) {
-          chartMarkLines.push({
-            xValue: timeSec,
-            label: `${label} start`,
+        if (hasRange) {
+          const endSec = Math.min(anno.endMs! / 1000, 12);
+          areas.push({ xStart: startSec, xEnd: endSec, color, opacity: 0.12 });
+        } else {
+          areas.push({
+            xStart: startSec - MIN_AREA_WIDTH_SEC / 2,
+            xEnd: startSec + MIN_AREA_WIDTH_SEC / 2,
             color,
-            lineStyle: 'dashed',
-            lineWidth: 1,
-          });
-          chartMarkLines.push({
-            xValue: endSec,
-            label: `${label} end`,
-            color,
-            lineStyle: 'dashed',
-            lineWidth: 1,
+            opacity: 0.3,
           });
         }
-      } else {
-        chartMarkLines.push({
-          xValue: timeSec,
-          label,
-          color,
-          lineStyle: 'dashed',
-          lineWidth: 1,
-        });
+      }
+    } else {
+      // Aggregate: compute min–p95 range per annotation type
+      const byType = new Map<AnnotationType, AnnotationEvent[]>();
+      for (const anno of annotations) {
+        if (!enabledAnnotations.has(anno.type)) continue;
+        if (!byType.has(anno.type)) byType.set(anno.type, []);
+        byType.get(anno.type)!.push(anno);
+      }
+
+      for (const [type, events] of byType) {
+        const color = ANNOTATION_COLORS[type];
+        const hasRanges = events.some(e => e.endMs != null);
+
+        if (hasRanges) {
+          // Range events (execution, data_columns): min of starts → p95 of ends
+          const starts = events.map(e => e.timeMs).sort((a, b) => a - b);
+          const ends = events.map(e => e.endMs ?? e.timeMs).sort((a, b) => a - b);
+          const startSec = starts[0] / 1000;
+          const endSec = percentile(ends, 0.95) / 1000;
+          if (startSec >= 0 && startSec <= 12) {
+            areas.push({
+              xStart: Math.max(0, startSec),
+              xEnd: Math.min(12, endSec),
+              color,
+              opacity: 0.1,
+            });
+          }
+        } else {
+          // Point events (block, head): min–p95 spread as area
+          const times = events.map(e => e.timeMs).sort((a, b) => a - b);
+          const minSec = times[0] / 1000;
+          const p95Sec = percentile(times, 0.95) / 1000;
+          if (minSec >= 0 && p95Sec <= 12) {
+            const width = p95Sec - minSec;
+            if (width < MIN_AREA_WIDTH_SEC) {
+              // Very tight spread: render as thin band at median
+              const medSec = percentile(times, 0.5) / 1000;
+              areas.push({
+                xStart: medSec - MIN_AREA_WIDTH_SEC / 2,
+                xEnd: medSec + MIN_AREA_WIDTH_SEC / 2,
+                color,
+                opacity: 0.25,
+              });
+            } else {
+              areas.push({ xStart: minSec, xEnd: p95Sec, color, opacity: 0.1 });
+            }
+          }
+        }
       }
     }
 
-    return { series: chartSeries, markLines: chartMarkLines, clClient: resolvedClClient, elClient: resolvedElClient };
-  }, [data, selectedNode, metric, CHART_CATEGORICAL_COLORS, annotations, enabledAnnotations]);
+    return areas;
+  }, [annotations, enabledAnnotations, selectedNode]);
+
+  // Slot phase boundary markLines (e.g. attestation deadline at 4s, aggregation at 8s)
+  // Colors match the live slot view: cyan (block), green (attestation), amber (aggregation)
+  const PHASE_BOUNDARY_COLORS = ['#22d3ee', '#22c55e', '#f59e0b'];
+
+  const markLines = useMemo((): MarkLineConfig[] => {
+    if (!enabledAnnotations.has('slot_phases')) return [];
+
+    const lines: MarkLineConfig[] = [];
+    let cumulativeSec = 0;
+
+    for (let i = 0; i < DEFAULT_BEACON_SLOT_PHASES.length - 1; i++) {
+      cumulativeSec += DEFAULT_BEACON_SLOT_PHASES[i].duration / 1000;
+      const nextPhase = DEFAULT_BEACON_SLOT_PHASES[i + 1];
+      const color = PHASE_BOUNDARY_COLORS[i + 1] ?? '#6b7280';
+
+      lines.push({
+        xValue: cumulativeSec,
+        label: nextPhase.label,
+        labelPosition: 'insideEndTop',
+        color,
+        lineStyle: 'dotted',
+        lineWidth: 1,
+        distance: [0, -8],
+      });
+    }
+
+    return lines;
+  }, [enabledAnnotations]);
 
   const nodeCount = new Set(data.map(d => d.meta_client_name)).size;
   const shortNodeName = selectedNode?.split('/').pop() ?? '';
@@ -262,13 +325,16 @@ export function CpuUtilizationChart({
     ? `Slot ${slot} · ${shortNodeName} · % of all CPU cores`
     : `Slot ${slot} · ${METRIC_LABELS[metric]} across ${nodeCount} nodes · % of all CPU cores`;
 
-  const headerActions =
-    selectedNode && (clClient || elClient) ? (
+  const headerActions = selectedNode ? (
+    clClient || elClient ? (
       <div className="flex items-center gap-1">
         {clClient && <ClientLogo client={clClient} size={24} />}
         {elClient && <ClientLogo client={elClient} size={24} />}
       </div>
-    ) : undefined;
+    ) : undefined
+  ) : (
+    <SelectMenu value={metric} onChange={onMetricChange} options={METRIC_OPTIONS} expandToFit />
+  );
 
   if (data.length === 0) {
     return (
@@ -305,6 +371,7 @@ export function CpuUtilizationChart({
           showLegend
           legendPosition="bottom"
           markLines={markLines}
+          markAreas={markAreas}
           syncGroup="slot-time"
           tooltipFormatter={(params: unknown) => {
             const items = Array.isArray(params) ? params : [params];

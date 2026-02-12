@@ -1,6 +1,7 @@
 export { MultiLineChart } from './MultiLine';
 export type {
   EnrichedDataPoint,
+  MarkAreaConfig,
   MarkLineConfig,
   MultiLineChartProps,
   SeriesData,

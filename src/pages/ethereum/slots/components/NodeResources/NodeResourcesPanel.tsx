@@ -4,9 +4,9 @@ import { useQuery } from '@tanstack/react-query';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { Card } from '@/components/Layout/Card';
 import { Checkbox } from '@/components/Forms/Checkbox';
-import { SelectMenu } from '@/components/Forms/SelectMenu';
 import { ReferenceNodesInfoDialog } from '@/pages/ethereum/execution/timings/components/ReferenceNodesInfoDialog';
 import { extractClusterFromNodeName } from '@/constants/eip7870';
+import { CONSENSUS_CLIENTS, EXECUTION_CLIENTS_SET } from '@/utils/ethereum';
 import { intEngineNewPayloadServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type {
   FctBlockFirstSeenByNode,
@@ -16,30 +16,21 @@ import type {
 import { useSlotNodeResources } from '../../hooks/useSlotNodeResources';
 import { NodeSelector, type NodeClientInfo } from './NodeSelector';
 import { CpuUtilizationChart } from './CpuUtilizationChart';
-import { ANNOTATION_OPTIONS, type AnnotationType, type AnnotationEvent } from './types';
+import {
+  ANNOTATION_OPTIONS,
+  ANNOTATION_COLORS,
+  type CpuMetric,
+  type AnnotationType,
+  type AnnotationEvent,
+} from './types';
 
-export type CpuMetric = 'mean' | 'min' | 'max';
-
-const CL_CLIENTS = new Set(['lighthouse', 'lodestar', 'nimbus', 'prysm', 'teku', 'grandine']);
-const EL_CLIENTS = new Set(['besu', 'erigon', 'geth', 'nethermind', 'reth']);
+export type { CpuMetric } from './types';
 
 interface NodeResourcesPanelProps {
   slot: number;
   blockPropagation: FctBlockFirstSeenByNode[];
   headPropagation: FctHeadFirstSeenByNode[];
   dataColumnPropagation: FctBlockDataColumnSidecarFirstSeenByNode[];
-}
-
-const METRIC_OPTIONS = [
-  { value: 'mean' as CpuMetric, label: 'Mean' },
-  { value: 'min' as CpuMetric, label: 'Min' },
-  { value: 'max' as CpuMetric, label: 'Max' },
-];
-
-/** Match a CPU node name to propagation node_id (fuzzy matching) */
-function nodeMatches(cpuNodeName: string, propNodeId: string): boolean {
-  const short = cpuNodeName.split('/').pop() ?? cpuNodeName;
-  return propNodeId === short || propNodeId === cpuNodeName || short.includes(propNodeId) || propNodeId.includes(short);
 }
 
 export function NodeResourcesPanel({
@@ -53,7 +44,7 @@ export function NodeResourcesPanel({
   const navigate = useNavigate();
   const [showRefNodeInfo, setShowRefNodeInfo] = useState(false);
   const [enabledAnnotations, setEnabledAnnotations] = useState<Set<AnnotationType>>(
-    () => new Set(['block', 'head', 'execution', 'data_columns'])
+    () => new Set<AnnotationType>(['slot_phases', 'block', 'head', 'execution', 'data_columns'])
   );
 
   // Always fetch execution timing data so the toggle can show availability
@@ -78,6 +69,7 @@ export function NodeResourcesPanel({
         params: { slot: String(slot) },
         search: prev => ({ ...prev, refNodes: value || undefined }),
         replace: true,
+        resetScroll: false,
       });
     },
     [navigate, slot]
@@ -90,6 +82,7 @@ export function NodeResourcesPanel({
         params: { slot: String(slot) },
         search: prev => ({ ...prev, node: value ?? undefined }),
         replace: true,
+        resetScroll: false,
       });
     },
     [navigate, slot]
@@ -102,6 +95,7 @@ export function NodeResourcesPanel({
         params: { slot: String(slot) },
         search: prev => ({ ...prev, metric: value === 'mean' ? undefined : value }),
         replace: true,
+        resetScroll: false,
       });
     },
     [navigate, slot]
@@ -143,9 +137,9 @@ export function NodeResourcesPanel({
       if (!name) continue;
 
       const existing = info.get(name) ?? { cl: '', el: '' };
-      if (CL_CLIENTS.has(clientType) && !existing.cl) {
+      if (CONSENSUS_CLIENTS.has(clientType) && !existing.cl) {
         existing.cl = clientType;
-      } else if (EL_CLIENTS.has(clientType) && !existing.el) {
+      } else if (EXECUTION_CLIENTS_SET.has(clientType) && !existing.el) {
         existing.el = clientType;
       }
       info.set(name, existing);
@@ -156,105 +150,66 @@ export function NodeResourcesPanel({
   // Reset selected node if it's no longer in the filtered list
   const effectiveSelectedNode = selectedNode && nodeNames.includes(selectedNode) ? selectedNode : null;
 
-  // Build annotations from propagation data
+  // Build raw per-node annotation events (chart handles aggregation)
   const annotations = useMemo((): AnnotationEvent[] => {
     const events: AnnotationEvent[] = [];
 
-    if (effectiveSelectedNode) {
-      // Single node: show exact events for this node
-      for (const p of blockPropagation) {
-        if (p.node_id && nodeMatches(effectiveSelectedNode, p.node_id)) {
-          events.push({ type: 'block', timeMs: p.seen_slot_start_diff ?? 0, nodeName: effectiveSelectedNode });
-          break;
-        }
+    for (const p of blockPropagation) {
+      if (p.node_id) {
+        events.push({ type: 'block', timeMs: p.seen_slot_start_diff ?? 0, nodeName: p.node_id });
       }
+    }
 
-      for (const p of headPropagation) {
-        if (p.node_id && nodeMatches(effectiveSelectedNode, p.node_id)) {
-          events.push({ type: 'head', timeMs: p.seen_slot_start_diff ?? 0, nodeName: effectiveSelectedNode });
-          break;
-        }
+    for (const p of headPropagation) {
+      if (p.node_id) {
+        events.push({ type: 'head', timeMs: p.seen_slot_start_diff ?? 0, nodeName: p.node_id });
       }
+    }
 
-      // Execution timing for this node
-      const execItems = executionData?.int_engine_new_payload ?? [];
-      for (const e of execItems) {
-        if (e.meta_client_name && nodeMatches(effectiveSelectedNode, e.meta_client_name)) {
-          const slotStartMs = (e.slot_start_date_time ?? 0) * 1000;
-          const requestedMs = (e.requested_date_time ?? 0) / 1000;
-          const startMs = requestedMs - slotStartMs;
-          const durationMs = e.duration_ms ?? 0;
-          events.push({
-            type: 'execution',
-            timeMs: startMs,
-            endMs: startMs + durationMs,
-            label: `${durationMs.toFixed(0)}ms`,
-            nodeName: effectiveSelectedNode,
-          });
-          break;
-        }
-      }
-
-      // Data columns: range from first to last column seen
-      const nodeColumns = dataColumnPropagation.filter(p => p.node_id && nodeMatches(effectiveSelectedNode, p.node_id));
-      if (nodeColumns.length > 0) {
-        const times = nodeColumns.map(c => c.seen_slot_start_diff ?? 0);
-        const minTime = Math.min(...times);
-        const maxTime = Math.max(...times);
+    const execItems = executionData?.int_engine_new_payload ?? [];
+    for (const e of execItems) {
+      if (e.meta_client_name) {
+        const slotStartMs = (e.slot_start_date_time ?? 0) * 1000;
+        const requestedMs = (e.requested_date_time ?? 0) / 1000;
+        const startMs = requestedMs - slotStartMs;
+        const durationMs = e.duration_ms ?? 0;
         events.push({
-          type: 'data_columns',
-          timeMs: minTime,
-          endMs: minTime !== maxTime ? maxTime : undefined,
-          label: `${nodeColumns.length} cols`,
-          nodeName: effectiveSelectedNode,
-        });
-      }
-    } else {
-      // Aggregate: show p50 for block/head, nothing for execution/data_columns
-      const blockTimes = blockPropagation.map(p => p.seen_slot_start_diff ?? 0).sort((a, b) => a - b);
-      if (blockTimes.length > 0) {
-        events.push({ type: 'block', timeMs: blockTimes[Math.floor(blockTimes.length * 0.5)], label: 'p50' });
-      }
-
-      const headTimes = headPropagation.map(p => p.seen_slot_start_diff ?? 0).sort((a, b) => a - b);
-      if (headTimes.length > 0) {
-        events.push({ type: 'head', timeMs: headTimes[Math.floor(headTimes.length * 0.5)], label: 'p50' });
-      }
-
-      // Data columns aggregate: p50 of first-seen, p50 of last-seen
-      if (dataColumnPropagation.length > 0) {
-        const byNode = new Map<string, number[]>();
-        for (const c of dataColumnPropagation) {
-          const nid = c.node_id ?? '';
-          if (!byNode.has(nid)) byNode.set(nid, []);
-          byNode.get(nid)!.push(c.seen_slot_start_diff ?? 0);
-        }
-        const firstTimes: number[] = [];
-        const lastTimes: number[] = [];
-        for (const times of byNode.values()) {
-          firstTimes.push(Math.min(...times));
-          lastTimes.push(Math.max(...times));
-        }
-        firstTimes.sort((a, b) => a - b);
-        lastTimes.sort((a, b) => a - b);
-        const firstP50 = firstTimes[Math.floor(firstTimes.length * 0.5)];
-        const lastP50 = lastTimes[Math.floor(lastTimes.length * 0.5)];
-        events.push({
-          type: 'data_columns',
-          timeMs: firstP50,
-          endMs: firstP50 !== lastP50 ? lastP50 : undefined,
-          label: 'p50',
+          type: 'execution',
+          timeMs: startMs,
+          endMs: startMs + durationMs,
+          label: `${durationMs.toFixed(0)}ms`,
+          nodeName: e.meta_client_name,
         });
       }
     }
 
-    return events;
-  }, [effectiveSelectedNode, blockPropagation, headPropagation, dataColumnPropagation, executionData]);
+    // Data columns: group by node, produce one range event per node
+    const colsByNode = new Map<string, number[]>();
+    for (const c of dataColumnPropagation) {
+      const nid = c.node_id ?? '';
+      if (!nid) continue;
+      if (!colsByNode.has(nid)) colsByNode.set(nid, []);
+      colsByNode.get(nid)!.push(c.seen_slot_start_diff ?? 0);
+    }
+    for (const [nid, times] of colsByNode) {
+      const minTime = Math.min(...times);
+      const maxTime = Math.max(...times);
+      events.push({
+        type: 'data_columns',
+        timeMs: minTime,
+        endMs: minTime !== maxTime ? maxTime : undefined,
+        label: `${times.length} cols`,
+        nodeName: nid,
+      });
+    }
 
-  // Which annotation types have data
+    return events;
+  }, [blockPropagation, headPropagation, dataColumnPropagation, executionData]);
+
+  // Which annotation types have data (slot_phases is always available)
   const availableAnnotations = useMemo(() => {
     const types = new Set(annotations.map(a => a.type));
-    return ANNOTATION_OPTIONS.filter(o => types.has(o.value));
+    return ANNOTATION_OPTIONS.filter(o => o.value === 'slot_phases' || types.has(o.value));
   }, [annotations]);
 
   if (isLoading) {
@@ -293,13 +248,24 @@ export function NodeResourcesPanel({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Controls */}
       <Card>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-lg font-semibold text-foreground">Node Resources</h3>
-            <p className="text-sm text-muted">CPU utilization across {nodeNames.length} nodes during this slot</p>
+            <p className="text-sm text-muted">
+              Data from{' '}
+              <a
+                href="https://github.com/ethpandaops/observoor"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-foreground"
+              >
+                Observoor
+              </a>{' '}
+              across {nodeNames.length} nodes
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <NodeSelector
@@ -308,16 +274,13 @@ export function NodeResourcesPanel({
               onChange={setSelectedNode}
               nodeClientInfo={nodeClientInfo}
             />
-            {!effectiveSelectedNode && (
-              <SelectMenu value={metric} onChange={setMetric} options={METRIC_OPTIONS} expandToFit />
-            )}
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setReferenceNodesOnly(!referenceNodesOnly)}
                 className="flex cursor-pointer items-center gap-2"
               >
-                <Checkbox checked={referenceNodesOnly} onChange={setReferenceNodesOnly} />
+                <Checkbox checked={referenceNodesOnly} className="pointer-events-none" />
                 <span className="text-sm text-foreground">7870 only</span>
               </button>
               <button
@@ -335,7 +298,7 @@ export function NodeResourcesPanel({
         {/* Annotation toggles */}
         {availableAnnotations.length > 0 && (
           <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-border pt-3">
-            <span className="text-xs text-muted">Annotations:</span>
+            <span className="text-xs text-muted">Annotations{!effectiveSelectedNode && ' (min–p95)'}:</span>
             {availableAnnotations.map(opt => (
               <button
                 key={opt.value}
@@ -343,7 +306,11 @@ export function NodeResourcesPanel({
                 onClick={() => toggleAnnotation(opt.value)}
                 className="flex cursor-pointer items-center gap-1.5"
               >
-                <Checkbox checked={enabledAnnotations.has(opt.value)} onChange={() => toggleAnnotation(opt.value)} />
+                <Checkbox checked={enabledAnnotations.has(opt.value)} className="pointer-events-none" />
+                <span
+                  className="inline-block size-2 rounded-full"
+                  style={{ backgroundColor: ANNOTATION_COLORS[opt.value] }}
+                />
                 <span className="text-xs text-foreground">{opt.label}</span>
               </button>
             ))}
@@ -356,6 +323,7 @@ export function NodeResourcesPanel({
         data={filteredData}
         selectedNode={effectiveSelectedNode}
         metric={metric}
+        onMetricChange={setMetric}
         slot={slot}
         annotations={annotations}
         enabledAnnotations={enabledAnnotations}
