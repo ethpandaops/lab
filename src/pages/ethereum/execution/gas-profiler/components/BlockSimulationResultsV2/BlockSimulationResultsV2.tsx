@@ -20,7 +20,9 @@ import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
 import { TenderlyIcon } from '@/components/Ethereum/TenderlyIcon';
 import { PhalconIcon } from '@/components/Ethereum/PhalconIcon';
+import { useNetwork } from '@/hooks/useNetwork';
 import { getOpcodeCategory, CATEGORY_COLORS } from '../../utils/opcodeUtils';
+import { getEtherscanBaseUrl, isMainnet } from '../../utils/explorerLinks';
 import type { BlockSimulationResult, TxSummary, OpcodeSummary, CallError } from '../../SimulatePage.types';
 
 // ============================================================================
@@ -606,6 +608,7 @@ function TransactionImpactView({
   blockNumber: number;
   onEnableMaxGasLimit?: () => void;
 }): JSX.Element {
+  const { currentNetwork } = useNetwork();
   const [filter, setFilter] = useState<TxFilter>('all');
   const [sortBy, setSortBy] = useState<TxSort>('delta');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
@@ -920,7 +923,7 @@ function TransactionImpactView({
                     </Link>
                     <div className="ml-auto flex items-center gap-2">
                       <a
-                        href={`https://etherscan.io/tx/${tx.hash}`}
+                        href={`${getEtherscanBaseUrl(currentNetwork?.name)}/tx/${tx.hash}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
@@ -928,24 +931,28 @@ function TransactionImpactView({
                       >
                         <EtherscanIcon className="size-4" />
                       </a>
-                      <a
-                        href={`https://dashboard.tenderly.co/tx/1/${tx.hash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
-                        title="View tx on Tenderly"
-                      >
-                        <TenderlyIcon className="size-4" />
-                      </a>
-                      <a
-                        href={`https://phalcon.blocksec.com/explorer/tx/eth/${tx.hash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
-                        title="View tx on Phalcon"
-                      >
-                        <PhalconIcon className="size-4" />
-                      </a>
+                      {isMainnet(currentNetwork?.name) && (
+                        <>
+                          <a
+                            href={`https://dashboard.tenderly.co/tx/1/${tx.hash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
+                            title="View tx on Tenderly"
+                          >
+                            <TenderlyIcon className="size-4" />
+                          </a>
+                          <a
+                            href={`https://phalcon.blocksec.com/explorer/tx/eth/${tx.hash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
+                            title="View tx on Phalcon"
+                          >
+                            <PhalconIcon className="size-4" />
+                          </a>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -984,6 +991,8 @@ export function BlockSimulationResultsV2({
   onEnableMaxGasLimit,
   className,
 }: BlockSimulationResultsV2Props): JSX.Element {
+  const { currentNetwork } = useNetwork();
+
   // Overall gas delta
   const overallDelta = useMemo(() => {
     if (result.original.gasUsed === 0) return 0;
@@ -1080,7 +1089,7 @@ export function BlockSimulationResultsV2({
           </ScrollableTabs>
           <div className="flex items-center gap-2 pb-2">
             <a
-              href={`https://etherscan.io/block/${result.blockNumber}`}
+              href={`${getEtherscanBaseUrl(currentNetwork?.name)}/block/${result.blockNumber}`}
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
@@ -1088,15 +1097,17 @@ export function BlockSimulationResultsV2({
             >
               <EtherscanIcon className="size-4" />
             </a>
-            <a
-              href={`https://dashboard.tenderly.co/block/1/${result.blockNumber}/txs`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
-              title="View block on Tenderly"
-            >
-              <TenderlyIcon className="size-4" />
-            </a>
+            {isMainnet(currentNetwork?.name) && (
+              <a
+                href={`https://dashboard.tenderly.co/block/1/${result.blockNumber}/txs`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
+                title="View block on Tenderly"
+              >
+                <TenderlyIcon className="size-4" />
+              </a>
+            )}
           </div>
         </div>
 

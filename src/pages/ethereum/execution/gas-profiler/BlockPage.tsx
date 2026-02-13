@@ -43,7 +43,7 @@ import {
 } from './components';
 import type { ContractInteractionItem, TopGasItem } from './components';
 import { useNetwork } from '@/hooks/useNetwork';
-import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory } from './utils';
+import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory, getEtherscanBaseUrl, isMainnet } from './utils';
 import type { GasProfilerBlockSearch } from './IndexPage.types';
 
 /**
@@ -943,7 +943,7 @@ export function BlockPage(): JSX.Element {
         <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-start">
           <div className="flex items-center gap-2">
             <a
-              href={`https://etherscan.io/block/${blockNumber}`}
+              href={`${getEtherscanBaseUrl(currentNetwork?.name)}/block/${blockNumber}`}
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
@@ -951,15 +951,17 @@ export function BlockPage(): JSX.Element {
             >
               <EtherscanIcon className="size-4" />
             </a>
-            <a
-              href={`https://dashboard.tenderly.co/block/1/${blockNumber}/txs`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
-              title="View on Tenderly"
-            >
-              <TenderlyIcon className="size-4" />
-            </a>
+            {isMainnet(currentNetwork?.name) && (
+              <a
+                href={`https://dashboard.tenderly.co/block/1/${blockNumber}/txs`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
+                title="View on Tenderly"
+              >
+                <TenderlyIcon className="size-4" />
+              </a>
+            )}
           </div>
 
           <div className="hidden h-4 w-px bg-border sm:block" />

@@ -34,7 +34,8 @@ import {
   CallTraceView,
   ContractStorageCTA,
 } from './components';
-import { CATEGORY_COLORS, getOpcodeCategory } from './utils';
+import { useNetwork } from '@/hooks/useNetwork';
+import { CATEGORY_COLORS, getOpcodeCategory, getEtherscanBaseUrl, isMainnet } from './utils';
 import type { IntTransactionCallFrame } from '@/api/types.gen';
 
 /**
@@ -83,6 +84,7 @@ export function CallPage(): JSX.Element {
   const { block: blockFromSearch } = Route.useSearch();
   const callIdNum = parseInt(callId, 10);
 
+  const { currentNetwork } = useNetwork();
   const [copied, setCopied] = useState(false);
 
   // Fetch all transaction data
@@ -545,7 +547,7 @@ export function CallPage(): JSX.Element {
         <div className="flex items-center gap-2">
           {currentFrame.target_address && (
             <a
-              href={`https://etherscan.io/address/${currentFrame.target_address}`}
+              href={`${getEtherscanBaseUrl(currentNetwork?.name)}/address/${currentFrame.target_address}`}
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
@@ -554,24 +556,28 @@ export function CallPage(): JSX.Element {
               <EtherscanIcon className="size-4" />
             </a>
           )}
-          <a
-            href={`https://dashboard.tenderly.co/tx/mainnet/${txHash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
-            title="View TX on Tenderly"
-          >
-            <TenderlyIcon className="size-4" />
-          </a>
-          <a
-            href={`https://phalcon.blocksec.com/explorer/tx/eth/${txHash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
-            title="View TX on Phalcon"
-          >
-            <PhalconIcon className="size-4" />
-          </a>
+          {isMainnet(currentNetwork?.name) && (
+            <>
+              <a
+                href={`https://dashboard.tenderly.co/tx/mainnet/${txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
+                title="View TX on Tenderly"
+              >
+                <TenderlyIcon className="size-4" />
+              </a>
+              <a
+                href={`https://phalcon.blocksec.com/explorer/tx/eth/${txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
+                title="View TX on Phalcon"
+              >
+                <PhalconIcon className="size-4" />
+              </a>
+            </>
+          )}
         </div>
       </div>
 

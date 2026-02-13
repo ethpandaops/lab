@@ -9,6 +9,7 @@ import { CallTreeSection } from '../CallTreeSection';
 import { GasBreakdownCard } from '../GasBreakdownCard';
 import { OpcodeDistribution } from '../OpcodeDistribution';
 import type { CallTreeNode } from '../../IndexPage.types';
+import { getEtherscanBaseUrl, isMainnet } from '../../utils';
 
 export interface TransactionRowProps {
   /** Transaction summary data */
@@ -174,29 +175,33 @@ export function TransactionRow({
               {/* External links */}
               <div className="flex gap-2 pt-2">
                 <a
-                  href={`https://etherscan.io/tx/${transaction.transactionHash}`}
+                  href={`${getEtherscanBaseUrl(network?.name)}/tx/${transaction.transactionHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-xs bg-surface px-2 py-1 text-xs text-muted transition-colors hover:text-foreground"
                 >
                   Etherscan ↗
                 </a>
-                <a
-                  href={`https://dashboard.tenderly.co/tx/mainnet/${transaction.transactionHash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-xs bg-surface px-2 py-1 text-xs text-muted transition-colors hover:text-foreground"
-                >
-                  Tenderly ↗
-                </a>
-                <a
-                  href={`https://phalcon.blocksec.com/explorer/tx/eth/${transaction.transactionHash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-xs bg-surface px-2 py-1 text-xs text-muted transition-colors hover:text-foreground"
-                >
-                  Phalcon ↗
-                </a>
+                {isMainnet(network?.name) && (
+                  <>
+                    <a
+                      href={`https://dashboard.tenderly.co/tx/mainnet/${transaction.transactionHash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-xs bg-surface px-2 py-1 text-xs text-muted transition-colors hover:text-foreground"
+                    >
+                      Tenderly ↗
+                    </a>
+                    <a
+                      href={`https://phalcon.blocksec.com/explorer/tx/eth/${transaction.transactionHash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-xs bg-surface px-2 py-1 text-xs text-muted transition-colors hover:text-foreground"
+                    >
+                      Phalcon ↗
+                    </a>
+                  </>
+                )}
               </div>
             </div>
           )}
