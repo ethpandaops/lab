@@ -36,8 +36,12 @@ export interface CardChainProps {
   hasPreviousItems?: boolean;
   /** Whether there are next items to load */
   hasNextItems?: boolean;
+  /** Badge count shown on the "next" arrow (e.g., number of new items available) */
+  nextItemCount?: number;
   /** Loading state - shows skeleton items */
   isLoading?: boolean;
+  /** Background fetching state - shows spinner on nav arrows */
+  isFetching?: boolean;
   /** Number of skeleton items to show when loading (default: 6) */
   skeletonCount?: number;
   /** Additional CSS class for the container */

@@ -8,10 +8,8 @@ import { Header } from '@/components/Layout/Header';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Divider } from '@/components/Layout/Divider';
 import { Alert } from '@/components/Feedback/Alert';
-import { Input } from '@/components/Forms/Input';
 // TODO: Re-enable when fork annotation data is available
 // import { Toggle } from '@/components/Forms/Toggle';
-import { Button } from '@/components/Elements/Button';
 import { CardChain, type CardChainItem } from '@/components/DataDisplay/CardChain';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useForks } from '@/hooks/useForks';
@@ -164,13 +162,6 @@ function formatCompact(value: number): string {
 }
 
 /**
- * Validate if string is a valid transaction hash
- */
-function isValidTxHash(value: string): boolean {
-  return /^0x[a-fA-F0-9]{64}$/.test(value);
-}
-
-/**
  * Validate if string is a valid block number
  */
 function isValidBlockNumber(value: string): boolean {
@@ -204,17 +195,30 @@ export function HomePage(): JSX.Element {
   const [searchError, setSearchError] = useState<string | null>(null);
   const [blocksOffset, setBlocksOffset] = useState(0);
 
+  // Pinned max block — prevents view from jumping when new blocks are indexed.
+  // Initialized from bounds on first load, then only advances on explicit user action.
+  const [pinnedMax, setPinnedMax] = useState<number | null>(null);
+
   // Fetch bounds to validate block range - uses intersection of all gas profiler tables
   const { data: bounds, isLoading: boundsLoading, error } = useGasProfilerBounds();
 
-  // Fetch recent blocks for visualization
+  // Initialize pinnedMax from bounds on first load
+  useEffect(() => {
+    if (bounds && pinnedMax === null) {
+      setPinnedMax(bounds.max);
+    }
+  }, [bounds, pinnedMax]);
+
+  // Fetch recent blocks for visualization — pinned to anchorBlock
   const {
     blocks: recentBlocks,
     isLoading: recentBlocksLoading,
-    isFetching: _recentBlocksFetching,
+    isFetching: recentBlocksFetching,
     hasOlderBlocks,
+    hasNewerBlocks,
     isAtLatest,
-  } = useRecentBlocks({ count: 6, offset: blocksOffset });
+    newerBlockCount,
+  } = useRecentBlocks({ count: 6, offset: blocksOffset, anchorBlock: pinnedMax ?? undefined });
 
   // Calculate timestamp for start of selected time range
   const startTimestamp = useMemo(() => {
@@ -401,8 +405,14 @@ export function HomePage(): JSX.Element {
   }, []);
 
   const handleLoadNewerBlocks = useCallback(() => {
-    setBlocksOffset(prev => Math.max(0, prev - 6));
-  }, []);
+    if (blocksOffset > 0) {
+      // Navigate back toward the pinned anchor
+      setBlocksOffset(prev => Math.max(0, prev - 6));
+    } else if (bounds && pinnedMax !== null && bounds.max > pinnedMax) {
+      // At anchor but newer blocks exist — advance anchor by one page
+      setPinnedMax(Math.min(bounds.max, pinnedMax + 6));
+    }
+  }, [blocksOffset, bounds, pinnedMax]);
 
   // Transform recent blocks to CardChainItem format
   const recentBlockItems = useMemo<CardChainItem[]>(() => {
@@ -431,48 +441,37 @@ export function HomePage(): JSX.Element {
 
   // Handle quick search from URL
   useEffect(() => {
-    if (search.tx && isValidTxHash(search.tx)) {
-      setSearchInput(search.tx);
-    }
     if (search.block) {
       navigate({
         to: '/ethereum/execution/gas-profiler/block/$blockNumber',
         params: { blockNumber: String(search.block) },
       });
     }
-  }, [search.tx, search.block, navigate]);
+  }, [search.block, navigate]);
 
-  // Handle search submission
+  // Handle search submission - block numbers only
   const handleSearch = useCallback(() => {
     setSearchError(null);
-    const cleanedInput = searchInput.replace(/,/g, '');
+    const cleanedInput = searchInput.replace(/,/g, '').trim();
 
-    if (isValidBlockNumber(cleanedInput) && !cleanedInput.startsWith('0x')) {
-      const blockNum = parseInt(cleanedInput, 10);
-      if (bounds) {
-        if (blockNum < bounds.min || blockNum > bounds.max) {
-          setSearchError(
-            `Block ${formatGas(blockNum)} is outside indexed range (${formatGas(bounds.min)} - ${formatGas(bounds.max)})`
-          );
-          return;
-        }
+    if (!isValidBlockNumber(cleanedInput) || cleanedInput.startsWith('0x')) {
+      setSearchError('Enter a valid block number');
+      return;
+    }
+
+    const blockNum = parseInt(cleanedInput, 10);
+    if (bounds) {
+      if (blockNum < bounds.min || blockNum > bounds.max) {
+        setSearchError(
+          `Block ${formatGas(blockNum)} is outside indexed range (${formatGas(bounds.min)} - ${formatGas(bounds.max)})`
+        );
+        return;
       }
-      navigate({
-        to: '/ethereum/execution/gas-profiler/block/$blockNumber',
-        params: { blockNumber: cleanedInput },
-      });
-      return;
     }
-
-    if (isValidTxHash(cleanedInput)) {
-      navigate({
-        to: '/ethereum/execution/gas-profiler/tx/$txHash',
-        params: { txHash: cleanedInput },
-      });
-      return;
-    }
-
-    setSearchError('Enter a valid transaction hash (0x...) or block number');
+    navigate({
+      to: '/ethereum/execution/gas-profiler/block/$blockNumber',
+      params: { blockNumber: cleanedInput },
+    });
   }, [searchInput, navigate, bounds]);
 
   const handleKeyPress = useCallback(
@@ -483,6 +482,27 @@ export function HomePage(): JSX.Element {
     },
     [handleSearch]
   );
+
+  // Handle simulate navigation - block numbers only
+  const handleSimulate = useCallback(() => {
+    const cleanedInput = searchInput.trim().replace(/,/g, '');
+
+    if (!cleanedInput) {
+      navigate({ to: '/ethereum/execution/gas-profiler/simulate' });
+      return;
+    }
+
+    if (isValidBlockNumber(cleanedInput) && !cleanedInput.startsWith('0x')) {
+      const blockNum = parseInt(cleanedInput, 10);
+      navigate({
+        to: '/ethereum/execution/gas-profiler/simulate',
+        search: { block: blockNum },
+      });
+      return;
+    }
+
+    setSearchError('Enter a valid block number');
+  }, [searchInput, navigate]);
 
   // ============================================================================
   // CHART CONFIGS
@@ -756,40 +776,51 @@ export function HomePage(): JSX.Element {
           Real-time block exploration and transaction/block search
           ============================================================================ */}
 
-      {/* Search Input + Simulate */}
-      <div className="mb-6 flex items-start gap-4">
-        <div className="flex-1">
-          <Input
-            error={!!searchError}
-            errorMessage={searchError ?? undefined}
-            helperText={!searchError ? `Indexed range: ${formatGas(bounds.min)} - ${formatGas(bounds.max)}` : undefined}
+      {/* Search Bar */}
+      <div className="mb-6">
+        <div
+          className={clsx(
+            'flex items-stretch bg-surface',
+            'outline-1 -outline-offset-1 transition-[outline-color]',
+            searchError
+              ? 'outline-danger/50 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-danger'
+              : 'outline-border focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary'
+          )}
+        >
+          <div className="pointer-events-none flex items-center pl-3.5">
+            <MagnifyingGlassIcon className="size-5 text-muted" aria-hidden="true" />
+          </div>
+          <input
+            type="text"
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
+            onKeyDown={handleKeyPress}
+            placeholder="Block number"
+            className="min-w-0 flex-1 border-0 bg-transparent px-3 py-2 text-base/6 text-foreground placeholder:text-muted focus:ring-0 focus:outline-hidden"
+          />
+          <button
+            type="button"
+            onClick={handleSearch}
+            className="bg-primary px-5 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
           >
-            <Input.Leading>
-              <MagnifyingGlassIcon />
-            </Input.Leading>
-            <Input.Field
-              type="text"
-              value={searchInput}
-              onChange={e => setSearchInput(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder="Tx hash or block number"
-            />
-            <Input.Trailing type="button">
-              <Button size="sm" onClick={handleSearch}>
-                Search
-              </Button>
-            </Input.Trailing>
-          </Input>
+            Search
+          </button>
+          <button
+            type="button"
+            onClick={handleSimulate}
+            className="flex items-center gap-2 border-l border-border px-4 text-sm font-medium text-muted transition-colors hover:bg-primary/5 hover:text-foreground"
+          >
+            <BeakerIcon className="size-4" />
+            Simulate
+          </button>
         </div>
-        <div className="flex items-center gap-3 pt-1">
-          <div className="h-8 w-px bg-border" />
-          <Link to="/ethereum/execution/gas-profiler/simulate">
-            <Button size="sm" variant="soft">
-              <BeakerIcon className="mr-1.5 size-4" />
-              Simulate
-            </Button>
-          </Link>
-        </div>
+        <p
+          className={clsx('mt-2 text-sm/6', searchError ? 'text-danger' : 'text-muted')}
+          role={searchError ? 'alert' : 'status'}
+          aria-live="polite"
+        >
+          {searchError ?? `Indexed range: ${formatGas(bounds.min)} - ${formatGas(bounds.max)}`}
+        </p>
       </div>
 
       {/* Recent Blocks Chain Visualization */}
@@ -797,11 +828,13 @@ export function HomePage(): JSX.Element {
         className="mb-8"
         items={recentBlockItems}
         isLoading={recentBlocksLoading}
+        isFetching={recentBlocksFetching}
         skeletonCount={6}
         onLoadPrevious={handleLoadOlderBlocks}
         onLoadNext={handleLoadNewerBlocks}
         hasPreviousItems={hasOlderBlocks}
-        hasNextItems={!isAtLatest}
+        hasNextItems={hasNewerBlocks}
+        nextItemCount={newerBlockCount}
         renderItemWrapper={(item, index, children) => {
           const fromEnd = recentBlockItems.length - 1 - index;
           return (

@@ -16,8 +16,10 @@ export interface BlockSummary {
 export interface UseRecentBlocksOptions {
   /** Number of recent blocks to fetch (default: 6) */
   count?: number;
-  /** Offset from latest (0 = latest blocks, 6 = 6 blocks back, etc.) */
+  /** Offset from the anchor block (0 = at anchor, 6 = 6 blocks back, etc.) */
   offset?: number;
+  /** Pin view to this block number instead of always chasing bounds.max */
+  anchorBlock?: number;
 }
 
 export interface UseRecentBlocksResult {
@@ -29,8 +31,12 @@ export interface UseRecentBlocksResult {
   error: Error | null;
   /** Whether there are older blocks available to load */
   hasOlderBlocks: boolean;
-  /** Whether we're viewing the latest blocks (offset = 0) */
+  /** Whether there are newer blocks beyond the current view */
+  hasNewerBlocks: boolean;
+  /** Whether the view includes the actual latest indexed block */
   isAtLatest: boolean;
+  /** Number of new blocks available beyond the current view */
+  newerBlockCount: number;
   /** The bounds of available data */
   bounds: { min: number; max: number } | undefined;
 }
@@ -38,15 +44,24 @@ export interface UseRecentBlocksResult {
 /**
  * Hook to fetch lightweight summary data for recent blocks.
  * Uses int_block_opcode_gas for efficient per-block gas totals.
+ *
+ * When `anchorBlock` is provided, the view is pinned to that block
+ * instead of always following bounds.max. This prevents the view
+ * from jumping when new blocks are indexed.
  */
-export function useRecentBlocks({ count = 6, offset = 0 }: UseRecentBlocksOptions = {}): UseRecentBlocksResult {
+export function useRecentBlocks({
+  count = 6,
+  offset = 0,
+  anchorBlock,
+}: UseRecentBlocksOptions = {}): UseRecentBlocksResult {
   const { currentNetwork } = useNetwork();
 
   // Get bounds (intersection of all gas profiler tables)
   const { data: bounds, isLoading: boundsLoading } = useGasProfilerBounds();
 
-  // Calculate the block range we want (with offset from latest)
-  const maxBlock = bounds?.max ? bounds.max - offset : null;
+  // Use anchor block if provided, otherwise fall back to bounds.max
+  const effectiveMax = anchorBlock ?? bounds?.max ?? null;
+  const maxBlock = effectiveMax ? effectiveMax - offset : null;
   const minBlock = maxBlock ? Math.max(bounds?.min ?? 0, maxBlock - count + 1) : null;
 
   // Fetch opcode gas data for recent blocks
@@ -94,9 +109,12 @@ export function useRecentBlocks({ count = 6, offset = 0 }: UseRecentBlocksOption
       .sort((a, b) => a.blockNumber - b.blockNumber);
   }, [opcodeGasData, maxBlock]);
 
-  // Calculate if there are older blocks available
+  // Calculate navigation availability
   const hasOlderBlocks = bounds?.min !== undefined && minBlock !== null && minBlock > bounds.min;
-  const isAtLatest = offset === 0;
+  const viewMax = maxBlock ?? 0;
+  const hasNewerBlocks = bounds?.max !== undefined && viewMax > 0 && viewMax < bounds.max;
+  const newerBlockCount = bounds?.max !== undefined && viewMax > 0 ? Math.max(0, bounds.max - viewMax) : 0;
+  const isAtLatest = !hasNewerBlocks;
 
   return {
     blocks,
@@ -104,7 +122,9 @@ export function useRecentBlocks({ count = 6, offset = 0 }: UseRecentBlocksOption
     isFetching: dataFetching,
     error: error as Error | null,
     hasOlderBlocks,
+    hasNewerBlocks,
     isAtLatest,
+    newerBlockCount,
     bounds,
   };
 }
