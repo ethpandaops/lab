@@ -40,12 +40,14 @@ export function DetailPage(): JSX.Element {
 
   const isHourly = config.dataType === 'hourly';
 
-  // Host spec (latest)
+  // Host spec (latest) - API requires primary key filter
+  const specLookbackSec = Math.floor((Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000);
   const specsQuery = useQuery({
     ...fctNodeHostSpecServiceListOptions({
       query: {
         meta_network_name_eq: networkName,
         meta_client_name_eq: nodeName,
+        wallclock_slot_start_date_time_gte: specLookbackSec,
         order_by: 'wallclock_slot_start_date_time DESC',
         page_size: 1,
       },
