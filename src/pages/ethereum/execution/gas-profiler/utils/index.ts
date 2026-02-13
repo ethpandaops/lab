@@ -9,3 +9,4 @@ export {
 } from './opcodeUtils';
 export { addOpcodesToCallTree, isOpcodeNode, type AddOpcodesToCallTreeOptions } from './callTreeWithOpcodes';
 export { getEffectiveGasRefund } from './gasRefund';
+export { getEtherscanBaseUrl, isMainnet } from './explorerLinks';

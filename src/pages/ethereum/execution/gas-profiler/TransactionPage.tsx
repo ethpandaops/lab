@@ -39,7 +39,14 @@ import {
 import type { TopGasItem, CallFrameData } from './components';
 import { getCallLabel } from './hooks/useTransactionGasData';
 import { useNetwork } from '@/hooks/useNetwork';
-import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory, getEffectiveGasRefund } from './utils';
+import {
+  CATEGORY_COLORS,
+  CALL_TYPE_COLORS,
+  getOpcodeCategory,
+  getEffectiveGasRefund,
+  getEtherscanBaseUrl,
+  isMainnet,
+} from './utils';
 import type { CallTreeNode, OpcodeStats } from './IndexPage.types';
 
 /**
@@ -725,7 +732,7 @@ export function TransactionPage(): JSX.Element {
         )}
         <div className="flex items-center gap-2">
           <a
-            href={`https://etherscan.io/tx/${txHash}`}
+            href={`${getEtherscanBaseUrl(currentNetwork?.name)}/tx/${txHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
@@ -733,24 +740,28 @@ export function TransactionPage(): JSX.Element {
           >
             <EtherscanIcon className="size-4" />
           </a>
-          <a
-            href={`https://dashboard.tenderly.co/tx/mainnet/${txHash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
-            title="View on Tenderly"
-          >
-            <TenderlyIcon className="size-4" />
-          </a>
-          <a
-            href={`https://phalcon.blocksec.com/explorer/tx/eth/${txHash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
-            title="View on Phalcon"
-          >
-            <PhalconIcon className="size-4" />
-          </a>
+          {isMainnet(currentNetwork?.name) && (
+            <>
+              <a
+                href={`https://dashboard.tenderly.co/tx/mainnet/${txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
+                title="View on Tenderly"
+              >
+                <TenderlyIcon className="size-4" />
+              </a>
+              <a
+                href={`https://phalcon.blocksec.com/explorer/tx/eth/${txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
+                title="View on Phalcon"
+              >
+                <PhalconIcon className="size-4" />
+              </a>
+            </>
+          )}
         </div>
       </div>
 
