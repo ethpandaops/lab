@@ -1,8 +1,15 @@
 import { type JSX, useMemo } from 'react';
-import { ANNOTATION_COLORS, ANNOTATION_OPTIONS, type AnnotationType, type AnnotationEvent, type HighlightRange } from './types';
+import {
+  ANNOTATION_COLORS,
+  ANNOTATION_OPTIONS,
+  type AnnotationType,
+  type AnnotationEvent,
+  type HighlightRange,
+} from './types';
 
 /** Minimum visual width (fraction of 0–1) so point events remain clickable/visible */
 const MIN_MARK_FRAC = 0.08 / 12;
+const SLOT_DURATION_MS = 12_000;
 
 /** Annotation types rendered as swim lanes (slot_phases excluded – those stay as chart markLines) */
 const LANE_TYPES: Exclude<AnnotationType, 'slot_phases'>[] = ['block', 'head', 'execution', 'data_columns'];
@@ -21,6 +28,10 @@ function nodeMatches(nodeName: string, selectedNode: string): boolean {
 function percentile(sorted: number[], p: number): number {
   const idx = Math.floor(sorted.length * p);
   return sorted[Math.min(idx, sorted.length - 1)];
+}
+
+function clampFraction(value: number): number {
+  return Math.max(0, Math.min(1, value));
 }
 
 interface AnnotationSwimLanesProps {
@@ -65,13 +76,15 @@ export function AnnotationSwimLanes({
           if (anno.type !== laneType) continue;
           if (!anno.nodeName || !nodeMatches(anno.nodeName, selectedNode)) continue;
 
-          const startFrac = anno.timeMs / 12000;
-          if (startFrac < 0 || startFrac > 1) continue;
-
           const hasRange = anno.endMs != null && Math.abs(anno.endMs - anno.timeMs) > 10;
+          const rawStartFrac = anno.timeMs / SLOT_DURATION_MS;
+          const rawEndFrac = (anno.endMs ?? anno.timeMs) / SLOT_DURATION_MS;
+          if (rawEndFrac < 0 || rawStartFrac > 1) continue;
+
+          const startFrac = clampFraction(rawStartFrac);
+          const endFrac = clampFraction(rawEndFrac);
 
           if (hasRange) {
-            const endFrac = Math.min(anno.endMs! / 12000, 1);
             marks.push({
               leftPct: startFrac * 100,
               widthPct: Math.max((endFrac - startFrac) * 100, MIN_MARK_FRAC * 100),
@@ -97,38 +110,42 @@ export function AnnotationSwimLanes({
         if (hasRanges) {
           const starts = events.map(e => e.timeMs).sort((a, b) => a - b);
           const ends = events.map(e => e.endMs ?? e.timeMs).sort((a, b) => a - b);
-          const startFrac = starts[0] / 12000;
-          const endFrac = Math.min(percentile(ends, 0.95) / 12000, 1);
-          if (startFrac >= 0 && startFrac <= 1) {
+          const rawStartFrac = starts[0] / SLOT_DURATION_MS;
+          const rawEndFrac = percentile(ends, 0.95) / SLOT_DURATION_MS;
+          if (rawEndFrac < 0 || rawStartFrac > 1) continue;
+
+          const startFrac = clampFraction(rawStartFrac);
+          const endFrac = clampFraction(rawEndFrac);
+          marks.push({
+            leftPct: startFrac * 100,
+            widthPct: Math.max((endFrac - startFrac) * 100, MIN_MARK_FRAC * 100),
+            color,
+            opacity: 0.5,
+          });
+        } else {
+          const times = events.map(e => e.timeMs).sort((a, b) => a - b);
+          const rawMinFrac = times[0] / SLOT_DURATION_MS;
+          const rawP95Frac = percentile(times, 0.95) / SLOT_DURATION_MS;
+          if (rawP95Frac < 0 || rawMinFrac > 1) continue;
+
+          const minFrac = clampFraction(rawMinFrac);
+          const p95Frac = clampFraction(rawP95Frac);
+          const width = p95Frac - minFrac;
+          if (width < MIN_MARK_FRAC) {
+            const medFrac = clampFraction(percentile(times, 0.5) / SLOT_DURATION_MS);
             marks.push({
-              leftPct: Math.max(0, startFrac) * 100,
-              widthPct: Math.max((endFrac - startFrac) * 100, MIN_MARK_FRAC * 100),
+              leftPct: Math.max(0, medFrac - MIN_MARK_FRAC / 2) * 100,
+              widthPct: MIN_MARK_FRAC * 100,
+              color,
+              opacity: 0.7,
+            });
+          } else {
+            marks.push({
+              leftPct: minFrac * 100,
+              widthPct: (p95Frac - minFrac) * 100,
               color,
               opacity: 0.5,
             });
-          }
-        } else {
-          const times = events.map(e => e.timeMs).sort((a, b) => a - b);
-          const minFrac = times[0] / 12000;
-          const p95Frac = percentile(times, 0.95) / 12000;
-          if (minFrac >= 0 && p95Frac <= 1) {
-            const width = p95Frac - minFrac;
-            if (width < MIN_MARK_FRAC) {
-              const medFrac = percentile(times, 0.5) / 12000;
-              marks.push({
-                leftPct: Math.max(0, medFrac - MIN_MARK_FRAC / 2) * 100,
-                widthPct: MIN_MARK_FRAC * 100,
-                color,
-                opacity: 0.7,
-              });
-            } else {
-              marks.push({
-                leftPct: minFrac * 100,
-                widthPct: (p95Frac - minFrac) * 100,
-                color,
-                opacity: 0.5,
-              });
-            }
           }
         }
       }

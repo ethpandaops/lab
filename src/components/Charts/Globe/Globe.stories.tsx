@@ -7,6 +7,8 @@ import type { LineData, PointData } from './Globe.types';
 const meta: Meta<typeof GlobeChart> = {
   title: 'Components/Charts/Globe',
   component: GlobeChart,
+  // WebGL contexts are not reliable in headless CI browsers.
+  tags: ['test-exclude'],
   decorators: [
     Story => (
       <div className="min-w-[600px] rounded-sm bg-surface p-6">

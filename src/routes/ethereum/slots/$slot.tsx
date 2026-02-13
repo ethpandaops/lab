@@ -10,7 +10,13 @@ const slotSearchSchema = z.object({
   node: z.string().optional(),
   metric: z.enum(['mean', 'min', 'max']).optional(),
   memMetric: z.enum(['vm_rss', 'rss_anon', 'rss_file', 'vm_swap']).optional(),
-  refNodes: z.coerce.boolean().optional(),
+  refNodes: z
+    .preprocess(value => {
+      if (value === 'true') return true;
+      if (value === 'false') return false;
+      return value;
+    }, z.boolean())
+    .optional(),
 });
 
 export const Route = createFileRoute('/ethereum/slots/$slot')({

@@ -180,7 +180,7 @@ export function CpuUtilizationChart({
 
       chartSeries.push({
         name: clLabel,
-        data: toPoints(clBuckets, b => b.meanVals),
+        data: toPoints(clBuckets, metricExtract),
         color: clColor,
         lineWidth: 2,
         showArea: true,
@@ -190,7 +190,7 @@ export function CpuUtilizationChart({
 
       chartSeries.push({
         name: elLabel,
-        data: toPoints(elBuckets, b => b.meanVals),
+        data: toPoints(elBuckets, metricExtract),
         color: elColor,
         lineWidth: 2,
         showArea: true,
