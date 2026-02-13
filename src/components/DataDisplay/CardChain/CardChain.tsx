@@ -1,5 +1,5 @@
-import type { JSX, ReactNode } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import { useEffect, useRef, useState, type JSX, type ReactNode } from 'react';
+import { ChevronLeftIcon, ChevronRightIcon, ArrowRightIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import type { CardChainItem, CardChainProps } from './CardChain.types';
 
@@ -148,28 +148,40 @@ function NavArrow({
   direction,
   onClick,
   disabled,
+  loading,
+  badgeCount,
   title,
 }: {
   direction: 'left' | 'right';
   onClick?: () => void;
   disabled: boolean;
+  loading?: boolean;
+  badgeCount?: number;
   title: string;
 }): JSX.Element {
   const Icon = direction === 'left' ? ChevronLeftIcon : ChevronRightIcon;
+  const showBadge = badgeCount !== undefined && badgeCount > 0 && !loading;
 
   return (
     <button
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled || loading}
       className={clsx(
-        'z-10 flex size-10 shrink-0 items-center justify-center rounded-full border-2 transition-all',
-        !disabled
-          ? 'border-border bg-surface text-muted hover:border-primary hover:bg-primary/10 hover:text-primary'
-          : 'cursor-not-allowed border-border/50 bg-surface/50 text-muted/30'
+        'relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full border-2 transition-all',
+        loading
+          ? 'border-primary/50 bg-primary/5 text-primary'
+          : !disabled
+            ? 'border-border bg-surface text-muted hover:border-primary hover:bg-primary/10 hover:text-primary'
+            : 'cursor-not-allowed border-border/50 bg-surface/50 text-muted/30'
       )}
       title={title}
     >
-      <Icon className="size-5" />
+      {loading ? <ArrowPathIcon className="size-5 animate-spin" /> : <Icon className="size-5" />}
+      {showBadge && (
+        <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+          {badgeCount > 99 ? '99+' : badgeCount}
+        </span>
+      )}
     </button>
   );
 }
@@ -187,10 +199,49 @@ export function CardChain({
   onLoadNext,
   hasPreviousItems = false,
   hasNextItems = false,
+  nextItemCount,
   isLoading = false,
+  isFetching = false,
   skeletonCount = 6,
   className,
 }: CardChainProps): JSX.Element {
+  // --- Slide animation state ---
+  const prevIdsRef = useRef<(string | number)[]>([]);
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
+  const [animationKey, setAnimationKey] = useState(0);
+  const fetchDirectionRef = useRef<'left' | 'right' | null>(null);
+
+  useEffect(() => {
+    if (isLoading || items.length === 0) return;
+
+    const currentIds = items.map(i => i.id);
+    const prevIds = prevIdsRef.current;
+
+    // Skip initial render or identical item sets
+    if (prevIds.length > 0 && JSON.stringify(currentIds) !== JSON.stringify(prevIds)) {
+      const newFirstId = currentIds[0];
+      const prevFirstId = prevIds[0];
+
+      // Compare as numbers if both are numeric, otherwise use string comparison
+      const newFirst = Number(newFirstId);
+      const prevFirst = Number(prevFirstId);
+      const isNumeric = !Number.isNaN(newFirst) && !Number.isNaN(prevFirst);
+
+      if (isNumeric ? newFirst > prevFirst : newFirstId > prevFirstId) {
+        setSlideDirection('left'); // newer blocks → cards enter from right
+      } else {
+        setSlideDirection('right'); // older blocks → cards enter from left
+      }
+      setAnimationKey(k => k + 1);
+      fetchDirectionRef.current = null;
+    }
+
+    prevIdsRef.current = currentIds;
+  }, [items, isLoading]);
+
+  const staggerMs = 50;
+  const durationMs = 350;
+
   // Default wrapper just renders children
   const wrapItem = (item: CardChainItem, index: number, children: ReactNode): ReactNode => {
     if (renderItemWrapper) {
@@ -231,8 +282,12 @@ export function CardChain({
         {onLoadPrevious && (
           <NavArrow
             direction="left"
-            onClick={onLoadPrevious}
+            onClick={() => {
+              fetchDirectionRef.current = 'left';
+              onLoadPrevious();
+            }}
             disabled={!hasPreviousItems || isLoading}
+            loading={isFetching && fetchDirectionRef.current === 'left'}
             title={hasPreviousItems ? 'Load previous items' : 'No previous items available'}
           />
         )}
@@ -246,13 +301,51 @@ export function CardChain({
               items.map((item, index) => {
                 const isLast = index === items.length - 1;
                 const cardElement = <ChainCard item={item} isLast={isLast} highlightBadgeText={highlightBadgeText} />;
-                return wrapItem(item, index, cardElement);
+
+                // Apply stagger animation when direction is set
+                const animStyle =
+                  slideDirection != null
+                    ? {
+                        animation: `chain-slide-${slideDirection} ${durationMs}ms ease-out both`,
+                        animationDelay: `${
+                          slideDirection === 'left'
+                            ? (items.length - 1 - index) * staggerMs // rightmost leads
+                            : index * staggerMs // leftmost leads
+                        }ms`,
+                      }
+                    : undefined;
+
+                return (
+                  <div
+                    key={`${item.id}-${animationKey}`}
+                    className="flex-1"
+                    style={animStyle}
+                    onAnimationEnd={
+                      // Clear direction after the last card finishes
+                      index === (slideDirection === 'left' ? 0 : items.length - 1)
+                        ? () => setSlideDirection(null)
+                        : undefined
+                    }
+                  >
+                    {wrapItem(item, index, cardElement)}
+                  </div>
+                );
               })}
         </div>
 
         {/* Right arrow - load next items (only show when there are next items) */}
         {onLoadNext && hasNextItems && (
-          <NavArrow direction="right" onClick={onLoadNext} disabled={isLoading} title="Load next items" />
+          <NavArrow
+            direction="right"
+            onClick={() => {
+              fetchDirectionRef.current = 'right';
+              onLoadNext();
+            }}
+            disabled={isLoading}
+            loading={isFetching && fetchDirectionRef.current === 'right'}
+            badgeCount={nextItemCount}
+            title="Load next items"
+          />
         )}
       </div>
     </div>
