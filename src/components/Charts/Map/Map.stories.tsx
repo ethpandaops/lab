@@ -6,6 +6,8 @@ import type { RouteData, PointData } from './Map.types';
 const meta: Meta<typeof MapChart> = {
   title: 'Components/Charts/Map',
   component: MapChart,
+  // WebGL contexts are not reliable in headless CI browsers.
+  tags: ['test-exclude'],
   decorators: [
     Story => (
       <div className="min-w-[600px] rounded-sm bg-surface p-6">

@@ -41,6 +41,7 @@ import { SlotDetailSkeleton } from './components/SlotDetailSkeleton';
 import { EngineTimingsCard } from './components/EngineTimingsCard';
 import { SlotProgressTimeline } from './components/SlotProgressTimeline';
 import { useSlotEngineTimings } from './hooks/useSlotEngineTimings';
+import { NodeResourcesPanel } from './components/NodeResources';
 
 /**
  * Detail page for a specific slot.
@@ -143,6 +144,7 @@ export function DetailPage(): JSX.Element {
     { id: 'blobs' },
     { id: 'execution' },
     { id: 'mev' },
+    { id: 'resources' },
   ]);
 
   // Validate slot number
@@ -393,6 +395,7 @@ export function DetailPage(): JSX.Element {
             <Tab>Blobs</Tab>
             <Tab>Execution</Tab>
             <Tab>MEV</Tab>
+            <Tab>Node Resources</Tab>
           </ScrollableTabs>
 
           <TabPanels className="mt-6">
@@ -1119,6 +1122,16 @@ export function DetailPage(): JSX.Element {
                   )}
                 </div>
               )}
+            </TabPanel>
+
+            {/* Node Resources Tab */}
+            <TabPanel>
+              <NodeResourcesPanel
+                slot={slot}
+                blockPropagation={data.blockPropagation}
+                headPropagation={data.headPropagation}
+                dataColumnPropagation={data.dataColumnPropagation}
+              />
             </TabPanel>
           </TabPanels>
         </TabGroup>

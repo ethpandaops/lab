@@ -258,6 +258,34 @@ export interface MarkLineConfig {
 }
 
 /**
+ * Configuration for a vertical annotation area (markArea)
+ * Renders a semi-transparent colored rectangle spanning the full y-axis
+ */
+export interface MarkAreaConfig {
+  /**
+   * Start x-axis value
+   */
+  xStart: number | string;
+  /**
+   * End x-axis value
+   */
+  xEnd: number | string;
+  /**
+   * Area color (hex or rgb)
+   */
+  color?: string;
+  /**
+   * Area opacity (0-1)
+   * @default 0.15
+   */
+  opacity?: number;
+  /**
+   * Label to display inside the area
+   */
+  label?: string;
+}
+
+/**
  * MultiLineChart component props
  */
 export interface MultiLineChartProps {
@@ -410,4 +438,14 @@ export interface MultiLineChartProps {
    * Useful for marking important events like resurrections or thresholds
    */
   markLines?: MarkLineConfig[];
+  /**
+   * Vertical annotation areas to display on the chart
+   * Renders semi-transparent colored rectangles spanning the full y-axis
+   */
+  markAreas?: MarkAreaConfig[];
+  /**
+   * Callback fired when the chart instance is ready
+   * Provides access to the underlying ECharts instance for advanced use cases
+   */
+  onChartReady?: (instance: import('echarts-for-react/lib').EChartsInstance) => void;
 }

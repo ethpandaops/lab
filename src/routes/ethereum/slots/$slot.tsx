@@ -4,9 +4,19 @@ import { DetailPage } from '@/pages/ethereum/slots';
 
 const slotSearchSchema = z.object({
   tab: z
-    .enum(['overview', 'timeline', 'block', 'attestations', 'propagation', 'blobs', 'execution', 'mev'])
+    .enum(['overview', 'timeline', 'block', 'attestations', 'propagation', 'blobs', 'execution', 'mev', 'resources'])
     .default('overview'),
   contributor: z.string().optional(),
+  node: z.string().optional(),
+  metric: z.enum(['mean', 'min', 'max']).optional(),
+  memMetric: z.enum(['vm_rss', 'rss_anon', 'rss_file', 'vm_swap']).optional(),
+  refNodes: z
+    .preprocess(value => {
+      if (value === 'true') return true;
+      if (value === 'false') return false;
+      return value;
+    }, z.boolean())
+    .optional(),
 });
 
 export const Route = createFileRoute('/ethereum/slots/$slot')({

@@ -184,6 +184,14 @@ import {
   fctMissedSlotRateHourlyServiceList,
   fctNodeActiveLast24hServiceGet,
   fctNodeActiveLast24hServiceList,
+  fctNodeCpuUtilizationByProcessServiceGet,
+  fctNodeCpuUtilizationByProcessServiceList,
+  fctNodeDiskIoByProcessServiceGet,
+  fctNodeDiskIoByProcessServiceList,
+  fctNodeMemoryUsageByProcessServiceGet,
+  fctNodeMemoryUsageByProcessServiceList,
+  fctNodeNetworkIoByProcessServiceGet,
+  fctNodeNetworkIoByProcessServiceList,
   fctOpcodeGasByOpcodeDailyServiceGet,
   fctOpcodeGasByOpcodeDailyServiceList,
   fctOpcodeGasByOpcodeHourlyServiceGet,
@@ -260,6 +268,10 @@ import {
   intBlockOpcodeGasServiceList,
   intBlockProposerCanonicalServiceGet,
   intBlockProposerCanonicalServiceList,
+  intContractCreationServiceGet,
+  intContractCreationServiceList,
+  intContractSelfdestructServiceGet,
+  intContractSelfdestructServiceList,
   intContractStorageExpiry12mServiceGet,
   intContractStorageExpiry12mServiceList,
   intContractStorageExpiry18mServiceGet,
@@ -300,12 +312,14 @@ import {
   intCustodyProbeServiceList,
   intEngineGetBlobsServiceGet,
   intEngineGetBlobsServiceList,
-  intEngineNewPayloadFastestServiceGet,
-  intEngineNewPayloadFastestServiceList,
+  intEngineNewPayloadFastestExecutionByNodeClassServiceGet,
+  intEngineNewPayloadFastestExecutionByNodeClassServiceList,
   intEngineNewPayloadServiceGet,
   intEngineNewPayloadServiceList,
   intExecutionBlockByDateServiceGet,
   intExecutionBlockByDateServiceList,
+  intStorageSelfdestructDiffsServiceGet,
+  intStorageSelfdestructDiffsServiceList,
   intStorageSlotDiffByAddressSlotServiceGet,
   intStorageSlotDiffByAddressSlotServiceList,
   intStorageSlotDiffServiceGet,
@@ -895,6 +909,30 @@ import type {
   FctNodeActiveLast24hServiceListData,
   FctNodeActiveLast24hServiceListError,
   FctNodeActiveLast24hServiceListResponse,
+  FctNodeCpuUtilizationByProcessServiceGetData,
+  FctNodeCpuUtilizationByProcessServiceGetError,
+  FctNodeCpuUtilizationByProcessServiceGetResponse,
+  FctNodeCpuUtilizationByProcessServiceListData,
+  FctNodeCpuUtilizationByProcessServiceListError,
+  FctNodeCpuUtilizationByProcessServiceListResponse,
+  FctNodeDiskIoByProcessServiceGetData,
+  FctNodeDiskIoByProcessServiceGetError,
+  FctNodeDiskIoByProcessServiceGetResponse,
+  FctNodeDiskIoByProcessServiceListData,
+  FctNodeDiskIoByProcessServiceListError,
+  FctNodeDiskIoByProcessServiceListResponse,
+  FctNodeMemoryUsageByProcessServiceGetData,
+  FctNodeMemoryUsageByProcessServiceGetError,
+  FctNodeMemoryUsageByProcessServiceGetResponse,
+  FctNodeMemoryUsageByProcessServiceListData,
+  FctNodeMemoryUsageByProcessServiceListError,
+  FctNodeMemoryUsageByProcessServiceListResponse,
+  FctNodeNetworkIoByProcessServiceGetData,
+  FctNodeNetworkIoByProcessServiceGetError,
+  FctNodeNetworkIoByProcessServiceGetResponse,
+  FctNodeNetworkIoByProcessServiceListData,
+  FctNodeNetworkIoByProcessServiceListError,
+  FctNodeNetworkIoByProcessServiceListResponse,
   FctOpcodeGasByOpcodeDailyServiceGetData,
   FctOpcodeGasByOpcodeDailyServiceGetError,
   FctOpcodeGasByOpcodeDailyServiceGetResponse,
@@ -1123,6 +1161,18 @@ import type {
   IntBlockProposerCanonicalServiceListData,
   IntBlockProposerCanonicalServiceListError,
   IntBlockProposerCanonicalServiceListResponse,
+  IntContractCreationServiceGetData,
+  IntContractCreationServiceGetError,
+  IntContractCreationServiceGetResponse,
+  IntContractCreationServiceListData,
+  IntContractCreationServiceListError,
+  IntContractCreationServiceListResponse,
+  IntContractSelfdestructServiceGetData,
+  IntContractSelfdestructServiceGetError,
+  IntContractSelfdestructServiceGetResponse,
+  IntContractSelfdestructServiceListData,
+  IntContractSelfdestructServiceListError,
+  IntContractSelfdestructServiceListResponse,
   IntContractStorageExpiry12mServiceGetData,
   IntContractStorageExpiry12mServiceGetError,
   IntContractStorageExpiry12mServiceGetResponse,
@@ -1243,12 +1293,12 @@ import type {
   IntEngineGetBlobsServiceListData,
   IntEngineGetBlobsServiceListError,
   IntEngineGetBlobsServiceListResponse,
-  IntEngineNewPayloadFastestServiceGetData,
-  IntEngineNewPayloadFastestServiceGetError,
-  IntEngineNewPayloadFastestServiceGetResponse,
-  IntEngineNewPayloadFastestServiceListData,
-  IntEngineNewPayloadFastestServiceListError,
-  IntEngineNewPayloadFastestServiceListResponse,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetData,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetError,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceListData,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceListError,
+  IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse,
   IntEngineNewPayloadServiceGetData,
   IntEngineNewPayloadServiceGetError,
   IntEngineNewPayloadServiceGetResponse,
@@ -1261,6 +1311,12 @@ import type {
   IntExecutionBlockByDateServiceListData,
   IntExecutionBlockByDateServiceListError,
   IntExecutionBlockByDateServiceListResponse,
+  IntStorageSelfdestructDiffsServiceGetData,
+  IntStorageSelfdestructDiffsServiceGetError,
+  IntStorageSelfdestructDiffsServiceGetResponse,
+  IntStorageSelfdestructDiffsServiceListData,
+  IntStorageSelfdestructDiffsServiceListError,
+  IntStorageSelfdestructDiffsServiceListResponse,
   IntStorageSlotDiffByAddressSlotServiceGetData,
   IntStorageSlotDiffByAddressSlotServiceGetError,
   IntStorageSlotDiffByAddressSlotServiceGetResponse,
@@ -6651,6 +6707,238 @@ export const fctNodeActiveLast24hServiceGetOptions = (options: Options<FctNodeAc
     queryKey: fctNodeActiveLast24hServiceGetQueryKey(options),
   });
 
+export const fctNodeCpuUtilizationByProcessServiceListQueryKey = (
+  options?: Options<FctNodeCpuUtilizationByProcessServiceListData>
+) => createQueryKey('fctNodeCpuUtilizationByProcessServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeCpuUtilizationByProcessServiceListOptions = (
+  options?: Options<FctNodeCpuUtilizationByProcessServiceListData>
+) =>
+  queryOptions<
+    FctNodeCpuUtilizationByProcessServiceListResponse,
+    FctNodeCpuUtilizationByProcessServiceListError,
+    FctNodeCpuUtilizationByProcessServiceListResponse,
+    ReturnType<typeof fctNodeCpuUtilizationByProcessServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeCpuUtilizationByProcessServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeCpuUtilizationByProcessServiceListQueryKey(options),
+  });
+
+export const fctNodeCpuUtilizationByProcessServiceGetQueryKey = (
+  options: Options<FctNodeCpuUtilizationByProcessServiceGetData>
+) => createQueryKey('fctNodeCpuUtilizationByProcessServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by wallclock_slot_start_date_time
+ */
+export const fctNodeCpuUtilizationByProcessServiceGetOptions = (
+  options: Options<FctNodeCpuUtilizationByProcessServiceGetData>
+) =>
+  queryOptions<
+    FctNodeCpuUtilizationByProcessServiceGetResponse,
+    FctNodeCpuUtilizationByProcessServiceGetError,
+    FctNodeCpuUtilizationByProcessServiceGetResponse,
+    ReturnType<typeof fctNodeCpuUtilizationByProcessServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeCpuUtilizationByProcessServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeCpuUtilizationByProcessServiceGetQueryKey(options),
+  });
+
+export const fctNodeDiskIoByProcessServiceListQueryKey = (options?: Options<FctNodeDiskIoByProcessServiceListData>) =>
+  createQueryKey('fctNodeDiskIoByProcessServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeDiskIoByProcessServiceListOptions = (options?: Options<FctNodeDiskIoByProcessServiceListData>) =>
+  queryOptions<
+    FctNodeDiskIoByProcessServiceListResponse,
+    FctNodeDiskIoByProcessServiceListError,
+    FctNodeDiskIoByProcessServiceListResponse,
+    ReturnType<typeof fctNodeDiskIoByProcessServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeDiskIoByProcessServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeDiskIoByProcessServiceListQueryKey(options),
+  });
+
+export const fctNodeDiskIoByProcessServiceGetQueryKey = (options: Options<FctNodeDiskIoByProcessServiceGetData>) =>
+  createQueryKey('fctNodeDiskIoByProcessServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by wallclock_slot_start_date_time
+ */
+export const fctNodeDiskIoByProcessServiceGetOptions = (options: Options<FctNodeDiskIoByProcessServiceGetData>) =>
+  queryOptions<
+    FctNodeDiskIoByProcessServiceGetResponse,
+    FctNodeDiskIoByProcessServiceGetError,
+    FctNodeDiskIoByProcessServiceGetResponse,
+    ReturnType<typeof fctNodeDiskIoByProcessServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeDiskIoByProcessServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeDiskIoByProcessServiceGetQueryKey(options),
+  });
+
+export const fctNodeMemoryUsageByProcessServiceListQueryKey = (
+  options?: Options<FctNodeMemoryUsageByProcessServiceListData>
+) => createQueryKey('fctNodeMemoryUsageByProcessServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeMemoryUsageByProcessServiceListOptions = (
+  options?: Options<FctNodeMemoryUsageByProcessServiceListData>
+) =>
+  queryOptions<
+    FctNodeMemoryUsageByProcessServiceListResponse,
+    FctNodeMemoryUsageByProcessServiceListError,
+    FctNodeMemoryUsageByProcessServiceListResponse,
+    ReturnType<typeof fctNodeMemoryUsageByProcessServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeMemoryUsageByProcessServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeMemoryUsageByProcessServiceListQueryKey(options),
+  });
+
+export const fctNodeMemoryUsageByProcessServiceGetQueryKey = (
+  options: Options<FctNodeMemoryUsageByProcessServiceGetData>
+) => createQueryKey('fctNodeMemoryUsageByProcessServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by wallclock_slot_start_date_time
+ */
+export const fctNodeMemoryUsageByProcessServiceGetOptions = (
+  options: Options<FctNodeMemoryUsageByProcessServiceGetData>
+) =>
+  queryOptions<
+    FctNodeMemoryUsageByProcessServiceGetResponse,
+    FctNodeMemoryUsageByProcessServiceGetError,
+    FctNodeMemoryUsageByProcessServiceGetResponse,
+    ReturnType<typeof fctNodeMemoryUsageByProcessServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeMemoryUsageByProcessServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeMemoryUsageByProcessServiceGetQueryKey(options),
+  });
+
+export const fctNodeNetworkIoByProcessServiceListQueryKey = (
+  options?: Options<FctNodeNetworkIoByProcessServiceListData>
+) => createQueryKey('fctNodeNetworkIoByProcessServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeNetworkIoByProcessServiceListOptions = (
+  options?: Options<FctNodeNetworkIoByProcessServiceListData>
+) =>
+  queryOptions<
+    FctNodeNetworkIoByProcessServiceListResponse,
+    FctNodeNetworkIoByProcessServiceListError,
+    FctNodeNetworkIoByProcessServiceListResponse,
+    ReturnType<typeof fctNodeNetworkIoByProcessServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeNetworkIoByProcessServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeNetworkIoByProcessServiceListQueryKey(options),
+  });
+
+export const fctNodeNetworkIoByProcessServiceGetQueryKey = (
+  options: Options<FctNodeNetworkIoByProcessServiceGetData>
+) => createQueryKey('fctNodeNetworkIoByProcessServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by wallclock_slot_start_date_time
+ */
+export const fctNodeNetworkIoByProcessServiceGetOptions = (options: Options<FctNodeNetworkIoByProcessServiceGetData>) =>
+  queryOptions<
+    FctNodeNetworkIoByProcessServiceGetResponse,
+    FctNodeNetworkIoByProcessServiceGetError,
+    FctNodeNetworkIoByProcessServiceGetResponse,
+    ReturnType<typeof fctNodeNetworkIoByProcessServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeNetworkIoByProcessServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeNetworkIoByProcessServiceGetQueryKey(options),
+  });
+
 export const fctOpcodeGasByOpcodeDailyServiceListQueryKey = (
   options?: Options<FctOpcodeGasByOpcodeDailyServiceListData>
 ) => createQueryKey('fctOpcodeGasByOpcodeDailyServiceList', options);
@@ -8832,6 +9120,114 @@ export const intBlockProposerCanonicalServiceGetOptions = (options: Options<IntB
     queryKey: intBlockProposerCanonicalServiceGetQueryKey(options),
   });
 
+export const intContractCreationServiceListQueryKey = (options?: Options<IntContractCreationServiceListData>) =>
+  createQueryKey('intContractCreationServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intContractCreationServiceListOptions = (options?: Options<IntContractCreationServiceListData>) =>
+  queryOptions<
+    IntContractCreationServiceListResponse,
+    IntContractCreationServiceListError,
+    IntContractCreationServiceListResponse,
+    ReturnType<typeof intContractCreationServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intContractCreationServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intContractCreationServiceListQueryKey(options),
+  });
+
+export const intContractCreationServiceGetQueryKey = (options: Options<IntContractCreationServiceGetData>) =>
+  createQueryKey('intContractCreationServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intContractCreationServiceGetOptions = (options: Options<IntContractCreationServiceGetData>) =>
+  queryOptions<
+    IntContractCreationServiceGetResponse,
+    IntContractCreationServiceGetError,
+    IntContractCreationServiceGetResponse,
+    ReturnType<typeof intContractCreationServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intContractCreationServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intContractCreationServiceGetQueryKey(options),
+  });
+
+export const intContractSelfdestructServiceListQueryKey = (options?: Options<IntContractSelfdestructServiceListData>) =>
+  createQueryKey('intContractSelfdestructServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intContractSelfdestructServiceListOptions = (options?: Options<IntContractSelfdestructServiceListData>) =>
+  queryOptions<
+    IntContractSelfdestructServiceListResponse,
+    IntContractSelfdestructServiceListError,
+    IntContractSelfdestructServiceListResponse,
+    ReturnType<typeof intContractSelfdestructServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intContractSelfdestructServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intContractSelfdestructServiceListQueryKey(options),
+  });
+
+export const intContractSelfdestructServiceGetQueryKey = (options: Options<IntContractSelfdestructServiceGetData>) =>
+  createQueryKey('intContractSelfdestructServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intContractSelfdestructServiceGetOptions = (options: Options<IntContractSelfdestructServiceGetData>) =>
+  queryOptions<
+    IntContractSelfdestructServiceGetResponse,
+    IntContractSelfdestructServiceGetError,
+    IntContractSelfdestructServiceGetResponse,
+    ReturnType<typeof intContractSelfdestructServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intContractSelfdestructServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intContractSelfdestructServiceGetQueryKey(options),
+  });
+
 export const intContractStorageExpiry1mServiceListQueryKey = (
   options?: Options<IntContractStorageExpiry1mServiceListData>
 ) => createQueryKey('intContractStorageExpiry1mServiceList', options);
@@ -10068,26 +10464,26 @@ export const intEngineNewPayloadServiceGetOptions = (options: Options<IntEngineN
     queryKey: intEngineNewPayloadServiceGetQueryKey(options),
   });
 
-export const intEngineNewPayloadFastestServiceListQueryKey = (
-  options?: Options<IntEngineNewPayloadFastestServiceListData>
-) => createQueryKey('intEngineNewPayloadFastestServiceList', options);
+export const intEngineNewPayloadFastestExecutionByNodeClassServiceListQueryKey = (
+  options?: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceListData>
+) => createQueryKey('intEngineNewPayloadFastestExecutionByNodeClassServiceList', options);
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intEngineNewPayloadFastestServiceListOptions = (
-  options?: Options<IntEngineNewPayloadFastestServiceListData>
+export const intEngineNewPayloadFastestExecutionByNodeClassServiceListOptions = (
+  options?: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceListData>
 ) =>
   queryOptions<
-    IntEngineNewPayloadFastestServiceListResponse,
-    IntEngineNewPayloadFastestServiceListError,
-    IntEngineNewPayloadFastestServiceListResponse,
-    ReturnType<typeof intEngineNewPayloadFastestServiceListQueryKey>
+    IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse,
+    IntEngineNewPayloadFastestExecutionByNodeClassServiceListError,
+    IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse,
+    ReturnType<typeof intEngineNewPayloadFastestExecutionByNodeClassServiceListQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await intEngineNewPayloadFastestServiceList({
+      const { data } = await intEngineNewPayloadFastestExecutionByNodeClassServiceList({
         ...options,
         ...queryKey[0],
         signal,
@@ -10095,29 +10491,29 @@ export const intEngineNewPayloadFastestServiceListOptions = (
       });
       return data;
     },
-    queryKey: intEngineNewPayloadFastestServiceListQueryKey(options),
+    queryKey: intEngineNewPayloadFastestExecutionByNodeClassServiceListQueryKey(options),
   });
 
-export const intEngineNewPayloadFastestServiceGetQueryKey = (
-  options: Options<IntEngineNewPayloadFastestServiceGetData>
-) => createQueryKey('intEngineNewPayloadFastestServiceGet', options);
+export const intEngineNewPayloadFastestExecutionByNodeClassServiceGetQueryKey = (
+  options: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceGetData>
+) => createQueryKey('intEngineNewPayloadFastestExecutionByNodeClassServiceGet', options);
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intEngineNewPayloadFastestServiceGetOptions = (
-  options: Options<IntEngineNewPayloadFastestServiceGetData>
+export const intEngineNewPayloadFastestExecutionByNodeClassServiceGetOptions = (
+  options: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceGetData>
 ) =>
   queryOptions<
-    IntEngineNewPayloadFastestServiceGetResponse,
-    IntEngineNewPayloadFastestServiceGetError,
-    IntEngineNewPayloadFastestServiceGetResponse,
-    ReturnType<typeof intEngineNewPayloadFastestServiceGetQueryKey>
+    IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse,
+    IntEngineNewPayloadFastestExecutionByNodeClassServiceGetError,
+    IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse,
+    ReturnType<typeof intEngineNewPayloadFastestExecutionByNodeClassServiceGetQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await intEngineNewPayloadFastestServiceGet({
+      const { data } = await intEngineNewPayloadFastestExecutionByNodeClassServiceGet({
         ...options,
         ...queryKey[0],
         signal,
@@ -10125,7 +10521,7 @@ export const intEngineNewPayloadFastestServiceGetOptions = (
       });
       return data;
     },
-    queryKey: intEngineNewPayloadFastestServiceGetQueryKey(options),
+    queryKey: intEngineNewPayloadFastestExecutionByNodeClassServiceGetQueryKey(options),
   });
 
 export const intExecutionBlockByDateServiceListQueryKey = (options?: Options<IntExecutionBlockByDateServiceListData>) =>
@@ -10180,6 +10576,66 @@ export const intExecutionBlockByDateServiceGetOptions = (options: Options<IntExe
       return data;
     },
     queryKey: intExecutionBlockByDateServiceGetQueryKey(options),
+  });
+
+export const intStorageSelfdestructDiffsServiceListQueryKey = (
+  options?: Options<IntStorageSelfdestructDiffsServiceListData>
+) => createQueryKey('intStorageSelfdestructDiffsServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intStorageSelfdestructDiffsServiceListOptions = (
+  options?: Options<IntStorageSelfdestructDiffsServiceListData>
+) =>
+  queryOptions<
+    IntStorageSelfdestructDiffsServiceListResponse,
+    IntStorageSelfdestructDiffsServiceListError,
+    IntStorageSelfdestructDiffsServiceListResponse,
+    ReturnType<typeof intStorageSelfdestructDiffsServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intStorageSelfdestructDiffsServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intStorageSelfdestructDiffsServiceListQueryKey(options),
+  });
+
+export const intStorageSelfdestructDiffsServiceGetQueryKey = (
+  options: Options<IntStorageSelfdestructDiffsServiceGetData>
+) => createQueryKey('intStorageSelfdestructDiffsServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intStorageSelfdestructDiffsServiceGetOptions = (
+  options: Options<IntStorageSelfdestructDiffsServiceGetData>
+) =>
+  queryOptions<
+    IntStorageSelfdestructDiffsServiceGetResponse,
+    IntStorageSelfdestructDiffsServiceGetError,
+    IntStorageSelfdestructDiffsServiceGetResponse,
+    ReturnType<typeof intStorageSelfdestructDiffsServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intStorageSelfdestructDiffsServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intStorageSelfdestructDiffsServiceGetQueryKey(options),
   });
 
 export const intStorageSlotDiffServiceListQueryKey = (options?: Options<IntStorageSlotDiffServiceListData>) =>

@@ -12,6 +12,7 @@ import {
   DataZoomComponent,
   LegendComponent,
   MarkLineComponent,
+  MarkAreaComponent,
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { hexToRgba, formatSmartDecimal, getDataVizColors, resolveCssColorToHex } from '@/utils';
@@ -30,6 +31,7 @@ echarts.use([
   DataZoomComponent,
   LegendComponent,
   MarkLineComponent,
+  MarkAreaComponent,
   CanvasRenderer,
 ]);
 
@@ -95,6 +97,8 @@ export function MultiLineChart({
   notMerge = true,
   onSeriesClick,
   markLines,
+  markAreas,
+  onChartReady: onChartReadyProp,
 }: MultiLineChartProps): React.JSX.Element {
   // Store ref to the ReactEChartsCore wrapper (not the instance) for click handling
   const chartWrapperRef = useRef<ReactEChartsCore | null>(null);
@@ -115,6 +119,7 @@ export function MultiLineChart({
       if (syncGroup && crosshairsContext) {
         crosshairsContext.registerChart(syncGroup, echartsInstance);
       }
+      onChartReadyProp?.(echartsInstance);
 
       // Track dataZoom changes to preserve zoom state across data updates and legend toggles
       // Using state ensures the zoom range is included in the option config on re-renders
@@ -139,7 +144,7 @@ export function MultiLineChart({
         echartsInstance.on('datazoom', handleDataZoom);
       }
     },
-    [syncGroup, crosshairsContext, enableDataZoom]
+    [syncGroup, crosshairsContext, enableDataZoom, onChartReadyProp]
   );
 
   // Cleanup sync registration on unmount or syncGroup change
@@ -580,41 +585,73 @@ export function MultiLineChart({
       return baseConfig;
     });
 
-    // Add annotation series for markLines if provided
+    // Add annotation series for markLines/markAreas if provided
+    const hasMarkLines = markLines && markLines.length > 0;
+    const hasMarkAreas = markAreas && markAreas.length > 0;
     const annotationSeries =
-      markLines && markLines.length > 0
+      hasMarkLines || hasMarkAreas
         ? [
             {
               name: '__annotations__',
               type: 'line' as const,
-              data: [], // Empty data - this series is only for markLine
+              data: [], // Empty data - this series is only for annotations
               silent: true, // Don't trigger events
               legendHoverLink: false,
-              markLine: {
-                silent: true,
-                symbol: 'none',
-                animation: false,
-                data: markLines.map(ml => ({
-                  xAxis: ml.xValue,
-                  label: {
-                    show: !!ml.label,
-                    formatter: ml.label ?? '',
-                    position: ml.labelPosition ?? 'end',
-                    rotate: -90,
-                    align: 'left',
-                    offset: [0, -2],
-                    color: hexToRgba(ml.color ?? themeColors.muted, 0.7),
-                    fontSize: 11,
-                    backgroundColor: 'transparent',
-                    padding: [2, 4],
-                  },
-                  lineStyle: {
-                    color: ml.color ?? themeColors.muted,
-                    type: (ml.lineStyle ?? 'dashed') as 'solid' | 'dashed' | 'dotted',
-                    width: ml.lineWidth ?? 1,
-                  },
-                })),
-              },
+              ...(hasMarkLines
+                ? {
+                    markLine: {
+                      silent: true,
+                      symbol: 'none',
+                      animation: false,
+                      data: markLines!.map(ml => ({
+                        xAxis: ml.xValue,
+                        label: {
+                          show: !!ml.label,
+                          formatter: ml.label ?? '',
+                          position: ml.labelPosition ?? 'end',
+                          rotate: -90,
+                          align: 'left',
+                          offset: ml.distance ?? [0, -2],
+                          color: hexToRgba(ml.color ?? themeColors.muted, 0.7),
+                          fontSize: 11,
+                          backgroundColor: 'transparent',
+                          padding: [2, 4],
+                        },
+                        lineStyle: {
+                          color: ml.color ?? themeColors.muted,
+                          type: (ml.lineStyle ?? 'dashed') as 'solid' | 'dashed' | 'dotted',
+                          width: ml.lineWidth ?? 1,
+                        },
+                      })),
+                    },
+                  }
+                : {}),
+              ...(hasMarkAreas
+                ? {
+                    markArea: {
+                      silent: true,
+                      animation: false,
+                      data: markAreas!.map(ma => [
+                        {
+                          xAxis: ma.xStart,
+                          itemStyle: {
+                            color: hexToRgba(ma.color ?? themeColors.muted, ma.opacity ?? 0.15),
+                          },
+                          label: {
+                            show: !!ma.label,
+                            formatter: ma.label ?? '',
+                            position: 'insideTop' as const,
+                            color: hexToRgba(ma.color ?? themeColors.muted, 0.8),
+                            fontSize: 10,
+                          },
+                        },
+                        {
+                          xAxis: ma.xEnd,
+                        },
+                      ]),
+                    },
+                  }
+                : {}),
             },
           ]
         : [];
@@ -861,6 +898,7 @@ export function MultiLineChart({
     showLegend,
     legendPosition,
     markLines,
+    markAreas,
   ]);
 
   const chartContent = (

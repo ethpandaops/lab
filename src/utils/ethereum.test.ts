@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { weiToEth, ethToWei, weiToGwei, gweiToWei, truncateAddress, parseExecutionClient } from './ethereum';
+import {
+  weiToEth,
+  ethToWei,
+  weiToGwei,
+  gweiToWei,
+  truncateAddress,
+  parseExecutionClient,
+  getClientLayer,
+} from './ethereum';
 
 describe('weiToEth', () => {
   it('should convert 1 ETH in wei to ETH', () => {
@@ -177,5 +185,29 @@ describe('parseExecutionClient', () => {
 
   it('should trim whitespace from parts', () => {
     expect(parseExecutionClient('Nethermind / v1.25.4 ')).toBe('Nethermind v1.25.4');
+  });
+});
+
+describe('getClientLayer', () => {
+  it('should classify known consensus clients as CL', () => {
+    expect(getClientLayer('lighthouse')).toBe('CL');
+    expect(getClientLayer('TeKu')).toBe('CL');
+  });
+
+  it('should classify known execution clients as EL', () => {
+    expect(getClientLayer('geth')).toBe('EL');
+    expect(getClientLayer('Nethermind')).toBe('EL');
+  });
+
+  it('should classify CL/EL aliases case-insensitively', () => {
+    expect(getClientLayer('CL')).toBe('CL');
+    expect(getClientLayer('cl')).toBe('CL');
+    expect(getClientLayer('EL')).toBe('EL');
+    expect(getClientLayer('el')).toBe('EL');
+  });
+
+  it('should return null for unknown client types', () => {
+    expect(getClientLayer('')).toBeNull();
+    expect(getClientLayer('unknown-client')).toBeNull();
   });
 });
