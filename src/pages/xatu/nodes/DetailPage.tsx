@@ -234,12 +234,8 @@ export function DetailPage(): JSX.Element {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Hardware specs card */}
-          {spec && (
-            <div className="max-w-2xl">
-              <NodeSpecsCard spec={spec} />
-            </div>
-          )}
+          {/* Hardware specs */}
+          {spec && <NodeSpecsCard spec={spec} />}
 
           {/* Charts grid */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">

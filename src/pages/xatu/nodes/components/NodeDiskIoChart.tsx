@@ -5,7 +5,7 @@ import type { SeriesData } from '@/components/Charts/MultiLine/MultiLine.types';
 import { getDataVizColors } from '@/utils';
 import type { FctNodeDiskIoHourly, FctNodeDiskIoDaily } from '@/api/types.gen';
 import type { TimePeriod } from '../constants';
-import { formatBytes } from '../utils';
+import { formatBytes, formatTimeTooltip } from '../utils';
 
 type DiskRow = FctNodeDiskIoHourly | FctNodeDiskIoDaily;
 
@@ -14,9 +14,7 @@ function isHourly(row: DiskRow): row is FctNodeDiskIoHourly {
 }
 
 function getTimestamp(row: DiskRow): number {
-  if (isHourly(row)) {
-    return row.hour_start_date_time ?? 0;
-  }
+  if (isHourly(row)) return row.hour_start_date_time ?? 0;
   const daily = row as FctNodeDiskIoDaily;
   return daily.day_start_date ? Math.floor(new Date(daily.day_start_date).getTime() / 1000) : 0;
 }
@@ -44,23 +42,20 @@ export function NodeDiskIoChart({ data, timePeriod, filterNode }: NodeDiskIoChar
     }
 
     const allTimestamps = new Set<number>();
-    for (const row of filtered) {
-      allTimestamps.add(getTimestamp(row));
-    }
+    for (const row of filtered) allTimestamps.add(getTimestamp(row));
     const sortedTimestamps = Array.from(allTimestamps).sort((a, b) => a - b);
 
     const chartSeries: SeriesData[] = [];
     let colorIndex = 0;
-
     for (const [name, timeMap] of grouped) {
-      const points: Array<[number, number]> = sortedTimestamps.map(ts => [ts, timeMap.get(ts) ?? 0]);
-
       chartSeries.push({
         name,
-        data: points,
+        data: sortedTimestamps.map(ts => [ts, timeMap.get(ts) ?? 0] as [number, number]),
         color: CHART_CATEGORICAL_COLORS[colorIndex % CHART_CATEGORICAL_COLORS.length],
-        lineWidth: 1.5,
-        smooth: 0.3,
+        lineWidth: 2,
+        smooth: 0.4,
+        showArea: true,
+        areaOpacity: 0.08,
       });
       colorIndex++;
     }
@@ -69,28 +64,34 @@ export function NodeDiskIoChart({ data, timePeriod, filterNode }: NodeDiskIoChar
   }, [data, filterNode, CHART_CATEGORICAL_COLORS]);
 
   const subtitle = filterNode
-    ? `${timePeriod} - Combined read + write`
-    : `${timePeriod} - Avg disk I/O per node (read + write)`;
+    ? `${timePeriod} · Combined read + write`
+    : `${timePeriod} · Avg disk I/O per node (read + write)`;
 
   return (
     <PopoutCard title="Disk I/O" subtitle={subtitle} modalSize="xl">
       {({ inModal }) => (
         <MultiLineChart
           series={series}
-          xAxis={{
-            type: 'time',
-            timestamps,
-          }}
+          xAxis={{ type: 'time', timestamps }}
           yAxis={{
-            name: 'Bytes / slot',
+            name: 'Avg bytes / slot',
             min: 0,
             formatter: (v: number) => formatBytes(v, 1),
           }}
-          height={inModal ? 500 : 300}
-          showLegend={series.length > 1}
+          height={inModal ? 500 : 350}
+          showLegend
+          legendPosition="bottom"
           enableSeriesFilter={series.length > 5}
           tooltipMode={series.length > 5 ? 'compact' : 'default'}
           syncGroup="node-time"
+          tooltipFormatter={(params: unknown) => {
+            const items = (Array.isArray(params) ? params : [params]) as Array<{
+              marker: string;
+              seriesName: string;
+              value: [number, number] | number;
+            }>;
+            return formatTimeTooltip(items, v => formatBytes(Number(v), 1));
+          }}
         />
       )}
     </PopoutCard>
