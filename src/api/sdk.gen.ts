@@ -795,6 +795,12 @@ import type {
   IntBlockProposerCanonicalServiceListData,
   IntBlockProposerCanonicalServiceListErrors,
   IntBlockProposerCanonicalServiceListResponses,
+  IntBlockResourceGasServiceGetData,
+  IntBlockResourceGasServiceGetErrors,
+  IntBlockResourceGasServiceGetResponses,
+  IntBlockResourceGasServiceListData,
+  IntBlockResourceGasServiceListErrors,
+  IntBlockResourceGasServiceListResponses,
   IntContractCreationServiceGetData,
   IntContractCreationServiceGetErrors,
   IntContractCreationServiceGetResponses,
@@ -1077,6 +1083,12 @@ import type {
   IntTransactionCallFrameOpcodeGasServiceListData,
   IntTransactionCallFrameOpcodeGasServiceListErrors,
   IntTransactionCallFrameOpcodeGasServiceListResponses,
+  IntTransactionCallFrameOpcodeResourceGasServiceGetData,
+  IntTransactionCallFrameOpcodeResourceGasServiceGetErrors,
+  IntTransactionCallFrameOpcodeResourceGasServiceGetResponses,
+  IntTransactionCallFrameOpcodeResourceGasServiceListData,
+  IntTransactionCallFrameOpcodeResourceGasServiceListErrors,
+  IntTransactionCallFrameOpcodeResourceGasServiceListResponses,
   IntTransactionCallFrameServiceGetData,
   IntTransactionCallFrameServiceGetErrors,
   IntTransactionCallFrameServiceGetResponses,
@@ -1089,6 +1101,12 @@ import type {
   IntTransactionOpcodeGasServiceListData,
   IntTransactionOpcodeGasServiceListErrors,
   IntTransactionOpcodeGasServiceListResponses,
+  IntTransactionResourceGasServiceGetData,
+  IntTransactionResourceGasServiceGetErrors,
+  IntTransactionResourceGasServiceGetResponses,
+  IntTransactionResourceGasServiceListData,
+  IntTransactionResourceGasServiceListErrors,
+  IntTransactionResourceGasServiceListResponses,
 } from './types.gen';
 import {
   zAdminCbtIncrementalServiceGetData,
@@ -1619,6 +1637,10 @@ import {
   zIntBlockProposerCanonicalServiceGetResponse,
   zIntBlockProposerCanonicalServiceListData,
   zIntBlockProposerCanonicalServiceListResponse,
+  zIntBlockResourceGasServiceGetData,
+  zIntBlockResourceGasServiceGetResponse,
+  zIntBlockResourceGasServiceListData,
+  zIntBlockResourceGasServiceListResponse,
   zIntContractCreationServiceGetData,
   zIntContractCreationServiceGetResponse,
   zIntContractCreationServiceListData,
@@ -1807,6 +1829,10 @@ import {
   zIntTransactionCallFrameOpcodeGasServiceGetResponse,
   zIntTransactionCallFrameOpcodeGasServiceListData,
   zIntTransactionCallFrameOpcodeGasServiceListResponse,
+  zIntTransactionCallFrameOpcodeResourceGasServiceGetData,
+  zIntTransactionCallFrameOpcodeResourceGasServiceGetResponse,
+  zIntTransactionCallFrameOpcodeResourceGasServiceListData,
+  zIntTransactionCallFrameOpcodeResourceGasServiceListResponse,
   zIntTransactionCallFrameServiceGetData,
   zIntTransactionCallFrameServiceGetResponse,
   zIntTransactionCallFrameServiceListData,
@@ -1815,6 +1841,10 @@ import {
   zIntTransactionOpcodeGasServiceGetResponse,
   zIntTransactionOpcodeGasServiceListData,
   zIntTransactionOpcodeGasServiceListResponse,
+  zIntTransactionResourceGasServiceGetData,
+  zIntTransactionResourceGasServiceGetResponse,
+  zIntTransactionResourceGasServiceListData,
+  zIntTransactionResourceGasServiceListResponse,
 } from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<
@@ -6823,6 +6853,44 @@ export const intBlockProposerCanonicalServiceGet = <ThrowOnError extends boolean
  *
  * Retrieve paginated results with optional filtering
  */
+export const intBlockResourceGasServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntBlockResourceGasServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntBlockResourceGasServiceListResponses,
+    IntBlockResourceGasServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockResourceGasServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntBlockResourceGasServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_block_resource_gas',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intBlockResourceGasServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntBlockResourceGasServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntBlockResourceGasServiceGetResponses,
+    IntBlockResourceGasServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockResourceGasServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntBlockResourceGasServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_block_resource_gas/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const intContractCreationServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractCreationServiceListData, ThrowOnError>
 ) =>
@@ -8644,6 +8712,45 @@ export const intTransactionCallFrameOpcodeGasServiceGet = <ThrowOnError extends 
  *
  * Retrieve paginated results with optional filtering
  */
+export const intTransactionCallFrameOpcodeResourceGasServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntTransactionCallFrameOpcodeResourceGasServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntTransactionCallFrameOpcodeResourceGasServiceListResponses,
+    IntTransactionCallFrameOpcodeResourceGasServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionCallFrameOpcodeResourceGasServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zIntTransactionCallFrameOpcodeResourceGasServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_call_frame_opcode_resource_gas',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intTransactionCallFrameOpcodeResourceGasServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntTransactionCallFrameOpcodeResourceGasServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntTransactionCallFrameOpcodeResourceGasServiceGetResponses,
+    IntTransactionCallFrameOpcodeResourceGasServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionCallFrameOpcodeResourceGasServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionCallFrameOpcodeResourceGasServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_call_frame_opcode_resource_gas/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const intTransactionOpcodeGasServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntTransactionOpcodeGasServiceListData, ThrowOnError>
 ) =>
@@ -8674,5 +8781,43 @@ export const intTransactionOpcodeGasServiceGet = <ThrowOnError extends boolean =
     requestValidator: async data => await zIntTransactionOpcodeGasServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntTransactionOpcodeGasServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_transaction_opcode_gas/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intTransactionResourceGasServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntTransactionResourceGasServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntTransactionResourceGasServiceListResponses,
+    IntTransactionResourceGasServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionResourceGasServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionResourceGasServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_resource_gas',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intTransactionResourceGasServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntTransactionResourceGasServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntTransactionResourceGasServiceGetResponses,
+    IntTransactionResourceGasServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionResourceGasServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionResourceGasServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_resource_gas/{block_number}',
     ...options,
   });

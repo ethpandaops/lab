@@ -36,6 +36,7 @@ import {
 } from './components';
 import { useNetwork } from '@/hooks/useNetwork';
 import { CATEGORY_COLORS, getOpcodeCategory, getEtherscanBaseUrl, isMainnet } from './utils';
+import { isPrecompileAddress } from './utils/precompileNames';
 import type { IntTransactionCallFrame } from '@/api/types.gen';
 
 /**
@@ -724,8 +725,8 @@ export function CallPage(): JSX.Element {
               </div>
             </Card>
 
-            {/* Contract Storage CTA */}
-            {currentFrame.target_address && (
+            {/* Contract Storage CTA - hide for precompiles (no storage) */}
+            {currentFrame.target_address && !isPrecompileAddress(currentFrame.target_address) && (
               <div className="mb-6">
                 <ContractStorageCTA
                   address={currentFrame.target_address}

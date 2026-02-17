@@ -7,6 +7,7 @@ import { ContractStorageButton } from '../ContractStorageButton';
 import type { CallFrameOpcodeStats } from '../../hooks/useTransactionGasData';
 import { useCallFrameOpcodes, type OpcodeBreakdown } from '../../hooks/useCallFrameOpcodes';
 import { getOpcodeCategory, CATEGORY_COLORS } from '../../utils/opcodeUtils';
+import { isPrecompileAddress } from '../../utils/precompileNames';
 import type { IntTransactionCallFrame } from '@/api/types.gen';
 
 /**
@@ -266,6 +267,7 @@ function TraceRow({
   const hasChildren = node.children.length > 0;
   const isExpanded = expandedNodes.has(callId);
   const hasError = (frame.error_count ?? 0) > 0;
+  const isPrecompile = isPrecompileAddress(frame.target_address);
 
   // Look up opcode stats for this specific call frame
   const opcodeStats = allOpcodeStats?.get(callId);
@@ -411,7 +413,7 @@ function TraceRow({
 
         {/* Contract/Function name */}
         <span className={clsx('truncate', hasError ? 'text-danger' : 'text-foreground', 'group-hover:text-primary')}>
-          {node.contractName && (
+          {node.contractName && !isPrecompile && (
             <span
               className={clsx(
                 'cursor-pointer transition-colors',
@@ -425,7 +427,7 @@ function TraceRow({
               {node.contractName}
             </span>
           )}
-          {node.contractName && <span className="text-muted">.</span>}
+          {node.contractName && !isPrecompile && <span className="text-muted">.</span>}
           <span
             className={clsx(
               'cursor-pointer font-medium transition-colors',
@@ -435,7 +437,7 @@ function TraceRow({
             onMouseEnter={node.functionName ? handleFunctionMouseEnter : undefined}
             onMouseLeave={node.functionName ? handleMouseLeave : undefined}
           >
-            {node.functionName || (node.contractName ? '(fallback)' : displayLabel)}
+            {isPrecompile ? displayLabel : node.functionName || (node.contractName ? '(fallback)' : displayLabel)}
           </span>
         </span>
 
@@ -524,11 +526,11 @@ function TraceRow({
         {/* Spacer */}
         <span className="flex-1" />
 
-        {/* Storage link */}
-        {frame.target_address && <ContractStorageButton address={frame.target_address} size="sm" />}
+        {/* Storage link - hide for precompiles (no storage) */}
+        {frame.target_address && !isPrecompile && <ContractStorageButton address={frame.target_address} size="sm" />}
 
-        {/* Opcode breakdown toggle - only for actual calls (not root) */}
-        {frame.call_type && (
+        {/* Opcode breakdown toggle - hide for precompiles (no opcodes) */}
+        {frame.call_type && !isPrecompile && (
           <button
             onClick={handleOpcodeToggle}
             className={clsx(
