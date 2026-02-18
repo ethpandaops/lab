@@ -35,9 +35,13 @@ import {
   TopItemsByGasTable,
   CallTraceView,
   ContractActionPopover,
+  ResourceGasBreakdown,
+  ResourceGasTable,
+  ResourceGasHelp,
 } from './components';
 import type { TopGasItem, CallFrameData } from './components';
 import { getCallLabel } from './hooks/useTransactionGasData';
+import { useCallFrameResourceGas } from './hooks/useCallFrameResourceGas';
 import { useNetwork } from '@/hooks/useNetwork';
 import {
   CATEGORY_COLORS,
@@ -112,6 +116,17 @@ export function TransactionPage(): JSX.Element {
   const { data: opcodeMap, isLoading: isLoadingOpcodes } = useAllCallFrameOpcodes({
     transactionHash: txHash,
     blockNumber,
+  });
+
+  // Fetch per-opcode resource gas for the resource view
+  const {
+    entries: txResourceCategoryEntries,
+    opcodeRows: txOpcodeResourceRows,
+    isLoading: txResourceOpcodeLoading,
+  } = useCallFrameResourceGas({
+    transactionHash: txHash,
+    blockNumber,
+    callFrameId: null,
   });
 
   // Derive badge stats from full opcode data (SSTORE, SLOAD, LOG*, CREATE*, SELFDESTRUCT)
@@ -501,8 +516,9 @@ export function TransactionPage(): JSX.Element {
     if (hash === 'overview') return 0;
     if (hash === 'trace') return 1;
     if (hash === 'opcodes') return 2;
-    if (hash === 'calls') return 3;
-    if (hash === 'contracts') return 4;
+    if (hash === 'resources') return 3;
+    if (hash === 'calls') return 4;
+    if (hash === 'contracts') return 5;
     return 0;
   }, []);
   const [selectedTabIndex, setSelectedTabIndex] = useState(getInitialTabIndex);
@@ -818,12 +834,16 @@ export function TransactionPage(): JSX.Element {
 
       {/* Tabbed Content */}
       <HeadlessTab.Group selectedIndex={selectedTabIndex} onChange={setSelectedTabIndex}>
-        <HeadlessTab.List className="mb-6 flex gap-1 border-b border-border">
-          <Tab hash="overview">Overview</Tab>
-          {!isSimpleTransfer && <Tab hash="trace">Trace</Tab>}
-          {!isSimpleTransfer && <Tab hash="opcodes">Opcodes</Tab>}
-          {!isSimpleTransfer && callTypeChartData.length > 0 && <Tab hash="calls">Internal Txs</Tab>}
-        </HeadlessTab.List>
+        <div className="mb-6 flex items-center justify-between border-b border-border">
+          <HeadlessTab.List className="flex gap-1">
+            <Tab hash="overview">Overview</Tab>
+            {!isSimpleTransfer && <Tab hash="trace">Trace</Tab>}
+            {!isSimpleTransfer && <Tab hash="opcodes">Opcodes</Tab>}
+            {!isSimpleTransfer && <Tab hash="resources">Resources</Tab>}
+            {!isSimpleTransfer && callTypeChartData.length > 0 && <Tab hash="calls">Internal Txs</Tab>}
+          </HeadlessTab.List>
+          {selectedTabIndex === 3 && <ResourceGasHelp />}
+        </div>
 
         <HeadlessTab.Panels>
           {/* Overview Tab */}
@@ -996,6 +1016,21 @@ export function TransactionPage(): JSX.Element {
                   <p className="text-muted">No opcode data available</p>
                 </Card>
               )}
+            </HeadlessTab.Panel>
+          )}
+
+          {/* Resources Tab - only show if not a simple transfer */}
+          {!isSimpleTransfer && (
+            <HeadlessTab.Panel>
+              <ResourceGasBreakdown
+                entries={txResourceCategoryEntries}
+                loading={txResourceOpcodeLoading}
+                title="Gas by Resource Category"
+                subtitle="What system resources consumed gas?"
+                className="mb-6"
+              />
+
+              <ResourceGasTable rows={txOpcodeResourceRows} loading={txResourceOpcodeLoading} />
             </HeadlessTab.Panel>
           )}
 

@@ -415,6 +415,13 @@ function TraceRow({
           </span>
         )}
 
+        {/* Precompile badge */}
+        {isPrecompile && (
+          <span className="shrink-0 rounded-xs bg-rose-500/20 px-1.5 py-0.5 text-xs font-medium text-rose-400">
+            precompile
+          </span>
+        )}
+
         {/* Contract/Function name */}
         <span className={clsx('truncate', hasError ? 'text-danger' : 'text-foreground', 'group-hover:text-primary')}>
           {node.contractName && !isPrecompile && (

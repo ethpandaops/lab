@@ -33,7 +33,11 @@ import {
   GasFormula,
   CallTraceView,
   ContractStorageCTA,
+  ResourceGasBreakdown,
+  ResourceGasTable,
+  ResourceGasHelp,
 } from './components';
+import { useCallFrameResourceGas } from './hooks/useCallFrameResourceGas';
 import { useNetwork } from '@/hooks/useNetwork';
 import { CATEGORY_COLORS, getOpcodeCategory, getEtherscanBaseUrl, isMainnet } from './utils';
 import { isPrecompileAddress } from './utils/precompileNames';
@@ -171,6 +175,17 @@ export function CallPage(): JSX.Element {
     callFrameId: callIdNum,
   });
 
+  // Fetch per-opcode resource gas for this call frame
+  const {
+    entries: frameResourceEntries,
+    opcodeRows: frameOpcodeResourceRows,
+    isLoading: frameResourceLoading,
+  } = useCallFrameResourceGas({
+    transactionHash: txHash,
+    blockNumber,
+    callFrameId: callIdNum,
+  });
+
   // Find the current frame from all frames
   const currentFrame = useMemo<IntTransactionCallFrame | null>(() => {
     if (!txData?.callFrames) return null;
@@ -292,6 +307,7 @@ export function CallPage(): JSX.Element {
     const hash = window.location.hash.slice(1);
     if (hash === 'overview') return 0;
     if (hash === 'opcodes') return 1;
+    if (hash === 'resources') return 2;
     return 0;
   }, []);
   const [selectedTabIndex, setSelectedTabIndex] = useState(getTabIndexFromHash);
@@ -635,10 +651,14 @@ export function CallPage(): JSX.Element {
 
       {/* Tabbed Content */}
       <HeadlessTab.Group selectedIndex={selectedTabIndex} onChange={setSelectedTabIndex}>
-        <HeadlessTab.List className="mb-6 flex gap-1 border-b border-border">
-          <Tab hash="overview">Overview</Tab>
-          <Tab hash="opcodes">Opcodes</Tab>
-        </HeadlessTab.List>
+        <div className="mb-6 flex items-center justify-between border-b border-border">
+          <HeadlessTab.List className="flex gap-1">
+            <Tab hash="overview">Overview</Tab>
+            <Tab hash="opcodes">Opcodes</Tab>
+            <Tab hash="resources">Resources</Tab>
+          </HeadlessTab.List>
+          {selectedTabIndex === 2 && <ResourceGasHelp />}
+        </div>
 
         <HeadlessTab.Panels>
           {/* Overview Tab */}
@@ -787,6 +807,13 @@ export function CallPage(): JSX.Element {
                 <p className="text-muted">No opcode data available for this internal tx</p>
               </Card>
             )}
+          </HeadlessTab.Panel>
+
+          {/* Resources Tab */}
+          <HeadlessTab.Panel>
+            <ResourceGasBreakdown entries={frameResourceEntries} loading={frameResourceLoading} className="mb-6" />
+
+            <ResourceGasTable rows={frameOpcodeResourceRows} loading={frameResourceLoading} />
           </HeadlessTab.Panel>
         </HeadlessTab.Panels>
       </HeadlessTab.Group>
