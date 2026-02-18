@@ -7,6 +7,7 @@ import { fetchAllPages } from '@/utils/api-pagination';
 import type { TransactionMetadata, CallTreeNode, OpcodeStats } from '../IndexPage.types';
 import { useContractOwners, type ContractOwnerMap } from './useContractOwners';
 import { useFunctionSignatures, type FunctionSignatureMap } from './useFunctionSignatures';
+import { getPrecompileOwnerMap } from '../utils/precompileNames';
 
 /**
  * Per-call-frame opcode statistics for "interesting" opcodes
@@ -386,6 +387,12 @@ export function useTransactionGasData({
     blockLookupQuery.isLoading || queries.some(q => q.isLoading) || contractOwnersLoading || functionSignaturesLoading;
   const error = blockLookupQuery.error ?? (queries.find(q => q.error)?.error as Error | null);
 
+  // Merge precompile names into contract owners (API results take priority)
+  const enrichedContractOwners = useMemo<ContractOwnerMap>(
+    () => ({ ...getPrecompileOwnerMap(), ...contractOwners }),
+    [contractOwners]
+  );
+
   const data = useMemo<TransactionGasData | null>(() => {
     if (isLoading || error) return null;
     if (!callFramesQuery.data || callFramesQuery.data.length === 0) return null;
@@ -397,12 +404,12 @@ export function useTransactionGasData({
       callFrames,
       opcodeGas,
       metadata: extractMetadata(callFrames),
-      callTree: buildCallTree(callFrames, contractOwners, functionSignatures),
+      callTree: buildCallTree(callFrames, enrichedContractOwners, functionSignatures),
       opcodeStats: calculateOpcodeStats(opcodeGas),
-      contractOwners,
+      contractOwners: enrichedContractOwners,
       functionSignatures,
     };
-  }, [isLoading, error, callFramesQuery.data, opcodeGasQuery.data, contractOwners, functionSignatures]);
+  }, [isLoading, error, callFramesQuery.data, opcodeGasQuery.data, enrichedContractOwners, functionSignatures]);
 
   return { data, isLoading, error };
 }

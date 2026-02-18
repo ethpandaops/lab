@@ -6,6 +6,7 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { useGasProfilerBounds } from './useGasProfilerBounds';
 import { useContractOwners, type ContractOwnerMap } from './useContractOwners';
+import { getPrecompileOwnerMap } from '../utils/precompileNames';
 
 /**
  * Summary of a transaction within a block
@@ -222,11 +223,17 @@ export function useBlockTransactions({ blockNumber }: UseBlockTransactionsOption
     enabled: contractAddresses.length > 0,
   });
 
+  // Merge precompile names into contract owners (API results take priority)
+  const enrichedContractOwners = useMemo<ContractOwnerMap>(
+    () => ({ ...getPrecompileOwnerMap(), ...contractOwners }),
+    [contractOwners]
+  );
+
   // Process frames into block data
   const data = useMemo<BlockData | null>(() => {
     if (!frames || targetBlock === null) return null;
 
-    const transactions = createTransactionSummaries(frames, contractOwners);
+    const transactions = createTransactionSummaries(frames, enrichedContractOwners);
     const totalGasUsed = transactions.reduce((sum, tx) => sum + tx.totalGasUsed, 0);
 
     // Aggregate call type distribution from ALL call frames (not just root)
@@ -281,7 +288,7 @@ export function useBlockTransactions({ blockNumber }: UseBlockTransactionsOption
         existing.callCount += 1;
         existing.callTypes.add(callType);
       } else {
-        const name = contractOwners[addr.toLowerCase()]?.contract_name ?? null;
+        const name = enrichedContractOwners[addr.toLowerCase()]?.contract_name ?? null;
         contractGasMap.set(addr, {
           gas: selfGas,
           name,
@@ -336,7 +343,7 @@ export function useBlockTransactions({ blockNumber }: UseBlockTransactionsOption
           txIndex: txSummary?.transactionIndex ?? 0,
           txName: txSummary?.targetName ?? null,
           contractAddress: addr,
-          contractName: contractOwners[addr.toLowerCase()]?.contract_name ?? null,
+          contractName: enrichedContractOwners[addr.toLowerCase()]?.contract_name ?? null,
           gas: selfGas,
           callCount: 1,
         });
@@ -356,7 +363,7 @@ export function useBlockTransactions({ blockNumber }: UseBlockTransactionsOption
       allContractsByGas,
       txContractFlows,
     };
-  }, [frames, targetBlock, contractOwners]);
+  }, [frames, targetBlock, enrichedContractOwners]);
 
   return {
     data,
