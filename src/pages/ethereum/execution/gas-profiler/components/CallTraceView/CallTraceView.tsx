@@ -360,15 +360,19 @@ function TraceRow({
     [onToggleExpand, callId]
   );
 
-  // Display label
-  const displayLabel =
-    node.functionName ||
-    node.contractName ||
-    (frame.target_address
-      ? `${frame.target_address.slice(0, 10)}...${frame.target_address.slice(-8)}`
-      : isContractCreation
-        ? 'Contract Creation'
-        : 'Unknown');
+  // Display label — for precompiles, prefer the precompile name (contractName) over functionName
+  // because the "function selector" is just the first 4 bytes of calldata, not a real selector.
+  const displayLabel = isPrecompile
+    ? node.contractName ||
+      node.functionName ||
+      (frame.target_address ? `${frame.target_address.slice(0, 10)}...${frame.target_address.slice(-8)}` : 'Unknown')
+    : node.functionName ||
+      node.contractName ||
+      (frame.target_address
+        ? `${frame.target_address.slice(0, 10)}...${frame.target_address.slice(-8)}`
+        : isContractCreation
+          ? 'Contract Creation'
+          : 'Unknown');
 
   return (
     <>
@@ -408,6 +412,13 @@ function TraceRow({
             )}
           >
             {isContractCreation ? 'CREATE' : frame.call_type}
+          </span>
+        )}
+
+        {/* Precompile badge */}
+        {isPrecompile && (
+          <span className="shrink-0 rounded-xs bg-rose-500/20 px-1.5 py-0.5 text-xs font-medium text-rose-400">
+            precompile
           </span>
         )}
 

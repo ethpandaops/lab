@@ -7,7 +7,7 @@ import { fetchAllPages } from '@/utils/api-pagination';
 import type { TransactionMetadata, CallTreeNode, OpcodeStats } from '../IndexPage.types';
 import { useContractOwners, type ContractOwnerMap } from './useContractOwners';
 import { useFunctionSignatures, type FunctionSignatureMap } from './useFunctionSignatures';
-import { getPrecompileOwnerMap } from '../utils/precompileNames';
+import { getPrecompileOwnerMap, isPrecompileAddress } from '../utils/precompileNames';
 
 /**
  * Per-call-frame opcode statistics for "interesting" opcodes
@@ -104,7 +104,11 @@ export function getFunctionName(
 /**
  * Get a combined label for a call frame.
  * Priority: function name > contract name > truncated address > fallback
- * Like Phalcon, we show just the function name when available for cleaner display.
+ *
+ * For precompile addresses, the priority is reversed: contract name (the precompile
+ * name like "ecAdd") takes precedence over function name, because the "function
+ * selector" for precompile calls is just the first 4 bytes of raw calldata, not a
+ * real Solidity function selector.
  */
 export function getCallLabel(
   targetAddress: string | null | undefined,
@@ -113,6 +117,11 @@ export function getCallLabel(
   functionSignatures: FunctionSignatureMap,
   fallback = 'Root'
 ): string {
+  // For precompile addresses, prefer the precompile name over spurious function matches
+  if (isPrecompileAddress(targetAddress)) {
+    return getContractLabel(targetAddress, contractOwners, fallback);
+  }
+
   // If we have a function name, just show that (cleanest display)
   const funcName = getFunctionName(functionSelector, functionSignatures);
   if (funcName) {
@@ -152,8 +161,12 @@ function buildCallTree(
     const targetName = owner?.contract_name ?? null;
 
     // Look up function name from dim_function_signature
+    // For precompile addresses, skip function name lookup — the "selector" is just the
+    // first 4 bytes of raw calldata, not a real Solidity function selector.
     const functionSelector = frame.function_selector ?? null;
-    const functionSig = functionSelector ? functionSignatures[functionSelector.toLowerCase()] : undefined;
+    const isPrecompile = isPrecompileAddress(frame.target_address);
+    const functionSig =
+      !isPrecompile && functionSelector ? functionSignatures[functionSelector.toLowerCase()] : undefined;
     const functionName = functionSig?.name ?? null;
 
     // Build label: prioritize function name > contract name > truncated address

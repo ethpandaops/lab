@@ -40,8 +40,13 @@ import {
   TRANSACTION_BUCKETS,
   BlockOpcodeHeatmap,
   ContractActionPopover,
+  ResourceGasBreakdown,
+  ResourceGasTable,
+  ResourceGasHelp,
 } from './components';
 import type { ContractInteractionItem, TopGasItem } from './components';
+import { useBlockResourceGas } from './hooks/useBlockResourceGas';
+import { useCallFrameResourceGas } from './hooks/useCallFrameResourceGas';
 import { useNetwork } from '@/hooks/useNetwork';
 import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory, getEtherscanBaseUrl, isMainnet } from './utils';
 import type { GasProfilerBlockSearch } from './IndexPage.types';
@@ -97,7 +102,7 @@ function filterAndSortTransactions(
 }
 
 // Tab hash values for URL-based navigation
-const BLOCK_TAB_HASHES = ['overview', 'opcodes', 'transactions', 'calls'] as const;
+const BLOCK_TAB_HASHES = ['overview', 'opcodes', 'resources', 'transactions', 'calls'] as const;
 
 /**
  * Block detail page - shows all transactions in a block with analytics
@@ -163,6 +168,21 @@ export function BlockPage(): JSX.Element {
       },
     }),
     enabled: !isNaN(blockNumber),
+  });
+
+  // Fetch block-level resource gas breakdown
+  const {
+    entries: resourceEntries,
+    refund: resourceRefund,
+    total: resourceTotal,
+    isLoading: resourceLoading,
+  } = useBlockResourceGas({ blockNumber: isNaN(blockNumber) ? null : blockNumber });
+
+  // Fetch per-opcode resource gas for the block (all transactions)
+  const { opcodeRows: blockOpcodeResourceRows, isLoading: blockResourceOpcodeLoading } = useCallFrameResourceGas({
+    transactionHash: null,
+    blockNumber: isNaN(blockNumber) ? null : blockNumber,
+    callFrameId: null,
   });
 
   // Handle sort change (uses local state to avoid scroll reset)
@@ -1057,17 +1077,21 @@ export function BlockPage(): JSX.Element {
           <HeadlessTab.List className="flex gap-1">
             <Tab hash="overview">Overview</Tab>
             <Tab hash="opcodes">Opcodes</Tab>
+            <Tab hash="resources">Resources</Tab>
             <Tab hash="transactions">Transactions</Tab>
             <Tab hash="calls">Calls</Tab>
           </HeadlessTab.List>
-          <Link
-            to="/ethereum/execution/gas-profiler/simulate"
-            search={{ block: blockNumber }}
-            className="mb-1 flex items-center gap-1.5 rounded-xs px-3 py-1.5 text-sm text-muted transition-colors hover:bg-primary/10 hover:text-primary"
-          >
-            <BeakerIcon className="size-4" />
-            Simulate
-          </Link>
+          <div className="mb-1 flex items-center gap-2">
+            {selectedTabIndex === 2 && <ResourceGasHelp />}
+            <Link
+              to="/ethereum/execution/gas-profiler/simulate"
+              search={{ block: blockNumber }}
+              className="flex items-center gap-1.5 rounded-xs px-3 py-1.5 text-sm text-muted transition-colors hover:bg-primary/10 hover:text-primary"
+            >
+              <BeakerIcon className="size-4" />
+              Simulate
+            </Link>
+          </div>
         </div>
 
         <HeadlessTab.Panels>
@@ -1218,6 +1242,21 @@ export function BlockPage(): JSX.Element {
                 <p className="text-muted">No opcode data available</p>
               </Card>
             )}
+          </HeadlessTab.Panel>
+
+          {/* Resources Tab */}
+          <HeadlessTab.Panel>
+            <ResourceGasBreakdown
+              entries={resourceEntries}
+              refund={resourceRefund}
+              total={resourceTotal}
+              loading={resourceLoading}
+              title="Gas by Resource Category"
+              subtitle="What system resources consumed gas?"
+              className="mb-6"
+            />
+
+            <ResourceGasTable rows={blockOpcodeResourceRows} loading={blockResourceOpcodeLoading} />
           </HeadlessTab.Panel>
 
           {/* Transactions Tab */}

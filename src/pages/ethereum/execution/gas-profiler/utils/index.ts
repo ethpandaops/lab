@@ -10,3 +10,13 @@ export {
 export { addOpcodesToCallTree, isOpcodeNode, type AddOpcodesToCallTreeOptions } from './callTreeWithOpcodes';
 export { getEffectiveGasRefund } from './gasRefund';
 export { getEtherscanBaseUrl, isMainnet } from './explorerLinks';
+export {
+  RESOURCE_CATEGORIES,
+  RESOURCE_COLORS,
+  toResourceEntries,
+  aggregateOpcodeResourceGas,
+  toOpcodeResourceRows,
+  getResourceRefund,
+  getTotalResourceGas,
+} from './resourceGas';
+export type { ResourceCategory, ResourceGasEntry, OpcodeResourceRow } from './resourceGas';

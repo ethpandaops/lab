@@ -33,3 +33,8 @@ export { GasScheduleDrawer } from './GasScheduleDrawer';
 export type { GasScheduleDrawerProps } from './GasScheduleDrawer';
 export { BlockSimulationResultsV2 } from './BlockSimulationResultsV2';
 export type { BlockSimulationResultsV2Props } from './BlockSimulationResultsV2';
+export { ResourceGasBreakdown } from './ResourceGasBreakdown';
+export type { ResourceGasBreakdownProps } from './ResourceGasBreakdown';
+export { ResourceGasTable } from './ResourceGasTable';
+export type { ResourceGasTableProps } from './ResourceGasTable';
+export { ResourceGasHelp } from './ResourceGasHelp';
