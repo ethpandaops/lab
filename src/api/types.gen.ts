@@ -5735,6 +5735,29 @@ export type FctValidatorBalanceHourly = {
   validator_index?: number;
 };
 
+export type FctValidatorCountByEntityByStatusDaily = {
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Entity name from dim_node mapping
+   */
+  entity?: string;
+  /**
+   * Validator status (active_ongoing, pending_queued, etc)
+   */
+  status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Number of validators with this status for this entity on this day
+   */
+  validator_count?: number;
+};
+
 /**
  * Response for getting a single admin_cbt_incremental record
  */
@@ -6566,6 +6589,13 @@ export type GetFctValidatorBalanceHourlyResponse = {
  */
 export type GetFctValidatorBalanceResponse = {
   item?: FctValidatorBalance;
+};
+
+/**
+ * Response for getting a single fct_validator_count_by_entity_by_status_daily record
+ */
+export type GetFctValidatorCountByEntityByStatusDailyResponse = {
+  item?: FctValidatorCountByEntityByStatusDaily;
 };
 
 /**
@@ -11497,6 +11527,20 @@ export type ListFctValidatorBalanceResponse = {
    * The list of fct_validator_balance.
    */
   fct_validator_balance?: Array<FctValidatorBalance>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_validator_count_by_entity_by_status_daily records
+ */
+export type ListFctValidatorCountByEntityByStatusDailyResponse = {
+  /**
+   * The list of fct_validator_count_by_entity_by_status_daily.
+   */
+  fct_validator_count_by_entity_by_status_daily?: Array<FctValidatorCountByEntityByStatusDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -66230,6 +66274,266 @@ export type FctValidatorBalanceHourlyServiceGetResponses = {
 
 export type FctValidatorBalanceHourlyServiceGetResponse =
   FctValidatorBalanceHourlyServiceGetResponses[keyof FctValidatorBalanceHourlyServiceGetResponses];
+
+export type FctValidatorCountByEntityByStatusDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Entity name from dim_node mapping (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * Entity name from dim_node mapping (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * Entity name from dim_node mapping (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * Entity name from dim_node mapping (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * Entity name from dim_node mapping (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * Entity name from dim_node mapping (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * Entity name from dim_node mapping (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * Entity name from dim_node mapping (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * Entity name from dim_node mapping (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * Validator status (active_ongoing, pending_queued, etc) (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * Validator status (active_ongoing, pending_queued, etc) (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * Validator status (active_ongoing, pending_queued, etc) (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * Validator status (active_ongoing, pending_queued, etc) (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * Validator status (active_ongoing, pending_queued, etc) (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * Validator status (active_ongoing, pending_queued, etc) (filter: like)
+     */
+    status_like?: string;
+    /**
+     * Validator status (active_ongoing, pending_queued, etc) (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * Validator status (active_ongoing, pending_queued, etc) (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * Validator status (active_ongoing, pending_queued, etc) (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of validators with this status for this entity on this day (filter: eq)
+     */
+    validator_count_eq?: number;
+    /**
+     * Number of validators with this status for this entity on this day (filter: ne)
+     */
+    validator_count_ne?: number;
+    /**
+     * Number of validators with this status for this entity on this day (filter: lt)
+     */
+    validator_count_lt?: number;
+    /**
+     * Number of validators with this status for this entity on this day (filter: lte)
+     */
+    validator_count_lte?: number;
+    /**
+     * Number of validators with this status for this entity on this day (filter: gt)
+     */
+    validator_count_gt?: number;
+    /**
+     * Number of validators with this status for this entity on this day (filter: gte)
+     */
+    validator_count_gte?: number;
+    /**
+     * Number of validators with this status for this entity on this day (filter: between_min)
+     */
+    validator_count_between_min?: number;
+    /**
+     * Number of validators with this status for this entity on this day (filter: between_max_value)
+     */
+    validator_count_between_max_value?: number;
+    /**
+     * Number of validators with this status for this entity on this day (filter: in_values) (comma-separated list)
+     */
+    validator_count_in_values?: string;
+    /**
+     * Number of validators with this status for this entity on this day (filter: not_in_values) (comma-separated list)
+     */
+    validator_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_validator_count_by_entity_by_status_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctValidatorCountByEntityByStatusDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_validator_count_by_entity_by_status_daily';
+};
+
+export type FctValidatorCountByEntityByStatusDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorCountByEntityByStatusDailyServiceListError =
+  FctValidatorCountByEntityByStatusDailyServiceListErrors[keyof FctValidatorCountByEntityByStatusDailyServiceListErrors];
+
+export type FctValidatorCountByEntityByStatusDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctValidatorCountByEntityByStatusDailyResponse;
+};
+
+export type FctValidatorCountByEntityByStatusDailyServiceListResponse =
+  FctValidatorCountByEntityByStatusDailyServiceListResponses[keyof FctValidatorCountByEntityByStatusDailyServiceListResponses];
+
+export type FctValidatorCountByEntityByStatusDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_validator_count_by_entity_by_status_daily/{day_start_date}';
+};
+
+export type FctValidatorCountByEntityByStatusDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorCountByEntityByStatusDailyServiceGetError =
+  FctValidatorCountByEntityByStatusDailyServiceGetErrors[keyof FctValidatorCountByEntityByStatusDailyServiceGetErrors];
+
+export type FctValidatorCountByEntityByStatusDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctValidatorCountByEntityByStatusDailyResponse;
+};
+
+export type FctValidatorCountByEntityByStatusDailyServiceGetResponse =
+  FctValidatorCountByEntityByStatusDailyServiceGetResponses[keyof FctValidatorCountByEntityByStatusDailyServiceGetResponses];
 
 export type IntAddressFirstAccessServiceListData = {
   body?: never;

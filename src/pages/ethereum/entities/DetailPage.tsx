@@ -1,6 +1,7 @@
-import { useParams } from '@tanstack/react-router';
+import { useParams, useNavigate } from '@tanstack/react-router';
 import { useMemo } from 'react';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
+import clsx from 'clsx';
 
 import { Alert } from '@/components/Feedback/Alert';
 import { Container } from '@/components/Layout/Container';
@@ -12,30 +13,26 @@ import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
 import { useTabState } from '@/hooks/useTabState';
 import { Route } from '@/routes/ethereum/entities/$entity';
 
-import { AttestationRateChart, AttestationVolumeChart, EntityBasicInfoCard, RecentActivityTable } from './components';
+import {
+  ActiveValidatorsChart,
+  AttestationRateChart,
+  AttestationVolumeChart,
+  EntityBasicInfoCard,
+  RecentActivityTable,
+  ValidatorStatusChart,
+} from './components';
 import { EpochSlotsTable } from '../epochs/components';
-import { useEntityDetailData } from './hooks';
+import { useEntityDetailData, useEntityValidatorStatusData } from './hooks';
+import { TIME_RANGE_CONFIG, TIME_PERIOD_OPTIONS, type TimePeriod } from './constants';
 
-/**
- * Entity detail page - comprehensive analysis of a single validator entity
- *
- * Shows:
- * - Basic entity statistics
- * - Attestation rate over time
- * - Attestation volume (attested vs missed)
- * - Block proposal history
- * - Recent activity table
- *
- * Validates entity parameter and handles errors
- */
 export function DetailPage(): React.JSX.Element {
   const params = useParams({ from: '/ethereum/entities/$entity' });
+  const { t } = Route.useSearch();
+  const navigate = useNavigate({ from: '/ethereum/entities/$entity' });
   const context = Route.useRouteContext();
 
-  // Redirect to entities index when network changes
   useNetworkChangeRedirect(context.redirectOnNetworkChange);
 
-  // Decode entity name from URL parameter
   const entityName = useMemo(() => {
     try {
       return decodeURIComponent(params.entity);
@@ -44,17 +41,19 @@ export function DetailPage(): React.JSX.Element {
     }
   }, [params.entity]);
 
-  // Fetch data for this entity
-  const { data, isLoading, error } = useEntityDetailData(entityName ?? '');
+  const timePeriod: TimePeriod = t ?? 'all';
+  const config = TIME_RANGE_CONFIG[timePeriod];
 
-  // Tab state management with URL search params
+  const { data, isLoading, error } = useEntityDetailData(entityName ?? '');
+  const validatorStatus = useEntityValidatorStatusData(entityName ?? '', config.days);
+
   const { selectedIndex, onChange } = useTabState([
+    { id: 'validators', anchors: ['active-validators-chart', 'validator-status-chart'] },
     { id: 'recent', anchors: ['recent-activity'] },
     { id: 'attestations', anchors: ['attestation-rate-chart', 'attestation-volume-chart'] },
     { id: 'blocks', anchors: ['block-proposals'] },
   ]);
 
-  // Handle invalid entity
   if (entityName === null) {
     return (
       <Container>
@@ -64,7 +63,6 @@ export function DetailPage(): React.JSX.Element {
     );
   }
 
-  // Loading state
   if (isLoading) {
     return (
       <Container>
@@ -74,7 +72,6 @@ export function DetailPage(): React.JSX.Element {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <Container>
@@ -84,7 +81,6 @@ export function DetailPage(): React.JSX.Element {
     );
   }
 
-  // No data state
   if (!data) {
     return (
       <Container>
@@ -100,24 +96,57 @@ export function DetailPage(): React.JSX.Element {
 
   return (
     <Container>
-      {/* Header */}
-      <Header title={entityName} description="Validator entity analysis and metrics" />
-
-      {/* Overview - Always visible */}
-      <div className="mt-6">
-        <EntityBasicInfoCard stats={data.stats} />
+      {/* Unified entity header with stats */}
+      <div className="animate-fade-in">
+        <EntityBasicInfoCard
+          stats={data.stats}
+          activeValidatorCount={validatorStatus.data?.latestActiveCount}
+          totalValidatorCount={validatorStatus.data?.latestTotalCount}
+        />
       </div>
 
-      {/* Tabs */}
-      <div className="mt-6">
+      {/* Tabbed content */}
+      <div className="mt-8 animate-fade-in-delay">
         <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
           <ScrollableTabs>
+            <Tab>Validators</Tab>
             <Tab>Recent</Tab>
             <Tab>Attestations</Tab>
             <Tab>Blocks</Tab>
           </ScrollableTabs>
 
           <TabPanels className="mt-6">
+            {/* Validators Tab */}
+            <TabPanel>
+              <div className="mb-6 flex flex-wrap items-center gap-1.5">
+                {TIME_PERIOD_OPTIONS.map(({ value, label }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => navigate({ search: prev => ({ ...prev, t: value }), replace: true })}
+                    className={clsx(
+                      'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
+                      timePeriod === value
+                        ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
+                        : 'bg-surface text-muted ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {validatorStatus.isLoading ? (
+                <LoadingContainer className="h-96" />
+              ) : validatorStatus.error ? (
+                <Alert variant="error" title="Error" description={validatorStatus.error.message} />
+              ) : (
+                <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 3xl:grid-cols-3 4xl:grid-cols-4">
+                  <ActiveValidatorsChart data={validatorStatus.data} timePeriod={timePeriod} />
+                  <ValidatorStatusChart data={validatorStatus.data} timePeriod={timePeriod} />
+                </div>
+              )}
+            </TabPanel>
+
             {/* Recent Tab */}
             <TabPanel>
               <RecentActivityTable epochs={data.epochData} />
