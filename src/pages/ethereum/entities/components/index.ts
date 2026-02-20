@@ -15,3 +15,8 @@ export type { RecentActivityTableProps } from './RecentActivityTable';
 
 export { BlockProposalsTable } from './BlockProposalsTable';
 export type { BlockProposalsTableProps } from './BlockProposalsTable';
+
+export { ValidatorStatusChart } from './ValidatorStatusChart';
+export type { ValidatorStatusChartProps } from './ValidatorStatusChart';
+
+export { ActiveValidatorsChart } from './ActiveValidatorsChart';

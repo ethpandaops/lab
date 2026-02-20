@@ -242,6 +242,8 @@ import {
   fctValidatorBalanceHourlyServiceList,
   fctValidatorBalanceServiceGet,
   fctValidatorBalanceServiceList,
+  fctValidatorCountByEntityByStatusDailyServiceGet,
+  fctValidatorCountByEntityByStatusDailyServiceList,
   intAddressFirstAccessServiceGet,
   intAddressFirstAccessServiceList,
   intAddressLastAccessServiceGet,
@@ -1089,6 +1091,12 @@ import type {
   FctValidatorBalanceServiceListData,
   FctValidatorBalanceServiceListError,
   FctValidatorBalanceServiceListResponse,
+  FctValidatorCountByEntityByStatusDailyServiceGetData,
+  FctValidatorCountByEntityByStatusDailyServiceGetError,
+  FctValidatorCountByEntityByStatusDailyServiceGetResponse,
+  FctValidatorCountByEntityByStatusDailyServiceListData,
+  FctValidatorCountByEntityByStatusDailyServiceListError,
+  FctValidatorCountByEntityByStatusDailyServiceListResponse,
   IntAddressFirstAccessServiceGetData,
   IntAddressFirstAccessServiceGetError,
   IntAddressFirstAccessServiceGetResponse,
@@ -8406,6 +8414,66 @@ export const fctValidatorBalanceHourlyServiceGetOptions = (options: Options<FctV
       return data;
     },
     queryKey: fctValidatorBalanceHourlyServiceGetQueryKey(options),
+  });
+
+export const fctValidatorCountByEntityByStatusDailyServiceListQueryKey = (
+  options?: Options<FctValidatorCountByEntityByStatusDailyServiceListData>
+) => createQueryKey('fctValidatorCountByEntityByStatusDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctValidatorCountByEntityByStatusDailyServiceListOptions = (
+  options?: Options<FctValidatorCountByEntityByStatusDailyServiceListData>
+) =>
+  queryOptions<
+    FctValidatorCountByEntityByStatusDailyServiceListResponse,
+    FctValidatorCountByEntityByStatusDailyServiceListError,
+    FctValidatorCountByEntityByStatusDailyServiceListResponse,
+    ReturnType<typeof fctValidatorCountByEntityByStatusDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctValidatorCountByEntityByStatusDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctValidatorCountByEntityByStatusDailyServiceListQueryKey(options),
+  });
+
+export const fctValidatorCountByEntityByStatusDailyServiceGetQueryKey = (
+  options: Options<FctValidatorCountByEntityByStatusDailyServiceGetData>
+) => createQueryKey('fctValidatorCountByEntityByStatusDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctValidatorCountByEntityByStatusDailyServiceGetOptions = (
+  options: Options<FctValidatorCountByEntityByStatusDailyServiceGetData>
+) =>
+  queryOptions<
+    FctValidatorCountByEntityByStatusDailyServiceGetResponse,
+    FctValidatorCountByEntityByStatusDailyServiceGetError,
+    FctValidatorCountByEntityByStatusDailyServiceGetResponse,
+    ReturnType<typeof fctValidatorCountByEntityByStatusDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctValidatorCountByEntityByStatusDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctValidatorCountByEntityByStatusDailyServiceGetQueryKey(options),
   });
 
 export const intAddressFirstAccessServiceListQueryKey = (options?: Options<IntAddressFirstAccessServiceListData>) =>
