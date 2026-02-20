@@ -27,13 +27,13 @@ export function ActiveValidatorsChart({ data, timePeriod }: ActiveValidatorsChar
     if (!data) return { series: [], yMin: 0 };
 
     let minVal = Infinity;
-    const chartData: Array<[string, number]> = data.days.map(day => {
+    const chartData: number[] = data.days.map(day => {
       let total = 0;
       for (const status of ACTIVE_STATUSES) {
         total += data.byStatus.get(status)?.get(day) ?? 0;
       }
       if (total < minVal) minVal = total;
-      return [day, total];
+      return total;
     });
 
     // Round down to a nice boundary (nearest 1000, 5000, or 10000 depending on magnitude)

@@ -39,7 +39,7 @@ export function ValidatorStatusChart({ data, timePeriod }: ValidatorStatusChartP
       .filter(status => !HIDDEN_STATUSES.has(status))
       .map(status => {
         const dayMap = data.byStatus.get(status)!;
-        const chartData: Array<[string, number]> = data.days.map(day => [day, dayMap.get(day) ?? 0]);
+        const chartData: number[] = data.days.map(day => dayMap.get(day) ?? 0);
 
         return {
           name: status.replace(/_/g, ' '),
