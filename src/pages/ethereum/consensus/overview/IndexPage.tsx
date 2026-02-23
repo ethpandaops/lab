@@ -53,7 +53,7 @@ import type {
   FctProposerRewardDaily,
 } from '@/api/types.gen';
 import { ConsensusOverviewSkeleton } from './components';
-import { type TimePeriod, TIME_RANGE_CONFIG, TIME_PERIOD_OPTIONS } from './constants';
+import { type TimePeriod, TIME_RANGE_CONFIG, TIME_PERIOD_OPTIONS, PAGE_SIZE } from './constants';
 import {
   fillTimeKeys,
   formatTooltipDate,
@@ -99,14 +99,14 @@ export function IndexPage(): JSX.Element {
       query: {
         hour_start_date_time_gte: startTimestamp,
         order_by: 'hour_start_date_time asc',
-        page_size: config.pageSize,
+        page_size: PAGE_SIZE,
       },
     }),
     enabled: !isDaily,
   });
   const blobDailyQuery = useQuery({
     ...fctBlobCountDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: config.pageSize },
+      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
   });
@@ -116,14 +116,14 @@ export function IndexPage(): JSX.Element {
       query: {
         hour_start_date_time_gte: startTimestamp,
         order_by: 'hour_start_date_time asc',
-        page_size: config.pageSize,
+        page_size: PAGE_SIZE,
       },
     }),
     enabled: !isDaily,
   });
   const attnDailyQuery = useQuery({
     ...fctAttestationParticipationRateDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: config.pageSize },
+      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
   });
@@ -133,14 +133,14 @@ export function IndexPage(): JSX.Element {
       query: {
         hour_start_date_time_gte: startTimestamp,
         order_by: 'hour_start_date_time asc',
-        page_size: config.pageSize,
+        page_size: PAGE_SIZE,
       },
     }),
     enabled: !isDaily,
   });
   const hvDailyQuery = useQuery({
     ...fctHeadVoteCorrectnessRateDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: config.pageSize },
+      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
   });
@@ -150,14 +150,14 @@ export function IndexPage(): JSX.Element {
       query: {
         hour_start_date_time_gte: startTimestamp,
         order_by: 'hour_start_date_time asc',
-        page_size: config.pageSize,
+        page_size: PAGE_SIZE,
       },
     }),
     enabled: !isDaily,
   });
   const reorgDailyQuery = useQuery({
     ...fctReorgDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: config.pageSize },
+      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
   });
@@ -167,14 +167,14 @@ export function IndexPage(): JSX.Element {
       query: {
         hour_start_date_time_gte: startTimestamp,
         order_by: 'hour_start_date_time asc',
-        page_size: config.pageSize,
+        page_size: PAGE_SIZE,
       },
     }),
     enabled: !isDaily,
   });
   const missedSlotDailyQuery = useQuery({
     ...fctMissedSlotRateDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: config.pageSize },
+      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
   });
@@ -184,14 +184,14 @@ export function IndexPage(): JSX.Element {
       query: {
         hour_start_date_time_gte: startTimestamp,
         order_by: 'hour_start_date_time asc',
-        page_size: config.pageSize,
+        page_size: PAGE_SIZE,
       },
     }),
     enabled: !isDaily,
   });
   const proposalStatusDailyQuery = useQuery({
     ...fctBlockProposalStatusDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: config.pageSize },
+      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
   });
@@ -201,14 +201,14 @@ export function IndexPage(): JSX.Element {
       query: {
         hour_start_date_time_gte: startTimestamp,
         order_by: 'hour_start_date_time asc',
-        page_size: config.pageSize,
+        page_size: PAGE_SIZE,
       },
     }),
     enabled: !isDaily,
   });
   const inclusionDelayDailyQuery = useQuery({
     ...fctAttestationInclusionDelayDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: config.pageSize },
+      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
   });
@@ -218,14 +218,14 @@ export function IndexPage(): JSX.Element {
       query: {
         hour_start_date_time_gte: startTimestamp,
         order_by: 'hour_start_date_time asc',
-        page_size: config.pageSize,
+        page_size: PAGE_SIZE,
       },
     }),
     enabled: !isDaily,
   });
   const proposerRewardDailyQuery = useQuery({
     ...fctProposerRewardDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: config.pageSize },
+      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
   });
