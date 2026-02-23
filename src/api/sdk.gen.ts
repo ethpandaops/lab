@@ -717,6 +717,12 @@ import type {
   FctValidatorBalanceServiceListData,
   FctValidatorBalanceServiceListErrors,
   FctValidatorBalanceServiceListResponses,
+  FctValidatorCountByEntityByStatusDailyServiceGetData,
+  FctValidatorCountByEntityByStatusDailyServiceGetErrors,
+  FctValidatorCountByEntityByStatusDailyServiceGetResponses,
+  FctValidatorCountByEntityByStatusDailyServiceListData,
+  FctValidatorCountByEntityByStatusDailyServiceListErrors,
+  FctValidatorCountByEntityByStatusDailyServiceListResponses,
   IntAddressFirstAccessServiceGetData,
   IntAddressFirstAccessServiceGetErrors,
   IntAddressFirstAccessServiceGetResponses,
@@ -1585,6 +1591,10 @@ import {
   zFctValidatorBalanceServiceGetResponse,
   zFctValidatorBalanceServiceListData,
   zFctValidatorBalanceServiceListResponse,
+  zFctValidatorCountByEntityByStatusDailyServiceGetData,
+  zFctValidatorCountByEntityByStatusDailyServiceGetResponse,
+  zFctValidatorCountByEntityByStatusDailyServiceListData,
+  zFctValidatorCountByEntityByStatusDailyServiceListResponse,
   zIntAddressFirstAccessServiceGetData,
   zIntAddressFirstAccessServiceGetResponse,
   zIntAddressFirstAccessServiceListData,
@@ -6355,6 +6365,44 @@ export const fctValidatorBalanceHourlyServiceGet = <ThrowOnError extends boolean
     requestValidator: async data => await zFctValidatorBalanceHourlyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctValidatorBalanceHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_validator_balance_hourly/{validator_index}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctValidatorCountByEntityByStatusDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctValidatorCountByEntityByStatusDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctValidatorCountByEntityByStatusDailyServiceListResponses,
+    FctValidatorCountByEntityByStatusDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctValidatorCountByEntityByStatusDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctValidatorCountByEntityByStatusDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_validator_count_by_entity_by_status_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctValidatorCountByEntityByStatusDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctValidatorCountByEntityByStatusDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctValidatorCountByEntityByStatusDailyServiceGetResponses,
+    FctValidatorCountByEntityByStatusDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctValidatorCountByEntityByStatusDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctValidatorCountByEntityByStatusDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_validator_count_by_entity_by_status_daily/{day_start_date}',
     ...options,
   });
 
