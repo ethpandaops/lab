@@ -7,6 +7,7 @@ import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import type { FctNodeDiskIoByProcess } from '@/api/types.gen';
 import { type AnnotationType, type AnnotationEvent, type HighlightRange } from './types';
+import { getByteScale, formatScaled, seriesMax } from './utils';
 import { AnnotationSwimLanes } from './AnnotationSwimLanes';
 
 function usToSeconds(us: number): number {
@@ -76,9 +77,9 @@ export function DiskIoChart({
     []
   );
 
-  const { series, clClient, elClient } = useMemo(() => {
+  const { series, clClient, elClient, displayUnit } = useMemo(() => {
     if (data.length === 0) {
-      return { series: [] as SeriesData[], clClient: '', elClient: '' };
+      return { series: [] as SeriesData[], clClient: '', elClient: '', displayUnit: 'KB' };
     }
 
     const slotStartUs = Math.min(...data.map(d => d.wallclock_slot_start_date_time ?? 0).filter(v => v > 0));
@@ -201,7 +202,18 @@ export function DiskIoChart({
       });
     }
 
-    return { series: chartSeries, clClient: resolvedClClient, elClient: resolvedElClient };
+    // Scale data to appropriate unit so ECharts picks nice round ticks
+    const maxKB = seriesMax(chartSeries);
+    const { divisor, unit } = getByteScale(maxKB, 'KB');
+    if (divisor > 1) {
+      for (const s of chartSeries) {
+        for (const p of s.data as [number, number][]) {
+          p[1] /= divisor;
+        }
+      }
+    }
+
+    return { series: chartSeries, clClient: resolvedClClient, elClient: resolvedElClient, displayUnit: unit };
   }, [data, selectedNode, CHART_CATEGORICAL_COLORS]);
 
   const markLines = useMemo((): MarkLineConfig[] => {
@@ -273,9 +285,9 @@ export function DiskIoChart({
                 formatter: (v: number | string) => `${v}s`,
               }}
               yAxis={{
-                name: 'KB',
+                name: displayUnit,
                 min: 0,
-                formatter: (v: number) => `${v.toFixed(0)} KB`,
+                formatter: (v: number) => formatScaled(v, displayUnit),
               }}
               height={inModal ? 500 : 350}
               showLegend
@@ -300,7 +312,7 @@ export function DiskIoChart({
                   html += `<div style="display:flex;align-items:center;gap:6px;margin:2px 0">`;
                   html += `${p.marker}`;
                   html += `<span style="flex:1">${p.seriesName}</span>`;
-                  html += `<span style="font-weight:600">${Number(val).toFixed(1)} KB</span>`;
+                  html += `<span style="font-weight:600">${formatScaled(Number(val), displayUnit)}</span>`;
                   html += `</div>`;
                 }
 

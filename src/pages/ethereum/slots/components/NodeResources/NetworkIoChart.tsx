@@ -6,6 +6,7 @@ import { getDataVizColors } from '@/utils';
 import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
 import type { FctNodeNetworkIoByProcess } from '@/api/types.gen';
 import { type AnnotationType, type AnnotationEvent, type HighlightRange } from './types';
+import { getByteScale, formatScaled, seriesMax } from './utils';
 import { AnnotationSwimLanes } from './AnnotationSwimLanes';
 
 function usToSeconds(us: number): number {
@@ -19,18 +20,28 @@ function bytesToKB(bytes: number): number {
 /** Port labels that are hidden by default (internal/API traffic) */
 const HIDDEN_PORTS = new Set(['cl_beacon_api', 'el_json_rpc', 'el_engine_api', 'el_ws', 'cl_grpc']);
 
-const PORT_LABELS: Record<string, string> = {
-  el_p2p_tcp: 'EL P2P',
-  cl_p2p_tcp: 'CL P2P',
-  cl_discovery: 'CL Discovery',
-  el_discovery: 'EL Discovery',
-  cl_beacon_api: 'CL Beacon API',
-  el_json_rpc: 'EL JSON-RPC',
-  el_engine_api: 'EL Engine API',
-  el_ws: 'EL WebSocket',
-  cl_grpc: 'CL gRPC',
-  unknown: 'Unknown',
+/** Well-known abbreviations and expansions for port label segments */
+const PORT_LABEL_TOKENS: Record<string, string> = {
+  cl: 'CL',
+  el: 'EL',
+  p2p: 'P2P',
+  tcp: 'TCP',
+  udp: 'UDP',
+  api: 'API',
+  rpc: 'RPC',
+  grpc: 'gRPC',
+  ws: 'WebSocket',
+  json: 'JSON',
+  io: 'I/O',
 };
+
+/** Convert a snake_case port label to a human-readable name */
+function formatPortLabel(label: string): string {
+  return label
+    .split('_')
+    .map(part => PORT_LABEL_TOKENS[part] ?? part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
 
 const BUCKET_SIZE = 0.25;
 const ALL_BUCKETS = Array.from({ length: 49 }, (_, i) => i * BUCKET_SIZE);
@@ -87,8 +98,8 @@ export function NetworkIoChart({
     []
   );
 
-  const series = useMemo(() => {
-    if (data.length === 0) return [] as SeriesData[];
+  const { series, displayUnit } = useMemo(() => {
+    if (data.length === 0) return { series: [] as SeriesData[], displayUnit: 'KB' };
 
     const slotStartUs = Math.min(...data.map(d => d.wallclock_slot_start_date_time ?? 0).filter(v => v > 0));
     const chartSeries: SeriesData[] = [];
@@ -123,7 +134,7 @@ export function NetworkIoChart({
         t => [t, buckets.has(t) ? avg(buckets.get(t)!) : 0] as [number, number]
       );
 
-      const label = PORT_LABELS[port] ?? port;
+      const label = formatPortLabel(port);
       const color = CHART_CATEGORICAL_COLORS[i % CHART_CATEGORICAL_COLORS.length];
 
       chartSeries.push({
@@ -138,7 +149,18 @@ export function NetworkIoChart({
       });
     }
 
-    return chartSeries;
+    // Scale data to appropriate unit so ECharts picks nice round ticks
+    const maxKB = seriesMax(chartSeries);
+    const { divisor, unit } = getByteScale(maxKB, 'KB');
+    if (divisor > 1) {
+      for (const s of chartSeries) {
+        for (const p of s.data as [number, number][]) {
+          p[1] /= divisor;
+        }
+      }
+    }
+
+    return { series: chartSeries, displayUnit: unit };
   }, [data, selectedNode, CHART_CATEGORICAL_COLORS]);
 
   const markLines = useMemo((): MarkLineConfig[] => {
@@ -202,9 +224,9 @@ export function NetworkIoChart({
                 formatter: (v: number | string) => `${v}s`,
               }}
               yAxis={{
-                name: 'KB',
+                name: displayUnit,
                 min: 0,
-                formatter: (v: number) => `${v.toFixed(0)} KB`,
+                formatter: (v: number) => formatScaled(v, displayUnit),
               }}
               height={inModal ? 500 : 350}
               showLegend
@@ -229,7 +251,7 @@ export function NetworkIoChart({
                   html += `<div style="display:flex;align-items:center;gap:6px;margin:2px 0">`;
                   html += `${p.marker}`;
                   html += `<span style="flex:1">${p.seriesName}</span>`;
-                  html += `<span style="font-weight:600">${Number(val).toFixed(1)} KB</span>`;
+                  html += `<span style="font-weight:600">${formatScaled(Number(val), displayUnit)}</span>`;
                   html += `</div>`;
                 }
 
