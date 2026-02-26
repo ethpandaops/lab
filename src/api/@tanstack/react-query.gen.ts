@@ -186,12 +186,30 @@ import {
   fctNodeActiveLast24hServiceList,
   fctNodeCpuUtilizationByProcessServiceGet,
   fctNodeCpuUtilizationByProcessServiceList,
+  fctNodeCpuUtilizationDailyServiceGet,
+  fctNodeCpuUtilizationDailyServiceList,
+  fctNodeCpuUtilizationHourlyServiceGet,
+  fctNodeCpuUtilizationHourlyServiceList,
   fctNodeDiskIoByProcessServiceGet,
   fctNodeDiskIoByProcessServiceList,
+  fctNodeDiskIoDailyServiceGet,
+  fctNodeDiskIoDailyServiceList,
+  fctNodeDiskIoHourlyServiceGet,
+  fctNodeDiskIoHourlyServiceList,
+  fctNodeHostSpecServiceGet,
+  fctNodeHostSpecServiceList,
   fctNodeMemoryUsageByProcessServiceGet,
   fctNodeMemoryUsageByProcessServiceList,
+  fctNodeMemoryUsageDailyServiceGet,
+  fctNodeMemoryUsageDailyServiceList,
+  fctNodeMemoryUsageHourlyServiceGet,
+  fctNodeMemoryUsageHourlyServiceList,
   fctNodeNetworkIoByProcessServiceGet,
   fctNodeNetworkIoByProcessServiceList,
+  fctNodeNetworkIoDailyServiceGet,
+  fctNodeNetworkIoDailyServiceList,
+  fctNodeNetworkIoHourlyServiceGet,
+  fctNodeNetworkIoHourlyServiceList,
   fctOpcodeGasByOpcodeDailyServiceGet,
   fctOpcodeGasByOpcodeDailyServiceList,
   fctOpcodeGasByOpcodeHourlyServiceGet,
@@ -923,24 +941,78 @@ import type {
   FctNodeCpuUtilizationByProcessServiceListData,
   FctNodeCpuUtilizationByProcessServiceListError,
   FctNodeCpuUtilizationByProcessServiceListResponse,
+  FctNodeCpuUtilizationDailyServiceGetData,
+  FctNodeCpuUtilizationDailyServiceGetError,
+  FctNodeCpuUtilizationDailyServiceGetResponse,
+  FctNodeCpuUtilizationDailyServiceListData,
+  FctNodeCpuUtilizationDailyServiceListError,
+  FctNodeCpuUtilizationDailyServiceListResponse,
+  FctNodeCpuUtilizationHourlyServiceGetData,
+  FctNodeCpuUtilizationHourlyServiceGetError,
+  FctNodeCpuUtilizationHourlyServiceGetResponse,
+  FctNodeCpuUtilizationHourlyServiceListData,
+  FctNodeCpuUtilizationHourlyServiceListError,
+  FctNodeCpuUtilizationHourlyServiceListResponse,
   FctNodeDiskIoByProcessServiceGetData,
   FctNodeDiskIoByProcessServiceGetError,
   FctNodeDiskIoByProcessServiceGetResponse,
   FctNodeDiskIoByProcessServiceListData,
   FctNodeDiskIoByProcessServiceListError,
   FctNodeDiskIoByProcessServiceListResponse,
+  FctNodeDiskIoDailyServiceGetData,
+  FctNodeDiskIoDailyServiceGetError,
+  FctNodeDiskIoDailyServiceGetResponse,
+  FctNodeDiskIoDailyServiceListData,
+  FctNodeDiskIoDailyServiceListError,
+  FctNodeDiskIoDailyServiceListResponse,
+  FctNodeDiskIoHourlyServiceGetData,
+  FctNodeDiskIoHourlyServiceGetError,
+  FctNodeDiskIoHourlyServiceGetResponse,
+  FctNodeDiskIoHourlyServiceListData,
+  FctNodeDiskIoHourlyServiceListError,
+  FctNodeDiskIoHourlyServiceListResponse,
+  FctNodeHostSpecServiceGetData,
+  FctNodeHostSpecServiceGetError,
+  FctNodeHostSpecServiceGetResponse,
+  FctNodeHostSpecServiceListData,
+  FctNodeHostSpecServiceListError,
+  FctNodeHostSpecServiceListResponse,
   FctNodeMemoryUsageByProcessServiceGetData,
   FctNodeMemoryUsageByProcessServiceGetError,
   FctNodeMemoryUsageByProcessServiceGetResponse,
   FctNodeMemoryUsageByProcessServiceListData,
   FctNodeMemoryUsageByProcessServiceListError,
   FctNodeMemoryUsageByProcessServiceListResponse,
+  FctNodeMemoryUsageDailyServiceGetData,
+  FctNodeMemoryUsageDailyServiceGetError,
+  FctNodeMemoryUsageDailyServiceGetResponse,
+  FctNodeMemoryUsageDailyServiceListData,
+  FctNodeMemoryUsageDailyServiceListError,
+  FctNodeMemoryUsageDailyServiceListResponse,
+  FctNodeMemoryUsageHourlyServiceGetData,
+  FctNodeMemoryUsageHourlyServiceGetError,
+  FctNodeMemoryUsageHourlyServiceGetResponse,
+  FctNodeMemoryUsageHourlyServiceListData,
+  FctNodeMemoryUsageHourlyServiceListError,
+  FctNodeMemoryUsageHourlyServiceListResponse,
   FctNodeNetworkIoByProcessServiceGetData,
   FctNodeNetworkIoByProcessServiceGetError,
   FctNodeNetworkIoByProcessServiceGetResponse,
   FctNodeNetworkIoByProcessServiceListData,
   FctNodeNetworkIoByProcessServiceListError,
   FctNodeNetworkIoByProcessServiceListResponse,
+  FctNodeNetworkIoDailyServiceGetData,
+  FctNodeNetworkIoDailyServiceGetError,
+  FctNodeNetworkIoDailyServiceGetResponse,
+  FctNodeNetworkIoDailyServiceListData,
+  FctNodeNetworkIoDailyServiceListError,
+  FctNodeNetworkIoDailyServiceListResponse,
+  FctNodeNetworkIoHourlyServiceGetData,
+  FctNodeNetworkIoHourlyServiceGetError,
+  FctNodeNetworkIoHourlyServiceGetResponse,
+  FctNodeNetworkIoHourlyServiceListData,
+  FctNodeNetworkIoHourlyServiceListError,
+  FctNodeNetworkIoHourlyServiceListResponse,
   FctOpcodeGasByOpcodeDailyServiceGetData,
   FctOpcodeGasByOpcodeDailyServiceGetError,
   FctOpcodeGasByOpcodeDailyServiceGetResponse,
@@ -6799,6 +6871,126 @@ export const fctNodeCpuUtilizationByProcessServiceGetOptions = (
     queryKey: fctNodeCpuUtilizationByProcessServiceGetQueryKey(options),
   });
 
+export const fctNodeCpuUtilizationDailyServiceListQueryKey = (
+  options?: Options<FctNodeCpuUtilizationDailyServiceListData>
+) => createQueryKey('fctNodeCpuUtilizationDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeCpuUtilizationDailyServiceListOptions = (
+  options?: Options<FctNodeCpuUtilizationDailyServiceListData>
+) =>
+  queryOptions<
+    FctNodeCpuUtilizationDailyServiceListResponse,
+    FctNodeCpuUtilizationDailyServiceListError,
+    FctNodeCpuUtilizationDailyServiceListResponse,
+    ReturnType<typeof fctNodeCpuUtilizationDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeCpuUtilizationDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeCpuUtilizationDailyServiceListQueryKey(options),
+  });
+
+export const fctNodeCpuUtilizationDailyServiceGetQueryKey = (
+  options: Options<FctNodeCpuUtilizationDailyServiceGetData>
+) => createQueryKey('fctNodeCpuUtilizationDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctNodeCpuUtilizationDailyServiceGetOptions = (
+  options: Options<FctNodeCpuUtilizationDailyServiceGetData>
+) =>
+  queryOptions<
+    FctNodeCpuUtilizationDailyServiceGetResponse,
+    FctNodeCpuUtilizationDailyServiceGetError,
+    FctNodeCpuUtilizationDailyServiceGetResponse,
+    ReturnType<typeof fctNodeCpuUtilizationDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeCpuUtilizationDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeCpuUtilizationDailyServiceGetQueryKey(options),
+  });
+
+export const fctNodeCpuUtilizationHourlyServiceListQueryKey = (
+  options?: Options<FctNodeCpuUtilizationHourlyServiceListData>
+) => createQueryKey('fctNodeCpuUtilizationHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeCpuUtilizationHourlyServiceListOptions = (
+  options?: Options<FctNodeCpuUtilizationHourlyServiceListData>
+) =>
+  queryOptions<
+    FctNodeCpuUtilizationHourlyServiceListResponse,
+    FctNodeCpuUtilizationHourlyServiceListError,
+    FctNodeCpuUtilizationHourlyServiceListResponse,
+    ReturnType<typeof fctNodeCpuUtilizationHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeCpuUtilizationHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeCpuUtilizationHourlyServiceListQueryKey(options),
+  });
+
+export const fctNodeCpuUtilizationHourlyServiceGetQueryKey = (
+  options: Options<FctNodeCpuUtilizationHourlyServiceGetData>
+) => createQueryKey('fctNodeCpuUtilizationHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctNodeCpuUtilizationHourlyServiceGetOptions = (
+  options: Options<FctNodeCpuUtilizationHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctNodeCpuUtilizationHourlyServiceGetResponse,
+    FctNodeCpuUtilizationHourlyServiceGetError,
+    FctNodeCpuUtilizationHourlyServiceGetResponse,
+    ReturnType<typeof fctNodeCpuUtilizationHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeCpuUtilizationHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeCpuUtilizationHourlyServiceGetQueryKey(options),
+  });
+
 export const fctNodeDiskIoByProcessServiceListQueryKey = (options?: Options<FctNodeDiskIoByProcessServiceListData>) =>
   createQueryKey('fctNodeDiskIoByProcessServiceList', options);
 
@@ -6851,6 +7043,168 @@ export const fctNodeDiskIoByProcessServiceGetOptions = (options: Options<FctNode
       return data;
     },
     queryKey: fctNodeDiskIoByProcessServiceGetQueryKey(options),
+  });
+
+export const fctNodeDiskIoDailyServiceListQueryKey = (options?: Options<FctNodeDiskIoDailyServiceListData>) =>
+  createQueryKey('fctNodeDiskIoDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeDiskIoDailyServiceListOptions = (options?: Options<FctNodeDiskIoDailyServiceListData>) =>
+  queryOptions<
+    FctNodeDiskIoDailyServiceListResponse,
+    FctNodeDiskIoDailyServiceListError,
+    FctNodeDiskIoDailyServiceListResponse,
+    ReturnType<typeof fctNodeDiskIoDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeDiskIoDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeDiskIoDailyServiceListQueryKey(options),
+  });
+
+export const fctNodeDiskIoDailyServiceGetQueryKey = (options: Options<FctNodeDiskIoDailyServiceGetData>) =>
+  createQueryKey('fctNodeDiskIoDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctNodeDiskIoDailyServiceGetOptions = (options: Options<FctNodeDiskIoDailyServiceGetData>) =>
+  queryOptions<
+    FctNodeDiskIoDailyServiceGetResponse,
+    FctNodeDiskIoDailyServiceGetError,
+    FctNodeDiskIoDailyServiceGetResponse,
+    ReturnType<typeof fctNodeDiskIoDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeDiskIoDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeDiskIoDailyServiceGetQueryKey(options),
+  });
+
+export const fctNodeDiskIoHourlyServiceListQueryKey = (options?: Options<FctNodeDiskIoHourlyServiceListData>) =>
+  createQueryKey('fctNodeDiskIoHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeDiskIoHourlyServiceListOptions = (options?: Options<FctNodeDiskIoHourlyServiceListData>) =>
+  queryOptions<
+    FctNodeDiskIoHourlyServiceListResponse,
+    FctNodeDiskIoHourlyServiceListError,
+    FctNodeDiskIoHourlyServiceListResponse,
+    ReturnType<typeof fctNodeDiskIoHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeDiskIoHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeDiskIoHourlyServiceListQueryKey(options),
+  });
+
+export const fctNodeDiskIoHourlyServiceGetQueryKey = (options: Options<FctNodeDiskIoHourlyServiceGetData>) =>
+  createQueryKey('fctNodeDiskIoHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctNodeDiskIoHourlyServiceGetOptions = (options: Options<FctNodeDiskIoHourlyServiceGetData>) =>
+  queryOptions<
+    FctNodeDiskIoHourlyServiceGetResponse,
+    FctNodeDiskIoHourlyServiceGetError,
+    FctNodeDiskIoHourlyServiceGetResponse,
+    ReturnType<typeof fctNodeDiskIoHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeDiskIoHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeDiskIoHourlyServiceGetQueryKey(options),
+  });
+
+export const fctNodeHostSpecServiceListQueryKey = (options?: Options<FctNodeHostSpecServiceListData>) =>
+  createQueryKey('fctNodeHostSpecServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeHostSpecServiceListOptions = (options?: Options<FctNodeHostSpecServiceListData>) =>
+  queryOptions<
+    FctNodeHostSpecServiceListResponse,
+    FctNodeHostSpecServiceListError,
+    FctNodeHostSpecServiceListResponse,
+    ReturnType<typeof fctNodeHostSpecServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeHostSpecServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeHostSpecServiceListQueryKey(options),
+  });
+
+export const fctNodeHostSpecServiceGetQueryKey = (options: Options<FctNodeHostSpecServiceGetData>) =>
+  createQueryKey('fctNodeHostSpecServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by wallclock_slot_start_date_time
+ */
+export const fctNodeHostSpecServiceGetOptions = (options: Options<FctNodeHostSpecServiceGetData>) =>
+  queryOptions<
+    FctNodeHostSpecServiceGetResponse,
+    FctNodeHostSpecServiceGetError,
+    FctNodeHostSpecServiceGetResponse,
+    ReturnType<typeof fctNodeHostSpecServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeHostSpecServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeHostSpecServiceGetQueryKey(options),
   });
 
 export const fctNodeMemoryUsageByProcessServiceListQueryKey = (
@@ -6913,6 +7267,117 @@ export const fctNodeMemoryUsageByProcessServiceGetOptions = (
     queryKey: fctNodeMemoryUsageByProcessServiceGetQueryKey(options),
   });
 
+export const fctNodeMemoryUsageDailyServiceListQueryKey = (options?: Options<FctNodeMemoryUsageDailyServiceListData>) =>
+  createQueryKey('fctNodeMemoryUsageDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeMemoryUsageDailyServiceListOptions = (options?: Options<FctNodeMemoryUsageDailyServiceListData>) =>
+  queryOptions<
+    FctNodeMemoryUsageDailyServiceListResponse,
+    FctNodeMemoryUsageDailyServiceListError,
+    FctNodeMemoryUsageDailyServiceListResponse,
+    ReturnType<typeof fctNodeMemoryUsageDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeMemoryUsageDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeMemoryUsageDailyServiceListQueryKey(options),
+  });
+
+export const fctNodeMemoryUsageDailyServiceGetQueryKey = (options: Options<FctNodeMemoryUsageDailyServiceGetData>) =>
+  createQueryKey('fctNodeMemoryUsageDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctNodeMemoryUsageDailyServiceGetOptions = (options: Options<FctNodeMemoryUsageDailyServiceGetData>) =>
+  queryOptions<
+    FctNodeMemoryUsageDailyServiceGetResponse,
+    FctNodeMemoryUsageDailyServiceGetError,
+    FctNodeMemoryUsageDailyServiceGetResponse,
+    ReturnType<typeof fctNodeMemoryUsageDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeMemoryUsageDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeMemoryUsageDailyServiceGetQueryKey(options),
+  });
+
+export const fctNodeMemoryUsageHourlyServiceListQueryKey = (
+  options?: Options<FctNodeMemoryUsageHourlyServiceListData>
+) => createQueryKey('fctNodeMemoryUsageHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeMemoryUsageHourlyServiceListOptions = (
+  options?: Options<FctNodeMemoryUsageHourlyServiceListData>
+) =>
+  queryOptions<
+    FctNodeMemoryUsageHourlyServiceListResponse,
+    FctNodeMemoryUsageHourlyServiceListError,
+    FctNodeMemoryUsageHourlyServiceListResponse,
+    ReturnType<typeof fctNodeMemoryUsageHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeMemoryUsageHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeMemoryUsageHourlyServiceListQueryKey(options),
+  });
+
+export const fctNodeMemoryUsageHourlyServiceGetQueryKey = (options: Options<FctNodeMemoryUsageHourlyServiceGetData>) =>
+  createQueryKey('fctNodeMemoryUsageHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctNodeMemoryUsageHourlyServiceGetOptions = (options: Options<FctNodeMemoryUsageHourlyServiceGetData>) =>
+  queryOptions<
+    FctNodeMemoryUsageHourlyServiceGetResponse,
+    FctNodeMemoryUsageHourlyServiceGetError,
+    FctNodeMemoryUsageHourlyServiceGetResponse,
+    ReturnType<typeof fctNodeMemoryUsageHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeMemoryUsageHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeMemoryUsageHourlyServiceGetQueryKey(options),
+  });
+
 export const fctNodeNetworkIoByProcessServiceListQueryKey = (
   options?: Options<FctNodeNetworkIoByProcessServiceListData>
 ) => createQueryKey('fctNodeNetworkIoByProcessServiceList', options);
@@ -6969,6 +7434,114 @@ export const fctNodeNetworkIoByProcessServiceGetOptions = (options: Options<FctN
       return data;
     },
     queryKey: fctNodeNetworkIoByProcessServiceGetQueryKey(options),
+  });
+
+export const fctNodeNetworkIoDailyServiceListQueryKey = (options?: Options<FctNodeNetworkIoDailyServiceListData>) =>
+  createQueryKey('fctNodeNetworkIoDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeNetworkIoDailyServiceListOptions = (options?: Options<FctNodeNetworkIoDailyServiceListData>) =>
+  queryOptions<
+    FctNodeNetworkIoDailyServiceListResponse,
+    FctNodeNetworkIoDailyServiceListError,
+    FctNodeNetworkIoDailyServiceListResponse,
+    ReturnType<typeof fctNodeNetworkIoDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeNetworkIoDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeNetworkIoDailyServiceListQueryKey(options),
+  });
+
+export const fctNodeNetworkIoDailyServiceGetQueryKey = (options: Options<FctNodeNetworkIoDailyServiceGetData>) =>
+  createQueryKey('fctNodeNetworkIoDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctNodeNetworkIoDailyServiceGetOptions = (options: Options<FctNodeNetworkIoDailyServiceGetData>) =>
+  queryOptions<
+    FctNodeNetworkIoDailyServiceGetResponse,
+    FctNodeNetworkIoDailyServiceGetError,
+    FctNodeNetworkIoDailyServiceGetResponse,
+    ReturnType<typeof fctNodeNetworkIoDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeNetworkIoDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeNetworkIoDailyServiceGetQueryKey(options),
+  });
+
+export const fctNodeNetworkIoHourlyServiceListQueryKey = (options?: Options<FctNodeNetworkIoHourlyServiceListData>) =>
+  createQueryKey('fctNodeNetworkIoHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeNetworkIoHourlyServiceListOptions = (options?: Options<FctNodeNetworkIoHourlyServiceListData>) =>
+  queryOptions<
+    FctNodeNetworkIoHourlyServiceListResponse,
+    FctNodeNetworkIoHourlyServiceListError,
+    FctNodeNetworkIoHourlyServiceListResponse,
+    ReturnType<typeof fctNodeNetworkIoHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeNetworkIoHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeNetworkIoHourlyServiceListQueryKey(options),
+  });
+
+export const fctNodeNetworkIoHourlyServiceGetQueryKey = (options: Options<FctNodeNetworkIoHourlyServiceGetData>) =>
+  createQueryKey('fctNodeNetworkIoHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctNodeNetworkIoHourlyServiceGetOptions = (options: Options<FctNodeNetworkIoHourlyServiceGetData>) =>
+  queryOptions<
+    FctNodeNetworkIoHourlyServiceGetResponse,
+    FctNodeNetworkIoHourlyServiceGetError,
+    FctNodeNetworkIoHourlyServiceGetResponse,
+    ReturnType<typeof fctNodeNetworkIoHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeNetworkIoHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeNetworkIoHourlyServiceGetQueryKey(options),
   });
 
 export const fctOpcodeGasByOpcodeDailyServiceListQueryKey = (

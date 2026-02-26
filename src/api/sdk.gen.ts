@@ -549,24 +549,78 @@ import type {
   FctNodeCpuUtilizationByProcessServiceListData,
   FctNodeCpuUtilizationByProcessServiceListErrors,
   FctNodeCpuUtilizationByProcessServiceListResponses,
+  FctNodeCpuUtilizationDailyServiceGetData,
+  FctNodeCpuUtilizationDailyServiceGetErrors,
+  FctNodeCpuUtilizationDailyServiceGetResponses,
+  FctNodeCpuUtilizationDailyServiceListData,
+  FctNodeCpuUtilizationDailyServiceListErrors,
+  FctNodeCpuUtilizationDailyServiceListResponses,
+  FctNodeCpuUtilizationHourlyServiceGetData,
+  FctNodeCpuUtilizationHourlyServiceGetErrors,
+  FctNodeCpuUtilizationHourlyServiceGetResponses,
+  FctNodeCpuUtilizationHourlyServiceListData,
+  FctNodeCpuUtilizationHourlyServiceListErrors,
+  FctNodeCpuUtilizationHourlyServiceListResponses,
   FctNodeDiskIoByProcessServiceGetData,
   FctNodeDiskIoByProcessServiceGetErrors,
   FctNodeDiskIoByProcessServiceGetResponses,
   FctNodeDiskIoByProcessServiceListData,
   FctNodeDiskIoByProcessServiceListErrors,
   FctNodeDiskIoByProcessServiceListResponses,
+  FctNodeDiskIoDailyServiceGetData,
+  FctNodeDiskIoDailyServiceGetErrors,
+  FctNodeDiskIoDailyServiceGetResponses,
+  FctNodeDiskIoDailyServiceListData,
+  FctNodeDiskIoDailyServiceListErrors,
+  FctNodeDiskIoDailyServiceListResponses,
+  FctNodeDiskIoHourlyServiceGetData,
+  FctNodeDiskIoHourlyServiceGetErrors,
+  FctNodeDiskIoHourlyServiceGetResponses,
+  FctNodeDiskIoHourlyServiceListData,
+  FctNodeDiskIoHourlyServiceListErrors,
+  FctNodeDiskIoHourlyServiceListResponses,
+  FctNodeHostSpecServiceGetData,
+  FctNodeHostSpecServiceGetErrors,
+  FctNodeHostSpecServiceGetResponses,
+  FctNodeHostSpecServiceListData,
+  FctNodeHostSpecServiceListErrors,
+  FctNodeHostSpecServiceListResponses,
   FctNodeMemoryUsageByProcessServiceGetData,
   FctNodeMemoryUsageByProcessServiceGetErrors,
   FctNodeMemoryUsageByProcessServiceGetResponses,
   FctNodeMemoryUsageByProcessServiceListData,
   FctNodeMemoryUsageByProcessServiceListErrors,
   FctNodeMemoryUsageByProcessServiceListResponses,
+  FctNodeMemoryUsageDailyServiceGetData,
+  FctNodeMemoryUsageDailyServiceGetErrors,
+  FctNodeMemoryUsageDailyServiceGetResponses,
+  FctNodeMemoryUsageDailyServiceListData,
+  FctNodeMemoryUsageDailyServiceListErrors,
+  FctNodeMemoryUsageDailyServiceListResponses,
+  FctNodeMemoryUsageHourlyServiceGetData,
+  FctNodeMemoryUsageHourlyServiceGetErrors,
+  FctNodeMemoryUsageHourlyServiceGetResponses,
+  FctNodeMemoryUsageHourlyServiceListData,
+  FctNodeMemoryUsageHourlyServiceListErrors,
+  FctNodeMemoryUsageHourlyServiceListResponses,
   FctNodeNetworkIoByProcessServiceGetData,
   FctNodeNetworkIoByProcessServiceGetErrors,
   FctNodeNetworkIoByProcessServiceGetResponses,
   FctNodeNetworkIoByProcessServiceListData,
   FctNodeNetworkIoByProcessServiceListErrors,
   FctNodeNetworkIoByProcessServiceListResponses,
+  FctNodeNetworkIoDailyServiceGetData,
+  FctNodeNetworkIoDailyServiceGetErrors,
+  FctNodeNetworkIoDailyServiceGetResponses,
+  FctNodeNetworkIoDailyServiceListData,
+  FctNodeNetworkIoDailyServiceListErrors,
+  FctNodeNetworkIoDailyServiceListResponses,
+  FctNodeNetworkIoHourlyServiceGetData,
+  FctNodeNetworkIoHourlyServiceGetErrors,
+  FctNodeNetworkIoHourlyServiceGetResponses,
+  FctNodeNetworkIoHourlyServiceListData,
+  FctNodeNetworkIoHourlyServiceListErrors,
+  FctNodeNetworkIoHourlyServiceListResponses,
   FctOpcodeGasByOpcodeDailyServiceGetData,
   FctOpcodeGasByOpcodeDailyServiceGetErrors,
   FctOpcodeGasByOpcodeDailyServiceGetResponses,
@@ -1479,18 +1533,54 @@ import {
   zFctNodeCpuUtilizationByProcessServiceGetResponse,
   zFctNodeCpuUtilizationByProcessServiceListData,
   zFctNodeCpuUtilizationByProcessServiceListResponse,
+  zFctNodeCpuUtilizationDailyServiceGetData,
+  zFctNodeCpuUtilizationDailyServiceGetResponse,
+  zFctNodeCpuUtilizationDailyServiceListData,
+  zFctNodeCpuUtilizationDailyServiceListResponse,
+  zFctNodeCpuUtilizationHourlyServiceGetData,
+  zFctNodeCpuUtilizationHourlyServiceGetResponse,
+  zFctNodeCpuUtilizationHourlyServiceListData,
+  zFctNodeCpuUtilizationHourlyServiceListResponse,
   zFctNodeDiskIoByProcessServiceGetData,
   zFctNodeDiskIoByProcessServiceGetResponse,
   zFctNodeDiskIoByProcessServiceListData,
   zFctNodeDiskIoByProcessServiceListResponse,
+  zFctNodeDiskIoDailyServiceGetData,
+  zFctNodeDiskIoDailyServiceGetResponse,
+  zFctNodeDiskIoDailyServiceListData,
+  zFctNodeDiskIoDailyServiceListResponse,
+  zFctNodeDiskIoHourlyServiceGetData,
+  zFctNodeDiskIoHourlyServiceGetResponse,
+  zFctNodeDiskIoHourlyServiceListData,
+  zFctNodeDiskIoHourlyServiceListResponse,
+  zFctNodeHostSpecServiceGetData,
+  zFctNodeHostSpecServiceGetResponse,
+  zFctNodeHostSpecServiceListData,
+  zFctNodeHostSpecServiceListResponse,
   zFctNodeMemoryUsageByProcessServiceGetData,
   zFctNodeMemoryUsageByProcessServiceGetResponse,
   zFctNodeMemoryUsageByProcessServiceListData,
   zFctNodeMemoryUsageByProcessServiceListResponse,
+  zFctNodeMemoryUsageDailyServiceGetData,
+  zFctNodeMemoryUsageDailyServiceGetResponse,
+  zFctNodeMemoryUsageDailyServiceListData,
+  zFctNodeMemoryUsageDailyServiceListResponse,
+  zFctNodeMemoryUsageHourlyServiceGetData,
+  zFctNodeMemoryUsageHourlyServiceGetResponse,
+  zFctNodeMemoryUsageHourlyServiceListData,
+  zFctNodeMemoryUsageHourlyServiceListResponse,
   zFctNodeNetworkIoByProcessServiceGetData,
   zFctNodeNetworkIoByProcessServiceGetResponse,
   zFctNodeNetworkIoByProcessServiceListData,
   zFctNodeNetworkIoByProcessServiceListResponse,
+  zFctNodeNetworkIoDailyServiceGetData,
+  zFctNodeNetworkIoDailyServiceGetResponse,
+  zFctNodeNetworkIoDailyServiceListData,
+  zFctNodeNetworkIoDailyServiceListResponse,
+  zFctNodeNetworkIoHourlyServiceGetData,
+  zFctNodeNetworkIoHourlyServiceGetResponse,
+  zFctNodeNetworkIoHourlyServiceListData,
+  zFctNodeNetworkIoHourlyServiceListResponse,
   zFctOpcodeGasByOpcodeDailyServiceGetData,
   zFctOpcodeGasByOpcodeDailyServiceGetResponse,
   zFctOpcodeGasByOpcodeDailyServiceListData,
@@ -5315,6 +5405,82 @@ export const fctNodeCpuUtilizationByProcessServiceGet = <ThrowOnError extends bo
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctNodeCpuUtilizationDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeCpuUtilizationDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctNodeCpuUtilizationDailyServiceListResponses,
+    FctNodeCpuUtilizationDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeCpuUtilizationDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeCpuUtilizationDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_cpu_utilization_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctNodeCpuUtilizationDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeCpuUtilizationDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctNodeCpuUtilizationDailyServiceGetResponses,
+    FctNodeCpuUtilizationDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeCpuUtilizationDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeCpuUtilizationDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_cpu_utilization_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeCpuUtilizationHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeCpuUtilizationHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctNodeCpuUtilizationHourlyServiceListResponses,
+    FctNodeCpuUtilizationHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeCpuUtilizationHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeCpuUtilizationHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_cpu_utilization_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctNodeCpuUtilizationHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeCpuUtilizationHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctNodeCpuUtilizationHourlyServiceGetResponses,
+    FctNodeCpuUtilizationHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeCpuUtilizationHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeCpuUtilizationHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_cpu_utilization_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctNodeDiskIoByProcessServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctNodeDiskIoByProcessServiceListData, ThrowOnError>
 ) =>
@@ -5345,6 +5511,112 @@ export const fctNodeDiskIoByProcessServiceGet = <ThrowOnError extends boolean = 
     requestValidator: async data => await zFctNodeDiskIoByProcessServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctNodeDiskIoByProcessServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_node_disk_io_by_process/{wallclock_slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeDiskIoDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeDiskIoDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctNodeDiskIoDailyServiceListResponses,
+    FctNodeDiskIoDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeDiskIoDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeDiskIoDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_disk_io_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctNodeDiskIoDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeDiskIoDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctNodeDiskIoDailyServiceGetResponses,
+    FctNodeDiskIoDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeDiskIoDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeDiskIoDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_disk_io_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeDiskIoHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeDiskIoHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctNodeDiskIoHourlyServiceListResponses,
+    FctNodeDiskIoHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeDiskIoHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeDiskIoHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_disk_io_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctNodeDiskIoHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeDiskIoHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctNodeDiskIoHourlyServiceGetResponses,
+    FctNodeDiskIoHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeDiskIoHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeDiskIoHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_disk_io_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeHostSpecServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeHostSpecServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<FctNodeHostSpecServiceListResponses, FctNodeHostSpecServiceListErrors, ThrowOnError>({
+    requestValidator: async data => await zFctNodeHostSpecServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeHostSpecServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_host_spec',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by wallclock_slot_start_date_time
+ */
+export const fctNodeHostSpecServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeHostSpecServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<FctNodeHostSpecServiceGetResponses, FctNodeHostSpecServiceGetErrors, ThrowOnError>({
+    requestValidator: async data => await zFctNodeHostSpecServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeHostSpecServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_host_spec/{wallclock_slot_start_date_time}',
     ...options,
   });
 
@@ -5391,6 +5663,82 @@ export const fctNodeMemoryUsageByProcessServiceGet = <ThrowOnError extends boole
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctNodeMemoryUsageDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeMemoryUsageDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctNodeMemoryUsageDailyServiceListResponses,
+    FctNodeMemoryUsageDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeMemoryUsageDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeMemoryUsageDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_memory_usage_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctNodeMemoryUsageDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeMemoryUsageDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctNodeMemoryUsageDailyServiceGetResponses,
+    FctNodeMemoryUsageDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeMemoryUsageDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeMemoryUsageDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_memory_usage_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeMemoryUsageHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeMemoryUsageHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctNodeMemoryUsageHourlyServiceListResponses,
+    FctNodeMemoryUsageHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeMemoryUsageHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeMemoryUsageHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_memory_usage_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctNodeMemoryUsageHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeMemoryUsageHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctNodeMemoryUsageHourlyServiceGetResponses,
+    FctNodeMemoryUsageHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeMemoryUsageHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeMemoryUsageHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_memory_usage_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctNodeNetworkIoByProcessServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctNodeNetworkIoByProcessServiceListData, ThrowOnError>
 ) =>
@@ -5421,6 +5769,82 @@ export const fctNodeNetworkIoByProcessServiceGet = <ThrowOnError extends boolean
     requestValidator: async data => await zFctNodeNetworkIoByProcessServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctNodeNetworkIoByProcessServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_node_network_io_by_process/{wallclock_slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeNetworkIoDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeNetworkIoDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctNodeNetworkIoDailyServiceListResponses,
+    FctNodeNetworkIoDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeNetworkIoDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeNetworkIoDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_network_io_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctNodeNetworkIoDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeNetworkIoDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctNodeNetworkIoDailyServiceGetResponses,
+    FctNodeNetworkIoDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeNetworkIoDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeNetworkIoDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_network_io_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctNodeNetworkIoHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeNetworkIoHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctNodeNetworkIoHourlyServiceListResponses,
+    FctNodeNetworkIoHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeNetworkIoHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeNetworkIoHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_network_io_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctNodeNetworkIoHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeNetworkIoHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctNodeNetworkIoHourlyServiceGetResponses,
+    FctNodeNetworkIoHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeNetworkIoHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeNetworkIoHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_network_io_hourly/{hour_start_date_time}',
     ...options,
   });
 
