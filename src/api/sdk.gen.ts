@@ -453,6 +453,18 @@ import type {
   FctExecutionGasUsedHourlyServiceListData,
   FctExecutionGasUsedHourlyServiceListErrors,
   FctExecutionGasUsedHourlyServiceListResponses,
+  FctExecutionReceiptSizeDailyServiceGetData,
+  FctExecutionReceiptSizeDailyServiceGetErrors,
+  FctExecutionReceiptSizeDailyServiceGetResponses,
+  FctExecutionReceiptSizeDailyServiceListData,
+  FctExecutionReceiptSizeDailyServiceListErrors,
+  FctExecutionReceiptSizeDailyServiceListResponses,
+  FctExecutionReceiptSizeHourlyServiceGetData,
+  FctExecutionReceiptSizeHourlyServiceGetErrors,
+  FctExecutionReceiptSizeHourlyServiceGetResponses,
+  FctExecutionReceiptSizeHourlyServiceListData,
+  FctExecutionReceiptSizeHourlyServiceListErrors,
+  FctExecutionReceiptSizeHourlyServiceListResponses,
   FctExecutionStateSizeDailyServiceGetData,
   FctExecutionStateSizeDailyServiceGetErrors,
   FctExecutionStateSizeDailyServiceGetResponses,
@@ -801,6 +813,12 @@ import type {
   IntBlockProposerCanonicalServiceListData,
   IntBlockProposerCanonicalServiceListErrors,
   IntBlockProposerCanonicalServiceListResponses,
+  IntBlockReceiptSizeServiceGetData,
+  IntBlockReceiptSizeServiceGetErrors,
+  IntBlockReceiptSizeServiceGetResponses,
+  IntBlockReceiptSizeServiceListData,
+  IntBlockReceiptSizeServiceListErrors,
+  IntBlockReceiptSizeServiceListResponses,
   IntBlockResourceGasServiceGetData,
   IntBlockResourceGasServiceGetErrors,
   IntBlockResourceGasServiceGetResponses,
@@ -1107,6 +1125,12 @@ import type {
   IntTransactionOpcodeGasServiceListData,
   IntTransactionOpcodeGasServiceListErrors,
   IntTransactionOpcodeGasServiceListResponses,
+  IntTransactionReceiptSizeServiceGetData,
+  IntTransactionReceiptSizeServiceGetErrors,
+  IntTransactionReceiptSizeServiceGetResponses,
+  IntTransactionReceiptSizeServiceListData,
+  IntTransactionReceiptSizeServiceListErrors,
+  IntTransactionReceiptSizeServiceListResponses,
   IntTransactionResourceGasServiceGetData,
   IntTransactionResourceGasServiceGetErrors,
   IntTransactionResourceGasServiceGetResponses,
@@ -1415,6 +1439,14 @@ import {
   zFctExecutionGasUsedHourlyServiceGetResponse,
   zFctExecutionGasUsedHourlyServiceListData,
   zFctExecutionGasUsedHourlyServiceListResponse,
+  zFctExecutionReceiptSizeDailyServiceGetData,
+  zFctExecutionReceiptSizeDailyServiceGetResponse,
+  zFctExecutionReceiptSizeDailyServiceListData,
+  zFctExecutionReceiptSizeDailyServiceListResponse,
+  zFctExecutionReceiptSizeHourlyServiceGetData,
+  zFctExecutionReceiptSizeHourlyServiceGetResponse,
+  zFctExecutionReceiptSizeHourlyServiceListData,
+  zFctExecutionReceiptSizeHourlyServiceListResponse,
   zFctExecutionStateSizeDailyServiceGetData,
   zFctExecutionStateSizeDailyServiceGetResponse,
   zFctExecutionStateSizeDailyServiceListData,
@@ -1647,6 +1679,10 @@ import {
   zIntBlockProposerCanonicalServiceGetResponse,
   zIntBlockProposerCanonicalServiceListData,
   zIntBlockProposerCanonicalServiceListResponse,
+  zIntBlockReceiptSizeServiceGetData,
+  zIntBlockReceiptSizeServiceGetResponse,
+  zIntBlockReceiptSizeServiceListData,
+  zIntBlockReceiptSizeServiceListResponse,
   zIntBlockResourceGasServiceGetData,
   zIntBlockResourceGasServiceGetResponse,
   zIntBlockResourceGasServiceListData,
@@ -1851,6 +1887,10 @@ import {
   zIntTransactionOpcodeGasServiceGetResponse,
   zIntTransactionOpcodeGasServiceListData,
   zIntTransactionOpcodeGasServiceListResponse,
+  zIntTransactionReceiptSizeServiceGetData,
+  zIntTransactionReceiptSizeServiceGetResponse,
+  zIntTransactionReceiptSizeServiceListData,
+  zIntTransactionReceiptSizeServiceListResponse,
   zIntTransactionResourceGasServiceGetData,
   zIntTransactionResourceGasServiceGetResponse,
   zIntTransactionResourceGasServiceListData,
@@ -4705,6 +4745,82 @@ export const fctExecutionGasUsedHourlyServiceGet = <ThrowOnError extends boolean
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctExecutionReceiptSizeDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctExecutionReceiptSizeDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctExecutionReceiptSizeDailyServiceListResponses,
+    FctExecutionReceiptSizeDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionReceiptSizeDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionReceiptSizeDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_receipt_size_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctExecutionReceiptSizeDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctExecutionReceiptSizeDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctExecutionReceiptSizeDailyServiceGetResponses,
+    FctExecutionReceiptSizeDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionReceiptSizeDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionReceiptSizeDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_receipt_size_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctExecutionReceiptSizeHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctExecutionReceiptSizeHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctExecutionReceiptSizeHourlyServiceListResponses,
+    FctExecutionReceiptSizeHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionReceiptSizeHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionReceiptSizeHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_receipt_size_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctExecutionReceiptSizeHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctExecutionReceiptSizeHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctExecutionReceiptSizeHourlyServiceGetResponses,
+    FctExecutionReceiptSizeHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctExecutionReceiptSizeHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctExecutionReceiptSizeHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_execution_receipt_size_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctExecutionStateSizeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionStateSizeDailyServiceListData, ThrowOnError>
 ) =>
@@ -6901,6 +7017,44 @@ export const intBlockProposerCanonicalServiceGet = <ThrowOnError extends boolean
  *
  * Retrieve paginated results with optional filtering
  */
+export const intBlockReceiptSizeServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntBlockReceiptSizeServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntBlockReceiptSizeServiceListResponses,
+    IntBlockReceiptSizeServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockReceiptSizeServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntBlockReceiptSizeServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_block_receipt_size',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intBlockReceiptSizeServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntBlockReceiptSizeServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntBlockReceiptSizeServiceGetResponses,
+    IntBlockReceiptSizeServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockReceiptSizeServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntBlockReceiptSizeServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_block_receipt_size/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const intBlockResourceGasServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBlockResourceGasServiceListData, ThrowOnError>
 ) =>
@@ -8829,6 +8983,44 @@ export const intTransactionOpcodeGasServiceGet = <ThrowOnError extends boolean =
     requestValidator: async data => await zIntTransactionOpcodeGasServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntTransactionOpcodeGasServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_transaction_opcode_gas/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intTransactionReceiptSizeServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntTransactionReceiptSizeServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntTransactionReceiptSizeServiceListResponses,
+    IntTransactionReceiptSizeServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionReceiptSizeServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionReceiptSizeServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_receipt_size',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intTransactionReceiptSizeServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntTransactionReceiptSizeServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntTransactionReceiptSizeServiceGetResponses,
+    IntTransactionReceiptSizeServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionReceiptSizeServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionReceiptSizeServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_receipt_size/{block_number}',
     ...options,
   });
 

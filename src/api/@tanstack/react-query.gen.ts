@@ -154,6 +154,10 @@ import {
   fctExecutionGasUsedDailyServiceList,
   fctExecutionGasUsedHourlyServiceGet,
   fctExecutionGasUsedHourlyServiceList,
+  fctExecutionReceiptSizeDailyServiceGet,
+  fctExecutionReceiptSizeDailyServiceList,
+  fctExecutionReceiptSizeHourlyServiceGet,
+  fctExecutionReceiptSizeHourlyServiceList,
   fctExecutionStateSizeDailyServiceGet,
   fctExecutionStateSizeDailyServiceList,
   fctExecutionStateSizeHourlyServiceGet,
@@ -270,6 +274,8 @@ import {
   intBlockOpcodeGasServiceList,
   intBlockProposerCanonicalServiceGet,
   intBlockProposerCanonicalServiceList,
+  intBlockReceiptSizeServiceGet,
+  intBlockReceiptSizeServiceList,
   intBlockResourceGasServiceGet,
   intBlockResourceGasServiceList,
   intContractCreationServiceGet,
@@ -372,6 +378,8 @@ import {
   intTransactionCallFrameServiceList,
   intTransactionOpcodeGasServiceGet,
   intTransactionOpcodeGasServiceList,
+  intTransactionReceiptSizeServiceGet,
+  intTransactionReceiptSizeServiceList,
   intTransactionResourceGasServiceGet,
   intTransactionResourceGasServiceList,
   type Options,
@@ -827,6 +835,18 @@ import type {
   FctExecutionGasUsedHourlyServiceListData,
   FctExecutionGasUsedHourlyServiceListError,
   FctExecutionGasUsedHourlyServiceListResponse,
+  FctExecutionReceiptSizeDailyServiceGetData,
+  FctExecutionReceiptSizeDailyServiceGetError,
+  FctExecutionReceiptSizeDailyServiceGetResponse,
+  FctExecutionReceiptSizeDailyServiceListData,
+  FctExecutionReceiptSizeDailyServiceListError,
+  FctExecutionReceiptSizeDailyServiceListResponse,
+  FctExecutionReceiptSizeHourlyServiceGetData,
+  FctExecutionReceiptSizeHourlyServiceGetError,
+  FctExecutionReceiptSizeHourlyServiceGetResponse,
+  FctExecutionReceiptSizeHourlyServiceListData,
+  FctExecutionReceiptSizeHourlyServiceListError,
+  FctExecutionReceiptSizeHourlyServiceListResponse,
   FctExecutionStateSizeDailyServiceGetData,
   FctExecutionStateSizeDailyServiceGetError,
   FctExecutionStateSizeDailyServiceGetResponse,
@@ -1175,6 +1195,12 @@ import type {
   IntBlockProposerCanonicalServiceListData,
   IntBlockProposerCanonicalServiceListError,
   IntBlockProposerCanonicalServiceListResponse,
+  IntBlockReceiptSizeServiceGetData,
+  IntBlockReceiptSizeServiceGetError,
+  IntBlockReceiptSizeServiceGetResponse,
+  IntBlockReceiptSizeServiceListData,
+  IntBlockReceiptSizeServiceListError,
+  IntBlockReceiptSizeServiceListResponse,
   IntBlockResourceGasServiceGetData,
   IntBlockResourceGasServiceGetError,
   IntBlockResourceGasServiceGetResponse,
@@ -1481,6 +1507,12 @@ import type {
   IntTransactionOpcodeGasServiceListData,
   IntTransactionOpcodeGasServiceListError,
   IntTransactionOpcodeGasServiceListResponse,
+  IntTransactionReceiptSizeServiceGetData,
+  IntTransactionReceiptSizeServiceGetError,
+  IntTransactionReceiptSizeServiceGetResponse,
+  IntTransactionReceiptSizeServiceListData,
+  IntTransactionReceiptSizeServiceListError,
+  IntTransactionReceiptSizeServiceListResponse,
   IntTransactionResourceGasServiceGetData,
   IntTransactionResourceGasServiceGetError,
   IntTransactionResourceGasServiceGetResponse,
@@ -5887,6 +5919,126 @@ export const fctExecutionGasUsedHourlyServiceGetOptions = (options: Options<FctE
     queryKey: fctExecutionGasUsedHourlyServiceGetQueryKey(options),
   });
 
+export const fctExecutionReceiptSizeDailyServiceListQueryKey = (
+  options?: Options<FctExecutionReceiptSizeDailyServiceListData>
+) => createQueryKey('fctExecutionReceiptSizeDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctExecutionReceiptSizeDailyServiceListOptions = (
+  options?: Options<FctExecutionReceiptSizeDailyServiceListData>
+) =>
+  queryOptions<
+    FctExecutionReceiptSizeDailyServiceListResponse,
+    FctExecutionReceiptSizeDailyServiceListError,
+    FctExecutionReceiptSizeDailyServiceListResponse,
+    ReturnType<typeof fctExecutionReceiptSizeDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctExecutionReceiptSizeDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctExecutionReceiptSizeDailyServiceListQueryKey(options),
+  });
+
+export const fctExecutionReceiptSizeDailyServiceGetQueryKey = (
+  options: Options<FctExecutionReceiptSizeDailyServiceGetData>
+) => createQueryKey('fctExecutionReceiptSizeDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctExecutionReceiptSizeDailyServiceGetOptions = (
+  options: Options<FctExecutionReceiptSizeDailyServiceGetData>
+) =>
+  queryOptions<
+    FctExecutionReceiptSizeDailyServiceGetResponse,
+    FctExecutionReceiptSizeDailyServiceGetError,
+    FctExecutionReceiptSizeDailyServiceGetResponse,
+    ReturnType<typeof fctExecutionReceiptSizeDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctExecutionReceiptSizeDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctExecutionReceiptSizeDailyServiceGetQueryKey(options),
+  });
+
+export const fctExecutionReceiptSizeHourlyServiceListQueryKey = (
+  options?: Options<FctExecutionReceiptSizeHourlyServiceListData>
+) => createQueryKey('fctExecutionReceiptSizeHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctExecutionReceiptSizeHourlyServiceListOptions = (
+  options?: Options<FctExecutionReceiptSizeHourlyServiceListData>
+) =>
+  queryOptions<
+    FctExecutionReceiptSizeHourlyServiceListResponse,
+    FctExecutionReceiptSizeHourlyServiceListError,
+    FctExecutionReceiptSizeHourlyServiceListResponse,
+    ReturnType<typeof fctExecutionReceiptSizeHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctExecutionReceiptSizeHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctExecutionReceiptSizeHourlyServiceListQueryKey(options),
+  });
+
+export const fctExecutionReceiptSizeHourlyServiceGetQueryKey = (
+  options: Options<FctExecutionReceiptSizeHourlyServiceGetData>
+) => createQueryKey('fctExecutionReceiptSizeHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctExecutionReceiptSizeHourlyServiceGetOptions = (
+  options: Options<FctExecutionReceiptSizeHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctExecutionReceiptSizeHourlyServiceGetResponse,
+    FctExecutionReceiptSizeHourlyServiceGetError,
+    FctExecutionReceiptSizeHourlyServiceGetResponse,
+    ReturnType<typeof fctExecutionReceiptSizeHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctExecutionReceiptSizeHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctExecutionReceiptSizeHourlyServiceGetQueryKey(options),
+  });
+
 export const fctExecutionStateSizeDailyServiceListQueryKey = (
   options?: Options<FctExecutionStateSizeDailyServiceListData>
 ) => createQueryKey('fctExecutionStateSizeDailyServiceList', options);
@@ -9212,6 +9364,60 @@ export const intBlockProposerCanonicalServiceGetOptions = (options: Options<IntB
     queryKey: intBlockProposerCanonicalServiceGetQueryKey(options),
   });
 
+export const intBlockReceiptSizeServiceListQueryKey = (options?: Options<IntBlockReceiptSizeServiceListData>) =>
+  createQueryKey('intBlockReceiptSizeServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intBlockReceiptSizeServiceListOptions = (options?: Options<IntBlockReceiptSizeServiceListData>) =>
+  queryOptions<
+    IntBlockReceiptSizeServiceListResponse,
+    IntBlockReceiptSizeServiceListError,
+    IntBlockReceiptSizeServiceListResponse,
+    ReturnType<typeof intBlockReceiptSizeServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockReceiptSizeServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockReceiptSizeServiceListQueryKey(options),
+  });
+
+export const intBlockReceiptSizeServiceGetQueryKey = (options: Options<IntBlockReceiptSizeServiceGetData>) =>
+  createQueryKey('intBlockReceiptSizeServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intBlockReceiptSizeServiceGetOptions = (options: Options<IntBlockReceiptSizeServiceGetData>) =>
+  queryOptions<
+    IntBlockReceiptSizeServiceGetResponse,
+    IntBlockReceiptSizeServiceGetError,
+    IntBlockReceiptSizeServiceGetResponse,
+    ReturnType<typeof intBlockReceiptSizeServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockReceiptSizeServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockReceiptSizeServiceGetQueryKey(options),
+  });
+
 export const intBlockResourceGasServiceListQueryKey = (options?: Options<IntBlockResourceGasServiceListData>) =>
   createQueryKey('intBlockResourceGasServiceList', options);
 
@@ -12156,6 +12362,64 @@ export const intTransactionOpcodeGasServiceGetOptions = (options: Options<IntTra
       return data;
     },
     queryKey: intTransactionOpcodeGasServiceGetQueryKey(options),
+  });
+
+export const intTransactionReceiptSizeServiceListQueryKey = (
+  options?: Options<IntTransactionReceiptSizeServiceListData>
+) => createQueryKey('intTransactionReceiptSizeServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intTransactionReceiptSizeServiceListOptions = (
+  options?: Options<IntTransactionReceiptSizeServiceListData>
+) =>
+  queryOptions<
+    IntTransactionReceiptSizeServiceListResponse,
+    IntTransactionReceiptSizeServiceListError,
+    IntTransactionReceiptSizeServiceListResponse,
+    ReturnType<typeof intTransactionReceiptSizeServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intTransactionReceiptSizeServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intTransactionReceiptSizeServiceListQueryKey(options),
+  });
+
+export const intTransactionReceiptSizeServiceGetQueryKey = (
+  options: Options<IntTransactionReceiptSizeServiceGetData>
+) => createQueryKey('intTransactionReceiptSizeServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intTransactionReceiptSizeServiceGetOptions = (options: Options<IntTransactionReceiptSizeServiceGetData>) =>
+  queryOptions<
+    IntTransactionReceiptSizeServiceGetResponse,
+    IntTransactionReceiptSizeServiceGetError,
+    IntTransactionReceiptSizeServiceGetResponse,
+    ReturnType<typeof intTransactionReceiptSizeServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intTransactionReceiptSizeServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intTransactionReceiptSizeServiceGetQueryKey(options),
   });
 
 export const intTransactionResourceGasServiceListQueryKey = (

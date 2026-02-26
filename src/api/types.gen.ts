@@ -3751,6 +3751,180 @@ export type FctExecutionGasUsedHourly = {
   upper_band_gas_used?: number;
 };
 
+export type FctExecutionReceiptSizeDaily = {
+  /**
+   * Average logs per transaction
+   */
+  avg_log_count_per_transaction?: number;
+  /**
+   * Average total receipt bytes per block
+   */
+  avg_receipt_bytes_per_block?: number;
+  /**
+   * Average receipt bytes per transaction
+   */
+  avg_receipt_bytes_per_transaction?: number;
+  /**
+   * Number of blocks in this day
+   */
+  block_count?: number;
+  /**
+   * Running total of receipt bytes since genesis
+   */
+  cumulative_receipt_bytes?: number;
+  /**
+   * The start date of the day
+   */
+  day_start_date?: string;
+  /**
+   * Lower Bollinger band (avg - 2*stddev)
+   */
+  lower_band_receipt_bytes_per_block?: number;
+  /**
+   * Maximum total receipt bytes in a single block
+   */
+  max_receipt_bytes_per_block?: number;
+  /**
+   * Minimum total receipt bytes in a single block
+   */
+  min_receipt_bytes_per_block?: number;
+  /**
+   * 7-day moving average of receipt bytes per block
+   */
+  moving_avg_receipt_bytes_per_block?: number;
+  /**
+   * 5th percentile of total receipt bytes per block
+   */
+  p05_receipt_bytes_per_block?: number;
+  /**
+   * 50th percentile of total receipt bytes per block
+   */
+  p50_receipt_bytes_per_block?: number;
+  /**
+   * 50th percentile of receipt bytes per transaction
+   */
+  p50_receipt_bytes_per_transaction?: number;
+  /**
+   * 95th percentile of total receipt bytes per block
+   */
+  p95_receipt_bytes_per_block?: number;
+  /**
+   * 95th percentile of receipt bytes per transaction
+   */
+  p95_receipt_bytes_per_transaction?: number;
+  /**
+   * Standard deviation of total receipt bytes per block
+   */
+  stddev_receipt_bytes_per_block?: number;
+  /**
+   * Total logs emitted across all transactions
+   */
+  total_log_count?: number;
+  /**
+   * Total receipt bytes across all blocks
+   */
+  total_receipt_bytes?: number;
+  /**
+   * Number of transactions in this day
+   */
+  transaction_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_receipt_bytes_per_block?: number;
+};
+
+export type FctExecutionReceiptSizeHourly = {
+  /**
+   * Average logs per transaction
+   */
+  avg_log_count_per_transaction?: number;
+  /**
+   * Average total receipt bytes per block
+   */
+  avg_receipt_bytes_per_block?: number;
+  /**
+   * Average receipt bytes per transaction
+   */
+  avg_receipt_bytes_per_transaction?: number;
+  /**
+   * Number of blocks in this hour
+   */
+  block_count?: number;
+  /**
+   * Running total of receipt bytes since genesis
+   */
+  cumulative_receipt_bytes?: number;
+  /**
+   * The start time of the hour
+   */
+  hour_start_date_time?: number;
+  /**
+   * Lower Bollinger band (avg - 2*stddev)
+   */
+  lower_band_receipt_bytes_per_block?: number;
+  /**
+   * Maximum total receipt bytes in a single block
+   */
+  max_receipt_bytes_per_block?: number;
+  /**
+   * Minimum total receipt bytes in a single block
+   */
+  min_receipt_bytes_per_block?: number;
+  /**
+   * 6-hour moving average of receipt bytes per block
+   */
+  moving_avg_receipt_bytes_per_block?: number;
+  /**
+   * 5th percentile of total receipt bytes per block
+   */
+  p05_receipt_bytes_per_block?: number;
+  /**
+   * 50th percentile of total receipt bytes per block
+   */
+  p50_receipt_bytes_per_block?: number;
+  /**
+   * 50th percentile of receipt bytes per transaction
+   */
+  p50_receipt_bytes_per_transaction?: number;
+  /**
+   * 95th percentile of total receipt bytes per block
+   */
+  p95_receipt_bytes_per_block?: number;
+  /**
+   * 95th percentile of receipt bytes per transaction
+   */
+  p95_receipt_bytes_per_transaction?: number;
+  /**
+   * Standard deviation of total receipt bytes per block
+   */
+  stddev_receipt_bytes_per_block?: number;
+  /**
+   * Total logs emitted across all transactions
+   */
+  total_log_count?: number;
+  /**
+   * Total receipt bytes across all blocks
+   */
+  total_receipt_bytes?: number;
+  /**
+   * Number of transactions in this hour
+   */
+  transaction_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper Bollinger band (avg + 2*stddev)
+   */
+  upper_band_receipt_bytes_per_block?: number;
+};
+
 export type FctExecutionStateSizeDaily = {
   /**
    * Account bytes at end of day
@@ -6284,6 +6458,20 @@ export type GetFctExecutionGasUsedHourlyResponse = {
 };
 
 /**
+ * Response for getting a single fct_execution_receipt_size_daily record
+ */
+export type GetFctExecutionReceiptSizeDailyResponse = {
+  item?: FctExecutionReceiptSizeDaily;
+};
+
+/**
+ * Response for getting a single fct_execution_receipt_size_hourly record
+ */
+export type GetFctExecutionReceiptSizeHourlyResponse = {
+  item?: FctExecutionReceiptSizeHourly;
+};
+
+/**
  * Response for getting a single fct_execution_state_size_daily record
  */
 export type GetFctExecutionStateSizeDailyResponse = {
@@ -6690,6 +6878,13 @@ export type GetIntBlockProposerCanonicalResponse = {
 };
 
 /**
+ * Response for getting a single int_block_receipt_size record
+ */
+export type GetIntBlockReceiptSizeResponse = {
+  item?: IntBlockReceiptSize;
+};
+
+/**
  * Response for getting a single int_block_resource_gas record
  */
 export type GetIntBlockResourceGasResponse = {
@@ -7044,6 +7239,13 @@ export type GetIntTransactionCallFrameResponse = {
  */
 export type GetIntTransactionOpcodeGasResponse = {
   item?: IntTransactionOpcodeGas;
+};
+
+/**
+ * Response for getting a single int_transaction_receipt_size record
+ */
+export type GetIntTransactionReceiptSizeResponse = {
+  item?: IntTransactionReceiptSize;
 };
 
 /**
@@ -7665,6 +7867,57 @@ export type IntBlockProposerCanonical = {
    * The wall clock time when the slot started
    */
   slot_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntBlockReceiptSize = {
+  /**
+   * Average receipt bytes per transaction in this block
+   */
+  avg_receipt_bytes_per_transaction?: number;
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Total logs emitted across all transactions in the block
+   */
+  log_count?: number;
+  /**
+   * Total raw bytes of log data fields across all transactions
+   */
+  log_data_bytes?: number;
+  /**
+   * Total number of topics across all logs in the block
+   */
+  log_topic_count?: number;
+  /**
+   * Largest single transaction receipt in this block
+   */
+  max_receipt_bytes_per_transaction?: number;
+  /**
+   * The name of the network
+   */
+  meta_network_name?: string;
+  /**
+   * 50th percentile of receipt bytes per transaction
+   */
+  p50_receipt_bytes_per_transaction?: number;
+  /**
+   * 95th percentile of receipt bytes per transaction
+   */
+  p95_receipt_bytes_per_transaction?: number;
+  /**
+   * Total RLP-encoded receipt bytes across all transactions in the block
+   */
+  receipt_bytes?: number;
+  /**
+   * Number of transactions in the block
+   */
+  transaction_count?: number;
   /**
    * Timestamp when the record was last updated
    */
@@ -9812,6 +10065,45 @@ export type IntTransactionOpcodeGas = {
   updated_date_time?: number;
 };
 
+export type IntTransactionReceiptSize = {
+  /**
+   * The block number containing the transaction
+   */
+  block_number?: number;
+  /**
+   * Number of logs emitted by this transaction
+   */
+  log_count?: number;
+  /**
+   * Total raw bytes of log data fields (before RLP encoding)
+   */
+  log_data_bytes?: number;
+  /**
+   * Total number of topics across all logs
+   */
+  log_topic_count?: number;
+  /**
+   * The name of the network
+   */
+  meta_network_name?: string;
+  /**
+   * Exact RLP-encoded receipt size in bytes (matches eth_getTransactionReceipt)
+   */
+  receipt_bytes?: number;
+  /**
+   * The transaction hash (hex encoded with 0x prefix)
+   */
+  transaction_hash?: string;
+  /**
+   * The index of the transaction within the block
+   */
+  transaction_index?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type IntTransactionResourceGas = {
   /**
    * The block number containing the transaction
@@ -10918,6 +11210,34 @@ export type ListFctExecutionGasUsedHourlyResponse = {
 };
 
 /**
+ * Response for listing fct_execution_receipt_size_daily records
+ */
+export type ListFctExecutionReceiptSizeDailyResponse = {
+  /**
+   * The list of fct_execution_receipt_size_daily.
+   */
+  fct_execution_receipt_size_daily?: Array<FctExecutionReceiptSizeDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_execution_receipt_size_hourly records
+ */
+export type ListFctExecutionReceiptSizeHourlyResponse = {
+  /**
+   * The list of fct_execution_receipt_size_hourly.
+   */
+  fct_execution_receipt_size_hourly?: Array<FctExecutionReceiptSizeHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_execution_state_size_daily records
  */
 export type ListFctExecutionStateSizeDailyResponse = {
@@ -11730,6 +12050,20 @@ export type ListIntBlockProposerCanonicalResponse = {
 };
 
 /**
+ * Response for listing int_block_receipt_size records
+ */
+export type ListIntBlockReceiptSizeResponse = {
+  /**
+   * The list of int_block_receipt_size.
+   */
+  int_block_receipt_size?: Array<IntBlockReceiptSize>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing int_block_resource_gas records
  */
 export type ListIntBlockResourceGasResponse = {
@@ -12437,6 +12771,20 @@ export type ListIntTransactionOpcodeGasResponse = {
    * The list of int_transaction_opcode_gas.
    */
   int_transaction_opcode_gas?: Array<IntTransactionOpcodeGas>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_transaction_receipt_size records
+ */
+export type ListIntTransactionReceiptSizeResponse = {
+  /**
+   * The list of int_transaction_receipt_size.
+   */
+  int_transaction_receipt_size?: Array<IntTransactionReceiptSize>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -49153,6 +49501,1322 @@ export type FctExecutionGasUsedHourlyServiceGetResponses = {
 export type FctExecutionGasUsedHourlyServiceGetResponse =
   FctExecutionGasUsedHourlyServiceGetResponses[keyof FctExecutionGasUsedHourlyServiceGetResponses];
 
+export type FctExecutionReceiptSizeDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The start date of the day (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The start date of the day (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The start date of the day (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The start date of the day (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The start date of the day (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The start date of the day (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The start date of the day (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The start date of the day (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The start date of the day (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks in this day (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks in this day (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks in this day (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks in this day (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks in this day (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks in this day (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks in this day (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks in this day (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks in this day (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks in this day (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Number of transactions in this day (filter: eq)
+     */
+    transaction_count_eq?: number;
+    /**
+     * Number of transactions in this day (filter: ne)
+     */
+    transaction_count_ne?: number;
+    /**
+     * Number of transactions in this day (filter: lt)
+     */
+    transaction_count_lt?: number;
+    /**
+     * Number of transactions in this day (filter: lte)
+     */
+    transaction_count_lte?: number;
+    /**
+     * Number of transactions in this day (filter: gt)
+     */
+    transaction_count_gt?: number;
+    /**
+     * Number of transactions in this day (filter: gte)
+     */
+    transaction_count_gte?: number;
+    /**
+     * Number of transactions in this day (filter: between_min)
+     */
+    transaction_count_between_min?: number;
+    /**
+     * Number of transactions in this day (filter: between_max_value)
+     */
+    transaction_count_between_max_value?: number;
+    /**
+     * Number of transactions in this day (filter: in_values) (comma-separated list)
+     */
+    transaction_count_in_values?: string;
+    /**
+     * Number of transactions in this day (filter: not_in_values) (comma-separated list)
+     */
+    transaction_count_not_in_values?: string;
+    /**
+     * Total receipt bytes across all blocks (filter: eq)
+     */
+    total_receipt_bytes_eq?: number;
+    /**
+     * Total receipt bytes across all blocks (filter: ne)
+     */
+    total_receipt_bytes_ne?: number;
+    /**
+     * Total receipt bytes across all blocks (filter: lt)
+     */
+    total_receipt_bytes_lt?: number;
+    /**
+     * Total receipt bytes across all blocks (filter: lte)
+     */
+    total_receipt_bytes_lte?: number;
+    /**
+     * Total receipt bytes across all blocks (filter: gt)
+     */
+    total_receipt_bytes_gt?: number;
+    /**
+     * Total receipt bytes across all blocks (filter: gte)
+     */
+    total_receipt_bytes_gte?: number;
+    /**
+     * Total receipt bytes across all blocks (filter: between_min)
+     */
+    total_receipt_bytes_between_min?: number;
+    /**
+     * Total receipt bytes across all blocks (filter: between_max_value)
+     */
+    total_receipt_bytes_between_max_value?: number;
+    /**
+     * Total receipt bytes across all blocks (filter: in_values) (comma-separated list)
+     */
+    total_receipt_bytes_in_values?: string;
+    /**
+     * Total receipt bytes across all blocks (filter: not_in_values) (comma-separated list)
+     */
+    total_receipt_bytes_not_in_values?: string;
+    /**
+     * Filter avg_receipt_bytes_per_block using value
+     */
+    avg_receipt_bytes_per_block_value?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: eq)
+     */
+    min_receipt_bytes_per_block_eq?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: ne)
+     */
+    min_receipt_bytes_per_block_ne?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: lt)
+     */
+    min_receipt_bytes_per_block_lt?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: lte)
+     */
+    min_receipt_bytes_per_block_lte?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: gt)
+     */
+    min_receipt_bytes_per_block_gt?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: gte)
+     */
+    min_receipt_bytes_per_block_gte?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: between_min)
+     */
+    min_receipt_bytes_per_block_between_min?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: between_max_value)
+     */
+    min_receipt_bytes_per_block_between_max_value?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: in_values) (comma-separated list)
+     */
+    min_receipt_bytes_per_block_in_values?: string;
+    /**
+     * Minimum total receipt bytes in a single block (filter: not_in_values) (comma-separated list)
+     */
+    min_receipt_bytes_per_block_not_in_values?: string;
+    /**
+     * Maximum total receipt bytes in a single block (filter: eq)
+     */
+    max_receipt_bytes_per_block_eq?: number;
+    /**
+     * Maximum total receipt bytes in a single block (filter: ne)
+     */
+    max_receipt_bytes_per_block_ne?: number;
+    /**
+     * Maximum total receipt bytes in a single block (filter: lt)
+     */
+    max_receipt_bytes_per_block_lt?: number;
+    /**
+     * Maximum total receipt bytes in a single block (filter: lte)
+     */
+    max_receipt_bytes_per_block_lte?: number;
+    /**
+     * Maximum total receipt bytes in a single block (filter: gt)
+     */
+    max_receipt_bytes_per_block_gt?: number;
+    /**
+     * Maximum total receipt bytes in a single block (filter: gte)
+     */
+    max_receipt_bytes_per_block_gte?: number;
+    /**
+     * Maximum total receipt bytes in a single block (filter: between_min)
+     */
+    max_receipt_bytes_per_block_between_min?: number;
+    /**
+     * Maximum total receipt bytes in a single block (filter: between_max_value)
+     */
+    max_receipt_bytes_per_block_between_max_value?: number;
+    /**
+     * Maximum total receipt bytes in a single block (filter: in_values) (comma-separated list)
+     */
+    max_receipt_bytes_per_block_in_values?: string;
+    /**
+     * Maximum total receipt bytes in a single block (filter: not_in_values) (comma-separated list)
+     */
+    max_receipt_bytes_per_block_not_in_values?: string;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: eq)
+     */
+    p05_receipt_bytes_per_block_eq?: number;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: ne)
+     */
+    p05_receipt_bytes_per_block_ne?: number;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: lt)
+     */
+    p05_receipt_bytes_per_block_lt?: number;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: lte)
+     */
+    p05_receipt_bytes_per_block_lte?: number;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: gt)
+     */
+    p05_receipt_bytes_per_block_gt?: number;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: gte)
+     */
+    p05_receipt_bytes_per_block_gte?: number;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: between_min)
+     */
+    p05_receipt_bytes_per_block_between_min?: number;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: between_max_value)
+     */
+    p05_receipt_bytes_per_block_between_max_value?: number;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: in_values) (comma-separated list)
+     */
+    p05_receipt_bytes_per_block_in_values?: string;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: not_in_values) (comma-separated list)
+     */
+    p05_receipt_bytes_per_block_not_in_values?: string;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: eq)
+     */
+    p50_receipt_bytes_per_block_eq?: number;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: ne)
+     */
+    p50_receipt_bytes_per_block_ne?: number;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: lt)
+     */
+    p50_receipt_bytes_per_block_lt?: number;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: lte)
+     */
+    p50_receipt_bytes_per_block_lte?: number;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: gt)
+     */
+    p50_receipt_bytes_per_block_gt?: number;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: gte)
+     */
+    p50_receipt_bytes_per_block_gte?: number;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: between_min)
+     */
+    p50_receipt_bytes_per_block_between_min?: number;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: between_max_value)
+     */
+    p50_receipt_bytes_per_block_between_max_value?: number;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: in_values) (comma-separated list)
+     */
+    p50_receipt_bytes_per_block_in_values?: string;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: not_in_values) (comma-separated list)
+     */
+    p50_receipt_bytes_per_block_not_in_values?: string;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: eq)
+     */
+    p95_receipt_bytes_per_block_eq?: number;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: ne)
+     */
+    p95_receipt_bytes_per_block_ne?: number;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: lt)
+     */
+    p95_receipt_bytes_per_block_lt?: number;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: lte)
+     */
+    p95_receipt_bytes_per_block_lte?: number;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: gt)
+     */
+    p95_receipt_bytes_per_block_gt?: number;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: gte)
+     */
+    p95_receipt_bytes_per_block_gte?: number;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: between_min)
+     */
+    p95_receipt_bytes_per_block_between_min?: number;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: between_max_value)
+     */
+    p95_receipt_bytes_per_block_between_max_value?: number;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: in_values) (comma-separated list)
+     */
+    p95_receipt_bytes_per_block_in_values?: string;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: not_in_values) (comma-separated list)
+     */
+    p95_receipt_bytes_per_block_not_in_values?: string;
+    /**
+     * Filter stddev_receipt_bytes_per_block using value
+     */
+    stddev_receipt_bytes_per_block_value?: number;
+    /**
+     * Filter upper_band_receipt_bytes_per_block using value
+     */
+    upper_band_receipt_bytes_per_block_value?: number;
+    /**
+     * Filter lower_band_receipt_bytes_per_block using value
+     */
+    lower_band_receipt_bytes_per_block_value?: number;
+    /**
+     * Filter moving_avg_receipt_bytes_per_block using value
+     */
+    moving_avg_receipt_bytes_per_block_value?: number;
+    /**
+     * Filter avg_receipt_bytes_per_transaction using value
+     */
+    avg_receipt_bytes_per_transaction_value?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: eq)
+     */
+    p50_receipt_bytes_per_transaction_eq?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: ne)
+     */
+    p50_receipt_bytes_per_transaction_ne?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: lt)
+     */
+    p50_receipt_bytes_per_transaction_lt?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: lte)
+     */
+    p50_receipt_bytes_per_transaction_lte?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: gt)
+     */
+    p50_receipt_bytes_per_transaction_gt?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: gte)
+     */
+    p50_receipt_bytes_per_transaction_gte?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: between_min)
+     */
+    p50_receipt_bytes_per_transaction_between_min?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: between_max_value)
+     */
+    p50_receipt_bytes_per_transaction_between_max_value?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: in_values) (comma-separated list)
+     */
+    p50_receipt_bytes_per_transaction_in_values?: string;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: not_in_values) (comma-separated list)
+     */
+    p50_receipt_bytes_per_transaction_not_in_values?: string;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: eq)
+     */
+    p95_receipt_bytes_per_transaction_eq?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: ne)
+     */
+    p95_receipt_bytes_per_transaction_ne?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: lt)
+     */
+    p95_receipt_bytes_per_transaction_lt?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: lte)
+     */
+    p95_receipt_bytes_per_transaction_lte?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: gt)
+     */
+    p95_receipt_bytes_per_transaction_gt?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: gte)
+     */
+    p95_receipt_bytes_per_transaction_gte?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: between_min)
+     */
+    p95_receipt_bytes_per_transaction_between_min?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: between_max_value)
+     */
+    p95_receipt_bytes_per_transaction_between_max_value?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: in_values) (comma-separated list)
+     */
+    p95_receipt_bytes_per_transaction_in_values?: string;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: not_in_values) (comma-separated list)
+     */
+    p95_receipt_bytes_per_transaction_not_in_values?: string;
+    /**
+     * Total logs emitted across all transactions (filter: eq)
+     */
+    total_log_count_eq?: number;
+    /**
+     * Total logs emitted across all transactions (filter: ne)
+     */
+    total_log_count_ne?: number;
+    /**
+     * Total logs emitted across all transactions (filter: lt)
+     */
+    total_log_count_lt?: number;
+    /**
+     * Total logs emitted across all transactions (filter: lte)
+     */
+    total_log_count_lte?: number;
+    /**
+     * Total logs emitted across all transactions (filter: gt)
+     */
+    total_log_count_gt?: number;
+    /**
+     * Total logs emitted across all transactions (filter: gte)
+     */
+    total_log_count_gte?: number;
+    /**
+     * Total logs emitted across all transactions (filter: between_min)
+     */
+    total_log_count_between_min?: number;
+    /**
+     * Total logs emitted across all transactions (filter: between_max_value)
+     */
+    total_log_count_between_max_value?: number;
+    /**
+     * Total logs emitted across all transactions (filter: in_values) (comma-separated list)
+     */
+    total_log_count_in_values?: string;
+    /**
+     * Total logs emitted across all transactions (filter: not_in_values) (comma-separated list)
+     */
+    total_log_count_not_in_values?: string;
+    /**
+     * Filter avg_log_count_per_transaction using value
+     */
+    avg_log_count_per_transaction_value?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: eq)
+     */
+    cumulative_receipt_bytes_eq?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: ne)
+     */
+    cumulative_receipt_bytes_ne?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: lt)
+     */
+    cumulative_receipt_bytes_lt?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: lte)
+     */
+    cumulative_receipt_bytes_lte?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: gt)
+     */
+    cumulative_receipt_bytes_gt?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: gte)
+     */
+    cumulative_receipt_bytes_gte?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: between_min)
+     */
+    cumulative_receipt_bytes_between_min?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: between_max_value)
+     */
+    cumulative_receipt_bytes_between_max_value?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: in_values) (comma-separated list)
+     */
+    cumulative_receipt_bytes_in_values?: string;
+    /**
+     * Running total of receipt bytes since genesis (filter: not_in_values) (comma-separated list)
+     */
+    cumulative_receipt_bytes_not_in_values?: string;
+    /**
+     * The maximum number of fct_execution_receipt_size_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctExecutionReceiptSizeDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_execution_receipt_size_daily';
+};
+
+export type FctExecutionReceiptSizeDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionReceiptSizeDailyServiceListError =
+  FctExecutionReceiptSizeDailyServiceListErrors[keyof FctExecutionReceiptSizeDailyServiceListErrors];
+
+export type FctExecutionReceiptSizeDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctExecutionReceiptSizeDailyResponse;
+};
+
+export type FctExecutionReceiptSizeDailyServiceListResponse =
+  FctExecutionReceiptSizeDailyServiceListResponses[keyof FctExecutionReceiptSizeDailyServiceListResponses];
+
+export type FctExecutionReceiptSizeDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The start date of the day
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_execution_receipt_size_daily/{day_start_date}';
+};
+
+export type FctExecutionReceiptSizeDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionReceiptSizeDailyServiceGetError =
+  FctExecutionReceiptSizeDailyServiceGetErrors[keyof FctExecutionReceiptSizeDailyServiceGetErrors];
+
+export type FctExecutionReceiptSizeDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctExecutionReceiptSizeDailyResponse;
+};
+
+export type FctExecutionReceiptSizeDailyServiceGetResponse =
+  FctExecutionReceiptSizeDailyServiceGetResponses[keyof FctExecutionReceiptSizeDailyServiceGetResponses];
+
+export type FctExecutionReceiptSizeHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The start time of the hour (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * The start time of the hour (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * The start time of the hour (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * The start time of the hour (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * The start time of the hour (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * The start time of the hour (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * The start time of the hour (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * The start time of the hour (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * The start time of the hour (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * The start time of the hour (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks in this hour (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks in this hour (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks in this hour (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks in this hour (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks in this hour (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks in this hour (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks in this hour (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks in this hour (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks in this hour (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks in this hour (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Number of transactions in this hour (filter: eq)
+     */
+    transaction_count_eq?: number;
+    /**
+     * Number of transactions in this hour (filter: ne)
+     */
+    transaction_count_ne?: number;
+    /**
+     * Number of transactions in this hour (filter: lt)
+     */
+    transaction_count_lt?: number;
+    /**
+     * Number of transactions in this hour (filter: lte)
+     */
+    transaction_count_lte?: number;
+    /**
+     * Number of transactions in this hour (filter: gt)
+     */
+    transaction_count_gt?: number;
+    /**
+     * Number of transactions in this hour (filter: gte)
+     */
+    transaction_count_gte?: number;
+    /**
+     * Number of transactions in this hour (filter: between_min)
+     */
+    transaction_count_between_min?: number;
+    /**
+     * Number of transactions in this hour (filter: between_max_value)
+     */
+    transaction_count_between_max_value?: number;
+    /**
+     * Number of transactions in this hour (filter: in_values) (comma-separated list)
+     */
+    transaction_count_in_values?: string;
+    /**
+     * Number of transactions in this hour (filter: not_in_values) (comma-separated list)
+     */
+    transaction_count_not_in_values?: string;
+    /**
+     * Total receipt bytes across all blocks (filter: eq)
+     */
+    total_receipt_bytes_eq?: number;
+    /**
+     * Total receipt bytes across all blocks (filter: ne)
+     */
+    total_receipt_bytes_ne?: number;
+    /**
+     * Total receipt bytes across all blocks (filter: lt)
+     */
+    total_receipt_bytes_lt?: number;
+    /**
+     * Total receipt bytes across all blocks (filter: lte)
+     */
+    total_receipt_bytes_lte?: number;
+    /**
+     * Total receipt bytes across all blocks (filter: gt)
+     */
+    total_receipt_bytes_gt?: number;
+    /**
+     * Total receipt bytes across all blocks (filter: gte)
+     */
+    total_receipt_bytes_gte?: number;
+    /**
+     * Total receipt bytes across all blocks (filter: between_min)
+     */
+    total_receipt_bytes_between_min?: number;
+    /**
+     * Total receipt bytes across all blocks (filter: between_max_value)
+     */
+    total_receipt_bytes_between_max_value?: number;
+    /**
+     * Total receipt bytes across all blocks (filter: in_values) (comma-separated list)
+     */
+    total_receipt_bytes_in_values?: string;
+    /**
+     * Total receipt bytes across all blocks (filter: not_in_values) (comma-separated list)
+     */
+    total_receipt_bytes_not_in_values?: string;
+    /**
+     * Filter avg_receipt_bytes_per_block using value
+     */
+    avg_receipt_bytes_per_block_value?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: eq)
+     */
+    min_receipt_bytes_per_block_eq?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: ne)
+     */
+    min_receipt_bytes_per_block_ne?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: lt)
+     */
+    min_receipt_bytes_per_block_lt?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: lte)
+     */
+    min_receipt_bytes_per_block_lte?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: gt)
+     */
+    min_receipt_bytes_per_block_gt?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: gte)
+     */
+    min_receipt_bytes_per_block_gte?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: between_min)
+     */
+    min_receipt_bytes_per_block_between_min?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: between_max_value)
+     */
+    min_receipt_bytes_per_block_between_max_value?: number;
+    /**
+     * Minimum total receipt bytes in a single block (filter: in_values) (comma-separated list)
+     */
+    min_receipt_bytes_per_block_in_values?: string;
+    /**
+     * Minimum total receipt bytes in a single block (filter: not_in_values) (comma-separated list)
+     */
+    min_receipt_bytes_per_block_not_in_values?: string;
+    /**
+     * Maximum total receipt bytes in a single block (filter: eq)
+     */
+    max_receipt_bytes_per_block_eq?: number;
+    /**
+     * Maximum total receipt bytes in a single block (filter: ne)
+     */
+    max_receipt_bytes_per_block_ne?: number;
+    /**
+     * Maximum total receipt bytes in a single block (filter: lt)
+     */
+    max_receipt_bytes_per_block_lt?: number;
+    /**
+     * Maximum total receipt bytes in a single block (filter: lte)
+     */
+    max_receipt_bytes_per_block_lte?: number;
+    /**
+     * Maximum total receipt bytes in a single block (filter: gt)
+     */
+    max_receipt_bytes_per_block_gt?: number;
+    /**
+     * Maximum total receipt bytes in a single block (filter: gte)
+     */
+    max_receipt_bytes_per_block_gte?: number;
+    /**
+     * Maximum total receipt bytes in a single block (filter: between_min)
+     */
+    max_receipt_bytes_per_block_between_min?: number;
+    /**
+     * Maximum total receipt bytes in a single block (filter: between_max_value)
+     */
+    max_receipt_bytes_per_block_between_max_value?: number;
+    /**
+     * Maximum total receipt bytes in a single block (filter: in_values) (comma-separated list)
+     */
+    max_receipt_bytes_per_block_in_values?: string;
+    /**
+     * Maximum total receipt bytes in a single block (filter: not_in_values) (comma-separated list)
+     */
+    max_receipt_bytes_per_block_not_in_values?: string;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: eq)
+     */
+    p05_receipt_bytes_per_block_eq?: number;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: ne)
+     */
+    p05_receipt_bytes_per_block_ne?: number;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: lt)
+     */
+    p05_receipt_bytes_per_block_lt?: number;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: lte)
+     */
+    p05_receipt_bytes_per_block_lte?: number;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: gt)
+     */
+    p05_receipt_bytes_per_block_gt?: number;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: gte)
+     */
+    p05_receipt_bytes_per_block_gte?: number;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: between_min)
+     */
+    p05_receipt_bytes_per_block_between_min?: number;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: between_max_value)
+     */
+    p05_receipt_bytes_per_block_between_max_value?: number;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: in_values) (comma-separated list)
+     */
+    p05_receipt_bytes_per_block_in_values?: string;
+    /**
+     * 5th percentile of total receipt bytes per block (filter: not_in_values) (comma-separated list)
+     */
+    p05_receipt_bytes_per_block_not_in_values?: string;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: eq)
+     */
+    p50_receipt_bytes_per_block_eq?: number;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: ne)
+     */
+    p50_receipt_bytes_per_block_ne?: number;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: lt)
+     */
+    p50_receipt_bytes_per_block_lt?: number;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: lte)
+     */
+    p50_receipt_bytes_per_block_lte?: number;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: gt)
+     */
+    p50_receipt_bytes_per_block_gt?: number;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: gte)
+     */
+    p50_receipt_bytes_per_block_gte?: number;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: between_min)
+     */
+    p50_receipt_bytes_per_block_between_min?: number;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: between_max_value)
+     */
+    p50_receipt_bytes_per_block_between_max_value?: number;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: in_values) (comma-separated list)
+     */
+    p50_receipt_bytes_per_block_in_values?: string;
+    /**
+     * 50th percentile of total receipt bytes per block (filter: not_in_values) (comma-separated list)
+     */
+    p50_receipt_bytes_per_block_not_in_values?: string;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: eq)
+     */
+    p95_receipt_bytes_per_block_eq?: number;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: ne)
+     */
+    p95_receipt_bytes_per_block_ne?: number;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: lt)
+     */
+    p95_receipt_bytes_per_block_lt?: number;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: lte)
+     */
+    p95_receipt_bytes_per_block_lte?: number;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: gt)
+     */
+    p95_receipt_bytes_per_block_gt?: number;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: gte)
+     */
+    p95_receipt_bytes_per_block_gte?: number;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: between_min)
+     */
+    p95_receipt_bytes_per_block_between_min?: number;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: between_max_value)
+     */
+    p95_receipt_bytes_per_block_between_max_value?: number;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: in_values) (comma-separated list)
+     */
+    p95_receipt_bytes_per_block_in_values?: string;
+    /**
+     * 95th percentile of total receipt bytes per block (filter: not_in_values) (comma-separated list)
+     */
+    p95_receipt_bytes_per_block_not_in_values?: string;
+    /**
+     * Filter stddev_receipt_bytes_per_block using value
+     */
+    stddev_receipt_bytes_per_block_value?: number;
+    /**
+     * Filter upper_band_receipt_bytes_per_block using value
+     */
+    upper_band_receipt_bytes_per_block_value?: number;
+    /**
+     * Filter lower_band_receipt_bytes_per_block using value
+     */
+    lower_band_receipt_bytes_per_block_value?: number;
+    /**
+     * Filter moving_avg_receipt_bytes_per_block using value
+     */
+    moving_avg_receipt_bytes_per_block_value?: number;
+    /**
+     * Filter avg_receipt_bytes_per_transaction using value
+     */
+    avg_receipt_bytes_per_transaction_value?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: eq)
+     */
+    p50_receipt_bytes_per_transaction_eq?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: ne)
+     */
+    p50_receipt_bytes_per_transaction_ne?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: lt)
+     */
+    p50_receipt_bytes_per_transaction_lt?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: lte)
+     */
+    p50_receipt_bytes_per_transaction_lte?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: gt)
+     */
+    p50_receipt_bytes_per_transaction_gt?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: gte)
+     */
+    p50_receipt_bytes_per_transaction_gte?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: between_min)
+     */
+    p50_receipt_bytes_per_transaction_between_min?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: between_max_value)
+     */
+    p50_receipt_bytes_per_transaction_between_max_value?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: in_values) (comma-separated list)
+     */
+    p50_receipt_bytes_per_transaction_in_values?: string;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: not_in_values) (comma-separated list)
+     */
+    p50_receipt_bytes_per_transaction_not_in_values?: string;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: eq)
+     */
+    p95_receipt_bytes_per_transaction_eq?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: ne)
+     */
+    p95_receipt_bytes_per_transaction_ne?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: lt)
+     */
+    p95_receipt_bytes_per_transaction_lt?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: lte)
+     */
+    p95_receipt_bytes_per_transaction_lte?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: gt)
+     */
+    p95_receipt_bytes_per_transaction_gt?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: gte)
+     */
+    p95_receipt_bytes_per_transaction_gte?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: between_min)
+     */
+    p95_receipt_bytes_per_transaction_between_min?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: between_max_value)
+     */
+    p95_receipt_bytes_per_transaction_between_max_value?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: in_values) (comma-separated list)
+     */
+    p95_receipt_bytes_per_transaction_in_values?: string;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: not_in_values) (comma-separated list)
+     */
+    p95_receipt_bytes_per_transaction_not_in_values?: string;
+    /**
+     * Total logs emitted across all transactions (filter: eq)
+     */
+    total_log_count_eq?: number;
+    /**
+     * Total logs emitted across all transactions (filter: ne)
+     */
+    total_log_count_ne?: number;
+    /**
+     * Total logs emitted across all transactions (filter: lt)
+     */
+    total_log_count_lt?: number;
+    /**
+     * Total logs emitted across all transactions (filter: lte)
+     */
+    total_log_count_lte?: number;
+    /**
+     * Total logs emitted across all transactions (filter: gt)
+     */
+    total_log_count_gt?: number;
+    /**
+     * Total logs emitted across all transactions (filter: gte)
+     */
+    total_log_count_gte?: number;
+    /**
+     * Total logs emitted across all transactions (filter: between_min)
+     */
+    total_log_count_between_min?: number;
+    /**
+     * Total logs emitted across all transactions (filter: between_max_value)
+     */
+    total_log_count_between_max_value?: number;
+    /**
+     * Total logs emitted across all transactions (filter: in_values) (comma-separated list)
+     */
+    total_log_count_in_values?: string;
+    /**
+     * Total logs emitted across all transactions (filter: not_in_values) (comma-separated list)
+     */
+    total_log_count_not_in_values?: string;
+    /**
+     * Filter avg_log_count_per_transaction using value
+     */
+    avg_log_count_per_transaction_value?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: eq)
+     */
+    cumulative_receipt_bytes_eq?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: ne)
+     */
+    cumulative_receipt_bytes_ne?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: lt)
+     */
+    cumulative_receipt_bytes_lt?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: lte)
+     */
+    cumulative_receipt_bytes_lte?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: gt)
+     */
+    cumulative_receipt_bytes_gt?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: gte)
+     */
+    cumulative_receipt_bytes_gte?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: between_min)
+     */
+    cumulative_receipt_bytes_between_min?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: between_max_value)
+     */
+    cumulative_receipt_bytes_between_max_value?: number;
+    /**
+     * Running total of receipt bytes since genesis (filter: in_values) (comma-separated list)
+     */
+    cumulative_receipt_bytes_in_values?: string;
+    /**
+     * Running total of receipt bytes since genesis (filter: not_in_values) (comma-separated list)
+     */
+    cumulative_receipt_bytes_not_in_values?: string;
+    /**
+     * The maximum number of fct_execution_receipt_size_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctExecutionReceiptSizeHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_execution_receipt_size_hourly';
+};
+
+export type FctExecutionReceiptSizeHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionReceiptSizeHourlyServiceListError =
+  FctExecutionReceiptSizeHourlyServiceListErrors[keyof FctExecutionReceiptSizeHourlyServiceListErrors];
+
+export type FctExecutionReceiptSizeHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctExecutionReceiptSizeHourlyResponse;
+};
+
+export type FctExecutionReceiptSizeHourlyServiceListResponse =
+  FctExecutionReceiptSizeHourlyServiceListResponses[keyof FctExecutionReceiptSizeHourlyServiceListResponses];
+
+export type FctExecutionReceiptSizeHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The start time of the hour
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_execution_receipt_size_hourly/{hour_start_date_time}';
+};
+
+export type FctExecutionReceiptSizeHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctExecutionReceiptSizeHourlyServiceGetError =
+  FctExecutionReceiptSizeHourlyServiceGetErrors[keyof FctExecutionReceiptSizeHourlyServiceGetErrors];
+
+export type FctExecutionReceiptSizeHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctExecutionReceiptSizeHourlyResponse;
+};
+
+export type FctExecutionReceiptSizeHourlyServiceGetResponse =
+  FctExecutionReceiptSizeHourlyServiceGetResponses[keyof FctExecutionReceiptSizeHourlyServiceGetResponses];
+
 export type FctExecutionStateSizeDailyServiceListData = {
   body?: never;
   path?: never;
@@ -72847,6 +74511,518 @@ export type IntBlockProposerCanonicalServiceGetResponses = {
 export type IntBlockProposerCanonicalServiceGetResponse =
   IntBlockProposerCanonicalServiceGetResponses[keyof IntBlockProposerCanonicalServiceGetResponses];
 
+export type IntBlockReceiptSizeServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The name of the network (filter: eq)
+     */
+    meta_network_name_eq?: string;
+    /**
+     * The name of the network (filter: ne)
+     */
+    meta_network_name_ne?: string;
+    /**
+     * The name of the network (filter: contains)
+     */
+    meta_network_name_contains?: string;
+    /**
+     * The name of the network (filter: starts_with)
+     */
+    meta_network_name_starts_with?: string;
+    /**
+     * The name of the network (filter: ends_with)
+     */
+    meta_network_name_ends_with?: string;
+    /**
+     * The name of the network (filter: like)
+     */
+    meta_network_name_like?: string;
+    /**
+     * The name of the network (filter: not_like)
+     */
+    meta_network_name_not_like?: string;
+    /**
+     * The name of the network (filter: in_values) (comma-separated list)
+     */
+    meta_network_name_in_values?: string;
+    /**
+     * The name of the network (filter: not_in_values) (comma-separated list)
+     */
+    meta_network_name_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Total RLP-encoded receipt bytes across all transactions in the block (filter: eq)
+     */
+    receipt_bytes_eq?: number;
+    /**
+     * Total RLP-encoded receipt bytes across all transactions in the block (filter: ne)
+     */
+    receipt_bytes_ne?: number;
+    /**
+     * Total RLP-encoded receipt bytes across all transactions in the block (filter: lt)
+     */
+    receipt_bytes_lt?: number;
+    /**
+     * Total RLP-encoded receipt bytes across all transactions in the block (filter: lte)
+     */
+    receipt_bytes_lte?: number;
+    /**
+     * Total RLP-encoded receipt bytes across all transactions in the block (filter: gt)
+     */
+    receipt_bytes_gt?: number;
+    /**
+     * Total RLP-encoded receipt bytes across all transactions in the block (filter: gte)
+     */
+    receipt_bytes_gte?: number;
+    /**
+     * Total RLP-encoded receipt bytes across all transactions in the block (filter: between_min)
+     */
+    receipt_bytes_between_min?: number;
+    /**
+     * Total RLP-encoded receipt bytes across all transactions in the block (filter: between_max_value)
+     */
+    receipt_bytes_between_max_value?: number;
+    /**
+     * Total RLP-encoded receipt bytes across all transactions in the block (filter: in_values) (comma-separated list)
+     */
+    receipt_bytes_in_values?: string;
+    /**
+     * Total RLP-encoded receipt bytes across all transactions in the block (filter: not_in_values) (comma-separated list)
+     */
+    receipt_bytes_not_in_values?: string;
+    /**
+     * Number of transactions in the block (filter: eq)
+     */
+    transaction_count_eq?: number;
+    /**
+     * Number of transactions in the block (filter: ne)
+     */
+    transaction_count_ne?: number;
+    /**
+     * Number of transactions in the block (filter: lt)
+     */
+    transaction_count_lt?: number;
+    /**
+     * Number of transactions in the block (filter: lte)
+     */
+    transaction_count_lte?: number;
+    /**
+     * Number of transactions in the block (filter: gt)
+     */
+    transaction_count_gt?: number;
+    /**
+     * Number of transactions in the block (filter: gte)
+     */
+    transaction_count_gte?: number;
+    /**
+     * Number of transactions in the block (filter: between_min)
+     */
+    transaction_count_between_min?: number;
+    /**
+     * Number of transactions in the block (filter: between_max_value)
+     */
+    transaction_count_between_max_value?: number;
+    /**
+     * Number of transactions in the block (filter: in_values) (comma-separated list)
+     */
+    transaction_count_in_values?: string;
+    /**
+     * Number of transactions in the block (filter: not_in_values) (comma-separated list)
+     */
+    transaction_count_not_in_values?: string;
+    /**
+     * Total logs emitted across all transactions in the block (filter: eq)
+     */
+    log_count_eq?: number;
+    /**
+     * Total logs emitted across all transactions in the block (filter: ne)
+     */
+    log_count_ne?: number;
+    /**
+     * Total logs emitted across all transactions in the block (filter: lt)
+     */
+    log_count_lt?: number;
+    /**
+     * Total logs emitted across all transactions in the block (filter: lte)
+     */
+    log_count_lte?: number;
+    /**
+     * Total logs emitted across all transactions in the block (filter: gt)
+     */
+    log_count_gt?: number;
+    /**
+     * Total logs emitted across all transactions in the block (filter: gte)
+     */
+    log_count_gte?: number;
+    /**
+     * Total logs emitted across all transactions in the block (filter: between_min)
+     */
+    log_count_between_min?: number;
+    /**
+     * Total logs emitted across all transactions in the block (filter: between_max_value)
+     */
+    log_count_between_max_value?: number;
+    /**
+     * Total logs emitted across all transactions in the block (filter: in_values) (comma-separated list)
+     */
+    log_count_in_values?: string;
+    /**
+     * Total logs emitted across all transactions in the block (filter: not_in_values) (comma-separated list)
+     */
+    log_count_not_in_values?: string;
+    /**
+     * Total raw bytes of log data fields across all transactions (filter: eq)
+     */
+    log_data_bytes_eq?: number;
+    /**
+     * Total raw bytes of log data fields across all transactions (filter: ne)
+     */
+    log_data_bytes_ne?: number;
+    /**
+     * Total raw bytes of log data fields across all transactions (filter: lt)
+     */
+    log_data_bytes_lt?: number;
+    /**
+     * Total raw bytes of log data fields across all transactions (filter: lte)
+     */
+    log_data_bytes_lte?: number;
+    /**
+     * Total raw bytes of log data fields across all transactions (filter: gt)
+     */
+    log_data_bytes_gt?: number;
+    /**
+     * Total raw bytes of log data fields across all transactions (filter: gte)
+     */
+    log_data_bytes_gte?: number;
+    /**
+     * Total raw bytes of log data fields across all transactions (filter: between_min)
+     */
+    log_data_bytes_between_min?: number;
+    /**
+     * Total raw bytes of log data fields across all transactions (filter: between_max_value)
+     */
+    log_data_bytes_between_max_value?: number;
+    /**
+     * Total raw bytes of log data fields across all transactions (filter: in_values) (comma-separated list)
+     */
+    log_data_bytes_in_values?: string;
+    /**
+     * Total raw bytes of log data fields across all transactions (filter: not_in_values) (comma-separated list)
+     */
+    log_data_bytes_not_in_values?: string;
+    /**
+     * Total number of topics across all logs in the block (filter: eq)
+     */
+    log_topic_count_eq?: number;
+    /**
+     * Total number of topics across all logs in the block (filter: ne)
+     */
+    log_topic_count_ne?: number;
+    /**
+     * Total number of topics across all logs in the block (filter: lt)
+     */
+    log_topic_count_lt?: number;
+    /**
+     * Total number of topics across all logs in the block (filter: lte)
+     */
+    log_topic_count_lte?: number;
+    /**
+     * Total number of topics across all logs in the block (filter: gt)
+     */
+    log_topic_count_gt?: number;
+    /**
+     * Total number of topics across all logs in the block (filter: gte)
+     */
+    log_topic_count_gte?: number;
+    /**
+     * Total number of topics across all logs in the block (filter: between_min)
+     */
+    log_topic_count_between_min?: number;
+    /**
+     * Total number of topics across all logs in the block (filter: between_max_value)
+     */
+    log_topic_count_between_max_value?: number;
+    /**
+     * Total number of topics across all logs in the block (filter: in_values) (comma-separated list)
+     */
+    log_topic_count_in_values?: string;
+    /**
+     * Total number of topics across all logs in the block (filter: not_in_values) (comma-separated list)
+     */
+    log_topic_count_not_in_values?: string;
+    /**
+     * Filter avg_receipt_bytes_per_transaction using value
+     */
+    avg_receipt_bytes_per_transaction_value?: number;
+    /**
+     * Largest single transaction receipt in this block (filter: eq)
+     */
+    max_receipt_bytes_per_transaction_eq?: number;
+    /**
+     * Largest single transaction receipt in this block (filter: ne)
+     */
+    max_receipt_bytes_per_transaction_ne?: number;
+    /**
+     * Largest single transaction receipt in this block (filter: lt)
+     */
+    max_receipt_bytes_per_transaction_lt?: number;
+    /**
+     * Largest single transaction receipt in this block (filter: lte)
+     */
+    max_receipt_bytes_per_transaction_lte?: number;
+    /**
+     * Largest single transaction receipt in this block (filter: gt)
+     */
+    max_receipt_bytes_per_transaction_gt?: number;
+    /**
+     * Largest single transaction receipt in this block (filter: gte)
+     */
+    max_receipt_bytes_per_transaction_gte?: number;
+    /**
+     * Largest single transaction receipt in this block (filter: between_min)
+     */
+    max_receipt_bytes_per_transaction_between_min?: number;
+    /**
+     * Largest single transaction receipt in this block (filter: between_max_value)
+     */
+    max_receipt_bytes_per_transaction_between_max_value?: number;
+    /**
+     * Largest single transaction receipt in this block (filter: in_values) (comma-separated list)
+     */
+    max_receipt_bytes_per_transaction_in_values?: string;
+    /**
+     * Largest single transaction receipt in this block (filter: not_in_values) (comma-separated list)
+     */
+    max_receipt_bytes_per_transaction_not_in_values?: string;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: eq)
+     */
+    p50_receipt_bytes_per_transaction_eq?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: ne)
+     */
+    p50_receipt_bytes_per_transaction_ne?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: lt)
+     */
+    p50_receipt_bytes_per_transaction_lt?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: lte)
+     */
+    p50_receipt_bytes_per_transaction_lte?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: gt)
+     */
+    p50_receipt_bytes_per_transaction_gt?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: gte)
+     */
+    p50_receipt_bytes_per_transaction_gte?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: between_min)
+     */
+    p50_receipt_bytes_per_transaction_between_min?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: between_max_value)
+     */
+    p50_receipt_bytes_per_transaction_between_max_value?: number;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: in_values) (comma-separated list)
+     */
+    p50_receipt_bytes_per_transaction_in_values?: string;
+    /**
+     * 50th percentile of receipt bytes per transaction (filter: not_in_values) (comma-separated list)
+     */
+    p50_receipt_bytes_per_transaction_not_in_values?: string;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: eq)
+     */
+    p95_receipt_bytes_per_transaction_eq?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: ne)
+     */
+    p95_receipt_bytes_per_transaction_ne?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: lt)
+     */
+    p95_receipt_bytes_per_transaction_lt?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: lte)
+     */
+    p95_receipt_bytes_per_transaction_lte?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: gt)
+     */
+    p95_receipt_bytes_per_transaction_gt?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: gte)
+     */
+    p95_receipt_bytes_per_transaction_gte?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: between_min)
+     */
+    p95_receipt_bytes_per_transaction_between_min?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: between_max_value)
+     */
+    p95_receipt_bytes_per_transaction_between_max_value?: number;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: in_values) (comma-separated list)
+     */
+    p95_receipt_bytes_per_transaction_in_values?: string;
+    /**
+     * 95th percentile of receipt bytes per transaction (filter: not_in_values) (comma-separated list)
+     */
+    p95_receipt_bytes_per_transaction_not_in_values?: string;
+    /**
+     * The maximum number of int_block_receipt_size to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntBlockReceiptSize` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_block_receipt_size';
+};
+
+export type IntBlockReceiptSizeServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntBlockReceiptSizeServiceListError =
+  IntBlockReceiptSizeServiceListErrors[keyof IntBlockReceiptSizeServiceListErrors];
+
+export type IntBlockReceiptSizeServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntBlockReceiptSizeResponse;
+};
+
+export type IntBlockReceiptSizeServiceListResponse =
+  IntBlockReceiptSizeServiceListResponses[keyof IntBlockReceiptSizeServiceListResponses];
+
+export type IntBlockReceiptSizeServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_block_receipt_size/{block_number}';
+};
+
+export type IntBlockReceiptSizeServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntBlockReceiptSizeServiceGetError =
+  IntBlockReceiptSizeServiceGetErrors[keyof IntBlockReceiptSizeServiceGetErrors];
+
+export type IntBlockReceiptSizeServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntBlockReceiptSizeResponse;
+};
+
+export type IntBlockReceiptSizeServiceGetResponse =
+  IntBlockReceiptSizeServiceGetResponses[keyof IntBlockReceiptSizeServiceGetResponses];
+
 export type IntBlockResourceGasServiceListData = {
   body?: never;
   path?: never;
@@ -95188,6 +97364,430 @@ export type IntTransactionOpcodeGasServiceGetResponses = {
 
 export type IntTransactionOpcodeGasServiceGetResponse =
   IntTransactionOpcodeGasServiceGetResponses[keyof IntTransactionOpcodeGasServiceGetResponses];
+
+export type IntTransactionReceiptSizeServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number containing the transaction (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number containing the transaction (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number containing the transaction (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number containing the transaction (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number containing the transaction (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number containing the transaction (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number containing the transaction (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number containing the transaction (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number containing the transaction (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number containing the transaction (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: eq)
+     */
+    transaction_hash_eq?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ne)
+     */
+    transaction_hash_ne?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: contains)
+     */
+    transaction_hash_contains?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    transaction_hash_starts_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    transaction_hash_ends_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: like)
+     */
+    transaction_hash_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_like)
+     */
+    transaction_hash_not_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    transaction_hash_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    transaction_hash_not_in_values?: string;
+    /**
+     * The name of the network (filter: eq)
+     */
+    meta_network_name_eq?: string;
+    /**
+     * The name of the network (filter: ne)
+     */
+    meta_network_name_ne?: string;
+    /**
+     * The name of the network (filter: contains)
+     */
+    meta_network_name_contains?: string;
+    /**
+     * The name of the network (filter: starts_with)
+     */
+    meta_network_name_starts_with?: string;
+    /**
+     * The name of the network (filter: ends_with)
+     */
+    meta_network_name_ends_with?: string;
+    /**
+     * The name of the network (filter: like)
+     */
+    meta_network_name_like?: string;
+    /**
+     * The name of the network (filter: not_like)
+     */
+    meta_network_name_not_like?: string;
+    /**
+     * The name of the network (filter: in_values) (comma-separated list)
+     */
+    meta_network_name_in_values?: string;
+    /**
+     * The name of the network (filter: not_in_values) (comma-separated list)
+     */
+    meta_network_name_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The index of the transaction within the block (filter: eq)
+     */
+    transaction_index_eq?: number;
+    /**
+     * The index of the transaction within the block (filter: ne)
+     */
+    transaction_index_ne?: number;
+    /**
+     * The index of the transaction within the block (filter: lt)
+     */
+    transaction_index_lt?: number;
+    /**
+     * The index of the transaction within the block (filter: lte)
+     */
+    transaction_index_lte?: number;
+    /**
+     * The index of the transaction within the block (filter: gt)
+     */
+    transaction_index_gt?: number;
+    /**
+     * The index of the transaction within the block (filter: gte)
+     */
+    transaction_index_gte?: number;
+    /**
+     * The index of the transaction within the block (filter: between_min)
+     */
+    transaction_index_between_min?: number;
+    /**
+     * The index of the transaction within the block (filter: between_max_value)
+     */
+    transaction_index_between_max_value?: number;
+    /**
+     * The index of the transaction within the block (filter: in_values) (comma-separated list)
+     */
+    transaction_index_in_values?: string;
+    /**
+     * The index of the transaction within the block (filter: not_in_values) (comma-separated list)
+     */
+    transaction_index_not_in_values?: string;
+    /**
+     * Exact RLP-encoded receipt size in bytes (matches eth_getTransactionReceipt) (filter: eq)
+     */
+    receipt_bytes_eq?: number;
+    /**
+     * Exact RLP-encoded receipt size in bytes (matches eth_getTransactionReceipt) (filter: ne)
+     */
+    receipt_bytes_ne?: number;
+    /**
+     * Exact RLP-encoded receipt size in bytes (matches eth_getTransactionReceipt) (filter: lt)
+     */
+    receipt_bytes_lt?: number;
+    /**
+     * Exact RLP-encoded receipt size in bytes (matches eth_getTransactionReceipt) (filter: lte)
+     */
+    receipt_bytes_lte?: number;
+    /**
+     * Exact RLP-encoded receipt size in bytes (matches eth_getTransactionReceipt) (filter: gt)
+     */
+    receipt_bytes_gt?: number;
+    /**
+     * Exact RLP-encoded receipt size in bytes (matches eth_getTransactionReceipt) (filter: gte)
+     */
+    receipt_bytes_gte?: number;
+    /**
+     * Exact RLP-encoded receipt size in bytes (matches eth_getTransactionReceipt) (filter: between_min)
+     */
+    receipt_bytes_between_min?: number;
+    /**
+     * Exact RLP-encoded receipt size in bytes (matches eth_getTransactionReceipt) (filter: between_max_value)
+     */
+    receipt_bytes_between_max_value?: number;
+    /**
+     * Exact RLP-encoded receipt size in bytes (matches eth_getTransactionReceipt) (filter: in_values) (comma-separated list)
+     */
+    receipt_bytes_in_values?: string;
+    /**
+     * Exact RLP-encoded receipt size in bytes (matches eth_getTransactionReceipt) (filter: not_in_values) (comma-separated list)
+     */
+    receipt_bytes_not_in_values?: string;
+    /**
+     * Number of logs emitted by this transaction (filter: eq)
+     */
+    log_count_eq?: number;
+    /**
+     * Number of logs emitted by this transaction (filter: ne)
+     */
+    log_count_ne?: number;
+    /**
+     * Number of logs emitted by this transaction (filter: lt)
+     */
+    log_count_lt?: number;
+    /**
+     * Number of logs emitted by this transaction (filter: lte)
+     */
+    log_count_lte?: number;
+    /**
+     * Number of logs emitted by this transaction (filter: gt)
+     */
+    log_count_gt?: number;
+    /**
+     * Number of logs emitted by this transaction (filter: gte)
+     */
+    log_count_gte?: number;
+    /**
+     * Number of logs emitted by this transaction (filter: between_min)
+     */
+    log_count_between_min?: number;
+    /**
+     * Number of logs emitted by this transaction (filter: between_max_value)
+     */
+    log_count_between_max_value?: number;
+    /**
+     * Number of logs emitted by this transaction (filter: in_values) (comma-separated list)
+     */
+    log_count_in_values?: string;
+    /**
+     * Number of logs emitted by this transaction (filter: not_in_values) (comma-separated list)
+     */
+    log_count_not_in_values?: string;
+    /**
+     * Total raw bytes of log data fields (before RLP encoding) (filter: eq)
+     */
+    log_data_bytes_eq?: number;
+    /**
+     * Total raw bytes of log data fields (before RLP encoding) (filter: ne)
+     */
+    log_data_bytes_ne?: number;
+    /**
+     * Total raw bytes of log data fields (before RLP encoding) (filter: lt)
+     */
+    log_data_bytes_lt?: number;
+    /**
+     * Total raw bytes of log data fields (before RLP encoding) (filter: lte)
+     */
+    log_data_bytes_lte?: number;
+    /**
+     * Total raw bytes of log data fields (before RLP encoding) (filter: gt)
+     */
+    log_data_bytes_gt?: number;
+    /**
+     * Total raw bytes of log data fields (before RLP encoding) (filter: gte)
+     */
+    log_data_bytes_gte?: number;
+    /**
+     * Total raw bytes of log data fields (before RLP encoding) (filter: between_min)
+     */
+    log_data_bytes_between_min?: number;
+    /**
+     * Total raw bytes of log data fields (before RLP encoding) (filter: between_max_value)
+     */
+    log_data_bytes_between_max_value?: number;
+    /**
+     * Total raw bytes of log data fields (before RLP encoding) (filter: in_values) (comma-separated list)
+     */
+    log_data_bytes_in_values?: string;
+    /**
+     * Total raw bytes of log data fields (before RLP encoding) (filter: not_in_values) (comma-separated list)
+     */
+    log_data_bytes_not_in_values?: string;
+    /**
+     * Total number of topics across all logs (filter: eq)
+     */
+    log_topic_count_eq?: number;
+    /**
+     * Total number of topics across all logs (filter: ne)
+     */
+    log_topic_count_ne?: number;
+    /**
+     * Total number of topics across all logs (filter: lt)
+     */
+    log_topic_count_lt?: number;
+    /**
+     * Total number of topics across all logs (filter: lte)
+     */
+    log_topic_count_lte?: number;
+    /**
+     * Total number of topics across all logs (filter: gt)
+     */
+    log_topic_count_gt?: number;
+    /**
+     * Total number of topics across all logs (filter: gte)
+     */
+    log_topic_count_gte?: number;
+    /**
+     * Total number of topics across all logs (filter: between_min)
+     */
+    log_topic_count_between_min?: number;
+    /**
+     * Total number of topics across all logs (filter: between_max_value)
+     */
+    log_topic_count_between_max_value?: number;
+    /**
+     * Total number of topics across all logs (filter: in_values) (comma-separated list)
+     */
+    log_topic_count_in_values?: string;
+    /**
+     * Total number of topics across all logs (filter: not_in_values) (comma-separated list)
+     */
+    log_topic_count_not_in_values?: string;
+    /**
+     * The maximum number of int_transaction_receipt_size to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntTransactionReceiptSize` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_transaction_receipt_size';
+};
+
+export type IntTransactionReceiptSizeServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntTransactionReceiptSizeServiceListError =
+  IntTransactionReceiptSizeServiceListErrors[keyof IntTransactionReceiptSizeServiceListErrors];
+
+export type IntTransactionReceiptSizeServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntTransactionReceiptSizeResponse;
+};
+
+export type IntTransactionReceiptSizeServiceListResponse =
+  IntTransactionReceiptSizeServiceListResponses[keyof IntTransactionReceiptSizeServiceListResponses];
+
+export type IntTransactionReceiptSizeServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number containing the transaction
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_transaction_receipt_size/{block_number}';
+};
+
+export type IntTransactionReceiptSizeServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntTransactionReceiptSizeServiceGetError =
+  IntTransactionReceiptSizeServiceGetErrors[keyof IntTransactionReceiptSizeServiceGetErrors];
+
+export type IntTransactionReceiptSizeServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntTransactionReceiptSizeResponse;
+};
+
+export type IntTransactionReceiptSizeServiceGetResponse =
+  IntTransactionReceiptSizeServiceGetResponses[keyof IntTransactionReceiptSizeServiceGetResponses];
 
 export type IntTransactionResourceGasServiceListData = {
   body?: never;

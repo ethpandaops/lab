@@ -27,14 +27,19 @@ import {
   fctOpcodeOpsDailyServiceList,
   fctOpcodeGasByOpcodeHourlyServiceList,
   fctOpcodeGasByOpcodeDailyServiceList,
+  fctExecutionReceiptSizeHourlyServiceList,
+  fctExecutionReceiptSizeDailyServiceList,
 } from '@/api/sdk.gen';
 import type {
   FctOpcodeOpsHourly,
   FctOpcodeOpsDaily,
   FctOpcodeGasByOpcodeHourly,
   FctOpcodeGasByOpcodeDaily,
+  FctExecutionReceiptSizeHourly,
+  FctExecutionReceiptSizeDaily,
 } from '@/api/types.gen';
 import { fetchAllPages } from '@/utils/api-pagination';
+import { formatBytes } from '@/utils';
 import { useRecentBlocks } from './hooks/useRecentBlocks';
 import { useGasProfilerBounds } from './hooks/useGasProfilerBounds';
 import { GasProfilerSkeleton, OpcodeAnalysis } from './components';
@@ -159,6 +164,13 @@ function formatCompact(value: number): string {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
   if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
   return value.toString();
+}
+
+/** Format a byte band range for display */
+function formatBytesBand(lower: number | undefined, upper: number | undefined): string {
+  const l = lower ?? 0;
+  const u = upper ?? 0;
+  return `${formatBytes(l)} – ${formatBytes(u)}`;
 }
 
 /**
@@ -301,6 +313,43 @@ export function HomePage(): JSX.Element {
     enabled: isDaily,
   });
 
+  // Receipt Size Per Block Queries - with pagination
+  const receiptSizeHourlyQuery = useQuery({
+    queryKey: ['gas-profiler', 'receipt-size-hourly', startTimestamp, config.pageSize],
+    queryFn: ({ signal }) =>
+      fetchAllPages<FctExecutionReceiptSizeHourly>(
+        fctExecutionReceiptSizeHourlyServiceList,
+        {
+          query: {
+            hour_start_date_time_gte: startTimestamp,
+            order_by: 'hour_start_date_time asc',
+            page_size: config.pageSize,
+          },
+        },
+        'fct_execution_receipt_size_hourly',
+        signal
+      ),
+    enabled: !isDaily,
+  });
+
+  const receiptSizeDailyQuery = useQuery({
+    queryKey: ['gas-profiler', 'receipt-size-daily', config.pageSize],
+    queryFn: ({ signal }) =>
+      fetchAllPages<FctExecutionReceiptSizeDaily>(
+        fctExecutionReceiptSizeDailyServiceList,
+        {
+          query: {
+            day_start_date_like: '20%',
+            order_by: 'day_start_date desc',
+            page_size: config.pageSize,
+          },
+        },
+        'fct_execution_receipt_size_daily',
+        signal
+      ),
+    enabled: isDaily,
+  });
+
   // Opcode ops records (fetchAllPages returns array directly)
   // Filter by time period for daily data
   const opcodeOpsRecords = useMemo(() => {
@@ -315,6 +364,19 @@ export function HomePage(): JSX.Element {
     }
     return opcodeOpsHourlyQuery.data;
   }, [isDaily, opcodeOpsDailyQuery.data, opcodeOpsHourlyQuery.data, config.days]);
+
+  // Receipt size records - hourly/daily switching with client-side date filtering
+  const receiptSizeRecords = useMemo(() => {
+    if (isDaily) {
+      const allRecords = [...(receiptSizeDailyQuery.data ?? [])].reverse();
+      if (config.days === null) return allRecords;
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - config.days);
+      const cutoffStr = cutoffDate.toISOString().split('T')[0];
+      return allRecords.filter(r => (r.day_start_date ?? '') >= cutoffStr);
+    }
+    return receiptSizeHourlyQuery.data;
+  }, [isDaily, receiptSizeDailyQuery.data, receiptSizeHourlyQuery.data, config.days]);
 
   // Aggregate opcodes for OpcodeAnalysis component (fetchAllPages returns array directly)
   // Filter by time period for daily data
@@ -718,11 +780,213 @@ export function HomePage(): JSX.Element {
     [opcodeOpsRecords, opcodesPerSecondConfig, isDaily, timePeriod]
   );
 
+  // Receipt Size Per Block chart config
+  const receiptSizeConfig = useMemo(() => {
+    if (!receiptSizeRecords?.length) return null;
+
+    const labels: string[] = [];
+    const avgValues: (number | null)[] = [];
+    const movingAvgValues: (number | null)[] = [];
+    const medianValues: (number | null)[] = [];
+    const minValues: (number | null)[] = [];
+    const maxValues: (number | null)[] = [];
+    const p5Values: (number | null)[] = [];
+    const p95Values: (number | null)[] = [];
+    const lowerBandValues: (number | null)[] = [];
+    const upperBandValues: (number | null)[] = [];
+
+    for (const r of receiptSizeRecords) {
+      let label: string;
+      if (isDaily) {
+        label = (r as FctExecutionReceiptSizeDaily).day_start_date ?? '';
+      } else {
+        const ts = (r as FctExecutionReceiptSizeHourly).hour_start_date_time ?? 0;
+        const date = new Date(ts * 1000);
+        if (timePeriod === '24h') {
+          label = date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            timeZone: 'UTC',
+          });
+        } else if (timePeriod === '72h') {
+          label = date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            timeZone: 'UTC',
+          });
+        } else {
+          label = date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: '2-digit',
+            timeZone: 'UTC',
+          });
+        }
+      }
+
+      labels.push(label);
+      avgValues.push(r.avg_receipt_bytes_per_block ?? null);
+      movingAvgValues.push(r.moving_avg_receipt_bytes_per_block ?? null);
+      medianValues.push(r.p50_receipt_bytes_per_block ?? null);
+      minValues.push(r.min_receipt_bytes_per_block ?? null);
+      maxValues.push(r.max_receipt_bytes_per_block ?? null);
+      p5Values.push(r.p05_receipt_bytes_per_block ?? null);
+      p95Values.push(r.p95_receipt_bytes_per_block ?? null);
+      lowerBandValues.push(r.lower_band_receipt_bytes_per_block ?? null);
+      upperBandValues.push(r.upper_band_receipt_bytes_per_block ?? null);
+    }
+
+    return {
+      labels,
+      series: [
+        createStatisticSeries('Average', avgValues, {
+          color: '#10b981',
+          lineWidth: 2.5,
+          group: 'Statistics',
+        }),
+        createStatisticSeries('Moving Avg', movingAvgValues, {
+          color: '#06b6d4',
+          lineWidth: 2,
+          group: 'Statistics',
+        }),
+        createStatisticSeries('Median', medianValues, {
+          color: '#a855f7',
+          lineWidth: 1.5,
+          lineStyle: 'dotted',
+          group: 'Statistics',
+        }),
+        ...createBandSeries('Bollinger', 'receipt-bollinger', lowerBandValues, upperBandValues, {
+          color: '#f59e0b',
+          opacity: 0.15,
+          group: 'Bands',
+          initiallyVisible: false,
+        }),
+        ...createBandSeries('P5/P95', 'receipt-percentile', p5Values, p95Values, {
+          color: '#6366f1',
+          opacity: 0.1,
+          group: 'Bands',
+        }),
+        ...createBandSeries('Min/Max', 'receipt-minmax', minValues, maxValues, {
+          color: '#64748b',
+          opacity: 0.06,
+          group: 'Bands',
+        }),
+      ],
+    };
+  }, [receiptSizeRecords, isDaily, timePeriod]);
+
+  // Receipt Size tooltip formatter
+  const receiptTooltipFormatter = useCallback(
+    (params: unknown): string => {
+      if (!receiptSizeRecords?.length || !receiptSizeConfig) return '';
+
+      const recordsByKey = new Map<string, FctExecutionReceiptSizeHourly | FctExecutionReceiptSizeDaily>();
+      for (const r of receiptSizeRecords) {
+        let key: string;
+        if (isDaily) {
+          key = (r as FctExecutionReceiptSizeDaily).day_start_date ?? '';
+        } else {
+          const ts = (r as FctExecutionReceiptSizeHourly).hour_start_date_time ?? 0;
+          const date = new Date(ts * 1000);
+          if (timePeriod === '24h') {
+            key = date.toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              timeZone: 'UTC',
+            });
+          } else if (timePeriod === '72h') {
+            key = date.toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              hour: 'numeric',
+              timeZone: 'UTC',
+            });
+          } else {
+            key = date.toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: '2-digit',
+              timeZone: 'UTC',
+            });
+          }
+        }
+        recordsByKey.set(key, r);
+      }
+
+      const dataPoints = Array.isArray(params) ? params : [params];
+      if (!dataPoints.length) return '';
+
+      const firstPoint = dataPoints[0] as { dataIndex?: number };
+      if (firstPoint.dataIndex === undefined) return '';
+
+      const timeKey = receiptSizeConfig.labels[firstPoint.dataIndex];
+      if (!timeKey) return '';
+
+      const record = recordsByKey.get(timeKey);
+      if (!record) return '';
+
+      const dateValue = isDaily
+        ? ((record as FctExecutionReceiptSizeDaily).day_start_date ?? '')
+        : ((record as FctExecutionReceiptSizeHourly).hour_start_date_time ?? 0);
+      const dateStr = formatTooltipDate(dateValue, isDaily);
+
+      const sections: TooltipSection[] = [
+        {
+          title: 'STATISTICS',
+          items: [
+            { color: '#10b981', label: 'Average', value: formatBytes(record.avg_receipt_bytes_per_block ?? 0) },
+            {
+              color: '#06b6d4',
+              label: 'Moving Avg',
+              value: formatBytes(record.moving_avg_receipt_bytes_per_block ?? 0),
+            },
+            {
+              color: '#a855f7',
+              label: 'Median',
+              value: formatBytes(record.p50_receipt_bytes_per_block ?? 0),
+              style: 'dotted',
+            },
+          ],
+        },
+        {
+          title: 'BANDS',
+          items: [
+            {
+              color: '#f59e0b',
+              label: 'Bollinger',
+              value: formatBytesBand(
+                record.lower_band_receipt_bytes_per_block,
+                record.upper_band_receipt_bytes_per_block
+              ),
+              style: 'area',
+            },
+            {
+              color: '#6366f1',
+              label: 'P5/P95',
+              value: formatBytesBand(record.p05_receipt_bytes_per_block, record.p95_receipt_bytes_per_block),
+              style: 'area',
+            },
+            {
+              color: '#64748b',
+              label: 'Min/Max',
+              value: formatBytesBand(record.min_receipt_bytes_per_block, record.max_receipt_bytes_per_block),
+              style: 'area',
+            },
+          ],
+        },
+      ];
+
+      return buildTooltipHtml(dateStr, sections);
+    },
+    [receiptSizeRecords, receiptSizeConfig, isDaily, timePeriod]
+  );
+
   // Loading states
 
   const isOpcodeOpsLoading = isDaily ? opcodeOpsDailyQuery.isLoading : opcodeOpsHourlyQuery.isLoading;
 
   const isOpcodeGasLoading = isDaily ? opcodeGasDailyQuery.isLoading : opcodeGasHourlyQuery.isLoading;
+
+  const isReceiptSizeLoading = isDaily ? receiptSizeDailyQuery.isLoading : receiptSizeHourlyQuery.isLoading;
 
   if (boundsLoading) {
     return (
@@ -881,7 +1145,7 @@ export function HomePage(): JSX.Element {
             <button
               key={value}
               type="button"
-              onClick={() => navigate({ search: prev => ({ ...prev, t: value }), replace: true })}
+              onClick={() => navigate({ search: prev => ({ ...prev, t: value }), replace: true, resetScroll: false })}
               className={clsx(
                 'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
                 timePeriod === value
@@ -995,6 +1259,47 @@ export function HomePage(): JSX.Element {
             No opcode data available
           </div>
         )}
+      </div>
+
+      {/* Receipt Size Per Block */}
+      <div className="mb-6 grid grid-cols-1 lg:grid-cols-2">
+        <PopoutCard
+          title="Receipt Size Per Block"
+          subtitle={`Total receipt bytes per block (${timePeriod})`}
+          anchorId="receipt-size-chart"
+          modalSize="full"
+        >
+          {({ inModal }) =>
+            isReceiptSizeLoading ? (
+              <div className="flex h-[320px] items-center justify-center">
+                <div className="animate-pulse text-muted">Loading receipt size data...</div>
+              </div>
+            ) : receiptSizeConfig ? (
+              <MultiLineChart
+                series={receiptSizeConfig.series}
+                xAxis={{
+                  type: 'category',
+                  labels: receiptSizeConfig.labels,
+                  name: timePeriod === '24h' ? 'Time (UTC)' : timePeriod === '72h' ? 'Date/Time (UTC)' : 'Date',
+                }}
+                yAxis={{
+                  name: 'Bytes',
+                  min: 0,
+                  formatter: (value: number) => formatBytes(value),
+                }}
+                height={inModal ? 600 : 320}
+                showLegend
+                legendPosition="top"
+                enableDataZoom
+                tooltipFormatter={receiptTooltipFormatter}
+                markLines={showAnnotations ? forkMarkLines : []}
+                syncGroup={inModal ? undefined : 'gas-profiler'}
+              />
+            ) : (
+              <div className="flex h-[320px] items-center justify-center text-muted">No data available</div>
+            )
+          }
+        </PopoutCard>
       </div>
     </Container>
   );

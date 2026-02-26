@@ -54,3 +54,20 @@ export function formatSlot(slot: number): string {
 export function formatEpoch(epoch: number): string {
   return epoch.toString();
 }
+
+/**
+ * Format byte values to human-readable string
+ *
+ * @param bytes - Number of bytes to format
+ * @returns Formatted string with appropriate unit (B, KB, MB)
+ *
+ * @example
+ * formatBytes(512)       // "512 B"
+ * formatBytes(2048)      // "2.0 KB"
+ * formatBytes(1572864)   // "1.5 MB"
+ */
+export function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
