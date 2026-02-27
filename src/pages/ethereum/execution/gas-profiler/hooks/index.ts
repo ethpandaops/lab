@@ -35,3 +35,7 @@ export { useTransactionResourceGas } from './useTransactionResourceGas';
 export type { UseTransactionResourceGasOptions, UseTransactionResourceGasResult } from './useTransactionResourceGas';
 export { useCallFrameResourceGas } from './useCallFrameResourceGas';
 export type { UseCallFrameResourceGasOptions, UseCallFrameResourceGasResult } from './useCallFrameResourceGas';
+export { useBlockReceiptSizes } from './useBlockReceiptSizes';
+export type { UseBlockReceiptSizesOptions, UseBlockReceiptSizesResult } from './useBlockReceiptSizes';
+export { useTransactionReceiptSize } from './useTransactionReceiptSize';
+export type { UseTransactionReceiptSizeOptions, UseTransactionReceiptSizeResult } from './useTransactionReceiptSize';

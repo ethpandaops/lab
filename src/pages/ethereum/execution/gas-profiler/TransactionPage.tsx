@@ -13,6 +13,7 @@ import {
   DocumentTextIcon,
 } from '@heroicons/react/24/outline';
 import ReactECharts from 'echarts-for-react';
+import clsx from 'clsx';
 import { Tab } from '@/components/Navigation/Tab';
 import { GasTooltip } from '@/components/DataDisplay/GasTooltip';
 import { Container } from '@/components/Layout/Container';
@@ -42,6 +43,8 @@ import {
 import type { TopGasItem, CallFrameData } from './components';
 import { getCallLabel } from './hooks/useTransactionGasData';
 import { useCallFrameResourceGas } from './hooks/useCallFrameResourceGas';
+import { useTransactionReceiptSize } from './hooks/useTransactionReceiptSize';
+import { formatBytes } from '@/utils';
 import { useNetwork } from '@/hooks/useNetwork';
 import {
   CATEGORY_COLORS,
@@ -127,6 +130,12 @@ export function TransactionPage(): JSX.Element {
     transactionHash: txHash,
     blockNumber,
     callFrameId: null,
+  });
+
+  // Fetch receipt size data for this transaction
+  const { data: receiptSize } = useTransactionReceiptSize({
+    transactionHash: txHash,
+    blockNumber,
   });
 
   // Derive badge stats from full opcode data (SSTORE, SLOAD, LOG*, CREATE*, SELFDESTRUCT)
@@ -782,7 +791,12 @@ export function TransactionPage(): JSX.Element {
       </div>
 
       {/* Quick Stats Row - Always visible */}
-      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div
+        className={clsx(
+          'mb-6 grid grid-cols-2 gap-4',
+          receiptSize?.receipt_bytes ? 'sm:grid-cols-5' : 'sm:grid-cols-4'
+        )}
+      >
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="rounded-xs bg-primary/10 p-2">
@@ -818,6 +832,35 @@ export function TransactionPage(): JSX.Element {
             </div>
           </div>
         </Card>
+
+        {receiptSize?.receipt_bytes && (
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="rounded-xs bg-teal-500/10 p-2">
+                <DocumentTextIcon className="size-5 text-teal-500" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1 text-xl font-semibold text-foreground">
+                  {formatBytes(receiptSize.receipt_bytes)}
+                  <GasTooltip
+                    type="receipt"
+                    size="md"
+                    customContent={
+                      <>
+                        <div className="mb-1.5 text-sm font-medium text-foreground">Receipt Payload Size</div>
+                        <div className="text-xs/5 text-muted">
+                          Number of bytes in the canonical encoded receipt value (type byte + RLP receipt) inserted as
+                          the receipts-trie value. Does not include trie node/path/proof overhead.
+                        </div>
+                      </>
+                    }
+                  />
+                </div>
+                <div className="text-xs text-muted">Receipt Payload</div>
+              </div>
+            </div>
+          </Card>
+        )}
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
@@ -921,6 +964,106 @@ export function TransactionPage(): JSX.Element {
                 </div>
               </div>
             </Card>
+
+            {/* Receipt Payload Breakdown - only show when data exists */}
+            {receiptSize &&
+              (() => {
+                const totalBytes = receiptSize.receipt_bytes ?? 0;
+                const logDataBytes = receiptSize.log_data_bytes ?? 0;
+                // Each topic is 32 bytes
+                const logTopicBytes = (receiptSize.log_topic_count ?? 0) * 32;
+                const overheadBytes = Math.max(0, totalBytes - logDataBytes - logTopicBytes);
+                const logDataPct = totalBytes > 0 ? (logDataBytes / totalBytes) * 100 : 0;
+                const logTopicPct = totalBytes > 0 ? (logTopicBytes / totalBytes) * 100 : 0;
+                const overheadPct = totalBytes > 0 ? (overheadBytes / totalBytes) * 100 : 0;
+
+                return (
+                  <Card className="mb-6 overflow-hidden">
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <h3 className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+                        Receipt Payload
+                        <GasTooltip
+                          type="receipt"
+                          size="md"
+                          customContent={
+                            <>
+                              <div className="mb-1.5 text-sm font-medium text-foreground">Receipt Payload Size</div>
+                              <div className="text-xs/5 text-muted">
+                                Number of bytes in the canonical encoded receipt value (type byte + RLP receipt)
+                                inserted as the receipts-trie value. Does not include trie node/path/proof overhead.
+                              </div>
+                            </>
+                          }
+                        />
+                      </h3>
+                      <span className="text-xs text-muted">
+                        {receiptSize.log_count ?? 0} log{(receiptSize.log_count ?? 0) !== 1 ? 's' : ''} emitted
+                      </span>
+                    </div>
+
+                    {/* Proportional bar */}
+                    <div className="bg-surface/30 px-4 py-5">
+                      <div className="mb-3">
+                        <span className="text-2xl font-semibold text-foreground tabular-nums">
+                          {formatBytes(totalBytes)}
+                        </span>
+                      </div>
+
+                      {/* Stacked bar */}
+                      <div className="flex h-3 overflow-hidden rounded-full">
+                        {logDataPct > 0 && (
+                          <div
+                            className="bg-primary transition-all"
+                            style={{ width: `${logDataPct}%` }}
+                            title={`Log Data: ${formatBytes(logDataBytes)} (${logDataPct.toFixed(1)}%)`}
+                          />
+                        )}
+                        {logTopicPct > 0 && (
+                          <div
+                            className="bg-cyan-500 transition-all"
+                            style={{ width: `${logTopicPct}%` }}
+                            title={`Log Topics: ${formatBytes(logTopicBytes)} (${logTopicPct.toFixed(1)}%)`}
+                          />
+                        )}
+                        {overheadPct > 0 && (
+                          <div
+                            className="bg-border transition-all"
+                            style={{ width: `${overheadPct}%` }}
+                            title={`RLP + Status: ${formatBytes(overheadBytes)} (${overheadPct.toFixed(1)}%)`}
+                          />
+                        )}
+                      </div>
+
+                      {/* Legend */}
+                      <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5">
+                        <div className="flex items-center gap-1.5">
+                          <span className="size-2 rounded-full bg-primary" />
+                          <span className="text-xs text-muted">
+                            Log Data <span className="font-medium text-foreground">{formatBytes(logDataBytes)}</span>
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="size-2 rounded-full bg-cyan-500" />
+                          <span className="text-xs text-muted">
+                            Log Topics{' '}
+                            <span className="font-medium text-foreground">
+                              {receiptSize.log_topic_count ?? 0} ({formatBytes(logTopicBytes)})
+                            </span>
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="size-2 rounded-full bg-border" />
+                          <span className="text-xs text-muted">
+                            RLP + Status{' '}
+                            <span className="font-medium text-foreground">{formatBytes(overheadBytes)}</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })()}
 
             {/* Call Tree or Simple Transfer Message */}
             {isSimpleTransfer ? (

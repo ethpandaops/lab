@@ -11,6 +11,7 @@ import {
   FireIcon,
   ArrowsPointingOutIcon,
   CodeBracketIcon,
+  DocumentTextIcon,
 } from '@heroicons/react/24/outline';
 import ReactECharts from 'echarts-for-react';
 import clsx from 'clsx';
@@ -46,10 +47,13 @@ import {
 } from './components';
 import type { ContractInteractionItem, TopGasItem } from './components';
 import { useBlockResourceGas } from './hooks/useBlockResourceGas';
+import { useBlockReceiptSizes } from './hooks/useBlockReceiptSizes';
 import { useCallFrameResourceGas } from './hooks/useCallFrameResourceGas';
 import { useNetwork } from '@/hooks/useNetwork';
 import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory, getEtherscanBaseUrl, isMainnet } from './utils';
 import type { GasProfilerBlockSearch } from './IndexPage.types';
+import type { IntTransactionReceiptSize } from '@/api/types.gen';
+import { formatBytes } from '@/utils';
 
 /**
  * Available call types for filtering
@@ -66,7 +70,7 @@ function formatGas(value: number): string {
 /**
  * Sort field type for transactions table
  */
-type TransactionSortField = 'index' | 'gas' | 'calls' | 'depth';
+type TransactionSortField = 'index' | 'gas' | 'calls' | 'depth' | 'receipt';
 
 /**
  * Filter and sort transactions based on current settings
@@ -75,7 +79,8 @@ function filterAndSortTransactions(
   transactions: TransactionSummary[],
   sort: TransactionSortField,
   sortDir: 'asc' | 'desc',
-  callTypeFilter?: string
+  callTypeFilter?: string,
+  receiptsByTxHash?: Map<string, IntTransactionReceiptSize>
 ): TransactionSummary[] {
   // Filter by call type if specified
   let filtered = transactions;
@@ -92,6 +97,11 @@ function filterAndSortTransactions(
         return a.frameCount - b.frameCount;
       case 'depth':
         return a.maxDepth - b.maxDepth;
+      case 'receipt': {
+        const aBytes = receiptsByTxHash?.get(a.transactionHash)?.receipt_bytes ?? 0;
+        const bBytes = receiptsByTxHash?.get(b.transactionHash)?.receipt_bytes ?? 0;
+        return aBytes - bBytes;
+      }
       case 'index':
       default:
         return a.transactionIndex - b.transactionIndex;
@@ -185,6 +195,11 @@ export function BlockPage(): JSX.Element {
     callFrameId: null,
   });
 
+  // Fetch receipt sizes for all transactions in the block
+  const { receiptsByTxHash, totalReceiptBytes } = useBlockReceiptSizes({
+    blockNumber: isNaN(blockNumber) ? null : blockNumber,
+  });
+
   // Handle sort change (uses local state to avoid scroll reset)
   const handleSortChange = useCallback(
     (newSort: TransactionSortField) => {
@@ -192,7 +207,7 @@ export function BlockPage(): JSX.Element {
         // Toggle direction
         setSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'));
       } else {
-        // Default to desc for gas/calls/depth (show highest first), asc for index
+        // Default to desc for gas/calls/depth/receipt (show highest first), asc for index
         const defaultDir = newSort === 'index' ? 'asc' : 'desc';
         setSortField(newSort);
         setSortDir(defaultDir);
@@ -233,8 +248,8 @@ export function BlockPage(): JSX.Element {
   // Filter and sort transactions (default to gas desc if not specified)
   const filteredTransactions = useMemo(() => {
     if (!data?.transactions) return [];
-    return filterAndSortTransactions(data.transactions, sortField, sortDir, search.callType);
-  }, [data?.transactions, sortField, sortDir, search.callType]);
+    return filterAndSortTransactions(data.transactions, sortField, sortDir, search.callType, receiptsByTxHash);
+  }, [data?.transactions, sortField, sortDir, search.callType, receiptsByTxHash]);
 
   // Calculate total gas for percentage (from all transactions, not filtered)
   const totalBlockGas = useMemo(() => {
@@ -942,6 +957,7 @@ export function BlockPage(): JSX.Element {
   const canGoPrev = blockNumber > bounds.min;
   const canGoNext = blockNumber < bounds.max;
   const failedCount = data.transactions.filter(tx => tx.hasErrors).length;
+  const hasReceiptData = totalReceiptBytes > 0;
 
   return (
     <Container>
@@ -1019,7 +1035,7 @@ export function BlockPage(): JSX.Element {
       </div>
 
       {/* Block Summary - Always visible */}
-      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className={clsx('mb-6 grid grid-cols-2 gap-4', hasReceiptData ? 'sm:grid-cols-5' : 'sm:grid-cols-4')}>
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="rounded-xs bg-primary/10 p-2">
@@ -1045,6 +1061,35 @@ export function BlockPage(): JSX.Element {
             </div>
           </div>
         </Card>
+
+        {hasReceiptData && (
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="rounded-xs bg-warning/10 p-2">
+                <DocumentTextIcon className="size-5 text-warning" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1 text-xl font-semibold text-foreground">
+                  {formatBytes(totalReceiptBytes)}
+                  <GasTooltip
+                    type="receipt"
+                    size="md"
+                    customContent={
+                      <>
+                        <div className="mb-1.5 text-sm font-medium text-foreground">Receipt Payload Size</div>
+                        <div className="text-xs/5 text-muted">
+                          Number of bytes in the canonical encoded receipt value (type byte + RLP receipt) inserted as
+                          the receipts-trie value. Does not include trie node/path/proof overhead.
+                        </div>
+                      </>
+                    }
+                  />
+                </div>
+                <div className="text-xs text-muted">Receipt Payload</div>
+              </div>
+            </div>
+          </Card>
+        )}
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
@@ -1360,6 +1405,23 @@ export function BlockPage(): JSX.Element {
                         >
                           %
                         </th>
+                        {hasReceiptData && (
+                          <th
+                            scope="col"
+                            onClick={() => handleSortChange('receipt')}
+                            className={clsx(
+                              'cursor-pointer px-3 py-3.5 text-right text-sm font-semibold whitespace-nowrap transition-colors hover:text-primary',
+                              sortField === 'receipt' ? 'text-primary' : 'text-foreground'
+                            )}
+                          >
+                            <span className="inline-flex items-center justify-end gap-1">
+                              Receipt
+                              {sortField === 'receipt' && (
+                                <span className="text-primary">{sortDir === 'asc' ? '↑' : '↓'}</span>
+                              )}
+                            </span>
+                          </th>
+                        )}
                         <th
                           scope="col"
                           onClick={() => handleSortChange('calls')}
@@ -1395,12 +1457,15 @@ export function BlockPage(): JSX.Element {
                     <tbody className="divide-y divide-border bg-surface">
                       {filteredTransactions.slice(0, visibleCount).map(tx => {
                         const gasPercentage = totalBlockGas > 0 ? (tx.totalGasUsed / totalBlockGas) * 100 : 0;
+                        const receiptData = receiptsByTxHash.get(tx.transactionHash);
                         return (
                           <TransactionSummaryCard
                             key={tx.transactionHash}
                             transaction={tx}
                             blockNumber={blockNumber}
                             gasPercentage={gasPercentage}
+                            receiptBytes={receiptData?.receipt_bytes}
+                            showReceiptColumn={hasReceiptData}
                           />
                         );
                       })}

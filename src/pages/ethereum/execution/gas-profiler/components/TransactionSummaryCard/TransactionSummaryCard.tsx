@@ -2,6 +2,7 @@ import { type JSX, useCallback } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
+import { formatBytes } from '@/utils';
 import type { TransactionSummaryCardProps } from './TransactionSummaryCard.types';
 
 /**
@@ -48,6 +49,8 @@ export function TransactionSummaryCard({
   transaction,
   blockNumber,
   gasPercentage,
+  receiptBytes,
+  showReceiptColumn,
 }: TransactionSummaryCardProps): JSX.Element {
   const callTypeStyles = getCallTypeStyles(transaction.rootCallType);
   const navigate = useNavigate();
@@ -121,6 +124,13 @@ export function TransactionSummaryCard({
           <span className="w-12 text-right text-xs text-muted">{gasPercentage.toFixed(1)}%</span>
         </div>
       </td>
+
+      {/* Receipt size */}
+      {showReceiptColumn && (
+        <td className="px-3 py-3 text-right font-mono text-sm text-foreground">
+          {receiptBytes != null ? formatBytes(receiptBytes) : '—'}
+        </td>
+      )}
 
       {/* Calls (frame count) */}
       <td className="px-3 py-3 text-right text-sm text-foreground">{transaction.frameCount}</td>
