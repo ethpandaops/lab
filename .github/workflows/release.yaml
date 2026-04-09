@@ -36,22 +36,9 @@ jobs:
           tar -czf lab-${{ github.event.release.tag_name }}.tar.gz -C dist .
           cd dist && zip -r ../lab-${{ github.event.release.tag_name }}.zip . && cd ..
 
-      - name: Upload tar.gz to release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload release assets
+        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe # v2.6.1
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./lab-${{ github.event.release.tag_name }}.tar.gz
-          asset_name: lab-${{ github.event.release.tag_name }}.tar.gz
-          asset_content_type: application/gzip
-
-      - name: Upload zip to release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./lab-${{ github.event.release.tag_name }}.zip
-          asset_name: lab-${{ github.event.release.tag_name }}.zip
-          asset_content_type: application/zip
+          files: |
+            ./lab-${{ github.event.release.tag_name }}.tar.gz
+            ./lab-${{ github.event.release.tag_name }}.zip
