@@ -263,7 +263,8 @@ export function PayloadsView({
             .replace(/^ethpandaops\/mainnet\//, '')
             .replace(/^ethpandaops\//, '')
             .replace(/^utility-mainnet-/, 'utility/')
-            .replace(/^sigma-mainnet-/, 'sigma/');
+            .replace(/^sigma-mainnet-/, 'sigma/')
+            .replace(/^berlin-/, 'berlin/');
           // Truncate long node names
           const displayName = shortName.length > 35 ? `${shortName.slice(0, 35)}...` : shortName;
           // Extract cluster for EIP-7870 reference nodes
