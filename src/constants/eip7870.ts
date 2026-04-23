@@ -76,6 +76,27 @@ export const CLUSTER_SPECS: ClusterSpec[] = [
       interface: 'NVMe',
     },
   },
+  {
+    name: 'berlin',
+    cpu: {
+      model: 'AMD Ryzen 7 5800U',
+      cores: 8,
+      threads: 16,
+      maxFrequency: '4.5 GHz',
+      passmarkSingle: '~3,000',
+      passmarkMulti: '~19k',
+    },
+    memory: {
+      total: '32 GB',
+      type: 'DDR4',
+      speed: '3200 MT/s',
+    },
+    storage: {
+      model: 'Samsung 970 EVO Plus',
+      capacity: '2 TB',
+      interface: 'NVMe',
+    },
+  },
 ];
 
 /**
@@ -84,6 +105,7 @@ export const CLUSTER_SPECS: ClusterSpec[] = [
 export const CLUSTER_COLORS: Record<string, string> = {
   utility: 'text-blue-500',
   sigma: 'text-emerald-500',
+  berlin: 'text-amber-500',
 };
 
 /**
@@ -105,10 +127,12 @@ export function extractClusterFromNodeName(nodeName: string): string | null {
     .replace(/^ethpandaops\/mainnet\//, '')
     .replace(/^ethpandaops\//, '')
     .replace(/^utility-mainnet-/, 'utility/')
-    .replace(/^sigma-mainnet-/, 'sigma/');
+    .replace(/^sigma-mainnet-/, 'sigma/')
+    .replace(/^berlin-/, 'berlin/');
 
   if (shortName.startsWith('utility/')) return 'utility';
   if (shortName.startsWith('sigma/')) return 'sigma';
+  if (shortName.startsWith('berlin/')) return 'berlin';
 
   return null;
 }

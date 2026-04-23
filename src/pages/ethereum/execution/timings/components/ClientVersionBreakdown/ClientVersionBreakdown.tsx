@@ -122,6 +122,7 @@ function shortenNodeName(nodeName?: string): string {
     .replace(/^ethpandaops\//, '')
     .replace(/^utility-mainnet-/, 'utility/')
     .replace(/^sigma-mainnet-/, 'sigma/')
+    .replace(/^berlin-/, 'berlin/')
     .replace(/^prysm-/, '');
 }
 
