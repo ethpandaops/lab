@@ -4,19 +4,21 @@ import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { SeriesData, MarkLineConfig } from '@/components/Charts/MultiLine/MultiLine.types';
 import { getDataVizColors, getClientLayer } from '@/utils';
 import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
+import {
+  type EChartsTooltipParam,
+  SLOT_BUCKET_SIZE,
+  ALL_SLOT_BUCKETS,
+  PHASE_BOUNDARY_COLORS,
+  usToSeconds,
+  capitalize,
+  toSlotBucket,
+  avg,
+} from '@/utils/node-resources';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
 import type { FctNodeMemoryUsageByProcess } from '@/api/types.gen';
 import { type AnnotationType, type AnnotationEvent, type HighlightRange } from './types';
 import { AnnotationSwimLanes } from './AnnotationSwimLanes';
-
-function usToSeconds(us: number): number {
-  return us / 1_000_000;
-}
-
-function capitalize(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
 
 function bytesToMB(bytes: number): number {
   return bytes / (1024 * 1024);
@@ -37,11 +39,6 @@ const METRIC_OPTIONS = [
   { value: 'rss_file' as MemoryMetric, label: 'RSS File' },
   { value: 'vm_swap' as MemoryMetric, label: 'Swap' },
 ];
-
-const BUCKET_SIZE = 0.25;
-const ALL_BUCKETS = Array.from({ length: 49 }, (_, i) => i * BUCKET_SIZE);
-const toBucket = (offsetSec: number): number => Math.round(offsetSec / BUCKET_SIZE) * BUCKET_SIZE;
-const avg = (arr: number[]): number => arr.reduce((s, v) => s + v, 0) / arr.length;
 
 function extractMetric(d: FctNodeMemoryUsageByProcess, metric: MemoryMetric): number {
   switch (metric) {
@@ -66,15 +63,6 @@ interface MemoryUsageChartProps {
   enabledAnnotations: Set<AnnotationType>;
   highlight: HighlightRange | null;
   onHighlight: (range: HighlightRange | null) => void;
-}
-
-const PHASE_BOUNDARY_COLORS = ['#22d3ee', '#22c55e', '#f59e0b'];
-
-interface EChartsTooltipParam {
-  marker: string;
-  seriesName: string;
-  value: [number, number] | number;
-  axisValue?: number | string;
 }
 
 export function MemoryUsageChart({
@@ -123,8 +111,8 @@ export function MemoryUsageChart({
     const bucketData = (items: FctNodeMemoryUsageByProcess[]): Map<number, number[]> => {
       const buckets = new Map<number, number[]>();
       for (const d of items) {
-        const offset = usToSeconds((d.window_start ?? 0) - slotStartUs) + BUCKET_SIZE;
-        const bucket = toBucket(offset);
+        const offset = usToSeconds((d.window_start ?? 0) - slotStartUs) + SLOT_BUCKET_SIZE;
+        const bucket = toSlotBucket(offset);
         if (bucket < 0 || bucket > 12) continue;
 
         if (!buckets.has(bucket)) buckets.set(bucket, []);
@@ -134,7 +122,7 @@ export function MemoryUsageChart({
     };
 
     const toPoints = (buckets: Map<number, number[]>): [number, number][] => {
-      const points: [number, number][] = ALL_BUCKETS.map(
+      const points: [number, number][] = ALL_SLOT_BUCKETS.map(
         t => [t, buckets.has(t) ? avg(buckets.get(t)!) : NaN] as [number, number]
       );
       // Gauge metric: forward-fill gaps, backward-fill leading empties
