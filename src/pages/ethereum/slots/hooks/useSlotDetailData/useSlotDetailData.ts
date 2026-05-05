@@ -339,14 +339,32 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
     }));
 
   // Get block data from both sources
-  const blockHeadData = queries[0].data?.fct_block_head ?? [];
-  const allBlockData = queries[1].data?.fct_block ?? [];
+  const rawBlockHeadData = queries[0].data?.fct_block_head ?? [];
+  const rawAllBlockData = queries[1].data?.fct_block ?? [];
+
+  // Both fct_block_head and fct_block can return multiple rows for a slot when
+  // a fork produces a competing block (canonical + orphaned). Sort canonical
+  // first so all downstream consumers using [0] pick the canonical row.
+  // FctBlockHead lacks a status field, so we identify its canonical row by
+  // matching block_root against the canonical row in fct_block.
+  const canonicalBlock = rawAllBlockData.find(b => b.status === 'canonical');
+  const allBlockData = [...rawAllBlockData].sort((a, b) => {
+    if (a.status === 'canonical' && b.status !== 'canonical') return -1;
+    if (b.status === 'canonical' && a.status !== 'canonical') return 1;
+    return 0;
+  });
+  const blockHeadData = canonicalBlock
+    ? [...rawBlockHeadData].sort((a, b) => {
+        if (a.block_root === canonicalBlock.block_root) return -1;
+        if (b.block_root === canonicalBlock.block_root) return 1;
+        return 0;
+      })
+    : rawBlockHeadData;
 
   // Determine if this is an orphaned block:
   // - No canonical block head exists, but we have block data from the all-blocks table
   // - Or we have block data with status "orphaned"
-  const isOrphaned =
-    blockHeadData.length === 0 && allBlockData.length > 0 && allBlockData.some(b => b.status === 'orphaned');
+  const isOrphaned = !canonicalBlock && allBlockData.length > 0 && allBlockData.some(b => b.status === 'orphaned');
 
   // Combine all data
   // Query indices (0-indexed):
