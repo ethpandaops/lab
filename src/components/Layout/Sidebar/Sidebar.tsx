@@ -165,10 +165,6 @@ const ethereumConsensusPages: NavItem[] = [
   { name: 'Forks', to: '/ethereum/forks', icon: SignalIcon },
 ];
 
-const ethereumValidatorsPages: NavItem[] = [
-  { name: 'Report', to: '/ethereum/validators/report', icon: DocumentTextIcon },
-];
-
 const ethereumDataAvailabilityPages: NavItem[] = [
   { name: 'Custody', to: '/ethereum/data-availability/custody', icon: CircleStackIcon },
   { name: 'Probes', to: '/ethereum/data-availability/probes', icon: MagnifyingGlassIcon },
@@ -292,11 +288,6 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
     [config?.features, currentNetwork?.name]
   );
 
-  const filteredEthereumValidatorsPages = useMemo(
-    () => ethereumValidatorsPages.filter(page => isPageEnabled(page.to, config?.features, currentNetwork?.name)),
-    [config?.features, currentNetwork?.name]
-  );
-
   const filteredXatuPages = useMemo(
     () => xatuPages.filter(page => isPageEnabled(page.to, config?.features, currentNetwork?.name)),
     [config?.features, currentNetwork?.name]
@@ -351,16 +342,6 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
                           <SubsectionHeader title="Execution" collapsed={false} />
                           <div className="space-y-0.5">
                             {filteredEthereumExecutionPages.map(page => (
-                              <NavLink key={page.to} page={page} collapsed={false} />
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      {filteredEthereumValidatorsPages.length > 0 && (
-                        <div>
-                          <SubsectionHeader title="Validators" collapsed={false} />
-                          <div className="space-y-0.5">
-                            {filteredEthereumValidatorsPages.map(page => (
                               <NavLink key={page.to} page={page} collapsed={false} />
                             ))}
                           </div>
@@ -482,16 +463,6 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
                     <SubsectionHeader title="Execution" collapsed={collapsed} />
                     <div className={clsx(collapsed ? 'space-y-1' : 'space-y-0.5')}>
                       {filteredEthereumExecutionPages.map(page => (
-                        <NavLink key={page.to} page={page} collapsed={collapsed} />
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {filteredEthereumValidatorsPages.length > 0 && (
-                  <div>
-                    <SubsectionHeader title="Validators" collapsed={collapsed} />
-                    <div className={clsx(collapsed ? 'space-y-1' : 'space-y-0.5')}>
-                      {filteredEthereumValidatorsPages.map(page => (
                         <NavLink key={page.to} page={page} collapsed={collapsed} />
                       ))}
                     </div>
