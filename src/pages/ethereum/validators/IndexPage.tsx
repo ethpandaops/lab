@@ -56,7 +56,7 @@ function tagsFromUrl(indices?: string): string[] {
  */
 export function IndexPage(): JSX.Element {
   const navigate = useNavigate();
-  const search = useSearch({ from: '/ethereum/validators/report' }) as ValidatorsSearch;
+  const search = useSearch({ from: '/ethereum/validators/' }) as ValidatorsSearch;
 
   // Initialize state from URL params or defaults
   const defaultRange = getDefaultTimeRange();
@@ -117,7 +117,7 @@ export function IndexPage(): JSX.Element {
     (tagList: string[], from: number, to: number) => {
       const indices = tagList.join(',');
       void navigate({
-        to: '/ethereum/validators/report',
+        to: '/ethereum/validators',
         search: {
           indices: indices || undefined,
           from: from || undefined,
