@@ -8,6 +8,7 @@ import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
 import type { FctNodeCpuUtilizationByProcess } from '@/api/types.gen';
 import { type CpuMetric, type AnnotationType, type AnnotationEvent, type HighlightRange } from './types';
+import { formatPercent } from './utils';
 import { AnnotationSwimLanes } from './AnnotationSwimLanes';
 
 function usToSeconds(us: number): number {
@@ -320,7 +321,7 @@ export function CpuUtilizationChart({
               yAxis={{
                 name: '% of all cores',
                 min: 0,
-                formatter: (v: number) => `${v.toFixed(1)}%`,
+                formatter: (v: number) => formatPercent(v),
               }}
               height={inModal ? 500 : 350}
               showLegend
@@ -345,7 +346,7 @@ export function CpuUtilizationChart({
                   html += `<div style="display:flex;align-items:center;gap:6px;margin:2px 0">`;
                   html += `${p.marker}`;
                   html += `<span style="flex:1">${p.seriesName}</span>`;
-                  html += `<span style="font-weight:600">${Number(val).toFixed(1)}%</span>`;
+                  html += `<span style="font-weight:600">${formatPercent(Number(val))}</span>`;
                   html += `</div>`;
                 }
 

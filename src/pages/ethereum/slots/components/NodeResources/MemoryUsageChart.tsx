@@ -8,6 +8,7 @@ import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
 import type { FctNodeMemoryUsageByProcess } from '@/api/types.gen';
 import { type AnnotationType, type AnnotationEvent, type HighlightRange } from './types';
+import { getByteScale, formatScaled, seriesMax } from './utils';
 import { AnnotationSwimLanes } from './AnnotationSwimLanes';
 
 function usToSeconds(us: number): number {
@@ -110,9 +111,9 @@ export function MemoryUsageChart({
     []
   );
 
-  const { series, clClient, elClient } = useMemo(() => {
+  const { series, clClient, elClient, displayUnit } = useMemo(() => {
     if (data.length === 0) {
-      return { series: [] as SeriesData[], clClient: '', elClient: '' };
+      return { series: [] as SeriesData[], clClient: '', elClient: '', displayUnit: 'MB' };
     }
 
     const slotStartUs = Math.min(...data.map(d => d.wallclock_slot_start_date_time ?? 0).filter(v => v > 0));
@@ -202,7 +203,18 @@ export function MemoryUsageChart({
       });
     }
 
-    return { series: chartSeries, clClient: resolvedClClient, elClient: resolvedElClient };
+    // Scale data to appropriate unit so ECharts picks nice round ticks
+    const maxMB = seriesMax(chartSeries);
+    const { divisor, unit } = getByteScale(maxMB, 'MB');
+    if (divisor > 1) {
+      for (const s of chartSeries) {
+        for (const p of s.data as [number, number][]) {
+          p[1] /= divisor;
+        }
+      }
+    }
+
+    return { series: chartSeries, clClient: resolvedClClient, elClient: resolvedElClient, displayUnit: unit };
   }, [data, selectedNode, metric, CHART_CATEGORICAL_COLORS]);
 
   const markLines = useMemo((): MarkLineConfig[] => {
@@ -274,9 +286,9 @@ export function MemoryUsageChart({
                 formatter: (v: number | string) => `${v}s`,
               }}
               yAxis={{
-                name: 'MB',
+                name: displayUnit,
                 min: 0,
-                formatter: (v: number) => `${v.toFixed(0)} MB`,
+                formatter: (v: number) => formatScaled(v, displayUnit),
               }}
               height={inModal ? 500 : 350}
               showLegend
@@ -301,7 +313,7 @@ export function MemoryUsageChart({
                   html += `<div style="display:flex;align-items:center;gap:6px;margin:2px 0">`;
                   html += `${p.marker}`;
                   html += `<span style="flex:1">${p.seriesName}</span>`;
-                  html += `<span style="font-weight:600">${Number(val).toFixed(1)} MB</span>`;
+                  html += `<span style="font-weight:600">${formatScaled(Number(val), displayUnit)}</span>`;
                   html += `</div>`;
                 }
 

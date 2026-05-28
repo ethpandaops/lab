@@ -84,7 +84,7 @@ export function NodeResourcesPanel({
   const referenceNodesOnly = search.refNodes ?? false;
   const selectedNode = search.node ?? null;
   const metric: CpuMetric = search.metric ?? 'mean';
-  const memMetric: MemoryMetric = search.memMetric ?? 'vm_rss';
+  const memMetric: MemoryMetric = search.memMetric ?? 'rss_anon';
 
   const setReferenceNodesOnly = useCallback(
     (value: boolean) => {
@@ -130,7 +130,7 @@ export function NodeResourcesPanel({
       navigate({
         to: '/ethereum/slots/$slot',
         params: { slot: String(slot) },
-        search: { ...search, memMetric: value === 'vm_rss' ? undefined : value },
+        search: { ...search, memMetric: value === 'rss_anon' ? undefined : value },
         replace: true,
         resetScroll: false,
       });
