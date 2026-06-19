@@ -7,7 +7,7 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { formatSmartDecimal } from '@/utils';
 import { useStateSizeData, useStateDelta, type DeltaTimeframe } from './hooks';
-import { StateSizeSkeleton } from './components';
+import { StateSizeSkeleton, TokenStorageShareCard } from './components';
 
 const TIMEFRAME_OPTIONS: { value: DeltaTimeframe; label: string }[] = [
   { value: 'daily', label: '24h' },
@@ -338,6 +338,9 @@ export function IndexPage(): JSX.Element {
               />
             )}
           </PopoutCard>
+
+          {/* Token storage share: ERC20 / ERC721 / Others as a share of total storage slots */}
+          <TokenStorageShareCard data={data} />
         </div>
       )}
     </Container>

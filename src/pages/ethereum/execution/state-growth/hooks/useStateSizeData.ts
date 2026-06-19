@@ -3,7 +3,7 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { fctExecutionStateSizeDailyServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { FctExecutionStateSizeDaily } from '@/api/types.gen';
 
-interface NormalizedDataPoint {
+export interface NormalizedDataPoint {
   date: Date;
   dateLabel: string;
   total_bytes: number;
