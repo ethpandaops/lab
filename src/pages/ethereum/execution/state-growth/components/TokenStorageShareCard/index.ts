@@ -1,0 +1,1 @@
+export { TokenStorageShareCard } from './TokenStorageShareCard';

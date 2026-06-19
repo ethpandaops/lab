@@ -72,6 +72,7 @@ export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function
     showPercentages = true,
     animated = true,
     height = 120,
+    labelFontSize = 11,
     animationDuration = 300,
     valueFormatter = defaultValueFormatter,
     showLegend = false,
@@ -180,7 +181,7 @@ export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function
                   return valueFormatter(seg.value);
                 },
                 color: '#ffffff',
-                fontSize: 11,
+                fontSize: labelFontSize,
                 fontWeight: 500,
               }
             : { show: false },
@@ -256,6 +257,7 @@ export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function
     showLabels,
     showPercentages,
     valueFormatter,
+    labelFontSize,
     animated,
     animationDuration,
     themeColors,

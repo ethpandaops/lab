@@ -99,6 +99,12 @@ export interface StackedBarProps {
   height?: number;
 
   /**
+   * Font size (px) for the in-segment value labels
+   * @default 11
+   */
+  labelFontSize?: number;
+
+  /**
    * Animation duration in milliseconds
    * @default 300
    */
