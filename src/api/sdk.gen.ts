@@ -2,1886 +2,21 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type {
-  AdminCbtIncrementalServiceGetData,
-  AdminCbtIncrementalServiceGetErrors,
-  AdminCbtIncrementalServiceGetResponses,
-  AdminCbtIncrementalServiceListData,
-  AdminCbtIncrementalServiceListErrors,
-  AdminCbtIncrementalServiceListResponses,
-  DimBlockBlobSubmitterServiceGetData,
-  DimBlockBlobSubmitterServiceGetErrors,
-  DimBlockBlobSubmitterServiceGetResponses,
-  DimBlockBlobSubmitterServiceListData,
-  DimBlockBlobSubmitterServiceListErrors,
-  DimBlockBlobSubmitterServiceListResponses,
-  DimContractOwnerServiceGetData,
-  DimContractOwnerServiceGetErrors,
-  DimContractOwnerServiceGetResponses,
-  DimContractOwnerServiceListData,
-  DimContractOwnerServiceListErrors,
-  DimContractOwnerServiceListResponses,
-  DimFunctionSignatureServiceGetData,
-  DimFunctionSignatureServiceGetErrors,
-  DimFunctionSignatureServiceGetResponses,
-  DimFunctionSignatureServiceListData,
-  DimFunctionSignatureServiceListErrors,
-  DimFunctionSignatureServiceListResponses,
-  DimNodeServiceGetData,
-  DimNodeServiceGetErrors,
-  DimNodeServiceGetResponses,
-  DimNodeServiceListData,
-  DimNodeServiceListErrors,
-  DimNodeServiceListResponses,
-  DimTokenContractServiceGetData,
-  DimTokenContractServiceGetErrors,
-  DimTokenContractServiceGetResponses,
-  DimTokenContractServiceListData,
-  DimTokenContractServiceListErrors,
-  DimTokenContractServiceListResponses,
-  DimValidatorPubkeyServiceGetData,
-  DimValidatorPubkeyServiceGetErrors,
-  DimValidatorPubkeyServiceGetResponses,
-  DimValidatorPubkeyServiceListData,
-  DimValidatorPubkeyServiceListErrors,
-  DimValidatorPubkeyServiceListResponses,
-  DimValidatorStatusServiceGetData,
-  DimValidatorStatusServiceGetErrors,
-  DimValidatorStatusServiceGetResponses,
-  DimValidatorStatusServiceListData,
-  DimValidatorStatusServiceListErrors,
-  DimValidatorStatusServiceListResponses,
-  FctAttestationCorrectnessByValidatorCanonicalServiceGetData,
-  FctAttestationCorrectnessByValidatorCanonicalServiceGetErrors,
-  FctAttestationCorrectnessByValidatorCanonicalServiceGetResponses,
-  FctAttestationCorrectnessByValidatorCanonicalServiceListData,
-  FctAttestationCorrectnessByValidatorCanonicalServiceListErrors,
-  FctAttestationCorrectnessByValidatorCanonicalServiceListResponses,
-  FctAttestationCorrectnessByValidatorHeadServiceGetData,
-  FctAttestationCorrectnessByValidatorHeadServiceGetErrors,
-  FctAttestationCorrectnessByValidatorHeadServiceGetResponses,
-  FctAttestationCorrectnessByValidatorHeadServiceListData,
-  FctAttestationCorrectnessByValidatorHeadServiceListErrors,
-  FctAttestationCorrectnessByValidatorHeadServiceListResponses,
-  FctAttestationCorrectnessCanonicalServiceGetData,
-  FctAttestationCorrectnessCanonicalServiceGetErrors,
-  FctAttestationCorrectnessCanonicalServiceGetResponses,
-  FctAttestationCorrectnessCanonicalServiceListData,
-  FctAttestationCorrectnessCanonicalServiceListErrors,
-  FctAttestationCorrectnessCanonicalServiceListResponses,
-  FctAttestationCorrectnessHeadServiceGetData,
-  FctAttestationCorrectnessHeadServiceGetErrors,
-  FctAttestationCorrectnessHeadServiceGetResponses,
-  FctAttestationCorrectnessHeadServiceListData,
-  FctAttestationCorrectnessHeadServiceListErrors,
-  FctAttestationCorrectnessHeadServiceListResponses,
-  FctAttestationFirstSeenByValidatorServiceGetData,
-  FctAttestationFirstSeenByValidatorServiceGetErrors,
-  FctAttestationFirstSeenByValidatorServiceGetResponses,
-  FctAttestationFirstSeenByValidatorServiceListData,
-  FctAttestationFirstSeenByValidatorServiceListErrors,
-  FctAttestationFirstSeenByValidatorServiceListResponses,
-  FctAttestationFirstSeenChunked50MsServiceGetData,
-  FctAttestationFirstSeenChunked50MsServiceGetErrors,
-  FctAttestationFirstSeenChunked50MsServiceGetResponses,
-  FctAttestationFirstSeenChunked50MsServiceListData,
-  FctAttestationFirstSeenChunked50MsServiceListErrors,
-  FctAttestationFirstSeenChunked50MsServiceListResponses,
-  FctAttestationInclusionDelayDailyServiceGetData,
-  FctAttestationInclusionDelayDailyServiceGetErrors,
-  FctAttestationInclusionDelayDailyServiceGetResponses,
-  FctAttestationInclusionDelayDailyServiceListData,
-  FctAttestationInclusionDelayDailyServiceListErrors,
-  FctAttestationInclusionDelayDailyServiceListResponses,
-  FctAttestationInclusionDelayHourlyServiceGetData,
-  FctAttestationInclusionDelayHourlyServiceGetErrors,
-  FctAttestationInclusionDelayHourlyServiceGetResponses,
-  FctAttestationInclusionDelayHourlyServiceListData,
-  FctAttestationInclusionDelayHourlyServiceListErrors,
-  FctAttestationInclusionDelayHourlyServiceListResponses,
-  FctAttestationLivenessByEntityHeadServiceGetData,
-  FctAttestationLivenessByEntityHeadServiceGetErrors,
-  FctAttestationLivenessByEntityHeadServiceGetResponses,
-  FctAttestationLivenessByEntityHeadServiceListData,
-  FctAttestationLivenessByEntityHeadServiceListErrors,
-  FctAttestationLivenessByEntityHeadServiceListResponses,
-  FctAttestationObservationByNodeServiceGetData,
-  FctAttestationObservationByNodeServiceGetErrors,
-  FctAttestationObservationByNodeServiceGetResponses,
-  FctAttestationObservationByNodeServiceListData,
-  FctAttestationObservationByNodeServiceListErrors,
-  FctAttestationObservationByNodeServiceListResponses,
-  FctAttestationParticipationRateDailyServiceGetData,
-  FctAttestationParticipationRateDailyServiceGetErrors,
-  FctAttestationParticipationRateDailyServiceGetResponses,
-  FctAttestationParticipationRateDailyServiceListData,
-  FctAttestationParticipationRateDailyServiceListErrors,
-  FctAttestationParticipationRateDailyServiceListResponses,
-  FctAttestationParticipationRateHourlyServiceGetData,
-  FctAttestationParticipationRateHourlyServiceGetErrors,
-  FctAttestationParticipationRateHourlyServiceGetResponses,
-  FctAttestationParticipationRateHourlyServiceListData,
-  FctAttestationParticipationRateHourlyServiceListErrors,
-  FctAttestationParticipationRateHourlyServiceListResponses,
-  FctAttestationVoteCorrectnessByValidatorDailyServiceGetData,
-  FctAttestationVoteCorrectnessByValidatorDailyServiceGetErrors,
-  FctAttestationVoteCorrectnessByValidatorDailyServiceGetResponses,
-  FctAttestationVoteCorrectnessByValidatorDailyServiceListData,
-  FctAttestationVoteCorrectnessByValidatorDailyServiceListErrors,
-  FctAttestationVoteCorrectnessByValidatorDailyServiceListResponses,
-  FctAttestationVoteCorrectnessByValidatorHourlyServiceGetData,
-  FctAttestationVoteCorrectnessByValidatorHourlyServiceGetErrors,
-  FctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponses,
-  FctAttestationVoteCorrectnessByValidatorHourlyServiceListData,
-  FctAttestationVoteCorrectnessByValidatorHourlyServiceListErrors,
-  FctAttestationVoteCorrectnessByValidatorHourlyServiceListResponses,
-  FctAttestationVoteCorrectnessByValidatorServiceGetData,
-  FctAttestationVoteCorrectnessByValidatorServiceGetErrors,
-  FctAttestationVoteCorrectnessByValidatorServiceGetResponses,
-  FctAttestationVoteCorrectnessByValidatorServiceListData,
-  FctAttestationVoteCorrectnessByValidatorServiceListErrors,
-  FctAttestationVoteCorrectnessByValidatorServiceListResponses,
-  FctBlobCountDailyServiceGetData,
-  FctBlobCountDailyServiceGetErrors,
-  FctBlobCountDailyServiceGetResponses,
-  FctBlobCountDailyServiceListData,
-  FctBlobCountDailyServiceListErrors,
-  FctBlobCountDailyServiceListResponses,
-  FctBlobCountHourlyServiceGetData,
-  FctBlobCountHourlyServiceGetErrors,
-  FctBlobCountHourlyServiceGetResponses,
-  FctBlobCountHourlyServiceListData,
-  FctBlobCountHourlyServiceListErrors,
-  FctBlobCountHourlyServiceListResponses,
-  FctBlockBlobCountHeadServiceGetData,
-  FctBlockBlobCountHeadServiceGetErrors,
-  FctBlockBlobCountHeadServiceGetResponses,
-  FctBlockBlobCountHeadServiceListData,
-  FctBlockBlobCountHeadServiceListErrors,
-  FctBlockBlobCountHeadServiceListResponses,
-  FctBlockBlobCountServiceGetData,
-  FctBlockBlobCountServiceGetErrors,
-  FctBlockBlobCountServiceGetResponses,
-  FctBlockBlobCountServiceListData,
-  FctBlockBlobCountServiceListErrors,
-  FctBlockBlobCountServiceListResponses,
-  FctBlockBlobFirstSeenByNodeServiceGetData,
-  FctBlockBlobFirstSeenByNodeServiceGetErrors,
-  FctBlockBlobFirstSeenByNodeServiceGetResponses,
-  FctBlockBlobFirstSeenByNodeServiceListData,
-  FctBlockBlobFirstSeenByNodeServiceListErrors,
-  FctBlockBlobFirstSeenByNodeServiceListResponses,
-  FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData,
-  FctBlockDataColumnSidecarFirstSeenByNodeServiceGetErrors,
-  FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponses,
-  FctBlockDataColumnSidecarFirstSeenByNodeServiceListData,
-  FctBlockDataColumnSidecarFirstSeenByNodeServiceListErrors,
-  FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponses,
-  FctBlockDataColumnSidecarFirstSeenServiceGetData,
-  FctBlockDataColumnSidecarFirstSeenServiceGetErrors,
-  FctBlockDataColumnSidecarFirstSeenServiceGetResponses,
-  FctBlockDataColumnSidecarFirstSeenServiceListData,
-  FctBlockDataColumnSidecarFirstSeenServiceListErrors,
-  FctBlockDataColumnSidecarFirstSeenServiceListResponses,
-  FctBlockFirstSeenByNodeServiceGetData,
-  FctBlockFirstSeenByNodeServiceGetErrors,
-  FctBlockFirstSeenByNodeServiceGetResponses,
-  FctBlockFirstSeenByNodeServiceListData,
-  FctBlockFirstSeenByNodeServiceListErrors,
-  FctBlockFirstSeenByNodeServiceListResponses,
-  FctBlockHeadServiceGetData,
-  FctBlockHeadServiceGetErrors,
-  FctBlockHeadServiceGetResponses,
-  FctBlockHeadServiceListData,
-  FctBlockHeadServiceListErrors,
-  FctBlockHeadServiceListResponses,
-  FctBlockMevHeadServiceGetData,
-  FctBlockMevHeadServiceGetErrors,
-  FctBlockMevHeadServiceGetResponses,
-  FctBlockMevHeadServiceListData,
-  FctBlockMevHeadServiceListErrors,
-  FctBlockMevHeadServiceListResponses,
-  FctBlockMevServiceGetData,
-  FctBlockMevServiceGetErrors,
-  FctBlockMevServiceGetResponses,
-  FctBlockMevServiceListData,
-  FctBlockMevServiceListErrors,
-  FctBlockMevServiceListResponses,
-  FctBlockProposalStatusDailyServiceGetData,
-  FctBlockProposalStatusDailyServiceGetErrors,
-  FctBlockProposalStatusDailyServiceGetResponses,
-  FctBlockProposalStatusDailyServiceListData,
-  FctBlockProposalStatusDailyServiceListErrors,
-  FctBlockProposalStatusDailyServiceListResponses,
-  FctBlockProposalStatusHourlyServiceGetData,
-  FctBlockProposalStatusHourlyServiceGetErrors,
-  FctBlockProposalStatusHourlyServiceGetResponses,
-  FctBlockProposalStatusHourlyServiceListData,
-  FctBlockProposalStatusHourlyServiceListErrors,
-  FctBlockProposalStatusHourlyServiceListResponses,
-  FctBlockProposerByValidatorServiceGetData,
-  FctBlockProposerByValidatorServiceGetErrors,
-  FctBlockProposerByValidatorServiceGetResponses,
-  FctBlockProposerByValidatorServiceListData,
-  FctBlockProposerByValidatorServiceListErrors,
-  FctBlockProposerByValidatorServiceListResponses,
-  FctBlockProposerEntityServiceGetData,
-  FctBlockProposerEntityServiceGetErrors,
-  FctBlockProposerEntityServiceGetResponses,
-  FctBlockProposerEntityServiceListData,
-  FctBlockProposerEntityServiceListErrors,
-  FctBlockProposerEntityServiceListResponses,
-  FctBlockProposerHeadServiceGetData,
-  FctBlockProposerHeadServiceGetErrors,
-  FctBlockProposerHeadServiceGetResponses,
-  FctBlockProposerHeadServiceListData,
-  FctBlockProposerHeadServiceListErrors,
-  FctBlockProposerHeadServiceListResponses,
-  FctBlockProposerServiceGetData,
-  FctBlockProposerServiceGetErrors,
-  FctBlockProposerServiceGetResponses,
-  FctBlockProposerServiceListData,
-  FctBlockProposerServiceListErrors,
-  FctBlockProposerServiceListResponses,
-  FctBlockServiceGetData,
-  FctBlockServiceGetErrors,
-  FctBlockServiceGetResponses,
-  FctBlockServiceListData,
-  FctBlockServiceListErrors,
-  FctBlockServiceListResponses,
-  FctContractStorageStateByAddressDailyServiceGetData,
-  FctContractStorageStateByAddressDailyServiceGetErrors,
-  FctContractStorageStateByAddressDailyServiceGetResponses,
-  FctContractStorageStateByAddressDailyServiceListData,
-  FctContractStorageStateByAddressDailyServiceListErrors,
-  FctContractStorageStateByAddressDailyServiceListResponses,
-  FctContractStorageStateByAddressHourlyServiceGetData,
-  FctContractStorageStateByAddressHourlyServiceGetErrors,
-  FctContractStorageStateByAddressHourlyServiceGetResponses,
-  FctContractStorageStateByAddressHourlyServiceListData,
-  FctContractStorageStateByAddressHourlyServiceListErrors,
-  FctContractStorageStateByAddressHourlyServiceListResponses,
-  FctContractStorageStateByBlockDailyServiceGetData,
-  FctContractStorageStateByBlockDailyServiceGetErrors,
-  FctContractStorageStateByBlockDailyServiceGetResponses,
-  FctContractStorageStateByBlockDailyServiceListData,
-  FctContractStorageStateByBlockDailyServiceListErrors,
-  FctContractStorageStateByBlockDailyServiceListResponses,
-  FctContractStorageStateByBlockHourlyServiceGetData,
-  FctContractStorageStateByBlockHourlyServiceGetErrors,
-  FctContractStorageStateByBlockHourlyServiceGetResponses,
-  FctContractStorageStateByBlockHourlyServiceListData,
-  FctContractStorageStateByBlockHourlyServiceListErrors,
-  FctContractStorageStateByBlockHourlyServiceListResponses,
-  FctContractStorageStateWithExpiryByAddressDailyServiceGetData,
-  FctContractStorageStateWithExpiryByAddressDailyServiceGetErrors,
-  FctContractStorageStateWithExpiryByAddressDailyServiceGetResponses,
-  FctContractStorageStateWithExpiryByAddressDailyServiceListData,
-  FctContractStorageStateWithExpiryByAddressDailyServiceListErrors,
-  FctContractStorageStateWithExpiryByAddressDailyServiceListResponses,
-  FctContractStorageStateWithExpiryByAddressHourlyServiceGetData,
-  FctContractStorageStateWithExpiryByAddressHourlyServiceGetErrors,
-  FctContractStorageStateWithExpiryByAddressHourlyServiceGetResponses,
-  FctContractStorageStateWithExpiryByAddressHourlyServiceListData,
-  FctContractStorageStateWithExpiryByAddressHourlyServiceListErrors,
-  FctContractStorageStateWithExpiryByAddressHourlyServiceListResponses,
-  FctContractStorageStateWithExpiryByBlockDailyServiceGetData,
-  FctContractStorageStateWithExpiryByBlockDailyServiceGetErrors,
-  FctContractStorageStateWithExpiryByBlockDailyServiceGetResponses,
-  FctContractStorageStateWithExpiryByBlockDailyServiceListData,
-  FctContractStorageStateWithExpiryByBlockDailyServiceListErrors,
-  FctContractStorageStateWithExpiryByBlockDailyServiceListResponses,
-  FctContractStorageStateWithExpiryByBlockHourlyServiceGetData,
-  FctContractStorageStateWithExpiryByBlockHourlyServiceGetErrors,
-  FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponses,
-  FctContractStorageStateWithExpiryByBlockHourlyServiceListData,
-  FctContractStorageStateWithExpiryByBlockHourlyServiceListErrors,
-  FctContractStorageStateWithExpiryByBlockHourlyServiceListResponses,
-  FctDataColumnAvailabilityByEpochServiceGetData,
-  FctDataColumnAvailabilityByEpochServiceGetErrors,
-  FctDataColumnAvailabilityByEpochServiceGetResponses,
-  FctDataColumnAvailabilityByEpochServiceListData,
-  FctDataColumnAvailabilityByEpochServiceListErrors,
-  FctDataColumnAvailabilityByEpochServiceListResponses,
-  FctDataColumnAvailabilityBySlotBlobServiceGetData,
-  FctDataColumnAvailabilityBySlotBlobServiceGetErrors,
-  FctDataColumnAvailabilityBySlotBlobServiceGetResponses,
-  FctDataColumnAvailabilityBySlotBlobServiceListData,
-  FctDataColumnAvailabilityBySlotBlobServiceListErrors,
-  FctDataColumnAvailabilityBySlotBlobServiceListResponses,
-  FctDataColumnAvailabilityBySlotServiceGetData,
-  FctDataColumnAvailabilityBySlotServiceGetErrors,
-  FctDataColumnAvailabilityBySlotServiceGetResponses,
-  FctDataColumnAvailabilityBySlotServiceListData,
-  FctDataColumnAvailabilityBySlotServiceListErrors,
-  FctDataColumnAvailabilityBySlotServiceListResponses,
-  FctDataColumnAvailabilityDailyServiceGetData,
-  FctDataColumnAvailabilityDailyServiceGetErrors,
-  FctDataColumnAvailabilityDailyServiceGetResponses,
-  FctDataColumnAvailabilityDailyServiceListData,
-  FctDataColumnAvailabilityDailyServiceListErrors,
-  FctDataColumnAvailabilityDailyServiceListResponses,
-  FctDataColumnAvailabilityHourlyServiceGetData,
-  FctDataColumnAvailabilityHourlyServiceGetErrors,
-  FctDataColumnAvailabilityHourlyServiceGetResponses,
-  FctDataColumnAvailabilityHourlyServiceListData,
-  FctDataColumnAvailabilityHourlyServiceListErrors,
-  FctDataColumnAvailabilityHourlyServiceListResponses,
-  FctEngineGetBlobsByElClientHourlyServiceGetData,
-  FctEngineGetBlobsByElClientHourlyServiceGetErrors,
-  FctEngineGetBlobsByElClientHourlyServiceGetResponses,
-  FctEngineGetBlobsByElClientHourlyServiceListData,
-  FctEngineGetBlobsByElClientHourlyServiceListErrors,
-  FctEngineGetBlobsByElClientHourlyServiceListResponses,
-  FctEngineGetBlobsByElClientServiceGetData,
-  FctEngineGetBlobsByElClientServiceGetErrors,
-  FctEngineGetBlobsByElClientServiceGetResponses,
-  FctEngineGetBlobsByElClientServiceListData,
-  FctEngineGetBlobsByElClientServiceListErrors,
-  FctEngineGetBlobsByElClientServiceListResponses,
-  FctEngineGetBlobsBySlotServiceGetData,
-  FctEngineGetBlobsBySlotServiceGetErrors,
-  FctEngineGetBlobsBySlotServiceGetResponses,
-  FctEngineGetBlobsBySlotServiceListData,
-  FctEngineGetBlobsBySlotServiceListErrors,
-  FctEngineGetBlobsBySlotServiceListResponses,
-  FctEngineGetBlobsDurationChunked50MsServiceGetData,
-  FctEngineGetBlobsDurationChunked50MsServiceGetErrors,
-  FctEngineGetBlobsDurationChunked50MsServiceGetResponses,
-  FctEngineGetBlobsDurationChunked50MsServiceListData,
-  FctEngineGetBlobsDurationChunked50MsServiceListErrors,
-  FctEngineGetBlobsDurationChunked50MsServiceListResponses,
-  FctEngineNewPayloadByElClientHourlyServiceGetData,
-  FctEngineNewPayloadByElClientHourlyServiceGetErrors,
-  FctEngineNewPayloadByElClientHourlyServiceGetResponses,
-  FctEngineNewPayloadByElClientHourlyServiceListData,
-  FctEngineNewPayloadByElClientHourlyServiceListErrors,
-  FctEngineNewPayloadByElClientHourlyServiceListResponses,
-  FctEngineNewPayloadByElClientServiceGetData,
-  FctEngineNewPayloadByElClientServiceGetErrors,
-  FctEngineNewPayloadByElClientServiceGetResponses,
-  FctEngineNewPayloadByElClientServiceListData,
-  FctEngineNewPayloadByElClientServiceListErrors,
-  FctEngineNewPayloadByElClientServiceListResponses,
-  FctEngineNewPayloadBySlotServiceGetData,
-  FctEngineNewPayloadBySlotServiceGetErrors,
-  FctEngineNewPayloadBySlotServiceGetResponses,
-  FctEngineNewPayloadBySlotServiceListData,
-  FctEngineNewPayloadBySlotServiceListErrors,
-  FctEngineNewPayloadBySlotServiceListResponses,
-  FctEngineNewPayloadDurationChunked50MsServiceGetData,
-  FctEngineNewPayloadDurationChunked50MsServiceGetErrors,
-  FctEngineNewPayloadDurationChunked50MsServiceGetResponses,
-  FctEngineNewPayloadDurationChunked50MsServiceListData,
-  FctEngineNewPayloadDurationChunked50MsServiceListErrors,
-  FctEngineNewPayloadDurationChunked50MsServiceListResponses,
-  FctEngineNewPayloadWinrateDailyServiceGetData,
-  FctEngineNewPayloadWinrateDailyServiceGetErrors,
-  FctEngineNewPayloadWinrateDailyServiceGetResponses,
-  FctEngineNewPayloadWinrateDailyServiceListData,
-  FctEngineNewPayloadWinrateDailyServiceListErrors,
-  FctEngineNewPayloadWinrateDailyServiceListResponses,
-  FctEngineNewPayloadWinrateHourlyServiceGetData,
-  FctEngineNewPayloadWinrateHourlyServiceGetErrors,
-  FctEngineNewPayloadWinrateHourlyServiceGetResponses,
-  FctEngineNewPayloadWinrateHourlyServiceListData,
-  FctEngineNewPayloadWinrateHourlyServiceListErrors,
-  FctEngineNewPayloadWinrateHourlyServiceListResponses,
-  FctExecutionGasLimitDailyServiceGetData,
-  FctExecutionGasLimitDailyServiceGetErrors,
-  FctExecutionGasLimitDailyServiceGetResponses,
-  FctExecutionGasLimitDailyServiceListData,
-  FctExecutionGasLimitDailyServiceListErrors,
-  FctExecutionGasLimitDailyServiceListResponses,
-  FctExecutionGasLimitHourlyServiceGetData,
-  FctExecutionGasLimitHourlyServiceGetErrors,
-  FctExecutionGasLimitHourlyServiceGetResponses,
-  FctExecutionGasLimitHourlyServiceListData,
-  FctExecutionGasLimitHourlyServiceListErrors,
-  FctExecutionGasLimitHourlyServiceListResponses,
-  FctExecutionGasLimitSignallingDailyServiceGetData,
-  FctExecutionGasLimitSignallingDailyServiceGetErrors,
-  FctExecutionGasLimitSignallingDailyServiceGetResponses,
-  FctExecutionGasLimitSignallingDailyServiceListData,
-  FctExecutionGasLimitSignallingDailyServiceListErrors,
-  FctExecutionGasLimitSignallingDailyServiceListResponses,
-  FctExecutionGasLimitSignallingHourlyServiceGetData,
-  FctExecutionGasLimitSignallingHourlyServiceGetErrors,
-  FctExecutionGasLimitSignallingHourlyServiceGetResponses,
-  FctExecutionGasLimitSignallingHourlyServiceListData,
-  FctExecutionGasLimitSignallingHourlyServiceListErrors,
-  FctExecutionGasLimitSignallingHourlyServiceListResponses,
-  FctExecutionGasUsedDailyServiceGetData,
-  FctExecutionGasUsedDailyServiceGetErrors,
-  FctExecutionGasUsedDailyServiceGetResponses,
-  FctExecutionGasUsedDailyServiceListData,
-  FctExecutionGasUsedDailyServiceListErrors,
-  FctExecutionGasUsedDailyServiceListResponses,
-  FctExecutionGasUsedHourlyServiceGetData,
-  FctExecutionGasUsedHourlyServiceGetErrors,
-  FctExecutionGasUsedHourlyServiceGetResponses,
-  FctExecutionGasUsedHourlyServiceListData,
-  FctExecutionGasUsedHourlyServiceListErrors,
-  FctExecutionGasUsedHourlyServiceListResponses,
-  FctExecutionReceiptSizeDailyServiceGetData,
-  FctExecutionReceiptSizeDailyServiceGetErrors,
-  FctExecutionReceiptSizeDailyServiceGetResponses,
-  FctExecutionReceiptSizeDailyServiceListData,
-  FctExecutionReceiptSizeDailyServiceListErrors,
-  FctExecutionReceiptSizeDailyServiceListResponses,
-  FctExecutionReceiptSizeHourlyServiceGetData,
-  FctExecutionReceiptSizeHourlyServiceGetErrors,
-  FctExecutionReceiptSizeHourlyServiceGetResponses,
-  FctExecutionReceiptSizeHourlyServiceListData,
-  FctExecutionReceiptSizeHourlyServiceListErrors,
-  FctExecutionReceiptSizeHourlyServiceListResponses,
-  FctExecutionStateSizeDailyServiceGetData,
-  FctExecutionStateSizeDailyServiceGetErrors,
-  FctExecutionStateSizeDailyServiceGetResponses,
-  FctExecutionStateSizeDailyServiceListData,
-  FctExecutionStateSizeDailyServiceListErrors,
-  FctExecutionStateSizeDailyServiceListResponses,
-  FctExecutionStateSizeHourlyServiceGetData,
-  FctExecutionStateSizeHourlyServiceGetErrors,
-  FctExecutionStateSizeHourlyServiceGetResponses,
-  FctExecutionStateSizeHourlyServiceListData,
-  FctExecutionStateSizeHourlyServiceListErrors,
-  FctExecutionStateSizeHourlyServiceListResponses,
-  FctExecutionTpsDailyServiceGetData,
-  FctExecutionTpsDailyServiceGetErrors,
-  FctExecutionTpsDailyServiceGetResponses,
-  FctExecutionTpsDailyServiceListData,
-  FctExecutionTpsDailyServiceListErrors,
-  FctExecutionTpsDailyServiceListResponses,
-  FctExecutionTpsHourlyServiceGetData,
-  FctExecutionTpsHourlyServiceGetErrors,
-  FctExecutionTpsHourlyServiceGetResponses,
-  FctExecutionTpsHourlyServiceListData,
-  FctExecutionTpsHourlyServiceListErrors,
-  FctExecutionTpsHourlyServiceListResponses,
-  FctExecutionTransactionsDailyServiceGetData,
-  FctExecutionTransactionsDailyServiceGetErrors,
-  FctExecutionTransactionsDailyServiceGetResponses,
-  FctExecutionTransactionsDailyServiceListData,
-  FctExecutionTransactionsDailyServiceListErrors,
-  FctExecutionTransactionsDailyServiceListResponses,
-  FctExecutionTransactionsHourlyServiceGetData,
-  FctExecutionTransactionsHourlyServiceGetErrors,
-  FctExecutionTransactionsHourlyServiceGetResponses,
-  FctExecutionTransactionsHourlyServiceListData,
-  FctExecutionTransactionsHourlyServiceListErrors,
-  FctExecutionTransactionsHourlyServiceListResponses,
-  FctHeadFirstSeenByNodeServiceGetData,
-  FctHeadFirstSeenByNodeServiceGetErrors,
-  FctHeadFirstSeenByNodeServiceGetResponses,
-  FctHeadFirstSeenByNodeServiceListData,
-  FctHeadFirstSeenByNodeServiceListErrors,
-  FctHeadFirstSeenByNodeServiceListResponses,
-  FctHeadVoteCorrectnessRateDailyServiceGetData,
-  FctHeadVoteCorrectnessRateDailyServiceGetErrors,
-  FctHeadVoteCorrectnessRateDailyServiceGetResponses,
-  FctHeadVoteCorrectnessRateDailyServiceListData,
-  FctHeadVoteCorrectnessRateDailyServiceListErrors,
-  FctHeadVoteCorrectnessRateDailyServiceListResponses,
-  FctHeadVoteCorrectnessRateHourlyServiceGetData,
-  FctHeadVoteCorrectnessRateHourlyServiceGetErrors,
-  FctHeadVoteCorrectnessRateHourlyServiceGetResponses,
-  FctHeadVoteCorrectnessRateHourlyServiceListData,
-  FctHeadVoteCorrectnessRateHourlyServiceListErrors,
-  FctHeadVoteCorrectnessRateHourlyServiceListResponses,
-  FctMevBidCountByBuilderServiceGetData,
-  FctMevBidCountByBuilderServiceGetErrors,
-  FctMevBidCountByBuilderServiceGetResponses,
-  FctMevBidCountByBuilderServiceListData,
-  FctMevBidCountByBuilderServiceListErrors,
-  FctMevBidCountByBuilderServiceListResponses,
-  FctMevBidCountByRelayServiceGetData,
-  FctMevBidCountByRelayServiceGetErrors,
-  FctMevBidCountByRelayServiceGetResponses,
-  FctMevBidCountByRelayServiceListData,
-  FctMevBidCountByRelayServiceListErrors,
-  FctMevBidCountByRelayServiceListResponses,
-  FctMevBidHighestValueByBuilderChunked50MsServiceGetData,
-  FctMevBidHighestValueByBuilderChunked50MsServiceGetErrors,
-  FctMevBidHighestValueByBuilderChunked50MsServiceGetResponses,
-  FctMevBidHighestValueByBuilderChunked50MsServiceListData,
-  FctMevBidHighestValueByBuilderChunked50MsServiceListErrors,
-  FctMevBidHighestValueByBuilderChunked50MsServiceListResponses,
-  FctMissedSlotRateDailyServiceGetData,
-  FctMissedSlotRateDailyServiceGetErrors,
-  FctMissedSlotRateDailyServiceGetResponses,
-  FctMissedSlotRateDailyServiceListData,
-  FctMissedSlotRateDailyServiceListErrors,
-  FctMissedSlotRateDailyServiceListResponses,
-  FctMissedSlotRateHourlyServiceGetData,
-  FctMissedSlotRateHourlyServiceGetErrors,
-  FctMissedSlotRateHourlyServiceGetResponses,
-  FctMissedSlotRateHourlyServiceListData,
-  FctMissedSlotRateHourlyServiceListErrors,
-  FctMissedSlotRateHourlyServiceListResponses,
-  FctNodeActiveLast24hServiceGetData,
-  FctNodeActiveLast24hServiceGetErrors,
-  FctNodeActiveLast24hServiceGetResponses,
-  FctNodeActiveLast24hServiceListData,
-  FctNodeActiveLast24hServiceListErrors,
-  FctNodeActiveLast24hServiceListResponses,
-  FctNodeCpuUtilizationByProcessServiceGetData,
-  FctNodeCpuUtilizationByProcessServiceGetErrors,
-  FctNodeCpuUtilizationByProcessServiceGetResponses,
-  FctNodeCpuUtilizationByProcessServiceListData,
-  FctNodeCpuUtilizationByProcessServiceListErrors,
-  FctNodeCpuUtilizationByProcessServiceListResponses,
-  FctNodeDiskIoByProcessServiceGetData,
-  FctNodeDiskIoByProcessServiceGetErrors,
-  FctNodeDiskIoByProcessServiceGetResponses,
-  FctNodeDiskIoByProcessServiceListData,
-  FctNodeDiskIoByProcessServiceListErrors,
-  FctNodeDiskIoByProcessServiceListResponses,
-  FctNodeMemoryUsageByProcessServiceGetData,
-  FctNodeMemoryUsageByProcessServiceGetErrors,
-  FctNodeMemoryUsageByProcessServiceGetResponses,
-  FctNodeMemoryUsageByProcessServiceListData,
-  FctNodeMemoryUsageByProcessServiceListErrors,
-  FctNodeMemoryUsageByProcessServiceListResponses,
-  FctNodeNetworkIoByProcessServiceGetData,
-  FctNodeNetworkIoByProcessServiceGetErrors,
-  FctNodeNetworkIoByProcessServiceGetResponses,
-  FctNodeNetworkIoByProcessServiceListData,
-  FctNodeNetworkIoByProcessServiceListErrors,
-  FctNodeNetworkIoByProcessServiceListResponses,
-  FctOpcodeGasByOpcodeDailyServiceGetData,
-  FctOpcodeGasByOpcodeDailyServiceGetErrors,
-  FctOpcodeGasByOpcodeDailyServiceGetResponses,
-  FctOpcodeGasByOpcodeDailyServiceListData,
-  FctOpcodeGasByOpcodeDailyServiceListErrors,
-  FctOpcodeGasByOpcodeDailyServiceListResponses,
-  FctOpcodeGasByOpcodeHourlyServiceGetData,
-  FctOpcodeGasByOpcodeHourlyServiceGetErrors,
-  FctOpcodeGasByOpcodeHourlyServiceGetResponses,
-  FctOpcodeGasByOpcodeHourlyServiceListData,
-  FctOpcodeGasByOpcodeHourlyServiceListErrors,
-  FctOpcodeGasByOpcodeHourlyServiceListResponses,
-  FctOpcodeOpsDailyServiceGetData,
-  FctOpcodeOpsDailyServiceGetErrors,
-  FctOpcodeOpsDailyServiceGetResponses,
-  FctOpcodeOpsDailyServiceListData,
-  FctOpcodeOpsDailyServiceListErrors,
-  FctOpcodeOpsDailyServiceListResponses,
-  FctOpcodeOpsHourlyServiceGetData,
-  FctOpcodeOpsHourlyServiceGetErrors,
-  FctOpcodeOpsHourlyServiceGetResponses,
-  FctOpcodeOpsHourlyServiceListData,
-  FctOpcodeOpsHourlyServiceListErrors,
-  FctOpcodeOpsHourlyServiceListResponses,
-  FctPreparedBlockServiceGetData,
-  FctPreparedBlockServiceGetErrors,
-  FctPreparedBlockServiceGetResponses,
-  FctPreparedBlockServiceListData,
-  FctPreparedBlockServiceListErrors,
-  FctPreparedBlockServiceListResponses,
-  FctProposerRewardDailyServiceGetData,
-  FctProposerRewardDailyServiceGetErrors,
-  FctProposerRewardDailyServiceGetResponses,
-  FctProposerRewardDailyServiceListData,
-  FctProposerRewardDailyServiceListErrors,
-  FctProposerRewardDailyServiceListResponses,
-  FctProposerRewardHourlyServiceGetData,
-  FctProposerRewardHourlyServiceGetErrors,
-  FctProposerRewardHourlyServiceGetResponses,
-  FctProposerRewardHourlyServiceListData,
-  FctProposerRewardHourlyServiceListErrors,
-  FctProposerRewardHourlyServiceListResponses,
-  FctReorgDailyServiceGetData,
-  FctReorgDailyServiceGetErrors,
-  FctReorgDailyServiceGetResponses,
-  FctReorgDailyServiceListData,
-  FctReorgDailyServiceListErrors,
-  FctReorgDailyServiceListResponses,
-  FctReorgHourlyServiceGetData,
-  FctReorgHourlyServiceGetErrors,
-  FctReorgHourlyServiceGetResponses,
-  FctReorgHourlyServiceListData,
-  FctReorgHourlyServiceListErrors,
-  FctReorgHourlyServiceListResponses,
-  FctStorageSlotStateByAddressDailyServiceGetData,
-  FctStorageSlotStateByAddressDailyServiceGetErrors,
-  FctStorageSlotStateByAddressDailyServiceGetResponses,
-  FctStorageSlotStateByAddressDailyServiceListData,
-  FctStorageSlotStateByAddressDailyServiceListErrors,
-  FctStorageSlotStateByAddressDailyServiceListResponses,
-  FctStorageSlotStateByAddressHourlyServiceGetData,
-  FctStorageSlotStateByAddressHourlyServiceGetErrors,
-  FctStorageSlotStateByAddressHourlyServiceGetResponses,
-  FctStorageSlotStateByAddressHourlyServiceListData,
-  FctStorageSlotStateByAddressHourlyServiceListErrors,
-  FctStorageSlotStateByAddressHourlyServiceListResponses,
-  FctStorageSlotStateByBlockDailyServiceGetData,
-  FctStorageSlotStateByBlockDailyServiceGetErrors,
-  FctStorageSlotStateByBlockDailyServiceGetResponses,
-  FctStorageSlotStateByBlockDailyServiceListData,
-  FctStorageSlotStateByBlockDailyServiceListErrors,
-  FctStorageSlotStateByBlockDailyServiceListResponses,
-  FctStorageSlotStateByBlockHourlyServiceGetData,
-  FctStorageSlotStateByBlockHourlyServiceGetErrors,
-  FctStorageSlotStateByBlockHourlyServiceGetResponses,
-  FctStorageSlotStateByBlockHourlyServiceListData,
-  FctStorageSlotStateByBlockHourlyServiceListErrors,
-  FctStorageSlotStateByBlockHourlyServiceListResponses,
-  FctStorageSlotStateWithExpiryByAddressDailyServiceGetData,
-  FctStorageSlotStateWithExpiryByAddressDailyServiceGetErrors,
-  FctStorageSlotStateWithExpiryByAddressDailyServiceGetResponses,
-  FctStorageSlotStateWithExpiryByAddressDailyServiceListData,
-  FctStorageSlotStateWithExpiryByAddressDailyServiceListErrors,
-  FctStorageSlotStateWithExpiryByAddressDailyServiceListResponses,
-  FctStorageSlotStateWithExpiryByAddressHourlyServiceGetData,
-  FctStorageSlotStateWithExpiryByAddressHourlyServiceGetErrors,
-  FctStorageSlotStateWithExpiryByAddressHourlyServiceGetResponses,
-  FctStorageSlotStateWithExpiryByAddressHourlyServiceListData,
-  FctStorageSlotStateWithExpiryByAddressHourlyServiceListErrors,
-  FctStorageSlotStateWithExpiryByAddressHourlyServiceListResponses,
-  FctStorageSlotStateWithExpiryByBlockDailyServiceGetData,
-  FctStorageSlotStateWithExpiryByBlockDailyServiceGetErrors,
-  FctStorageSlotStateWithExpiryByBlockDailyServiceGetResponses,
-  FctStorageSlotStateWithExpiryByBlockDailyServiceListData,
-  FctStorageSlotStateWithExpiryByBlockDailyServiceListErrors,
-  FctStorageSlotStateWithExpiryByBlockDailyServiceListResponses,
-  FctStorageSlotStateWithExpiryByBlockHourlyServiceGetData,
-  FctStorageSlotStateWithExpiryByBlockHourlyServiceGetErrors,
-  FctStorageSlotStateWithExpiryByBlockHourlyServiceGetResponses,
-  FctStorageSlotStateWithExpiryByBlockHourlyServiceListData,
-  FctStorageSlotStateWithExpiryByBlockHourlyServiceListErrors,
-  FctStorageSlotStateWithExpiryByBlockHourlyServiceListResponses,
-  FctStorageSlotTop100ByBytesServiceGetData,
-  FctStorageSlotTop100ByBytesServiceGetErrors,
-  FctStorageSlotTop100ByBytesServiceGetResponses,
-  FctStorageSlotTop100ByBytesServiceListData,
-  FctStorageSlotTop100ByBytesServiceListErrors,
-  FctStorageSlotTop100ByBytesServiceListResponses,
-  FctStorageSlotTop100BySlotsServiceGetData,
-  FctStorageSlotTop100BySlotsServiceGetErrors,
-  FctStorageSlotTop100BySlotsServiceGetResponses,
-  FctStorageSlotTop100BySlotsServiceListData,
-  FctStorageSlotTop100BySlotsServiceListErrors,
-  FctStorageSlotTop100BySlotsServiceListResponses,
-  FctSyncCommitteeParticipationByValidatorDailyServiceGetData,
-  FctSyncCommitteeParticipationByValidatorDailyServiceGetErrors,
-  FctSyncCommitteeParticipationByValidatorDailyServiceGetResponses,
-  FctSyncCommitteeParticipationByValidatorDailyServiceListData,
-  FctSyncCommitteeParticipationByValidatorDailyServiceListErrors,
-  FctSyncCommitteeParticipationByValidatorDailyServiceListResponses,
-  FctSyncCommitteeParticipationByValidatorHourlyServiceGetData,
-  FctSyncCommitteeParticipationByValidatorHourlyServiceGetErrors,
-  FctSyncCommitteeParticipationByValidatorHourlyServiceGetResponses,
-  FctSyncCommitteeParticipationByValidatorHourlyServiceListData,
-  FctSyncCommitteeParticipationByValidatorHourlyServiceListErrors,
-  FctSyncCommitteeParticipationByValidatorHourlyServiceListResponses,
-  FctSyncCommitteeParticipationByValidatorServiceGetData,
-  FctSyncCommitteeParticipationByValidatorServiceGetErrors,
-  FctSyncCommitteeParticipationByValidatorServiceGetResponses,
-  FctSyncCommitteeParticipationByValidatorServiceListData,
-  FctSyncCommitteeParticipationByValidatorServiceListErrors,
-  FctSyncCommitteeParticipationByValidatorServiceListResponses,
-  FctTokenContractStorageStateByBlockDailyServiceGetData,
-  FctTokenContractStorageStateByBlockDailyServiceGetErrors,
-  FctTokenContractStorageStateByBlockDailyServiceGetResponses,
-  FctTokenContractStorageStateByBlockDailyServiceListData,
-  FctTokenContractStorageStateByBlockDailyServiceListErrors,
-  FctTokenContractStorageStateByBlockDailyServiceListResponses,
-  FctValidatorBalanceDailyServiceGetData,
-  FctValidatorBalanceDailyServiceGetErrors,
-  FctValidatorBalanceDailyServiceGetResponses,
-  FctValidatorBalanceDailyServiceListData,
-  FctValidatorBalanceDailyServiceListErrors,
-  FctValidatorBalanceDailyServiceListResponses,
-  FctValidatorBalanceHourlyServiceGetData,
-  FctValidatorBalanceHourlyServiceGetErrors,
-  FctValidatorBalanceHourlyServiceGetResponses,
-  FctValidatorBalanceHourlyServiceListData,
-  FctValidatorBalanceHourlyServiceListErrors,
-  FctValidatorBalanceHourlyServiceListResponses,
-  FctValidatorBalanceServiceGetData,
-  FctValidatorBalanceServiceGetErrors,
-  FctValidatorBalanceServiceGetResponses,
-  FctValidatorBalanceServiceListData,
-  FctValidatorBalanceServiceListErrors,
-  FctValidatorBalanceServiceListResponses,
-  FctValidatorCountByEntityByStatusDailyServiceGetData,
-  FctValidatorCountByEntityByStatusDailyServiceGetErrors,
-  FctValidatorCountByEntityByStatusDailyServiceGetResponses,
-  FctValidatorCountByEntityByStatusDailyServiceListData,
-  FctValidatorCountByEntityByStatusDailyServiceListErrors,
-  FctValidatorCountByEntityByStatusDailyServiceListResponses,
-  IntAttestationAttestedCanonicalServiceGetData,
-  IntAttestationAttestedCanonicalServiceGetErrors,
-  IntAttestationAttestedCanonicalServiceGetResponses,
-  IntAttestationAttestedCanonicalServiceListData,
-  IntAttestationAttestedCanonicalServiceListErrors,
-  IntAttestationAttestedCanonicalServiceListResponses,
-  IntAttestationAttestedHeadServiceGetData,
-  IntAttestationAttestedHeadServiceGetErrors,
-  IntAttestationAttestedHeadServiceGetResponses,
-  IntAttestationAttestedHeadServiceListData,
-  IntAttestationAttestedHeadServiceListErrors,
-  IntAttestationAttestedHeadServiceListResponses,
-  IntAttestationFirstSeenAggregateServiceGetData,
-  IntAttestationFirstSeenAggregateServiceGetErrors,
-  IntAttestationFirstSeenAggregateServiceGetResponses,
-  IntAttestationFirstSeenAggregateServiceListData,
-  IntAttestationFirstSeenAggregateServiceListErrors,
-  IntAttestationFirstSeenAggregateServiceListResponses,
-  IntAttestationFirstSeenServiceGetData,
-  IntAttestationFirstSeenServiceGetErrors,
-  IntAttestationFirstSeenServiceGetResponses,
-  IntAttestationFirstSeenServiceListData,
-  IntAttestationFirstSeenServiceListErrors,
-  IntAttestationFirstSeenServiceListResponses,
-  IntBeaconCommitteeHeadServiceGetData,
-  IntBeaconCommitteeHeadServiceGetErrors,
-  IntBeaconCommitteeHeadServiceGetResponses,
-  IntBeaconCommitteeHeadServiceListData,
-  IntBeaconCommitteeHeadServiceListErrors,
-  IntBeaconCommitteeHeadServiceListResponses,
-  IntBlockBlobCountCanonicalServiceGetData,
-  IntBlockBlobCountCanonicalServiceGetErrors,
-  IntBlockBlobCountCanonicalServiceGetResponses,
-  IntBlockBlobCountCanonicalServiceListData,
-  IntBlockBlobCountCanonicalServiceListErrors,
-  IntBlockBlobCountCanonicalServiceListResponses,
-  IntBlockCanonicalServiceGetData,
-  IntBlockCanonicalServiceGetErrors,
-  IntBlockCanonicalServiceGetResponses,
-  IntBlockCanonicalServiceListData,
-  IntBlockCanonicalServiceListErrors,
-  IntBlockCanonicalServiceListResponses,
-  IntBlockMevCanonicalServiceGetData,
-  IntBlockMevCanonicalServiceGetErrors,
-  IntBlockMevCanonicalServiceGetResponses,
-  IntBlockMevCanonicalServiceListData,
-  IntBlockMevCanonicalServiceListErrors,
-  IntBlockMevCanonicalServiceListResponses,
-  IntBlockOpcodeGasServiceGetData,
-  IntBlockOpcodeGasServiceGetErrors,
-  IntBlockOpcodeGasServiceGetResponses,
-  IntBlockOpcodeGasServiceListData,
-  IntBlockOpcodeGasServiceListErrors,
-  IntBlockOpcodeGasServiceListResponses,
-  IntBlockProposerCanonicalServiceGetData,
-  IntBlockProposerCanonicalServiceGetErrors,
-  IntBlockProposerCanonicalServiceGetResponses,
-  IntBlockProposerCanonicalServiceListData,
-  IntBlockProposerCanonicalServiceListErrors,
-  IntBlockProposerCanonicalServiceListResponses,
-  IntBlockReceiptSizeServiceGetData,
-  IntBlockReceiptSizeServiceGetErrors,
-  IntBlockReceiptSizeServiceGetResponses,
-  IntBlockReceiptSizeServiceListData,
-  IntBlockReceiptSizeServiceListErrors,
-  IntBlockReceiptSizeServiceListResponses,
-  IntBlockResourceGasServiceGetData,
-  IntBlockResourceGasServiceGetErrors,
-  IntBlockResourceGasServiceGetResponses,
-  IntBlockResourceGasServiceListData,
-  IntBlockResourceGasServiceListErrors,
-  IntBlockResourceGasServiceListResponses,
-  IntContractCreationServiceGetData,
-  IntContractCreationServiceGetErrors,
-  IntContractCreationServiceGetResponses,
-  IntContractCreationServiceListData,
-  IntContractCreationServiceListErrors,
-  IntContractCreationServiceListResponses,
-  IntContractSelfdestructServiceGetData,
-  IntContractSelfdestructServiceGetErrors,
-  IntContractSelfdestructServiceGetResponses,
-  IntContractSelfdestructServiceListData,
-  IntContractSelfdestructServiceListErrors,
-  IntContractSelfdestructServiceListResponses,
-  IntContractStorageExpiry12mServiceGetData,
-  IntContractStorageExpiry12mServiceGetErrors,
-  IntContractStorageExpiry12mServiceGetResponses,
-  IntContractStorageExpiry12mServiceListData,
-  IntContractStorageExpiry12mServiceListErrors,
-  IntContractStorageExpiry12mServiceListResponses,
-  IntContractStorageExpiry18mServiceGetData,
-  IntContractStorageExpiry18mServiceGetErrors,
-  IntContractStorageExpiry18mServiceGetResponses,
-  IntContractStorageExpiry18mServiceListData,
-  IntContractStorageExpiry18mServiceListErrors,
-  IntContractStorageExpiry18mServiceListResponses,
-  IntContractStorageExpiry1mServiceGetData,
-  IntContractStorageExpiry1mServiceGetErrors,
-  IntContractStorageExpiry1mServiceGetResponses,
-  IntContractStorageExpiry1mServiceListData,
-  IntContractStorageExpiry1mServiceListErrors,
-  IntContractStorageExpiry1mServiceListResponses,
-  IntContractStorageExpiry24mServiceGetData,
-  IntContractStorageExpiry24mServiceGetErrors,
-  IntContractStorageExpiry24mServiceGetResponses,
-  IntContractStorageExpiry24mServiceListData,
-  IntContractStorageExpiry24mServiceListErrors,
-  IntContractStorageExpiry24mServiceListResponses,
-  IntContractStorageExpiry6mServiceGetData,
-  IntContractStorageExpiry6mServiceGetErrors,
-  IntContractStorageExpiry6mServiceGetResponses,
-  IntContractStorageExpiry6mServiceListData,
-  IntContractStorageExpiry6mServiceListErrors,
-  IntContractStorageExpiry6mServiceListResponses,
-  IntContractStorageNextTouchServiceGetData,
-  IntContractStorageNextTouchServiceGetErrors,
-  IntContractStorageNextTouchServiceGetResponses,
-  IntContractStorageNextTouchServiceListData,
-  IntContractStorageNextTouchServiceListErrors,
-  IntContractStorageNextTouchServiceListResponses,
-  IntContractStorageReactivation12mServiceGetData,
-  IntContractStorageReactivation12mServiceGetErrors,
-  IntContractStorageReactivation12mServiceGetResponses,
-  IntContractStorageReactivation12mServiceListData,
-  IntContractStorageReactivation12mServiceListErrors,
-  IntContractStorageReactivation12mServiceListResponses,
-  IntContractStorageReactivation18mServiceGetData,
-  IntContractStorageReactivation18mServiceGetErrors,
-  IntContractStorageReactivation18mServiceGetResponses,
-  IntContractStorageReactivation18mServiceListData,
-  IntContractStorageReactivation18mServiceListErrors,
-  IntContractStorageReactivation18mServiceListResponses,
-  IntContractStorageReactivation1mServiceGetData,
-  IntContractStorageReactivation1mServiceGetErrors,
-  IntContractStorageReactivation1mServiceGetResponses,
-  IntContractStorageReactivation1mServiceListData,
-  IntContractStorageReactivation1mServiceListErrors,
-  IntContractStorageReactivation1mServiceListResponses,
-  IntContractStorageReactivation24mServiceGetData,
-  IntContractStorageReactivation24mServiceGetErrors,
-  IntContractStorageReactivation24mServiceGetResponses,
-  IntContractStorageReactivation24mServiceListData,
-  IntContractStorageReactivation24mServiceListErrors,
-  IntContractStorageReactivation24mServiceListResponses,
-  IntContractStorageReactivation6mServiceGetData,
-  IntContractStorageReactivation6mServiceGetErrors,
-  IntContractStorageReactivation6mServiceGetResponses,
-  IntContractStorageReactivation6mServiceListData,
-  IntContractStorageReactivation6mServiceListErrors,
-  IntContractStorageReactivation6mServiceListResponses,
-  IntContractStorageStateByAddressServiceGetData,
-  IntContractStorageStateByAddressServiceGetErrors,
-  IntContractStorageStateByAddressServiceGetResponses,
-  IntContractStorageStateByAddressServiceListData,
-  IntContractStorageStateByAddressServiceListErrors,
-  IntContractStorageStateByAddressServiceListResponses,
-  IntContractStorageStateByBlockServiceGetData,
-  IntContractStorageStateByBlockServiceGetErrors,
-  IntContractStorageStateByBlockServiceGetResponses,
-  IntContractStorageStateByBlockServiceListData,
-  IntContractStorageStateByBlockServiceListErrors,
-  IntContractStorageStateByBlockServiceListResponses,
-  IntContractStorageStateServiceGetData,
-  IntContractStorageStateServiceGetErrors,
-  IntContractStorageStateServiceGetResponses,
-  IntContractStorageStateServiceListData,
-  IntContractStorageStateServiceListErrors,
-  IntContractStorageStateServiceListResponses,
-  IntContractStorageStateWithExpiryByAddressServiceGetData,
-  IntContractStorageStateWithExpiryByAddressServiceGetErrors,
-  IntContractStorageStateWithExpiryByAddressServiceGetResponses,
-  IntContractStorageStateWithExpiryByAddressServiceListData,
-  IntContractStorageStateWithExpiryByAddressServiceListErrors,
-  IntContractStorageStateWithExpiryByAddressServiceListResponses,
-  IntContractStorageStateWithExpiryByBlockServiceGetData,
-  IntContractStorageStateWithExpiryByBlockServiceGetErrors,
-  IntContractStorageStateWithExpiryByBlockServiceGetResponses,
-  IntContractStorageStateWithExpiryByBlockServiceListData,
-  IntContractStorageStateWithExpiryByBlockServiceListErrors,
-  IntContractStorageStateWithExpiryByBlockServiceListResponses,
-  IntContractStorageStateWithExpiryServiceGetData,
-  IntContractStorageStateWithExpiryServiceGetErrors,
-  IntContractStorageStateWithExpiryServiceGetResponses,
-  IntContractStorageStateWithExpiryServiceListData,
-  IntContractStorageStateWithExpiryServiceListErrors,
-  IntContractStorageStateWithExpiryServiceListResponses,
-  IntCustodyProbeOrderBySlotServiceGetData,
-  IntCustodyProbeOrderBySlotServiceGetErrors,
-  IntCustodyProbeOrderBySlotServiceGetResponses,
-  IntCustodyProbeOrderBySlotServiceListData,
-  IntCustodyProbeOrderBySlotServiceListErrors,
-  IntCustodyProbeOrderBySlotServiceListResponses,
-  IntCustodyProbeServiceGetData,
-  IntCustodyProbeServiceGetErrors,
-  IntCustodyProbeServiceGetResponses,
-  IntCustodyProbeServiceListData,
-  IntCustodyProbeServiceListErrors,
-  IntCustodyProbeServiceListResponses,
-  IntEngineGetBlobsServiceGetData,
-  IntEngineGetBlobsServiceGetErrors,
-  IntEngineGetBlobsServiceGetResponses,
-  IntEngineGetBlobsServiceListData,
-  IntEngineGetBlobsServiceListErrors,
-  IntEngineGetBlobsServiceListResponses,
-  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetData,
-  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetErrors,
-  IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses,
-  IntEngineNewPayloadFastestExecutionByNodeClassServiceListData,
-  IntEngineNewPayloadFastestExecutionByNodeClassServiceListErrors,
-  IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponses,
-  IntEngineNewPayloadServiceGetData,
-  IntEngineNewPayloadServiceGetErrors,
-  IntEngineNewPayloadServiceGetResponses,
-  IntEngineNewPayloadServiceListData,
-  IntEngineNewPayloadServiceListErrors,
-  IntEngineNewPayloadServiceListResponses,
-  IntExecutionBlockByDateServiceGetData,
-  IntExecutionBlockByDateServiceGetErrors,
-  IntExecutionBlockByDateServiceGetResponses,
-  IntExecutionBlockByDateServiceListData,
-  IntExecutionBlockByDateServiceListErrors,
-  IntExecutionBlockByDateServiceListResponses,
-  IntExecutionStateSizeByBlockServiceGetData,
-  IntExecutionStateSizeByBlockServiceGetErrors,
-  IntExecutionStateSizeByBlockServiceGetResponses,
-  IntExecutionStateSizeByBlockServiceListData,
-  IntExecutionStateSizeByBlockServiceListErrors,
-  IntExecutionStateSizeByBlockServiceListResponses,
-  IntStorageSelfdestructDiffsServiceGetData,
-  IntStorageSelfdestructDiffsServiceGetErrors,
-  IntStorageSelfdestructDiffsServiceGetResponses,
-  IntStorageSelfdestructDiffsServiceListData,
-  IntStorageSelfdestructDiffsServiceListErrors,
-  IntStorageSelfdestructDiffsServiceListResponses,
-  IntStorageSlotDiffByAddressSlotServiceGetData,
-  IntStorageSlotDiffByAddressSlotServiceGetErrors,
-  IntStorageSlotDiffByAddressSlotServiceGetResponses,
-  IntStorageSlotDiffByAddressSlotServiceListData,
-  IntStorageSlotDiffByAddressSlotServiceListErrors,
-  IntStorageSlotDiffByAddressSlotServiceListResponses,
-  IntStorageSlotDiffServiceGetData,
-  IntStorageSlotDiffServiceGetErrors,
-  IntStorageSlotDiffServiceGetResponses,
-  IntStorageSlotDiffServiceListData,
-  IntStorageSlotDiffServiceListErrors,
-  IntStorageSlotDiffServiceListResponses,
-  IntStorageSlotExpiry12mServiceGetData,
-  IntStorageSlotExpiry12mServiceGetErrors,
-  IntStorageSlotExpiry12mServiceGetResponses,
-  IntStorageSlotExpiry12mServiceListData,
-  IntStorageSlotExpiry12mServiceListErrors,
-  IntStorageSlotExpiry12mServiceListResponses,
-  IntStorageSlotExpiry18mServiceGetData,
-  IntStorageSlotExpiry18mServiceGetErrors,
-  IntStorageSlotExpiry18mServiceGetResponses,
-  IntStorageSlotExpiry18mServiceListData,
-  IntStorageSlotExpiry18mServiceListErrors,
-  IntStorageSlotExpiry18mServiceListResponses,
-  IntStorageSlotExpiry1mServiceGetData,
-  IntStorageSlotExpiry1mServiceGetErrors,
-  IntStorageSlotExpiry1mServiceGetResponses,
-  IntStorageSlotExpiry1mServiceListData,
-  IntStorageSlotExpiry1mServiceListErrors,
-  IntStorageSlotExpiry1mServiceListResponses,
-  IntStorageSlotExpiry24mServiceGetData,
-  IntStorageSlotExpiry24mServiceGetErrors,
-  IntStorageSlotExpiry24mServiceGetResponses,
-  IntStorageSlotExpiry24mServiceListData,
-  IntStorageSlotExpiry24mServiceListErrors,
-  IntStorageSlotExpiry24mServiceListResponses,
-  IntStorageSlotExpiry6mServiceGetData,
-  IntStorageSlotExpiry6mServiceGetErrors,
-  IntStorageSlotExpiry6mServiceGetResponses,
-  IntStorageSlotExpiry6mServiceListData,
-  IntStorageSlotExpiry6mServiceListErrors,
-  IntStorageSlotExpiry6mServiceListResponses,
-  IntStorageSlotLifecycleBoundaryServiceGetData,
-  IntStorageSlotLifecycleBoundaryServiceGetErrors,
-  IntStorageSlotLifecycleBoundaryServiceGetResponses,
-  IntStorageSlotLifecycleBoundaryServiceListData,
-  IntStorageSlotLifecycleBoundaryServiceListErrors,
-  IntStorageSlotLifecycleBoundaryServiceListResponses,
-  IntStorageSlotLifecycleServiceGetData,
-  IntStorageSlotLifecycleServiceGetErrors,
-  IntStorageSlotLifecycleServiceGetResponses,
-  IntStorageSlotLifecycleServiceListData,
-  IntStorageSlotLifecycleServiceListErrors,
-  IntStorageSlotLifecycleServiceListResponses,
-  IntStorageSlotNextTouchServiceGetData,
-  IntStorageSlotNextTouchServiceGetErrors,
-  IntStorageSlotNextTouchServiceGetResponses,
-  IntStorageSlotNextTouchServiceListData,
-  IntStorageSlotNextTouchServiceListErrors,
-  IntStorageSlotNextTouchServiceListResponses,
-  IntStorageSlotReactivation12mServiceGetData,
-  IntStorageSlotReactivation12mServiceGetErrors,
-  IntStorageSlotReactivation12mServiceGetResponses,
-  IntStorageSlotReactivation12mServiceListData,
-  IntStorageSlotReactivation12mServiceListErrors,
-  IntStorageSlotReactivation12mServiceListResponses,
-  IntStorageSlotReactivation18mServiceGetData,
-  IntStorageSlotReactivation18mServiceGetErrors,
-  IntStorageSlotReactivation18mServiceGetResponses,
-  IntStorageSlotReactivation18mServiceListData,
-  IntStorageSlotReactivation18mServiceListErrors,
-  IntStorageSlotReactivation18mServiceListResponses,
-  IntStorageSlotReactivation1mServiceGetData,
-  IntStorageSlotReactivation1mServiceGetErrors,
-  IntStorageSlotReactivation1mServiceGetResponses,
-  IntStorageSlotReactivation1mServiceListData,
-  IntStorageSlotReactivation1mServiceListErrors,
-  IntStorageSlotReactivation1mServiceListResponses,
-  IntStorageSlotReactivation24mServiceGetData,
-  IntStorageSlotReactivation24mServiceGetErrors,
-  IntStorageSlotReactivation24mServiceGetResponses,
-  IntStorageSlotReactivation24mServiceListData,
-  IntStorageSlotReactivation24mServiceListErrors,
-  IntStorageSlotReactivation24mServiceListResponses,
-  IntStorageSlotReactivation6mServiceGetData,
-  IntStorageSlotReactivation6mServiceGetErrors,
-  IntStorageSlotReactivation6mServiceGetResponses,
-  IntStorageSlotReactivation6mServiceListData,
-  IntStorageSlotReactivation6mServiceListErrors,
-  IntStorageSlotReactivation6mServiceListResponses,
-  IntStorageSlotReadServiceGetData,
-  IntStorageSlotReadServiceGetErrors,
-  IntStorageSlotReadServiceGetResponses,
-  IntStorageSlotReadServiceListData,
-  IntStorageSlotReadServiceListErrors,
-  IntStorageSlotReadServiceListResponses,
-  IntStorageSlotStateByAddressServiceGetData,
-  IntStorageSlotStateByAddressServiceGetErrors,
-  IntStorageSlotStateByAddressServiceGetResponses,
-  IntStorageSlotStateByAddressServiceListData,
-  IntStorageSlotStateByAddressServiceListErrors,
-  IntStorageSlotStateByAddressServiceListResponses,
-  IntStorageSlotStateByBlockServiceGetData,
-  IntStorageSlotStateByBlockServiceGetErrors,
-  IntStorageSlotStateByBlockServiceGetResponses,
-  IntStorageSlotStateByBlockServiceListData,
-  IntStorageSlotStateByBlockServiceListErrors,
-  IntStorageSlotStateByBlockServiceListResponses,
-  IntStorageSlotStateServiceGetData,
-  IntStorageSlotStateServiceGetErrors,
-  IntStorageSlotStateServiceGetResponses,
-  IntStorageSlotStateServiceListData,
-  IntStorageSlotStateServiceListErrors,
-  IntStorageSlotStateServiceListResponses,
-  IntStorageSlotStateWithExpiryByAddressServiceGetData,
-  IntStorageSlotStateWithExpiryByAddressServiceGetErrors,
-  IntStorageSlotStateWithExpiryByAddressServiceGetResponses,
-  IntStorageSlotStateWithExpiryByAddressServiceListData,
-  IntStorageSlotStateWithExpiryByAddressServiceListErrors,
-  IntStorageSlotStateWithExpiryByAddressServiceListResponses,
-  IntStorageSlotStateWithExpiryByBlockServiceGetData,
-  IntStorageSlotStateWithExpiryByBlockServiceGetErrors,
-  IntStorageSlotStateWithExpiryByBlockServiceGetResponses,
-  IntStorageSlotStateWithExpiryByBlockServiceListData,
-  IntStorageSlotStateWithExpiryByBlockServiceListErrors,
-  IntStorageSlotStateWithExpiryByBlockServiceListResponses,
-  IntStorageSlotStateWithExpiryServiceGetData,
-  IntStorageSlotStateWithExpiryServiceGetErrors,
-  IntStorageSlotStateWithExpiryServiceGetResponses,
-  IntStorageSlotStateWithExpiryServiceListData,
-  IntStorageSlotStateWithExpiryServiceListErrors,
-  IntStorageSlotStateWithExpiryServiceListResponses,
-  IntTokenContractStorageStateByBlockServiceGetData,
-  IntTokenContractStorageStateByBlockServiceGetErrors,
-  IntTokenContractStorageStateByBlockServiceGetResponses,
-  IntTokenContractStorageStateByBlockServiceListData,
-  IntTokenContractStorageStateByBlockServiceListErrors,
-  IntTokenContractStorageStateByBlockServiceListResponses,
-  IntTransactionCallFrameOpcodeGasServiceGetData,
-  IntTransactionCallFrameOpcodeGasServiceGetErrors,
-  IntTransactionCallFrameOpcodeGasServiceGetResponses,
-  IntTransactionCallFrameOpcodeGasServiceListData,
-  IntTransactionCallFrameOpcodeGasServiceListErrors,
-  IntTransactionCallFrameOpcodeGasServiceListResponses,
-  IntTransactionCallFrameOpcodeResourceGasServiceGetData,
-  IntTransactionCallFrameOpcodeResourceGasServiceGetErrors,
-  IntTransactionCallFrameOpcodeResourceGasServiceGetResponses,
-  IntTransactionCallFrameOpcodeResourceGasServiceListData,
-  IntTransactionCallFrameOpcodeResourceGasServiceListErrors,
-  IntTransactionCallFrameOpcodeResourceGasServiceListResponses,
-  IntTransactionCallFrameServiceGetData,
-  IntTransactionCallFrameServiceGetErrors,
-  IntTransactionCallFrameServiceGetResponses,
-  IntTransactionCallFrameServiceListData,
-  IntTransactionCallFrameServiceListErrors,
-  IntTransactionCallFrameServiceListResponses,
-  IntTransactionOpcodeGasServiceGetData,
-  IntTransactionOpcodeGasServiceGetErrors,
-  IntTransactionOpcodeGasServiceGetResponses,
-  IntTransactionOpcodeGasServiceListData,
-  IntTransactionOpcodeGasServiceListErrors,
-  IntTransactionOpcodeGasServiceListResponses,
-  IntTransactionReceiptSizeServiceGetData,
-  IntTransactionReceiptSizeServiceGetErrors,
-  IntTransactionReceiptSizeServiceGetResponses,
-  IntTransactionReceiptSizeServiceListData,
-  IntTransactionReceiptSizeServiceListErrors,
-  IntTransactionReceiptSizeServiceListResponses,
-  IntTransactionResourceGasServiceGetData,
-  IntTransactionResourceGasServiceGetErrors,
-  IntTransactionResourceGasServiceGetResponses,
-  IntTransactionResourceGasServiceListData,
-  IntTransactionResourceGasServiceListErrors,
-  IntTransactionResourceGasServiceListResponses,
-} from './types.gen';
-import {
-  zAdminCbtIncrementalServiceGetData,
-  zAdminCbtIncrementalServiceGetResponse,
-  zAdminCbtIncrementalServiceListData,
-  zAdminCbtIncrementalServiceListResponse,
-  zDimBlockBlobSubmitterServiceGetData,
-  zDimBlockBlobSubmitterServiceGetResponse,
-  zDimBlockBlobSubmitterServiceListData,
-  zDimBlockBlobSubmitterServiceListResponse,
-  zDimContractOwnerServiceGetData,
-  zDimContractOwnerServiceGetResponse,
-  zDimContractOwnerServiceListData,
-  zDimContractOwnerServiceListResponse,
-  zDimFunctionSignatureServiceGetData,
-  zDimFunctionSignatureServiceGetResponse,
-  zDimFunctionSignatureServiceListData,
-  zDimFunctionSignatureServiceListResponse,
-  zDimNodeServiceGetData,
-  zDimNodeServiceGetResponse,
-  zDimNodeServiceListData,
-  zDimNodeServiceListResponse,
-  zDimTokenContractServiceGetData,
-  zDimTokenContractServiceGetResponse,
-  zDimTokenContractServiceListData,
-  zDimTokenContractServiceListResponse,
-  zDimValidatorPubkeyServiceGetData,
-  zDimValidatorPubkeyServiceGetResponse,
-  zDimValidatorPubkeyServiceListData,
-  zDimValidatorPubkeyServiceListResponse,
-  zDimValidatorStatusServiceGetData,
-  zDimValidatorStatusServiceGetResponse,
-  zDimValidatorStatusServiceListData,
-  zDimValidatorStatusServiceListResponse,
-  zFctAttestationCorrectnessByValidatorCanonicalServiceGetData,
-  zFctAttestationCorrectnessByValidatorCanonicalServiceGetResponse,
-  zFctAttestationCorrectnessByValidatorCanonicalServiceListData,
-  zFctAttestationCorrectnessByValidatorCanonicalServiceListResponse,
-  zFctAttestationCorrectnessByValidatorHeadServiceGetData,
-  zFctAttestationCorrectnessByValidatorHeadServiceGetResponse,
-  zFctAttestationCorrectnessByValidatorHeadServiceListData,
-  zFctAttestationCorrectnessByValidatorHeadServiceListResponse,
-  zFctAttestationCorrectnessCanonicalServiceGetData,
-  zFctAttestationCorrectnessCanonicalServiceGetResponse,
-  zFctAttestationCorrectnessCanonicalServiceListData,
-  zFctAttestationCorrectnessCanonicalServiceListResponse,
-  zFctAttestationCorrectnessHeadServiceGetData,
-  zFctAttestationCorrectnessHeadServiceGetResponse,
-  zFctAttestationCorrectnessHeadServiceListData,
-  zFctAttestationCorrectnessHeadServiceListResponse,
-  zFctAttestationFirstSeenByValidatorServiceGetData,
-  zFctAttestationFirstSeenByValidatorServiceGetResponse,
-  zFctAttestationFirstSeenByValidatorServiceListData,
-  zFctAttestationFirstSeenByValidatorServiceListResponse,
-  zFctAttestationFirstSeenChunked50MsServiceGetData,
-  zFctAttestationFirstSeenChunked50MsServiceGetResponse,
-  zFctAttestationFirstSeenChunked50MsServiceListData,
-  zFctAttestationFirstSeenChunked50MsServiceListResponse,
-  zFctAttestationInclusionDelayDailyServiceGetData,
-  zFctAttestationInclusionDelayDailyServiceGetResponse,
-  zFctAttestationInclusionDelayDailyServiceListData,
-  zFctAttestationInclusionDelayDailyServiceListResponse,
-  zFctAttestationInclusionDelayHourlyServiceGetData,
-  zFctAttestationInclusionDelayHourlyServiceGetResponse,
-  zFctAttestationInclusionDelayHourlyServiceListData,
-  zFctAttestationInclusionDelayHourlyServiceListResponse,
-  zFctAttestationLivenessByEntityHeadServiceGetData,
-  zFctAttestationLivenessByEntityHeadServiceGetResponse,
-  zFctAttestationLivenessByEntityHeadServiceListData,
-  zFctAttestationLivenessByEntityHeadServiceListResponse,
-  zFctAttestationObservationByNodeServiceGetData,
-  zFctAttestationObservationByNodeServiceGetResponse,
-  zFctAttestationObservationByNodeServiceListData,
-  zFctAttestationObservationByNodeServiceListResponse,
-  zFctAttestationParticipationRateDailyServiceGetData,
-  zFctAttestationParticipationRateDailyServiceGetResponse,
-  zFctAttestationParticipationRateDailyServiceListData,
-  zFctAttestationParticipationRateDailyServiceListResponse,
-  zFctAttestationParticipationRateHourlyServiceGetData,
-  zFctAttestationParticipationRateHourlyServiceGetResponse,
-  zFctAttestationParticipationRateHourlyServiceListData,
-  zFctAttestationParticipationRateHourlyServiceListResponse,
-  zFctAttestationVoteCorrectnessByValidatorDailyServiceGetData,
-  zFctAttestationVoteCorrectnessByValidatorDailyServiceGetResponse,
-  zFctAttestationVoteCorrectnessByValidatorDailyServiceListData,
-  zFctAttestationVoteCorrectnessByValidatorDailyServiceListResponse,
-  zFctAttestationVoteCorrectnessByValidatorHourlyServiceGetData,
-  zFctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponse,
-  zFctAttestationVoteCorrectnessByValidatorHourlyServiceListData,
-  zFctAttestationVoteCorrectnessByValidatorHourlyServiceListResponse,
-  zFctAttestationVoteCorrectnessByValidatorServiceGetData,
-  zFctAttestationVoteCorrectnessByValidatorServiceGetResponse,
-  zFctAttestationVoteCorrectnessByValidatorServiceListData,
-  zFctAttestationVoteCorrectnessByValidatorServiceListResponse,
-  zFctBlobCountDailyServiceGetData,
-  zFctBlobCountDailyServiceGetResponse,
-  zFctBlobCountDailyServiceListData,
-  zFctBlobCountDailyServiceListResponse,
-  zFctBlobCountHourlyServiceGetData,
-  zFctBlobCountHourlyServiceGetResponse,
-  zFctBlobCountHourlyServiceListData,
-  zFctBlobCountHourlyServiceListResponse,
-  zFctBlockBlobCountHeadServiceGetData,
-  zFctBlockBlobCountHeadServiceGetResponse,
-  zFctBlockBlobCountHeadServiceListData,
-  zFctBlockBlobCountHeadServiceListResponse,
-  zFctBlockBlobCountServiceGetData,
-  zFctBlockBlobCountServiceGetResponse,
-  zFctBlockBlobCountServiceListData,
-  zFctBlockBlobCountServiceListResponse,
-  zFctBlockBlobFirstSeenByNodeServiceGetData,
-  zFctBlockBlobFirstSeenByNodeServiceGetResponse,
-  zFctBlockBlobFirstSeenByNodeServiceListData,
-  zFctBlockBlobFirstSeenByNodeServiceListResponse,
-  zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetData,
-  zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse,
-  zFctBlockDataColumnSidecarFirstSeenByNodeServiceListData,
-  zFctBlockDataColumnSidecarFirstSeenByNodeServiceListResponse,
-  zFctBlockDataColumnSidecarFirstSeenServiceGetData,
-  zFctBlockDataColumnSidecarFirstSeenServiceGetResponse,
-  zFctBlockDataColumnSidecarFirstSeenServiceListData,
-  zFctBlockDataColumnSidecarFirstSeenServiceListResponse,
-  zFctBlockFirstSeenByNodeServiceGetData,
-  zFctBlockFirstSeenByNodeServiceGetResponse,
-  zFctBlockFirstSeenByNodeServiceListData,
-  zFctBlockFirstSeenByNodeServiceListResponse,
-  zFctBlockHeadServiceGetData,
-  zFctBlockHeadServiceGetResponse,
-  zFctBlockHeadServiceListData,
-  zFctBlockHeadServiceListResponse,
-  zFctBlockMevHeadServiceGetData,
-  zFctBlockMevHeadServiceGetResponse,
-  zFctBlockMevHeadServiceListData,
-  zFctBlockMevHeadServiceListResponse,
-  zFctBlockMevServiceGetData,
-  zFctBlockMevServiceGetResponse,
-  zFctBlockMevServiceListData,
-  zFctBlockMevServiceListResponse,
-  zFctBlockProposalStatusDailyServiceGetData,
-  zFctBlockProposalStatusDailyServiceGetResponse,
-  zFctBlockProposalStatusDailyServiceListData,
-  zFctBlockProposalStatusDailyServiceListResponse,
-  zFctBlockProposalStatusHourlyServiceGetData,
-  zFctBlockProposalStatusHourlyServiceGetResponse,
-  zFctBlockProposalStatusHourlyServiceListData,
-  zFctBlockProposalStatusHourlyServiceListResponse,
-  zFctBlockProposerByValidatorServiceGetData,
-  zFctBlockProposerByValidatorServiceGetResponse,
-  zFctBlockProposerByValidatorServiceListData,
-  zFctBlockProposerByValidatorServiceListResponse,
-  zFctBlockProposerEntityServiceGetData,
-  zFctBlockProposerEntityServiceGetResponse,
-  zFctBlockProposerEntityServiceListData,
-  zFctBlockProposerEntityServiceListResponse,
-  zFctBlockProposerHeadServiceGetData,
-  zFctBlockProposerHeadServiceGetResponse,
-  zFctBlockProposerHeadServiceListData,
-  zFctBlockProposerHeadServiceListResponse,
-  zFctBlockProposerServiceGetData,
-  zFctBlockProposerServiceGetResponse,
-  zFctBlockProposerServiceListData,
-  zFctBlockProposerServiceListResponse,
-  zFctBlockServiceGetData,
-  zFctBlockServiceGetResponse,
-  zFctBlockServiceListData,
-  zFctBlockServiceListResponse,
-  zFctContractStorageStateByAddressDailyServiceGetData,
-  zFctContractStorageStateByAddressDailyServiceGetResponse,
-  zFctContractStorageStateByAddressDailyServiceListData,
-  zFctContractStorageStateByAddressDailyServiceListResponse,
-  zFctContractStorageStateByAddressHourlyServiceGetData,
-  zFctContractStorageStateByAddressHourlyServiceGetResponse,
-  zFctContractStorageStateByAddressHourlyServiceListData,
-  zFctContractStorageStateByAddressHourlyServiceListResponse,
-  zFctContractStorageStateByBlockDailyServiceGetData,
-  zFctContractStorageStateByBlockDailyServiceGetResponse,
-  zFctContractStorageStateByBlockDailyServiceListData,
-  zFctContractStorageStateByBlockDailyServiceListResponse,
-  zFctContractStorageStateByBlockHourlyServiceGetData,
-  zFctContractStorageStateByBlockHourlyServiceGetResponse,
-  zFctContractStorageStateByBlockHourlyServiceListData,
-  zFctContractStorageStateByBlockHourlyServiceListResponse,
-  zFctContractStorageStateWithExpiryByAddressDailyServiceGetData,
-  zFctContractStorageStateWithExpiryByAddressDailyServiceGetResponse,
-  zFctContractStorageStateWithExpiryByAddressDailyServiceListData,
-  zFctContractStorageStateWithExpiryByAddressDailyServiceListResponse,
-  zFctContractStorageStateWithExpiryByAddressHourlyServiceGetData,
-  zFctContractStorageStateWithExpiryByAddressHourlyServiceGetResponse,
-  zFctContractStorageStateWithExpiryByAddressHourlyServiceListData,
-  zFctContractStorageStateWithExpiryByAddressHourlyServiceListResponse,
-  zFctContractStorageStateWithExpiryByBlockDailyServiceGetData,
-  zFctContractStorageStateWithExpiryByBlockDailyServiceGetResponse,
-  zFctContractStorageStateWithExpiryByBlockDailyServiceListData,
-  zFctContractStorageStateWithExpiryByBlockDailyServiceListResponse,
-  zFctContractStorageStateWithExpiryByBlockHourlyServiceGetData,
-  zFctContractStorageStateWithExpiryByBlockHourlyServiceGetResponse,
-  zFctContractStorageStateWithExpiryByBlockHourlyServiceListData,
-  zFctContractStorageStateWithExpiryByBlockHourlyServiceListResponse,
-  zFctDataColumnAvailabilityByEpochServiceGetData,
-  zFctDataColumnAvailabilityByEpochServiceGetResponse,
-  zFctDataColumnAvailabilityByEpochServiceListData,
-  zFctDataColumnAvailabilityByEpochServiceListResponse,
-  zFctDataColumnAvailabilityBySlotBlobServiceGetData,
-  zFctDataColumnAvailabilityBySlotBlobServiceGetResponse,
-  zFctDataColumnAvailabilityBySlotBlobServiceListData,
-  zFctDataColumnAvailabilityBySlotBlobServiceListResponse,
-  zFctDataColumnAvailabilityBySlotServiceGetData,
-  zFctDataColumnAvailabilityBySlotServiceGetResponse,
-  zFctDataColumnAvailabilityBySlotServiceListData,
-  zFctDataColumnAvailabilityBySlotServiceListResponse,
-  zFctDataColumnAvailabilityDailyServiceGetData,
-  zFctDataColumnAvailabilityDailyServiceGetResponse,
-  zFctDataColumnAvailabilityDailyServiceListData,
-  zFctDataColumnAvailabilityDailyServiceListResponse,
-  zFctDataColumnAvailabilityHourlyServiceGetData,
-  zFctDataColumnAvailabilityHourlyServiceGetResponse,
-  zFctDataColumnAvailabilityHourlyServiceListData,
-  zFctDataColumnAvailabilityHourlyServiceListResponse,
-  zFctEngineGetBlobsByElClientHourlyServiceGetData,
-  zFctEngineGetBlobsByElClientHourlyServiceGetResponse,
-  zFctEngineGetBlobsByElClientHourlyServiceListData,
-  zFctEngineGetBlobsByElClientHourlyServiceListResponse,
-  zFctEngineGetBlobsByElClientServiceGetData,
-  zFctEngineGetBlobsByElClientServiceGetResponse,
-  zFctEngineGetBlobsByElClientServiceListData,
-  zFctEngineGetBlobsByElClientServiceListResponse,
-  zFctEngineGetBlobsBySlotServiceGetData,
-  zFctEngineGetBlobsBySlotServiceGetResponse,
-  zFctEngineGetBlobsBySlotServiceListData,
-  zFctEngineGetBlobsBySlotServiceListResponse,
-  zFctEngineGetBlobsDurationChunked50MsServiceGetData,
-  zFctEngineGetBlobsDurationChunked50MsServiceGetResponse,
-  zFctEngineGetBlobsDurationChunked50MsServiceListData,
-  zFctEngineGetBlobsDurationChunked50MsServiceListResponse,
-  zFctEngineNewPayloadByElClientHourlyServiceGetData,
-  zFctEngineNewPayloadByElClientHourlyServiceGetResponse,
-  zFctEngineNewPayloadByElClientHourlyServiceListData,
-  zFctEngineNewPayloadByElClientHourlyServiceListResponse,
-  zFctEngineNewPayloadByElClientServiceGetData,
-  zFctEngineNewPayloadByElClientServiceGetResponse,
-  zFctEngineNewPayloadByElClientServiceListData,
-  zFctEngineNewPayloadByElClientServiceListResponse,
-  zFctEngineNewPayloadBySlotServiceGetData,
-  zFctEngineNewPayloadBySlotServiceGetResponse,
-  zFctEngineNewPayloadBySlotServiceListData,
-  zFctEngineNewPayloadBySlotServiceListResponse,
-  zFctEngineNewPayloadDurationChunked50MsServiceGetData,
-  zFctEngineNewPayloadDurationChunked50MsServiceGetResponse,
-  zFctEngineNewPayloadDurationChunked50MsServiceListData,
-  zFctEngineNewPayloadDurationChunked50MsServiceListResponse,
-  zFctEngineNewPayloadWinrateDailyServiceGetData,
-  zFctEngineNewPayloadWinrateDailyServiceGetResponse,
-  zFctEngineNewPayloadWinrateDailyServiceListData,
-  zFctEngineNewPayloadWinrateDailyServiceListResponse,
-  zFctEngineNewPayloadWinrateHourlyServiceGetData,
-  zFctEngineNewPayloadWinrateHourlyServiceGetResponse,
-  zFctEngineNewPayloadWinrateHourlyServiceListData,
-  zFctEngineNewPayloadWinrateHourlyServiceListResponse,
-  zFctExecutionGasLimitDailyServiceGetData,
-  zFctExecutionGasLimitDailyServiceGetResponse,
-  zFctExecutionGasLimitDailyServiceListData,
-  zFctExecutionGasLimitDailyServiceListResponse,
-  zFctExecutionGasLimitHourlyServiceGetData,
-  zFctExecutionGasLimitHourlyServiceGetResponse,
-  zFctExecutionGasLimitHourlyServiceListData,
-  zFctExecutionGasLimitHourlyServiceListResponse,
-  zFctExecutionGasLimitSignallingDailyServiceGetData,
-  zFctExecutionGasLimitSignallingDailyServiceGetResponse,
-  zFctExecutionGasLimitSignallingDailyServiceListData,
-  zFctExecutionGasLimitSignallingDailyServiceListResponse,
-  zFctExecutionGasLimitSignallingHourlyServiceGetData,
-  zFctExecutionGasLimitSignallingHourlyServiceGetResponse,
-  zFctExecutionGasLimitSignallingHourlyServiceListData,
-  zFctExecutionGasLimitSignallingHourlyServiceListResponse,
-  zFctExecutionGasUsedDailyServiceGetData,
-  zFctExecutionGasUsedDailyServiceGetResponse,
-  zFctExecutionGasUsedDailyServiceListData,
-  zFctExecutionGasUsedDailyServiceListResponse,
-  zFctExecutionGasUsedHourlyServiceGetData,
-  zFctExecutionGasUsedHourlyServiceGetResponse,
-  zFctExecutionGasUsedHourlyServiceListData,
-  zFctExecutionGasUsedHourlyServiceListResponse,
-  zFctExecutionReceiptSizeDailyServiceGetData,
-  zFctExecutionReceiptSizeDailyServiceGetResponse,
-  zFctExecutionReceiptSizeDailyServiceListData,
-  zFctExecutionReceiptSizeDailyServiceListResponse,
-  zFctExecutionReceiptSizeHourlyServiceGetData,
-  zFctExecutionReceiptSizeHourlyServiceGetResponse,
-  zFctExecutionReceiptSizeHourlyServiceListData,
-  zFctExecutionReceiptSizeHourlyServiceListResponse,
-  zFctExecutionStateSizeDailyServiceGetData,
-  zFctExecutionStateSizeDailyServiceGetResponse,
-  zFctExecutionStateSizeDailyServiceListData,
-  zFctExecutionStateSizeDailyServiceListResponse,
-  zFctExecutionStateSizeHourlyServiceGetData,
-  zFctExecutionStateSizeHourlyServiceGetResponse,
-  zFctExecutionStateSizeHourlyServiceListData,
-  zFctExecutionStateSizeHourlyServiceListResponse,
-  zFctExecutionTpsDailyServiceGetData,
-  zFctExecutionTpsDailyServiceGetResponse,
-  zFctExecutionTpsDailyServiceListData,
-  zFctExecutionTpsDailyServiceListResponse,
-  zFctExecutionTpsHourlyServiceGetData,
-  zFctExecutionTpsHourlyServiceGetResponse,
-  zFctExecutionTpsHourlyServiceListData,
-  zFctExecutionTpsHourlyServiceListResponse,
-  zFctExecutionTransactionsDailyServiceGetData,
-  zFctExecutionTransactionsDailyServiceGetResponse,
-  zFctExecutionTransactionsDailyServiceListData,
-  zFctExecutionTransactionsDailyServiceListResponse,
-  zFctExecutionTransactionsHourlyServiceGetData,
-  zFctExecutionTransactionsHourlyServiceGetResponse,
-  zFctExecutionTransactionsHourlyServiceListData,
-  zFctExecutionTransactionsHourlyServiceListResponse,
-  zFctHeadFirstSeenByNodeServiceGetData,
-  zFctHeadFirstSeenByNodeServiceGetResponse,
-  zFctHeadFirstSeenByNodeServiceListData,
-  zFctHeadFirstSeenByNodeServiceListResponse,
-  zFctHeadVoteCorrectnessRateDailyServiceGetData,
-  zFctHeadVoteCorrectnessRateDailyServiceGetResponse,
-  zFctHeadVoteCorrectnessRateDailyServiceListData,
-  zFctHeadVoteCorrectnessRateDailyServiceListResponse,
-  zFctHeadVoteCorrectnessRateHourlyServiceGetData,
-  zFctHeadVoteCorrectnessRateHourlyServiceGetResponse,
-  zFctHeadVoteCorrectnessRateHourlyServiceListData,
-  zFctHeadVoteCorrectnessRateHourlyServiceListResponse,
-  zFctMevBidCountByBuilderServiceGetData,
-  zFctMevBidCountByBuilderServiceGetResponse,
-  zFctMevBidCountByBuilderServiceListData,
-  zFctMevBidCountByBuilderServiceListResponse,
-  zFctMevBidCountByRelayServiceGetData,
-  zFctMevBidCountByRelayServiceGetResponse,
-  zFctMevBidCountByRelayServiceListData,
-  zFctMevBidCountByRelayServiceListResponse,
-  zFctMevBidHighestValueByBuilderChunked50MsServiceGetData,
-  zFctMevBidHighestValueByBuilderChunked50MsServiceGetResponse,
-  zFctMevBidHighestValueByBuilderChunked50MsServiceListData,
-  zFctMevBidHighestValueByBuilderChunked50MsServiceListResponse,
-  zFctMissedSlotRateDailyServiceGetData,
-  zFctMissedSlotRateDailyServiceGetResponse,
-  zFctMissedSlotRateDailyServiceListData,
-  zFctMissedSlotRateDailyServiceListResponse,
-  zFctMissedSlotRateHourlyServiceGetData,
-  zFctMissedSlotRateHourlyServiceGetResponse,
-  zFctMissedSlotRateHourlyServiceListData,
-  zFctMissedSlotRateHourlyServiceListResponse,
-  zFctNodeActiveLast24hServiceGetData,
-  zFctNodeActiveLast24hServiceGetResponse,
-  zFctNodeActiveLast24hServiceListData,
-  zFctNodeActiveLast24hServiceListResponse,
-  zFctNodeCpuUtilizationByProcessServiceGetData,
-  zFctNodeCpuUtilizationByProcessServiceGetResponse,
-  zFctNodeCpuUtilizationByProcessServiceListData,
-  zFctNodeCpuUtilizationByProcessServiceListResponse,
-  zFctNodeDiskIoByProcessServiceGetData,
-  zFctNodeDiskIoByProcessServiceGetResponse,
-  zFctNodeDiskIoByProcessServiceListData,
-  zFctNodeDiskIoByProcessServiceListResponse,
-  zFctNodeMemoryUsageByProcessServiceGetData,
-  zFctNodeMemoryUsageByProcessServiceGetResponse,
-  zFctNodeMemoryUsageByProcessServiceListData,
-  zFctNodeMemoryUsageByProcessServiceListResponse,
-  zFctNodeNetworkIoByProcessServiceGetData,
-  zFctNodeNetworkIoByProcessServiceGetResponse,
-  zFctNodeNetworkIoByProcessServiceListData,
-  zFctNodeNetworkIoByProcessServiceListResponse,
-  zFctOpcodeGasByOpcodeDailyServiceGetData,
-  zFctOpcodeGasByOpcodeDailyServiceGetResponse,
-  zFctOpcodeGasByOpcodeDailyServiceListData,
-  zFctOpcodeGasByOpcodeDailyServiceListResponse,
-  zFctOpcodeGasByOpcodeHourlyServiceGetData,
-  zFctOpcodeGasByOpcodeHourlyServiceGetResponse,
-  zFctOpcodeGasByOpcodeHourlyServiceListData,
-  zFctOpcodeGasByOpcodeHourlyServiceListResponse,
-  zFctOpcodeOpsDailyServiceGetData,
-  zFctOpcodeOpsDailyServiceGetResponse,
-  zFctOpcodeOpsDailyServiceListData,
-  zFctOpcodeOpsDailyServiceListResponse,
-  zFctOpcodeOpsHourlyServiceGetData,
-  zFctOpcodeOpsHourlyServiceGetResponse,
-  zFctOpcodeOpsHourlyServiceListData,
-  zFctOpcodeOpsHourlyServiceListResponse,
-  zFctPreparedBlockServiceGetData,
-  zFctPreparedBlockServiceGetResponse,
-  zFctPreparedBlockServiceListData,
-  zFctPreparedBlockServiceListResponse,
-  zFctProposerRewardDailyServiceGetData,
-  zFctProposerRewardDailyServiceGetResponse,
-  zFctProposerRewardDailyServiceListData,
-  zFctProposerRewardDailyServiceListResponse,
-  zFctProposerRewardHourlyServiceGetData,
-  zFctProposerRewardHourlyServiceGetResponse,
-  zFctProposerRewardHourlyServiceListData,
-  zFctProposerRewardHourlyServiceListResponse,
-  zFctReorgDailyServiceGetData,
-  zFctReorgDailyServiceGetResponse,
-  zFctReorgDailyServiceListData,
-  zFctReorgDailyServiceListResponse,
-  zFctReorgHourlyServiceGetData,
-  zFctReorgHourlyServiceGetResponse,
-  zFctReorgHourlyServiceListData,
-  zFctReorgHourlyServiceListResponse,
-  zFctStorageSlotStateByAddressDailyServiceGetData,
-  zFctStorageSlotStateByAddressDailyServiceGetResponse,
-  zFctStorageSlotStateByAddressDailyServiceListData,
-  zFctStorageSlotStateByAddressDailyServiceListResponse,
-  zFctStorageSlotStateByAddressHourlyServiceGetData,
-  zFctStorageSlotStateByAddressHourlyServiceGetResponse,
-  zFctStorageSlotStateByAddressHourlyServiceListData,
-  zFctStorageSlotStateByAddressHourlyServiceListResponse,
-  zFctStorageSlotStateByBlockDailyServiceGetData,
-  zFctStorageSlotStateByBlockDailyServiceGetResponse,
-  zFctStorageSlotStateByBlockDailyServiceListData,
-  zFctStorageSlotStateByBlockDailyServiceListResponse,
-  zFctStorageSlotStateByBlockHourlyServiceGetData,
-  zFctStorageSlotStateByBlockHourlyServiceGetResponse,
-  zFctStorageSlotStateByBlockHourlyServiceListData,
-  zFctStorageSlotStateByBlockHourlyServiceListResponse,
-  zFctStorageSlotStateWithExpiryByAddressDailyServiceGetData,
-  zFctStorageSlotStateWithExpiryByAddressDailyServiceGetResponse,
-  zFctStorageSlotStateWithExpiryByAddressDailyServiceListData,
-  zFctStorageSlotStateWithExpiryByAddressDailyServiceListResponse,
-  zFctStorageSlotStateWithExpiryByAddressHourlyServiceGetData,
-  zFctStorageSlotStateWithExpiryByAddressHourlyServiceGetResponse,
-  zFctStorageSlotStateWithExpiryByAddressHourlyServiceListData,
-  zFctStorageSlotStateWithExpiryByAddressHourlyServiceListResponse,
-  zFctStorageSlotStateWithExpiryByBlockDailyServiceGetData,
-  zFctStorageSlotStateWithExpiryByBlockDailyServiceGetResponse,
-  zFctStorageSlotStateWithExpiryByBlockDailyServiceListData,
-  zFctStorageSlotStateWithExpiryByBlockDailyServiceListResponse,
-  zFctStorageSlotStateWithExpiryByBlockHourlyServiceGetData,
-  zFctStorageSlotStateWithExpiryByBlockHourlyServiceGetResponse,
-  zFctStorageSlotStateWithExpiryByBlockHourlyServiceListData,
-  zFctStorageSlotStateWithExpiryByBlockHourlyServiceListResponse,
-  zFctStorageSlotTop100ByBytesServiceGetData,
-  zFctStorageSlotTop100ByBytesServiceGetResponse,
-  zFctStorageSlotTop100ByBytesServiceListData,
-  zFctStorageSlotTop100ByBytesServiceListResponse,
-  zFctStorageSlotTop100BySlotsServiceGetData,
-  zFctStorageSlotTop100BySlotsServiceGetResponse,
-  zFctStorageSlotTop100BySlotsServiceListData,
-  zFctStorageSlotTop100BySlotsServiceListResponse,
-  zFctSyncCommitteeParticipationByValidatorDailyServiceGetData,
-  zFctSyncCommitteeParticipationByValidatorDailyServiceGetResponse,
-  zFctSyncCommitteeParticipationByValidatorDailyServiceListData,
-  zFctSyncCommitteeParticipationByValidatorDailyServiceListResponse,
-  zFctSyncCommitteeParticipationByValidatorHourlyServiceGetData,
-  zFctSyncCommitteeParticipationByValidatorHourlyServiceGetResponse,
-  zFctSyncCommitteeParticipationByValidatorHourlyServiceListData,
-  zFctSyncCommitteeParticipationByValidatorHourlyServiceListResponse,
-  zFctSyncCommitteeParticipationByValidatorServiceGetData,
-  zFctSyncCommitteeParticipationByValidatorServiceGetResponse,
-  zFctSyncCommitteeParticipationByValidatorServiceListData,
-  zFctSyncCommitteeParticipationByValidatorServiceListResponse,
-  zFctTokenContractStorageStateByBlockDailyServiceGetData,
-  zFctTokenContractStorageStateByBlockDailyServiceGetResponse,
-  zFctTokenContractStorageStateByBlockDailyServiceListData,
-  zFctTokenContractStorageStateByBlockDailyServiceListResponse,
-  zFctValidatorBalanceDailyServiceGetData,
-  zFctValidatorBalanceDailyServiceGetResponse,
-  zFctValidatorBalanceDailyServiceListData,
-  zFctValidatorBalanceDailyServiceListResponse,
-  zFctValidatorBalanceHourlyServiceGetData,
-  zFctValidatorBalanceHourlyServiceGetResponse,
-  zFctValidatorBalanceHourlyServiceListData,
-  zFctValidatorBalanceHourlyServiceListResponse,
-  zFctValidatorBalanceServiceGetData,
-  zFctValidatorBalanceServiceGetResponse,
-  zFctValidatorBalanceServiceListData,
-  zFctValidatorBalanceServiceListResponse,
-  zFctValidatorCountByEntityByStatusDailyServiceGetData,
-  zFctValidatorCountByEntityByStatusDailyServiceGetResponse,
-  zFctValidatorCountByEntityByStatusDailyServiceListData,
-  zFctValidatorCountByEntityByStatusDailyServiceListResponse,
-  zIntAttestationAttestedCanonicalServiceGetData,
-  zIntAttestationAttestedCanonicalServiceGetResponse,
-  zIntAttestationAttestedCanonicalServiceListData,
-  zIntAttestationAttestedCanonicalServiceListResponse,
-  zIntAttestationAttestedHeadServiceGetData,
-  zIntAttestationAttestedHeadServiceGetResponse,
-  zIntAttestationAttestedHeadServiceListData,
-  zIntAttestationAttestedHeadServiceListResponse,
-  zIntAttestationFirstSeenAggregateServiceGetData,
-  zIntAttestationFirstSeenAggregateServiceGetResponse,
-  zIntAttestationFirstSeenAggregateServiceListData,
-  zIntAttestationFirstSeenAggregateServiceListResponse,
-  zIntAttestationFirstSeenServiceGetData,
-  zIntAttestationFirstSeenServiceGetResponse,
-  zIntAttestationFirstSeenServiceListData,
-  zIntAttestationFirstSeenServiceListResponse,
-  zIntBeaconCommitteeHeadServiceGetData,
-  zIntBeaconCommitteeHeadServiceGetResponse,
-  zIntBeaconCommitteeHeadServiceListData,
-  zIntBeaconCommitteeHeadServiceListResponse,
-  zIntBlockBlobCountCanonicalServiceGetData,
-  zIntBlockBlobCountCanonicalServiceGetResponse,
-  zIntBlockBlobCountCanonicalServiceListData,
-  zIntBlockBlobCountCanonicalServiceListResponse,
-  zIntBlockCanonicalServiceGetData,
-  zIntBlockCanonicalServiceGetResponse,
-  zIntBlockCanonicalServiceListData,
-  zIntBlockCanonicalServiceListResponse,
-  zIntBlockMevCanonicalServiceGetData,
-  zIntBlockMevCanonicalServiceGetResponse,
-  zIntBlockMevCanonicalServiceListData,
-  zIntBlockMevCanonicalServiceListResponse,
-  zIntBlockOpcodeGasServiceGetData,
-  zIntBlockOpcodeGasServiceGetResponse,
-  zIntBlockOpcodeGasServiceListData,
-  zIntBlockOpcodeGasServiceListResponse,
-  zIntBlockProposerCanonicalServiceGetData,
-  zIntBlockProposerCanonicalServiceGetResponse,
-  zIntBlockProposerCanonicalServiceListData,
-  zIntBlockProposerCanonicalServiceListResponse,
-  zIntBlockReceiptSizeServiceGetData,
-  zIntBlockReceiptSizeServiceGetResponse,
-  zIntBlockReceiptSizeServiceListData,
-  zIntBlockReceiptSizeServiceListResponse,
-  zIntBlockResourceGasServiceGetData,
-  zIntBlockResourceGasServiceGetResponse,
-  zIntBlockResourceGasServiceListData,
-  zIntBlockResourceGasServiceListResponse,
-  zIntContractCreationServiceGetData,
-  zIntContractCreationServiceGetResponse,
-  zIntContractCreationServiceListData,
-  zIntContractCreationServiceListResponse,
-  zIntContractSelfdestructServiceGetData,
-  zIntContractSelfdestructServiceGetResponse,
-  zIntContractSelfdestructServiceListData,
-  zIntContractSelfdestructServiceListResponse,
-  zIntContractStorageExpiry12mServiceGetData,
-  zIntContractStorageExpiry12mServiceGetResponse,
-  zIntContractStorageExpiry12mServiceListData,
-  zIntContractStorageExpiry12mServiceListResponse,
-  zIntContractStorageExpiry18mServiceGetData,
-  zIntContractStorageExpiry18mServiceGetResponse,
-  zIntContractStorageExpiry18mServiceListData,
-  zIntContractStorageExpiry18mServiceListResponse,
-  zIntContractStorageExpiry1mServiceGetData,
-  zIntContractStorageExpiry1mServiceGetResponse,
-  zIntContractStorageExpiry1mServiceListData,
-  zIntContractStorageExpiry1mServiceListResponse,
-  zIntContractStorageExpiry24mServiceGetData,
-  zIntContractStorageExpiry24mServiceGetResponse,
-  zIntContractStorageExpiry24mServiceListData,
-  zIntContractStorageExpiry24mServiceListResponse,
-  zIntContractStorageExpiry6mServiceGetData,
-  zIntContractStorageExpiry6mServiceGetResponse,
-  zIntContractStorageExpiry6mServiceListData,
-  zIntContractStorageExpiry6mServiceListResponse,
-  zIntContractStorageNextTouchServiceGetData,
-  zIntContractStorageNextTouchServiceGetResponse,
-  zIntContractStorageNextTouchServiceListData,
-  zIntContractStorageNextTouchServiceListResponse,
-  zIntContractStorageReactivation12mServiceGetData,
-  zIntContractStorageReactivation12mServiceGetResponse,
-  zIntContractStorageReactivation12mServiceListData,
-  zIntContractStorageReactivation12mServiceListResponse,
-  zIntContractStorageReactivation18mServiceGetData,
-  zIntContractStorageReactivation18mServiceGetResponse,
-  zIntContractStorageReactivation18mServiceListData,
-  zIntContractStorageReactivation18mServiceListResponse,
-  zIntContractStorageReactivation1mServiceGetData,
-  zIntContractStorageReactivation1mServiceGetResponse,
-  zIntContractStorageReactivation1mServiceListData,
-  zIntContractStorageReactivation1mServiceListResponse,
-  zIntContractStorageReactivation24mServiceGetData,
-  zIntContractStorageReactivation24mServiceGetResponse,
-  zIntContractStorageReactivation24mServiceListData,
-  zIntContractStorageReactivation24mServiceListResponse,
-  zIntContractStorageReactivation6mServiceGetData,
-  zIntContractStorageReactivation6mServiceGetResponse,
-  zIntContractStorageReactivation6mServiceListData,
-  zIntContractStorageReactivation6mServiceListResponse,
-  zIntContractStorageStateByAddressServiceGetData,
-  zIntContractStorageStateByAddressServiceGetResponse,
-  zIntContractStorageStateByAddressServiceListData,
-  zIntContractStorageStateByAddressServiceListResponse,
-  zIntContractStorageStateByBlockServiceGetData,
-  zIntContractStorageStateByBlockServiceGetResponse,
-  zIntContractStorageStateByBlockServiceListData,
-  zIntContractStorageStateByBlockServiceListResponse,
-  zIntContractStorageStateServiceGetData,
-  zIntContractStorageStateServiceGetResponse,
-  zIntContractStorageStateServiceListData,
-  zIntContractStorageStateServiceListResponse,
-  zIntContractStorageStateWithExpiryByAddressServiceGetData,
-  zIntContractStorageStateWithExpiryByAddressServiceGetResponse,
-  zIntContractStorageStateWithExpiryByAddressServiceListData,
-  zIntContractStorageStateWithExpiryByAddressServiceListResponse,
-  zIntContractStorageStateWithExpiryByBlockServiceGetData,
-  zIntContractStorageStateWithExpiryByBlockServiceGetResponse,
-  zIntContractStorageStateWithExpiryByBlockServiceListData,
-  zIntContractStorageStateWithExpiryByBlockServiceListResponse,
-  zIntContractStorageStateWithExpiryServiceGetData,
-  zIntContractStorageStateWithExpiryServiceGetResponse,
-  zIntContractStorageStateWithExpiryServiceListData,
-  zIntContractStorageStateWithExpiryServiceListResponse,
-  zIntCustodyProbeOrderBySlotServiceGetData,
-  zIntCustodyProbeOrderBySlotServiceGetResponse,
-  zIntCustodyProbeOrderBySlotServiceListData,
-  zIntCustodyProbeOrderBySlotServiceListResponse,
-  zIntCustodyProbeServiceGetData,
-  zIntCustodyProbeServiceGetResponse,
-  zIntCustodyProbeServiceListData,
-  zIntCustodyProbeServiceListResponse,
-  zIntEngineGetBlobsServiceGetData,
-  zIntEngineGetBlobsServiceGetResponse,
-  zIntEngineGetBlobsServiceListData,
-  zIntEngineGetBlobsServiceListResponse,
-  zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetData,
-  zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse,
-  zIntEngineNewPayloadFastestExecutionByNodeClassServiceListData,
-  zIntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse,
-  zIntEngineNewPayloadServiceGetData,
-  zIntEngineNewPayloadServiceGetResponse,
-  zIntEngineNewPayloadServiceListData,
-  zIntEngineNewPayloadServiceListResponse,
-  zIntExecutionBlockByDateServiceGetData,
-  zIntExecutionBlockByDateServiceGetResponse,
-  zIntExecutionBlockByDateServiceListData,
-  zIntExecutionBlockByDateServiceListResponse,
-  zIntExecutionStateSizeByBlockServiceGetData,
-  zIntExecutionStateSizeByBlockServiceGetResponse,
-  zIntExecutionStateSizeByBlockServiceListData,
-  zIntExecutionStateSizeByBlockServiceListResponse,
-  zIntStorageSelfdestructDiffsServiceGetData,
-  zIntStorageSelfdestructDiffsServiceGetResponse,
-  zIntStorageSelfdestructDiffsServiceListData,
-  zIntStorageSelfdestructDiffsServiceListResponse,
-  zIntStorageSlotDiffByAddressSlotServiceGetData,
-  zIntStorageSlotDiffByAddressSlotServiceGetResponse,
-  zIntStorageSlotDiffByAddressSlotServiceListData,
-  zIntStorageSlotDiffByAddressSlotServiceListResponse,
-  zIntStorageSlotDiffServiceGetData,
-  zIntStorageSlotDiffServiceGetResponse,
-  zIntStorageSlotDiffServiceListData,
-  zIntStorageSlotDiffServiceListResponse,
-  zIntStorageSlotExpiry12mServiceGetData,
-  zIntStorageSlotExpiry12mServiceGetResponse,
-  zIntStorageSlotExpiry12mServiceListData,
-  zIntStorageSlotExpiry12mServiceListResponse,
-  zIntStorageSlotExpiry18mServiceGetData,
-  zIntStorageSlotExpiry18mServiceGetResponse,
-  zIntStorageSlotExpiry18mServiceListData,
-  zIntStorageSlotExpiry18mServiceListResponse,
-  zIntStorageSlotExpiry1mServiceGetData,
-  zIntStorageSlotExpiry1mServiceGetResponse,
-  zIntStorageSlotExpiry1mServiceListData,
-  zIntStorageSlotExpiry1mServiceListResponse,
-  zIntStorageSlotExpiry24mServiceGetData,
-  zIntStorageSlotExpiry24mServiceGetResponse,
-  zIntStorageSlotExpiry24mServiceListData,
-  zIntStorageSlotExpiry24mServiceListResponse,
-  zIntStorageSlotExpiry6mServiceGetData,
-  zIntStorageSlotExpiry6mServiceGetResponse,
-  zIntStorageSlotExpiry6mServiceListData,
-  zIntStorageSlotExpiry6mServiceListResponse,
-  zIntStorageSlotLifecycleBoundaryServiceGetData,
-  zIntStorageSlotLifecycleBoundaryServiceGetResponse,
-  zIntStorageSlotLifecycleBoundaryServiceListData,
-  zIntStorageSlotLifecycleBoundaryServiceListResponse,
-  zIntStorageSlotLifecycleServiceGetData,
-  zIntStorageSlotLifecycleServiceGetResponse,
-  zIntStorageSlotLifecycleServiceListData,
-  zIntStorageSlotLifecycleServiceListResponse,
-  zIntStorageSlotNextTouchServiceGetData,
-  zIntStorageSlotNextTouchServiceGetResponse,
-  zIntStorageSlotNextTouchServiceListData,
-  zIntStorageSlotNextTouchServiceListResponse,
-  zIntStorageSlotReactivation12mServiceGetData,
-  zIntStorageSlotReactivation12mServiceGetResponse,
-  zIntStorageSlotReactivation12mServiceListData,
-  zIntStorageSlotReactivation12mServiceListResponse,
-  zIntStorageSlotReactivation18mServiceGetData,
-  zIntStorageSlotReactivation18mServiceGetResponse,
-  zIntStorageSlotReactivation18mServiceListData,
-  zIntStorageSlotReactivation18mServiceListResponse,
-  zIntStorageSlotReactivation1mServiceGetData,
-  zIntStorageSlotReactivation1mServiceGetResponse,
-  zIntStorageSlotReactivation1mServiceListData,
-  zIntStorageSlotReactivation1mServiceListResponse,
-  zIntStorageSlotReactivation24mServiceGetData,
-  zIntStorageSlotReactivation24mServiceGetResponse,
-  zIntStorageSlotReactivation24mServiceListData,
-  zIntStorageSlotReactivation24mServiceListResponse,
-  zIntStorageSlotReactivation6mServiceGetData,
-  zIntStorageSlotReactivation6mServiceGetResponse,
-  zIntStorageSlotReactivation6mServiceListData,
-  zIntStorageSlotReactivation6mServiceListResponse,
-  zIntStorageSlotReadServiceGetData,
-  zIntStorageSlotReadServiceGetResponse,
-  zIntStorageSlotReadServiceListData,
-  zIntStorageSlotReadServiceListResponse,
-  zIntStorageSlotStateByAddressServiceGetData,
-  zIntStorageSlotStateByAddressServiceGetResponse,
-  zIntStorageSlotStateByAddressServiceListData,
-  zIntStorageSlotStateByAddressServiceListResponse,
-  zIntStorageSlotStateByBlockServiceGetData,
-  zIntStorageSlotStateByBlockServiceGetResponse,
-  zIntStorageSlotStateByBlockServiceListData,
-  zIntStorageSlotStateByBlockServiceListResponse,
-  zIntStorageSlotStateServiceGetData,
-  zIntStorageSlotStateServiceGetResponse,
-  zIntStorageSlotStateServiceListData,
-  zIntStorageSlotStateServiceListResponse,
-  zIntStorageSlotStateWithExpiryByAddressServiceGetData,
-  zIntStorageSlotStateWithExpiryByAddressServiceGetResponse,
-  zIntStorageSlotStateWithExpiryByAddressServiceListData,
-  zIntStorageSlotStateWithExpiryByAddressServiceListResponse,
-  zIntStorageSlotStateWithExpiryByBlockServiceGetData,
-  zIntStorageSlotStateWithExpiryByBlockServiceGetResponse,
-  zIntStorageSlotStateWithExpiryByBlockServiceListData,
-  zIntStorageSlotStateWithExpiryByBlockServiceListResponse,
-  zIntStorageSlotStateWithExpiryServiceGetData,
-  zIntStorageSlotStateWithExpiryServiceGetResponse,
-  zIntStorageSlotStateWithExpiryServiceListData,
-  zIntStorageSlotStateWithExpiryServiceListResponse,
-  zIntTokenContractStorageStateByBlockServiceGetData,
-  zIntTokenContractStorageStateByBlockServiceGetResponse,
-  zIntTokenContractStorageStateByBlockServiceListData,
-  zIntTokenContractStorageStateByBlockServiceListResponse,
-  zIntTransactionCallFrameOpcodeGasServiceGetData,
-  zIntTransactionCallFrameOpcodeGasServiceGetResponse,
-  zIntTransactionCallFrameOpcodeGasServiceListData,
-  zIntTransactionCallFrameOpcodeGasServiceListResponse,
-  zIntTransactionCallFrameOpcodeResourceGasServiceGetData,
-  zIntTransactionCallFrameOpcodeResourceGasServiceGetResponse,
-  zIntTransactionCallFrameOpcodeResourceGasServiceListData,
-  zIntTransactionCallFrameOpcodeResourceGasServiceListResponse,
-  zIntTransactionCallFrameServiceGetData,
-  zIntTransactionCallFrameServiceGetResponse,
-  zIntTransactionCallFrameServiceListData,
-  zIntTransactionCallFrameServiceListResponse,
-  zIntTransactionOpcodeGasServiceGetData,
-  zIntTransactionOpcodeGasServiceGetResponse,
-  zIntTransactionOpcodeGasServiceListData,
-  zIntTransactionOpcodeGasServiceListResponse,
-  zIntTransactionReceiptSizeServiceGetData,
-  zIntTransactionReceiptSizeServiceGetResponse,
-  zIntTransactionReceiptSizeServiceListData,
-  zIntTransactionReceiptSizeServiceListResponse,
-  zIntTransactionResourceGasServiceGetData,
-  zIntTransactionResourceGasServiceGetResponse,
-  zIntTransactionResourceGasServiceListData,
-  zIntTransactionResourceGasServiceListResponse,
-} from './zod.gen';
+import type { AdminCbtIncrementalServiceGetData, AdminCbtIncrementalServiceGetErrors, AdminCbtIncrementalServiceGetResponses, AdminCbtIncrementalServiceListData, AdminCbtIncrementalServiceListErrors, AdminCbtIncrementalServiceListResponses, DimBlockBlobSubmitterServiceGetData, DimBlockBlobSubmitterServiceGetErrors, DimBlockBlobSubmitterServiceGetResponses, DimBlockBlobSubmitterServiceListData, DimBlockBlobSubmitterServiceListErrors, DimBlockBlobSubmitterServiceListResponses, DimContractOwnerServiceGetData, DimContractOwnerServiceGetErrors, DimContractOwnerServiceGetResponses, DimContractOwnerServiceListData, DimContractOwnerServiceListErrors, DimContractOwnerServiceListResponses, DimFunctionSignatureServiceGetData, DimFunctionSignatureServiceGetErrors, DimFunctionSignatureServiceGetResponses, DimFunctionSignatureServiceListData, DimFunctionSignatureServiceListErrors, DimFunctionSignatureServiceListResponses, DimNodeServiceGetData, DimNodeServiceGetErrors, DimNodeServiceGetResponses, DimNodeServiceListData, DimNodeServiceListErrors, DimNodeServiceListResponses, DimRocketpoolNodeServiceGetData, DimRocketpoolNodeServiceGetErrors, DimRocketpoolNodeServiceGetResponses, DimRocketpoolNodeServiceListData, DimRocketpoolNodeServiceListErrors, DimRocketpoolNodeServiceListResponses, DimTokenContractServiceGetData, DimTokenContractServiceGetErrors, DimTokenContractServiceGetResponses, DimTokenContractServiceListData, DimTokenContractServiceListErrors, DimTokenContractServiceListResponses, DimValidatorPubkeyServiceGetData, DimValidatorPubkeyServiceGetErrors, DimValidatorPubkeyServiceGetResponses, DimValidatorPubkeyServiceListData, DimValidatorPubkeyServiceListErrors, DimValidatorPubkeyServiceListResponses, DimValidatorStatusServiceGetData, DimValidatorStatusServiceGetErrors, DimValidatorStatusServiceGetResponses, DimValidatorStatusServiceListData, DimValidatorStatusServiceListErrors, DimValidatorStatusServiceListResponses, FctAttestationCorrectnessByValidatorCanonicalServiceGetData, FctAttestationCorrectnessByValidatorCanonicalServiceGetErrors, FctAttestationCorrectnessByValidatorCanonicalServiceGetResponses, FctAttestationCorrectnessByValidatorCanonicalServiceListData, FctAttestationCorrectnessByValidatorCanonicalServiceListErrors, FctAttestationCorrectnessByValidatorCanonicalServiceListResponses, FctAttestationCorrectnessByValidatorHeadServiceGetData, FctAttestationCorrectnessByValidatorHeadServiceGetErrors, FctAttestationCorrectnessByValidatorHeadServiceGetResponses, FctAttestationCorrectnessByValidatorHeadServiceListData, FctAttestationCorrectnessByValidatorHeadServiceListErrors, FctAttestationCorrectnessByValidatorHeadServiceListResponses, FctAttestationCorrectnessCanonicalServiceGetData, FctAttestationCorrectnessCanonicalServiceGetErrors, FctAttestationCorrectnessCanonicalServiceGetResponses, FctAttestationCorrectnessCanonicalServiceListData, FctAttestationCorrectnessCanonicalServiceListErrors, FctAttestationCorrectnessCanonicalServiceListResponses, FctAttestationCorrectnessHeadServiceGetData, FctAttestationCorrectnessHeadServiceGetErrors, FctAttestationCorrectnessHeadServiceGetResponses, FctAttestationCorrectnessHeadServiceListData, FctAttestationCorrectnessHeadServiceListErrors, FctAttestationCorrectnessHeadServiceListResponses, FctAttestationFirstSeenByValidatorServiceGetData, FctAttestationFirstSeenByValidatorServiceGetErrors, FctAttestationFirstSeenByValidatorServiceGetResponses, FctAttestationFirstSeenByValidatorServiceListData, FctAttestationFirstSeenByValidatorServiceListErrors, FctAttestationFirstSeenByValidatorServiceListResponses, FctAttestationFirstSeenChunked50MsServiceGetData, FctAttestationFirstSeenChunked50MsServiceGetErrors, FctAttestationFirstSeenChunked50MsServiceGetResponses, FctAttestationFirstSeenChunked50MsServiceListData, FctAttestationFirstSeenChunked50MsServiceListErrors, FctAttestationFirstSeenChunked50MsServiceListResponses, FctAttestationInclusionDelayDailyServiceGetData, FctAttestationInclusionDelayDailyServiceGetErrors, FctAttestationInclusionDelayDailyServiceGetResponses, FctAttestationInclusionDelayDailyServiceListData, FctAttestationInclusionDelayDailyServiceListErrors, FctAttestationInclusionDelayDailyServiceListResponses, FctAttestationInclusionDelayHourlyServiceGetData, FctAttestationInclusionDelayHourlyServiceGetErrors, FctAttestationInclusionDelayHourlyServiceGetResponses, FctAttestationInclusionDelayHourlyServiceListData, FctAttestationInclusionDelayHourlyServiceListErrors, FctAttestationInclusionDelayHourlyServiceListResponses, FctAttestationLivenessByEntityHeadServiceGetData, FctAttestationLivenessByEntityHeadServiceGetErrors, FctAttestationLivenessByEntityHeadServiceGetResponses, FctAttestationLivenessByEntityHeadServiceListData, FctAttestationLivenessByEntityHeadServiceListErrors, FctAttestationLivenessByEntityHeadServiceListResponses, FctAttestationObservationByNodeServiceGetData, FctAttestationObservationByNodeServiceGetErrors, FctAttestationObservationByNodeServiceGetResponses, FctAttestationObservationByNodeServiceListData, FctAttestationObservationByNodeServiceListErrors, FctAttestationObservationByNodeServiceListResponses, FctAttestationParticipationRateDailyServiceGetData, FctAttestationParticipationRateDailyServiceGetErrors, FctAttestationParticipationRateDailyServiceGetResponses, FctAttestationParticipationRateDailyServiceListData, FctAttestationParticipationRateDailyServiceListErrors, FctAttestationParticipationRateDailyServiceListResponses, FctAttestationParticipationRateHourlyServiceGetData, FctAttestationParticipationRateHourlyServiceGetErrors, FctAttestationParticipationRateHourlyServiceGetResponses, FctAttestationParticipationRateHourlyServiceListData, FctAttestationParticipationRateHourlyServiceListErrors, FctAttestationParticipationRateHourlyServiceListResponses, FctAttestationVoteCorrectnessByValidatorDailyServiceGetData, FctAttestationVoteCorrectnessByValidatorDailyServiceGetErrors, FctAttestationVoteCorrectnessByValidatorDailyServiceGetResponses, FctAttestationVoteCorrectnessByValidatorDailyServiceListData, FctAttestationVoteCorrectnessByValidatorDailyServiceListErrors, FctAttestationVoteCorrectnessByValidatorDailyServiceListResponses, FctAttestationVoteCorrectnessByValidatorHourlyServiceGetData, FctAttestationVoteCorrectnessByValidatorHourlyServiceGetErrors, FctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponses, FctAttestationVoteCorrectnessByValidatorHourlyServiceListData, FctAttestationVoteCorrectnessByValidatorHourlyServiceListErrors, FctAttestationVoteCorrectnessByValidatorHourlyServiceListResponses, FctAttestationVoteCorrectnessByValidatorServiceGetData, FctAttestationVoteCorrectnessByValidatorServiceGetErrors, FctAttestationVoteCorrectnessByValidatorServiceGetResponses, FctAttestationVoteCorrectnessByValidatorServiceListData, FctAttestationVoteCorrectnessByValidatorServiceListErrors, FctAttestationVoteCorrectnessByValidatorServiceListResponses, FctBlobCountDailyServiceGetData, FctBlobCountDailyServiceGetErrors, FctBlobCountDailyServiceGetResponses, FctBlobCountDailyServiceListData, FctBlobCountDailyServiceListErrors, FctBlobCountDailyServiceListResponses, FctBlobCountHourlyServiceGetData, FctBlobCountHourlyServiceGetErrors, FctBlobCountHourlyServiceGetResponses, FctBlobCountHourlyServiceListData, FctBlobCountHourlyServiceListErrors, FctBlobCountHourlyServiceListResponses, FctBlockBlobCountHeadServiceGetData, FctBlockBlobCountHeadServiceGetErrors, FctBlockBlobCountHeadServiceGetResponses, FctBlockBlobCountHeadServiceListData, FctBlockBlobCountHeadServiceListErrors, FctBlockBlobCountHeadServiceListResponses, FctBlockBlobCountServiceGetData, FctBlockBlobCountServiceGetErrors, FctBlockBlobCountServiceGetResponses, FctBlockBlobCountServiceListData, FctBlockBlobCountServiceListErrors, FctBlockBlobCountServiceListResponses, FctBlockBlobFirstSeenByNodeServiceGetData, FctBlockBlobFirstSeenByNodeServiceGetErrors, FctBlockBlobFirstSeenByNodeServiceGetResponses, FctBlockBlobFirstSeenByNodeServiceListData, FctBlockBlobFirstSeenByNodeServiceListErrors, FctBlockBlobFirstSeenByNodeServiceListResponses, FctBlockBlobHeadServiceGetData, FctBlockBlobHeadServiceGetErrors, FctBlockBlobHeadServiceGetResponses, FctBlockBlobHeadServiceListData, FctBlockBlobHeadServiceListErrors, FctBlockBlobHeadServiceListResponses, FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData, FctBlockDataColumnSidecarFirstSeenByNodeServiceGetErrors, FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponses, FctBlockDataColumnSidecarFirstSeenByNodeServiceListData, FctBlockDataColumnSidecarFirstSeenByNodeServiceListErrors, FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponses, FctBlockDataColumnSidecarFirstSeenServiceGetData, FctBlockDataColumnSidecarFirstSeenServiceGetErrors, FctBlockDataColumnSidecarFirstSeenServiceGetResponses, FctBlockDataColumnSidecarFirstSeenServiceListData, FctBlockDataColumnSidecarFirstSeenServiceListErrors, FctBlockDataColumnSidecarFirstSeenServiceListResponses, FctBlockFirstSeenByNodeServiceGetData, FctBlockFirstSeenByNodeServiceGetErrors, FctBlockFirstSeenByNodeServiceGetResponses, FctBlockFirstSeenByNodeServiceListData, FctBlockFirstSeenByNodeServiceListErrors, FctBlockFirstSeenByNodeServiceListResponses, FctBlockHeadServiceGetData, FctBlockHeadServiceGetErrors, FctBlockHeadServiceGetResponses, FctBlockHeadServiceListData, FctBlockHeadServiceListErrors, FctBlockHeadServiceListResponses, FctBlockMevHeadServiceGetData, FctBlockMevHeadServiceGetErrors, FctBlockMevHeadServiceGetResponses, FctBlockMevHeadServiceListData, FctBlockMevHeadServiceListErrors, FctBlockMevHeadServiceListResponses, FctBlockMevServiceGetData, FctBlockMevServiceGetErrors, FctBlockMevServiceGetResponses, FctBlockMevServiceListData, FctBlockMevServiceListErrors, FctBlockMevServiceListResponses, FctBlockProposalStatusDailyServiceGetData, FctBlockProposalStatusDailyServiceGetErrors, FctBlockProposalStatusDailyServiceGetResponses, FctBlockProposalStatusDailyServiceListData, FctBlockProposalStatusDailyServiceListErrors, FctBlockProposalStatusDailyServiceListResponses, FctBlockProposalStatusHourlyServiceGetData, FctBlockProposalStatusHourlyServiceGetErrors, FctBlockProposalStatusHourlyServiceGetResponses, FctBlockProposalStatusHourlyServiceListData, FctBlockProposalStatusHourlyServiceListErrors, FctBlockProposalStatusHourlyServiceListResponses, FctBlockProposerByValidatorServiceGetData, FctBlockProposerByValidatorServiceGetErrors, FctBlockProposerByValidatorServiceGetResponses, FctBlockProposerByValidatorServiceListData, FctBlockProposerByValidatorServiceListErrors, FctBlockProposerByValidatorServiceListResponses, FctBlockProposerEntityServiceGetData, FctBlockProposerEntityServiceGetErrors, FctBlockProposerEntityServiceGetResponses, FctBlockProposerEntityServiceListData, FctBlockProposerEntityServiceListErrors, FctBlockProposerEntityServiceListResponses, FctBlockProposerHeadServiceGetData, FctBlockProposerHeadServiceGetErrors, FctBlockProposerHeadServiceGetResponses, FctBlockProposerHeadServiceListData, FctBlockProposerHeadServiceListErrors, FctBlockProposerHeadServiceListResponses, FctBlockProposerServiceGetData, FctBlockProposerServiceGetErrors, FctBlockProposerServiceGetResponses, FctBlockProposerServiceListData, FctBlockProposerServiceListErrors, FctBlockProposerServiceListResponses, FctBlockServiceGetData, FctBlockServiceGetErrors, FctBlockServiceGetResponses, FctBlockServiceListData, FctBlockServiceListErrors, FctBlockServiceListResponses, FctContractStorageStateByAddressDailyServiceGetData, FctContractStorageStateByAddressDailyServiceGetErrors, FctContractStorageStateByAddressDailyServiceGetResponses, FctContractStorageStateByAddressDailyServiceListData, FctContractStorageStateByAddressDailyServiceListErrors, FctContractStorageStateByAddressDailyServiceListResponses, FctContractStorageStateByAddressHourlyServiceGetData, FctContractStorageStateByAddressHourlyServiceGetErrors, FctContractStorageStateByAddressHourlyServiceGetResponses, FctContractStorageStateByAddressHourlyServiceListData, FctContractStorageStateByAddressHourlyServiceListErrors, FctContractStorageStateByAddressHourlyServiceListResponses, FctContractStorageStateByBlockDailyServiceGetData, FctContractStorageStateByBlockDailyServiceGetErrors, FctContractStorageStateByBlockDailyServiceGetResponses, FctContractStorageStateByBlockDailyServiceListData, FctContractStorageStateByBlockDailyServiceListErrors, FctContractStorageStateByBlockDailyServiceListResponses, FctContractStorageStateByBlockHourlyServiceGetData, FctContractStorageStateByBlockHourlyServiceGetErrors, FctContractStorageStateByBlockHourlyServiceGetResponses, FctContractStorageStateByBlockHourlyServiceListData, FctContractStorageStateByBlockHourlyServiceListErrors, FctContractStorageStateByBlockHourlyServiceListResponses, FctContractStorageStateWithExpiryByAddressDailyServiceGetData, FctContractStorageStateWithExpiryByAddressDailyServiceGetErrors, FctContractStorageStateWithExpiryByAddressDailyServiceGetResponses, FctContractStorageStateWithExpiryByAddressDailyServiceListData, FctContractStorageStateWithExpiryByAddressDailyServiceListErrors, FctContractStorageStateWithExpiryByAddressDailyServiceListResponses, FctContractStorageStateWithExpiryByAddressHourlyServiceGetData, FctContractStorageStateWithExpiryByAddressHourlyServiceGetErrors, FctContractStorageStateWithExpiryByAddressHourlyServiceGetResponses, FctContractStorageStateWithExpiryByAddressHourlyServiceListData, FctContractStorageStateWithExpiryByAddressHourlyServiceListErrors, FctContractStorageStateWithExpiryByAddressHourlyServiceListResponses, FctContractStorageStateWithExpiryByBlockDailyServiceGetData, FctContractStorageStateWithExpiryByBlockDailyServiceGetErrors, FctContractStorageStateWithExpiryByBlockDailyServiceGetResponses, FctContractStorageStateWithExpiryByBlockDailyServiceListData, FctContractStorageStateWithExpiryByBlockDailyServiceListErrors, FctContractStorageStateWithExpiryByBlockDailyServiceListResponses, FctContractStorageStateWithExpiryByBlockHourlyServiceGetData, FctContractStorageStateWithExpiryByBlockHourlyServiceGetErrors, FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponses, FctContractStorageStateWithExpiryByBlockHourlyServiceListData, FctContractStorageStateWithExpiryByBlockHourlyServiceListErrors, FctContractStorageStateWithExpiryByBlockHourlyServiceListResponses, FctDataColumnAvailabilityByEpochServiceGetData, FctDataColumnAvailabilityByEpochServiceGetErrors, FctDataColumnAvailabilityByEpochServiceGetResponses, FctDataColumnAvailabilityByEpochServiceListData, FctDataColumnAvailabilityByEpochServiceListErrors, FctDataColumnAvailabilityByEpochServiceListResponses, FctDataColumnAvailabilityBySlotBlobServiceGetData, FctDataColumnAvailabilityBySlotBlobServiceGetErrors, FctDataColumnAvailabilityBySlotBlobServiceGetResponses, FctDataColumnAvailabilityBySlotBlobServiceListData, FctDataColumnAvailabilityBySlotBlobServiceListErrors, FctDataColumnAvailabilityBySlotBlobServiceListResponses, FctDataColumnAvailabilityBySlotServiceGetData, FctDataColumnAvailabilityBySlotServiceGetErrors, FctDataColumnAvailabilityBySlotServiceGetResponses, FctDataColumnAvailabilityBySlotServiceListData, FctDataColumnAvailabilityBySlotServiceListErrors, FctDataColumnAvailabilityBySlotServiceListResponses, FctDataColumnAvailabilityDailyServiceGetData, FctDataColumnAvailabilityDailyServiceGetErrors, FctDataColumnAvailabilityDailyServiceGetResponses, FctDataColumnAvailabilityDailyServiceListData, FctDataColumnAvailabilityDailyServiceListErrors, FctDataColumnAvailabilityDailyServiceListResponses, FctDataColumnAvailabilityHourlyServiceGetData, FctDataColumnAvailabilityHourlyServiceGetErrors, FctDataColumnAvailabilityHourlyServiceGetResponses, FctDataColumnAvailabilityHourlyServiceListData, FctDataColumnAvailabilityHourlyServiceListErrors, FctDataColumnAvailabilityHourlyServiceListResponses, FctEngineGetBlobsByElClientHourlyServiceGetData, FctEngineGetBlobsByElClientHourlyServiceGetErrors, FctEngineGetBlobsByElClientHourlyServiceGetResponses, FctEngineGetBlobsByElClientHourlyServiceListData, FctEngineGetBlobsByElClientHourlyServiceListErrors, FctEngineGetBlobsByElClientHourlyServiceListResponses, FctEngineGetBlobsByElClientServiceGetData, FctEngineGetBlobsByElClientServiceGetErrors, FctEngineGetBlobsByElClientServiceGetResponses, FctEngineGetBlobsByElClientServiceListData, FctEngineGetBlobsByElClientServiceListErrors, FctEngineGetBlobsByElClientServiceListResponses, FctEngineGetBlobsBySlotServiceGetData, FctEngineGetBlobsBySlotServiceGetErrors, FctEngineGetBlobsBySlotServiceGetResponses, FctEngineGetBlobsBySlotServiceListData, FctEngineGetBlobsBySlotServiceListErrors, FctEngineGetBlobsBySlotServiceListResponses, FctEngineGetBlobsDurationChunked50MsServiceGetData, FctEngineGetBlobsDurationChunked50MsServiceGetErrors, FctEngineGetBlobsDurationChunked50MsServiceGetResponses, FctEngineGetBlobsDurationChunked50MsServiceListData, FctEngineGetBlobsDurationChunked50MsServiceListErrors, FctEngineGetBlobsDurationChunked50MsServiceListResponses, FctEngineNewPayloadByElClientHourlyServiceGetData, FctEngineNewPayloadByElClientHourlyServiceGetErrors, FctEngineNewPayloadByElClientHourlyServiceGetResponses, FctEngineNewPayloadByElClientHourlyServiceListData, FctEngineNewPayloadByElClientHourlyServiceListErrors, FctEngineNewPayloadByElClientHourlyServiceListResponses, FctEngineNewPayloadByElClientServiceGetData, FctEngineNewPayloadByElClientServiceGetErrors, FctEngineNewPayloadByElClientServiceGetResponses, FctEngineNewPayloadByElClientServiceListData, FctEngineNewPayloadByElClientServiceListErrors, FctEngineNewPayloadByElClientServiceListResponses, FctEngineNewPayloadBySlotServiceGetData, FctEngineNewPayloadBySlotServiceGetErrors, FctEngineNewPayloadBySlotServiceGetResponses, FctEngineNewPayloadBySlotServiceListData, FctEngineNewPayloadBySlotServiceListErrors, FctEngineNewPayloadBySlotServiceListResponses, FctEngineNewPayloadDurationChunked50MsServiceGetData, FctEngineNewPayloadDurationChunked50MsServiceGetErrors, FctEngineNewPayloadDurationChunked50MsServiceGetResponses, FctEngineNewPayloadDurationChunked50MsServiceListData, FctEngineNewPayloadDurationChunked50MsServiceListErrors, FctEngineNewPayloadDurationChunked50MsServiceListResponses, FctEngineNewPayloadWinrateDailyServiceGetData, FctEngineNewPayloadWinrateDailyServiceGetErrors, FctEngineNewPayloadWinrateDailyServiceGetResponses, FctEngineNewPayloadWinrateDailyServiceListData, FctEngineNewPayloadWinrateDailyServiceListErrors, FctEngineNewPayloadWinrateDailyServiceListResponses, FctEngineNewPayloadWinrateHourlyServiceGetData, FctEngineNewPayloadWinrateHourlyServiceGetErrors, FctEngineNewPayloadWinrateHourlyServiceGetResponses, FctEngineNewPayloadWinrateHourlyServiceListData, FctEngineNewPayloadWinrateHourlyServiceListErrors, FctEngineNewPayloadWinrateHourlyServiceListResponses, FctExecutionGasLimitDailyServiceGetData, FctExecutionGasLimitDailyServiceGetErrors, FctExecutionGasLimitDailyServiceGetResponses, FctExecutionGasLimitDailyServiceListData, FctExecutionGasLimitDailyServiceListErrors, FctExecutionGasLimitDailyServiceListResponses, FctExecutionGasLimitHourlyServiceGetData, FctExecutionGasLimitHourlyServiceGetErrors, FctExecutionGasLimitHourlyServiceGetResponses, FctExecutionGasLimitHourlyServiceListData, FctExecutionGasLimitHourlyServiceListErrors, FctExecutionGasLimitHourlyServiceListResponses, FctExecutionGasLimitSignallingDailyServiceGetData, FctExecutionGasLimitSignallingDailyServiceGetErrors, FctExecutionGasLimitSignallingDailyServiceGetResponses, FctExecutionGasLimitSignallingDailyServiceListData, FctExecutionGasLimitSignallingDailyServiceListErrors, FctExecutionGasLimitSignallingDailyServiceListResponses, FctExecutionGasLimitSignallingHourlyServiceGetData, FctExecutionGasLimitSignallingHourlyServiceGetErrors, FctExecutionGasLimitSignallingHourlyServiceGetResponses, FctExecutionGasLimitSignallingHourlyServiceListData, FctExecutionGasLimitSignallingHourlyServiceListErrors, FctExecutionGasLimitSignallingHourlyServiceListResponses, FctExecutionGasUsedDailyServiceGetData, FctExecutionGasUsedDailyServiceGetErrors, FctExecutionGasUsedDailyServiceGetResponses, FctExecutionGasUsedDailyServiceListData, FctExecutionGasUsedDailyServiceListErrors, FctExecutionGasUsedDailyServiceListResponses, FctExecutionGasUsedHourlyServiceGetData, FctExecutionGasUsedHourlyServiceGetErrors, FctExecutionGasUsedHourlyServiceGetResponses, FctExecutionGasUsedHourlyServiceListData, FctExecutionGasUsedHourlyServiceListErrors, FctExecutionGasUsedHourlyServiceListResponses, FctExecutionReceiptSizeDailyServiceGetData, FctExecutionReceiptSizeDailyServiceGetErrors, FctExecutionReceiptSizeDailyServiceGetResponses, FctExecutionReceiptSizeDailyServiceListData, FctExecutionReceiptSizeDailyServiceListErrors, FctExecutionReceiptSizeDailyServiceListResponses, FctExecutionReceiptSizeHourlyServiceGetData, FctExecutionReceiptSizeHourlyServiceGetErrors, FctExecutionReceiptSizeHourlyServiceGetResponses, FctExecutionReceiptSizeHourlyServiceListData, FctExecutionReceiptSizeHourlyServiceListErrors, FctExecutionReceiptSizeHourlyServiceListResponses, FctExecutionStateSizeDailyServiceGetData, FctExecutionStateSizeDailyServiceGetErrors, FctExecutionStateSizeDailyServiceGetResponses, FctExecutionStateSizeDailyServiceListData, FctExecutionStateSizeDailyServiceListErrors, FctExecutionStateSizeDailyServiceListResponses, FctExecutionStateSizeHourlyServiceGetData, FctExecutionStateSizeHourlyServiceGetErrors, FctExecutionStateSizeHourlyServiceGetResponses, FctExecutionStateSizeHourlyServiceListData, FctExecutionStateSizeHourlyServiceListErrors, FctExecutionStateSizeHourlyServiceListResponses, FctExecutionTpsDailyServiceGetData, FctExecutionTpsDailyServiceGetErrors, FctExecutionTpsDailyServiceGetResponses, FctExecutionTpsDailyServiceListData, FctExecutionTpsDailyServiceListErrors, FctExecutionTpsDailyServiceListResponses, FctExecutionTpsHourlyServiceGetData, FctExecutionTpsHourlyServiceGetErrors, FctExecutionTpsHourlyServiceGetResponses, FctExecutionTpsHourlyServiceListData, FctExecutionTpsHourlyServiceListErrors, FctExecutionTpsHourlyServiceListResponses, FctExecutionTransactionsDailyServiceGetData, FctExecutionTransactionsDailyServiceGetErrors, FctExecutionTransactionsDailyServiceGetResponses, FctExecutionTransactionsDailyServiceListData, FctExecutionTransactionsDailyServiceListErrors, FctExecutionTransactionsDailyServiceListResponses, FctExecutionTransactionsHourlyServiceGetData, FctExecutionTransactionsHourlyServiceGetErrors, FctExecutionTransactionsHourlyServiceGetResponses, FctExecutionTransactionsHourlyServiceListData, FctExecutionTransactionsHourlyServiceListErrors, FctExecutionTransactionsHourlyServiceListResponses, FctHeadFirstSeenByNodeServiceGetData, FctHeadFirstSeenByNodeServiceGetErrors, FctHeadFirstSeenByNodeServiceGetResponses, FctHeadFirstSeenByNodeServiceListData, FctHeadFirstSeenByNodeServiceListErrors, FctHeadFirstSeenByNodeServiceListResponses, FctHeadVoteCorrectnessRateDailyServiceGetData, FctHeadVoteCorrectnessRateDailyServiceGetErrors, FctHeadVoteCorrectnessRateDailyServiceGetResponses, FctHeadVoteCorrectnessRateDailyServiceListData, FctHeadVoteCorrectnessRateDailyServiceListErrors, FctHeadVoteCorrectnessRateDailyServiceListResponses, FctHeadVoteCorrectnessRateHourlyServiceGetData, FctHeadVoteCorrectnessRateHourlyServiceGetErrors, FctHeadVoteCorrectnessRateHourlyServiceGetResponses, FctHeadVoteCorrectnessRateHourlyServiceListData, FctHeadVoteCorrectnessRateHourlyServiceListErrors, FctHeadVoteCorrectnessRateHourlyServiceListResponses, FctMevBidCountByBuilderServiceGetData, FctMevBidCountByBuilderServiceGetErrors, FctMevBidCountByBuilderServiceGetResponses, FctMevBidCountByBuilderServiceListData, FctMevBidCountByBuilderServiceListErrors, FctMevBidCountByBuilderServiceListResponses, FctMevBidCountByRelayServiceGetData, FctMevBidCountByRelayServiceGetErrors, FctMevBidCountByRelayServiceGetResponses, FctMevBidCountByRelayServiceListData, FctMevBidCountByRelayServiceListErrors, FctMevBidCountByRelayServiceListResponses, FctMevBidHighestValueByBuilderChunked50MsServiceGetData, FctMevBidHighestValueByBuilderChunked50MsServiceGetErrors, FctMevBidHighestValueByBuilderChunked50MsServiceGetResponses, FctMevBidHighestValueByBuilderChunked50MsServiceListData, FctMevBidHighestValueByBuilderChunked50MsServiceListErrors, FctMevBidHighestValueByBuilderChunked50MsServiceListResponses, FctMissedSlotRateDailyServiceGetData, FctMissedSlotRateDailyServiceGetErrors, FctMissedSlotRateDailyServiceGetResponses, FctMissedSlotRateDailyServiceListData, FctMissedSlotRateDailyServiceListErrors, FctMissedSlotRateDailyServiceListResponses, FctMissedSlotRateHourlyServiceGetData, FctMissedSlotRateHourlyServiceGetErrors, FctMissedSlotRateHourlyServiceGetResponses, FctMissedSlotRateHourlyServiceListData, FctMissedSlotRateHourlyServiceListErrors, FctMissedSlotRateHourlyServiceListResponses, FctNodeActiveLast24hServiceGetData, FctNodeActiveLast24hServiceGetErrors, FctNodeActiveLast24hServiceGetResponses, FctNodeActiveLast24hServiceListData, FctNodeActiveLast24hServiceListErrors, FctNodeActiveLast24hServiceListResponses, FctNodeCpuUtilizationByProcessServiceGetData, FctNodeCpuUtilizationByProcessServiceGetErrors, FctNodeCpuUtilizationByProcessServiceGetResponses, FctNodeCpuUtilizationByProcessServiceListData, FctNodeCpuUtilizationByProcessServiceListErrors, FctNodeCpuUtilizationByProcessServiceListResponses, FctNodeDiskIoByProcessServiceGetData, FctNodeDiskIoByProcessServiceGetErrors, FctNodeDiskIoByProcessServiceGetResponses, FctNodeDiskIoByProcessServiceListData, FctNodeDiskIoByProcessServiceListErrors, FctNodeDiskIoByProcessServiceListResponses, FctNodeMemoryUsageByProcessServiceGetData, FctNodeMemoryUsageByProcessServiceGetErrors, FctNodeMemoryUsageByProcessServiceGetResponses, FctNodeMemoryUsageByProcessServiceListData, FctNodeMemoryUsageByProcessServiceListErrors, FctNodeMemoryUsageByProcessServiceListResponses, FctNodeNetworkIoByProcessServiceGetData, FctNodeNetworkIoByProcessServiceGetErrors, FctNodeNetworkIoByProcessServiceGetResponses, FctNodeNetworkIoByProcessServiceListData, FctNodeNetworkIoByProcessServiceListErrors, FctNodeNetworkIoByProcessServiceListResponses, FctOpcodeGasByOpcodeDailyServiceGetData, FctOpcodeGasByOpcodeDailyServiceGetErrors, FctOpcodeGasByOpcodeDailyServiceGetResponses, FctOpcodeGasByOpcodeDailyServiceListData, FctOpcodeGasByOpcodeDailyServiceListErrors, FctOpcodeGasByOpcodeDailyServiceListResponses, FctOpcodeGasByOpcodeHourlyServiceGetData, FctOpcodeGasByOpcodeHourlyServiceGetErrors, FctOpcodeGasByOpcodeHourlyServiceGetResponses, FctOpcodeGasByOpcodeHourlyServiceListData, FctOpcodeGasByOpcodeHourlyServiceListErrors, FctOpcodeGasByOpcodeHourlyServiceListResponses, FctOpcodeOpsDailyServiceGetData, FctOpcodeOpsDailyServiceGetErrors, FctOpcodeOpsDailyServiceGetResponses, FctOpcodeOpsDailyServiceListData, FctOpcodeOpsDailyServiceListErrors, FctOpcodeOpsDailyServiceListResponses, FctOpcodeOpsHourlyServiceGetData, FctOpcodeOpsHourlyServiceGetErrors, FctOpcodeOpsHourlyServiceGetResponses, FctOpcodeOpsHourlyServiceListData, FctOpcodeOpsHourlyServiceListErrors, FctOpcodeOpsHourlyServiceListResponses, FctPreparedBlockServiceGetData, FctPreparedBlockServiceGetErrors, FctPreparedBlockServiceGetResponses, FctPreparedBlockServiceListData, FctPreparedBlockServiceListErrors, FctPreparedBlockServiceListResponses, FctProposerRewardDailyServiceGetData, FctProposerRewardDailyServiceGetErrors, FctProposerRewardDailyServiceGetResponses, FctProposerRewardDailyServiceListData, FctProposerRewardDailyServiceListErrors, FctProposerRewardDailyServiceListResponses, FctProposerRewardHourlyServiceGetData, FctProposerRewardHourlyServiceGetErrors, FctProposerRewardHourlyServiceGetResponses, FctProposerRewardHourlyServiceListData, FctProposerRewardHourlyServiceListErrors, FctProposerRewardHourlyServiceListResponses, FctReorgDailyServiceGetData, FctReorgDailyServiceGetErrors, FctReorgDailyServiceGetResponses, FctReorgDailyServiceListData, FctReorgDailyServiceListErrors, FctReorgDailyServiceListResponses, FctReorgHourlyServiceGetData, FctReorgHourlyServiceGetErrors, FctReorgHourlyServiceGetResponses, FctReorgHourlyServiceListData, FctReorgHourlyServiceListErrors, FctReorgHourlyServiceListResponses, FctRocketpoolValidatorServiceGetData, FctRocketpoolValidatorServiceGetErrors, FctRocketpoolValidatorServiceGetResponses, FctRocketpoolValidatorServiceListData, FctRocketpoolValidatorServiceListErrors, FctRocketpoolValidatorServiceListResponses, FctStorageSlotStateByAddressDailyServiceGetData, FctStorageSlotStateByAddressDailyServiceGetErrors, FctStorageSlotStateByAddressDailyServiceGetResponses, FctStorageSlotStateByAddressDailyServiceListData, FctStorageSlotStateByAddressDailyServiceListErrors, FctStorageSlotStateByAddressDailyServiceListResponses, FctStorageSlotStateByAddressHourlyServiceGetData, FctStorageSlotStateByAddressHourlyServiceGetErrors, FctStorageSlotStateByAddressHourlyServiceGetResponses, FctStorageSlotStateByAddressHourlyServiceListData, FctStorageSlotStateByAddressHourlyServiceListErrors, FctStorageSlotStateByAddressHourlyServiceListResponses, FctStorageSlotStateByBlockDailyServiceGetData, FctStorageSlotStateByBlockDailyServiceGetErrors, FctStorageSlotStateByBlockDailyServiceGetResponses, FctStorageSlotStateByBlockDailyServiceListData, FctStorageSlotStateByBlockDailyServiceListErrors, FctStorageSlotStateByBlockDailyServiceListResponses, FctStorageSlotStateByBlockHourlyServiceGetData, FctStorageSlotStateByBlockHourlyServiceGetErrors, FctStorageSlotStateByBlockHourlyServiceGetResponses, FctStorageSlotStateByBlockHourlyServiceListData, FctStorageSlotStateByBlockHourlyServiceListErrors, FctStorageSlotStateByBlockHourlyServiceListResponses, FctStorageSlotStateWithExpiryByAddressDailyServiceGetData, FctStorageSlotStateWithExpiryByAddressDailyServiceGetErrors, FctStorageSlotStateWithExpiryByAddressDailyServiceGetResponses, FctStorageSlotStateWithExpiryByAddressDailyServiceListData, FctStorageSlotStateWithExpiryByAddressDailyServiceListErrors, FctStorageSlotStateWithExpiryByAddressDailyServiceListResponses, FctStorageSlotStateWithExpiryByAddressHourlyServiceGetData, FctStorageSlotStateWithExpiryByAddressHourlyServiceGetErrors, FctStorageSlotStateWithExpiryByAddressHourlyServiceGetResponses, FctStorageSlotStateWithExpiryByAddressHourlyServiceListData, FctStorageSlotStateWithExpiryByAddressHourlyServiceListErrors, FctStorageSlotStateWithExpiryByAddressHourlyServiceListResponses, FctStorageSlotStateWithExpiryByBlockDailyServiceGetData, FctStorageSlotStateWithExpiryByBlockDailyServiceGetErrors, FctStorageSlotStateWithExpiryByBlockDailyServiceGetResponses, FctStorageSlotStateWithExpiryByBlockDailyServiceListData, FctStorageSlotStateWithExpiryByBlockDailyServiceListErrors, FctStorageSlotStateWithExpiryByBlockDailyServiceListResponses, FctStorageSlotStateWithExpiryByBlockHourlyServiceGetData, FctStorageSlotStateWithExpiryByBlockHourlyServiceGetErrors, FctStorageSlotStateWithExpiryByBlockHourlyServiceGetResponses, FctStorageSlotStateWithExpiryByBlockHourlyServiceListData, FctStorageSlotStateWithExpiryByBlockHourlyServiceListErrors, FctStorageSlotStateWithExpiryByBlockHourlyServiceListResponses, FctStorageSlotTop100ByBytesServiceGetData, FctStorageSlotTop100ByBytesServiceGetErrors, FctStorageSlotTop100ByBytesServiceGetResponses, FctStorageSlotTop100ByBytesServiceListData, FctStorageSlotTop100ByBytesServiceListErrors, FctStorageSlotTop100ByBytesServiceListResponses, FctStorageSlotTop100BySlotsServiceGetData, FctStorageSlotTop100BySlotsServiceGetErrors, FctStorageSlotTop100BySlotsServiceGetResponses, FctStorageSlotTop100BySlotsServiceListData, FctStorageSlotTop100BySlotsServiceListErrors, FctStorageSlotTop100BySlotsServiceListResponses, FctSyncCommitteeParticipationByValidatorDailyServiceGetData, FctSyncCommitteeParticipationByValidatorDailyServiceGetErrors, FctSyncCommitteeParticipationByValidatorDailyServiceGetResponses, FctSyncCommitteeParticipationByValidatorDailyServiceListData, FctSyncCommitteeParticipationByValidatorDailyServiceListErrors, FctSyncCommitteeParticipationByValidatorDailyServiceListResponses, FctSyncCommitteeParticipationByValidatorHourlyServiceGetData, FctSyncCommitteeParticipationByValidatorHourlyServiceGetErrors, FctSyncCommitteeParticipationByValidatorHourlyServiceGetResponses, FctSyncCommitteeParticipationByValidatorHourlyServiceListData, FctSyncCommitteeParticipationByValidatorHourlyServiceListErrors, FctSyncCommitteeParticipationByValidatorHourlyServiceListResponses, FctSyncCommitteeParticipationByValidatorServiceGetData, FctSyncCommitteeParticipationByValidatorServiceGetErrors, FctSyncCommitteeParticipationByValidatorServiceGetResponses, FctSyncCommitteeParticipationByValidatorServiceListData, FctSyncCommitteeParticipationByValidatorServiceListErrors, FctSyncCommitteeParticipationByValidatorServiceListResponses, FctTokenContractStorageStateByBlockDailyServiceGetData, FctTokenContractStorageStateByBlockDailyServiceGetErrors, FctTokenContractStorageStateByBlockDailyServiceGetResponses, FctTokenContractStorageStateByBlockDailyServiceListData, FctTokenContractStorageStateByBlockDailyServiceListErrors, FctTokenContractStorageStateByBlockDailyServiceListResponses, FctValidatorBalanceDailyServiceGetData, FctValidatorBalanceDailyServiceGetErrors, FctValidatorBalanceDailyServiceGetResponses, FctValidatorBalanceDailyServiceListData, FctValidatorBalanceDailyServiceListErrors, FctValidatorBalanceDailyServiceListResponses, FctValidatorBalanceHourlyServiceGetData, FctValidatorBalanceHourlyServiceGetErrors, FctValidatorBalanceHourlyServiceGetResponses, FctValidatorBalanceHourlyServiceListData, FctValidatorBalanceHourlyServiceListErrors, FctValidatorBalanceHourlyServiceListResponses, FctValidatorBalanceServiceGetData, FctValidatorBalanceServiceGetErrors, FctValidatorBalanceServiceGetResponses, FctValidatorBalanceServiceListData, FctValidatorBalanceServiceListErrors, FctValidatorBalanceServiceListResponses, FctValidatorCountByEntityByStatusDailyServiceGetData, FctValidatorCountByEntityByStatusDailyServiceGetErrors, FctValidatorCountByEntityByStatusDailyServiceGetResponses, FctValidatorCountByEntityByStatusDailyServiceListData, FctValidatorCountByEntityByStatusDailyServiceListErrors, FctValidatorCountByEntityByStatusDailyServiceListResponses, IntAttestationAttestedCanonicalServiceGetData, IntAttestationAttestedCanonicalServiceGetErrors, IntAttestationAttestedCanonicalServiceGetResponses, IntAttestationAttestedCanonicalServiceListData, IntAttestationAttestedCanonicalServiceListErrors, IntAttestationAttestedCanonicalServiceListResponses, IntAttestationAttestedHeadServiceGetData, IntAttestationAttestedHeadServiceGetErrors, IntAttestationAttestedHeadServiceGetResponses, IntAttestationAttestedHeadServiceListData, IntAttestationAttestedHeadServiceListErrors, IntAttestationAttestedHeadServiceListResponses, IntAttestationFirstSeenAggregateServiceGetData, IntAttestationFirstSeenAggregateServiceGetErrors, IntAttestationFirstSeenAggregateServiceGetResponses, IntAttestationFirstSeenAggregateServiceListData, IntAttestationFirstSeenAggregateServiceListErrors, IntAttestationFirstSeenAggregateServiceListResponses, IntAttestationFirstSeenServiceGetData, IntAttestationFirstSeenServiceGetErrors, IntAttestationFirstSeenServiceGetResponses, IntAttestationFirstSeenServiceListData, IntAttestationFirstSeenServiceListErrors, IntAttestationFirstSeenServiceListResponses, IntBeaconCommitteeHeadServiceGetData, IntBeaconCommitteeHeadServiceGetErrors, IntBeaconCommitteeHeadServiceGetResponses, IntBeaconCommitteeHeadServiceListData, IntBeaconCommitteeHeadServiceListErrors, IntBeaconCommitteeHeadServiceListResponses, IntBlockBlobCountCanonicalServiceGetData, IntBlockBlobCountCanonicalServiceGetErrors, IntBlockBlobCountCanonicalServiceGetResponses, IntBlockBlobCountCanonicalServiceListData, IntBlockBlobCountCanonicalServiceListErrors, IntBlockBlobCountCanonicalServiceListResponses, IntBlockCanonicalServiceGetData, IntBlockCanonicalServiceGetErrors, IntBlockCanonicalServiceGetResponses, IntBlockCanonicalServiceListData, IntBlockCanonicalServiceListErrors, IntBlockCanonicalServiceListResponses, IntBlockMevCanonicalServiceGetData, IntBlockMevCanonicalServiceGetErrors, IntBlockMevCanonicalServiceGetResponses, IntBlockMevCanonicalServiceListData, IntBlockMevCanonicalServiceListErrors, IntBlockMevCanonicalServiceListResponses, IntBlockOpcodeGasServiceGetData, IntBlockOpcodeGasServiceGetErrors, IntBlockOpcodeGasServiceGetResponses, IntBlockOpcodeGasServiceListData, IntBlockOpcodeGasServiceListErrors, IntBlockOpcodeGasServiceListResponses, IntBlockProposerCanonicalServiceGetData, IntBlockProposerCanonicalServiceGetErrors, IntBlockProposerCanonicalServiceGetResponses, IntBlockProposerCanonicalServiceListData, IntBlockProposerCanonicalServiceListErrors, IntBlockProposerCanonicalServiceListResponses, IntBlockReceiptSizeServiceGetData, IntBlockReceiptSizeServiceGetErrors, IntBlockReceiptSizeServiceGetResponses, IntBlockReceiptSizeServiceListData, IntBlockReceiptSizeServiceListErrors, IntBlockReceiptSizeServiceListResponses, IntBlockResourceGasServiceGetData, IntBlockResourceGasServiceGetErrors, IntBlockResourceGasServiceGetResponses, IntBlockResourceGasServiceListData, IntBlockResourceGasServiceListErrors, IntBlockResourceGasServiceListResponses, IntContractCreationServiceGetData, IntContractCreationServiceGetErrors, IntContractCreationServiceGetResponses, IntContractCreationServiceListData, IntContractCreationServiceListErrors, IntContractCreationServiceListResponses, IntContractSelfdestructServiceGetData, IntContractSelfdestructServiceGetErrors, IntContractSelfdestructServiceGetResponses, IntContractSelfdestructServiceListData, IntContractSelfdestructServiceListErrors, IntContractSelfdestructServiceListResponses, IntContractStorageExpiry12mServiceGetData, IntContractStorageExpiry12mServiceGetErrors, IntContractStorageExpiry12mServiceGetResponses, IntContractStorageExpiry12mServiceListData, IntContractStorageExpiry12mServiceListErrors, IntContractStorageExpiry12mServiceListResponses, IntContractStorageExpiry18mServiceGetData, IntContractStorageExpiry18mServiceGetErrors, IntContractStorageExpiry18mServiceGetResponses, IntContractStorageExpiry18mServiceListData, IntContractStorageExpiry18mServiceListErrors, IntContractStorageExpiry18mServiceListResponses, IntContractStorageExpiry1mServiceGetData, IntContractStorageExpiry1mServiceGetErrors, IntContractStorageExpiry1mServiceGetResponses, IntContractStorageExpiry1mServiceListData, IntContractStorageExpiry1mServiceListErrors, IntContractStorageExpiry1mServiceListResponses, IntContractStorageExpiry24mServiceGetData, IntContractStorageExpiry24mServiceGetErrors, IntContractStorageExpiry24mServiceGetResponses, IntContractStorageExpiry24mServiceListData, IntContractStorageExpiry24mServiceListErrors, IntContractStorageExpiry24mServiceListResponses, IntContractStorageExpiry6mServiceGetData, IntContractStorageExpiry6mServiceGetErrors, IntContractStorageExpiry6mServiceGetResponses, IntContractStorageExpiry6mServiceListData, IntContractStorageExpiry6mServiceListErrors, IntContractStorageExpiry6mServiceListResponses, IntContractStorageNextTouchServiceGetData, IntContractStorageNextTouchServiceGetErrors, IntContractStorageNextTouchServiceGetResponses, IntContractStorageNextTouchServiceListData, IntContractStorageNextTouchServiceListErrors, IntContractStorageNextTouchServiceListResponses, IntContractStorageReactivation12mServiceGetData, IntContractStorageReactivation12mServiceGetErrors, IntContractStorageReactivation12mServiceGetResponses, IntContractStorageReactivation12mServiceListData, IntContractStorageReactivation12mServiceListErrors, IntContractStorageReactivation12mServiceListResponses, IntContractStorageReactivation18mServiceGetData, IntContractStorageReactivation18mServiceGetErrors, IntContractStorageReactivation18mServiceGetResponses, IntContractStorageReactivation18mServiceListData, IntContractStorageReactivation18mServiceListErrors, IntContractStorageReactivation18mServiceListResponses, IntContractStorageReactivation1mServiceGetData, IntContractStorageReactivation1mServiceGetErrors, IntContractStorageReactivation1mServiceGetResponses, IntContractStorageReactivation1mServiceListData, IntContractStorageReactivation1mServiceListErrors, IntContractStorageReactivation1mServiceListResponses, IntContractStorageReactivation24mServiceGetData, IntContractStorageReactivation24mServiceGetErrors, IntContractStorageReactivation24mServiceGetResponses, IntContractStorageReactivation24mServiceListData, IntContractStorageReactivation24mServiceListErrors, IntContractStorageReactivation24mServiceListResponses, IntContractStorageReactivation6mServiceGetData, IntContractStorageReactivation6mServiceGetErrors, IntContractStorageReactivation6mServiceGetResponses, IntContractStorageReactivation6mServiceListData, IntContractStorageReactivation6mServiceListErrors, IntContractStorageReactivation6mServiceListResponses, IntContractStorageStateByAddressServiceGetData, IntContractStorageStateByAddressServiceGetErrors, IntContractStorageStateByAddressServiceGetResponses, IntContractStorageStateByAddressServiceListData, IntContractStorageStateByAddressServiceListErrors, IntContractStorageStateByAddressServiceListResponses, IntContractStorageStateByBlockServiceGetData, IntContractStorageStateByBlockServiceGetErrors, IntContractStorageStateByBlockServiceGetResponses, IntContractStorageStateByBlockServiceListData, IntContractStorageStateByBlockServiceListErrors, IntContractStorageStateByBlockServiceListResponses, IntContractStorageStateServiceGetData, IntContractStorageStateServiceGetErrors, IntContractStorageStateServiceGetResponses, IntContractStorageStateServiceListData, IntContractStorageStateServiceListErrors, IntContractStorageStateServiceListResponses, IntContractStorageStateWithExpiryByAddressServiceGetData, IntContractStorageStateWithExpiryByAddressServiceGetErrors, IntContractStorageStateWithExpiryByAddressServiceGetResponses, IntContractStorageStateWithExpiryByAddressServiceListData, IntContractStorageStateWithExpiryByAddressServiceListErrors, IntContractStorageStateWithExpiryByAddressServiceListResponses, IntContractStorageStateWithExpiryByBlockServiceGetData, IntContractStorageStateWithExpiryByBlockServiceGetErrors, IntContractStorageStateWithExpiryByBlockServiceGetResponses, IntContractStorageStateWithExpiryByBlockServiceListData, IntContractStorageStateWithExpiryByBlockServiceListErrors, IntContractStorageStateWithExpiryByBlockServiceListResponses, IntContractStorageStateWithExpiryServiceGetData, IntContractStorageStateWithExpiryServiceGetErrors, IntContractStorageStateWithExpiryServiceGetResponses, IntContractStorageStateWithExpiryServiceListData, IntContractStorageStateWithExpiryServiceListErrors, IntContractStorageStateWithExpiryServiceListResponses, IntCustodyProbeOrderBySlotServiceGetData, IntCustodyProbeOrderBySlotServiceGetErrors, IntCustodyProbeOrderBySlotServiceGetResponses, IntCustodyProbeOrderBySlotServiceListData, IntCustodyProbeOrderBySlotServiceListErrors, IntCustodyProbeOrderBySlotServiceListResponses, IntCustodyProbeServiceGetData, IntCustodyProbeServiceGetErrors, IntCustodyProbeServiceGetResponses, IntCustodyProbeServiceListData, IntCustodyProbeServiceListErrors, IntCustodyProbeServiceListResponses, IntEngineGetBlobsServiceGetData, IntEngineGetBlobsServiceGetErrors, IntEngineGetBlobsServiceGetResponses, IntEngineGetBlobsServiceListData, IntEngineGetBlobsServiceListErrors, IntEngineGetBlobsServiceListResponses, IntEngineNewPayloadFastestExecutionByNodeClassServiceGetData, IntEngineNewPayloadFastestExecutionByNodeClassServiceGetErrors, IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses, IntEngineNewPayloadFastestExecutionByNodeClassServiceListData, IntEngineNewPayloadFastestExecutionByNodeClassServiceListErrors, IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponses, IntEngineNewPayloadServiceGetData, IntEngineNewPayloadServiceGetErrors, IntEngineNewPayloadServiceGetResponses, IntEngineNewPayloadServiceListData, IntEngineNewPayloadServiceListErrors, IntEngineNewPayloadServiceListResponses, IntExecutionBlockByDateServiceGetData, IntExecutionBlockByDateServiceGetErrors, IntExecutionBlockByDateServiceGetResponses, IntExecutionBlockByDateServiceListData, IntExecutionBlockByDateServiceListErrors, IntExecutionBlockByDateServiceListResponses, IntExecutionStateSizeByBlockServiceGetData, IntExecutionStateSizeByBlockServiceGetErrors, IntExecutionStateSizeByBlockServiceGetResponses, IntExecutionStateSizeByBlockServiceListData, IntExecutionStateSizeByBlockServiceListErrors, IntExecutionStateSizeByBlockServiceListResponses, IntRocketpoolMegapoolServiceGetData, IntRocketpoolMegapoolServiceGetErrors, IntRocketpoolMegapoolServiceGetResponses, IntRocketpoolMegapoolServiceListData, IntRocketpoolMegapoolServiceListErrors, IntRocketpoolMegapoolServiceListResponses, IntRocketpoolMinipoolServiceGetData, IntRocketpoolMinipoolServiceGetErrors, IntRocketpoolMinipoolServiceGetResponses, IntRocketpoolMinipoolServiceListData, IntRocketpoolMinipoolServiceListErrors, IntRocketpoolMinipoolServiceListResponses, IntRocketpoolNodeEventServiceGetData, IntRocketpoolNodeEventServiceGetErrors, IntRocketpoolNodeEventServiceGetResponses, IntRocketpoolNodeEventServiceListData, IntRocketpoolNodeEventServiceListErrors, IntRocketpoolNodeEventServiceListResponses, IntRocketpoolNodeTimezoneServiceGetData, IntRocketpoolNodeTimezoneServiceGetErrors, IntRocketpoolNodeTimezoneServiceGetResponses, IntRocketpoolNodeTimezoneServiceListData, IntRocketpoolNodeTimezoneServiceListErrors, IntRocketpoolNodeTimezoneServiceListResponses, IntStorageSelfdestructDiffsServiceGetData, IntStorageSelfdestructDiffsServiceGetErrors, IntStorageSelfdestructDiffsServiceGetResponses, IntStorageSelfdestructDiffsServiceListData, IntStorageSelfdestructDiffsServiceListErrors, IntStorageSelfdestructDiffsServiceListResponses, IntStorageSlotDiffByAddressSlotServiceGetData, IntStorageSlotDiffByAddressSlotServiceGetErrors, IntStorageSlotDiffByAddressSlotServiceGetResponses, IntStorageSlotDiffByAddressSlotServiceListData, IntStorageSlotDiffByAddressSlotServiceListErrors, IntStorageSlotDiffByAddressSlotServiceListResponses, IntStorageSlotDiffServiceGetData, IntStorageSlotDiffServiceGetErrors, IntStorageSlotDiffServiceGetResponses, IntStorageSlotDiffServiceListData, IntStorageSlotDiffServiceListErrors, IntStorageSlotDiffServiceListResponses, IntStorageSlotExpiry12mServiceGetData, IntStorageSlotExpiry12mServiceGetErrors, IntStorageSlotExpiry12mServiceGetResponses, IntStorageSlotExpiry12mServiceListData, IntStorageSlotExpiry12mServiceListErrors, IntStorageSlotExpiry12mServiceListResponses, IntStorageSlotExpiry18mServiceGetData, IntStorageSlotExpiry18mServiceGetErrors, IntStorageSlotExpiry18mServiceGetResponses, IntStorageSlotExpiry18mServiceListData, IntStorageSlotExpiry18mServiceListErrors, IntStorageSlotExpiry18mServiceListResponses, IntStorageSlotExpiry1mServiceGetData, IntStorageSlotExpiry1mServiceGetErrors, IntStorageSlotExpiry1mServiceGetResponses, IntStorageSlotExpiry1mServiceListData, IntStorageSlotExpiry1mServiceListErrors, IntStorageSlotExpiry1mServiceListResponses, IntStorageSlotExpiry24mServiceGetData, IntStorageSlotExpiry24mServiceGetErrors, IntStorageSlotExpiry24mServiceGetResponses, IntStorageSlotExpiry24mServiceListData, IntStorageSlotExpiry24mServiceListErrors, IntStorageSlotExpiry24mServiceListResponses, IntStorageSlotExpiry6mServiceGetData, IntStorageSlotExpiry6mServiceGetErrors, IntStorageSlotExpiry6mServiceGetResponses, IntStorageSlotExpiry6mServiceListData, IntStorageSlotExpiry6mServiceListErrors, IntStorageSlotExpiry6mServiceListResponses, IntStorageSlotLifecycleBoundaryServiceGetData, IntStorageSlotLifecycleBoundaryServiceGetErrors, IntStorageSlotLifecycleBoundaryServiceGetResponses, IntStorageSlotLifecycleBoundaryServiceListData, IntStorageSlotLifecycleBoundaryServiceListErrors, IntStorageSlotLifecycleBoundaryServiceListResponses, IntStorageSlotLifecycleServiceGetData, IntStorageSlotLifecycleServiceGetErrors, IntStorageSlotLifecycleServiceGetResponses, IntStorageSlotLifecycleServiceListData, IntStorageSlotLifecycleServiceListErrors, IntStorageSlotLifecycleServiceListResponses, IntStorageSlotNextTouchServiceGetData, IntStorageSlotNextTouchServiceGetErrors, IntStorageSlotNextTouchServiceGetResponses, IntStorageSlotNextTouchServiceListData, IntStorageSlotNextTouchServiceListErrors, IntStorageSlotNextTouchServiceListResponses, IntStorageSlotReactivation12mServiceGetData, IntStorageSlotReactivation12mServiceGetErrors, IntStorageSlotReactivation12mServiceGetResponses, IntStorageSlotReactivation12mServiceListData, IntStorageSlotReactivation12mServiceListErrors, IntStorageSlotReactivation12mServiceListResponses, IntStorageSlotReactivation18mServiceGetData, IntStorageSlotReactivation18mServiceGetErrors, IntStorageSlotReactivation18mServiceGetResponses, IntStorageSlotReactivation18mServiceListData, IntStorageSlotReactivation18mServiceListErrors, IntStorageSlotReactivation18mServiceListResponses, IntStorageSlotReactivation1mServiceGetData, IntStorageSlotReactivation1mServiceGetErrors, IntStorageSlotReactivation1mServiceGetResponses, IntStorageSlotReactivation1mServiceListData, IntStorageSlotReactivation1mServiceListErrors, IntStorageSlotReactivation1mServiceListResponses, IntStorageSlotReactivation24mServiceGetData, IntStorageSlotReactivation24mServiceGetErrors, IntStorageSlotReactivation24mServiceGetResponses, IntStorageSlotReactivation24mServiceListData, IntStorageSlotReactivation24mServiceListErrors, IntStorageSlotReactivation24mServiceListResponses, IntStorageSlotReactivation6mServiceGetData, IntStorageSlotReactivation6mServiceGetErrors, IntStorageSlotReactivation6mServiceGetResponses, IntStorageSlotReactivation6mServiceListData, IntStorageSlotReactivation6mServiceListErrors, IntStorageSlotReactivation6mServiceListResponses, IntStorageSlotReadServiceGetData, IntStorageSlotReadServiceGetErrors, IntStorageSlotReadServiceGetResponses, IntStorageSlotReadServiceListData, IntStorageSlotReadServiceListErrors, IntStorageSlotReadServiceListResponses, IntStorageSlotStateByAddressServiceGetData, IntStorageSlotStateByAddressServiceGetErrors, IntStorageSlotStateByAddressServiceGetResponses, IntStorageSlotStateByAddressServiceListData, IntStorageSlotStateByAddressServiceListErrors, IntStorageSlotStateByAddressServiceListResponses, IntStorageSlotStateByBlockServiceGetData, IntStorageSlotStateByBlockServiceGetErrors, IntStorageSlotStateByBlockServiceGetResponses, IntStorageSlotStateByBlockServiceListData, IntStorageSlotStateByBlockServiceListErrors, IntStorageSlotStateByBlockServiceListResponses, IntStorageSlotStateServiceGetData, IntStorageSlotStateServiceGetErrors, IntStorageSlotStateServiceGetResponses, IntStorageSlotStateServiceListData, IntStorageSlotStateServiceListErrors, IntStorageSlotStateServiceListResponses, IntStorageSlotStateWithExpiryByAddressServiceGetData, IntStorageSlotStateWithExpiryByAddressServiceGetErrors, IntStorageSlotStateWithExpiryByAddressServiceGetResponses, IntStorageSlotStateWithExpiryByAddressServiceListData, IntStorageSlotStateWithExpiryByAddressServiceListErrors, IntStorageSlotStateWithExpiryByAddressServiceListResponses, IntStorageSlotStateWithExpiryByBlockServiceGetData, IntStorageSlotStateWithExpiryByBlockServiceGetErrors, IntStorageSlotStateWithExpiryByBlockServiceGetResponses, IntStorageSlotStateWithExpiryByBlockServiceListData, IntStorageSlotStateWithExpiryByBlockServiceListErrors, IntStorageSlotStateWithExpiryByBlockServiceListResponses, IntStorageSlotStateWithExpiryServiceGetData, IntStorageSlotStateWithExpiryServiceGetErrors, IntStorageSlotStateWithExpiryServiceGetResponses, IntStorageSlotStateWithExpiryServiceListData, IntStorageSlotStateWithExpiryServiceListErrors, IntStorageSlotStateWithExpiryServiceListResponses, IntTokenContractStorageStateByBlockServiceGetData, IntTokenContractStorageStateByBlockServiceGetErrors, IntTokenContractStorageStateByBlockServiceGetResponses, IntTokenContractStorageStateByBlockServiceListData, IntTokenContractStorageStateByBlockServiceListErrors, IntTokenContractStorageStateByBlockServiceListResponses, IntTransactionCallFrameOpcodeGasServiceGetData, IntTransactionCallFrameOpcodeGasServiceGetErrors, IntTransactionCallFrameOpcodeGasServiceGetResponses, IntTransactionCallFrameOpcodeGasServiceListData, IntTransactionCallFrameOpcodeGasServiceListErrors, IntTransactionCallFrameOpcodeGasServiceListResponses, IntTransactionCallFrameOpcodeResourceGasServiceGetData, IntTransactionCallFrameOpcodeResourceGasServiceGetErrors, IntTransactionCallFrameOpcodeResourceGasServiceGetResponses, IntTransactionCallFrameOpcodeResourceGasServiceListData, IntTransactionCallFrameOpcodeResourceGasServiceListErrors, IntTransactionCallFrameOpcodeResourceGasServiceListResponses, IntTransactionCallFrameServiceGetData, IntTransactionCallFrameServiceGetErrors, IntTransactionCallFrameServiceGetResponses, IntTransactionCallFrameServiceListData, IntTransactionCallFrameServiceListErrors, IntTransactionCallFrameServiceListResponses, IntTransactionOpcodeGasServiceGetData, IntTransactionOpcodeGasServiceGetErrors, IntTransactionOpcodeGasServiceGetResponses, IntTransactionOpcodeGasServiceListData, IntTransactionOpcodeGasServiceListErrors, IntTransactionOpcodeGasServiceListResponses, IntTransactionReceiptSizeServiceGetData, IntTransactionReceiptSizeServiceGetErrors, IntTransactionReceiptSizeServiceGetResponses, IntTransactionReceiptSizeServiceListData, IntTransactionReceiptSizeServiceListErrors, IntTransactionReceiptSizeServiceListResponses, IntTransactionResourceGasServiceGetData, IntTransactionResourceGasServiceGetErrors, IntTransactionResourceGasServiceGetResponses, IntTransactionResourceGasServiceListData, IntTransactionResourceGasServiceListErrors, IntTransactionResourceGasServiceListResponses } from './types.gen';
+import { zAdminCbtIncrementalServiceGetData, zAdminCbtIncrementalServiceGetResponse, zAdminCbtIncrementalServiceListData, zAdminCbtIncrementalServiceListResponse, zDimBlockBlobSubmitterServiceGetData, zDimBlockBlobSubmitterServiceGetResponse, zDimBlockBlobSubmitterServiceListData, zDimBlockBlobSubmitterServiceListResponse, zDimContractOwnerServiceGetData, zDimContractOwnerServiceGetResponse, zDimContractOwnerServiceListData, zDimContractOwnerServiceListResponse, zDimFunctionSignatureServiceGetData, zDimFunctionSignatureServiceGetResponse, zDimFunctionSignatureServiceListData, zDimFunctionSignatureServiceListResponse, zDimNodeServiceGetData, zDimNodeServiceGetResponse, zDimNodeServiceListData, zDimNodeServiceListResponse, zDimRocketpoolNodeServiceGetData, zDimRocketpoolNodeServiceGetResponse, zDimRocketpoolNodeServiceListData, zDimRocketpoolNodeServiceListResponse, zDimTokenContractServiceGetData, zDimTokenContractServiceGetResponse, zDimTokenContractServiceListData, zDimTokenContractServiceListResponse, zDimValidatorPubkeyServiceGetData, zDimValidatorPubkeyServiceGetResponse, zDimValidatorPubkeyServiceListData, zDimValidatorPubkeyServiceListResponse, zDimValidatorStatusServiceGetData, zDimValidatorStatusServiceGetResponse, zDimValidatorStatusServiceListData, zDimValidatorStatusServiceListResponse, zFctAttestationCorrectnessByValidatorCanonicalServiceGetData, zFctAttestationCorrectnessByValidatorCanonicalServiceGetResponse, zFctAttestationCorrectnessByValidatorCanonicalServiceListData, zFctAttestationCorrectnessByValidatorCanonicalServiceListResponse, zFctAttestationCorrectnessByValidatorHeadServiceGetData, zFctAttestationCorrectnessByValidatorHeadServiceGetResponse, zFctAttestationCorrectnessByValidatorHeadServiceListData, zFctAttestationCorrectnessByValidatorHeadServiceListResponse, zFctAttestationCorrectnessCanonicalServiceGetData, zFctAttestationCorrectnessCanonicalServiceGetResponse, zFctAttestationCorrectnessCanonicalServiceListData, zFctAttestationCorrectnessCanonicalServiceListResponse, zFctAttestationCorrectnessHeadServiceGetData, zFctAttestationCorrectnessHeadServiceGetResponse, zFctAttestationCorrectnessHeadServiceListData, zFctAttestationCorrectnessHeadServiceListResponse, zFctAttestationFirstSeenByValidatorServiceGetData, zFctAttestationFirstSeenByValidatorServiceGetResponse, zFctAttestationFirstSeenByValidatorServiceListData, zFctAttestationFirstSeenByValidatorServiceListResponse, zFctAttestationFirstSeenChunked50MsServiceGetData, zFctAttestationFirstSeenChunked50MsServiceGetResponse, zFctAttestationFirstSeenChunked50MsServiceListData, zFctAttestationFirstSeenChunked50MsServiceListResponse, zFctAttestationInclusionDelayDailyServiceGetData, zFctAttestationInclusionDelayDailyServiceGetResponse, zFctAttestationInclusionDelayDailyServiceListData, zFctAttestationInclusionDelayDailyServiceListResponse, zFctAttestationInclusionDelayHourlyServiceGetData, zFctAttestationInclusionDelayHourlyServiceGetResponse, zFctAttestationInclusionDelayHourlyServiceListData, zFctAttestationInclusionDelayHourlyServiceListResponse, zFctAttestationLivenessByEntityHeadServiceGetData, zFctAttestationLivenessByEntityHeadServiceGetResponse, zFctAttestationLivenessByEntityHeadServiceListData, zFctAttestationLivenessByEntityHeadServiceListResponse, zFctAttestationObservationByNodeServiceGetData, zFctAttestationObservationByNodeServiceGetResponse, zFctAttestationObservationByNodeServiceListData, zFctAttestationObservationByNodeServiceListResponse, zFctAttestationParticipationRateDailyServiceGetData, zFctAttestationParticipationRateDailyServiceGetResponse, zFctAttestationParticipationRateDailyServiceListData, zFctAttestationParticipationRateDailyServiceListResponse, zFctAttestationParticipationRateHourlyServiceGetData, zFctAttestationParticipationRateHourlyServiceGetResponse, zFctAttestationParticipationRateHourlyServiceListData, zFctAttestationParticipationRateHourlyServiceListResponse, zFctAttestationVoteCorrectnessByValidatorDailyServiceGetData, zFctAttestationVoteCorrectnessByValidatorDailyServiceGetResponse, zFctAttestationVoteCorrectnessByValidatorDailyServiceListData, zFctAttestationVoteCorrectnessByValidatorDailyServiceListResponse, zFctAttestationVoteCorrectnessByValidatorHourlyServiceGetData, zFctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponse, zFctAttestationVoteCorrectnessByValidatorHourlyServiceListData, zFctAttestationVoteCorrectnessByValidatorHourlyServiceListResponse, zFctAttestationVoteCorrectnessByValidatorServiceGetData, zFctAttestationVoteCorrectnessByValidatorServiceGetResponse, zFctAttestationVoteCorrectnessByValidatorServiceListData, zFctAttestationVoteCorrectnessByValidatorServiceListResponse, zFctBlobCountDailyServiceGetData, zFctBlobCountDailyServiceGetResponse, zFctBlobCountDailyServiceListData, zFctBlobCountDailyServiceListResponse, zFctBlobCountHourlyServiceGetData, zFctBlobCountHourlyServiceGetResponse, zFctBlobCountHourlyServiceListData, zFctBlobCountHourlyServiceListResponse, zFctBlockBlobCountHeadServiceGetData, zFctBlockBlobCountHeadServiceGetResponse, zFctBlockBlobCountHeadServiceListData, zFctBlockBlobCountHeadServiceListResponse, zFctBlockBlobCountServiceGetData, zFctBlockBlobCountServiceGetResponse, zFctBlockBlobCountServiceListData, zFctBlockBlobCountServiceListResponse, zFctBlockBlobFirstSeenByNodeServiceGetData, zFctBlockBlobFirstSeenByNodeServiceGetResponse, zFctBlockBlobFirstSeenByNodeServiceListData, zFctBlockBlobFirstSeenByNodeServiceListResponse, zFctBlockBlobHeadServiceGetData, zFctBlockBlobHeadServiceGetResponse, zFctBlockBlobHeadServiceListData, zFctBlockBlobHeadServiceListResponse, zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetData, zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse, zFctBlockDataColumnSidecarFirstSeenByNodeServiceListData, zFctBlockDataColumnSidecarFirstSeenByNodeServiceListResponse, zFctBlockDataColumnSidecarFirstSeenServiceGetData, zFctBlockDataColumnSidecarFirstSeenServiceGetResponse, zFctBlockDataColumnSidecarFirstSeenServiceListData, zFctBlockDataColumnSidecarFirstSeenServiceListResponse, zFctBlockFirstSeenByNodeServiceGetData, zFctBlockFirstSeenByNodeServiceGetResponse, zFctBlockFirstSeenByNodeServiceListData, zFctBlockFirstSeenByNodeServiceListResponse, zFctBlockHeadServiceGetData, zFctBlockHeadServiceGetResponse, zFctBlockHeadServiceListData, zFctBlockHeadServiceListResponse, zFctBlockMevHeadServiceGetData, zFctBlockMevHeadServiceGetResponse, zFctBlockMevHeadServiceListData, zFctBlockMevHeadServiceListResponse, zFctBlockMevServiceGetData, zFctBlockMevServiceGetResponse, zFctBlockMevServiceListData, zFctBlockMevServiceListResponse, zFctBlockProposalStatusDailyServiceGetData, zFctBlockProposalStatusDailyServiceGetResponse, zFctBlockProposalStatusDailyServiceListData, zFctBlockProposalStatusDailyServiceListResponse, zFctBlockProposalStatusHourlyServiceGetData, zFctBlockProposalStatusHourlyServiceGetResponse, zFctBlockProposalStatusHourlyServiceListData, zFctBlockProposalStatusHourlyServiceListResponse, zFctBlockProposerByValidatorServiceGetData, zFctBlockProposerByValidatorServiceGetResponse, zFctBlockProposerByValidatorServiceListData, zFctBlockProposerByValidatorServiceListResponse, zFctBlockProposerEntityServiceGetData, zFctBlockProposerEntityServiceGetResponse, zFctBlockProposerEntityServiceListData, zFctBlockProposerEntityServiceListResponse, zFctBlockProposerHeadServiceGetData, zFctBlockProposerHeadServiceGetResponse, zFctBlockProposerHeadServiceListData, zFctBlockProposerHeadServiceListResponse, zFctBlockProposerServiceGetData, zFctBlockProposerServiceGetResponse, zFctBlockProposerServiceListData, zFctBlockProposerServiceListResponse, zFctBlockServiceGetData, zFctBlockServiceGetResponse, zFctBlockServiceListData, zFctBlockServiceListResponse, zFctContractStorageStateByAddressDailyServiceGetData, zFctContractStorageStateByAddressDailyServiceGetResponse, zFctContractStorageStateByAddressDailyServiceListData, zFctContractStorageStateByAddressDailyServiceListResponse, zFctContractStorageStateByAddressHourlyServiceGetData, zFctContractStorageStateByAddressHourlyServiceGetResponse, zFctContractStorageStateByAddressHourlyServiceListData, zFctContractStorageStateByAddressHourlyServiceListResponse, zFctContractStorageStateByBlockDailyServiceGetData, zFctContractStorageStateByBlockDailyServiceGetResponse, zFctContractStorageStateByBlockDailyServiceListData, zFctContractStorageStateByBlockDailyServiceListResponse, zFctContractStorageStateByBlockHourlyServiceGetData, zFctContractStorageStateByBlockHourlyServiceGetResponse, zFctContractStorageStateByBlockHourlyServiceListData, zFctContractStorageStateByBlockHourlyServiceListResponse, zFctContractStorageStateWithExpiryByAddressDailyServiceGetData, zFctContractStorageStateWithExpiryByAddressDailyServiceGetResponse, zFctContractStorageStateWithExpiryByAddressDailyServiceListData, zFctContractStorageStateWithExpiryByAddressDailyServiceListResponse, zFctContractStorageStateWithExpiryByAddressHourlyServiceGetData, zFctContractStorageStateWithExpiryByAddressHourlyServiceGetResponse, zFctContractStorageStateWithExpiryByAddressHourlyServiceListData, zFctContractStorageStateWithExpiryByAddressHourlyServiceListResponse, zFctContractStorageStateWithExpiryByBlockDailyServiceGetData, zFctContractStorageStateWithExpiryByBlockDailyServiceGetResponse, zFctContractStorageStateWithExpiryByBlockDailyServiceListData, zFctContractStorageStateWithExpiryByBlockDailyServiceListResponse, zFctContractStorageStateWithExpiryByBlockHourlyServiceGetData, zFctContractStorageStateWithExpiryByBlockHourlyServiceGetResponse, zFctContractStorageStateWithExpiryByBlockHourlyServiceListData, zFctContractStorageStateWithExpiryByBlockHourlyServiceListResponse, zFctDataColumnAvailabilityByEpochServiceGetData, zFctDataColumnAvailabilityByEpochServiceGetResponse, zFctDataColumnAvailabilityByEpochServiceListData, zFctDataColumnAvailabilityByEpochServiceListResponse, zFctDataColumnAvailabilityBySlotBlobServiceGetData, zFctDataColumnAvailabilityBySlotBlobServiceGetResponse, zFctDataColumnAvailabilityBySlotBlobServiceListData, zFctDataColumnAvailabilityBySlotBlobServiceListResponse, zFctDataColumnAvailabilityBySlotServiceGetData, zFctDataColumnAvailabilityBySlotServiceGetResponse, zFctDataColumnAvailabilityBySlotServiceListData, zFctDataColumnAvailabilityBySlotServiceListResponse, zFctDataColumnAvailabilityDailyServiceGetData, zFctDataColumnAvailabilityDailyServiceGetResponse, zFctDataColumnAvailabilityDailyServiceListData, zFctDataColumnAvailabilityDailyServiceListResponse, zFctDataColumnAvailabilityHourlyServiceGetData, zFctDataColumnAvailabilityHourlyServiceGetResponse, zFctDataColumnAvailabilityHourlyServiceListData, zFctDataColumnAvailabilityHourlyServiceListResponse, zFctEngineGetBlobsByElClientHourlyServiceGetData, zFctEngineGetBlobsByElClientHourlyServiceGetResponse, zFctEngineGetBlobsByElClientHourlyServiceListData, zFctEngineGetBlobsByElClientHourlyServiceListResponse, zFctEngineGetBlobsByElClientServiceGetData, zFctEngineGetBlobsByElClientServiceGetResponse, zFctEngineGetBlobsByElClientServiceListData, zFctEngineGetBlobsByElClientServiceListResponse, zFctEngineGetBlobsBySlotServiceGetData, zFctEngineGetBlobsBySlotServiceGetResponse, zFctEngineGetBlobsBySlotServiceListData, zFctEngineGetBlobsBySlotServiceListResponse, zFctEngineGetBlobsDurationChunked50MsServiceGetData, zFctEngineGetBlobsDurationChunked50MsServiceGetResponse, zFctEngineGetBlobsDurationChunked50MsServiceListData, zFctEngineGetBlobsDurationChunked50MsServiceListResponse, zFctEngineNewPayloadByElClientHourlyServiceGetData, zFctEngineNewPayloadByElClientHourlyServiceGetResponse, zFctEngineNewPayloadByElClientHourlyServiceListData, zFctEngineNewPayloadByElClientHourlyServiceListResponse, zFctEngineNewPayloadByElClientServiceGetData, zFctEngineNewPayloadByElClientServiceGetResponse, zFctEngineNewPayloadByElClientServiceListData, zFctEngineNewPayloadByElClientServiceListResponse, zFctEngineNewPayloadBySlotServiceGetData, zFctEngineNewPayloadBySlotServiceGetResponse, zFctEngineNewPayloadBySlotServiceListData, zFctEngineNewPayloadBySlotServiceListResponse, zFctEngineNewPayloadDurationChunked50MsServiceGetData, zFctEngineNewPayloadDurationChunked50MsServiceGetResponse, zFctEngineNewPayloadDurationChunked50MsServiceListData, zFctEngineNewPayloadDurationChunked50MsServiceListResponse, zFctEngineNewPayloadWinrateDailyServiceGetData, zFctEngineNewPayloadWinrateDailyServiceGetResponse, zFctEngineNewPayloadWinrateDailyServiceListData, zFctEngineNewPayloadWinrateDailyServiceListResponse, zFctEngineNewPayloadWinrateHourlyServiceGetData, zFctEngineNewPayloadWinrateHourlyServiceGetResponse, zFctEngineNewPayloadWinrateHourlyServiceListData, zFctEngineNewPayloadWinrateHourlyServiceListResponse, zFctExecutionGasLimitDailyServiceGetData, zFctExecutionGasLimitDailyServiceGetResponse, zFctExecutionGasLimitDailyServiceListData, zFctExecutionGasLimitDailyServiceListResponse, zFctExecutionGasLimitHourlyServiceGetData, zFctExecutionGasLimitHourlyServiceGetResponse, zFctExecutionGasLimitHourlyServiceListData, zFctExecutionGasLimitHourlyServiceListResponse, zFctExecutionGasLimitSignallingDailyServiceGetData, zFctExecutionGasLimitSignallingDailyServiceGetResponse, zFctExecutionGasLimitSignallingDailyServiceListData, zFctExecutionGasLimitSignallingDailyServiceListResponse, zFctExecutionGasLimitSignallingHourlyServiceGetData, zFctExecutionGasLimitSignallingHourlyServiceGetResponse, zFctExecutionGasLimitSignallingHourlyServiceListData, zFctExecutionGasLimitSignallingHourlyServiceListResponse, zFctExecutionGasUsedDailyServiceGetData, zFctExecutionGasUsedDailyServiceGetResponse, zFctExecutionGasUsedDailyServiceListData, zFctExecutionGasUsedDailyServiceListResponse, zFctExecutionGasUsedHourlyServiceGetData, zFctExecutionGasUsedHourlyServiceGetResponse, zFctExecutionGasUsedHourlyServiceListData, zFctExecutionGasUsedHourlyServiceListResponse, zFctExecutionReceiptSizeDailyServiceGetData, zFctExecutionReceiptSizeDailyServiceGetResponse, zFctExecutionReceiptSizeDailyServiceListData, zFctExecutionReceiptSizeDailyServiceListResponse, zFctExecutionReceiptSizeHourlyServiceGetData, zFctExecutionReceiptSizeHourlyServiceGetResponse, zFctExecutionReceiptSizeHourlyServiceListData, zFctExecutionReceiptSizeHourlyServiceListResponse, zFctExecutionStateSizeDailyServiceGetData, zFctExecutionStateSizeDailyServiceGetResponse, zFctExecutionStateSizeDailyServiceListData, zFctExecutionStateSizeDailyServiceListResponse, zFctExecutionStateSizeHourlyServiceGetData, zFctExecutionStateSizeHourlyServiceGetResponse, zFctExecutionStateSizeHourlyServiceListData, zFctExecutionStateSizeHourlyServiceListResponse, zFctExecutionTpsDailyServiceGetData, zFctExecutionTpsDailyServiceGetResponse, zFctExecutionTpsDailyServiceListData, zFctExecutionTpsDailyServiceListResponse, zFctExecutionTpsHourlyServiceGetData, zFctExecutionTpsHourlyServiceGetResponse, zFctExecutionTpsHourlyServiceListData, zFctExecutionTpsHourlyServiceListResponse, zFctExecutionTransactionsDailyServiceGetData, zFctExecutionTransactionsDailyServiceGetResponse, zFctExecutionTransactionsDailyServiceListData, zFctExecutionTransactionsDailyServiceListResponse, zFctExecutionTransactionsHourlyServiceGetData, zFctExecutionTransactionsHourlyServiceGetResponse, zFctExecutionTransactionsHourlyServiceListData, zFctExecutionTransactionsHourlyServiceListResponse, zFctHeadFirstSeenByNodeServiceGetData, zFctHeadFirstSeenByNodeServiceGetResponse, zFctHeadFirstSeenByNodeServiceListData, zFctHeadFirstSeenByNodeServiceListResponse, zFctHeadVoteCorrectnessRateDailyServiceGetData, zFctHeadVoteCorrectnessRateDailyServiceGetResponse, zFctHeadVoteCorrectnessRateDailyServiceListData, zFctHeadVoteCorrectnessRateDailyServiceListResponse, zFctHeadVoteCorrectnessRateHourlyServiceGetData, zFctHeadVoteCorrectnessRateHourlyServiceGetResponse, zFctHeadVoteCorrectnessRateHourlyServiceListData, zFctHeadVoteCorrectnessRateHourlyServiceListResponse, zFctMevBidCountByBuilderServiceGetData, zFctMevBidCountByBuilderServiceGetResponse, zFctMevBidCountByBuilderServiceListData, zFctMevBidCountByBuilderServiceListResponse, zFctMevBidCountByRelayServiceGetData, zFctMevBidCountByRelayServiceGetResponse, zFctMevBidCountByRelayServiceListData, zFctMevBidCountByRelayServiceListResponse, zFctMevBidHighestValueByBuilderChunked50MsServiceGetData, zFctMevBidHighestValueByBuilderChunked50MsServiceGetResponse, zFctMevBidHighestValueByBuilderChunked50MsServiceListData, zFctMevBidHighestValueByBuilderChunked50MsServiceListResponse, zFctMissedSlotRateDailyServiceGetData, zFctMissedSlotRateDailyServiceGetResponse, zFctMissedSlotRateDailyServiceListData, zFctMissedSlotRateDailyServiceListResponse, zFctMissedSlotRateHourlyServiceGetData, zFctMissedSlotRateHourlyServiceGetResponse, zFctMissedSlotRateHourlyServiceListData, zFctMissedSlotRateHourlyServiceListResponse, zFctNodeActiveLast24hServiceGetData, zFctNodeActiveLast24hServiceGetResponse, zFctNodeActiveLast24hServiceListData, zFctNodeActiveLast24hServiceListResponse, zFctNodeCpuUtilizationByProcessServiceGetData, zFctNodeCpuUtilizationByProcessServiceGetResponse, zFctNodeCpuUtilizationByProcessServiceListData, zFctNodeCpuUtilizationByProcessServiceListResponse, zFctNodeDiskIoByProcessServiceGetData, zFctNodeDiskIoByProcessServiceGetResponse, zFctNodeDiskIoByProcessServiceListData, zFctNodeDiskIoByProcessServiceListResponse, zFctNodeMemoryUsageByProcessServiceGetData, zFctNodeMemoryUsageByProcessServiceGetResponse, zFctNodeMemoryUsageByProcessServiceListData, zFctNodeMemoryUsageByProcessServiceListResponse, zFctNodeNetworkIoByProcessServiceGetData, zFctNodeNetworkIoByProcessServiceGetResponse, zFctNodeNetworkIoByProcessServiceListData, zFctNodeNetworkIoByProcessServiceListResponse, zFctOpcodeGasByOpcodeDailyServiceGetData, zFctOpcodeGasByOpcodeDailyServiceGetResponse, zFctOpcodeGasByOpcodeDailyServiceListData, zFctOpcodeGasByOpcodeDailyServiceListResponse, zFctOpcodeGasByOpcodeHourlyServiceGetData, zFctOpcodeGasByOpcodeHourlyServiceGetResponse, zFctOpcodeGasByOpcodeHourlyServiceListData, zFctOpcodeGasByOpcodeHourlyServiceListResponse, zFctOpcodeOpsDailyServiceGetData, zFctOpcodeOpsDailyServiceGetResponse, zFctOpcodeOpsDailyServiceListData, zFctOpcodeOpsDailyServiceListResponse, zFctOpcodeOpsHourlyServiceGetData, zFctOpcodeOpsHourlyServiceGetResponse, zFctOpcodeOpsHourlyServiceListData, zFctOpcodeOpsHourlyServiceListResponse, zFctPreparedBlockServiceGetData, zFctPreparedBlockServiceGetResponse, zFctPreparedBlockServiceListData, zFctPreparedBlockServiceListResponse, zFctProposerRewardDailyServiceGetData, zFctProposerRewardDailyServiceGetResponse, zFctProposerRewardDailyServiceListData, zFctProposerRewardDailyServiceListResponse, zFctProposerRewardHourlyServiceGetData, zFctProposerRewardHourlyServiceGetResponse, zFctProposerRewardHourlyServiceListData, zFctProposerRewardHourlyServiceListResponse, zFctReorgDailyServiceGetData, zFctReorgDailyServiceGetResponse, zFctReorgDailyServiceListData, zFctReorgDailyServiceListResponse, zFctReorgHourlyServiceGetData, zFctReorgHourlyServiceGetResponse, zFctReorgHourlyServiceListData, zFctReorgHourlyServiceListResponse, zFctRocketpoolValidatorServiceGetData, zFctRocketpoolValidatorServiceGetResponse, zFctRocketpoolValidatorServiceListData, zFctRocketpoolValidatorServiceListResponse, zFctStorageSlotStateByAddressDailyServiceGetData, zFctStorageSlotStateByAddressDailyServiceGetResponse, zFctStorageSlotStateByAddressDailyServiceListData, zFctStorageSlotStateByAddressDailyServiceListResponse, zFctStorageSlotStateByAddressHourlyServiceGetData, zFctStorageSlotStateByAddressHourlyServiceGetResponse, zFctStorageSlotStateByAddressHourlyServiceListData, zFctStorageSlotStateByAddressHourlyServiceListResponse, zFctStorageSlotStateByBlockDailyServiceGetData, zFctStorageSlotStateByBlockDailyServiceGetResponse, zFctStorageSlotStateByBlockDailyServiceListData, zFctStorageSlotStateByBlockDailyServiceListResponse, zFctStorageSlotStateByBlockHourlyServiceGetData, zFctStorageSlotStateByBlockHourlyServiceGetResponse, zFctStorageSlotStateByBlockHourlyServiceListData, zFctStorageSlotStateByBlockHourlyServiceListResponse, zFctStorageSlotStateWithExpiryByAddressDailyServiceGetData, zFctStorageSlotStateWithExpiryByAddressDailyServiceGetResponse, zFctStorageSlotStateWithExpiryByAddressDailyServiceListData, zFctStorageSlotStateWithExpiryByAddressDailyServiceListResponse, zFctStorageSlotStateWithExpiryByAddressHourlyServiceGetData, zFctStorageSlotStateWithExpiryByAddressHourlyServiceGetResponse, zFctStorageSlotStateWithExpiryByAddressHourlyServiceListData, zFctStorageSlotStateWithExpiryByAddressHourlyServiceListResponse, zFctStorageSlotStateWithExpiryByBlockDailyServiceGetData, zFctStorageSlotStateWithExpiryByBlockDailyServiceGetResponse, zFctStorageSlotStateWithExpiryByBlockDailyServiceListData, zFctStorageSlotStateWithExpiryByBlockDailyServiceListResponse, zFctStorageSlotStateWithExpiryByBlockHourlyServiceGetData, zFctStorageSlotStateWithExpiryByBlockHourlyServiceGetResponse, zFctStorageSlotStateWithExpiryByBlockHourlyServiceListData, zFctStorageSlotStateWithExpiryByBlockHourlyServiceListResponse, zFctStorageSlotTop100ByBytesServiceGetData, zFctStorageSlotTop100ByBytesServiceGetResponse, zFctStorageSlotTop100ByBytesServiceListData, zFctStorageSlotTop100ByBytesServiceListResponse, zFctStorageSlotTop100BySlotsServiceGetData, zFctStorageSlotTop100BySlotsServiceGetResponse, zFctStorageSlotTop100BySlotsServiceListData, zFctStorageSlotTop100BySlotsServiceListResponse, zFctSyncCommitteeParticipationByValidatorDailyServiceGetData, zFctSyncCommitteeParticipationByValidatorDailyServiceGetResponse, zFctSyncCommitteeParticipationByValidatorDailyServiceListData, zFctSyncCommitteeParticipationByValidatorDailyServiceListResponse, zFctSyncCommitteeParticipationByValidatorHourlyServiceGetData, zFctSyncCommitteeParticipationByValidatorHourlyServiceGetResponse, zFctSyncCommitteeParticipationByValidatorHourlyServiceListData, zFctSyncCommitteeParticipationByValidatorHourlyServiceListResponse, zFctSyncCommitteeParticipationByValidatorServiceGetData, zFctSyncCommitteeParticipationByValidatorServiceGetResponse, zFctSyncCommitteeParticipationByValidatorServiceListData, zFctSyncCommitteeParticipationByValidatorServiceListResponse, zFctTokenContractStorageStateByBlockDailyServiceGetData, zFctTokenContractStorageStateByBlockDailyServiceGetResponse, zFctTokenContractStorageStateByBlockDailyServiceListData, zFctTokenContractStorageStateByBlockDailyServiceListResponse, zFctValidatorBalanceDailyServiceGetData, zFctValidatorBalanceDailyServiceGetResponse, zFctValidatorBalanceDailyServiceListData, zFctValidatorBalanceDailyServiceListResponse, zFctValidatorBalanceHourlyServiceGetData, zFctValidatorBalanceHourlyServiceGetResponse, zFctValidatorBalanceHourlyServiceListData, zFctValidatorBalanceHourlyServiceListResponse, zFctValidatorBalanceServiceGetData, zFctValidatorBalanceServiceGetResponse, zFctValidatorBalanceServiceListData, zFctValidatorBalanceServiceListResponse, zFctValidatorCountByEntityByStatusDailyServiceGetData, zFctValidatorCountByEntityByStatusDailyServiceGetResponse, zFctValidatorCountByEntityByStatusDailyServiceListData, zFctValidatorCountByEntityByStatusDailyServiceListResponse, zIntAttestationAttestedCanonicalServiceGetData, zIntAttestationAttestedCanonicalServiceGetResponse, zIntAttestationAttestedCanonicalServiceListData, zIntAttestationAttestedCanonicalServiceListResponse, zIntAttestationAttestedHeadServiceGetData, zIntAttestationAttestedHeadServiceGetResponse, zIntAttestationAttestedHeadServiceListData, zIntAttestationAttestedHeadServiceListResponse, zIntAttestationFirstSeenAggregateServiceGetData, zIntAttestationFirstSeenAggregateServiceGetResponse, zIntAttestationFirstSeenAggregateServiceListData, zIntAttestationFirstSeenAggregateServiceListResponse, zIntAttestationFirstSeenServiceGetData, zIntAttestationFirstSeenServiceGetResponse, zIntAttestationFirstSeenServiceListData, zIntAttestationFirstSeenServiceListResponse, zIntBeaconCommitteeHeadServiceGetData, zIntBeaconCommitteeHeadServiceGetResponse, zIntBeaconCommitteeHeadServiceListData, zIntBeaconCommitteeHeadServiceListResponse, zIntBlockBlobCountCanonicalServiceGetData, zIntBlockBlobCountCanonicalServiceGetResponse, zIntBlockBlobCountCanonicalServiceListData, zIntBlockBlobCountCanonicalServiceListResponse, zIntBlockCanonicalServiceGetData, zIntBlockCanonicalServiceGetResponse, zIntBlockCanonicalServiceListData, zIntBlockCanonicalServiceListResponse, zIntBlockMevCanonicalServiceGetData, zIntBlockMevCanonicalServiceGetResponse, zIntBlockMevCanonicalServiceListData, zIntBlockMevCanonicalServiceListResponse, zIntBlockOpcodeGasServiceGetData, zIntBlockOpcodeGasServiceGetResponse, zIntBlockOpcodeGasServiceListData, zIntBlockOpcodeGasServiceListResponse, zIntBlockProposerCanonicalServiceGetData, zIntBlockProposerCanonicalServiceGetResponse, zIntBlockProposerCanonicalServiceListData, zIntBlockProposerCanonicalServiceListResponse, zIntBlockReceiptSizeServiceGetData, zIntBlockReceiptSizeServiceGetResponse, zIntBlockReceiptSizeServiceListData, zIntBlockReceiptSizeServiceListResponse, zIntBlockResourceGasServiceGetData, zIntBlockResourceGasServiceGetResponse, zIntBlockResourceGasServiceListData, zIntBlockResourceGasServiceListResponse, zIntContractCreationServiceGetData, zIntContractCreationServiceGetResponse, zIntContractCreationServiceListData, zIntContractCreationServiceListResponse, zIntContractSelfdestructServiceGetData, zIntContractSelfdestructServiceGetResponse, zIntContractSelfdestructServiceListData, zIntContractSelfdestructServiceListResponse, zIntContractStorageExpiry12mServiceGetData, zIntContractStorageExpiry12mServiceGetResponse, zIntContractStorageExpiry12mServiceListData, zIntContractStorageExpiry12mServiceListResponse, zIntContractStorageExpiry18mServiceGetData, zIntContractStorageExpiry18mServiceGetResponse, zIntContractStorageExpiry18mServiceListData, zIntContractStorageExpiry18mServiceListResponse, zIntContractStorageExpiry1mServiceGetData, zIntContractStorageExpiry1mServiceGetResponse, zIntContractStorageExpiry1mServiceListData, zIntContractStorageExpiry1mServiceListResponse, zIntContractStorageExpiry24mServiceGetData, zIntContractStorageExpiry24mServiceGetResponse, zIntContractStorageExpiry24mServiceListData, zIntContractStorageExpiry24mServiceListResponse, zIntContractStorageExpiry6mServiceGetData, zIntContractStorageExpiry6mServiceGetResponse, zIntContractStorageExpiry6mServiceListData, zIntContractStorageExpiry6mServiceListResponse, zIntContractStorageNextTouchServiceGetData, zIntContractStorageNextTouchServiceGetResponse, zIntContractStorageNextTouchServiceListData, zIntContractStorageNextTouchServiceListResponse, zIntContractStorageReactivation12mServiceGetData, zIntContractStorageReactivation12mServiceGetResponse, zIntContractStorageReactivation12mServiceListData, zIntContractStorageReactivation12mServiceListResponse, zIntContractStorageReactivation18mServiceGetData, zIntContractStorageReactivation18mServiceGetResponse, zIntContractStorageReactivation18mServiceListData, zIntContractStorageReactivation18mServiceListResponse, zIntContractStorageReactivation1mServiceGetData, zIntContractStorageReactivation1mServiceGetResponse, zIntContractStorageReactivation1mServiceListData, zIntContractStorageReactivation1mServiceListResponse, zIntContractStorageReactivation24mServiceGetData, zIntContractStorageReactivation24mServiceGetResponse, zIntContractStorageReactivation24mServiceListData, zIntContractStorageReactivation24mServiceListResponse, zIntContractStorageReactivation6mServiceGetData, zIntContractStorageReactivation6mServiceGetResponse, zIntContractStorageReactivation6mServiceListData, zIntContractStorageReactivation6mServiceListResponse, zIntContractStorageStateByAddressServiceGetData, zIntContractStorageStateByAddressServiceGetResponse, zIntContractStorageStateByAddressServiceListData, zIntContractStorageStateByAddressServiceListResponse, zIntContractStorageStateByBlockServiceGetData, zIntContractStorageStateByBlockServiceGetResponse, zIntContractStorageStateByBlockServiceListData, zIntContractStorageStateByBlockServiceListResponse, zIntContractStorageStateServiceGetData, zIntContractStorageStateServiceGetResponse, zIntContractStorageStateServiceListData, zIntContractStorageStateServiceListResponse, zIntContractStorageStateWithExpiryByAddressServiceGetData, zIntContractStorageStateWithExpiryByAddressServiceGetResponse, zIntContractStorageStateWithExpiryByAddressServiceListData, zIntContractStorageStateWithExpiryByAddressServiceListResponse, zIntContractStorageStateWithExpiryByBlockServiceGetData, zIntContractStorageStateWithExpiryByBlockServiceGetResponse, zIntContractStorageStateWithExpiryByBlockServiceListData, zIntContractStorageStateWithExpiryByBlockServiceListResponse, zIntContractStorageStateWithExpiryServiceGetData, zIntContractStorageStateWithExpiryServiceGetResponse, zIntContractStorageStateWithExpiryServiceListData, zIntContractStorageStateWithExpiryServiceListResponse, zIntCustodyProbeOrderBySlotServiceGetData, zIntCustodyProbeOrderBySlotServiceGetResponse, zIntCustodyProbeOrderBySlotServiceListData, zIntCustodyProbeOrderBySlotServiceListResponse, zIntCustodyProbeServiceGetData, zIntCustodyProbeServiceGetResponse, zIntCustodyProbeServiceListData, zIntCustodyProbeServiceListResponse, zIntEngineGetBlobsServiceGetData, zIntEngineGetBlobsServiceGetResponse, zIntEngineGetBlobsServiceListData, zIntEngineGetBlobsServiceListResponse, zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetData, zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse, zIntEngineNewPayloadFastestExecutionByNodeClassServiceListData, zIntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse, zIntEngineNewPayloadServiceGetData, zIntEngineNewPayloadServiceGetResponse, zIntEngineNewPayloadServiceListData, zIntEngineNewPayloadServiceListResponse, zIntExecutionBlockByDateServiceGetData, zIntExecutionBlockByDateServiceGetResponse, zIntExecutionBlockByDateServiceListData, zIntExecutionBlockByDateServiceListResponse, zIntExecutionStateSizeByBlockServiceGetData, zIntExecutionStateSizeByBlockServiceGetResponse, zIntExecutionStateSizeByBlockServiceListData, zIntExecutionStateSizeByBlockServiceListResponse, zIntRocketpoolMegapoolServiceGetData, zIntRocketpoolMegapoolServiceGetResponse, zIntRocketpoolMegapoolServiceListData, zIntRocketpoolMegapoolServiceListResponse, zIntRocketpoolMinipoolServiceGetData, zIntRocketpoolMinipoolServiceGetResponse, zIntRocketpoolMinipoolServiceListData, zIntRocketpoolMinipoolServiceListResponse, zIntRocketpoolNodeEventServiceGetData, zIntRocketpoolNodeEventServiceGetResponse, zIntRocketpoolNodeEventServiceListData, zIntRocketpoolNodeEventServiceListResponse, zIntRocketpoolNodeTimezoneServiceGetData, zIntRocketpoolNodeTimezoneServiceGetResponse, zIntRocketpoolNodeTimezoneServiceListData, zIntRocketpoolNodeTimezoneServiceListResponse, zIntStorageSelfdestructDiffsServiceGetData, zIntStorageSelfdestructDiffsServiceGetResponse, zIntStorageSelfdestructDiffsServiceListData, zIntStorageSelfdestructDiffsServiceListResponse, zIntStorageSlotDiffByAddressSlotServiceGetData, zIntStorageSlotDiffByAddressSlotServiceGetResponse, zIntStorageSlotDiffByAddressSlotServiceListData, zIntStorageSlotDiffByAddressSlotServiceListResponse, zIntStorageSlotDiffServiceGetData, zIntStorageSlotDiffServiceGetResponse, zIntStorageSlotDiffServiceListData, zIntStorageSlotDiffServiceListResponse, zIntStorageSlotExpiry12mServiceGetData, zIntStorageSlotExpiry12mServiceGetResponse, zIntStorageSlotExpiry12mServiceListData, zIntStorageSlotExpiry12mServiceListResponse, zIntStorageSlotExpiry18mServiceGetData, zIntStorageSlotExpiry18mServiceGetResponse, zIntStorageSlotExpiry18mServiceListData, zIntStorageSlotExpiry18mServiceListResponse, zIntStorageSlotExpiry1mServiceGetData, zIntStorageSlotExpiry1mServiceGetResponse, zIntStorageSlotExpiry1mServiceListData, zIntStorageSlotExpiry1mServiceListResponse, zIntStorageSlotExpiry24mServiceGetData, zIntStorageSlotExpiry24mServiceGetResponse, zIntStorageSlotExpiry24mServiceListData, zIntStorageSlotExpiry24mServiceListResponse, zIntStorageSlotExpiry6mServiceGetData, zIntStorageSlotExpiry6mServiceGetResponse, zIntStorageSlotExpiry6mServiceListData, zIntStorageSlotExpiry6mServiceListResponse, zIntStorageSlotLifecycleBoundaryServiceGetData, zIntStorageSlotLifecycleBoundaryServiceGetResponse, zIntStorageSlotLifecycleBoundaryServiceListData, zIntStorageSlotLifecycleBoundaryServiceListResponse, zIntStorageSlotLifecycleServiceGetData, zIntStorageSlotLifecycleServiceGetResponse, zIntStorageSlotLifecycleServiceListData, zIntStorageSlotLifecycleServiceListResponse, zIntStorageSlotNextTouchServiceGetData, zIntStorageSlotNextTouchServiceGetResponse, zIntStorageSlotNextTouchServiceListData, zIntStorageSlotNextTouchServiceListResponse, zIntStorageSlotReactivation12mServiceGetData, zIntStorageSlotReactivation12mServiceGetResponse, zIntStorageSlotReactivation12mServiceListData, zIntStorageSlotReactivation12mServiceListResponse, zIntStorageSlotReactivation18mServiceGetData, zIntStorageSlotReactivation18mServiceGetResponse, zIntStorageSlotReactivation18mServiceListData, zIntStorageSlotReactivation18mServiceListResponse, zIntStorageSlotReactivation1mServiceGetData, zIntStorageSlotReactivation1mServiceGetResponse, zIntStorageSlotReactivation1mServiceListData, zIntStorageSlotReactivation1mServiceListResponse, zIntStorageSlotReactivation24mServiceGetData, zIntStorageSlotReactivation24mServiceGetResponse, zIntStorageSlotReactivation24mServiceListData, zIntStorageSlotReactivation24mServiceListResponse, zIntStorageSlotReactivation6mServiceGetData, zIntStorageSlotReactivation6mServiceGetResponse, zIntStorageSlotReactivation6mServiceListData, zIntStorageSlotReactivation6mServiceListResponse, zIntStorageSlotReadServiceGetData, zIntStorageSlotReadServiceGetResponse, zIntStorageSlotReadServiceListData, zIntStorageSlotReadServiceListResponse, zIntStorageSlotStateByAddressServiceGetData, zIntStorageSlotStateByAddressServiceGetResponse, zIntStorageSlotStateByAddressServiceListData, zIntStorageSlotStateByAddressServiceListResponse, zIntStorageSlotStateByBlockServiceGetData, zIntStorageSlotStateByBlockServiceGetResponse, zIntStorageSlotStateByBlockServiceListData, zIntStorageSlotStateByBlockServiceListResponse, zIntStorageSlotStateServiceGetData, zIntStorageSlotStateServiceGetResponse, zIntStorageSlotStateServiceListData, zIntStorageSlotStateServiceListResponse, zIntStorageSlotStateWithExpiryByAddressServiceGetData, zIntStorageSlotStateWithExpiryByAddressServiceGetResponse, zIntStorageSlotStateWithExpiryByAddressServiceListData, zIntStorageSlotStateWithExpiryByAddressServiceListResponse, zIntStorageSlotStateWithExpiryByBlockServiceGetData, zIntStorageSlotStateWithExpiryByBlockServiceGetResponse, zIntStorageSlotStateWithExpiryByBlockServiceListData, zIntStorageSlotStateWithExpiryByBlockServiceListResponse, zIntStorageSlotStateWithExpiryServiceGetData, zIntStorageSlotStateWithExpiryServiceGetResponse, zIntStorageSlotStateWithExpiryServiceListData, zIntStorageSlotStateWithExpiryServiceListResponse, zIntTokenContractStorageStateByBlockServiceGetData, zIntTokenContractStorageStateByBlockServiceGetResponse, zIntTokenContractStorageStateByBlockServiceListData, zIntTokenContractStorageStateByBlockServiceListResponse, zIntTransactionCallFrameOpcodeGasServiceGetData, zIntTransactionCallFrameOpcodeGasServiceGetResponse, zIntTransactionCallFrameOpcodeGasServiceListData, zIntTransactionCallFrameOpcodeGasServiceListResponse, zIntTransactionCallFrameOpcodeResourceGasServiceGetData, zIntTransactionCallFrameOpcodeResourceGasServiceGetResponse, zIntTransactionCallFrameOpcodeResourceGasServiceListData, zIntTransactionCallFrameOpcodeResourceGasServiceListResponse, zIntTransactionCallFrameServiceGetData, zIntTransactionCallFrameServiceGetResponse, zIntTransactionCallFrameServiceListData, zIntTransactionCallFrameServiceListResponse, zIntTransactionOpcodeGasServiceGetData, zIntTransactionOpcodeGasServiceGetResponse, zIntTransactionOpcodeGasServiceListData, zIntTransactionOpcodeGasServiceListResponse, zIntTransactionReceiptSizeServiceGetData, zIntTransactionReceiptSizeServiceGetResponse, zIntTransactionReceiptSizeServiceListData, zIntTransactionReceiptSizeServiceListResponse, zIntTransactionResourceGasServiceGetData, zIntTransactionResourceGasServiceGetResponse, zIntTransactionResourceGasServiceListData, zIntTransactionResourceGasServiceListResponse } from './zod.gen';
 
-export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<
-  TData,
-  ThrowOnError
-> & {
-  /**
-   * You can provide a client instance returned by `createClient()` instead of
-   * individual options. This might be also useful if you want to implement a
-   * custom client.
-   */
-  client?: Client;
-  /**
-   * You can pass arbitrary values through the `meta` object. This can be
-   * used to access values that aren't defined as part of the SDK function.
-   */
-  meta?: Record<string, unknown>;
+export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
+    /**
+     * You can provide a client instance returned by `createClient()` instead of
+     * individual options. This might be also useful if you want to implement a
+     * custom client.
+     */
+    client?: Client;
+    /**
+     * You can pass arbitrary values through the `meta` object. This can be
+     * used to access values that aren't defined as part of the SDK function.
+     */
+    meta?: Record<string, unknown>;
 };
 
 /**
@@ -1889,7028 +24,4629 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  *
  * Retrieve paginated results with optional filtering
  */
-export const adminCbtIncrementalServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<AdminCbtIncrementalServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    AdminCbtIncrementalServiceListResponses,
-    AdminCbtIncrementalServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zAdminCbtIncrementalServiceListData.parseAsync(data),
-    responseValidator: async data => await zAdminCbtIncrementalServiceListResponse.parseAsync(data),
+export const adminCbtIncrementalServiceList = <ThrowOnError extends boolean = false>(options?: Options<AdminCbtIncrementalServiceListData, ThrowOnError>) => (options?.client ?? client).get<AdminCbtIncrementalServiceListResponses, AdminCbtIncrementalServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zAdminCbtIncrementalServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zAdminCbtIncrementalServiceListResponse.parseAsync(data),
     url: '/api/v1/admin_cbt_incremental',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by database
  */
-export const adminCbtIncrementalServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<AdminCbtIncrementalServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    AdminCbtIncrementalServiceGetResponses,
-    AdminCbtIncrementalServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zAdminCbtIncrementalServiceGetData.parseAsync(data),
-    responseValidator: async data => await zAdminCbtIncrementalServiceGetResponse.parseAsync(data),
+export const adminCbtIncrementalServiceGet = <ThrowOnError extends boolean = false>(options: Options<AdminCbtIncrementalServiceGetData, ThrowOnError>) => (options.client ?? client).get<AdminCbtIncrementalServiceGetResponses, AdminCbtIncrementalServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zAdminCbtIncrementalServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zAdminCbtIncrementalServiceGetResponse.parseAsync(data),
     url: '/api/v1/admin_cbt_incremental/{database}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const dimBlockBlobSubmitterServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<DimBlockBlobSubmitterServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    DimBlockBlobSubmitterServiceListResponses,
-    DimBlockBlobSubmitterServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zDimBlockBlobSubmitterServiceListData.parseAsync(data),
-    responseValidator: async data => await zDimBlockBlobSubmitterServiceListResponse.parseAsync(data),
+export const dimBlockBlobSubmitterServiceList = <ThrowOnError extends boolean = false>(options?: Options<DimBlockBlobSubmitterServiceListData, ThrowOnError>) => (options?.client ?? client).get<DimBlockBlobSubmitterServiceListResponses, DimBlockBlobSubmitterServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDimBlockBlobSubmitterServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zDimBlockBlobSubmitterServiceListResponse.parseAsync(data),
     url: '/api/v1/dim_block_blob_submitter',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const dimBlockBlobSubmitterServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<DimBlockBlobSubmitterServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    DimBlockBlobSubmitterServiceGetResponses,
-    DimBlockBlobSubmitterServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zDimBlockBlobSubmitterServiceGetData.parseAsync(data),
-    responseValidator: async data => await zDimBlockBlobSubmitterServiceGetResponse.parseAsync(data),
+export const dimBlockBlobSubmitterServiceGet = <ThrowOnError extends boolean = false>(options: Options<DimBlockBlobSubmitterServiceGetData, ThrowOnError>) => (options.client ?? client).get<DimBlockBlobSubmitterServiceGetResponses, DimBlockBlobSubmitterServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDimBlockBlobSubmitterServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zDimBlockBlobSubmitterServiceGetResponse.parseAsync(data),
     url: '/api/v1/dim_block_blob_submitter/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const dimContractOwnerServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<DimContractOwnerServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    DimContractOwnerServiceListResponses,
-    DimContractOwnerServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zDimContractOwnerServiceListData.parseAsync(data),
-    responseValidator: async data => await zDimContractOwnerServiceListResponse.parseAsync(data),
+export const dimContractOwnerServiceList = <ThrowOnError extends boolean = false>(options?: Options<DimContractOwnerServiceListData, ThrowOnError>) => (options?.client ?? client).get<DimContractOwnerServiceListResponses, DimContractOwnerServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDimContractOwnerServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zDimContractOwnerServiceListResponse.parseAsync(data),
     url: '/api/v1/dim_contract_owner',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by contract_address
  */
-export const dimContractOwnerServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<DimContractOwnerServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<DimContractOwnerServiceGetResponses, DimContractOwnerServiceGetErrors, ThrowOnError>({
-    requestValidator: async data => await zDimContractOwnerServiceGetData.parseAsync(data),
-    responseValidator: async data => await zDimContractOwnerServiceGetResponse.parseAsync(data),
+export const dimContractOwnerServiceGet = <ThrowOnError extends boolean = false>(options: Options<DimContractOwnerServiceGetData, ThrowOnError>) => (options.client ?? client).get<DimContractOwnerServiceGetResponses, DimContractOwnerServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDimContractOwnerServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zDimContractOwnerServiceGetResponse.parseAsync(data),
     url: '/api/v1/dim_contract_owner/{contract_address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const dimFunctionSignatureServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<DimFunctionSignatureServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    DimFunctionSignatureServiceListResponses,
-    DimFunctionSignatureServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zDimFunctionSignatureServiceListData.parseAsync(data),
-    responseValidator: async data => await zDimFunctionSignatureServiceListResponse.parseAsync(data),
+export const dimFunctionSignatureServiceList = <ThrowOnError extends boolean = false>(options?: Options<DimFunctionSignatureServiceListData, ThrowOnError>) => (options?.client ?? client).get<DimFunctionSignatureServiceListResponses, DimFunctionSignatureServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDimFunctionSignatureServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zDimFunctionSignatureServiceListResponse.parseAsync(data),
     url: '/api/v1/dim_function_signature',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by selector
  */
-export const dimFunctionSignatureServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<DimFunctionSignatureServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    DimFunctionSignatureServiceGetResponses,
-    DimFunctionSignatureServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zDimFunctionSignatureServiceGetData.parseAsync(data),
-    responseValidator: async data => await zDimFunctionSignatureServiceGetResponse.parseAsync(data),
+export const dimFunctionSignatureServiceGet = <ThrowOnError extends boolean = false>(options: Options<DimFunctionSignatureServiceGetData, ThrowOnError>) => (options.client ?? client).get<DimFunctionSignatureServiceGetResponses, DimFunctionSignatureServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDimFunctionSignatureServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zDimFunctionSignatureServiceGetResponse.parseAsync(data),
     url: '/api/v1/dim_function_signature/{selector}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const dimNodeServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<DimNodeServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<DimNodeServiceListResponses, DimNodeServiceListErrors, ThrowOnError>({
-    requestValidator: async data => await zDimNodeServiceListData.parseAsync(data),
-    responseValidator: async data => await zDimNodeServiceListResponse.parseAsync(data),
+export const dimNodeServiceList = <ThrowOnError extends boolean = false>(options?: Options<DimNodeServiceListData, ThrowOnError>) => (options?.client ?? client).get<DimNodeServiceListResponses, DimNodeServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDimNodeServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zDimNodeServiceListResponse.parseAsync(data),
     url: '/api/v1/dim_node',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by validator_index
  */
-export const dimNodeServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<DimNodeServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<DimNodeServiceGetResponses, DimNodeServiceGetErrors, ThrowOnError>({
-    requestValidator: async data => await zDimNodeServiceGetData.parseAsync(data),
-    responseValidator: async data => await zDimNodeServiceGetResponse.parseAsync(data),
+export const dimNodeServiceGet = <ThrowOnError extends boolean = false>(options: Options<DimNodeServiceGetData, ThrowOnError>) => (options.client ?? client).get<DimNodeServiceGetResponses, DimNodeServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDimNodeServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zDimNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/dim_node/{validator_index}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const dimTokenContractServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<DimTokenContractServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    DimTokenContractServiceListResponses,
-    DimTokenContractServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zDimTokenContractServiceListData.parseAsync(data),
-    responseValidator: async data => await zDimTokenContractServiceListResponse.parseAsync(data),
+export const dimRocketpoolNodeServiceList = <ThrowOnError extends boolean = false>(options?: Options<DimRocketpoolNodeServiceListData, ThrowOnError>) => (options?.client ?? client).get<DimRocketpoolNodeServiceListResponses, DimRocketpoolNodeServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDimRocketpoolNodeServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zDimRocketpoolNodeServiceListResponse.parseAsync(data),
+    url: '/api/v1/dim_rocketpool_node',
+    ...options
+});
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by node_operator
+ */
+export const dimRocketpoolNodeServiceGet = <ThrowOnError extends boolean = false>(options: Options<DimRocketpoolNodeServiceGetData, ThrowOnError>) => (options.client ?? client).get<DimRocketpoolNodeServiceGetResponses, DimRocketpoolNodeServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDimRocketpoolNodeServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zDimRocketpoolNodeServiceGetResponse.parseAsync(data),
+    url: '/api/v1/dim_rocketpool_node/{node_operator}',
+    ...options
+});
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimTokenContractServiceList = <ThrowOnError extends boolean = false>(options?: Options<DimTokenContractServiceListData, ThrowOnError>) => (options?.client ?? client).get<DimTokenContractServiceListResponses, DimTokenContractServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDimTokenContractServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zDimTokenContractServiceListResponse.parseAsync(data),
     url: '/api/v1/dim_token_contract',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by contract_address
  */
-export const dimTokenContractServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<DimTokenContractServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<DimTokenContractServiceGetResponses, DimTokenContractServiceGetErrors, ThrowOnError>({
-    requestValidator: async data => await zDimTokenContractServiceGetData.parseAsync(data),
-    responseValidator: async data => await zDimTokenContractServiceGetResponse.parseAsync(data),
+export const dimTokenContractServiceGet = <ThrowOnError extends boolean = false>(options: Options<DimTokenContractServiceGetData, ThrowOnError>) => (options.client ?? client).get<DimTokenContractServiceGetResponses, DimTokenContractServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDimTokenContractServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zDimTokenContractServiceGetResponse.parseAsync(data),
     url: '/api/v1/dim_token_contract/{contract_address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const dimValidatorPubkeyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<DimValidatorPubkeyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    DimValidatorPubkeyServiceListResponses,
-    DimValidatorPubkeyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zDimValidatorPubkeyServiceListData.parseAsync(data),
-    responseValidator: async data => await zDimValidatorPubkeyServiceListResponse.parseAsync(data),
+export const dimValidatorPubkeyServiceList = <ThrowOnError extends boolean = false>(options?: Options<DimValidatorPubkeyServiceListData, ThrowOnError>) => (options?.client ?? client).get<DimValidatorPubkeyServiceListResponses, DimValidatorPubkeyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDimValidatorPubkeyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zDimValidatorPubkeyServiceListResponse.parseAsync(data),
     url: '/api/v1/dim_validator_pubkey',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by pubkey
  */
-export const dimValidatorPubkeyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<DimValidatorPubkeyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    DimValidatorPubkeyServiceGetResponses,
-    DimValidatorPubkeyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zDimValidatorPubkeyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zDimValidatorPubkeyServiceGetResponse.parseAsync(data),
+export const dimValidatorPubkeyServiceGet = <ThrowOnError extends boolean = false>(options: Options<DimValidatorPubkeyServiceGetData, ThrowOnError>) => (options.client ?? client).get<DimValidatorPubkeyServiceGetResponses, DimValidatorPubkeyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDimValidatorPubkeyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zDimValidatorPubkeyServiceGetResponse.parseAsync(data),
     url: '/api/v1/dim_validator_pubkey/{pubkey}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const dimValidatorStatusServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<DimValidatorStatusServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    DimValidatorStatusServiceListResponses,
-    DimValidatorStatusServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zDimValidatorStatusServiceListData.parseAsync(data),
-    responseValidator: async data => await zDimValidatorStatusServiceListResponse.parseAsync(data),
+export const dimValidatorStatusServiceList = <ThrowOnError extends boolean = false>(options?: Options<DimValidatorStatusServiceListData, ThrowOnError>) => (options?.client ?? client).get<DimValidatorStatusServiceListResponses, DimValidatorStatusServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDimValidatorStatusServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zDimValidatorStatusServiceListResponse.parseAsync(data),
     url: '/api/v1/dim_validator_status',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by validator_index
  */
-export const dimValidatorStatusServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<DimValidatorStatusServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    DimValidatorStatusServiceGetResponses,
-    DimValidatorStatusServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zDimValidatorStatusServiceGetData.parseAsync(data),
-    responseValidator: async data => await zDimValidatorStatusServiceGetResponse.parseAsync(data),
+export const dimValidatorStatusServiceGet = <ThrowOnError extends boolean = false>(options: Options<DimValidatorStatusServiceGetData, ThrowOnError>) => (options.client ?? client).get<DimValidatorStatusServiceGetResponses, DimValidatorStatusServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDimValidatorStatusServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zDimValidatorStatusServiceGetResponse.parseAsync(data),
     url: '/api/v1/dim_validator_status/{validator_index}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctAttestationCorrectnessByValidatorCanonicalServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctAttestationCorrectnessByValidatorCanonicalServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctAttestationCorrectnessByValidatorCanonicalServiceListResponses,
-    FctAttestationCorrectnessByValidatorCanonicalServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data =>
-      await zFctAttestationCorrectnessByValidatorCanonicalServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctAttestationCorrectnessByValidatorCanonicalServiceListResponse.parseAsync(data),
+export const fctAttestationCorrectnessByValidatorCanonicalServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctAttestationCorrectnessByValidatorCanonicalServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctAttestationCorrectnessByValidatorCanonicalServiceListResponses, FctAttestationCorrectnessByValidatorCanonicalServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationCorrectnessByValidatorCanonicalServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationCorrectnessByValidatorCanonicalServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_correctness_by_validator_canonical',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctAttestationCorrectnessByValidatorCanonicalServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctAttestationCorrectnessByValidatorCanonicalServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctAttestationCorrectnessByValidatorCanonicalServiceGetResponses,
-    FctAttestationCorrectnessByValidatorCanonicalServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationCorrectnessByValidatorCanonicalServiceGetData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctAttestationCorrectnessByValidatorCanonicalServiceGetResponse.parseAsync(data),
+export const fctAttestationCorrectnessByValidatorCanonicalServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctAttestationCorrectnessByValidatorCanonicalServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctAttestationCorrectnessByValidatorCanonicalServiceGetResponses, FctAttestationCorrectnessByValidatorCanonicalServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationCorrectnessByValidatorCanonicalServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationCorrectnessByValidatorCanonicalServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_correctness_by_validator_canonical/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctAttestationCorrectnessByValidatorHeadServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctAttestationCorrectnessByValidatorHeadServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctAttestationCorrectnessByValidatorHeadServiceListResponses,
-    FctAttestationCorrectnessByValidatorHeadServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationCorrectnessByValidatorHeadServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctAttestationCorrectnessByValidatorHeadServiceListResponse.parseAsync(data),
+export const fctAttestationCorrectnessByValidatorHeadServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctAttestationCorrectnessByValidatorHeadServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctAttestationCorrectnessByValidatorHeadServiceListResponses, FctAttestationCorrectnessByValidatorHeadServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationCorrectnessByValidatorHeadServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationCorrectnessByValidatorHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_correctness_by_validator_head',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctAttestationCorrectnessByValidatorHeadServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctAttestationCorrectnessByValidatorHeadServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctAttestationCorrectnessByValidatorHeadServiceGetResponses,
-    FctAttestationCorrectnessByValidatorHeadServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationCorrectnessByValidatorHeadServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationCorrectnessByValidatorHeadServiceGetResponse.parseAsync(data),
+export const fctAttestationCorrectnessByValidatorHeadServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctAttestationCorrectnessByValidatorHeadServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctAttestationCorrectnessByValidatorHeadServiceGetResponses, FctAttestationCorrectnessByValidatorHeadServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationCorrectnessByValidatorHeadServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationCorrectnessByValidatorHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_correctness_by_validator_head/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctAttestationCorrectnessCanonicalServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctAttestationCorrectnessCanonicalServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctAttestationCorrectnessCanonicalServiceListResponses,
-    FctAttestationCorrectnessCanonicalServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationCorrectnessCanonicalServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationCorrectnessCanonicalServiceListResponse.parseAsync(data),
+export const fctAttestationCorrectnessCanonicalServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctAttestationCorrectnessCanonicalServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctAttestationCorrectnessCanonicalServiceListResponses, FctAttestationCorrectnessCanonicalServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationCorrectnessCanonicalServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationCorrectnessCanonicalServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_correctness_canonical',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctAttestationCorrectnessCanonicalServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctAttestationCorrectnessCanonicalServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctAttestationCorrectnessCanonicalServiceGetResponses,
-    FctAttestationCorrectnessCanonicalServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationCorrectnessCanonicalServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationCorrectnessCanonicalServiceGetResponse.parseAsync(data),
+export const fctAttestationCorrectnessCanonicalServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctAttestationCorrectnessCanonicalServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctAttestationCorrectnessCanonicalServiceGetResponses, FctAttestationCorrectnessCanonicalServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationCorrectnessCanonicalServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationCorrectnessCanonicalServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_correctness_canonical/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctAttestationCorrectnessHeadServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctAttestationCorrectnessHeadServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctAttestationCorrectnessHeadServiceListResponses,
-    FctAttestationCorrectnessHeadServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationCorrectnessHeadServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationCorrectnessHeadServiceListResponse.parseAsync(data),
+export const fctAttestationCorrectnessHeadServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctAttestationCorrectnessHeadServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctAttestationCorrectnessHeadServiceListResponses, FctAttestationCorrectnessHeadServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationCorrectnessHeadServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationCorrectnessHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_correctness_head',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctAttestationCorrectnessHeadServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctAttestationCorrectnessHeadServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctAttestationCorrectnessHeadServiceGetResponses,
-    FctAttestationCorrectnessHeadServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationCorrectnessHeadServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationCorrectnessHeadServiceGetResponse.parseAsync(data),
+export const fctAttestationCorrectnessHeadServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctAttestationCorrectnessHeadServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctAttestationCorrectnessHeadServiceGetResponses, FctAttestationCorrectnessHeadServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationCorrectnessHeadServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationCorrectnessHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_correctness_head/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctAttestationFirstSeenByValidatorServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctAttestationFirstSeenByValidatorServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctAttestationFirstSeenByValidatorServiceListResponses,
-    FctAttestationFirstSeenByValidatorServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationFirstSeenByValidatorServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationFirstSeenByValidatorServiceListResponse.parseAsync(data),
+export const fctAttestationFirstSeenByValidatorServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctAttestationFirstSeenByValidatorServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctAttestationFirstSeenByValidatorServiceListResponses, FctAttestationFirstSeenByValidatorServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationFirstSeenByValidatorServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationFirstSeenByValidatorServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_first_seen_by_validator',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctAttestationFirstSeenByValidatorServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctAttestationFirstSeenByValidatorServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctAttestationFirstSeenByValidatorServiceGetResponses,
-    FctAttestationFirstSeenByValidatorServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationFirstSeenByValidatorServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationFirstSeenByValidatorServiceGetResponse.parseAsync(data),
+export const fctAttestationFirstSeenByValidatorServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctAttestationFirstSeenByValidatorServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctAttestationFirstSeenByValidatorServiceGetResponses, FctAttestationFirstSeenByValidatorServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationFirstSeenByValidatorServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationFirstSeenByValidatorServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_first_seen_by_validator/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctAttestationFirstSeenChunked50MsServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctAttestationFirstSeenChunked50MsServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctAttestationFirstSeenChunked50MsServiceListResponses,
-    FctAttestationFirstSeenChunked50MsServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationFirstSeenChunked50MsServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationFirstSeenChunked50MsServiceListResponse.parseAsync(data),
+export const fctAttestationFirstSeenChunked50MsServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctAttestationFirstSeenChunked50MsServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctAttestationFirstSeenChunked50MsServiceListResponses, FctAttestationFirstSeenChunked50MsServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationFirstSeenChunked50MsServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationFirstSeenChunked50MsServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_first_seen_chunked_50ms',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctAttestationFirstSeenChunked50MsServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctAttestationFirstSeenChunked50MsServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctAttestationFirstSeenChunked50MsServiceGetResponses,
-    FctAttestationFirstSeenChunked50MsServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationFirstSeenChunked50MsServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationFirstSeenChunked50MsServiceGetResponse.parseAsync(data),
+export const fctAttestationFirstSeenChunked50MsServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctAttestationFirstSeenChunked50MsServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctAttestationFirstSeenChunked50MsServiceGetResponses, FctAttestationFirstSeenChunked50MsServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationFirstSeenChunked50MsServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationFirstSeenChunked50MsServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_first_seen_chunked_50ms/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctAttestationInclusionDelayDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctAttestationInclusionDelayDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctAttestationInclusionDelayDailyServiceListResponses,
-    FctAttestationInclusionDelayDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationInclusionDelayDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationInclusionDelayDailyServiceListResponse.parseAsync(data),
+export const fctAttestationInclusionDelayDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctAttestationInclusionDelayDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctAttestationInclusionDelayDailyServiceListResponses, FctAttestationInclusionDelayDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationInclusionDelayDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationInclusionDelayDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_inclusion_delay_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctAttestationInclusionDelayDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctAttestationInclusionDelayDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctAttestationInclusionDelayDailyServiceGetResponses,
-    FctAttestationInclusionDelayDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationInclusionDelayDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationInclusionDelayDailyServiceGetResponse.parseAsync(data),
+export const fctAttestationInclusionDelayDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctAttestationInclusionDelayDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctAttestationInclusionDelayDailyServiceGetResponses, FctAttestationInclusionDelayDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationInclusionDelayDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationInclusionDelayDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_inclusion_delay_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctAttestationInclusionDelayHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctAttestationInclusionDelayHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctAttestationInclusionDelayHourlyServiceListResponses,
-    FctAttestationInclusionDelayHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationInclusionDelayHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationInclusionDelayHourlyServiceListResponse.parseAsync(data),
+export const fctAttestationInclusionDelayHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctAttestationInclusionDelayHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctAttestationInclusionDelayHourlyServiceListResponses, FctAttestationInclusionDelayHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationInclusionDelayHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationInclusionDelayHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_inclusion_delay_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctAttestationInclusionDelayHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctAttestationInclusionDelayHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctAttestationInclusionDelayHourlyServiceGetResponses,
-    FctAttestationInclusionDelayHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationInclusionDelayHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationInclusionDelayHourlyServiceGetResponse.parseAsync(data),
+export const fctAttestationInclusionDelayHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctAttestationInclusionDelayHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctAttestationInclusionDelayHourlyServiceGetResponses, FctAttestationInclusionDelayHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationInclusionDelayHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationInclusionDelayHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_inclusion_delay_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctAttestationLivenessByEntityHeadServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctAttestationLivenessByEntityHeadServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctAttestationLivenessByEntityHeadServiceListResponses,
-    FctAttestationLivenessByEntityHeadServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationLivenessByEntityHeadServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationLivenessByEntityHeadServiceListResponse.parseAsync(data),
+export const fctAttestationLivenessByEntityHeadServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctAttestationLivenessByEntityHeadServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctAttestationLivenessByEntityHeadServiceListResponses, FctAttestationLivenessByEntityHeadServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationLivenessByEntityHeadServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationLivenessByEntityHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_liveness_by_entity_head',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctAttestationLivenessByEntityHeadServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctAttestationLivenessByEntityHeadServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctAttestationLivenessByEntityHeadServiceGetResponses,
-    FctAttestationLivenessByEntityHeadServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationLivenessByEntityHeadServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationLivenessByEntityHeadServiceGetResponse.parseAsync(data),
+export const fctAttestationLivenessByEntityHeadServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctAttestationLivenessByEntityHeadServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctAttestationLivenessByEntityHeadServiceGetResponses, FctAttestationLivenessByEntityHeadServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationLivenessByEntityHeadServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationLivenessByEntityHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_liveness_by_entity_head/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctAttestationObservationByNodeServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctAttestationObservationByNodeServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctAttestationObservationByNodeServiceListResponses,
-    FctAttestationObservationByNodeServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationObservationByNodeServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationObservationByNodeServiceListResponse.parseAsync(data),
+export const fctAttestationObservationByNodeServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctAttestationObservationByNodeServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctAttestationObservationByNodeServiceListResponses, FctAttestationObservationByNodeServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationObservationByNodeServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationObservationByNodeServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_observation_by_node',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctAttestationObservationByNodeServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctAttestationObservationByNodeServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctAttestationObservationByNodeServiceGetResponses,
-    FctAttestationObservationByNodeServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationObservationByNodeServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationObservationByNodeServiceGetResponse.parseAsync(data),
+export const fctAttestationObservationByNodeServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctAttestationObservationByNodeServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctAttestationObservationByNodeServiceGetResponses, FctAttestationObservationByNodeServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationObservationByNodeServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationObservationByNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_observation_by_node/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctAttestationParticipationRateDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctAttestationParticipationRateDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctAttestationParticipationRateDailyServiceListResponses,
-    FctAttestationParticipationRateDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationParticipationRateDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationParticipationRateDailyServiceListResponse.parseAsync(data),
+export const fctAttestationParticipationRateDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctAttestationParticipationRateDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctAttestationParticipationRateDailyServiceListResponses, FctAttestationParticipationRateDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationParticipationRateDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationParticipationRateDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_participation_rate_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctAttestationParticipationRateDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctAttestationParticipationRateDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctAttestationParticipationRateDailyServiceGetResponses,
-    FctAttestationParticipationRateDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationParticipationRateDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationParticipationRateDailyServiceGetResponse.parseAsync(data),
+export const fctAttestationParticipationRateDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctAttestationParticipationRateDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctAttestationParticipationRateDailyServiceGetResponses, FctAttestationParticipationRateDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationParticipationRateDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationParticipationRateDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_participation_rate_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctAttestationParticipationRateHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctAttestationParticipationRateHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctAttestationParticipationRateHourlyServiceListResponses,
-    FctAttestationParticipationRateHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationParticipationRateHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationParticipationRateHourlyServiceListResponse.parseAsync(data),
+export const fctAttestationParticipationRateHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctAttestationParticipationRateHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctAttestationParticipationRateHourlyServiceListResponses, FctAttestationParticipationRateHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationParticipationRateHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationParticipationRateHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_participation_rate_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctAttestationParticipationRateHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctAttestationParticipationRateHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctAttestationParticipationRateHourlyServiceGetResponses,
-    FctAttestationParticipationRateHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationParticipationRateHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationParticipationRateHourlyServiceGetResponse.parseAsync(data),
+export const fctAttestationParticipationRateHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctAttestationParticipationRateHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctAttestationParticipationRateHourlyServiceGetResponses, FctAttestationParticipationRateHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationParticipationRateHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationParticipationRateHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_participation_rate_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctAttestationVoteCorrectnessByValidatorServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctAttestationVoteCorrectnessByValidatorServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctAttestationVoteCorrectnessByValidatorServiceListResponses,
-    FctAttestationVoteCorrectnessByValidatorServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationVoteCorrectnessByValidatorServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctAttestationVoteCorrectnessByValidatorServiceListResponse.parseAsync(data),
+export const fctAttestationVoteCorrectnessByValidatorServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctAttestationVoteCorrectnessByValidatorServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctAttestationVoteCorrectnessByValidatorServiceListResponses, FctAttestationVoteCorrectnessByValidatorServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationVoteCorrectnessByValidatorServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationVoteCorrectnessByValidatorServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_vote_correctness_by_validator',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by validator_index
  */
-export const fctAttestationVoteCorrectnessByValidatorServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctAttestationVoteCorrectnessByValidatorServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctAttestationVoteCorrectnessByValidatorServiceGetResponses,
-    FctAttestationVoteCorrectnessByValidatorServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationVoteCorrectnessByValidatorServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctAttestationVoteCorrectnessByValidatorServiceGetResponse.parseAsync(data),
+export const fctAttestationVoteCorrectnessByValidatorServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctAttestationVoteCorrectnessByValidatorServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctAttestationVoteCorrectnessByValidatorServiceGetResponses, FctAttestationVoteCorrectnessByValidatorServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationVoteCorrectnessByValidatorServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationVoteCorrectnessByValidatorServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_vote_correctness_by_validator/{validator_index}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctAttestationVoteCorrectnessByValidatorDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctAttestationVoteCorrectnessByValidatorDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctAttestationVoteCorrectnessByValidatorDailyServiceListResponses,
-    FctAttestationVoteCorrectnessByValidatorDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data =>
-      await zFctAttestationVoteCorrectnessByValidatorDailyServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctAttestationVoteCorrectnessByValidatorDailyServiceListResponse.parseAsync(data),
+export const fctAttestationVoteCorrectnessByValidatorDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctAttestationVoteCorrectnessByValidatorDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctAttestationVoteCorrectnessByValidatorDailyServiceListResponses, FctAttestationVoteCorrectnessByValidatorDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationVoteCorrectnessByValidatorDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationVoteCorrectnessByValidatorDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_vote_correctness_by_validator_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by validator_index
  */
-export const fctAttestationVoteCorrectnessByValidatorDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctAttestationVoteCorrectnessByValidatorDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctAttestationVoteCorrectnessByValidatorDailyServiceGetResponses,
-    FctAttestationVoteCorrectnessByValidatorDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctAttestationVoteCorrectnessByValidatorDailyServiceGetData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctAttestationVoteCorrectnessByValidatorDailyServiceGetResponse.parseAsync(data),
+export const fctAttestationVoteCorrectnessByValidatorDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctAttestationVoteCorrectnessByValidatorDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctAttestationVoteCorrectnessByValidatorDailyServiceGetResponses, FctAttestationVoteCorrectnessByValidatorDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationVoteCorrectnessByValidatorDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationVoteCorrectnessByValidatorDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_vote_correctness_by_validator_daily/{validator_index}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctAttestationVoteCorrectnessByValidatorHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctAttestationVoteCorrectnessByValidatorHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctAttestationVoteCorrectnessByValidatorHourlyServiceListResponses,
-    FctAttestationVoteCorrectnessByValidatorHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data =>
-      await zFctAttestationVoteCorrectnessByValidatorHourlyServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctAttestationVoteCorrectnessByValidatorHourlyServiceListResponse.parseAsync(data),
+export const fctAttestationVoteCorrectnessByValidatorHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctAttestationVoteCorrectnessByValidatorHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctAttestationVoteCorrectnessByValidatorHourlyServiceListResponses, FctAttestationVoteCorrectnessByValidatorHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationVoteCorrectnessByValidatorHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationVoteCorrectnessByValidatorHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_vote_correctness_by_validator_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by validator_index
  */
-export const fctAttestationVoteCorrectnessByValidatorHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctAttestationVoteCorrectnessByValidatorHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponses,
-    FctAttestationVoteCorrectnessByValidatorHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data =>
-      await zFctAttestationVoteCorrectnessByValidatorHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponse.parseAsync(data),
+export const fctAttestationVoteCorrectnessByValidatorHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctAttestationVoteCorrectnessByValidatorHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponses, FctAttestationVoteCorrectnessByValidatorHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctAttestationVoteCorrectnessByValidatorHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_vote_correctness_by_validator_hourly/{validator_index}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlobCountDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlobCountDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctBlobCountDailyServiceListResponses,
-    FctBlobCountDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlobCountDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlobCountDailyServiceListResponse.parseAsync(data),
+export const fctBlobCountDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlobCountDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlobCountDailyServiceListResponses, FctBlobCountDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlobCountDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlobCountDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_blob_count_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctBlobCountDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlobCountDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<FctBlobCountDailyServiceGetResponses, FctBlobCountDailyServiceGetErrors, ThrowOnError>(
-    {
-      requestValidator: async data => await zFctBlobCountDailyServiceGetData.parseAsync(data),
-      responseValidator: async data => await zFctBlobCountDailyServiceGetResponse.parseAsync(data),
-      url: '/api/v1/fct_blob_count_daily/{day_start_date}',
-      ...options,
-    }
-  );
+export const fctBlobCountDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlobCountDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlobCountDailyServiceGetResponses, FctBlobCountDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlobCountDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlobCountDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_blob_count_daily/{day_start_date}',
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlobCountHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlobCountHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctBlobCountHourlyServiceListResponses,
-    FctBlobCountHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlobCountHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlobCountHourlyServiceListResponse.parseAsync(data),
+export const fctBlobCountHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlobCountHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlobCountHourlyServiceListResponses, FctBlobCountHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlobCountHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlobCountHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_blob_count_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctBlobCountHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlobCountHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctBlobCountHourlyServiceGetResponses,
-    FctBlobCountHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlobCountHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlobCountHourlyServiceGetResponse.parseAsync(data),
+export const fctBlobCountHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlobCountHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlobCountHourlyServiceGetResponses, FctBlobCountHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlobCountHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlobCountHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_blob_count_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<FctBlockServiceListResponses, FctBlockServiceListErrors, ThrowOnError>({
-    requestValidator: async data => await zFctBlockServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlockServiceListResponse.parseAsync(data),
+export const fctBlockServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockServiceListResponses, FctBlockServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<FctBlockServiceGetResponses, FctBlockServiceGetErrors, ThrowOnError>({
-    requestValidator: async data => await zFctBlockServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlockServiceGetResponse.parseAsync(data),
+export const fctBlockServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockServiceGetResponses, FctBlockServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockBlobCountServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockBlobCountServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctBlockBlobCountServiceListResponses,
-    FctBlockBlobCountServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockBlobCountServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlockBlobCountServiceListResponse.parseAsync(data),
+export const fctBlockBlobCountServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockBlobCountServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockBlobCountServiceListResponses, FctBlockBlobCountServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockBlobCountServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockBlobCountServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_blob_count',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockBlobCountServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockBlobCountServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<FctBlockBlobCountServiceGetResponses, FctBlockBlobCountServiceGetErrors, ThrowOnError>(
-    {
-      requestValidator: async data => await zFctBlockBlobCountServiceGetData.parseAsync(data),
-      responseValidator: async data => await zFctBlockBlobCountServiceGetResponse.parseAsync(data),
-      url: '/api/v1/fct_block_blob_count/{slot_start_date_time}',
-      ...options,
-    }
-  );
+export const fctBlockBlobCountServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockBlobCountServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockBlobCountServiceGetResponses, FctBlockBlobCountServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockBlobCountServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockBlobCountServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_blob_count/{slot_start_date_time}',
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockBlobCountHeadServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockBlobCountHeadServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctBlockBlobCountHeadServiceListResponses,
-    FctBlockBlobCountHeadServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockBlobCountHeadServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlockBlobCountHeadServiceListResponse.parseAsync(data),
+export const fctBlockBlobCountHeadServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockBlobCountHeadServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockBlobCountHeadServiceListResponses, FctBlockBlobCountHeadServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockBlobCountHeadServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockBlobCountHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_blob_count_head',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockBlobCountHeadServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockBlobCountHeadServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctBlockBlobCountHeadServiceGetResponses,
-    FctBlockBlobCountHeadServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockBlobCountHeadServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlockBlobCountHeadServiceGetResponse.parseAsync(data),
+export const fctBlockBlobCountHeadServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockBlobCountHeadServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockBlobCountHeadServiceGetResponses, FctBlockBlobCountHeadServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockBlobCountHeadServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockBlobCountHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_blob_count_head/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockBlobFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockBlobFirstSeenByNodeServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctBlockBlobFirstSeenByNodeServiceListResponses,
-    FctBlockBlobFirstSeenByNodeServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockBlobFirstSeenByNodeServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlockBlobFirstSeenByNodeServiceListResponse.parseAsync(data),
+export const fctBlockBlobFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockBlobFirstSeenByNodeServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockBlobFirstSeenByNodeServiceListResponses, FctBlockBlobFirstSeenByNodeServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockBlobFirstSeenByNodeServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockBlobFirstSeenByNodeServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_blob_first_seen_by_node',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockBlobFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockBlobFirstSeenByNodeServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctBlockBlobFirstSeenByNodeServiceGetResponses,
-    FctBlockBlobFirstSeenByNodeServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockBlobFirstSeenByNodeServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlockBlobFirstSeenByNodeServiceGetResponse.parseAsync(data),
+export const fctBlockBlobFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockBlobFirstSeenByNodeServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockBlobFirstSeenByNodeServiceGetResponses, FctBlockBlobFirstSeenByNodeServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockBlobFirstSeenByNodeServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockBlobFirstSeenByNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_blob_first_seen_by_node/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockDataColumnSidecarFirstSeenServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockDataColumnSidecarFirstSeenServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctBlockDataColumnSidecarFirstSeenServiceListResponses,
-    FctBlockDataColumnSidecarFirstSeenServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockDataColumnSidecarFirstSeenServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlockDataColumnSidecarFirstSeenServiceListResponse.parseAsync(data),
+export const fctBlockBlobHeadServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockBlobHeadServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockBlobHeadServiceListResponses, FctBlockBlobHeadServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockBlobHeadServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockBlobHeadServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_blob_head',
+    ...options
+});
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockBlobHeadServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockBlobHeadServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockBlobHeadServiceGetResponses, FctBlockBlobHeadServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockBlobHeadServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockBlobHeadServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_blob_head/{slot_start_date_time}',
+    ...options
+});
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockDataColumnSidecarFirstSeenServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockDataColumnSidecarFirstSeenServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockDataColumnSidecarFirstSeenServiceListResponses, FctBlockDataColumnSidecarFirstSeenServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockDataColumnSidecarFirstSeenServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockDataColumnSidecarFirstSeenServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_data_column_sidecar_first_seen',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockDataColumnSidecarFirstSeenServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockDataColumnSidecarFirstSeenServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctBlockDataColumnSidecarFirstSeenServiceGetResponses,
-    FctBlockDataColumnSidecarFirstSeenServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockDataColumnSidecarFirstSeenServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlockDataColumnSidecarFirstSeenServiceGetResponse.parseAsync(data),
+export const fctBlockDataColumnSidecarFirstSeenServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockDataColumnSidecarFirstSeenServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockDataColumnSidecarFirstSeenServiceGetResponses, FctBlockDataColumnSidecarFirstSeenServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockDataColumnSidecarFirstSeenServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockDataColumnSidecarFirstSeenServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_data_column_sidecar_first_seen/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockDataColumnSidecarFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponses,
-    FctBlockDataColumnSidecarFirstSeenByNodeServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockDataColumnSidecarFirstSeenByNodeServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctBlockDataColumnSidecarFirstSeenByNodeServiceListResponse.parseAsync(data),
+export const fctBlockDataColumnSidecarFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponses, FctBlockDataColumnSidecarFirstSeenByNodeServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockDataColumnSidecarFirstSeenByNodeServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockDataColumnSidecarFirstSeenByNodeServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponses,
-    FctBlockDataColumnSidecarFirstSeenByNodeServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse.parseAsync(data),
+export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponses, FctBlockDataColumnSidecarFirstSeenByNodeServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockFirstSeenByNodeServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctBlockFirstSeenByNodeServiceListResponses,
-    FctBlockFirstSeenByNodeServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockFirstSeenByNodeServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlockFirstSeenByNodeServiceListResponse.parseAsync(data),
+export const fctBlockFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockFirstSeenByNodeServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockFirstSeenByNodeServiceListResponses, FctBlockFirstSeenByNodeServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockFirstSeenByNodeServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockFirstSeenByNodeServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_first_seen_by_node',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockFirstSeenByNodeServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctBlockFirstSeenByNodeServiceGetResponses,
-    FctBlockFirstSeenByNodeServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockFirstSeenByNodeServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlockFirstSeenByNodeServiceGetResponse.parseAsync(data),
+export const fctBlockFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockFirstSeenByNodeServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockFirstSeenByNodeServiceGetResponses, FctBlockFirstSeenByNodeServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockFirstSeenByNodeServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockFirstSeenByNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_first_seen_by_node/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockHeadServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockHeadServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<FctBlockHeadServiceListResponses, FctBlockHeadServiceListErrors, ThrowOnError>({
-    requestValidator: async data => await zFctBlockHeadServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlockHeadServiceListResponse.parseAsync(data),
+export const fctBlockHeadServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockHeadServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockHeadServiceListResponses, FctBlockHeadServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockHeadServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_head',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockHeadServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockHeadServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<FctBlockHeadServiceGetResponses, FctBlockHeadServiceGetErrors, ThrowOnError>({
-    requestValidator: async data => await zFctBlockHeadServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlockHeadServiceGetResponse.parseAsync(data),
+export const fctBlockHeadServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockHeadServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockHeadServiceGetResponses, FctBlockHeadServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockHeadServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_head/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockMevServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockMevServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<FctBlockMevServiceListResponses, FctBlockMevServiceListErrors, ThrowOnError>({
-    requestValidator: async data => await zFctBlockMevServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlockMevServiceListResponse.parseAsync(data),
+export const fctBlockMevServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockMevServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockMevServiceListResponses, FctBlockMevServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockMevServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockMevServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_mev',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockMevServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockMevServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<FctBlockMevServiceGetResponses, FctBlockMevServiceGetErrors, ThrowOnError>({
-    requestValidator: async data => await zFctBlockMevServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlockMevServiceGetResponse.parseAsync(data),
+export const fctBlockMevServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockMevServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockMevServiceGetResponses, FctBlockMevServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockMevServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockMevServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_mev/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockMevHeadServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockMevHeadServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<FctBlockMevHeadServiceListResponses, FctBlockMevHeadServiceListErrors, ThrowOnError>({
-    requestValidator: async data => await zFctBlockMevHeadServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlockMevHeadServiceListResponse.parseAsync(data),
+export const fctBlockMevHeadServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockMevHeadServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockMevHeadServiceListResponses, FctBlockMevHeadServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockMevHeadServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockMevHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_mev_head',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockMevHeadServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockMevHeadServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<FctBlockMevHeadServiceGetResponses, FctBlockMevHeadServiceGetErrors, ThrowOnError>({
-    requestValidator: async data => await zFctBlockMevHeadServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlockMevHeadServiceGetResponse.parseAsync(data),
+export const fctBlockMevHeadServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockMevHeadServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockMevHeadServiceGetResponses, FctBlockMevHeadServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockMevHeadServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockMevHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_mev_head/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockProposalStatusDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockProposalStatusDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctBlockProposalStatusDailyServiceListResponses,
-    FctBlockProposalStatusDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockProposalStatusDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlockProposalStatusDailyServiceListResponse.parseAsync(data),
+export const fctBlockProposalStatusDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockProposalStatusDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockProposalStatusDailyServiceListResponses, FctBlockProposalStatusDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockProposalStatusDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockProposalStatusDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposal_status_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctBlockProposalStatusDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockProposalStatusDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctBlockProposalStatusDailyServiceGetResponses,
-    FctBlockProposalStatusDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockProposalStatusDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlockProposalStatusDailyServiceGetResponse.parseAsync(data),
+export const fctBlockProposalStatusDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockProposalStatusDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockProposalStatusDailyServiceGetResponses, FctBlockProposalStatusDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockProposalStatusDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockProposalStatusDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposal_status_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockProposalStatusHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockProposalStatusHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctBlockProposalStatusHourlyServiceListResponses,
-    FctBlockProposalStatusHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockProposalStatusHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlockProposalStatusHourlyServiceListResponse.parseAsync(data),
+export const fctBlockProposalStatusHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockProposalStatusHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockProposalStatusHourlyServiceListResponses, FctBlockProposalStatusHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockProposalStatusHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockProposalStatusHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposal_status_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctBlockProposalStatusHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockProposalStatusHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctBlockProposalStatusHourlyServiceGetResponses,
-    FctBlockProposalStatusHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockProposalStatusHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlockProposalStatusHourlyServiceGetResponse.parseAsync(data),
+export const fctBlockProposalStatusHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockProposalStatusHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockProposalStatusHourlyServiceGetResponses, FctBlockProposalStatusHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockProposalStatusHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockProposalStatusHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposal_status_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockProposerServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockProposerServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctBlockProposerServiceListResponses,
-    FctBlockProposerServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockProposerServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlockProposerServiceListResponse.parseAsync(data),
+export const fctBlockProposerServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockProposerServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockProposerServiceListResponses, FctBlockProposerServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockProposerServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockProposerServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockProposerServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockProposerServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<FctBlockProposerServiceGetResponses, FctBlockProposerServiceGetErrors, ThrowOnError>({
-    requestValidator: async data => await zFctBlockProposerServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlockProposerServiceGetResponse.parseAsync(data),
+export const fctBlockProposerServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockProposerServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockProposerServiceGetResponses, FctBlockProposerServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockProposerServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockProposerServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockProposerByValidatorServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockProposerByValidatorServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctBlockProposerByValidatorServiceListResponses,
-    FctBlockProposerByValidatorServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockProposerByValidatorServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlockProposerByValidatorServiceListResponse.parseAsync(data),
+export const fctBlockProposerByValidatorServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockProposerByValidatorServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockProposerByValidatorServiceListResponses, FctBlockProposerByValidatorServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockProposerByValidatorServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockProposerByValidatorServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer_by_validator',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by validator_index
  */
-export const fctBlockProposerByValidatorServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockProposerByValidatorServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctBlockProposerByValidatorServiceGetResponses,
-    FctBlockProposerByValidatorServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockProposerByValidatorServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlockProposerByValidatorServiceGetResponse.parseAsync(data),
+export const fctBlockProposerByValidatorServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockProposerByValidatorServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockProposerByValidatorServiceGetResponses, FctBlockProposerByValidatorServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockProposerByValidatorServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockProposerByValidatorServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer_by_validator/{validator_index}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockProposerEntityServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockProposerEntityServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctBlockProposerEntityServiceListResponses,
-    FctBlockProposerEntityServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockProposerEntityServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlockProposerEntityServiceListResponse.parseAsync(data),
+export const fctBlockProposerEntityServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockProposerEntityServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockProposerEntityServiceListResponses, FctBlockProposerEntityServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockProposerEntityServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockProposerEntityServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer_entity',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockProposerEntityServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockProposerEntityServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctBlockProposerEntityServiceGetResponses,
-    FctBlockProposerEntityServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockProposerEntityServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlockProposerEntityServiceGetResponse.parseAsync(data),
+export const fctBlockProposerEntityServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockProposerEntityServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockProposerEntityServiceGetResponses, FctBlockProposerEntityServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockProposerEntityServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockProposerEntityServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer_entity/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctBlockProposerHeadServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctBlockProposerHeadServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctBlockProposerHeadServiceListResponses,
-    FctBlockProposerHeadServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockProposerHeadServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctBlockProposerHeadServiceListResponse.parseAsync(data),
+export const fctBlockProposerHeadServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctBlockProposerHeadServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctBlockProposerHeadServiceListResponses, FctBlockProposerHeadServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockProposerHeadServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockProposerHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer_head',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctBlockProposerHeadServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctBlockProposerHeadServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctBlockProposerHeadServiceGetResponses,
-    FctBlockProposerHeadServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctBlockProposerHeadServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctBlockProposerHeadServiceGetResponse.parseAsync(data),
+export const fctBlockProposerHeadServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctBlockProposerHeadServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctBlockProposerHeadServiceGetResponses, FctBlockProposerHeadServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctBlockProposerHeadServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctBlockProposerHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer_head/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctContractStorageStateByAddressDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctContractStorageStateByAddressDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctContractStorageStateByAddressDailyServiceListResponses,
-    FctContractStorageStateByAddressDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctContractStorageStateByAddressDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctContractStorageStateByAddressDailyServiceListResponse.parseAsync(data),
+export const fctContractStorageStateByAddressDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctContractStorageStateByAddressDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctContractStorageStateByAddressDailyServiceListResponses, FctContractStorageStateByAddressDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctContractStorageStateByAddressDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctContractStorageStateByAddressDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_by_address_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by address
  */
-export const fctContractStorageStateByAddressDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctContractStorageStateByAddressDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctContractStorageStateByAddressDailyServiceGetResponses,
-    FctContractStorageStateByAddressDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctContractStorageStateByAddressDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctContractStorageStateByAddressDailyServiceGetResponse.parseAsync(data),
+export const fctContractStorageStateByAddressDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctContractStorageStateByAddressDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctContractStorageStateByAddressDailyServiceGetResponses, FctContractStorageStateByAddressDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctContractStorageStateByAddressDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctContractStorageStateByAddressDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_by_address_daily/{address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctContractStorageStateByAddressHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctContractStorageStateByAddressHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctContractStorageStateByAddressHourlyServiceListResponses,
-    FctContractStorageStateByAddressHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctContractStorageStateByAddressHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctContractStorageStateByAddressHourlyServiceListResponse.parseAsync(data),
+export const fctContractStorageStateByAddressHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctContractStorageStateByAddressHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctContractStorageStateByAddressHourlyServiceListResponses, FctContractStorageStateByAddressHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctContractStorageStateByAddressHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctContractStorageStateByAddressHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_by_address_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by address
  */
-export const fctContractStorageStateByAddressHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctContractStorageStateByAddressHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctContractStorageStateByAddressHourlyServiceGetResponses,
-    FctContractStorageStateByAddressHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctContractStorageStateByAddressHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctContractStorageStateByAddressHourlyServiceGetResponse.parseAsync(data),
+export const fctContractStorageStateByAddressHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctContractStorageStateByAddressHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctContractStorageStateByAddressHourlyServiceGetResponses, FctContractStorageStateByAddressHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctContractStorageStateByAddressHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctContractStorageStateByAddressHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_by_address_hourly/{address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctContractStorageStateByBlockDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctContractStorageStateByBlockDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctContractStorageStateByBlockDailyServiceListResponses,
-    FctContractStorageStateByBlockDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctContractStorageStateByBlockDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctContractStorageStateByBlockDailyServiceListResponse.parseAsync(data),
+export const fctContractStorageStateByBlockDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctContractStorageStateByBlockDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctContractStorageStateByBlockDailyServiceListResponses, FctContractStorageStateByBlockDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctContractStorageStateByBlockDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctContractStorageStateByBlockDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_by_block_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctContractStorageStateByBlockDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctContractStorageStateByBlockDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctContractStorageStateByBlockDailyServiceGetResponses,
-    FctContractStorageStateByBlockDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctContractStorageStateByBlockDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctContractStorageStateByBlockDailyServiceGetResponse.parseAsync(data),
+export const fctContractStorageStateByBlockDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctContractStorageStateByBlockDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctContractStorageStateByBlockDailyServiceGetResponses, FctContractStorageStateByBlockDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctContractStorageStateByBlockDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctContractStorageStateByBlockDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_by_block_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctContractStorageStateByBlockHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctContractStorageStateByBlockHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctContractStorageStateByBlockHourlyServiceListResponses,
-    FctContractStorageStateByBlockHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctContractStorageStateByBlockHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctContractStorageStateByBlockHourlyServiceListResponse.parseAsync(data),
+export const fctContractStorageStateByBlockHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctContractStorageStateByBlockHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctContractStorageStateByBlockHourlyServiceListResponses, FctContractStorageStateByBlockHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctContractStorageStateByBlockHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctContractStorageStateByBlockHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_by_block_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctContractStorageStateByBlockHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctContractStorageStateByBlockHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctContractStorageStateByBlockHourlyServiceGetResponses,
-    FctContractStorageStateByBlockHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctContractStorageStateByBlockHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctContractStorageStateByBlockHourlyServiceGetResponse.parseAsync(data),
+export const fctContractStorageStateByBlockHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctContractStorageStateByBlockHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctContractStorageStateByBlockHourlyServiceGetResponses, FctContractStorageStateByBlockHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctContractStorageStateByBlockHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctContractStorageStateByBlockHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_by_block_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctContractStorageStateWithExpiryByAddressDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctContractStorageStateWithExpiryByAddressDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctContractStorageStateWithExpiryByAddressDailyServiceListResponses,
-    FctContractStorageStateWithExpiryByAddressDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data =>
-      await zFctContractStorageStateWithExpiryByAddressDailyServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctContractStorageStateWithExpiryByAddressDailyServiceListResponse.parseAsync(data),
+export const fctContractStorageStateWithExpiryByAddressDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctContractStorageStateWithExpiryByAddressDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctContractStorageStateWithExpiryByAddressDailyServiceListResponses, FctContractStorageStateWithExpiryByAddressDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctContractStorageStateWithExpiryByAddressDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctContractStorageStateWithExpiryByAddressDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_address_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by address
  */
-export const fctContractStorageStateWithExpiryByAddressDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctContractStorageStateWithExpiryByAddressDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctContractStorageStateWithExpiryByAddressDailyServiceGetResponses,
-    FctContractStorageStateWithExpiryByAddressDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data =>
-      await zFctContractStorageStateWithExpiryByAddressDailyServiceGetData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctContractStorageStateWithExpiryByAddressDailyServiceGetResponse.parseAsync(data),
+export const fctContractStorageStateWithExpiryByAddressDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctContractStorageStateWithExpiryByAddressDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctContractStorageStateWithExpiryByAddressDailyServiceGetResponses, FctContractStorageStateWithExpiryByAddressDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctContractStorageStateWithExpiryByAddressDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctContractStorageStateWithExpiryByAddressDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_address_daily/{address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctContractStorageStateWithExpiryByAddressHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctContractStorageStateWithExpiryByAddressHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctContractStorageStateWithExpiryByAddressHourlyServiceListResponses,
-    FctContractStorageStateWithExpiryByAddressHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data =>
-      await zFctContractStorageStateWithExpiryByAddressHourlyServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctContractStorageStateWithExpiryByAddressHourlyServiceListResponse.parseAsync(data),
+export const fctContractStorageStateWithExpiryByAddressHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctContractStorageStateWithExpiryByAddressHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctContractStorageStateWithExpiryByAddressHourlyServiceListResponses, FctContractStorageStateWithExpiryByAddressHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctContractStorageStateWithExpiryByAddressHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctContractStorageStateWithExpiryByAddressHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_address_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by address
  */
-export const fctContractStorageStateWithExpiryByAddressHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctContractStorageStateWithExpiryByAddressHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctContractStorageStateWithExpiryByAddressHourlyServiceGetResponses,
-    FctContractStorageStateWithExpiryByAddressHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data =>
-      await zFctContractStorageStateWithExpiryByAddressHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctContractStorageStateWithExpiryByAddressHourlyServiceGetResponse.parseAsync(data),
+export const fctContractStorageStateWithExpiryByAddressHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctContractStorageStateWithExpiryByAddressHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctContractStorageStateWithExpiryByAddressHourlyServiceGetResponses, FctContractStorageStateWithExpiryByAddressHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctContractStorageStateWithExpiryByAddressHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctContractStorageStateWithExpiryByAddressHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_address_hourly/{address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctContractStorageStateWithExpiryByBlockDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctContractStorageStateWithExpiryByBlockDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctContractStorageStateWithExpiryByBlockDailyServiceListResponses,
-    FctContractStorageStateWithExpiryByBlockDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data =>
-      await zFctContractStorageStateWithExpiryByBlockDailyServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctContractStorageStateWithExpiryByBlockDailyServiceListResponse.parseAsync(data),
+export const fctContractStorageStateWithExpiryByBlockDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctContractStorageStateWithExpiryByBlockDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctContractStorageStateWithExpiryByBlockDailyServiceListResponses, FctContractStorageStateWithExpiryByBlockDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctContractStorageStateWithExpiryByBlockDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctContractStorageStateWithExpiryByBlockDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_block_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by expiry_policy
  */
-export const fctContractStorageStateWithExpiryByBlockDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctContractStorageStateWithExpiryByBlockDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctContractStorageStateWithExpiryByBlockDailyServiceGetResponses,
-    FctContractStorageStateWithExpiryByBlockDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctContractStorageStateWithExpiryByBlockDailyServiceGetData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctContractStorageStateWithExpiryByBlockDailyServiceGetResponse.parseAsync(data),
+export const fctContractStorageStateWithExpiryByBlockDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctContractStorageStateWithExpiryByBlockDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctContractStorageStateWithExpiryByBlockDailyServiceGetResponses, FctContractStorageStateWithExpiryByBlockDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctContractStorageStateWithExpiryByBlockDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctContractStorageStateWithExpiryByBlockDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_block_daily/{expiry_policy}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctContractStorageStateWithExpiryByBlockHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctContractStorageStateWithExpiryByBlockHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctContractStorageStateWithExpiryByBlockHourlyServiceListResponses,
-    FctContractStorageStateWithExpiryByBlockHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data =>
-      await zFctContractStorageStateWithExpiryByBlockHourlyServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctContractStorageStateWithExpiryByBlockHourlyServiceListResponse.parseAsync(data),
+export const fctContractStorageStateWithExpiryByBlockHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctContractStorageStateWithExpiryByBlockHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctContractStorageStateWithExpiryByBlockHourlyServiceListResponses, FctContractStorageStateWithExpiryByBlockHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctContractStorageStateWithExpiryByBlockHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctContractStorageStateWithExpiryByBlockHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_block_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by expiry_policy
  */
-export const fctContractStorageStateWithExpiryByBlockHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctContractStorageStateWithExpiryByBlockHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponses,
-    FctContractStorageStateWithExpiryByBlockHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data =>
-      await zFctContractStorageStateWithExpiryByBlockHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctContractStorageStateWithExpiryByBlockHourlyServiceGetResponse.parseAsync(data),
+export const fctContractStorageStateWithExpiryByBlockHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctContractStorageStateWithExpiryByBlockHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponses, FctContractStorageStateWithExpiryByBlockHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctContractStorageStateWithExpiryByBlockHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctContractStorageStateWithExpiryByBlockHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_block_hourly/{expiry_policy}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctDataColumnAvailabilityByEpochServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctDataColumnAvailabilityByEpochServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctDataColumnAvailabilityByEpochServiceListResponses,
-    FctDataColumnAvailabilityByEpochServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctDataColumnAvailabilityByEpochServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctDataColumnAvailabilityByEpochServiceListResponse.parseAsync(data),
+export const fctDataColumnAvailabilityByEpochServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctDataColumnAvailabilityByEpochServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctDataColumnAvailabilityByEpochServiceListResponses, FctDataColumnAvailabilityByEpochServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctDataColumnAvailabilityByEpochServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctDataColumnAvailabilityByEpochServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_by_epoch',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by epoch_start_date_time
  */
-export const fctDataColumnAvailabilityByEpochServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctDataColumnAvailabilityByEpochServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctDataColumnAvailabilityByEpochServiceGetResponses,
-    FctDataColumnAvailabilityByEpochServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctDataColumnAvailabilityByEpochServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctDataColumnAvailabilityByEpochServiceGetResponse.parseAsync(data),
+export const fctDataColumnAvailabilityByEpochServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctDataColumnAvailabilityByEpochServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctDataColumnAvailabilityByEpochServiceGetResponses, FctDataColumnAvailabilityByEpochServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctDataColumnAvailabilityByEpochServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctDataColumnAvailabilityByEpochServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_by_epoch/{epoch_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctDataColumnAvailabilityBySlotServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctDataColumnAvailabilityBySlotServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctDataColumnAvailabilityBySlotServiceListResponses,
-    FctDataColumnAvailabilityBySlotServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctDataColumnAvailabilityBySlotServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctDataColumnAvailabilityBySlotServiceListResponse.parseAsync(data),
+export const fctDataColumnAvailabilityBySlotServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctDataColumnAvailabilityBySlotServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctDataColumnAvailabilityBySlotServiceListResponses, FctDataColumnAvailabilityBySlotServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctDataColumnAvailabilityBySlotServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctDataColumnAvailabilityBySlotServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_by_slot',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctDataColumnAvailabilityBySlotServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctDataColumnAvailabilityBySlotServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctDataColumnAvailabilityBySlotServiceGetResponses,
-    FctDataColumnAvailabilityBySlotServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctDataColumnAvailabilityBySlotServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctDataColumnAvailabilityBySlotServiceGetResponse.parseAsync(data),
+export const fctDataColumnAvailabilityBySlotServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctDataColumnAvailabilityBySlotServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctDataColumnAvailabilityBySlotServiceGetResponses, FctDataColumnAvailabilityBySlotServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctDataColumnAvailabilityBySlotServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctDataColumnAvailabilityBySlotServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_by_slot/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctDataColumnAvailabilityBySlotBlobServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctDataColumnAvailabilityBySlotBlobServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctDataColumnAvailabilityBySlotBlobServiceListResponses,
-    FctDataColumnAvailabilityBySlotBlobServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctDataColumnAvailabilityBySlotBlobServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctDataColumnAvailabilityBySlotBlobServiceListResponse.parseAsync(data),
+export const fctDataColumnAvailabilityBySlotBlobServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctDataColumnAvailabilityBySlotBlobServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctDataColumnAvailabilityBySlotBlobServiceListResponses, FctDataColumnAvailabilityBySlotBlobServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctDataColumnAvailabilityBySlotBlobServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctDataColumnAvailabilityBySlotBlobServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_by_slot_blob',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctDataColumnAvailabilityBySlotBlobServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctDataColumnAvailabilityBySlotBlobServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctDataColumnAvailabilityBySlotBlobServiceGetResponses,
-    FctDataColumnAvailabilityBySlotBlobServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctDataColumnAvailabilityBySlotBlobServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctDataColumnAvailabilityBySlotBlobServiceGetResponse.parseAsync(data),
+export const fctDataColumnAvailabilityBySlotBlobServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctDataColumnAvailabilityBySlotBlobServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctDataColumnAvailabilityBySlotBlobServiceGetResponses, FctDataColumnAvailabilityBySlotBlobServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctDataColumnAvailabilityBySlotBlobServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctDataColumnAvailabilityBySlotBlobServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_by_slot_blob/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctDataColumnAvailabilityDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctDataColumnAvailabilityDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctDataColumnAvailabilityDailyServiceListResponses,
-    FctDataColumnAvailabilityDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctDataColumnAvailabilityDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctDataColumnAvailabilityDailyServiceListResponse.parseAsync(data),
+export const fctDataColumnAvailabilityDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctDataColumnAvailabilityDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctDataColumnAvailabilityDailyServiceListResponses, FctDataColumnAvailabilityDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctDataColumnAvailabilityDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctDataColumnAvailabilityDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by date
  */
-export const fctDataColumnAvailabilityDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctDataColumnAvailabilityDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctDataColumnAvailabilityDailyServiceGetResponses,
-    FctDataColumnAvailabilityDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctDataColumnAvailabilityDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctDataColumnAvailabilityDailyServiceGetResponse.parseAsync(data),
+export const fctDataColumnAvailabilityDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctDataColumnAvailabilityDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctDataColumnAvailabilityDailyServiceGetResponses, FctDataColumnAvailabilityDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctDataColumnAvailabilityDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctDataColumnAvailabilityDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_daily/{date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctDataColumnAvailabilityHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctDataColumnAvailabilityHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctDataColumnAvailabilityHourlyServiceListResponses,
-    FctDataColumnAvailabilityHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctDataColumnAvailabilityHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctDataColumnAvailabilityHourlyServiceListResponse.parseAsync(data),
+export const fctDataColumnAvailabilityHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctDataColumnAvailabilityHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctDataColumnAvailabilityHourlyServiceListResponses, FctDataColumnAvailabilityHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctDataColumnAvailabilityHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctDataColumnAvailabilityHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctDataColumnAvailabilityHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctDataColumnAvailabilityHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctDataColumnAvailabilityHourlyServiceGetResponses,
-    FctDataColumnAvailabilityHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctDataColumnAvailabilityHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctDataColumnAvailabilityHourlyServiceGetResponse.parseAsync(data),
+export const fctDataColumnAvailabilityHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctDataColumnAvailabilityHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctDataColumnAvailabilityHourlyServiceGetResponses, FctDataColumnAvailabilityHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctDataColumnAvailabilityHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctDataColumnAvailabilityHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctEngineGetBlobsByElClientServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctEngineGetBlobsByElClientServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctEngineGetBlobsByElClientServiceListResponses,
-    FctEngineGetBlobsByElClientServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineGetBlobsByElClientServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctEngineGetBlobsByElClientServiceListResponse.parseAsync(data),
+export const fctEngineGetBlobsByElClientServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctEngineGetBlobsByElClientServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctEngineGetBlobsByElClientServiceListResponses, FctEngineGetBlobsByElClientServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineGetBlobsByElClientServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineGetBlobsByElClientServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_engine_get_blobs_by_el_client',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctEngineGetBlobsByElClientServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctEngineGetBlobsByElClientServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctEngineGetBlobsByElClientServiceGetResponses,
-    FctEngineGetBlobsByElClientServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineGetBlobsByElClientServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctEngineGetBlobsByElClientServiceGetResponse.parseAsync(data),
+export const fctEngineGetBlobsByElClientServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctEngineGetBlobsByElClientServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctEngineGetBlobsByElClientServiceGetResponses, FctEngineGetBlobsByElClientServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineGetBlobsByElClientServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineGetBlobsByElClientServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_engine_get_blobs_by_el_client/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctEngineGetBlobsByElClientHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctEngineGetBlobsByElClientHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctEngineGetBlobsByElClientHourlyServiceListResponses,
-    FctEngineGetBlobsByElClientHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineGetBlobsByElClientHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctEngineGetBlobsByElClientHourlyServiceListResponse.parseAsync(data),
+export const fctEngineGetBlobsByElClientHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctEngineGetBlobsByElClientHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctEngineGetBlobsByElClientHourlyServiceListResponses, FctEngineGetBlobsByElClientHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineGetBlobsByElClientHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineGetBlobsByElClientHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_engine_get_blobs_by_el_client_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctEngineGetBlobsByElClientHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctEngineGetBlobsByElClientHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctEngineGetBlobsByElClientHourlyServiceGetResponses,
-    FctEngineGetBlobsByElClientHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineGetBlobsByElClientHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctEngineGetBlobsByElClientHourlyServiceGetResponse.parseAsync(data),
+export const fctEngineGetBlobsByElClientHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctEngineGetBlobsByElClientHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctEngineGetBlobsByElClientHourlyServiceGetResponses, FctEngineGetBlobsByElClientHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineGetBlobsByElClientHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineGetBlobsByElClientHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_engine_get_blobs_by_el_client_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctEngineGetBlobsBySlotServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctEngineGetBlobsBySlotServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctEngineGetBlobsBySlotServiceListResponses,
-    FctEngineGetBlobsBySlotServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineGetBlobsBySlotServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctEngineGetBlobsBySlotServiceListResponse.parseAsync(data),
+export const fctEngineGetBlobsBySlotServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctEngineGetBlobsBySlotServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctEngineGetBlobsBySlotServiceListResponses, FctEngineGetBlobsBySlotServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineGetBlobsBySlotServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineGetBlobsBySlotServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_engine_get_blobs_by_slot',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctEngineGetBlobsBySlotServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctEngineGetBlobsBySlotServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctEngineGetBlobsBySlotServiceGetResponses,
-    FctEngineGetBlobsBySlotServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineGetBlobsBySlotServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctEngineGetBlobsBySlotServiceGetResponse.parseAsync(data),
+export const fctEngineGetBlobsBySlotServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctEngineGetBlobsBySlotServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctEngineGetBlobsBySlotServiceGetResponses, FctEngineGetBlobsBySlotServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineGetBlobsBySlotServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineGetBlobsBySlotServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_engine_get_blobs_by_slot/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctEngineGetBlobsDurationChunked50MsServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctEngineGetBlobsDurationChunked50MsServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctEngineGetBlobsDurationChunked50MsServiceListResponses,
-    FctEngineGetBlobsDurationChunked50MsServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineGetBlobsDurationChunked50MsServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctEngineGetBlobsDurationChunked50MsServiceListResponse.parseAsync(data),
+export const fctEngineGetBlobsDurationChunked50MsServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctEngineGetBlobsDurationChunked50MsServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctEngineGetBlobsDurationChunked50MsServiceListResponses, FctEngineGetBlobsDurationChunked50MsServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineGetBlobsDurationChunked50MsServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineGetBlobsDurationChunked50MsServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_engine_get_blobs_duration_chunked_50ms',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctEngineGetBlobsDurationChunked50MsServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctEngineGetBlobsDurationChunked50MsServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctEngineGetBlobsDurationChunked50MsServiceGetResponses,
-    FctEngineGetBlobsDurationChunked50MsServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineGetBlobsDurationChunked50MsServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctEngineGetBlobsDurationChunked50MsServiceGetResponse.parseAsync(data),
+export const fctEngineGetBlobsDurationChunked50MsServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctEngineGetBlobsDurationChunked50MsServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctEngineGetBlobsDurationChunked50MsServiceGetResponses, FctEngineGetBlobsDurationChunked50MsServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineGetBlobsDurationChunked50MsServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineGetBlobsDurationChunked50MsServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_engine_get_blobs_duration_chunked_50ms/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctEngineNewPayloadByElClientServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctEngineNewPayloadByElClientServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctEngineNewPayloadByElClientServiceListResponses,
-    FctEngineNewPayloadByElClientServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineNewPayloadByElClientServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctEngineNewPayloadByElClientServiceListResponse.parseAsync(data),
+export const fctEngineNewPayloadByElClientServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctEngineNewPayloadByElClientServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctEngineNewPayloadByElClientServiceListResponses, FctEngineNewPayloadByElClientServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineNewPayloadByElClientServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineNewPayloadByElClientServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_by_el_client',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctEngineNewPayloadByElClientServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctEngineNewPayloadByElClientServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctEngineNewPayloadByElClientServiceGetResponses,
-    FctEngineNewPayloadByElClientServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineNewPayloadByElClientServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctEngineNewPayloadByElClientServiceGetResponse.parseAsync(data),
+export const fctEngineNewPayloadByElClientServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctEngineNewPayloadByElClientServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctEngineNewPayloadByElClientServiceGetResponses, FctEngineNewPayloadByElClientServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineNewPayloadByElClientServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineNewPayloadByElClientServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_by_el_client/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctEngineNewPayloadByElClientHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctEngineNewPayloadByElClientHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctEngineNewPayloadByElClientHourlyServiceListResponses,
-    FctEngineNewPayloadByElClientHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineNewPayloadByElClientHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctEngineNewPayloadByElClientHourlyServiceListResponse.parseAsync(data),
+export const fctEngineNewPayloadByElClientHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctEngineNewPayloadByElClientHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctEngineNewPayloadByElClientHourlyServiceListResponses, FctEngineNewPayloadByElClientHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineNewPayloadByElClientHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineNewPayloadByElClientHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_by_el_client_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctEngineNewPayloadByElClientHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctEngineNewPayloadByElClientHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctEngineNewPayloadByElClientHourlyServiceGetResponses,
-    FctEngineNewPayloadByElClientHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineNewPayloadByElClientHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctEngineNewPayloadByElClientHourlyServiceGetResponse.parseAsync(data),
+export const fctEngineNewPayloadByElClientHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctEngineNewPayloadByElClientHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctEngineNewPayloadByElClientHourlyServiceGetResponses, FctEngineNewPayloadByElClientHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineNewPayloadByElClientHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineNewPayloadByElClientHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_by_el_client_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctEngineNewPayloadBySlotServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctEngineNewPayloadBySlotServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctEngineNewPayloadBySlotServiceListResponses,
-    FctEngineNewPayloadBySlotServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineNewPayloadBySlotServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctEngineNewPayloadBySlotServiceListResponse.parseAsync(data),
+export const fctEngineNewPayloadBySlotServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctEngineNewPayloadBySlotServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctEngineNewPayloadBySlotServiceListResponses, FctEngineNewPayloadBySlotServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineNewPayloadBySlotServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineNewPayloadBySlotServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_by_slot',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctEngineNewPayloadBySlotServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctEngineNewPayloadBySlotServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctEngineNewPayloadBySlotServiceGetResponses,
-    FctEngineNewPayloadBySlotServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineNewPayloadBySlotServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctEngineNewPayloadBySlotServiceGetResponse.parseAsync(data),
+export const fctEngineNewPayloadBySlotServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctEngineNewPayloadBySlotServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctEngineNewPayloadBySlotServiceGetResponses, FctEngineNewPayloadBySlotServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineNewPayloadBySlotServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineNewPayloadBySlotServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_by_slot/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctEngineNewPayloadDurationChunked50MsServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctEngineNewPayloadDurationChunked50MsServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctEngineNewPayloadDurationChunked50MsServiceListResponses,
-    FctEngineNewPayloadDurationChunked50MsServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineNewPayloadDurationChunked50MsServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctEngineNewPayloadDurationChunked50MsServiceListResponse.parseAsync(data),
+export const fctEngineNewPayloadDurationChunked50MsServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctEngineNewPayloadDurationChunked50MsServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctEngineNewPayloadDurationChunked50MsServiceListResponses, FctEngineNewPayloadDurationChunked50MsServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineNewPayloadDurationChunked50MsServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineNewPayloadDurationChunked50MsServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_duration_chunked_50ms',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctEngineNewPayloadDurationChunked50MsServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctEngineNewPayloadDurationChunked50MsServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctEngineNewPayloadDurationChunked50MsServiceGetResponses,
-    FctEngineNewPayloadDurationChunked50MsServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineNewPayloadDurationChunked50MsServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctEngineNewPayloadDurationChunked50MsServiceGetResponse.parseAsync(data),
+export const fctEngineNewPayloadDurationChunked50MsServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctEngineNewPayloadDurationChunked50MsServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctEngineNewPayloadDurationChunked50MsServiceGetResponses, FctEngineNewPayloadDurationChunked50MsServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineNewPayloadDurationChunked50MsServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineNewPayloadDurationChunked50MsServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_duration_chunked_50ms/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctEngineNewPayloadWinrateDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctEngineNewPayloadWinrateDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctEngineNewPayloadWinrateDailyServiceListResponses,
-    FctEngineNewPayloadWinrateDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineNewPayloadWinrateDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctEngineNewPayloadWinrateDailyServiceListResponse.parseAsync(data),
+export const fctEngineNewPayloadWinrateDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctEngineNewPayloadWinrateDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctEngineNewPayloadWinrateDailyServiceListResponses, FctEngineNewPayloadWinrateDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineNewPayloadWinrateDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineNewPayloadWinrateDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_winrate_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctEngineNewPayloadWinrateDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctEngineNewPayloadWinrateDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctEngineNewPayloadWinrateDailyServiceGetResponses,
-    FctEngineNewPayloadWinrateDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineNewPayloadWinrateDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctEngineNewPayloadWinrateDailyServiceGetResponse.parseAsync(data),
+export const fctEngineNewPayloadWinrateDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctEngineNewPayloadWinrateDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctEngineNewPayloadWinrateDailyServiceGetResponses, FctEngineNewPayloadWinrateDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineNewPayloadWinrateDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineNewPayloadWinrateDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_winrate_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctEngineNewPayloadWinrateHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctEngineNewPayloadWinrateHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctEngineNewPayloadWinrateHourlyServiceListResponses,
-    FctEngineNewPayloadWinrateHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineNewPayloadWinrateHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctEngineNewPayloadWinrateHourlyServiceListResponse.parseAsync(data),
+export const fctEngineNewPayloadWinrateHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctEngineNewPayloadWinrateHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctEngineNewPayloadWinrateHourlyServiceListResponses, FctEngineNewPayloadWinrateHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineNewPayloadWinrateHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineNewPayloadWinrateHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_winrate_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctEngineNewPayloadWinrateHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctEngineNewPayloadWinrateHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctEngineNewPayloadWinrateHourlyServiceGetResponses,
-    FctEngineNewPayloadWinrateHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctEngineNewPayloadWinrateHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctEngineNewPayloadWinrateHourlyServiceGetResponse.parseAsync(data),
+export const fctEngineNewPayloadWinrateHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctEngineNewPayloadWinrateHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctEngineNewPayloadWinrateHourlyServiceGetResponses, FctEngineNewPayloadWinrateHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctEngineNewPayloadWinrateHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctEngineNewPayloadWinrateHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_winrate_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctExecutionGasLimitDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctExecutionGasLimitDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctExecutionGasLimitDailyServiceListResponses,
-    FctExecutionGasLimitDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionGasLimitDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionGasLimitDailyServiceListResponse.parseAsync(data),
+export const fctExecutionGasLimitDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctExecutionGasLimitDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctExecutionGasLimitDailyServiceListResponses, FctExecutionGasLimitDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionGasLimitDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionGasLimitDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_execution_gas_limit_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctExecutionGasLimitDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctExecutionGasLimitDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctExecutionGasLimitDailyServiceGetResponses,
-    FctExecutionGasLimitDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionGasLimitDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionGasLimitDailyServiceGetResponse.parseAsync(data),
+export const fctExecutionGasLimitDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctExecutionGasLimitDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctExecutionGasLimitDailyServiceGetResponses, FctExecutionGasLimitDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionGasLimitDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionGasLimitDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_execution_gas_limit_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctExecutionGasLimitHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctExecutionGasLimitHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctExecutionGasLimitHourlyServiceListResponses,
-    FctExecutionGasLimitHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionGasLimitHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionGasLimitHourlyServiceListResponse.parseAsync(data),
+export const fctExecutionGasLimitHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctExecutionGasLimitHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctExecutionGasLimitHourlyServiceListResponses, FctExecutionGasLimitHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionGasLimitHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionGasLimitHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_execution_gas_limit_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctExecutionGasLimitHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctExecutionGasLimitHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctExecutionGasLimitHourlyServiceGetResponses,
-    FctExecutionGasLimitHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionGasLimitHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionGasLimitHourlyServiceGetResponse.parseAsync(data),
+export const fctExecutionGasLimitHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctExecutionGasLimitHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctExecutionGasLimitHourlyServiceGetResponses, FctExecutionGasLimitHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionGasLimitHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionGasLimitHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_execution_gas_limit_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctExecutionGasLimitSignallingDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctExecutionGasLimitSignallingDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctExecutionGasLimitSignallingDailyServiceListResponses,
-    FctExecutionGasLimitSignallingDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionGasLimitSignallingDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionGasLimitSignallingDailyServiceListResponse.parseAsync(data),
+export const fctExecutionGasLimitSignallingDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctExecutionGasLimitSignallingDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctExecutionGasLimitSignallingDailyServiceListResponses, FctExecutionGasLimitSignallingDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionGasLimitSignallingDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionGasLimitSignallingDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_execution_gas_limit_signalling_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctExecutionGasLimitSignallingDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctExecutionGasLimitSignallingDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctExecutionGasLimitSignallingDailyServiceGetResponses,
-    FctExecutionGasLimitSignallingDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionGasLimitSignallingDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionGasLimitSignallingDailyServiceGetResponse.parseAsync(data),
+export const fctExecutionGasLimitSignallingDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctExecutionGasLimitSignallingDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctExecutionGasLimitSignallingDailyServiceGetResponses, FctExecutionGasLimitSignallingDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionGasLimitSignallingDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionGasLimitSignallingDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_execution_gas_limit_signalling_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctExecutionGasLimitSignallingHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctExecutionGasLimitSignallingHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctExecutionGasLimitSignallingHourlyServiceListResponses,
-    FctExecutionGasLimitSignallingHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionGasLimitSignallingHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionGasLimitSignallingHourlyServiceListResponse.parseAsync(data),
+export const fctExecutionGasLimitSignallingHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctExecutionGasLimitSignallingHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctExecutionGasLimitSignallingHourlyServiceListResponses, FctExecutionGasLimitSignallingHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionGasLimitSignallingHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionGasLimitSignallingHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_execution_gas_limit_signalling_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctExecutionGasLimitSignallingHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctExecutionGasLimitSignallingHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctExecutionGasLimitSignallingHourlyServiceGetResponses,
-    FctExecutionGasLimitSignallingHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionGasLimitSignallingHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionGasLimitSignallingHourlyServiceGetResponse.parseAsync(data),
+export const fctExecutionGasLimitSignallingHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctExecutionGasLimitSignallingHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctExecutionGasLimitSignallingHourlyServiceGetResponses, FctExecutionGasLimitSignallingHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionGasLimitSignallingHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionGasLimitSignallingHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_execution_gas_limit_signalling_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctExecutionGasUsedDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctExecutionGasUsedDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctExecutionGasUsedDailyServiceListResponses,
-    FctExecutionGasUsedDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionGasUsedDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionGasUsedDailyServiceListResponse.parseAsync(data),
+export const fctExecutionGasUsedDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctExecutionGasUsedDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctExecutionGasUsedDailyServiceListResponses, FctExecutionGasUsedDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionGasUsedDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionGasUsedDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_execution_gas_used_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctExecutionGasUsedDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctExecutionGasUsedDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctExecutionGasUsedDailyServiceGetResponses,
-    FctExecutionGasUsedDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionGasUsedDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionGasUsedDailyServiceGetResponse.parseAsync(data),
+export const fctExecutionGasUsedDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctExecutionGasUsedDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctExecutionGasUsedDailyServiceGetResponses, FctExecutionGasUsedDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionGasUsedDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionGasUsedDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_execution_gas_used_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctExecutionGasUsedHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctExecutionGasUsedHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctExecutionGasUsedHourlyServiceListResponses,
-    FctExecutionGasUsedHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionGasUsedHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionGasUsedHourlyServiceListResponse.parseAsync(data),
+export const fctExecutionGasUsedHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctExecutionGasUsedHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctExecutionGasUsedHourlyServiceListResponses, FctExecutionGasUsedHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionGasUsedHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionGasUsedHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_execution_gas_used_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctExecutionGasUsedHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctExecutionGasUsedHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctExecutionGasUsedHourlyServiceGetResponses,
-    FctExecutionGasUsedHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionGasUsedHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionGasUsedHourlyServiceGetResponse.parseAsync(data),
+export const fctExecutionGasUsedHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctExecutionGasUsedHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctExecutionGasUsedHourlyServiceGetResponses, FctExecutionGasUsedHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionGasUsedHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionGasUsedHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_execution_gas_used_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctExecutionReceiptSizeDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctExecutionReceiptSizeDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctExecutionReceiptSizeDailyServiceListResponses,
-    FctExecutionReceiptSizeDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionReceiptSizeDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionReceiptSizeDailyServiceListResponse.parseAsync(data),
+export const fctExecutionReceiptSizeDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctExecutionReceiptSizeDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctExecutionReceiptSizeDailyServiceListResponses, FctExecutionReceiptSizeDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionReceiptSizeDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionReceiptSizeDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_execution_receipt_size_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctExecutionReceiptSizeDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctExecutionReceiptSizeDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctExecutionReceiptSizeDailyServiceGetResponses,
-    FctExecutionReceiptSizeDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionReceiptSizeDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionReceiptSizeDailyServiceGetResponse.parseAsync(data),
+export const fctExecutionReceiptSizeDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctExecutionReceiptSizeDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctExecutionReceiptSizeDailyServiceGetResponses, FctExecutionReceiptSizeDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionReceiptSizeDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionReceiptSizeDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_execution_receipt_size_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctExecutionReceiptSizeHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctExecutionReceiptSizeHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctExecutionReceiptSizeHourlyServiceListResponses,
-    FctExecutionReceiptSizeHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionReceiptSizeHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionReceiptSizeHourlyServiceListResponse.parseAsync(data),
+export const fctExecutionReceiptSizeHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctExecutionReceiptSizeHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctExecutionReceiptSizeHourlyServiceListResponses, FctExecutionReceiptSizeHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionReceiptSizeHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionReceiptSizeHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_execution_receipt_size_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctExecutionReceiptSizeHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctExecutionReceiptSizeHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctExecutionReceiptSizeHourlyServiceGetResponses,
-    FctExecutionReceiptSizeHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionReceiptSizeHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionReceiptSizeHourlyServiceGetResponse.parseAsync(data),
+export const fctExecutionReceiptSizeHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctExecutionReceiptSizeHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctExecutionReceiptSizeHourlyServiceGetResponses, FctExecutionReceiptSizeHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionReceiptSizeHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionReceiptSizeHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_execution_receipt_size_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctExecutionStateSizeDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctExecutionStateSizeDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctExecutionStateSizeDailyServiceListResponses,
-    FctExecutionStateSizeDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionStateSizeDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionStateSizeDailyServiceListResponse.parseAsync(data),
+export const fctExecutionStateSizeDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctExecutionStateSizeDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctExecutionStateSizeDailyServiceListResponses, FctExecutionStateSizeDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionStateSizeDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionStateSizeDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_execution_state_size_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctExecutionStateSizeDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctExecutionStateSizeDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctExecutionStateSizeDailyServiceGetResponses,
-    FctExecutionStateSizeDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionStateSizeDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionStateSizeDailyServiceGetResponse.parseAsync(data),
+export const fctExecutionStateSizeDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctExecutionStateSizeDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctExecutionStateSizeDailyServiceGetResponses, FctExecutionStateSizeDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionStateSizeDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionStateSizeDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_execution_state_size_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctExecutionStateSizeHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctExecutionStateSizeHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctExecutionStateSizeHourlyServiceListResponses,
-    FctExecutionStateSizeHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionStateSizeHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionStateSizeHourlyServiceListResponse.parseAsync(data),
+export const fctExecutionStateSizeHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctExecutionStateSizeHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctExecutionStateSizeHourlyServiceListResponses, FctExecutionStateSizeHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionStateSizeHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionStateSizeHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_execution_state_size_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctExecutionStateSizeHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctExecutionStateSizeHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctExecutionStateSizeHourlyServiceGetResponses,
-    FctExecutionStateSizeHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionStateSizeHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionStateSizeHourlyServiceGetResponse.parseAsync(data),
+export const fctExecutionStateSizeHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctExecutionStateSizeHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctExecutionStateSizeHourlyServiceGetResponses, FctExecutionStateSizeHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionStateSizeHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionStateSizeHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_execution_state_size_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctExecutionTpsDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctExecutionTpsDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctExecutionTpsDailyServiceListResponses,
-    FctExecutionTpsDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionTpsDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionTpsDailyServiceListResponse.parseAsync(data),
+export const fctExecutionTpsDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctExecutionTpsDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctExecutionTpsDailyServiceListResponses, FctExecutionTpsDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionTpsDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionTpsDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_execution_tps_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctExecutionTpsDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctExecutionTpsDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctExecutionTpsDailyServiceGetResponses,
-    FctExecutionTpsDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionTpsDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionTpsDailyServiceGetResponse.parseAsync(data),
+export const fctExecutionTpsDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctExecutionTpsDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctExecutionTpsDailyServiceGetResponses, FctExecutionTpsDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionTpsDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionTpsDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_execution_tps_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctExecutionTpsHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctExecutionTpsHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctExecutionTpsHourlyServiceListResponses,
-    FctExecutionTpsHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionTpsHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionTpsHourlyServiceListResponse.parseAsync(data),
+export const fctExecutionTpsHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctExecutionTpsHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctExecutionTpsHourlyServiceListResponses, FctExecutionTpsHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionTpsHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionTpsHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_execution_tps_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctExecutionTpsHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctExecutionTpsHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctExecutionTpsHourlyServiceGetResponses,
-    FctExecutionTpsHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionTpsHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionTpsHourlyServiceGetResponse.parseAsync(data),
+export const fctExecutionTpsHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctExecutionTpsHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctExecutionTpsHourlyServiceGetResponses, FctExecutionTpsHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionTpsHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionTpsHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_execution_tps_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctExecutionTransactionsDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctExecutionTransactionsDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctExecutionTransactionsDailyServiceListResponses,
-    FctExecutionTransactionsDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionTransactionsDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionTransactionsDailyServiceListResponse.parseAsync(data),
+export const fctExecutionTransactionsDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctExecutionTransactionsDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctExecutionTransactionsDailyServiceListResponses, FctExecutionTransactionsDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionTransactionsDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionTransactionsDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_execution_transactions_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctExecutionTransactionsDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctExecutionTransactionsDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctExecutionTransactionsDailyServiceGetResponses,
-    FctExecutionTransactionsDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionTransactionsDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionTransactionsDailyServiceGetResponse.parseAsync(data),
+export const fctExecutionTransactionsDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctExecutionTransactionsDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctExecutionTransactionsDailyServiceGetResponses, FctExecutionTransactionsDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionTransactionsDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionTransactionsDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_execution_transactions_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctExecutionTransactionsHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctExecutionTransactionsHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctExecutionTransactionsHourlyServiceListResponses,
-    FctExecutionTransactionsHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionTransactionsHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionTransactionsHourlyServiceListResponse.parseAsync(data),
+export const fctExecutionTransactionsHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctExecutionTransactionsHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctExecutionTransactionsHourlyServiceListResponses, FctExecutionTransactionsHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionTransactionsHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionTransactionsHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_execution_transactions_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctExecutionTransactionsHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctExecutionTransactionsHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctExecutionTransactionsHourlyServiceGetResponses,
-    FctExecutionTransactionsHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctExecutionTransactionsHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctExecutionTransactionsHourlyServiceGetResponse.parseAsync(data),
+export const fctExecutionTransactionsHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctExecutionTransactionsHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctExecutionTransactionsHourlyServiceGetResponses, FctExecutionTransactionsHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctExecutionTransactionsHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctExecutionTransactionsHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_execution_transactions_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctHeadFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctHeadFirstSeenByNodeServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctHeadFirstSeenByNodeServiceListResponses,
-    FctHeadFirstSeenByNodeServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctHeadFirstSeenByNodeServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctHeadFirstSeenByNodeServiceListResponse.parseAsync(data),
+export const fctHeadFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctHeadFirstSeenByNodeServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctHeadFirstSeenByNodeServiceListResponses, FctHeadFirstSeenByNodeServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctHeadFirstSeenByNodeServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctHeadFirstSeenByNodeServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_head_first_seen_by_node',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctHeadFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctHeadFirstSeenByNodeServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctHeadFirstSeenByNodeServiceGetResponses,
-    FctHeadFirstSeenByNodeServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctHeadFirstSeenByNodeServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctHeadFirstSeenByNodeServiceGetResponse.parseAsync(data),
+export const fctHeadFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctHeadFirstSeenByNodeServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctHeadFirstSeenByNodeServiceGetResponses, FctHeadFirstSeenByNodeServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctHeadFirstSeenByNodeServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctHeadFirstSeenByNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_head_first_seen_by_node/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctHeadVoteCorrectnessRateDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctHeadVoteCorrectnessRateDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctHeadVoteCorrectnessRateDailyServiceListResponses,
-    FctHeadVoteCorrectnessRateDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctHeadVoteCorrectnessRateDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctHeadVoteCorrectnessRateDailyServiceListResponse.parseAsync(data),
+export const fctHeadVoteCorrectnessRateDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctHeadVoteCorrectnessRateDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctHeadVoteCorrectnessRateDailyServiceListResponses, FctHeadVoteCorrectnessRateDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctHeadVoteCorrectnessRateDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctHeadVoteCorrectnessRateDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_head_vote_correctness_rate_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctHeadVoteCorrectnessRateDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctHeadVoteCorrectnessRateDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctHeadVoteCorrectnessRateDailyServiceGetResponses,
-    FctHeadVoteCorrectnessRateDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctHeadVoteCorrectnessRateDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctHeadVoteCorrectnessRateDailyServiceGetResponse.parseAsync(data),
+export const fctHeadVoteCorrectnessRateDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctHeadVoteCorrectnessRateDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctHeadVoteCorrectnessRateDailyServiceGetResponses, FctHeadVoteCorrectnessRateDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctHeadVoteCorrectnessRateDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctHeadVoteCorrectnessRateDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_head_vote_correctness_rate_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctHeadVoteCorrectnessRateHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctHeadVoteCorrectnessRateHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctHeadVoteCorrectnessRateHourlyServiceListResponses,
-    FctHeadVoteCorrectnessRateHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctHeadVoteCorrectnessRateHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctHeadVoteCorrectnessRateHourlyServiceListResponse.parseAsync(data),
+export const fctHeadVoteCorrectnessRateHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctHeadVoteCorrectnessRateHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctHeadVoteCorrectnessRateHourlyServiceListResponses, FctHeadVoteCorrectnessRateHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctHeadVoteCorrectnessRateHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctHeadVoteCorrectnessRateHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_head_vote_correctness_rate_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctHeadVoteCorrectnessRateHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctHeadVoteCorrectnessRateHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctHeadVoteCorrectnessRateHourlyServiceGetResponses,
-    FctHeadVoteCorrectnessRateHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctHeadVoteCorrectnessRateHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctHeadVoteCorrectnessRateHourlyServiceGetResponse.parseAsync(data),
+export const fctHeadVoteCorrectnessRateHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctHeadVoteCorrectnessRateHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctHeadVoteCorrectnessRateHourlyServiceGetResponses, FctHeadVoteCorrectnessRateHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctHeadVoteCorrectnessRateHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctHeadVoteCorrectnessRateHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_head_vote_correctness_rate_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctMevBidCountByBuilderServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctMevBidCountByBuilderServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctMevBidCountByBuilderServiceListResponses,
-    FctMevBidCountByBuilderServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctMevBidCountByBuilderServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctMevBidCountByBuilderServiceListResponse.parseAsync(data),
+export const fctMevBidCountByBuilderServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctMevBidCountByBuilderServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctMevBidCountByBuilderServiceListResponses, FctMevBidCountByBuilderServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctMevBidCountByBuilderServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctMevBidCountByBuilderServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_mev_bid_count_by_builder',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctMevBidCountByBuilderServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctMevBidCountByBuilderServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctMevBidCountByBuilderServiceGetResponses,
-    FctMevBidCountByBuilderServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctMevBidCountByBuilderServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctMevBidCountByBuilderServiceGetResponse.parseAsync(data),
+export const fctMevBidCountByBuilderServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctMevBidCountByBuilderServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctMevBidCountByBuilderServiceGetResponses, FctMevBidCountByBuilderServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctMevBidCountByBuilderServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctMevBidCountByBuilderServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_mev_bid_count_by_builder/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctMevBidCountByRelayServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctMevBidCountByRelayServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctMevBidCountByRelayServiceListResponses,
-    FctMevBidCountByRelayServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctMevBidCountByRelayServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctMevBidCountByRelayServiceListResponse.parseAsync(data),
+export const fctMevBidCountByRelayServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctMevBidCountByRelayServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctMevBidCountByRelayServiceListResponses, FctMevBidCountByRelayServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctMevBidCountByRelayServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctMevBidCountByRelayServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_mev_bid_count_by_relay',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctMevBidCountByRelayServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctMevBidCountByRelayServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctMevBidCountByRelayServiceGetResponses,
-    FctMevBidCountByRelayServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctMevBidCountByRelayServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctMevBidCountByRelayServiceGetResponse.parseAsync(data),
+export const fctMevBidCountByRelayServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctMevBidCountByRelayServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctMevBidCountByRelayServiceGetResponses, FctMevBidCountByRelayServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctMevBidCountByRelayServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctMevBidCountByRelayServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_mev_bid_count_by_relay/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctMevBidHighestValueByBuilderChunked50MsServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctMevBidHighestValueByBuilderChunked50MsServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctMevBidHighestValueByBuilderChunked50MsServiceListResponses,
-    FctMevBidHighestValueByBuilderChunked50MsServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctMevBidHighestValueByBuilderChunked50MsServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctMevBidHighestValueByBuilderChunked50MsServiceListResponse.parseAsync(data),
+export const fctMevBidHighestValueByBuilderChunked50MsServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctMevBidHighestValueByBuilderChunked50MsServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctMevBidHighestValueByBuilderChunked50MsServiceListResponses, FctMevBidHighestValueByBuilderChunked50MsServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctMevBidHighestValueByBuilderChunked50MsServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctMevBidHighestValueByBuilderChunked50MsServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_mev_bid_highest_value_by_builder_chunked_50ms',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctMevBidHighestValueByBuilderChunked50MsServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctMevBidHighestValueByBuilderChunked50MsServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctMevBidHighestValueByBuilderChunked50MsServiceGetResponses,
-    FctMevBidHighestValueByBuilderChunked50MsServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctMevBidHighestValueByBuilderChunked50MsServiceGetData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctMevBidHighestValueByBuilderChunked50MsServiceGetResponse.parseAsync(data),
+export const fctMevBidHighestValueByBuilderChunked50MsServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctMevBidHighestValueByBuilderChunked50MsServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctMevBidHighestValueByBuilderChunked50MsServiceGetResponses, FctMevBidHighestValueByBuilderChunked50MsServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctMevBidHighestValueByBuilderChunked50MsServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctMevBidHighestValueByBuilderChunked50MsServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_mev_bid_highest_value_by_builder_chunked_50ms/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctMissedSlotRateDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctMissedSlotRateDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctMissedSlotRateDailyServiceListResponses,
-    FctMissedSlotRateDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctMissedSlotRateDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctMissedSlotRateDailyServiceListResponse.parseAsync(data),
+export const fctMissedSlotRateDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctMissedSlotRateDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctMissedSlotRateDailyServiceListResponses, FctMissedSlotRateDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctMissedSlotRateDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctMissedSlotRateDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_missed_slot_rate_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctMissedSlotRateDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctMissedSlotRateDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctMissedSlotRateDailyServiceGetResponses,
-    FctMissedSlotRateDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctMissedSlotRateDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctMissedSlotRateDailyServiceGetResponse.parseAsync(data),
+export const fctMissedSlotRateDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctMissedSlotRateDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctMissedSlotRateDailyServiceGetResponses, FctMissedSlotRateDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctMissedSlotRateDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctMissedSlotRateDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_missed_slot_rate_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctMissedSlotRateHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctMissedSlotRateHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctMissedSlotRateHourlyServiceListResponses,
-    FctMissedSlotRateHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctMissedSlotRateHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctMissedSlotRateHourlyServiceListResponse.parseAsync(data),
+export const fctMissedSlotRateHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctMissedSlotRateHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctMissedSlotRateHourlyServiceListResponses, FctMissedSlotRateHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctMissedSlotRateHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctMissedSlotRateHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_missed_slot_rate_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctMissedSlotRateHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctMissedSlotRateHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctMissedSlotRateHourlyServiceGetResponses,
-    FctMissedSlotRateHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctMissedSlotRateHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctMissedSlotRateHourlyServiceGetResponse.parseAsync(data),
+export const fctMissedSlotRateHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctMissedSlotRateHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctMissedSlotRateHourlyServiceGetResponses, FctMissedSlotRateHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctMissedSlotRateHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctMissedSlotRateHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_missed_slot_rate_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctNodeActiveLast24hServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctNodeActiveLast24hServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctNodeActiveLast24hServiceListResponses,
-    FctNodeActiveLast24hServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctNodeActiveLast24hServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctNodeActiveLast24hServiceListResponse.parseAsync(data),
+export const fctNodeActiveLast24hServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctNodeActiveLast24hServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctNodeActiveLast24hServiceListResponses, FctNodeActiveLast24hServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctNodeActiveLast24hServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctNodeActiveLast24hServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_node_active_last_24h',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by meta_client_name
  */
-export const fctNodeActiveLast24hServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctNodeActiveLast24hServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctNodeActiveLast24hServiceGetResponses,
-    FctNodeActiveLast24hServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctNodeActiveLast24hServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctNodeActiveLast24hServiceGetResponse.parseAsync(data),
+export const fctNodeActiveLast24hServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctNodeActiveLast24hServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctNodeActiveLast24hServiceGetResponses, FctNodeActiveLast24hServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctNodeActiveLast24hServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctNodeActiveLast24hServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_node_active_last_24h/{meta_client_name}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctNodeCpuUtilizationByProcessServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctNodeCpuUtilizationByProcessServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctNodeCpuUtilizationByProcessServiceListResponses,
-    FctNodeCpuUtilizationByProcessServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctNodeCpuUtilizationByProcessServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctNodeCpuUtilizationByProcessServiceListResponse.parseAsync(data),
+export const fctNodeCpuUtilizationByProcessServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctNodeCpuUtilizationByProcessServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctNodeCpuUtilizationByProcessServiceListResponses, FctNodeCpuUtilizationByProcessServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctNodeCpuUtilizationByProcessServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctNodeCpuUtilizationByProcessServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_node_cpu_utilization_by_process',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by wallclock_slot_start_date_time
  */
-export const fctNodeCpuUtilizationByProcessServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctNodeCpuUtilizationByProcessServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctNodeCpuUtilizationByProcessServiceGetResponses,
-    FctNodeCpuUtilizationByProcessServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctNodeCpuUtilizationByProcessServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctNodeCpuUtilizationByProcessServiceGetResponse.parseAsync(data),
+export const fctNodeCpuUtilizationByProcessServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctNodeCpuUtilizationByProcessServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctNodeCpuUtilizationByProcessServiceGetResponses, FctNodeCpuUtilizationByProcessServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctNodeCpuUtilizationByProcessServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctNodeCpuUtilizationByProcessServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_node_cpu_utilization_by_process/{wallclock_slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctNodeDiskIoByProcessServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctNodeDiskIoByProcessServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctNodeDiskIoByProcessServiceListResponses,
-    FctNodeDiskIoByProcessServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctNodeDiskIoByProcessServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctNodeDiskIoByProcessServiceListResponse.parseAsync(data),
+export const fctNodeDiskIoByProcessServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctNodeDiskIoByProcessServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctNodeDiskIoByProcessServiceListResponses, FctNodeDiskIoByProcessServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctNodeDiskIoByProcessServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctNodeDiskIoByProcessServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_node_disk_io_by_process',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by wallclock_slot_start_date_time
  */
-export const fctNodeDiskIoByProcessServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctNodeDiskIoByProcessServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctNodeDiskIoByProcessServiceGetResponses,
-    FctNodeDiskIoByProcessServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctNodeDiskIoByProcessServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctNodeDiskIoByProcessServiceGetResponse.parseAsync(data),
+export const fctNodeDiskIoByProcessServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctNodeDiskIoByProcessServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctNodeDiskIoByProcessServiceGetResponses, FctNodeDiskIoByProcessServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctNodeDiskIoByProcessServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctNodeDiskIoByProcessServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_node_disk_io_by_process/{wallclock_slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctNodeMemoryUsageByProcessServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctNodeMemoryUsageByProcessServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctNodeMemoryUsageByProcessServiceListResponses,
-    FctNodeMemoryUsageByProcessServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctNodeMemoryUsageByProcessServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctNodeMemoryUsageByProcessServiceListResponse.parseAsync(data),
+export const fctNodeMemoryUsageByProcessServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctNodeMemoryUsageByProcessServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctNodeMemoryUsageByProcessServiceListResponses, FctNodeMemoryUsageByProcessServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctNodeMemoryUsageByProcessServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctNodeMemoryUsageByProcessServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_node_memory_usage_by_process',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by wallclock_slot_start_date_time
  */
-export const fctNodeMemoryUsageByProcessServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctNodeMemoryUsageByProcessServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctNodeMemoryUsageByProcessServiceGetResponses,
-    FctNodeMemoryUsageByProcessServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctNodeMemoryUsageByProcessServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctNodeMemoryUsageByProcessServiceGetResponse.parseAsync(data),
+export const fctNodeMemoryUsageByProcessServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctNodeMemoryUsageByProcessServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctNodeMemoryUsageByProcessServiceGetResponses, FctNodeMemoryUsageByProcessServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctNodeMemoryUsageByProcessServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctNodeMemoryUsageByProcessServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_node_memory_usage_by_process/{wallclock_slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctNodeNetworkIoByProcessServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctNodeNetworkIoByProcessServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctNodeNetworkIoByProcessServiceListResponses,
-    FctNodeNetworkIoByProcessServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctNodeNetworkIoByProcessServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctNodeNetworkIoByProcessServiceListResponse.parseAsync(data),
+export const fctNodeNetworkIoByProcessServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctNodeNetworkIoByProcessServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctNodeNetworkIoByProcessServiceListResponses, FctNodeNetworkIoByProcessServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctNodeNetworkIoByProcessServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctNodeNetworkIoByProcessServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_node_network_io_by_process',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by wallclock_slot_start_date_time
  */
-export const fctNodeNetworkIoByProcessServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctNodeNetworkIoByProcessServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctNodeNetworkIoByProcessServiceGetResponses,
-    FctNodeNetworkIoByProcessServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctNodeNetworkIoByProcessServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctNodeNetworkIoByProcessServiceGetResponse.parseAsync(data),
+export const fctNodeNetworkIoByProcessServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctNodeNetworkIoByProcessServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctNodeNetworkIoByProcessServiceGetResponses, FctNodeNetworkIoByProcessServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctNodeNetworkIoByProcessServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctNodeNetworkIoByProcessServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_node_network_io_by_process/{wallclock_slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctOpcodeGasByOpcodeDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctOpcodeGasByOpcodeDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctOpcodeGasByOpcodeDailyServiceListResponses,
-    FctOpcodeGasByOpcodeDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctOpcodeGasByOpcodeDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctOpcodeGasByOpcodeDailyServiceListResponse.parseAsync(data),
+export const fctOpcodeGasByOpcodeDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctOpcodeGasByOpcodeDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctOpcodeGasByOpcodeDailyServiceListResponses, FctOpcodeGasByOpcodeDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctOpcodeGasByOpcodeDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctOpcodeGasByOpcodeDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_opcode_gas_by_opcode_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctOpcodeGasByOpcodeDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctOpcodeGasByOpcodeDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctOpcodeGasByOpcodeDailyServiceGetResponses,
-    FctOpcodeGasByOpcodeDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctOpcodeGasByOpcodeDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctOpcodeGasByOpcodeDailyServiceGetResponse.parseAsync(data),
+export const fctOpcodeGasByOpcodeDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctOpcodeGasByOpcodeDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctOpcodeGasByOpcodeDailyServiceGetResponses, FctOpcodeGasByOpcodeDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctOpcodeGasByOpcodeDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctOpcodeGasByOpcodeDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_opcode_gas_by_opcode_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctOpcodeGasByOpcodeHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctOpcodeGasByOpcodeHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctOpcodeGasByOpcodeHourlyServiceListResponses,
-    FctOpcodeGasByOpcodeHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctOpcodeGasByOpcodeHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctOpcodeGasByOpcodeHourlyServiceListResponse.parseAsync(data),
+export const fctOpcodeGasByOpcodeHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctOpcodeGasByOpcodeHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctOpcodeGasByOpcodeHourlyServiceListResponses, FctOpcodeGasByOpcodeHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctOpcodeGasByOpcodeHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctOpcodeGasByOpcodeHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_opcode_gas_by_opcode_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctOpcodeGasByOpcodeHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctOpcodeGasByOpcodeHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctOpcodeGasByOpcodeHourlyServiceGetResponses,
-    FctOpcodeGasByOpcodeHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctOpcodeGasByOpcodeHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctOpcodeGasByOpcodeHourlyServiceGetResponse.parseAsync(data),
+export const fctOpcodeGasByOpcodeHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctOpcodeGasByOpcodeHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctOpcodeGasByOpcodeHourlyServiceGetResponses, FctOpcodeGasByOpcodeHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctOpcodeGasByOpcodeHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctOpcodeGasByOpcodeHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_opcode_gas_by_opcode_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctOpcodeOpsDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctOpcodeOpsDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctOpcodeOpsDailyServiceListResponses,
-    FctOpcodeOpsDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctOpcodeOpsDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctOpcodeOpsDailyServiceListResponse.parseAsync(data),
+export const fctOpcodeOpsDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctOpcodeOpsDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctOpcodeOpsDailyServiceListResponses, FctOpcodeOpsDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctOpcodeOpsDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctOpcodeOpsDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_opcode_ops_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctOpcodeOpsDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctOpcodeOpsDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<FctOpcodeOpsDailyServiceGetResponses, FctOpcodeOpsDailyServiceGetErrors, ThrowOnError>(
-    {
-      requestValidator: async data => await zFctOpcodeOpsDailyServiceGetData.parseAsync(data),
-      responseValidator: async data => await zFctOpcodeOpsDailyServiceGetResponse.parseAsync(data),
-      url: '/api/v1/fct_opcode_ops_daily/{day_start_date}',
-      ...options,
-    }
-  );
+export const fctOpcodeOpsDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctOpcodeOpsDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctOpcodeOpsDailyServiceGetResponses, FctOpcodeOpsDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctOpcodeOpsDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctOpcodeOpsDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_ops_daily/{day_start_date}',
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctOpcodeOpsHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctOpcodeOpsHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctOpcodeOpsHourlyServiceListResponses,
-    FctOpcodeOpsHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctOpcodeOpsHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctOpcodeOpsHourlyServiceListResponse.parseAsync(data),
+export const fctOpcodeOpsHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctOpcodeOpsHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctOpcodeOpsHourlyServiceListResponses, FctOpcodeOpsHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctOpcodeOpsHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctOpcodeOpsHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_opcode_ops_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctOpcodeOpsHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctOpcodeOpsHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctOpcodeOpsHourlyServiceGetResponses,
-    FctOpcodeOpsHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctOpcodeOpsHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctOpcodeOpsHourlyServiceGetResponse.parseAsync(data),
+export const fctOpcodeOpsHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctOpcodeOpsHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctOpcodeOpsHourlyServiceGetResponses, FctOpcodeOpsHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctOpcodeOpsHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctOpcodeOpsHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_opcode_ops_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctPreparedBlockServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctPreparedBlockServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctPreparedBlockServiceListResponses,
-    FctPreparedBlockServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctPreparedBlockServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctPreparedBlockServiceListResponse.parseAsync(data),
+export const fctPreparedBlockServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctPreparedBlockServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctPreparedBlockServiceListResponses, FctPreparedBlockServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctPreparedBlockServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctPreparedBlockServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_prepared_block',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const fctPreparedBlockServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctPreparedBlockServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<FctPreparedBlockServiceGetResponses, FctPreparedBlockServiceGetErrors, ThrowOnError>({
-    requestValidator: async data => await zFctPreparedBlockServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctPreparedBlockServiceGetResponse.parseAsync(data),
+export const fctPreparedBlockServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctPreparedBlockServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctPreparedBlockServiceGetResponses, FctPreparedBlockServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctPreparedBlockServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctPreparedBlockServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_prepared_block/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctProposerRewardDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctProposerRewardDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctProposerRewardDailyServiceListResponses,
-    FctProposerRewardDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctProposerRewardDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctProposerRewardDailyServiceListResponse.parseAsync(data),
+export const fctProposerRewardDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctProposerRewardDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctProposerRewardDailyServiceListResponses, FctProposerRewardDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctProposerRewardDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctProposerRewardDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_proposer_reward_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctProposerRewardDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctProposerRewardDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctProposerRewardDailyServiceGetResponses,
-    FctProposerRewardDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctProposerRewardDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctProposerRewardDailyServiceGetResponse.parseAsync(data),
+export const fctProposerRewardDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctProposerRewardDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctProposerRewardDailyServiceGetResponses, FctProposerRewardDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctProposerRewardDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctProposerRewardDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_proposer_reward_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctProposerRewardHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctProposerRewardHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctProposerRewardHourlyServiceListResponses,
-    FctProposerRewardHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctProposerRewardHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctProposerRewardHourlyServiceListResponse.parseAsync(data),
+export const fctProposerRewardHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctProposerRewardHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctProposerRewardHourlyServiceListResponses, FctProposerRewardHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctProposerRewardHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctProposerRewardHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_proposer_reward_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctProposerRewardHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctProposerRewardHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctProposerRewardHourlyServiceGetResponses,
-    FctProposerRewardHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctProposerRewardHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctProposerRewardHourlyServiceGetResponse.parseAsync(data),
+export const fctProposerRewardHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctProposerRewardHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctProposerRewardHourlyServiceGetResponses, FctProposerRewardHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctProposerRewardHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctProposerRewardHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_proposer_reward_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctReorgDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctReorgDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<FctReorgDailyServiceListResponses, FctReorgDailyServiceListErrors, ThrowOnError>({
-    requestValidator: async data => await zFctReorgDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctReorgDailyServiceListResponse.parseAsync(data),
+export const fctReorgDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctReorgDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctReorgDailyServiceListResponses, FctReorgDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctReorgDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctReorgDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_reorg_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctReorgDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctReorgDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<FctReorgDailyServiceGetResponses, FctReorgDailyServiceGetErrors, ThrowOnError>({
-    requestValidator: async data => await zFctReorgDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctReorgDailyServiceGetResponse.parseAsync(data),
+export const fctReorgDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctReorgDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctReorgDailyServiceGetResponses, FctReorgDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctReorgDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctReorgDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_reorg_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctReorgHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctReorgHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<FctReorgHourlyServiceListResponses, FctReorgHourlyServiceListErrors, ThrowOnError>({
-    requestValidator: async data => await zFctReorgHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctReorgHourlyServiceListResponse.parseAsync(data),
+export const fctReorgHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctReorgHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctReorgHourlyServiceListResponses, FctReorgHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctReorgHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctReorgHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_reorg_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctReorgHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctReorgHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<FctReorgHourlyServiceGetResponses, FctReorgHourlyServiceGetErrors, ThrowOnError>({
-    requestValidator: async data => await zFctReorgHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctReorgHourlyServiceGetResponse.parseAsync(data),
+export const fctReorgHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctReorgHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctReorgHourlyServiceGetResponses, FctReorgHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctReorgHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctReorgHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_reorg_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctStorageSlotStateByAddressDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctStorageSlotStateByAddressDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctStorageSlotStateByAddressDailyServiceListResponses,
-    FctStorageSlotStateByAddressDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotStateByAddressDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctStorageSlotStateByAddressDailyServiceListResponse.parseAsync(data),
+export const fctRocketpoolValidatorServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctRocketpoolValidatorServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctRocketpoolValidatorServiceListResponses, FctRocketpoolValidatorServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctRocketpoolValidatorServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctRocketpoolValidatorServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_rocketpool_validator',
+    ...options
+});
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctRocketpoolValidatorServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctRocketpoolValidatorServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctRocketpoolValidatorServiceGetResponses, FctRocketpoolValidatorServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctRocketpoolValidatorServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctRocketpoolValidatorServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_rocketpool_validator/{validator_index}',
+    ...options
+});
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctStorageSlotStateByAddressDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctStorageSlotStateByAddressDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctStorageSlotStateByAddressDailyServiceListResponses, FctStorageSlotStateByAddressDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotStateByAddressDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotStateByAddressDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_state_by_address_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by address
  */
-export const fctStorageSlotStateByAddressDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctStorageSlotStateByAddressDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctStorageSlotStateByAddressDailyServiceGetResponses,
-    FctStorageSlotStateByAddressDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotStateByAddressDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctStorageSlotStateByAddressDailyServiceGetResponse.parseAsync(data),
+export const fctStorageSlotStateByAddressDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctStorageSlotStateByAddressDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctStorageSlotStateByAddressDailyServiceGetResponses, FctStorageSlotStateByAddressDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotStateByAddressDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotStateByAddressDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_state_by_address_daily/{address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctStorageSlotStateByAddressHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctStorageSlotStateByAddressHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctStorageSlotStateByAddressHourlyServiceListResponses,
-    FctStorageSlotStateByAddressHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotStateByAddressHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctStorageSlotStateByAddressHourlyServiceListResponse.parseAsync(data),
+export const fctStorageSlotStateByAddressHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctStorageSlotStateByAddressHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctStorageSlotStateByAddressHourlyServiceListResponses, FctStorageSlotStateByAddressHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotStateByAddressHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotStateByAddressHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_state_by_address_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by address
  */
-export const fctStorageSlotStateByAddressHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctStorageSlotStateByAddressHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctStorageSlotStateByAddressHourlyServiceGetResponses,
-    FctStorageSlotStateByAddressHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotStateByAddressHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctStorageSlotStateByAddressHourlyServiceGetResponse.parseAsync(data),
+export const fctStorageSlotStateByAddressHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctStorageSlotStateByAddressHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctStorageSlotStateByAddressHourlyServiceGetResponses, FctStorageSlotStateByAddressHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotStateByAddressHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotStateByAddressHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_state_by_address_hourly/{address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctStorageSlotStateByBlockDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctStorageSlotStateByBlockDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctStorageSlotStateByBlockDailyServiceListResponses,
-    FctStorageSlotStateByBlockDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotStateByBlockDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctStorageSlotStateByBlockDailyServiceListResponse.parseAsync(data),
+export const fctStorageSlotStateByBlockDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctStorageSlotStateByBlockDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctStorageSlotStateByBlockDailyServiceListResponses, FctStorageSlotStateByBlockDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotStateByBlockDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotStateByBlockDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_state_by_block_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctStorageSlotStateByBlockDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctStorageSlotStateByBlockDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctStorageSlotStateByBlockDailyServiceGetResponses,
-    FctStorageSlotStateByBlockDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotStateByBlockDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctStorageSlotStateByBlockDailyServiceGetResponse.parseAsync(data),
+export const fctStorageSlotStateByBlockDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctStorageSlotStateByBlockDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctStorageSlotStateByBlockDailyServiceGetResponses, FctStorageSlotStateByBlockDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotStateByBlockDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotStateByBlockDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_state_by_block_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctStorageSlotStateByBlockHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctStorageSlotStateByBlockHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctStorageSlotStateByBlockHourlyServiceListResponses,
-    FctStorageSlotStateByBlockHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotStateByBlockHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctStorageSlotStateByBlockHourlyServiceListResponse.parseAsync(data),
+export const fctStorageSlotStateByBlockHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctStorageSlotStateByBlockHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctStorageSlotStateByBlockHourlyServiceListResponses, FctStorageSlotStateByBlockHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotStateByBlockHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotStateByBlockHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_state_by_block_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by hour_start_date_time
  */
-export const fctStorageSlotStateByBlockHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctStorageSlotStateByBlockHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctStorageSlotStateByBlockHourlyServiceGetResponses,
-    FctStorageSlotStateByBlockHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotStateByBlockHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctStorageSlotStateByBlockHourlyServiceGetResponse.parseAsync(data),
+export const fctStorageSlotStateByBlockHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctStorageSlotStateByBlockHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctStorageSlotStateByBlockHourlyServiceGetResponses, FctStorageSlotStateByBlockHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotStateByBlockHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotStateByBlockHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_state_by_block_hourly/{hour_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctStorageSlotStateWithExpiryByAddressDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctStorageSlotStateWithExpiryByAddressDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctStorageSlotStateWithExpiryByAddressDailyServiceListResponses,
-    FctStorageSlotStateWithExpiryByAddressDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotStateWithExpiryByAddressDailyServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctStorageSlotStateWithExpiryByAddressDailyServiceListResponse.parseAsync(data),
+export const fctStorageSlotStateWithExpiryByAddressDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctStorageSlotStateWithExpiryByAddressDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctStorageSlotStateWithExpiryByAddressDailyServiceListResponses, FctStorageSlotStateWithExpiryByAddressDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotStateWithExpiryByAddressDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotStateWithExpiryByAddressDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_state_with_expiry_by_address_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by address
  */
-export const fctStorageSlotStateWithExpiryByAddressDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctStorageSlotStateWithExpiryByAddressDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctStorageSlotStateWithExpiryByAddressDailyServiceGetResponses,
-    FctStorageSlotStateWithExpiryByAddressDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotStateWithExpiryByAddressDailyServiceGetData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctStorageSlotStateWithExpiryByAddressDailyServiceGetResponse.parseAsync(data),
+export const fctStorageSlotStateWithExpiryByAddressDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctStorageSlotStateWithExpiryByAddressDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctStorageSlotStateWithExpiryByAddressDailyServiceGetResponses, FctStorageSlotStateWithExpiryByAddressDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotStateWithExpiryByAddressDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotStateWithExpiryByAddressDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_state_with_expiry_by_address_daily/{address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctStorageSlotStateWithExpiryByAddressHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctStorageSlotStateWithExpiryByAddressHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctStorageSlotStateWithExpiryByAddressHourlyServiceListResponses,
-    FctStorageSlotStateWithExpiryByAddressHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotStateWithExpiryByAddressHourlyServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctStorageSlotStateWithExpiryByAddressHourlyServiceListResponse.parseAsync(data),
+export const fctStorageSlotStateWithExpiryByAddressHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctStorageSlotStateWithExpiryByAddressHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctStorageSlotStateWithExpiryByAddressHourlyServiceListResponses, FctStorageSlotStateWithExpiryByAddressHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotStateWithExpiryByAddressHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotStateWithExpiryByAddressHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_state_with_expiry_by_address_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by address
  */
-export const fctStorageSlotStateWithExpiryByAddressHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctStorageSlotStateWithExpiryByAddressHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctStorageSlotStateWithExpiryByAddressHourlyServiceGetResponses,
-    FctStorageSlotStateWithExpiryByAddressHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotStateWithExpiryByAddressHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctStorageSlotStateWithExpiryByAddressHourlyServiceGetResponse.parseAsync(data),
+export const fctStorageSlotStateWithExpiryByAddressHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctStorageSlotStateWithExpiryByAddressHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctStorageSlotStateWithExpiryByAddressHourlyServiceGetResponses, FctStorageSlotStateWithExpiryByAddressHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotStateWithExpiryByAddressHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotStateWithExpiryByAddressHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_state_with_expiry_by_address_hourly/{address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctStorageSlotStateWithExpiryByBlockDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctStorageSlotStateWithExpiryByBlockDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctStorageSlotStateWithExpiryByBlockDailyServiceListResponses,
-    FctStorageSlotStateWithExpiryByBlockDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotStateWithExpiryByBlockDailyServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctStorageSlotStateWithExpiryByBlockDailyServiceListResponse.parseAsync(data),
+export const fctStorageSlotStateWithExpiryByBlockDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctStorageSlotStateWithExpiryByBlockDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctStorageSlotStateWithExpiryByBlockDailyServiceListResponses, FctStorageSlotStateWithExpiryByBlockDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotStateWithExpiryByBlockDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotStateWithExpiryByBlockDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_state_with_expiry_by_block_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by expiry_policy
  */
-export const fctStorageSlotStateWithExpiryByBlockDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctStorageSlotStateWithExpiryByBlockDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctStorageSlotStateWithExpiryByBlockDailyServiceGetResponses,
-    FctStorageSlotStateWithExpiryByBlockDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotStateWithExpiryByBlockDailyServiceGetData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctStorageSlotStateWithExpiryByBlockDailyServiceGetResponse.parseAsync(data),
+export const fctStorageSlotStateWithExpiryByBlockDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctStorageSlotStateWithExpiryByBlockDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctStorageSlotStateWithExpiryByBlockDailyServiceGetResponses, FctStorageSlotStateWithExpiryByBlockDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotStateWithExpiryByBlockDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotStateWithExpiryByBlockDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_state_with_expiry_by_block_daily/{expiry_policy}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctStorageSlotStateWithExpiryByBlockHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctStorageSlotStateWithExpiryByBlockHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctStorageSlotStateWithExpiryByBlockHourlyServiceListResponses,
-    FctStorageSlotStateWithExpiryByBlockHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotStateWithExpiryByBlockHourlyServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctStorageSlotStateWithExpiryByBlockHourlyServiceListResponse.parseAsync(data),
+export const fctStorageSlotStateWithExpiryByBlockHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctStorageSlotStateWithExpiryByBlockHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctStorageSlotStateWithExpiryByBlockHourlyServiceListResponses, FctStorageSlotStateWithExpiryByBlockHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotStateWithExpiryByBlockHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotStateWithExpiryByBlockHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_state_with_expiry_by_block_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by expiry_policy
  */
-export const fctStorageSlotStateWithExpiryByBlockHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctStorageSlotStateWithExpiryByBlockHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctStorageSlotStateWithExpiryByBlockHourlyServiceGetResponses,
-    FctStorageSlotStateWithExpiryByBlockHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotStateWithExpiryByBlockHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctStorageSlotStateWithExpiryByBlockHourlyServiceGetResponse.parseAsync(data),
+export const fctStorageSlotStateWithExpiryByBlockHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctStorageSlotStateWithExpiryByBlockHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctStorageSlotStateWithExpiryByBlockHourlyServiceGetResponses, FctStorageSlotStateWithExpiryByBlockHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotStateWithExpiryByBlockHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotStateWithExpiryByBlockHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_state_with_expiry_by_block_hourly/{expiry_policy}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctStorageSlotTop100ByBytesServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctStorageSlotTop100ByBytesServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctStorageSlotTop100ByBytesServiceListResponses,
-    FctStorageSlotTop100ByBytesServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotTop100ByBytesServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctStorageSlotTop100ByBytesServiceListResponse.parseAsync(data),
+export const fctStorageSlotTop100ByBytesServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctStorageSlotTop100ByBytesServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctStorageSlotTop100ByBytesServiceListResponses, FctStorageSlotTop100ByBytesServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotTop100ByBytesServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotTop100ByBytesServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_top_100_by_bytes',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by rank
  */
-export const fctStorageSlotTop100ByBytesServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctStorageSlotTop100ByBytesServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctStorageSlotTop100ByBytesServiceGetResponses,
-    FctStorageSlotTop100ByBytesServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotTop100ByBytesServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctStorageSlotTop100ByBytesServiceGetResponse.parseAsync(data),
+export const fctStorageSlotTop100ByBytesServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctStorageSlotTop100ByBytesServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctStorageSlotTop100ByBytesServiceGetResponses, FctStorageSlotTop100ByBytesServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotTop100ByBytesServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotTop100ByBytesServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_top_100_by_bytes/{rank}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctStorageSlotTop100BySlotsServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctStorageSlotTop100BySlotsServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctStorageSlotTop100BySlotsServiceListResponses,
-    FctStorageSlotTop100BySlotsServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotTop100BySlotsServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctStorageSlotTop100BySlotsServiceListResponse.parseAsync(data),
+export const fctStorageSlotTop100BySlotsServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctStorageSlotTop100BySlotsServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctStorageSlotTop100BySlotsServiceListResponses, FctStorageSlotTop100BySlotsServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotTop100BySlotsServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotTop100BySlotsServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_top_100_by_slots',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by rank
  */
-export const fctStorageSlotTop100BySlotsServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctStorageSlotTop100BySlotsServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctStorageSlotTop100BySlotsServiceGetResponses,
-    FctStorageSlotTop100BySlotsServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctStorageSlotTop100BySlotsServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctStorageSlotTop100BySlotsServiceGetResponse.parseAsync(data),
+export const fctStorageSlotTop100BySlotsServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctStorageSlotTop100BySlotsServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctStorageSlotTop100BySlotsServiceGetResponses, FctStorageSlotTop100BySlotsServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctStorageSlotTop100BySlotsServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctStorageSlotTop100BySlotsServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_storage_slot_top_100_by_slots/{rank}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctSyncCommitteeParticipationByValidatorServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctSyncCommitteeParticipationByValidatorServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctSyncCommitteeParticipationByValidatorServiceListResponses,
-    FctSyncCommitteeParticipationByValidatorServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctSyncCommitteeParticipationByValidatorServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctSyncCommitteeParticipationByValidatorServiceListResponse.parseAsync(data),
+export const fctSyncCommitteeParticipationByValidatorServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctSyncCommitteeParticipationByValidatorServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctSyncCommitteeParticipationByValidatorServiceListResponses, FctSyncCommitteeParticipationByValidatorServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctSyncCommitteeParticipationByValidatorServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctSyncCommitteeParticipationByValidatorServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_sync_committee_participation_by_validator',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by validator_index
  */
-export const fctSyncCommitteeParticipationByValidatorServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctSyncCommitteeParticipationByValidatorServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctSyncCommitteeParticipationByValidatorServiceGetResponses,
-    FctSyncCommitteeParticipationByValidatorServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctSyncCommitteeParticipationByValidatorServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctSyncCommitteeParticipationByValidatorServiceGetResponse.parseAsync(data),
+export const fctSyncCommitteeParticipationByValidatorServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctSyncCommitteeParticipationByValidatorServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctSyncCommitteeParticipationByValidatorServiceGetResponses, FctSyncCommitteeParticipationByValidatorServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctSyncCommitteeParticipationByValidatorServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctSyncCommitteeParticipationByValidatorServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_sync_committee_participation_by_validator/{validator_index}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctSyncCommitteeParticipationByValidatorDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctSyncCommitteeParticipationByValidatorDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctSyncCommitteeParticipationByValidatorDailyServiceListResponses,
-    FctSyncCommitteeParticipationByValidatorDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data =>
-      await zFctSyncCommitteeParticipationByValidatorDailyServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctSyncCommitteeParticipationByValidatorDailyServiceListResponse.parseAsync(data),
+export const fctSyncCommitteeParticipationByValidatorDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctSyncCommitteeParticipationByValidatorDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctSyncCommitteeParticipationByValidatorDailyServiceListResponses, FctSyncCommitteeParticipationByValidatorDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctSyncCommitteeParticipationByValidatorDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctSyncCommitteeParticipationByValidatorDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_sync_committee_participation_by_validator_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by validator_index
  */
-export const fctSyncCommitteeParticipationByValidatorDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctSyncCommitteeParticipationByValidatorDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctSyncCommitteeParticipationByValidatorDailyServiceGetResponses,
-    FctSyncCommitteeParticipationByValidatorDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctSyncCommitteeParticipationByValidatorDailyServiceGetData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctSyncCommitteeParticipationByValidatorDailyServiceGetResponse.parseAsync(data),
+export const fctSyncCommitteeParticipationByValidatorDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctSyncCommitteeParticipationByValidatorDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctSyncCommitteeParticipationByValidatorDailyServiceGetResponses, FctSyncCommitteeParticipationByValidatorDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctSyncCommitteeParticipationByValidatorDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctSyncCommitteeParticipationByValidatorDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_sync_committee_participation_by_validator_daily/{validator_index}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctSyncCommitteeParticipationByValidatorHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctSyncCommitteeParticipationByValidatorHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctSyncCommitteeParticipationByValidatorHourlyServiceListResponses,
-    FctSyncCommitteeParticipationByValidatorHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data =>
-      await zFctSyncCommitteeParticipationByValidatorHourlyServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctSyncCommitteeParticipationByValidatorHourlyServiceListResponse.parseAsync(data),
+export const fctSyncCommitteeParticipationByValidatorHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctSyncCommitteeParticipationByValidatorHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctSyncCommitteeParticipationByValidatorHourlyServiceListResponses, FctSyncCommitteeParticipationByValidatorHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctSyncCommitteeParticipationByValidatorHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctSyncCommitteeParticipationByValidatorHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_sync_committee_participation_by_validator_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by validator_index
  */
-export const fctSyncCommitteeParticipationByValidatorHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctSyncCommitteeParticipationByValidatorHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctSyncCommitteeParticipationByValidatorHourlyServiceGetResponses,
-    FctSyncCommitteeParticipationByValidatorHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data =>
-      await zFctSyncCommitteeParticipationByValidatorHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctSyncCommitteeParticipationByValidatorHourlyServiceGetResponse.parseAsync(data),
+export const fctSyncCommitteeParticipationByValidatorHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctSyncCommitteeParticipationByValidatorHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctSyncCommitteeParticipationByValidatorHourlyServiceGetResponses, FctSyncCommitteeParticipationByValidatorHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctSyncCommitteeParticipationByValidatorHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctSyncCommitteeParticipationByValidatorHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_sync_committee_participation_by_validator_hourly/{validator_index}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctTokenContractStorageStateByBlockDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctTokenContractStorageStateByBlockDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctTokenContractStorageStateByBlockDailyServiceListResponses,
-    FctTokenContractStorageStateByBlockDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctTokenContractStorageStateByBlockDailyServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zFctTokenContractStorageStateByBlockDailyServiceListResponse.parseAsync(data),
+export const fctTokenContractStorageStateByBlockDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctTokenContractStorageStateByBlockDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctTokenContractStorageStateByBlockDailyServiceListResponses, FctTokenContractStorageStateByBlockDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctTokenContractStorageStateByBlockDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctTokenContractStorageStateByBlockDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_token_contract_storage_state_by_block_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctTokenContractStorageStateByBlockDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctTokenContractStorageStateByBlockDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctTokenContractStorageStateByBlockDailyServiceGetResponses,
-    FctTokenContractStorageStateByBlockDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctTokenContractStorageStateByBlockDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctTokenContractStorageStateByBlockDailyServiceGetResponse.parseAsync(data),
+export const fctTokenContractStorageStateByBlockDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctTokenContractStorageStateByBlockDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctTokenContractStorageStateByBlockDailyServiceGetResponses, FctTokenContractStorageStateByBlockDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctTokenContractStorageStateByBlockDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctTokenContractStorageStateByBlockDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_token_contract_storage_state_by_block_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctValidatorBalanceServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctValidatorBalanceServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctValidatorBalanceServiceListResponses,
-    FctValidatorBalanceServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctValidatorBalanceServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctValidatorBalanceServiceListResponse.parseAsync(data),
+export const fctValidatorBalanceServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctValidatorBalanceServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctValidatorBalanceServiceListResponses, FctValidatorBalanceServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctValidatorBalanceServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctValidatorBalanceServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_validator_balance',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by validator_index
  */
-export const fctValidatorBalanceServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctValidatorBalanceServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctValidatorBalanceServiceGetResponses,
-    FctValidatorBalanceServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctValidatorBalanceServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctValidatorBalanceServiceGetResponse.parseAsync(data),
+export const fctValidatorBalanceServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctValidatorBalanceServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctValidatorBalanceServiceGetResponses, FctValidatorBalanceServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctValidatorBalanceServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctValidatorBalanceServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_validator_balance/{validator_index}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctValidatorBalanceDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctValidatorBalanceDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctValidatorBalanceDailyServiceListResponses,
-    FctValidatorBalanceDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctValidatorBalanceDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctValidatorBalanceDailyServiceListResponse.parseAsync(data),
+export const fctValidatorBalanceDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctValidatorBalanceDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctValidatorBalanceDailyServiceListResponses, FctValidatorBalanceDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctValidatorBalanceDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctValidatorBalanceDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_validator_balance_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by validator_index
  */
-export const fctValidatorBalanceDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctValidatorBalanceDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctValidatorBalanceDailyServiceGetResponses,
-    FctValidatorBalanceDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctValidatorBalanceDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctValidatorBalanceDailyServiceGetResponse.parseAsync(data),
+export const fctValidatorBalanceDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctValidatorBalanceDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctValidatorBalanceDailyServiceGetResponses, FctValidatorBalanceDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctValidatorBalanceDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctValidatorBalanceDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_validator_balance_daily/{validator_index}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctValidatorBalanceHourlyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctValidatorBalanceHourlyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctValidatorBalanceHourlyServiceListResponses,
-    FctValidatorBalanceHourlyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctValidatorBalanceHourlyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctValidatorBalanceHourlyServiceListResponse.parseAsync(data),
+export const fctValidatorBalanceHourlyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctValidatorBalanceHourlyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctValidatorBalanceHourlyServiceListResponses, FctValidatorBalanceHourlyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctValidatorBalanceHourlyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctValidatorBalanceHourlyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_validator_balance_hourly',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by validator_index
  */
-export const fctValidatorBalanceHourlyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctValidatorBalanceHourlyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctValidatorBalanceHourlyServiceGetResponses,
-    FctValidatorBalanceHourlyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctValidatorBalanceHourlyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctValidatorBalanceHourlyServiceGetResponse.parseAsync(data),
+export const fctValidatorBalanceHourlyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctValidatorBalanceHourlyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctValidatorBalanceHourlyServiceGetResponses, FctValidatorBalanceHourlyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctValidatorBalanceHourlyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctValidatorBalanceHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_validator_balance_hourly/{validator_index}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const fctValidatorCountByEntityByStatusDailyServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctValidatorCountByEntityByStatusDailyServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    FctValidatorCountByEntityByStatusDailyServiceListResponses,
-    FctValidatorCountByEntityByStatusDailyServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctValidatorCountByEntityByStatusDailyServiceListData.parseAsync(data),
-    responseValidator: async data => await zFctValidatorCountByEntityByStatusDailyServiceListResponse.parseAsync(data),
+export const fctValidatorCountByEntityByStatusDailyServiceList = <ThrowOnError extends boolean = false>(options?: Options<FctValidatorCountByEntityByStatusDailyServiceListData, ThrowOnError>) => (options?.client ?? client).get<FctValidatorCountByEntityByStatusDailyServiceListResponses, FctValidatorCountByEntityByStatusDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctValidatorCountByEntityByStatusDailyServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zFctValidatorCountByEntityByStatusDailyServiceListResponse.parseAsync(data),
     url: '/api/v1/fct_validator_count_by_entity_by_status_daily',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by day_start_date
  */
-export const fctValidatorCountByEntityByStatusDailyServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctValidatorCountByEntityByStatusDailyServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    FctValidatorCountByEntityByStatusDailyServiceGetResponses,
-    FctValidatorCountByEntityByStatusDailyServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zFctValidatorCountByEntityByStatusDailyServiceGetData.parseAsync(data),
-    responseValidator: async data => await zFctValidatorCountByEntityByStatusDailyServiceGetResponse.parseAsync(data),
+export const fctValidatorCountByEntityByStatusDailyServiceGet = <ThrowOnError extends boolean = false>(options: Options<FctValidatorCountByEntityByStatusDailyServiceGetData, ThrowOnError>) => (options.client ?? client).get<FctValidatorCountByEntityByStatusDailyServiceGetResponses, FctValidatorCountByEntityByStatusDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zFctValidatorCountByEntityByStatusDailyServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zFctValidatorCountByEntityByStatusDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_validator_count_by_entity_by_status_daily/{day_start_date}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intAttestationAttestedCanonicalServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntAttestationAttestedCanonicalServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntAttestationAttestedCanonicalServiceListResponses,
-    IntAttestationAttestedCanonicalServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntAttestationAttestedCanonicalServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntAttestationAttestedCanonicalServiceListResponse.parseAsync(data),
+export const intAttestationAttestedCanonicalServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntAttestationAttestedCanonicalServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntAttestationAttestedCanonicalServiceListResponses, IntAttestationAttestedCanonicalServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntAttestationAttestedCanonicalServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntAttestationAttestedCanonicalServiceListResponse.parseAsync(data),
     url: '/api/v1/int_attestation_attested_canonical',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intAttestationAttestedCanonicalServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntAttestationAttestedCanonicalServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntAttestationAttestedCanonicalServiceGetResponses,
-    IntAttestationAttestedCanonicalServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntAttestationAttestedCanonicalServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntAttestationAttestedCanonicalServiceGetResponse.parseAsync(data),
+export const intAttestationAttestedCanonicalServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntAttestationAttestedCanonicalServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntAttestationAttestedCanonicalServiceGetResponses, IntAttestationAttestedCanonicalServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntAttestationAttestedCanonicalServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntAttestationAttestedCanonicalServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_attestation_attested_canonical/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intAttestationAttestedHeadServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntAttestationAttestedHeadServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntAttestationAttestedHeadServiceListResponses,
-    IntAttestationAttestedHeadServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntAttestationAttestedHeadServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntAttestationAttestedHeadServiceListResponse.parseAsync(data),
+export const intAttestationAttestedHeadServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntAttestationAttestedHeadServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntAttestationAttestedHeadServiceListResponses, IntAttestationAttestedHeadServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntAttestationAttestedHeadServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntAttestationAttestedHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/int_attestation_attested_head',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intAttestationAttestedHeadServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntAttestationAttestedHeadServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntAttestationAttestedHeadServiceGetResponses,
-    IntAttestationAttestedHeadServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntAttestationAttestedHeadServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntAttestationAttestedHeadServiceGetResponse.parseAsync(data),
+export const intAttestationAttestedHeadServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntAttestationAttestedHeadServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntAttestationAttestedHeadServiceGetResponses, IntAttestationAttestedHeadServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntAttestationAttestedHeadServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntAttestationAttestedHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_attestation_attested_head/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intAttestationFirstSeenServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntAttestationFirstSeenServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntAttestationFirstSeenServiceListResponses,
-    IntAttestationFirstSeenServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntAttestationFirstSeenServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntAttestationFirstSeenServiceListResponse.parseAsync(data),
+export const intAttestationFirstSeenServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntAttestationFirstSeenServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntAttestationFirstSeenServiceListResponses, IntAttestationFirstSeenServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntAttestationFirstSeenServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntAttestationFirstSeenServiceListResponse.parseAsync(data),
     url: '/api/v1/int_attestation_first_seen',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intAttestationFirstSeenServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntAttestationFirstSeenServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntAttestationFirstSeenServiceGetResponses,
-    IntAttestationFirstSeenServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntAttestationFirstSeenServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntAttestationFirstSeenServiceGetResponse.parseAsync(data),
+export const intAttestationFirstSeenServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntAttestationFirstSeenServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntAttestationFirstSeenServiceGetResponses, IntAttestationFirstSeenServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntAttestationFirstSeenServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntAttestationFirstSeenServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_attestation_first_seen/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intAttestationFirstSeenAggregateServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntAttestationFirstSeenAggregateServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntAttestationFirstSeenAggregateServiceListResponses,
-    IntAttestationFirstSeenAggregateServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntAttestationFirstSeenAggregateServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntAttestationFirstSeenAggregateServiceListResponse.parseAsync(data),
+export const intAttestationFirstSeenAggregateServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntAttestationFirstSeenAggregateServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntAttestationFirstSeenAggregateServiceListResponses, IntAttestationFirstSeenAggregateServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntAttestationFirstSeenAggregateServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntAttestationFirstSeenAggregateServiceListResponse.parseAsync(data),
     url: '/api/v1/int_attestation_first_seen_aggregate',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intAttestationFirstSeenAggregateServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntAttestationFirstSeenAggregateServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntAttestationFirstSeenAggregateServiceGetResponses,
-    IntAttestationFirstSeenAggregateServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntAttestationFirstSeenAggregateServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntAttestationFirstSeenAggregateServiceGetResponse.parseAsync(data),
+export const intAttestationFirstSeenAggregateServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntAttestationFirstSeenAggregateServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntAttestationFirstSeenAggregateServiceGetResponses, IntAttestationFirstSeenAggregateServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntAttestationFirstSeenAggregateServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntAttestationFirstSeenAggregateServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_attestation_first_seen_aggregate/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intBeaconCommitteeHeadServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntBeaconCommitteeHeadServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntBeaconCommitteeHeadServiceListResponses,
-    IntBeaconCommitteeHeadServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntBeaconCommitteeHeadServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntBeaconCommitteeHeadServiceListResponse.parseAsync(data),
+export const intBeaconCommitteeHeadServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntBeaconCommitteeHeadServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntBeaconCommitteeHeadServiceListResponses, IntBeaconCommitteeHeadServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntBeaconCommitteeHeadServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntBeaconCommitteeHeadServiceListResponse.parseAsync(data),
     url: '/api/v1/int_beacon_committee_head',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intBeaconCommitteeHeadServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntBeaconCommitteeHeadServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntBeaconCommitteeHeadServiceGetResponses,
-    IntBeaconCommitteeHeadServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntBeaconCommitteeHeadServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntBeaconCommitteeHeadServiceGetResponse.parseAsync(data),
+export const intBeaconCommitteeHeadServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntBeaconCommitteeHeadServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntBeaconCommitteeHeadServiceGetResponses, IntBeaconCommitteeHeadServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntBeaconCommitteeHeadServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntBeaconCommitteeHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_beacon_committee_head/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intBlockBlobCountCanonicalServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntBlockBlobCountCanonicalServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntBlockBlobCountCanonicalServiceListResponses,
-    IntBlockBlobCountCanonicalServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntBlockBlobCountCanonicalServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntBlockBlobCountCanonicalServiceListResponse.parseAsync(data),
+export const intBlockBlobCountCanonicalServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntBlockBlobCountCanonicalServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntBlockBlobCountCanonicalServiceListResponses, IntBlockBlobCountCanonicalServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntBlockBlobCountCanonicalServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntBlockBlobCountCanonicalServiceListResponse.parseAsync(data),
     url: '/api/v1/int_block_blob_count_canonical',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intBlockBlobCountCanonicalServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntBlockBlobCountCanonicalServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntBlockBlobCountCanonicalServiceGetResponses,
-    IntBlockBlobCountCanonicalServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntBlockBlobCountCanonicalServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntBlockBlobCountCanonicalServiceGetResponse.parseAsync(data),
+export const intBlockBlobCountCanonicalServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntBlockBlobCountCanonicalServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntBlockBlobCountCanonicalServiceGetResponses, IntBlockBlobCountCanonicalServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntBlockBlobCountCanonicalServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntBlockBlobCountCanonicalServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_block_blob_count_canonical/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intBlockCanonicalServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntBlockCanonicalServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntBlockCanonicalServiceListResponses,
-    IntBlockCanonicalServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntBlockCanonicalServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntBlockCanonicalServiceListResponse.parseAsync(data),
+export const intBlockCanonicalServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntBlockCanonicalServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntBlockCanonicalServiceListResponses, IntBlockCanonicalServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntBlockCanonicalServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntBlockCanonicalServiceListResponse.parseAsync(data),
     url: '/api/v1/int_block_canonical',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intBlockCanonicalServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntBlockCanonicalServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<IntBlockCanonicalServiceGetResponses, IntBlockCanonicalServiceGetErrors, ThrowOnError>(
-    {
-      requestValidator: async data => await zIntBlockCanonicalServiceGetData.parseAsync(data),
-      responseValidator: async data => await zIntBlockCanonicalServiceGetResponse.parseAsync(data),
-      url: '/api/v1/int_block_canonical/{slot_start_date_time}',
-      ...options,
-    }
-  );
+export const intBlockCanonicalServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntBlockCanonicalServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntBlockCanonicalServiceGetResponses, IntBlockCanonicalServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntBlockCanonicalServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntBlockCanonicalServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_block_canonical/{slot_start_date_time}',
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intBlockMevCanonicalServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntBlockMevCanonicalServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntBlockMevCanonicalServiceListResponses,
-    IntBlockMevCanonicalServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntBlockMevCanonicalServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntBlockMevCanonicalServiceListResponse.parseAsync(data),
+export const intBlockMevCanonicalServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntBlockMevCanonicalServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntBlockMevCanonicalServiceListResponses, IntBlockMevCanonicalServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntBlockMevCanonicalServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntBlockMevCanonicalServiceListResponse.parseAsync(data),
     url: '/api/v1/int_block_mev_canonical',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intBlockMevCanonicalServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntBlockMevCanonicalServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntBlockMevCanonicalServiceGetResponses,
-    IntBlockMevCanonicalServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntBlockMevCanonicalServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntBlockMevCanonicalServiceGetResponse.parseAsync(data),
+export const intBlockMevCanonicalServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntBlockMevCanonicalServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntBlockMevCanonicalServiceGetResponses, IntBlockMevCanonicalServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntBlockMevCanonicalServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntBlockMevCanonicalServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_block_mev_canonical/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intBlockOpcodeGasServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntBlockOpcodeGasServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntBlockOpcodeGasServiceListResponses,
-    IntBlockOpcodeGasServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntBlockOpcodeGasServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntBlockOpcodeGasServiceListResponse.parseAsync(data),
+export const intBlockOpcodeGasServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntBlockOpcodeGasServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntBlockOpcodeGasServiceListResponses, IntBlockOpcodeGasServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntBlockOpcodeGasServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntBlockOpcodeGasServiceListResponse.parseAsync(data),
     url: '/api/v1/int_block_opcode_gas',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intBlockOpcodeGasServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntBlockOpcodeGasServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<IntBlockOpcodeGasServiceGetResponses, IntBlockOpcodeGasServiceGetErrors, ThrowOnError>(
-    {
-      requestValidator: async data => await zIntBlockOpcodeGasServiceGetData.parseAsync(data),
-      responseValidator: async data => await zIntBlockOpcodeGasServiceGetResponse.parseAsync(data),
-      url: '/api/v1/int_block_opcode_gas/{block_number}',
-      ...options,
-    }
-  );
+export const intBlockOpcodeGasServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntBlockOpcodeGasServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntBlockOpcodeGasServiceGetResponses, IntBlockOpcodeGasServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntBlockOpcodeGasServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntBlockOpcodeGasServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_block_opcode_gas/{block_number}',
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intBlockProposerCanonicalServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntBlockProposerCanonicalServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntBlockProposerCanonicalServiceListResponses,
-    IntBlockProposerCanonicalServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntBlockProposerCanonicalServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntBlockProposerCanonicalServiceListResponse.parseAsync(data),
+export const intBlockProposerCanonicalServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntBlockProposerCanonicalServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntBlockProposerCanonicalServiceListResponses, IntBlockProposerCanonicalServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntBlockProposerCanonicalServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntBlockProposerCanonicalServiceListResponse.parseAsync(data),
     url: '/api/v1/int_block_proposer_canonical',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intBlockProposerCanonicalServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntBlockProposerCanonicalServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntBlockProposerCanonicalServiceGetResponses,
-    IntBlockProposerCanonicalServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntBlockProposerCanonicalServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntBlockProposerCanonicalServiceGetResponse.parseAsync(data),
+export const intBlockProposerCanonicalServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntBlockProposerCanonicalServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntBlockProposerCanonicalServiceGetResponses, IntBlockProposerCanonicalServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntBlockProposerCanonicalServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntBlockProposerCanonicalServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_block_proposer_canonical/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intBlockReceiptSizeServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntBlockReceiptSizeServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntBlockReceiptSizeServiceListResponses,
-    IntBlockReceiptSizeServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntBlockReceiptSizeServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntBlockReceiptSizeServiceListResponse.parseAsync(data),
+export const intBlockReceiptSizeServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntBlockReceiptSizeServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntBlockReceiptSizeServiceListResponses, IntBlockReceiptSizeServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntBlockReceiptSizeServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntBlockReceiptSizeServiceListResponse.parseAsync(data),
     url: '/api/v1/int_block_receipt_size',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intBlockReceiptSizeServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntBlockReceiptSizeServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntBlockReceiptSizeServiceGetResponses,
-    IntBlockReceiptSizeServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntBlockReceiptSizeServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntBlockReceiptSizeServiceGetResponse.parseAsync(data),
+export const intBlockReceiptSizeServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntBlockReceiptSizeServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntBlockReceiptSizeServiceGetResponses, IntBlockReceiptSizeServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntBlockReceiptSizeServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntBlockReceiptSizeServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_block_receipt_size/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intBlockResourceGasServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntBlockResourceGasServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntBlockResourceGasServiceListResponses,
-    IntBlockResourceGasServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntBlockResourceGasServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntBlockResourceGasServiceListResponse.parseAsync(data),
+export const intBlockResourceGasServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntBlockResourceGasServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntBlockResourceGasServiceListResponses, IntBlockResourceGasServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntBlockResourceGasServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntBlockResourceGasServiceListResponse.parseAsync(data),
     url: '/api/v1/int_block_resource_gas',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intBlockResourceGasServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntBlockResourceGasServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntBlockResourceGasServiceGetResponses,
-    IntBlockResourceGasServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntBlockResourceGasServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntBlockResourceGasServiceGetResponse.parseAsync(data),
+export const intBlockResourceGasServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntBlockResourceGasServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntBlockResourceGasServiceGetResponses, IntBlockResourceGasServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntBlockResourceGasServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntBlockResourceGasServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_block_resource_gas/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractCreationServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractCreationServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractCreationServiceListResponses,
-    IntContractCreationServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractCreationServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractCreationServiceListResponse.parseAsync(data),
+export const intContractCreationServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractCreationServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractCreationServiceListResponses, IntContractCreationServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractCreationServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractCreationServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_creation',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intContractCreationServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractCreationServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractCreationServiceGetResponses,
-    IntContractCreationServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractCreationServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractCreationServiceGetResponse.parseAsync(data),
+export const intContractCreationServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractCreationServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractCreationServiceGetResponses, IntContractCreationServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractCreationServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractCreationServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_creation/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractSelfdestructServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractSelfdestructServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractSelfdestructServiceListResponses,
-    IntContractSelfdestructServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractSelfdestructServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractSelfdestructServiceListResponse.parseAsync(data),
+export const intContractSelfdestructServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractSelfdestructServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractSelfdestructServiceListResponses, IntContractSelfdestructServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractSelfdestructServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractSelfdestructServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_selfdestruct',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intContractSelfdestructServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractSelfdestructServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractSelfdestructServiceGetResponses,
-    IntContractSelfdestructServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractSelfdestructServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractSelfdestructServiceGetResponse.parseAsync(data),
+export const intContractSelfdestructServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractSelfdestructServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractSelfdestructServiceGetResponses, IntContractSelfdestructServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractSelfdestructServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractSelfdestructServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_selfdestruct/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageExpiry1mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageExpiry1mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageExpiry1mServiceListResponses,
-    IntContractStorageExpiry1mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageExpiry1mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageExpiry1mServiceListResponse.parseAsync(data),
+export const intContractStorageExpiry1mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageExpiry1mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageExpiry1mServiceListResponses, IntContractStorageExpiry1mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageExpiry1mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageExpiry1mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_expiry_1m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intContractStorageExpiry1mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageExpiry1mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageExpiry1mServiceGetResponses,
-    IntContractStorageExpiry1mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageExpiry1mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageExpiry1mServiceGetResponse.parseAsync(data),
+export const intContractStorageExpiry1mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageExpiry1mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageExpiry1mServiceGetResponses, IntContractStorageExpiry1mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageExpiry1mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageExpiry1mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_expiry_1m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageExpiry6mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageExpiry6mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageExpiry6mServiceListResponses,
-    IntContractStorageExpiry6mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageExpiry6mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageExpiry6mServiceListResponse.parseAsync(data),
+export const intContractStorageExpiry6mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageExpiry6mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageExpiry6mServiceListResponses, IntContractStorageExpiry6mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageExpiry6mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageExpiry6mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_expiry_6m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intContractStorageExpiry6mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageExpiry6mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageExpiry6mServiceGetResponses,
-    IntContractStorageExpiry6mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageExpiry6mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageExpiry6mServiceGetResponse.parseAsync(data),
+export const intContractStorageExpiry6mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageExpiry6mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageExpiry6mServiceGetResponses, IntContractStorageExpiry6mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageExpiry6mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageExpiry6mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_expiry_6m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageExpiry12mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageExpiry12mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageExpiry12mServiceListResponses,
-    IntContractStorageExpiry12mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageExpiry12mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageExpiry12mServiceListResponse.parseAsync(data),
+export const intContractStorageExpiry12mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageExpiry12mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageExpiry12mServiceListResponses, IntContractStorageExpiry12mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageExpiry12mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageExpiry12mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_expiry_12m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intContractStorageExpiry12mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageExpiry12mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageExpiry12mServiceGetResponses,
-    IntContractStorageExpiry12mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageExpiry12mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageExpiry12mServiceGetResponse.parseAsync(data),
+export const intContractStorageExpiry12mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageExpiry12mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageExpiry12mServiceGetResponses, IntContractStorageExpiry12mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageExpiry12mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageExpiry12mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_expiry_12m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageExpiry18mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageExpiry18mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageExpiry18mServiceListResponses,
-    IntContractStorageExpiry18mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageExpiry18mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageExpiry18mServiceListResponse.parseAsync(data),
+export const intContractStorageExpiry18mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageExpiry18mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageExpiry18mServiceListResponses, IntContractStorageExpiry18mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageExpiry18mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageExpiry18mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_expiry_18m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intContractStorageExpiry18mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageExpiry18mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageExpiry18mServiceGetResponses,
-    IntContractStorageExpiry18mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageExpiry18mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageExpiry18mServiceGetResponse.parseAsync(data),
+export const intContractStorageExpiry18mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageExpiry18mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageExpiry18mServiceGetResponses, IntContractStorageExpiry18mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageExpiry18mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageExpiry18mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_expiry_18m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageExpiry24mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageExpiry24mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageExpiry24mServiceListResponses,
-    IntContractStorageExpiry24mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageExpiry24mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageExpiry24mServiceListResponse.parseAsync(data),
+export const intContractStorageExpiry24mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageExpiry24mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageExpiry24mServiceListResponses, IntContractStorageExpiry24mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageExpiry24mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageExpiry24mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_expiry_24m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intContractStorageExpiry24mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageExpiry24mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageExpiry24mServiceGetResponses,
-    IntContractStorageExpiry24mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageExpiry24mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageExpiry24mServiceGetResponse.parseAsync(data),
+export const intContractStorageExpiry24mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageExpiry24mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageExpiry24mServiceGetResponses, IntContractStorageExpiry24mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageExpiry24mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageExpiry24mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_expiry_24m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageNextTouchServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageNextTouchServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageNextTouchServiceListResponses,
-    IntContractStorageNextTouchServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageNextTouchServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageNextTouchServiceListResponse.parseAsync(data),
+export const intContractStorageNextTouchServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageNextTouchServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageNextTouchServiceListResponses, IntContractStorageNextTouchServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageNextTouchServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageNextTouchServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_next_touch',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intContractStorageNextTouchServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageNextTouchServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageNextTouchServiceGetResponses,
-    IntContractStorageNextTouchServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageNextTouchServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageNextTouchServiceGetResponse.parseAsync(data),
+export const intContractStorageNextTouchServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageNextTouchServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageNextTouchServiceGetResponses, IntContractStorageNextTouchServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageNextTouchServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageNextTouchServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_next_touch/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageReactivation1mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageReactivation1mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageReactivation1mServiceListResponses,
-    IntContractStorageReactivation1mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageReactivation1mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageReactivation1mServiceListResponse.parseAsync(data),
+export const intContractStorageReactivation1mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageReactivation1mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageReactivation1mServiceListResponses, IntContractStorageReactivation1mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageReactivation1mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageReactivation1mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_reactivation_1m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intContractStorageReactivation1mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageReactivation1mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageReactivation1mServiceGetResponses,
-    IntContractStorageReactivation1mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageReactivation1mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageReactivation1mServiceGetResponse.parseAsync(data),
+export const intContractStorageReactivation1mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageReactivation1mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageReactivation1mServiceGetResponses, IntContractStorageReactivation1mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageReactivation1mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageReactivation1mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_reactivation_1m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageReactivation6mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageReactivation6mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageReactivation6mServiceListResponses,
-    IntContractStorageReactivation6mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageReactivation6mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageReactivation6mServiceListResponse.parseAsync(data),
+export const intContractStorageReactivation6mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageReactivation6mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageReactivation6mServiceListResponses, IntContractStorageReactivation6mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageReactivation6mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageReactivation6mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_reactivation_6m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intContractStorageReactivation6mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageReactivation6mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageReactivation6mServiceGetResponses,
-    IntContractStorageReactivation6mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageReactivation6mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageReactivation6mServiceGetResponse.parseAsync(data),
+export const intContractStorageReactivation6mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageReactivation6mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageReactivation6mServiceGetResponses, IntContractStorageReactivation6mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageReactivation6mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageReactivation6mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_reactivation_6m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageReactivation12mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageReactivation12mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageReactivation12mServiceListResponses,
-    IntContractStorageReactivation12mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageReactivation12mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageReactivation12mServiceListResponse.parseAsync(data),
+export const intContractStorageReactivation12mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageReactivation12mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageReactivation12mServiceListResponses, IntContractStorageReactivation12mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageReactivation12mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageReactivation12mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_reactivation_12m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intContractStorageReactivation12mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageReactivation12mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageReactivation12mServiceGetResponses,
-    IntContractStorageReactivation12mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageReactivation12mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageReactivation12mServiceGetResponse.parseAsync(data),
+export const intContractStorageReactivation12mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageReactivation12mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageReactivation12mServiceGetResponses, IntContractStorageReactivation12mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageReactivation12mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageReactivation12mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_reactivation_12m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageReactivation18mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageReactivation18mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageReactivation18mServiceListResponses,
-    IntContractStorageReactivation18mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageReactivation18mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageReactivation18mServiceListResponse.parseAsync(data),
+export const intContractStorageReactivation18mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageReactivation18mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageReactivation18mServiceListResponses, IntContractStorageReactivation18mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageReactivation18mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageReactivation18mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_reactivation_18m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intContractStorageReactivation18mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageReactivation18mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageReactivation18mServiceGetResponses,
-    IntContractStorageReactivation18mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageReactivation18mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageReactivation18mServiceGetResponse.parseAsync(data),
+export const intContractStorageReactivation18mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageReactivation18mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageReactivation18mServiceGetResponses, IntContractStorageReactivation18mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageReactivation18mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageReactivation18mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_reactivation_18m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageReactivation24mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageReactivation24mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageReactivation24mServiceListResponses,
-    IntContractStorageReactivation24mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageReactivation24mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageReactivation24mServiceListResponse.parseAsync(data),
+export const intContractStorageReactivation24mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageReactivation24mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageReactivation24mServiceListResponses, IntContractStorageReactivation24mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageReactivation24mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageReactivation24mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_reactivation_24m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intContractStorageReactivation24mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageReactivation24mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageReactivation24mServiceGetResponses,
-    IntContractStorageReactivation24mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageReactivation24mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageReactivation24mServiceGetResponse.parseAsync(data),
+export const intContractStorageReactivation24mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageReactivation24mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageReactivation24mServiceGetResponses, IntContractStorageReactivation24mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageReactivation24mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageReactivation24mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_reactivation_24m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageStateServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageStateServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageStateServiceListResponses,
-    IntContractStorageStateServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageStateServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageStateServiceListResponse.parseAsync(data),
+export const intContractStorageStateServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageStateServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageStateServiceListResponses, IntContractStorageStateServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageStateServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageStateServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_state',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intContractStorageStateServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageStateServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageStateServiceGetResponses,
-    IntContractStorageStateServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageStateServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageStateServiceGetResponse.parseAsync(data),
+export const intContractStorageStateServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageStateServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageStateServiceGetResponses, IntContractStorageStateServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageStateServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageStateServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_state/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageStateByAddressServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageStateByAddressServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageStateByAddressServiceListResponses,
-    IntContractStorageStateByAddressServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageStateByAddressServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageStateByAddressServiceListResponse.parseAsync(data),
+export const intContractStorageStateByAddressServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageStateByAddressServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageStateByAddressServiceListResponses, IntContractStorageStateByAddressServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageStateByAddressServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageStateByAddressServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_state_by_address',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by address
  */
-export const intContractStorageStateByAddressServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageStateByAddressServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageStateByAddressServiceGetResponses,
-    IntContractStorageStateByAddressServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageStateByAddressServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageStateByAddressServiceGetResponse.parseAsync(data),
+export const intContractStorageStateByAddressServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageStateByAddressServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageStateByAddressServiceGetResponses, IntContractStorageStateByAddressServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageStateByAddressServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageStateByAddressServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_state_by_address/{address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageStateByBlockServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageStateByBlockServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageStateByBlockServiceListResponses,
-    IntContractStorageStateByBlockServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageStateByBlockServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageStateByBlockServiceListResponse.parseAsync(data),
+export const intContractStorageStateByBlockServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageStateByBlockServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageStateByBlockServiceListResponses, IntContractStorageStateByBlockServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageStateByBlockServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageStateByBlockServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_state_by_block',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intContractStorageStateByBlockServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageStateByBlockServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageStateByBlockServiceGetResponses,
-    IntContractStorageStateByBlockServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageStateByBlockServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageStateByBlockServiceGetResponse.parseAsync(data),
+export const intContractStorageStateByBlockServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageStateByBlockServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageStateByBlockServiceGetResponses, IntContractStorageStateByBlockServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageStateByBlockServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageStateByBlockServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_state_by_block/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageStateWithExpiryServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageStateWithExpiryServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageStateWithExpiryServiceListResponses,
-    IntContractStorageStateWithExpiryServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageStateWithExpiryServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageStateWithExpiryServiceListResponse.parseAsync(data),
+export const intContractStorageStateWithExpiryServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageStateWithExpiryServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageStateWithExpiryServiceListResponses, IntContractStorageStateWithExpiryServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageStateWithExpiryServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageStateWithExpiryServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_state_with_expiry',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by expiry_policy
  */
-export const intContractStorageStateWithExpiryServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageStateWithExpiryServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageStateWithExpiryServiceGetResponses,
-    IntContractStorageStateWithExpiryServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageStateWithExpiryServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageStateWithExpiryServiceGetResponse.parseAsync(data),
+export const intContractStorageStateWithExpiryServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageStateWithExpiryServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageStateWithExpiryServiceGetResponses, IntContractStorageStateWithExpiryServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageStateWithExpiryServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageStateWithExpiryServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_state_with_expiry/{expiry_policy}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageStateWithExpiryByAddressServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageStateWithExpiryByAddressServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageStateWithExpiryByAddressServiceListResponses,
-    IntContractStorageStateWithExpiryByAddressServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageStateWithExpiryByAddressServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zIntContractStorageStateWithExpiryByAddressServiceListResponse.parseAsync(data),
+export const intContractStorageStateWithExpiryByAddressServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageStateWithExpiryByAddressServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageStateWithExpiryByAddressServiceListResponses, IntContractStorageStateWithExpiryByAddressServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageStateWithExpiryByAddressServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageStateWithExpiryByAddressServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_state_with_expiry_by_address',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by address
  */
-export const intContractStorageStateWithExpiryByAddressServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageStateWithExpiryByAddressServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageStateWithExpiryByAddressServiceGetResponses,
-    IntContractStorageStateWithExpiryByAddressServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageStateWithExpiryByAddressServiceGetData.parseAsync(data),
-    responseValidator: async data =>
-      await zIntContractStorageStateWithExpiryByAddressServiceGetResponse.parseAsync(data),
+export const intContractStorageStateWithExpiryByAddressServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageStateWithExpiryByAddressServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageStateWithExpiryByAddressServiceGetResponses, IntContractStorageStateWithExpiryByAddressServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageStateWithExpiryByAddressServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageStateWithExpiryByAddressServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_state_with_expiry_by_address/{address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intContractStorageStateWithExpiryByBlockServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageStateWithExpiryByBlockServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageStateWithExpiryByBlockServiceListResponses,
-    IntContractStorageStateWithExpiryByBlockServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageStateWithExpiryByBlockServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zIntContractStorageStateWithExpiryByBlockServiceListResponse.parseAsync(data),
+export const intContractStorageStateWithExpiryByBlockServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntContractStorageStateWithExpiryByBlockServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntContractStorageStateWithExpiryByBlockServiceListResponses, IntContractStorageStateWithExpiryByBlockServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageStateWithExpiryByBlockServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageStateWithExpiryByBlockServiceListResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_state_with_expiry_by_block',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by expiry_policy
  */
-export const intContractStorageStateWithExpiryByBlockServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageStateWithExpiryByBlockServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageStateWithExpiryByBlockServiceGetResponses,
-    IntContractStorageStateWithExpiryByBlockServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageStateWithExpiryByBlockServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageStateWithExpiryByBlockServiceGetResponse.parseAsync(data),
+export const intContractStorageStateWithExpiryByBlockServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntContractStorageStateWithExpiryByBlockServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntContractStorageStateWithExpiryByBlockServiceGetResponses, IntContractStorageStateWithExpiryByBlockServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntContractStorageStateWithExpiryByBlockServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntContractStorageStateWithExpiryByBlockServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_state_with_expiry_by_block/{expiry_policy}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intCustodyProbeServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntCustodyProbeServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<IntCustodyProbeServiceListResponses, IntCustodyProbeServiceListErrors, ThrowOnError>({
-    requestValidator: async data => await zIntCustodyProbeServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntCustodyProbeServiceListResponse.parseAsync(data),
+export const intCustodyProbeServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntCustodyProbeServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntCustodyProbeServiceListResponses, IntCustodyProbeServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntCustodyProbeServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntCustodyProbeServiceListResponse.parseAsync(data),
     url: '/api/v1/int_custody_probe',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by probe_date_time
  */
-export const intCustodyProbeServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntCustodyProbeServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<IntCustodyProbeServiceGetResponses, IntCustodyProbeServiceGetErrors, ThrowOnError>({
-    requestValidator: async data => await zIntCustodyProbeServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntCustodyProbeServiceGetResponse.parseAsync(data),
+export const intCustodyProbeServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntCustodyProbeServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntCustodyProbeServiceGetResponses, IntCustodyProbeServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntCustodyProbeServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntCustodyProbeServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_custody_probe/{probe_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intCustodyProbeOrderBySlotServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntCustodyProbeOrderBySlotServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntCustodyProbeOrderBySlotServiceListResponses,
-    IntCustodyProbeOrderBySlotServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntCustodyProbeOrderBySlotServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntCustodyProbeOrderBySlotServiceListResponse.parseAsync(data),
+export const intCustodyProbeOrderBySlotServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntCustodyProbeOrderBySlotServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntCustodyProbeOrderBySlotServiceListResponses, IntCustodyProbeOrderBySlotServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntCustodyProbeOrderBySlotServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntCustodyProbeOrderBySlotServiceListResponse.parseAsync(data),
     url: '/api/v1/int_custody_probe_order_by_slot',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intCustodyProbeOrderBySlotServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntCustodyProbeOrderBySlotServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntCustodyProbeOrderBySlotServiceGetResponses,
-    IntCustodyProbeOrderBySlotServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntCustodyProbeOrderBySlotServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntCustodyProbeOrderBySlotServiceGetResponse.parseAsync(data),
+export const intCustodyProbeOrderBySlotServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntCustodyProbeOrderBySlotServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntCustodyProbeOrderBySlotServiceGetResponses, IntCustodyProbeOrderBySlotServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntCustodyProbeOrderBySlotServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntCustodyProbeOrderBySlotServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_custody_probe_order_by_slot/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intEngineGetBlobsServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntEngineGetBlobsServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntEngineGetBlobsServiceListResponses,
-    IntEngineGetBlobsServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntEngineGetBlobsServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntEngineGetBlobsServiceListResponse.parseAsync(data),
+export const intEngineGetBlobsServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntEngineGetBlobsServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntEngineGetBlobsServiceListResponses, IntEngineGetBlobsServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntEngineGetBlobsServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntEngineGetBlobsServiceListResponse.parseAsync(data),
     url: '/api/v1/int_engine_get_blobs',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intEngineGetBlobsServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntEngineGetBlobsServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<IntEngineGetBlobsServiceGetResponses, IntEngineGetBlobsServiceGetErrors, ThrowOnError>(
-    {
-      requestValidator: async data => await zIntEngineGetBlobsServiceGetData.parseAsync(data),
-      responseValidator: async data => await zIntEngineGetBlobsServiceGetResponse.parseAsync(data),
-      url: '/api/v1/int_engine_get_blobs/{slot_start_date_time}',
-      ...options,
-    }
-  );
+export const intEngineGetBlobsServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntEngineGetBlobsServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntEngineGetBlobsServiceGetResponses, IntEngineGetBlobsServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntEngineGetBlobsServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntEngineGetBlobsServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_engine_get_blobs/{slot_start_date_time}',
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intEngineNewPayloadServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntEngineNewPayloadServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntEngineNewPayloadServiceListResponses,
-    IntEngineNewPayloadServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntEngineNewPayloadServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntEngineNewPayloadServiceListResponse.parseAsync(data),
+export const intEngineNewPayloadServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntEngineNewPayloadServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntEngineNewPayloadServiceListResponses, IntEngineNewPayloadServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntEngineNewPayloadServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntEngineNewPayloadServiceListResponse.parseAsync(data),
     url: '/api/v1/int_engine_new_payload',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intEngineNewPayloadServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntEngineNewPayloadServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntEngineNewPayloadServiceGetResponses,
-    IntEngineNewPayloadServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntEngineNewPayloadServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntEngineNewPayloadServiceGetResponse.parseAsync(data),
+export const intEngineNewPayloadServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntEngineNewPayloadServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntEngineNewPayloadServiceGetResponses, IntEngineNewPayloadServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntEngineNewPayloadServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntEngineNewPayloadServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_engine_new_payload/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intEngineNewPayloadFastestExecutionByNodeClassServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponses,
-    IntEngineNewPayloadFastestExecutionByNodeClassServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data =>
-      await zIntEngineNewPayloadFastestExecutionByNodeClassServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zIntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse.parseAsync(data),
+export const intEngineNewPayloadFastestExecutionByNodeClassServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponses, IntEngineNewPayloadFastestExecutionByNodeClassServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntEngineNewPayloadFastestExecutionByNodeClassServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse.parseAsync(data),
     url: '/api/v1/int_engine_new_payload_fastest_execution_by_node_class',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by slot_start_date_time
  */
-export const intEngineNewPayloadFastestExecutionByNodeClassServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses,
-    IntEngineNewPayloadFastestExecutionByNodeClassServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data =>
-      await zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetData.parseAsync(data),
-    responseValidator: async data =>
-      await zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse.parseAsync(data),
+export const intEngineNewPayloadFastestExecutionByNodeClassServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses, IntEngineNewPayloadFastestExecutionByNodeClassServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_engine_new_payload_fastest_execution_by_node_class/{slot_start_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intExecutionBlockByDateServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntExecutionBlockByDateServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntExecutionBlockByDateServiceListResponses,
-    IntExecutionBlockByDateServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntExecutionBlockByDateServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntExecutionBlockByDateServiceListResponse.parseAsync(data),
+export const intExecutionBlockByDateServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntExecutionBlockByDateServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntExecutionBlockByDateServiceListResponses, IntExecutionBlockByDateServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntExecutionBlockByDateServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntExecutionBlockByDateServiceListResponse.parseAsync(data),
     url: '/api/v1/int_execution_block_by_date',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_date_time
  */
-export const intExecutionBlockByDateServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntExecutionBlockByDateServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntExecutionBlockByDateServiceGetResponses,
-    IntExecutionBlockByDateServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntExecutionBlockByDateServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntExecutionBlockByDateServiceGetResponse.parseAsync(data),
+export const intExecutionBlockByDateServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntExecutionBlockByDateServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntExecutionBlockByDateServiceGetResponses, IntExecutionBlockByDateServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntExecutionBlockByDateServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntExecutionBlockByDateServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_execution_block_by_date/{block_date_time}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intExecutionStateSizeByBlockServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntExecutionStateSizeByBlockServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntExecutionStateSizeByBlockServiceListResponses,
-    IntExecutionStateSizeByBlockServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntExecutionStateSizeByBlockServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntExecutionStateSizeByBlockServiceListResponse.parseAsync(data),
+export const intExecutionStateSizeByBlockServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntExecutionStateSizeByBlockServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntExecutionStateSizeByBlockServiceListResponses, IntExecutionStateSizeByBlockServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntExecutionStateSizeByBlockServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntExecutionStateSizeByBlockServiceListResponse.parseAsync(data),
     url: '/api/v1/int_execution_state_size_by_block',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intExecutionStateSizeByBlockServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntExecutionStateSizeByBlockServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntExecutionStateSizeByBlockServiceGetResponses,
-    IntExecutionStateSizeByBlockServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntExecutionStateSizeByBlockServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntExecutionStateSizeByBlockServiceGetResponse.parseAsync(data),
+export const intExecutionStateSizeByBlockServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntExecutionStateSizeByBlockServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntExecutionStateSizeByBlockServiceGetResponses, IntExecutionStateSizeByBlockServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntExecutionStateSizeByBlockServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntExecutionStateSizeByBlockServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_execution_state_size_by_block/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSelfdestructDiffsServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSelfdestructDiffsServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSelfdestructDiffsServiceListResponses,
-    IntStorageSelfdestructDiffsServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSelfdestructDiffsServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSelfdestructDiffsServiceListResponse.parseAsync(data),
+export const intRocketpoolMegapoolServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntRocketpoolMegapoolServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntRocketpoolMegapoolServiceListResponses, IntRocketpoolMegapoolServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntRocketpoolMegapoolServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntRocketpoolMegapoolServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_rocketpool_megapool',
+    ...options
+});
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by megapool_address
+ */
+export const intRocketpoolMegapoolServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntRocketpoolMegapoolServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntRocketpoolMegapoolServiceGetResponses, IntRocketpoolMegapoolServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntRocketpoolMegapoolServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntRocketpoolMegapoolServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_rocketpool_megapool/{megapool_address}',
+    ...options
+});
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intRocketpoolMinipoolServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntRocketpoolMinipoolServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntRocketpoolMinipoolServiceListResponses, IntRocketpoolMinipoolServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntRocketpoolMinipoolServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntRocketpoolMinipoolServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_rocketpool_minipool',
+    ...options
+});
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by event_name
+ */
+export const intRocketpoolMinipoolServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntRocketpoolMinipoolServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntRocketpoolMinipoolServiceGetResponses, IntRocketpoolMinipoolServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntRocketpoolMinipoolServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntRocketpoolMinipoolServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_rocketpool_minipool/{event_name}',
+    ...options
+});
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intRocketpoolNodeEventServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntRocketpoolNodeEventServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntRocketpoolNodeEventServiceListResponses, IntRocketpoolNodeEventServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntRocketpoolNodeEventServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntRocketpoolNodeEventServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_rocketpool_node_event',
+    ...options
+});
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by event_name
+ */
+export const intRocketpoolNodeEventServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntRocketpoolNodeEventServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntRocketpoolNodeEventServiceGetResponses, IntRocketpoolNodeEventServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntRocketpoolNodeEventServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntRocketpoolNodeEventServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_rocketpool_node_event/{event_name}',
+    ...options
+});
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intRocketpoolNodeTimezoneServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntRocketpoolNodeTimezoneServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntRocketpoolNodeTimezoneServiceListResponses, IntRocketpoolNodeTimezoneServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntRocketpoolNodeTimezoneServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntRocketpoolNodeTimezoneServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_rocketpool_node_timezone',
+    ...options
+});
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by node_address
+ */
+export const intRocketpoolNodeTimezoneServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntRocketpoolNodeTimezoneServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntRocketpoolNodeTimezoneServiceGetResponses, IntRocketpoolNodeTimezoneServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntRocketpoolNodeTimezoneServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntRocketpoolNodeTimezoneServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_rocketpool_node_timezone/{node_address}',
+    ...options
+});
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intStorageSelfdestructDiffsServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSelfdestructDiffsServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSelfdestructDiffsServiceListResponses, IntStorageSelfdestructDiffsServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSelfdestructDiffsServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSelfdestructDiffsServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_selfdestruct_diffs',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intStorageSelfdestructDiffsServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSelfdestructDiffsServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSelfdestructDiffsServiceGetResponses,
-    IntStorageSelfdestructDiffsServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSelfdestructDiffsServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSelfdestructDiffsServiceGetResponse.parseAsync(data),
+export const intStorageSelfdestructDiffsServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSelfdestructDiffsServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSelfdestructDiffsServiceGetResponses, IntStorageSelfdestructDiffsServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSelfdestructDiffsServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSelfdestructDiffsServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_selfdestruct_diffs/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotDiffServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotDiffServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotDiffServiceListResponses,
-    IntStorageSlotDiffServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotDiffServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotDiffServiceListResponse.parseAsync(data),
+export const intStorageSlotDiffServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotDiffServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotDiffServiceListResponses, IntStorageSlotDiffServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotDiffServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotDiffServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_diff',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intStorageSlotDiffServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotDiffServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotDiffServiceGetResponses,
-    IntStorageSlotDiffServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotDiffServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotDiffServiceGetResponse.parseAsync(data),
+export const intStorageSlotDiffServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotDiffServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotDiffServiceGetResponses, IntStorageSlotDiffServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotDiffServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotDiffServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_diff/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotDiffByAddressSlotServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotDiffByAddressSlotServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotDiffByAddressSlotServiceListResponses,
-    IntStorageSlotDiffByAddressSlotServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotDiffByAddressSlotServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotDiffByAddressSlotServiceListResponse.parseAsync(data),
+export const intStorageSlotDiffByAddressSlotServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotDiffByAddressSlotServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotDiffByAddressSlotServiceListResponses, IntStorageSlotDiffByAddressSlotServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotDiffByAddressSlotServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotDiffByAddressSlotServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_diff_by_address_slot',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by address
  */
-export const intStorageSlotDiffByAddressSlotServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotDiffByAddressSlotServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotDiffByAddressSlotServiceGetResponses,
-    IntStorageSlotDiffByAddressSlotServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotDiffByAddressSlotServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotDiffByAddressSlotServiceGetResponse.parseAsync(data),
+export const intStorageSlotDiffByAddressSlotServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotDiffByAddressSlotServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotDiffByAddressSlotServiceGetResponses, IntStorageSlotDiffByAddressSlotServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotDiffByAddressSlotServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotDiffByAddressSlotServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_diff_by_address_slot/{address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotExpiry1mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotExpiry1mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotExpiry1mServiceListResponses,
-    IntStorageSlotExpiry1mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotExpiry1mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotExpiry1mServiceListResponse.parseAsync(data),
+export const intStorageSlotExpiry1mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotExpiry1mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotExpiry1mServiceListResponses, IntStorageSlotExpiry1mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotExpiry1mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotExpiry1mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_expiry_1m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intStorageSlotExpiry1mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotExpiry1mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotExpiry1mServiceGetResponses,
-    IntStorageSlotExpiry1mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotExpiry1mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotExpiry1mServiceGetResponse.parseAsync(data),
+export const intStorageSlotExpiry1mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotExpiry1mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotExpiry1mServiceGetResponses, IntStorageSlotExpiry1mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotExpiry1mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotExpiry1mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_expiry_1m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotExpiry6mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotExpiry6mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotExpiry6mServiceListResponses,
-    IntStorageSlotExpiry6mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotExpiry6mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotExpiry6mServiceListResponse.parseAsync(data),
+export const intStorageSlotExpiry6mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotExpiry6mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotExpiry6mServiceListResponses, IntStorageSlotExpiry6mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotExpiry6mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotExpiry6mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_expiry_6m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intStorageSlotExpiry6mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotExpiry6mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotExpiry6mServiceGetResponses,
-    IntStorageSlotExpiry6mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotExpiry6mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotExpiry6mServiceGetResponse.parseAsync(data),
+export const intStorageSlotExpiry6mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotExpiry6mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotExpiry6mServiceGetResponses, IntStorageSlotExpiry6mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotExpiry6mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotExpiry6mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_expiry_6m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotExpiry12mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotExpiry12mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotExpiry12mServiceListResponses,
-    IntStorageSlotExpiry12mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotExpiry12mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotExpiry12mServiceListResponse.parseAsync(data),
+export const intStorageSlotExpiry12mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotExpiry12mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotExpiry12mServiceListResponses, IntStorageSlotExpiry12mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotExpiry12mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotExpiry12mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_expiry_12m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intStorageSlotExpiry12mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotExpiry12mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotExpiry12mServiceGetResponses,
-    IntStorageSlotExpiry12mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotExpiry12mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotExpiry12mServiceGetResponse.parseAsync(data),
+export const intStorageSlotExpiry12mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotExpiry12mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotExpiry12mServiceGetResponses, IntStorageSlotExpiry12mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotExpiry12mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotExpiry12mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_expiry_12m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotExpiry18mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotExpiry18mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotExpiry18mServiceListResponses,
-    IntStorageSlotExpiry18mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotExpiry18mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotExpiry18mServiceListResponse.parseAsync(data),
+export const intStorageSlotExpiry18mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotExpiry18mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotExpiry18mServiceListResponses, IntStorageSlotExpiry18mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotExpiry18mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotExpiry18mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_expiry_18m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intStorageSlotExpiry18mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotExpiry18mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotExpiry18mServiceGetResponses,
-    IntStorageSlotExpiry18mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotExpiry18mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotExpiry18mServiceGetResponse.parseAsync(data),
+export const intStorageSlotExpiry18mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotExpiry18mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotExpiry18mServiceGetResponses, IntStorageSlotExpiry18mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotExpiry18mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotExpiry18mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_expiry_18m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotExpiry24mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotExpiry24mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotExpiry24mServiceListResponses,
-    IntStorageSlotExpiry24mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotExpiry24mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotExpiry24mServiceListResponse.parseAsync(data),
+export const intStorageSlotExpiry24mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotExpiry24mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotExpiry24mServiceListResponses, IntStorageSlotExpiry24mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotExpiry24mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotExpiry24mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_expiry_24m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intStorageSlotExpiry24mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotExpiry24mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotExpiry24mServiceGetResponses,
-    IntStorageSlotExpiry24mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotExpiry24mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotExpiry24mServiceGetResponse.parseAsync(data),
+export const intStorageSlotExpiry24mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotExpiry24mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotExpiry24mServiceGetResponses, IntStorageSlotExpiry24mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotExpiry24mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotExpiry24mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_expiry_24m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotLifecycleServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotLifecycleServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotLifecycleServiceListResponses,
-    IntStorageSlotLifecycleServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotLifecycleServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotLifecycleServiceListResponse.parseAsync(data),
+export const intStorageSlotLifecycleServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotLifecycleServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotLifecycleServiceListResponses, IntStorageSlotLifecycleServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotLifecycleServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotLifecycleServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_lifecycle',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by address
  */
-export const intStorageSlotLifecycleServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotLifecycleServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotLifecycleServiceGetResponses,
-    IntStorageSlotLifecycleServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotLifecycleServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotLifecycleServiceGetResponse.parseAsync(data),
+export const intStorageSlotLifecycleServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotLifecycleServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotLifecycleServiceGetResponses, IntStorageSlotLifecycleServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotLifecycleServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotLifecycleServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_lifecycle/{address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotLifecycleBoundaryServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotLifecycleBoundaryServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotLifecycleBoundaryServiceListResponses,
-    IntStorageSlotLifecycleBoundaryServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotLifecycleBoundaryServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotLifecycleBoundaryServiceListResponse.parseAsync(data),
+export const intStorageSlotLifecycleBoundaryServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotLifecycleBoundaryServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotLifecycleBoundaryServiceListResponses, IntStorageSlotLifecycleBoundaryServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotLifecycleBoundaryServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotLifecycleBoundaryServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_lifecycle_boundary',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by address
  */
-export const intStorageSlotLifecycleBoundaryServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotLifecycleBoundaryServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotLifecycleBoundaryServiceGetResponses,
-    IntStorageSlotLifecycleBoundaryServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotLifecycleBoundaryServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotLifecycleBoundaryServiceGetResponse.parseAsync(data),
+export const intStorageSlotLifecycleBoundaryServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotLifecycleBoundaryServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotLifecycleBoundaryServiceGetResponses, IntStorageSlotLifecycleBoundaryServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotLifecycleBoundaryServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotLifecycleBoundaryServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_lifecycle_boundary/{address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotNextTouchServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotNextTouchServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotNextTouchServiceListResponses,
-    IntStorageSlotNextTouchServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotNextTouchServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotNextTouchServiceListResponse.parseAsync(data),
+export const intStorageSlotNextTouchServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotNextTouchServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotNextTouchServiceListResponses, IntStorageSlotNextTouchServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotNextTouchServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotNextTouchServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_next_touch',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intStorageSlotNextTouchServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotNextTouchServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotNextTouchServiceGetResponses,
-    IntStorageSlotNextTouchServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotNextTouchServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotNextTouchServiceGetResponse.parseAsync(data),
+export const intStorageSlotNextTouchServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotNextTouchServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotNextTouchServiceGetResponses, IntStorageSlotNextTouchServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotNextTouchServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotNextTouchServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_next_touch/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotReactivation1mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotReactivation1mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotReactivation1mServiceListResponses,
-    IntStorageSlotReactivation1mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotReactivation1mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotReactivation1mServiceListResponse.parseAsync(data),
+export const intStorageSlotReactivation1mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotReactivation1mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotReactivation1mServiceListResponses, IntStorageSlotReactivation1mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotReactivation1mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotReactivation1mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_reactivation_1m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intStorageSlotReactivation1mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotReactivation1mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotReactivation1mServiceGetResponses,
-    IntStorageSlotReactivation1mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotReactivation1mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotReactivation1mServiceGetResponse.parseAsync(data),
+export const intStorageSlotReactivation1mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotReactivation1mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotReactivation1mServiceGetResponses, IntStorageSlotReactivation1mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotReactivation1mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotReactivation1mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_reactivation_1m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotReactivation6mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotReactivation6mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotReactivation6mServiceListResponses,
-    IntStorageSlotReactivation6mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotReactivation6mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotReactivation6mServiceListResponse.parseAsync(data),
+export const intStorageSlotReactivation6mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotReactivation6mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotReactivation6mServiceListResponses, IntStorageSlotReactivation6mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotReactivation6mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotReactivation6mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_reactivation_6m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intStorageSlotReactivation6mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotReactivation6mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotReactivation6mServiceGetResponses,
-    IntStorageSlotReactivation6mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotReactivation6mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotReactivation6mServiceGetResponse.parseAsync(data),
+export const intStorageSlotReactivation6mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotReactivation6mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotReactivation6mServiceGetResponses, IntStorageSlotReactivation6mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotReactivation6mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotReactivation6mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_reactivation_6m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotReactivation12mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotReactivation12mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotReactivation12mServiceListResponses,
-    IntStorageSlotReactivation12mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotReactivation12mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotReactivation12mServiceListResponse.parseAsync(data),
+export const intStorageSlotReactivation12mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotReactivation12mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotReactivation12mServiceListResponses, IntStorageSlotReactivation12mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotReactivation12mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotReactivation12mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_reactivation_12m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intStorageSlotReactivation12mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotReactivation12mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotReactivation12mServiceGetResponses,
-    IntStorageSlotReactivation12mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotReactivation12mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotReactivation12mServiceGetResponse.parseAsync(data),
+export const intStorageSlotReactivation12mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotReactivation12mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotReactivation12mServiceGetResponses, IntStorageSlotReactivation12mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotReactivation12mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotReactivation12mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_reactivation_12m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotReactivation18mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotReactivation18mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotReactivation18mServiceListResponses,
-    IntStorageSlotReactivation18mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotReactivation18mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotReactivation18mServiceListResponse.parseAsync(data),
+export const intStorageSlotReactivation18mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotReactivation18mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotReactivation18mServiceListResponses, IntStorageSlotReactivation18mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotReactivation18mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotReactivation18mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_reactivation_18m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intStorageSlotReactivation18mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotReactivation18mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotReactivation18mServiceGetResponses,
-    IntStorageSlotReactivation18mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotReactivation18mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotReactivation18mServiceGetResponse.parseAsync(data),
+export const intStorageSlotReactivation18mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotReactivation18mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotReactivation18mServiceGetResponses, IntStorageSlotReactivation18mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotReactivation18mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotReactivation18mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_reactivation_18m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotReactivation24mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotReactivation24mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotReactivation24mServiceListResponses,
-    IntStorageSlotReactivation24mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotReactivation24mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotReactivation24mServiceListResponse.parseAsync(data),
+export const intStorageSlotReactivation24mServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotReactivation24mServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotReactivation24mServiceListResponses, IntStorageSlotReactivation24mServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotReactivation24mServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotReactivation24mServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_reactivation_24m',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intStorageSlotReactivation24mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotReactivation24mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotReactivation24mServiceGetResponses,
-    IntStorageSlotReactivation24mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotReactivation24mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotReactivation24mServiceGetResponse.parseAsync(data),
+export const intStorageSlotReactivation24mServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotReactivation24mServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotReactivation24mServiceGetResponses, IntStorageSlotReactivation24mServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotReactivation24mServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotReactivation24mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_reactivation_24m/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotReadServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotReadServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotReadServiceListResponses,
-    IntStorageSlotReadServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotReadServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotReadServiceListResponse.parseAsync(data),
+export const intStorageSlotReadServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotReadServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotReadServiceListResponses, IntStorageSlotReadServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotReadServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotReadServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_read',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intStorageSlotReadServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotReadServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotReadServiceGetResponses,
-    IntStorageSlotReadServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotReadServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotReadServiceGetResponse.parseAsync(data),
+export const intStorageSlotReadServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotReadServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotReadServiceGetResponses, IntStorageSlotReadServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotReadServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotReadServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_read/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotStateServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotStateServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotStateServiceListResponses,
-    IntStorageSlotStateServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotStateServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotStateServiceListResponse.parseAsync(data),
+export const intStorageSlotStateServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotStateServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotStateServiceListResponses, IntStorageSlotStateServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotStateServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotStateServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_state',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intStorageSlotStateServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotStateServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotStateServiceGetResponses,
-    IntStorageSlotStateServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotStateServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotStateServiceGetResponse.parseAsync(data),
+export const intStorageSlotStateServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotStateServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotStateServiceGetResponses, IntStorageSlotStateServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotStateServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotStateServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_state/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotStateByAddressServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotStateByAddressServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotStateByAddressServiceListResponses,
-    IntStorageSlotStateByAddressServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotStateByAddressServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotStateByAddressServiceListResponse.parseAsync(data),
+export const intStorageSlotStateByAddressServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotStateByAddressServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotStateByAddressServiceListResponses, IntStorageSlotStateByAddressServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotStateByAddressServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotStateByAddressServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_state_by_address',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by address
  */
-export const intStorageSlotStateByAddressServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotStateByAddressServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotStateByAddressServiceGetResponses,
-    IntStorageSlotStateByAddressServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotStateByAddressServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotStateByAddressServiceGetResponse.parseAsync(data),
+export const intStorageSlotStateByAddressServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotStateByAddressServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotStateByAddressServiceGetResponses, IntStorageSlotStateByAddressServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotStateByAddressServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotStateByAddressServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_state_by_address/{address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotStateByBlockServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotStateByBlockServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotStateByBlockServiceListResponses,
-    IntStorageSlotStateByBlockServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotStateByBlockServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotStateByBlockServiceListResponse.parseAsync(data),
+export const intStorageSlotStateByBlockServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotStateByBlockServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotStateByBlockServiceListResponses, IntStorageSlotStateByBlockServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotStateByBlockServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotStateByBlockServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_state_by_block',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intStorageSlotStateByBlockServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotStateByBlockServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotStateByBlockServiceGetResponses,
-    IntStorageSlotStateByBlockServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotStateByBlockServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotStateByBlockServiceGetResponse.parseAsync(data),
+export const intStorageSlotStateByBlockServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotStateByBlockServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotStateByBlockServiceGetResponses, IntStorageSlotStateByBlockServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotStateByBlockServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotStateByBlockServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_state_by_block/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotStateWithExpiryServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotStateWithExpiryServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotStateWithExpiryServiceListResponses,
-    IntStorageSlotStateWithExpiryServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotStateWithExpiryServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotStateWithExpiryServiceListResponse.parseAsync(data),
+export const intStorageSlotStateWithExpiryServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotStateWithExpiryServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotStateWithExpiryServiceListResponses, IntStorageSlotStateWithExpiryServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotStateWithExpiryServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotStateWithExpiryServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_state_with_expiry',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by expiry_policy
  */
-export const intStorageSlotStateWithExpiryServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotStateWithExpiryServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotStateWithExpiryServiceGetResponses,
-    IntStorageSlotStateWithExpiryServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotStateWithExpiryServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotStateWithExpiryServiceGetResponse.parseAsync(data),
+export const intStorageSlotStateWithExpiryServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotStateWithExpiryServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotStateWithExpiryServiceGetResponses, IntStorageSlotStateWithExpiryServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotStateWithExpiryServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotStateWithExpiryServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_state_with_expiry/{expiry_policy}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotStateWithExpiryByAddressServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotStateWithExpiryByAddressServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotStateWithExpiryByAddressServiceListResponses,
-    IntStorageSlotStateWithExpiryByAddressServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotStateWithExpiryByAddressServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotStateWithExpiryByAddressServiceListResponse.parseAsync(data),
+export const intStorageSlotStateWithExpiryByAddressServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotStateWithExpiryByAddressServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotStateWithExpiryByAddressServiceListResponses, IntStorageSlotStateWithExpiryByAddressServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotStateWithExpiryByAddressServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotStateWithExpiryByAddressServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_state_with_expiry_by_address',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by address
  */
-export const intStorageSlotStateWithExpiryByAddressServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotStateWithExpiryByAddressServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotStateWithExpiryByAddressServiceGetResponses,
-    IntStorageSlotStateWithExpiryByAddressServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotStateWithExpiryByAddressServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotStateWithExpiryByAddressServiceGetResponse.parseAsync(data),
+export const intStorageSlotStateWithExpiryByAddressServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotStateWithExpiryByAddressServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotStateWithExpiryByAddressServiceGetResponses, IntStorageSlotStateWithExpiryByAddressServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotStateWithExpiryByAddressServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotStateWithExpiryByAddressServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_state_with_expiry_by_address/{address}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intStorageSlotStateWithExpiryByBlockServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntStorageSlotStateWithExpiryByBlockServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntStorageSlotStateWithExpiryByBlockServiceListResponses,
-    IntStorageSlotStateWithExpiryByBlockServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotStateWithExpiryByBlockServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotStateWithExpiryByBlockServiceListResponse.parseAsync(data),
+export const intStorageSlotStateWithExpiryByBlockServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntStorageSlotStateWithExpiryByBlockServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntStorageSlotStateWithExpiryByBlockServiceListResponses, IntStorageSlotStateWithExpiryByBlockServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotStateWithExpiryByBlockServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotStateWithExpiryByBlockServiceListResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_state_with_expiry_by_block',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by expiry_policy
  */
-export const intStorageSlotStateWithExpiryByBlockServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntStorageSlotStateWithExpiryByBlockServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntStorageSlotStateWithExpiryByBlockServiceGetResponses,
-    IntStorageSlotStateWithExpiryByBlockServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntStorageSlotStateWithExpiryByBlockServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntStorageSlotStateWithExpiryByBlockServiceGetResponse.parseAsync(data),
+export const intStorageSlotStateWithExpiryByBlockServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntStorageSlotStateWithExpiryByBlockServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntStorageSlotStateWithExpiryByBlockServiceGetResponses, IntStorageSlotStateWithExpiryByBlockServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntStorageSlotStateWithExpiryByBlockServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntStorageSlotStateWithExpiryByBlockServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_storage_slot_state_with_expiry_by_block/{expiry_policy}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intTokenContractStorageStateByBlockServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntTokenContractStorageStateByBlockServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntTokenContractStorageStateByBlockServiceListResponses,
-    IntTokenContractStorageStateByBlockServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntTokenContractStorageStateByBlockServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntTokenContractStorageStateByBlockServiceListResponse.parseAsync(data),
+export const intTokenContractStorageStateByBlockServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntTokenContractStorageStateByBlockServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntTokenContractStorageStateByBlockServiceListResponses, IntTokenContractStorageStateByBlockServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntTokenContractStorageStateByBlockServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntTokenContractStorageStateByBlockServiceListResponse.parseAsync(data),
     url: '/api/v1/int_token_contract_storage_state_by_block',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intTokenContractStorageStateByBlockServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntTokenContractStorageStateByBlockServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntTokenContractStorageStateByBlockServiceGetResponses,
-    IntTokenContractStorageStateByBlockServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntTokenContractStorageStateByBlockServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntTokenContractStorageStateByBlockServiceGetResponse.parseAsync(data),
+export const intTokenContractStorageStateByBlockServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntTokenContractStorageStateByBlockServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntTokenContractStorageStateByBlockServiceGetResponses, IntTokenContractStorageStateByBlockServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntTokenContractStorageStateByBlockServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntTokenContractStorageStateByBlockServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_token_contract_storage_state_by_block/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intTransactionCallFrameServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntTransactionCallFrameServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntTransactionCallFrameServiceListResponses,
-    IntTransactionCallFrameServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntTransactionCallFrameServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntTransactionCallFrameServiceListResponse.parseAsync(data),
+export const intTransactionCallFrameServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntTransactionCallFrameServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntTransactionCallFrameServiceListResponses, IntTransactionCallFrameServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntTransactionCallFrameServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntTransactionCallFrameServiceListResponse.parseAsync(data),
     url: '/api/v1/int_transaction_call_frame',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intTransactionCallFrameServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntTransactionCallFrameServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntTransactionCallFrameServiceGetResponses,
-    IntTransactionCallFrameServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntTransactionCallFrameServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntTransactionCallFrameServiceGetResponse.parseAsync(data),
+export const intTransactionCallFrameServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntTransactionCallFrameServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntTransactionCallFrameServiceGetResponses, IntTransactionCallFrameServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntTransactionCallFrameServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntTransactionCallFrameServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_transaction_call_frame/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intTransactionCallFrameOpcodeGasServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntTransactionCallFrameOpcodeGasServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntTransactionCallFrameOpcodeGasServiceListResponses,
-    IntTransactionCallFrameOpcodeGasServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntTransactionCallFrameOpcodeGasServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntTransactionCallFrameOpcodeGasServiceListResponse.parseAsync(data),
+export const intTransactionCallFrameOpcodeGasServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntTransactionCallFrameOpcodeGasServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntTransactionCallFrameOpcodeGasServiceListResponses, IntTransactionCallFrameOpcodeGasServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntTransactionCallFrameOpcodeGasServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntTransactionCallFrameOpcodeGasServiceListResponse.parseAsync(data),
     url: '/api/v1/int_transaction_call_frame_opcode_gas',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intTransactionCallFrameOpcodeGasServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntTransactionCallFrameOpcodeGasServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntTransactionCallFrameOpcodeGasServiceGetResponses,
-    IntTransactionCallFrameOpcodeGasServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntTransactionCallFrameOpcodeGasServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntTransactionCallFrameOpcodeGasServiceGetResponse.parseAsync(data),
+export const intTransactionCallFrameOpcodeGasServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntTransactionCallFrameOpcodeGasServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntTransactionCallFrameOpcodeGasServiceGetResponses, IntTransactionCallFrameOpcodeGasServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntTransactionCallFrameOpcodeGasServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntTransactionCallFrameOpcodeGasServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_transaction_call_frame_opcode_gas/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intTransactionCallFrameOpcodeResourceGasServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntTransactionCallFrameOpcodeResourceGasServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntTransactionCallFrameOpcodeResourceGasServiceListResponses,
-    IntTransactionCallFrameOpcodeResourceGasServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntTransactionCallFrameOpcodeResourceGasServiceListData.parseAsync(data),
-    responseValidator: async data =>
-      await zIntTransactionCallFrameOpcodeResourceGasServiceListResponse.parseAsync(data),
+export const intTransactionCallFrameOpcodeResourceGasServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntTransactionCallFrameOpcodeResourceGasServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntTransactionCallFrameOpcodeResourceGasServiceListResponses, IntTransactionCallFrameOpcodeResourceGasServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntTransactionCallFrameOpcodeResourceGasServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntTransactionCallFrameOpcodeResourceGasServiceListResponse.parseAsync(data),
     url: '/api/v1/int_transaction_call_frame_opcode_resource_gas',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intTransactionCallFrameOpcodeResourceGasServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntTransactionCallFrameOpcodeResourceGasServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntTransactionCallFrameOpcodeResourceGasServiceGetResponses,
-    IntTransactionCallFrameOpcodeResourceGasServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntTransactionCallFrameOpcodeResourceGasServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntTransactionCallFrameOpcodeResourceGasServiceGetResponse.parseAsync(data),
+export const intTransactionCallFrameOpcodeResourceGasServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntTransactionCallFrameOpcodeResourceGasServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntTransactionCallFrameOpcodeResourceGasServiceGetResponses, IntTransactionCallFrameOpcodeResourceGasServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntTransactionCallFrameOpcodeResourceGasServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntTransactionCallFrameOpcodeResourceGasServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_transaction_call_frame_opcode_resource_gas/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intTransactionOpcodeGasServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntTransactionOpcodeGasServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntTransactionOpcodeGasServiceListResponses,
-    IntTransactionOpcodeGasServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntTransactionOpcodeGasServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntTransactionOpcodeGasServiceListResponse.parseAsync(data),
+export const intTransactionOpcodeGasServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntTransactionOpcodeGasServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntTransactionOpcodeGasServiceListResponses, IntTransactionOpcodeGasServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntTransactionOpcodeGasServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntTransactionOpcodeGasServiceListResponse.parseAsync(data),
     url: '/api/v1/int_transaction_opcode_gas',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intTransactionOpcodeGasServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntTransactionOpcodeGasServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntTransactionOpcodeGasServiceGetResponses,
-    IntTransactionOpcodeGasServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntTransactionOpcodeGasServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntTransactionOpcodeGasServiceGetResponse.parseAsync(data),
+export const intTransactionOpcodeGasServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntTransactionOpcodeGasServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntTransactionOpcodeGasServiceGetResponses, IntTransactionOpcodeGasServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntTransactionOpcodeGasServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntTransactionOpcodeGasServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_transaction_opcode_gas/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intTransactionReceiptSizeServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntTransactionReceiptSizeServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntTransactionReceiptSizeServiceListResponses,
-    IntTransactionReceiptSizeServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntTransactionReceiptSizeServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntTransactionReceiptSizeServiceListResponse.parseAsync(data),
+export const intTransactionReceiptSizeServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntTransactionReceiptSizeServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntTransactionReceiptSizeServiceListResponses, IntTransactionReceiptSizeServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntTransactionReceiptSizeServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntTransactionReceiptSizeServiceListResponse.parseAsync(data),
     url: '/api/v1/int_transaction_receipt_size',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intTransactionReceiptSizeServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntTransactionReceiptSizeServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntTransactionReceiptSizeServiceGetResponses,
-    IntTransactionReceiptSizeServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntTransactionReceiptSizeServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntTransactionReceiptSizeServiceGetResponse.parseAsync(data),
+export const intTransactionReceiptSizeServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntTransactionReceiptSizeServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntTransactionReceiptSizeServiceGetResponses, IntTransactionReceiptSizeServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntTransactionReceiptSizeServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntTransactionReceiptSizeServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_transaction_receipt_size/{block_number}',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * List records
  *
  * Retrieve paginated results with optional filtering
  */
-export const intTransactionResourceGasServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntTransactionResourceGasServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntTransactionResourceGasServiceListResponses,
-    IntTransactionResourceGasServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntTransactionResourceGasServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntTransactionResourceGasServiceListResponse.parseAsync(data),
+export const intTransactionResourceGasServiceList = <ThrowOnError extends boolean = false>(options?: Options<IntTransactionResourceGasServiceListData, ThrowOnError>) => (options?.client ?? client).get<IntTransactionResourceGasServiceListResponses, IntTransactionResourceGasServiceListErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntTransactionResourceGasServiceListData.parseAsync(data),
+    responseValidator: async (data) => await zIntTransactionResourceGasServiceListResponse.parseAsync(data),
     url: '/api/v1/int_transaction_resource_gas',
-    ...options,
-  });
+    ...options
+});
 
 /**
  * Get record
  *
  * Retrieve a single record by block_number
  */
-export const intTransactionResourceGasServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntTransactionResourceGasServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntTransactionResourceGasServiceGetResponses,
-    IntTransactionResourceGasServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntTransactionResourceGasServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntTransactionResourceGasServiceGetResponse.parseAsync(data),
+export const intTransactionResourceGasServiceGet = <ThrowOnError extends boolean = false>(options: Options<IntTransactionResourceGasServiceGetData, ThrowOnError>) => (options.client ?? client).get<IntTransactionResourceGasServiceGetResponses, IntTransactionResourceGasServiceGetErrors, ThrowOnError>({
+    requestValidator: async (data) => await zIntTransactionResourceGasServiceGetData.parseAsync(data),
+    responseValidator: async (data) => await zIntTransactionResourceGasServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_transaction_resource_gas/{block_number}',
-    ...options,
-  });
+    ...options
+});

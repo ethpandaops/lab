@@ -1,8 +1,14 @@
-import { type JSX, useCallback, useEffect } from 'react';
+import { type JSX, useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearch, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
-import { ChevronLeftIcon, ChevronRightIcon, QuestionMarkCircleIcon, EyeIcon } from '@heroicons/react/24/outline';
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  QuestionMarkCircleIcon,
+  EyeIcon,
+  ArrowDownTrayIcon,
+} from '@heroicons/react/24/outline';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
@@ -20,6 +26,7 @@ import { dimBlockBlobSubmitterServiceListOptions } from '@/api/@tanstack/react-q
 import { useSlotDetailData } from './hooks/useSlotDetailData';
 import { useAllAttestationVotes } from './hooks/useAllAttestationVotes';
 import { SlotBasicInfoCard } from './components/SlotBasicInfoCard';
+import { SlotDownloadModal } from './components/SlotDownloadModal';
 import { AttestationArrivalsChart } from './components/AttestationArrivalsChart';
 import { AttestationVotesBreakdownTable } from './components/AttestationVotesBreakdownTable';
 import { AttestationsByEntity } from '@/components/Ethereum/AttestationsByEntity';
@@ -80,6 +87,9 @@ export function DetailPage(): JSX.Element {
 
   // Get current network
   const { currentNetwork } = useNetwork();
+
+  // Download modal (beacon block + blob sidecars)
+  const [downloadOpen, setDownloadOpen] = useState(false);
 
   // Keyboard navigation
   useEffect(() => {
@@ -324,8 +334,22 @@ export function DetailPage(): JSX.Element {
   // Get blob count for display
   const blobCount = data.blobCount[0]?.blob_count ?? 0;
 
+  // Download modal inputs: canonical block root (the modal self-fetches blobs)
+  const downloadBlockRoot = data.blockHead[0]?.block_root ?? data.block[0]?.block_root;
+
   return (
     <Container>
+      {currentNetwork && (
+        <SlotDownloadModal
+          open={downloadOpen}
+          onClose={() => setDownloadOpen(false)}
+          network={currentNetwork.name}
+          slot={slot}
+          slotStartDateTime={slotToTimestamp(slot, currentNetwork.genesis_time)}
+          blockRoot={downloadBlockRoot}
+        />
+      )}
+
       {/* Navigation Controls */}
       <div className="mb-6 flex items-center justify-between gap-4">
         <Button
@@ -340,6 +364,17 @@ export function DetailPage(): JSX.Element {
           Previous
         </Button>
         <div className="flex-1" />
+        {currentNetwork && (downloadBlockRoot || blobCount > 0) && (
+          <Button
+            variant="secondary"
+            size="sm"
+            rounded="sm"
+            leadingIcon={<ArrowDownTrayIcon />}
+            onClick={() => setDownloadOpen(true)}
+          >
+            Download
+          </Button>
+        )}
         {currentNetwork &&
           (() => {
             const slotTimestamp = slotToTimestamp(slot, currentNetwork.genesis_time);

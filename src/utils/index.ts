@@ -10,3 +10,4 @@ export * from './country';
 export * from './number';
 export * from './version';
 export * from './forks';
+export * from './slot-download';
