@@ -22,7 +22,10 @@ import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
 import { useTabState } from '@/hooks/useTabState';
 import { useNetwork } from '@/hooks/useNetwork';
 import { Route } from '@/routes/ethereum/slots/$slot';
-import { dimBlockBlobSubmitterServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import {
+  dimBlockBlobSubmitterServiceListOptions,
+  fctBlockBlobHeadServiceListOptions,
+} from '@/api/@tanstack/react-query.gen';
 import { useSlotDetailData } from './hooks/useSlotDetailData';
 import { useAllAttestationVotes } from './hooks/useAllAttestationVotes';
 import { SlotBasicInfoCard } from './components/SlotBasicInfoCard';
@@ -143,6 +146,18 @@ export function DetailPage(): JSX.Element {
     enabled: !!executionBlockNumber,
   });
   const blobSubmitters = blobSubmittersData?.dim_block_blob_submitter ?? [];
+
+  // Fetch the slot's blobs from the head table (real-time, one row per blob with
+  // its versioned hash + KZG commitment) — drives the blobs listing.
+  const { data: blobHeadData } = useQuery({
+    ...fctBlockBlobHeadServiceListOptions({
+      query: { slot_start_date_time_eq: slotTimestamp, page_size: 100 },
+    }),
+    enabled: !!currentNetwork && slotTimestamp > 0,
+  });
+  const blobDetails = (blobHeadData?.fct_block_blob_head ?? [])
+    .slice()
+    .sort((a, b) => (a.blob_index ?? 0) - (b.blob_index ?? 0));
 
   // Tab state management with URL search params
   const { selectedIndex, onChange } = useTabState([
@@ -927,7 +942,7 @@ export function DetailPage(): JSX.Element {
             {/* Blobs Tab - Blob data and submitters */}
             <TabPanel>
               <div className="space-y-6">
-                {blobCount === 0 && blobSubmitters.length === 0 ? (
+                {blobCount === 0 && blobDetails.length === 0 && blobSubmitters.length === 0 ? (
                   <Card>
                     <div className="py-8 text-center">
                       <p className="text-muted">No blob data available for this slot</p>
@@ -962,6 +977,42 @@ export function DetailPage(): JSX.Element {
                                 value={`${(effectiveBlockData.execution_payload_excess_blob_gas / 1e6).toFixed(2)}M`}
                               />
                             )}
+                        </div>
+                      </Card>
+                    )}
+
+                    {/* Blobs - one row per blob with its versioned hash + KZG commitment */}
+                    {blobDetails.length > 0 && (
+                      <Card>
+                        <div className="mb-4">
+                          <h3 className="text-lg font-semibold text-foreground">Blobs</h3>
+                          <p className="text-sm text-muted">
+                            {blobDetails.length} blob{blobDetails.length !== 1 ? 's' : ''} in this block
+                          </p>
+                        </div>
+                        <div className="grid gap-3">
+                          {blobDetails.map(blob => (
+                            <div
+                              key={`${blob.block_root}-${blob.blob_index}`}
+                              className="flex flex-col gap-2 rounded-sm border border-border bg-surface/50 p-4"
+                            >
+                              <div className="flex items-center justify-between gap-3">
+                                <span className="font-medium text-foreground">Blob {blob.blob_index}</span>
+                              </div>
+                              <div className="flex flex-col gap-1.5 text-xs">
+                                <div className="flex items-center gap-2">
+                                  <span className="shrink-0 text-muted">Versioned Hash:</span>
+                                  <code className="truncate font-mono text-foreground">{blob.versioned_hash}</code>
+                                  {blob.versioned_hash && <CopyToClipboard content={blob.versioned_hash} />}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="shrink-0 text-muted">KZG Commitment:</span>
+                                  <code className="truncate font-mono text-foreground">{blob.kzg_commitment}</code>
+                                  {blob.kzg_commitment && <CopyToClipboard content={blob.kzg_commitment} />}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </Card>
                     )}

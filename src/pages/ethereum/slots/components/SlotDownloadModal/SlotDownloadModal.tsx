@@ -8,8 +8,13 @@ import { Alert } from '@/components/Feedback/Alert';
 import { CopyToClipboard } from '@/components/Elements/CopyToClipboard';
 import { fctBlockBlobHeadServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { getBlobDownloadUrl, getBlockDownloadUrl, type BlockDownloadFormat } from '@/utils';
+import { SLOTS_PER_EPOCH } from '@/utils/beacon';
+import { useBeaconClock } from '@/hooks/useBeaconClock';
 import { useArchiveDownload } from './useArchiveDownload';
 import type { SlotDownloadModalProps } from './SlotDownloadModal.types';
+
+// A slot's blobs are only archived once it finalizes (~2 epochs behind head).
+const FINALITY_LAG_SLOTS = 2 * SLOTS_PER_EPOCH;
 
 type TabKey = 'block' | 'blobs';
 
@@ -34,6 +39,11 @@ export function SlotDownloadModal({
 }: SlotDownloadModalProps): JSX.Element {
   const [tab, setTab] = useState<TabKey>('block');
   const { pendingKey, error, download } = useArchiveDownload();
+
+  // Blobs are not in the archive until the slot finalizes, so gate blob
+  // downloads on finality (block downloads are available much sooner).
+  const { slot: wallClockSlot } = useBeaconClock();
+  const blobsArchived = wallClockSlot - slot >= FINALITY_LAG_SLOTS;
 
   // Fetch the slot's blob versioned hashes from the head table (real-time,
   // unlike dim_block_blob_submitter which lags behind the chain head).
@@ -137,26 +147,30 @@ export function SlotDownloadModal({
                             <CopyToClipboard content={hash} successMessage="Versioned hash copied" />
                           </div>
                         </div>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          rounded="sm"
-                          nowrap
-                          disabled={pendingKey === key}
-                          leadingIcon={
-                            pendingKey === key ? <ArrowPathIcon className="animate-spin" /> : <ArrowDownTrayIcon />
-                          }
-                          onClick={() => download(key, getBlobDownloadUrl(network, hash))}
-                        >
-                          Download
-                        </Button>
+                        <span title={blobsArchived ? undefined : 'Available once the slot finalizes (~13 min)'}>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            rounded="sm"
+                            nowrap
+                            disabled={!blobsArchived || pendingKey === key}
+                            leadingIcon={
+                              pendingKey === key ? <ArrowPathIcon className="animate-spin" /> : <ArrowDownTrayIcon />
+                            }
+                            onClick={() => download(key, getBlobDownloadUrl(network, hash))}
+                          >
+                            {blobsArchived ? 'Download' : 'Pending'}
+                          </Button>
+                        </span>
                       </div>
                     );
                   })}
                 </div>
               </div>
               <p className="text-xs text-muted">
-                Raw blob bytes from the blob archive. Recently proposed blobs may not be archived yet.
+                {blobsArchived
+                  ? 'Raw blob bytes from the blob archive.'
+                  : 'Blobs are archived once the slot finalizes (~13 min) — downloads will be available then.'}
               </p>
             </div>
           ) : (
