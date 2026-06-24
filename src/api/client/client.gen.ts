@@ -65,7 +65,7 @@ export const createClient = (config: Config = {}): Client => {
     return { opts, url };
   };
 
-  const request: Client['request'] = async options => {
+  const request: Client['request'] = async (options) => {
     // @ts-expect-error
     const { opts, url } = await beforeRequest(options);
     const requestInit: ReqInit = {
@@ -128,7 +128,9 @@ export const createClient = (config: Config = {}): Client => {
 
     if (response.ok) {
       const parseAs =
-        (opts.parseAs === 'auto' ? getParseAs(response.headers.get('Content-Type')) : opts.parseAs) ?? 'json';
+        (opts.parseAs === 'auto'
+          ? getParseAs(response.headers.get('Content-Type'))
+          : opts.parseAs) ?? 'json';
 
       if (response.status === 204 || response.headers.get('Content-Length') === '0') {
         let emptyData: any;
@@ -232,7 +234,8 @@ export const createClient = (config: Config = {}): Client => {
         };
   };
 
-  const makeMethodFn = (method: Uppercase<HttpMethod>) => (options: RequestOptions) => request({ ...options, method });
+  const makeMethodFn = (method: Uppercase<HttpMethod>) => (options: RequestOptions) =>
+    request({ ...options, method });
 
   const makeSseFn = (method: Uppercase<HttpMethod>) => async (options: RequestOptions) => {
     const { opts, url } = await beforeRequest(options);

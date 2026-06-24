@@ -39,7 +39,9 @@ const serializeUrlSearchParamsPair = (data: URLSearchParams, key: string, value:
 };
 
 export const formDataBodySerializer = {
-  bodySerializer: <T extends Record<string, any> | Array<Record<string, any>>>(body: T): FormData => {
+  bodySerializer: <T extends Record<string, any> | Array<Record<string, any>>>(
+    body: T,
+  ): FormData => {
     const data = new FormData();
 
     Object.entries(body).forEach(([key, value]) => {
@@ -47,7 +49,7 @@ export const formDataBodySerializer = {
         return;
       }
       if (Array.isArray(value)) {
-        value.forEach(v => serializeFormDataPair(data, key, v));
+        value.forEach((v) => serializeFormDataPair(data, key, v));
       } else {
         serializeFormDataPair(data, key, value);
       }
@@ -71,7 +73,7 @@ export const urlSearchParamsBodySerializer = {
         return;
       }
       if (Array.isArray(value)) {
-        value.forEach(v => serializeUrlSearchParamsPair(data, key, v));
+        value.forEach((v) => serializeUrlSearchParamsPair(data, key, v));
       } else {
         serializeUrlSearchParamsPair(data, key, value);
       }
