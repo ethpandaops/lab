@@ -10,8 +10,8 @@ export interface SlotDownloadModalProps {
   network: string;
   /** Slot number. */
   slot: number;
+  /** Slot start time as a unix timestamp (seconds) — primary key for the blob query. */
+  slotStartDateTime: number;
   /** Canonical block root, if the slot has a block. Absent for missed slots. */
   blockRoot?: string;
-  /** Versioned hashes of the slot's blob sidecars, in order. */
-  versionedHashes: string[];
 }

@@ -334,9 +334,8 @@ export function DetailPage(): JSX.Element {
   // Get blob count for display
   const blobCount = data.blobCount[0]?.blob_count ?? 0;
 
-  // Download modal inputs: canonical block root + the slot's blob versioned hashes
+  // Download modal inputs: canonical block root (the modal self-fetches blobs)
   const downloadBlockRoot = data.blockHead[0]?.block_root ?? data.block[0]?.block_root;
-  const downloadVersionedHashes = blobSubmitters.flatMap(submitter => submitter.versioned_hashes ?? []);
 
   return (
     <Container>
@@ -346,8 +345,8 @@ export function DetailPage(): JSX.Element {
           onClose={() => setDownloadOpen(false)}
           network={currentNetwork.name}
           slot={slot}
+          slotStartDateTime={slotToTimestamp(slot, currentNetwork.genesis_time)}
           blockRoot={downloadBlockRoot}
-          versionedHashes={downloadVersionedHashes}
         />
       )}
 
@@ -365,7 +364,7 @@ export function DetailPage(): JSX.Element {
           Previous
         </Button>
         <div className="flex-1" />
-        {currentNetwork && (downloadBlockRoot || downloadVersionedHashes.length > 0) && (
+        {currentNetwork && (downloadBlockRoot || blobCount > 0) && (
           <Button
             variant="secondary"
             size="sm"

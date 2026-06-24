@@ -1,10 +1,12 @@
-import { type JSX, useState } from 'react';
+import { type JSX, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { ArrowDownTrayIcon, ArrowPathIcon, CubeIcon, Square3Stack3DIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { Button } from '@/components/Elements/Button';
 import { Alert } from '@/components/Feedback/Alert';
 import { CopyToClipboard } from '@/components/Elements/CopyToClipboard';
+import { fctBlockBlobHeadServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { getBlobDownloadUrl, getBlockDownloadUrl, type BlockDownloadFormat } from '@/utils';
 import { useArchiveDownload } from './useArchiveDownload';
 import type { SlotDownloadModalProps } from './SlotDownloadModal.types';
@@ -27,11 +29,30 @@ export function SlotDownloadModal({
   onClose,
   network,
   slot,
+  slotStartDateTime,
   blockRoot,
-  versionedHashes,
 }: SlotDownloadModalProps): JSX.Element {
   const [tab, setTab] = useState<TabKey>('block');
   const { pendingKey, error, download } = useArchiveDownload();
+
+  // Fetch the slot's blob versioned hashes from the head table (real-time,
+  // unlike dim_block_blob_submitter which lags behind the chain head).
+  const { data: blobData, isLoading: blobsLoading } = useQuery({
+    ...fctBlockBlobHeadServiceListOptions({
+      query: { slot_start_date_time_eq: slotStartDateTime, page_size: 100 },
+    }),
+    enabled: open && slotStartDateTime > 0,
+  });
+
+  const versionedHashes = useMemo(
+    () =>
+      (blobData?.fct_block_blob_head ?? [])
+        .slice()
+        .sort((a, b) => (a.blob_index ?? 0) - (b.blob_index ?? 0))
+        .map(row => row.versioned_hash)
+        .filter((hash): hash is string => !!hash),
+    [blobData]
+  );
 
   const blockFormats: { format: BlockDownloadFormat; label: string; hint: string }[] = [
     { format: 'json', label: 'JSON', hint: 'Decoded beacon block' },
@@ -95,7 +116,9 @@ export function SlotDownloadModal({
 
         {/* Blobs tab */}
         {tab === 'blobs' &&
-          (versionedHashes.length > 0 ? (
+          (blobsLoading ? (
+            <EmptyState message="Loading blobs…" />
+          ) : versionedHashes.length > 0 ? (
             <div className="flex flex-col gap-2">
               <div className="max-h-80 overflow-y-auto">
                 <div className="flex flex-col gap-2">
