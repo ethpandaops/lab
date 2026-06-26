@@ -2,7 +2,13 @@ import type React from 'react';
 import { memo, useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
-import type { Map2DChartProps, PointData, PointNodeData } from './Map2D.types';
+import type { Map2DChartProps, PointData, PointNodeData, RouteData } from './Map2D.types';
+
+// Stable empty-array defaults so an omitted prop doesn't produce a new reference
+// each render — that would recompute `option` and re-apply an empty scatter
+// series, wiping the streamed points and flickering the map.
+const EMPTY_ROUTES: RouteData[] = [];
+const EMPTY_POINTS: PointData[] = [];
 import { useThemeColors } from '@/hooks/useThemeColors';
 
 /**
@@ -27,8 +33,8 @@ interface HoveredPointInfo {
 }
 
 function Map2DChartComponent({
-  routes = [],
-  points = [],
+  routes = EMPTY_ROUTES,
+  points = EMPTY_POINTS,
   title,
   height = 600,
   showEffect = false,
@@ -221,6 +227,7 @@ function Map2DChartComponent({
       name: point.name,
       value: [...point.coords, point.value || 1],
       nodes: point.nodes,
+      ...(point.color ? { itemStyle: { color: point.color, shadowColor: point.color } } : {}),
     }));
 
     // Update the scatter series by stable ID to avoid index mismatches

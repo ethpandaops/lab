@@ -115,12 +115,15 @@ export function getClusterSpec(name: string): ClusterSpec | undefined {
   return CLUSTER_SPECS.find(spec => spec.name === name);
 }
 
+/** Marker substring identifying EIP-7870 reference nodes (in node names and node_class values). */
+export const EIP7870_REFERENCE_TAG = '7870';
+
 /**
  * Extract cluster name from a node name string
  * Returns the cluster name if the node is an EIP-7870 reference node, null otherwise
  */
 export function extractClusterFromNodeName(nodeName: string): string | null {
-  if (!nodeName.includes('7870')) return null;
+  if (!nodeName.includes(EIP7870_REFERENCE_TAG)) return null;
 
   // Transform the node name to extract the cluster prefix
   const shortName = nodeName

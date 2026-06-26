@@ -17,6 +17,7 @@ export interface PointData {
   name?: string;
   coords: [number, number]; // [longitude, latitude]
   value?: number; // Optional value for sizing the point
+  color?: string; // Optional per-point color (e.g. encoding arrival time); falls back to the series color
   nodes?: PointNodeData[]; // All nodes at this location for tooltip display
 }
 

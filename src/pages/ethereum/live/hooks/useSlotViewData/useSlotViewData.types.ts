@@ -19,6 +19,16 @@ import type {
   FctMevBidCountByRelay,
 } from '@/api/types.gen';
 
+/** One EL client's engine_newPayload validation timing for a slot. */
+export interface ClientValidationRow {
+  /** Execution client implementation (e.g. Geth, Nethermind, Reth). */
+  client: string;
+  /** Median engine_newPayload duration in milliseconds. */
+  medianMs: number;
+  /** Number of node observations backing this row. */
+  observations: number;
+}
+
 export interface SlotViewData {
   // Block details (for slim card)
   blockDetails: BlockDetailsData | null;
@@ -45,6 +55,30 @@ export interface SlotViewData {
   attestationTotalExpected: number;
   attestationActualCount: number; // Actual count of validators who attested
   attestationMaxCount: number; // Max count across all time points for yMax
+
+  // EL client block-validation race (engine_newPayload timing), sorted fastest first
+  clientValidation: ClientValidationRow[];
+
+  // Named staking entity that proposed the block, when known (e.g. Lido)
+  proposerEntity: string | null;
+
+  // Block propagation across the sentry network (arrival ms percentiles)
+  propagationMinMs: number | null;
+  propagationP50Ms: number | null;
+  propagationP90Ms: number | null;
+  propagationMaxMs: number | null;
+  propagationNodeCount: number;
+
+  // Attestation arrival timing (ms from slot start)
+  attestationFirstMs: number | null;
+  attestationPeakMs: number | null;
+
+  // MEV auction depth for the slot
+  auctionBuilders: number;
+  auctionRelays: number;
+  auctionBids: number;
+  auctionTopRelay: string | null;
+  auctionTopBidWei: string | null;
 
   // State
   isLoading: boolean;

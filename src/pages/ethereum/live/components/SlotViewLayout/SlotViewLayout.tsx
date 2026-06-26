@@ -12,17 +12,19 @@ import {
 } from 'react';
 import { useSlotPlayerState, useSlotPlayerActions, useSlotPlayerProgress } from '@/hooks/useSlotPlayer';
 import { useForks } from '@/hooks/useForks';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import { Map2DChart } from '@/components/Charts/Map2D';
 import { Sidebar } from '../Sidebar';
 import type { SidebarProps } from '../Sidebar/Sidebar.types';
 import { MobileSlotHeader } from '../MobileSlotHeader';
-import { BlockDetailsCard } from '../BlockDetailsCard';
-import type { BlockDetailsCardProps } from '../BlockDetailsCard';
+import { MobileSlotStats } from '../MobileSlotStats';
+import { SlotHud } from '../SlotHud';
+import type { SlotHudProps } from '../SlotHud';
 import { BottomBar } from '../BottomBar';
 import type { BottomBarProps } from '../BottomBar';
 import { ScrollingTimeline } from '@/components/Lists/ScrollingTimeline';
 import { SlotTimeline } from '@/components/Ethereum/SlotTimeline';
-import { useSlotViewData, useSlotProgressData } from '../../hooks';
+import { useSlotViewData } from '../../hooks';
 import type { SlotViewLayoutProps, TimeFilteredData } from './SlotViewLayout.types';
 import type { MapPointWithTiming } from '../../hooks/useMapData/useMapData';
 import type { ContinentalPropagationSeries } from '../BlobDataAvailability/BlobDataAvailability.types';
@@ -131,14 +133,11 @@ function SlotLiveDataProvider({
       dataColumnFirstSeenData: [],
     };
     setDataVersion(prev => prev + 1);
-  }, [
-    currentSlot,
-    sortedMapPoints,
-    deduplicatedBlobTimeline,
-    sortedContinentalSeries,
-    attestationTimeToCount,
-    dataColumnFirstSeenData,
-  ]);
+    // Only reset on a genuine slot change. The grow effect below re-derives the
+    // visible sets from the latest data every tick, so resetting on mid-slot
+    // data-reference changes (e.g. background refetches) just clears and
+    // regrows the map — the source of the dot "flicker".
+  }, [currentSlot]);
 
   useEffect(() => {
     let mutated = false;
@@ -250,17 +249,14 @@ function SlotLiveDataProvider({
   return <SlotLiveDataContext.Provider value={value}>{children}</SlotLiveDataContext.Provider>;
 }
 
-interface BlockDetailsSectionProps {
-  data: BlockDetailsCardProps['data'];
-  slotProgressPhases: BlockDetailsCardProps['slotProgressPhases'];
-}
-
-const LiveBlockDetailsCard = memo(function LiveBlockDetailsCard({
-  data,
-  slotProgressPhases,
-}: BlockDetailsSectionProps) {
+const LiveSlotHud = memo(function LiveSlotHud({
+  currentSlot,
+  ...props
+}: Omit<SlotHudProps, 'currentTime'> & { currentSlot: number }) {
   const { slotProgress } = useSlotPlayerProgress();
-  return <BlockDetailsCard data={data} currentTime={slotProgress} slotProgressPhases={slotProgressPhases} />;
+  // Remount on slot change so a new slot starts fresh (faded out) instead of
+  // tweening from the previous slot's data.
+  return <SlotHud key={currentSlot} {...props} currentTime={slotProgress} />;
 });
 
 type SidebarStaticProps = Omit<SidebarProps, 'currentTime' | 'slotDuration'> & { slotDuration?: number };
@@ -320,19 +316,35 @@ interface LiveMapChartProps {
   height?: number | string;
 }
 
+// Color a node by how quickly it saw the block, on a fast→slow gradient
+// (green → terracotta → amber → red) so propagation speed reads geographically.
+function arrivalColor(
+  ms: number,
+  colors: { success: string; primary: string; warning: string; danger: string }
+): string {
+  if (ms < 1500) return colors.success;
+  if (ms < 2500) return colors.primary;
+  if (ms < 3500) return colors.warning;
+  return colors.danger;
+}
+
 const LiveMapChart = memo(function LiveMapChart({
   currentSlot,
   pointSizeMultiplier,
   height = '100%',
 }: LiveMapChartProps) {
   const { timeFilteredData } = useSlotLiveData();
+  const colors = useThemeColors();
+  const points = useMemo(
+    () =>
+      timeFilteredData.visibleMapPoints.map(point => ({
+        ...point,
+        color: arrivalColor(point.earliestSeenTime, colors),
+      })),
+    [timeFilteredData.visibleMapPoints, colors]
+  );
   return (
-    <Map2DChart
-      points={timeFilteredData.visibleMapPoints}
-      height={height}
-      pointSizeMultiplier={pointSizeMultiplier}
-      resetKey={currentSlot}
-    />
+    <Map2DChart points={points} height={height} pointSizeMultiplier={pointSizeMultiplier} resetKey={currentSlot} />
   );
 });
 
@@ -360,7 +372,6 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
   const { activeFork } = useForks();
 
   const slotData = useSlotViewData(currentSlot);
-  const { phases: slotProgressPhases } = useSlotProgressData(slotData.rawApiData);
 
   const handleTimeClick = useCallback((timeMs: number) => actions.seekToTime(timeMs), [actions]);
 
@@ -412,7 +423,27 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
       <>
         <div className="hidden h-screen flex-col overflow-hidden bg-background lg:flex">
           <div className="shrink-0 border-b border-border bg-surface px-6 py-2">
-            <LiveBlockDetailsCard data={slotData.blockDetails} slotProgressPhases={slotProgressPhases} />
+            <LiveSlotHud
+              currentSlot={currentSlot}
+              clientValidation={slotData.clientValidation}
+              proposerEntity={slotData.proposerEntity}
+              propagationMinMs={slotData.propagationMinMs}
+              propagationP50Ms={slotData.propagationP50Ms}
+              propagationP90Ms={slotData.propagationP90Ms}
+              propagationMaxMs={slotData.propagationMaxMs}
+              propagationNodeCount={slotData.propagationNodeCount}
+              attestationFirstMs={slotData.attestationFirstMs}
+              attestationPeakMs={slotData.attestationPeakMs}
+              attestationExpected={slotData.attestationTotalExpected}
+              blockDetails={slotData.blockDetails}
+              auctionBuilders={slotData.auctionBuilders}
+              auctionRelays={slotData.auctionRelays}
+              auctionBids={slotData.auctionBids}
+              auctionTopRelay={slotData.auctionTopRelay}
+              auctionTopBidWei={slotData.auctionTopBidWei}
+              blobCount={slotData.blobCount}
+              dataColumnBlobCount={slotData.dataColumnBlobCount}
+            />
           </div>
 
           <div className="grid min-h-0 flex-1 grid-cols-12">
@@ -461,6 +492,16 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
               onBackward={actions.previousSlot}
               onForward={actions.nextSlot}
               isLive={mode === 'live'}
+            />
+          </div>
+
+          <div className="h-9 shrink-0 border-b border-border bg-surface">
+            <MobileSlotStats
+              clientValidation={slotData.clientValidation}
+              propagationP90Ms={slotData.propagationP90Ms}
+              blockDetails={slotData.blockDetails}
+              blobCount={slotData.blobCount}
+              dataColumnBlobCount={slotData.dataColumnBlobCount}
             />
           </div>
 
