@@ -471,7 +471,6 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
           <ClientVersionBreakdown
             data={validPayloadByElClient}
             hourlyData={newPayloadByElClientHourly}
-            hideObservations
             hideRange
             noCard
           />
