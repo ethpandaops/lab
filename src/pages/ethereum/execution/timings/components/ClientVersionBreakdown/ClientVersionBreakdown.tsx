@@ -32,6 +32,7 @@ interface ClientVersionData {
   max_duration_ms?: number;
   avg_returned_count?: number;
   status?: string;
+  slot_start_date_time?: number;
 }
 
 interface HourlyClientVersionData {
@@ -44,6 +45,7 @@ interface HourlyClientVersionData {
   min_duration_ms?: number;
   max_duration_ms?: number;
   avg_returned_count?: number;
+  hour_start_date_time?: number;
 }
 
 export interface ClientVersionBreakdownProps {
@@ -85,10 +87,13 @@ interface AggregatedRow {
   maxDuration: number;
   observations: number;
   avgBlobCount?: number;
+  /** Epoch seconds of the most recent observation for this version (0 if unknown) */
+  lastSeen: number;
 }
 
 interface ClientGroupedRow extends AggregatedRow {
-  otherVersions: AggregatedRow[];
+  /** All versions for this client, newest first (empty for single-version clients) */
+  versions: AggregatedRow[];
   versionCount: number;
 }
 
@@ -321,6 +326,7 @@ export function ClientVersionBreakdown({
         maxDuration: number;
         totalObservations: number;
         totalWeightedBlobCount: number;
+        lastSeen: number;
       }
     >();
 
@@ -331,6 +337,7 @@ export function ClientVersionBreakdown({
       const obs = row.observation_count ?? 0;
       const minDur = row.min_duration_ms ?? 0;
       const maxDur = row.max_duration_ms ?? 0;
+      const seenAt = row.hour_start_date_time ?? 0;
 
       const existing = map.get(key);
       if (existing) {
@@ -345,6 +352,9 @@ export function ClientVersionBreakdown({
         }
         existing.totalObservations += obs;
         existing.totalWeightedBlobCount += (row.avg_returned_count ?? 0) * obs;
+        if (seenAt > existing.lastSeen) {
+          existing.lastSeen = seenAt;
+        }
       } else {
         map.set(key, {
           client,
@@ -356,6 +366,7 @@ export function ClientVersionBreakdown({
           maxDuration: maxDur,
           totalObservations: obs,
           totalWeightedBlobCount: (row.avg_returned_count ?? 0) * obs,
+          lastSeen: seenAt,
         });
       }
     });
@@ -374,6 +385,7 @@ export function ClientVersionBreakdown({
           maxDuration: entry.maxDuration,
           observations: entry.totalObservations,
           avgBlobCount: entry.totalWeightedBlobCount / entry.totalObservations,
+          lastSeen: entry.lastSeen,
         });
       }
     });
@@ -401,6 +413,7 @@ export function ClientVersionBreakdown({
         maxDuration: number;
         totalObservations: number;
         totalWeightedBlobCount: number;
+        lastSeen: number;
       }
     >();
 
@@ -411,6 +424,7 @@ export function ClientVersionBreakdown({
       const obs = row.observation_count ?? 0;
       const minDur = row.min_duration_ms ?? 0;
       const maxDur = row.max_duration_ms ?? 0;
+      const seenAt = row.slot_start_date_time ?? 0;
 
       // Check if this row's status matches the filter for duration calculation
       const statusMatches = !durationStatusFilter || row.status?.toUpperCase() === durationStatusFilter.toUpperCase();
@@ -430,6 +444,9 @@ export function ClientVersionBreakdown({
         }
         existing.totalObservations += obs;
         existing.totalWeightedBlobCount += (row.avg_returned_count ?? 0) * obs;
+        if (seenAt > existing.lastSeen) {
+          existing.lastSeen = seenAt;
+        }
       } else {
         map.set(key, {
           client,
@@ -440,6 +457,7 @@ export function ClientVersionBreakdown({
           maxDuration: statusMatches ? maxDur : 0,
           totalObservations: obs,
           totalWeightedBlobCount: (row.avg_returned_count ?? 0) * obs,
+          lastSeen: seenAt,
         });
       }
     });
@@ -459,6 +477,7 @@ export function ClientVersionBreakdown({
           maxDuration: entry.maxDuration,
           observations: entry.totalObservations,
           avgBlobCount: entry.totalWeightedBlobCount / entry.totalObservations,
+          lastSeen: entry.lastSeen,
         });
       }
     });
@@ -466,7 +485,8 @@ export function ClientVersionBreakdown({
     return result;
   }, [data, hasHourlyData, hourlyAggregatedData, durationStatusFilter]);
 
-  // Group aggregated data by client, showing only the most-observed version per client
+  // Group aggregated data by client. Multi-version clients get a synthetic summary row
+  // aggregating all versions over the period; expanding lists each version newest-first.
   const clientGroupedData = useMemo(() => {
     const clientMap = new Map<string, AggregatedRow[]>();
 
@@ -482,15 +502,59 @@ export function ClientVersionBreakdown({
     const result: ClientGroupedRow[] = [];
 
     clientMap.forEach(versions => {
-      // Sort by observation count descending — highest count is the "primary" version
-      const sorted = [...versions].sort((a, b) => b.observations - a.observations);
-      const primary = sorted[0];
-      const others = sorted.slice(1);
+      const sorted = [...versions].sort((a, b) => b.lastSeen - a.lastSeen || b.observations - a.observations);
+
+      if (sorted.length === 1) {
+        result.push({
+          ...sorted[0],
+          versions: [],
+          versionCount: 1,
+        });
+        return;
+      }
+
+      const summary = sorted.reduce(
+        (acc, v) => {
+          const durationObs = v.avgDuration > 0 ? v.observations : 0;
+          acc.totalWeightedAvg += v.avgDuration * durationObs;
+          acc.totalWeightedP50 += v.p50Duration * durationObs;
+          acc.totalWeightedP95 += v.p95Duration * durationObs;
+          acc.durationObs += durationObs;
+          if (v.minDuration > 0 && (acc.minDuration === 0 || v.minDuration < acc.minDuration)) {
+            acc.minDuration = v.minDuration;
+          }
+          if (v.maxDuration > acc.maxDuration) {
+            acc.maxDuration = v.maxDuration;
+          }
+          acc.observations += v.observations;
+          acc.totalWeightedBlobCount += (v.avgBlobCount ?? 0) * v.observations;
+          return acc;
+        },
+        {
+          totalWeightedAvg: 0,
+          totalWeightedP50: 0,
+          totalWeightedP95: 0,
+          durationObs: 0,
+          minDuration: 0,
+          maxDuration: 0,
+          observations: 0,
+          totalWeightedBlobCount: 0,
+        }
+      );
 
       result.push({
-        ...primary,
-        otherVersions: others,
-        versionCount: versions.length,
+        client: sorted[0].client,
+        version: sorted[0].version,
+        avgDuration: summary.durationObs > 0 ? summary.totalWeightedAvg / summary.durationObs : 0,
+        p50Duration: summary.durationObs > 0 ? summary.totalWeightedP50 / summary.durationObs : 0,
+        p95Duration: summary.durationObs > 0 ? summary.totalWeightedP95 / summary.durationObs : 0,
+        minDuration: summary.minDuration,
+        maxDuration: summary.maxDuration,
+        observations: summary.observations,
+        avgBlobCount: summary.observations > 0 ? summary.totalWeightedBlobCount / summary.observations : 0,
+        lastSeen: sorted[0].lastSeen,
+        versions: sorted,
+        versionCount: sorted.length,
       });
     });
 
@@ -767,11 +831,15 @@ export function ClientVersionBreakdown({
                       </div>
                     </td>
                     <td className="px-3 py-3">
-                      <span className="font-mono text-sm text-muted">{row.version}</span>
-                      {hasMultipleVersions && (
-                        <span className="ml-2 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs text-primary">
+                      {hasMultipleVersions ? (
+                        <span
+                          className="rounded-full bg-primary/10 px-1.5 py-0.5 text-xs text-primary"
+                          title={`Aggregate across ${row.versionCount} versions for the selected period`}
+                        >
                           {row.versionCount} versions
                         </span>
+                      ) : (
+                        <span className="font-mono text-sm text-muted">{row.version}</span>
                       )}
                     </td>
                     {renderMetricCells(row)}
@@ -787,10 +855,10 @@ export function ClientVersionBreakdown({
                     />
                   )}
 
-                  {/* Group expansion: other version sub-rows */}
+                  {/* Group expansion: per-version sub-rows, newest first */}
                   {hasMultipleVersions &&
                     isGroupExpanded &&
-                    row.otherVersions.map((subRow, subIndex) => {
+                    row.versions.map((subRow, subIndex) => {
                       const subRowKey = `${subRow.client}-${subRow.version}`;
                       const isSubNodeExpanded = expandedClients.has(subRowKey);
 
