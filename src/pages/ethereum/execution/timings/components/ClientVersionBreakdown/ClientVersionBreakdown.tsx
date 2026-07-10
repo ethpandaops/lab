@@ -32,6 +32,7 @@ interface ClientVersionData {
   max_duration_ms?: number;
   avg_returned_count?: number;
   status?: string;
+  slot_start_date_time?: number;
 }
 
 interface HourlyClientVersionData {
@@ -44,6 +45,7 @@ interface HourlyClientVersionData {
   min_duration_ms?: number;
   max_duration_ms?: number;
   avg_returned_count?: number;
+  hour_start_date_time?: number;
 }
 
 export interface ClientVersionBreakdownProps {
@@ -85,15 +87,58 @@ interface AggregatedRow {
   maxDuration: number;
   observations: number;
   avgBlobCount?: number;
+  /** Epoch seconds of the earliest observation for this version within the range (0 if unknown) */
+  firstSeen: number;
+  /** Epoch seconds of the most recent observation for this version (0 if unknown) */
+  lastSeen: number;
 }
 
 interface ClientGroupedRow extends AggregatedRow {
-  otherVersions: AggregatedRow[];
+  /** All versions for this client, newest first (empty for single-version clients) */
+  versions: AggregatedRow[];
   versionCount: number;
 }
 
-type SortField = 'client' | 'version' | 'avgDuration' | 'p50Duration' | 'p95Duration' | 'observations' | 'avgBlobCount';
+type SortField =
+  | 'client'
+  | 'version'
+  | 'active'
+  | 'avgDuration'
+  | 'p50Duration'
+  | 'p95Duration'
+  | 'observations'
+  | 'avgBlobCount';
 type SortDirection = 'asc' | 'desc';
+
+/**
+ * Format a timestamp as a coarse relative age, e.g. "5h" or "3d" (hourly-bucketed data)
+ */
+function formatAge(timestamp: number): string {
+  const diffHours = Math.max(0, (Date.now() / 1000 - timestamp) / 3600);
+  if (diffHours < 1) return '<1h';
+  if (diffHours < 48) return `${Math.round(diffHours)}h`;
+  return `${Math.round(diffHours / 24)}d`;
+}
+
+/**
+ * Format an active window as a relative range, e.g. "6d ago – now" or "6d – 2d ago"
+ */
+function formatActiveWindow(firstSeen: number, lastSeen: number): string {
+  const isCurrent = Date.now() / 1000 - lastSeen < 2 * 3600;
+  if (isCurrent) return `${formatAge(firstSeen)} ago – now`;
+  if (firstSeen === lastSeen) return `${formatAge(lastSeen)} ago`;
+  return `${formatAge(firstSeen)} – ${formatAge(lastSeen)} ago`;
+}
+
+/**
+ * Format an active window as an absolute local date range for tooltips, e.g. "Jul 6, 14:00 – Jul 10, 09:00"
+ */
+function formatActiveRange(firstSeen: number, lastSeen: number): string {
+  const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+  const first = new Date(firstSeen * 1000).toLocaleString(undefined, options);
+  const last = new Date(lastSeen * 1000).toLocaleString(undefined, options);
+  return first === last ? last : `${first} – ${last}`;
+}
 
 /**
  * Get status badge styling
@@ -283,9 +328,9 @@ export function ClientVersionBreakdown({
   slot,
   durationStatusFilter,
 }: ClientVersionBreakdownProps): JSX.Element {
-  // Default sort by avgDuration (ascending = fastest first) when observations hidden, otherwise by observations
-  const [sortField, setSortField] = useState<SortField>(hideObservations ? 'avgDuration' : 'observations');
-  const [sortDirection, setSortDirection] = useState<SortDirection>(hideObservations ? 'asc' : 'desc');
+  // Default sort by avgDuration ascending — fastest client first
+  const [sortField, setSortField] = useState<SortField>('avgDuration');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   // Track which clients are expanded (for expandable mode)
   const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set());
@@ -321,6 +366,8 @@ export function ClientVersionBreakdown({
         maxDuration: number;
         totalObservations: number;
         totalWeightedBlobCount: number;
+        firstSeen: number;
+        lastSeen: number;
       }
     >();
 
@@ -331,6 +378,7 @@ export function ClientVersionBreakdown({
       const obs = row.observation_count ?? 0;
       const minDur = row.min_duration_ms ?? 0;
       const maxDur = row.max_duration_ms ?? 0;
+      const seenAt = row.hour_start_date_time ?? 0;
 
       const existing = map.get(key);
       if (existing) {
@@ -345,6 +393,12 @@ export function ClientVersionBreakdown({
         }
         existing.totalObservations += obs;
         existing.totalWeightedBlobCount += (row.avg_returned_count ?? 0) * obs;
+        if (seenAt > existing.lastSeen) {
+          existing.lastSeen = seenAt;
+        }
+        if (seenAt > 0 && (existing.firstSeen === 0 || seenAt < existing.firstSeen)) {
+          existing.firstSeen = seenAt;
+        }
       } else {
         map.set(key, {
           client,
@@ -356,6 +410,8 @@ export function ClientVersionBreakdown({
           maxDuration: maxDur,
           totalObservations: obs,
           totalWeightedBlobCount: (row.avg_returned_count ?? 0) * obs,
+          firstSeen: seenAt,
+          lastSeen: seenAt,
         });
       }
     });
@@ -374,6 +430,8 @@ export function ClientVersionBreakdown({
           maxDuration: entry.maxDuration,
           observations: entry.totalObservations,
           avgBlobCount: entry.totalWeightedBlobCount / entry.totalObservations,
+          firstSeen: entry.firstSeen,
+          lastSeen: entry.lastSeen,
         });
       }
     });
@@ -401,6 +459,8 @@ export function ClientVersionBreakdown({
         maxDuration: number;
         totalObservations: number;
         totalWeightedBlobCount: number;
+        firstSeen: number;
+        lastSeen: number;
       }
     >();
 
@@ -411,6 +471,7 @@ export function ClientVersionBreakdown({
       const obs = row.observation_count ?? 0;
       const minDur = row.min_duration_ms ?? 0;
       const maxDur = row.max_duration_ms ?? 0;
+      const seenAt = row.slot_start_date_time ?? 0;
 
       // Check if this row's status matches the filter for duration calculation
       const statusMatches = !durationStatusFilter || row.status?.toUpperCase() === durationStatusFilter.toUpperCase();
@@ -430,6 +491,12 @@ export function ClientVersionBreakdown({
         }
         existing.totalObservations += obs;
         existing.totalWeightedBlobCount += (row.avg_returned_count ?? 0) * obs;
+        if (seenAt > existing.lastSeen) {
+          existing.lastSeen = seenAt;
+        }
+        if (seenAt > 0 && (existing.firstSeen === 0 || seenAt < existing.firstSeen)) {
+          existing.firstSeen = seenAt;
+        }
       } else {
         map.set(key, {
           client,
@@ -440,6 +507,8 @@ export function ClientVersionBreakdown({
           maxDuration: statusMatches ? maxDur : 0,
           totalObservations: obs,
           totalWeightedBlobCount: (row.avg_returned_count ?? 0) * obs,
+          firstSeen: seenAt,
+          lastSeen: seenAt,
         });
       }
     });
@@ -459,6 +528,8 @@ export function ClientVersionBreakdown({
           maxDuration: entry.maxDuration,
           observations: entry.totalObservations,
           avgBlobCount: entry.totalWeightedBlobCount / entry.totalObservations,
+          firstSeen: entry.firstSeen,
+          lastSeen: entry.lastSeen,
         });
       }
     });
@@ -466,7 +537,8 @@ export function ClientVersionBreakdown({
     return result;
   }, [data, hasHourlyData, hourlyAggregatedData, durationStatusFilter]);
 
-  // Group aggregated data by client, showing only the most-observed version per client
+  // Group aggregated data by client. Multi-version clients get a synthetic summary row
+  // aggregating all versions over the period; expanding lists each version newest-first.
   const clientGroupedData = useMemo(() => {
     const clientMap = new Map<string, AggregatedRow[]>();
 
@@ -482,15 +554,64 @@ export function ClientVersionBreakdown({
     const result: ClientGroupedRow[] = [];
 
     clientMap.forEach(versions => {
-      // Sort by observation count descending — highest count is the "primary" version
-      const sorted = [...versions].sort((a, b) => b.observations - a.observations);
-      const primary = sorted[0];
-      const others = sorted.slice(1);
+      const sorted = [...versions].sort((a, b) => b.lastSeen - a.lastSeen || b.observations - a.observations);
+
+      if (sorted.length === 1) {
+        result.push({
+          ...sorted[0],
+          versions: [],
+          versionCount: 1,
+        });
+        return;
+      }
+
+      const summary = sorted.reduce(
+        (acc, v) => {
+          const durationObs = v.avgDuration > 0 ? v.observations : 0;
+          acc.totalWeightedAvg += v.avgDuration * durationObs;
+          acc.totalWeightedP50 += v.p50Duration * durationObs;
+          acc.totalWeightedP95 += v.p95Duration * durationObs;
+          acc.durationObs += durationObs;
+          if (v.minDuration > 0 && (acc.minDuration === 0 || v.minDuration < acc.minDuration)) {
+            acc.minDuration = v.minDuration;
+          }
+          if (v.maxDuration > acc.maxDuration) {
+            acc.maxDuration = v.maxDuration;
+          }
+          acc.observations += v.observations;
+          acc.totalWeightedBlobCount += (v.avgBlobCount ?? 0) * v.observations;
+          if (v.firstSeen > 0 && (acc.firstSeen === 0 || v.firstSeen < acc.firstSeen)) {
+            acc.firstSeen = v.firstSeen;
+          }
+          return acc;
+        },
+        {
+          totalWeightedAvg: 0,
+          totalWeightedP50: 0,
+          totalWeightedP95: 0,
+          durationObs: 0,
+          minDuration: 0,
+          maxDuration: 0,
+          observations: 0,
+          totalWeightedBlobCount: 0,
+          firstSeen: 0,
+        }
+      );
 
       result.push({
-        ...primary,
-        otherVersions: others,
-        versionCount: versions.length,
+        client: sorted[0].client,
+        version: sorted[0].version,
+        avgDuration: summary.durationObs > 0 ? summary.totalWeightedAvg / summary.durationObs : 0,
+        p50Duration: summary.durationObs > 0 ? summary.totalWeightedP50 / summary.durationObs : 0,
+        p95Duration: summary.durationObs > 0 ? summary.totalWeightedP95 / summary.durationObs : 0,
+        minDuration: summary.minDuration,
+        maxDuration: summary.maxDuration,
+        observations: summary.observations,
+        avgBlobCount: summary.observations > 0 ? summary.totalWeightedBlobCount / summary.observations : 0,
+        firstSeen: summary.firstSeen,
+        lastSeen: sorted[0].lastSeen,
+        versions: sorted,
+        versionCount: sorted.length,
       });
     });
 
@@ -502,6 +623,9 @@ export function ClientVersionBreakdown({
     return Math.max(...aggregatedData.map(r => r.avgDuration), 0);
   }, [aggregatedData]);
 
+  // Whether the data carries timestamps for an Active column
+  const hasActivity = aggregatedData.some(r => r.lastSeen > 0);
+
   // Sort grouped data (one row per client, showing primary version)
   const sortedData = useMemo(() => {
     return [...clientGroupedData].sort((a, b) => {
@@ -512,6 +636,9 @@ export function ClientVersionBreakdown({
           break;
         case 'version':
           comparison = a.version.localeCompare(b.version);
+          break;
+        case 'active':
+          comparison = a.lastSeen - b.lastSeen || a.firstSeen - b.firstSeen;
           break;
         case 'avgDuration':
           comparison = a.avgDuration - b.avgDuration;
@@ -599,6 +726,12 @@ export function ClientVersionBreakdown({
                 Version
                 <SortIcon field="version" />
               </th>
+              {hasActivity && (
+                <th className={headerClass} onClick={() => handleSort('active')}>
+                  Active
+                  <SortIcon field="active" />
+                </th>
+              )}
               <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('avgDuration')}>
                 Avg (ms)
                 <SortIcon field="avgDuration" />
@@ -639,6 +772,7 @@ export function ClientVersionBreakdown({
               const canExpandNode = expandable && slot !== undefined;
               const colCount =
                 3 +
+                (hasActivity ? 1 : 0) +
                 (hasHourlyData ? 2 : 0) +
                 (hideRange ? 0 : 1) +
                 (showBlobCount ? 1 : 0) +
@@ -674,6 +808,20 @@ export function ClientVersionBreakdown({
 
               const renderMetricCells = (metricRow: AggregatedRow): JSX.Element => (
                 <>
+                  {hasActivity && (
+                    <td className="px-3 py-3">
+                      {metricRow.lastSeen > 0 ? (
+                        <span
+                          className="text-sm whitespace-nowrap text-muted"
+                          title={`Active ${formatActiveRange(metricRow.firstSeen, metricRow.lastSeen)} (within the selected range)`}
+                        >
+                          {formatActiveWindow(metricRow.firstSeen, metricRow.lastSeen)}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-muted">-</span>
+                      )}
+                    </td>
+                  )}
                   <td className="px-3 py-3 text-right">
                     {metricRow.avgDuration > 0 ? (
                       <span
@@ -767,11 +915,15 @@ export function ClientVersionBreakdown({
                       </div>
                     </td>
                     <td className="px-3 py-3">
-                      <span className="font-mono text-sm text-muted">{row.version}</span>
-                      {hasMultipleVersions && (
-                        <span className="ml-2 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs text-primary">
+                      {hasMultipleVersions ? (
+                        <span
+                          className="rounded-full bg-primary/10 px-1.5 py-0.5 text-xs text-primary"
+                          title={`Aggregate across ${row.versionCount} versions for the selected period`}
+                        >
                           {row.versionCount} versions
                         </span>
+                      ) : (
+                        <span className="font-mono text-sm text-muted">{row.version}</span>
                       )}
                     </td>
                     {renderMetricCells(row)}
@@ -787,10 +939,10 @@ export function ClientVersionBreakdown({
                     />
                   )}
 
-                  {/* Group expansion: other version sub-rows */}
+                  {/* Group expansion: per-version sub-rows, newest first */}
                   {hasMultipleVersions &&
                     isGroupExpanded &&
-                    row.otherVersions.map((subRow, subIndex) => {
+                    row.versions.map((subRow, subIndex) => {
                       const subRowKey = `${subRow.client}-${subRow.version}`;
                       const isSubNodeExpanded = expandedClients.has(subRowKey);
 
