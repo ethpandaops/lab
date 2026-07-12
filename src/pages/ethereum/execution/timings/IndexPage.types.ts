@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * Time range options for engine timing data
  */
-export type TimeRange = '1hour' | '6hours' | '24hours' | '7days' | '31days';
+export type TimeRange = '1hour' | '6hours' | '24hours' | '7days' | '31days' | '90days' | '180days' | '365days';
 
 /**
  * Time range configuration with labels and duration in seconds
@@ -14,6 +14,9 @@ export const TIME_RANGE_CONFIG: Record<TimeRange, { label: string; seconds: numb
   '24hours': { label: 'Last 24h', seconds: 86400 },
   '7days': { label: 'Last 7d', seconds: 604800 },
   '31days': { label: 'Last 31d', seconds: 2678400 },
+  '90days': { label: 'Last 90d', seconds: 7776000 },
+  '180days': { label: 'Last 6mo', seconds: 15552000 },
+  '365days': { label: 'Last 1y', seconds: 31536000 },
 };
 
 /**
@@ -21,6 +24,12 @@ export const TIME_RANGE_CONFIG: Record<TimeRange, { label: string; seconds: numb
  * Longer ranges will use hourly aggregated data or hide per-slot charts
  */
 export const PER_SLOT_CHART_RANGES: TimeRange[] = ['1hour', '6hours'];
+
+/**
+ * Time ranges backed by hourly aggregated data (per-slot or hourly charts)
+ * Longer ranges only fetch the daily winrate aggregation and hide hourly-based sections
+ */
+export const HOURLY_CHART_RANGES: TimeRange[] = ['1hour', '6hours', '24hours', '7days', '31days'];
 
 /**
  * Tab identifiers for the timings page
@@ -36,7 +45,7 @@ export const timingsSearchSchema = z.object({
   tab: z.enum(['overview', 'newPayload', 'getBlobs', 'clients']).optional(),
 
   // Time range for data queries
-  range: z.enum(['1hour', '6hours', '24hours', '7days', '31days']).optional(),
+  range: z.enum(['1hour', '6hours', '24hours', '7days', '31days', '90days', '180days', '365days']).optional(),
 
   // Filter to reference nodes only (ethPandaOps controlled fleet)
   refNodes: z.boolean().optional(),
