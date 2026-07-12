@@ -8,6 +8,7 @@ import {
   fctEngineGetBlobsByElClientHourlyServiceList,
   fctEngineGetBlobsDurationChunked50MsServiceList,
   fctEngineNewPayloadWinrateHourlyServiceList,
+  fctEngineNewPayloadWinrateDailyServiceList,
   intEngineNewPayloadFastestExecutionByNodeClassServiceList,
 } from '@/api/sdk.gen';
 import type {
@@ -18,11 +19,12 @@ import type {
   FctEngineGetBlobsByElClientHourly,
   FctEngineGetBlobsDurationChunked50Ms,
   FctEngineNewPayloadWinrateHourly,
+  FctEngineNewPayloadWinrateDaily,
   IntEngineNewPayloadFastestExecutionByNodeClass,
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { TIME_RANGE_CONFIG, PER_SLOT_CHART_RANGES, type TimeRange } from '../IndexPage.types';
+import { TIME_RANGE_CONFIG, PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, type TimeRange } from '../IndexPage.types';
 
 export interface EngineTimingsData {
   // newPayload per-EL-client aggregations (includes per-slot granularity)
@@ -45,6 +47,9 @@ export interface EngineTimingsData {
 
   // newPayload winrate (hourly aggregated)
   winrateHourly: FctEngineNewPayloadWinrateHourly[];
+
+  // newPayload winrate (daily aggregated, for long time ranges)
+  winrateDaily: FctEngineNewPayloadWinrateDaily[];
 
   // newPayload winrate (per-slot, for short time ranges)
   winratePerSlot: IntEngineNewPayloadFastestExecutionByNodeClass[];
@@ -86,6 +91,25 @@ function getTimeRangeTimestamps(range: TimeRange): {
 }
 
 /**
+ * Generate all YYYY-MM-DD UTC date strings in a timestamp range, joined by commas.
+ * The daily winrate table keys on a string date column whose generated filters
+ * have no gte/lt variants, so ranges are expressed via day_start_date_in_values.
+ */
+function generateDateRange(startTs: number, endTs: number): string {
+  const dates: string[] = [];
+  const current = new Date(startTs * 1000);
+  current.setUTCHours(0, 0, 0, 0);
+  const endDate = new Date(endTs * 1000);
+  endDate.setUTCHours(23, 59, 59, 999);
+
+  while (current <= endDate) {
+    dates.push(current.toISOString().slice(0, 10));
+    current.setUTCDate(current.getUTCDate() + 1);
+  }
+  return dates.join(',');
+}
+
+/**
  * Hook to fetch all engine timing data based on time range.
  * Uses fetchAllPages to handle pagination automatically for all endpoints.
  */
@@ -110,6 +134,10 @@ export function useEngineTimingsData({
 
   // Only fetch per-slot data for short time ranges (per-slot charts not shown for 24h, 7d)
   const fetchPerSlotData = PER_SLOT_CHART_RANGES.includes(timeRange);
+
+  // Hourly and per-slot tables are too heavy for long ranges (90d+),
+  // which rely solely on the daily winrate aggregation
+  const fetchHourlyData = HOURLY_CHART_RANGES.includes(timeRange);
 
   const queries = useQueries({
     queries: [
@@ -155,7 +183,7 @@ export function useEngineTimingsData({
             'fct_engine_new_payload_by_el_client_hourly',
             signal
           ),
-        enabled: !!currentNetwork,
+        enabled: !!currentNetwork && fetchHourlyData,
         placeholderData: keepPreviousData,
       },
       // newPayload duration histogram
@@ -223,7 +251,7 @@ export function useEngineTimingsData({
             'fct_engine_get_blobs_by_el_client_hourly',
             signal
           ),
-        enabled: !!currentNetwork && fetchBlobs,
+        enabled: !!currentNetwork && fetchBlobs && fetchHourlyData,
         placeholderData: keepPreviousData,
       },
       // getBlobs duration histogram
@@ -268,7 +296,28 @@ export function useEngineTimingsData({
             'fct_engine_new_payload_winrate_hourly',
             signal
           ),
-        enabled: !!currentNetwork && !fetchPerSlotData,
+        enabled: !!currentNetwork && !fetchPerSlotData && fetchHourlyData,
+        placeholderData: keepPreviousData,
+      },
+      // newPayload winrate (daily) - lightweight aggregation for long ranges (90d+)
+      // Must apply refNodeFilter to avoid double-counting across node_classes
+      {
+        queryKey: ['engine-timings', 'winrate-daily', hourlyStart, hourlyEnd, referenceNodesOnly],
+        queryFn: ({ signal }) =>
+          fetchAllPages<FctEngineNewPayloadWinrateDaily>(
+            fctEngineNewPayloadWinrateDailyServiceList,
+            {
+              query: {
+                day_start_date_in_values: generateDateRange(hourlyStart, hourlyEnd),
+                order_by: 'day_start_date ASC',
+                page_size: 10000,
+                ...refNodeFilter,
+              },
+            },
+            'fct_engine_new_payload_winrate_daily',
+            signal
+          ),
+        enabled: !!currentNetwork && !fetchHourlyData,
         placeholderData: keepPreviousData,
       },
       // newPayload winrate (per-slot) - raw fastest client per slot for short ranges
@@ -304,25 +353,28 @@ export function useEngineTimingsData({
     getBlobsByElClientHourlyQuery,
     getBlobsDurationHistogramQuery,
     winrateHourlyQuery,
+    winrateDailyQuery,
     winratePerSlotQuery,
   ] = queries;
 
-  // Check loading state for newPayload queries (first 3)
+  // Primary queries drive the page's loading/empty state: the newPayload queries
+  // for hourly-capable ranges, or the daily winrate (the only data) for long ranges
   const newPayloadQueries = queries.slice(0, 3);
+  const primaryQueries = fetchHourlyData ? newPayloadQueries : [winrateDailyQuery];
   const blobQueries = queries.slice(3, 6);
 
   // Initial loading = no data has ever been fetched yet
-  const hasAnyNewPayloadData = newPayloadQueries.some(q => q.data !== undefined);
-  const isLoading = !hasAnyNewPayloadData && newPayloadQueries.some(q => q.isFetching);
+  const hasAnyPrimaryData = primaryQueries.some(q => q.data !== undefined);
+  const isLoading = !hasAnyPrimaryData && primaryQueries.some(q => q.isFetching);
   const isLoadingBlobs = blobQueries.some(q => q.isLoading);
 
   // Check for errors (only core queries - winrate is supplementary and shouldn't break the page)
-  const coreQueries = [...newPayloadQueries, ...blobQueries];
+  const coreQueries = [...primaryQueries, ...blobQueries];
   const error = coreQueries.find(q => q.error)?.error as Error | null;
 
   // Build data object whenever any query has data (stale data is fine during refetch)
   const freshData: EngineTimingsData | null =
-    hasAnyNewPayloadData && !error
+    hasAnyPrimaryData && !error
       ? {
           newPayloadByElClient: newPayloadByElClientQuery.data ?? [],
           newPayloadByElClientHourly: newPayloadByElClientHourlyQuery.data ?? [],
@@ -331,6 +383,7 @@ export function useEngineTimingsData({
           getBlobsByElClientHourly: getBlobsByElClientHourlyQuery.data ?? [],
           getBlobsDurationHistogram: getBlobsDurationHistogramQuery.data ?? [],
           winrateHourly: winrateHourlyQuery.data ?? [],
+          winrateDaily: winrateDailyQuery.data ?? [],
           winratePerSlot: winratePerSlotQuery.data ?? [],
         }
       : null;

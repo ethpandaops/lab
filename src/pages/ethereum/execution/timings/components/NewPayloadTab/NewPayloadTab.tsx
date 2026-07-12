@@ -10,10 +10,15 @@ import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot, getExecutionClientColor } from '@/utils';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
-import type { FctEngineNewPayloadWinrateHourly, IntEngineNewPayloadFastestExecutionByNodeClass } from '@/api/types.gen';
+import type {
+  FctEngineNewPayloadWinrateHourly,
+  FctEngineNewPayloadWinrateDaily,
+  IntEngineNewPayloadFastestExecutionByNodeClass,
+} from '@/api/types.gen';
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
-import { PER_SLOT_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
+import { PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
 import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
+import { RangeUnavailableNote } from '../RangeUnavailableNote';
 
 export interface NewPayloadTabProps {
   data: EngineTimingsData;
@@ -30,11 +35,15 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     newPayloadByElClient,
     newPayloadByElClientHourly,
     winrateHourly,
+    winrateDaily,
     winratePerSlot,
   } = data;
 
   // Check if we should show per-slot charts (only for short time ranges)
   const showPerSlotCharts = PER_SLOT_CHART_RANGES.includes(timeRange);
+
+  // Long ranges (90d+) only fetch daily winrate data - hourly-based sections are unavailable
+  const showHourlyCharts = HOURLY_CHART_RANGES.includes(timeRange);
 
   // Filter to VALID status only for duration-based charts
   const validPayloadByElClient = newPayloadByElClient.filter(r => r.status?.toUpperCase() === 'VALID');
@@ -454,10 +463,12 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
       {/* Execution Winrate — fastest client per slot */}
       <WinrateSection
         hourlyRecords={winrateHourly}
+        dailyRecords={winrateDaily}
         perSlotRecords={computedWinratePerSlot}
         allClients={[...new Set([...hourlyClientList, ...elClientList])]}
         timeRange={timeRange}
         showPerSlot={showPerSlotCharts}
+        showDaily={!showHourlyCharts}
       />
 
       {/* Client Version Breakdown — VALID status only */}
@@ -467,14 +478,18 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
         anchorId="client-duration"
         modalSize="full"
       >
-        {() => (
-          <ClientVersionBreakdown
-            data={validPayloadByElClient}
-            hourlyData={newPayloadByElClientHourly}
-            hideRange
-            noCard
-          />
-        )}
+        {() =>
+          showHourlyCharts ? (
+            <ClientVersionBreakdown
+              data={validPayloadByElClient}
+              hourlyData={newPayloadByElClientHourly}
+              hideRange
+              noCard
+            />
+          ) : (
+            <RangeUnavailableNote />
+          )
+        }
       </PopoutCard>
 
       {/* Per-slot charts — short time ranges only */}
@@ -570,7 +585,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
       )}
 
       {/* Hourly charts — longer time ranges */}
-      {!showPerSlotCharts && (
+      {!showPerSlotCharts && showHourlyCharts && (
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           {hourlyTrendSeries.length > 0 && hourlyTrendSeries.some(s => s.data.length > 0) && (
             <PopoutCard
@@ -826,16 +841,20 @@ function buildStandings(totalsByImpl: Map<string, number>, allClients: string[])
 /** Winrate chart + standings for engine_newPayload fastest client per slot */
 function WinrateSection({
   hourlyRecords,
+  dailyRecords,
   perSlotRecords,
   allClients,
   timeRange,
   showPerSlot,
+  showDaily,
 }: {
   hourlyRecords: FctEngineNewPayloadWinrateHourly[];
+  dailyRecords: FctEngineNewPayloadWinrateDaily[];
   perSlotRecords: IntEngineNewPayloadFastestExecutionByNodeClass[];
   allClients: string[];
   timeRange: TimeRange;
   showPerSlot: boolean;
+  showDaily: boolean;
 }): JSX.Element | null {
   const { chartConfig, standings, tooltipLabels } = useMemo(() => {
     if (showPerSlot) {
@@ -928,7 +947,77 @@ function WinrateSection({
       };
     }
 
-    // Hourly mode (24h / 7d)
+    // Daily mode (90d+): one bar per day, win_count normalized by that day's total
+    // Ties award full credit to each tied client, so totals may exceed slot counts
+    if (showDaily) {
+      if (!dailyRecords.length && !allClients.length)
+        return { chartConfig: null, standings: [], tooltipLabels: [] as string[] };
+
+      const byDayAndImpl = new Map<string, Map<string, number>>();
+      const allImpls = new Set<string>();
+
+      for (const r of dailyRecords) {
+        const day = r.day_start_date ?? '';
+        const impl = normalizeClient(r.meta_execution_implementation ?? '');
+        const count = r.win_count ?? 0;
+        if (!impl || !day) continue;
+
+        allImpls.add(impl);
+        if (!byDayAndImpl.has(day)) byDayAndImpl.set(day, new Map());
+        const dayMap = byDayAndImpl.get(day)!;
+        dayMap.set(impl, (dayMap.get(impl) ?? 0) + count);
+      }
+
+      // YYYY-MM-DD strings sort chronologically
+      const sortedDays = [...byDayAndImpl.keys()].sort();
+      if (!sortedDays.length) return { chartConfig: null, standings: [] };
+
+      const totalsByDay = new Map<string, number>();
+      for (const day of sortedDays) {
+        const implMap = byDayAndImpl.get(day)!;
+        let total = 0;
+        for (const count of implMap.values()) total += count;
+        totalsByDay.set(day, total);
+      }
+
+      const labels = sortedDays.map(day => {
+        const date = new Date(day + 'T00:00:00Z');
+        return date.toLocaleDateString([], { month: 'short', day: 'numeric', timeZone: 'UTC' });
+      });
+
+      const tooltipLabels = sortedDays.map(day => {
+        const date = new Date(day + 'T00:00:00Z');
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+      });
+
+      const sortedImpls = [...allImpls].sort();
+      const series: SeriesData[] = sortedImpls.map((impl, i) => ({
+        name: impl,
+        data: sortedDays.map(day => {
+          const count = byDayAndImpl.get(day)?.get(impl) ?? 0;
+          const total = totalsByDay.get(day) ?? 0;
+          return total > 0 ? Number(((count / total) * 100).toFixed(2)) : null;
+        }),
+        color: getExecutionClientColor(impl, i),
+        seriesType: 'bar' as const,
+        stack: 'winrate',
+      }));
+
+      const totalsByImpl = new Map<string, number>();
+      for (const r of dailyRecords) {
+        const impl = normalizeClient(r.meta_execution_implementation ?? '');
+        if (!impl) continue;
+        totalsByImpl.set(impl, (totalsByImpl.get(impl) ?? 0) + (r.win_count ?? 0));
+      }
+
+      return {
+        chartConfig: { labels, series },
+        standings: buildStandings(totalsByImpl, allClients),
+        tooltipLabels,
+      };
+    }
+
+    // Hourly mode (24h / 7d / 31d)
     if (!hourlyRecords.length && !allClients.length)
       return { chartConfig: null, standings: [], tooltipLabels: [] as string[] };
 
@@ -1014,7 +1103,7 @@ function WinrateSection({
       standings: buildStandings(totalsByImpl, allClients),
       tooltipLabels,
     };
-  }, [hourlyRecords, perSlotRecords, allClients, timeRange, showPerSlot]);
+  }, [hourlyRecords, dailyRecords, perSlotRecords, allClients, timeRange, showPerSlot, showDaily]);
 
   // Custom tooltip formatter that shows full timestamps instead of abbreviated axis labels
   const winrateTooltipFormatter = useMemo(() => {

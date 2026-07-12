@@ -11,8 +11,9 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot, getExecutionClientColor } from '@/utils';
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
-import { PER_SLOT_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
+import { PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
 import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
+import { RangeUnavailableNote } from '../RangeUnavailableNote';
 
 export interface GetBlobsTabProps {
   data: EngineTimingsData;
@@ -73,6 +74,16 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
   // Show skeleton while loading
   if (isLoading) {
     return <GetBlobsTabSkeleton />;
+  }
+
+  // getBlobs data is only aggregated hourly or finer, which is too heavy for long ranges (90d+)
+  if (!HOURLY_CHART_RANGES.includes(timeRange)) {
+    return (
+      <div className="space-y-6">
+        <EIP7870SpecsBanner />
+        <RangeUnavailableNote />
+      </div>
+    );
   }
 
   const { getBlobsByElClient, getBlobsByElClientHourly, getBlobsDurationHistogram } = data;
