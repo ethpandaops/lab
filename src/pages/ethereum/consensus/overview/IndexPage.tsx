@@ -59,6 +59,8 @@ import {
   formatTooltipDate,
   buildTooltipHtml,
   formatBand,
+  dailyWindowStartDate,
+  trimDailyRecords,
   buildBlobCountChartConfig,
   buildAttestationParticipationChartConfig,
   buildHeadVoteCorrectnessChartConfig,
@@ -91,6 +93,10 @@ export function IndexPage(): JSX.Element {
     const now = Math.floor(Date.now() / 1000);
     return now - config.days * 24 * 60 * 60;
   }, [config.days]);
+
+  // Daily endpoints have no server-side range filter on their primary key, so the
+  // selected window is applied to daily records client-side via this cutoff date.
+  const dailyStartDate = useMemo(() => dailyWindowStartDate(config.days), [config.days]);
 
   // --- Queries ---
 
@@ -235,63 +241,80 @@ export function IndexPage(): JSX.Element {
   const blobRecords = useMemo(
     () =>
       isDaily
-        ? [...(blobDailyQuery.data?.fct_blob_count_daily ?? [])].reverse()
+        ? trimDailyRecords([...(blobDailyQuery.data?.fct_blob_count_daily ?? [])].reverse(), dailyStartDate)
         : blobHourlyQuery.data?.fct_blob_count_hourly,
-    [isDaily, blobDailyQuery.data, blobHourlyQuery.data]
+    [isDaily, blobDailyQuery.data, blobHourlyQuery.data, dailyStartDate]
   );
 
   const attnRecords = useMemo(
     () =>
       isDaily
-        ? [...(attnDailyQuery.data?.fct_attestation_participation_rate_daily ?? [])].reverse()
+        ? trimDailyRecords(
+            [...(attnDailyQuery.data?.fct_attestation_participation_rate_daily ?? [])].reverse(),
+            dailyStartDate
+          )
         : attnHourlyQuery.data?.fct_attestation_participation_rate_hourly,
-    [isDaily, attnDailyQuery.data, attnHourlyQuery.data]
+    [isDaily, attnDailyQuery.data, attnHourlyQuery.data, dailyStartDate]
   );
 
   const hvRecords = useMemo(
     () =>
       isDaily
-        ? [...(hvDailyQuery.data?.fct_head_vote_correctness_rate_daily ?? [])].reverse()
+        ? trimDailyRecords(
+            [...(hvDailyQuery.data?.fct_head_vote_correctness_rate_daily ?? [])].reverse(),
+            dailyStartDate
+          )
         : hvHourlyQuery.data?.fct_head_vote_correctness_rate_hourly,
-    [isDaily, hvDailyQuery.data, hvHourlyQuery.data]
+    [isDaily, hvDailyQuery.data, hvHourlyQuery.data, dailyStartDate]
   );
 
   const reorgRecords = useMemo(
     () =>
-      isDaily ? [...(reorgDailyQuery.data?.fct_reorg_daily ?? [])].reverse() : reorgHourlyQuery.data?.fct_reorg_hourly,
-    [isDaily, reorgDailyQuery.data, reorgHourlyQuery.data]
+      isDaily
+        ? trimDailyRecords([...(reorgDailyQuery.data?.fct_reorg_daily ?? [])].reverse(), dailyStartDate)
+        : reorgHourlyQuery.data?.fct_reorg_hourly,
+    [isDaily, reorgDailyQuery.data, reorgHourlyQuery.data, dailyStartDate]
   );
 
   const missedSlotRecords = useMemo(
     () =>
       isDaily
-        ? [...(missedSlotDailyQuery.data?.fct_missed_slot_rate_daily ?? [])].reverse()
+        ? trimDailyRecords([...(missedSlotDailyQuery.data?.fct_missed_slot_rate_daily ?? [])].reverse(), dailyStartDate)
         : missedSlotHourlyQuery.data?.fct_missed_slot_rate_hourly,
-    [isDaily, missedSlotDailyQuery.data, missedSlotHourlyQuery.data]
+    [isDaily, missedSlotDailyQuery.data, missedSlotHourlyQuery.data, dailyStartDate]
   );
 
   const proposalStatusRecords = useMemo(
     () =>
       isDaily
-        ? [...(proposalStatusDailyQuery.data?.fct_block_proposal_status_daily ?? [])].reverse()
+        ? trimDailyRecords(
+            [...(proposalStatusDailyQuery.data?.fct_block_proposal_status_daily ?? [])].reverse(),
+            dailyStartDate
+          )
         : proposalStatusHourlyQuery.data?.fct_block_proposal_status_hourly,
-    [isDaily, proposalStatusDailyQuery.data, proposalStatusHourlyQuery.data]
+    [isDaily, proposalStatusDailyQuery.data, proposalStatusHourlyQuery.data, dailyStartDate]
   );
 
   const inclusionDelayRecords = useMemo(
     () =>
       isDaily
-        ? [...(inclusionDelayDailyQuery.data?.fct_attestation_inclusion_delay_daily ?? [])].reverse()
+        ? trimDailyRecords(
+            [...(inclusionDelayDailyQuery.data?.fct_attestation_inclusion_delay_daily ?? [])].reverse(),
+            dailyStartDate
+          )
         : inclusionDelayHourlyQuery.data?.fct_attestation_inclusion_delay_hourly,
-    [isDaily, inclusionDelayDailyQuery.data, inclusionDelayHourlyQuery.data]
+    [isDaily, inclusionDelayDailyQuery.data, inclusionDelayHourlyQuery.data, dailyStartDate]
   );
 
   const proposerRewardRecords = useMemo(
     () =>
       isDaily
-        ? [...(proposerRewardDailyQuery.data?.fct_proposer_reward_daily ?? [])].reverse()
+        ? trimDailyRecords(
+            [...(proposerRewardDailyQuery.data?.fct_proposer_reward_daily ?? [])].reverse(),
+            dailyStartDate
+          )
         : proposerRewardHourlyQuery.data?.fct_proposer_reward_hourly,
-    [isDaily, proposerRewardDailyQuery.data, proposerRewardHourlyQuery.data]
+    [isDaily, proposerRewardDailyQuery.data, proposerRewardHourlyQuery.data, dailyStartDate]
   );
 
   // --- Unified time keys from all datasets ---
