@@ -39,6 +39,30 @@ export function formatBand(lower: number | undefined, upper: number | undefined)
   return `${l.toFixed(2)} – ${u.toFixed(2)}`;
 }
 
+/**
+ * Computes the inclusive start date (YYYY-MM-DD, UTC) for a daily window of `days` calendar days.
+ * The window spans exactly `days` buckets ending on the current UTC day (today and the `days - 1`
+ * preceding days). Returns undefined for an unbounded ("all") window.
+ */
+export function dailyWindowStartDate(days: number | null, now: number = Date.now()): string | undefined {
+  if (days === null) return undefined;
+  return new Date(now - (days - 1) * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
+/**
+ * Trims daily records to those on or after `startDate` (inclusive, string comparison on YYYY-MM-DD).
+ * The daily API endpoints have no range filter on their primary key, so the window is applied client-side.
+ * A nullish `startDate` (the "all" window) returns the records unchanged.
+ */
+export function trimDailyRecords<T extends { day_start_date?: string }>(
+  records: T[] | undefined,
+  startDate: string | undefined
+): T[] {
+  if (!records) return [];
+  if (!startDate) return records;
+  return records.filter(r => (r.day_start_date ?? '') >= startDate);
+}
+
 /** @deprecated Use formatBand instead */
 export const formatBlobBand = formatBand;
 
