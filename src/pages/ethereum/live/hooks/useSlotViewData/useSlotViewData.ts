@@ -37,8 +37,8 @@ const EMPTY_BLOB_FIRST_SEEN: never[] = [];
 const EMPTY_DATA_COLUMN_FIRST_SEEN: never[] = [];
 const EMPTY_ATTESTATION: never[] = [];
 
-// Shared options for the per-slot queries. A given slot's data is essentially
-// settled once seen, so cache it and skip the window-focus refetch storm that
+// Shared options for the per-slot queries. A settled slot's data never
+// changes, so cache it and skip the window-focus refetch storm that
 // otherwise churns these arrays and flickers the live visualizations.
 const SLOT_QUERY_OPTIONS = {
   staleTime: 60_000,
@@ -49,6 +49,25 @@ const SLOT_QUERY_OPTIONS = {
     return failureCount < 3;
   },
 };
+
+// A slot near the head of the chain is still filling in: the pipeline lands
+// events for it over the following seconds, and a one-shot fetch at slot
+// start bakes a partial view (e.g. one node on the map) into the cache.
+// Poll such slots until they are comfortably settled, then fall back to the
+// cache-forever behaviour above.
+const NEAR_HEAD_WINDOW_S = 48;
+
+function slotQueryOptions(
+  slotStartDateTime: number
+): typeof SLOT_QUERY_OPTIONS & { refetchInterval: () => number | false } {
+  const nearHead = (): boolean => Date.now() / 1000 - slotStartDateTime < NEAR_HEAD_WINDOW_S;
+
+  return {
+    ...SLOT_QUERY_OPTIONS,
+    staleTime: nearHead() ? 4_000 : SLOT_QUERY_OPTIONS.staleTime,
+    refetchInterval: () => (nearHead() ? 5_000 : false),
+  };
+}
 
 export function useSlotViewData(currentSlot: number): SlotViewData {
   const { currentNetwork } = useNetwork();
@@ -71,7 +90,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 2: Block Proposer
@@ -83,7 +102,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 2b: Proposer Entity (named staker, when known)
@@ -95,7 +114,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 3: Block MEV (head table — the canonical fct_block_mev lags and is
@@ -108,7 +127,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 4: Blob Count (using _head table for live data)
@@ -120,7 +139,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 5: Block First Seen by Node (List)
@@ -132,7 +151,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 6: Blob First Seen by Node (List)
@@ -144,7 +163,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 6b: Data Column Sidecar First Seen (aggregated per column, not per node)
@@ -156,7 +175,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 7: Attestation Chunked 50ms (List)
@@ -168,7 +187,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 8: Beacon Committee (List) - for total expected validators
@@ -180,7 +199,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 9: MEV Bidding Timeline (chunked 50ms)
@@ -192,7 +211,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 10: MEV Bid Count by Relay
@@ -203,7 +222,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 11: Engine newPayload validation timing per EL client
@@ -216,7 +235,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 12 (gloas): payload envelope first seen per sentry
@@ -228,7 +247,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0 && isGloas,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 13 (gloas): PTC votes for the slot's block
@@ -239,7 +258,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0 && isGloas,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 14 (gloas): the on-chain builder bid race
@@ -251,7 +270,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0 && isGloas,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // Aggregate loading state (critical queries only)
