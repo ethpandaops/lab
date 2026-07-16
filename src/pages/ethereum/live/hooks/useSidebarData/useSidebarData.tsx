@@ -7,7 +7,8 @@ import type {
 } from '@/api/types.gen';
 import type { SlotPhase } from '@/utils/beacon';
 import type { TimelineItem } from '@/components/Lists/ScrollingTimeline/ScrollingTimeline.types';
-import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
+import { getSlotPhases } from '@/utils/beacon';
+import { useForks } from '@/hooks/useForks';
 import { Badge } from '@/components/Elements/Badge';
 
 /**
@@ -36,7 +37,8 @@ export function useSidebarData({
   phases: SlotPhase[];
   items: TimelineItem[];
 } {
-  const phases = useMemo(() => DEFAULT_BEACON_SLOT_PHASES, []);
+  const { activeFork } = useForks();
+  const phases = useMemo(() => getSlotPhases(activeFork?.name), [activeFork?.name]);
 
   const items = useMemo<TimelineItem[]>(() => {
     const allItems: TimelineItem[] = [];

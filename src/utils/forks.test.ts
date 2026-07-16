@@ -33,7 +33,7 @@ const mockNetwork: Network = {
 describe('forks utilities', () => {
   describe('FORK_ORDER', () => {
     it('should have correct order', () => {
-      expect(FORK_ORDER).toEqual(['phase0', 'altair', 'bellatrix', 'capella', 'deneb', 'electra', 'fulu', 'glaos']);
+      expect(FORK_ORDER).toEqual(['phase0', 'altair', 'bellatrix', 'capella', 'deneb', 'electra', 'fulu', 'gloas']);
     });
   });
 
@@ -174,7 +174,7 @@ describe('forks utilities', () => {
 
     it('should return null for unconfigured forks', () => {
       expect(getForkEpoch(mockNetwork, 'fulu')).toBeNull();
-      expect(getForkEpoch(mockNetwork, 'glaos')).toBeNull();
+      expect(getForkEpoch(mockNetwork, 'gloas')).toBeNull();
     });
   });
 

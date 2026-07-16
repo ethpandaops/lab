@@ -1,5 +1,6 @@
 import type { Network } from '@/hooks/useConfig';
 import { getActiveFork } from './forks';
+import { isForkAtOrAfter } from './forkOrder';
 
 /**
  * Beacon chain timing constants
@@ -30,6 +31,104 @@ export interface SlotPhase {
 }
 
 /**
+ * A slot phase boundary expressed in basis points of the slot duration,
+ * mirroring how the consensus config specifies deadlines (ATTESTATION_DUE_BPS
+ * etc). Each phase runs from the previous phase's end to endBps.
+ */
+interface SlotPhaseSpec {
+  label: string;
+  /** Phase end as basis points (1/10000) of the slot duration */
+  endBps: number;
+  className: string;
+  textClassName: string;
+  description: string;
+}
+
+/**
+ * Pre-gloas slot structure: attestations due at 1/3 of the slot, aggregates
+ * at 2/3 (ATTESTATION_DUE_BPS 3333, AGGREGATE_DUE_BPS 6667).
+ */
+const PRE_GLOAS_PHASE_SPECS: SlotPhaseSpec[] = [
+  {
+    label: 'Block',
+    endBps: 3333,
+    className: 'bg-surface border-b-4 border-b-cyan-500/50',
+    textClassName: 'text-cyan-600 dark:text-cyan-400 font-bold',
+    description: 'Proposer broadcasts block',
+  },
+  {
+    label: 'Attestations',
+    endBps: 6667,
+    className: 'bg-surface border-b-4 border-b-green-500/50',
+    textClassName: 'text-green-600 dark:text-green-400 font-bold',
+    description: 'Validators attest to block',
+  },
+  {
+    label: 'Aggregations',
+    endBps: 10000,
+    className: 'bg-surface border-b-4 border-b-amber-500/50',
+    textClassName: 'text-amber-600 dark:text-amber-400 font-bold',
+    description: 'Attestations aggregated',
+  },
+];
+
+/**
+ * Gloas (ePBS, EIP-7732) slot structure. The block only commits to a builder
+ * bid; the execution payload is revealed separately and judged by the Payload
+ * Timeliness Committee. Deadlines from the consensus config:
+ * ATTESTATION_DUE_BPS_GLOAS 2500, AGGREGATE_DUE_BPS_GLOAS 5000,
+ * INCLUSION_LIST_DUE_BPS 6667, PAYLOAD_DUE_BPS / PAYLOAD_ATTESTATION_DUE_BPS 7500.
+ */
+const GLOAS_PHASE_SPECS: SlotPhaseSpec[] = [
+  {
+    label: 'Block',
+    endBps: 2500,
+    className: 'bg-surface border-b-4 border-b-cyan-500/50',
+    textClassName: 'text-cyan-600 dark:text-cyan-400 font-bold',
+    description: 'Proposer broadcasts block committing to a builder bid',
+  },
+  {
+    label: 'Attestations',
+    endBps: 5000,
+    className: 'bg-surface border-b-4 border-b-green-500/50',
+    textClassName: 'text-green-600 dark:text-green-400 font-bold',
+    description: 'Validators attest to block',
+  },
+  {
+    label: 'Payload',
+    endBps: 7500,
+    className: 'bg-surface border-b-4 border-b-purple-500/50',
+    textClassName: 'text-purple-600 dark:text-purple-400 font-bold',
+    description: 'Builder reveals the execution payload, inclusion lists due',
+  },
+  {
+    label: 'PTC',
+    endBps: 10000,
+    className: 'bg-surface border-b-4 border-b-amber-500/50',
+    textClassName: 'text-amber-600 dark:text-amber-400 font-bold',
+    description: 'Payload Timeliness Committee attests whether the payload arrived',
+  },
+];
+
+function phasesFromSpec(specs: SlotPhaseSpec[], slotDurationMs: number): SlotPhase[] {
+  let previousEndMs = 0;
+
+  return specs.map(spec => {
+    const endMs = Math.round((spec.endBps / 10000) * slotDurationMs);
+    const phase: SlotPhase = {
+      label: spec.label,
+      duration: endMs - previousEndMs,
+      className: spec.className,
+      textClassName: spec.textClassName,
+      description: spec.description,
+    };
+    previousEndMs = endMs;
+
+    return phase;
+  });
+}
+
+/**
  * Default Ethereum beacon chain slot phases (12000 milliseconds total).
  *
  * Based on standard beacon chain slot timing:
@@ -37,29 +136,25 @@ export interface SlotPhase {
  * - 4000-8000ms: Attestations - Validators attest to the block
  * - 8000-12000ms: Aggregations - Attestations are aggregated
  */
-export const DEFAULT_BEACON_SLOT_PHASES: SlotPhase[] = [
-  {
-    label: 'Block',
-    duration: ATTESTATION_DEADLINE_MS,
-    className: 'bg-surface border-b-4 border-b-cyan-500/50',
-    textClassName: 'text-cyan-600 dark:text-cyan-400 font-bold',
-    description: 'Proposer broadcasts block',
-  },
-  {
-    label: 'Attestations',
-    duration: 4000,
-    className: 'bg-surface border-b-4 border-b-green-500/50',
-    textClassName: 'text-green-600 dark:text-green-400 font-bold',
-    description: 'Validators attest to block',
-  },
-  {
-    label: 'Aggregations',
-    duration: 4000,
-    className: 'bg-surface border-b-4 border-b-amber-500/50',
-    textClassName: 'text-amber-600 dark:text-amber-400 font-bold',
-    description: 'Attestations aggregated',
-  },
-];
+export const DEFAULT_BEACON_SLOT_PHASES: SlotPhase[] = phasesFromSpec(PRE_GLOAS_PHASE_SPECS, SECONDS_PER_SLOT * 1000);
+
+/**
+ * Gloas (ePBS) slot phases (12000 milliseconds total): block, attestations,
+ * payload reveal, PTC vote.
+ */
+export const GLOAS_BEACON_SLOT_PHASES: SlotPhase[] = phasesFromSpec(GLOAS_PHASE_SPECS, SECONDS_PER_SLOT * 1000);
+
+/**
+ * Get the slot phases for a fork. Gloas and later forks use the ePBS slot
+ * structure; everything earlier keeps the classic three-phase layout.
+ */
+export function getSlotPhases(fork?: ForkVersion | null, slotDurationMs = SECONDS_PER_SLOT * 1000): SlotPhase[] {
+  const specs = fork && isForkAtOrAfter(fork, 'gloas') ? GLOAS_PHASE_SPECS : PRE_GLOAS_PHASE_SPECS;
+
+  return phasesFromSpec(specs, slotDurationMs);
+}
+
+export { CANONICAL_FORK_ORDER, isForkAtOrAfter } from './forkOrder';
 
 /**
  * Convert slot number to Unix timestamp
@@ -181,7 +276,7 @@ export function isEpochAtOrAfter(currentEpoch: number, forkEpoch?: number): bool
 /**
  * Beacon chain fork version identifiers
  */
-export type ForkVersion = 'phase0' | 'altair' | 'bellatrix' | 'capella' | 'deneb' | 'electra' | 'fulu' | 'glaos';
+export type ForkVersion = 'phase0' | 'altair' | 'bellatrix' | 'capella' | 'deneb' | 'electra' | 'fulu' | 'gloas';
 
 /**
  * Metadata for a beacon chain fork
@@ -269,12 +364,15 @@ export const FORK_METADATA: Record<ForkVersion, ForkMetadata> = {
     executionName: 'osaka',
     combinedName: 'fusaka',
   },
-  glaos: {
-    version: 'glaos',
-    name: 'Glaos',
+  gloas: {
+    version: 'gloas',
+    name: 'Gloas',
     emoji: '🐋',
     color: 'bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-400',
-    description: 'Future consensus layer upgrade - Seventh CL fork with features to be determined',
+    description:
+      'Glamsterdam - Enshrines proposer-builder separation, splitting the execution payload from the block with a Payload Timeliness Committee (EIP-7732), and adds fork-choice enforced inclusion lists (EIP-7805)',
+    executionName: 'amsterdam',
+    combinedName: 'glamsterdam',
   },
 } as const;
 

@@ -1,20 +1,12 @@
 import type { Network, BlobScheduleItem } from '@/hooks/useConfig';
 import { FORK_METADATA, type ForkVersion } from './beacon';
+import { CANONICAL_FORK_ORDER } from './forkOrder';
 
 /**
  * Fork names in chronological order.
  * This order is critical for determining fork activation and precedence.
  */
-export const FORK_ORDER: readonly ForkVersion[] = [
-  'phase0',
-  'altair',
-  'bellatrix',
-  'capella',
-  'deneb',
-  'electra',
-  'fulu',
-  'glaos',
-] as const;
+export const FORK_ORDER: readonly ForkVersion[] = CANONICAL_FORK_ORDER;
 
 /**
  * Map of fork versions to their display names.
@@ -27,7 +19,7 @@ export const FORK_DISPLAY_NAMES: Record<ForkVersion, string> = {
   deneb: 'Deneb',
   electra: 'Electra',
   fulu: 'Fulu',
-  glaos: 'Glaos',
+  gloas: 'Gloas',
 };
 
 export type ForkName = ForkVersion;
@@ -232,7 +224,7 @@ export function getForksAtEpoch(network: Network, epoch: number): ForkInfo[] {
 /**
  * Valid URL slugs for fork pages.
  * Includes both consensus fork names (phase0, altair, etc.)
- * and combined upgrade names (merge, shapella, dencun, pectra, fusaka).
+ * and combined upgrade names (merge, shapella, dencun, pectra, fusaka, glamsterdam).
  */
 export const VALID_FORK_SLUGS = [
   // Consensus fork names
@@ -243,13 +235,14 @@ export const VALID_FORK_SLUGS = [
   'deneb',
   'electra',
   'fulu',
-  'glaos',
+  'gloas',
   // Combined upgrade names
   'merge',
   'shapella',
   'dencun',
   'pectra',
   'fusaka',
+  'glamsterdam',
 ] as const;
 
 export type ForkSlug = (typeof VALID_FORK_SLUGS)[number];

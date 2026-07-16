@@ -20,7 +20,15 @@ import type { ForkLabelProps } from './ForkLabel.types';
  * <ForkLabel fork="bellatrix" size="lg" className="shadow-lg" />
  */
 export function ForkLabel({ fork, className, size = 'md', showIcon = true }: ForkLabelProps): React.JSX.Element {
-  const metadata = FORK_METADATA[fork];
+  // Networks can serve fork names newer than this build knows about; render
+  // them as a plain label instead of crashing on missing metadata.
+  const metadata = FORK_METADATA[fork] ?? {
+    version: fork,
+    name: fork,
+    emoji: '🔮',
+    color: 'bg-gray-100 text-gray-700 dark:bg-gray-400/10 dark:text-gray-400',
+    description: `Upcoming fork: ${fork}`,
+  };
 
   const sizeClasses = {
     sm: 'px-2 py-0.5 text-xs gap-1',

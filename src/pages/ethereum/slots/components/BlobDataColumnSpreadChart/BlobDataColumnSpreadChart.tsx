@@ -3,7 +3,7 @@ import { CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon } from '@heroicon
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { BarChart } from '@/components/Charts/Bar';
 import { MiniStat } from '@/components/DataDisplay/MiniStat';
-import { getForkForSlot } from '@/utils/beacon';
+import { getForkForSlot, isForkAtOrAfter } from '@/utils/beacon';
 import { useNetwork } from '@/hooks/useNetwork';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { BlobDataColumnSpreadChartProps, NodeSpreadStats } from './BlobDataColumnSpreadChart.types';
@@ -32,7 +32,7 @@ export function BlobDataColumnSpreadChart({ blobPropagationData, slot }: BlobDat
   const forkVersion = getForkForSlot(slot, currentNetwork);
 
   // Determine if we're in Fulu or later (data columns) vs earlier forks (blobs)
-  const isDataColumn = forkVersion === 'fulu';
+  const isDataColumn = isForkAtOrAfter(forkVersion, 'fulu');
   const itemType = isDataColumn ? 'data column' : 'blob';
 
   // Calculate overall spread statistic

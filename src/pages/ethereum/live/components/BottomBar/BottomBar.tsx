@@ -32,7 +32,7 @@ function BottomBarComponent({
   // Deneb and Electra: show blob availability
   // Earlier forks: show neither
   const showBlobAvailability = forkName === 'deneb' || forkName === 'electra';
-  const showDataColumnAvailability = forkName === 'fulu' || forkName === 'glaos';
+  const showDataColumnAvailability = forkName === 'fulu' || forkName === 'gloas';
 
   return (
     <>

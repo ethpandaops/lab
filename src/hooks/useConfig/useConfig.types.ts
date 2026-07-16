@@ -22,7 +22,7 @@ export interface ConsensusForks {
   deneb?: ConsensusFork;
   electra?: ConsensusFork;
   fulu?: ConsensusFork;
-  glaos?: ConsensusFork;
+  gloas?: ConsensusFork;
   fusaka?: ConsensusFork;
 }
 
