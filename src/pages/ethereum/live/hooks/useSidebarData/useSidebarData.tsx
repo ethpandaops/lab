@@ -11,7 +11,6 @@ import type { SlotPhase } from '@/utils/beacon';
 import type { TimelineItem } from '@/components/Lists/ScrollingTimeline/ScrollingTimeline.types';
 import { getSlotPhases } from '@/utils/beacon';
 import { useForks } from '@/hooks/useForks';
-import { useNetwork } from '@/hooks/useNetwork';
 import { Badge } from '@/components/Elements/Badge';
 
 /**
@@ -47,66 +46,64 @@ export function useSidebarData({
   items: TimelineItem[];
 } {
   const { activeFork } = useForks();
-  const { currentNetwork } = useNetwork();
   const phases = useMemo(() => getSlotPhases(activeFork?.name), [activeFork?.name]);
-  const networkName = currentNetwork?.name;
 
   const items = useMemo<TimelineItem[]>(() => {
     const allItems: TimelineItem[] = [];
 
-    // Location is the display convention (matching the map); node id rides
-    // along muted so identical locations stay distinguishable.
-    const nodeLocation = (node: { meta_client_geo_city?: string; meta_client_geo_country?: string }): string => {
+    // 2. Block seen in locations - Group by city and take earliest
+    const cityFirstSeen = new Map<string, { timestamp: number; location: string }>();
+    blockNodes.forEach(node => {
       const city = node.meta_client_geo_city;
       const country = node.meta_client_geo_country ?? 'Unknown';
-      return city ? `${city}, ${country}` : country;
-    };
+      const timestamp = node.seen_slot_start_diff ?? 0;
 
-    // Internal node ids repeat the network name; strip it so rows fit.
-    const shortNodeId = (nodeId: string | undefined): string | undefined =>
-      networkName && nodeId?.startsWith(`${networkName}-`) ? nodeId.slice(networkName.length + 1) : nodeId;
+      // Format location: "City, Country" or just "Country" if city is missing
+      const location = city ? `${city}, ${country}` : country;
 
-    // 2. Block sightings - one row per sentry node
-    blockNodes.forEach((node, index) => {
-      const nodeId = shortNodeId(node.node_id ?? node.meta_client_name);
+      if (!cityFirstSeen.has(location) || timestamp < cityFirstSeen.get(location)!.timestamp) {
+        cityFirstSeen.set(location, { timestamp, location });
+      }
+    });
 
+    cityFirstSeen.forEach((data, location) => {
       allItems.push({
-        id: `${currentSlot}-block-seen-${nodeId ?? index}-${index}`,
-        timestamp: node.seen_slot_start_diff ?? 0,
+        id: `${currentSlot}-block-seen-${location}-${data.timestamp}`,
+        timestamp: data.timestamp,
         content: (
-          <div className="flex min-w-0 items-center gap-1.5">
+          <div className="flex items-center gap-1.5">
             <Badge color="green" variant="border" size="small">
               Block
             </Badge>
-            <span className="shrink-0">{nodeLocation(node)}</span>
-            {nodeId && (
-              <span className="min-w-0 truncate text-muted" title={nodeId}>
-                {nodeId}
-              </span>
-            )}
+            <span>{location}</span>
           </div>
         ),
       });
     });
 
-    // 2b. Gloas (ePBS): payload envelope sightings - one row per sentry node
-    (payloadNodes ?? []).forEach((node, index) => {
-      const nodeId = shortNodeId(node.node_id ?? node.meta_client_name);
+    // 2b. Gloas (ePBS): payload envelope seen in locations - same shape as blocks
+    const payloadCityFirstSeen = new Map<string, { timestamp: number; location: string }>();
+    (payloadNodes ?? []).forEach(node => {
+      const city = node.meta_client_geo_city;
+      const country = node.meta_client_geo_country ?? 'Unknown';
+      const timestamp = node.seen_slot_start_diff ?? 0;
+      const location = city ? `${city}, ${country}` : country;
 
+      if (!payloadCityFirstSeen.has(location) || timestamp < payloadCityFirstSeen.get(location)!.timestamp) {
+        payloadCityFirstSeen.set(location, { timestamp, location });
+      }
+    });
+
+    payloadCityFirstSeen.forEach((data, location) => {
       allItems.push({
-        id: `${currentSlot}-payload-seen-${nodeId ?? index}-${index}`,
-        timestamp: node.seen_slot_start_diff ?? 0,
+        id: `${currentSlot}-payload-seen-${location}-${data.timestamp}`,
+        timestamp: data.timestamp,
         content: (
-          <div className="flex min-w-0 items-center gap-1.5">
+          <div className="flex items-center gap-1.5">
             <Badge color="indigo" variant="border" size="small">
               Payload
             </Badge>
-            <span className="shrink-0">{nodeLocation(node)}</span>
-            {nodeId && (
-              <span className="min-w-0 truncate text-muted" title={nodeId}>
-                {nodeId}
-              </span>
-            )}
+            <span>{location}</span>
           </div>
         ),
       });
@@ -240,7 +237,7 @@ export function useSidebarData({
 
     // Sort all items by timestamp
     return allItems.sort((a, b) => a.timestamp - b.timestamp);
-  }, [blockNodes, blobNodes, attestationChunks, payloadNodes, ptcChunks, currentSlot, networkName]);
+  }, [blockNodes, blobNodes, attestationChunks, payloadNodes, ptcChunks, currentSlot]);
 
   return { phases, items };
 }
