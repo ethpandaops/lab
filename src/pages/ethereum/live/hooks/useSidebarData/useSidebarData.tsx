@@ -51,67 +51,41 @@ export function useSidebarData({
   const items = useMemo<TimelineItem[]>(() => {
     const allItems: TimelineItem[] = [];
 
-    // 2. Block seen in locations - Group by city and take earliest
-    const cityFirstSeen = new Map<string, { timestamp: number; location: string; nodes: number }>();
-    blockNodes.forEach(node => {
+    // 2. Block sightings - one row per sentry node
+    blockNodes.forEach((node, index) => {
       const city = node.meta_client_geo_city;
-      const country = node.meta_client_geo_country ?? 'Unknown';
-      const timestamp = node.seen_slot_start_diff ?? 0;
+      const label = node.node_id ?? node.meta_client_name ?? 'unknown';
 
-      // Format location: "City, Country" or just "Country" if city is missing
-      const location = city ? `${city}, ${country}` : country;
-
-      const existing = cityFirstSeen.get(location);
-      if (!existing) {
-        cityFirstSeen.set(location, { timestamp, location, nodes: 1 });
-      } else {
-        existing.nodes += 1;
-        if (timestamp < existing.timestamp) existing.timestamp = timestamp;
-      }
-    });
-
-    cityFirstSeen.forEach((data, location) => {
       allItems.push({
-        id: `${currentSlot}-block-seen-${location}-${data.timestamp}`,
-        timestamp: data.timestamp,
+        id: `${currentSlot}-block-seen-${label}-${index}`,
+        timestamp: node.seen_slot_start_diff ?? 0,
         content: (
           <div className="flex items-center gap-1.5">
             <Badge color="green" variant="border" size="small">
               Block
             </Badge>
-            <span>{data.nodes > 1 ? `${location} · ${data.nodes} nodes` : location}</span>
+            <span className="truncate">{label}</span>
+            {city && <span className="truncate text-muted">{city}</span>}
           </div>
         ),
       });
     });
 
-    // 2b. Gloas (ePBS): payload envelope sightings, grouped like blocks
-    const payloadCityFirstSeen = new Map<string, { timestamp: number; nodes: number }>();
-    (payloadNodes ?? []).forEach(node => {
+    // 2b. Gloas (ePBS): payload envelope sightings - one row per sentry node
+    (payloadNodes ?? []).forEach((node, index) => {
       const city = node.meta_client_geo_city;
-      const country = node.meta_client_geo_country ?? 'Unknown';
-      const timestamp = node.seen_slot_start_diff ?? 0;
-      const location = city ? `${city}, ${country}` : country;
+      const label = node.node_id ?? node.meta_client_name ?? 'unknown';
 
-      const existing = payloadCityFirstSeen.get(location);
-      if (!existing) {
-        payloadCityFirstSeen.set(location, { timestamp, nodes: 1 });
-      } else {
-        existing.nodes += 1;
-        if (timestamp < existing.timestamp) existing.timestamp = timestamp;
-      }
-    });
-
-    payloadCityFirstSeen.forEach((data, location) => {
       allItems.push({
-        id: `${currentSlot}-payload-seen-${location}-${data.timestamp}`,
-        timestamp: data.timestamp,
+        id: `${currentSlot}-payload-seen-${label}-${index}`,
+        timestamp: node.seen_slot_start_diff ?? 0,
         content: (
           <div className="flex items-center gap-1.5">
             <Badge color="indigo" variant="border" size="small">
               Payload
             </Badge>
-            <span>{data.nodes > 1 ? `${location} · ${data.nodes} nodes` : location}</span>
+            <span className="truncate">{label}</span>
+            {city && <span className="truncate text-muted">{city}</span>}
           </div>
         ),
       });
