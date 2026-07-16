@@ -11,6 +11,7 @@ import type { SlotPhase } from '@/utils/beacon';
 import type { TimelineItem } from '@/components/Lists/ScrollingTimeline/ScrollingTimeline.types';
 import { getSlotPhases } from '@/utils/beacon';
 import { useForks } from '@/hooks/useForks';
+import { useNetwork } from '@/hooks/useNetwork';
 import { Badge } from '@/components/Elements/Badge';
 
 /**
@@ -46,7 +47,9 @@ export function useSidebarData({
   items: TimelineItem[];
 } {
   const { activeFork } = useForks();
+  const { currentNetwork } = useNetwork();
   const phases = useMemo(() => getSlotPhases(activeFork?.name), [activeFork?.name]);
+  const networkName = currentNetwork?.name;
 
   const items = useMemo<TimelineItem[]>(() => {
     const allItems: TimelineItem[] = [];
@@ -59,20 +62,28 @@ export function useSidebarData({
       return city ? `${city}, ${country}` : country;
     };
 
+    // Internal node ids repeat the network name; strip it so rows fit.
+    const shortNodeId = (nodeId: string | undefined): string | undefined =>
+      networkName && nodeId?.startsWith(`${networkName}-`) ? nodeId.slice(networkName.length + 1) : nodeId;
+
     // 2. Block sightings - one row per sentry node
     blockNodes.forEach((node, index) => {
-      const nodeId = node.node_id ?? node.meta_client_name;
+      const nodeId = shortNodeId(node.node_id ?? node.meta_client_name);
 
       allItems.push({
         id: `${currentSlot}-block-seen-${nodeId ?? index}-${index}`,
         timestamp: node.seen_slot_start_diff ?? 0,
         content: (
-          <div className="flex items-center gap-1.5">
+          <div className="flex min-w-0 items-center gap-1.5">
             <Badge color="green" variant="border" size="small">
               Block
             </Badge>
-            <span className="truncate">{nodeLocation(node)}</span>
-            {nodeId && <span className="truncate text-muted">{nodeId}</span>}
+            <span className="shrink-0">{nodeLocation(node)}</span>
+            {nodeId && (
+              <span className="min-w-0 truncate text-muted" title={nodeId}>
+                {nodeId}
+              </span>
+            )}
           </div>
         ),
       });
@@ -80,18 +91,22 @@ export function useSidebarData({
 
     // 2b. Gloas (ePBS): payload envelope sightings - one row per sentry node
     (payloadNodes ?? []).forEach((node, index) => {
-      const nodeId = node.node_id ?? node.meta_client_name;
+      const nodeId = shortNodeId(node.node_id ?? node.meta_client_name);
 
       allItems.push({
         id: `${currentSlot}-payload-seen-${nodeId ?? index}-${index}`,
         timestamp: node.seen_slot_start_diff ?? 0,
         content: (
-          <div className="flex items-center gap-1.5">
+          <div className="flex min-w-0 items-center gap-1.5">
             <Badge color="indigo" variant="border" size="small">
               Payload
             </Badge>
-            <span className="truncate">{nodeLocation(node)}</span>
-            {nodeId && <span className="truncate text-muted">{nodeId}</span>}
+            <span className="shrink-0">{nodeLocation(node)}</span>
+            {nodeId && (
+              <span className="min-w-0 truncate text-muted" title={nodeId}>
+                {nodeId}
+              </span>
+            )}
           </div>
         ),
       });
@@ -225,7 +240,7 @@ export function useSidebarData({
 
     // Sort all items by timestamp
     return allItems.sort((a, b) => a.timestamp - b.timestamp);
-  }, [blockNodes, blobNodes, attestationChunks, payloadNodes, ptcChunks, currentSlot]);
+  }, [blockNodes, blobNodes, attestationChunks, payloadNodes, ptcChunks, currentSlot, networkName]);
 
   return { phases, items };
 }
