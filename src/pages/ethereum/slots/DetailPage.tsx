@@ -16,7 +16,7 @@ import { Card } from '@/components/Layout/Card';
 import { Tab } from '@/components/Navigation/Tab';
 import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { Button } from '@/components/Elements/Button';
-import { SLOTS_PER_EPOCH, slotToTimestamp } from '@/utils/beacon';
+import { SLOTS_PER_EPOCH, slotToTimestamp, getForkForSlot, isForkAtOrAfter } from '@/utils/beacon';
 import { formatEpoch } from '@/utils';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
 import { useTabState } from '@/hooks/useTabState';
@@ -27,6 +27,7 @@ import {
   fctBlockBlobHeadServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import { useSlotDetailData } from './hooks/useSlotDetailData';
+import { useSlotPayloadData } from './hooks/useSlotPayloadData';
 import { useAllAttestationVotes } from './hooks/useAllAttestationVotes';
 import { SlotBasicInfoCard } from './components/SlotBasicInfoCard';
 import { SlotPayloadCard } from './components/SlotPayloadCard';
@@ -91,6 +92,16 @@ export function DetailPage(): JSX.Element {
 
   // Get current network
   const { currentNetwork } = useNetwork();
+
+  // Gloas (ePBS) slots get a dedicated Payload tab
+  const isGloas = isForkAtOrAfter(getForkForSlot(slot, currentNetwork), 'gloas');
+  const { data: payloadData } = useSlotPayloadData(slot, isGloas);
+  const payloadBidRaceData = payloadData.bidRace.map(bid => ({
+    chunk_slot_start_diff: bid.chunk_slot_start_diff ?? 0,
+    value: bid.value ?? '0',
+    builder_pubkey: `builder-${bid.builder_index ?? 'unknown'}`,
+    block_hash: bid.block_hash,
+  }));
 
   // Download modal (beacon block + blob sidecars)
   const [downloadOpen, setDownloadOpen] = useState(false);
@@ -168,6 +179,7 @@ export function DetailPage(): JSX.Element {
     { id: 'attestations', anchors: ['missed-attestations'] },
     { id: 'propagation' },
     { id: 'blobs' },
+    ...(isGloas ? [{ id: 'payload' }] : []),
     { id: 'execution' },
     { id: 'mev' },
     { id: 'resources' },
@@ -434,14 +446,6 @@ export function DetailPage(): JSX.Element {
 
       <SlotBasicInfoCard slot={slot} epoch={epoch} data={data} isMissedSlot={isMissedSlot} />
 
-      <div className="mt-6">
-        <SlotPayloadCard
-          slot={slot}
-          proposerIndex={data.blockProposer[0]?.proposer_validator_index}
-          hasBlock={!isMissedSlot}
-        />
-      </div>
-
       {/* Tabbed Content */}
       <div className="mt-8">
         <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
@@ -452,6 +456,7 @@ export function DetailPage(): JSX.Element {
             <Tab>Attestations</Tab>
             <Tab>Propagation</Tab>
             <Tab>Blobs</Tab>
+            {isGloas && <Tab>Payload</Tab>}
             <Tab>Execution</Tab>
             <Tab>MEV</Tab>
             <Tab>Node Resources</Tab>
@@ -1094,6 +1099,29 @@ export function DetailPage(): JSX.Element {
                 )}
               </div>
             </TabPanel>
+
+            {/* Payload Tab - Gloas (ePBS) payload lifecycle, only rendered post-gloas */}
+            {isGloas && (
+              <TabPanel>
+                <div className="space-y-6">
+                  <SlotPayloadCard
+                    slot={slot}
+                    proposerIndex={data.blockProposer[0]?.proposer_validator_index}
+                    hasBlock={!isMissedSlot}
+                  />
+                  {payloadBidRaceData.length > 0 && (
+                    <MevBiddingTimelineChart
+                      biddingData={payloadBidRaceData}
+                      winningMevValue={payloadData.bid?.value}
+                      winningBuilder={payloadData.bid ? `builder-${payloadData.bid.builder_index}` : undefined}
+                      title="Builder Bid Race"
+                      anchorId="payload-bid-race"
+                      yAxisTitle="Bid Value (ETH)"
+                    />
+                  )}
+                </div>
+              </TabPanel>
+            )}
 
             {/* Execution Tab - Comprehensive execution layer data */}
             <TabPanel>

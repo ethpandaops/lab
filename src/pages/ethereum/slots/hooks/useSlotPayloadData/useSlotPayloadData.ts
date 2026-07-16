@@ -4,12 +4,14 @@ import {
   fctBlockPayloadFirstSeenByNodeServiceListOptions,
   fctBlockPayloadPtcVoteHeadServiceListOptions,
   fctBlockPayloadAvailableByNodeServiceListOptions,
+  fctPayloadBidHighestValueByBuilderChunked50MsServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import type {
   FctBlockPayloadBid,
   FctBlockPayloadFirstSeenByNode,
   FctBlockPayloadPtcVoteHead,
   FctBlockPayloadAvailableByNode,
+  FctPayloadBidHighestValueByBuilderChunked50Ms,
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { slotToTimestamp } from '@/utils/beacon';
@@ -23,6 +25,8 @@ export interface SlotPayloadData {
   payloadAvailable: FctBlockPayloadAvailableByNode[];
   /** PTC votes observed on the live event stream */
   ptcVote?: FctBlockPayloadPtcVoteHead;
+  /** The bid race: highest value per builder per 50ms chunk, from gossip */
+  bidRace: FctPayloadBidHighestValueByBuilderChunked50Ms[];
 }
 
 export interface UseSlotPayloadDataResult {
@@ -67,10 +71,16 @@ export function useSlotPayloadData(slot: number, enabled = true): UseSlotPayload
         }),
         enabled: queryEnabled,
       },
+      {
+        ...fctPayloadBidHighestValueByBuilderChunked50MsServiceListOptions({
+          query: { slot_start_date_time_eq: slotTimestamp, page_size: 10000 },
+        }),
+        enabled: queryEnabled,
+      },
     ],
   });
 
-  const [bidQuery, firstSeenQuery, availableQuery, ptcVoteQuery] = queries;
+  const [bidQuery, firstSeenQuery, availableQuery, ptcVoteQuery, bidRaceQuery] = queries;
 
   return {
     data: {
@@ -78,6 +88,7 @@ export function useSlotPayloadData(slot: number, enabled = true): UseSlotPayload
       payloadFirstSeen: firstSeenQuery.data?.fct_block_payload_first_seen_by_node ?? [],
       payloadAvailable: availableQuery.data?.fct_block_payload_available_by_node ?? [],
       ptcVote: ptcVoteQuery.data?.fct_block_payload_ptc_vote_head?.[0],
+      bidRace: bidRaceQuery.data?.fct_payload_bid_highest_value_by_builder_chunked_50ms ?? [],
     },
     isLoading: queryEnabled && queries.some(query => query.isLoading),
   };

@@ -32,6 +32,21 @@ export interface MevBiddingTimelineChartProps {
    * Winning builder pubkey
    */
   winningBuilder?: string;
+
+  /**
+   * Card title, defaults to the relay-era MEV wording
+   */
+  title?: string;
+
+  /**
+   * Anchor id for the popout card, must be unique per page
+   */
+  anchorId?: string;
+
+  /**
+   * Y axis label, defaults to the relay-era MEV wording
+   */
+  yAxisTitle?: string;
 }
 
 /**

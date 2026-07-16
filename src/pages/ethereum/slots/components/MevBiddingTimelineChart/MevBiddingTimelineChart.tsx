@@ -61,6 +61,9 @@ export function MevBiddingTimelineChart({
   biddingData,
   winningMevValue,
   winningBuilder,
+  title = 'MEV Bidding Timeline',
+  anchorId = 'mev-bidding-timeline',
+  yAxisTitle = 'MEV Value (ETH)',
 }: MevBiddingTimelineChartProps): JSX.Element {
   const themeColors = useThemeColors();
 
@@ -214,7 +217,7 @@ export function MevBiddingTimelineChart({
   // Handle empty data
   if (biddingData.length === 0) {
     return (
-      <PopoutCard title="MEV Bidding Timeline" anchorId="mev-bidding-timeline" modalSize="full">
+      <PopoutCard title={title} anchorId={anchorId} modalSize="full">
         {({ inModal }) => (
           <div
             className={
@@ -235,14 +238,14 @@ export function MevBiddingTimelineChart({
   const subtitle = winningValueDisplay || undefined;
 
   return (
-    <PopoutCard title="MEV Bidding Timeline" anchorId="mev-bidding-timeline" subtitle={subtitle} modalSize="full">
+    <PopoutCard title={title} anchorId={anchorId} subtitle={subtitle} modalSize="full">
       {({ inModal }) => (
         <div className={inModal ? 'h-96' : 'h-72'}>
           <ScatterAndLineChart
             lineSeries={lineSeries}
             scatterSeries={scatterSeries}
             xAxisTitle="Slot Time (s)"
-            yAxisTitle="MEV Value (ETH)"
+            yAxisTitle={yAxisTitle}
             xMin={-8000}
             xMax={4000}
             xInterval={2000}

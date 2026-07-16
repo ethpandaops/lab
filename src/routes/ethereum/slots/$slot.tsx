@@ -4,7 +4,18 @@ import { DetailPage } from '@/pages/ethereum/slots';
 
 const slotSearchSchema = z.object({
   tab: z
-    .enum(['overview', 'timeline', 'block', 'attestations', 'propagation', 'blobs', 'execution', 'mev', 'resources'])
+    .enum([
+      'overview',
+      'timeline',
+      'block',
+      'attestations',
+      'propagation',
+      'blobs',
+      'payload',
+      'execution',
+      'mev',
+      'resources',
+    ])
     .default('overview'),
   contributor: z.string().optional(),
   node: z.string().optional(),
