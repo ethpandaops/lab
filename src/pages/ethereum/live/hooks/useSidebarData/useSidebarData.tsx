@@ -51,21 +51,28 @@ export function useSidebarData({
   const items = useMemo<TimelineItem[]>(() => {
     const allItems: TimelineItem[] = [];
 
+    // Location is the display convention (matching the map); node id rides
+    // along muted so identical locations stay distinguishable.
+    const nodeLocation = (node: { meta_client_geo_city?: string; meta_client_geo_country?: string }): string => {
+      const city = node.meta_client_geo_city;
+      const country = node.meta_client_geo_country ?? 'Unknown';
+      return city ? `${city}, ${country}` : country;
+    };
+
     // 2. Block sightings - one row per sentry node
     blockNodes.forEach((node, index) => {
-      const city = node.meta_client_geo_city;
-      const label = node.node_id ?? node.meta_client_name ?? 'unknown';
+      const nodeId = node.node_id ?? node.meta_client_name;
 
       allItems.push({
-        id: `${currentSlot}-block-seen-${label}-${index}`,
+        id: `${currentSlot}-block-seen-${nodeId ?? index}-${index}`,
         timestamp: node.seen_slot_start_diff ?? 0,
         content: (
           <div className="flex items-center gap-1.5">
             <Badge color="green" variant="border" size="small">
               Block
             </Badge>
-            <span className="truncate">{label}</span>
-            {city && <span className="truncate text-muted">{city}</span>}
+            <span className="truncate">{nodeLocation(node)}</span>
+            {nodeId && <span className="truncate text-muted">{nodeId}</span>}
           </div>
         ),
       });
@@ -73,19 +80,18 @@ export function useSidebarData({
 
     // 2b. Gloas (ePBS): payload envelope sightings - one row per sentry node
     (payloadNodes ?? []).forEach((node, index) => {
-      const city = node.meta_client_geo_city;
-      const label = node.node_id ?? node.meta_client_name ?? 'unknown';
+      const nodeId = node.node_id ?? node.meta_client_name;
 
       allItems.push({
-        id: `${currentSlot}-payload-seen-${label}-${index}`,
+        id: `${currentSlot}-payload-seen-${nodeId ?? index}-${index}`,
         timestamp: node.seen_slot_start_diff ?? 0,
         content: (
           <div className="flex items-center gap-1.5">
             <Badge color="indigo" variant="border" size="small">
               Payload
             </Badge>
-            <span className="truncate">{label}</span>
-            {city && <span className="truncate text-muted">{city}</span>}
+            <span className="truncate">{nodeLocation(node)}</span>
+            {nodeId && <span className="truncate text-muted">{nodeId}</span>}
           </div>
         ),
       });
