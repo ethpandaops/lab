@@ -2,6 +2,7 @@ import { type JSX, type ReactNode } from 'react';
 import clsx from 'clsx';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { weiToEth, weiToGwei } from '@/utils';
+import type { PayloadStatus } from '@/utils/epbs';
 import type { SlotHudProps } from './SlotHud.types';
 
 const MAX_CLIENTS = 6;
@@ -50,6 +51,13 @@ const STATUS_META: Record<string, { label: string; cls: string }> = {
   canonical: { label: 'Proposed', cls: 'border-success/40 bg-success/10 text-success' },
   orphaned: { label: 'Orphaned', cls: 'border-warning/40 bg-warning/10 text-warning' },
   missed: { label: 'Missed', cls: 'border-danger/40 bg-danger/10 text-danger' },
+};
+
+const PAYLOAD_STATUS_META: Record<PayloadStatus, { label: string; cls: string }> = {
+  payload_present: { label: 'Delivered', cls: 'border-success/40 bg-success/10 text-success' },
+  payload_late: { label: 'Late', cls: 'border-warning/40 bg-warning/10 text-warning' },
+  payload_withheld: { label: 'Withheld', cls: 'border-danger/40 bg-danger/10 text-danger' },
+  pending: { label: 'Pending', cls: 'border-border bg-surface text-muted' },
 };
 
 /** Fades content in once its data is active on the slot replay timeline. */
@@ -134,6 +142,7 @@ export function SlotHud({
   auctionBids,
   auctionTopRelay,
   auctionTopBidWei,
+  epbs,
   blobCount,
   dataColumnBlobCount,
   className,
@@ -149,6 +158,10 @@ export function SlotHud({
   const baseGwei = gweiOrNull(bd?.baseFeePerGas);
   const mevEth = formatEth(bd?.mevValue);
   const topBidEth = formatEth(auctionTopBidWei);
+  const epbsTopBidEth = formatEth(epbs?.topBidWei);
+  // Reveal the payload columns as the live clock crosses the envelope arrival.
+  const payloadActive = epbs?.payloadFirstSeenMs != null && currentTime >= epbs.payloadFirstSeenMs;
+  const payloadStatusMeta = epbs ? PAYLOAD_STATUS_META[epbs.status] : null;
   const blobs = dataColumnBlobCount || blobCount;
   const statusMeta = bd?.status ? STATUS_META[bd.status] : null;
   const blockType = bd ? (mevEth ? 'mev-boost' : 'self-built') : null;
@@ -204,26 +217,85 @@ export function SlotHud({
         </Fade>
       </Section>
 
-      {/* MEV outcome */}
-      <Section title="MEV" className="flex-1">
-        <Fade active={blockActive} className="flex flex-col gap-px">
-          <Row k="value" v={mevEth ? `${mevEth} Ξ` : '—'} tone={mevEth ? 'text-success' : 'text-muted'} />
-          <Row k="via" v={bd?.mevRelays?.[0] ?? '—'} title={bd?.mevRelays?.join(', ') || undefined} />
-          <Row k="builder" v={shortHex(bd?.builderPubkey)} title={bd?.builderPubkey ?? undefined} />
-          <Row k="type" v={blockType ?? '—'} />
-        </Fade>
-      </Section>
+      {/* Payload lifecycle (gloas) or relay-era MEV outcome */}
+      {epbs ? (
+        <Section
+          title="Payload"
+          className="flex-1"
+          accessory={
+            payloadStatusMeta ? (
+              <Fade active={payloadActive || epbs.ptcVotesSeen > 0} className="ml-auto">
+                <span
+                  className={clsx(
+                    'inline-block rounded-sm border px-1.5 py-0 text-[9px]/3 font-semibold tracking-wide uppercase',
+                    payloadStatusMeta.cls
+                  )}
+                >
+                  {payloadStatusMeta.label}
+                </span>
+              </Fade>
+            ) : undefined
+          }
+        >
+          <Fade active={payloadActive} className="flex flex-col gap-px">
+            <Row k="reveal" v={secs(epbs.payloadFirstSeenMs)} tone="text-primary" />
+            <Row k="p50" v={secs(epbs.payloadP50Ms)} />
+            <Row k="nodes" v={dash(epbs.payloadNodeCount)} />
+            <Row k="builder" v={epbs.builderIndex != null ? `#${epbs.builderIndex}` : '—'} />
+            <Row
+              k="ptc"
+              v={epbs.ptcVotesSeen > 0 ? `${epbs.ptcPresentVotes}/${epbs.ptcVotesSeen}` : '—'}
+              tone={
+                epbs.ptcVotesSeen > 0 && epbs.ptcPresentVotes * 2 >= epbs.ptcVotesSeen
+                  ? 'text-success'
+                  : 'text-foreground'
+              }
+            />
+          </Fade>
+        </Section>
+      ) : (
+        <Section title="MEV" className="flex-1">
+          <Fade active={blockActive} className="flex flex-col gap-px">
+            <Row k="value" v={mevEth ? `${mevEth} Ξ` : '—'} tone={mevEth ? 'text-success' : 'text-muted'} />
+            <Row k="via" v={bd?.mevRelays?.[0] ?? '—'} title={bd?.mevRelays?.join(', ') || undefined} />
+            <Row k="builder" v={shortHex(bd?.builderPubkey)} title={bd?.builderPubkey ?? undefined} />
+            <Row k="type" v={blockType ?? '—'} />
+          </Fade>
+        </Section>
+      )}
 
-      {/* MEV auction depth (populated even when self-built) */}
-      <Section title="Auction" className="flex-1">
-        <Fade active={blockActive} className="flex flex-col gap-px">
-          <Row k="builders" v={dash(auctionBuilders)} />
-          <Row k="relays" v={dash(auctionRelays)} />
-          <Row k="bids" v={dash(auctionBids, n => n.toLocaleString())} />
-          <Row k="best" v={topBidEth ? `${topBidEth} Ξ` : '—'} tone={topBidEth ? 'text-success' : undefined} />
-          <Row k="top" v={auctionTopRelay ?? '—'} title={auctionTopRelay ?? undefined} />
-        </Fade>
-      </Section>
+      {/* Auction depth: on-chain builder bids (gloas) or relay bids */}
+      {epbs ? (
+        <Section title="Auction" className="flex-1">
+          <div className="flex flex-col gap-px">
+            <Row k="builders" v={dash(epbs.bidBuilders)} />
+            <Row k="bids" v={dash(epbs.bidCount, n => n.toLocaleString())} />
+            <Row
+              k="best"
+              v={epbsTopBidEth ? `${epbsTopBidEth} Ξ` : '—'}
+              tone={epbsTopBidEth ? 'text-success' : undefined}
+            />
+            <Row
+              k="first"
+              v={epbs.firstBidMs != null ? secs(epbs.firstBidMs) : '—'}
+              tone={epbs.firstBidMs != null && epbs.firstBidMs < 0 ? 'text-primary' : undefined}
+              title={
+                epbs.firstBidMs != null && epbs.firstBidMs < 0 ? 'First bid arrived before the slot started' : undefined
+              }
+            />
+          </div>
+        </Section>
+      ) : (
+        <Section title="Auction" className="flex-1">
+          <Fade active={blockActive} className="flex flex-col gap-px">
+            <Row k="builders" v={dash(auctionBuilders)} />
+            <Row k="relays" v={dash(auctionRelays)} />
+            <Row k="bids" v={dash(auctionBids, n => n.toLocaleString())} />
+            <Row k="best" v={topBidEth ? `${topBidEth} Ξ` : '—'} tone={topBidEth ? 'text-success' : undefined} />
+            <Row k="top" v={auctionTopRelay ?? '—'} title={auctionTopRelay ?? undefined} />
+          </Fade>
+        </Section>
+      )}
 
       {/* Execution payload */}
       <Section title="Execution" className="flex-1">

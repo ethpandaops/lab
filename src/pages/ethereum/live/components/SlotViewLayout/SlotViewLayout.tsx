@@ -441,6 +441,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
               auctionBids={slotData.auctionBids}
               auctionTopRelay={slotData.auctionTopRelay}
               auctionTopBidWei={slotData.auctionTopBidWei}
+              epbs={slotData.epbs}
               blobCount={slotData.blobCount}
               dataColumnBlobCount={slotData.dataColumnBlobCount}
             />

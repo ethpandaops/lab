@@ -15,7 +15,12 @@ import {
   fctMevBidHighestValueByBuilderChunked50MsServiceListOptions,
   fctMevBidCountByRelayServiceListOptions,
   fctEngineNewPayloadByElClientServiceListOptions,
+  fctBlockPayloadFirstSeenByNodeServiceListOptions,
+  fctBlockPayloadPtcVoteHeadServiceListOptions,
+  fctPayloadBidHighestValueByBuilderChunked50MsServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
+import { getForkForSlot, isForkAtOrAfter } from '@/utils/beacon';
+import { derivePayloadStatus } from '@/utils/epbs';
 import { EIP7870_REFERENCE_TAG } from '@/constants';
 import { slotToTimestamp } from '../../utils';
 import { useBlockDetailsData } from '../useBlockDetailsData';
@@ -47,6 +52,9 @@ const SLOT_QUERY_OPTIONS = {
 
 export function useSlotViewData(currentSlot: number): SlotViewData {
   const { currentNetwork } = useNetwork();
+
+  // Gloas (ePBS): the payload lifecycle queries only exist post-gloas.
+  const isGloas = isForkAtOrAfter(getForkForSlot(currentSlot, currentNetwork), 'gloas');
 
   // Convert slot to timestamp for API calls
   const slotStartDateTime = useMemo(() => {
@@ -208,6 +216,41 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
+    ...SLOT_QUERY_OPTIONS,
+  });
+
+  // API Query 12 (gloas): payload envelope first seen per sentry
+  const payloadFirstSeenQuery = useQuery({
+    ...fctBlockPayloadFirstSeenByNodeServiceListOptions({
+      query: {
+        slot_start_date_time_eq: slotStartDateTime,
+        page_size: 10000,
+      },
+    }),
+    enabled: slotStartDateTime > 0 && isGloas,
+    ...SLOT_QUERY_OPTIONS,
+  });
+
+  // API Query 13 (gloas): PTC votes for the slot's block
+  const ptcVoteQuery = useQuery({
+    ...fctBlockPayloadPtcVoteHeadServiceListOptions({
+      query: {
+        slot_start_date_time_eq: slotStartDateTime,
+      },
+    }),
+    enabled: slotStartDateTime > 0 && isGloas,
+    ...SLOT_QUERY_OPTIONS,
+  });
+
+  // API Query 14 (gloas): the on-chain builder bid race
+  const payloadBidsQuery = useQuery({
+    ...fctPayloadBidHighestValueByBuilderChunked50MsServiceListOptions({
+      query: {
+        slot_start_date_time_eq: slotStartDateTime,
+        page_size: 10000,
+      },
+    }),
+    enabled: slotStartDateTime > 0 && isGloas,
     ...SLOT_QUERY_OPTIONS,
   });
 
@@ -428,6 +471,64 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
 
   const proposerEntity = proposerEntityQuery.data?.fct_block_proposer_entity?.[0]?.entity ?? null;
 
+  // Gloas (ePBS): the payload lifecycle — bid race depth, envelope propagation,
+  // and the PTC verdict. Null pre-gloas so the HUD keeps its relay-era layout.
+  const epbs = useMemo(() => {
+    if (!isGloas) return null;
+
+    const seenRows = payloadFirstSeenQuery.data?.fct_block_payload_first_seen_by_node ?? [];
+    const ptcVote = ptcVoteQuery.data?.fct_block_payload_ptc_vote_head?.[0];
+    const bidRows = payloadBidsQuery.data?.fct_payload_bid_highest_value_by_builder_chunked_50ms ?? [];
+
+    const seenDiffs = seenRows
+      .map(node => node.seen_slot_start_diff)
+      .filter((d): d is number => typeof d === 'number')
+      .sort((a, b) => a - b);
+
+    let topBidWei: string | null = null;
+    let topBidValue = -1n;
+    let firstBidMs: number | null = null;
+    for (const bid of bidRows) {
+      if (
+        typeof bid.chunk_slot_start_diff === 'number' &&
+        (firstBidMs === null || bid.chunk_slot_start_diff < firstBidMs)
+      ) {
+        firstBidMs = bid.chunk_slot_start_diff;
+      }
+      if (!bid.value) continue;
+      try {
+        const value = BigInt(bid.value);
+        if (value > topBidValue) {
+          topBidValue = value;
+          topBidWei = bid.value;
+        }
+      } catch {
+        // ignore malformed bid values
+      }
+    }
+
+    const { status, presentVotes, ptcVotesSeen } = derivePayloadStatus({
+      hasBlock: !!blockHeadQuery.data?.fct_block_head?.[0],
+      payloadFirstSeen: seenRows,
+      ptcVote,
+    });
+
+    return {
+      payloadFirstSeenMs: seenDiffs[0] ?? null,
+      payloadP50Ms: seenDiffs.length > 0 ? seenDiffs[Math.floor(0.5 * (seenDiffs.length - 1))] : null,
+      payloadNodeCount: seenDiffs.length,
+      builderIndex: seenRows[0]?.builder_index ?? null,
+      ptcPresentVotes: presentVotes,
+      ptcVotesSeen,
+      ptcBlobVotes: ptcVote?.blob_data_available_votes ?? 0,
+      status,
+      bidBuilders: new Set(bidRows.map(bid => bid.builder_index).filter(index => index !== undefined)).size,
+      bidCount: bidRows.length,
+      topBidWei,
+      firstBidMs,
+    };
+  }, [isGloas, payloadFirstSeenQuery.data, ptcVoteQuery.data, payloadBidsQuery.data, blockHeadQuery.data]);
+
   // Prepare raw API data for slot progress timeline
   const rawApiData = useMemo(
     () => ({
@@ -455,6 +556,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
   return useMemo(
     () => ({
       blockDetails,
+      epbs,
       mapPoints,
       sidebarPhases,
       sidebarItems,
@@ -484,6 +586,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     }),
     [
       blockDetails,
+      epbs,
       mapPoints,
       sidebarPhases,
       sidebarItems,

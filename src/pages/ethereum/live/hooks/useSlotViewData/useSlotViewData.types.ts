@@ -8,6 +8,7 @@ import type {
   ContinentalPropagationSeries,
 } from '../../components/BlobDataAvailability/BlobDataAvailability.types';
 import type { AttestationDataPoint } from '../../components/AttestationArrivals/AttestationArrivals.types';
+import type { PayloadStatus } from '@/utils/epbs';
 import type {
   FctBlockHead,
   FctBlockProposer,
@@ -29,9 +30,28 @@ export interface ClientValidationRow {
   observations: number;
 }
 
+/** Gloas (ePBS) payload lifecycle data for the HUD; null pre-gloas. */
+export interface EpbsSlotData {
+  payloadFirstSeenMs: number | null;
+  payloadP50Ms: number | null;
+  payloadNodeCount: number;
+  builderIndex: number | null;
+  ptcPresentVotes: number;
+  ptcVotesSeen: number;
+  ptcBlobVotes: number;
+  status: PayloadStatus;
+  bidBuilders: number;
+  bidCount: number;
+  topBidWei: string | null;
+  firstBidMs: number | null;
+}
+
 export interface SlotViewData {
   // Block details (for slim card)
   blockDetails: BlockDetailsData | null;
+
+  // Gloas (ePBS) payload lifecycle; null pre-gloas
+  epbs: EpbsSlotData | null;
 
   // Map visualization - includes timing information for progressive rendering
   mapPoints: MapPointWithTiming[];
