@@ -3,6 +3,8 @@ import type {
   FctBlockFirstSeenByNode,
   FctBlockBlobFirstSeenByNode,
   FctAttestationFirstSeenChunked50Ms,
+  FctBlockPayloadFirstSeenByNode,
+  FctPayloadAttestationFirstSeenChunked50Ms,
   FctBlockProposer,
 } from '@/api/types.gen';
 import type { SlotPhase } from '@/utils/beacon';
@@ -23,6 +25,10 @@ export interface UseSidebarDataParams {
   blockNodes: FctBlockFirstSeenByNode[];
   blobNodes: FctBlockBlobFirstSeenByNode[];
   attestationChunks: FctAttestationFirstSeenChunked50Ms[];
+  /** Gloas (ePBS): payload envelope sightings per sentry */
+  payloadNodes?: FctBlockPayloadFirstSeenByNode[];
+  /** Gloas (ePBS): PTC payload attestation arrivals, chunked */
+  ptcChunks?: FctPayloadAttestationFirstSeenChunked50Ms[];
   proposer: FctBlockProposer | undefined;
   currentSlot: number;
 }
@@ -31,6 +37,8 @@ export function useSidebarData({
   blockNodes,
   blobNodes,
   attestationChunks,
+  payloadNodes,
+  ptcChunks,
   proposer: _proposer,
   currentSlot,
 }: UseSidebarDataParams): {
@@ -44,7 +52,7 @@ export function useSidebarData({
     const allItems: TimelineItem[] = [];
 
     // 2. Block seen in locations - Group by city and take earliest
-    const cityFirstSeen = new Map<string, { timestamp: number; location: string }>();
+    const cityFirstSeen = new Map<string, { timestamp: number; location: string; nodes: number }>();
     blockNodes.forEach(node => {
       const city = node.meta_client_geo_city;
       const country = node.meta_client_geo_country ?? 'Unknown';
@@ -53,8 +61,12 @@ export function useSidebarData({
       // Format location: "City, Country" or just "Country" if city is missing
       const location = city ? `${city}, ${country}` : country;
 
-      if (!cityFirstSeen.has(location) || timestamp < cityFirstSeen.get(location)!.timestamp) {
-        cityFirstSeen.set(location, { timestamp, location });
+      const existing = cityFirstSeen.get(location);
+      if (!existing) {
+        cityFirstSeen.set(location, { timestamp, location, nodes: 1 });
+      } else {
+        existing.nodes += 1;
+        if (timestamp < existing.timestamp) existing.timestamp = timestamp;
       }
     });
 
@@ -67,7 +79,39 @@ export function useSidebarData({
             <Badge color="green" variant="border" size="small">
               Block
             </Badge>
-            <span>{location}</span>
+            <span>{data.nodes > 1 ? `${location} · ${data.nodes} nodes` : location}</span>
+          </div>
+        ),
+      });
+    });
+
+    // 2b. Gloas (ePBS): payload envelope sightings, grouped like blocks
+    const payloadCityFirstSeen = new Map<string, { timestamp: number; nodes: number }>();
+    (payloadNodes ?? []).forEach(node => {
+      const city = node.meta_client_geo_city;
+      const country = node.meta_client_geo_country ?? 'Unknown';
+      const timestamp = node.seen_slot_start_diff ?? 0;
+      const location = city ? `${city}, ${country}` : country;
+
+      const existing = payloadCityFirstSeen.get(location);
+      if (!existing) {
+        payloadCityFirstSeen.set(location, { timestamp, nodes: 1 });
+      } else {
+        existing.nodes += 1;
+        if (timestamp < existing.timestamp) existing.timestamp = timestamp;
+      }
+    });
+
+    payloadCityFirstSeen.forEach((data, location) => {
+      allItems.push({
+        id: `${currentSlot}-payload-seen-${location}-${data.timestamp}`,
+        timestamp: data.timestamp,
+        content: (
+          <div className="flex items-center gap-1.5">
+            <Badge color="indigo" variant="border" size="small">
+              Payload
+            </Badge>
+            <span>{data.nodes > 1 ? `${location} · ${data.nodes} nodes` : location}</span>
           </div>
         ),
       });
@@ -86,6 +130,29 @@ export function useSidebarData({
             <div className="flex items-center gap-1.5">
               <Badge color="purple" variant="border" size="small">
                 Attest
+              </Badge>
+              <span>
+                {count} validator{count > 1 ? 's' : ''}
+              </span>
+            </div>
+          ),
+        });
+      }
+    });
+
+    // 3b. Gloas (ePBS): PTC payload attestation arrivals, chunked
+    (ptcChunks ?? []).forEach((chunk, index) => {
+      const count = chunk.attestation_count ?? 0;
+      const timestamp = chunk.chunk_slot_start_diff ?? 0;
+
+      if (count > 0) {
+        allItems.push({
+          id: `${currentSlot}-ptc-${timestamp}-${index}`,
+          timestamp,
+          content: (
+            <div className="flex items-center gap-1.5">
+              <Badge color="yellow" variant="border" size="small">
+                PTC
               </Badge>
               <span>
                 {count} validator{count > 1 ? 's' : ''}
@@ -178,7 +245,7 @@ export function useSidebarData({
 
     // Sort all items by timestamp
     return allItems.sort((a, b) => a.timestamp - b.timestamp);
-  }, [blockNodes, blobNodes, attestationChunks, currentSlot]);
+  }, [blockNodes, blobNodes, attestationChunks, payloadNodes, ptcChunks, currentSlot]);
 
   return { phases, items };
 }

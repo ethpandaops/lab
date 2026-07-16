@@ -358,6 +358,8 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     blockNodes: blockFirstSeenQuery.data?.fct_block_first_seen_by_node ?? EMPTY_BLOCK_FIRST_SEEN,
     blobNodes: blobFirstSeenQuery.data?.fct_block_blob_first_seen_by_node ?? EMPTY_BLOB_FIRST_SEEN,
     attestationChunks: attestationQuery.data?.fct_attestation_first_seen_chunked_50ms ?? EMPTY_ATTESTATION,
+    payloadNodes: payloadFirstSeenQuery.data?.fct_block_payload_first_seen_by_node,
+    ptcChunks: ptcArrivalsQuery.data?.fct_payload_attestation_first_seen_chunked_50ms,
     proposer: blockProposerQuery.data?.fct_block_proposer?.[0],
     currentSlot,
   });
