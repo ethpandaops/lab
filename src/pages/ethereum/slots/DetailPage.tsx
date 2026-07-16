@@ -29,6 +29,7 @@ import {
 import { useSlotDetailData } from './hooks/useSlotDetailData';
 import { useAllAttestationVotes } from './hooks/useAllAttestationVotes';
 import { SlotBasicInfoCard } from './components/SlotBasicInfoCard';
+import { SlotPayloadCard } from './components/SlotPayloadCard';
 import { SlotDownloadModal } from './components/SlotDownloadModal';
 import { AttestationArrivalsChart } from './components/AttestationArrivalsChart';
 import { AttestationVotesBreakdownTable } from './components/AttestationVotesBreakdownTable';
@@ -432,6 +433,14 @@ export function DetailPage(): JSX.Element {
       )}
 
       <SlotBasicInfoCard slot={slot} epoch={epoch} data={data} isMissedSlot={isMissedSlot} />
+
+      <div className="mt-6">
+        <SlotPayloadCard
+          slot={slot}
+          proposerIndex={data.blockProposer[0]?.proposer_validator_index}
+          hasBlock={!isMissedSlot}
+        />
+      </div>
 
       {/* Tabbed Content */}
       <div className="mt-8">
