@@ -3,24 +3,9 @@
 import type { Auth, AuthToken } from './auth.gen';
 import type { BodySerializer, QuerySerializer, QuerySerializerOptions } from './bodySerializer.gen';
 
-export type HttpMethod =
-  | 'connect'
-  | 'delete'
-  | 'get'
-  | 'head'
-  | 'options'
-  | 'patch'
-  | 'post'
-  | 'put'
-  | 'trace';
+export type HttpMethod = 'connect' | 'delete' | 'get' | 'head' | 'options' | 'patch' | 'post' | 'put' | 'trace';
 
-export type Client<
-  RequestFn = never,
-  Config = unknown,
-  MethodFn = never,
-  BuildUrlFn = never,
-  SseFn = never,
-> = {
+export type Client<RequestFn = never, Config = unknown, MethodFn = never, BuildUrlFn = never, SseFn = never> = {
   /**
    * Returns the final request URL.
    */
@@ -51,10 +36,7 @@ export interface Config {
    */
   headers?:
     | RequestInit['headers']
-    | Record<
-        string,
-        string | number | boolean | (string | number | boolean)[] | null | undefined | unknown
-      >;
+    | Record<string, string | number | boolean | (string | number | boolean)[] | null | undefined | unknown>;
   /**
    * The request method.
    *
