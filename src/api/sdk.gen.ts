@@ -639,6 +639,12 @@ import type {
   FctOpcodeOpsHourlyServiceListData,
   FctOpcodeOpsHourlyServiceListErrors,
   FctOpcodeOpsHourlyServiceListResponses,
+  FctPayloadAttestationFirstSeenChunked50MsServiceGetData,
+  FctPayloadAttestationFirstSeenChunked50MsServiceGetErrors,
+  FctPayloadAttestationFirstSeenChunked50MsServiceGetResponses,
+  FctPayloadAttestationFirstSeenChunked50MsServiceListData,
+  FctPayloadAttestationFirstSeenChunked50MsServiceListErrors,
+  FctPayloadAttestationFirstSeenChunked50MsServiceListResponses,
   FctPayloadBidHighestValueByBuilderChunked50MsServiceGetData,
   FctPayloadBidHighestValueByBuilderChunked50MsServiceGetErrors,
   FctPayloadBidHighestValueByBuilderChunked50MsServiceGetResponses,
@@ -1665,6 +1671,10 @@ import {
   zFctOpcodeOpsHourlyServiceGetResponse,
   zFctOpcodeOpsHourlyServiceListData,
   zFctOpcodeOpsHourlyServiceListResponse,
+  zFctPayloadAttestationFirstSeenChunked50MsServiceGetData,
+  zFctPayloadAttestationFirstSeenChunked50MsServiceGetResponse,
+  zFctPayloadAttestationFirstSeenChunked50MsServiceListData,
+  zFctPayloadAttestationFirstSeenChunked50MsServiceListResponse,
   zFctPayloadBidHighestValueByBuilderChunked50MsServiceGetData,
   zFctPayloadBidHighestValueByBuilderChunked50MsServiceGetResponse,
   zFctPayloadBidHighestValueByBuilderChunked50MsServiceListData,
@@ -6073,6 +6083,46 @@ export const fctOpcodeOpsHourlyServiceGet = <ThrowOnError extends boolean = fals
     requestValidator: async data => await zFctOpcodeOpsHourlyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctOpcodeOpsHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_opcode_ops_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctPayloadAttestationFirstSeenChunked50MsServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPayloadAttestationFirstSeenChunked50MsServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPayloadAttestationFirstSeenChunked50MsServiceListResponses,
+    FctPayloadAttestationFirstSeenChunked50MsServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPayloadAttestationFirstSeenChunked50MsServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctPayloadAttestationFirstSeenChunked50MsServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_payload_attestation_first_seen_chunked_50ms',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctPayloadAttestationFirstSeenChunked50MsServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPayloadAttestationFirstSeenChunked50MsServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPayloadAttestationFirstSeenChunked50MsServiceGetResponses,
+    FctPayloadAttestationFirstSeenChunked50MsServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPayloadAttestationFirstSeenChunked50MsServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctPayloadAttestationFirstSeenChunked50MsServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_payload_attestation_first_seen_chunked_50ms/{slot_start_date_time}',
     ...options,
   });
 

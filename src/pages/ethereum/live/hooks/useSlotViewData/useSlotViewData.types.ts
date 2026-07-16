@@ -56,6 +56,9 @@ export interface SlotViewData {
   // Map visualization - includes timing information for progressive rendering
   mapPoints: MapPointWithTiming[];
 
+  // Gloas (ePBS): payload envelope arrivals as a second map wave
+  payloadMapPoints: MapPointWithTiming[];
+
   // Sidebar
   sidebarPhases: SlotPhase[];
   sidebarItems: TimelineItem[];
@@ -69,6 +72,10 @@ export interface SlotViewData {
   // Data column availability (PeerDAS)
   dataColumnBlobCount: number;
   dataColumnFirstSeenData: Array<{ columnId: number; time: number; color?: string }>;
+
+  // Gloas (ePBS): PTC payload attestation arrivals (second attestation stream)
+  ptcArrivalData: AttestationDataPoint[];
+  ptcArrivalMaxCount: number;
 
   // Attestation arrivals
   attestationData: AttestationDataPoint[];

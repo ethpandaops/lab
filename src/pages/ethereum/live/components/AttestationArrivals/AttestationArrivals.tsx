@@ -14,10 +14,14 @@ import type { AttestationArrivalsProps } from './AttestationArrivals.types';
  */
 function AttestationArrivalsComponent({
   attestationChartValues,
+  payloadAttestationChartValues,
   totalExpected: _totalExpected,
   maxCount,
   className,
 }: AttestationArrivalsProps): JSX.Element {
+  // The PTC stream only exists on gloas networks; an all-empty array means
+  // the fork is active but this slot's votes have not landed yet.
+  const hasPtcStream = payloadAttestationChartValues !== undefined;
   // Prepare data for interval arrivals chart from pre-computed values
   // Convert from milliseconds (0-12000 in 50ms steps) to seconds (0-12 in 0.05s steps)
   const intervalChartData = useMemo(() => {
@@ -50,7 +54,7 @@ function AttestationArrivalsComponent({
 
   return (
     <div className={clsx('flex h-full flex-col', className)}>
-      {/* Attestation Arrivals Chart - takes full height */}
+      {/* Attestation Arrivals Chart - takes full height, splits when the PTC stream exists */}
       <div className="flex h-full flex-col bg-surface p-3">
         <div className="mb-2 shrink-0">
           <h3 className="text-sm font-semibold text-foreground uppercase">Attestation Arrivals</h3>
@@ -59,7 +63,7 @@ function AttestationArrivalsComponent({
           <LineChart
             data={intervalChartData.values}
             labels={intervalChartData.labels}
-            xAxisTitle="Slot Time (s)"
+            xAxisTitle={hasPtcStream ? undefined : 'Slot Time (s)'}
             yAxisTitle="Count"
             height="100%"
             smooth={false}
@@ -73,6 +77,30 @@ function AttestationArrivalsComponent({
             tooltipFormatter={tooltipFormatter}
           />
         </div>
+        {hasPtcStream && (
+          <>
+            <div className="mt-2 mb-2 shrink-0">
+              <h3 className="text-sm font-semibold text-foreground uppercase">PTC Payload Attestations</h3>
+            </div>
+            <div className="min-h-0 flex-1">
+              <LineChart
+                data={payloadAttestationChartValues}
+                labels={intervalChartData.labels}
+                xAxisTitle="Slot Time (s)"
+                yAxisTitle="Count"
+                height="100%"
+                smooth={false}
+                showArea={true}
+                connectNulls={false}
+                animationDuration={0}
+                xAxisLabelInterval={intervalChartData.labelInterval}
+                showGridlines={false}
+                showYAxisLine={true}
+                tooltipFormatter={tooltipFormatter}
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -80,7 +108,10 @@ function AttestationArrivalsComponent({
 
 // Custom comparison function to prevent re-renders when data hasn't changed
 const arePropsEqual = (prevProps: AttestationArrivalsProps, nextProps: AttestationArrivalsProps): boolean => {
-  return prevProps.attestationChartValues === nextProps.attestationChartValues;
+  return (
+    prevProps.attestationChartValues === nextProps.attestationChartValues &&
+    prevProps.payloadAttestationChartValues === nextProps.payloadAttestationChartValues
+  );
 };
 
 export const AttestationArrivals = memo(AttestationArrivalsComponent, arePropsEqual);

@@ -18,6 +18,7 @@ import {
   fctBlockPayloadFirstSeenByNodeServiceListOptions,
   fctBlockPayloadPtcVoteHeadServiceListOptions,
   fctPayloadBidHighestValueByBuilderChunked50MsServiceListOptions,
+  fctPayloadAttestationFirstSeenChunked50MsServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import { getForkForSlot, isForkAtOrAfter } from '@/utils/beacon';
 import { derivePayloadStatus } from '@/utils/epbs';
@@ -29,6 +30,7 @@ import { useSidebarData } from '../useSidebarData';
 import { useBlobAvailabilityData } from '../useBlobAvailabilityData';
 import { useDataColumnAvailabilityData } from '../useDataColumnAvailabilityData';
 import { useAttestationData } from '../useAttestationData';
+import type { FctBlockFirstSeenByNode } from '@/api/types.gen';
 import type { SlotViewData } from './useSlotViewData.types';
 
 // Stable empty arrays to prevent infinite re-renders
@@ -261,7 +263,19 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     ...slotQueryOptions(slotStartDateTime),
   });
 
-  // API Query 14 (gloas): the on-chain builder bid race
+  // API Query 14 (gloas): PTC payload attestation arrivals, chunked 50ms
+  const ptcArrivalsQuery = useQuery({
+    ...fctPayloadAttestationFirstSeenChunked50MsServiceListOptions({
+      query: {
+        slot_start_date_time_eq: slotStartDateTime,
+        page_size: 10000,
+      },
+    }),
+    enabled: slotStartDateTime > 0 && isGloas,
+    ...slotQueryOptions(slotStartDateTime),
+  });
+
+  // API Query 15 (gloas): the on-chain builder bid race
   const payloadBidsQuery = useQuery({
     ...fctPayloadBidHighestValueByBuilderChunked50MsServiceListOptions({
       query: {
@@ -333,6 +347,13 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
 
   const mapPoints = useMapData(blockFirstSeenQuery.data?.fct_block_first_seen_by_node ?? EMPTY_BLOCK_FIRST_SEEN);
 
+  // Gloas (ePBS): payload envelope sightings share the sentry geo shape, so
+  // they reuse the map aggregation and render as a second wave of dots.
+  const payloadMapPoints = useMapData(
+    (payloadFirstSeenQuery.data?.fct_block_payload_first_seen_by_node ??
+      EMPTY_BLOCK_FIRST_SEEN) as unknown as FctBlockFirstSeenByNode[]
+  );
+
   const { phases: sidebarPhases, items: sidebarItems } = useSidebarData({
     blockNodes: blockFirstSeenQuery.data?.fct_block_first_seen_by_node ?? EMPTY_BLOCK_FIRST_SEEN,
     blobNodes: blobFirstSeenQuery.data?.fct_block_blob_first_seen_by_node ?? EMPTY_BLOB_FIRST_SEEN,
@@ -366,6 +387,11 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
   } = useAttestationData(
     attestationQuery.data?.fct_attestation_first_seen_chunked_50ms ?? EMPTY_ATTESTATION,
     totalExpectedValidators
+  );
+
+  const { data: ptcArrivalData, maxCount: ptcArrivalMaxCount } = useAttestationData(
+    ptcArrivalsQuery.data?.fct_payload_attestation_first_seen_chunked_50ms ?? EMPTY_ATTESTATION,
+    0
   );
 
   const blobCount = blobCountQuery.data?.fct_block_blob_count_head?.[0]?.blob_count ?? 0;
@@ -576,7 +602,10 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     () => ({
       blockDetails,
       epbs,
+      ptcArrivalData,
+      ptcArrivalMaxCount,
       mapPoints,
+      payloadMapPoints,
       sidebarPhases,
       sidebarItems,
       blobCount,
@@ -606,7 +635,10 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     [
       blockDetails,
       epbs,
+      ptcArrivalData,
+      ptcArrivalMaxCount,
       mapPoints,
+      payloadMapPoints,
       sidebarPhases,
       sidebarItems,
       blobCount,

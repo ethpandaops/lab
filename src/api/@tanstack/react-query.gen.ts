@@ -216,6 +216,8 @@ import {
   fctOpcodeOpsDailyServiceList,
   fctOpcodeOpsHourlyServiceGet,
   fctOpcodeOpsHourlyServiceList,
+  fctPayloadAttestationFirstSeenChunked50MsServiceGet,
+  fctPayloadAttestationFirstSeenChunked50MsServiceList,
   fctPayloadBidHighestValueByBuilderChunked50MsServiceGet,
   fctPayloadBidHighestValueByBuilderChunked50MsServiceList,
   fctPreparedBlockServiceGet,
@@ -1055,6 +1057,12 @@ import type {
   FctOpcodeOpsHourlyServiceListData,
   FctOpcodeOpsHourlyServiceListError,
   FctOpcodeOpsHourlyServiceListResponse,
+  FctPayloadAttestationFirstSeenChunked50MsServiceGetData,
+  FctPayloadAttestationFirstSeenChunked50MsServiceGetError,
+  FctPayloadAttestationFirstSeenChunked50MsServiceGetResponse,
+  FctPayloadAttestationFirstSeenChunked50MsServiceListData,
+  FctPayloadAttestationFirstSeenChunked50MsServiceListError,
+  FctPayloadAttestationFirstSeenChunked50MsServiceListResponse,
   FctPayloadBidHighestValueByBuilderChunked50MsServiceGetData,
   FctPayloadBidHighestValueByBuilderChunked50MsServiceGetError,
   FctPayloadBidHighestValueByBuilderChunked50MsServiceGetResponse,
@@ -7817,6 +7825,66 @@ export const fctOpcodeOpsHourlyServiceGetOptions = (options: Options<FctOpcodeOp
       return data;
     },
     queryKey: fctOpcodeOpsHourlyServiceGetQueryKey(options),
+  });
+
+export const fctPayloadAttestationFirstSeenChunked50MsServiceListQueryKey = (
+  options?: Options<FctPayloadAttestationFirstSeenChunked50MsServiceListData>
+) => createQueryKey('fctPayloadAttestationFirstSeenChunked50MsServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctPayloadAttestationFirstSeenChunked50MsServiceListOptions = (
+  options?: Options<FctPayloadAttestationFirstSeenChunked50MsServiceListData>
+) =>
+  queryOptions<
+    FctPayloadAttestationFirstSeenChunked50MsServiceListResponse,
+    FctPayloadAttestationFirstSeenChunked50MsServiceListError,
+    FctPayloadAttestationFirstSeenChunked50MsServiceListResponse,
+    ReturnType<typeof fctPayloadAttestationFirstSeenChunked50MsServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPayloadAttestationFirstSeenChunked50MsServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPayloadAttestationFirstSeenChunked50MsServiceListQueryKey(options),
+  });
+
+export const fctPayloadAttestationFirstSeenChunked50MsServiceGetQueryKey = (
+  options: Options<FctPayloadAttestationFirstSeenChunked50MsServiceGetData>
+) => createQueryKey('fctPayloadAttestationFirstSeenChunked50MsServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctPayloadAttestationFirstSeenChunked50MsServiceGetOptions = (
+  options: Options<FctPayloadAttestationFirstSeenChunked50MsServiceGetData>
+) =>
+  queryOptions<
+    FctPayloadAttestationFirstSeenChunked50MsServiceGetResponse,
+    FctPayloadAttestationFirstSeenChunked50MsServiceGetError,
+    FctPayloadAttestationFirstSeenChunked50MsServiceGetResponse,
+    ReturnType<typeof fctPayloadAttestationFirstSeenChunked50MsServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPayloadAttestationFirstSeenChunked50MsServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPayloadAttestationFirstSeenChunked50MsServiceGetQueryKey(options),
   });
 
 export const fctPayloadBidHighestValueByBuilderChunked50MsServiceListQueryKey = (

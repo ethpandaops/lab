@@ -70,6 +70,7 @@ interface SlotLiveDataProviderProps {
   deduplicatedBlobTimeline: Array<{ blobId: string; time: number; color?: string }>;
   sortedContinentalSeries: ContinentalPropagationSeries[];
   attestationTimeToCount: Map<number, number>;
+  ptcTimeToCount: Map<number, number>;
   attestationActualCount: number;
   attestationTotalExpected: number;
   dataColumnFirstSeenData: DataColumnFirstSeenPoint[];
@@ -82,6 +83,7 @@ function SlotLiveDataProvider({
   deduplicatedBlobTimeline,
   sortedContinentalSeries,
   attestationTimeToCount,
+  ptcTimeToCount,
   attestationActualCount,
   attestationTotalExpected,
   dataColumnFirstSeenData,
@@ -98,6 +100,7 @@ function SlotLiveDataProvider({
   const continentalIndicesRef = useRef<number[]>([]);
   const visibleContinentalPropagationDataRef = useRef<typeof sortedContinentalSeries>([]);
   const attestationChartValuesRef = useRef<(number | null)[]>([]);
+  const ptcChartValuesRef = useRef<(number | null)[]>([]);
   const lastChartTimeRef = useRef(-1);
   const visibleDataColumnsRef = useRef<DataColumnFirstSeenPoint[]>([]);
   const visibleDataColumnIdsRef = useRef<Set<number>>(new Set());
@@ -109,6 +112,7 @@ function SlotLiveDataProvider({
     deduplicatedBlobData: [],
     visibleContinentalPropagationData: [],
     attestationChartValues: [],
+    ptcChartValues: [],
     dataColumnFirstSeenData: [],
   });
 
@@ -121,6 +125,7 @@ function SlotLiveDataProvider({
     deduplicatedBlobDataRef.current = [];
     visibleContinentalPropagationDataRef.current = [];
     attestationChartValuesRef.current = [];
+    ptcChartValuesRef.current = [];
     visibleDataColumnsRef.current = [];
     visibleDataColumnIdsRef.current = new Set();
     timeFilteredDataRef.current = {
@@ -130,6 +135,7 @@ function SlotLiveDataProvider({
       deduplicatedBlobData: [],
       visibleContinentalPropagationData: [],
       attestationChartValues: [],
+      ptcChartValues: [],
       dataColumnFirstSeenData: [],
     };
     setDataVersion(prev => prev + 1);
@@ -205,8 +211,13 @@ function SlotLiveDataProvider({
         if (time > quantizedTime) return null;
         return attestationTimeToCount.get(time) ?? 0;
       });
+      ptcChartValuesRef.current = TIME_POINTS.map(time => {
+        if (time > quantizedTime) return null;
+        return ptcTimeToCount.get(time) ?? 0;
+      });
       lastChartTimeRef.current = roundedTime;
       timeFilteredDataRef.current.attestationChartValues = attestationChartValuesRef.current;
+      timeFilteredDataRef.current.ptcChartValues = ptcChartValuesRef.current;
       mutated = true;
     }
 
@@ -235,6 +246,7 @@ function SlotLiveDataProvider({
     deduplicatedBlobTimeline,
     sortedContinentalSeries,
     attestationTimeToCount,
+    ptcTimeToCount,
     attestationActualCount,
     attestationTotalExpected,
     dataColumnFirstSeenData,
@@ -361,6 +373,7 @@ const LiveBottomBar = memo(function LiveBottomBar(props: BottomBarBaseProps) {
       deduplicatedBlobData={timeFilteredData.deduplicatedBlobData}
       visibleContinentalPropagationData={timeFilteredData.visibleContinentalPropagationData}
       attestationChartValues={timeFilteredData.attestationChartValues}
+      payloadAttestationChartValues={timeFilteredData.ptcChartValues}
       dataColumnFirstSeenData={timeFilteredData.dataColumnFirstSeenData}
     />
   );
@@ -376,8 +389,17 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
   const handleTimeClick = useCallback((timeMs: number) => actions.seekToTime(timeMs), [actions]);
 
   const sortedMapPoints = useMemo(() => {
-    return [...slotData.mapPoints].sort((a, b) => a.earliestSeenTime - b.earliestSeenTime);
-  }, [slotData.mapPoints]);
+    // Gloas (ePBS): overlay the payload envelope wave on the block wave. The
+    // per-point color separates the two, and sorting by arrival keeps the
+    // progressive reveal working across both.
+    const payloadWave = slotData.payloadMapPoints.map(point => ({
+      ...point,
+      name: `${point.name} · payload`,
+      color: 'var(--color-purple-500, #a855f7)',
+    }));
+
+    return [...slotData.mapPoints, ...payloadWave].sort((a, b) => a.earliestSeenTime - b.earliestSeenTime);
+  }, [slotData.mapPoints, slotData.payloadMapPoints]);
 
   const deduplicatedBlobTimeline = useMemo(() => {
     const earliestByBlob = new Map<string, { time: number; color?: string }>();
@@ -409,6 +431,14 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
     return map;
   }, [slotData.attestationData]);
 
+  const ptcTimeToCount = useMemo(() => {
+    const map = new Map<number, number>();
+    for (const point of slotData.ptcArrivalData) {
+      map.set(point.time, point.count);
+    }
+    return map;
+  }, [slotData.ptcArrivalData]);
+
   return (
     <SlotLiveDataProvider
       currentSlot={currentSlot}
@@ -416,6 +446,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
       deduplicatedBlobTimeline={deduplicatedBlobTimeline}
       sortedContinentalSeries={sortedContinentalSeries}
       attestationTimeToCount={attestationTimeToCount}
+      ptcTimeToCount={ptcTimeToCount}
       attestationActualCount={slotData.attestationActualCount}
       attestationTotalExpected={slotData.attestationTotalExpected}
       dataColumnFirstSeenData={slotData.dataColumnFirstSeenData}

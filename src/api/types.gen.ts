@@ -5720,6 +5720,41 @@ export type FctOpcodeOpsHourly = {
   upper_band_ops?: number;
 };
 
+export type FctPayloadAttestationFirstSeenChunked50Ms = {
+  /**
+   * The number of PTC validators first seen in this chunk
+   */
+  attestation_count?: number;
+  /**
+   * The beacon block root being attested by the PTC
+   */
+  block_root?: string;
+  /**
+   * The difference between the chunk start time and slot_start_date_time. "9000" would mean this chunk contains payload attestations first seen between 9000ms and 9050ms into the slot
+   */
+  chunk_slot_start_diff?: number;
+  /**
+   * The epoch number containing the attested slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * The attested slot number
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the attested slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type FctPayloadBidHighestValueByBuilderChunked50Ms = {
   /**
    * The execution block hash committed to in the bid
@@ -7323,6 +7358,13 @@ export type GetFctOpcodeOpsDailyResponse = {
  */
 export type GetFctOpcodeOpsHourlyResponse = {
   item?: FctOpcodeOpsHourly;
+};
+
+/**
+ * Response for getting a single fct_payload_attestation_first_seen_chunked_50ms record
+ */
+export type GetFctPayloadAttestationFirstSeenChunked50MsResponse = {
+  item?: FctPayloadAttestationFirstSeenChunked50Ms;
 };
 
 /**
@@ -12851,6 +12893,20 @@ export type ListFctOpcodeOpsHourlyResponse = {
    * The list of fct_opcode_ops_hourly.
    */
   fct_opcode_ops_hourly?: Array<FctOpcodeOpsHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_payload_attestation_first_seen_chunked_50ms records
+ */
+export type ListFctPayloadAttestationFirstSeenChunked50MsResponse = {
+  /**
+   * The list of fct_payload_attestation_first_seen_chunked_50ms.
+   */
+  fct_payload_attestation_first_seen_chunked_50ms?: Array<FctPayloadAttestationFirstSeenChunked50Ms>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -67566,6 +67622,394 @@ export type FctOpcodeOpsHourlyServiceGetResponses = {
 
 export type FctOpcodeOpsHourlyServiceGetResponse =
   FctOpcodeOpsHourlyServiceGetResponses[keyof FctOpcodeOpsHourlyServiceGetResponses];
+
+export type FctPayloadAttestationFirstSeenChunked50MsServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the attested slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the attested slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the attested slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the attested slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the attested slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the attested slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the attested slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the attested slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the attested slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the attested slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * The beacon block root being attested by the PTC (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * The beacon block root being attested by the PTC (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * The beacon block root being attested by the PTC (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * The beacon block root being attested by the PTC (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * The beacon block root being attested by the PTC (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * The beacon block root being attested by the PTC (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * The beacon block root being attested by the PTC (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * The beacon block root being attested by the PTC (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * The beacon block root being attested by the PTC (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. "9000" would mean this chunk contains payload attestations first seen between 9000ms and 9050ms into the slot (filter: eq)
+     */
+    chunk_slot_start_diff_eq?: number;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. "9000" would mean this chunk contains payload attestations first seen between 9000ms and 9050ms into the slot (filter: ne)
+     */
+    chunk_slot_start_diff_ne?: number;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. "9000" would mean this chunk contains payload attestations first seen between 9000ms and 9050ms into the slot (filter: lt)
+     */
+    chunk_slot_start_diff_lt?: number;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. "9000" would mean this chunk contains payload attestations first seen between 9000ms and 9050ms into the slot (filter: lte)
+     */
+    chunk_slot_start_diff_lte?: number;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. "9000" would mean this chunk contains payload attestations first seen between 9000ms and 9050ms into the slot (filter: gt)
+     */
+    chunk_slot_start_diff_gt?: number;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. "9000" would mean this chunk contains payload attestations first seen between 9000ms and 9050ms into the slot (filter: gte)
+     */
+    chunk_slot_start_diff_gte?: number;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. "9000" would mean this chunk contains payload attestations first seen between 9000ms and 9050ms into the slot (filter: between_min)
+     */
+    chunk_slot_start_diff_between_min?: number;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. "9000" would mean this chunk contains payload attestations first seen between 9000ms and 9050ms into the slot (filter: between_max_value)
+     */
+    chunk_slot_start_diff_between_max_value?: number;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. "9000" would mean this chunk contains payload attestations first seen between 9000ms and 9050ms into the slot (filter: in_values) (comma-separated list)
+     */
+    chunk_slot_start_diff_in_values?: string;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. "9000" would mean this chunk contains payload attestations first seen between 9000ms and 9050ms into the slot (filter: not_in_values) (comma-separated list)
+     */
+    chunk_slot_start_diff_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The attested slot number (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The attested slot number (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The attested slot number (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The attested slot number (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The attested slot number (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The attested slot number (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The attested slot number (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The attested slot number (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The attested slot number (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The attested slot number (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the attested slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the attested slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the attested slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the attested slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the attested slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the attested slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the attested slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the attested slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the attested slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the attested slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * The number of PTC validators first seen in this chunk (filter: eq)
+     */
+    attestation_count_eq?: number;
+    /**
+     * The number of PTC validators first seen in this chunk (filter: ne)
+     */
+    attestation_count_ne?: number;
+    /**
+     * The number of PTC validators first seen in this chunk (filter: lt)
+     */
+    attestation_count_lt?: number;
+    /**
+     * The number of PTC validators first seen in this chunk (filter: lte)
+     */
+    attestation_count_lte?: number;
+    /**
+     * The number of PTC validators first seen in this chunk (filter: gt)
+     */
+    attestation_count_gt?: number;
+    /**
+     * The number of PTC validators first seen in this chunk (filter: gte)
+     */
+    attestation_count_gte?: number;
+    /**
+     * The number of PTC validators first seen in this chunk (filter: between_min)
+     */
+    attestation_count_between_min?: number;
+    /**
+     * The number of PTC validators first seen in this chunk (filter: between_max_value)
+     */
+    attestation_count_between_max_value?: number;
+    /**
+     * The number of PTC validators first seen in this chunk (filter: in_values) (comma-separated list)
+     */
+    attestation_count_in_values?: string;
+    /**
+     * The number of PTC validators first seen in this chunk (filter: not_in_values) (comma-separated list)
+     */
+    attestation_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_payload_attestation_first_seen_chunked_50ms to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPayloadAttestationFirstSeenChunked50ms` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_payload_attestation_first_seen_chunked_50ms';
+};
+
+export type FctPayloadAttestationFirstSeenChunked50MsServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPayloadAttestationFirstSeenChunked50MsServiceListError =
+  FctPayloadAttestationFirstSeenChunked50MsServiceListErrors[keyof FctPayloadAttestationFirstSeenChunked50MsServiceListErrors];
+
+export type FctPayloadAttestationFirstSeenChunked50MsServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPayloadAttestationFirstSeenChunked50MsResponse;
+};
+
+export type FctPayloadAttestationFirstSeenChunked50MsServiceListResponse =
+  FctPayloadAttestationFirstSeenChunked50MsServiceListResponses[keyof FctPayloadAttestationFirstSeenChunked50MsServiceListResponses];
+
+export type FctPayloadAttestationFirstSeenChunked50MsServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the attested slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_payload_attestation_first_seen_chunked_50ms/{slot_start_date_time}';
+};
+
+export type FctPayloadAttestationFirstSeenChunked50MsServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPayloadAttestationFirstSeenChunked50MsServiceGetError =
+  FctPayloadAttestationFirstSeenChunked50MsServiceGetErrors[keyof FctPayloadAttestationFirstSeenChunked50MsServiceGetErrors];
+
+export type FctPayloadAttestationFirstSeenChunked50MsServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPayloadAttestationFirstSeenChunked50MsResponse;
+};
+
+export type FctPayloadAttestationFirstSeenChunked50MsServiceGetResponse =
+  FctPayloadAttestationFirstSeenChunked50MsServiceGetResponses[keyof FctPayloadAttestationFirstSeenChunked50MsServiceGetResponses];
 
 export type FctPayloadBidHighestValueByBuilderChunked50MsServiceListData = {
   body?: never;
