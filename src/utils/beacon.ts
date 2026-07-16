@@ -77,7 +77,7 @@ const PRE_GLOAS_PHASE_SPECS: SlotPhaseSpec[] = [
  * bid; the execution payload is revealed separately and judged by the Payload
  * Timeliness Committee. Deadlines from the consensus config:
  * ATTESTATION_DUE_BPS_GLOAS 2500, AGGREGATE_DUE_BPS_GLOAS 5000,
- * INCLUSION_LIST_DUE_BPS 6667, PAYLOAD_DUE_BPS / PAYLOAD_ATTESTATION_DUE_BPS 7500.
+ * PAYLOAD_DUE_BPS / PAYLOAD_ATTESTATION_DUE_BPS 7500.
  */
 const GLOAS_PHASE_SPECS: SlotPhaseSpec[] = [
   {
@@ -99,7 +99,7 @@ const GLOAS_PHASE_SPECS: SlotPhaseSpec[] = [
     endBps: 7500,
     className: 'bg-surface border-b-4 border-b-purple-500/50',
     textClassName: 'text-purple-600 dark:text-purple-400 font-bold',
-    description: 'Builder reveals the execution payload, inclusion lists due',
+    description: 'Builder reveals the execution payload',
   },
   {
     label: 'PTC',
@@ -370,7 +370,7 @@ export const FORK_METADATA: Record<ForkVersion, ForkMetadata> = {
     emoji: '🐋',
     color: 'bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-400',
     description:
-      'Glamsterdam - Enshrines proposer-builder separation, splitting the execution payload from the block with a Payload Timeliness Committee (EIP-7732), and adds fork-choice enforced inclusion lists (EIP-7805)',
+      'Glamsterdam - Enshrines proposer-builder separation, splitting the execution payload from the block with a Payload Timeliness Committee (EIP-7732)',
     executionName: 'amsterdam',
     combinedName: 'glamsterdam',
   },
