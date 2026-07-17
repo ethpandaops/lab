@@ -152,8 +152,8 @@ export function AttestationArrivalsChart({
 
   return (
     <PopoutCard
-      title="Attestation Arrivals by Block Vote"
-      anchorId="attestation-arrivals"
+      title={title}
+      anchorId={anchorId}
       subtitle={participationMessage}
       modalSize="fullscreen"
       modalDescription="Shows when attestations arrived during the slot, grouped by which block they voted for. Each line represents votes for a different block at varying distances from the current slot."
