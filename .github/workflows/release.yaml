@@ -42,3 +42,14 @@ jobs:
           files: |
             ./lab-${{ github.event.release.tag_name }}.tar.gz
             ./lab-${{ github.event.release.tag_name }}.zip
+
+      # Assets are uploaded, so lab-backend can now cut a release that
+      # embeds this frontend version.
+      - name: Trigger lab-backend release
+        if: ${{ !github.event.release.prerelease }}
+        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4.0.1
+        with:
+          token: ${{ secrets.EPOBOT_TOKEN }}
+          repository: ethpandaops/lab-backend
+          event-type: frontend-release
+          client-payload: '{"frontend_tag": "${{ github.event.release.tag_name }}"}'
