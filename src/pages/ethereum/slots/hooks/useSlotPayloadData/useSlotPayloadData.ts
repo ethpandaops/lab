@@ -6,6 +6,7 @@ import {
   fctBlockPayloadAvailableByNodeServiceListOptions,
   fctPayloadBidHighestValueByBuilderChunked50MsServiceListOptions,
   fctBlockPayloadServiceListOptions,
+  fctPayloadBidHighestValueChunked50MsServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import type {
   FctBlockPayloadBid,
@@ -14,6 +15,7 @@ import type {
   FctBlockPayloadAvailableByNode,
   FctPayloadBidHighestValueByBuilderChunked50Ms,
   FctBlockPayload,
+  FctPayloadBidHighestValueChunked50Ms,
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { slotToTimestamp } from '@/utils/beacon';
@@ -31,6 +33,8 @@ export interface SlotPayloadData {
   bidRace: FctPayloadBidHighestValueByBuilderChunked50Ms[];
   /** Canonical per-block payload facts: bid commitment + envelope contents */
   payload?: FctBlockPayload;
+  /** The auction frontier: best bid per 50ms chunk across all builders */
+  bidFrontier: FctPayloadBidHighestValueChunked50Ms[];
 }
 
 export interface UseSlotPayloadDataResult {
@@ -87,10 +91,17 @@ export function useSlotPayloadData(slot: number, enabled = true): UseSlotPayload
         }),
         enabled: queryEnabled,
       },
+      {
+        ...fctPayloadBidHighestValueChunked50MsServiceListOptions({
+          query: { slot_start_date_time_eq: slotTimestamp, page_size: 1000 },
+        }),
+        enabled: queryEnabled,
+      },
     ],
   });
 
-  const [bidQuery, firstSeenQuery, availableQuery, ptcVoteQuery, bidRaceQuery, payloadQuery] = queries;
+  const [bidQuery, firstSeenQuery, availableQuery, ptcVoteQuery, bidRaceQuery, payloadQuery, bidFrontierQuery] =
+    queries;
 
   return {
     data: {
@@ -100,6 +111,7 @@ export function useSlotPayloadData(slot: number, enabled = true): UseSlotPayload
       ptcVote: ptcVoteQuery.data?.fct_block_payload_ptc_vote_head?.[0],
       bidRace: bidRaceQuery.data?.fct_payload_bid_highest_value_by_builder_chunked_50ms ?? [],
       payload: payloadQuery.data?.fct_block_payload?.[0],
+      bidFrontier: bidFrontierQuery.data?.fct_payload_bid_highest_value_chunked_50ms ?? [],
     },
     isLoading: queryEnabled && queries.some(query => query.isLoading),
   };

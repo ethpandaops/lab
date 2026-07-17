@@ -97,11 +97,25 @@ export function DetailPage(): JSX.Element {
   const isGloas = isForkAtOrAfter(getForkForSlot(slot, currentNetwork), 'gloas');
   const { data: payloadData } = useSlotPayloadData(slot, isGloas);
   // The chart draws one series per builder, which stops scaling somewhere
-  // around a dozen. Keep the strongest bidders as individual series and
-  // collapse the rest into a single "field" series holding the best bid of
-  // the remainder per chunk.
+  // around a dozen. The strongest bidders keep individual series and the
+  // auction frontier table supplies the "best bid" line — bounded by the
+  // 50ms chunk grid no matter how many builders compete. If the by_builder
+  // fetch truncated (unbounded builder count), fall back to frontier only.
   const payloadBidRaceData = useMemo(() => {
     const TOP_BUILDERS = 10;
+    const BY_BUILDER_PAGE_SIZE = 10000;
+
+    const frontierRows = payloadData.bidFrontier.map(bid => ({
+      chunk_slot_start_diff: bid.chunk_slot_start_diff ?? 0,
+      value: bid.value ?? '0',
+      builder_pubkey: 'best bid',
+      block_hash: bid.block_hash,
+    }));
+
+    if (payloadData.bidRace.length >= BY_BUILDER_PAGE_SIZE) {
+      return frontierRows;
+    }
+
     const peakByBuilder = new Map<number, bigint>();
     for (const bid of payloadData.bidRace) {
       if (bid.builder_index === undefined || !bid.value) continue;
@@ -121,45 +135,23 @@ export function DetailPage(): JSX.Element {
         .map(([index]) => index)
     );
 
-    const rows: Array<{ chunk_slot_start_diff: number; value: string; builder_pubkey: string; block_hash?: string }> =
-      [];
-    const fieldBestByChunk = new Map<number, { value: bigint; row: (typeof rows)[number] }>();
-
-    for (const bid of payloadData.bidRace) {
-      const chunk = bid.chunk_slot_start_diff ?? 0;
-      const row = {
-        chunk_slot_start_diff: chunk,
+    const rows = payloadData.bidRace
+      .filter(bid => bid.builder_index !== undefined && topBuilders.has(bid.builder_index))
+      .map(bid => ({
+        chunk_slot_start_diff: bid.chunk_slot_start_diff ?? 0,
         value: bid.value ?? '0',
-        builder_pubkey:
-          bid.builder_index !== undefined && topBuilders.has(bid.builder_index)
-            ? `builder-${bid.builder_index}`
-            : `field (${peakByBuilder.size - topBuilders.size} builders)`,
+        builder_pubkey: `builder-${bid.builder_index}`,
         block_hash: bid.block_hash,
-      };
+      }));
 
-      if (bid.builder_index !== undefined && topBuilders.has(bid.builder_index)) {
-        rows.push(row);
-        continue;
-      }
-
-      // Remainder: keep only the best bid per chunk.
-      try {
-        const value = BigInt(bid.value ?? '0');
-        const existing = fieldBestByChunk.get(chunk);
-        if (!existing || value > existing.value) {
-          fieldBestByChunk.set(chunk, { value, row });
-        }
-      } catch {
-        // ignore malformed values
-      }
-    }
-
-    for (const { row } of fieldBestByChunk.values()) {
-      rows.push(row);
+    // Only draw the frontier alongside individual builders when it adds
+    // information (i.e. some builders were cut from the top list).
+    if (peakByBuilder.size > topBuilders.size) {
+      rows.push(...frontierRows);
     }
 
     return rows;
-  }, [payloadData.bidRace]);
+  }, [payloadData.bidRace, payloadData.bidFrontier]);
 
   // Download modal (beacon block + blob sidecars)
   const [downloadOpen, setDownloadOpen] = useState(false);

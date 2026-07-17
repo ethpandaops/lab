@@ -5877,6 +5877,49 @@ export type FctPayloadBidHighestValueByBuilderChunked50Ms = {
   value?: string;
 };
 
+export type FctPayloadBidHighestValueChunked50Ms = {
+  /**
+   * The execution block hash committed to in the leading bid
+   */
+  block_hash?: string;
+  /**
+   * Validator index of the builder leading this chunk
+   */
+  builder_index?: number;
+  /**
+   * The difference between the chunk start time and slot_start_date_time. Negative values indicate bids received before slot start
+   */
+  chunk_slot_start_diff?: number;
+  /**
+   * The timestamp of the earliest observation of the leading bid in this chunk
+   */
+  earliest_bid_date_time?: number;
+  /**
+   * Epoch number derived from the slot that the bid is for
+   */
+  epoch?: number;
+  /**
+   * The start time for the epoch that the bid is for
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Slot number the bid targets
+   */
+  slot?: number;
+  /**
+   * The start time for the slot that the bid is for
+   */
+  slot_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The best bid value across all builders in this chunk, in wei
+   */
+  value?: string;
+};
+
 export type FctPreparedBlock = {
   /**
    * The total bytes of the beacon block payload
@@ -7450,6 +7493,13 @@ export type GetFctPayloadAttestationFirstSeenChunked50MsResponse = {
  */
 export type GetFctPayloadBidHighestValueByBuilderChunked50MsResponse = {
   item?: FctPayloadBidHighestValueByBuilderChunked50Ms;
+};
+
+/**
+ * Response for getting a single fct_payload_bid_highest_value_chunked_50ms record
+ */
+export type GetFctPayloadBidHighestValueChunked50MsResponse = {
+  item?: FctPayloadBidHighestValueChunked50Ms;
 };
 
 /**
@@ -13013,6 +13063,20 @@ export type ListFctPayloadBidHighestValueByBuilderChunked50MsResponse = {
    * The list of fct_payload_bid_highest_value_by_builder_chunked_50ms.
    */
   fct_payload_bid_highest_value_by_builder_chunked_50ms?: Array<FctPayloadBidHighestValueByBuilderChunked50Ms>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_payload_bid_highest_value_chunked_50ms records
+ */
+export type ListFctPayloadBidHighestValueChunked50MsResponse = {
+  /**
+   * The list of fct_payload_bid_highest_value_chunked_50ms.
+   */
+  fct_payload_bid_highest_value_chunked_50ms?: Array<FctPayloadBidHighestValueChunked50Ms>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -69368,6 +69432,470 @@ export type FctPayloadBidHighestValueByBuilderChunked50MsServiceGetResponses = {
 
 export type FctPayloadBidHighestValueByBuilderChunked50MsServiceGetResponse =
   FctPayloadBidHighestValueByBuilderChunked50MsServiceGetResponses[keyof FctPayloadBidHighestValueByBuilderChunked50MsServiceGetResponses];
+
+export type FctPayloadBidHighestValueChunked50MsServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The start time for the slot that the bid is for (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The start time for the slot that the bid is for (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The start time for the slot that the bid is for (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The start time for the slot that the bid is for (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The start time for the slot that the bid is for (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The start time for the slot that the bid is for (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The start time for the slot that the bid is for (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The start time for the slot that the bid is for (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The start time for the slot that the bid is for (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The start time for the slot that the bid is for (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. Negative values indicate bids received before slot start (filter: eq)
+     */
+    chunk_slot_start_diff_eq?: number;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. Negative values indicate bids received before slot start (filter: ne)
+     */
+    chunk_slot_start_diff_ne?: number;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. Negative values indicate bids received before slot start (filter: lt)
+     */
+    chunk_slot_start_diff_lt?: number;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. Negative values indicate bids received before slot start (filter: lte)
+     */
+    chunk_slot_start_diff_lte?: number;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. Negative values indicate bids received before slot start (filter: gt)
+     */
+    chunk_slot_start_diff_gt?: number;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. Negative values indicate bids received before slot start (filter: gte)
+     */
+    chunk_slot_start_diff_gte?: number;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. Negative values indicate bids received before slot start (filter: between_min)
+     */
+    chunk_slot_start_diff_between_min?: number;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. Negative values indicate bids received before slot start (filter: between_max_value)
+     */
+    chunk_slot_start_diff_between_max_value?: number;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. Negative values indicate bids received before slot start (filter: in_values) (comma-separated list)
+     */
+    chunk_slot_start_diff_in_values?: string;
+    /**
+     * The difference between the chunk start time and slot_start_date_time. Negative values indicate bids received before slot start (filter: not_in_values) (comma-separated list)
+     */
+    chunk_slot_start_diff_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Slot number the bid targets (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * Slot number the bid targets (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * Slot number the bid targets (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * Slot number the bid targets (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * Slot number the bid targets (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * Slot number the bid targets (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * Slot number the bid targets (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * Slot number the bid targets (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * Slot number the bid targets (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * Slot number the bid targets (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * Epoch number derived from the slot that the bid is for (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * Epoch number derived from the slot that the bid is for (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * Epoch number derived from the slot that the bid is for (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * Epoch number derived from the slot that the bid is for (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * Epoch number derived from the slot that the bid is for (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * Epoch number derived from the slot that the bid is for (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * Epoch number derived from the slot that the bid is for (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * Epoch number derived from the slot that the bid is for (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * Epoch number derived from the slot that the bid is for (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * Epoch number derived from the slot that the bid is for (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The start time for the epoch that the bid is for (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The start time for the epoch that the bid is for (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The start time for the epoch that the bid is for (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The start time for the epoch that the bid is for (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The start time for the epoch that the bid is for (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The start time for the epoch that the bid is for (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The start time for the epoch that the bid is for (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The start time for the epoch that the bid is for (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The start time for the epoch that the bid is for (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The start time for the epoch that the bid is for (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * The timestamp of the earliest observation of the leading bid in this chunk (filter: eq)
+     */
+    earliest_bid_date_time_eq?: number;
+    /**
+     * The timestamp of the earliest observation of the leading bid in this chunk (filter: ne)
+     */
+    earliest_bid_date_time_ne?: number;
+    /**
+     * The timestamp of the earliest observation of the leading bid in this chunk (filter: lt)
+     */
+    earliest_bid_date_time_lt?: number;
+    /**
+     * The timestamp of the earliest observation of the leading bid in this chunk (filter: lte)
+     */
+    earliest_bid_date_time_lte?: number;
+    /**
+     * The timestamp of the earliest observation of the leading bid in this chunk (filter: gt)
+     */
+    earliest_bid_date_time_gt?: number;
+    /**
+     * The timestamp of the earliest observation of the leading bid in this chunk (filter: gte)
+     */
+    earliest_bid_date_time_gte?: number;
+    /**
+     * The timestamp of the earliest observation of the leading bid in this chunk (filter: between_min)
+     */
+    earliest_bid_date_time_between_min?: number;
+    /**
+     * The timestamp of the earliest observation of the leading bid in this chunk (filter: between_max_value)
+     */
+    earliest_bid_date_time_between_max_value?: number;
+    /**
+     * The timestamp of the earliest observation of the leading bid in this chunk (filter: in_values) (comma-separated list)
+     */
+    earliest_bid_date_time_in_values?: string;
+    /**
+     * The timestamp of the earliest observation of the leading bid in this chunk (filter: not_in_values) (comma-separated list)
+     */
+    earliest_bid_date_time_not_in_values?: string;
+    /**
+     * The execution block hash committed to in the leading bid (filter: eq)
+     */
+    block_hash_eq?: string;
+    /**
+     * The execution block hash committed to in the leading bid (filter: ne)
+     */
+    block_hash_ne?: string;
+    /**
+     * The execution block hash committed to in the leading bid (filter: contains)
+     */
+    block_hash_contains?: string;
+    /**
+     * The execution block hash committed to in the leading bid (filter: starts_with)
+     */
+    block_hash_starts_with?: string;
+    /**
+     * The execution block hash committed to in the leading bid (filter: ends_with)
+     */
+    block_hash_ends_with?: string;
+    /**
+     * The execution block hash committed to in the leading bid (filter: like)
+     */
+    block_hash_like?: string;
+    /**
+     * The execution block hash committed to in the leading bid (filter: not_like)
+     */
+    block_hash_not_like?: string;
+    /**
+     * The execution block hash committed to in the leading bid (filter: in_values) (comma-separated list)
+     */
+    block_hash_in_values?: string;
+    /**
+     * The execution block hash committed to in the leading bid (filter: not_in_values) (comma-separated list)
+     */
+    block_hash_not_in_values?: string;
+    /**
+     * Validator index of the builder leading this chunk (filter: eq)
+     */
+    builder_index_eq?: number;
+    /**
+     * Validator index of the builder leading this chunk (filter: ne)
+     */
+    builder_index_ne?: number;
+    /**
+     * Validator index of the builder leading this chunk (filter: lt)
+     */
+    builder_index_lt?: number;
+    /**
+     * Validator index of the builder leading this chunk (filter: lte)
+     */
+    builder_index_lte?: number;
+    /**
+     * Validator index of the builder leading this chunk (filter: gt)
+     */
+    builder_index_gt?: number;
+    /**
+     * Validator index of the builder leading this chunk (filter: gte)
+     */
+    builder_index_gte?: number;
+    /**
+     * Validator index of the builder leading this chunk (filter: between_min)
+     */
+    builder_index_between_min?: number;
+    /**
+     * Validator index of the builder leading this chunk (filter: between_max_value)
+     */
+    builder_index_between_max_value?: number;
+    /**
+     * Validator index of the builder leading this chunk (filter: in_values) (comma-separated list)
+     */
+    builder_index_in_values?: string;
+    /**
+     * Validator index of the builder leading this chunk (filter: not_in_values) (comma-separated list)
+     */
+    builder_index_not_in_values?: string;
+    /**
+     * The best bid value across all builders in this chunk, in wei (filter: eq)
+     */
+    value_eq?: string;
+    /**
+     * The best bid value across all builders in this chunk, in wei (filter: ne)
+     */
+    value_ne?: string;
+    /**
+     * The best bid value across all builders in this chunk, in wei (filter: contains)
+     */
+    value_contains?: string;
+    /**
+     * The best bid value across all builders in this chunk, in wei (filter: starts_with)
+     */
+    value_starts_with?: string;
+    /**
+     * The best bid value across all builders in this chunk, in wei (filter: ends_with)
+     */
+    value_ends_with?: string;
+    /**
+     * The best bid value across all builders in this chunk, in wei (filter: like)
+     */
+    value_like?: string;
+    /**
+     * The best bid value across all builders in this chunk, in wei (filter: not_like)
+     */
+    value_not_like?: string;
+    /**
+     * The best bid value across all builders in this chunk, in wei (filter: in_values) (comma-separated list)
+     */
+    value_in_values?: string;
+    /**
+     * The best bid value across all builders in this chunk, in wei (filter: not_in_values) (comma-separated list)
+     */
+    value_not_in_values?: string;
+    /**
+     * The maximum number of fct_payload_bid_highest_value_chunked_50ms to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPayloadBidHighestValueChunked50ms` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_payload_bid_highest_value_chunked_50ms';
+};
+
+export type FctPayloadBidHighestValueChunked50MsServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPayloadBidHighestValueChunked50MsServiceListError =
+  FctPayloadBidHighestValueChunked50MsServiceListErrors[keyof FctPayloadBidHighestValueChunked50MsServiceListErrors];
+
+export type FctPayloadBidHighestValueChunked50MsServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPayloadBidHighestValueChunked50MsResponse;
+};
+
+export type FctPayloadBidHighestValueChunked50MsServiceListResponse =
+  FctPayloadBidHighestValueChunked50MsServiceListResponses[keyof FctPayloadBidHighestValueChunked50MsServiceListResponses];
+
+export type FctPayloadBidHighestValueChunked50MsServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The start time for the slot that the bid is for
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_payload_bid_highest_value_chunked_50ms/{slot_start_date_time}';
+};
+
+export type FctPayloadBidHighestValueChunked50MsServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPayloadBidHighestValueChunked50MsServiceGetError =
+  FctPayloadBidHighestValueChunked50MsServiceGetErrors[keyof FctPayloadBidHighestValueChunked50MsServiceGetErrors];
+
+export type FctPayloadBidHighestValueChunked50MsServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPayloadBidHighestValueChunked50MsResponse;
+};
+
+export type FctPayloadBidHighestValueChunked50MsServiceGetResponse =
+  FctPayloadBidHighestValueChunked50MsServiceGetResponses[keyof FctPayloadBidHighestValueChunked50MsServiceGetResponses];
 
 export type FctPreparedBlockServiceListData = {
   body?: never;

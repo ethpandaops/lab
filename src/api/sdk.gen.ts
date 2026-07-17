@@ -657,6 +657,12 @@ import type {
   FctPayloadBidHighestValueByBuilderChunked50MsServiceListData,
   FctPayloadBidHighestValueByBuilderChunked50MsServiceListErrors,
   FctPayloadBidHighestValueByBuilderChunked50MsServiceListResponses,
+  FctPayloadBidHighestValueChunked50MsServiceGetData,
+  FctPayloadBidHighestValueChunked50MsServiceGetErrors,
+  FctPayloadBidHighestValueChunked50MsServiceGetResponses,
+  FctPayloadBidHighestValueChunked50MsServiceListData,
+  FctPayloadBidHighestValueChunked50MsServiceListErrors,
+  FctPayloadBidHighestValueChunked50MsServiceListResponses,
   FctPreparedBlockServiceGetData,
   FctPreparedBlockServiceGetErrors,
   FctPreparedBlockServiceGetResponses,
@@ -1689,6 +1695,10 @@ import {
   zFctPayloadBidHighestValueByBuilderChunked50MsServiceGetResponse,
   zFctPayloadBidHighestValueByBuilderChunked50MsServiceListData,
   zFctPayloadBidHighestValueByBuilderChunked50MsServiceListResponse,
+  zFctPayloadBidHighestValueChunked50MsServiceGetData,
+  zFctPayloadBidHighestValueChunked50MsServiceGetResponse,
+  zFctPayloadBidHighestValueChunked50MsServiceListData,
+  zFctPayloadBidHighestValueChunked50MsServiceListResponse,
   zFctPreparedBlockServiceGetData,
   zFctPreparedBlockServiceGetResponse,
   zFctPreparedBlockServiceListData,
@@ -6204,6 +6214,44 @@ export const fctPayloadBidHighestValueByBuilderChunked50MsServiceGet = <ThrowOnE
     responseValidator: async data =>
       await zFctPayloadBidHighestValueByBuilderChunked50MsServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_payload_bid_highest_value_by_builder_chunked_50ms/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctPayloadBidHighestValueChunked50MsServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPayloadBidHighestValueChunked50MsServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPayloadBidHighestValueChunked50MsServiceListResponses,
+    FctPayloadBidHighestValueChunked50MsServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPayloadBidHighestValueChunked50MsServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPayloadBidHighestValueChunked50MsServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_payload_bid_highest_value_chunked_50ms',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctPayloadBidHighestValueChunked50MsServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPayloadBidHighestValueChunked50MsServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPayloadBidHighestValueChunked50MsServiceGetResponses,
+    FctPayloadBidHighestValueChunked50MsServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPayloadBidHighestValueChunked50MsServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPayloadBidHighestValueChunked50MsServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_payload_bid_highest_value_chunked_50ms/{slot_start_date_time}',
     ...options,
   });
 
