@@ -45,9 +45,13 @@ export function derivePayloadStatus({ hasBlock, payloadFirstSeen, ptcVote }: Pay
   const presentVotes = ptcVote?.payload_present_votes ?? 0;
   const ptcVotesSeen = ptcVote?.ptc_validators_seen ?? 0;
 
+  // PTC votes and payload sightings are themselves proof a block existed —
+  // don't wait for the (lagging) proposer pipeline to confirm it.
+  const blockEvidenced = hasBlock || ptcVotesSeen > 0 || seenByNodes > 0;
+
   let status: PayloadStatus = 'pending';
 
-  if (hasBlock && ptcVotesSeen > 0) {
+  if (blockEvidenced && ptcVotesSeen > 0) {
     const majorityPresent = presentVotes * 2 >= ptcVotesSeen;
 
     if (majorityPresent) {
@@ -57,7 +61,7 @@ export function derivePayloadStatus({ hasBlock, payloadFirstSeen, ptcVote }: Pay
     } else {
       status = 'payload_withheld';
     }
-  } else if (hasBlock && seenByNodes > 0) {
+  } else if (blockEvidenced && seenByNodes > 0) {
     status = 'payload_present';
   }
 
