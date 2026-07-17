@@ -1,0 +1,45 @@
+{
+  "pkg": "lab",
+  "projectId": "8e0ad382-54fd-42aa-8661-dccfcb925556",
+  "globalName": "Lab",
+  "shape": "storybook",
+  "entry": ".design-sync/ds-entry.ts",
+  "storybookStatic": ".design-sync/sb-reference",
+  "storybookConfigDir": ".storybook",
+  "tsconfig": ".design-sync/tsconfig.paths.json",
+  "buildCmd": "pnpm run build",
+  "cssEntry": ".design-sync/ds-tailwind.css",
+  "readmeHeader": ".design-sync/conventions.md",
+  "extraEntries": ["./.design-sync/ds-providers.tsx"],
+  "provider": {
+    "component": "DesignSyncProvider"
+  },
+  "titleMap": {
+    "Globe": null,
+    "Map": null,
+    "Probes": null,
+    "ValidatorHeatmap": null,
+    "PolicySelector": null,
+    "TimezoneToggle": null,
+    "CopyToClipboard": null,
+    "Map2D": null,
+    "GeographicalMapView": null,
+    "FeatureGate": null,
+    "Tab": null,
+    "ScrollableTabs": null,
+    "Breadcrumb": null,
+    "ConfigGate": null,
+    "DataColumnDataAvailability": null,
+    "GeographicalFilters": null
+  },
+  "overrides": {
+    "UserCard": { "cardMode": "column" },
+    "Badge": { "cardMode": "column" },
+    "TagInput": { "cardMode": "column" },
+    "Sidebar": { "cardMode": "column" },
+    "DataTable": { "cardMode": "column" },
+    "Table": { "cardMode": "column" },
+    "InfoBox": { "cardMode": "column" },
+    "NetworkIcon": { "skip": ["components-ethereum-networkicon--mainnet", "components-ethereum-networkicon--custom-size"] }
+  }
+}

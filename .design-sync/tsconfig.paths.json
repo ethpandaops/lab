@@ -1,0 +1,1117 @@
+{
+  "compilerOptions": {
+    "baseUrl": "..",
+    "paths": {
+      "echarts-for-react/lib/core": [
+        ".design-sync/echarts-core-shim"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/ContractInteractionsTable": [
+        "src/pages/ethereum/execution/gas-profiler/components/ContractInteractionsTable/index"
+      ],
+      "@/pages/xatu/geographical-checklist/components/GeographicalChecklistSkeleton": [
+        "src/pages/xatu/geographical-checklist/components/GeographicalChecklistSkeleton/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/BlockSimulationResultsV2": [
+        "src/pages/ethereum/execution/gas-profiler/components/BlockSimulationResultsV2/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/GlamsterdamPresetModal": [
+        "src/pages/ethereum/execution/gas-profiler/components/GlamsterdamPresetModal/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/TopContractsByGasChart": [
+        "src/pages/ethereum/execution/gas-profiler/components/TopContractsByGasChart/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/TransactionSearchInput": [
+        "src/pages/ethereum/execution/gas-profiler/components/TransactionSearchInput/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/TransactionSummaryCard": [
+        "src/pages/ethereum/execution/gas-profiler/components/TransactionSummaryCard/index"
+      ],
+      "@/pages/ethereum/consensus/overview/components/ConsensusOverviewSkeleton": [
+        "src/pages/ethereum/consensus/overview/components/ConsensusOverviewSkeleton/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/ContractActionPopover": [
+        "src/pages/ethereum/execution/gas-profiler/components/ContractActionPopover/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/ContractStorageButton": [
+        "src/pages/ethereum/execution/gas-profiler/components/ContractStorageButton/index"
+      ],
+      "@/pages/ethereum/execution/overview/components/ExecutionOverviewSkeleton": [
+        "src/pages/ethereum/execution/overview/components/ExecutionOverviewSkeleton/index"
+      ],
+      "@/pages/ethereum/execution/state-growth/components/TokenStorageShareCard": [
+        "src/pages/ethereum/execution/state-growth/components/TokenStorageShareCard/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/ResourceGasBreakdown": [
+        "src/pages/ethereum/execution/gas-profiler/components/ResourceGasBreakdown/index"
+      ],
+      "@/pages/xatu/locally-built-blocks/components/LocallyBuiltBlocksSkeleton": [
+        "src/pages/xatu/locally-built-blocks/components/LocallyBuiltBlocksSkeleton/index"
+      ],
+      "@/pages/ethereum/data-availability/components/DataAvailabilitySkeleton": [
+        "src/pages/ethereum/data-availability/components/DataAvailabilitySkeleton/index"
+      ],
+      "@/pages/ethereum/data-availability/probes/components/ProbeDetailDialog": [
+        "src/pages/ethereum/data-availability/probes/components/ProbeDetailDialog/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/GasProfilerSkeleton": [
+        "src/pages/ethereum/execution/gas-profiler/components/GasProfilerSkeleton/index"
+      ],
+      "@/pages/ethereum/execution/state-expiry/components/StateExpirySkeleton": [
+        "src/pages/ethereum/execution/state-expiry/components/StateExpirySkeleton/index"
+      ],
+      "@/pages/ethereum/execution/timings/components/ReferenceNodesInfoDialog": [
+        "src/pages/ethereum/execution/timings/components/ReferenceNodesInfoDialog/index"
+      ],
+      "@/components/Ethereum/SlotProgressTimeline/components/PhaseConnection": [
+        "src/components/Ethereum/SlotProgressTimeline/components/PhaseConnection/index"
+      ],
+      "@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap": [
+        "src/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/index"
+      ],
+      "@/pages/ethereum/data-availability/custody/components/CellProbeDialog": [
+        "src/pages/ethereum/data-availability/custody/components/CellProbeDialog/index"
+      ],
+      "@/pages/ethereum/data-availability/custody/components/LiveProbeEvents": [
+        "src/pages/ethereum/data-availability/custody/components/LiveProbeEvents/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/BlockOpcodeHeatmap": [
+        "src/pages/ethereum/execution/gas-profiler/components/BlockOpcodeHeatmap/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/ContractStorageCTA": [
+        "src/pages/ethereum/execution/gas-profiler/components/ContractStorageCTA/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/OpcodeDistribution": [
+        "src/pages/ethereum/execution/gas-profiler/components/OpcodeDistribution/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/ResourceViewToggle": [
+        "src/pages/ethereum/execution/gas-profiler/components/ResourceViewToggle/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/TopItemsByGasTable": [
+        "src/pages/ethereum/execution/gas-profiler/components/TopItemsByGasTable/index"
+      ],
+      "@/pages/ethereum/execution/state-expiry/components/ContractTop100List": [
+        "src/pages/ethereum/execution/state-expiry/components/ContractTop100List/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/GasScheduleDrawer": [
+        "src/pages/ethereum/execution/gas-profiler/components/GasScheduleDrawer/index"
+      ],
+      "@/pages/ethereum/execution/state-growth/components/StateSizeSkeleton": [
+        "src/pages/ethereum/execution/state-growth/components/StateSizeSkeleton/index"
+      ],
+      "@/pages/ethereum/execution/timings/components/ClientVersionBreakdown": [
+        "src/pages/ethereum/execution/timings/components/ClientVersionBreakdown/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/CategoryPieChart": [
+        "src/pages/ethereum/execution/gas-profiler/components/CategoryPieChart/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/GasBreakdownCard": [
+        "src/pages/ethereum/execution/gas-profiler/components/GasBreakdownCard/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/ResourceGasTable": [
+        "src/pages/ethereum/execution/gas-profiler/components/ResourceGasTable/index"
+      ],
+      "@/pages/xatu/geographical-checklist/components/GeographicalListView": [
+        "src/pages/xatu/geographical-checklist/components/GeographicalListView/index"
+      ],
+      "@/components/Ethereum/SlotProgressTimeline/components/TimelineAxis": [
+        "src/components/Ethereum/SlotProgressTimeline/components/TimelineAxis/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/CallTreeSection": [
+        "src/pages/ethereum/execution/gas-profiler/components/CallTreeSection/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/CallsVsGasChart": [
+        "src/pages/ethereum/execution/gas-profiler/components/CallsVsGasChart/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/ResourceGasHelp": [
+        "src/pages/ethereum/execution/gas-profiler/components/ResourceGasHelp/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/TransactionList": [
+        "src/pages/ethereum/execution/gas-profiler/components/TransactionList/index"
+      ],
+      "@/pages/ethereum/execution/state-growth/components/StateDeltaCards": [
+        "src/pages/ethereum/execution/state-growth/components/StateDeltaCards/index"
+      ],
+      "@/pages/ethereum/execution/state-growth/components/StateMetricCard": [
+        "src/pages/ethereum/execution/state-growth/components/StateMetricCard/index"
+      ],
+      "@/pages/xatu/geographical-checklist/components/GeographicalFilters": [
+        "src/pages/xatu/geographical-checklist/components/GeographicalFilters/index"
+      ],
+      "@/pages/xatu/geographical-checklist/components/GeographicalMapView": [
+        "src/pages/xatu/geographical-checklist/components/GeographicalMapView/index"
+      ],
+      "@/pages/ethereum/contracts/components/ContractStateExpirySkeleton": [
+        "src/pages/ethereum/contracts/components/ContractStateExpirySkeleton/index"
+      ],
+      "@/pages/ethereum/data-availability/probes/components/PeerIdAvatar": [
+        "src/pages/ethereum/data-availability/probes/components/PeerIdAvatar/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/OpcodeAnalysis": [
+        "src/pages/ethereum/execution/gas-profiler/components/OpcodeAnalysis/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/TransactionRow": [
+        "src/pages/ethereum/execution/gas-profiler/components/TransactionRow/index"
+      ],
+      "@/pages/ethereum/execution/state-expiry/components/PolicySelector": [
+        "src/pages/ethereum/execution/state-expiry/components/PolicySelector/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/CallTraceView": [
+        "src/pages/ethereum/execution/gas-profiler/components/CallTraceView/index"
+      ],
+      "@/pages/ethereum/execution/state-expiry/components/SavingsMatrix": [
+        "src/pages/ethereum/execution/state-expiry/components/SavingsMatrix/index"
+      ],
+      "@/pages/ethereum/slots/components/AttestationHeadCorrectnessCard": [
+        "src/pages/ethereum/slots/components/AttestationHeadCorrectnessCard/index"
+      ],
+      "@/pages/ethereum/slots/components/AttestationVotesBreakdownTable": [
+        "src/pages/ethereum/slots/components/AttestationVotesBreakdownTable/index"
+      ],
+      "@/pages/xatu/geographical-checklist/components/GeographicalStats": [
+        "src/pages/xatu/geographical-checklist/components/GeographicalStats/index"
+      ],
+      "@/pages/xatu/locally-built-blocks/components/ClientPairingMatrix": [
+        "src/pages/xatu/locally-built-blocks/components/ClientPairingMatrix/index"
+      ],
+      "@/components/Ethereum/SlotProgressTimeline/components/PhaseNode": [
+        "src/components/Ethereum/SlotProgressTimeline/components/PhaseNode/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/CallFrameRow": [
+        "src/pages/ethereum/execution/gas-profiler/components/CallFrameRow/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/GasHistogram": [
+        "src/pages/ethereum/execution/gas-profiler/components/GasHistogram/index"
+      ],
+      "@/pages/ethereum/slots/components/PreparedBlocksComparisonChart": [
+        "src/pages/ethereum/slots/components/PreparedBlocksComparisonChart/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/BlockHeader": [
+        "src/pages/ethereum/execution/gas-profiler/components/BlockHeader/index"
+      ],
+      "@/pages/ethereum/execution/state-expiry/components/ContractRow": [
+        "src/pages/ethereum/execution/state-expiry/components/ContractRow/index"
+      ],
+      "@/pages/ethereum/slots/components/AttestationParticipationCard": [
+        "src/pages/ethereum/slots/components/AttestationParticipationCard/index"
+      ],
+      "@/pages/xatu/locally-built-blocks/components/BlockDetailsModal": [
+        "src/pages/xatu/locally-built-blocks/components/BlockDetailsModal/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components/GasFormula": [
+        "src/pages/ethereum/execution/gas-profiler/components/GasFormula/index"
+      ],
+      "@/pages/ethereum/execution/timings/components/TimingsSkeleton": [
+        "src/pages/ethereum/execution/timings/components/TimingsSkeleton/index"
+      ],
+      "@/pages/ethereum/slots/components/BlockClassificationCDFChart": [
+        "src/pages/ethereum/slots/components/BlockClassificationCDFChart/index"
+      ],
+      "@/pages/xatu/geographical-checklist/components/InsightsDialog": [
+        "src/pages/xatu/geographical-checklist/components/InsightsDialog/index"
+      ],
+      "@/pages/xatu/geographical-checklist/hooks/useGeographicalData": [
+        "src/pages/xatu/geographical-checklist/hooks/useGeographicalData/index"
+      ],
+      "@/pages/ethereum/data-availability/components/ViewModeToggle": [
+        "src/pages/ethereum/data-availability/components/ViewModeToggle/index"
+      ],
+      "@/pages/xatu/contributors/components/AttestationLatencyChart": [
+        "src/pages/xatu/contributors/components/AttestationLatencyChart/index"
+      ],
+      "@/pages/xatu/geographical-checklist/components/FiltersDialog": [
+        "src/pages/xatu/geographical-checklist/components/FiltersDialog/index"
+      ],
+      "@/pages/ethereum/data-availability/components/ProbeEventRow": [
+        "src/pages/ethereum/data-availability/components/ProbeEventRow/index"
+      ],
+      "@/pages/ethereum/entities/components/AttestationVolumeChart": [
+        "src/pages/ethereum/entities/components/AttestationVolumeChart/index"
+      ],
+      "@/pages/ethereum/execution/payloads/components/PayloadsView": [
+        "src/pages/ethereum/execution/payloads/components/PayloadsView/index"
+      ],
+      "@/pages/ethereum/execution/payloads/components/QuickFilters": [
+        "src/pages/ethereum/execution/payloads/components/QuickFilters/index"
+      ],
+      "@/pages/ethereum/execution/timings/components/NewPayloadTab": [
+        "src/pages/ethereum/execution/timings/components/NewPayloadTab/index"
+      ],
+      "@/pages/ethereum/live/components/DataColumnDataAvailability": [
+        "src/pages/ethereum/live/components/DataColumnDataAvailability/index"
+      ],
+      "@/pages/ethereum/slots/components/BlobDataColumnSpreadChart": [
+        "src/pages/ethereum/slots/components/BlobDataColumnSpreadChart/index"
+      ],
+      "@/pages/xatu/contributors/components/DataColumnLatencyChart": [
+        "src/pages/xatu/contributors/components/DataColumnLatencyChart/index"
+      ],
+      "@/pages/xatu/fork-readiness/components/ForkReadinessLoading": [
+        "src/pages/xatu/fork-readiness/components/ForkReadinessLoading/index"
+      ],
+      "@/pages/ethereum/contracts/components/ContractPageSkeleton": [
+        "src/pages/ethereum/contracts/components/ContractPageSkeleton/index"
+      ],
+      "@/pages/ethereum/entities/components/ActiveValidatorsChart": [
+        "src/pages/ethereum/entities/components/ActiveValidatorsChart/index"
+      ],
+      "@/pages/ethereum/execution/payloads/components/FilterPanel": [
+        "src/pages/ethereum/execution/payloads/components/FilterPanel/index"
+      ],
+      "@/pages/ethereum/slots/components/AttestationArrivalsChart": [
+        "src/pages/ethereum/slots/components/AttestationArrivalsChart/index"
+      ],
+      "@/pages/ethereum/slots/components/BlockSizeEfficiencyChart": [
+        "src/pages/ethereum/slots/components/BlockSizeEfficiencyChart/index"
+      ],
+      "@/pages/ethereum/validators/components/DailyBreakdownTable": [
+        "src/pages/ethereum/validators/components/DailyBreakdownTable/index"
+      ],
+      "@/pages/xatu/fork-readiness/components/ClientReadinessCard": [
+        "src/pages/xatu/fork-readiness/components/ClientReadinessCard/index"
+      ],
+      "@/pages/ethereum/entities/components/AttestationRateChart": [
+        "src/pages/ethereum/entities/components/AttestationRateChart/index"
+      ],
+      "@/pages/ethereum/entities/components/ValidatorStatusChart": [
+        "src/pages/ethereum/entities/components/ValidatorStatusChart/index"
+      ],
+      "@/pages/ethereum/execution/timings/components/GetBlobsTab": [
+        "src/pages/ethereum/execution/timings/components/GetBlobsTab/index"
+      ],
+      "@/pages/ethereum/live/hooks/useDataColumnAvailabilityData": [
+        "src/pages/ethereum/live/hooks/useDataColumnAvailabilityData/index"
+      ],
+      "@/pages/ethereum/slots/components/BuilderCompetitionChart": [
+        "src/pages/ethereum/slots/components/BuilderCompetitionChart/index"
+      ],
+      "@/pages/ethereum/slots/components/MevBiddingTimelineChart": [
+        "src/pages/ethereum/slots/components/MevBiddingTimelineChart/index"
+      ],
+      "@/pages/ethereum/validators/components/PerformanceSummary": [
+        "src/pages/ethereum/validators/components/PerformanceSummary/index"
+      ],
+      "@/pages/ethereum/validators/components/ValidatorsSkeleton": [
+        "src/pages/ethereum/validators/components/ValidatorsSkeleton/index"
+      ],
+      "@/pages/xatu/locally-built-blocks/components/SlotTimeline": [
+        "src/pages/xatu/locally-built-blocks/components/SlotTimeline/index"
+      ],
+      "@/pages/ethereum/entities/components/BlockProposalsTable": [
+        "src/pages/ethereum/entities/components/BlockProposalsTable/index"
+      ],
+      "@/pages/ethereum/entities/components/EntityBasicInfoCard": [
+        "src/pages/ethereum/entities/components/EntityBasicInfoCard/index"
+      ],
+      "@/pages/ethereum/entities/components/RecentActivityTable": [
+        "src/pages/ethereum/entities/components/RecentActivityTable/index"
+      ],
+      "@/pages/ethereum/slots/components/RelayDistributionChart": [
+        "src/pages/ethereum/slots/components/RelayDistributionChart/index"
+      ],
+      "@/pages/ethereum/validators/components/DateRangeSelector": [
+        "src/pages/ethereum/validators/components/DateRangeSelector/index"
+      ],
+      "@/pages/ethereum/validators/components/StatusSummaryCard": [
+        "src/pages/ethereum/validators/components/StatusSummaryCard/index"
+      ],
+      "@/pages/xatu/contributors/components/UserDetailsSkeleton": [
+        "src/pages/xatu/contributors/components/UserDetailsSkeleton/index"
+      ],
+      "@/pages/ethereum/entities/components/BlockProposalChart": [
+        "src/pages/ethereum/entities/components/BlockProposalChart/index"
+      ],
+      "@/pages/ethereum/slots/components/BlockPropagationChart": [
+        "src/pages/ethereum/slots/components/BlockPropagationChart/index"
+      ],
+      "@/pages/ethereum/validators/components/ValidatorHeatmap": [
+        "src/pages/ethereum/validators/components/ValidatorHeatmap/index"
+      ],
+      "@/pages/xatu/contributors/components/SlotPlayerControls": [
+        "src/pages/xatu/contributors/components/SlotPlayerControls/index"
+      ],
+      "@/pages/ethereum/contracts/components/ContractInfoCard": [
+        "src/pages/ethereum/contracts/components/ContractInfoCard/index"
+      ],
+      "@/pages/ethereum/epochs/components/EpochDetailSkeleton": [
+        "src/pages/ethereum/epochs/components/EpochDetailSkeleton/index"
+      ],
+      "@/pages/ethereum/slots/components/BlobPropagationChart": [
+        "src/pages/ethereum/slots/components/BlobPropagationChart/index"
+      ],
+      "@/pages/ethereum/slots/components/SlotProgressTimeline": [
+        "src/pages/ethereum/slots/components/SlotProgressTimeline/index"
+      ],
+      "@/pages/ethereum/validators/components/ThresholdConfig": [
+        "src/pages/ethereum/validators/components/ThresholdConfig/index"
+      ],
+      "@/pages/xatu/contributors/components/BlockLatencyChart": [
+        "src/pages/xatu/contributors/components/BlockLatencyChart/index"
+      ],
+      "@/pages/ethereum/entities/components/EntitiesSkeleton": [
+        "src/pages/ethereum/entities/components/EntitiesSkeleton/index"
+      ],
+      "@/pages/ethereum/live/components/BlobDataAvailability": [
+        "src/pages/ethereum/live/components/BlobDataAvailability/index"
+      ],
+      "@/pages/ethereum/validators/components/ValidatorInput": [
+        "src/pages/ethereum/validators/components/ValidatorInput/index"
+      ],
+      "@/pages/ethereum/validators/components/ValidatorTable": [
+        "src/pages/ethereum/validators/components/ValidatorTable/index"
+      ],
+      "@/pages/xatu/contributors/components/BlobLatencyChart": [
+        "src/pages/xatu/contributors/components/BlobLatencyChart/index"
+      ],
+      "@/pages/xatu/contributors/components/HeadLatencyChart": [
+        "src/pages/xatu/contributors/components/HeadLatencyChart/index"
+      ],
+      "@/pages/xatu/contributors/components/UserCardSkeleton": [
+        "src/pages/xatu/contributors/components/UserCardSkeleton/index"
+      ],
+      "@/pages/ethereum/live/components/AttestationArrivals": [
+        "src/pages/ethereum/live/components/AttestationArrivals/index"
+      ],
+      "@/pages/ethereum/slots/components/SlotDetailSkeleton": [
+        "src/pages/ethereum/slots/components/SlotDetailSkeleton/index"
+      ],
+      "@/pages/xatu/contributors/components/MetricsSkeleton": [
+        "src/pages/xatu/contributors/components/MetricsSkeleton/index"
+      ],
+      "@/pages/ethereum/live/hooks/useBlobAvailabilityData": [
+        "src/pages/ethereum/live/hooks/useBlobAvailabilityData/index"
+      ],
+      "@/pages/ethereum/slots/components/EngineTimingsCard": [
+        "src/pages/ethereum/slots/components/EngineTimingsCard/index"
+      ],
+      "@/pages/ethereum/slots/components/SlotBasicInfoCard": [
+        "src/pages/ethereum/slots/components/SlotBasicInfoCard/index"
+      ],
+      "@/pages/ethereum/slots/components/SlotDownloadModal": [
+        "src/pages/ethereum/slots/components/SlotDownloadModal/index"
+      ],
+      "@/pages/ethereum/slots/hooks/useAllAttestationVotes": [
+        "src/pages/ethereum/slots/hooks/useAllAttestationVotes/index"
+      ],
+      "@/pages/xatu/contributors/hooks/useContributorsData": [
+        "src/pages/xatu/contributors/hooks/useContributorsData/index"
+      ],
+      "@/pages/xatu/fork-readiness/components/ForkOverview": [
+        "src/pages/xatu/fork-readiness/components/ForkOverview/index"
+      ],
+      "@/pages/ethereum/epochs/components/EpochSlotsTable": [
+        "src/pages/ethereum/epochs/components/EpochSlotsTable/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/components": [
+        "src/pages/ethereum/execution/gas-profiler/components/index"
+      ],
+      "@/pages/ethereum/execution/state-expiry/components": [
+        "src/pages/ethereum/execution/state-expiry/components/index"
+      ],
+      "@/pages/ethereum/execution/state-growth/components": [
+        "src/pages/ethereum/execution/state-growth/components/index"
+      ],
+      "@/pages/xatu/fork-readiness/components/ForkSection": [
+        "src/pages/xatu/fork-readiness/components/ForkSection/index"
+      ],
+      "@/pages/xatu/fork-readiness/hooks/useForkReadiness": [
+        "src/pages/xatu/fork-readiness/hooks/useForkReadiness/index"
+      ],
+      "@/components/Ethereum/MevBuilderDistributionChart": [
+        "src/components/Ethereum/MevBuilderDistributionChart/index"
+      ],
+      "@/pages/ethereum/epochs/components/EpochsSkeleton": [
+        "src/pages/ethereum/epochs/components/EpochsSkeleton/index"
+      ],
+      "@/pages/ethereum/live/components/BlockDetailsCard": [
+        "src/pages/ethereum/live/components/BlockDetailsCard/index"
+      ],
+      "@/pages/ethereum/live/components/DataAvailability": [
+        "src/pages/ethereum/live/components/DataAvailability/index"
+      ],
+      "@/pages/ethereum/live/components/MobileSlotHeader": [
+        "src/pages/ethereum/live/components/MobileSlotHeader/index"
+      ],
+      "@/pages/ethereum/slots/hooks/useSlotEngineTimings": [
+        "src/pages/ethereum/slots/hooks/useSlotEngineTimings/index"
+      ],
+      "@/pages/ethereum/slots/hooks/useSlotNodeNetworkIo": [
+        "src/pages/ethereum/slots/hooks/useSlotNodeNetworkIo/index"
+      ],
+      "@/pages/ethereum/slots/hooks/useSlotNodeResources": [
+        "src/pages/ethereum/slots/hooks/useSlotNodeResources/index"
+      ],
+      "@/pages/ethereum/live/components/MobileSlotStats": [
+        "src/pages/ethereum/live/components/MobileSlotStats/index"
+      ],
+      "@/pages/ethereum/slots/hooks/useSlotProgressData": [
+        "src/pages/ethereum/slots/hooks/useSlotProgressData/index"
+      ],
+      "@/components/Ethereum/MevRelayDistributionChart": [
+        "src/components/Ethereum/MevRelayDistributionChart/index"
+      ],
+      "@/pages/ethereum/data-availability/probes/hooks": [
+        "src/pages/ethereum/data-availability/probes/hooks/index"
+      ],
+      "@/pages/ethereum/forks/components/ForksTimeline": [
+        "src/pages/ethereum/forks/components/ForksTimeline/index"
+      ],
+      "@/pages/ethereum/live/components/SlotViewLayout": [
+        "src/pages/ethereum/live/components/SlotViewLayout/index"
+      ],
+      "@/pages/ethereum/live/hooks/useBlockDetailsData": [
+        "src/pages/ethereum/live/hooks/useBlockDetailsData/index"
+      ],
+      "@/pages/ethereum/live/hooks/useSlotProgressData": [
+        "src/pages/ethereum/live/hooks/useSlotProgressData/index"
+      ],
+      "@/pages/ethereum/slots/components/NodeResources": [
+        "src/pages/ethereum/slots/components/NodeResources/index"
+      ],
+      "@/pages/ethereum/consensus/overview/components": [
+        "src/pages/ethereum/consensus/overview/components/index"
+      ],
+      "@/pages/ethereum/epochs/components/EpochHeader": [
+        "src/pages/ethereum/epochs/components/EpochHeader/index"
+      ],
+      "@/pages/ethereum/execution/overview/components": [
+        "src/pages/ethereum/execution/overview/components/index"
+      ],
+      "@/pages/ethereum/live/hooks/useAttestationData": [
+        "src/pages/ethereum/live/hooks/useAttestationData/index"
+      ],
+      "@/pages/ethereum/slots/hooks/useSlotDetailData": [
+        "src/pages/ethereum/slots/hooks/useSlotDetailData/index"
+      ],
+      "@/pages/ethereum/slots/hooks/useSlotNodeDiskIo": [
+        "src/pages/ethereum/slots/hooks/useSlotNodeDiskIo/index"
+      ],
+      "@/pages/ethereum/slots/hooks/useSlotNodeMemory": [
+        "src/pages/ethereum/slots/hooks/useSlotNodeMemory/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/hooks": [
+        "src/pages/ethereum/execution/gas-profiler/hooks/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler/utils": [
+        "src/pages/ethereum/execution/gas-profiler/utils/index"
+      ],
+      "@/pages/ethereum/execution/state-expiry/hooks": [
+        "src/pages/ethereum/execution/state-expiry/hooks/index"
+      ],
+      "@/pages/ethereum/execution/state-growth/hooks": [
+        "src/pages/ethereum/execution/state-growth/hooks/index"
+      ],
+      "@/pages/ethereum/execution/timings/components": [
+        "src/pages/ethereum/execution/timings/components/index"
+      ],
+      "@/pages/ethereum/forks/components/ForksHeader": [
+        "src/pages/ethereum/forks/components/ForksHeader/index"
+      ],
+      "@/pages/xatu/contributors/components/UserCard": [
+        "src/pages/xatu/contributors/components/UserCard/index"
+      ],
+      "@/components/Ethereum/BlockArrivalTimesChart": [
+        "src/components/Ethereum/BlockArrivalTimesChart/index"
+      ],
+      "@/pages/xatu/locally-built-blocks/components": [
+        "src/pages/xatu/locally-built-blocks/components/index"
+      ],
+      "@/components/Ethereum/TransactionCountChart": [
+        "src/components/Ethereum/TransactionCountChart/index"
+      ],
+      "@/pages/ethereum/live/hooks/useSlotViewData": [
+        "src/pages/ethereum/live/hooks/useSlotViewData/index"
+      ],
+      "@/routes/ethereum/data-availability/custody": [
+        "src/routes/ethereum/data-availability/custody/index"
+      ],
+      "@/components/Ethereum/AttestationsByEntity": [
+        "src/components/Ethereum/AttestationsByEntity/index"
+      ],
+      "@/components/Ethereum/SlotProgressTimeline": [
+        "src/components/Ethereum/SlotProgressTimeline/index"
+      ],
+      "@/pages/ethereum/data-availability/custody": [
+        "src/pages/ethereum/data-availability/custody/index"
+      ],
+      "@/pages/ethereum/live/components/BottomBar": [
+        "src/pages/ethereum/live/components/BottomBar/index"
+      ],
+      "@/pages/ethereum/live/hooks/useSidebarData": [
+        "src/pages/ethereum/live/hooks/useSidebarData/index"
+      ],
+      "@/routes/ethereum/data-availability/probes": [
+        "src/routes/ethereum/data-availability/probes/index"
+      ],
+      "@/pages/ethereum/data-availability/probes": [
+        "src/pages/ethereum/data-availability/probes/index"
+      ],
+      "@/pages/ethereum/execution/payloads/hooks": [
+        "src/pages/ethereum/execution/payloads/hooks/index"
+      ],
+      "@/pages/ethereum/live/components/Timeline": [
+        "src/pages/ethereum/live/components/Timeline/index"
+      ],
+      "@/components/Ethereum/EIP7870SpecsBanner": [
+        "src/components/Ethereum/EIP7870SpecsBanner/index"
+      ],
+      "@/pages/ethereum/execution/timings/hooks": [
+        "src/pages/ethereum/execution/timings/hooks/index"
+      ],
+      "@/pages/ethereum/live/components/Sidebar": [
+        "src/pages/ethereum/live/components/Sidebar/index"
+      ],
+      "@/pages/ethereum/live/components/SlotHud": [
+        "src/pages/ethereum/live/components/SlotHud/index"
+      ],
+      "@/routes/ethereum/execution/gas-profiler": [
+        "src/routes/ethereum/execution/gas-profiler/index"
+      ],
+      "@/components/DateTimePickers/DatePicker": [
+        "src/components/DateTimePickers/DatePicker/index"
+      ],
+      "@/components/Ethereum/BlockExplorerLink": [
+        "src/components/Ethereum/BlockExplorerLink/index"
+      ],
+      "@/components/Ethereum/ClusterSpecsModal": [
+        "src/components/Ethereum/ClusterSpecsModal/index"
+      ],
+      "@/pages/ethereum/execution/gas-profiler": [
+        "src/pages/ethereum/execution/gas-profiler/index"
+      ],
+      "@/pages/ethereum/execution/state-expiry": [
+        "src/pages/ethereum/execution/state-expiry/index"
+      ],
+      "@/pages/ethereum/execution/state-growth": [
+        "src/pages/ethereum/execution/state-growth/index"
+      ],
+      "@/pages/xatu/locally-built-blocks/hooks": [
+        "src/pages/xatu/locally-built-blocks/hooks/index"
+      ],
+      "@/pages/xatu/locally-built-blocks/utils": [
+        "src/pages/xatu/locally-built-blocks/utils/index"
+      ],
+      "@/components/Ethereum/MevAdoptionChart": [
+        "src/components/Ethereum/MevAdoptionChart/index"
+      ],
+      "@/components/Ethereum/TopEntitiesChart": [
+        "src/components/Ethereum/TopEntitiesChart/index"
+      ],
+      "@/components/Navigation/ScrollableTabs": [
+        "src/components/Navigation/ScrollableTabs/index"
+      ],
+      "@/pages/ethereum/live/hooks/useMapData": [
+        "src/pages/ethereum/live/hooks/useMapData/index"
+      ],
+      "@/pages/ethereum/validators/components": [
+        "src/pages/ethereum/validators/components/index"
+      ],
+      "@/pages/xatu/fork-readiness/components": [
+        "src/pages/xatu/fork-readiness/components/index"
+      ],
+      "@/components/Elements/CopyToClipboard": [
+        "src/components/Elements/CopyToClipboard/index"
+      ],
+      "@/components/Ethereum/BeaconchainIcon": [
+        "src/components/Ethereum/BeaconchainIcon/index"
+      ],
+      "@/components/Ethereum/BlockValueChart": [
+        "src/components/Ethereum/BlockValueChart/index"
+      ],
+      "@/components/Navigation/ProgressSteps": [
+        "src/components/Navigation/ProgressSteps/index"
+      ],
+      "@/pages/ethereum/contracts/components": [
+        "src/pages/ethereum/contracts/components/index"
+      ],
+      "@/components/Elements/TimezoneToggle": [
+        "src/components/Elements/TimezoneToggle/index"
+      ],
+      "@/components/Ethereum/BlobCountChart": [
+        "src/components/Ethereum/BlobCountChart/index"
+      ],
+      "@/components/Ethereum/BlobPosterLogo": [
+        "src/components/Ethereum/BlobPosterLogo/index"
+      ],
+      "@/components/Ethereum/BlockSizeChart": [
+        "src/components/Ethereum/BlockSizeChart/index"
+      ],
+      "@/components/Layout/LoadingContainer": [
+        "src/components/Layout/LoadingContainer/index"
+      ],
+      "@/components/Lists/ScrollingTimeline": [
+        "src/components/Lists/ScrollingTimeline/index"
+      ],
+      "@/components/Navigation/ScrollAnchor": [
+        "src/components/Navigation/ScrollAnchor/index"
+      ],
+      "@/pages/ethereum/entities/components": [
+        "src/pages/ethereum/entities/components/index"
+      ],
+      "@/providers/SharedCrosshairsProvider": [
+        "src/providers/SharedCrosshairsProvider/index"
+      ],
+      "@/routes/ethereum/execution/payloads": [
+        "src/routes/ethereum/execution/payloads/index"
+      ],
+      "@/components/DataDisplay/GasTooltip": [
+        "src/components/DataDisplay/GasTooltip/index"
+      ],
+      "@/components/Ethereum/EtherscanIcon": [
+        "src/components/Ethereum/EtherscanIcon/index"
+      ],
+      "@/components/Ethereum/NetworkSelect": [
+        "src/components/Ethereum/NetworkSelect/index"
+      ],
+      "@/components/Navigation/ProgressBar": [
+        "src/components/Navigation/ProgressBar/index"
+      ],
+      "@/pages/ethereum/consensus/overview": [
+        "src/pages/ethereum/consensus/overview/index"
+      ],
+      "@/pages/ethereum/execution/overview": [
+        "src/pages/ethereum/execution/overview/index"
+      ],
+      "@/pages/ethereum/execution/payloads": [
+        "src/pages/ethereum/execution/payloads/index"
+      ],
+      "@/pages/home/components/HeroSection": [
+        "src/pages/home/components/HeroSection/index"
+      ],
+      "@/pages/xatu/geographical-checklist": [
+        "src/pages/xatu/geographical-checklist/index"
+      ],
+      "@/routes/ethereum/execution/timings": [
+        "src/routes/ethereum/execution/timings/index"
+      ],
+      "@/components/Charts/GasFlowDiagram": [
+        "src/components/Charts/GasFlowDiagram/index"
+      ],
+      "@/components/Charts/ScatterAndLine": [
+        "src/components/Charts/ScatterAndLine/index"
+      ],
+      "@/components/DataDisplay/CardChain": [
+        "src/components/DataDisplay/CardChain/index"
+      ],
+      "@/components/DataDisplay/Timestamp": [
+        "src/components/DataDisplay/Timestamp/index"
+      ],
+      "@/components/Ethereum/BaseFeeChart": [
+        "src/components/Ethereum/BaseFeeChart/index"
+      ],
+      "@/components/Ethereum/ClientSelect": [
+        "src/components/Ethereum/ClientSelect/index"
+      ],
+      "@/components/Ethereum/GasUsedChart": [
+        "src/components/Ethereum/GasUsedChart/index"
+      ],
+      "@/components/Ethereum/SlotTimeline": [
+        "src/components/Ethereum/SlotTimeline/index"
+      ],
+      "@/components/Ethereum/TenderlyIcon": [
+        "src/components/Ethereum/TenderlyIcon/index"
+      ],
+      "@/components/Navigation/Breadcrumb": [
+        "src/components/Navigation/Breadcrumb/index"
+      ],
+      "@/components/Overlays/Notification": [
+        "src/components/Overlays/Notification/index"
+      ],
+      "@/contexts/SharedCrosshairsContext": [
+        "src/contexts/SharedCrosshairsContext/index"
+      ],
+      "@/pages/ethereum/epochs/components": [
+        "src/pages/ethereum/epochs/components/index"
+      ],
+      "@/pages/ethereum/execution/timings": [
+        "src/pages/ethereum/execution/timings/index"
+      ],
+      "@/components/DataDisplay/MiniStat": [
+        "src/components/DataDisplay/MiniStat/index"
+      ],
+      "@/components/Elements/ButtonGroup": [
+        "src/components/Elements/ButtonGroup/index"
+      ],
+      "@/components/Ethereum/NetworkIcon": [
+        "src/components/Ethereum/NetworkIcon/index"
+      ],
+      "@/components/Ethereum/PhalconIcon": [
+        "src/components/Ethereum/PhalconIcon/index"
+      ],
+      "@/components/Ethereum/TracoorIcon": [
+        "src/components/Ethereum/TracoorIcon/index"
+      ],
+      "@/components/Layout/ListContainer": [
+        "src/components/Layout/ListContainer/index"
+      ],
+      "@/components/Overlays/FeatureGate": [
+        "src/components/Overlays/FeatureGate/index"
+      ],
+      "@/pages/ethereum/validators/hooks": [
+        "src/pages/ethereum/validators/hooks/index"
+      ],
+      "@/pages/ethereum/validators/utils": [
+        "src/pages/ethereum/validators/utils/index"
+      ],
+      "@/pages/xatu/fork-readiness/hooks": [
+        "src/pages/xatu/fork-readiness/hooks/index"
+      ],
+      "@/pages/xatu/fork-readiness/utils": [
+        "src/pages/xatu/fork-readiness/utils/index"
+      ],
+      "@/pages/xatu/locally-built-blocks": [
+        "src/pages/xatu/locally-built-blocks/index"
+      ],
+      "@/components/Ethereum/ClientLogo": [
+        "src/components/Ethereum/ClientLogo/index"
+      ],
+      "@/components/Forms/CheckboxGroup": [
+        "src/components/Forms/CheckboxGroup/index"
+      ],
+      "@/components/Overlays/ConfigGate": [
+        "src/components/Overlays/ConfigGate/index"
+      ],
+      "@/components/Overlays/FatalError": [
+        "src/components/Overlays/FatalError/index"
+      ],
+      "@/hooks/useNetworkChangeRedirect": [
+        "src/hooks/useNetworkChangeRedirect/index"
+      ],
+      "@/pages/ethereum/contracts/hooks": [
+        "src/pages/ethereum/contracts/hooks/index"
+      ],
+      "@/pages/ethereum/contracts/utils": [
+        "src/pages/ethereum/contracts/utils/index"
+      ],
+      "@/providers/NotificationProvider": [
+        "src/providers/NotificationProvider/index"
+      ],
+      "@/components/Charts/GridHeatmap": [
+        "src/components/Charts/GridHeatmap/index"
+      ],
+      "@/components/Ethereum/ForkLabel": [
+        "src/components/Ethereum/ForkLabel/index"
+      ],
+      "@/components/Layout/ThemeToggle": [
+        "src/components/Layout/ThemeToggle/index"
+      ],
+      "@/pages/ethereum/entities/hooks": [
+        "src/pages/ethereum/entities/hooks/index"
+      ],
+      "@/pages/xatu/contributors/hooks": [
+        "src/pages/xatu/contributors/hooks/index"
+      ],
+      "@/components/Charts/FlameGraph": [
+        "src/components/Charts/FlameGraph/index"
+      ],
+      "@/components/Charts/StackedBar": [
+        "src/components/Charts/StackedBar/index"
+      ],
+      "@/components/DataDisplay/Stats": [
+        "src/components/DataDisplay/Stats/index"
+      ],
+      "@/components/Elements/Dropdown": [
+        "src/components/Elements/Dropdown/index"
+      ],
+      "@/components/Ethereum/DoraIcon": [
+        "src/components/Ethereum/DoraIcon/index"
+      ],
+      "@/components/Layout/Disclosure": [
+        "src/components/Layout/Disclosure/index"
+      ],
+      "@/components/Layout/PopoutCard": [
+        "src/components/Layout/PopoutCard/index"
+      ],
+      "@/components/Layout/ScrollArea": [
+        "src/components/Layout/ScrollArea/index"
+      ],
+      "@/components/Overlays/NotFound": [
+        "src/components/Overlays/NotFound/index"
+      ],
+      "@/contexts/NotificationContext": [
+        "src/contexts/NotificationContext/index"
+      ],
+      "@/providers/SlotPlayerProvider": [
+        "src/providers/SlotPlayerProvider/index"
+      ],
+      "@/components/Charts/MultiLine": [
+        "src/components/Charts/MultiLine/index"
+      ],
+      "@/components/Charts/Sparkline": [
+        "src/components/Charts/Sparkline/index"
+      ],
+      "@/components/Feedback/InfoBox": [
+        "src/components/Feedback/InfoBox/index"
+      ],
+      "@/components/Forms/RadioGroup": [
+        "src/components/Forms/RadioGroup/index"
+      ],
+      "@/components/Forms/RangeInput": [
+        "src/components/Forms/RangeInput/index"
+      ],
+      "@/components/Forms/SelectMenu": [
+        "src/components/Forms/SelectMenu/index"
+      ],
+      "@/components/Layout/Container": [
+        "src/components/Layout/Container/index"
+      ],
+      "@/components/Overlays/Popover": [
+        "src/components/Overlays/Popover/index"
+      ],
+      "@/pages/ethereum/epochs/hooks": [
+        "src/pages/ethereum/epochs/hooks/index"
+      ],
+      "@/components/Elements/Avatar": [
+        "src/components/Elements/Avatar/index"
+      ],
+      "@/components/Elements/Button": [
+        "src/components/Elements/Button/index"
+      ],
+      "@/components/Ethereum/Entity": [
+        "src/components/Ethereum/Entity/index"
+      ],
+      "@/components/Overlays/Dialog": [
+        "src/components/Overlays/Dialog/index"
+      ],
+      "@/contexts/SlotPlayerContext": [
+        "src/contexts/SlotPlayerContext/index"
+      ],
+      "@/pages/ethereum/slots/hooks": [
+        "src/pages/ethereum/slots/hooks/index"
+      ],
+      "@/providers/TimezoneProvider": [
+        "src/providers/TimezoneProvider/index"
+      ],
+      "@/routes/ethereum/validators": [
+        "src/routes/ethereum/validators/index"
+      ],
+      "@/components/Charts/BoxPlot": [
+        "src/components/Charts/BoxPlot/index"
+      ],
+      "@/components/Charts/Heatmap": [
+        "src/components/Charts/Heatmap/index"
+      ],
+      "@/components/Elements/Badge": [
+        "src/components/Elements/Badge/index"
+      ],
+      "@/components/Elements/Icons": [
+        "src/components/Elements/Icons/index"
+      ],
+      "@/components/Ethereum/Epoch": [
+        "src/components/Ethereum/Epoch/index"
+      ],
+      "@/components/Feedback/Alert": [
+        "src/components/Feedback/Alert/index"
+      ],
+      "@/components/Forms/Checkbox": [
+        "src/components/Forms/Checkbox/index"
+      ],
+      "@/components/Forms/TagInput": [
+        "src/components/Forms/TagInput/index"
+      ],
+      "@/components/Layout/Divider": [
+        "src/components/Layout/Divider/index"
+      ],
+      "@/components/Layout/Sidebar": [
+        "src/components/Layout/Sidebar/index"
+      ],
+      "@/components/Navigation/Tab": [
+        "src/components/Navigation/Tab/index"
+      ],
+      "@/hooks/useSharedCrosshairs": [
+        "src/hooks/useSharedCrosshairs/index"
+      ],
+      "@/pages/ethereum/live/hooks": [
+        "src/pages/ethereum/live/hooks/index"
+      ],
+      "@/pages/ethereum/live/utils": [
+        "src/pages/ethereum/live/utils/index"
+      ],
+      "@/pages/ethereum/validators": [
+        "src/pages/ethereum/validators/index"
+      ],
+      "@/pages/xatu/fork-readiness": [
+        "src/pages/xatu/fork-readiness/index"
+      ],
+      "@/providers/NetworkProvider": [
+        "src/providers/NetworkProvider/index"
+      ],
+      "@/routes/ethereum/contracts": [
+        "src/routes/ethereum/contracts/index"
+      ],
+      "@/components/Ethereum/Slot": [
+        "src/components/Ethereum/Slot/index"
+      ],
+      "@/components/Layout/Header": [
+        "src/components/Layout/Header/index"
+      ],
+      "@/contexts/TimezoneContext": [
+        "src/contexts/TimezoneContext/index"
+      ],
+      "@/pages/ethereum/contracts": [
+        "src/pages/ethereum/contracts/index"
+      ],
+      "@/routes/ethereum/entities": [
+        "src/routes/ethereum/entities/index"
+      ],
+      "@/routes/xatu/contributors": [
+        "src/routes/xatu/contributors/index"
+      ],
+      "@/components/Charts/Donut": [
+        "src/components/Charts/Donut/index"
+      ],
+      "@/components/Charts/Gauge": [
+        "src/components/Charts/Gauge/index"
+      ],
+      "@/components/Charts/Globe": [
+        "src/components/Charts/Globe/index"
+      ],
+      "@/components/Charts/Map2D": [
+        "src/components/Charts/Map2D/index"
+      ],
+      "@/components/Charts/Radar": [
+        "src/components/Charts/Radar/index"
+      ],
+      "@/components/Forms/Toggle": [
+        "src/components/Forms/Toggle/index"
+      ],
+      "@/contexts/NetworkContext": [
+        "src/contexts/NetworkContext/index"
+      ],
+      "@/hooks/useStableCallback": [
+        "src/hooks/useStableCallback/index"
+      ],
+      "@/pages/ethereum/entities": [
+        "src/pages/ethereum/entities/index"
+      ],
+      "@/pages/xatu/contributors": [
+        "src/pages/xatu/contributors/index"
+      ],
+      "@/providers/ThemeProvider": [
+        "src/providers/ThemeProvider/index"
+      ],
+      "@/components/Charts/Line": [
+        "src/components/Charts/Line/index"
+      ],
+      "@/components/Forms/Input": [
+        "src/components/Forms/Input/index"
+      ],
+      "@/components/Layout/Card": [
+        "src/components/Layout/Card/index"
+      ],
+      "@/components/Lists/Table": [
+        "src/components/Lists/Table/index"
+      ],
+      "@/hooks/useChartDownload": [
+        "src/hooks/useChartDownload/index"
+      ],
+      "@/hooks/useIsPageEnabled": [
+        "src/hooks/useIsPageEnabled/index"
+      ],
+      "@/routes/ethereum/epochs": [
+        "src/routes/ethereum/epochs/index"
+      ],
+      "@/components/Charts/Bar": [
+        "src/components/Charts/Bar/index"
+      ],
+      "@/components/Charts/Map": [
+        "src/components/Charts/Map/index"
+      ],
+      "@/contexts/ThemeContext": [
+        "src/contexts/ThemeContext/index"
+      ],
+      "@/hooks/useNotification": [
+        "src/hooks/useNotification/index"
+      ],
+      "@/pages/ethereum/epochs": [
+        "src/pages/ethereum/epochs/index"
+      ],
+      "@/routes/ethereum/forks": [
+        "src/routes/ethereum/forks/index"
+      ],
+      "@/routes/ethereum/slots": [
+        "src/routes/ethereum/slots/index"
+      ],
+      "@/components/DataTable": [
+        "src/components/DataTable/index"
+      ],
+      "@/hooks/useBeaconClock": [
+        "src/hooks/useBeaconClock/index"
+      ],
+      "@/hooks/useThemeColors": [
+        "src/hooks/useThemeColors/index"
+      ],
+      "@/pages/ethereum/forks": [
+        "src/pages/ethereum/forks/index"
+      ],
+      "@/pages/ethereum/slots": [
+        "src/pages/ethereum/slots/index"
+      ],
+      "@/hooks/useSlotPlayer": [
+        "src/hooks/useSlotPlayer/index"
+      ],
+      "@/pages/ethereum/live": [
+        "src/pages/ethereum/live/index"
+      ],
+      "@/routes/experiments": [
+        "src/routes/experiments/index"
+      ],
+      "@/hooks/useCanHover": [
+        "src/hooks/useCanHover/index"
+      ],
+      "@/hooks/useHashTabs": [
+        "src/hooks/useHashTabs/index"
+      ],
+      "@/hooks/useInterval": [
+        "src/hooks/useInterval/index"
+      ],
+      "@/hooks/useTabState": [
+        "src/hooks/useTabState/index"
+      ],
+      "@/hooks/useTimezone": [
+        "src/hooks/useTimezone/index"
+      ],
+      "@/pages/experiments": [
+        "src/pages/experiments/index"
+      ],
+      "@/hooks/useNetwork": [
+        "src/hooks/useNetwork/index"
+      ],
+      "@/routes/xatu-data": [
+        "src/routes/xatu-data/index"
+      ],
+      "@/hooks/useBounds": [
+        "src/hooks/useBounds/index"
+      ],
+      "@/hooks/useConfig": [
+        "src/hooks/useConfig/index"
+      ],
+      "@/hooks/useForks": [
+        "src/hooks/useForks/index"
+      ],
+      "@/hooks/useTheme": [
+        "src/hooks/useTheme/index"
+      ],
+      "@/api/client": [
+        "src/api/client/index"
+      ],
+      "@/pages/home": [
+        "src/pages/home/index"
+      ],
+      "@/constants": [
+        "src/constants/index"
+      ],
+      "@/routes": [
+        "src/routes/index"
+      ],
+      "@/utils": [
+        "src/utils/index"
+      ],
+      "@/api": [
+        "src/api/index"
+      ],
+      "@/*": [
+        "src/*"
+      ]
+    }
+  }
+}
