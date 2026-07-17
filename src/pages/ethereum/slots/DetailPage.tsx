@@ -1,4 +1,4 @@
-import { type JSX, useCallback, useEffect, useState } from 'react';
+import { type JSX, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, useSearch, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
@@ -96,12 +96,70 @@ export function DetailPage(): JSX.Element {
   // Gloas (ePBS) slots get a dedicated Payload tab
   const isGloas = isForkAtOrAfter(getForkForSlot(slot, currentNetwork), 'gloas');
   const { data: payloadData } = useSlotPayloadData(slot, isGloas);
-  const payloadBidRaceData = payloadData.bidRace.map(bid => ({
-    chunk_slot_start_diff: bid.chunk_slot_start_diff ?? 0,
-    value: bid.value ?? '0',
-    builder_pubkey: `builder-${bid.builder_index ?? 'unknown'}`,
-    block_hash: bid.block_hash,
-  }));
+  // The chart draws one series per builder, which stops scaling somewhere
+  // around a dozen. Keep the strongest bidders as individual series and
+  // collapse the rest into a single "field" series holding the best bid of
+  // the remainder per chunk.
+  const payloadBidRaceData = useMemo(() => {
+    const TOP_BUILDERS = 10;
+    const peakByBuilder = new Map<number, bigint>();
+    for (const bid of payloadData.bidRace) {
+      if (bid.builder_index === undefined || !bid.value) continue;
+      try {
+        const value = BigInt(bid.value);
+        if (value > (peakByBuilder.get(bid.builder_index) ?? -1n)) {
+          peakByBuilder.set(bid.builder_index, value);
+        }
+      } catch {
+        // ignore malformed values
+      }
+    }
+    const topBuilders = new Set(
+      [...peakByBuilder.entries()]
+        .sort((a, b) => (a[1] > b[1] ? -1 : 1))
+        .slice(0, TOP_BUILDERS)
+        .map(([index]) => index)
+    );
+
+    const rows: Array<{ chunk_slot_start_diff: number; value: string; builder_pubkey: string; block_hash?: string }> =
+      [];
+    const fieldBestByChunk = new Map<number, { value: bigint; row: (typeof rows)[number] }>();
+
+    for (const bid of payloadData.bidRace) {
+      const chunk = bid.chunk_slot_start_diff ?? 0;
+      const row = {
+        chunk_slot_start_diff: chunk,
+        value: bid.value ?? '0',
+        builder_pubkey:
+          bid.builder_index !== undefined && topBuilders.has(bid.builder_index)
+            ? `builder-${bid.builder_index}`
+            : `field (${peakByBuilder.size - topBuilders.size} builders)`,
+        block_hash: bid.block_hash,
+      };
+
+      if (bid.builder_index !== undefined && topBuilders.has(bid.builder_index)) {
+        rows.push(row);
+        continue;
+      }
+
+      // Remainder: keep only the best bid per chunk.
+      try {
+        const value = BigInt(bid.value ?? '0');
+        const existing = fieldBestByChunk.get(chunk);
+        if (!existing || value > existing.value) {
+          fieldBestByChunk.set(chunk, { value, row });
+        }
+      } catch {
+        // ignore malformed values
+      }
+    }
+
+    for (const { row } of fieldBestByChunk.values()) {
+      rows.push(row);
+    }
+
+    return rows;
+  }, [payloadData.bidRace]);
 
   // Download modal (beacon block + blob sidecars)
   const [downloadOpen, setDownloadOpen] = useState(false);
