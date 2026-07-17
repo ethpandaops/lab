@@ -664,6 +664,8 @@ export function DetailPage(): JSX.Element {
                 dataColumnPropagation={data.dataColumnPropagation}
                 attestations={data.attestations}
                 mevBidding={data.mevBidding}
+                payloadPropagation={isGloas ? payloadData.payloadFirstSeen : undefined}
+                ptcArrivals={isGloas ? payloadData.ptcArrivals : undefined}
                 contributor={search.contributor}
                 onContributorChange={handleContributorChange}
               />
