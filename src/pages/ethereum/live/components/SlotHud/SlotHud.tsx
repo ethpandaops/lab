@@ -297,15 +297,23 @@ export function SlotHud({
         </Section>
       )}
 
-      {/* Execution payload */}
+      {/* Execution payload. On gloas the beacon block carries no payload, so
+          the CL-sourced execution fields arrive zero-filled — show only what
+          is real at the head of the chain. */}
       <Section title="Execution" className="flex-1">
         <Fade active={blockActive} className="flex flex-col gap-px">
-          <Row k="txns" v={bd?.transactionCount != null ? bd.transactionCount.toLocaleString() : '—'} />
-          <Row k="gas" v={gasPct !== null ? `${gasPct.toFixed(0)}%` : '—'} />
-          <Row k="used" v={gasUsedM ?? '—'} />
-          <Row k="base" v={baseGwei !== null ? `${baseGwei.toFixed(2)} gw` : '—'} />
-          <Row k="block" v={bd?.executionBlockNumber != null ? bd.executionBlockNumber.toLocaleString() : '—'} />
-          <Row k="blobs" v={dash(blobs)} />
+          {epbs ? (
+            <Row k="blobs" v={dash(blobs)} />
+          ) : (
+            <>
+              <Row k="txns" v={bd?.transactionCount != null ? bd.transactionCount.toLocaleString() : '—'} />
+              <Row k="gas" v={gasPct !== null ? `${gasPct.toFixed(0)}%` : '—'} />
+              <Row k="used" v={gasUsedM ?? '—'} />
+              <Row k="base" v={baseGwei !== null ? `${baseGwei.toFixed(2)} gw` : '—'} />
+              <Row k="block" v={bd?.executionBlockNumber != null ? bd.executionBlockNumber.toLocaleString() : '—'} />
+              <Row k="blobs" v={dash(blobs)} />
+            </>
+          )}
         </Fade>
       </Section>
 
