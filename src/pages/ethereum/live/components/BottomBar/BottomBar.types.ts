@@ -11,6 +11,8 @@ export interface BottomBarProps {
   deduplicatedBlobData: Array<{ blobId: string; time: number; color?: string }>;
   visibleContinentalPropagationData: ContinentalPropagationSeries[];
   attestationChartValues: (number | null)[];
+  /** Gloas (ePBS): PTC payload attestation arrivals, second stream. */
+  payloadAttestationChartValues?: (number | null)[];
   attestationTotalExpected: number;
   attestationMaxCount: number;
   mode: 'live' | 'static';

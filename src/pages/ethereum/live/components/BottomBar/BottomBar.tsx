@@ -17,6 +17,7 @@ function BottomBarComponent({
   deduplicatedBlobData,
   visibleContinentalPropagationData,
   attestationChartValues,
+  payloadAttestationChartValues,
   attestationTotalExpected,
   attestationMaxCount,
   mode: _mode,
@@ -32,7 +33,7 @@ function BottomBarComponent({
   // Deneb and Electra: show blob availability
   // Earlier forks: show neither
   const showBlobAvailability = forkName === 'deneb' || forkName === 'electra';
-  const showDataColumnAvailability = forkName === 'fulu' || forkName === 'glaos';
+  const showDataColumnAvailability = forkName === 'fulu' || forkName === 'gloas';
 
   return (
     <>
@@ -78,6 +79,7 @@ function BottomBarComponent({
         <div className="h-full">
           <AttestationArrivals
             attestationChartValues={attestationChartValues}
+            payloadAttestationChartValues={payloadAttestationChartValues}
             totalExpected={attestationTotalExpected}
             maxCount={attestationMaxCount}
           />
@@ -111,6 +113,7 @@ function BottomBarComponent({
             <TabPanel className="h-full">
               <AttestationArrivals
                 attestationChartValues={attestationChartValues}
+                payloadAttestationChartValues={payloadAttestationChartValues}
                 totalExpected={attestationTotalExpected}
                 maxCount={attestationMaxCount}
               />
@@ -133,6 +136,7 @@ const arePropsEqual = (prevProps: BottomBarProps, nextProps: BottomBarProps): bo
     prevProps.deduplicatedBlobData === nextProps.deduplicatedBlobData &&
     prevProps.visibleContinentalPropagationData === nextProps.visibleContinentalPropagationData &&
     prevProps.attestationChartValues === nextProps.attestationChartValues &&
+    prevProps.payloadAttestationChartValues === nextProps.payloadAttestationChartValues &&
     prevProps.attestationTotalExpected === nextProps.attestationTotalExpected &&
     prevProps.attestationMaxCount === nextProps.attestationMaxCount
   );

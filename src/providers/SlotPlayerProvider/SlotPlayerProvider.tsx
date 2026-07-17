@@ -362,9 +362,17 @@ export function SlotPlayerProvider({
   }, [boundsData, currentNetwork]);
 
   const maxSlot = useMemo(() => {
-    if (!boundsData?.aggregate?.maxOfMaxes || !currentNetwork) return 0;
-    const calculated = Math.floor((boundsData.aggregate.maxOfMaxes - currentNetwork.genesis_time) / SECONDS_PER_SLOT);
+    // minOfMaxes is the intersection: the newest slot EVERY table has data
+    // for. Prefer it so playback doesn't run ahead into slots the slower
+    // tables haven't landed — but cap how far a single lagging table can
+    // hold playback behind the freshest one, since near-head slots keep
+    // polling and fill in as their data arrives.
+    if (!boundsData?.aggregate?.minOfMaxes || !boundsData?.aggregate?.maxOfMaxes || !currentNetwork) return 0;
+    const maxLagSeconds = 3 * SECONDS_PER_SLOT;
+    const effectiveMax = Math.max(boundsData.aggregate.minOfMaxes, boundsData.aggregate.maxOfMaxes - maxLagSeconds);
+    const calculated = Math.floor((effectiveMax - currentNetwork.genesis_time) / SECONDS_PER_SLOT);
     console.log('[SlotPlayerProvider] maxSlot calculation:', {
+      minOfMaxes: boundsData.aggregate.minOfMaxes,
       maxOfMaxes: boundsData.aggregate.maxOfMaxes,
       genesisTime: currentNetwork.genesis_time,
       calculatedMaxSlot: calculated,

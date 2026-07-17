@@ -29,6 +29,7 @@ import {
   fctMissedSlotRateDailyServiceListOptions,
   fctBlockProposalStatusHourlyServiceListOptions,
   fctBlockProposalStatusDailyServiceListOptions,
+  fctBlockPayloadStatusHourlyServiceListOptions,
   fctAttestationInclusionDelayHourlyServiceListOptions,
   fctAttestationInclusionDelayDailyServiceListOptions,
   fctProposerRewardHourlyServiceListOptions,
@@ -200,6 +201,19 @@ export function IndexPage(): JSX.Element {
       query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
+  });
+
+  // Gloas (ePBS): hourly payload delivery outcomes judged by the PTC. The
+  // table is empty pre-gloas, so the chart self-gates by data presence.
+  const payloadStatusHourlyQuery = useQuery({
+    ...fctBlockPayloadStatusHourlyServiceListOptions({
+      query: {
+        hour_start_date_time_gte: startTimestamp,
+        order_by: 'hour_start_date_time asc',
+        page_size: PAGE_SIZE,
+      },
+    }),
+    enabled: !isDaily,
   });
 
   const inclusionDelayHourlyQuery = useQuery({
@@ -481,6 +495,17 @@ export function IndexPage(): JSX.Element {
     if (!proposalStatusRecords?.length || !unifiedTimeKeys.length) return null;
     return buildBlockProposalStatusChartConfig(proposalStatusRecords, unifiedTimeKeys, isDaily);
   }, [proposalStatusRecords, unifiedTimeKeys, isDaily]);
+
+  const payloadStatusChartConfig = useMemo(() => {
+    const records = payloadStatusHourlyQuery.data?.fct_block_payload_status_hourly ?? [];
+    if (isDaily || !records.length || !unifiedTimeKeys.length) return null;
+    // Same record shape as proposal status: (time key, status, slot_count).
+    return buildBlockProposalStatusChartConfig(
+      records as unknown as FctBlockProposalStatusHourly[],
+      unifiedTimeKeys,
+      isDaily
+    );
+  }, [payloadStatusHourlyQuery.data, unifiedTimeKeys, isDaily]);
 
   const inclusionDelayChartConfig = useMemo(() => {
     if (!inclusionDelayRecords?.length || !unifiedTimeKeys.length) return null;
@@ -1007,6 +1032,30 @@ export function IndexPage(): JSX.Element {
                   legendPosition="top"
                   enableDataZoom
                   tooltipFormatter={missedSlotTooltipFormatter}
+                  markLines={showAnnotations ? forkMarkLines : []}
+                  syncGroup={inModal ? undefined : 'consensus-overview'}
+                />
+              )}
+            </PopoutCard>
+          )}
+
+          {/* Gloas (ePBS): payload delivery rate judged by the PTC */}
+          {payloadStatusChartConfig && (
+            <PopoutCard
+              title="Payload Delivery (ePBS)"
+              subtitle={`Hourly PTC-judged payload delivery rates over ${config.days} days`}
+              anchorId="payload-delivery-chart"
+              modalSize="full"
+            >
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={payloadStatusChartConfig.series}
+                  xAxis={{ type: 'category', labels: payloadStatusChartConfig.labels, name: 'Date' }}
+                  yAxis={{ name: 'Rate (%)', min: 'dataMin' }}
+                  height={inModal ? 600 : 280}
+                  showLegend
+                  legendPosition="top"
+                  enableDataZoom
                   markLines={showAnnotations ? forkMarkLines : []}
                   syncGroup={inModal ? undefined : 'consensus-overview'}
                 />

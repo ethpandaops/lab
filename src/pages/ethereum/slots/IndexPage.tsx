@@ -7,6 +7,8 @@ import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
 import { Slot } from '@/components/Ethereum/Slot';
 import { useInfiniteSlotsData, type SlotData } from './hooks';
+import { useNetwork } from '@/hooks/useNetwork';
+import { getForkEpoch } from '@/utils/forks';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
 import { formatSlot } from '@/utils';
@@ -31,6 +33,8 @@ import { ArrowPathIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 export function IndexPage(): JSX.Element {
   const { slots, isLoading, error, hasNextPage, fetchNextPage, isFetchingNextPage, currentSlot } =
     useInfiniteSlotsData();
+  const { currentNetwork } = useNetwork();
+  const hasGloas = currentNetwork ? getForkEpoch(currentNetwork, 'gloas') !== null : false;
   const navigate = useNavigate();
 
   /**
@@ -190,6 +194,31 @@ export function IndexPage(): JSX.Element {
         accessor: row => (row.blobCount !== null ? row.blobCount : '-'),
         cellClassName: 'text-muted',
       },
+      ...(hasGloas
+        ? [
+            {
+              header: 'Payload',
+              accessor: (row: SlotData): ReactNode => {
+                // The PTC's verdict on whether the builder revealed in time.
+                if (row.ptcVotesSeen == null || row.ptcVotesSeen === 0) {
+                  return <span className="text-muted">-</span>;
+                }
+
+                const delivered = (row.ptcPresentVotes ?? 0) * 2 >= row.ptcVotesSeen;
+
+                return (
+                  <span
+                    className={clsx('font-medium', delivered ? 'text-success' : 'text-danger')}
+                    title={`PTC: ${row.ptcPresentVotes ?? 0}/${row.ptcVotesSeen} present votes`}
+                  >
+                    {delivered ? 'Delivered' : 'Absent'}
+                  </span>
+                );
+              },
+              cellClassName: 'text-muted',
+            },
+          ]
+        : []),
       {
         header: 'Status',
         accessor: row => {
@@ -209,7 +238,7 @@ export function IndexPage(): JSX.Element {
         cellClassName: 'text-muted',
       },
     ],
-    [slotsWithCurrent]
+    [slotsWithCurrent, hasGloas]
   );
 
   // Loading state (initial load only)

@@ -15,7 +15,13 @@ import {
   fctMevBidHighestValueByBuilderChunked50MsServiceListOptions,
   fctMevBidCountByRelayServiceListOptions,
   fctEngineNewPayloadByElClientServiceListOptions,
+  fctBlockPayloadFirstSeenByNodeServiceListOptions,
+  fctBlockPayloadPtcVoteHeadServiceListOptions,
+  fctPayloadBidHighestValueByBuilderChunked50MsServiceListOptions,
+  fctPayloadAttestationFirstSeenChunked50MsServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
+import { getForkForSlot, isForkAtOrAfter } from '@/utils/beacon';
+import { derivePayloadStatus } from '@/utils/epbs';
 import { EIP7870_REFERENCE_TAG } from '@/constants';
 import { slotToTimestamp } from '../../utils';
 import { useBlockDetailsData } from '../useBlockDetailsData';
@@ -24,6 +30,7 @@ import { useSidebarData } from '../useSidebarData';
 import { useBlobAvailabilityData } from '../useBlobAvailabilityData';
 import { useDataColumnAvailabilityData } from '../useDataColumnAvailabilityData';
 import { useAttestationData } from '../useAttestationData';
+import type { FctBlockFirstSeenByNode } from '@/api/types.gen';
 import type { SlotViewData } from './useSlotViewData.types';
 
 // Stable empty arrays to prevent infinite re-renders
@@ -32,8 +39,8 @@ const EMPTY_BLOB_FIRST_SEEN: never[] = [];
 const EMPTY_DATA_COLUMN_FIRST_SEEN: never[] = [];
 const EMPTY_ATTESTATION: never[] = [];
 
-// Shared options for the per-slot queries. A given slot's data is essentially
-// settled once seen, so cache it and skip the window-focus refetch storm that
+// Shared options for the per-slot queries. A settled slot's data never
+// changes, so cache it and skip the window-focus refetch storm that
 // otherwise churns these arrays and flickers the live visualizations.
 const SLOT_QUERY_OPTIONS = {
   staleTime: 60_000,
@@ -45,8 +52,30 @@ const SLOT_QUERY_OPTIONS = {
   },
 };
 
+// A slot near the head of the chain is still filling in: the pipeline lands
+// events for it over the following seconds, and a one-shot fetch at slot
+// start bakes a partial view (e.g. one node on the map) into the cache.
+// Poll such slots until they are comfortably settled, then fall back to the
+// cache-forever behaviour above.
+const NEAR_HEAD_WINDOW_S = 48;
+
+function slotQueryOptions(
+  slotStartDateTime: number
+): typeof SLOT_QUERY_OPTIONS & { refetchInterval: () => number | false } {
+  const nearHead = (): boolean => Date.now() / 1000 - slotStartDateTime < NEAR_HEAD_WINDOW_S;
+
+  return {
+    ...SLOT_QUERY_OPTIONS,
+    staleTime: nearHead() ? 4_000 : SLOT_QUERY_OPTIONS.staleTime,
+    refetchInterval: () => (nearHead() ? 5_000 : false),
+  };
+}
+
 export function useSlotViewData(currentSlot: number): SlotViewData {
   const { currentNetwork } = useNetwork();
+
+  // Gloas (ePBS): the payload lifecycle queries only exist post-gloas.
+  const isGloas = isForkAtOrAfter(getForkForSlot(currentSlot, currentNetwork), 'gloas');
 
   // Convert slot to timestamp for API calls
   const slotStartDateTime = useMemo(() => {
@@ -63,7 +92,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 2: Block Proposer
@@ -75,7 +104,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 2b: Proposer Entity (named staker, when known)
@@ -87,7 +116,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 3: Block MEV (head table — the canonical fct_block_mev lags and is
@@ -100,7 +129,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 4: Blob Count (using _head table for live data)
@@ -112,7 +141,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 5: Block First Seen by Node (List)
@@ -124,7 +153,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 6: Blob First Seen by Node (List)
@@ -136,7 +165,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 6b: Data Column Sidecar First Seen (aggregated per column, not per node)
@@ -148,7 +177,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 7: Attestation Chunked 50ms (List)
@@ -160,7 +189,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 8: Beacon Committee (List) - for total expected validators
@@ -172,7 +201,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 9: MEV Bidding Timeline (chunked 50ms)
@@ -184,7 +213,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 10: MEV Bid Count by Relay
@@ -195,7 +224,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // API Query 11: Engine newPayload validation timing per EL client
@@ -208,7 +237,54 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       },
     }),
     enabled: slotStartDateTime > 0,
-    ...SLOT_QUERY_OPTIONS,
+    ...slotQueryOptions(slotStartDateTime),
+  });
+
+  // API Query 12 (gloas): payload envelope first seen per sentry
+  const payloadFirstSeenQuery = useQuery({
+    ...fctBlockPayloadFirstSeenByNodeServiceListOptions({
+      query: {
+        slot_start_date_time_eq: slotStartDateTime,
+        page_size: 10000,
+      },
+    }),
+    enabled: slotStartDateTime > 0 && isGloas,
+    ...slotQueryOptions(slotStartDateTime),
+  });
+
+  // API Query 13 (gloas): PTC votes for the slot's block
+  const ptcVoteQuery = useQuery({
+    ...fctBlockPayloadPtcVoteHeadServiceListOptions({
+      query: {
+        slot_start_date_time_eq: slotStartDateTime,
+      },
+    }),
+    enabled: slotStartDateTime > 0 && isGloas,
+    ...slotQueryOptions(slotStartDateTime),
+  });
+
+  // API Query 14 (gloas): PTC payload attestation arrivals, chunked 50ms
+  const ptcArrivalsQuery = useQuery({
+    ...fctPayloadAttestationFirstSeenChunked50MsServiceListOptions({
+      query: {
+        slot_start_date_time_eq: slotStartDateTime,
+        page_size: 10000,
+      },
+    }),
+    enabled: slotStartDateTime > 0 && isGloas,
+    ...slotQueryOptions(slotStartDateTime),
+  });
+
+  // API Query 15 (gloas): the on-chain builder bid race
+  const payloadBidsQuery = useQuery({
+    ...fctPayloadBidHighestValueByBuilderChunked50MsServiceListOptions({
+      query: {
+        slot_start_date_time_eq: slotStartDateTime,
+        page_size: 10000,
+      },
+    }),
+    enabled: slotStartDateTime > 0 && isGloas,
+    ...slotQueryOptions(slotStartDateTime),
   });
 
   // Aggregate loading state (critical queries only)
@@ -271,10 +347,19 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
 
   const mapPoints = useMapData(blockFirstSeenQuery.data?.fct_block_first_seen_by_node ?? EMPTY_BLOCK_FIRST_SEEN);
 
+  // Gloas (ePBS): payload envelope sightings share the sentry geo shape, so
+  // they reuse the map aggregation and render as a second wave of dots.
+  const payloadMapPoints = useMapData(
+    (payloadFirstSeenQuery.data?.fct_block_payload_first_seen_by_node ??
+      EMPTY_BLOCK_FIRST_SEEN) as unknown as FctBlockFirstSeenByNode[]
+  );
+
   const { phases: sidebarPhases, items: sidebarItems } = useSidebarData({
     blockNodes: blockFirstSeenQuery.data?.fct_block_first_seen_by_node ?? EMPTY_BLOCK_FIRST_SEEN,
     blobNodes: blobFirstSeenQuery.data?.fct_block_blob_first_seen_by_node ?? EMPTY_BLOB_FIRST_SEEN,
     attestationChunks: attestationQuery.data?.fct_attestation_first_seen_chunked_50ms ?? EMPTY_ATTESTATION,
+    payloadNodes: payloadFirstSeenQuery.data?.fct_block_payload_first_seen_by_node,
+    ptcChunks: ptcArrivalsQuery.data?.fct_payload_attestation_first_seen_chunked_50ms,
     proposer: blockProposerQuery.data?.fct_block_proposer?.[0],
     currentSlot,
   });
@@ -304,6 +389,11 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
   } = useAttestationData(
     attestationQuery.data?.fct_attestation_first_seen_chunked_50ms ?? EMPTY_ATTESTATION,
     totalExpectedValidators
+  );
+
+  const { data: ptcArrivalData, maxCount: ptcArrivalMaxCount } = useAttestationData(
+    ptcArrivalsQuery.data?.fct_payload_attestation_first_seen_chunked_50ms ?? EMPTY_ATTESTATION,
+    0
   );
 
   const blobCount = blobCountQuery.data?.fct_block_blob_count_head?.[0]?.blob_count ?? 0;
@@ -428,6 +518,64 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
 
   const proposerEntity = proposerEntityQuery.data?.fct_block_proposer_entity?.[0]?.entity ?? null;
 
+  // Gloas (ePBS): the payload lifecycle — bid race depth, envelope propagation,
+  // and the PTC verdict. Null pre-gloas so the HUD keeps its relay-era layout.
+  const epbs = useMemo(() => {
+    if (!isGloas) return null;
+
+    const seenRows = payloadFirstSeenQuery.data?.fct_block_payload_first_seen_by_node ?? [];
+    const ptcVote = ptcVoteQuery.data?.fct_block_payload_ptc_vote_head?.[0];
+    const bidRows = payloadBidsQuery.data?.fct_payload_bid_highest_value_by_builder_chunked_50ms ?? [];
+
+    const seenDiffs = seenRows
+      .map(node => node.seen_slot_start_diff)
+      .filter((d): d is number => typeof d === 'number')
+      .sort((a, b) => a - b);
+
+    let topBidWei: string | null = null;
+    let topBidValue = -1n;
+    let firstBidMs: number | null = null;
+    for (const bid of bidRows) {
+      if (
+        typeof bid.chunk_slot_start_diff === 'number' &&
+        (firstBidMs === null || bid.chunk_slot_start_diff < firstBidMs)
+      ) {
+        firstBidMs = bid.chunk_slot_start_diff;
+      }
+      if (!bid.value) continue;
+      try {
+        const value = BigInt(bid.value);
+        if (value > topBidValue) {
+          topBidValue = value;
+          topBidWei = bid.value;
+        }
+      } catch {
+        // ignore malformed bid values
+      }
+    }
+
+    const { status, presentVotes, ptcVotesSeen } = derivePayloadStatus({
+      hasBlock: !!blockHeadQuery.data?.fct_block_head?.[0],
+      payloadFirstSeen: seenRows,
+      ptcVote,
+    });
+
+    return {
+      payloadFirstSeenMs: seenDiffs[0] ?? null,
+      payloadP50Ms: seenDiffs.length > 0 ? seenDiffs[Math.floor(0.5 * (seenDiffs.length - 1))] : null,
+      payloadNodeCount: seenDiffs.length,
+      builderIndex: seenRows[0]?.builder_index ?? null,
+      ptcPresentVotes: presentVotes,
+      ptcVotesSeen,
+      ptcBlobVotes: ptcVote?.blob_data_available_votes ?? 0,
+      status,
+      bidBuilders: new Set(bidRows.map(bid => bid.builder_index).filter(index => index !== undefined)).size,
+      bidCount: bidRows.length,
+      topBidWei,
+      firstBidMs,
+    };
+  }, [isGloas, payloadFirstSeenQuery.data, ptcVoteQuery.data, payloadBidsQuery.data, blockHeadQuery.data]);
+
   // Prepare raw API data for slot progress timeline
   const rawApiData = useMemo(
     () => ({
@@ -455,7 +603,11 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
   return useMemo(
     () => ({
       blockDetails,
+      epbs,
+      ptcArrivalData,
+      ptcArrivalMaxCount,
       mapPoints,
+      payloadMapPoints,
       sidebarPhases,
       sidebarItems,
       blobCount,
@@ -484,7 +636,11 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     }),
     [
       blockDetails,
+      epbs,
+      ptcArrivalData,
+      ptcArrivalMaxCount,
       mapPoints,
+      payloadMapPoints,
       sidebarPhases,
       sidebarItems,
       blobCount,

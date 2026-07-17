@@ -72,11 +72,7 @@ export interface StreamEvent<TData = unknown> {
 }
 
 export type ServerSentEventsResult<TData = unknown, TReturn = void, TNext = unknown> = {
-  stream: AsyncGenerator<
-    TData extends Record<string, unknown> ? TData[keyof TData] : TData,
-    TReturn,
-    TNext
-  >;
+  stream: AsyncGenerator<TData extends Record<string, unknown> ? TData[keyof TData] : TData, TReturn, TNext>;
 };
 
 export const createSseClient = <TData = unknown>({
@@ -94,7 +90,7 @@ export const createSseClient = <TData = unknown>({
 }: ServerSentEventsOptions): ServerSentEventsResult<TData> => {
   let lastEventId: string | undefined;
 
-  const sleep = sseSleepFn ?? ((ms: number) => new Promise((resolve) => setTimeout(resolve, ms)));
+  const sleep = sseSleepFn ?? ((ms: number) => new Promise(resolve => setTimeout(resolve, ms)));
 
   const createStream = async function* () {
     let retryDelay: number = sseDefaultRetryDelay ?? 3000;

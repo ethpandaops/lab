@@ -35,6 +35,8 @@ export function SlotProgressTimeline({
   dataColumnPropagation,
   attestations,
   mevBidding,
+  payloadPropagation,
+  ptcArrivals,
   isLoading = false,
   contributor,
   onContributorChange,
@@ -66,6 +68,8 @@ export function SlotProgressTimeline({
     dataColumnPropagation,
     attestations,
     mevBidding,
+    payloadPropagation,
+    ptcArrivals,
     selectedUsername,
     excludeOutliers,
   });

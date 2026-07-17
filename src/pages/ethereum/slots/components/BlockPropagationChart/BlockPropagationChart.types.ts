@@ -41,6 +41,10 @@ export interface BlockPropagationDataPoint {
  * Props for BlockPropagationChart component
  */
 export interface BlockPropagationChartProps {
+  /** Card title, defaults to the block wording */
+  title?: string;
+  /** Anchor id for the popout card, must be unique per page */
+  anchorId?: string;
   /**
    * Array of block propagation data points from fct_block_first_seen_by_node
    */

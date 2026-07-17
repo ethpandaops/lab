@@ -25,6 +25,8 @@ vi.mock('@/hooks/useBounds', () => ({
     data: {
       aggregate: {
         minOfMins: MIN_TIMESTAMP,
+        maxOfMins: MIN_TIMESTAMP,
+        minOfMaxes: MAX_TIMESTAMP,
         maxOfMaxes: MAX_TIMESTAMP,
       },
     },

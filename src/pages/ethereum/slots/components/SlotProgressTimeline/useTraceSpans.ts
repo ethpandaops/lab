@@ -22,6 +22,10 @@ interface UseTraceSpansOptions {
   dataColumnPropagation: FctBlockDataColumnSidecarFirstSeenByNode[];
   attestations: FctAttestationFirstSeenChunked50Ms[];
   mevBidding: FctMevBidHighestValueByBuilderChunked50Ms[];
+  /** Gloas (ePBS): payload envelope sightings per sentry */
+  payloadPropagation?: { seen_slot_start_diff?: number }[];
+  /** Gloas (ePBS): PTC payload attestation arrivals, chunked */
+  ptcArrivals?: { chunk_slot_start_diff?: number; attestation_count?: number }[];
   selectedUsername: string | null;
   excludeOutliers: boolean;
 }
@@ -45,6 +49,8 @@ export function useTraceSpans({
   dataColumnPropagation,
   attestations,
   mevBidding,
+  payloadPropagation,
+  ptcArrivals,
   selectedUsername,
   excludeOutliers,
 }: UseTraceSpansOptions): UseTraceSpansResult {
@@ -113,6 +119,45 @@ export function useTraceSpans({
 
     // MEV Builders
     buildMevSpans(result, mevBidding, blockFirstSeenMs);
+
+    // Gloas (ePBS): payload reveal across sentries
+    if (payloadPropagation && payloadPropagation.length > 0) {
+      const times = payloadPropagation
+        .map(node => node.seen_slot_start_diff ?? Infinity)
+        .filter(v => v !== Infinity && v >= 0 && v <= MAX_REASONABLE_SEEN_TIME_MS);
+      if (times.length > 0) {
+        const first = Math.min(...times);
+        const last = Math.max(...times);
+        result.push({
+          id: 'payload-reveal',
+          label: 'Payload Reveal',
+          startMs: first,
+          endMs: Math.max(last, first + 50),
+          category: 'execution',
+          depth: 1,
+          details: `Envelope seen by ${times.length} nodes (${formatMs(first)} to ${formatMs(last)})`,
+        });
+      }
+    }
+
+    // Gloas (ePBS): PTC payload attestation votes
+    if (ptcArrivals && ptcArrivals.length > 0) {
+      const chunks = ptcArrivals.filter(chunk => (chunk.attestation_count ?? 0) > 0);
+      if (chunks.length > 0) {
+        const first = Math.min(...chunks.map(chunk => chunk.chunk_slot_start_diff ?? Infinity));
+        const last = Math.max(...chunks.map(chunk => chunk.chunk_slot_start_diff ?? 0));
+        const votes = chunks.reduce((sum, chunk) => sum + (chunk.attestation_count ?? 0), 0);
+        result.push({
+          id: 'ptc-votes',
+          label: 'PTC Votes',
+          startMs: first,
+          endMs: last + 50,
+          category: 'attestation',
+          depth: 1,
+          details: `${votes} PTC votes (${formatMs(first)} to ${formatMs(last)})`,
+        });
+      }
+    }
 
     // Aggregate all node data into per-node timelines
     const nodeTimelines = aggregateNodeTimelines(

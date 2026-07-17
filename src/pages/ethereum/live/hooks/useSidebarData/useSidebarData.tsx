@@ -3,11 +3,14 @@ import type {
   FctBlockFirstSeenByNode,
   FctBlockBlobFirstSeenByNode,
   FctAttestationFirstSeenChunked50Ms,
+  FctBlockPayloadFirstSeenByNode,
+  FctPayloadAttestationFirstSeenChunked50Ms,
   FctBlockProposer,
 } from '@/api/types.gen';
 import type { SlotPhase } from '@/utils/beacon';
 import type { TimelineItem } from '@/components/Lists/ScrollingTimeline/ScrollingTimeline.types';
-import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
+import { getSlotPhases } from '@/utils/beacon';
+import { useForks } from '@/hooks/useForks';
 import { Badge } from '@/components/Elements/Badge';
 
 /**
@@ -22,6 +25,10 @@ export interface UseSidebarDataParams {
   blockNodes: FctBlockFirstSeenByNode[];
   blobNodes: FctBlockBlobFirstSeenByNode[];
   attestationChunks: FctAttestationFirstSeenChunked50Ms[];
+  /** Gloas (ePBS): payload envelope sightings per sentry */
+  payloadNodes?: FctBlockPayloadFirstSeenByNode[];
+  /** Gloas (ePBS): PTC payload attestation arrivals, chunked */
+  ptcChunks?: FctPayloadAttestationFirstSeenChunked50Ms[];
   proposer: FctBlockProposer | undefined;
   currentSlot: number;
 }
@@ -30,13 +37,16 @@ export function useSidebarData({
   blockNodes,
   blobNodes,
   attestationChunks,
+  payloadNodes,
+  ptcChunks,
   proposer: _proposer,
   currentSlot,
 }: UseSidebarDataParams): {
   phases: SlotPhase[];
   items: TimelineItem[];
 } {
-  const phases = useMemo(() => DEFAULT_BEACON_SLOT_PHASES, []);
+  const { activeFork } = useForks();
+  const phases = useMemo(() => getSlotPhases(activeFork?.name), [activeFork?.name]);
 
   const items = useMemo<TimelineItem[]>(() => {
     const allItems: TimelineItem[] = [];
@@ -71,6 +81,34 @@ export function useSidebarData({
       });
     });
 
+    // 2b. Gloas (ePBS): payload envelope seen in locations - same shape as blocks
+    const payloadCityFirstSeen = new Map<string, { timestamp: number; location: string }>();
+    (payloadNodes ?? []).forEach(node => {
+      const city = node.meta_client_geo_city;
+      const country = node.meta_client_geo_country ?? 'Unknown';
+      const timestamp = node.seen_slot_start_diff ?? 0;
+      const location = city ? `${city}, ${country}` : country;
+
+      if (!payloadCityFirstSeen.has(location) || timestamp < payloadCityFirstSeen.get(location)!.timestamp) {
+        payloadCityFirstSeen.set(location, { timestamp, location });
+      }
+    });
+
+    payloadCityFirstSeen.forEach((data, location) => {
+      allItems.push({
+        id: `${currentSlot}-payload-seen-${location}-${data.timestamp}`,
+        timestamp: data.timestamp,
+        content: (
+          <div className="flex items-center gap-1.5">
+            <Badge color="indigo" variant="border" size="small">
+              Payload
+            </Badge>
+            <span>{location}</span>
+          </div>
+        ),
+      });
+    });
+
     // 3. Chunk attestations - Group by 50ms chunks
     attestationChunks.forEach((chunk, index) => {
       const count = chunk.attestation_count ?? 0;
@@ -84,6 +122,29 @@ export function useSidebarData({
             <div className="flex items-center gap-1.5">
               <Badge color="purple" variant="border" size="small">
                 Attest
+              </Badge>
+              <span>
+                {count} validator{count > 1 ? 's' : ''}
+              </span>
+            </div>
+          ),
+        });
+      }
+    });
+
+    // 3b. Gloas (ePBS): PTC payload attestation arrivals, chunked
+    (ptcChunks ?? []).forEach((chunk, index) => {
+      const count = chunk.attestation_count ?? 0;
+      const timestamp = chunk.chunk_slot_start_diff ?? 0;
+
+      if (count > 0) {
+        allItems.push({
+          id: `${currentSlot}-ptc-${timestamp}-${index}`,
+          timestamp,
+          content: (
+            <div className="flex items-center gap-1.5">
+              <Badge color="yellow" variant="border" size="small">
+                PTC
               </Badge>
               <span>
                 {count} validator{count > 1 ? 's' : ''}
@@ -176,7 +237,7 @@ export function useSidebarData({
 
     // Sort all items by timestamp
     return allItems.sort((a, b) => a.timestamp - b.timestamp);
-  }, [blockNodes, blobNodes, attestationChunks, currentSlot]);
+  }, [blockNodes, blobNodes, attestationChunks, payloadNodes, ptcChunks, currentSlot]);
 
   return { phases, items };
 }

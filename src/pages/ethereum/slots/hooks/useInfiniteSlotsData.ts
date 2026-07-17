@@ -8,8 +8,15 @@ import {
   fctBlockProposerServiceList,
   fctBlockBlobCountServiceList,
   fctBlockProposerEntityServiceList,
+  fctBlockPayloadPtcVoteHeadServiceList,
 } from '@/api/sdk.gen';
-import type { FctBlockProposer, FctBlockBlobCount, FctBlockHead, FctBlockProposerEntity } from '@/api/types.gen';
+import type {
+  FctBlockProposer,
+  FctBlockBlobCount,
+  FctBlockHead,
+  FctBlockProposerEntity,
+  FctBlockPayloadPtcVoteHead,
+} from '@/api/types.gen';
 import type { SlotData } from './useSlotsData.types';
 
 /**
@@ -160,41 +167,53 @@ export function useInfiniteSlotsData(): UseInfiniteSlotsDataReturn {
       const startTimestamp = slotToTimestamp(startSlot, currentNetwork.genesis_time);
       const endTimestamp = slotToTimestamp(endSlot, currentNetwork.genesis_time);
 
-      // Fetch all four data sources in parallel
-      const [blockHeadResult, proposerResult, blobCountResult, proposerEntityResult] = await Promise.all([
-        fctBlockHeadServiceList({
-          query: {
-            slot_start_date_time_gte: startTimestamp,
-            slot_start_date_time_lte: endTimestamp,
-            page_size: SLOTS_PER_PAGE,
-            order_by: 'slot desc',
-          },
-        }),
-        fctBlockProposerServiceList({
-          query: {
-            slot_start_date_time_gte: startTimestamp,
-            slot_start_date_time_lte: endTimestamp,
-            page_size: SLOTS_PER_PAGE,
-            order_by: 'slot desc',
-          },
-        }),
-        fctBlockBlobCountServiceList({
-          query: {
-            slot_start_date_time_gte: startTimestamp,
-            slot_start_date_time_lte: endTimestamp,
-            page_size: SLOTS_PER_PAGE,
-            order_by: 'slot desc',
-          },
-        }),
-        fctBlockProposerEntityServiceList({
-          query: {
-            slot_start_date_time_gte: startTimestamp,
-            slot_start_date_time_lte: endTimestamp,
-            page_size: SLOTS_PER_PAGE,
-            order_by: 'slot desc',
-          },
-        }),
-      ]);
+      // Fetch all data sources in parallel
+      const [blockHeadResult, proposerResult, blobCountResult, proposerEntityResult, ptcVoteResult] = await Promise.all(
+        [
+          fctBlockHeadServiceList({
+            query: {
+              slot_start_date_time_gte: startTimestamp,
+              slot_start_date_time_lte: endTimestamp,
+              page_size: SLOTS_PER_PAGE,
+              order_by: 'slot desc',
+            },
+          }),
+          fctBlockProposerServiceList({
+            query: {
+              slot_start_date_time_gte: startTimestamp,
+              slot_start_date_time_lte: endTimestamp,
+              page_size: SLOTS_PER_PAGE,
+              order_by: 'slot desc',
+            },
+          }),
+          fctBlockBlobCountServiceList({
+            query: {
+              slot_start_date_time_gte: startTimestamp,
+              slot_start_date_time_lte: endTimestamp,
+              page_size: SLOTS_PER_PAGE,
+              order_by: 'slot desc',
+            },
+          }),
+          fctBlockProposerEntityServiceList({
+            query: {
+              slot_start_date_time_gte: startTimestamp,
+              slot_start_date_time_lte: endTimestamp,
+              page_size: SLOTS_PER_PAGE,
+              order_by: 'slot desc',
+            },
+          }),
+          // Gloas (ePBS): PTC verdict per slot. Empty pre-gloas, so it costs
+          // nothing on networks without the fork.
+          fctBlockPayloadPtcVoteHeadServiceList({
+            query: {
+              slot_start_date_time_gte: startTimestamp,
+              slot_start_date_time_lte: endTimestamp,
+              page_size: SLOTS_PER_PAGE,
+              order_by: 'slot desc',
+            },
+          }).catch(() => undefined),
+        ]
+      );
 
       // Combine data from all queries
       const slots: SlotData[] = [];
@@ -207,6 +226,9 @@ export function useInfiniteSlotsData(): UseInfiniteSlotsDataReturn {
         const blockData = blockHeadResult.data?.fct_block_head?.find((b: FctBlockHead) => b.slot === slot);
         const entityData = proposerEntityResult.data?.fct_block_proposer_entity?.find(
           (e: FctBlockProposerEntity) => e.slot === slot
+        );
+        const ptcData = ptcVoteResult?.data?.fct_block_payload_ptc_vote_head?.find(
+          (v: FctBlockPayloadPtcVoteHead) => v.slot === slot
         );
 
         // Determine if slot has data
@@ -225,6 +247,8 @@ export function useInfiniteSlotsData(): UseInfiniteSlotsDataReturn {
           blockRoot: proposerData?.block_root ?? blockData?.block_root ?? null,
           timestamp,
           proposerEntity: entityData?.entity ?? null,
+          ptcPresentVotes: ptcData?.payload_present_votes ?? null,
+          ptcVotesSeen: ptcData?.ptc_validators_seen ?? null,
         });
       }
 

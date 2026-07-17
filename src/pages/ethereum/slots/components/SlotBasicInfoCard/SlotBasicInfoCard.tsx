@@ -215,13 +215,16 @@ export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: S
                   </div>
                 )}
 
-                {/* Execution Block Number */}
-                <div>
-                  <dt className="text-xs font-medium text-muted">Execution Block</dt>
-                  <dd className="mt-1 text-base/7 font-semibold text-foreground">
-                    {blockHead?.execution_payload_block_number ?? 'N/A'}
-                  </dd>
-                </div>
+                {/* Execution Block Number - zero means the CL row has no
+                    payload data (gloas blocks carry only the bid), so hide it */}
+                {!!blockHead?.execution_payload_block_number && (
+                  <div>
+                    <dt className="text-xs font-medium text-muted">Execution Block</dt>
+                    <dd className="mt-1 text-base/7 font-semibold text-foreground">
+                      {blockHead.execution_payload_block_number}
+                    </dd>
+                  </div>
+                )}
 
                 {/* Blob Count - only show if there are blobs */}
                 {actualBlobCount > 0 && (

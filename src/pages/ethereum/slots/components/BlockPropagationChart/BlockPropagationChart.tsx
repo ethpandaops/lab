@@ -24,7 +24,11 @@ import type { TooltipFormatterParams, TooltipFormatterParam } from '@/types/echa
  * />
  * ```
  */
-export function BlockPropagationChart({ blockPropagationData }: BlockPropagationChartProps): JSX.Element {
+export function BlockPropagationChart({
+  blockPropagationData,
+  title = 'Block Propagation',
+  anchorId = 'block-propagation-chart',
+}: BlockPropagationChartProps): JSX.Element {
   const themeColors = useThemeColors();
   const { CONTINENT_COLORS } = getDataVizColors();
 
@@ -169,7 +173,7 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
   // Handle empty data
   if (blockPropagationData.length === 0) {
     return (
-      <PopoutCard title="Block Propagation" anchorId="block-propagation-chart" modalSize="xl">
+      <PopoutCard title={title} anchorId={anchorId} modalSize="xl">
         {({ inModal }) => (
           <div
             className={
@@ -188,7 +192,7 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
   const subtitle = `Avg: ${avgPropagationTime.toFixed(0)}ms across ${blockPropagationData.length.toLocaleString()} nodes`;
 
   return (
-    <PopoutCard title="Block Propagation" anchorId="block-propagation-chart" subtitle={subtitle} modalSize="xl">
+    <PopoutCard title={title} anchorId={anchorId} subtitle={subtitle} modalSize="xl">
       {({ inModal }) => (
         <ScatterAndLineChart
           scatterSeries={scatterSeries}

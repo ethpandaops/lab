@@ -404,6 +404,8 @@ export function buildMissedSlotRateChartConfig(
 }
 
 export const STATUS_COLORS: Record<string, string> = {
+  delivered: '#22c55e',
+  absent: '#ef4444',
   canonical: '#22c55e',
   orphaned: '#f59e0b',
   missed: '#f43f5e',

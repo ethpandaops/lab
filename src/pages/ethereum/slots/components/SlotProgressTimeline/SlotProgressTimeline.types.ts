@@ -25,6 +25,10 @@ export interface SlotProgressTimelineProps {
   attestations: FctAttestationFirstSeenChunked50Ms[];
   /** MEV bid timing data (50ms chunks) */
   mevBidding: FctMevBidHighestValueByBuilderChunked50Ms[];
+  /** Gloas (ePBS): payload envelope sightings per sentry */
+  payloadPropagation?: { seen_slot_start_diff?: number }[];
+  /** Gloas (ePBS): PTC payload attestation arrivals, chunked */
+  ptcArrivals?: { chunk_slot_start_diff?: number; attestation_count?: number }[];
   /** Whether data is still loading */
   isLoading?: boolean;
   /** Selected contributor username from URL params */

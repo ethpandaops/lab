@@ -1,4 +1,4 @@
-import type { ClientValidationRow } from '../../hooks/useSlotViewData/useSlotViewData.types';
+import type { ClientValidationRow, EpbsSlotData } from '../../hooks/useSlotViewData/useSlotViewData.types';
 import type { BlockDetailsData } from '../../hooks/useBlockDetailsData/useBlockDetailsData.types';
 
 export interface SlotHudProps {
@@ -26,6 +26,8 @@ export interface SlotHudProps {
   auctionBids: number;
   auctionTopRelay: string | null;
   auctionTopBidWei: string | null;
+  /** Gloas (ePBS) payload lifecycle; null pre-gloas keeps the relay-era layout. */
+  epbs: EpbsSlotData | null;
   /** Blob counts (PeerDAS columns + legacy blob count). */
   blobCount: number;
   dataColumnBlobCount: number;

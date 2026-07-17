@@ -1,4 +1,4 @@
-import { type JSX, useCallback, useEffect, useState } from 'react';
+import { type JSX, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, useSearch, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
@@ -16,7 +16,7 @@ import { Card } from '@/components/Layout/Card';
 import { Tab } from '@/components/Navigation/Tab';
 import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { Button } from '@/components/Elements/Button';
-import { SLOTS_PER_EPOCH, slotToTimestamp } from '@/utils/beacon';
+import { SLOTS_PER_EPOCH, slotToTimestamp, getForkForSlot, isForkAtOrAfter } from '@/utils/beacon';
 import { formatEpoch } from '@/utils';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
 import { useTabState } from '@/hooks/useTabState';
@@ -27,8 +27,10 @@ import {
   fctBlockBlobHeadServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import { useSlotDetailData } from './hooks/useSlotDetailData';
+import { useSlotPayloadData } from './hooks/useSlotPayloadData';
 import { useAllAttestationVotes } from './hooks/useAllAttestationVotes';
 import { SlotBasicInfoCard } from './components/SlotBasicInfoCard';
+import { SlotPayloadCard } from './components/SlotPayloadCard';
 import { SlotDownloadModal } from './components/SlotDownloadModal';
 import { AttestationArrivalsChart } from './components/AttestationArrivalsChart';
 import { AttestationVotesBreakdownTable } from './components/AttestationVotesBreakdownTable';
@@ -90,6 +92,66 @@ export function DetailPage(): JSX.Element {
 
   // Get current network
   const { currentNetwork } = useNetwork();
+
+  // Gloas (ePBS) slots get a dedicated Payload tab
+  const isGloas = isForkAtOrAfter(getForkForSlot(slot, currentNetwork), 'gloas');
+  const { data: payloadData } = useSlotPayloadData(slot, isGloas);
+  // The chart draws one series per builder, which stops scaling somewhere
+  // around a dozen. The strongest bidders keep individual series and the
+  // auction frontier table supplies the "best bid" line — bounded by the
+  // 50ms chunk grid no matter how many builders compete. If the by_builder
+  // fetch truncated (unbounded builder count), fall back to frontier only.
+  const payloadBidRaceData = useMemo(() => {
+    const TOP_BUILDERS = 10;
+    const BY_BUILDER_PAGE_SIZE = 10000;
+
+    const frontierRows = payloadData.bidFrontier.map(bid => ({
+      chunk_slot_start_diff: bid.chunk_slot_start_diff ?? 0,
+      value: bid.value ?? '0',
+      builder_pubkey: 'best bid',
+      block_hash: bid.block_hash,
+    }));
+
+    if (payloadData.bidRace.length >= BY_BUILDER_PAGE_SIZE) {
+      return frontierRows;
+    }
+
+    const peakByBuilder = new Map<number, bigint>();
+    for (const bid of payloadData.bidRace) {
+      if (bid.builder_index === undefined || !bid.value) continue;
+      try {
+        const value = BigInt(bid.value);
+        if (value > (peakByBuilder.get(bid.builder_index) ?? -1n)) {
+          peakByBuilder.set(bid.builder_index, value);
+        }
+      } catch {
+        // ignore malformed values
+      }
+    }
+    const topBuilders = new Set(
+      [...peakByBuilder.entries()]
+        .sort((a, b) => (a[1] > b[1] ? -1 : 1))
+        .slice(0, TOP_BUILDERS)
+        .map(([index]) => index)
+    );
+
+    const rows = payloadData.bidRace
+      .filter(bid => bid.builder_index !== undefined && topBuilders.has(bid.builder_index))
+      .map(bid => ({
+        chunk_slot_start_diff: bid.chunk_slot_start_diff ?? 0,
+        value: bid.value ?? '0',
+        builder_pubkey: `builder-${bid.builder_index}`,
+        block_hash: bid.block_hash,
+      }));
+
+    // Only draw the frontier alongside individual builders when it adds
+    // information (i.e. some builders were cut from the top list).
+    if (peakByBuilder.size > topBuilders.size) {
+      rows.push(...frontierRows);
+    }
+
+    return rows;
+  }, [payloadData.bidRace, payloadData.bidFrontier]);
 
   // Download modal (beacon block + blob sidecars)
   const [downloadOpen, setDownloadOpen] = useState(false);
@@ -167,6 +229,7 @@ export function DetailPage(): JSX.Element {
     { id: 'attestations', anchors: ['missed-attestations'] },
     { id: 'propagation' },
     { id: 'blobs' },
+    ...(isGloas ? [{ id: 'payload' }] : []),
     { id: 'execution' },
     { id: 'mev' },
     { id: 'resources' },
@@ -236,7 +299,30 @@ export function DetailPage(): JSX.Element {
 
   // Get the effective block data - prefer canonical (blockHead) but fall back to orphaned block
   // Will be undefined for missed slots
-  const effectiveBlockData = data.blockHead[0] ?? data.block[0];
+  const rawEffectiveBlockData = data.blockHead[0] ?? data.block[0];
+  // Gloas (ePBS): the beacon block no longer carries the payload, so its
+  // execution_payload_* columns arrive zero-filled. Overlay the real facts
+  // from fct_block_payload (bid commitment + envelope contents) and null the
+  // fields that genuinely no longer exist on the CL side.
+  const effectiveBlockData =
+    isGloas && rawEffectiveBlockData
+      ? {
+          ...rawEffectiveBlockData,
+          execution_payload_block_hash: payloadData.payload?.block_hash ?? undefined,
+          execution_payload_parent_hash: payloadData.payload?.parent_block_hash ?? undefined,
+          execution_payload_transactions_count: payloadData.payload?.transactions_count ?? undefined,
+          execution_payload_transactions_total_bytes: payloadData.payload?.transactions_total_bytes ?? undefined,
+          execution_payload_transactions_total_bytes_compressed: undefined,
+          execution_payload_gas_limit: payloadData.payload?.gas_limit ?? undefined,
+          execution_payload_gas_used: undefined,
+          execution_payload_base_fee_per_gas: undefined,
+          execution_payload_blob_gas_used: undefined,
+          execution_payload_excess_blob_gas: undefined,
+          execution_payload_block_number: undefined,
+          execution_payload_fee_recipient: undefined,
+          execution_payload_state_root: undefined,
+        }
+      : rawEffectiveBlockData;
 
   // Get total expected validators from attestation correctness data
   // This is more accurate than summing committee validators (which would double-count)
@@ -443,6 +529,7 @@ export function DetailPage(): JSX.Element {
             <Tab>Attestations</Tab>
             <Tab>Propagation</Tab>
             <Tab>Blobs</Tab>
+            {isGloas && <Tab>Payload</Tab>}
             <Tab>Execution</Tab>
             <Tab>MEV</Tab>
             <Tab>Node Resources</Tab>
@@ -577,6 +664,8 @@ export function DetailPage(): JSX.Element {
                 dataColumnPropagation={data.dataColumnPropagation}
                 attestations={data.attestations}
                 mevBidding={data.mevBidding}
+                payloadPropagation={isGloas ? payloadData.payloadFirstSeen : undefined}
+                ptcArrivals={isGloas ? payloadData.ptcArrivals : undefined}
                 contributor={search.contributor}
                 onContributorChange={handleContributorChange}
               />
@@ -1085,6 +1174,54 @@ export function DetailPage(): JSX.Element {
                 )}
               </div>
             </TabPanel>
+
+            {/* Payload Tab - Gloas (ePBS) payload lifecycle, only rendered post-gloas */}
+            {isGloas && (
+              <TabPanel>
+                <div className="space-y-6">
+                  <SlotPayloadCard
+                    slot={slot}
+                    proposerIndex={data.blockProposer[0]?.proposer_validator_index}
+                    hasBlock={!isMissedSlot}
+                  />
+                  {payloadBidRaceData.length > 0 && (
+                    <MevBiddingTimelineChart
+                      biddingData={payloadBidRaceData}
+                      winningMevValue={payloadData.bid?.value}
+                      winningBuilder={payloadData.bid ? `builder-${payloadData.bid.builder_index}` : undefined}
+                      title="Builder Bid Race"
+                      anchorId="payload-bid-race"
+                      yAxisTitle="Bid Value (ETH)"
+                    />
+                  )}
+                  {payloadData.payloadFirstSeen.length > 0 && (
+                    <BlockPropagationChart
+                      blockPropagationData={payloadData.payloadFirstSeen.map(node => ({
+                        seen_slot_start_diff: node.seen_slot_start_diff ?? 0,
+                        node_id: node.node_id ?? 'unknown',
+                        meta_client_geo_continent_code: node.meta_client_geo_continent_code,
+                        meta_client_geo_country: node.meta_client_geo_country,
+                        meta_client_geo_city: node.meta_client_geo_city,
+                        username: node.username,
+                        classification: node.classification,
+                      }))}
+                      title="Payload Propagation"
+                      anchorId="payload-propagation-chart"
+                    />
+                  )}
+                  {payloadData.ptcArrivals.length > 0 && (
+                    <AttestationArrivalsChart
+                      attestationData={payloadData.ptcArrivals}
+                      currentSlot={slot}
+                      votedForBlocks={data.votedForBlocks}
+                      totalExpectedValidators={payloadData.ptcVote?.ptc_validators_seen ?? 0}
+                      title="PTC Payload Attestation Arrivals"
+                      anchorId="ptc-arrivals"
+                    />
+                  )}
+                </div>
+              </TabPanel>
+            )}
 
             {/* Execution Tab - Comprehensive execution layer data */}
             <TabPanel>
