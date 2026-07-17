@@ -3,10 +3,19 @@ name: Release
 # Builds the frontend, attaches it to a GitHub release, and dispatches a
 # lab-backend release embedding this version.
 #
-# Run manually (workflow_dispatch) to cut the next release from master, or
-# publish a release by hand and the release event picks up from there.
+# Every master push cuts the next patch release automatically (put
+# '[skip release]' in the commit message to opt out). workflow_dispatch
+# does the same with a selectable bump, and publishing a release by hand
+# enters at the build step.
 
 on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+      - '.github/**'
+      - '.claude/**'
   release:
     types: [published]
   workflow_dispatch:
@@ -31,6 +40,7 @@ concurrency:
 jobs:
   release:
     name: Build and Publish Release
+    if: github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip release]')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -54,6 +64,7 @@ jobs:
             else
               VERSION="${LATEST_TAG#v}"
               IFS='.' read -r major minor patch <<< "$VERSION"
+              # inputs.bump is empty on push events, falling through to patch.
               case "${{ inputs.bump }}" in
                 major) NEW_VERSION="$((major + 1)).0.0" ;;
                 minor) NEW_VERSION="${major}.$((minor + 1)).0" ;;
@@ -107,7 +118,7 @@ jobs:
       # Assets are uploaded, so lab-backend can now cut a release that
       # embeds this frontend version.
       - name: Trigger lab-backend release
-        if: github.event_name == 'workflow_dispatch' || !github.event.release.prerelease
+        if: github.event_name != 'release' || !github.event.release.prerelease
         uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4.0.1
         with:
           token: ${{ secrets.EPOBOT_TOKEN }}
