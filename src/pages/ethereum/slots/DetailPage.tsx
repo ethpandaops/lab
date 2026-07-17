@@ -249,7 +249,30 @@ export function DetailPage(): JSX.Element {
 
   // Get the effective block data - prefer canonical (blockHead) but fall back to orphaned block
   // Will be undefined for missed slots
-  const effectiveBlockData = data.blockHead[0] ?? data.block[0];
+  const rawEffectiveBlockData = data.blockHead[0] ?? data.block[0];
+  // Gloas (ePBS): the beacon block no longer carries the payload, so its
+  // execution_payload_* columns arrive zero-filled. Overlay the real facts
+  // from fct_block_payload (bid commitment + envelope contents) and null the
+  // fields that genuinely no longer exist on the CL side.
+  const effectiveBlockData =
+    isGloas && rawEffectiveBlockData
+      ? {
+          ...rawEffectiveBlockData,
+          execution_payload_block_hash: payloadData.payload?.block_hash ?? undefined,
+          execution_payload_parent_hash: payloadData.payload?.parent_block_hash ?? undefined,
+          execution_payload_transactions_count: payloadData.payload?.transactions_count ?? undefined,
+          execution_payload_transactions_total_bytes: payloadData.payload?.transactions_total_bytes ?? undefined,
+          execution_payload_transactions_total_bytes_compressed: undefined,
+          execution_payload_gas_limit: payloadData.payload?.gas_limit ?? undefined,
+          execution_payload_gas_used: undefined,
+          execution_payload_base_fee_per_gas: undefined,
+          execution_payload_blob_gas_used: undefined,
+          execution_payload_excess_blob_gas: undefined,
+          execution_payload_block_number: undefined,
+          execution_payload_fee_recipient: undefined,
+          execution_payload_state_root: undefined,
+        }
+      : rawEffectiveBlockData;
 
   // Get total expected validators from attestation correctness data
   // This is more accurate than summing committee validators (which would double-count)

@@ -2183,6 +2183,77 @@ export type FctBlockMevHead = {
   value?: string | null;
 };
 
+export type FctBlockPayload = {
+  /**
+   * Number of blob KZG commitments in the bid
+   */
+  blob_kzg_commitment_count?: number;
+  /**
+   * Number of type-3 blob transactions in the revealed payload
+   */
+  blob_transactions_count?: number;
+  /**
+   * The execution block hash of the payload
+   */
+  block_hash?: string;
+  /**
+   * The root of the beacon block the payload belongs to
+   */
+  block_root?: string;
+  /**
+   * The beacon block version, e.g. gloas
+   */
+  block_version?: string;
+  /**
+   * Validator index of the builder, equal to the block proposer index for self-built payloads
+   */
+  builder_index?: number;
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * The gas limit committed to in the bid
+   */
+  gas_limit?: number;
+  /**
+   * The parent execution block hash
+   */
+  parent_block_hash?: string;
+  /**
+   * The slot number of the block the payload belongs to
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Number of transactions in the revealed payload
+   */
+  transactions_count?: number;
+  /**
+   * Total bytes of transactions in the revealed payload
+   */
+  transactions_total_bytes?: number;
+  /**
+   * Sum of per-transaction gas limits in the revealed payload
+   */
+  transactions_total_gas_limit?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The winning bid value in wei
+   */
+  value?: string;
+};
+
 export type FctBlockPayloadAvailableByNode = {
   /**
    * The time from slot start for the node to have the payload and its blobs locally verified
@@ -6931,6 +7002,13 @@ export type GetFctBlockPayloadPtcVoteHeadResponse = {
  */
 export type GetFctBlockPayloadPtcVoteResponse = {
   item?: FctBlockPayloadPtcVote;
+};
+
+/**
+ * Response for getting a single fct_block_payload record
+ */
+export type GetFctBlockPayloadResponse = {
+  item?: FctBlockPayload;
 };
 
 /**
@@ -12039,6 +12117,20 @@ export type ListFctBlockPayloadPtcVoteResponse = {
    * The list of fct_block_payload_ptc_vote.
    */
   fct_block_payload_ptc_vote?: Array<FctBlockPayloadPtcVote>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_payload records
+ */
+export type ListFctBlockPayloadResponse = {
+  /**
+   * The list of fct_block_payload.
+   */
+  fct_block_payload?: Array<FctBlockPayload>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -34489,6 +34581,736 @@ export type FctBlockMevHeadServiceGetResponses = {
 
 export type FctBlockMevHeadServiceGetResponse =
   FctBlockMevHeadServiceGetResponses[keyof FctBlockMevHeadServiceGetResponses];
+
+export type FctBlockPayloadServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * The root of the beacon block the payload belongs to (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * The root of the beacon block the payload belongs to (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * The root of the beacon block the payload belongs to (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * The root of the beacon block the payload belongs to (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * The root of the beacon block the payload belongs to (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * The root of the beacon block the payload belongs to (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * The root of the beacon block the payload belongs to (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * The root of the beacon block the payload belongs to (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * The root of the beacon block the payload belongs to (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The slot number of the block the payload belongs to (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot number of the block the payload belongs to (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot number of the block the payload belongs to (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot number of the block the payload belongs to (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot number of the block the payload belongs to (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot number of the block the payload belongs to (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot number of the block the payload belongs to (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot number of the block the payload belongs to (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot number of the block the payload belongs to (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot number of the block the payload belongs to (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * The beacon block version, e.g. gloas (filter: eq)
+     */
+    block_version_eq?: string;
+    /**
+     * The beacon block version, e.g. gloas (filter: ne)
+     */
+    block_version_ne?: string;
+    /**
+     * The beacon block version, e.g. gloas (filter: contains)
+     */
+    block_version_contains?: string;
+    /**
+     * The beacon block version, e.g. gloas (filter: starts_with)
+     */
+    block_version_starts_with?: string;
+    /**
+     * The beacon block version, e.g. gloas (filter: ends_with)
+     */
+    block_version_ends_with?: string;
+    /**
+     * The beacon block version, e.g. gloas (filter: like)
+     */
+    block_version_like?: string;
+    /**
+     * The beacon block version, e.g. gloas (filter: not_like)
+     */
+    block_version_not_like?: string;
+    /**
+     * The beacon block version, e.g. gloas (filter: in_values) (comma-separated list)
+     */
+    block_version_in_values?: string;
+    /**
+     * The beacon block version, e.g. gloas (filter: not_in_values) (comma-separated list)
+     */
+    block_version_not_in_values?: string;
+    /**
+     * Validator index of the builder, equal to the block proposer index for self-built payloads (filter: eq)
+     */
+    builder_index_eq?: number;
+    /**
+     * Validator index of the builder, equal to the block proposer index for self-built payloads (filter: ne)
+     */
+    builder_index_ne?: number;
+    /**
+     * Validator index of the builder, equal to the block proposer index for self-built payloads (filter: lt)
+     */
+    builder_index_lt?: number;
+    /**
+     * Validator index of the builder, equal to the block proposer index for self-built payloads (filter: lte)
+     */
+    builder_index_lte?: number;
+    /**
+     * Validator index of the builder, equal to the block proposer index for self-built payloads (filter: gt)
+     */
+    builder_index_gt?: number;
+    /**
+     * Validator index of the builder, equal to the block proposer index for self-built payloads (filter: gte)
+     */
+    builder_index_gte?: number;
+    /**
+     * Validator index of the builder, equal to the block proposer index for self-built payloads (filter: between_min)
+     */
+    builder_index_between_min?: number;
+    /**
+     * Validator index of the builder, equal to the block proposer index for self-built payloads (filter: between_max_value)
+     */
+    builder_index_between_max_value?: number;
+    /**
+     * Validator index of the builder, equal to the block proposer index for self-built payloads (filter: in_values) (comma-separated list)
+     */
+    builder_index_in_values?: string;
+    /**
+     * Validator index of the builder, equal to the block proposer index for self-built payloads (filter: not_in_values) (comma-separated list)
+     */
+    builder_index_not_in_values?: string;
+    /**
+     * The execution block hash of the payload (filter: eq)
+     */
+    block_hash_eq?: string;
+    /**
+     * The execution block hash of the payload (filter: ne)
+     */
+    block_hash_ne?: string;
+    /**
+     * The execution block hash of the payload (filter: contains)
+     */
+    block_hash_contains?: string;
+    /**
+     * The execution block hash of the payload (filter: starts_with)
+     */
+    block_hash_starts_with?: string;
+    /**
+     * The execution block hash of the payload (filter: ends_with)
+     */
+    block_hash_ends_with?: string;
+    /**
+     * The execution block hash of the payload (filter: like)
+     */
+    block_hash_like?: string;
+    /**
+     * The execution block hash of the payload (filter: not_like)
+     */
+    block_hash_not_like?: string;
+    /**
+     * The execution block hash of the payload (filter: in_values) (comma-separated list)
+     */
+    block_hash_in_values?: string;
+    /**
+     * The execution block hash of the payload (filter: not_in_values) (comma-separated list)
+     */
+    block_hash_not_in_values?: string;
+    /**
+     * The parent execution block hash (filter: eq)
+     */
+    parent_block_hash_eq?: string;
+    /**
+     * The parent execution block hash (filter: ne)
+     */
+    parent_block_hash_ne?: string;
+    /**
+     * The parent execution block hash (filter: contains)
+     */
+    parent_block_hash_contains?: string;
+    /**
+     * The parent execution block hash (filter: starts_with)
+     */
+    parent_block_hash_starts_with?: string;
+    /**
+     * The parent execution block hash (filter: ends_with)
+     */
+    parent_block_hash_ends_with?: string;
+    /**
+     * The parent execution block hash (filter: like)
+     */
+    parent_block_hash_like?: string;
+    /**
+     * The parent execution block hash (filter: not_like)
+     */
+    parent_block_hash_not_like?: string;
+    /**
+     * The parent execution block hash (filter: in_values) (comma-separated list)
+     */
+    parent_block_hash_in_values?: string;
+    /**
+     * The parent execution block hash (filter: not_in_values) (comma-separated list)
+     */
+    parent_block_hash_not_in_values?: string;
+    /**
+     * The winning bid value in wei (filter: eq)
+     */
+    value_eq?: string;
+    /**
+     * The winning bid value in wei (filter: ne)
+     */
+    value_ne?: string;
+    /**
+     * The winning bid value in wei (filter: contains)
+     */
+    value_contains?: string;
+    /**
+     * The winning bid value in wei (filter: starts_with)
+     */
+    value_starts_with?: string;
+    /**
+     * The winning bid value in wei (filter: ends_with)
+     */
+    value_ends_with?: string;
+    /**
+     * The winning bid value in wei (filter: like)
+     */
+    value_like?: string;
+    /**
+     * The winning bid value in wei (filter: not_like)
+     */
+    value_not_like?: string;
+    /**
+     * The winning bid value in wei (filter: in_values) (comma-separated list)
+     */
+    value_in_values?: string;
+    /**
+     * The winning bid value in wei (filter: not_in_values) (comma-separated list)
+     */
+    value_not_in_values?: string;
+    /**
+     * The gas limit committed to in the bid (filter: eq)
+     */
+    gas_limit_eq?: number;
+    /**
+     * The gas limit committed to in the bid (filter: ne)
+     */
+    gas_limit_ne?: number;
+    /**
+     * The gas limit committed to in the bid (filter: lt)
+     */
+    gas_limit_lt?: number;
+    /**
+     * The gas limit committed to in the bid (filter: lte)
+     */
+    gas_limit_lte?: number;
+    /**
+     * The gas limit committed to in the bid (filter: gt)
+     */
+    gas_limit_gt?: number;
+    /**
+     * The gas limit committed to in the bid (filter: gte)
+     */
+    gas_limit_gte?: number;
+    /**
+     * The gas limit committed to in the bid (filter: between_min)
+     */
+    gas_limit_between_min?: number;
+    /**
+     * The gas limit committed to in the bid (filter: between_max_value)
+     */
+    gas_limit_between_max_value?: number;
+    /**
+     * The gas limit committed to in the bid (filter: in_values) (comma-separated list)
+     */
+    gas_limit_in_values?: string;
+    /**
+     * The gas limit committed to in the bid (filter: not_in_values) (comma-separated list)
+     */
+    gas_limit_not_in_values?: string;
+    /**
+     * Number of blob KZG commitments in the bid (filter: eq)
+     */
+    blob_kzg_commitment_count_eq?: number;
+    /**
+     * Number of blob KZG commitments in the bid (filter: ne)
+     */
+    blob_kzg_commitment_count_ne?: number;
+    /**
+     * Number of blob KZG commitments in the bid (filter: lt)
+     */
+    blob_kzg_commitment_count_lt?: number;
+    /**
+     * Number of blob KZG commitments in the bid (filter: lte)
+     */
+    blob_kzg_commitment_count_lte?: number;
+    /**
+     * Number of blob KZG commitments in the bid (filter: gt)
+     */
+    blob_kzg_commitment_count_gt?: number;
+    /**
+     * Number of blob KZG commitments in the bid (filter: gte)
+     */
+    blob_kzg_commitment_count_gte?: number;
+    /**
+     * Number of blob KZG commitments in the bid (filter: between_min)
+     */
+    blob_kzg_commitment_count_between_min?: number;
+    /**
+     * Number of blob KZG commitments in the bid (filter: between_max_value)
+     */
+    blob_kzg_commitment_count_between_max_value?: number;
+    /**
+     * Number of blob KZG commitments in the bid (filter: in_values) (comma-separated list)
+     */
+    blob_kzg_commitment_count_in_values?: string;
+    /**
+     * Number of blob KZG commitments in the bid (filter: not_in_values) (comma-separated list)
+     */
+    blob_kzg_commitment_count_not_in_values?: string;
+    /**
+     * Number of transactions in the revealed payload (filter: eq)
+     */
+    transactions_count_eq?: number;
+    /**
+     * Number of transactions in the revealed payload (filter: ne)
+     */
+    transactions_count_ne?: number;
+    /**
+     * Number of transactions in the revealed payload (filter: lt)
+     */
+    transactions_count_lt?: number;
+    /**
+     * Number of transactions in the revealed payload (filter: lte)
+     */
+    transactions_count_lte?: number;
+    /**
+     * Number of transactions in the revealed payload (filter: gt)
+     */
+    transactions_count_gt?: number;
+    /**
+     * Number of transactions in the revealed payload (filter: gte)
+     */
+    transactions_count_gte?: number;
+    /**
+     * Number of transactions in the revealed payload (filter: between_min)
+     */
+    transactions_count_between_min?: number;
+    /**
+     * Number of transactions in the revealed payload (filter: between_max_value)
+     */
+    transactions_count_between_max_value?: number;
+    /**
+     * Number of transactions in the revealed payload (filter: in_values) (comma-separated list)
+     */
+    transactions_count_in_values?: string;
+    /**
+     * Number of transactions in the revealed payload (filter: not_in_values) (comma-separated list)
+     */
+    transactions_count_not_in_values?: string;
+    /**
+     * Total bytes of transactions in the revealed payload (filter: eq)
+     */
+    transactions_total_bytes_eq?: number;
+    /**
+     * Total bytes of transactions in the revealed payload (filter: ne)
+     */
+    transactions_total_bytes_ne?: number;
+    /**
+     * Total bytes of transactions in the revealed payload (filter: lt)
+     */
+    transactions_total_bytes_lt?: number;
+    /**
+     * Total bytes of transactions in the revealed payload (filter: lte)
+     */
+    transactions_total_bytes_lte?: number;
+    /**
+     * Total bytes of transactions in the revealed payload (filter: gt)
+     */
+    transactions_total_bytes_gt?: number;
+    /**
+     * Total bytes of transactions in the revealed payload (filter: gte)
+     */
+    transactions_total_bytes_gte?: number;
+    /**
+     * Total bytes of transactions in the revealed payload (filter: between_min)
+     */
+    transactions_total_bytes_between_min?: number;
+    /**
+     * Total bytes of transactions in the revealed payload (filter: between_max_value)
+     */
+    transactions_total_bytes_between_max_value?: number;
+    /**
+     * Total bytes of transactions in the revealed payload (filter: in_values) (comma-separated list)
+     */
+    transactions_total_bytes_in_values?: string;
+    /**
+     * Total bytes of transactions in the revealed payload (filter: not_in_values) (comma-separated list)
+     */
+    transactions_total_bytes_not_in_values?: string;
+    /**
+     * Sum of per-transaction gas limits in the revealed payload (filter: eq)
+     */
+    transactions_total_gas_limit_eq?: number;
+    /**
+     * Sum of per-transaction gas limits in the revealed payload (filter: ne)
+     */
+    transactions_total_gas_limit_ne?: number;
+    /**
+     * Sum of per-transaction gas limits in the revealed payload (filter: lt)
+     */
+    transactions_total_gas_limit_lt?: number;
+    /**
+     * Sum of per-transaction gas limits in the revealed payload (filter: lte)
+     */
+    transactions_total_gas_limit_lte?: number;
+    /**
+     * Sum of per-transaction gas limits in the revealed payload (filter: gt)
+     */
+    transactions_total_gas_limit_gt?: number;
+    /**
+     * Sum of per-transaction gas limits in the revealed payload (filter: gte)
+     */
+    transactions_total_gas_limit_gte?: number;
+    /**
+     * Sum of per-transaction gas limits in the revealed payload (filter: between_min)
+     */
+    transactions_total_gas_limit_between_min?: number;
+    /**
+     * Sum of per-transaction gas limits in the revealed payload (filter: between_max_value)
+     */
+    transactions_total_gas_limit_between_max_value?: number;
+    /**
+     * Sum of per-transaction gas limits in the revealed payload (filter: in_values) (comma-separated list)
+     */
+    transactions_total_gas_limit_in_values?: string;
+    /**
+     * Sum of per-transaction gas limits in the revealed payload (filter: not_in_values) (comma-separated list)
+     */
+    transactions_total_gas_limit_not_in_values?: string;
+    /**
+     * Number of type-3 blob transactions in the revealed payload (filter: eq)
+     */
+    blob_transactions_count_eq?: number;
+    /**
+     * Number of type-3 blob transactions in the revealed payload (filter: ne)
+     */
+    blob_transactions_count_ne?: number;
+    /**
+     * Number of type-3 blob transactions in the revealed payload (filter: lt)
+     */
+    blob_transactions_count_lt?: number;
+    /**
+     * Number of type-3 blob transactions in the revealed payload (filter: lte)
+     */
+    blob_transactions_count_lte?: number;
+    /**
+     * Number of type-3 blob transactions in the revealed payload (filter: gt)
+     */
+    blob_transactions_count_gt?: number;
+    /**
+     * Number of type-3 blob transactions in the revealed payload (filter: gte)
+     */
+    blob_transactions_count_gte?: number;
+    /**
+     * Number of type-3 blob transactions in the revealed payload (filter: between_min)
+     */
+    blob_transactions_count_between_min?: number;
+    /**
+     * Number of type-3 blob transactions in the revealed payload (filter: between_max_value)
+     */
+    blob_transactions_count_between_max_value?: number;
+    /**
+     * Number of type-3 blob transactions in the revealed payload (filter: in_values) (comma-separated list)
+     */
+    blob_transactions_count_in_values?: string;
+    /**
+     * Number of type-3 blob transactions in the revealed payload (filter: not_in_values) (comma-separated list)
+     */
+    blob_transactions_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_payload to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockPayload` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_payload';
+};
+
+export type FctBlockPayloadServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockPayloadServiceListError = FctBlockPayloadServiceListErrors[keyof FctBlockPayloadServiceListErrors];
+
+export type FctBlockPayloadServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockPayloadResponse;
+};
+
+export type FctBlockPayloadServiceListResponse =
+  FctBlockPayloadServiceListResponses[keyof FctBlockPayloadServiceListResponses];
+
+export type FctBlockPayloadServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_payload/{slot_start_date_time}';
+};
+
+export type FctBlockPayloadServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockPayloadServiceGetError = FctBlockPayloadServiceGetErrors[keyof FctBlockPayloadServiceGetErrors];
+
+export type FctBlockPayloadServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockPayloadResponse;
+};
+
+export type FctBlockPayloadServiceGetResponse =
+  FctBlockPayloadServiceGetResponses[keyof FctBlockPayloadServiceGetResponses];
 
 export type FctBlockPayloadAvailableByNodeServiceListData = {
   body?: never;

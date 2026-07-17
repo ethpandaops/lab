@@ -273,6 +273,12 @@ import type {
   FctBlockPayloadPtcVoteServiceListData,
   FctBlockPayloadPtcVoteServiceListErrors,
   FctBlockPayloadPtcVoteServiceListResponses,
+  FctBlockPayloadServiceGetData,
+  FctBlockPayloadServiceGetErrors,
+  FctBlockPayloadServiceGetResponses,
+  FctBlockPayloadServiceListData,
+  FctBlockPayloadServiceListErrors,
+  FctBlockPayloadServiceListResponses,
   FctBlockProposalStatusDailyServiceGetData,
   FctBlockProposalStatusDailyServiceGetErrors,
   FctBlockProposalStatusDailyServiceGetResponses,
@@ -1427,6 +1433,10 @@ import {
   zFctBlockPayloadPtcVoteServiceGetResponse,
   zFctBlockPayloadPtcVoteServiceListData,
   zFctBlockPayloadPtcVoteServiceListResponse,
+  zFctBlockPayloadServiceGetData,
+  zFctBlockPayloadServiceGetResponse,
+  zFctBlockPayloadServiceListData,
+  zFctBlockPayloadServiceListResponse,
   zFctBlockProposalStatusDailyServiceGetData,
   zFctBlockProposalStatusDailyServiceGetResponse,
   zFctBlockProposalStatusDailyServiceListData,
@@ -3602,6 +3612,36 @@ export const fctBlockMevHeadServiceGet = <ThrowOnError extends boolean = false>(
     requestValidator: async data => await zFctBlockMevHeadServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockMevHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_mev_head/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockPayloadServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockPayloadServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<FctBlockPayloadServiceListResponses, FctBlockPayloadServiceListErrors, ThrowOnError>({
+    requestValidator: async data => await zFctBlockPayloadServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockPayloadServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_payload',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockPayloadServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockPayloadServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<FctBlockPayloadServiceGetResponses, FctBlockPayloadServiceGetErrors, ThrowOnError>({
+    requestValidator: async data => await zFctBlockPayloadServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockPayloadServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_payload/{slot_start_date_time}',
     ...options,
   });
 

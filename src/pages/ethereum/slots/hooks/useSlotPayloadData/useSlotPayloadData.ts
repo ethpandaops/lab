@@ -5,6 +5,7 @@ import {
   fctBlockPayloadPtcVoteHeadServiceListOptions,
   fctBlockPayloadAvailableByNodeServiceListOptions,
   fctPayloadBidHighestValueByBuilderChunked50MsServiceListOptions,
+  fctBlockPayloadServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import type {
   FctBlockPayloadBid,
@@ -12,6 +13,7 @@ import type {
   FctBlockPayloadPtcVoteHead,
   FctBlockPayloadAvailableByNode,
   FctPayloadBidHighestValueByBuilderChunked50Ms,
+  FctBlockPayload,
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { slotToTimestamp } from '@/utils/beacon';
@@ -27,6 +29,8 @@ export interface SlotPayloadData {
   ptcVote?: FctBlockPayloadPtcVoteHead;
   /** The bid race: highest value per builder per 50ms chunk, from gossip */
   bidRace: FctPayloadBidHighestValueByBuilderChunked50Ms[];
+  /** Canonical per-block payload facts: bid commitment + envelope contents */
+  payload?: FctBlockPayload;
 }
 
 export interface UseSlotPayloadDataResult {
@@ -77,10 +81,16 @@ export function useSlotPayloadData(slot: number, enabled = true): UseSlotPayload
         }),
         enabled: queryEnabled,
       },
+      {
+        ...fctBlockPayloadServiceListOptions({
+          query: { slot_start_date_time_eq: slotTimestamp },
+        }),
+        enabled: queryEnabled,
+      },
     ],
   });
 
-  const [bidQuery, firstSeenQuery, availableQuery, ptcVoteQuery, bidRaceQuery] = queries;
+  const [bidQuery, firstSeenQuery, availableQuery, ptcVoteQuery, bidRaceQuery, payloadQuery] = queries;
 
   return {
     data: {
@@ -89,6 +99,7 @@ export function useSlotPayloadData(slot: number, enabled = true): UseSlotPayload
       payloadAvailable: availableQuery.data?.fct_block_payload_available_by_node ?? [],
       ptcVote: ptcVoteQuery.data?.fct_block_payload_ptc_vote_head?.[0],
       bidRace: bidRaceQuery.data?.fct_payload_bid_highest_value_by_builder_chunked_50ms ?? [],
+      payload: payloadQuery.data?.fct_block_payload?.[0],
     },
     isLoading: queryEnabled && queries.some(query => query.isLoading),
   };

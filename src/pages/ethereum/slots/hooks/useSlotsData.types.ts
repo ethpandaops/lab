@@ -2,6 +2,10 @@
  * Data for a single slot in the slots list
  */
 export interface SlotData {
+  /** Gloas (ePBS): PTC validators voting payload present, null pre-gloas */
+  ptcPresentVotes?: number | null;
+  /** Gloas (ePBS): PTC validators seen voting, null pre-gloas */
+  ptcVotesSeen?: number | null;
   /**
    * Slot number
    */
