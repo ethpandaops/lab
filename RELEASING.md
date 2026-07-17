@@ -2,15 +2,17 @@
 
 ## Stable release
 
-Run the [Release workflow](../../actions/workflows/release.yaml) (or `gh workflow run release.yaml`), picking a `patch`/`minor`/`major` bump. Everything else is automatic:
+Every push to `master` cuts the next patch release automatically (except pushes that only touch markdown, `.github/`, or `.claude/` files). Each release:
 
-1. The workflow computes the next `vX.Y.Z` tag and publishes a GitHub release from `master`.
-2. It builds the frontend and attaches `lab-<tag>.tar.gz` / `lab-<tag>.zip` to the release.
-3. It then dispatches a `frontend-release` event to [lab-backend](https://github.com/ethpandaops/lab-backend), which tags its own next release and builds Docker images embedding this exact frontend version.
+1. Computes the next `vX.Y.Z` tag and publishes a GitHub release from the pushed commit.
+2. Builds the frontend and attaches `lab-<tag>.tar.gz` / `lab-<tag>.zip` to the release.
+3. Dispatches a `frontend-release` event to [lab-backend](https://github.com/ethpandaops/lab-backend), which tags its own next release and builds Docker images embedding this exact frontend version.
 
 End to end this takes ~10 minutes; the lab-backend release notes and `/lab-backend/version` output record which frontend tag was embedded.
 
-Publishing a release by hand through the GitHub UI also works — the release publish event runs the same workflow from step 2 onwards.
+Include `[skip release]` in the commit message (or squash-merge PR title) to opt a push out.
+
+For a `minor`/`major` bump, run the [Release workflow](../../actions/workflows/release.yaml) manually (or `gh workflow run release.yaml -f bump=minor`). Publishing a release by hand through the GitHub UI also works — the release publish event runs the same workflow from step 2 onwards.
 
 Deploying the resulting image is still a manual bump of `image.tag` in the [platform](https://github.com/ethpandaops/platform) lab application values.
 
