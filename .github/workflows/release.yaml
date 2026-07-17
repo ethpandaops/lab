@@ -1,19 +1,77 @@
 name: Release
 
+# Builds the frontend, attaches it to a GitHub release, and dispatches a
+# lab-backend release embedding this version.
+#
+# Run manually (workflow_dispatch) to cut the next release from master, or
+# publish a release by hand and the release event picks up from there.
+
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 permissions:
   contents: write
 
+# Serialized so concurrent runs cannot compute the same next tag.
+concurrency:
+  group: release
+
 jobs:
-  build:
-    name: Build and Upload Release Assets
+  release:
+    name: Build and Publish Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      # A release created here with GITHUB_TOKEN emits no workflow events,
+      # so this run does not re-trigger itself via the release trigger.
+      - name: Resolve release tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            TAG_NAME="${{ github.event.release.tag_name }}"
+          else
+            LATEST_TAG=$(git tag -l 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1)
+
+            if [ -z "$LATEST_TAG" ]; then
+              NEW_VERSION="0.0.1"
+            else
+              VERSION="${LATEST_TAG#v}"
+              IFS='.' read -r major minor patch <<< "$VERSION"
+              case "${{ inputs.bump }}" in
+                major) NEW_VERSION="$((major + 1)).0.0" ;;
+                minor) NEW_VERSION="${major}.$((minor + 1)).0" ;;
+                *)     NEW_VERSION="${major}.${minor}.$((patch + 1))" ;;
+              esac
+            fi
+
+            TAG_NAME="v${NEW_VERSION}"
+            echo "Latest tag: ${LATEST_TAG:-none}, new tag: $TAG_NAME"
+
+            gh release create "$TAG_NAME" \
+              --repo "${{ github.repository }}" \
+              --target "${{ github.sha }}" \
+              --title "$TAG_NAME" \
+              --generate-notes
+          fi
+
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -31,14 +89,28 @@ jobs:
       - name: Build project
         run: pnpm build
 
-      - name: Create build archive
+      - name: Create build archives
         run: |
-          tar -czf lab-${{ github.event.release.tag_name }}.tar.gz -C dist .
-          cd dist && zip -r ../lab-${{ github.event.release.tag_name }}.zip . && cd ..
+          tar -czf lab-${TAG_NAME}.tar.gz -C dist .
+          cd dist && zip -r ../lab-${TAG_NAME}.zip . && cd ..
 
       - name: Upload release assets
-        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe # v2.6.1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "$TAG_NAME" \
+            --repo "${{ github.repository }}" \
+            --clobber \
+            "lab-${TAG_NAME}.tar.gz" \
+            "lab-${TAG_NAME}.zip"
+
+      # Assets are uploaded, so lab-backend can now cut a release that
+      # embeds this frontend version.
+      - name: Trigger lab-backend release
+        if: github.event_name == 'workflow_dispatch' || !github.event.release.prerelease
+        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4.0.1
         with:
-          files: |
-            ./lab-${{ github.event.release.tag_name }}.tar.gz
-            ./lab-${{ github.event.release.tag_name }}.zip
+          token: ${{ secrets.EPOBOT_TOKEN }}
+          repository: ethpandaops/lab-backend
+          event-type: frontend-release
+          client-payload: '{"frontend_tag": "${{ env.TAG_NAME }}"}'
