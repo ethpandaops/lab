@@ -7,6 +7,7 @@ import {
   fctPayloadBidHighestValueByBuilderChunked50MsServiceListOptions,
   fctBlockPayloadServiceListOptions,
   fctPayloadBidHighestValueChunked50MsServiceListOptions,
+  fctPayloadAttestationFirstSeenChunked50MsServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import type {
   FctBlockPayloadBid,
@@ -16,6 +17,7 @@ import type {
   FctPayloadBidHighestValueByBuilderChunked50Ms,
   FctBlockPayload,
   FctPayloadBidHighestValueChunked50Ms,
+  FctPayloadAttestationFirstSeenChunked50Ms,
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { slotToTimestamp } from '@/utils/beacon';
@@ -35,6 +37,8 @@ export interface SlotPayloadData {
   payload?: FctBlockPayload;
   /** The auction frontier: best bid per 50ms chunk across all builders */
   bidFrontier: FctPayloadBidHighestValueChunked50Ms[];
+  /** PTC payload attestation arrivals, chunked 50ms */
+  ptcArrivals: FctPayloadAttestationFirstSeenChunked50Ms[];
 }
 
 export interface UseSlotPayloadDataResult {
@@ -97,11 +101,25 @@ export function useSlotPayloadData(slot: number, enabled = true): UseSlotPayload
         }),
         enabled: queryEnabled,
       },
+      {
+        ...fctPayloadAttestationFirstSeenChunked50MsServiceListOptions({
+          query: { slot_start_date_time_eq: slotTimestamp, page_size: 10000 },
+        }),
+        enabled: queryEnabled,
+      },
     ],
   });
 
-  const [bidQuery, firstSeenQuery, availableQuery, ptcVoteQuery, bidRaceQuery, payloadQuery, bidFrontierQuery] =
-    queries;
+  const [
+    bidQuery,
+    firstSeenQuery,
+    availableQuery,
+    ptcVoteQuery,
+    bidRaceQuery,
+    payloadQuery,
+    bidFrontierQuery,
+    ptcArrivalsQuery,
+  ] = queries;
 
   return {
     data: {
@@ -112,6 +130,7 @@ export function useSlotPayloadData(slot: number, enabled = true): UseSlotPayload
       bidRace: bidRaceQuery.data?.fct_payload_bid_highest_value_by_builder_chunked_50ms ?? [],
       payload: payloadQuery.data?.fct_block_payload?.[0],
       bidFrontier: bidFrontierQuery.data?.fct_payload_bid_highest_value_chunked_50ms ?? [],
+      ptcArrivals: ptcArrivalsQuery.data?.fct_payload_attestation_first_seen_chunked_50ms ?? [],
     },
     isLoading: queryEnabled && queries.some(query => query.isLoading),
   };

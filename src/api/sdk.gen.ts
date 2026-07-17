@@ -279,6 +279,12 @@ import type {
   FctBlockPayloadServiceListData,
   FctBlockPayloadServiceListErrors,
   FctBlockPayloadServiceListResponses,
+  FctBlockPayloadStatusHourlyServiceGetData,
+  FctBlockPayloadStatusHourlyServiceGetErrors,
+  FctBlockPayloadStatusHourlyServiceGetResponses,
+  FctBlockPayloadStatusHourlyServiceListData,
+  FctBlockPayloadStatusHourlyServiceListErrors,
+  FctBlockPayloadStatusHourlyServiceListResponses,
   FctBlockProposalStatusDailyServiceGetData,
   FctBlockProposalStatusDailyServiceGetErrors,
   FctBlockProposalStatusDailyServiceGetResponses,
@@ -1443,6 +1449,10 @@ import {
   zFctBlockPayloadServiceGetResponse,
   zFctBlockPayloadServiceListData,
   zFctBlockPayloadServiceListResponse,
+  zFctBlockPayloadStatusHourlyServiceGetData,
+  zFctBlockPayloadStatusHourlyServiceGetResponse,
+  zFctBlockPayloadStatusHourlyServiceListData,
+  zFctBlockPayloadStatusHourlyServiceListResponse,
   zFctBlockProposalStatusDailyServiceGetData,
   zFctBlockProposalStatusDailyServiceGetResponse,
   zFctBlockProposalStatusDailyServiceListData,
@@ -3842,6 +3852,44 @@ export const fctBlockPayloadPtcVoteHeadServiceGet = <ThrowOnError extends boolea
     requestValidator: async data => await zFctBlockPayloadPtcVoteHeadServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockPayloadPtcVoteHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_payload_ptc_vote_head/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockPayloadStatusHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockPayloadStatusHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockPayloadStatusHourlyServiceListResponses,
+    FctBlockPayloadStatusHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockPayloadStatusHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockPayloadStatusHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_payload_status_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctBlockPayloadStatusHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockPayloadStatusHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockPayloadStatusHourlyServiceGetResponses,
+    FctBlockPayloadStatusHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockPayloadStatusHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockPayloadStatusHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_payload_status_hourly/{hour_start_date_time}',
     ...options,
   });
 

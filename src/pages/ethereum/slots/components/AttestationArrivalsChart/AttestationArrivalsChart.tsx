@@ -25,6 +25,8 @@ export function AttestationArrivalsChart({
   currentSlot,
   votedForBlocks,
   totalExpectedValidators,
+  title = 'Attestation Arrivals by Block Vote',
+  anchorId = 'attestation-arrivals',
 }: AttestationArrivalsChartProps): JSX.Element {
   // Create a map of block_root -> slot for quick lookup
   const blockSlotMap = useMemo(() => {
@@ -132,7 +134,7 @@ export function AttestationArrivalsChart({
   // Handle empty data
   if (attestationData.length === 0 || series.length === 0) {
     return (
-      <PopoutCard title="Attestation Arrivals by Block Vote" anchorId="attestation-arrivals" modalSize="xl">
+      <PopoutCard title={title} anchorId={anchorId} modalSize="xl">
         {({ inModal }) => (
           <div
             className={

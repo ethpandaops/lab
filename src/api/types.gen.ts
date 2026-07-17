@@ -2625,6 +2625,25 @@ export type FctBlockPayloadPtcVoteHead = {
   updated_date_time?: number;
 };
 
+export type FctBlockPayloadStatusHourly = {
+  /**
+   * The wall clock time at the start of the hour
+   */
+  hour_start_date_time?: number;
+  /**
+   * Number of blocks with this payload outcome in the hour
+   */
+  slot_count?: number;
+  /**
+   * PTC verdict bucket: delivered or absent
+   */
+  status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type FctBlockProposalStatusDaily = {
   /**
    * Start of the day period
@@ -7052,6 +7071,13 @@ export type GetFctBlockPayloadPtcVoteResponse = {
  */
 export type GetFctBlockPayloadResponse = {
   item?: FctBlockPayload;
+};
+
+/**
+ * Response for getting a single fct_block_payload_status_hourly record
+ */
+export type GetFctBlockPayloadStatusHourlyResponse = {
+  item?: FctBlockPayloadStatusHourly;
 };
 
 /**
@@ -12181,6 +12207,20 @@ export type ListFctBlockPayloadResponse = {
    * The list of fct_block_payload.
    */
   fct_block_payload?: Array<FctBlockPayload>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_payload_status_hourly records
+ */
+export type ListFctBlockPayloadStatusHourlyResponse = {
+  /**
+   * The list of fct_block_payload_status_hourly.
+   */
+  fct_block_payload_status_hourly?: Array<FctBlockPayloadStatusHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -38979,6 +39019,234 @@ export type FctBlockPayloadPtcVoteHeadServiceGetResponses = {
 
 export type FctBlockPayloadPtcVoteHeadServiceGetResponse =
   FctBlockPayloadPtcVoteHeadServiceGetResponses[keyof FctBlockPayloadPtcVoteHeadServiceGetResponses];
+
+export type FctBlockPayloadStatusHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time at the start of the hour (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * The wall clock time at the start of the hour (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: like)
+     */
+    status_like?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks with this payload outcome in the hour (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Number of blocks with this payload outcome in the hour (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Number of blocks with this payload outcome in the hour (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Number of blocks with this payload outcome in the hour (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Number of blocks with this payload outcome in the hour (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Number of blocks with this payload outcome in the hour (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Number of blocks with this payload outcome in the hour (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Number of blocks with this payload outcome in the hour (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Number of blocks with this payload outcome in the hour (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Number of blocks with this payload outcome in the hour (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_payload_status_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockPayloadStatusHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_payload_status_hourly';
+};
+
+export type FctBlockPayloadStatusHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockPayloadStatusHourlyServiceListError =
+  FctBlockPayloadStatusHourlyServiceListErrors[keyof FctBlockPayloadStatusHourlyServiceListErrors];
+
+export type FctBlockPayloadStatusHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockPayloadStatusHourlyResponse;
+};
+
+export type FctBlockPayloadStatusHourlyServiceListResponse =
+  FctBlockPayloadStatusHourlyServiceListResponses[keyof FctBlockPayloadStatusHourlyServiceListResponses];
+
+export type FctBlockPayloadStatusHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time at the start of the hour
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_payload_status_hourly/{hour_start_date_time}';
+};
+
+export type FctBlockPayloadStatusHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockPayloadStatusHourlyServiceGetError =
+  FctBlockPayloadStatusHourlyServiceGetErrors[keyof FctBlockPayloadStatusHourlyServiceGetErrors];
+
+export type FctBlockPayloadStatusHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockPayloadStatusHourlyResponse;
+};
+
+export type FctBlockPayloadStatusHourlyServiceGetResponse =
+  FctBlockPayloadStatusHourlyServiceGetResponses[keyof FctBlockPayloadStatusHourlyServiceGetResponses];
 
 export type FctBlockProposalStatusDailyServiceListData = {
   body?: never;

@@ -1192,6 +1192,31 @@ export function DetailPage(): JSX.Element {
                       yAxisTitle="Bid Value (ETH)"
                     />
                   )}
+                  {payloadData.payloadFirstSeen.length > 0 && (
+                    <BlockPropagationChart
+                      blockPropagationData={payloadData.payloadFirstSeen.map(node => ({
+                        seen_slot_start_diff: node.seen_slot_start_diff ?? 0,
+                        node_id: node.node_id ?? 'unknown',
+                        meta_client_geo_continent_code: node.meta_client_geo_continent_code,
+                        meta_client_geo_country: node.meta_client_geo_country,
+                        meta_client_geo_city: node.meta_client_geo_city,
+                        username: node.username,
+                        classification: node.classification,
+                      }))}
+                      title="Payload Propagation"
+                      anchorId="payload-propagation-chart"
+                    />
+                  )}
+                  {payloadData.ptcArrivals.length > 0 && (
+                    <AttestationArrivalsChart
+                      attestationData={payloadData.ptcArrivals}
+                      currentSlot={slot}
+                      votedForBlocks={data.votedForBlocks}
+                      totalExpectedValidators={payloadData.ptcVote?.ptc_validators_seen ?? 0}
+                      title="PTC Payload Attestation Arrivals"
+                      anchorId="ptc-arrivals"
+                    />
+                  )}
                 </div>
               </TabPanel>
             )}

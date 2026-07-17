@@ -96,6 +96,8 @@ import {
   fctBlockPayloadPtcVoteServiceList,
   fctBlockPayloadServiceGet,
   fctBlockPayloadServiceList,
+  fctBlockPayloadStatusHourlyServiceGet,
+  fctBlockPayloadStatusHourlyServiceList,
   fctBlockProposalStatusDailyServiceGet,
   fctBlockProposalStatusDailyServiceList,
   fctBlockProposalStatusHourlyServiceGet,
@@ -701,6 +703,12 @@ import type {
   FctBlockPayloadServiceListData,
   FctBlockPayloadServiceListError,
   FctBlockPayloadServiceListResponse,
+  FctBlockPayloadStatusHourlyServiceGetData,
+  FctBlockPayloadStatusHourlyServiceGetError,
+  FctBlockPayloadStatusHourlyServiceGetResponse,
+  FctBlockPayloadStatusHourlyServiceListData,
+  FctBlockPayloadStatusHourlyServiceListError,
+  FctBlockPayloadStatusHourlyServiceListResponse,
   FctBlockProposalStatusDailyServiceGetData,
   FctBlockProposalStatusDailyServiceGetError,
   FctBlockProposalStatusDailyServiceGetResponse,
@@ -4398,6 +4406,66 @@ export const fctBlockPayloadPtcVoteHeadServiceGetOptions = (
       return data;
     },
     queryKey: fctBlockPayloadPtcVoteHeadServiceGetQueryKey(options),
+  });
+
+export const fctBlockPayloadStatusHourlyServiceListQueryKey = (
+  options?: Options<FctBlockPayloadStatusHourlyServiceListData>
+) => createQueryKey('fctBlockPayloadStatusHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockPayloadStatusHourlyServiceListOptions = (
+  options?: Options<FctBlockPayloadStatusHourlyServiceListData>
+) =>
+  queryOptions<
+    FctBlockPayloadStatusHourlyServiceListResponse,
+    FctBlockPayloadStatusHourlyServiceListError,
+    FctBlockPayloadStatusHourlyServiceListResponse,
+    ReturnType<typeof fctBlockPayloadStatusHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockPayloadStatusHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockPayloadStatusHourlyServiceListQueryKey(options),
+  });
+
+export const fctBlockPayloadStatusHourlyServiceGetQueryKey = (
+  options: Options<FctBlockPayloadStatusHourlyServiceGetData>
+) => createQueryKey('fctBlockPayloadStatusHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctBlockPayloadStatusHourlyServiceGetOptions = (
+  options: Options<FctBlockPayloadStatusHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockPayloadStatusHourlyServiceGetResponse,
+    FctBlockPayloadStatusHourlyServiceGetError,
+    FctBlockPayloadStatusHourlyServiceGetResponse,
+    ReturnType<typeof fctBlockPayloadStatusHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockPayloadStatusHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockPayloadStatusHourlyServiceGetQueryKey(options),
   });
 
 export const fctBlockProposalStatusDailyServiceListQueryKey = (

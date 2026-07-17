@@ -4,6 +4,10 @@ import type { FctAttestationFirstSeenChunked50Ms, FctBlockHead } from '@/api/typ
  * Props for AttestationArrivalsChart component
  */
 export interface AttestationArrivalsChartProps {
+  /** Card title, defaults to the committee attestation wording */
+  title?: string;
+  /** Anchor id for the popout card, must be unique per page */
+  anchorId?: string;
   /**
    * Array of attestation data points from fct_attestation_first_seen_chunked_50ms
    * Must include block_root and slot information
