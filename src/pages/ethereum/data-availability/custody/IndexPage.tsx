@@ -671,7 +671,7 @@ export function IndexPage(): JSX.Element {
       let contextLabel: string;
       switch (currentLevel.type) {
         case 'window':
-          contextLabel = `Last ${WINDOW_DAYS} Days (UTC)`;
+          contextLabel = `Last 12 Hours (UTC)`;
           break;
         case 'day': {
           const labelDate = new Date(currentLevel.date + 'T00:00:00Z');
@@ -722,9 +722,9 @@ export function IndexPage(): JSX.Element {
 
       switch (currentLevel.type) {
         case 'window': {
-          // Full 19-day window
+          // Last 12 hours (not full window - too expensive to query)
           timeRange = {
-            timeStart: now - WINDOW_DAYS * SECONDS_PER_DAY,
+            timeStart: now - 12 * SECONDS_PER_HOUR,
             timeEnd: now,
           };
           break;
