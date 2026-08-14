@@ -59,25 +59,29 @@ interface CategoryGroup {
 }
 
 /**
- * Derive slider constraints from default value
+ * Derive slider constraints from the default value, widening the range to keep
+ * the current value (e.g. an applied preset) within the slider scale
  */
-function getSliderConstraints(defaultValue: number): { min: number; max: number; step: number } {
+function getSliderConstraints(
+  defaultValue: number,
+  currentValue: number = defaultValue
+): { min: number; max: number; step: number } {
   if (defaultValue === 0) {
-    return { min: 0, max: 100, step: 1 };
+    return { min: 0, max: Math.max(100, currentValue), step: 1 };
   }
   if (defaultValue <= 10) {
-    return { min: 0, max: Math.max(50, defaultValue * 5), step: 1 };
+    return { min: 0, max: Math.max(50, defaultValue * 5, currentValue), step: 1 };
   }
   if (defaultValue <= 100) {
-    return { min: 0, max: Math.max(500, defaultValue * 5), step: 10 };
+    return { min: 0, max: Math.max(500, defaultValue * 5, currentValue), step: 10 };
   }
   if (defaultValue <= 1000) {
-    return { min: 0, max: Math.max(5000, defaultValue * 5), step: 50 };
+    return { min: 0, max: Math.max(5000, defaultValue * 5, currentValue), step: 50 };
   }
   if (defaultValue <= 10000) {
-    return { min: 0, max: Math.max(50000, defaultValue * 5), step: 100 };
+    return { min: 0, max: Math.max(50000, defaultValue * 5, currentValue), step: 100 };
   }
-  return { min: 0, max: defaultValue * 5, step: 1000 };
+  return { min: 0, max: Math.max(defaultValue * 5, currentValue), step: 1000 };
 }
 
 /**
@@ -462,7 +466,7 @@ export function GasScheduleDrawer({
                                 if (!param) return null;
                                 const currentValue = schedule[key] ?? param.value;
                                 const isModified = schedule[key] !== undefined && schedule[key] !== param.value;
-                                const { min, max, step } = getSliderConstraints(param.value);
+                                const { min, max, step } = getSliderConstraints(param.value, currentValue);
 
                                 return (
                                   <div
