@@ -320,41 +320,41 @@ export const GAS_PARAMETER_GROUPS: GasParameterGroup[] = [
 
 /**
  * Glamsterdam (EIP-8007) gas schedule preset.
- * Applies all gas parameter changes proposed for the Glamsterdam fork.
+ * Values match the frozen glamsterdam-devnet-8 repricing (ACDT #90).
  *
- * EIP-7904: Compute repricing (opcodes + precompiles)
+ * EIP-2780: Intrinsic transaction gas decomposition
  * EIP-7976: Calldata floor cost increase
- * EIP-2780: Transaction base cost reduction
- * EIP-8038: State access repricing (TBD - using current values as placeholders)
+ * EIP-7981: Access list data cost (folded into per-entry costs)
+ * EIP-8037: State creation gas (state-gas dimension folded into execution gas)
+ * EIP-8038: State access repricing
+ *
+ * EIP-7904 (compute repricing) is now Informational and recommends no changes,
+ * so the preset no longer overrides compute opcodes or precompiles.
  */
 export const GLAMSTERDAM_PRESET: Record<string, number> = {
-  // EIP-7904: Compute repricing
-  DIV: 15,
-  SDIV: 20,
-  MOD: 12,
-  MULMOD: 11,
-  KECCAK256: 45,
-  PC_BLAKE2F_BASE: 170,
-  PC_BLAKE2F_PER_ROUND: 2,
-  PC_BLS12_G1ADD: 643,
-  PC_BLS12_G2ADD: 765,
-  PC_BN254_ADD: 314,
-  PC_BN254_PAIRING_PER_PAIR: 34103,
-  PC_KZG_POINT_EVALUATION: 89363,
+  // EIP-2780: TX_BASE_COST; create tx intrinsic = TX_BASE_COST + CREATE_ACCESS (EIP-8038)
+  TX_BASE: 12000,
+  TX_CREATE_BASE: 24000,
 
   // EIP-7976: Calldata floor
-  TX_FLOOR_PER_TOKEN: 15,
+  TX_FLOOR_PER_TOKEN: 16,
 
-  // EIP-2780: TX base cost
-  TX_BASE: 4500,
+  // EIP-8038: State access repricing
+  CALL_COLD: 3000, // COLD_ACCOUNT_ACCESS
+  SSTORE_RESET: 12100, // SLOAD_COLD 2,100 + STORAGE_WRITE 10,000
+  CALL_VALUE_XFER: 11300, // CALL_VALUE = ACCOUNT_WRITE 9,000 + CALL_STIPEND 2,300
 
-  // EIP-8038: State access repricing (TBD - current values)
-  SLOAD_COLD: 2100,
-  SLOAD_WARM: 100,
-  SSTORE_RESET: 2900,
-  CALL_COLD: 2600,
-  TX_ACCESS_LIST_ADDR: 2400,
-  TX_ACCESS_LIST_KEY: 1900,
+  // EIP-8038 per-entry cost + EIP-7981 data cost (64 gas/byte)
+  TX_ACCESS_LIST_ADDR: 4180, // 2,900 + 1,280
+  TX_ACCESS_LIST_KEY: 4048, // 2,000 + 2,048
+
+  // EIP-8037: State creation gas (CPSB = 1,530 per state byte)
+  SSTORE_SET: 97920, // GAS_STORAGE_SET = 64 * CPSB
+  CALL_NEW_ACCOUNT: 183600, // GAS_NEW_ACCOUNT = 120 * CPSB
+  CREATE: 195600, // GAS_CREATE 183,600 + CREATE_ACCESS 12,000
+  CREATE2: 195600,
+  CREATE_DATA: 1530, // GAS_CODE_DEPOSIT per byte
+  TX_AUTH_COST: 35190, // PER_AUTH_BASE_COST = 23 * CPSB
 };
 
 /**

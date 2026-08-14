@@ -34,24 +34,16 @@ interface UnsupportedEip {
 /** EIP sections with overridable parameters */
 const EIP_SECTIONS: EipSection[] = [
   {
-    eip: 'EIP-7904',
-    name: 'Compute Repricing',
-    description: 'Adjusts gas costs for compute-heavy opcodes and precompiles to better reflect actual resource usage.',
-    url: 'https://eips.ethereum.org/EIPS/eip-7904',
+    eip: 'EIP-2780',
+    name: 'Intrinsic Transaction Gas',
+    description:
+      'Decomposes the flat 21,000 intrinsic cost into TX_BASE_COST (12,000) plus per-resource primitives; contract-creation intrinsic becomes TX_BASE_COST + CREATE_ACCESS (24,000).',
+    url: 'https://eips.ethereum.org/EIPS/eip-2780',
     parameters: [
-      { key: 'DIV', label: 'DIV' },
-      { key: 'SDIV', label: 'SDIV' },
-      { key: 'MOD', label: 'MOD' },
-      { key: 'MULMOD', label: 'MULMOD' },
-      { key: 'KECCAK256', label: 'KECCAK256' },
-      { key: 'PC_BLAKE2F_BASE', label: 'BLAKE2F Base' },
-      { key: 'PC_BLAKE2F_PER_ROUND', label: 'BLAKE2F /Round' },
-      { key: 'PC_BLS12_G1ADD', label: 'BLS12 G1Add' },
-      { key: 'PC_BLS12_G2ADD', label: 'BLS12 G2Add' },
-      { key: 'PC_BN254_ADD', label: 'BN254 Add' },
-      { key: 'PC_BN254_PAIRING_PER_PAIR', label: 'BN254 Pairing /Pair' },
-      { key: 'PC_KZG_POINT_EVALUATION', label: 'KZG Point Eval' },
+      { key: 'TX_BASE', label: 'TX Base' },
+      { key: 'TX_CREATE_BASE', label: 'TX Create Base' },
     ],
+    note: 'The decomposition itself (COLD_ACCOUNT_ACCESS and TX_VALUE_COST charged per transaction shape) cannot be expressed as overrides, so plain ETH transfers simulate at 12,000 instead of the decomposed 21,000.',
   },
   {
     eip: 'EIP-7976',
@@ -59,50 +51,56 @@ const EIP_SECTIONS: EipSection[] = [
     description: 'Increases the calldata floor cost per token, discouraging using calldata for data availability.',
     url: 'https://eips.ethereum.org/EIPS/eip-7976',
     parameters: [{ key: 'TX_FLOOR_PER_TOKEN', label: 'Floor Per Token' }],
-  },
-  {
-    eip: 'EIP-2780',
-    name: 'Transaction Repricing',
-    description:
-      'Reprices transaction costs: reduces the base cost from 21,000 to 4,500, and restructures value transfer and cold account access pricing.',
-    url: 'https://eips.ethereum.org/EIPS/eip-2780',
-    parameters: [{ key: 'TX_BASE', label: 'TX Base' }],
-    note: 'This EIP also introduces structural changes (new account surcharge, cold account cost splitting by code presence, value transfer repricing) that cannot be simulated as parameter overrides.',
+    note: 'The EIP also re-weights zero bytes to 4 tokens (64/64 per byte); token weights cannot be overridden, so zero bytes floor at 16 per byte here.',
   },
   {
     eip: 'EIP-8038',
     name: 'State Access Repricing',
     description:
-      'Reprices state access opcodes (SLOAD, SSTORE, CALL cold/warm). Values are still under discussion and may change.',
+      'Reprices state access: COLD_ACCOUNT_ACCESS 3,000, STORAGE_WRITE 10,000, CALL_VALUE 11,300, access list entries. Frozen for glamsterdam-devnet-8 (ACDT #90).',
     url: 'https://eips.ethereum.org/EIPS/eip-8038',
-    placeholder: true,
     parameters: [
-      { key: 'SLOAD_COLD', label: 'SLOAD Cold' },
-      { key: 'SLOAD_WARM', label: 'SLOAD Warm' },
+      { key: 'CALL_COLD', label: 'Cold Account Access' },
       { key: 'SSTORE_RESET', label: 'SSTORE Reset' },
-      { key: 'CALL_COLD', label: 'CALL Cold' },
+      { key: 'CALL_VALUE_XFER', label: 'Call Value' },
       { key: 'TX_ACCESS_LIST_ADDR', label: 'Access List Addr' },
       { key: 'TX_ACCESS_LIST_KEY', label: 'Access List Key' },
     ],
-    note: 'SSTORE clear refund and EXTCODESIZE/EXTCODECOPY formula changes in this EIP cannot be simulated as parameter overrides.',
+    note: 'SSTORE Reset is SLOAD_COLD 2,100 + STORAGE_WRITE 10,000. Access list entries include EIP-7981 data cost (1,280 per address, 2,048 per key). The raised storage-clear refund and the EXTCODESIZE/EXTCODECOPY extra warm read cannot be simulated as overrides.',
+  },
+  {
+    eip: 'EIP-8037',
+    name: 'State Creation Gas',
+    description:
+      'Prices state creation at a fixed 1,530 gas per state byte (CPSB): new account 183,600, storage set 97,920, code deposit 1,530 per byte, EIP-7702 auth 35,190.',
+    url: 'https://eips.ethereum.org/EIPS/eip-8037',
+    parameters: [
+      { key: 'SSTORE_SET', label: 'SSTORE Set' },
+      { key: 'CALL_NEW_ACCOUNT', label: 'New Account' },
+      { key: 'CREATE', label: 'CREATE' },
+      { key: 'CREATE2', label: 'CREATE2' },
+      { key: 'CREATE_DATA', label: 'Code Deposit /Byte' },
+      { key: 'TX_AUTH_COST', label: '7702 Auth' },
+    ],
+    note: 'The EIP meters these in a separate state-gas dimension with source-based refunds; the simulation folds them into execution gas, so blocks near the limit overestimate slightly.',
   },
 ];
 
 /** EIPs that involve structural changes and cannot be simulated via parameter overrides */
 const UNSUPPORTED_EIPS: UnsupportedEip[] = [
   {
-    eip: 'EIP-8037',
-    name: 'State Growth Costs',
+    eip: 'EIP-7904',
+    name: 'Compute Gas Cost Analysis',
     reason:
-      'Introduces new gas costs for account/storage creation that require protocol-level changes, not just parameter adjustments.',
-    url: 'https://eips.ethereum.org/EIPS/eip-8037',
+      'Now Informational: with EIP-7928 optimizations, compute opcodes and precompiles meet the throughput target at current costs, so no compute repricing is applied.',
+    url: 'https://eips.ethereum.org/EIPS/eip-7904',
   },
   {
-    eip: 'EIP-7981',
-    name: 'Access List Data Gas',
+    eip: 'EIP-7778',
+    name: 'Block Gas Accounting without Refunds',
     reason:
-      'Adds a new intrinsic gas mechanism for access list data that cannot be expressed as a simple price override.',
-    url: 'https://eips.ethereum.org/EIPS/eip-7981',
+      'Excludes gas refunds from block-level gas accounting, a structural change that cannot be expressed as a price override.',
+    url: 'https://eips.ethereum.org/EIPS/eip-7778',
   },
 ];
 
@@ -218,11 +216,13 @@ export function GlamsterdamPresetModal({
               EIP-8007 (Glamsterdam)
               <ArrowTopRightOnSquareIcon className="size-3.5" />
             </a>
-            , the upcoming Ethereum execution layer upgrade. It bundles compute repricing, calldata floor increases, and
-            transaction base cost reductions into a single preset you can simulate against real blocks.
+            , the upcoming Ethereum execution layer upgrade. It bundles state access and state creation repricing,
+            calldata floor increases, and the intrinsic transaction gas decomposition into a single preset you can
+            simulate against real blocks.
           </p>
           <p className="mt-2 text-sm/6 text-muted">
-            Values below are pre-filled with the proposed changes. You can adjust any parameter before simulating.
+            Values below are pre-filled with the frozen glamsterdam-devnet-8 repricing. You can adjust any parameter
+            before simulating.
           </p>
         </div>
 
