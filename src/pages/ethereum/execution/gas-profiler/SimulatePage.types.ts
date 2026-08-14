@@ -23,7 +23,7 @@ export interface GasSchedule {
 
   // Storage - SSTORE (Istanbul+: EIP-2200 net metered)
   SSTORE_SET?: number; // Istanbul+: 20000
-  SSTORE_RESET?: number; // Istanbul+: 2900
+  SSTORE_RESET?: number; // Istanbul+: 5000 (legacy EIP-2200 value; backend charges SSTORE_RESET - SLOAD_COLD as the write surcharge)
 
   // Calls - access costs (pre-Berlin: single CALL_BASE, post-Berlin: cold/warm)
   CALL_BASE?: number; // pre-Berlin: varies by fork
@@ -123,8 +123,8 @@ export const GAS_PARAMETER_GROUPS: GasParameterGroup[] = [
       // Post-Berlin (EIP-2929): cold/warm access costs
       { key: 'SLOAD_COLD', label: 'SLOAD Cold', min: 0, max: 10000, step: 100 },
       { key: 'SLOAD_WARM', label: 'SLOAD Warm', min: 0, max: 1000, step: 10 },
-      { key: 'SSTORE_SET', label: 'SSTORE Set', min: 0, max: 50000, step: 1000 },
-      { key: 'SSTORE_RESET', label: 'SSTORE Reset', min: 0, max: 10000, step: 100 },
+      { key: 'SSTORE_SET', label: 'SSTORE Set', min: 0, max: 150000, step: 1000 },
+      { key: 'SSTORE_RESET', label: 'SSTORE Reset', min: 0, max: 25000, step: 100 },
     ],
   },
   {
@@ -145,9 +145,9 @@ export const GAS_PARAMETER_GROUPS: GasParameterGroup[] = [
       { key: 'CALL_COLD', label: 'CALL Cold', min: 0, max: 10000, step: 100 },
       { key: 'CALL_WARM', label: 'CALL Warm', min: 0, max: 1000, step: 10 },
       { key: 'CALL_VALUE_XFER', label: 'Value Transfer', min: 0, max: 20000, step: 500 },
-      { key: 'CALL_NEW_ACCOUNT', label: 'New Account', min: 0, max: 50000, step: 1000 },
-      { key: 'CREATE', label: 'CREATE', min: 0, max: 100000, step: 1000 },
-      { key: 'CREATE2', label: 'CREATE2', min: 0, max: 100000, step: 1000 },
+      { key: 'CALL_NEW_ACCOUNT', label: 'New Account', min: 0, max: 300000, step: 1000 },
+      { key: 'CREATE', label: 'CREATE', min: 0, max: 300000, step: 1000 },
+      { key: 'CREATE2', label: 'CREATE2', min: 0, max: 300000, step: 1000 },
       { key: 'SELFDESTRUCT', label: 'SELFDESTRUCT', min: 0, max: 10000, step: 100 },
     ],
   },
