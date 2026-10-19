@@ -30,9 +30,10 @@ export function parseClientName(clientName: string | undefined): {
     }
   }
 
-  // Find consensus client in the name
+  // Match consensus clients without the execution client name, so nimbusel does not read as nimbus
+  const consensusSearch = executionClient ? lowerName.replace(executionClient, '') : lowerName;
   for (const client of CONSENSUS_CLIENTS) {
-    if (lowerName.includes(client)) {
+    if (consensusSearch.includes(client)) {
       consensusClient = client;
       break;
     }

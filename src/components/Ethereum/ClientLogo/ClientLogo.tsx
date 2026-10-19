@@ -5,6 +5,7 @@ import type { ClientLogoProps } from './ClientLogo.types';
 /** Map client name aliases to canonical names */
 const CLIENT_ALIASES: Record<string, string> = {
   'go-ethereum': 'geth',
+  'nimbus-el': 'nimbusel',
 };
 
 function normalizeClientName(clientName: string): string {
@@ -19,7 +20,7 @@ function getClientLogoUrl(clientName: string): string {
 export function ClientLogo({ client, size = 20, className = '' }: ClientLogoProps): JSX.Element {
   const [hasError, setHasError] = useState(false);
 
-  if (hasError || client === 'Unknown') {
+  if (hasError || client.toLowerCase() === 'unknown') {
     return (
       <div
         className={`flex items-center justify-center rounded-sm bg-muted/50 text-muted ${className}`}

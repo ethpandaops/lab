@@ -9,12 +9,6 @@ import type {
   AdminCbtIncrementalServiceListData,
   AdminCbtIncrementalServiceListErrors,
   AdminCbtIncrementalServiceListResponses,
-  AdminCbtScheduledServiceGetData,
-  AdminCbtScheduledServiceGetErrors,
-  AdminCbtScheduledServiceGetResponses,
-  AdminCbtScheduledServiceListData,
-  AdminCbtScheduledServiceListErrors,
-  AdminCbtScheduledServiceListResponses,
   DimBlockBlobSubmitterServiceGetData,
   DimBlockBlobSubmitterServiceGetErrors,
   DimBlockBlobSubmitterServiceGetResponses,
@@ -225,6 +219,24 @@ import type {
   FctBlockFirstSeenByNodeServiceListData,
   FctBlockFirstSeenByNodeServiceListErrors,
   FctBlockFirstSeenByNodeServiceListResponses,
+  FctBlockGraffitiClientDailyServiceGetData,
+  FctBlockGraffitiClientDailyServiceGetErrors,
+  FctBlockGraffitiClientDailyServiceGetResponses,
+  FctBlockGraffitiClientDailyServiceListData,
+  FctBlockGraffitiClientDailyServiceListErrors,
+  FctBlockGraffitiClientDailyServiceListResponses,
+  FctBlockGraffitiClientHourlyServiceGetData,
+  FctBlockGraffitiClientHourlyServiceGetErrors,
+  FctBlockGraffitiClientHourlyServiceGetResponses,
+  FctBlockGraffitiClientHourlyServiceListData,
+  FctBlockGraffitiClientHourlyServiceListErrors,
+  FctBlockGraffitiClientHourlyServiceListResponses,
+  FctBlockGraffitiServiceGetData,
+  FctBlockGraffitiServiceGetErrors,
+  FctBlockGraffitiServiceGetResponses,
+  FctBlockGraffitiServiceListData,
+  FctBlockGraffitiServiceListErrors,
+  FctBlockGraffitiServiceListResponses,
   FctBlockHeadServiceGetData,
   FctBlockHeadServiceGetErrors,
   FctBlockHeadServiceGetResponses,
@@ -1269,10 +1281,6 @@ import {
   zAdminCbtIncrementalServiceGetResponse,
   zAdminCbtIncrementalServiceListData,
   zAdminCbtIncrementalServiceListResponse,
-  zAdminCbtScheduledServiceGetData,
-  zAdminCbtScheduledServiceGetResponse,
-  zAdminCbtScheduledServiceListData,
-  zAdminCbtScheduledServiceListResponse,
   zDimBlockBlobSubmitterServiceGetData,
   zDimBlockBlobSubmitterServiceGetResponse,
   zDimBlockBlobSubmitterServiceListData,
@@ -1413,6 +1421,18 @@ import {
   zFctBlockFirstSeenByNodeServiceGetResponse,
   zFctBlockFirstSeenByNodeServiceListData,
   zFctBlockFirstSeenByNodeServiceListResponse,
+  zFctBlockGraffitiClientDailyServiceGetData,
+  zFctBlockGraffitiClientDailyServiceGetResponse,
+  zFctBlockGraffitiClientDailyServiceListData,
+  zFctBlockGraffitiClientDailyServiceListResponse,
+  zFctBlockGraffitiClientHourlyServiceGetData,
+  zFctBlockGraffitiClientHourlyServiceGetResponse,
+  zFctBlockGraffitiClientHourlyServiceListData,
+  zFctBlockGraffitiClientHourlyServiceListResponse,
+  zFctBlockGraffitiServiceGetData,
+  zFctBlockGraffitiServiceGetResponse,
+  zFctBlockGraffitiServiceListData,
+  zFctBlockGraffitiServiceListResponse,
   zFctBlockHeadServiceGetData,
   zFctBlockHeadServiceGetResponse,
   zFctBlockHeadServiceListData,
@@ -2161,42 +2181,6 @@ export const adminCbtIncrementalServiceGet = <ThrowOnError extends boolean = fal
     url: '/api/v1/admin_cbt_incremental/{database}',
     ...options,
   });
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const adminCbtScheduledServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<AdminCbtScheduledServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    AdminCbtScheduledServiceListResponses,
-    AdminCbtScheduledServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zAdminCbtScheduledServiceListData.parseAsync(data),
-    responseValidator: async data => await zAdminCbtScheduledServiceListResponse.parseAsync(data),
-    url: '/api/v1/admin_cbt_scheduled',
-    ...options,
-  });
-
-/**
- * Get record
- *
- * Retrieve a single record by database
- */
-export const adminCbtScheduledServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<AdminCbtScheduledServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<AdminCbtScheduledServiceGetResponses, AdminCbtScheduledServiceGetErrors, ThrowOnError>(
-    {
-      requestValidator: async data => await zAdminCbtScheduledServiceGetData.parseAsync(data),
-      responseValidator: async data => await zAdminCbtScheduledServiceGetResponse.parseAsync(data),
-      url: '/api/v1/admin_cbt_scheduled/{database}',
-      ...options,
-    }
-  );
 
 /**
  * List records
@@ -3542,6 +3526,116 @@ export const fctBlockFirstSeenByNodeServiceGet = <ThrowOnError extends boolean =
     requestValidator: async data => await zFctBlockFirstSeenByNodeServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockFirstSeenByNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_first_seen_by_node/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockGraffitiServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockGraffitiServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockGraffitiServiceListResponses,
+    FctBlockGraffitiServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockGraffitiServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockGraffitiServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<FctBlockGraffitiServiceGetResponses, FctBlockGraffitiServiceGetErrors, ThrowOnError>({
+    requestValidator: async data => await zFctBlockGraffitiServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockGraffitiClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockGraffitiClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockGraffitiClientDailyServiceListResponses,
+    FctBlockGraffitiClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockGraffitiClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockGraffitiClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockGraffitiClientDailyServiceGetResponses,
+    FctBlockGraffitiClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockGraffitiClientHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockGraffitiClientHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockGraffitiClientHourlyServiceListResponses,
+    FctBlockGraffitiClientHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctBlockGraffitiClientHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockGraffitiClientHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockGraffitiClientHourlyServiceGetResponses,
+    FctBlockGraffitiClientHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_hourly/{hour_start_date_time}',
     ...options,
   });
 

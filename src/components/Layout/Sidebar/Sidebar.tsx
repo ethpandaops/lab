@@ -16,6 +16,7 @@ import {
   Square3Stack3DIcon,
   UserGroupIcon,
   ClockIcon,
+  CpuChipIcon,
   MapIcon,
   WrenchScrewdriverIcon,
   ServerStackIcon,
@@ -162,6 +163,7 @@ const ethereumConsensusPages: NavItem[] = [
   { name: 'Epochs', to: '/ethereum/epochs', icon: ClockIcon },
   { name: 'Slots', to: '/ethereum/slots', icon: Square3Stack3DIcon },
   { name: 'Entities', to: '/ethereum/entities', icon: UserGroupIcon },
+  { name: 'Clients', to: '/ethereum/clients', icon: CpuChipIcon },
   { name: 'Forks', to: '/ethereum/forks', icon: SignalIcon },
 ];
 

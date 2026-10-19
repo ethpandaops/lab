@@ -33,6 +33,7 @@ import { Route as EthereumEntitiesRouteImport } from './routes/ethereum/entities
 import { Route as EthereumDataAvailabilityRouteImport } from './routes/ethereum/data-availability'
 import { Route as EthereumContractsRouteImport } from './routes/ethereum/contracts'
 import { Route as EthereumConsensusRouteImport } from './routes/ethereum/consensus'
+import { Route as EthereumClientsRouteImport } from './routes/ethereum/clients'
 import { Route as BeaconLocallyBuiltBlocksRouteImport } from './routes/beacon/locally-built-blocks'
 import { Route as XatuContributorsIndexRouteImport } from './routes/xatu/contributors/index'
 import { Route as EthereumValidatorsIndexRouteImport } from './routes/ethereum/validators/index'
@@ -190,6 +191,11 @@ const EthereumContractsRoute = EthereumContractsRouteImport.update({
 const EthereumConsensusRoute = EthereumConsensusRouteImport.update({
   id: '/consensus',
   path: '/consensus',
+  getParentRoute: () => EthereumRoute,
+} as any)
+const EthereumClientsRoute = EthereumClientsRouteImport.update({
+  id: '/clients',
+  path: '/clients',
   getParentRoute: () => EthereumRoute,
 } as any)
 const BeaconLocallyBuiltBlocksRoute =
@@ -390,6 +396,7 @@ export interface FileRoutesByFullPath {
   '/experiments': typeof ExperimentsRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
   '/beacon/locally-built-blocks': typeof BeaconLocallyBuiltBlocksRoute
+  '/ethereum/clients': typeof EthereumClientsRoute
   '/ethereum/consensus': typeof EthereumConsensusRouteWithChildren
   '/ethereum/contracts': typeof EthereumContractsRouteWithChildren
   '/ethereum/data-availability': typeof EthereumDataAvailabilityRouteWithChildren
@@ -449,6 +456,7 @@ export interface FileRoutesByTo {
   '/ethereum': typeof EthereumRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
   '/beacon/locally-built-blocks': typeof BeaconLocallyBuiltBlocksRoute
+  '/ethereum/clients': typeof EthereumClientsRoute
   '/ethereum/consensus': typeof EthereumConsensusRouteWithChildren
   '/ethereum/data-availability': typeof EthereumDataAvailabilityRouteWithChildren
   '/ethereum/execution': typeof EthereumExecutionRouteWithChildren
@@ -498,6 +506,7 @@ export interface FileRoutesById {
   '/experiments': typeof ExperimentsRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
   '/beacon/locally-built-blocks': typeof BeaconLocallyBuiltBlocksRoute
+  '/ethereum/clients': typeof EthereumClientsRoute
   '/ethereum/consensus': typeof EthereumConsensusRouteWithChildren
   '/ethereum/contracts': typeof EthereumContractsRouteWithChildren
   '/ethereum/data-availability': typeof EthereumDataAvailabilityRouteWithChildren
@@ -560,6 +569,7 @@ export interface FileRouteTypes {
     | '/experiments'
     | '/xatu'
     | '/beacon/locally-built-blocks'
+    | '/ethereum/clients'
     | '/ethereum/consensus'
     | '/ethereum/contracts'
     | '/ethereum/data-availability'
@@ -619,6 +629,7 @@ export interface FileRouteTypes {
     | '/ethereum'
     | '/xatu'
     | '/beacon/locally-built-blocks'
+    | '/ethereum/clients'
     | '/ethereum/consensus'
     | '/ethereum/data-availability'
     | '/ethereum/execution'
@@ -667,6 +678,7 @@ export interface FileRouteTypes {
     | '/experiments'
     | '/xatu'
     | '/beacon/locally-built-blocks'
+    | '/ethereum/clients'
     | '/ethereum/consensus'
     | '/ethereum/contracts'
     | '/ethereum/data-availability'
@@ -903,6 +915,13 @@ declare module '@tanstack/react-router' {
       path: '/consensus'
       fullPath: '/ethereum/consensus'
       preLoaderRoute: typeof EthereumConsensusRouteImport
+      parentRoute: typeof EthereumRoute
+    }
+    '/ethereum/clients': {
+      id: '/ethereum/clients'
+      path: '/clients'
+      fullPath: '/ethereum/clients'
+      preLoaderRoute: typeof EthereumClientsRouteImport
       parentRoute: typeof EthereumRoute
     }
     '/beacon/locally-built-blocks': {
@@ -1362,6 +1381,7 @@ const EthereumValidatorsRouteWithChildren =
   EthereumValidatorsRoute._addFileChildren(EthereumValidatorsRouteChildren)
 
 interface EthereumRouteChildren {
+  EthereumClientsRoute: typeof EthereumClientsRoute
   EthereumConsensusRoute: typeof EthereumConsensusRouteWithChildren
   EthereumContractsRoute: typeof EthereumContractsRouteWithChildren
   EthereumDataAvailabilityRoute: typeof EthereumDataAvailabilityRouteWithChildren
@@ -1375,6 +1395,7 @@ interface EthereumRouteChildren {
 }
 
 const EthereumRouteChildren: EthereumRouteChildren = {
+  EthereumClientsRoute: EthereumClientsRoute,
   EthereumConsensusRoute: EthereumConsensusRouteWithChildren,
   EthereumContractsRoute: EthereumContractsRouteWithChildren,
   EthereumDataAvailabilityRoute: EthereumDataAvailabilityRouteWithChildren,

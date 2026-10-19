@@ -7,6 +7,12 @@ import {
   truncateAddress,
   parseExecutionClient,
   getClientLayer,
+  getConsensusClientColor,
+  getExecutionClientColor,
+  getClientColor,
+  CONSENSUS_CLIENT_COLORS,
+  EXECUTION_CLIENT_COLORS,
+  UNKNOWN_CLIENT_COLOR,
 } from './ethereum';
 
 describe('weiToEth', () => {
@@ -209,5 +215,40 @@ describe('getClientLayer', () => {
   it('should return null for unknown client types', () => {
     expect(getClientLayer('')).toBeNull();
     expect(getClientLayer('unknown-client')).toBeNull();
+  });
+
+  it('should classify caplin as CL and the newer execution clients as EL', () => {
+    expect(getClientLayer('caplin')).toBe('CL');
+    expect(getClientLayer('nimbusel')).toBe('EL');
+    expect(getClientLayer('ethereumjs')).toBe('EL');
+    expect(getClientLayer('trin-execution')).toBe('EL');
+  });
+});
+
+describe('client colors', () => {
+  it('should return the consensus client color case-insensitively', () => {
+    expect(getConsensusClientColor('Lighthouse')).toBe(CONSENSUS_CLIENT_COLORS.lighthouse);
+    expect(getConsensusClientColor('caplin')).toBe(CONSENSUS_CLIENT_COLORS.caplin);
+  });
+
+  it('should return the neutral color for unknown', () => {
+    expect(getConsensusClientColor('unknown')).toBe(UNKNOWN_CLIENT_COLOR);
+    expect(getClientColor('Unknown')).toBe(UNKNOWN_CLIENT_COLOR);
+  });
+
+  it('should have colors for the newer execution clients', () => {
+    expect(getExecutionClientColor('nimbusel')).toBe(EXECUTION_CLIENT_COLORS.nimbusel);
+    expect(getExecutionClientColor('ethereumjs')).toBe(EXECUTION_CLIENT_COLORS.ethereumjs);
+    expect(getExecutionClientColor('trin-execution')).toBe(EXECUTION_CLIENT_COLORS['trin-execution']);
+  });
+
+  it('should pick the layer color in getClientColor', () => {
+    expect(getClientColor('teku')).toBe(CONSENSUS_CLIENT_COLORS.teku);
+    expect(getClientColor('geth')).toBe(EXECUTION_CLIENT_COLORS.geth);
+  });
+
+  it('should keep consensus colors distinct', () => {
+    const colors = Object.values(CONSENSUS_CLIENT_COLORS);
+    expect(new Set(colors).size).toBe(colors.length);
   });
 });

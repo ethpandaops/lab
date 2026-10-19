@@ -6,8 +6,6 @@ import { client } from '../client.gen';
 import {
   adminCbtIncrementalServiceGet,
   adminCbtIncrementalServiceList,
-  adminCbtScheduledServiceGet,
-  adminCbtScheduledServiceList,
   dimBlockBlobSubmitterServiceGet,
   dimBlockBlobSubmitterServiceList,
   dimContractOwnerServiceGet,
@@ -78,6 +76,12 @@ import {
   fctBlockDataColumnSidecarFirstSeenServiceList,
   fctBlockFirstSeenByNodeServiceGet,
   fctBlockFirstSeenByNodeServiceList,
+  fctBlockGraffitiClientDailyServiceGet,
+  fctBlockGraffitiClientDailyServiceList,
+  fctBlockGraffitiClientHourlyServiceGet,
+  fctBlockGraffitiClientHourlyServiceList,
+  fctBlockGraffitiServiceGet,
+  fctBlockGraffitiServiceList,
   fctBlockHeadServiceGet,
   fctBlockHeadServiceList,
   fctBlockMevHeadServiceGet,
@@ -433,12 +437,6 @@ import type {
   AdminCbtIncrementalServiceListData,
   AdminCbtIncrementalServiceListError,
   AdminCbtIncrementalServiceListResponse,
-  AdminCbtScheduledServiceGetData,
-  AdminCbtScheduledServiceGetError,
-  AdminCbtScheduledServiceGetResponse,
-  AdminCbtScheduledServiceListData,
-  AdminCbtScheduledServiceListError,
-  AdminCbtScheduledServiceListResponse,
   DimBlockBlobSubmitterServiceGetData,
   DimBlockBlobSubmitterServiceGetError,
   DimBlockBlobSubmitterServiceGetResponse,
@@ -649,6 +647,24 @@ import type {
   FctBlockFirstSeenByNodeServiceListData,
   FctBlockFirstSeenByNodeServiceListError,
   FctBlockFirstSeenByNodeServiceListResponse,
+  FctBlockGraffitiClientDailyServiceGetData,
+  FctBlockGraffitiClientDailyServiceGetError,
+  FctBlockGraffitiClientDailyServiceGetResponse,
+  FctBlockGraffitiClientDailyServiceListData,
+  FctBlockGraffitiClientDailyServiceListError,
+  FctBlockGraffitiClientDailyServiceListResponse,
+  FctBlockGraffitiClientHourlyServiceGetData,
+  FctBlockGraffitiClientHourlyServiceGetError,
+  FctBlockGraffitiClientHourlyServiceGetResponse,
+  FctBlockGraffitiClientHourlyServiceListData,
+  FctBlockGraffitiClientHourlyServiceListError,
+  FctBlockGraffitiClientHourlyServiceListResponse,
+  FctBlockGraffitiServiceGetData,
+  FctBlockGraffitiServiceGetError,
+  FctBlockGraffitiServiceGetResponse,
+  FctBlockGraffitiServiceListData,
+  FctBlockGraffitiServiceListError,
+  FctBlockGraffitiServiceListResponse,
   FctBlockHeadServiceGetData,
   FctBlockHeadServiceGetError,
   FctBlockHeadServiceGetResponse,
@@ -1780,60 +1796,6 @@ export const adminCbtIncrementalServiceGetOptions = (options: Options<AdminCbtIn
       return data;
     },
     queryKey: adminCbtIncrementalServiceGetQueryKey(options),
-  });
-
-export const adminCbtScheduledServiceListQueryKey = (options?: Options<AdminCbtScheduledServiceListData>) =>
-  createQueryKey('adminCbtScheduledServiceList', options);
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const adminCbtScheduledServiceListOptions = (options?: Options<AdminCbtScheduledServiceListData>) =>
-  queryOptions<
-    AdminCbtScheduledServiceListResponse,
-    AdminCbtScheduledServiceListError,
-    AdminCbtScheduledServiceListResponse,
-    ReturnType<typeof adminCbtScheduledServiceListQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await adminCbtScheduledServiceList({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: adminCbtScheduledServiceListQueryKey(options),
-  });
-
-export const adminCbtScheduledServiceGetQueryKey = (options: Options<AdminCbtScheduledServiceGetData>) =>
-  createQueryKey('adminCbtScheduledServiceGet', options);
-
-/**
- * Get record
- *
- * Retrieve a single record by database
- */
-export const adminCbtScheduledServiceGetOptions = (options: Options<AdminCbtScheduledServiceGetData>) =>
-  queryOptions<
-    AdminCbtScheduledServiceGetResponse,
-    AdminCbtScheduledServiceGetError,
-    AdminCbtScheduledServiceGetResponse,
-    ReturnType<typeof adminCbtScheduledServiceGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await adminCbtScheduledServiceGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: adminCbtScheduledServiceGetQueryKey(options),
   });
 
 export const dimBlockBlobSubmitterServiceListQueryKey = (options?: Options<DimBlockBlobSubmitterServiceListData>) =>
@@ -3902,6 +3864,180 @@ export const fctBlockFirstSeenByNodeServiceGetOptions = (options: Options<FctBlo
       return data;
     },
     queryKey: fctBlockFirstSeenByNodeServiceGetQueryKey(options),
+  });
+
+export const fctBlockGraffitiServiceListQueryKey = (options?: Options<FctBlockGraffitiServiceListData>) =>
+  createQueryKey('fctBlockGraffitiServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockGraffitiServiceListOptions = (options?: Options<FctBlockGraffitiServiceListData>) =>
+  queryOptions<
+    FctBlockGraffitiServiceListResponse,
+    FctBlockGraffitiServiceListError,
+    FctBlockGraffitiServiceListResponse,
+    ReturnType<typeof fctBlockGraffitiServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiServiceListQueryKey(options),
+  });
+
+export const fctBlockGraffitiServiceGetQueryKey = (options: Options<FctBlockGraffitiServiceGetData>) =>
+  createQueryKey('fctBlockGraffitiServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockGraffitiServiceGetOptions = (options: Options<FctBlockGraffitiServiceGetData>) =>
+  queryOptions<
+    FctBlockGraffitiServiceGetResponse,
+    FctBlockGraffitiServiceGetError,
+    FctBlockGraffitiServiceGetResponse,
+    ReturnType<typeof fctBlockGraffitiServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiServiceGetQueryKey(options),
+  });
+
+export const fctBlockGraffitiClientDailyServiceListQueryKey = (
+  options?: Options<FctBlockGraffitiClientDailyServiceListData>
+) => createQueryKey('fctBlockGraffitiClientDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockGraffitiClientDailyServiceListOptions = (
+  options?: Options<FctBlockGraffitiClientDailyServiceListData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientDailyServiceListResponse,
+    FctBlockGraffitiClientDailyServiceListError,
+    FctBlockGraffitiClientDailyServiceListResponse,
+    ReturnType<typeof fctBlockGraffitiClientDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientDailyServiceListQueryKey(options),
+  });
+
+export const fctBlockGraffitiClientDailyServiceGetQueryKey = (
+  options: Options<FctBlockGraffitiClientDailyServiceGetData>
+) => createQueryKey('fctBlockGraffitiClientDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockGraffitiClientDailyServiceGetOptions = (
+  options: Options<FctBlockGraffitiClientDailyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientDailyServiceGetResponse,
+    FctBlockGraffitiClientDailyServiceGetError,
+    FctBlockGraffitiClientDailyServiceGetResponse,
+    ReturnType<typeof fctBlockGraffitiClientDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientDailyServiceGetQueryKey(options),
+  });
+
+export const fctBlockGraffitiClientHourlyServiceListQueryKey = (
+  options?: Options<FctBlockGraffitiClientHourlyServiceListData>
+) => createQueryKey('fctBlockGraffitiClientHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockGraffitiClientHourlyServiceListOptions = (
+  options?: Options<FctBlockGraffitiClientHourlyServiceListData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientHourlyServiceListResponse,
+    FctBlockGraffitiClientHourlyServiceListError,
+    FctBlockGraffitiClientHourlyServiceListResponse,
+    ReturnType<typeof fctBlockGraffitiClientHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientHourlyServiceListQueryKey(options),
+  });
+
+export const fctBlockGraffitiClientHourlyServiceGetQueryKey = (
+  options: Options<FctBlockGraffitiClientHourlyServiceGetData>
+) => createQueryKey('fctBlockGraffitiClientHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctBlockGraffitiClientHourlyServiceGetOptions = (
+  options: Options<FctBlockGraffitiClientHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientHourlyServiceGetResponse,
+    FctBlockGraffitiClientHourlyServiceGetError,
+    FctBlockGraffitiClientHourlyServiceGetResponse,
+    ReturnType<typeof fctBlockGraffitiClientHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientHourlyServiceGetQueryKey(options),
   });
 
 export const fctBlockHeadServiceListQueryKey = (options?: Options<FctBlockHeadServiceListData>) =>

@@ -98,15 +98,26 @@ export function truncateAddress(pubkey?: string, startChars = 6, endChars = 4): 
 }
 
 /**
- * Known consensus client names
+ * Known consensus client names (caplin is the consensus client embedded in erigon)
  */
-export const CONSENSUS_CLIENTS = ['lighthouse', 'lodestar', 'nimbus', 'prysm', 'teku', 'grandine'] as const;
+export const CONSENSUS_CLIENTS = ['lighthouse', 'lodestar', 'nimbus', 'prysm', 'teku', 'grandine', 'caplin'] as const;
 export const CONSENSUS_CLIENTS_SET = new Set<string>(CONSENSUS_CLIENTS);
 
 /**
- * Known execution client names
+ * Known execution client names, using the names the engine API client codes map to
+ * (nimbusel is the nimbus execution client, trin-execution is trin's execution client)
  */
-export const EXECUTION_CLIENTS = ['geth', 'nethermind', 'besu', 'erigon', 'reth', 'ethrex'] as const;
+export const EXECUTION_CLIENTS = [
+  'geth',
+  'nethermind',
+  'besu',
+  'erigon',
+  'reth',
+  'ethrex',
+  'nimbusel',
+  'ethereumjs',
+  'trin-execution',
+] as const;
 export const EXECUTION_CLIENTS_SET = new Set<string>(EXECUTION_CLIENTS);
 
 /**
@@ -132,7 +143,28 @@ export const EXECUTION_CLIENT_COLORS: Record<string, string> = {
   'go-ethereum': '#707d91',
   erigon: '#f5ad73',
   ethrex: '#8b5cf6',
+  nimbusel: '#eab308',
+  ethereumjs: '#ec4899',
+  'trin-execution': '#22c55e',
 };
+
+/**
+ * Colors for Ethereum consensus clients, chosen to stay distinct from each other in stacked charts
+ */
+export const CONSENSUS_CLIENT_COLORS: Record<string, string> = {
+  lighthouse: '#3b82f6',
+  prysm: '#db2777',
+  teku: '#f97316',
+  nimbus: '#eab308',
+  lodestar: '#8b5cf6',
+  grandine: '#14b8a6',
+  caplin: '#a16207',
+};
+
+/**
+ * Color for blocks or nodes whose client could not be identified
+ */
+export const UNKNOWN_CLIENT_COLOR = '#9ca3af';
 
 /**
  * Default fallback colors for unknown clients
@@ -163,6 +195,39 @@ const FALLBACK_COLORS = [
 export function getExecutionClientColor(clientName: string, fallbackIndex = 0): string {
   const normalized = clientName.toLowerCase().trim();
   return EXECUTION_CLIENT_COLORS[normalized] ?? FALLBACK_COLORS[fallbackIndex % FALLBACK_COLORS.length];
+}
+
+/**
+ * Get the color for a consensus client
+ *
+ * @param clientName - Name of the consensus client (case-insensitive)
+ * @param fallbackIndex - Index for fallback color if client is unknown (cycles through fallback colors)
+ * @returns Hex color string
+ *
+ * @example
+ * ```tsx
+ * getConsensusClientColor('lighthouse') // Returns '#3b82f6'
+ * getConsensusClientColor('unknown')    // Returns '#9ca3af'
+ * ```
+ */
+export function getConsensusClientColor(clientName: string, fallbackIndex = 0): string {
+  const normalized = clientName.toLowerCase().trim();
+  if (normalized === 'unknown') return UNKNOWN_CLIENT_COLOR;
+  return CONSENSUS_CLIENT_COLORS[normalized] ?? FALLBACK_COLORS[fallbackIndex % FALLBACK_COLORS.length];
+}
+
+/**
+ * Get the color for a client of either layer, with a neutral color for 'unknown'
+ *
+ * @param clientName - Consensus or execution client name (case-insensitive)
+ * @param fallbackIndex - Index for fallback color if client is not recognised
+ * @returns Hex color string
+ */
+export function getClientColor(clientName: string, fallbackIndex = 0): string {
+  const normalized = clientName.toLowerCase().trim();
+  if (normalized === 'unknown') return UNKNOWN_CLIENT_COLOR;
+  if (CONSENSUS_CLIENTS_SET.has(normalized)) return getConsensusClientColor(normalized, fallbackIndex);
+  return getExecutionClientColor(normalized, fallbackIndex);
 }
 
 /**
