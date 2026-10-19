@@ -196,6 +196,18 @@ export const AllExecutionClients: Story = {
           <ClientLogo client="ethrex" />
           <span className="text-xs text-muted">ethrex</span>
         </div>
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="nimbusel" />
+          <span className="text-xs text-muted">nimbusel</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="ethereumjs" />
+          <span className="text-xs text-muted">ethereumjs</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="trin-execution" />
+          <span className="text-xs text-muted">trin-execution</span>
+        </div>
       </div>
     </div>
   ),
@@ -239,6 +251,10 @@ export const AllConsensusClients: Story = {
         <div className="flex flex-col items-center gap-1">
           <ClientLogo client="grandine" />
           <span className="text-xs text-muted">grandine</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="caplin" />
+          <span className="text-xs text-muted">caplin</span>
         </div>
       </div>
     </div>
