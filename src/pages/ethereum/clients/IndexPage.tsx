@@ -8,13 +8,21 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { InfoBox } from '@/components/Feedback/InfoBox';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { Toggle } from '@/components/Forms/Toggle';
+import { Button } from '@/components/Elements/Button';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
 import { getClientColor } from '@/utils/ethereum';
 import { buildTooltipHtml, formatTooltipDate } from '@/pages/ethereum/execution/overview/overview.utils';
-import { ClientBreakdown, ClientPairs, ClientsSkeleton, GraffitiBlocksTable } from './components';
-import { useClientCounts, useGraffitiBlocks } from './hooks';
+import {
+  ClientBreakdown,
+  ClientFilter,
+  ClientPairs,
+  ClientsSkeleton,
+  EntityFilter,
+  GraffitiBlocksTable,
+} from './components';
+import { useClientCounts, useEntityOptions, useGraffitiBlocks } from './hooks';
 import {
   BLOCK_GRAFFITI_TABLE,
   DEFAULT_TIME_PERIOD,
@@ -26,15 +34,26 @@ import {
   bucketShares,
   buildShareChartConfig,
   computeCoverage,
+  entityLabel,
+  filterRecords,
   formatClientName,
   summariseClients,
   summarisePairs,
+  type ClientFilters,
   type ClientLayer,
 } from './utils/client-share';
 
 /** Formats a share of blocks as a percentage, or a dash when there are no blocks */
 function formatShare(part: number, total: number): string {
   return total > 0 ? `${((part / total) * 100).toFixed(1)}%` : '-';
+}
+
+/** Describes the blocks a layer's chart covers, e.g. "blocks from coinbase with Geth execution" */
+function describeBlocks(entity: string | undefined, filters: ClientFilters, layer: ClientLayer): string {
+  const other = layer === 'consensus' ? filters.executionClient : filters.consensusClient;
+  const parts = [entity ? `blocks from ${entityLabel(entity)}` : 'blocks'];
+  if (other) parts.push(`with ${formatClientName(other)} ${layer === 'consensus' ? 'execution' : 'consensus'}`);
+  return entity || other ? parts.join(' ') : 'all proposed blocks';
 }
 
 /** Proposer clients page: client shares of proposed blocks parsed from graffiti, with a per-block drill-down. */
@@ -49,7 +68,15 @@ export function IndexPage(): JSX.Element {
   const { data: tableBounds, isLoading: boundsLoading } = useTableBounds(BLOCK_GRAFFITI_TABLE);
   const hasData = !!tableBounds;
 
-  const { records, keys, isDaily, isLoading, error } = useClientCounts(timePeriod);
+  const entity = search.entity;
+  const filters: ClientFilters = useMemo(
+    () => ({ consensusClient: search.cl, executionClient: search.el }),
+    [search.cl, search.el]
+  );
+  const hasFilters = !!entity || !!filters.consensusClient || !!filters.executionClient;
+
+  const { records, keys, isDaily, isLoading, error } = useClientCounts(timePeriod, entity);
+  const entityOptions = useEntityOptions();
 
   const windowStart = useMemo(() => {
     if (config.days === null) return tableBounds?.min ?? 0;
@@ -58,28 +85,37 @@ export function IndexPage(): JSX.Element {
 
   const blocks = useGraffitiBlocks({
     since: windowStart,
-    consensusClient: search.cl,
-    executionClient: search.el,
+    consensusClient: filters.consensusClient,
+    executionClient: filters.executionClient,
+    entity,
   });
 
-  const coverage = useMemo(() => computeCoverage(records), [records]);
-  const consensusSummary = useMemo(() => summariseClients(records, 'consensus'), [records]);
-  const executionSummary = useMemo(() => summariseClients(records, 'execution'), [records]);
-  const pairs = useMemo(() => summarisePairs(records), [records]);
+  // Each layer's own filter is skipped for its chart and breakdown, so the selected client shows among the others.
+  const filtered = useMemo(() => filterRecords(records, filters), [records, filters]);
+  const consensusRecords = useMemo(() => filterRecords(records, filters, 'consensus'), [records, filters]);
+  const executionRecords = useMemo(() => filterRecords(records, filters, 'execution'), [records, filters]);
+
+  const coverage = useMemo(() => computeCoverage(filtered), [filtered]);
+  const consensusSummary = useMemo(() => summariseClients(consensusRecords, 'consensus'), [consensusRecords]);
+  const executionSummary = useMemo(() => summariseClients(executionRecords, 'execution'), [executionRecords]);
+  const consensusClients = useMemo(() => summariseClients(records, 'consensus').map(s => s.client), [records]);
+  const executionClients = useMemo(() => summariseClients(records, 'execution').map(s => s.client), [records]);
+  const pairs = useMemo(() => summarisePairs(filtered), [filtered]);
   const consensusChart = useMemo(
-    () => buildShareChartConfig(records, keys, 'consensus', isDaily, identifiedOnly),
-    [records, keys, isDaily, identifiedOnly]
+    () => buildShareChartConfig(consensusRecords, keys, 'consensus', isDaily, identifiedOnly),
+    [consensusRecords, keys, isDaily, identifiedOnly]
   );
   const executionChart = useMemo(
-    () => buildShareChartConfig(records, keys, 'execution', isDaily, identifiedOnly),
-    [records, keys, isDaily, identifiedOnly]
+    () => buildShareChartConfig(executionRecords, keys, 'execution', isDaily, identifiedOnly),
+    [executionRecords, keys, isDaily, identifiedOnly]
   );
 
   const setSearch = useCallback(
-    (update: { t?: TimePeriod; cl?: string; el?: string; identified?: boolean }) =>
+    (update: { t?: TimePeriod; cl?: string; el?: string; entity?: string; identified?: boolean }) =>
       navigate({ search: prev => ({ ...prev, ...update }), replace: true }),
     [navigate]
   );
+  const clearFilters = useCallback(() => setSearch({ cl: undefined, el: undefined, entity: undefined }), [setSearch]);
 
   const makeTooltip = useCallback(
     (layer: ClientLayer) =>
@@ -88,7 +124,8 @@ export function IndexPage(): JSX.Element {
         const index = points[0]?.dataIndex;
         const key = index === undefined ? undefined : keys[index];
         if (!key) return '';
-        const { total, items } = bucketShares(records, key, layer, identifiedOnly);
+        const layerRecords = layer === 'consensus' ? consensusRecords : executionRecords;
+        const { total, items } = bucketShares(layerRecords, key, layer, identifiedOnly);
         return buildTooltipHtml(formatTooltipDate(isDaily ? key : Number(key), isDaily), [
           {
             title: `${layer === 'consensus' ? 'CONSENSUS' : 'EXECUTION'} CLIENTS (${total} blocks)`,
@@ -100,13 +137,17 @@ export function IndexPage(): JSX.Element {
           },
         ]);
       },
-    [keys, records, identifiedOnly, isDaily]
+    [keys, consensusRecords, executionRecords, identifiedOnly, isDaily]
   );
 
   const periodLabel = isDaily ? 'Daily' : 'Hourly';
-  const shareSubtitle = identifiedOnly
-    ? `${periodLabel} share of blocks whose graffiti names a client`
-    : `${periodLabel} share of all proposed blocks, unknown included`;
+  const shareSubtitle = (layer: ClientLayer): string => {
+    const blocks = describeBlocks(entity, filters, layer);
+    return identifiedOnly
+      ? `${periodLabel} share of ${blocks === 'all proposed blocks' ? 'blocks' : blocks} whose graffiti names a client`
+      : `${periodLabel} share of ${blocks}, unknown included`;
+  };
+  const isEmpty = !isLoading && !boundsLoading && !error && coverage.total === 0;
 
   return (
     <Container>
@@ -128,7 +169,7 @@ export function IndexPage(): JSX.Element {
         </Card>
       ) : (
         <div className="flex flex-col gap-6">
-          <div className="flex flex-wrap items-center gap-6">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
             <div className="flex flex-wrap items-center gap-1.5">
               {TIME_PERIOD_OPTIONS.map(({ value, label }) => (
                 <button
@@ -146,6 +187,32 @@ export function IndexPage(): JSX.Element {
                 </button>
               ))}
             </div>
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
+              {entityOptions.options.length > 0 && (
+                <EntityFilter
+                  value={entity}
+                  onChange={value => setSearch({ entity: value })}
+                  options={entityOptions.options}
+                />
+              )}
+              <ClientFilter
+                layer="consensus"
+                value={filters.consensusClient}
+                onChange={client => setSearch({ cl: client })}
+                clients={consensusClients}
+              />
+              <ClientFilter
+                layer="execution"
+                value={filters.executionClient}
+                onChange={client => setSearch({ el: client })}
+                clients={executionClients}
+              />
+              {hasFilters && (
+                <Button variant="blank" size="sm" rounded="sm" onClick={clearFilters}>
+                  Clear filters
+                </Button>
+              )}
+            </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted">Identified blocks only</span>
               <Toggle
@@ -161,7 +228,8 @@ export function IndexPage(): JSX.Element {
             Clients are read from what proposers put in their graffiti: the engine API client version codes most
             consensus clients append (for example <span className="font-mono">GEa579PMfea2</span>) or a client&apos;s
             default version string. Blocks with empty or custom graffiti count as unknown, so these shares describe the
-            blocks that name a client, not the whole validator set.
+            blocks that name a client, not the whole validator set. Entities are the proposer&apos;s current validator
+            mapping; validators without one are left out when filtering by entity.
           </InfoBox>
 
           {error && (
@@ -172,6 +240,24 @@ export function IndexPage(): JSX.Element {
 
           {isLoading || boundsLoading ? (
             <ClientsSkeleton />
+          ) : isEmpty ? (
+            <Card rounded>
+              <div className="flex flex-col items-start gap-3">
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-base/7 font-semibold text-foreground">No blocks match these filters</h3>
+                  <p className="text-sm/6 text-muted">
+                    {hasFilters
+                      ? 'Nothing was proposed in this window with the selected entity and clients. Try a longer window or fewer filters.'
+                      : 'Nothing has been proposed in this window yet.'}
+                  </p>
+                </div>
+                {hasFilters && (
+                  <Button variant="secondary" size="sm" rounded="sm" onClick={clearFilters}>
+                    Clear filters
+                  </Button>
+                )}
+              </div>
+            </Card>
           ) : (
             <>
               <Stats
@@ -195,7 +281,7 @@ export function IndexPage(): JSX.Element {
               <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
                 <PopoutCard
                   title="Consensus Client Share"
-                  subtitle={shareSubtitle}
+                  subtitle={shareSubtitle('consensus')}
                   anchorId="consensus-client-share"
                   modalSize="full"
                 >
@@ -215,7 +301,7 @@ export function IndexPage(): JSX.Element {
                 </PopoutCard>
                 <PopoutCard
                   title="Execution Client Share"
-                  subtitle={shareSubtitle}
+                  subtitle={shareSubtitle('execution')}
                   anchorId="execution-client-share"
                   modalSize="full"
                 >
@@ -238,14 +324,14 @@ export function IndexPage(): JSX.Element {
                   title="Consensus clients"
                   summaries={consensusSummary}
                   identifiedOnly={identifiedOnly}
-                  selectedClient={search.cl}
+                  selectedClient={filters.consensusClient}
                   onSelect={client => setSearch({ cl: client })}
                 />
                 <ClientBreakdown
                   title="Execution clients"
                   summaries={executionSummary}
                   identifiedOnly={identifiedOnly}
-                  selectedClient={search.el}
+                  selectedClient={filters.executionClient}
                   onSelect={client => setSearch({ el: client })}
                 />
               </div>
@@ -257,17 +343,16 @@ export function IndexPage(): JSX.Element {
             </>
           )}
 
-          <GraffitiBlocksTable
-            blocks={blocks.blocks}
-            isLoading={blocks.isLoading}
-            error={blocks.error}
-            hasNextPage={blocks.hasNextPage}
-            isFetchingNextPage={blocks.isFetchingNextPage}
-            onLoadMore={blocks.fetchNextPage}
-            consensusClient={search.cl}
-            executionClient={search.el}
-            onClearFilter={layer => setSearch(layer === 'consensus' ? { cl: undefined } : { el: undefined })}
-          />
+          {!isEmpty && (
+            <GraffitiBlocksTable
+              blocks={blocks.blocks}
+              isLoading={blocks.isLoading}
+              error={blocks.error}
+              hasNextPage={blocks.hasNextPage}
+              isFetchingNextPage={blocks.isFetchingNextPage}
+              onLoadMore={blocks.fetchNextPage}
+            />
+          )}
         </div>
       )}
     </Container>

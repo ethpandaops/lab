@@ -452,7 +452,7 @@ export function DetailPage(): JSX.Element {
       )}
 
       {/* Navigation Controls */}
-      <div className="mb-6 flex items-center justify-between gap-4">
+      <div className="mb-6 flex items-center justify-between gap-2 sm:gap-4">
         <Button
           variant="secondary"
           size="sm"
@@ -472,8 +472,9 @@ export function DetailPage(): JSX.Element {
             rounded="sm"
             leadingIcon={<ArrowDownTrayIcon />}
             onClick={() => setDownloadOpen(true)}
+            aria-label="Download"
           >
-            Download
+            <span className="hidden sm:inline">Download</span>
           </Button>
         )}
         {currentNetwork &&
@@ -488,10 +489,12 @@ export function DetailPage(): JSX.Element {
                   hour: Math.floor(slotTimestamp / 3600) * 3600,
                   date: new Date(slotTimestamp * 1000).toISOString().split('T')[0],
                 }}
+                aria-label="View Custody"
+                title="View Custody"
                 className="flex items-center gap-1.5 rounded-sm border border-accent/30 bg-accent/10 px-3 py-2 text-sm font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
               >
                 <EyeIcon className="size-4" />
-                <span>View Custody</span>
+                <span className="hidden sm:inline">View Custody</span>
               </Link>
             );
           })()}

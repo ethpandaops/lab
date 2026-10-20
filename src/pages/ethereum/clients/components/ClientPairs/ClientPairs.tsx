@@ -10,7 +10,7 @@ export interface ClientPairsProps {
   pairs: ClientPairSummary[];
   /** How many pairs to show */
   limit?: number;
-  /** Called with a pair to filter the blocks table */
+  /** Called with a pair to filter the page by */
   onSelect: (pair: ClientPairSummary) => void;
 }
 

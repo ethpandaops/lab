@@ -6,11 +6,12 @@ import { Slot } from '@/components/Ethereum/Slot';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { Badge } from '@/components/Elements/Badge';
 import { Button } from '@/components/Elements/Button';
+import { Entity } from '@/components/Ethereum/Entity';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import type { FctBlockGraffiti } from '@/api/types.gen';
 import { ClientLabel } from '@/components/Ethereum/ClientLabel';
 import { GRAFFITI_FORMAT_LABELS } from '../../constants';
-import { formatClientName, normaliseClient } from '../../utils/client-share';
+import { normaliseClient } from '../../utils/client-share';
 
 export interface GraffitiBlocksTableProps {
   blocks: FctBlockGraffiti[];
@@ -19,12 +20,6 @@ export interface GraffitiBlocksTableProps {
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   onLoadMore: () => void;
-  /** Active consensus client filter */
-  consensusClient?: string;
-  /** Active execution client filter */
-  executionClient?: string;
-  /** Clears one of the filters */
-  onClearFilter: (layer: 'consensus' | 'execution') => void;
 }
 
 /** Badge color per graffiti format: client codes and version strings parsed, the rest did not */
@@ -53,6 +48,10 @@ const columns: Column<FctBlockGraffiti>[] = [
     header: 'Proposer',
     accessor: row => row.proposer_index ?? '-',
     cellClassName: 'tabular-nums text-muted',
+  },
+  {
+    header: 'Entity',
+    accessor: row => <Entity entity={row.entity} className="text-sm/6" />,
   },
   {
     header: 'Consensus',
@@ -100,37 +99,16 @@ export function GraffitiBlocksTable({
   hasNextPage,
   isFetchingNextPage,
   onLoadMore,
-  consensusClient,
-  executionClient,
-  onClearFilter,
 }: GraffitiBlocksTableProps): JSX.Element {
-  const hasFilter = !!consensusClient || !!executionClient;
-
   return (
     <Card
       rounded
       header={
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-col gap-1">
-            <h3 className="text-sm/6 font-semibold text-foreground">Blocks</h3>
-            <p className="text-xs/5 text-muted">
-              Raw graffiti and the clients parsed from it. Pick a client or pair above to filter.
-            </p>
-          </div>
-          {hasFilter && (
-            <div className="flex flex-wrap gap-2">
-              {consensusClient && (
-                <Badge color="indigo" pill onRemove={() => onClearFilter('consensus')}>
-                  Consensus: {formatClientName(consensusClient)}
-                </Badge>
-              )}
-              {executionClient && (
-                <Badge color="indigo" pill onRemove={() => onClearFilter('execution')}>
-                  Execution: {formatClientName(executionClient)}
-                </Badge>
-              )}
-            </div>
-          )}
+        <div className="flex flex-col gap-1">
+          <h3 className="text-sm/6 font-semibold text-foreground">Blocks</h3>
+          <p className="text-xs/5 text-muted">
+            Raw graffiti and the clients parsed from it, matching the filters above
+          </p>
         </div>
       }
     >

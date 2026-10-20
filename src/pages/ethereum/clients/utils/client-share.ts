@@ -247,3 +247,95 @@ export function dailyDateValues(days: number, now: number = Date.now()): string 
   }
   return dates.join(',');
 }
+
+/** Active client filters for the page */
+export interface ClientFilters {
+  consensusClient?: string;
+  executionClient?: string;
+}
+
+/**
+ * Records matching the client filters. `exceptLayer` skips that layer's own filter, so a breakdown or share
+ * chart can show the selected client among the others instead of collapsing to 100%.
+ */
+export function filterRecords(
+  records: ClientCountRecord[],
+  filters: ClientFilters,
+  exceptLayer?: ClientLayer
+): ClientCountRecord[] {
+  const consensus = exceptLayer === 'consensus' ? undefined : filters.consensusClient;
+  const execution = exceptLayer === 'execution' ? undefined : filters.executionClient;
+  if (!consensus && !execution) return records;
+  return records.filter(
+    record =>
+      (!consensus || record.consensusClient === consensus) && (!execution || record.executionClient === execution)
+  );
+}
+
+/** Entity name the validator counts give validators without a mapping */
+const UNKNOWN_ENTITY = 'unknown';
+
+/** Prefix that marks an entity filter value as a group: every entity whose name ends with the rest */
+const GROUP_MARKER = '*';
+
+/** Entities split per node operator that can also be filtered as a whole, by name suffix */
+export const ENTITY_GROUPS: ReadonlyArray<{ suffix: string; label: string }> = [
+  { suffix: 'lido', label: 'Lido (all node operators)' },
+];
+
+/** An entity to filter by, with its active validator count */
+export interface EntityOption {
+  /** Entity name, or a group value such as "*lido" */
+  entity: string;
+  validators: number;
+  /** Display name when it differs from the entity */
+  label?: string;
+}
+
+/**
+ * API filter for an entity filter value: an exact match, or a suffix match for a group.
+ */
+export function entityQuery(entity: string): { entity_eq: string } | { entity_ends_with: string } {
+  return entity.startsWith(GROUP_MARKER) ? { entity_ends_with: entity.slice(1) } : { entity_eq: entity };
+}
+
+/**
+ * Display name for an entity filter value.
+ */
+export function entityLabel(entity: string): string {
+  if (!entity.startsWith(GROUP_MARKER)) return entity;
+  const suffix = entity.slice(1);
+  return ENTITY_GROUPS.find(group => group.suffix === suffix)?.label ?? entity;
+}
+
+/**
+ * Entities from daily per-entity validator counts, using each entity's latest day, plus a group option for each
+ * entry in {@link ENTITY_GROUPS} with several members, largest first. The counts label unmapped validators
+ * "unknown", which the graffiti tables leave empty, so that bucket is not offered.
+ */
+export function toEntityOptions(
+  rows: Array<{ day_start_date?: string; entity?: string; validator_count?: number }>
+): EntityOption[] {
+  const latest = new Map<string, { day: string; validators: number }>();
+  for (const row of rows) {
+    const entity = row.entity?.trim();
+    const day = row.day_start_date ?? '';
+    if (!entity || entity === UNKNOWN_ENTITY) continue;
+    const current = latest.get(entity);
+    if (!current || day > current.day) {
+      latest.set(entity, { day, validators: row.validator_count ?? 0 });
+    } else if (day === current.day) {
+      current.validators += row.validator_count ?? 0;
+    }
+  }
+
+  const options: EntityOption[] = [...latest.entries()].map(([entity, { validators }]) => ({ entity, validators }));
+  const groups = ENTITY_GROUPS.flatMap(({ suffix, label }) => {
+    const members = options.filter(option => option.entity.endsWith(suffix));
+    if (members.length < 2) return [];
+    const validators = members.reduce((sum, member) => sum + member.validators, 0);
+    return [{ entity: `${GROUP_MARKER}${suffix}`, validators, label }];
+  });
+
+  return [...groups, ...options].sort((a, b) => b.validators - a.validators || a.entity.localeCompare(b.entity));
+}

@@ -78,6 +78,10 @@ import {
   fctBlockDataColumnSidecarFirstSeenServiceList,
   fctBlockFirstSeenByNodeServiceGet,
   fctBlockFirstSeenByNodeServiceList,
+  fctBlockGraffitiClientByEntityDailyServiceGet,
+  fctBlockGraffitiClientByEntityDailyServiceList,
+  fctBlockGraffitiClientByEntityHourlyServiceGet,
+  fctBlockGraffitiClientByEntityHourlyServiceList,
   fctBlockGraffitiClientDailyServiceGet,
   fctBlockGraffitiClientDailyServiceList,
   fctBlockGraffitiClientHourlyServiceGet,
@@ -334,6 +338,8 @@ import {
   intContractStorageReactivation1mServiceList,
   intContractStorageReactivation24mServiceGet,
   intContractStorageReactivation24mServiceList,
+  intContractStorageReactivation6mServiceGet,
+  intContractStorageReactivation6mServiceList,
   intContractStorageStateByAddressServiceGet,
   intContractStorageStateByAddressServiceList,
   intContractStorageStateByBlockServiceGet,
@@ -653,6 +659,18 @@ import type {
   FctBlockFirstSeenByNodeServiceListData,
   FctBlockFirstSeenByNodeServiceListError,
   FctBlockFirstSeenByNodeServiceListResponse,
+  FctBlockGraffitiClientByEntityDailyServiceGetData,
+  FctBlockGraffitiClientByEntityDailyServiceGetError,
+  FctBlockGraffitiClientByEntityDailyServiceGetResponse,
+  FctBlockGraffitiClientByEntityDailyServiceListData,
+  FctBlockGraffitiClientByEntityDailyServiceListError,
+  FctBlockGraffitiClientByEntityDailyServiceListResponse,
+  FctBlockGraffitiClientByEntityHourlyServiceGetData,
+  FctBlockGraffitiClientByEntityHourlyServiceGetError,
+  FctBlockGraffitiClientByEntityHourlyServiceGetResponse,
+  FctBlockGraffitiClientByEntityHourlyServiceListData,
+  FctBlockGraffitiClientByEntityHourlyServiceListError,
+  FctBlockGraffitiClientByEntityHourlyServiceListResponse,
   FctBlockGraffitiClientDailyServiceGetData,
   FctBlockGraffitiClientDailyServiceGetError,
   FctBlockGraffitiClientDailyServiceGetResponse,
@@ -1421,6 +1439,12 @@ import type {
   IntContractStorageReactivation24mServiceListData,
   IntContractStorageReactivation24mServiceListError,
   IntContractStorageReactivation24mServiceListResponse,
+  IntContractStorageReactivation6mServiceGetData,
+  IntContractStorageReactivation6mServiceGetError,
+  IntContractStorageReactivation6mServiceGetResponse,
+  IntContractStorageReactivation6mServiceListData,
+  IntContractStorageReactivation6mServiceListError,
+  IntContractStorageReactivation6mServiceListResponse,
   IntContractStorageStateByAddressServiceGetData,
   IntContractStorageStateByAddressServiceGetError,
   IntContractStorageStateByAddressServiceGetResponse,
@@ -3972,6 +3996,126 @@ export const fctBlockGraffitiServiceGetOptions = (options: Options<FctBlockGraff
       return data;
     },
     queryKey: fctBlockGraffitiServiceGetQueryKey(options),
+  });
+
+export const fctBlockGraffitiClientByEntityDailyServiceListQueryKey = (
+  options?: Options<FctBlockGraffitiClientByEntityDailyServiceListData>
+) => createQueryKey('fctBlockGraffitiClientByEntityDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockGraffitiClientByEntityDailyServiceListOptions = (
+  options?: Options<FctBlockGraffitiClientByEntityDailyServiceListData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientByEntityDailyServiceListResponse,
+    FctBlockGraffitiClientByEntityDailyServiceListError,
+    FctBlockGraffitiClientByEntityDailyServiceListResponse,
+    ReturnType<typeof fctBlockGraffitiClientByEntityDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientByEntityDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientByEntityDailyServiceListQueryKey(options),
+  });
+
+export const fctBlockGraffitiClientByEntityDailyServiceGetQueryKey = (
+  options: Options<FctBlockGraffitiClientByEntityDailyServiceGetData>
+) => createQueryKey('fctBlockGraffitiClientByEntityDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockGraffitiClientByEntityDailyServiceGetOptions = (
+  options: Options<FctBlockGraffitiClientByEntityDailyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientByEntityDailyServiceGetResponse,
+    FctBlockGraffitiClientByEntityDailyServiceGetError,
+    FctBlockGraffitiClientByEntityDailyServiceGetResponse,
+    ReturnType<typeof fctBlockGraffitiClientByEntityDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientByEntityDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientByEntityDailyServiceGetQueryKey(options),
+  });
+
+export const fctBlockGraffitiClientByEntityHourlyServiceListQueryKey = (
+  options?: Options<FctBlockGraffitiClientByEntityHourlyServiceListData>
+) => createQueryKey('fctBlockGraffitiClientByEntityHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockGraffitiClientByEntityHourlyServiceListOptions = (
+  options?: Options<FctBlockGraffitiClientByEntityHourlyServiceListData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientByEntityHourlyServiceListResponse,
+    FctBlockGraffitiClientByEntityHourlyServiceListError,
+    FctBlockGraffitiClientByEntityHourlyServiceListResponse,
+    ReturnType<typeof fctBlockGraffitiClientByEntityHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientByEntityHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientByEntityHourlyServiceListQueryKey(options),
+  });
+
+export const fctBlockGraffitiClientByEntityHourlyServiceGetQueryKey = (
+  options: Options<FctBlockGraffitiClientByEntityHourlyServiceGetData>
+) => createQueryKey('fctBlockGraffitiClientByEntityHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctBlockGraffitiClientByEntityHourlyServiceGetOptions = (
+  options: Options<FctBlockGraffitiClientByEntityHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientByEntityHourlyServiceGetResponse,
+    FctBlockGraffitiClientByEntityHourlyServiceGetError,
+    FctBlockGraffitiClientByEntityHourlyServiceGetResponse,
+    ReturnType<typeof fctBlockGraffitiClientByEntityHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientByEntityHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientByEntityHourlyServiceGetQueryKey(options),
   });
 
 export const fctBlockGraffitiClientDailyServiceListQueryKey = (
@@ -11098,6 +11242,66 @@ export const intContractStorageReactivation1mServiceGetOptions = (
       return data;
     },
     queryKey: intContractStorageReactivation1mServiceGetQueryKey(options),
+  });
+
+export const intContractStorageReactivation6mServiceListQueryKey = (
+  options?: Options<IntContractStorageReactivation6mServiceListData>
+) => createQueryKey('intContractStorageReactivation6mServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intContractStorageReactivation6mServiceListOptions = (
+  options?: Options<IntContractStorageReactivation6mServiceListData>
+) =>
+  queryOptions<
+    IntContractStorageReactivation6mServiceListResponse,
+    IntContractStorageReactivation6mServiceListError,
+    IntContractStorageReactivation6mServiceListResponse,
+    ReturnType<typeof intContractStorageReactivation6mServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intContractStorageReactivation6mServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intContractStorageReactivation6mServiceListQueryKey(options),
+  });
+
+export const intContractStorageReactivation6mServiceGetQueryKey = (
+  options: Options<IntContractStorageReactivation6mServiceGetData>
+) => createQueryKey('intContractStorageReactivation6mServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intContractStorageReactivation6mServiceGetOptions = (
+  options: Options<IntContractStorageReactivation6mServiceGetData>
+) =>
+  queryOptions<
+    IntContractStorageReactivation6mServiceGetResponse,
+    IntContractStorageReactivation6mServiceGetError,
+    IntContractStorageReactivation6mServiceGetResponse,
+    ReturnType<typeof intContractStorageReactivation6mServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intContractStorageReactivation6mServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intContractStorageReactivation6mServiceGetQueryKey(options),
   });
 
 export const intContractStorageReactivation12mServiceListQueryKey = (
