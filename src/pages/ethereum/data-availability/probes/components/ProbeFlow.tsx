@@ -18,13 +18,15 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
   const isSuccess = probe.result === 'success';
   const isFailure = probe.result === 'failure';
 
-  // Calculate total data requested
+  // Calculate total data requested: one cell per blob in each column
   const columnsCount = probe.column_indices?.length ?? 0;
-  const cellsCount = columnsCount;
+  const blobCount = probe.blob_submitters?.length ?? 0;
+  const cellsCount = columnsCount * blobCount;
   const cellSizeKiB = 2;
   const totalSizeKiB = cellsCount * cellSizeKiB;
   const totalSizeMiB = totalSizeKiB / 1024;
-  const sizeDisplay = totalSizeMiB >= 1 ? `${totalSizeMiB.toFixed(1)} MiB` : `${totalSizeKiB} KiB`;
+  const sizeDisplay =
+    blobCount === 0 ? '---' : totalSizeMiB >= 1 ? `${totalSizeMiB.toFixed(1)} MiB` : `${totalSizeKiB} KiB`;
 
   // Get country codes for flags
   const clientCountryCode = probe.meta_client_geo_country_code;

@@ -48,9 +48,7 @@ export function RecentActivityTable({ epochs }: RecentActivityTableProps): JSX.E
       },
       {
         header: 'Attestations Attested',
-        accessor: row => (
-          <span className="text-success">{(row.totalAttestations - row.missedAttestations).toLocaleString()}</span>
-        ),
+        accessor: row => <span className="text-success">{row.totalAttestations.toLocaleString()}</span>,
       },
       {
         header: 'Attestations Missed',

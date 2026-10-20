@@ -24,7 +24,7 @@ export interface EntityEpochData {
   epoch: number;
   /** Epoch start timestamp (Unix seconds) */
   epochStartDateTime: number;
-  /** Total attestations in this epoch */
+  /** Attested (non-missed) attestations in this epoch */
   totalAttestations: number;
   /** Missed attestations in this epoch */
   missedAttestations: number;

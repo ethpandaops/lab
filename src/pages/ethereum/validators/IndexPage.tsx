@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { MagnifyingGlassIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
+import { useNetwork } from '@/hooks/useNetwork';
 import { useValidatorsData, useValidatorResolver, useValidatorStatus } from './hooks';
 import {
   ValidatorInput,
@@ -57,6 +58,7 @@ function tagsFromUrl(indices?: string): string[] {
 export function IndexPage(): JSX.Element {
   const navigate = useNavigate();
   const search = useSearch({ from: '/ethereum/validators/' }) as ValidatorsSearch;
+  const { currentNetwork } = useNetwork();
 
   // Initialize state from URL params or defaults
   const defaultRange = getDefaultTimeRange();
@@ -176,13 +178,14 @@ export function IndexPage(): JSX.Element {
 
   // Handle download report
   const handleDownloadReport = useCallback(() => {
-    if (!summary) return;
+    if (!summary || !currentNetwork) return;
 
     const markdown = generateValidatorReport({
       validators,
       summary,
       thresholds,
       timeRange,
+      network: currentNetwork.name,
       url: window.location.href,
       blockProposals,
       validatorMap,
@@ -195,7 +198,7 @@ export function IndexPage(): JSX.Element {
     a.download = `validator-report-${new Date().toISOString().split('T')[0]}.md`;
     a.click();
     URL.revokeObjectURL(url);
-  }, [validators, summary, thresholds, timeRange, blockProposals, validatorMap]);
+  }, [validators, summary, thresholds, timeRange, currentNetwork, blockProposals, validatorMap]);
 
   return (
     <Container>
