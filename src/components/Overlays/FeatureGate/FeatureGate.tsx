@@ -3,6 +3,7 @@ import { useLocation, Link } from '@tanstack/react-router';
 import { useIsPageEnabled } from '@/hooks/useIsPageEnabled';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useConfig } from '@/hooks/useConfig';
+import { getNetworkFullLabel } from '@/utils/networks';
 
 interface FeatureGateProps {
   children: React.ReactNode;
@@ -47,7 +48,10 @@ export function FeatureGate({ children }: FeatureGateProps): JSX.Element {
           <h1 className="text-2xl font-bold text-foreground">Feature Not Available</h1>
           <p className="mt-4 max-w-md text-center text-muted">
             This feature is not available on{' '}
-            <span className="font-semibold text-foreground">{currentNetwork?.display_name}</span>.
+            <span className="font-semibold text-foreground">
+              {currentNetwork && getNetworkFullLabel(currentNetwork)}
+            </span>
+            .
           </p>
 
           {availableNetworks.length > 0 && (
@@ -61,7 +65,7 @@ export function FeatureGate({ children }: FeatureGateProps): JSX.Element {
                     search={{ network: network.name }}
                     className="font-medium text-primary hover:underline"
                   >
-                    {network.display_name}
+                    {getNetworkFullLabel(network)}
                   </Link>
                 </Fragment>
               ))}
