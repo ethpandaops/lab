@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 import { Card } from '@/components/Layout/Card';
 import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
-import { ClientLabel } from '../ClientLabel';
+import { ClientLabel } from '@/components/Ethereum/ClientLabel';
 import type { ClientPairSummary } from '../../utils/client-share';
 
 export interface ClientPairsProps {

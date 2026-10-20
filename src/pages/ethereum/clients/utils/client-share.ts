@@ -1,7 +1,9 @@
 import type { SeriesData } from '@/components/Charts/MultiLine';
 import { getClientColor } from '@/utils/ethereum';
 import { formatDailyDate, formatHourlyDate } from '@/pages/ethereum/execution/overview/overview.utils';
-import { UNKNOWN_CLIENT } from '../constants';
+import { UNKNOWN_CLIENT, formatClientName } from '@/utils/graffiti';
+
+export { formatClientName };
 
 /** Which client layer a breakdown is for */
 export type ClientLayer = 'consensus' | 'execution';
@@ -205,21 +207,6 @@ export function buildShareChartConfig(
     labels: keys.map(key => (isDaily ? formatDailyDate(key) : formatHourlyDate(Number(key)))),
     series,
   };
-}
-
-/** Display names for clients whose identifier does not capitalise cleanly */
-const CLIENT_DISPLAY_NAMES: Record<string, string> = {
-  nimbusel: 'Nimbus EL',
-  ethereumjs: 'EthereumJS',
-  'trin-execution': 'Trin Execution',
-};
-
-/**
- * Display name for a client: capitalised, with unknown as "Unknown".
- */
-export function formatClientName(client: string): string {
-  if (client === UNKNOWN_CLIENT) return 'Unknown';
-  return CLIENT_DISPLAY_NAMES[client] ?? client.charAt(0).toUpperCase() + client.slice(1);
 }
 
 /** One tooltip line for a client in a time bucket */

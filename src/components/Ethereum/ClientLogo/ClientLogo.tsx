@@ -1,5 +1,6 @@
 import { type JSX, useState } from 'react';
 import { CubeIcon } from '@heroicons/react/24/outline';
+import clsx from 'clsx';
 import type { ClientLogoProps } from './ClientLogo.types';
 
 /** Map client name aliases to canonical names */
@@ -12,6 +13,9 @@ function normalizeClientName(clientName: string): string {
   const lower = clientName.toLowerCase();
   return CLIENT_ALIASES[lower] ?? lower;
 }
+
+/** Logos drawn in white on transparent, inverted on light themes so they stay visible */
+const LIGHT_GLYPH_LOGOS = new Set(['lighthouse']);
 
 function getClientLogoUrl(clientName: string): string {
   return `/images/external/clients/${normalizeClientName(clientName)}.png`;
@@ -36,7 +40,11 @@ export function ClientLogo({ client, size = 20, className = '' }: ClientLogoProp
     <img
       src={getClientLogoUrl(client)}
       alt={client}
-      className={`rounded-sm ${className}`}
+      className={clsx(
+        'rounded-sm',
+        LIGHT_GLYPH_LOGOS.has(normalizeClientName(client)) && 'invert dark:invert-0 star:invert-0',
+        className
+      )}
       style={{ width: `${size}px`, height: `${size}px` }}
       title={client}
       onError={() => setHasError(true)}

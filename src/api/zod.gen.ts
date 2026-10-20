@@ -72,6 +72,34 @@ export const zDimBlockBlobSubmitter = z.object({
   versioned_hashes: z.optional(z.array(z.string())),
 });
 
+export const zDimClientRelease = z.object({
+  client: z.optional(z.string()),
+  commit_sha: z.optional(z.string()),
+  layer: z.optional(z.string()),
+  prerelease: z.optional(z.boolean()),
+  release_date: z.optional(
+    z.union([
+      z
+        .int()
+        .check(
+          z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+          z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+        ),
+      z.null(),
+    ])
+  ),
+  tag: z.optional(z.string()),
+  updated_date_time: z.optional(
+    z
+      .int()
+      .check(
+        z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+        z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+      )
+  ),
+  version: z.optional(z.string()),
+});
+
 export const zDimContractOwner = z.object({
   account_owner: z.optional(z.union([z.string(), z.null()])),
   contract_address: z.optional(z.string()),
@@ -9705,6 +9733,13 @@ export const zGetDimBlockBlobSubmitterResponse = z.object({
 });
 
 /**
+ * Response for getting a single dim_client_release record
+ */
+export const zGetDimClientReleaseResponse = z.object({
+  item: z.optional(zDimClientRelease),
+});
+
+/**
  * Response for getting a single dim_contract_owner record
  */
 export const zGetDimContractOwnerResponse = z.object({
@@ -16318,6 +16353,14 @@ export const zListDimBlockBlobSubmitterResponse = z.object({
 });
 
 /**
+ * Response for listing dim_client_release records
+ */
+export const zListDimClientReleaseResponse = z.object({
+  dim_client_release: z.optional(z.array(zDimClientRelease)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
  * Response for listing dim_contract_owner records
  */
 export const zListDimContractOwnerResponse = z.object({
@@ -18683,6 +18726,222 @@ export const zDimBlockBlobSubmitterServiceGetData = z.object({
  * OK
  */
 export const zDimBlockBlobSubmitterServiceGetResponse = zGetDimBlockBlobSubmitterResponse;
+
+export const zDimClientReleaseServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      client_eq: z.optional(z.string()),
+      client_ne: z.optional(z.string()),
+      client_contains: z.optional(z.string()),
+      client_starts_with: z.optional(z.string()),
+      client_ends_with: z.optional(z.string()),
+      client_like: z.optional(z.string()),
+      client_not_like: z.optional(z.string()),
+      client_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      client_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      commit_sha_eq: z.optional(z.string()),
+      commit_sha_ne: z.optional(z.string()),
+      commit_sha_contains: z.optional(z.string()),
+      commit_sha_starts_with: z.optional(z.string()),
+      commit_sha_ends_with: z.optional(z.string()),
+      commit_sha_like: z.optional(z.string()),
+      commit_sha_not_like: z.optional(z.string()),
+      commit_sha_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      commit_sha_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      tag_eq: z.optional(z.string()),
+      tag_ne: z.optional(z.string()),
+      tag_contains: z.optional(z.string()),
+      tag_starts_with: z.optional(z.string()),
+      tag_ends_with: z.optional(z.string()),
+      tag_like: z.optional(z.string()),
+      tag_not_like: z.optional(z.string()),
+      tag_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      tag_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      updated_date_time_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      layer_eq: z.optional(z.string()),
+      layer_ne: z.optional(z.string()),
+      layer_contains: z.optional(z.string()),
+      layer_starts_with: z.optional(z.string()),
+      layer_ends_with: z.optional(z.string()),
+      layer_like: z.optional(z.string()),
+      layer_not_like: z.optional(z.string()),
+      layer_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      layer_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      version_eq: z.optional(z.string()),
+      version_ne: z.optional(z.string()),
+      version_contains: z.optional(z.string()),
+      version_starts_with: z.optional(z.string()),
+      version_ends_with: z.optional(z.string()),
+      version_like: z.optional(z.string()),
+      version_not_like: z.optional(z.string()),
+      version_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      version_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      release_date_eq: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      release_date_ne: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      release_date_lt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      release_date_lte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      release_date_gt: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      release_date_gte: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      release_date_between_min: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      release_date_between_max_value: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(0, { error: 'Invalid value: Expected uint32 to be >= 0' }),
+            z.maximum(4294967295, { error: 'Invalid value: Expected uint32 to be <= 4294967295' })
+          )
+      ),
+      release_date_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      release_date_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      prerelease_eq: z.optional(z.boolean()),
+      prerelease_ne: z.optional(z.boolean()),
+      page_size: z.optional(
+        z
+          .int()
+          .check(
+            z.minimum(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }),
+            z.maximum(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' })
+          )
+      ),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zDimClientReleaseServiceListResponse = zListDimClientReleaseResponse;
+
+export const zDimClientReleaseServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    client: z.string(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zDimClientReleaseServiceGetResponse = zGetDimClientReleaseResponse;
 
 export const zDimContractOwnerServiceListData = z.object({
   body: z.optional(z.never()),

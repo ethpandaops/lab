@@ -1,3 +1,4 @@
+export { UNKNOWN_CLIENT, GRAFFITI_FORMAT_LABELS } from '@/utils/graffiti';
 import { z } from 'zod';
 
 /** Available time period options for the client share charts */
@@ -45,19 +46,5 @@ export const PAGE_SIZE = 10_000;
 /** Page size for the blocks table */
 export const BLOCKS_PAGE_SIZE = 25;
 
-/** Client name the models use when the graffiti names no client */
-export const UNKNOWN_CLIENT = 'unknown';
-
 /** Table that holds one row per block, used for bounds and the blocks table */
 export const BLOCK_GRAFFITI_TABLE = 'fct_block_graffiti';
-
-/** Human readable labels for the graffiti_format column */
-export const GRAFFITI_FORMAT_LABELS: Record<string, string> = {
-  codes_full: 'Client codes, 8 char commits',
-  codes_long: 'Client codes, 4 char commits',
-  codes_short: 'Client codes, 2 char commits',
-  codes_min: 'Client codes',
-  version_string: 'Client version string',
-  none: 'Unrecognised text',
-  empty: 'Empty',
-};

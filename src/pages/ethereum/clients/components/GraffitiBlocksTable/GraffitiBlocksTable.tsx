@@ -8,7 +8,7 @@ import { Badge } from '@/components/Elements/Badge';
 import { Button } from '@/components/Elements/Button';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import type { FctBlockGraffiti } from '@/api/types.gen';
-import { ClientLabel } from '../ClientLabel';
+import { ClientLabel } from '@/components/Ethereum/ClientLabel';
 import { GRAFFITI_FORMAT_LABELS } from '../../constants';
 import { formatClientName, normaliseClient } from '../../utils/client-share';
 
