@@ -12,6 +12,7 @@ import { slotToEpoch, epochToTimestamp, SECONDS_PER_SLOT, SLOTS_PER_EPOCH } from
 import { getAllDiscordFormats, DISCORD_STYLE_LABELS } from '@/utils/discord-timestamp';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
 import { formatSlot, formatEpoch } from '@/utils/number';
+import { getNetworkFullLabel } from '@/utils/networks';
 import { Slot } from '@/components/Ethereum/Slot';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import type { DiscordTimestampStyle } from '@/utils/discord-timestamp';
@@ -179,7 +180,7 @@ function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.E
             <TabPanel>
               <div className="mb-3 flex items-center gap-2 text-sm/6 text-muted">
                 <NetworkIcon networkName={currentNetwork.name} className="size-5" />
-                <span className="font-semibold text-foreground">{currentNetwork.display_name}</span>
+                <span className="font-semibold text-foreground">{getNetworkFullLabel(currentNetwork)}</span>
               </div>
               <div className="overflow-hidden rounded-sm border border-border">
                 <table className="w-full">

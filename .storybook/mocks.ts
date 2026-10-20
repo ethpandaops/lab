@@ -130,6 +130,30 @@ export const mockConfig: Config = {
         },
       },
     },
+    {
+      name: 'glamsterdam-devnet-7',
+      display_name: 'Glamsterdam-devnet-7',
+      chain_id: 7091047533,
+      genesis_time: 1784808000,
+      genesis_delay: 60,
+      forks: {
+        consensus: {
+          gloas: { epoch: 0, min_client_versions: {} },
+        },
+      },
+    },
+    {
+      name: 'glamsterdam-devnet-8',
+      display_name: 'Glamsterdam-devnet-8',
+      chain_id: 7091047534,
+      genesis_time: 1786622400,
+      genesis_delay: 60,
+      forks: {
+        consensus: {
+          gloas: { epoch: 0, min_client_versions: {} },
+        },
+      },
+    },
   ],
   features: [],
 };

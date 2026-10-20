@@ -67,6 +67,22 @@ export const WithHoleskySelected: Story = {
 };
 
 /**
+ * Network selector with a devnet pre-selected. The button shows the devnet family above the
+ * devnet label, and the menu lists devnets under their family heading.
+ */
+export const WithDevnetSelected: Story = {
+  args: {
+    showLabel: false,
+  },
+  parameters: {
+    router: {
+      initialUrl: '/',
+      initialSearch: { network: 'glamsterdam-devnet-8' },
+    },
+  },
+};
+
+/**
  * Network selector with Sepolia pre-selected via URL params.
  */
 export const WithSepoliaSelected: Story = {

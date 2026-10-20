@@ -31,6 +31,7 @@ import { GitHubIcon } from '@/components/Elements/Icons';
 import { ThemeToggle } from '@/components/Layout/ThemeToggle';
 import { useConfig } from '@/hooks/useConfig';
 import { useNetwork } from '@/hooks/useNetwork';
+import { getNetworkFullLabel } from '@/utils/networks';
 import type { SidebarProps } from './Sidebar.types';
 
 /**
@@ -428,7 +429,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
           {/* Network Selector */}
           {collapsed ? (
             currentNetwork && (
-              <div className="flex justify-center" title={currentNetwork.display_name}>
+              <div className="flex justify-center" title={getNetworkFullLabel(currentNetwork)}>
                 <NetworkIcon networkName={currentNetwork.name} className="size-6" />
               </div>
             )

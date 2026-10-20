@@ -14,6 +14,7 @@ import { CopyToClipboard } from '@/components/Elements/CopyToClipboard';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
 import { useChartDownload } from '@/hooks/useChartDownload';
 import { useNetwork } from '@/hooks/useNetwork';
+import { getNetworkFullLabel } from '@/utils/networks';
 import type { PopoutCardProps } from './PopoutCard.types';
 
 /**
@@ -123,7 +124,7 @@ export function PopoutCard({
   // Metadata footer for downloads (only shown during screenshot capture)
   const metadataTitle = downloadMetadataTitle || document.title;
   const metadataSubtitle = downloadMetadataSubtitle || window.location.href;
-  const metadataNetwork = downloadMetadataNetwork || currentNetwork?.display_name || '';
+  const metadataNetwork = downloadMetadataNetwork || (currentNetwork ? getNetworkFullLabel(currentNetwork) : '');
   const metadataFooter =
     appendMetadataToDownload && showMetadata ? (
       <div

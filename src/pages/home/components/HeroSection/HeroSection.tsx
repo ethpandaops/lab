@@ -1,11 +1,11 @@
-import { type JSX, useEffect, useMemo, useRef, useState } from 'react';
+import { type JSX, Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
 import { type Network } from '@/hooks/useConfig/useConfig.types';
 import { useNetwork } from '@/hooks/useNetwork';
 import { SECONDS_PER_SLOT, SLOTS_PER_EPOCH } from '@/utils/beacon';
 import { getActiveFork } from '@/utils/forks';
-import { NETWORK_ORDER } from '@/utils/networks';
+import { getNetworkShortLabel, groupNetworks } from '@/utils/networks';
 import { formatSlot } from '@/utils/number';
 
 /** Compute the current slot for a network from its genesis time. */
@@ -88,7 +88,7 @@ function NetworkCard({
       <div className="flex items-center gap-1.5">
         <span className="size-1.5 rounded-full bg-success transition-shadow duration-200 group-hover:shadow-[0_0_6px_var(--color-success)]" />
         <span className="text-xs/4 font-semibold tracking-tight text-foreground sm:text-sm/4">
-          {network.display_name}
+          {getNetworkShortLabel(network)}
         </span>
       </div>
       <span className="text-[10px]/3 font-medium tracking-wide text-muted uppercase">{forkLabel}</span>
@@ -117,13 +117,7 @@ export function HeroSection(): JSX.Element {
   const { networks, setCurrentNetwork } = useNetwork();
   const now = useNow();
 
-  const { staticNets, devnets } = useMemo(() => {
-    const s = networks
-      .filter(n => NETWORK_ORDER.includes(n.name))
-      .sort((a, b) => NETWORK_ORDER.indexOf(a.name) - NETWORK_ORDER.indexOf(b.name));
-    const d = networks.filter(n => !NETWORK_ORDER.includes(n.name));
-    return { staticNets: s, devnets: d };
-  }, [networks]);
+  const groups = useMemo(() => groupNetworks(networks), [networks]);
 
   return (
     <div className="relative flex min-h-dvh flex-col justify-start lg:justify-center lg:overflow-hidden">
@@ -157,27 +151,22 @@ export function HeroSection(): JSX.Element {
         </div>
 
         {/* Network instrument panels */}
-        {(staticNets.length > 0 || devnets.length > 0) && (
+        {groups.length > 0 && (
           <div className="mx-auto mt-6 flex max-w-4xl animate-fade-in-delay-2 flex-col items-center gap-3 sm:mt-8 lg:mt-12">
-            {staticNets.length > 0 && (
-              <div className="flex flex-wrap justify-center gap-3">
-                {staticNets.map(network => (
-                  <NetworkCard key={network.name} network={network} now={now} onSelectNetwork={setCurrentNetwork} />
-                ))}
-              </div>
-            )}
-            {devnets.length > 0 && (
-              <>
-                <span className="mt-1 text-[10px]/3 font-medium tracking-[0.15em] text-muted/40 uppercase">
-                  Devnets
-                </span>
+            {groups.map(group => (
+              <Fragment key={group.id}>
+                {group.id !== 'public' && (
+                  <span className="mt-1 text-[10px]/3 font-medium tracking-[0.15em] text-muted/40 uppercase">
+                    {group.id === 'other' ? 'Devnets' : `${group.label} devnets`}
+                  </span>
+                )}
                 <div className="flex flex-wrap justify-center gap-3">
-                  {devnets.map(network => (
+                  {group.networks.map(network => (
                     <NetworkCard key={network.name} network={network} now={now} onSelectNetwork={setCurrentNetwork} />
                   ))}
                 </div>
-              </>
-            )}
+              </Fragment>
+            ))}
           </div>
         )}
       </div>
