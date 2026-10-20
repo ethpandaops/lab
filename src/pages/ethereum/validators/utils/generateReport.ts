@@ -6,6 +6,7 @@ export interface ReportParams {
   summary: AggregateSummary;
   thresholds: ThresholdValues;
   timeRange: { from: number; to: number };
+  network: string;
   url: string;
   blockProposals?: BlockProposalDataPoint[];
   validatorMap?: Map<number, string>;
@@ -50,6 +51,7 @@ export function generateValidatorReport({
   summary,
   thresholds,
   timeRange,
+  network,
   url,
   blockProposals = [],
   validatorMap,
@@ -69,7 +71,7 @@ export function generateValidatorReport({
   sections.push('## Configuration');
   sections.push('');
   sections.push(`- **Generated**: ${generatedAt}`);
-  sections.push(`- **Network**: mainnet`);
+  sections.push(`- **Network**: ${network}`);
   sections.push(`- **Validators Analyzed**: ${summary.totalValidators}`);
   sections.push(`- **Time Range**: ${fromDate} to ${toDate}`);
   sections.push('');

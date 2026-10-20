@@ -279,56 +279,29 @@ export function ForksTimeline({
                                         );
                                       }
                                     })()
-                                  : blobIndex > 0
-                                    ? (() => {
-                                        const prevBlob = blobItems[blobIndex - 1];
-                                        const epochsSincePrev = blobItem.epoch - prevBlob.epoch;
-                                        const daysSincePrev = Math.floor((epochsSincePrev * 32 * 12) / 86400);
+                                  : (() => {
+                                      const epochsSinceActivation = currentEpoch - blobItem.epoch;
+                                      const daysSinceActivation = Math.floor((epochsSinceActivation * 32 * 12) / 86400);
 
-                                        if (daysSincePrev < 60) {
-                                          return (
-                                            <p className="text-xs text-muted">Activated {daysSincePrev} days ago</p>
-                                          );
-                                        } else if (daysSincePrev < 730) {
-                                          const months = Math.floor(daysSincePrev / 30);
-                                          return <p className="text-xs text-muted">Activated {months} months ago</p>;
-                                        } else {
-                                          const years = Math.floor(daysSincePrev / 365);
-                                          const remainingMonths = Math.floor((daysSincePrev % 365) / 30);
-                                          return (
-                                            <p className="text-xs text-muted">
-                                              Activated {years}y {remainingMonths > 0 ? `${remainingMonths}m` : ''} ago
-                                            </p>
-                                          );
-                                        }
-                                      })()
-                                    : (() => {
-                                        const epochsSinceActivation = currentEpoch - blobItem.epoch;
-                                        const daysSinceActivation = Math.floor(
-                                          (epochsSinceActivation * 32 * 12) / 86400
+                                      if (daysSinceActivation < 1) {
+                                        return <p className="text-xs text-muted">Activated recently</p>;
+                                      } else if (daysSinceActivation < 60) {
+                                        return (
+                                          <p className="text-xs text-muted">Activated {daysSinceActivation} days ago</p>
                                         );
-
-                                        if (daysSinceActivation < 1) {
-                                          return <p className="text-xs text-muted">Activated recently</p>;
-                                        } else if (daysSinceActivation < 60) {
-                                          return (
-                                            <p className="text-xs text-muted">
-                                              Activated {daysSinceActivation} days ago
-                                            </p>
-                                          );
-                                        } else if (daysSinceActivation < 730) {
-                                          const months = Math.floor(daysSinceActivation / 30);
-                                          return <p className="text-xs text-muted">Activated {months} months ago</p>;
-                                        } else {
-                                          const years = Math.floor(daysSinceActivation / 365);
-                                          const remainingMonths = Math.floor((daysSinceActivation % 365) / 30);
-                                          return (
-                                            <p className="text-xs text-muted">
-                                              Activated {years}y {remainingMonths > 0 ? `${remainingMonths}m` : ''} ago
-                                            </p>
-                                          );
-                                        }
-                                      })()}
+                                      } else if (daysSinceActivation < 730) {
+                                        const months = Math.floor(daysSinceActivation / 30);
+                                        return <p className="text-xs text-muted">Activated {months} months ago</p>;
+                                      } else {
+                                        const years = Math.floor(daysSinceActivation / 365);
+                                        const remainingMonths = Math.floor((daysSinceActivation % 365) / 30);
+                                        return (
+                                          <p className="text-xs text-muted">
+                                            Activated {years}y {remainingMonths > 0 ? `${remainingMonths}m` : ''} ago
+                                          </p>
+                                        );
+                                      }
+                                    })()}
                               </div>
                             </div>
                           </div>
