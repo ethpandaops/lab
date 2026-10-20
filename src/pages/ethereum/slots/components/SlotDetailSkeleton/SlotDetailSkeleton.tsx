@@ -197,10 +197,7 @@ export function SlotDetailSkeleton({ slot, epoch }: SlotDetailSkeletonProps): JS
               <div className="space-y-6">
                 {/* Performance Metrics Card */}
                 <Card>
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold text-foreground">Performance Metrics</h3>
-                    <p className="text-sm text-muted">Block timing and attestation statistics</p>
-                  </div>
+                  <h3 className="mb-4 text-lg font-semibold text-foreground">Performance Metrics</h3>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {['Block First Seen At', 'Gas Used', 'Participation', 'Block Votes'].map(label => (
                       <div key={label}>
@@ -218,10 +215,7 @@ export function SlotDetailSkeleton({ slot, epoch }: SlotDetailSkeletonProps): JS
 
                 {/* Network Propagation Card */}
                 <Card>
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold text-foreground">Network Propagation</h3>
-                    <p className="text-sm text-muted">Nodes that received block data</p>
-                  </div>
+                  <h3 className="mb-4 text-lg font-semibold text-foreground">Network Propagation</h3>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <div>
                       <dt className="text-xs font-medium text-muted">Block Nodes</dt>
@@ -234,10 +228,7 @@ export function SlotDetailSkeleton({ slot, epoch }: SlotDetailSkeletonProps): JS
 
                 {/* MEV Activity Card */}
                 <Card>
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold text-foreground">MEV Activity</h3>
-                    <p className="text-sm text-muted">Block builder and relay participation</p>
-                  </div>
+                  <h3 className="mb-4 text-lg font-semibold text-foreground">MEV Activity</h3>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {['Relays', 'Builders'].map(label => (
                       <div key={label}>

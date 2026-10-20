@@ -12,7 +12,7 @@ export function IndexPage(): JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title="Fork Readiness" description="Track node readiness for upcoming Ethereum consensus layer forks" />
+        <Header title="Fork Readiness" />
         <ForkReadinessLoading />
       </Container>
     );
@@ -33,7 +33,7 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      <Header title="Fork Readiness" description="Track node readiness for upcoming Ethereum consensus layer forks" />
+      <Header title="Fork Readiness" />
 
       <div className="space-y-4">
         {upcomingForks.length > 0 ? (
@@ -45,11 +45,7 @@ export function IndexPage(): JSX.Element {
             </div>
           </Disclosure>
         ) : (
-          <Alert
-            variant="info"
-            title="No upcoming forks"
-            description="There are no upcoming forks configured at this time."
-          />
+          <Alert variant="info" title="No upcoming forks" />
         )}
 
         {pastForks.map(fork => (

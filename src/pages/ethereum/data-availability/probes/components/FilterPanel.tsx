@@ -190,7 +190,6 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
             <span>Filter Probes</span>
           </div>
         }
-        description="Apply filters to narrow down probe results"
         size="xl"
       >
         <div className="space-y-4">
@@ -214,7 +213,6 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateDraft('slot', e.target.value ? Number(e.target.value) : undefined)
                   }
-                  placeholder="Slot number"
                 />
               </Input>
             </div>
@@ -227,7 +225,6 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateDraft('column', e.target.value ? Number(e.target.value) : undefined)
                   }
-                  placeholder="Column index"
                 />
               </Input>
             </div>
@@ -318,7 +315,6 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                       type="text"
                       value={draftFilters.nodeId || ''}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateDraft('nodeId', e.target.value)}
-                      placeholder="Node identifier"
                     />
                   </Input>
                 </div>
@@ -331,7 +327,6 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         updateDraft('proberVersion', e.target.value)
                       }
-                      placeholder="Version string"
                     />
                   </Input>
                 </div>
@@ -345,7 +340,6 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           updateDraft('proberCountry', e.target.value)
                         }
-                        placeholder="Country"
                       />
                     </Input>
                   </div>
@@ -356,7 +350,6 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                         type="text"
                         value={draftFilters.proberCity || ''}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateDraft('proberCity', e.target.value)}
-                        placeholder="City"
                       />
                     </Input>
                   </div>
@@ -370,7 +363,6 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         updateDraft('proberAsn', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      placeholder="AS number"
                     />
                   </Input>
                 </div>
@@ -410,7 +402,6 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                       type="text"
                       value={draftFilters.peerVersion || ''}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateDraft('peerVersion', e.target.value)}
-                      placeholder="Version string"
                     />
                   </Input>
                 </div>
@@ -424,7 +415,6 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           updateDraft('peerCountry', e.target.value)
                         }
-                        placeholder="Country"
                       />
                     </Input>
                   </div>
@@ -435,7 +425,6 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                         type="text"
                         value={draftFilters.peerCity || ''}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateDraft('peerCity', e.target.value)}
-                        placeholder="City"
                       />
                     </Input>
                   </div>
@@ -449,7 +438,6 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         updateDraft('peerAsn', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      placeholder="AS number"
                     />
                   </Input>
                 </div>

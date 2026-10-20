@@ -158,10 +158,7 @@ export function SlotProgressTimeline({
   if (isLoading || executionLoading) {
     return (
       <Card>
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold text-foreground">Slot Trace</h3>
-          <p className="text-sm text-muted">Event timeline trace view</p>
-        </div>
+        <h3 className="mb-4 text-lg font-semibold text-foreground">Slot Trace</h3>
         <div className="h-64 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30 bg-[length:200%_100%]" />
       </Card>
     );
@@ -171,10 +168,7 @@ export function SlotProgressTimeline({
   if (spans.length <= 1) {
     return (
       <Card>
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold text-foreground">Slot Trace</h3>
-          <p className="text-sm text-muted">Event timeline trace view</p>
-        </div>
+        <h3 className="mb-4 text-lg font-semibold text-foreground">Slot Trace</h3>
         <div className="py-8 text-center">
           <p className="text-muted">No trace data available for this slot</p>
         </div>

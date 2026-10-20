@@ -756,10 +756,7 @@ export function ProbesView({
             Each probe samples a specific peer&apos;s custody of data columns, validating responses against KZG
             commitments.
           </p>
-          <p>
-            The prober (our node) requests data from a peer, and the result indicates whether the peer successfully
-            provided valid data for the requested columns.
-          </p>
+          <p>The prober (our node) requests data from a peer.</p>
           <div className="rounded-sm border border-accent/20 bg-accent/5 p-3">
             <p className="text-foreground">
               <span className="font-medium">Result meanings:</span>
@@ -778,10 +775,6 @@ export function ProbesView({
               </li>
             </ul>
           </div>
-          <p>
-            Use the filters to drill down into specific probers, peers, geographic regions, client implementations, or
-            time ranges to analyze custody behavior across the network.
-          </p>
         </div>
       </Dialog>
 

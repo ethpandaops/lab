@@ -151,13 +151,7 @@ export function AttestationArrivalsChart({
   }
 
   return (
-    <PopoutCard
-      title={title}
-      anchorId={anchorId}
-      subtitle={participationMessage}
-      modalSize="fullscreen"
-      modalDescription="Shows when attestations arrived during the slot, grouped by which block they voted for. Each line represents votes for a different block at varying distances from the current slot."
-    >
+    <PopoutCard title={title} anchorId={anchorId} subtitle={participationMessage} modalSize="fullscreen">
       {({ inModal }) => (
         <div className={inModal ? 'h-[calc(100vh-12rem)]' : 'h-80'}>
           <MultiLineChart

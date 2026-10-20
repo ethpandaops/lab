@@ -229,20 +229,15 @@ export function ProbeDetailDialog({
                     ? 'Probe incomplete - peer may still have this data'
                     : "This peer doesn't appear to have this data"}
               </span>
-              {/* Reassuring link - only show for failure/missing */}
               {probe.slot !== undefined && probe.result !== 'success' && (
-                <div className="flex items-center gap-1.5 text-xs text-muted">
-                  <span>This is just one probe.</span>
-                  <Link
-                    to="/ethereum/data-availability/probes"
-                    search={{ slot: probe.slot }}
-                    className="inline-flex items-center gap-1 text-primary transition-colors hover:text-primary/80 hover:underline"
-                  >
-                    <MagnifyingGlassIcon className="size-3" />
-                    <span>View all probes for this slot</span>
-                  </Link>
-                  <span>to see the full picture.</span>
-                </div>
+                <Link
+                  to="/ethereum/data-availability/probes"
+                  search={{ slot: probe.slot }}
+                  className="inline-flex w-fit items-center gap-1 text-xs text-primary transition-colors hover:text-primary/80 hover:underline"
+                >
+                  <MagnifyingGlassIcon className="size-3" />
+                  <span>View all probes for this slot</span>
+                </Link>
               )}
             </div>
 
@@ -363,7 +358,6 @@ export function ProbeDetailDialog({
           <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
             <CpuChipIcon className="size-4 text-primary" />
             Client Details
-            {onFilterClick && <span className="text-[10px] font-normal text-muted normal-case">(click to filter)</span>}
           </h4>
 
           <div className="overflow-x-auto rounded-lg border border-border">
@@ -524,9 +518,6 @@ export function ProbeDetailDialog({
             <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
               <ListBulletIcon className="size-4 text-primary" />
               Probed Columns
-              {onFilterClick && (
-                <span className="text-[10px] font-normal text-muted normal-case">(click to filter)</span>
-              )}
             </h4>
             <div className="max-h-32 overflow-y-auto rounded border border-border/50 bg-muted/30 p-2">
               <div className="flex flex-wrap gap-1">

@@ -147,11 +147,11 @@ export function DetailPage(): React.JSX.Element {
     if (!bpo) {
       return (
         <Container>
-          <Header title="BPO Not Found" description={`The BPO "${params.fork}" is not configured on this network`} />
+          <Header title="BPO Not Found" />
           <Alert
             variant="warning"
             title="BPO Not Available"
-            description={`The BPO "${params.fork}" is not scheduled for this network. BPO forks are blob parameter changes that occur independently of consensus forks.`}
+            description={`The BPO "${params.fork}" is not scheduled for this network.`}
           />
         </Container>
       );
@@ -174,11 +174,11 @@ export function DetailPage(): React.JSX.Element {
   if (!fork) {
     return (
       <Container>
-        <Header title="Fork Not Found" description={`The fork "${params.fork}" is not configured on this network`} />
+        <Header title="Fork Not Found" />
         <Alert
           variant="warning"
           title="Fork Not Available"
-          description={`The fork "${params.fork}" is not scheduled for this network. It may be a future upgrade that hasn't been announced yet, or the network may not support this fork.`}
+          description={`The fork "${params.fork}" is not scheduled for this network.`}
         />
       </Container>
     );
@@ -637,9 +637,6 @@ function BPOParentForkCard({ bpo }: BPOParentForkCardProps): React.JSX.Element {
     <Card>
       <div className="p-6">
         <h3 className="text-lg font-semibold text-foreground">Parent Fork</h3>
-        <p className="mt-1 text-sm text-muted">
-          This BPO is a blob parameter change within the {bpo.parentFork.displayName} fork
-        </p>
 
         <div className="mt-6">
           <Link
@@ -800,7 +797,6 @@ function ForkLinksCard({ fork }: ForkLinksCardProps): React.JSX.Element {
     <Card>
       <div className="p-6">
         <h3 className="text-lg font-semibold text-foreground">External Resources</h3>
-        <p className="mt-1 text-sm text-muted">Learn more about this upgrade</p>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {links.map(link => (
@@ -847,7 +843,6 @@ function BPOLinksCard(): React.JSX.Element {
     <Card>
       <div className="p-6">
         <h3 className="text-lg font-semibold text-foreground">External Resources</h3>
-        <p className="mt-1 text-sm text-muted">Learn more about BPO forks</p>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {links.map(link => (

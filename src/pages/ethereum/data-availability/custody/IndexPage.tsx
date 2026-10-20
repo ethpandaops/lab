@@ -997,25 +997,13 @@ export function IndexPage(): JSX.Element {
       <Dialog open={learnMoreOpen} onClose={() => setLearnMoreOpen(false)} title="About PeerDAS Custody" size="lg">
         <div className="space-y-4 text-sm leading-relaxed text-muted">
           <p>
-            <span className="font-medium text-foreground">
-              PeerDAS transforms Ethereum&apos;s data availability layer.
-            </span>{' '}
             Instead of every node storing every blob, data is erasure coded with 2x redundancy and split into 128
             columns. Each node commits to storing a subset based on its identity and validator balance.
           </p>
+          <p>64 distinct columns are required to reconstruct the full blob matrix.</p>
           <p>
-            64 distinct columns are required to reconstruct the full blob matrix, enabling dramatic scalability
-            improvements while maintaining the network&apos;s security guarantees.
-          </p>
-          <div className="rounded-sm border border-accent/20 bg-accent/5 p-3">
-            <p className="text-foreground">
-              <span className="font-medium">This dashboard answers a critical question:</span>{' '}
-              <span className="italic">are peers actually storing the data they claim?</span>
-            </p>
-          </div>
-          <p>
-            To answer this, we continuously sample nodes in the network, validate their responses against KZG
-            commitments, and build a real-time picture of custody compliance across all 128 columns.
+            We continuously sample nodes in the network, validate their responses against KZG commitments, and build a
+            real-time picture of custody compliance across all 128 columns.
           </p>
         </div>
       </Dialog>

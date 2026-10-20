@@ -35,10 +35,7 @@ export function EngineTimingsCard({
   if (isLoading) {
     return (
       <Card>
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold text-foreground">Engine API Timings</h3>
-          <p className="text-sm text-muted">How execution clients processed this block</p>
-        </div>
+        <h3 className="mb-4 text-lg font-semibold text-foreground">Engine API Timings</h3>
         <div className="space-y-3">
           <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30 bg-[length:200%_100%]" />
           <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30 bg-[length:200%_100%]" />

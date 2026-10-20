@@ -412,10 +412,7 @@ export function PayloadsView({
         <div className="mb-4 flex items-center rounded-sm border border-green-500/30 bg-green-500/10 px-4 py-2">
           <div className="flex items-center gap-3">
             <SignalIcon className="size-5 text-green-500" />
-            <div>
-              <span className="text-sm font-medium text-green-500">Live Mode Active</span>
-              <span className="ml-2 text-xs text-muted">Showing latest observations in real-time</span>
-            </div>
+            <span className="text-sm font-medium text-green-500">Live Mode Active</span>
           </div>
         </div>
       )}
@@ -462,9 +459,7 @@ export function PayloadsView({
 
       {/* Live mode info */}
       {isLive && data.length > 0 && (
-        <div className="mt-2 text-center text-xs text-muted">
-          Showing latest {data.length} observations (max 50) • New items animate in
-        </div>
+        <div className="mt-2 text-center text-xs text-muted">Showing latest {data.length} observations (max 50)</div>
       )}
 
       {/* Reference Nodes Info Dialog */}

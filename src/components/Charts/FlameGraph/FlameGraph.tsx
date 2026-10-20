@@ -699,11 +699,6 @@ export function FlameGraph({
                     </div>
                   )}
 
-                  {/* Click hint for zoomable nodes */}
-                  {hoveredNode.children && hoveredNode.children.length > 0 && (
-                    <div className="mt-3 text-center text-xs text-muted">Click to zoom in</div>
-                  )}
-
                   {/* Error indicator */}
                   {hoveredNode.hasError && (
                     <div className="mt-3 flex items-center gap-2 rounded-xs bg-danger/10 px-2 py-1.5 text-xs text-danger">

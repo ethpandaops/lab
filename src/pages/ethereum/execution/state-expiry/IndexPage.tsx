@@ -1,11 +1,5 @@
 import { type JSX, useMemo, useCallback, useState } from 'react';
-import {
-  CubeIcon,
-  CursorArrowRaysIcon,
-  DocumentTextIcon,
-  ClockIcon,
-  InformationCircleIcon,
-} from '@heroicons/react/24/outline';
+import { CubeIcon, DocumentTextIcon, ClockIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { Container } from '@/components/Layout/Container';
 import { Card } from '@/components/Layout/Card';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
@@ -66,24 +60,23 @@ const POLICY_SELECTOR_CONFIG: PolicySelectorConfig<ExpiryType, ExpiryPolicy> = {
     '12m': {
       shortLabel: '1y',
       fullLabel: '1 year',
-      tooltip: 'Storage expires after 1 year of inactivity. More aggressive pruning.',
+      tooltip: 'Storage expires after 1 year of inactivity.',
     },
     '24m': {
       shortLabel: '2y',
       fullLabel: '2 years',
-      tooltip: 'Storage expires after 2 years of inactivity. More conservative.',
+      tooltip: 'Storage expires after 2 years of inactivity.',
     },
   },
   typeTooltips: {
     slot: {
       title: 'Slot-based expiry',
       description:
-        "Tracks each storage slot independently. A slot expires if it hasn't been accessed within the inactivity period. More aggressive pruning, finer control.",
+        "Tracks each storage slot independently. A slot expires if it hasn't been accessed within the inactivity period.",
     },
     contract: {
       title: 'Contract-based expiry',
-      description:
-        'Groups all slots by contract. If ANY slot is accessed, the entire contract stays active. Simpler but less aggressive.',
+      description: 'Groups all slots by contract. If ANY slot is accessed, the entire contract stays active.',
     },
   },
 };
@@ -448,12 +441,6 @@ export function IndexPage(): JSX.Element {
 
       {!error && (
         <div className="space-y-4">
-          {/* Call to action - always visible */}
-          <div className="inline-flex items-center gap-2 rounded-sm border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary">
-            <CursorArrowRaysIcon className="size-4 shrink-0" />
-            <span>Select an expiry policy below to see how much storage could be removed</span>
-          </div>
-
           {/* Policy Selector - integrated with current state and resulting values */}
           <PolicySelector
             selectedType={selectedType}

@@ -51,8 +51,8 @@ export function AttestationRateChart({ data }: AttestationRateChartProps): React
   // Handle empty state
   if (series.length === 0) {
     return (
-      <PopoutCard title="Online Rate" subtitle="No attestation data available">
-        {() => <Alert variant="info" title="No Data" description="No attestation data available for this entity." />}
+      <PopoutCard title="Online Rate">
+        {() => <Alert variant="info" description="No attestation data available for this entity." />}
       </PopoutCard>
     );
   }

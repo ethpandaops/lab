@@ -667,7 +667,7 @@ export function IndexPage(): JSX.Element {
 
   // Chart subtitles
   const subtitles = {
-    tps: isDaily ? 'Daily TPS with statistical bands' : `Hourly TPS over ${config.days} days`,
+    tps: isDaily ? 'Daily TPS' : `Hourly TPS over ${config.days} days`,
     transactions: isDaily
       ? 'Daily transactions per block with cumulative'
       : `Hourly transactions over ${config.days} days`,
@@ -679,7 +679,6 @@ export function IndexPage(): JSX.Element {
     <Container>
       <div className="mb-8">
         <h1 className="text-4xl/tight font-bold text-foreground">Execution Overview</h1>
-        <p className="mt-1 text-muted">Ethereum execution layer throughput and metrics</p>
       </div>
 
       {/* Time Period Selector */}

@@ -171,8 +171,8 @@ export function TopEntitiesChart({
   // Handle empty state
   if (series.length === 0) {
     return (
-      <PopoutCard title={title} subtitle={emptyMessage} anchorId={anchorId} modalSize={modalSize}>
-        {() => <Alert variant="info" title="No Data" description={emptyMessage} />}
+      <PopoutCard title={title} anchorId={anchorId} modalSize={modalSize}>
+        {() => <Alert variant="info" description={emptyMessage} />}
       </PopoutCard>
     );
   }

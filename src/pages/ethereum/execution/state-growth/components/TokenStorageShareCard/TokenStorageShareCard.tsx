@@ -58,13 +58,11 @@ export function TokenStorageShareCard({ data }: TokenStorageShareCardProps): JSX
         name: 'ERC20',
         value: snapshot.erc20,
         color: themeColors.primary,
-        description: 'Slots owned by ERC20 token contracts',
       },
       {
         name: 'ERC721',
         value: snapshot.erc721,
         color: '#3b82f6',
-        description: 'Slots owned by ERC721 token contracts',
       },
       {
         name: 'Others',
@@ -76,7 +74,7 @@ export function TokenStorageShareCard({ data }: TokenStorageShareCardProps): JSX
   }, [snapshot, themeColors]);
 
   const subtitle = snapshot
-    ? `${new Date(snapshot.day).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} · ${formatBillions(snapshot.total)} slots`
+    ? `${new Date(snapshot.day).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}, ${formatBillions(snapshot.total)} slots`
     : undefined;
 
   return (

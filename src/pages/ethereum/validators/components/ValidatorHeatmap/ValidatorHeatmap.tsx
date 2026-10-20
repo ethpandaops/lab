@@ -877,7 +877,7 @@ export function ValidatorHeatmap({
               Back to hourly view
             </button>
             <span className="text-sm text-muted">
-              {formatFullDate(drillDownDay!)} &middot; {formatHourLabel(drillDownHour)}
+              {formatFullDate(drillDownDay!)} / {formatHourLabel(drillDownHour)}
             </span>
           </div>
 
@@ -945,9 +945,7 @@ export function ValidatorHeatmap({
               <ArrowLeftIcon className="size-4" />
               Back to daily view
             </button>
-            <span className="text-sm text-muted">
-              {formatFullDate(drillDownDay)} &middot; Select a cell to explore slot details
-            </span>
+            <span className="text-sm text-muted">{formatFullDate(drillDownDay)}</span>
           </div>
 
           {metricToggle}
@@ -1005,10 +1003,6 @@ export function ValidatorHeatmap({
   return (
     <Card className={clsx('p-4', className)}>
       <div ref={containerRef}>
-        <div className="mb-4 flex items-center gap-3">
-          <span className="text-sm text-muted">Select a cell to explore hourly breakdown</span>
-        </div>
-
         {metricToggle}
 
         {activeDailyData.length === 0 ? (

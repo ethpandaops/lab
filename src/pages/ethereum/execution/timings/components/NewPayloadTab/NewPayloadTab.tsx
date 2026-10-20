@@ -497,7 +497,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <PopoutCard
             title="Per-Slot Duration by Client"
-            subtitle="Median duration for each slot, grouped by execution client"
+            subtitle="Median duration for each slot"
             anchorId="slot-duration"
             modalSize="full"
           >
@@ -523,12 +523,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
             }
           </PopoutCard>
 
-          <PopoutCard
-            title="Block Complexity vs Duration"
-            subtitle="Gas used vs processing time, grouped by execution client"
-            anchorId="block-complexity"
-            modalSize="full"
-          >
+          <PopoutCard title="Block Complexity vs Duration" anchorId="block-complexity" modalSize="full">
             {({ inModal }) =>
               hasBlockComplexityData ? (
                 <>
@@ -590,11 +585,6 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
           {hourlyTrendSeries.length > 0 && hourlyTrendSeries.some(s => s.data.length > 0) && (
             <PopoutCard
               title={`Hourly ${selectedPercentile === 'p50' ? 'P50' : 'P95'} Duration by Client`}
-              subtitle={
-                selectedPercentile === 'p50'
-                  ? '50th percentile duration over time, grouped by execution client'
-                  : '95th percentile duration over time (tail latency)'
-              }
               anchorId="hourly-duration"
               modalSize="full"
               headerActions={
@@ -748,12 +738,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
       {/* Duration Histogram and Status Distribution — per-slot data */}
       {showPerSlotCharts && (
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <PopoutCard
-            title="Duration Distribution (50ms buckets)"
-            subtitle="Histogram of engine_newPayload call durations"
-            anchorId="duration-histogram"
-            modalSize="full"
-          >
+          <PopoutCard title="Duration Distribution (50ms buckets)" anchorId="duration-histogram" modalSize="full">
             {({ inModal }) =>
               histogramData.length > 0 ? (
                 <BarChart
@@ -768,12 +753,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
             }
           </PopoutCard>
 
-          <PopoutCard
-            title="Status Distribution"
-            subtitle="Breakdown of validation status responses"
-            anchorId="status-distribution"
-            modalSize="full"
-          >
+          <PopoutCard title="Status Distribution" anchorId="status-distribution" modalSize="full">
             {({ inModal }) =>
               statusData.some(d => d.value > 0) ? (
                 <BarChart

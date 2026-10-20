@@ -23,10 +23,7 @@ export function IndexPage(): JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header
-          title="Locally Built Blocks"
-          description="Blocks built locally by sentry nodes. Useful for analyzing client block building capabilities."
-        />
+        <Header title="Locally Built Blocks" />
         <Alert variant="error" title="Failed to load data" description={error.message} />
       </Container>
     );
@@ -35,15 +32,12 @@ export function IndexPage(): JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header
-          title="Locally Built Blocks"
-          description="Blocks built locally by sentry nodes. Useful for analyzing client block building capabilities."
-        />
+        <Header title="Locally Built Blocks" />
         <div className="mb-6">
           <Alert
             variant="info"
             title="About Locally Built Blocks"
-            description="These blocks were built locally by ethPandaOps sentry nodes. They represent what each node would have proposed if selected as a block proposer. This data is useful for comparing different client implementations and their transaction selection strategies across various execution and consensus client pairings."
+            description="These blocks were built locally by ethPandaOps sentry nodes. They represent what each node would have proposed if selected as a block proposer."
           />
         </div>
         <LocallyBuiltBlocksSkeleton />
@@ -54,10 +48,7 @@ export function IndexPage(): JSX.Element {
   return (
     <Container>
       <div className="flex items-center gap-2">
-        <Header
-          title="Locally Built Blocks"
-          description="Blocks built locally by sentry nodes. Useful for analyzing client block building capabilities."
-        />
+        <Header title="Locally Built Blocks" />
         {isFetching && (
           <div className="inline-block h-2 w-2 animate-pulse rounded-full bg-primary" title="Refreshing data..." />
         )}
@@ -67,7 +58,7 @@ export function IndexPage(): JSX.Element {
         <Alert
           variant="info"
           title="About Locally Built Blocks"
-          description="These blocks were built locally by ethPandaOps sentry nodes. They represent what each node would have proposed if selected as a block proposer. This data is useful for comparing different client implementations and their transaction selection strategies across various execution and consensus client pairings."
+          description="These blocks were built locally by ethPandaOps sentry nodes. They represent what each node would have proposed if selected as a block proposer."
         />
       </div>
 

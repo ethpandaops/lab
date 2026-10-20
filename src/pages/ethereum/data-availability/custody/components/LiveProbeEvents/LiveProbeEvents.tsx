@@ -228,7 +228,6 @@ export function LiveProbeEvents({
               <div className="py-8 text-center">
                 <SignalIcon className="mx-auto mb-2 size-8 text-muted/50" />
                 <p className="text-sm text-muted">No probes found</p>
-                <p className="text-xs text-muted/70">{contextLabel}</p>
               </div>
             ) : (
               // Event rows

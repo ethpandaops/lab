@@ -91,7 +91,7 @@ export function CallTreeSection({
 
   if (!displayTree) {
     return (
-      <PopoutCard title={title} subtitle="Visualize the call hierarchy">
+      <PopoutCard title={title}>
         {() => (
           <div className="flex h-[200px] items-center justify-center text-sm text-muted">
             No call tree data available
@@ -102,7 +102,7 @@ export function CallTreeSection({
   }
 
   return (
-    <PopoutCard title={title} subtitle="Visualize the call hierarchy">
+    <PopoutCard title={title}>
       {({ inModal }) => (
         <>
           <FlameGraph

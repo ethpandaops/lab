@@ -296,7 +296,7 @@ export function transformBlobsToRows(
 
       // Get submitter name from the array (index = blob index), default to UNKNOWN
       const submitter = blobSubmitters?.[blobIndex] ?? 'UNKNOWN';
-      const label = `${blobIndex} · ${submitter}`;
+      const label = `${blobIndex} / ${submitter}`;
 
       return {
         identifier,

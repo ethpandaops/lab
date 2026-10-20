@@ -10,7 +10,7 @@ import type { FilterValues } from './FilterPanel';
 type QuickFilterPreset = {
   id: string;
   label: string;
-  description: string;
+  description?: string;
   icon?: JSX.Element;
   blobPosterLogos?: string[];
   filters: Partial<FilterValues>;
@@ -68,7 +68,6 @@ const PRESETS: QuickFilterPreset[] = [
   {
     id: 'top-l2s',
     label: 'Top L2s',
-    description: 'Filter to blobs from top Layer 2 networks',
     blobPosterLogos: ['base', 'arbitrum', 'optimism', 'scroll'],
     filters: {
       blobPosters: TOP_L2S,
@@ -77,7 +76,6 @@ const PRESETS: QuickFilterPreset[] = [
   {
     id: 'failures',
     label: 'Failures Only',
-    description: 'Show only failed probe attempts',
     icon: <XCircleIcon className="size-4 text-yellow-500" />,
     filters: {
       result: 'failure',
@@ -95,7 +93,6 @@ const PRESETS: QuickFilterPreset[] = [
   {
     id: 'successes',
     label: 'Successes Only',
-    description: 'Show only successful probes',
     icon: <CheckCircleIcon className="size-4 text-green-500" />,
     filters: {
       result: 'success',

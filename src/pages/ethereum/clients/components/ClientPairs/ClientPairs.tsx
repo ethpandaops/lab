@@ -36,15 +36,7 @@ const columns: Column<ClientPairSummary>[] = [
  */
 export function ClientPairs({ pairs, limit = 10, onSelect }: ClientPairsProps): JSX.Element {
   return (
-    <Card
-      rounded
-      header={
-        <div className="flex flex-col gap-1">
-          <h3 className="text-sm/6 font-semibold text-foreground">Client pairs</h3>
-          <p className="text-xs/5 text-muted">Most common consensus and execution client combinations</p>
-        </div>
-      }
-    >
+    <Card rounded header={<h3 className="text-sm/6 font-semibold text-foreground">Client pairs</h3>}>
       <Table
         variant="nested"
         data={pairs.slice(0, limit)}

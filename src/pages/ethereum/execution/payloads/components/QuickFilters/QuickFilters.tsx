@@ -19,7 +19,7 @@ import { DEFAULT_DURATION_MIN } from '../../IndexPage.types';
 type QuickFilterPreset = {
   id: string;
   label: string;
-  description: string;
+  description?: string;
   icon: JSX.Element;
   filters: Partial<FilterValues>;
 };
@@ -64,14 +64,12 @@ const CORE_PRESETS: QuickFilterPreset[] = [
   {
     id: 'slow-500ms',
     label: '500ms+',
-    description: 'Payloads taking 500ms or longer',
     icon: <ClockIcon className="size-4 text-yellow-500" />,
     filters: { durationMin: 500 },
   },
   {
     id: 'slow-1s',
     label: '1s+',
-    description: 'Payloads taking 1 second or longer',
     icon: <ClockIcon className="size-4 text-orange-500" />,
     filters: { durationMin: 1000 },
   },
@@ -89,14 +87,12 @@ const EXTRA_PRESETS: QuickFilterPreset[] = [
   {
     id: 'high-gas',
     label: '50M+ Gas',
-    description: 'Blocks using 50M+ gas',
     icon: <FireIcon className="size-4 text-amber-500" />,
     filters: { gasUsedMin: 50_000_000 },
   },
   {
     id: 'many-txs',
     label: '300+ Txs',
-    description: 'Blocks with 300+ transactions',
     icon: <QueueListIcon className="size-4 text-blue-500" />,
     filters: { txCountMin: 300 },
   },

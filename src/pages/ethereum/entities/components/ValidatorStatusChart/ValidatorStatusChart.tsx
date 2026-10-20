@@ -58,10 +58,8 @@ export function ValidatorStatusChart({ data, timePeriod }: ValidatorStatusChartP
 
   if (!data || series.length === 0) {
     return (
-      <PopoutCard title="Validator Count by Status" subtitle="No data available">
-        {() => (
-          <Alert variant="info" title="No Data" description="No validator status data available for this entity." />
-        )}
+      <PopoutCard title="Validator Count by Status">
+        {() => <Alert variant="info" description="No validator status data available for this entity." />}
       </PopoutCard>
     );
   }

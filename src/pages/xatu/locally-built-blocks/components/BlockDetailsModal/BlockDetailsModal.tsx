@@ -411,15 +411,6 @@ function BlockDetails({
           <div className="text-xs text-muted">Consensus Value</div>
           <div className="text-sm text-foreground">{formatEth(block.consensus_payload_value)}</div>
         </div>
-
-        <div className="mt-4 rounded-sm bg-background p-3">
-          <div className="text-xs font-medium text-muted">Block Context</div>
-          <div className="mt-1 text-xs leading-relaxed text-muted">
-            This block was built locally by a node running {block.meta_client_name}. It represents what the node would
-            have proposed if selected as a block proposer for slot {block.slot ? formatSlot(block.slot) : 'N/A'}. This
-            data is useful for comparing different client implementations and their transaction selection strategies.
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -57,8 +57,8 @@ export function AttestationVolumeChart({ data }: AttestationVolumeChartProps): R
   // Handle empty state
   if (series.length === 0) {
     return (
-      <PopoutCard title="Attestation Liveness" subtitle="No attestation data available">
-        {() => <Alert variant="info" title="No Data" description="No attestation data available for this entity." />}
+      <PopoutCard title="Attestation Liveness">
+        {() => <Alert variant="info" description="No attestation data available for this entity." />}
       </PopoutCard>
     );
   }

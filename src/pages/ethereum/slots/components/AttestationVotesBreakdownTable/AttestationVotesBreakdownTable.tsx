@@ -77,7 +77,7 @@ export function AttestationVotesBreakdownTable({
     <PopoutCard
       title="Attestation Vote Breakdown"
       subtitle={`Total votes: ${totalVotes.toLocaleString()} • Offline: ${offlineCount.toLocaleString()}`}
-      modalDescription="Shows which blocks validators voted for as the head of the chain. Each row represents a different block that received attestations."
+      modalDescription="Shows which blocks validators voted for as the head of the chain."
       noPadding
       modalSize="full"
     >

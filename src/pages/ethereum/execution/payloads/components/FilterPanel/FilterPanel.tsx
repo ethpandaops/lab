@@ -253,7 +253,6 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
             <span>Filter Slow Blocks</span>
           </div>
         }
-        description="Apply filters to narrow down slow block results"
         size="xl"
         allowContentOverflow
       >

@@ -335,7 +335,7 @@ export function CallPage(): JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title="Internal Tx Details" description="Internal tx gas analysis" />
+        <Header title="Internal Tx Details" />
         <GasProfilerSkeleton />
       </Container>
     );
@@ -345,7 +345,7 @@ export function CallPage(): JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header title="Internal Tx Details" description="Internal tx gas analysis" />
+        <Header title="Internal Tx Details" />
         <Alert variant="error" title="Error loading internal tx" description={error.message} />
       </Container>
     );
@@ -355,7 +355,7 @@ export function CallPage(): JSX.Element {
   if (!txData) {
     return (
       <Container>
-        <Header title="Internal Tx Details" description="Internal tx gas analysis" />
+        <Header title="Internal Tx Details" />
         <Alert
           variant="warning"
           title="Transaction not found"
@@ -378,7 +378,7 @@ export function CallPage(): JSX.Element {
   if (!currentFrame) {
     return (
       <Container>
-        <Header title="Internal Tx Details" description="Internal tx gas analysis" />
+        <Header title="Internal Tx Details" />
         <Alert
           variant="warning"
           title="Internal tx not found"
@@ -411,7 +411,7 @@ export function CallPage(): JSX.Element {
 
   return (
     <Container>
-      <Header title="Internal Tx Details" description="Internal tx gas analysis" />
+      <Header title="Internal Tx Details" />
 
       {/* Internal Tx Path Navigation */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-sm">
@@ -781,7 +781,6 @@ export function CallPage(): JSX.Element {
                 data={opcodeCategoryData}
                 colorMap={CATEGORY_COLORS}
                 title="Gas by Opcode Category"
-                subtitle="Where was this internal tx's gas spent?"
                 percentLabel="of self gas"
                 loading={frameOpcodesLoading}
                 emptyMessage="No opcode data"
@@ -791,7 +790,6 @@ export function CallPage(): JSX.Element {
                 data={opcodeCategoryCountData}
                 colorMap={CATEGORY_COLORS}
                 title="Count by Opcode Category"
-                subtitle="How often did each category execute?"
                 percentLabel="of executions"
                 loading={frameOpcodesLoading}
                 emptyMessage="No opcode data"

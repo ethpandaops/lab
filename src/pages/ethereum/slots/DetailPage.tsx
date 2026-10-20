@@ -243,7 +243,7 @@ export function DetailPage(): JSX.Element {
   if (isNaN(slot) || slot < 0) {
     return (
       <Container>
-        <Header title="Invalid Slot" description="The slot number provided is not valid" />
+        <Header title="Invalid Slot" />
         <Alert
           variant="error"
           title="Invalid slot number"
@@ -292,7 +292,7 @@ export function DetailPage(): JSX.Element {
         <Alert
           variant="warning"
           title="No data available"
-          description={`No data has been recorded for slot ${slot}. This slot may not have occurred yet, or data collection may not have been active.`}
+          description="This slot may not have occurred yet, or data collection may not have been active."
         />
       </Container>
     );
@@ -548,10 +548,7 @@ export function DetailPage(): JSX.Element {
               <div className="space-y-6">
                 {/* Performance Metrics */}
                 <Card>
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold text-foreground">Performance Metrics</h3>
-                    <p className="text-sm text-muted">Block timing and attestation statistics</p>
-                  </div>
+                  <h3 className="mb-4 text-lg font-semibold text-foreground">Performance Metrics</h3>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {/* Block First Seen At */}
                     {firstBlockSeen !== null && firstBlockSeen !== Infinity && (
@@ -617,10 +614,7 @@ export function DetailPage(): JSX.Element {
                 {/* Network Propagation */}
                 {blockPropagationData.length > 0 && (
                   <Card>
-                    <div className="mb-4">
-                      <h3 className="text-lg font-semibold text-foreground">Network Propagation</h3>
-                      <p className="text-sm text-muted">Nodes that received block data</p>
-                    </div>
+                    <h3 className="mb-4 text-lg font-semibold text-foreground">Network Propagation</h3>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                       <MiniStat label="Block Nodes" value={distinctBlockClients.toLocaleString()} />
                     </div>
@@ -630,10 +624,7 @@ export function DetailPage(): JSX.Element {
                 {/* MEV Activity */}
                 {(data.blockMev[0]?.value || data.relayBids.length > 0 || data.builderBids.length > 0) && (
                   <Card>
-                    <div className="mb-4">
-                      <h3 className="text-lg font-semibold text-foreground">MEV Activity</h3>
-                      <p className="text-sm text-muted">Block builder and relay participation</p>
-                    </div>
+                    <h3 className="mb-4 text-lg font-semibold text-foreground">MEV Activity</h3>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                       {data.blockMev[0]?.value && data.blockMev[0].value !== '0' && (
                         <MiniStat
@@ -681,10 +672,7 @@ export function DetailPage(): JSX.Element {
             {/* Block Tab - All block data in two-column layout */}
             <TabPanel>
               <Card>
-                <div className="mb-4">
-                  <h3 className="text-lg font-semibold text-foreground">Block Data</h3>
-                  <p className="text-sm text-muted">Complete block information from beacon and execution layers</p>
-                </div>
+                <h3 className="mb-4 text-lg font-semibold text-foreground">Block Data</h3>
                 {effectiveBlockData ? (
                   <dl className="grid grid-cols-1 gap-x-8 gap-y-4 lg:grid-cols-2">
                     {/* Beacon Block Section */}
@@ -1050,10 +1038,7 @@ export function DetailPage(): JSX.Element {
                     {/* Blob Metrics - only show if there are actual blobs */}
                     {blobCount > 0 && (
                       <Card>
-                        <div className="mb-4">
-                          <h3 className="text-lg font-semibold text-foreground">Blob Metrics</h3>
-                          <p className="text-sm text-muted">EIP-4844 blob gas usage for this block</p>
-                        </div>
+                        <h3 className="mb-4 text-lg font-semibold text-foreground">Blob Metrics</h3>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                           <MiniStat label="Blob Count" value={blobCount.toString()} />
 
@@ -1146,7 +1131,7 @@ export function DetailPage(): JSX.Element {
                                   <div className="font-medium text-foreground">{submitter.name ?? 'Unknown'}</div>
                                   <div className="text-xs text-muted">
                                     {submitter.versioned_hashes?.length ?? 0} blob
-                                    {(submitter.versioned_hashes?.length ?? 0) !== 1 ? 's' : ''} · Tx Index:{' '}
+                                    {(submitter.versioned_hashes?.length ?? 0) !== 1 ? 's' : ''}, Tx Index:{' '}
                                     {submitter.transaction_index ?? '-'}
                                   </div>
                                 </div>
@@ -1244,10 +1229,7 @@ export function DetailPage(): JSX.Element {
                   <>
                     {/* Transaction & Gas Metrics */}
                     <Card>
-                      <div className="mb-4">
-                        <h3 className="text-lg font-semibold text-foreground">Transactions & Gas</h3>
-                        <p className="text-sm text-muted">Block execution metrics</p>
-                      </div>
+                      <h3 className="mb-4 text-lg font-semibold text-foreground">Transactions & Gas</h3>
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         {effectiveBlockData.execution_payload_transactions_count !== null &&
                           effectiveBlockData.execution_payload_transactions_count !== undefined && (

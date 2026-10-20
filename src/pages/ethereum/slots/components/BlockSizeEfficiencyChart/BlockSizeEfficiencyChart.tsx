@@ -118,7 +118,6 @@ export function BlockSizeEfficiencyChart({ blockHead }: BlockSizeEfficiencyChart
             <dd className="mt-1 text-2xl/8 font-semibold text-foreground">
               {formatBytes(metrics.bytesPerTransaction)}
             </dd>
-            <dd className="mt-1 text-xs/5 text-muted">Efficiency metric</dd>
           </div>
         </div>
       )}

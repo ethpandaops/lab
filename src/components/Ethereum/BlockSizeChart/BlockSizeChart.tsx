@@ -53,7 +53,7 @@ export function BlockSizeChart({
   data,
   xAxis,
   title = 'Block Size',
-  subtitle = 'Consensus and execution layer block sizes (compressed and uncompressed)',
+  subtitle,
   height,
   anchorId,
   inModal = false,

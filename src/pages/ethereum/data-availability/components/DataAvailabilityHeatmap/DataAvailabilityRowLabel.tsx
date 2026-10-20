@@ -59,10 +59,10 @@ function getRowTypeLabel(granularity: DataAvailabilityGranularity): string {
 
 /**
  * Parse blob label to extract index and submitter
- * Label format: "0 · arbitrum" or just "0"
+ * Label format: "0 / arbitrum" or just "0"
  */
 function parseBlobLabel(label: string): { index: string; submitter: string | null } {
-  const parts = label.split(' · ');
+  const parts = label.split(' / ');
   return {
     index: parts[0],
     submitter: parts[1] ?? null,

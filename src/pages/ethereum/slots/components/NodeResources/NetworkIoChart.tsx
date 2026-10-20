@@ -169,13 +169,11 @@ export function NetworkIoChart({
   const nodeCount = new Set(data.map(d => d.meta_client_name)).size;
   const shortNodeName = selectedNode?.split('/').pop() ?? '';
 
-  const subtitle = selectedNode
-    ? `Slot ${slot} · ${shortNodeName} · Network traffic by port`
-    : `Slot ${slot} · Mean across ${nodeCount} nodes · Network traffic by port`;
+  const subtitle = selectedNode ? `Slot ${slot} / ${shortNodeName}` : `Slot ${slot} / Mean across ${nodeCount} nodes`;
 
   if (data.length === 0) {
     return (
-      <PopoutCard title="Network I/O" subtitle="No data available" modalSize="xl">
+      <PopoutCard title="Network I/O" modalSize="xl">
         {({ inModal }) => (
           <div className={inModal ? 'min-h-80' : 'h-64'}>
             <div className="flex h-full items-center justify-center">

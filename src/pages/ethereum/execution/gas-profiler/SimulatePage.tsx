@@ -675,7 +675,7 @@ export function SimulatePage(): JSX.Element {
 
   return (
     <Container>
-      <Header title="Gas Repricing Simulator" description="Simulate gas repricing across multiple blocks" />
+      <Header title="Gas Repricing Simulator" />
 
       {/* Back link */}
       <div className="mb-6">
@@ -854,7 +854,7 @@ export function SimulatePage(): JSX.Element {
                 <div className="min-w-0 flex-1">
                   <p className="text-sm/5 font-medium text-amber-800 dark:text-amber-200">Backend nodes are syncing</p>
                   <p className="mt-0.5 text-xs/4 text-amber-700/70 dark:text-amber-300/60">
-                    The nodes serving this network are catching up with the chain. Check back shortly and try again.
+                    Check back shortly and try again.
                   </p>
                 </div>
               </div>
@@ -1086,7 +1086,7 @@ export function SimulatePage(): JSX.Element {
 
           {/* Trend Chart */}
           {chartOptions && simState.results.length > 1 && (
-            <PopoutCard title="Gas Delta by Block" subtitle="Click a point to select that block">
+            <PopoutCard title="Gas Delta by Block">
               <ReactEChartsCore
                 echarts={echarts}
                 option={chartOptions}
