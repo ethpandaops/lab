@@ -8,6 +8,8 @@ import {
   adminCbtIncrementalServiceList,
   dimBlockBlobSubmitterServiceGet,
   dimBlockBlobSubmitterServiceList,
+  dimClientReleaseServiceGet,
+  dimClientReleaseServiceList,
   dimContractOwnerServiceGet,
   dimContractOwnerServiceList,
   dimFunctionSignatureServiceGet,
@@ -443,6 +445,12 @@ import type {
   DimBlockBlobSubmitterServiceListData,
   DimBlockBlobSubmitterServiceListError,
   DimBlockBlobSubmitterServiceListResponse,
+  DimClientReleaseServiceGetData,
+  DimClientReleaseServiceGetError,
+  DimClientReleaseServiceGetResponse,
+  DimClientReleaseServiceListData,
+  DimClientReleaseServiceListError,
+  DimClientReleaseServiceListResponse,
   DimContractOwnerServiceGetData,
   DimContractOwnerServiceGetError,
   DimContractOwnerServiceGetResponse,
@@ -1850,6 +1858,60 @@ export const dimBlockBlobSubmitterServiceGetOptions = (options: Options<DimBlock
       return data;
     },
     queryKey: dimBlockBlobSubmitterServiceGetQueryKey(options),
+  });
+
+export const dimClientReleaseServiceListQueryKey = (options?: Options<DimClientReleaseServiceListData>) =>
+  createQueryKey('dimClientReleaseServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimClientReleaseServiceListOptions = (options?: Options<DimClientReleaseServiceListData>) =>
+  queryOptions<
+    DimClientReleaseServiceListResponse,
+    DimClientReleaseServiceListError,
+    DimClientReleaseServiceListResponse,
+    ReturnType<typeof dimClientReleaseServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimClientReleaseServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimClientReleaseServiceListQueryKey(options),
+  });
+
+export const dimClientReleaseServiceGetQueryKey = (options: Options<DimClientReleaseServiceGetData>) =>
+  createQueryKey('dimClientReleaseServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by client
+ */
+export const dimClientReleaseServiceGetOptions = (options: Options<DimClientReleaseServiceGetData>) =>
+  queryOptions<
+    DimClientReleaseServiceGetResponse,
+    DimClientReleaseServiceGetError,
+    DimClientReleaseServiceGetResponse,
+    ReturnType<typeof dimClientReleaseServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimClientReleaseServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimClientReleaseServiceGetQueryKey(options),
   });
 
 export const dimContractOwnerServiceListQueryKey = (options?: Options<DimContractOwnerServiceListData>) =>

@@ -1,8 +1,7 @@
 import type { JSX } from 'react';
 import clsx from 'clsx';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
-import { UNKNOWN_CLIENT } from '../../constants';
-import { formatClientName } from '../../utils/client-share';
+import { UNKNOWN_CLIENT, formatClientName } from '@/utils/graffiti';
 
 export interface ClientLabelProps {
   /** Client name as stored by the models, e.g. lighthouse or unknown */

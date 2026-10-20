@@ -15,6 +15,12 @@ import type {
   DimBlockBlobSubmitterServiceListData,
   DimBlockBlobSubmitterServiceListErrors,
   DimBlockBlobSubmitterServiceListResponses,
+  DimClientReleaseServiceGetData,
+  DimClientReleaseServiceGetErrors,
+  DimClientReleaseServiceGetResponses,
+  DimClientReleaseServiceListData,
+  DimClientReleaseServiceListErrors,
+  DimClientReleaseServiceListResponses,
   DimContractOwnerServiceGetData,
   DimContractOwnerServiceGetErrors,
   DimContractOwnerServiceGetResponses,
@@ -1285,6 +1291,10 @@ import {
   zDimBlockBlobSubmitterServiceGetResponse,
   zDimBlockBlobSubmitterServiceListData,
   zDimBlockBlobSubmitterServiceListResponse,
+  zDimClientReleaseServiceGetData,
+  zDimClientReleaseServiceGetResponse,
+  zDimClientReleaseServiceListData,
+  zDimClientReleaseServiceListResponse,
   zDimContractOwnerServiceGetData,
   zDimContractOwnerServiceGetResponse,
   zDimContractOwnerServiceListData,
@@ -2217,6 +2227,40 @@ export const dimBlockBlobSubmitterServiceGet = <ThrowOnError extends boolean = f
     requestValidator: async data => await zDimBlockBlobSubmitterServiceGetData.parseAsync(data),
     responseValidator: async data => await zDimBlockBlobSubmitterServiceGetResponse.parseAsync(data),
     url: '/api/v1/dim_block_blob_submitter/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimClientReleaseServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<DimClientReleaseServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    DimClientReleaseServiceListResponses,
+    DimClientReleaseServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zDimClientReleaseServiceListData.parseAsync(data),
+    responseValidator: async data => await zDimClientReleaseServiceListResponse.parseAsync(data),
+    url: '/api/v1/dim_client_release',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by client
+ */
+export const dimClientReleaseServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<DimClientReleaseServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<DimClientReleaseServiceGetResponses, DimClientReleaseServiceGetErrors, ThrowOnError>({
+    requestValidator: async data => await zDimClientReleaseServiceGetData.parseAsync(data),
+    responseValidator: async data => await zDimClientReleaseServiceGetResponse.parseAsync(data),
+    url: '/api/v1/dim_client_release/{client}',
     ...options,
   });
 

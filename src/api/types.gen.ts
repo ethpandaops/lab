@@ -55,6 +55,41 @@ export type DimBlockBlobSubmitter = {
   versioned_hashes?: Array<string>;
 };
 
+export type DimClientRelease = {
+  /**
+   * Client name as used by fct_block_graffiti, e.g. lighthouse or geth
+   */
+  client?: string;
+  /**
+   * Full commit hash the release tag points at, which graffiti commit prefixes resolve against
+   */
+  commit_sha?: string;
+  /**
+   * Client layer: consensus or execution
+   */
+  layer?: string;
+  /**
+   * Whether the release is a pre-release (GitHub flag, or a pre-release suffix on the version)
+   */
+  prerelease?: boolean;
+  /**
+   * When the GitHub release was published, NULL when unknown
+   */
+  release_date?: number | null;
+  /**
+   * Git tag of the release in the client repository
+   */
+  tag?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Release version taken from the tag, e.g. v8.2.3
+   */
+  version?: string;
+};
+
 export type DimContractOwner = {
   /**
    * Account owner of the contract
@@ -1936,7 +1971,7 @@ export type FctBlockGraffiti = {
    */
   execution_client_commit?: string;
   /**
-   * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), none (unrecognised text) or empty
+   * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), rocketpool (the Rocket Pool smartnode default RP-<EL><CL> v<version>), none (unrecognised text) or empty
    */
   graffiti_format?: string;
   /**
@@ -6855,6 +6890,13 @@ export type GetDimBlockBlobSubmitterResponse = {
 };
 
 /**
+ * Response for getting a single dim_client_release record
+ */
+export type GetDimClientReleaseResponse = {
+  item?: DimClientRelease;
+};
+
+/**
  * Response for getting a single dim_contract_owner record
  */
 export type GetDimContractOwnerResponse = {
@@ -11701,6 +11743,20 @@ export type ListDimBlockBlobSubmitterResponse = {
 };
 
 /**
+ * Response for listing dim_client_release records
+ */
+export type ListDimClientReleaseResponse = {
+  /**
+   * The list of dim_client_release.
+   */
+  dim_client_release?: Array<DimClientRelease>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing dim_contract_owner records
  */
 export type ListDimContractOwnerResponse = {
@@ -15253,6 +15309,345 @@ export type DimBlockBlobSubmitterServiceGetResponses = {
 
 export type DimBlockBlobSubmitterServiceGetResponse =
   DimBlockBlobSubmitterServiceGetResponses[keyof DimBlockBlobSubmitterServiceGetResponses];
+
+export type DimClientReleaseServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Client name as used by fct_block_graffiti, e.g. lighthouse or geth (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Client name as used by fct_block_graffiti, e.g. lighthouse or geth (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Client name as used by fct_block_graffiti, e.g. lighthouse or geth (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Client name as used by fct_block_graffiti, e.g. lighthouse or geth (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Client name as used by fct_block_graffiti, e.g. lighthouse or geth (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Client name as used by fct_block_graffiti, e.g. lighthouse or geth (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Client name as used by fct_block_graffiti, e.g. lighthouse or geth (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Client name as used by fct_block_graffiti, e.g. lighthouse or geth (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Client name as used by fct_block_graffiti, e.g. lighthouse or geth (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Full commit hash the release tag points at, which graffiti commit prefixes resolve against (filter: eq)
+     */
+    commit_sha_eq?: string;
+    /**
+     * Full commit hash the release tag points at, which graffiti commit prefixes resolve against (filter: ne)
+     */
+    commit_sha_ne?: string;
+    /**
+     * Full commit hash the release tag points at, which graffiti commit prefixes resolve against (filter: contains)
+     */
+    commit_sha_contains?: string;
+    /**
+     * Full commit hash the release tag points at, which graffiti commit prefixes resolve against (filter: starts_with)
+     */
+    commit_sha_starts_with?: string;
+    /**
+     * Full commit hash the release tag points at, which graffiti commit prefixes resolve against (filter: ends_with)
+     */
+    commit_sha_ends_with?: string;
+    /**
+     * Full commit hash the release tag points at, which graffiti commit prefixes resolve against (filter: like)
+     */
+    commit_sha_like?: string;
+    /**
+     * Full commit hash the release tag points at, which graffiti commit prefixes resolve against (filter: not_like)
+     */
+    commit_sha_not_like?: string;
+    /**
+     * Full commit hash the release tag points at, which graffiti commit prefixes resolve against (filter: in_values) (comma-separated list)
+     */
+    commit_sha_in_values?: string;
+    /**
+     * Full commit hash the release tag points at, which graffiti commit prefixes resolve against (filter: not_in_values) (comma-separated list)
+     */
+    commit_sha_not_in_values?: string;
+    /**
+     * Git tag of the release in the client repository (filter: eq)
+     */
+    tag_eq?: string;
+    /**
+     * Git tag of the release in the client repository (filter: ne)
+     */
+    tag_ne?: string;
+    /**
+     * Git tag of the release in the client repository (filter: contains)
+     */
+    tag_contains?: string;
+    /**
+     * Git tag of the release in the client repository (filter: starts_with)
+     */
+    tag_starts_with?: string;
+    /**
+     * Git tag of the release in the client repository (filter: ends_with)
+     */
+    tag_ends_with?: string;
+    /**
+     * Git tag of the release in the client repository (filter: like)
+     */
+    tag_like?: string;
+    /**
+     * Git tag of the release in the client repository (filter: not_like)
+     */
+    tag_not_like?: string;
+    /**
+     * Git tag of the release in the client repository (filter: in_values) (comma-separated list)
+     */
+    tag_in_values?: string;
+    /**
+     * Git tag of the release in the client repository (filter: not_in_values) (comma-separated list)
+     */
+    tag_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: eq)
+     */
+    layer_eq?: string;
+    /**
+     * Client layer: consensus or execution (filter: ne)
+     */
+    layer_ne?: string;
+    /**
+     * Client layer: consensus or execution (filter: contains)
+     */
+    layer_contains?: string;
+    /**
+     * Client layer: consensus or execution (filter: starts_with)
+     */
+    layer_starts_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: ends_with)
+     */
+    layer_ends_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: like)
+     */
+    layer_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_like)
+     */
+    layer_not_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: in_values) (comma-separated list)
+     */
+    layer_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_in_values) (comma-separated list)
+     */
+    layer_not_in_values?: string;
+    /**
+     * Release version taken from the tag, e.g. v8.2.3 (filter: eq)
+     */
+    version_eq?: string;
+    /**
+     * Release version taken from the tag, e.g. v8.2.3 (filter: ne)
+     */
+    version_ne?: string;
+    /**
+     * Release version taken from the tag, e.g. v8.2.3 (filter: contains)
+     */
+    version_contains?: string;
+    /**
+     * Release version taken from the tag, e.g. v8.2.3 (filter: starts_with)
+     */
+    version_starts_with?: string;
+    /**
+     * Release version taken from the tag, e.g. v8.2.3 (filter: ends_with)
+     */
+    version_ends_with?: string;
+    /**
+     * Release version taken from the tag, e.g. v8.2.3 (filter: like)
+     */
+    version_like?: string;
+    /**
+     * Release version taken from the tag, e.g. v8.2.3 (filter: not_like)
+     */
+    version_not_like?: string;
+    /**
+     * Release version taken from the tag, e.g. v8.2.3 (filter: in_values) (comma-separated list)
+     */
+    version_in_values?: string;
+    /**
+     * Release version taken from the tag, e.g. v8.2.3 (filter: not_in_values) (comma-separated list)
+     */
+    version_not_in_values?: string;
+    /**
+     * When the GitHub release was published, NULL when unknown (filter: eq)
+     */
+    release_date_eq?: number;
+    /**
+     * When the GitHub release was published, NULL when unknown (filter: ne)
+     */
+    release_date_ne?: number;
+    /**
+     * When the GitHub release was published, NULL when unknown (filter: lt)
+     */
+    release_date_lt?: number;
+    /**
+     * When the GitHub release was published, NULL when unknown (filter: lte)
+     */
+    release_date_lte?: number;
+    /**
+     * When the GitHub release was published, NULL when unknown (filter: gt)
+     */
+    release_date_gt?: number;
+    /**
+     * When the GitHub release was published, NULL when unknown (filter: gte)
+     */
+    release_date_gte?: number;
+    /**
+     * When the GitHub release was published, NULL when unknown (filter: between_min)
+     */
+    release_date_between_min?: number;
+    /**
+     * When the GitHub release was published, NULL when unknown (filter: between_max_value)
+     */
+    release_date_between_max_value?: number;
+    /**
+     * When the GitHub release was published, NULL when unknown (filter: in_values) (comma-separated list)
+     */
+    release_date_in_values?: string;
+    /**
+     * When the GitHub release was published, NULL when unknown (filter: not_in_values) (comma-separated list)
+     */
+    release_date_not_in_values?: string;
+    /**
+     * Whether the release is a pre-release (GitHub flag, or a pre-release suffix on the version) (filter: eq)
+     */
+    prerelease_eq?: boolean;
+    /**
+     * Whether the release is a pre-release (GitHub flag, or a pre-release suffix on the version) (filter: ne)
+     */
+    prerelease_ne?: boolean;
+    /**
+     * The maximum number of dim_client_release to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListDimClientRelease` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/dim_client_release';
+};
+
+export type DimClientReleaseServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimClientReleaseServiceListError =
+  DimClientReleaseServiceListErrors[keyof DimClientReleaseServiceListErrors];
+
+export type DimClientReleaseServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListDimClientReleaseResponse;
+};
+
+export type DimClientReleaseServiceListResponse =
+  DimClientReleaseServiceListResponses[keyof DimClientReleaseServiceListResponses];
+
+export type DimClientReleaseServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Client name as used by fct_block_graffiti, e.g. lighthouse or geth
+     */
+    client: string;
+  };
+  query?: never;
+  url: '/api/v1/dim_client_release/{client}';
+};
+
+export type DimClientReleaseServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimClientReleaseServiceGetError = DimClientReleaseServiceGetErrors[keyof DimClientReleaseServiceGetErrors];
+
+export type DimClientReleaseServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetDimClientReleaseResponse;
+};
+
+export type DimClientReleaseServiceGetResponse =
+  DimClientReleaseServiceGetResponses[keyof DimClientReleaseServiceGetResponses];
 
 export type DimContractOwnerServiceListData = {
   body?: never;
@@ -32272,39 +32667,39 @@ export type FctBlockGraffitiServiceListData = {
      */
     graffiti_text_not_in_values?: string;
     /**
-     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), none (unrecognised text) or empty (filter: eq)
+     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), rocketpool (the Rocket Pool smartnode default RP-<EL><CL> v<version>), none (unrecognised text) or empty (filter: eq)
      */
     graffiti_format_eq?: string;
     /**
-     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), none (unrecognised text) or empty (filter: ne)
+     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), rocketpool (the Rocket Pool smartnode default RP-<EL><CL> v<version>), none (unrecognised text) or empty (filter: ne)
      */
     graffiti_format_ne?: string;
     /**
-     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), none (unrecognised text) or empty (filter: contains)
+     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), rocketpool (the Rocket Pool smartnode default RP-<EL><CL> v<version>), none (unrecognised text) or empty (filter: contains)
      */
     graffiti_format_contains?: string;
     /**
-     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), none (unrecognised text) or empty (filter: starts_with)
+     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), rocketpool (the Rocket Pool smartnode default RP-<EL><CL> v<version>), none (unrecognised text) or empty (filter: starts_with)
      */
     graffiti_format_starts_with?: string;
     /**
-     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), none (unrecognised text) or empty (filter: ends_with)
+     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), rocketpool (the Rocket Pool smartnode default RP-<EL><CL> v<version>), none (unrecognised text) or empty (filter: ends_with)
      */
     graffiti_format_ends_with?: string;
     /**
-     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), none (unrecognised text) or empty (filter: like)
+     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), rocketpool (the Rocket Pool smartnode default RP-<EL><CL> v<version>), none (unrecognised text) or empty (filter: like)
      */
     graffiti_format_like?: string;
     /**
-     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), none (unrecognised text) or empty (filter: not_like)
+     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), rocketpool (the Rocket Pool smartnode default RP-<EL><CL> v<version>), none (unrecognised text) or empty (filter: not_like)
      */
     graffiti_format_not_like?: string;
     /**
-     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), none (unrecognised text) or empty (filter: in_values) (comma-separated list)
+     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), rocketpool (the Rocket Pool smartnode default RP-<EL><CL> v<version>), none (unrecognised text) or empty (filter: in_values) (comma-separated list)
      */
     graffiti_format_in_values?: string;
     /**
-     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), none (unrecognised text) or empty (filter: not_in_values) (comma-separated list)
+     * Which graffiti format identified the clients: codes_full, codes_long, codes_short or codes_min (client version codes with 8, 4, 2 or no commit characters), version_string (a client default such as Lighthouse/v8.2.3-6db6ae9), rocketpool (the Rocket Pool smartnode default RP-<EL><CL> v<version>), none (unrecognised text) or empty (filter: not_in_values) (comma-separated list)
      */
     graffiti_format_not_in_values?: string;
     /**
