@@ -232,9 +232,7 @@ export function DiskIoChart({
   const nodeCount = new Set(data.map(d => d.meta_client_name)).size;
   const shortNodeName = selectedNode?.split('/').pop() ?? '';
 
-  const subtitle = selectedNode
-    ? `Slot ${slot} · ${shortNodeName} · Disk I/O`
-    : `Slot ${slot} · Mean across ${nodeCount} nodes · Disk I/O`;
+  const subtitle = selectedNode ? `Slot ${slot} / ${shortNodeName}` : `Slot ${slot} / Mean across ${nodeCount} nodes`;
 
   const headerActions =
     selectedNode && (clClient || elClient) ? (
@@ -246,7 +244,7 @@ export function DiskIoChart({
 
   if (data.length === 0) {
     return (
-      <PopoutCard title="Disk I/O" subtitle="No data available" modalSize="xl">
+      <PopoutCard title="Disk I/O" modalSize="xl">
         {({ inModal }) => (
           <div className={inModal ? 'min-h-80' : 'h-64'}>
             <div className="flex h-full items-center justify-center">

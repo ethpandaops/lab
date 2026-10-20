@@ -129,10 +129,7 @@ export function ResourceGasTable({ rows, maxRows = 20, loading = false }: Resour
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h3 className="text-sm font-medium text-foreground">Resource Details</h3>
-          <p className="text-xs text-muted">Click column headers to sort</p>
-        </div>
+        <h3 className="text-sm font-medium text-foreground">Resource Details</h3>
         <input
           type="text"
           placeholder="Search opcodes..."

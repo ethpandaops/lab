@@ -48,7 +48,7 @@ export function ResourceGasBreakdown({
   refund = 0,
   total: totalProp,
   title = 'Resource Gas Breakdown',
-  subtitle = 'What system resources did gas pay for?',
+  subtitle,
   loading = false,
   className,
 }: ResourceGasBreakdownProps): JSX.Element {
@@ -59,7 +59,7 @@ export function ResourceGasBreakdown({
       <Card className={className}>
         <div className="px-4 py-3">
           <h3 className="text-sm font-medium text-foreground">{title}</h3>
-          <p className="text-xs text-muted">{subtitle}</p>
+          {subtitle && <p className="text-xs text-muted">{subtitle}</p>}
         </div>
         <div className="px-4 pb-4">
           <div className="h-48 animate-pulse rounded-sm bg-surface" />

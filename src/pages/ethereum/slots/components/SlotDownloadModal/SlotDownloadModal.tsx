@@ -64,13 +64,13 @@ export function SlotDownloadModal({
     [blobData]
   );
 
-  const blockFormats: { format: BlockDownloadFormat; label: string; hint: string }[] = [
-    { format: 'json', label: 'JSON', hint: 'Decoded beacon block' },
-    { format: 'ssz', label: 'SSZ', hint: 'Raw SSZ-encoded block' },
+  const blockFormats: { format: BlockDownloadFormat; label: string }[] = [
+    { format: 'json', label: 'JSON' },
+    { format: 'ssz', label: 'SSZ' },
   ];
 
   return (
-    <Dialog open={open} onClose={onClose} title={`Download · Slot ${slot}`} size="lg">
+    <Dialog open={open} onClose={onClose} title={`Download Slot ${slot}`} size="lg">
       <div className="flex flex-col gap-4">
         {/* Tabs */}
         <div className="flex gap-1 rounded-sm bg-background p-1">
@@ -91,7 +91,7 @@ export function SlotDownloadModal({
         {tab === 'block' &&
           (blockRoot ? (
             <div className="flex flex-col gap-2">
-              {blockFormats.map(({ format, label, hint }) => {
+              {blockFormats.map(({ format, label }) => {
                 const key = `block-${format}`;
 
                 return (
@@ -99,10 +99,7 @@ export function SlotDownloadModal({
                     key={format}
                     className="flex items-center justify-between gap-4 rounded-sm border border-border bg-surface px-4 py-3"
                   >
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{label}</p>
-                      <p className="text-xs text-muted">{hint}</p>
-                    </div>
+                    <p className="text-sm font-medium text-foreground">{label}</p>
                     <Button
                       variant="secondary"
                       size="sm"
@@ -118,7 +115,6 @@ export function SlotDownloadModal({
                   </div>
                 );
               })}
-              <p className="text-xs text-muted">Served from the block archive.</p>
             </div>
           ) : (
             <EmptyState message="No block was seen for this slot." />

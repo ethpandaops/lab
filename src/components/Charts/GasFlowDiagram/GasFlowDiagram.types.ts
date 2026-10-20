@@ -54,8 +54,7 @@ export const GAS_EXPLANATIONS: Record<GasType, GasExplanation> = {
   },
   evm: {
     title: 'EVM Execution',
-    description:
-      'Gas consumed by opcode execution during the transaction. This is what the flame graph visualizes - the cost of running smart contract code.',
+    description: 'Gas consumed by opcode execution during the transaction. This is what the flame graph visualizes.',
     color: {
       bg: 'bg-primary/10',
       text: 'text-primary',
@@ -65,7 +64,7 @@ export const GAS_EXPLANATIONS: Record<GasType, GasExplanation> = {
   refund: {
     title: 'Gas Refund',
     description:
-      'Gas returned for storage cleanup operations (SSTORE setting to zero). Capped at 20% of total gas per EIP-3529 to prevent refund abuse.',
+      'Gas returned for storage cleanup operations (SSTORE setting to zero). Capped at 20% of total gas per EIP-3529.',
     color: {
       bg: 'bg-success/10',
       text: 'text-success',
@@ -74,8 +73,7 @@ export const GAS_EXPLANATIONS: Record<GasType, GasExplanation> = {
   },
   receipt: {
     title: 'Receipt Gas',
-    description:
-      'Final gas charged to the user. Calculated as: Intrinsic + EVM Execution - Effective Refund. This is the value shown in block explorers.',
+    description: 'Final gas charged to the user. This is the value shown in block explorers.',
     color: {
       bg: 'bg-surface',
       text: 'text-foreground',

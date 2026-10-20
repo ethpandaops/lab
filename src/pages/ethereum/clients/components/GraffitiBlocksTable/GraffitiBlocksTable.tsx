@@ -101,17 +101,7 @@ export function GraffitiBlocksTable({
   onLoadMore,
 }: GraffitiBlocksTableProps): JSX.Element {
   return (
-    <Card
-      rounded
-      header={
-        <div className="flex flex-col gap-1">
-          <h3 className="text-sm/6 font-semibold text-foreground">Blocks</h3>
-          <p className="text-xs/5 text-muted">
-            Raw graffiti and the clients parsed from it, matching the filters above
-          </p>
-        </div>
-      }
-    >
+    <Card rounded header={<h3 className="text-sm/6 font-semibold text-foreground">Blocks</h3>}>
       {error && <p className="text-sm text-danger">Failed to load blocks: {error.message}</p>}
       {!error && isLoading && (
         <div className="flex flex-col gap-2">

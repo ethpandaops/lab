@@ -1046,7 +1046,6 @@ export function MultiLineChart({
                                   ? 'bg-surface-hover border-border text-foreground hover:border-primary/50 hover:bg-primary/10'
                                   : 'hover:bg-surface-hover/50 border-transparent bg-surface/50 text-muted/50 hover:border-border'
                               }`}
-                              title={isVisible ? `Click to hide ${s.name}` : `Click to show ${s.name}`}
                             >
                               <span
                                 className="h-2 w-2 rounded-full transition-colors"
@@ -1144,7 +1143,6 @@ export function MultiLineChart({
                                   ? 'bg-surface-hover border-border text-foreground hover:border-primary/50 hover:bg-primary/10'
                                   : 'hover:bg-surface-hover/50 border-transparent bg-surface/50 text-muted/50 hover:border-border'
                               }`}
-                              title={isVisible ? `Click to hide ${s.name}` : `Click to show ${s.name}`}
                             >
                               <span
                                 className="h-2 w-2 rounded-full transition-colors"

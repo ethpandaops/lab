@@ -55,8 +55,8 @@ export function BlockProposalChart({ data }: BlockProposalChartProps): React.JSX
   // Handle empty state
   if (series.length === 0) {
     return (
-      <PopoutCard title="Proposals" subtitle="No block proposal data available">
-        {() => <Alert variant="info" title="No Data" description="No block proposal data available for this entity." />}
+      <PopoutCard title="Proposals">
+        {() => <Alert variant="info" description="No block proposal data available for this entity." />}
       </PopoutCard>
     );
   }

@@ -377,7 +377,7 @@ describe('transformBlobsToRows', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].identifier).toBe('0');
-    expect(result[0].label).toBe('0 · UNKNOWN'); // No submitter provided, defaults to UNKNOWN
+    expect(result[0].label).toBe('0 / UNKNOWN'); // No submitter provided, defaults to UNKNOWN
     expect(result[0].cells).toHaveLength(128);
     expect(result[0].cells[0].availability).toBe(0.955);
     expect(result[0].cells[0].blobIndex).toBe(0);
@@ -394,9 +394,9 @@ describe('transformBlobsToRows', () => {
     const result = transformBlobsToRows(blobData, blobSubmitters);
 
     expect(result).toHaveLength(3);
-    expect(result[0].label).toBe('0 · base');
-    expect(result[1].label).toBe('1 · optimism');
-    expect(result[2].label).toBe('2 · Unknown');
+    expect(result[0].label).toBe('0 / base');
+    expect(result[1].label).toBe('1 / optimism');
+    expect(result[2].label).toBe('2 / Unknown');
   });
 
   it('should handle empty data', () => {
@@ -470,9 +470,9 @@ describe('transformBlobsToRows', () => {
     const result = transformBlobsToRows(blobData);
 
     expect(result).toHaveLength(3);
-    expect(result[0].label).toBe('0 · UNKNOWN');
-    expect(result[1].label).toBe('1 · UNKNOWN');
-    expect(result[2].label).toBe('2 · UNKNOWN');
+    expect(result[0].label).toBe('0 / UNKNOWN');
+    expect(result[1].label).toBe('1 / UNKNOWN');
+    expect(result[2].label).toBe('2 / UNKNOWN');
   });
 });
 

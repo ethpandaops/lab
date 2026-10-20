@@ -906,10 +906,7 @@ export function BlockPage(): JSX.Element {
   if (boundsLoading || (isLoading && !data)) {
     return (
       <Container>
-        <Header
-          title={`Block ${formatGas(blockNumber)}`}
-          description="Analyze gas consumption across all block transactions"
-        />
+        <Header title={`Block ${formatGas(blockNumber)}`} />
         <GasProfilerSkeleton />
       </Container>
     );
@@ -919,10 +916,7 @@ export function BlockPage(): JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header
-          title={`Block ${formatGas(blockNumber)}`}
-          description="Analyze gas consumption across all block transactions"
-        />
+        <Header title={`Block ${formatGas(blockNumber)}`} />
         <Alert variant="error" title="Error loading block data" description={error.message} />
       </Container>
     );
@@ -932,10 +926,7 @@ export function BlockPage(): JSX.Element {
   if (!data || !bounds || blockNumber < bounds.min || blockNumber > bounds.max) {
     return (
       <Container>
-        <Header
-          title={`Block ${formatGas(blockNumber)}`}
-          description="Analyze gas consumption across all block transactions"
-        />
+        <Header title={`Block ${formatGas(blockNumber)}`} />
         <Alert
           variant="warning"
           title="Block not available"
@@ -961,10 +952,7 @@ export function BlockPage(): JSX.Element {
 
   return (
     <Container>
-      <Header
-        title={`Block ${formatGas(blockNumber)}`}
-        description="Analyze gas consumption across all block transactions"
-      />
+      <Header title={`Block ${formatGas(blockNumber)}`} />
 
       {/* Back link and block navigation */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -1183,11 +1171,7 @@ export function BlockPage(): JSX.Element {
             </Card>
 
             {/* Gas Distribution - Full width treemap */}
-            <PopoutCard
-              title="Gas Distribution"
-              subtitle="Top 30 transactions by gas · Which transactions consumed the most gas?"
-              className="mb-6"
-            >
+            <PopoutCard title="Gas Distribution" subtitle="Top 30 transactions by gas" className="mb-6">
               {({ inModal }) =>
                 data.transactions.length > 0 ? (
                   <ReactECharts
@@ -1210,7 +1194,6 @@ export function BlockPage(): JSX.Element {
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <TopItemsByGasTable
                 title="Top Transactions by Gas"
-                subtitle="Which transactions consumed the most gas?"
                 items={topTransactionsItems}
                 totalGas={totalBlockGas}
                 compactCount={5}
@@ -1249,7 +1232,6 @@ export function BlockPage(): JSX.Element {
                 data={opcodeCategoryData}
                 colorMap={CATEGORY_COLORS}
                 title="Gas by Opcode Category"
-                subtitle="Where was EVM gas spent?"
                 percentLabel="of EVM gas"
                 emptyMessage="No opcode data"
                 height={280}
@@ -1258,7 +1240,6 @@ export function BlockPage(): JSX.Element {
                 data={opcodeCategoryCountData}
                 colorMap={CATEGORY_COLORS}
                 title="Count by Opcode Category"
-                subtitle="How often did each category execute?"
                 percentLabel="of executions"
                 emptyMessage="No opcode data"
                 height={280}
@@ -1297,7 +1278,6 @@ export function BlockPage(): JSX.Element {
               total={resourceTotal}
               loading={resourceLoading}
               title="Gas by Resource Category"
-              subtitle="What system resources consumed gas?"
               className="mb-6"
             />
 
@@ -1342,10 +1322,7 @@ export function BlockPage(): JSX.Element {
 
             {/* Transactions Header */}
             <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-medium text-foreground">Transactions</h3>
-                <p className="text-xs text-muted">All transactions in this block with gas profiling data.</p>
-              </div>
+              <h3 className="text-sm font-medium text-foreground">Transactions</h3>
               <span className="text-xs text-muted">{filteredTransactions.length} transactions</span>
             </div>
 
@@ -1520,7 +1497,6 @@ export function BlockPage(): JSX.Element {
                   data={callTypeChartData}
                   colorMap={CALL_TYPE_COLORS}
                   title="Call Type Distribution"
-                  subtitle="How many calls of each type?"
                   percentLabel="of calls"
                   emptyMessage="No call data"
                   innerRadius={50}
@@ -1531,7 +1507,6 @@ export function BlockPage(): JSX.Element {
                   data={callTypeGasChartData}
                   colorMap={CALL_TYPE_COLORS}
                   title="Gas by Call Type"
-                  subtitle="How much gas did each call type consume?"
                   percentLabel="of call gas"
                   emptyMessage="No call data"
                   innerRadius={50}

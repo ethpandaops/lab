@@ -57,7 +57,7 @@ export function DetailPage(): React.JSX.Element {
   if (entityName === null) {
     return (
       <Container>
-        <Header title="Invalid Entity" description="The entity parameter could not be decoded" />
+        <Header title="Invalid Entity" />
         <Alert variant="error" title="Invalid Entity" description={`"${params.entity}" is not a valid entity name.`} />
       </Container>
     );
@@ -75,7 +75,7 @@ export function DetailPage(): React.JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header title={entityName} description="Error loading entity data" />
+        <Header title={entityName} />
         <Alert variant="error" title="Error Loading Entity Data" description={error.message} />
       </Container>
     );
@@ -84,12 +84,8 @@ export function DetailPage(): React.JSX.Element {
   if (!data) {
     return (
       <Container>
-        <Header title={entityName} description="No data available" />
-        <Alert
-          variant="info"
-          title="No Data Available"
-          description="No data was found for this entity. It may not exist or data may not be available."
-        />
+        <Header title={entityName} />
+        <Alert variant="info" title="No Data Available" description="This entity may not exist." />
       </Container>
     );
   }

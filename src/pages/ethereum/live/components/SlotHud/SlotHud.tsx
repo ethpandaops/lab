@@ -169,7 +169,7 @@ export function SlotHud({
   return (
     <div className={clsx('flex h-[96px] w-full items-stretch', className)}>
       {/* Validation race — 7870 reference nodes */}
-      <Section title="Validation · 7870" className="flex-[1.3]">
+      <Section title="Validation / 7870" className="flex-[1.3]">
         <div className="flex flex-col gap-px">
           {clients.map((row, i) => (
             <Fade

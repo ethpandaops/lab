@@ -190,3 +190,9 @@ Detailed standards for specific topics are in `.claude/rules/`:
 - [SEO](.claude/rules/seo.md) — Head meta hierarchy, feature images, route implementation
 - [Theming](.claude/rules/theming.md) — Two-tier color architecture, semantic tokens
 - [Storybook](.claude/rules/storybook.md) — Decorator pattern, story title convention
+
+## Copy
+
+Every user-facing string (titles, descriptions, hints, tooltips, empty states, toasts, button text) must pass the clean-copy skill:
+
+@.claude/skills/clean-copy/SKILL.md

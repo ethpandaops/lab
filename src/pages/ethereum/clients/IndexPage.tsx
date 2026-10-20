@@ -10,7 +10,6 @@ import { Stats } from '@/components/DataDisplay/Stats';
 import { Toggle } from '@/components/Forms/Toggle';
 import { Button } from '@/components/Elements/Button';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
-import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
 import { getClientColor } from '@/utils/ethereum';
 import { buildTooltipHtml, formatTooltipDate } from '@/pages/ethereum/execution/overview/overview.utils';
@@ -64,7 +63,6 @@ export function IndexPage(): JSX.Element {
   const identifiedOnly = search.identified ?? false;
   const config = TIME_RANGE_CONFIG[timePeriod];
 
-  const { currentNetwork } = useNetwork();
   const { data: tableBounds, isLoading: boundsLoading } = useTableBounds(BLOCK_GRAFFITI_TABLE);
   const hasData = !!tableBounds;
 
@@ -159,13 +157,7 @@ export function IndexPage(): JSX.Element {
 
       {!boundsLoading && !hasData ? (
         <Card rounded>
-          <div className="flex flex-col gap-2">
-            <h3 className="text-base/7 font-semibold text-foreground">No graffiti data for this network</h3>
-            <p className="text-sm/6 text-muted">
-              {currentNetwork?.display_name ?? 'This network'} has no parsed block graffiti yet, so its proposer clients
-              cannot be shown.
-            </p>
-          </div>
+          <h3 className="text-base/7 font-semibold text-foreground">No graffiti data for this network</h3>
         </Card>
       ) : (
         <div className="flex flex-col gap-6">
@@ -247,7 +239,7 @@ export function IndexPage(): JSX.Element {
                   <h3 className="text-base/7 font-semibold text-foreground">No blocks match these filters</h3>
                   <p className="text-sm/6 text-muted">
                     {hasFilters
-                      ? 'Nothing was proposed in this window with the selected entity and clients. Try a longer window or fewer filters.'
+                      ? 'Try a longer window or fewer filters.'
                       : 'Nothing has been proposed in this window yet.'}
                   </p>
                 </div>

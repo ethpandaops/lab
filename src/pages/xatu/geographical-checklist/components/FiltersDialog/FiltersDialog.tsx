@@ -41,7 +41,6 @@ export function FiltersDialog({
       open={open}
       onClose={onClose}
       title="Filters"
-      description="Filter nodes by continent, country, or client implementation."
       size="xl"
       allowContentOverflow
       footer={

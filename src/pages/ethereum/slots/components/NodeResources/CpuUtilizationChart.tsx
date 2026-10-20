@@ -278,8 +278,8 @@ export function CpuUtilizationChart({
   const shortNodeName = selectedNode?.split('/').pop() ?? '';
 
   const subtitle = selectedNode
-    ? `Slot ${slot} · ${shortNodeName} · % of all CPU cores`
-    : `Slot ${slot} · ${METRIC_LABELS[metric]} across ${nodeCount} nodes · % of all CPU cores`;
+    ? `Slot ${slot} / ${shortNodeName}`
+    : `Slot ${slot} / ${METRIC_LABELS[metric]} across ${nodeCount} nodes`;
 
   const headerActions = (
     <div className="flex items-center gap-2">
@@ -291,7 +291,7 @@ export function CpuUtilizationChart({
 
   if (data.length === 0) {
     return (
-      <PopoutCard title="CPU Utilization" subtitle="No data available" modalSize="xl">
+      <PopoutCard title="CPU Utilization" modalSize="xl">
         {({ inModal }) => (
           <div className={inModal ? 'min-h-80' : 'h-64'}>
             <div className="flex h-full items-center justify-center">

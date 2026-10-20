@@ -318,7 +318,7 @@ function GasComparisonSection({
               <span className="text-xs text-green-500">Within limit</span>
             </>
           )}
-          <span className="text-xs text-muted">&middot; {formatCompactGas(gasLimit)}</span>
+          <span className="text-xs text-muted">{formatCompactGas(gasLimit)}</span>
         </div>
       </div>
     </div>
@@ -833,11 +833,11 @@ function TransactionImpactView({
                           description={
                             tx.diverged
                               ? statusChanged
-                                ? `The modified gas costs caused this transaction to follow a different execution path, changing its outcome from ${tx.originalStatus === 'success' ? 'success' : 'failure'} to ${tx.simulatedStatus === 'success' ? 'success' : 'failure'}. This means the gas change would materially affect this transaction's behavior on-chain.`
+                                ? `The modified gas costs caused this transaction to follow a different execution path, changing its outcome from ${tx.originalStatus === 'success' ? 'success' : 'failure'} to ${tx.simulatedStatus === 'success' ? 'success' : 'failure'}.`
                                 : hasErrors && tx.originalErrors.length !== tx.simulatedErrors.length
                                   ? 'The modified gas costs caused this transaction to hit different internal call errors. While the final outcome stayed the same, the execution path diverged \u2014 some internal calls that previously succeeded now fail, or vice versa.'
-                                  : 'The modified gas costs caused opcodes to execute a different number of times, meaning the transaction took a different code path. The final outcome was unchanged, but the internal execution flow diverged.'
-                              : 'This transaction executed identically under both gas schedules \u2014 same opcode counts, same call results, same outcome. The gas cost change had no effect on its execution path.'
+                                  : 'The modified gas costs caused opcodes to execute a different number of times, meaning the transaction took a different code path. The final outcome was unchanged.'
+                              : 'This transaction executed identically under both gas schedules \u2014 same opcode counts, same call results, same outcome.'
                           }
                         >
                           {tx.diverged ? (

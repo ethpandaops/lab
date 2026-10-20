@@ -174,7 +174,7 @@ export function DetailPage(): JSX.Element {
   if (isLoading || slotPlayerLoading) {
     return (
       <Container>
-        <Header title="Contributor Details" description="Detailed contribution metrics and activity" />
+        <Header title="Contributor Details" />
         <UserDetailsSkeleton />
         {!isLoading && slotPlayerLoading && (
           <div className="mt-8">
@@ -189,7 +189,7 @@ export function DetailPage(): JSX.Element {
   if (error || slotPlayerError) {
     return (
       <Container>
-        <Header title="Contributor Details" description="Detailed contribution metrics and activity" />
+        <Header title="Contributor Details" />
         <div className="rounded-sm border border-danger bg-danger/10 p-4 text-danger">
           {error && `Error loading contributor: ${error.message}`}
           {slotPlayerError && `Error initializing slot player: ${slotPlayerError.message}`}
@@ -206,7 +206,7 @@ export function DetailPage(): JSX.Element {
   if (nodes.length === 0) {
     return (
       <Container>
-        <Header title="Contributor Details" description="Detailed contribution metrics and activity" />
+        <Header title="Contributor Details" />
         <div className="rounded-sm border border-border bg-surface/50 p-12 text-center backdrop-blur-sm">
           <h2 className="mb-2 text-2xl/8 font-bold text-foreground">Contributor not found</h2>
           <p className="mb-4 text-muted">No active nodes found for &quot;{id}&quot; in the last 24 hours.</p>
@@ -249,7 +249,7 @@ export function DetailPage(): JSX.Element {
         {/* Inline Client Logos */}
         {uniqueConsensusClients.size > 0 && (
           <>
-            <span className="text-muted">·</span>
+            <span className="text-muted">/</span>
             <div className="flex items-center gap-2">
               {Array.from(uniqueConsensusClients)
                 .filter((client): client is string => typeof client === 'string')
@@ -299,10 +299,6 @@ export function DetailPage(): JSX.Element {
       {/* Live Metrics Section */}
       <div className="mt-12">
         <h2 className="mb-6 text-2xl/8 font-bold text-foreground">Propagation Latency Metrics</h2>
-        <p className="mb-6 text-muted">
-          Real-time propagation latency for blocks, blobs, attestations, and head events observed by this
-          contributor&apos;s nodes. Metrics update live as each slot progresses.
-        </p>
 
         <div className="mb-6">
           <SlotPlayerControls />

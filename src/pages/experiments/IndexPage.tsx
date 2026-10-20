@@ -30,7 +30,7 @@ const experimentCards: ExperimentCard[] = [
 export function IndexPage(): JSX.Element {
   return (
     <Container>
-      <Header title="Experiments" description="Explore cutting-edge Ethereum data visualizations and analytics" />
+      <Header title="Experiments" />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {experimentCards.map(experiment => (

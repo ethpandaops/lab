@@ -98,15 +98,8 @@ export function BlockClassificationCDFChart({ blockPropagationData }: BlockClass
     );
   }
 
-  const subtitle = `Cumulative distribution of block arrival times by node classification`;
-
   return (
-    <PopoutCard
-      title="Block Propagation by Classification (CDF)"
-      anchorId="block-classification-cdf"
-      subtitle={subtitle}
-      modalSize="xl"
-    >
+    <PopoutCard title="Block Propagation by Classification (CDF)" anchorId="block-classification-cdf" modalSize="xl">
       {({ inModal }) => (
         <div className="space-y-4">
           {/* Chart */}

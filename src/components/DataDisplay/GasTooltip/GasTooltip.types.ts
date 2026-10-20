@@ -47,8 +47,7 @@ const TRANSACTION_EXPLANATIONS: Record<GasType, GasExplanation> = {
   },
   evm: {
     title: 'EVM Execution Gas',
-    description:
-      'Gas consumed by opcode execution during the transaction. This is what the flame graph visualizes - the cost of running smart contract code.',
+    description: 'Gas consumed by opcode execution during the transaction. This is what the flame graph visualizes.',
   },
   refund: {
     title: 'Gas Refund',
@@ -57,12 +56,11 @@ const TRANSACTION_EXPLANATIONS: Record<GasType, GasExplanation> = {
   },
   receipt: {
     title: 'Receipt Gas',
-    description: 'Final gas charged to the user. Calculated as: Intrinsic + EVM Execution - Refund.',
+    description: 'Final gas charged to the user.',
   },
   self: {
     title: 'Gas',
-    description:
-      "Gas consumed directly by this call's opcodes, excluding any gas consumed by sub-calls. Useful for identifying which specific call is expensive.",
+    description: "Gas consumed directly by this call's opcodes, excluding any gas consumed by sub-calls.",
   },
   child: {
     title: 'Child Calls Gas',
@@ -71,8 +69,7 @@ const TRANSACTION_EXPLANATIONS: Record<GasType, GasExplanation> = {
   },
   cumulative: {
     title: 'Cumulative Gas',
-    description:
-      'Total gas consumed by this call including all sub-calls. Represents the full cost of this call and everything it triggered.',
+    description: 'Total gas consumed by this call including all sub-calls.',
   },
 };
 
@@ -87,8 +84,7 @@ const BLOCK_EXPLANATIONS: Record<GasType, GasExplanation> = {
   },
   evm: {
     title: 'Total EVM Execution Gas',
-    description:
-      'Sum of EVM execution gas across all transactions in this block. This represents the total cost of running smart contract code.',
+    description: 'Sum of EVM execution gas across all transactions in this block.',
   },
   refund: {
     title: 'Total Gas Refund',
@@ -111,17 +107,15 @@ const CALL_EXPLANATIONS: Record<GasType, GasExplanation> = {
   ...TRANSACTION_EXPLANATIONS,
   self: {
     title: 'Gas',
-    description:
-      "Gas consumed directly by this call's opcodes, excluding any gas used by sub-calls. Shows the direct cost of this specific call.",
+    description: "Gas consumed directly by this call's opcodes, excluding any gas used by sub-calls.",
   },
   child: {
     title: 'Child Calls Gas',
-    description: 'Total gas consumed by all sub-calls made from this call. Calculated as: Cumulative - Gas.',
+    description: 'Total gas consumed by all sub-calls made from this call.',
   },
   cumulative: {
     title: 'Cumulative Gas',
-    description:
-      'Total gas consumed by this call including all its sub-calls. Represents the full cost of this call and everything it triggered.',
+    description: 'Total gas consumed by this call including all its sub-calls.',
   },
 };
 

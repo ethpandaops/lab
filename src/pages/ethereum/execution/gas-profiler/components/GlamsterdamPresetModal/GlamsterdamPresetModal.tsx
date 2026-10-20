@@ -72,8 +72,7 @@ const EIP_SECTIONS: EipSection[] = [
   {
     eip: 'EIP-8038',
     name: 'State Access Repricing',
-    description:
-      'Reprices state access opcodes (SLOAD, SSTORE, CALL cold/warm). Values are still under discussion and may change.',
+    description: 'Reprices state access opcodes (SLOAD, SSTORE, CALL cold/warm).',
     url: 'https://eips.ethereum.org/EIPS/eip-8038',
     placeholder: true,
     parameters: [
@@ -218,11 +217,7 @@ export function GlamsterdamPresetModal({
               EIP-8007 (Glamsterdam)
               <ArrowTopRightOnSquareIcon className="size-3.5" />
             </a>
-            , the upcoming Ethereum execution layer upgrade. It bundles compute repricing, calldata floor increases, and
-            transaction base cost reductions into a single preset you can simulate against real blocks.
-          </p>
-          <p className="mt-2 text-sm/6 text-muted">
-            Values below are pre-filled with the proposed changes. You can adjust any parameter before simulating.
+            , the upcoming Ethereum execution layer upgrade.
           </p>
         </div>
 
@@ -354,10 +349,6 @@ export function GlamsterdamPresetModal({
             <ExclamationTriangleIcon className="size-4 text-amber-500" />
             <h3 className="text-sm font-semibold text-foreground">Not Simulated</h3>
           </div>
-          <p className="mb-3 text-xs/5 text-muted">
-            The following EIPs in Glamsterdam involve structural protocol changes that cannot be expressed as gas
-            parameter overrides. Their effects are not reflected in this simulation.
-          </p>
           <div className="space-y-2">
             {UNSUPPORTED_EIPS.map(eip => (
               <div key={eip.eip} className="flex items-start gap-3 rounded-xs bg-surface px-3 py-2.5">

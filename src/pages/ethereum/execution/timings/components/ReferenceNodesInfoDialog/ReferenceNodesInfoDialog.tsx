@@ -14,16 +14,12 @@ export function ReferenceNodesInfoDialog({ open, onClose }: ReferenceNodesInfoDi
   return (
     <Dialog open={open} onClose={onClose} title="About Reference Nodes" size="lg">
       <div className="space-y-4 text-sm leading-relaxed text-muted">
-        <p>
-          <span className="font-medium text-foreground">
-            Reference nodes are controlled by ethPandaOps and follow EIP-7870 hardware specifications.
-          </span>{' '}
-          This EIP establishes standardized hardware and bandwidth recommendations to ensure consistent, meaningful
-          benchmark comparisons across the Ethereum network.
+        <p className="font-medium text-foreground">
+          Reference nodes are controlled by ethPandaOps and follow EIP-7870 hardware specifications.
         </p>
         <p>
           EIP-7870 defines three node types with specific requirements: Full Nodes for chain following, Attesters for
-          validators, and Local Block Builders for block proposal. Each has distinct hardware and bandwidth needs.
+          validators, and Local Block Builders for block proposal.
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
@@ -65,11 +61,7 @@ export function ReferenceNodesInfoDialog({ open, onClose }: ReferenceNodesInfoDi
             </span>
           </p>
         </div>
-        <p>
-          All reference nodes use 4 TB NVMe storage. By filtering to reference nodes, you see Engine API performance on
-          standardized infrastructure, making it easier to identify client-specific behavior versus hardware-related
-          variance.
-        </p>
+        <p>All reference nodes use 4 TB NVMe storage.</p>
         <p className="text-xs">
           <a
             href="https://eips.ethereum.org/EIPS/eip-7870"

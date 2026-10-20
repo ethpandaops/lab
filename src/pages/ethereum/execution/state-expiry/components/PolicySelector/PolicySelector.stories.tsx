@@ -42,12 +42,12 @@ const EXAMPLE_CONFIG: PolicySelectorConfig<ExpiryType, ExpiryPolicy> = {
     '12m': {
       shortLabel: '1y',
       fullLabel: '1 year',
-      tooltip: 'Storage expires after 1 year of inactivity. More aggressive pruning.',
+      tooltip: 'Storage expires after 1 year of inactivity.',
     },
     '24m': {
       shortLabel: '2y',
       fullLabel: '2 years',
-      tooltip: 'Storage expires after 2 years of inactivity. More conservative.',
+      tooltip: 'Storage expires after 2 years of inactivity.',
     },
   },
   typeTooltips: {

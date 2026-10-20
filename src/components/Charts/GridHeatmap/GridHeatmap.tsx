@@ -241,7 +241,7 @@ export function GridHeatmap<T = unknown>({
                           onRowClick ? 'cursor-pointer hover:text-accent' : 'cursor-default text-muted',
                           hoveredRow === row.identifier ? 'font-bold text-accent' : 'text-muted'
                         )}
-                        title={onRowClick ? 'Click to drill down' : row.label}
+                        title={row.label}
                       >
                         {/* Drill-down icon (only visible on hover if clickable) */}
                         {onRowClick && (

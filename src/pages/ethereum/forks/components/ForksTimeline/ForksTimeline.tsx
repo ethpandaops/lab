@@ -29,7 +29,6 @@ export function ForksTimeline({
     <Card>
       <div className="p-6">
         <h3 className="text-lg font-semibold text-foreground">Fork Timeline</h3>
-        <p className="mt-1 text-sm text-muted">Complete history of consensus layer upgrades</p>
 
         <div className="mt-6 space-y-8">
           {forks.map((fork, forkIndex) => {

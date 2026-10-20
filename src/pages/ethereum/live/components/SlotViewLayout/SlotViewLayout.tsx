@@ -394,7 +394,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
     // progressive reveal working across both.
     const payloadWave = slotData.payloadMapPoints.map(point => ({
       ...point,
-      name: `${point.name} · payload`,
+      name: `${point.name} / payload`,
       color: 'var(--color-purple-500, #a855f7)',
     }));
 

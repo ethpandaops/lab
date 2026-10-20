@@ -13,7 +13,7 @@ const meta = {
     Story => (
       <div className="min-w-[600px] rounded-sm bg-surface p-6">
         <Container>
-          <Header title="Contributor Details" description="Detailed contribution metrics and activity" />
+          <Header title="Contributor Details" />
           <Story />
         </Container>
       </div>

@@ -57,7 +57,7 @@ export function SlotPayloadCard({ slot, proposerIndex, hasBlock }: SlotPayloadCa
   const blobVotes = ptcVote?.blob_data_available_votes;
 
   return (
-    <PopoutCard title="Payload" subtitle="ePBS payload lifecycle: bid, reveal, PTC verdict" anchorId="slot-payload">
+    <PopoutCard title="Payload" anchorId="slot-payload">
       {() => (
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2">

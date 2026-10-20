@@ -488,10 +488,9 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
             {/* Duration Histogram */}
             <Card>
               <div className="p-4">
-                <h4 className="mb-2 text-base font-semibold text-foreground" id="blob-duration">
+                <h4 className="mb-4 text-base font-semibold text-foreground" id="blob-duration">
                   Duration Distribution (50ms buckets)
                 </h4>
-                <p className="mb-4 text-sm text-muted">Histogram of engine_getBlobs call durations</p>
                 {histogramData.length > 0 ? (
                   <BarChart data={histogramData} labels={histogramLabels} color={themeColors.accent} height={375} />
                 ) : (
@@ -506,7 +505,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
             <Card>
               <div className="p-4">
                 <h4 className="mb-2 text-base font-semibold text-foreground">Per-Slot Duration by Client</h4>
-                <p className="mb-4 text-sm text-muted">Median duration for each slot, grouped by execution client</p>
+                <p className="mb-4 text-sm text-muted">Median duration for each slot</p>
                 {hasClientData && slotDurationByClientSeries.some(s => s.data.length > 0) ? (
                   <MultiLineChart
                     series={slotDurationByClientSeries}
@@ -535,8 +534,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
             {/* Status Breakdown */}
             <Card>
               <div className="p-4">
-                <h4 className="mb-2 text-base font-semibold text-foreground">Status Distribution</h4>
-                <p className="mb-4 text-sm text-muted">Breakdown of getBlobs response status</p>
+                <h4 className="mb-4 text-base font-semibold text-foreground">Status Distribution</h4>
                 {statusData.some(d => d.value > 0) ? (
                   <BarChart data={statusData} labels={statusLabels} height={250} orientation="horizontal" />
                 ) : (
@@ -567,7 +565,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
           {/* Hourly Duration (P50/P95 toggle) */}
           <Card>
             <div className="p-4">
-              <div className="mb-2 flex items-center justify-between">
+              <div className="mb-4 flex items-center justify-between">
                 <h4 className="text-base font-semibold text-foreground">
                   Hourly {selectedPercentile === 'p50' ? 'P50' : 'P95'} Duration by Client
                 </h4>
@@ -596,11 +594,6 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   </button>
                 </div>
               </div>
-              <p className="mb-4 text-sm text-muted">
-                {selectedPercentile === 'p50'
-                  ? '50th percentile duration over time, grouped by execution client'
-                  : '95th percentile duration over time (tail latency)'}
-              </p>
               {(selectedPercentile === 'p50' ? hourlyTrendSeries : hourlyP95Series).length > 0 &&
               (selectedPercentile === 'p50' ? hourlyTrendSeries : hourlyP95Series).some(s => s.data.length > 0) ? (
                 <MultiLineChart

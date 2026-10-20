@@ -23,18 +23,13 @@ export function ContractStorageCTA({ address, contractName }: ContractStorageCTA
       params={{ address }}
       className="group block rounded-sm border border-primary/20 bg-primary/5 p-4 transition-colors hover:border-primary/40 hover:bg-primary/10"
     >
-      <div className="flex items-start gap-4">
+      <div className="flex items-center gap-4">
         <div className="rounded-sm bg-primary/20 p-2.5">
           <CircleStackIcon className="size-6 text-primary" />
         </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <h4 className="text-sm font-semibold text-foreground">{displayName}</h4>
-            <ArrowRightIcon className="size-4 text-primary opacity-0 transition-opacity group-hover:opacity-100" />
-          </div>
-          <p className="mt-1 text-xs text-muted">
-            Explore this contract&apos;s storage slots, access patterns, and state expiry projections.
-          </p>
+        <div className="flex flex-1 items-center gap-2">
+          <h4 className="text-sm font-semibold text-foreground">{displayName}</h4>
+          <ArrowRightIcon className="size-4 text-primary opacity-0 transition-opacity group-hover:opacity-100" />
         </div>
         <span className="rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors group-hover:border-primary/50 group-hover:bg-primary/20">
           View Storage Analysis

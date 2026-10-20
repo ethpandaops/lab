@@ -527,22 +527,13 @@ export function OpcodeAnalysis({
       {showTable && (
         <div>
           <div className="mb-4 flex items-center justify-between">
-            {showHeader ? (
-              <div>
-                <h3 className="text-sm font-medium text-foreground">Opcode Details</h3>
-                <p className="text-xs text-muted">Click column headers to sort</p>
-              </div>
-            ) : (
-              <div>
-                <p className="text-xs text-muted">Click column headers to sort</p>
-              </div>
-            )}
+            {showHeader && <h3 className="text-sm font-medium text-foreground">Opcode Details</h3>}
             <input
               type="text"
               placeholder="Search opcodes..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="rounded-xs border border-border bg-surface px-3 py-1.5 text-sm text-foreground placeholder:text-muted focus:border-primary focus:outline-none"
+              className="ml-auto rounded-xs border border-border bg-surface px-3 py-1.5 text-sm text-foreground placeholder:text-muted focus:border-primary focus:outline-none"
             />
           </div>
           <div className="overflow-hidden rounded-sm border border-border">

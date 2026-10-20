@@ -123,7 +123,7 @@ export function GeographicalMapView({ nodes, isLoading }: GeographicalMapViewPro
           if (data) {
             const pointName = data.name || 'Unknown';
             const value = data.value?.[2] ?? 0;
-            return `<strong>${pointName}</strong><br/>Nodes: ${value}<br/><span style="font-size: 11px; opacity: 0.7;">Click for details</span>`;
+            return `<strong>${pointName}</strong><br/>Nodes: ${value}`;
           }
           return params.name || '';
         },

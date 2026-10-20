@@ -87,28 +87,18 @@ function ContractRow({
               className="flex items-center gap-1.5 text-left hover:underline"
             >
               {contract.name && (
-                <>
-                  <span
-                    className={contract.isImplementation ? 'font-medium text-muted' : 'font-medium text-foreground'}
-                  >
-                    {contract.name}
-                  </span>
-                  <span className="text-border">·</span>
-                </>
+                <span className={contract.isImplementation ? 'font-medium text-muted' : 'font-medium text-foreground'}>
+                  {contract.name}
+                </span>
               )}
               <span className="font-mono text-xs text-muted">{truncateAddress(contract.address)}</span>
             </button>
           ) : (
             <div className="flex items-center gap-1.5">
               {contract.name && (
-                <>
-                  <span
-                    className={contract.isImplementation ? 'font-medium text-muted' : 'font-medium text-foreground'}
-                  >
-                    {contract.name}
-                  </span>
-                  <span className="text-border">·</span>
-                </>
+                <span className={contract.isImplementation ? 'font-medium text-muted' : 'font-medium text-foreground'}>
+                  {contract.name}
+                </span>
               )}
               <span className="font-mono text-xs text-muted">{truncateAddress(contract.address)}</span>
             </div>
@@ -186,22 +176,12 @@ function ImplementationRow({
               onClick={() => onContractClick(contract)}
               className="flex items-center gap-1.5 text-left hover:underline"
             >
-              {contract.name && (
-                <>
-                  <span className="font-medium text-muted">{contract.name}</span>
-                  <span className="text-border">·</span>
-                </>
-              )}
+              {contract.name && <span className="font-medium text-muted">{contract.name}</span>}
               <span className="font-mono text-xs text-muted">{truncateAddress(contract.address)}</span>
             </button>
           ) : (
             <div className="flex items-center gap-1.5">
-              {contract.name && (
-                <>
-                  <span className="font-medium text-muted">{contract.name}</span>
-                  <span className="text-border">·</span>
-                </>
-              )}
+              {contract.name && <span className="font-medium text-muted">{contract.name}</span>}
               <span className="font-mono text-xs text-muted">{truncateAddress(contract.address)}</span>
             </div>
           )}

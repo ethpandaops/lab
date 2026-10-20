@@ -81,9 +81,9 @@ export function BlobDataColumnSpreadChart({ blobPropagationData, slot }: BlobDat
   }, [blobPropagationData]);
 
   // Calculate per-node spread distribution
-  const { barData, barLabels, bucketSize } = useMemo(() => {
+  const { barData, barLabels } = useMemo(() => {
     if (blobPropagationData.length === 0) {
-      return { barData: [], barLabels: [], bucketSize: 100 };
+      return { barData: [], barLabels: [] };
     }
 
     // Group by node - collect all times this node saw any blob/column
@@ -118,7 +118,7 @@ export function BlobDataColumnSpreadChart({ blobPropagationData, slot }: BlobDat
       .sort((a, b) => a.spread - b.spread);
 
     if (stats.length === 0) {
-      return { barData: [], barLabels: [], bucketSize: 100 };
+      return { barData: [], barLabels: [] };
     }
 
     // Create histogram data - distribution of spreads across nodes
@@ -152,7 +152,7 @@ export function BlobDataColumnSpreadChart({ blobPropagationData, slot }: BlobDat
     const data = sortedBuckets.map(([, count]) => count);
     const labels = sortedBuckets.map(([bucket]) => `${bucket}-${bucket + bucketSize}ms`);
 
-    return { barData: data, barLabels: labels, bucketSize };
+    return { barData: data, barLabels: labels };
   }, [blobPropagationData]);
 
   // Handle empty data
@@ -227,8 +227,7 @@ export function BlobDataColumnSpreadChart({ blobPropagationData, slot }: BlobDat
             {/* Per-Node Distribution */}
             {barData.length > 0 && (
               <div>
-                <h4 className="mb-2 text-sm font-semibold text-foreground">Per-Node Spread Distribution</h4>
-                <p className="mb-4 text-xs text-muted">Number of nodes by spread time ({bucketSize}ms buckets)</p>
+                <h4 className="mb-4 text-sm font-semibold text-foreground">Per-Node Spread Distribution</h4>
                 <BarChart
                   data={barData}
                   labels={barLabels}

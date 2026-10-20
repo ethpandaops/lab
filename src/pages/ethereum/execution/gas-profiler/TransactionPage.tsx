@@ -677,7 +677,7 @@ export function TransactionPage(): JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title={`TX ${txHash.slice(0, 10)}...${txHash.slice(-8)}`} description="Transaction gas analysis" />
+        <Header title={`TX ${txHash.slice(0, 10)}...${txHash.slice(-8)}`} />
         <GasProfilerSkeleton />
       </Container>
     );
@@ -687,7 +687,7 @@ export function TransactionPage(): JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header title={`TX ${txHash.slice(0, 10)}...${txHash.slice(-8)}`} description="Transaction gas analysis" />
+        <Header title={`TX ${txHash.slice(0, 10)}...${txHash.slice(-8)}`} />
         <Alert variant="error" title="Error loading transaction" description={error.message} />
       </Container>
     );
@@ -697,7 +697,7 @@ export function TransactionPage(): JSX.Element {
   if (!txData) {
     return (
       <Container>
-        <Header title={`TX ${txHash.slice(0, 10)}...${txHash.slice(-8)}`} description="Transaction gas analysis" />
+        <Header title={`TX ${txHash.slice(0, 10)}...${txHash.slice(-8)}`} />
         <Alert
           variant="warning"
           title="Transaction not found"
@@ -733,7 +733,7 @@ export function TransactionPage(): JSX.Element {
 
   return (
     <Container>
-      <Header title={`TX ${txHash.slice(0, 10)}...${txHash.slice(-8)}`} description="Transaction gas analysis" />
+      <Header title={`TX ${txHash.slice(0, 10)}...${txHash.slice(-8)}`} />
 
       {/* Back link + External links */}
       <div className="mb-6 flex items-center justify-between">
@@ -1081,8 +1081,6 @@ export function TransactionPage(): JSX.Element {
                 <h3 className="mb-1 text-sm font-medium text-foreground">Simple ETH Transfer</h3>
                 <p className="text-xs text-muted">
                   This transaction is a simple value transfer with no smart contract interaction.
-                  <br />
-                  Only intrinsic gas ({formatGas(metadata.intrinsicGas ?? 21000)} gas) was consumed.
                 </p>
               </Card>
             ) : (
@@ -1135,7 +1133,6 @@ export function TransactionPage(): JSX.Element {
                   data={opcodeCategoryData}
                   colorMap={CATEGORY_COLORS}
                   title="Gas by Opcode Category"
-                  subtitle="Where was EVM gas spent?"
                   percentLabel="of EVM gas"
                   emptyMessage="No opcode data"
                   height={280}
@@ -1144,7 +1141,6 @@ export function TransactionPage(): JSX.Element {
                   data={opcodeCategoryCountData}
                   colorMap={CATEGORY_COLORS}
                   title="Count by Opcode Category"
-                  subtitle="How often did each category execute?"
                   percentLabel="of executions"
                   emptyMessage="No opcode data"
                   height={280}
@@ -1169,7 +1165,6 @@ export function TransactionPage(): JSX.Element {
                 entries={txResourceCategoryEntries}
                 loading={txResourceOpcodeLoading}
                 title="Gas by Resource Category"
-                subtitle="What system resources consumed gas?"
                 className="mb-6"
               />
 
@@ -1183,11 +1178,7 @@ export function TransactionPage(): JSX.Element {
               <div className="space-y-6">
                 {/* Gas Distribution + Top Internal Txs */}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  <PopoutCard
-                    title="Gas by Contract"
-                    subtitle="Total gas per contract (all calls to same address combined)"
-                    modalSize="xl"
-                  >
+                  <PopoutCard title="Gas by Contract" modalSize="xl">
                     {({ inModal }) => (
                       <ReactECharts
                         option={contractTreemapOption}
@@ -1199,7 +1190,6 @@ export function TransactionPage(): JSX.Element {
                   </PopoutCard>
                   <TopItemsByGasTable
                     title="Top Calls by Gas"
-                    subtitle="Individual calls ranked by gas (same contract may appear multiple times)"
                     items={topCallsItems}
                     totalGas={totalCallGas}
                     compactCount={5}
@@ -1215,7 +1205,6 @@ export function TransactionPage(): JSX.Element {
                     data={callTypeChartData}
                     colorMap={CALL_TYPE_COLORS}
                     title="Internal Tx Type Distribution"
-                    subtitle="How many of each type?"
                     percentLabel="of internal txs"
                     emptyMessage="No call data"
                     innerRadius={50}
@@ -1226,7 +1215,6 @@ export function TransactionPage(): JSX.Element {
                     data={callTypeGasChartData}
                     colorMap={CALL_TYPE_COLORS}
                     title="Gas by Internal Tx Type"
-                    subtitle="How much gas did each type consume?"
                     percentLabel="of internal tx gas"
                     emptyMessage="No call data"
                     innerRadius={50}

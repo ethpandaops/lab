@@ -71,7 +71,7 @@ export function ProbeEventRow({ probe, onClick, isNew, showViewIcon }: ProbeEven
         {/* Row 1: Client name - slot, result */}
         <div className="flex w-full items-center gap-1.5 text-xs">
           <span className="truncate font-medium text-foreground">{peerClient}</span>
-          <span className="text-muted">·</span>
+          <span className="text-muted">/</span>
           <span className="font-mono text-muted">{slot !== undefined ? formatSlot(slot) : '?'}</span>
           <div className="flex-1" />
           <ResultIcon result={probe.result} />
@@ -82,7 +82,7 @@ export function ProbeEventRow({ probe, onClick, isNew, showViewIcon }: ProbeEven
           <span>{columnsCount} cols</span>
           {blobPosters.length > 0 && (
             <>
-              <span>·</span>
+              <span>/</span>
               <div className="flex items-center gap-1">
                 {blobPosters.map(poster => (
                   <BlobPosterLogo key={poster} poster={poster} size={16} className="shrink-0" />

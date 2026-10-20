@@ -1,7 +1,7 @@
 import { type JSX, useMemo, useCallback, useState } from 'react';
 import { useParams } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { CubeIcon, CursorArrowRaysIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import { CubeIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import { dimContractOwnerServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { Container } from '@/components/Layout/Container';
 import { Card } from '@/components/Layout/Card';
@@ -63,12 +63,12 @@ const POLICY_SELECTOR_CONFIG: PolicySelectorConfig<ExpiryType, ExpiryPolicy> = {
     '12m': {
       shortLabel: '1y',
       fullLabel: '1 year',
-      tooltip: 'Storage expires after 1 year of inactivity. More aggressive pruning.',
+      tooltip: 'Storage expires after 1 year of inactivity.',
     },
     '24m': {
       shortLabel: '2y',
       fullLabel: '2 years',
-      tooltip: 'Storage expires after 2 years of inactivity. More conservative.',
+      tooltip: 'Storage expires after 2 years of inactivity.',
     },
   },
   typeTooltips: {
@@ -448,12 +448,6 @@ export function ContractPage(): JSX.Element {
         <div className="mt-8 space-y-4">
           {/* State Expiry Section Title */}
           <h2 className="text-xl font-semibold text-foreground">State Expiry</h2>
-
-          {/* Call to action */}
-          <div className="inline-flex items-center gap-2 rounded-sm border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary">
-            <CursorArrowRaysIcon className="size-4 shrink-0" />
-            <span>Select an expiry policy below to see how much storage could be removed</span>
-          </div>
 
           {/* Policy Selector - always visible */}
           <PolicySelector

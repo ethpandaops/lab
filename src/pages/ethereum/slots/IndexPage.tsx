@@ -245,10 +245,7 @@ export function IndexPage(): JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header
-          title="Slots"
-          description="Browse Ethereum consensus layer slots with detailed block, proposer, and blob information"
-        />
+        <Header title="Slots" />
         <div className="mt-6">
           <Table
             data={skeletonData}
@@ -265,10 +262,7 @@ export function IndexPage(): JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header
-          title="Slots"
-          description="Browse Ethereum consensus layer slots with detailed block, proposer, and blob information"
-        />
+        <Header title="Slots" />
         <div className="mt-8 rounded-sm border border-danger/20 bg-danger/10 p-4 text-danger">
           Error loading slots: {error.message}
         </div>
@@ -278,10 +272,7 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      <Header
-        title="Slots"
-        description="Browse Ethereum consensus layer slots with detailed block, proposer, and blob information"
-      />
+      <Header title="Slots" />
 
       {/* Slots Table */}
       <div className="mt-6">

@@ -22,10 +22,7 @@ export function EntityBasicInfoCard({
       {/* Header section */}
       <div className="border-b border-border bg-background px-6 py-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">{stats.entity}</h1>
-            <p className="mt-1 text-sm text-muted">Validator entity overview</p>
-          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">{stats.entity}</h1>
 
           {/* Health status badge */}
           <div

@@ -124,7 +124,7 @@ export function DetailPage(): React.JSX.Element {
   if (epoch === null) {
     return (
       <Container>
-        <Header title="Invalid Epoch" description="The epoch parameter must be a valid non-negative integer" />
+        <Header title="Invalid Epoch" />
         <Alert variant="error" title="Invalid Epoch" description={`"${params.epoch}" is not a valid epoch number.`} />
       </Container>
     );
@@ -143,7 +143,7 @@ export function DetailPage(): React.JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header title={`Epoch ${formatEpoch(epoch)}`} description="Error loading epoch data" />
+        <Header title={`Epoch ${formatEpoch(epoch)}`} />
         <Alert variant="error" title="Error Loading Epoch Data" description={error.message} />
       </Container>
     );
@@ -153,12 +153,8 @@ export function DetailPage(): React.JSX.Element {
   if (!data) {
     return (
       <Container>
-        <Header title={`Epoch ${formatEpoch(epoch)}`} description="No data available" />
-        <Alert
-          variant="info"
-          title="No Data Available"
-          description="No data was found for this epoch. It may not have occurred yet or data may not be available."
-        />
+        <Header title={`Epoch ${formatEpoch(epoch)}`} />
+        <Alert variant="info" title="No Data Available" description="This epoch may not have occurred yet." />
       </Container>
     );
   }

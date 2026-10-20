@@ -102,7 +102,7 @@ function buildContextDescription(cellContext: CellContext): string {
       parts.push(rowLabel ?? 'Unknown');
   }
 
-  return parts.join(' · ');
+  return parts.join(' / ');
 }
 
 /**

@@ -54,7 +54,7 @@ export function IndexPage(): React.JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title="Epochs" description="Explore Ethereum beacon chain epochs and their attestation data" />
+        <Header title="Epochs" />
         <EpochsSkeleton />
       </Container>
     );
@@ -63,7 +63,7 @@ export function IndexPage(): React.JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header title="Epochs" description="Explore Ethereum beacon chain epochs and their attestation data" />
+        <Header title="Epochs" />
         <Alert variant="error" title="Error loading epochs" description={error.message} />
       </Container>
     );
@@ -71,7 +71,7 @@ export function IndexPage(): React.JSX.Element {
 
   return (
     <Container>
-      <Header title="Epochs" description="Explore Ethereum beacon chain epochs and their attestation data" />
+      <Header title="Epochs" />
 
       <div className="mt-6">
         <Table
@@ -126,10 +126,6 @@ export function IndexPage(): React.JSX.Element {
           ]}
           onRowClick={handleRowClick}
         />
-
-        <div className="mt-4 text-sm text-muted">
-          <p>Click on an epoch to view detailed analytics including slot-by-slot data.</p>
-        </div>
       </div>
 
       <div id="metrics" className="mt-8">

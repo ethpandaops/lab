@@ -1019,11 +1019,7 @@ export function HomePage(): JSX.Element {
           title="Gas Profiler"
           description="Analyze Ethereum transaction gas consumption with call tree visualization and opcode breakdown"
         />
-        <Alert
-          variant="warning"
-          title="No data available"
-          description="Gas profiling data is not yet available. Blocks are still being indexed."
-        />
+        <Alert variant="warning" title="No data available" description="Blocks are still being indexed." />
       </Container>
     );
   }
@@ -1131,10 +1127,7 @@ export function HomePage(): JSX.Element {
           <div className="rounded-xs bg-primary/10 p-2">
             <ChartBarIcon className="size-5 text-primary" />
           </div>
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Network Analytics</h2>
-            <p className="text-sm text-muted">Historical gas consumption and opcode metrics</p>
-          </div>
+          <h2 className="text-lg font-semibold text-foreground">Network Analytics</h2>
         </div>
       </div>
 

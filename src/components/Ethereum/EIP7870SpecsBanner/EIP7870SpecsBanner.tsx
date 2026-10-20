@@ -87,9 +87,7 @@ export function EIP7870SpecsBanner({ className }: EIP7870SpecsBannerProps): JSX.
             </table>
           </div>
           <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-3">
-            <p className="text-xs text-muted">
-              Reference nodes are controlled by ethPandaOps and follow EIP-7870 hardware specifications.
-            </p>
+            <p className="text-xs text-muted">Reference nodes are controlled by ethPandaOps.</p>
             <a
               href="https://eips.ethereum.org/EIPS/eip-7870"
               target="_blank"

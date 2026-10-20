@@ -24,13 +24,6 @@ function bytesToMB(bytes: number): number {
 
 export type MemoryMetric = 'vm_rss' | 'rss_anon' | 'rss_file' | 'vm_swap';
 
-const METRIC_LABELS: Record<MemoryMetric, string> = {
-  vm_rss: 'RSS Total',
-  rss_anon: 'RSS Anon',
-  rss_file: 'RSS File',
-  vm_swap: 'Swap',
-};
-
 const METRIC_OPTIONS = [
   { value: 'vm_rss' as MemoryMetric, label: 'RSS Total' },
   { value: 'rss_anon' as MemoryMetric, label: 'RSS Anon' },
@@ -233,9 +226,7 @@ export function MemoryUsageChart({
   const nodeCount = new Set(data.map(d => d.meta_client_name)).size;
   const shortNodeName = selectedNode?.split('/').pop() ?? '';
 
-  const subtitle = selectedNode
-    ? `Slot ${slot} · ${shortNodeName} · ${METRIC_LABELS[metric]}`
-    : `Slot ${slot} · Mean across ${nodeCount} nodes · ${METRIC_LABELS[metric]}`;
+  const subtitle = selectedNode ? `Slot ${slot} / ${shortNodeName}` : `Slot ${slot} / Mean across ${nodeCount} nodes`;
 
   const headerActions = (
     <div className="flex items-center gap-2">
@@ -247,7 +238,7 @@ export function MemoryUsageChart({
 
   if (data.length === 0) {
     return (
-      <PopoutCard title="Memory Usage" subtitle="No data available" modalSize="xl">
+      <PopoutCard title="Memory Usage" modalSize="xl">
         {({ inModal }) => (
           <div className={inModal ? 'min-h-80' : 'h-64'}>
             <div className="flex h-full items-center justify-center">

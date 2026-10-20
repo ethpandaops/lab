@@ -9,7 +9,6 @@ import { InfoBox } from '@/components/Feedback/InfoBox';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { SeriesData } from '@/components/Charts/MultiLine';
-import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
 import {
   buildTooltipHtml,
@@ -79,7 +78,6 @@ export function IndexPage(): JSX.Element {
   const timePeriod: TimePeriod = search.t ?? DEFAULT_TIME_PERIOD;
   const config = TIME_RANGE_CONFIG[timePeriod];
 
-  const { currentNetwork } = useNetwork();
   const { data: tableBounds, isLoading: boundsLoading } = useTableBounds(COMPLETION_HOURLY_TABLE);
   const hasData = !!tableBounds;
 
@@ -223,13 +221,7 @@ export function IndexPage(): JSX.Element {
 
       {!boundsLoading && !hasData ? (
         <Card rounded>
-          <div className="flex flex-col gap-2">
-            <h3 className="text-base/7 font-semibold text-foreground">No partial column data for this network</h3>
-            <p className="text-sm/6 text-muted">
-              {currentNetwork?.display_name ?? 'This network'} has no data column completions from sentry nodes yet, so
-              partial message adoption and column completion cannot be shown.
-            </p>
-          </div>
+          <h3 className="text-base/7 font-semibold text-foreground">No partial column data for this network</h3>
         </Card>
       ) : (
         <div className="flex flex-col gap-6">
@@ -275,9 +267,7 @@ export function IndexPage(): JSX.Element {
             <Card rounded>
               <div className="flex flex-col gap-1">
                 <h3 className="text-base/7 font-semibold text-foreground">No completions in this window</h3>
-                <p className="text-sm/6 text-muted">
-                  Sentry nodes reported no column completions here. Try a longer window.
-                </p>
+                <p className="text-sm/6 text-muted">Try a longer window.</p>
               </div>
             </Card>
           ) : (

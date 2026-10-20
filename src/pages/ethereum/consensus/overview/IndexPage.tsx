@@ -870,12 +870,12 @@ export function IndexPage(): JSX.Element {
 
   // --- Subtitles ---
 
-  const makeSub = (metric: string): string =>
-    isDaily ? `Daily ${metric} with statistical bands` : `Hourly ${metric} over ${config.days} days`;
+  const windowLabel = config.days === 1 ? '24 hours' : `${config.days} days`;
+  const makeSub = (metric: string): string => (isDaily ? `Daily ${metric}` : `Hourly ${metric} over ${windowLabel}`);
 
   return (
     <Container>
-      <Header title="Consensus Overview" description="Ethereum consensus layer metrics" showAccent={false} />
+      <Header title="Consensus Overview" showAccent={false} />
 
       {/* Time Period Selector */}
       <div className="mb-6 flex flex-wrap items-center gap-6">
@@ -993,7 +993,7 @@ export function IndexPage(): JSX.Element {
           {reorgChartConfig && (
             <PopoutCard
               title="Reorgs"
-              subtitle={isDaily ? 'Daily reorg events by depth' : `Hourly reorg events over ${config.days} days`}
+              subtitle={isDaily ? 'Daily reorg events by depth' : `Hourly reorg events over ${windowLabel}`}
               anchorId="reorg-chart"
               modalSize="full"
             >
@@ -1043,7 +1043,7 @@ export function IndexPage(): JSX.Element {
           {payloadStatusChartConfig && (
             <PopoutCard
               title="Payload Delivery (ePBS)"
-              subtitle={`Hourly PTC-judged payload delivery rates over ${config.days} days`}
+              subtitle={`Hourly PTC-judged payload delivery rates over ${windowLabel}`}
               anchorId="payload-delivery-chart"
               modalSize="full"
             >
@@ -1070,7 +1070,7 @@ export function IndexPage(): JSX.Element {
               subtitle={
                 isDaily
                   ? 'Daily block proposal outcome rates'
-                  : `Hourly block proposal outcome rates over ${config.days} days`
+                  : `Hourly block proposal outcome rates over ${windowLabel}`
               }
               anchorId="block-proposal-status-chart"
               modalSize="full"

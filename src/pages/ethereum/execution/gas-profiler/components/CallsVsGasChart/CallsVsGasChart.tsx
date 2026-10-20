@@ -19,7 +19,7 @@ export interface CallsVsGasChartProps {
   data: CallsVsGasDataPoint[];
   /** Card title (default: "Calls vs Gas") */
   title?: string;
-  /** Card subtitle (default: "Do more calls use more gas?") */
+  /** Card subtitle */
   subtitle?: string;
   /** X-axis label (default: "Calls") */
   xAxisLabel?: string;
@@ -54,7 +54,7 @@ function formatCompact(value: number): string {
 export function CallsVsGasChart({
   data,
   title = 'Calls vs Gas',
-  subtitle = 'Do more calls use more gas?',
+  subtitle,
   xAxisLabel = 'Calls',
   tooltipLabel = 'calls',
 }: CallsVsGasChartProps): JSX.Element {

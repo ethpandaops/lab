@@ -19,7 +19,7 @@ export interface CategoryPieChartProps {
   /** Chart title */
   title: string;
   /** Chart subtitle/description */
-  subtitle: string;
+  subtitle?: string;
   /** Total label displayed in header (e.g., "123K total") */
   totalLabel?: string;
   /** Label for percentage in tooltip (e.g., "of EVM gas", "of self gas") */
@@ -136,7 +136,7 @@ export function CategoryPieChart({
   }, [processedData, colorMap, colors, innerRadius, outerRadius, percentLabel]);
 
   const titleWithTotal = totalLabel ? `${title}` : title;
-  const subtitleWithTotal = totalLabel ? `${subtitle} · ${totalLabel}` : subtitle;
+  const subtitleWithTotal = totalLabel ? [subtitle, totalLabel].filter(Boolean).join(', ') : subtitle;
 
   return (
     <PopoutCard title={titleWithTotal} subtitle={subtitleWithTotal}>

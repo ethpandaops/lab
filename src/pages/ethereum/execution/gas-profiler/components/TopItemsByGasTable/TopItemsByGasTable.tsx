@@ -37,7 +37,7 @@ export interface TopItemsByGasTableProps {
   /** Title for the card */
   title: string;
   /** Subtitle for the card */
-  subtitle: string;
+  subtitle?: string;
   /** Items to display (already sorted by gas descending) */
   items: TopGasItem[];
   /** Total gas for percentage calculation */

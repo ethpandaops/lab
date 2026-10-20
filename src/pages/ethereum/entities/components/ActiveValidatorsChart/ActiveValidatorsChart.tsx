@@ -60,10 +60,8 @@ export function ActiveValidatorsChart({ data, timePeriod }: ActiveValidatorsChar
 
   if (!data || series.length === 0) {
     return (
-      <PopoutCard title="Active Validators" subtitle="No data available">
-        {() => (
-          <Alert variant="info" title="No Data" description="No active validator data available for this entity." />
-        )}
+      <PopoutCard title="Active Validators">
+        {() => <Alert variant="info" description="No active validator data available for this entity." />}
       </PopoutCard>
     );
   }
