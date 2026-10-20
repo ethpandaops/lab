@@ -4,51 +4,102 @@ import {
   dimNodeServiceListOptions,
   fctBlockGraffitiServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
-import type { DimClientRelease, DimNode, FctBlockGraffiti } from '@/api/types.gen';
+import type { DimClientRelease } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { useTableBounds } from '@/hooks/useBounds';
 import { slotToTimestamp } from '@/utils/beacon';
-import { UNKNOWN_CLIENT, resolveClientRelease, type ClientReleaseResolution } from '@/utils/graffiti';
+import {
+  UNKNOWN_CLIENT,
+  findReleaseByVersion,
+  githubCommitUrl,
+  githubReleaseUrl,
+  resolveClientRelease,
+} from '@/utils/graffiti';
 
-/** Where the slot sits relative to the parsed graffiti data */
-export type GraffitiCoverage = 'covered' | 'not_collected' | 'not_yet_processed' | 'before_backfill';
-
-export interface SlotProposerClientData {
-  /** Parsed graffiti of the canonical block, undefined when there is none */
-  graffiti?: FctBlockGraffiti;
-  consensusRelease: ClientReleaseResolution;
-  executionRelease: ClientReleaseResolution;
-  /** Node metadata for the proposer, only set when it has a name (devnets) */
-  node?: DimNode;
-  coverage: GraffitiCoverage;
-  isLoading: boolean;
-  /** Message of the failed graffiti request, null when it succeeded */
-  error: string | null;
+/** One proposer client as shown on the slot page */
+export interface ProposerClientField {
+  client: string;
+  /** Release version, from the graffiti's version string or resolved from its commit prefix */
+  version?: string;
+  versionUrl?: string;
+  /** Commit prefix from the graffiti */
+  commit?: string;
+  commitUrl?: string;
+  /** Why the commit did not resolve to a version, for a tooltip */
+  commitNote?: string;
 }
 
-/** Fetches the releases a client's commit prefix may resolve to */
-function useClientReleases(
-  client: string | undefined,
-  commit: string | undefined,
-  enabled: boolean
-): { releases: DimClientRelease[]; isLoading: boolean } {
-  const prefix = (commit ?? '').toLowerCase();
+export interface SlotProposerClient {
+  consensus?: ProposerClientField;
+  execution?: ProposerClientField;
+  graffitiText?: string;
+  graffitiFormat?: string;
+  /** Node name for the proposer where the network publishes one (devnets) */
+  nodeName?: string;
+}
+
+const HEX_PREFIX = /^[0-9a-f]{2,40}$/;
+
+/** Releases for a client matching a commit prefix, or a version when there is no commit */
+function useReleases(client: string | undefined, commit: string, version: string | undefined): DimClientRelease[] {
+  const byCommit = HEX_PREFIX.test(commit);
+  const versions = version ? [version, version.replace(/^v/i, ''), `v${version.replace(/^v/i, '')}`] : [];
   const query = useQuery({
     ...dimClientReleaseServiceListOptions({
-      query: { client_eq: client, commit_sha_starts_with: prefix, page_size: 100 },
+      query: byCommit
+        ? { client_eq: client, commit_sha_starts_with: commit, page_size: 100 }
+        : { client_eq: client, version_in_values: [...new Set(versions)].join(','), page_size: 100 },
     }),
-    enabled: enabled && !!client && client !== UNKNOWN_CLIENT && /^[0-9a-f]{2,40}$/.test(prefix),
+    enabled: !!client && client !== UNKNOWN_CLIENT && (byCommit || versions.length > 0),
   });
-  return { releases: query.data?.dim_client_release ?? [], isLoading: query.isLoading };
+  return query.data?.dim_client_release ?? [];
+}
+
+/** Repository of a client, for linking commits that match no release */
+function useRepository(client: string | undefined, enabled: boolean): string | undefined {
+  const query = useQuery({
+    ...dimClientReleaseServiceListOptions({ query: { client_eq: client, page_size: 1 } }),
+    enabled: enabled && !!client && client !== UNKNOWN_CLIENT,
+  });
+  return query.data?.dim_client_release?.[0]?.repository;
+}
+
+/** Builds the field for one client from its graffiti parse and the matching releases */
+function buildField(
+  client: string | undefined,
+  commit: string,
+  graffitiVersion: string | undefined,
+  releases: DimClientRelease[],
+  fallbackRepository: string | undefined,
+  blockTime: number
+): ProposerClientField | undefined {
+  if (!client || client === UNKNOWN_CLIENT) return undefined;
+
+  const resolution = HEX_PREFIX.test(commit) ? resolveClientRelease(releases, commit, blockTime) : undefined;
+  const release =
+    resolution?.status === 'resolved' ? resolution.release : findReleaseByVersion(releases, graffitiVersion);
+  const repository = release?.repository ?? releases[0]?.repository ?? fallbackRepository;
+  const version = graffitiVersion || release?.version;
+
+  let commitNote: string | undefined;
+  if (!version && resolution?.status === 'ambiguous') commitNote = `Matches ${resolution.candidates} releases`;
+  if (!version && resolution?.status === 'unmatched') commitNote = 'No release with this commit';
+
+  return {
+    client,
+    version,
+    versionUrl: release ? githubReleaseUrl(release.repository ?? repository, release.tag) : undefined,
+    commit: commit || undefined,
+    commitUrl: githubCommitUrl(repository, commit),
+    commitNote,
+  };
 }
 
 /**
- * Proposer client details for a slot: parsed graffiti, commit prefixes resolved to releases, and node metadata.
+ * Proposer clients for a slot from its parsed graffiti, with versions linked to their GitHub releases.
  */
-export function useSlotProposerClient(slot: number, proposerIndex?: number | null): SlotProposerClientData {
+export function useSlotProposerClient(slot: number, proposerIndex?: number | null): SlotProposerClient {
   const { currentNetwork } = useNetwork();
   const slotTime = currentNetwork ? slotToTimestamp(slot, currentNetwork.genesis_time) : 0;
-  const { data: bounds, isLoading: boundsLoading } = useTableBounds('fct_block_graffiti');
 
   const graffitiQuery = useQuery({
     ...fctBlockGraffitiServiceListOptions({ query: { slot_start_date_time_eq: slotTime, page_size: 10 } }),
@@ -56,36 +107,27 @@ export function useSlotProposerClient(slot: number, proposerIndex?: number | nul
   });
   const graffiti = graffitiQuery.data?.fct_block_graffiti?.find(row => row.slot === slot);
 
-  const consensusReleases = useClientReleases(
-    graffiti?.consensus_client,
-    graffiti?.consensus_client_commit,
-    !!graffiti && !graffiti.consensus_client_version
-  );
-  const executionReleases = useClientReleases(
-    graffiti?.execution_client,
-    graffiti?.execution_client_commit,
-    !!graffiti
-  );
+  const clCommit = (graffiti?.consensus_client_commit ?? '').toLowerCase();
+  const elCommit = (graffiti?.execution_client_commit ?? '').toLowerCase();
+  const clVersion = graffiti?.consensus_client_version || undefined;
+  const clReleases = useReleases(graffiti?.consensus_client, clCommit, clVersion);
+  const elReleases = useReleases(graffiti?.execution_client, elCommit, undefined);
+  const clRepository = useRepository(graffiti?.consensus_client, !!graffiti && clReleases.length === 0);
+  const elRepository = useRepository(graffiti?.execution_client, !!graffiti && elReleases.length === 0);
 
   const index = proposerIndex ?? graffiti?.proposer_index;
   const nodeQuery = useQuery({
     ...dimNodeServiceListOptions({ query: { validator_index_eq: index ?? 0, page_size: 1 } }),
     enabled: !!currentNetwork && index !== undefined && index !== null,
   });
-  const node = nodeQuery.data?.dim_node?.find(row => !!row.name);
 
-  let coverage: GraffitiCoverage = 'covered';
-  if (!boundsLoading && !bounds) coverage = 'not_collected';
-  else if (bounds && slotTime > bounds.max) coverage = 'not_yet_processed';
-  else if (bounds && slotTime < bounds.min) coverage = 'before_backfill';
+  if (!graffiti) return { nodeName: nodeQuery.data?.dim_node?.find(row => !!row.name)?.name ?? undefined };
 
   return {
-    graffiti,
-    consensusRelease: resolveClientRelease(consensusReleases.releases, graffiti?.consensus_client_commit, slotTime),
-    executionRelease: resolveClientRelease(executionReleases.releases, graffiti?.execution_client_commit, slotTime),
-    node,
-    coverage,
-    isLoading: graffitiQuery.isLoading || boundsLoading || consensusReleases.isLoading || executionReleases.isLoading,
-    error: graffitiQuery.error ? (graffitiQuery.error.message ?? 'request failed') : null,
+    consensus: buildField(graffiti.consensus_client, clCommit, clVersion, clReleases, clRepository, slotTime),
+    execution: buildField(graffiti.execution_client, elCommit, undefined, elReleases, elRepository, slotTime),
+    graffitiText: graffiti.graffiti_text || undefined,
+    graffitiFormat: graffiti.graffiti_format,
+    nodeName: nodeQuery.data?.dim_node?.find(row => !!row.name)?.name ?? undefined,
   };
 }

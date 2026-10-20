@@ -993,12 +993,6 @@ import type {
   IntContractStorageReactivation24mServiceListData,
   IntContractStorageReactivation24mServiceListErrors,
   IntContractStorageReactivation24mServiceListResponses,
-  IntContractStorageReactivation6mServiceGetData,
-  IntContractStorageReactivation6mServiceGetErrors,
-  IntContractStorageReactivation6mServiceGetResponses,
-  IntContractStorageReactivation6mServiceListData,
-  IntContractStorageReactivation6mServiceListErrors,
-  IntContractStorageReactivation6mServiceListResponses,
   IntContractStorageStateByAddressServiceGetData,
   IntContractStorageStateByAddressServiceGetErrors,
   IntContractStorageStateByAddressServiceGetResponses,
@@ -1943,10 +1937,6 @@ import {
   zIntContractStorageReactivation24mServiceGetResponse,
   zIntContractStorageReactivation24mServiceListData,
   zIntContractStorageReactivation24mServiceListResponse,
-  zIntContractStorageReactivation6mServiceGetData,
-  zIntContractStorageReactivation6mServiceGetResponse,
-  zIntContractStorageReactivation6mServiceListData,
-  zIntContractStorageReactivation6mServiceListResponse,
   zIntContractStorageStateByAddressServiceGetData,
   zIntContractStorageStateByAddressServiceGetResponse,
   zIntContractStorageStateByAddressServiceListData,
@@ -8255,44 +8245,6 @@ export const intContractStorageReactivation1mServiceGet = <ThrowOnError extends 
     requestValidator: async data => await zIntContractStorageReactivation1mServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntContractStorageReactivation1mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_reactivation_1m/{block_number}',
-    ...options,
-  });
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const intContractStorageReactivation6mServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<IntContractStorageReactivation6mServiceListData, ThrowOnError>
-) =>
-  (options?.client ?? client).get<
-    IntContractStorageReactivation6mServiceListResponses,
-    IntContractStorageReactivation6mServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageReactivation6mServiceListData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageReactivation6mServiceListResponse.parseAsync(data),
-    url: '/api/v1/int_contract_storage_reactivation_6m',
-    ...options,
-  });
-
-/**
- * Get record
- *
- * Retrieve a single record by block_number
- */
-export const intContractStorageReactivation6mServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<IntContractStorageReactivation6mServiceGetData, ThrowOnError>
-) =>
-  (options.client ?? client).get<
-    IntContractStorageReactivation6mServiceGetResponses,
-    IntContractStorageReactivation6mServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => await zIntContractStorageReactivation6mServiceGetData.parseAsync(data),
-    responseValidator: async data => await zIntContractStorageReactivation6mServiceGetResponse.parseAsync(data),
-    url: '/api/v1/int_contract_storage_reactivation_6m/{block_number}',
     ...options,
   });
 

@@ -11,9 +11,47 @@ import { BeaconchainIcon } from '@/components/Ethereum/BeaconchainIcon';
 import { DoraIcon } from '@/components/Ethereum/DoraIcon';
 import { TracoorIcon } from '@/components/Ethereum/TracoorIcon';
 import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
+import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { useNetwork } from '@/hooks/useNetwork';
+import { GRAFFITI_FORMAT_LABELS, formatClientName } from '@/utils/graffiti';
+import { useSlotProposerClient, type ProposerClientField } from '../../hooks/useSlotProposerClient';
 import type { SlotBasicInfoCardProps } from './SlotBasicInfoCard.types';
 import type { ForkVersion } from '@/utils/beacon';
+
+/** Client logo and name with its version linked to the GitHub release, or the commit prefix when no version resolved */
+function ProposerClientValue({ field }: { field: ProposerClientField }): JSX.Element {
+  return (
+    <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+      <ClientLogo client={field.client} size={16} />
+      <span>{formatClientName(field.client)}</span>
+      {field.version &&
+        (field.versionUrl ? (
+          <a href={field.versionUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
+            {field.version}
+          </a>
+        ) : (
+          <span>{field.version}</span>
+        ))}
+      {!field.version &&
+        field.commit &&
+        (field.commitUrl ? (
+          <a
+            href={field.commitUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-xs text-muted hover:underline"
+            title={field.commitNote}
+          >
+            {field.commit}
+          </a>
+        ) : (
+          <span className="font-mono text-xs text-muted" title={field.commitNote}>
+            {field.commit}
+          </span>
+        ))}
+    </span>
+  );
+}
 
 /**
  * Displays basic information about a slot in a card layout.
@@ -28,6 +66,7 @@ export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: S
   const blockMev = data.blockMev[0];
   const blobCount = data.blobCount[0];
   const proposerEntity = data.proposerEntity[0];
+  const proposerClient = useSlotProposerClient(slot, blockProposer?.proposer_validator_index);
 
   // Calculate blob count from blob propagation data if blobCount data is not available
   const actualBlobCount =
@@ -297,6 +336,45 @@ export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: S
                   <dt className="text-xs font-medium text-muted">MEV Value</dt>
                   <dd className="mt-1 text-base/7 font-semibold text-foreground">{formatMevValue(blockMev?.value)}</dd>
                 </div>
+
+                {/* Proposer clients parsed from the graffiti */}
+                {proposerClient.consensus && (
+                  <div className="col-span-2">
+                    <dt className="text-xs font-medium text-muted">Consensus Client</dt>
+                    <dd className="mt-1 text-sm text-foreground">
+                      <ProposerClientValue field={proposerClient.consensus} />
+                    </dd>
+                  </div>
+                )}
+                {proposerClient.execution && (
+                  <div className="col-span-2">
+                    <dt className="text-xs font-medium text-muted">Execution Client</dt>
+                    <dd className="mt-1 text-sm text-foreground">
+                      <ProposerClientValue field={proposerClient.execution} />
+                    </dd>
+                  </div>
+                )}
+
+                {/* Node name, only published on devnets */}
+                {proposerClient.nodeName && (
+                  <div className="col-span-2">
+                    <dt className="text-xs font-medium text-muted">Node</dt>
+                    <dd className="mt-1 font-mono text-xs text-foreground">{proposerClient.nodeName}</dd>
+                  </div>
+                )}
+
+                {/* Graffiti */}
+                {proposerClient.graffitiText && (
+                  <div className="col-span-2 sm:col-span-3 lg:col-span-4">
+                    <dt className="text-xs font-medium text-muted">Graffiti</dt>
+                    <dd
+                      className="mt-1 truncate font-mono text-xs text-foreground"
+                      title={`${proposerClient.graffitiText} (${GRAFFITI_FORMAT_LABELS[proposerClient.graffitiFormat ?? ''] ?? proposerClient.graffitiFormat})`}
+                    >
+                      {proposerClient.graffitiText}
+                    </dd>
+                  </div>
+                )}
 
                 {/* Block Root */}
                 <div className="col-span-2 sm:col-span-3 lg:col-span-4">

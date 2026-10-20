@@ -67,3 +67,32 @@ export function resolveClientRelease(
   );
   return { status: 'resolved', release };
 }
+
+/** Version without a leading "v", so graffiti "v25.9.2" matches tag "25.9.2" */
+function normaliseVersion(version: string): string {
+  return version.trim().replace(/^v/i, '');
+}
+
+/** Finds the release for a version taken from a default version string, preferring the full release. */
+export function findReleaseByVersion(
+  releases: DimClientRelease[],
+  version: string | undefined
+): DimClientRelease | undefined {
+  if (!version) return undefined;
+  const wanted = normaliseVersion(version);
+  return releases
+    .filter(release => normaliseVersion(release.version ?? '') === wanted)
+    .sort((a, b) => Number(a.prerelease ?? false) - Number(b.prerelease ?? false))[0];
+}
+
+/** GitHub release page for a tag, keeping slashes in tags such as @ethereumjs/client@0.9.0 */
+export function githubReleaseUrl(repository: string | undefined, tag: string | undefined): string | undefined {
+  if (!repository || !tag) return undefined;
+  return `https://github.com/${repository}/releases/tag/${tag.split('/').map(encodeURIComponent).join('/')}`;
+}
+
+/** GitHub commit page, only for prefixes of 7+ characters since GitHub does not resolve shorter ones */
+export function githubCommitUrl(repository: string | undefined, commit: string | undefined): string | undefined {
+  if (!repository || !commit || !/^[0-9a-f]{7,40}$/i.test(commit)) return undefined;
+  return `https://github.com/${repository}/commit/${commit.toLowerCase()}`;
+}
