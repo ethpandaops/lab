@@ -1,0 +1,1 @@
+export { CompletionBlocksTable } from './CompletionBlocksTable';

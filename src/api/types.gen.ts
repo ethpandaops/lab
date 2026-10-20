@@ -1628,6 +1628,105 @@ export type FctBlockBlobHead = {
   versioned_hash?: string;
 };
 
+export type FctBlockDataColumnCompletion = {
+  /**
+   * Number of blobs in the block, the number of cells in each column
+   */
+  blob_count?: number;
+  /**
+   * The beacon block root hash
+   */
+  block_root?: string;
+  /**
+   * Cells built from blobs returned by the execution layer, summed over completions
+   */
+  cells_from_el?: number;
+  /**
+   * Cells received over gossip, summed over completions
+   */
+  cells_from_gossip?: number;
+  /**
+   * Cells in the completed columns, summed over completions
+   */
+  cells_total?: number;
+  /**
+   * Distinct columns of the block that a sentry node completed
+   */
+  column_count?: number;
+  /**
+   * Column completions, one per node per column
+   */
+  completion_count?: number;
+  /**
+   * Completions built from blobs returned by the execution layer
+   */
+  el_completion_count?: number;
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Completions by a full data column gossip message
+   */
+  full_gossip_completion_count?: number;
+  /**
+   * Latest completion of any column by any node, in milliseconds from slot start
+   */
+  max_completion_slot_start_diff?: number;
+  /**
+   * Earliest completion of any column by any node, in milliseconds from slot start
+   */
+  min_completion_slot_start_diff?: number;
+  /**
+   * Distinct sentry nodes that completed a column of the block
+   */
+  node_count?: number;
+  /**
+   * Median completion time across completions, in milliseconds from slot start
+   */
+  p50_completion_slot_start_diff?: number;
+  /**
+   * Median across nodes of the time each node completed its last column of the block, in milliseconds from slot start
+   */
+  p50_node_last_completion_slot_start_diff?: number;
+  /**
+   * 90th percentile completion time across completions, in milliseconds from slot start
+   */
+  p90_completion_slot_start_diff?: number;
+  /**
+   * 90th percentile across nodes of the time each node completed its last column of the block, in milliseconds from slot start
+   */
+  p90_node_last_completion_slot_start_diff?: number;
+  /**
+   * Completions from cells received as gossipsub partial messages
+   */
+  partial_gossip_completion_count?: number;
+  /**
+   * Completions recovered by reconstruction from other columns
+   */
+  reconstruction_completion_count?: number;
+  /**
+   * The slot number
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Completions by a path the node did not report
+   */
+  unknown_completion_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type FctBlockDataColumnSidecarFirstSeen = {
   /**
    * The beacon block root hash
@@ -1641,6 +1740,10 @@ export type FctBlockDataColumnSidecarFirstSeen = {
    * The data column index
    */
   column_index?: number;
+  /**
+   * How the node that first saw the data column completed it: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events
+   */
+  completed_via?: string;
   /**
    * The epoch number containing the slot
    */
@@ -1748,6 +1851,10 @@ export type FctBlockDataColumnSidecarFirstSeenByNode = {
    * The data column index
    */
   column_index?: number;
+  /**
+   * How the node completed the data column: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events
+   */
+  completed_via?: string;
   /**
    * The epoch number containing the slot
    */
@@ -2367,6 +2474,65 @@ export type FctBlockMevHead = {
    * The transaction value in wei
    */
   value?: string | null;
+};
+
+export type FctBlockPartialDataColumnHeaderFirstSeen = {
+  /**
+   * Number of KZG commitments in the header
+   */
+  blob_count?: number;
+  /**
+   * The beacon block root hash
+   */
+  block_root?: string;
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Name of the sentry node that received a header first
+   */
+  first_seen_meta_client_name?: string;
+  /**
+   * Latest time a node first received a header for the block, in milliseconds from slot start
+   */
+  max_node_seen_slot_start_diff?: number;
+  /**
+   * Number of sentry nodes that received a partial data column header for the block
+   */
+  node_count?: number;
+  /**
+   * Median across nodes of the time each node first received a header for the block, in milliseconds from slot start
+   */
+  p50_node_seen_slot_start_diff?: number;
+  /**
+   * 90th percentile across nodes of the time each node first received a header for the block, in milliseconds from slot start
+   */
+  p90_node_seen_slot_start_diff?: number;
+  /**
+   * The validator index of the block proposer, from the header
+   */
+  proposer_index?: number;
+  /**
+   * Time from slot start until any sentry node first received a partial data column header for the block, in milliseconds
+   */
+  seen_slot_start_diff?: number;
+  /**
+   * The slot number
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
 };
 
 export type FctBlockPayload = {
@@ -3645,6 +3811,493 @@ export type FctDataColumnAvailabilityHourly = {
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
+};
+
+export type FctDataColumnCompletionByPathDaily = {
+  /**
+   * Average number of distinct peers that contributed cells to a completion
+   */
+  avg_contributing_peers?: number;
+  /**
+   * Distinct blocks with a column completed on this path
+   */
+  block_count?: number;
+  /**
+   * Cells built from blobs returned by the execution layer
+   */
+  cells_from_el?: number;
+  /**
+   * Cells received over gossip
+   */
+  cells_from_gossip?: number;
+  /**
+   * Cells in the completed columns
+   */
+  cells_total?: number;
+  /**
+   * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN
+   */
+  completed_via?: string;
+  /**
+   * Column completions, one per node per column
+   */
+  completion_count?: number;
+  /**
+   * Start of the day period, by block slot
+   */
+  day_start_date?: string;
+  /**
+   * Latest completion, in milliseconds from slot start
+   */
+  max_completion_slot_start_diff?: number;
+  /**
+   * Consensus client of the sentry nodes that completed the columns
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * Earliest completion, in milliseconds from slot start
+   */
+  min_completion_slot_start_diff?: number;
+  /**
+   * Distinct sentry nodes with a completion on this path
+   */
+  node_count?: number;
+  /**
+   * Median completion time, in milliseconds from slot start
+   */
+  p50_completion_slot_start_diff?: number;
+  /**
+   * 90th percentile completion time, in milliseconds from slot start
+   */
+  p90_completion_slot_start_diff?: number;
+  /**
+   * 99th percentile completion time, in milliseconds from slot start
+   */
+  p99_completion_slot_start_diff?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctDataColumnCompletionByPathHourly = {
+  /**
+   * Average number of distinct peers that contributed cells to a completion
+   */
+  avg_contributing_peers?: number;
+  /**
+   * Distinct blocks with a column completed on this path
+   */
+  block_count?: number;
+  /**
+   * Cells built from blobs returned by the execution layer
+   */
+  cells_from_el?: number;
+  /**
+   * Cells received over gossip
+   */
+  cells_from_gossip?: number;
+  /**
+   * Cells in the completed columns
+   */
+  cells_total?: number;
+  /**
+   * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN
+   */
+  completed_via?: string;
+  /**
+   * Column completions, one per node per column
+   */
+  completion_count?: number;
+  /**
+   * The wall clock time at the start of the hour, by block slot
+   */
+  hour_start_date_time?: number;
+  /**
+   * Latest completion, in milliseconds from slot start
+   */
+  max_completion_slot_start_diff?: number;
+  /**
+   * Consensus client of the sentry nodes that completed the columns
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * Earliest completion, in milliseconds from slot start
+   */
+  min_completion_slot_start_diff?: number;
+  /**
+   * Distinct sentry nodes with a completion on this path
+   */
+  node_count?: number;
+  /**
+   * Median completion time, in milliseconds from slot start
+   */
+  p50_completion_slot_start_diff?: number;
+  /**
+   * 90th percentile completion time, in milliseconds from slot start
+   */
+  p90_completion_slot_start_diff?: number;
+  /**
+   * 99th percentile completion time, in milliseconds from slot start
+   */
+  p99_completion_slot_start_diff?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctDataColumnCompletionBySlot = {
+  /**
+   * Average number of distinct peers that contributed cells to a PARTIAL_GOSSIP completion, 0 when there was none
+   */
+  avg_partial_contributing_peers?: number;
+  /**
+   * Number of blobs in the block, the number of cells in the column
+   */
+  blob_count?: number;
+  /**
+   * The beacon block root hash
+   */
+  block_root?: string;
+  /**
+   * Cells built from blobs returned by the execution layer, summed over the nodes that completed the column
+   */
+  cells_from_el?: number;
+  /**
+   * Cells received over gossip, summed over the nodes that completed the column
+   */
+  cells_from_gossip?: number;
+  /**
+   * Cells in the completed columns, summed over the nodes that completed it
+   */
+  cells_total?: number;
+  /**
+   * The data column index
+   */
+  column_index?: number;
+  /**
+   * Number of sentry nodes that reported the column complete
+   */
+  completion_node_count?: number;
+  /**
+   * Number of nodes whose column was built from blobs returned by the execution layer
+   */
+  el_completion_count?: number;
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Number of nodes whose column was completed by a full gossip message
+   */
+  full_gossip_completion_count?: number;
+  /**
+   * Latest completion of the column by any node, in milliseconds from slot start
+   */
+  max_completion_slot_start_diff?: number;
+  /**
+   * Earliest completion of the column by any node, in milliseconds from slot start
+   */
+  min_completion_slot_start_diff?: number;
+  /**
+   * Median completion time across nodes, in milliseconds from slot start
+   */
+  p50_completion_slot_start_diff?: number;
+  /**
+   * Median completion time across EL completions, in milliseconds from slot start, 0 when there was none
+   */
+  p50_el_completion_slot_start_diff?: number;
+  /**
+   * Median completion time across FULL_GOSSIP completions, in milliseconds from slot start, 0 when there was none
+   */
+  p50_full_gossip_completion_slot_start_diff?: number;
+  /**
+   * Median completion time across PARTIAL_GOSSIP completions, in milliseconds from slot start, 0 when there was none
+   */
+  p50_partial_gossip_completion_slot_start_diff?: number;
+  /**
+   * 90th percentile completion time across nodes, in milliseconds from slot start
+   */
+  p90_completion_slot_start_diff?: number;
+  /**
+   * Validation verdicts on received partial messages that accepted them
+   */
+  partial_accept_verdict_count?: number;
+  /**
+   * Number of nodes whose column was completed from cells received as gossipsub partial messages
+   */
+  partial_gossip_completion_count?: number;
+  /**
+   * Validation verdicts on received partial messages that ignored them
+   */
+  partial_ignore_verdict_count?: number;
+  /**
+   * Cells new to the receiving node that passed verification. Divided by partial_received_cells this approximates the useful cell ratio
+   */
+  partial_new_cells?: number;
+  /**
+   * Cells carried by the partial messages received by sentry nodes, duplicates included
+   */
+  partial_received_cells?: number;
+  /**
+   * Partial messages with a body received by sentry nodes, summed over nodes. WIRE capture points count every part, APP capture points only those the gossipsub router passed on
+   */
+  partial_received_message_count?: number;
+  /**
+   * Validation verdicts on received partial messages that rejected them
+   */
+  partial_reject_verdict_count?: number;
+  /**
+   * Distinct peers that sent a partial message with a body for the column to a sentry node
+   */
+  partial_sender_peer_count?: number;
+  /**
+   * Cells carried by the partial messages sent by sentry nodes
+   */
+  partial_sent_cells?: number;
+  /**
+   * Partial messages with a body sent by sentry nodes, summed over nodes
+   */
+  partial_sent_message_count?: number;
+  /**
+   * Number of nodes whose column was recovered by reconstruction from other columns
+   */
+  reconstruction_completion_count?: number;
+  /**
+   * The slot number
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Number of nodes whose column was completed by a path the node did not report
+   */
+  unknown_completion_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctDataColumnPartialMessageDaily = {
+  /**
+   * Distinct peers that sent a sentry node at least one cell
+   */
+  cell_sender_peer_count?: number;
+  /**
+   * Cell verdicts that accepted a received partial message
+   */
+  cells_accept_count?: number;
+  /**
+   * Cell verdicts that ignored a received partial message, for example because its cells were already known
+   */
+  cells_ignore_count?: number;
+  /**
+   * Cell verdicts that rejected a received partial message
+   */
+  cells_reject_count?: number;
+  /**
+   * Start of the day period, by wall clock slot
+   */
+  day_start_date?: string;
+  /**
+   * Header verdicts that accepted a partial data column header
+   */
+  header_accept_count?: number;
+  /**
+   * Header verdicts that ignored a partial data column header
+   */
+  header_ignore_count?: number;
+  /**
+   * Node and Fulu block pairs where the node received a partial data column header
+   */
+  header_node_block_count?: number;
+  /**
+   * Header verdicts that rejected a partial data column header
+   */
+  header_reject_count?: number;
+  /**
+   * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio
+   */
+  new_cells?: number;
+  /**
+   * Distinct sentry nodes that sent or received a partial message
+   */
+  node_count?: number;
+  /**
+   * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none
+   */
+  p50_header_seen_slot_start_diff?: number;
+  /**
+   * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none
+   */
+  p90_header_seen_slot_start_diff?: number;
+  /**
+   * Received partial messages that carried at least one cell
+   */
+  received_cell_message_count?: number;
+  /**
+   * Cells carried by received partial messages, duplicates included
+   */
+  received_cells?: number;
+  /**
+   * Received partial messages that carried the partial data column header
+   */
+  received_header_count?: number;
+  /**
+   * Received partial messages with a body, header-only pushes included
+   */
+  received_message_count?: number;
+  /**
+   * Received partial messages that only carried parts metadata
+   */
+  received_metadata_count?: number;
+  /**
+   * Sent partial messages that carried at least one cell
+   */
+  sent_cell_message_count?: number;
+  /**
+   * Cells carried by sent partial messages
+   */
+  sent_cells?: number;
+  /**
+   * Sent partial messages that carried the partial data column header
+   */
+  sent_header_count?: number;
+  /**
+   * Sent partial messages with a body, header-only pushes included
+   */
+  sent_message_count?: number;
+  /**
+   * Sent partial messages that only carried parts metadata
+   */
+  sent_metadata_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Cells carried by the partial messages that got a cell verdict
+   */
+  verdict_cells?: number;
+};
+
+export type FctDataColumnPartialMessageHourly = {
+  /**
+   * Distinct peers that sent a sentry node at least one cell
+   */
+  cell_sender_peer_count?: number;
+  /**
+   * Cell verdicts that accepted a received partial message
+   */
+  cells_accept_count?: number;
+  /**
+   * Cell verdicts that ignored a received partial message, for example because its cells were already known
+   */
+  cells_ignore_count?: number;
+  /**
+   * Cell verdicts that rejected a received partial message
+   */
+  cells_reject_count?: number;
+  /**
+   * Header verdicts that accepted a partial data column header
+   */
+  header_accept_count?: number;
+  /**
+   * Header verdicts that ignored a partial data column header
+   */
+  header_ignore_count?: number;
+  /**
+   * Node and Fulu block pairs where the node received a partial data column header
+   */
+  header_node_block_count?: number;
+  /**
+   * Header verdicts that rejected a partial data column header
+   */
+  header_reject_count?: number;
+  /**
+   * The wall clock time at the start of the hour, by wall clock slot
+   */
+  hour_start_date_time?: number;
+  /**
+   * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio
+   */
+  new_cells?: number;
+  /**
+   * Distinct sentry nodes that sent or received a partial message
+   */
+  node_count?: number;
+  /**
+   * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none
+   */
+  p50_header_seen_slot_start_diff?: number;
+  /**
+   * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none
+   */
+  p90_header_seen_slot_start_diff?: number;
+  /**
+   * Received partial messages that carried at least one cell
+   */
+  received_cell_message_count?: number;
+  /**
+   * Cells carried by received partial messages, duplicates included
+   */
+  received_cells?: number;
+  /**
+   * Received partial messages that carried the partial data column header
+   */
+  received_header_count?: number;
+  /**
+   * Received partial messages with a body, header-only pushes included
+   */
+  received_message_count?: number;
+  /**
+   * Received partial messages that only carried parts metadata
+   */
+  received_metadata_count?: number;
+  /**
+   * Sent partial messages that carried at least one cell
+   */
+  sent_cell_message_count?: number;
+  /**
+   * Cells carried by sent partial messages
+   */
+  sent_cells?: number;
+  /**
+   * Sent partial messages that carried the partial data column header
+   */
+  sent_header_count?: number;
+  /**
+   * Sent partial messages with a body, header-only pushes included
+   */
+  sent_message_count?: number;
+  /**
+   * Sent partial messages that only carried parts metadata
+   */
+  sent_metadata_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Cells carried by the partial messages that got a cell verdict
+   */
+  verdict_cells?: number;
 };
 
 export type FctEngineGetBlobsByElClient = {
@@ -6125,6 +6778,88 @@ export type FctPayloadBidHighestValueChunked50Ms = {
   value?: string;
 };
 
+export type FctPeerPartialMessageSupportByClientDaily = {
+  /**
+   * Hourly distinct connected peers, averaged over the hours of the day
+   */
+  avg_connected_peer_count?: number;
+  /**
+   * Hourly connected peers that support gossipsub v1.3, averaged over the hours of the day
+   */
+  avg_gossipsub_v13_peer_count?: number;
+  /**
+   * Hourly subscribed peers that requested partial messages, averaged over the hours of the day
+   */
+  avg_requests_partial_peer_count?: number;
+  /**
+   * Hourly peers seen subscribing to a data column topic by a sentry node that reports the partial flags, averaged over the hours of the day
+   */
+  avg_subscribed_peer_count?: number;
+  /**
+   * Hourly subscribed peers that support sending partial messages, averaged over the hours of the day
+   */
+  avg_supports_sending_partial_peer_count?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Hours of the day with peer data on the network, the divisor of the averages
+   */
+  hour_count?: number;
+  /**
+   * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it
+   */
+  peer_implementation?: string;
+  /**
+   * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse
+   */
+  peer_version?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctPeerPartialMessageSupportByClientHourly = {
+  /**
+   * Distinct peers connected to a sentry node during the hour, from heartbeats
+   */
+  connected_peer_count?: number;
+  /**
+   * Connected peers that support gossipsub v1.3 (/meshsub/1.3.0), which the partial messages extension requires
+   */
+  gossipsub_v13_peer_count?: number;
+  /**
+   * The wall clock time at the start of the hour
+   */
+  hour_start_date_time?: number;
+  /**
+   * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it
+   */
+  peer_implementation?: string;
+  /**
+   * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse
+   */
+  peer_version?: string;
+  /**
+   * Subscribed peers that requested partial messages on a data column topic
+   */
+  requests_partial_peer_count?: number;
+  /**
+   * Distinct peers seen subscribing to a data column topic during the hour by a sentry node that reports the partial flags
+   */
+  subscribed_peer_count?: number;
+  /**
+   * Subscribed peers that support sending partial messages on a data column topic
+   */
+  supports_sending_partial_peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type FctPreparedBlock = {
   /**
    * The total bytes of the beacon block payload
@@ -7176,6 +7911,13 @@ export type GetFctBlockBlobHeadResponse = {
 };
 
 /**
+ * Response for getting a single fct_block_data_column_completion record
+ */
+export type GetFctBlockDataColumnCompletionResponse = {
+  item?: FctBlockDataColumnCompletion;
+};
+
+/**
  * Response for getting a single fct_block_data_column_sidecar_first_seen_by_node record
  */
 export type GetFctBlockDataColumnSidecarFirstSeenByNodeResponse = {
@@ -7250,6 +7992,13 @@ export type GetFctBlockMevHeadResponse = {
  */
 export type GetFctBlockMevResponse = {
   item?: FctBlockMev;
+};
+
+/**
+ * Response for getting a single fct_block_partial_data_column_header_first_seen record
+ */
+export type GetFctBlockPartialDataColumnHeaderFirstSeenResponse = {
+  item?: FctBlockPartialDataColumnHeaderFirstSeen;
 };
 
 /**
@@ -7439,6 +8188,41 @@ export type GetFctDataColumnAvailabilityDailyResponse = {
  */
 export type GetFctDataColumnAvailabilityHourlyResponse = {
   item?: FctDataColumnAvailabilityHourly;
+};
+
+/**
+ * Response for getting a single fct_data_column_completion_by_path_daily record
+ */
+export type GetFctDataColumnCompletionByPathDailyResponse = {
+  item?: FctDataColumnCompletionByPathDaily;
+};
+
+/**
+ * Response for getting a single fct_data_column_completion_by_path_hourly record
+ */
+export type GetFctDataColumnCompletionByPathHourlyResponse = {
+  item?: FctDataColumnCompletionByPathHourly;
+};
+
+/**
+ * Response for getting a single fct_data_column_completion_by_slot record
+ */
+export type GetFctDataColumnCompletionBySlotResponse = {
+  item?: FctDataColumnCompletionBySlot;
+};
+
+/**
+ * Response for getting a single fct_data_column_partial_message_daily record
+ */
+export type GetFctDataColumnPartialMessageDailyResponse = {
+  item?: FctDataColumnPartialMessageDaily;
+};
+
+/**
+ * Response for getting a single fct_data_column_partial_message_hourly record
+ */
+export type GetFctDataColumnPartialMessageHourlyResponse = {
+  item?: FctDataColumnPartialMessageHourly;
 };
 
 /**
@@ -7747,6 +8531,20 @@ export type GetFctPayloadBidHighestValueByBuilderChunked50MsResponse = {
  */
 export type GetFctPayloadBidHighestValueChunked50MsResponse = {
   item?: FctPayloadBidHighestValueChunked50Ms;
+};
+
+/**
+ * Response for getting a single fct_peer_partial_message_support_by_client_daily record
+ */
+export type GetFctPeerPartialMessageSupportByClientDailyResponse = {
+  item?: FctPeerPartialMessageSupportByClientDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_partial_message_support_by_client_hourly record
+ */
+export type GetFctPeerPartialMessageSupportByClientHourlyResponse = {
+  item?: FctPeerPartialMessageSupportByClientHourly;
 };
 
 /**
@@ -12267,6 +13065,20 @@ export type ListFctBlockBlobHeadResponse = {
 };
 
 /**
+ * Response for listing fct_block_data_column_completion records
+ */
+export type ListFctBlockDataColumnCompletionResponse = {
+  /**
+   * The list of fct_block_data_column_completion.
+   */
+  fct_block_data_column_completion?: Array<FctBlockDataColumnCompletion>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_block_data_column_sidecar_first_seen_by_node records
  */
 export type ListFctBlockDataColumnSidecarFirstSeenByNodeResponse = {
@@ -12414,6 +13226,20 @@ export type ListFctBlockMevResponse = {
    * The list of fct_block_mev.
    */
   fct_block_mev?: Array<FctBlockMev>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_partial_data_column_header_first_seen records
+ */
+export type ListFctBlockPartialDataColumnHeaderFirstSeenResponse = {
+  /**
+   * The list of fct_block_partial_data_column_header_first_seen.
+   */
+  fct_block_partial_data_column_header_first_seen?: Array<FctBlockPartialDataColumnHeaderFirstSeen>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -12792,6 +13618,76 @@ export type ListFctDataColumnAvailabilityHourlyResponse = {
    * The list of fct_data_column_availability_hourly.
    */
   fct_data_column_availability_hourly?: Array<FctDataColumnAvailabilityHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_data_column_completion_by_path_daily records
+ */
+export type ListFctDataColumnCompletionByPathDailyResponse = {
+  /**
+   * The list of fct_data_column_completion_by_path_daily.
+   */
+  fct_data_column_completion_by_path_daily?: Array<FctDataColumnCompletionByPathDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_data_column_completion_by_path_hourly records
+ */
+export type ListFctDataColumnCompletionByPathHourlyResponse = {
+  /**
+   * The list of fct_data_column_completion_by_path_hourly.
+   */
+  fct_data_column_completion_by_path_hourly?: Array<FctDataColumnCompletionByPathHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_data_column_completion_by_slot records
+ */
+export type ListFctDataColumnCompletionBySlotResponse = {
+  /**
+   * The list of fct_data_column_completion_by_slot.
+   */
+  fct_data_column_completion_by_slot?: Array<FctDataColumnCompletionBySlot>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_data_column_partial_message_daily records
+ */
+export type ListFctDataColumnPartialMessageDailyResponse = {
+  /**
+   * The list of fct_data_column_partial_message_daily.
+   */
+  fct_data_column_partial_message_daily?: Array<FctDataColumnPartialMessageDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_data_column_partial_message_hourly records
+ */
+export type ListFctDataColumnPartialMessageHourlyResponse = {
+  /**
+   * The list of fct_data_column_partial_message_hourly.
+   */
+  fct_data_column_partial_message_hourly?: Array<FctDataColumnPartialMessageHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -13408,6 +14304,34 @@ export type ListFctPayloadBidHighestValueChunked50MsResponse = {
    * The list of fct_payload_bid_highest_value_chunked_50ms.
    */
   fct_payload_bid_highest_value_chunked_50ms?: Array<FctPayloadBidHighestValueChunked50Ms>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_partial_message_support_by_client_daily records
+ */
+export type ListFctPeerPartialMessageSupportByClientDailyResponse = {
+  /**
+   * The list of fct_peer_partial_message_support_by_client_daily.
+   */
+  fct_peer_partial_message_support_by_client_daily?: Array<FctPeerPartialMessageSupportByClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_partial_message_support_by_client_hourly records
+ */
+export type ListFctPeerPartialMessageSupportByClientHourlyResponse = {
+  /**
+   * The list of fct_peer_partial_message_support_by_client_hourly.
+   */
+  fct_peer_partial_message_support_by_client_hourly?: Array<FctPeerPartialMessageSupportByClientHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -29630,6 +30554,1034 @@ export type FctBlockBlobHeadServiceGetResponses = {
 export type FctBlockBlobHeadServiceGetResponse =
   FctBlockBlobHeadServiceGetResponses[keyof FctBlockBlobHeadServiceGetResponses];
 
+export type FctBlockDataColumnCompletionServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * The beacon block root hash (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * The beacon block root hash (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * The beacon block root hash (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * The beacon block root hash (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * The beacon block root hash (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * The beacon block root hash (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * The beacon block root hash (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * The beacon block root hash (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * The beacon block root hash (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The slot number (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot number (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot number (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot number (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot number (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot number (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot number (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot number (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot number (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot number (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Number of blobs in the block, the number of cells in each column (filter: eq)
+     */
+    blob_count_eq?: number;
+    /**
+     * Number of blobs in the block, the number of cells in each column (filter: ne)
+     */
+    blob_count_ne?: number;
+    /**
+     * Number of blobs in the block, the number of cells in each column (filter: lt)
+     */
+    blob_count_lt?: number;
+    /**
+     * Number of blobs in the block, the number of cells in each column (filter: lte)
+     */
+    blob_count_lte?: number;
+    /**
+     * Number of blobs in the block, the number of cells in each column (filter: gt)
+     */
+    blob_count_gt?: number;
+    /**
+     * Number of blobs in the block, the number of cells in each column (filter: gte)
+     */
+    blob_count_gte?: number;
+    /**
+     * Number of blobs in the block, the number of cells in each column (filter: between_min)
+     */
+    blob_count_between_min?: number;
+    /**
+     * Number of blobs in the block, the number of cells in each column (filter: between_max_value)
+     */
+    blob_count_between_max_value?: number;
+    /**
+     * Number of blobs in the block, the number of cells in each column (filter: in_values) (comma-separated list)
+     */
+    blob_count_in_values?: string;
+    /**
+     * Number of blobs in the block, the number of cells in each column (filter: not_in_values) (comma-separated list)
+     */
+    blob_count_not_in_values?: string;
+    /**
+     * Distinct columns of the block that a sentry node completed (filter: eq)
+     */
+    column_count_eq?: number;
+    /**
+     * Distinct columns of the block that a sentry node completed (filter: ne)
+     */
+    column_count_ne?: number;
+    /**
+     * Distinct columns of the block that a sentry node completed (filter: lt)
+     */
+    column_count_lt?: number;
+    /**
+     * Distinct columns of the block that a sentry node completed (filter: lte)
+     */
+    column_count_lte?: number;
+    /**
+     * Distinct columns of the block that a sentry node completed (filter: gt)
+     */
+    column_count_gt?: number;
+    /**
+     * Distinct columns of the block that a sentry node completed (filter: gte)
+     */
+    column_count_gte?: number;
+    /**
+     * Distinct columns of the block that a sentry node completed (filter: between_min)
+     */
+    column_count_between_min?: number;
+    /**
+     * Distinct columns of the block that a sentry node completed (filter: between_max_value)
+     */
+    column_count_between_max_value?: number;
+    /**
+     * Distinct columns of the block that a sentry node completed (filter: in_values) (comma-separated list)
+     */
+    column_count_in_values?: string;
+    /**
+     * Distinct columns of the block that a sentry node completed (filter: not_in_values) (comma-separated list)
+     */
+    column_count_not_in_values?: string;
+    /**
+     * Distinct sentry nodes that completed a column of the block (filter: eq)
+     */
+    node_count_eq?: number;
+    /**
+     * Distinct sentry nodes that completed a column of the block (filter: ne)
+     */
+    node_count_ne?: number;
+    /**
+     * Distinct sentry nodes that completed a column of the block (filter: lt)
+     */
+    node_count_lt?: number;
+    /**
+     * Distinct sentry nodes that completed a column of the block (filter: lte)
+     */
+    node_count_lte?: number;
+    /**
+     * Distinct sentry nodes that completed a column of the block (filter: gt)
+     */
+    node_count_gt?: number;
+    /**
+     * Distinct sentry nodes that completed a column of the block (filter: gte)
+     */
+    node_count_gte?: number;
+    /**
+     * Distinct sentry nodes that completed a column of the block (filter: between_min)
+     */
+    node_count_between_min?: number;
+    /**
+     * Distinct sentry nodes that completed a column of the block (filter: between_max_value)
+     */
+    node_count_between_max_value?: number;
+    /**
+     * Distinct sentry nodes that completed a column of the block (filter: in_values) (comma-separated list)
+     */
+    node_count_in_values?: string;
+    /**
+     * Distinct sentry nodes that completed a column of the block (filter: not_in_values) (comma-separated list)
+     */
+    node_count_not_in_values?: string;
+    /**
+     * Column completions, one per node per column (filter: eq)
+     */
+    completion_count_eq?: number;
+    /**
+     * Column completions, one per node per column (filter: ne)
+     */
+    completion_count_ne?: number;
+    /**
+     * Column completions, one per node per column (filter: lt)
+     */
+    completion_count_lt?: number;
+    /**
+     * Column completions, one per node per column (filter: lte)
+     */
+    completion_count_lte?: number;
+    /**
+     * Column completions, one per node per column (filter: gt)
+     */
+    completion_count_gt?: number;
+    /**
+     * Column completions, one per node per column (filter: gte)
+     */
+    completion_count_gte?: number;
+    /**
+     * Column completions, one per node per column (filter: between_min)
+     */
+    completion_count_between_min?: number;
+    /**
+     * Column completions, one per node per column (filter: between_max_value)
+     */
+    completion_count_between_max_value?: number;
+    /**
+     * Column completions, one per node per column (filter: in_values) (comma-separated list)
+     */
+    completion_count_in_values?: string;
+    /**
+     * Column completions, one per node per column (filter: not_in_values) (comma-separated list)
+     */
+    completion_count_not_in_values?: string;
+    /**
+     * Completions by a full data column gossip message (filter: eq)
+     */
+    full_gossip_completion_count_eq?: number;
+    /**
+     * Completions by a full data column gossip message (filter: ne)
+     */
+    full_gossip_completion_count_ne?: number;
+    /**
+     * Completions by a full data column gossip message (filter: lt)
+     */
+    full_gossip_completion_count_lt?: number;
+    /**
+     * Completions by a full data column gossip message (filter: lte)
+     */
+    full_gossip_completion_count_lte?: number;
+    /**
+     * Completions by a full data column gossip message (filter: gt)
+     */
+    full_gossip_completion_count_gt?: number;
+    /**
+     * Completions by a full data column gossip message (filter: gte)
+     */
+    full_gossip_completion_count_gte?: number;
+    /**
+     * Completions by a full data column gossip message (filter: between_min)
+     */
+    full_gossip_completion_count_between_min?: number;
+    /**
+     * Completions by a full data column gossip message (filter: between_max_value)
+     */
+    full_gossip_completion_count_between_max_value?: number;
+    /**
+     * Completions by a full data column gossip message (filter: in_values) (comma-separated list)
+     */
+    full_gossip_completion_count_in_values?: string;
+    /**
+     * Completions by a full data column gossip message (filter: not_in_values) (comma-separated list)
+     */
+    full_gossip_completion_count_not_in_values?: string;
+    /**
+     * Completions from cells received as gossipsub partial messages (filter: eq)
+     */
+    partial_gossip_completion_count_eq?: number;
+    /**
+     * Completions from cells received as gossipsub partial messages (filter: ne)
+     */
+    partial_gossip_completion_count_ne?: number;
+    /**
+     * Completions from cells received as gossipsub partial messages (filter: lt)
+     */
+    partial_gossip_completion_count_lt?: number;
+    /**
+     * Completions from cells received as gossipsub partial messages (filter: lte)
+     */
+    partial_gossip_completion_count_lte?: number;
+    /**
+     * Completions from cells received as gossipsub partial messages (filter: gt)
+     */
+    partial_gossip_completion_count_gt?: number;
+    /**
+     * Completions from cells received as gossipsub partial messages (filter: gte)
+     */
+    partial_gossip_completion_count_gte?: number;
+    /**
+     * Completions from cells received as gossipsub partial messages (filter: between_min)
+     */
+    partial_gossip_completion_count_between_min?: number;
+    /**
+     * Completions from cells received as gossipsub partial messages (filter: between_max_value)
+     */
+    partial_gossip_completion_count_between_max_value?: number;
+    /**
+     * Completions from cells received as gossipsub partial messages (filter: in_values) (comma-separated list)
+     */
+    partial_gossip_completion_count_in_values?: string;
+    /**
+     * Completions from cells received as gossipsub partial messages (filter: not_in_values) (comma-separated list)
+     */
+    partial_gossip_completion_count_not_in_values?: string;
+    /**
+     * Completions built from blobs returned by the execution layer (filter: eq)
+     */
+    el_completion_count_eq?: number;
+    /**
+     * Completions built from blobs returned by the execution layer (filter: ne)
+     */
+    el_completion_count_ne?: number;
+    /**
+     * Completions built from blobs returned by the execution layer (filter: lt)
+     */
+    el_completion_count_lt?: number;
+    /**
+     * Completions built from blobs returned by the execution layer (filter: lte)
+     */
+    el_completion_count_lte?: number;
+    /**
+     * Completions built from blobs returned by the execution layer (filter: gt)
+     */
+    el_completion_count_gt?: number;
+    /**
+     * Completions built from blobs returned by the execution layer (filter: gte)
+     */
+    el_completion_count_gte?: number;
+    /**
+     * Completions built from blobs returned by the execution layer (filter: between_min)
+     */
+    el_completion_count_between_min?: number;
+    /**
+     * Completions built from blobs returned by the execution layer (filter: between_max_value)
+     */
+    el_completion_count_between_max_value?: number;
+    /**
+     * Completions built from blobs returned by the execution layer (filter: in_values) (comma-separated list)
+     */
+    el_completion_count_in_values?: string;
+    /**
+     * Completions built from blobs returned by the execution layer (filter: not_in_values) (comma-separated list)
+     */
+    el_completion_count_not_in_values?: string;
+    /**
+     * Completions recovered by reconstruction from other columns (filter: eq)
+     */
+    reconstruction_completion_count_eq?: number;
+    /**
+     * Completions recovered by reconstruction from other columns (filter: ne)
+     */
+    reconstruction_completion_count_ne?: number;
+    /**
+     * Completions recovered by reconstruction from other columns (filter: lt)
+     */
+    reconstruction_completion_count_lt?: number;
+    /**
+     * Completions recovered by reconstruction from other columns (filter: lte)
+     */
+    reconstruction_completion_count_lte?: number;
+    /**
+     * Completions recovered by reconstruction from other columns (filter: gt)
+     */
+    reconstruction_completion_count_gt?: number;
+    /**
+     * Completions recovered by reconstruction from other columns (filter: gte)
+     */
+    reconstruction_completion_count_gte?: number;
+    /**
+     * Completions recovered by reconstruction from other columns (filter: between_min)
+     */
+    reconstruction_completion_count_between_min?: number;
+    /**
+     * Completions recovered by reconstruction from other columns (filter: between_max_value)
+     */
+    reconstruction_completion_count_between_max_value?: number;
+    /**
+     * Completions recovered by reconstruction from other columns (filter: in_values) (comma-separated list)
+     */
+    reconstruction_completion_count_in_values?: string;
+    /**
+     * Completions recovered by reconstruction from other columns (filter: not_in_values) (comma-separated list)
+     */
+    reconstruction_completion_count_not_in_values?: string;
+    /**
+     * Completions by a path the node did not report (filter: eq)
+     */
+    unknown_completion_count_eq?: number;
+    /**
+     * Completions by a path the node did not report (filter: ne)
+     */
+    unknown_completion_count_ne?: number;
+    /**
+     * Completions by a path the node did not report (filter: lt)
+     */
+    unknown_completion_count_lt?: number;
+    /**
+     * Completions by a path the node did not report (filter: lte)
+     */
+    unknown_completion_count_lte?: number;
+    /**
+     * Completions by a path the node did not report (filter: gt)
+     */
+    unknown_completion_count_gt?: number;
+    /**
+     * Completions by a path the node did not report (filter: gte)
+     */
+    unknown_completion_count_gte?: number;
+    /**
+     * Completions by a path the node did not report (filter: between_min)
+     */
+    unknown_completion_count_between_min?: number;
+    /**
+     * Completions by a path the node did not report (filter: between_max_value)
+     */
+    unknown_completion_count_between_max_value?: number;
+    /**
+     * Completions by a path the node did not report (filter: in_values) (comma-separated list)
+     */
+    unknown_completion_count_in_values?: string;
+    /**
+     * Completions by a path the node did not report (filter: not_in_values) (comma-separated list)
+     */
+    unknown_completion_count_not_in_values?: string;
+    /**
+     * Cells in the completed columns, summed over completions (filter: eq)
+     */
+    cells_total_eq?: number;
+    /**
+     * Cells in the completed columns, summed over completions (filter: ne)
+     */
+    cells_total_ne?: number;
+    /**
+     * Cells in the completed columns, summed over completions (filter: lt)
+     */
+    cells_total_lt?: number;
+    /**
+     * Cells in the completed columns, summed over completions (filter: lte)
+     */
+    cells_total_lte?: number;
+    /**
+     * Cells in the completed columns, summed over completions (filter: gt)
+     */
+    cells_total_gt?: number;
+    /**
+     * Cells in the completed columns, summed over completions (filter: gte)
+     */
+    cells_total_gte?: number;
+    /**
+     * Cells in the completed columns, summed over completions (filter: between_min)
+     */
+    cells_total_between_min?: number;
+    /**
+     * Cells in the completed columns, summed over completions (filter: between_max_value)
+     */
+    cells_total_between_max_value?: number;
+    /**
+     * Cells in the completed columns, summed over completions (filter: in_values) (comma-separated list)
+     */
+    cells_total_in_values?: string;
+    /**
+     * Cells in the completed columns, summed over completions (filter: not_in_values) (comma-separated list)
+     */
+    cells_total_not_in_values?: string;
+    /**
+     * Cells received over gossip, summed over completions (filter: eq)
+     */
+    cells_from_gossip_eq?: number;
+    /**
+     * Cells received over gossip, summed over completions (filter: ne)
+     */
+    cells_from_gossip_ne?: number;
+    /**
+     * Cells received over gossip, summed over completions (filter: lt)
+     */
+    cells_from_gossip_lt?: number;
+    /**
+     * Cells received over gossip, summed over completions (filter: lte)
+     */
+    cells_from_gossip_lte?: number;
+    /**
+     * Cells received over gossip, summed over completions (filter: gt)
+     */
+    cells_from_gossip_gt?: number;
+    /**
+     * Cells received over gossip, summed over completions (filter: gte)
+     */
+    cells_from_gossip_gte?: number;
+    /**
+     * Cells received over gossip, summed over completions (filter: between_min)
+     */
+    cells_from_gossip_between_min?: number;
+    /**
+     * Cells received over gossip, summed over completions (filter: between_max_value)
+     */
+    cells_from_gossip_between_max_value?: number;
+    /**
+     * Cells received over gossip, summed over completions (filter: in_values) (comma-separated list)
+     */
+    cells_from_gossip_in_values?: string;
+    /**
+     * Cells received over gossip, summed over completions (filter: not_in_values) (comma-separated list)
+     */
+    cells_from_gossip_not_in_values?: string;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over completions (filter: eq)
+     */
+    cells_from_el_eq?: number;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over completions (filter: ne)
+     */
+    cells_from_el_ne?: number;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over completions (filter: lt)
+     */
+    cells_from_el_lt?: number;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over completions (filter: lte)
+     */
+    cells_from_el_lte?: number;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over completions (filter: gt)
+     */
+    cells_from_el_gt?: number;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over completions (filter: gte)
+     */
+    cells_from_el_gte?: number;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over completions (filter: between_min)
+     */
+    cells_from_el_between_min?: number;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over completions (filter: between_max_value)
+     */
+    cells_from_el_between_max_value?: number;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over completions (filter: in_values) (comma-separated list)
+     */
+    cells_from_el_in_values?: string;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over completions (filter: not_in_values) (comma-separated list)
+     */
+    cells_from_el_not_in_values?: string;
+    /**
+     * Earliest completion of any column by any node, in milliseconds from slot start (filter: eq)
+     */
+    min_completion_slot_start_diff_eq?: number;
+    /**
+     * Earliest completion of any column by any node, in milliseconds from slot start (filter: ne)
+     */
+    min_completion_slot_start_diff_ne?: number;
+    /**
+     * Earliest completion of any column by any node, in milliseconds from slot start (filter: lt)
+     */
+    min_completion_slot_start_diff_lt?: number;
+    /**
+     * Earliest completion of any column by any node, in milliseconds from slot start (filter: lte)
+     */
+    min_completion_slot_start_diff_lte?: number;
+    /**
+     * Earliest completion of any column by any node, in milliseconds from slot start (filter: gt)
+     */
+    min_completion_slot_start_diff_gt?: number;
+    /**
+     * Earliest completion of any column by any node, in milliseconds from slot start (filter: gte)
+     */
+    min_completion_slot_start_diff_gte?: number;
+    /**
+     * Earliest completion of any column by any node, in milliseconds from slot start (filter: between_min)
+     */
+    min_completion_slot_start_diff_between_min?: number;
+    /**
+     * Earliest completion of any column by any node, in milliseconds from slot start (filter: between_max_value)
+     */
+    min_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * Earliest completion of any column by any node, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    min_completion_slot_start_diff_in_values?: string;
+    /**
+     * Earliest completion of any column by any node, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    min_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * Median completion time across completions, in milliseconds from slot start (filter: eq)
+     */
+    p50_completion_slot_start_diff_eq?: number;
+    /**
+     * Median completion time across completions, in milliseconds from slot start (filter: ne)
+     */
+    p50_completion_slot_start_diff_ne?: number;
+    /**
+     * Median completion time across completions, in milliseconds from slot start (filter: lt)
+     */
+    p50_completion_slot_start_diff_lt?: number;
+    /**
+     * Median completion time across completions, in milliseconds from slot start (filter: lte)
+     */
+    p50_completion_slot_start_diff_lte?: number;
+    /**
+     * Median completion time across completions, in milliseconds from slot start (filter: gt)
+     */
+    p50_completion_slot_start_diff_gt?: number;
+    /**
+     * Median completion time across completions, in milliseconds from slot start (filter: gte)
+     */
+    p50_completion_slot_start_diff_gte?: number;
+    /**
+     * Median completion time across completions, in milliseconds from slot start (filter: between_min)
+     */
+    p50_completion_slot_start_diff_between_min?: number;
+    /**
+     * Median completion time across completions, in milliseconds from slot start (filter: between_max_value)
+     */
+    p50_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * Median completion time across completions, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p50_completion_slot_start_diff_in_values?: string;
+    /**
+     * Median completion time across completions, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p50_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * 90th percentile completion time across completions, in milliseconds from slot start (filter: eq)
+     */
+    p90_completion_slot_start_diff_eq?: number;
+    /**
+     * 90th percentile completion time across completions, in milliseconds from slot start (filter: ne)
+     */
+    p90_completion_slot_start_diff_ne?: number;
+    /**
+     * 90th percentile completion time across completions, in milliseconds from slot start (filter: lt)
+     */
+    p90_completion_slot_start_diff_lt?: number;
+    /**
+     * 90th percentile completion time across completions, in milliseconds from slot start (filter: lte)
+     */
+    p90_completion_slot_start_diff_lte?: number;
+    /**
+     * 90th percentile completion time across completions, in milliseconds from slot start (filter: gt)
+     */
+    p90_completion_slot_start_diff_gt?: number;
+    /**
+     * 90th percentile completion time across completions, in milliseconds from slot start (filter: gte)
+     */
+    p90_completion_slot_start_diff_gte?: number;
+    /**
+     * 90th percentile completion time across completions, in milliseconds from slot start (filter: between_min)
+     */
+    p90_completion_slot_start_diff_between_min?: number;
+    /**
+     * 90th percentile completion time across completions, in milliseconds from slot start (filter: between_max_value)
+     */
+    p90_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * 90th percentile completion time across completions, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p90_completion_slot_start_diff_in_values?: string;
+    /**
+     * 90th percentile completion time across completions, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p90_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * Latest completion of any column by any node, in milliseconds from slot start (filter: eq)
+     */
+    max_completion_slot_start_diff_eq?: number;
+    /**
+     * Latest completion of any column by any node, in milliseconds from slot start (filter: ne)
+     */
+    max_completion_slot_start_diff_ne?: number;
+    /**
+     * Latest completion of any column by any node, in milliseconds from slot start (filter: lt)
+     */
+    max_completion_slot_start_diff_lt?: number;
+    /**
+     * Latest completion of any column by any node, in milliseconds from slot start (filter: lte)
+     */
+    max_completion_slot_start_diff_lte?: number;
+    /**
+     * Latest completion of any column by any node, in milliseconds from slot start (filter: gt)
+     */
+    max_completion_slot_start_diff_gt?: number;
+    /**
+     * Latest completion of any column by any node, in milliseconds from slot start (filter: gte)
+     */
+    max_completion_slot_start_diff_gte?: number;
+    /**
+     * Latest completion of any column by any node, in milliseconds from slot start (filter: between_min)
+     */
+    max_completion_slot_start_diff_between_min?: number;
+    /**
+     * Latest completion of any column by any node, in milliseconds from slot start (filter: between_max_value)
+     */
+    max_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * Latest completion of any column by any node, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    max_completion_slot_start_diff_in_values?: string;
+    /**
+     * Latest completion of any column by any node, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    max_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * Median across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: eq)
+     */
+    p50_node_last_completion_slot_start_diff_eq?: number;
+    /**
+     * Median across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: ne)
+     */
+    p50_node_last_completion_slot_start_diff_ne?: number;
+    /**
+     * Median across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: lt)
+     */
+    p50_node_last_completion_slot_start_diff_lt?: number;
+    /**
+     * Median across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: lte)
+     */
+    p50_node_last_completion_slot_start_diff_lte?: number;
+    /**
+     * Median across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: gt)
+     */
+    p50_node_last_completion_slot_start_diff_gt?: number;
+    /**
+     * Median across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: gte)
+     */
+    p50_node_last_completion_slot_start_diff_gte?: number;
+    /**
+     * Median across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: between_min)
+     */
+    p50_node_last_completion_slot_start_diff_between_min?: number;
+    /**
+     * Median across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: between_max_value)
+     */
+    p50_node_last_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * Median across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p50_node_last_completion_slot_start_diff_in_values?: string;
+    /**
+     * Median across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p50_node_last_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * 90th percentile across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: eq)
+     */
+    p90_node_last_completion_slot_start_diff_eq?: number;
+    /**
+     * 90th percentile across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: ne)
+     */
+    p90_node_last_completion_slot_start_diff_ne?: number;
+    /**
+     * 90th percentile across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: lt)
+     */
+    p90_node_last_completion_slot_start_diff_lt?: number;
+    /**
+     * 90th percentile across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: lte)
+     */
+    p90_node_last_completion_slot_start_diff_lte?: number;
+    /**
+     * 90th percentile across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: gt)
+     */
+    p90_node_last_completion_slot_start_diff_gt?: number;
+    /**
+     * 90th percentile across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: gte)
+     */
+    p90_node_last_completion_slot_start_diff_gte?: number;
+    /**
+     * 90th percentile across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: between_min)
+     */
+    p90_node_last_completion_slot_start_diff_between_min?: number;
+    /**
+     * 90th percentile across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: between_max_value)
+     */
+    p90_node_last_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * 90th percentile across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p90_node_last_completion_slot_start_diff_in_values?: string;
+    /**
+     * 90th percentile across nodes of the time each node completed its last column of the block, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p90_node_last_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_data_column_completion to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockDataColumnCompletion` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_data_column_completion';
+};
+
+export type FctBlockDataColumnCompletionServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockDataColumnCompletionServiceListError =
+  FctBlockDataColumnCompletionServiceListErrors[keyof FctBlockDataColumnCompletionServiceListErrors];
+
+export type FctBlockDataColumnCompletionServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockDataColumnCompletionResponse;
+};
+
+export type FctBlockDataColumnCompletionServiceListResponse =
+  FctBlockDataColumnCompletionServiceListResponses[keyof FctBlockDataColumnCompletionServiceListResponses];
+
+export type FctBlockDataColumnCompletionServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_data_column_completion/{slot_start_date_time}';
+};
+
+export type FctBlockDataColumnCompletionServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockDataColumnCompletionServiceGetError =
+  FctBlockDataColumnCompletionServiceGetErrors[keyof FctBlockDataColumnCompletionServiceGetErrors];
+
+export type FctBlockDataColumnCompletionServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockDataColumnCompletionResponse;
+};
+
+export type FctBlockDataColumnCompletionServiceGetResponse =
+  FctBlockDataColumnCompletionServiceGetResponses[keyof FctBlockDataColumnCompletionServiceGetResponses];
+
 export type FctBlockDataColumnSidecarFirstSeenServiceListData = {
   body?: never;
   path?: never;
@@ -30542,6 +32494,42 @@ export type FctBlockDataColumnSidecarFirstSeenServiceListData = {
      * Ethereum consensus client implementation of the client that first saw the data column (filter: not_in_values) (comma-separated list)
      */
     meta_consensus_implementation_not_in_values?: string;
+    /**
+     * How the node that first saw the data column completed it: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: eq)
+     */
+    completed_via_eq?: string;
+    /**
+     * How the node that first saw the data column completed it: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: ne)
+     */
+    completed_via_ne?: string;
+    /**
+     * How the node that first saw the data column completed it: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: contains)
+     */
+    completed_via_contains?: string;
+    /**
+     * How the node that first saw the data column completed it: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: starts_with)
+     */
+    completed_via_starts_with?: string;
+    /**
+     * How the node that first saw the data column completed it: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: ends_with)
+     */
+    completed_via_ends_with?: string;
+    /**
+     * How the node that first saw the data column completed it: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: like)
+     */
+    completed_via_like?: string;
+    /**
+     * How the node that first saw the data column completed it: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: not_like)
+     */
+    completed_via_not_like?: string;
+    /**
+     * How the node that first saw the data column completed it: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: in_values) (comma-separated list)
+     */
+    completed_via_in_values?: string;
+    /**
+     * How the node that first saw the data column completed it: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: not_in_values) (comma-separated list)
+     */
+    completed_via_not_in_values?: string;
     /**
      * The maximum number of fct_block_data_column_sidecar_first_seen to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
@@ -31522,6 +33510,42 @@ export type FctBlockDataColumnSidecarFirstSeenByNodeServiceListData = {
      * Ethereum consensus client implementation (filter: not_in_values) (comma-separated list)
      */
     meta_consensus_implementation_not_in_values?: string;
+    /**
+     * How the node completed the data column: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: eq)
+     */
+    completed_via_eq?: string;
+    /**
+     * How the node completed the data column: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: ne)
+     */
+    completed_via_ne?: string;
+    /**
+     * How the node completed the data column: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: contains)
+     */
+    completed_via_contains?: string;
+    /**
+     * How the node completed the data column: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: starts_with)
+     */
+    completed_via_starts_with?: string;
+    /**
+     * How the node completed the data column: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: ends_with)
+     */
+    completed_via_ends_with?: string;
+    /**
+     * How the node completed the data column: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: like)
+     */
+    completed_via_like?: string;
+    /**
+     * How the node completed the data column: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: not_like)
+     */
+    completed_via_not_like?: string;
+    /**
+     * How the node completed the data column: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: in_values) (comma-separated list)
+     */
+    completed_via_in_values?: string;
+    /**
+     * How the node completed the data column: FULL_GOSSIP for a full gossip message, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN from a column completion event, empty for beacon API events (filter: not_in_values) (comma-separated list)
+     */
+    completed_via_not_in_values?: string;
     /**
      * The maximum number of fct_block_data_column_sidecar_first_seen_by_node to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
@@ -36890,6 +38914,630 @@ export type FctBlockMevHeadServiceGetResponses = {
 
 export type FctBlockMevHeadServiceGetResponse =
   FctBlockMevHeadServiceGetResponses[keyof FctBlockMevHeadServiceGetResponses];
+
+export type FctBlockPartialDataColumnHeaderFirstSeenServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * The beacon block root hash (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * The beacon block root hash (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * The beacon block root hash (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * The beacon block root hash (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * The beacon block root hash (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * The beacon block root hash (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * The beacon block root hash (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * The beacon block root hash (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * The beacon block root hash (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The slot number (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot number (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot number (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot number (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot number (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot number (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot number (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot number (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot number (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot number (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * The validator index of the block proposer, from the header (filter: eq)
+     */
+    proposer_index_eq?: number;
+    /**
+     * The validator index of the block proposer, from the header (filter: ne)
+     */
+    proposer_index_ne?: number;
+    /**
+     * The validator index of the block proposer, from the header (filter: lt)
+     */
+    proposer_index_lt?: number;
+    /**
+     * The validator index of the block proposer, from the header (filter: lte)
+     */
+    proposer_index_lte?: number;
+    /**
+     * The validator index of the block proposer, from the header (filter: gt)
+     */
+    proposer_index_gt?: number;
+    /**
+     * The validator index of the block proposer, from the header (filter: gte)
+     */
+    proposer_index_gte?: number;
+    /**
+     * The validator index of the block proposer, from the header (filter: between_min)
+     */
+    proposer_index_between_min?: number;
+    /**
+     * The validator index of the block proposer, from the header (filter: between_max_value)
+     */
+    proposer_index_between_max_value?: number;
+    /**
+     * The validator index of the block proposer, from the header (filter: in_values) (comma-separated list)
+     */
+    proposer_index_in_values?: string;
+    /**
+     * The validator index of the block proposer, from the header (filter: not_in_values) (comma-separated list)
+     */
+    proposer_index_not_in_values?: string;
+    /**
+     * Number of KZG commitments in the header (filter: eq)
+     */
+    blob_count_eq?: number;
+    /**
+     * Number of KZG commitments in the header (filter: ne)
+     */
+    blob_count_ne?: number;
+    /**
+     * Number of KZG commitments in the header (filter: lt)
+     */
+    blob_count_lt?: number;
+    /**
+     * Number of KZG commitments in the header (filter: lte)
+     */
+    blob_count_lte?: number;
+    /**
+     * Number of KZG commitments in the header (filter: gt)
+     */
+    blob_count_gt?: number;
+    /**
+     * Number of KZG commitments in the header (filter: gte)
+     */
+    blob_count_gte?: number;
+    /**
+     * Number of KZG commitments in the header (filter: between_min)
+     */
+    blob_count_between_min?: number;
+    /**
+     * Number of KZG commitments in the header (filter: between_max_value)
+     */
+    blob_count_between_max_value?: number;
+    /**
+     * Number of KZG commitments in the header (filter: in_values) (comma-separated list)
+     */
+    blob_count_in_values?: string;
+    /**
+     * Number of KZG commitments in the header (filter: not_in_values) (comma-separated list)
+     */
+    blob_count_not_in_values?: string;
+    /**
+     * Time from slot start until any sentry node first received a partial data column header for the block, in milliseconds (filter: eq)
+     */
+    seen_slot_start_diff_eq?: number;
+    /**
+     * Time from slot start until any sentry node first received a partial data column header for the block, in milliseconds (filter: ne)
+     */
+    seen_slot_start_diff_ne?: number;
+    /**
+     * Time from slot start until any sentry node first received a partial data column header for the block, in milliseconds (filter: lt)
+     */
+    seen_slot_start_diff_lt?: number;
+    /**
+     * Time from slot start until any sentry node first received a partial data column header for the block, in milliseconds (filter: lte)
+     */
+    seen_slot_start_diff_lte?: number;
+    /**
+     * Time from slot start until any sentry node first received a partial data column header for the block, in milliseconds (filter: gt)
+     */
+    seen_slot_start_diff_gt?: number;
+    /**
+     * Time from slot start until any sentry node first received a partial data column header for the block, in milliseconds (filter: gte)
+     */
+    seen_slot_start_diff_gte?: number;
+    /**
+     * Time from slot start until any sentry node first received a partial data column header for the block, in milliseconds (filter: between_min)
+     */
+    seen_slot_start_diff_between_min?: number;
+    /**
+     * Time from slot start until any sentry node first received a partial data column header for the block, in milliseconds (filter: between_max_value)
+     */
+    seen_slot_start_diff_between_max_value?: number;
+    /**
+     * Time from slot start until any sentry node first received a partial data column header for the block, in milliseconds (filter: in_values) (comma-separated list)
+     */
+    seen_slot_start_diff_in_values?: string;
+    /**
+     * Time from slot start until any sentry node first received a partial data column header for the block, in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    seen_slot_start_diff_not_in_values?: string;
+    /**
+     * Median across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: eq)
+     */
+    p50_node_seen_slot_start_diff_eq?: number;
+    /**
+     * Median across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: ne)
+     */
+    p50_node_seen_slot_start_diff_ne?: number;
+    /**
+     * Median across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: lt)
+     */
+    p50_node_seen_slot_start_diff_lt?: number;
+    /**
+     * Median across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: lte)
+     */
+    p50_node_seen_slot_start_diff_lte?: number;
+    /**
+     * Median across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: gt)
+     */
+    p50_node_seen_slot_start_diff_gt?: number;
+    /**
+     * Median across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: gte)
+     */
+    p50_node_seen_slot_start_diff_gte?: number;
+    /**
+     * Median across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: between_min)
+     */
+    p50_node_seen_slot_start_diff_between_min?: number;
+    /**
+     * Median across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: between_max_value)
+     */
+    p50_node_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * Median across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p50_node_seen_slot_start_diff_in_values?: string;
+    /**
+     * Median across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p50_node_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * 90th percentile across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: eq)
+     */
+    p90_node_seen_slot_start_diff_eq?: number;
+    /**
+     * 90th percentile across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: ne)
+     */
+    p90_node_seen_slot_start_diff_ne?: number;
+    /**
+     * 90th percentile across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: lt)
+     */
+    p90_node_seen_slot_start_diff_lt?: number;
+    /**
+     * 90th percentile across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: lte)
+     */
+    p90_node_seen_slot_start_diff_lte?: number;
+    /**
+     * 90th percentile across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: gt)
+     */
+    p90_node_seen_slot_start_diff_gt?: number;
+    /**
+     * 90th percentile across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: gte)
+     */
+    p90_node_seen_slot_start_diff_gte?: number;
+    /**
+     * 90th percentile across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: between_min)
+     */
+    p90_node_seen_slot_start_diff_between_min?: number;
+    /**
+     * 90th percentile across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: between_max_value)
+     */
+    p90_node_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * 90th percentile across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p90_node_seen_slot_start_diff_in_values?: string;
+    /**
+     * 90th percentile across nodes of the time each node first received a header for the block, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p90_node_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * Latest time a node first received a header for the block, in milliseconds from slot start (filter: eq)
+     */
+    max_node_seen_slot_start_diff_eq?: number;
+    /**
+     * Latest time a node first received a header for the block, in milliseconds from slot start (filter: ne)
+     */
+    max_node_seen_slot_start_diff_ne?: number;
+    /**
+     * Latest time a node first received a header for the block, in milliseconds from slot start (filter: lt)
+     */
+    max_node_seen_slot_start_diff_lt?: number;
+    /**
+     * Latest time a node first received a header for the block, in milliseconds from slot start (filter: lte)
+     */
+    max_node_seen_slot_start_diff_lte?: number;
+    /**
+     * Latest time a node first received a header for the block, in milliseconds from slot start (filter: gt)
+     */
+    max_node_seen_slot_start_diff_gt?: number;
+    /**
+     * Latest time a node first received a header for the block, in milliseconds from slot start (filter: gte)
+     */
+    max_node_seen_slot_start_diff_gte?: number;
+    /**
+     * Latest time a node first received a header for the block, in milliseconds from slot start (filter: between_min)
+     */
+    max_node_seen_slot_start_diff_between_min?: number;
+    /**
+     * Latest time a node first received a header for the block, in milliseconds from slot start (filter: between_max_value)
+     */
+    max_node_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * Latest time a node first received a header for the block, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    max_node_seen_slot_start_diff_in_values?: string;
+    /**
+     * Latest time a node first received a header for the block, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    max_node_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * Number of sentry nodes that received a partial data column header for the block (filter: eq)
+     */
+    node_count_eq?: number;
+    /**
+     * Number of sentry nodes that received a partial data column header for the block (filter: ne)
+     */
+    node_count_ne?: number;
+    /**
+     * Number of sentry nodes that received a partial data column header for the block (filter: lt)
+     */
+    node_count_lt?: number;
+    /**
+     * Number of sentry nodes that received a partial data column header for the block (filter: lte)
+     */
+    node_count_lte?: number;
+    /**
+     * Number of sentry nodes that received a partial data column header for the block (filter: gt)
+     */
+    node_count_gt?: number;
+    /**
+     * Number of sentry nodes that received a partial data column header for the block (filter: gte)
+     */
+    node_count_gte?: number;
+    /**
+     * Number of sentry nodes that received a partial data column header for the block (filter: between_min)
+     */
+    node_count_between_min?: number;
+    /**
+     * Number of sentry nodes that received a partial data column header for the block (filter: between_max_value)
+     */
+    node_count_between_max_value?: number;
+    /**
+     * Number of sentry nodes that received a partial data column header for the block (filter: in_values) (comma-separated list)
+     */
+    node_count_in_values?: string;
+    /**
+     * Number of sentry nodes that received a partial data column header for the block (filter: not_in_values) (comma-separated list)
+     */
+    node_count_not_in_values?: string;
+    /**
+     * Name of the sentry node that received a header first (filter: eq)
+     */
+    first_seen_meta_client_name_eq?: string;
+    /**
+     * Name of the sentry node that received a header first (filter: ne)
+     */
+    first_seen_meta_client_name_ne?: string;
+    /**
+     * Name of the sentry node that received a header first (filter: contains)
+     */
+    first_seen_meta_client_name_contains?: string;
+    /**
+     * Name of the sentry node that received a header first (filter: starts_with)
+     */
+    first_seen_meta_client_name_starts_with?: string;
+    /**
+     * Name of the sentry node that received a header first (filter: ends_with)
+     */
+    first_seen_meta_client_name_ends_with?: string;
+    /**
+     * Name of the sentry node that received a header first (filter: like)
+     */
+    first_seen_meta_client_name_like?: string;
+    /**
+     * Name of the sentry node that received a header first (filter: not_like)
+     */
+    first_seen_meta_client_name_not_like?: string;
+    /**
+     * Name of the sentry node that received a header first (filter: in_values) (comma-separated list)
+     */
+    first_seen_meta_client_name_in_values?: string;
+    /**
+     * Name of the sentry node that received a header first (filter: not_in_values) (comma-separated list)
+     */
+    first_seen_meta_client_name_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_partial_data_column_header_first_seen to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockPartialDataColumnHeaderFirstSeen` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_partial_data_column_header_first_seen';
+};
+
+export type FctBlockPartialDataColumnHeaderFirstSeenServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockPartialDataColumnHeaderFirstSeenServiceListError =
+  FctBlockPartialDataColumnHeaderFirstSeenServiceListErrors[keyof FctBlockPartialDataColumnHeaderFirstSeenServiceListErrors];
+
+export type FctBlockPartialDataColumnHeaderFirstSeenServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockPartialDataColumnHeaderFirstSeenResponse;
+};
+
+export type FctBlockPartialDataColumnHeaderFirstSeenServiceListResponse =
+  FctBlockPartialDataColumnHeaderFirstSeenServiceListResponses[keyof FctBlockPartialDataColumnHeaderFirstSeenServiceListResponses];
+
+export type FctBlockPartialDataColumnHeaderFirstSeenServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_partial_data_column_header_first_seen/{slot_start_date_time}';
+};
+
+export type FctBlockPartialDataColumnHeaderFirstSeenServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockPartialDataColumnHeaderFirstSeenServiceGetError =
+  FctBlockPartialDataColumnHeaderFirstSeenServiceGetErrors[keyof FctBlockPartialDataColumnHeaderFirstSeenServiceGetErrors];
+
+export type FctBlockPartialDataColumnHeaderFirstSeenServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockPartialDataColumnHeaderFirstSeenResponse;
+};
+
+export type FctBlockPartialDataColumnHeaderFirstSeenServiceGetResponse =
+  FctBlockPartialDataColumnHeaderFirstSeenServiceGetResponses[keyof FctBlockPartialDataColumnHeaderFirstSeenServiceGetResponses];
 
 export type FctBlockPayloadServiceListData = {
   body?: never;
@@ -49919,6 +52567,4942 @@ export type FctDataColumnAvailabilityHourlyServiceGetResponses = {
 
 export type FctDataColumnAvailabilityHourlyServiceGetResponse =
   FctDataColumnAvailabilityHourlyServiceGetResponses[keyof FctDataColumnAvailabilityHourlyServiceGetResponses];
+
+export type FctDataColumnCompletionByPathDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period, by block slot (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period, by block slot (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period, by block slot (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period, by block slot (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period, by block slot (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period, by block slot (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period, by block slot (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period, by block slot (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period, by block slot (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: eq)
+     */
+    completed_via_eq?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: ne)
+     */
+    completed_via_ne?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: contains)
+     */
+    completed_via_contains?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: starts_with)
+     */
+    completed_via_starts_with?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: ends_with)
+     */
+    completed_via_ends_with?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: like)
+     */
+    completed_via_like?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: not_like)
+     */
+    completed_via_not_like?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: in_values) (comma-separated list)
+     */
+    completed_via_in_values?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: not_in_values) (comma-separated list)
+     */
+    completed_via_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: eq)
+     */
+    node_count_eq?: number;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: ne)
+     */
+    node_count_ne?: number;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: lt)
+     */
+    node_count_lt?: number;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: lte)
+     */
+    node_count_lte?: number;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: gt)
+     */
+    node_count_gt?: number;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: gte)
+     */
+    node_count_gte?: number;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: between_min)
+     */
+    node_count_between_min?: number;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: between_max_value)
+     */
+    node_count_between_max_value?: number;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: in_values) (comma-separated list)
+     */
+    node_count_in_values?: string;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: not_in_values) (comma-separated list)
+     */
+    node_count_not_in_values?: string;
+    /**
+     * Distinct blocks with a column completed on this path (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Distinct blocks with a column completed on this path (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Distinct blocks with a column completed on this path (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Distinct blocks with a column completed on this path (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Distinct blocks with a column completed on this path (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Distinct blocks with a column completed on this path (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Distinct blocks with a column completed on this path (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Distinct blocks with a column completed on this path (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Distinct blocks with a column completed on this path (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Distinct blocks with a column completed on this path (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Column completions, one per node per column (filter: eq)
+     */
+    completion_count_eq?: number;
+    /**
+     * Column completions, one per node per column (filter: ne)
+     */
+    completion_count_ne?: number;
+    /**
+     * Column completions, one per node per column (filter: lt)
+     */
+    completion_count_lt?: number;
+    /**
+     * Column completions, one per node per column (filter: lte)
+     */
+    completion_count_lte?: number;
+    /**
+     * Column completions, one per node per column (filter: gt)
+     */
+    completion_count_gt?: number;
+    /**
+     * Column completions, one per node per column (filter: gte)
+     */
+    completion_count_gte?: number;
+    /**
+     * Column completions, one per node per column (filter: between_min)
+     */
+    completion_count_between_min?: number;
+    /**
+     * Column completions, one per node per column (filter: between_max_value)
+     */
+    completion_count_between_max_value?: number;
+    /**
+     * Column completions, one per node per column (filter: in_values) (comma-separated list)
+     */
+    completion_count_in_values?: string;
+    /**
+     * Column completions, one per node per column (filter: not_in_values) (comma-separated list)
+     */
+    completion_count_not_in_values?: string;
+    /**
+     * Cells in the completed columns (filter: eq)
+     */
+    cells_total_eq?: number;
+    /**
+     * Cells in the completed columns (filter: ne)
+     */
+    cells_total_ne?: number;
+    /**
+     * Cells in the completed columns (filter: lt)
+     */
+    cells_total_lt?: number;
+    /**
+     * Cells in the completed columns (filter: lte)
+     */
+    cells_total_lte?: number;
+    /**
+     * Cells in the completed columns (filter: gt)
+     */
+    cells_total_gt?: number;
+    /**
+     * Cells in the completed columns (filter: gte)
+     */
+    cells_total_gte?: number;
+    /**
+     * Cells in the completed columns (filter: between_min)
+     */
+    cells_total_between_min?: number;
+    /**
+     * Cells in the completed columns (filter: between_max_value)
+     */
+    cells_total_between_max_value?: number;
+    /**
+     * Cells in the completed columns (filter: in_values) (comma-separated list)
+     */
+    cells_total_in_values?: string;
+    /**
+     * Cells in the completed columns (filter: not_in_values) (comma-separated list)
+     */
+    cells_total_not_in_values?: string;
+    /**
+     * Cells received over gossip (filter: eq)
+     */
+    cells_from_gossip_eq?: number;
+    /**
+     * Cells received over gossip (filter: ne)
+     */
+    cells_from_gossip_ne?: number;
+    /**
+     * Cells received over gossip (filter: lt)
+     */
+    cells_from_gossip_lt?: number;
+    /**
+     * Cells received over gossip (filter: lte)
+     */
+    cells_from_gossip_lte?: number;
+    /**
+     * Cells received over gossip (filter: gt)
+     */
+    cells_from_gossip_gt?: number;
+    /**
+     * Cells received over gossip (filter: gte)
+     */
+    cells_from_gossip_gte?: number;
+    /**
+     * Cells received over gossip (filter: between_min)
+     */
+    cells_from_gossip_between_min?: number;
+    /**
+     * Cells received over gossip (filter: between_max_value)
+     */
+    cells_from_gossip_between_max_value?: number;
+    /**
+     * Cells received over gossip (filter: in_values) (comma-separated list)
+     */
+    cells_from_gossip_in_values?: string;
+    /**
+     * Cells received over gossip (filter: not_in_values) (comma-separated list)
+     */
+    cells_from_gossip_not_in_values?: string;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: eq)
+     */
+    cells_from_el_eq?: number;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: ne)
+     */
+    cells_from_el_ne?: number;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: lt)
+     */
+    cells_from_el_lt?: number;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: lte)
+     */
+    cells_from_el_lte?: number;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: gt)
+     */
+    cells_from_el_gt?: number;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: gte)
+     */
+    cells_from_el_gte?: number;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: between_min)
+     */
+    cells_from_el_between_min?: number;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: between_max_value)
+     */
+    cells_from_el_between_max_value?: number;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: in_values) (comma-separated list)
+     */
+    cells_from_el_in_values?: string;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: not_in_values) (comma-separated list)
+     */
+    cells_from_el_not_in_values?: string;
+    /**
+     * Filter avg_contributing_peers using value
+     */
+    avg_contributing_peers_value?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: eq)
+     */
+    min_completion_slot_start_diff_eq?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: ne)
+     */
+    min_completion_slot_start_diff_ne?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: lt)
+     */
+    min_completion_slot_start_diff_lt?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: lte)
+     */
+    min_completion_slot_start_diff_lte?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: gt)
+     */
+    min_completion_slot_start_diff_gt?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: gte)
+     */
+    min_completion_slot_start_diff_gte?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: between_min)
+     */
+    min_completion_slot_start_diff_between_min?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: between_max_value)
+     */
+    min_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    min_completion_slot_start_diff_in_values?: string;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    min_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: eq)
+     */
+    p50_completion_slot_start_diff_eq?: number;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: ne)
+     */
+    p50_completion_slot_start_diff_ne?: number;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: lt)
+     */
+    p50_completion_slot_start_diff_lt?: number;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: lte)
+     */
+    p50_completion_slot_start_diff_lte?: number;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: gt)
+     */
+    p50_completion_slot_start_diff_gt?: number;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: gte)
+     */
+    p50_completion_slot_start_diff_gte?: number;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: between_min)
+     */
+    p50_completion_slot_start_diff_between_min?: number;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: between_max_value)
+     */
+    p50_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p50_completion_slot_start_diff_in_values?: string;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p50_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: eq)
+     */
+    p90_completion_slot_start_diff_eq?: number;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: ne)
+     */
+    p90_completion_slot_start_diff_ne?: number;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: lt)
+     */
+    p90_completion_slot_start_diff_lt?: number;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: lte)
+     */
+    p90_completion_slot_start_diff_lte?: number;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: gt)
+     */
+    p90_completion_slot_start_diff_gt?: number;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: gte)
+     */
+    p90_completion_slot_start_diff_gte?: number;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: between_min)
+     */
+    p90_completion_slot_start_diff_between_min?: number;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: between_max_value)
+     */
+    p90_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p90_completion_slot_start_diff_in_values?: string;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p90_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: eq)
+     */
+    p99_completion_slot_start_diff_eq?: number;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: ne)
+     */
+    p99_completion_slot_start_diff_ne?: number;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: lt)
+     */
+    p99_completion_slot_start_diff_lt?: number;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: lte)
+     */
+    p99_completion_slot_start_diff_lte?: number;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: gt)
+     */
+    p99_completion_slot_start_diff_gt?: number;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: gte)
+     */
+    p99_completion_slot_start_diff_gte?: number;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: between_min)
+     */
+    p99_completion_slot_start_diff_between_min?: number;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: between_max_value)
+     */
+    p99_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p99_completion_slot_start_diff_in_values?: string;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p99_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: eq)
+     */
+    max_completion_slot_start_diff_eq?: number;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: ne)
+     */
+    max_completion_slot_start_diff_ne?: number;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: lt)
+     */
+    max_completion_slot_start_diff_lt?: number;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: lte)
+     */
+    max_completion_slot_start_diff_lte?: number;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: gt)
+     */
+    max_completion_slot_start_diff_gt?: number;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: gte)
+     */
+    max_completion_slot_start_diff_gte?: number;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: between_min)
+     */
+    max_completion_slot_start_diff_between_min?: number;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: between_max_value)
+     */
+    max_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    max_completion_slot_start_diff_in_values?: string;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    max_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * The maximum number of fct_data_column_completion_by_path_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctDataColumnCompletionByPathDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_data_column_completion_by_path_daily';
+};
+
+export type FctDataColumnCompletionByPathDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctDataColumnCompletionByPathDailyServiceListError =
+  FctDataColumnCompletionByPathDailyServiceListErrors[keyof FctDataColumnCompletionByPathDailyServiceListErrors];
+
+export type FctDataColumnCompletionByPathDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctDataColumnCompletionByPathDailyResponse;
+};
+
+export type FctDataColumnCompletionByPathDailyServiceListResponse =
+  FctDataColumnCompletionByPathDailyServiceListResponses[keyof FctDataColumnCompletionByPathDailyServiceListResponses];
+
+export type FctDataColumnCompletionByPathDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period, by block slot
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_data_column_completion_by_path_daily/{day_start_date}';
+};
+
+export type FctDataColumnCompletionByPathDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctDataColumnCompletionByPathDailyServiceGetError =
+  FctDataColumnCompletionByPathDailyServiceGetErrors[keyof FctDataColumnCompletionByPathDailyServiceGetErrors];
+
+export type FctDataColumnCompletionByPathDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctDataColumnCompletionByPathDailyResponse;
+};
+
+export type FctDataColumnCompletionByPathDailyServiceGetResponse =
+  FctDataColumnCompletionByPathDailyServiceGetResponses[keyof FctDataColumnCompletionByPathDailyServiceGetResponses];
+
+export type FctDataColumnCompletionByPathHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time at the start of the hour, by block slot (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * The wall clock time at the start of the hour, by block slot (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * The wall clock time at the start of the hour, by block slot (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * The wall clock time at the start of the hour, by block slot (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * The wall clock time at the start of the hour, by block slot (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * The wall clock time at the start of the hour, by block slot (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * The wall clock time at the start of the hour, by block slot (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * The wall clock time at the start of the hour, by block slot (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time at the start of the hour, by block slot (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * The wall clock time at the start of the hour, by block slot (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * Consensus client of the sentry nodes that completed the columns (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: eq)
+     */
+    completed_via_eq?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: ne)
+     */
+    completed_via_ne?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: contains)
+     */
+    completed_via_contains?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: starts_with)
+     */
+    completed_via_starts_with?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: ends_with)
+     */
+    completed_via_ends_with?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: like)
+     */
+    completed_via_like?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: not_like)
+     */
+    completed_via_not_like?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: in_values) (comma-separated list)
+     */
+    completed_via_in_values?: string;
+    /**
+     * How the columns were completed: FULL_GOSSIP, PARTIAL_GOSSIP, EL, RECONSTRUCTION or UNKNOWN (filter: not_in_values) (comma-separated list)
+     */
+    completed_via_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: eq)
+     */
+    node_count_eq?: number;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: ne)
+     */
+    node_count_ne?: number;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: lt)
+     */
+    node_count_lt?: number;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: lte)
+     */
+    node_count_lte?: number;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: gt)
+     */
+    node_count_gt?: number;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: gte)
+     */
+    node_count_gte?: number;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: between_min)
+     */
+    node_count_between_min?: number;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: between_max_value)
+     */
+    node_count_between_max_value?: number;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: in_values) (comma-separated list)
+     */
+    node_count_in_values?: string;
+    /**
+     * Distinct sentry nodes with a completion on this path (filter: not_in_values) (comma-separated list)
+     */
+    node_count_not_in_values?: string;
+    /**
+     * Distinct blocks with a column completed on this path (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Distinct blocks with a column completed on this path (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Distinct blocks with a column completed on this path (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Distinct blocks with a column completed on this path (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Distinct blocks with a column completed on this path (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Distinct blocks with a column completed on this path (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Distinct blocks with a column completed on this path (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Distinct blocks with a column completed on this path (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Distinct blocks with a column completed on this path (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Distinct blocks with a column completed on this path (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Column completions, one per node per column (filter: eq)
+     */
+    completion_count_eq?: number;
+    /**
+     * Column completions, one per node per column (filter: ne)
+     */
+    completion_count_ne?: number;
+    /**
+     * Column completions, one per node per column (filter: lt)
+     */
+    completion_count_lt?: number;
+    /**
+     * Column completions, one per node per column (filter: lte)
+     */
+    completion_count_lte?: number;
+    /**
+     * Column completions, one per node per column (filter: gt)
+     */
+    completion_count_gt?: number;
+    /**
+     * Column completions, one per node per column (filter: gte)
+     */
+    completion_count_gte?: number;
+    /**
+     * Column completions, one per node per column (filter: between_min)
+     */
+    completion_count_between_min?: number;
+    /**
+     * Column completions, one per node per column (filter: between_max_value)
+     */
+    completion_count_between_max_value?: number;
+    /**
+     * Column completions, one per node per column (filter: in_values) (comma-separated list)
+     */
+    completion_count_in_values?: string;
+    /**
+     * Column completions, one per node per column (filter: not_in_values) (comma-separated list)
+     */
+    completion_count_not_in_values?: string;
+    /**
+     * Cells in the completed columns (filter: eq)
+     */
+    cells_total_eq?: number;
+    /**
+     * Cells in the completed columns (filter: ne)
+     */
+    cells_total_ne?: number;
+    /**
+     * Cells in the completed columns (filter: lt)
+     */
+    cells_total_lt?: number;
+    /**
+     * Cells in the completed columns (filter: lte)
+     */
+    cells_total_lte?: number;
+    /**
+     * Cells in the completed columns (filter: gt)
+     */
+    cells_total_gt?: number;
+    /**
+     * Cells in the completed columns (filter: gte)
+     */
+    cells_total_gte?: number;
+    /**
+     * Cells in the completed columns (filter: between_min)
+     */
+    cells_total_between_min?: number;
+    /**
+     * Cells in the completed columns (filter: between_max_value)
+     */
+    cells_total_between_max_value?: number;
+    /**
+     * Cells in the completed columns (filter: in_values) (comma-separated list)
+     */
+    cells_total_in_values?: string;
+    /**
+     * Cells in the completed columns (filter: not_in_values) (comma-separated list)
+     */
+    cells_total_not_in_values?: string;
+    /**
+     * Cells received over gossip (filter: eq)
+     */
+    cells_from_gossip_eq?: number;
+    /**
+     * Cells received over gossip (filter: ne)
+     */
+    cells_from_gossip_ne?: number;
+    /**
+     * Cells received over gossip (filter: lt)
+     */
+    cells_from_gossip_lt?: number;
+    /**
+     * Cells received over gossip (filter: lte)
+     */
+    cells_from_gossip_lte?: number;
+    /**
+     * Cells received over gossip (filter: gt)
+     */
+    cells_from_gossip_gt?: number;
+    /**
+     * Cells received over gossip (filter: gte)
+     */
+    cells_from_gossip_gte?: number;
+    /**
+     * Cells received over gossip (filter: between_min)
+     */
+    cells_from_gossip_between_min?: number;
+    /**
+     * Cells received over gossip (filter: between_max_value)
+     */
+    cells_from_gossip_between_max_value?: number;
+    /**
+     * Cells received over gossip (filter: in_values) (comma-separated list)
+     */
+    cells_from_gossip_in_values?: string;
+    /**
+     * Cells received over gossip (filter: not_in_values) (comma-separated list)
+     */
+    cells_from_gossip_not_in_values?: string;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: eq)
+     */
+    cells_from_el_eq?: number;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: ne)
+     */
+    cells_from_el_ne?: number;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: lt)
+     */
+    cells_from_el_lt?: number;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: lte)
+     */
+    cells_from_el_lte?: number;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: gt)
+     */
+    cells_from_el_gt?: number;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: gte)
+     */
+    cells_from_el_gte?: number;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: between_min)
+     */
+    cells_from_el_between_min?: number;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: between_max_value)
+     */
+    cells_from_el_between_max_value?: number;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: in_values) (comma-separated list)
+     */
+    cells_from_el_in_values?: string;
+    /**
+     * Cells built from blobs returned by the execution layer (filter: not_in_values) (comma-separated list)
+     */
+    cells_from_el_not_in_values?: string;
+    /**
+     * Filter avg_contributing_peers using value
+     */
+    avg_contributing_peers_value?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: eq)
+     */
+    min_completion_slot_start_diff_eq?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: ne)
+     */
+    min_completion_slot_start_diff_ne?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: lt)
+     */
+    min_completion_slot_start_diff_lt?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: lte)
+     */
+    min_completion_slot_start_diff_lte?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: gt)
+     */
+    min_completion_slot_start_diff_gt?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: gte)
+     */
+    min_completion_slot_start_diff_gte?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: between_min)
+     */
+    min_completion_slot_start_diff_between_min?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: between_max_value)
+     */
+    min_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    min_completion_slot_start_diff_in_values?: string;
+    /**
+     * Earliest completion, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    min_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: eq)
+     */
+    p50_completion_slot_start_diff_eq?: number;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: ne)
+     */
+    p50_completion_slot_start_diff_ne?: number;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: lt)
+     */
+    p50_completion_slot_start_diff_lt?: number;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: lte)
+     */
+    p50_completion_slot_start_diff_lte?: number;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: gt)
+     */
+    p50_completion_slot_start_diff_gt?: number;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: gte)
+     */
+    p50_completion_slot_start_diff_gte?: number;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: between_min)
+     */
+    p50_completion_slot_start_diff_between_min?: number;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: between_max_value)
+     */
+    p50_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p50_completion_slot_start_diff_in_values?: string;
+    /**
+     * Median completion time, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p50_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: eq)
+     */
+    p90_completion_slot_start_diff_eq?: number;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: ne)
+     */
+    p90_completion_slot_start_diff_ne?: number;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: lt)
+     */
+    p90_completion_slot_start_diff_lt?: number;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: lte)
+     */
+    p90_completion_slot_start_diff_lte?: number;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: gt)
+     */
+    p90_completion_slot_start_diff_gt?: number;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: gte)
+     */
+    p90_completion_slot_start_diff_gte?: number;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: between_min)
+     */
+    p90_completion_slot_start_diff_between_min?: number;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: between_max_value)
+     */
+    p90_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p90_completion_slot_start_diff_in_values?: string;
+    /**
+     * 90th percentile completion time, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p90_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: eq)
+     */
+    p99_completion_slot_start_diff_eq?: number;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: ne)
+     */
+    p99_completion_slot_start_diff_ne?: number;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: lt)
+     */
+    p99_completion_slot_start_diff_lt?: number;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: lte)
+     */
+    p99_completion_slot_start_diff_lte?: number;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: gt)
+     */
+    p99_completion_slot_start_diff_gt?: number;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: gte)
+     */
+    p99_completion_slot_start_diff_gte?: number;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: between_min)
+     */
+    p99_completion_slot_start_diff_between_min?: number;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: between_max_value)
+     */
+    p99_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p99_completion_slot_start_diff_in_values?: string;
+    /**
+     * 99th percentile completion time, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p99_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: eq)
+     */
+    max_completion_slot_start_diff_eq?: number;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: ne)
+     */
+    max_completion_slot_start_diff_ne?: number;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: lt)
+     */
+    max_completion_slot_start_diff_lt?: number;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: lte)
+     */
+    max_completion_slot_start_diff_lte?: number;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: gt)
+     */
+    max_completion_slot_start_diff_gt?: number;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: gte)
+     */
+    max_completion_slot_start_diff_gte?: number;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: between_min)
+     */
+    max_completion_slot_start_diff_between_min?: number;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: between_max_value)
+     */
+    max_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    max_completion_slot_start_diff_in_values?: string;
+    /**
+     * Latest completion, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    max_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * The maximum number of fct_data_column_completion_by_path_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctDataColumnCompletionByPathHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_data_column_completion_by_path_hourly';
+};
+
+export type FctDataColumnCompletionByPathHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctDataColumnCompletionByPathHourlyServiceListError =
+  FctDataColumnCompletionByPathHourlyServiceListErrors[keyof FctDataColumnCompletionByPathHourlyServiceListErrors];
+
+export type FctDataColumnCompletionByPathHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctDataColumnCompletionByPathHourlyResponse;
+};
+
+export type FctDataColumnCompletionByPathHourlyServiceListResponse =
+  FctDataColumnCompletionByPathHourlyServiceListResponses[keyof FctDataColumnCompletionByPathHourlyServiceListResponses];
+
+export type FctDataColumnCompletionByPathHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time at the start of the hour, by block slot
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_data_column_completion_by_path_hourly/{hour_start_date_time}';
+};
+
+export type FctDataColumnCompletionByPathHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctDataColumnCompletionByPathHourlyServiceGetError =
+  FctDataColumnCompletionByPathHourlyServiceGetErrors[keyof FctDataColumnCompletionByPathHourlyServiceGetErrors];
+
+export type FctDataColumnCompletionByPathHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctDataColumnCompletionByPathHourlyResponse;
+};
+
+export type FctDataColumnCompletionByPathHourlyServiceGetResponse =
+  FctDataColumnCompletionByPathHourlyServiceGetResponses[keyof FctDataColumnCompletionByPathHourlyServiceGetResponses];
+
+export type FctDataColumnCompletionBySlotServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * The beacon block root hash (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * The beacon block root hash (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * The beacon block root hash (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * The beacon block root hash (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * The beacon block root hash (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * The beacon block root hash (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * The beacon block root hash (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * The beacon block root hash (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * The beacon block root hash (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * The data column index (filter: eq)
+     */
+    column_index_eq?: number;
+    /**
+     * The data column index (filter: ne)
+     */
+    column_index_ne?: number;
+    /**
+     * The data column index (filter: lt)
+     */
+    column_index_lt?: number;
+    /**
+     * The data column index (filter: lte)
+     */
+    column_index_lte?: number;
+    /**
+     * The data column index (filter: gt)
+     */
+    column_index_gt?: number;
+    /**
+     * The data column index (filter: gte)
+     */
+    column_index_gte?: number;
+    /**
+     * The data column index (filter: between_min)
+     */
+    column_index_between_min?: number;
+    /**
+     * The data column index (filter: between_max_value)
+     */
+    column_index_between_max_value?: number;
+    /**
+     * The data column index (filter: in_values) (comma-separated list)
+     */
+    column_index_in_values?: string;
+    /**
+     * The data column index (filter: not_in_values) (comma-separated list)
+     */
+    column_index_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The slot number (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot number (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot number (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot number (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot number (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot number (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot number (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot number (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot number (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot number (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Number of blobs in the block, the number of cells in the column (filter: eq)
+     */
+    blob_count_eq?: number;
+    /**
+     * Number of blobs in the block, the number of cells in the column (filter: ne)
+     */
+    blob_count_ne?: number;
+    /**
+     * Number of blobs in the block, the number of cells in the column (filter: lt)
+     */
+    blob_count_lt?: number;
+    /**
+     * Number of blobs in the block, the number of cells in the column (filter: lte)
+     */
+    blob_count_lte?: number;
+    /**
+     * Number of blobs in the block, the number of cells in the column (filter: gt)
+     */
+    blob_count_gt?: number;
+    /**
+     * Number of blobs in the block, the number of cells in the column (filter: gte)
+     */
+    blob_count_gte?: number;
+    /**
+     * Number of blobs in the block, the number of cells in the column (filter: between_min)
+     */
+    blob_count_between_min?: number;
+    /**
+     * Number of blobs in the block, the number of cells in the column (filter: between_max_value)
+     */
+    blob_count_between_max_value?: number;
+    /**
+     * Number of blobs in the block, the number of cells in the column (filter: in_values) (comma-separated list)
+     */
+    blob_count_in_values?: string;
+    /**
+     * Number of blobs in the block, the number of cells in the column (filter: not_in_values) (comma-separated list)
+     */
+    blob_count_not_in_values?: string;
+    /**
+     * Number of sentry nodes that reported the column complete (filter: eq)
+     */
+    completion_node_count_eq?: number;
+    /**
+     * Number of sentry nodes that reported the column complete (filter: ne)
+     */
+    completion_node_count_ne?: number;
+    /**
+     * Number of sentry nodes that reported the column complete (filter: lt)
+     */
+    completion_node_count_lt?: number;
+    /**
+     * Number of sentry nodes that reported the column complete (filter: lte)
+     */
+    completion_node_count_lte?: number;
+    /**
+     * Number of sentry nodes that reported the column complete (filter: gt)
+     */
+    completion_node_count_gt?: number;
+    /**
+     * Number of sentry nodes that reported the column complete (filter: gte)
+     */
+    completion_node_count_gte?: number;
+    /**
+     * Number of sentry nodes that reported the column complete (filter: between_min)
+     */
+    completion_node_count_between_min?: number;
+    /**
+     * Number of sentry nodes that reported the column complete (filter: between_max_value)
+     */
+    completion_node_count_between_max_value?: number;
+    /**
+     * Number of sentry nodes that reported the column complete (filter: in_values) (comma-separated list)
+     */
+    completion_node_count_in_values?: string;
+    /**
+     * Number of sentry nodes that reported the column complete (filter: not_in_values) (comma-separated list)
+     */
+    completion_node_count_not_in_values?: string;
+    /**
+     * Number of nodes whose column was completed by a full gossip message (filter: eq)
+     */
+    full_gossip_completion_count_eq?: number;
+    /**
+     * Number of nodes whose column was completed by a full gossip message (filter: ne)
+     */
+    full_gossip_completion_count_ne?: number;
+    /**
+     * Number of nodes whose column was completed by a full gossip message (filter: lt)
+     */
+    full_gossip_completion_count_lt?: number;
+    /**
+     * Number of nodes whose column was completed by a full gossip message (filter: lte)
+     */
+    full_gossip_completion_count_lte?: number;
+    /**
+     * Number of nodes whose column was completed by a full gossip message (filter: gt)
+     */
+    full_gossip_completion_count_gt?: number;
+    /**
+     * Number of nodes whose column was completed by a full gossip message (filter: gte)
+     */
+    full_gossip_completion_count_gte?: number;
+    /**
+     * Number of nodes whose column was completed by a full gossip message (filter: between_min)
+     */
+    full_gossip_completion_count_between_min?: number;
+    /**
+     * Number of nodes whose column was completed by a full gossip message (filter: between_max_value)
+     */
+    full_gossip_completion_count_between_max_value?: number;
+    /**
+     * Number of nodes whose column was completed by a full gossip message (filter: in_values) (comma-separated list)
+     */
+    full_gossip_completion_count_in_values?: string;
+    /**
+     * Number of nodes whose column was completed by a full gossip message (filter: not_in_values) (comma-separated list)
+     */
+    full_gossip_completion_count_not_in_values?: string;
+    /**
+     * Number of nodes whose column was completed from cells received as gossipsub partial messages (filter: eq)
+     */
+    partial_gossip_completion_count_eq?: number;
+    /**
+     * Number of nodes whose column was completed from cells received as gossipsub partial messages (filter: ne)
+     */
+    partial_gossip_completion_count_ne?: number;
+    /**
+     * Number of nodes whose column was completed from cells received as gossipsub partial messages (filter: lt)
+     */
+    partial_gossip_completion_count_lt?: number;
+    /**
+     * Number of nodes whose column was completed from cells received as gossipsub partial messages (filter: lte)
+     */
+    partial_gossip_completion_count_lte?: number;
+    /**
+     * Number of nodes whose column was completed from cells received as gossipsub partial messages (filter: gt)
+     */
+    partial_gossip_completion_count_gt?: number;
+    /**
+     * Number of nodes whose column was completed from cells received as gossipsub partial messages (filter: gte)
+     */
+    partial_gossip_completion_count_gte?: number;
+    /**
+     * Number of nodes whose column was completed from cells received as gossipsub partial messages (filter: between_min)
+     */
+    partial_gossip_completion_count_between_min?: number;
+    /**
+     * Number of nodes whose column was completed from cells received as gossipsub partial messages (filter: between_max_value)
+     */
+    partial_gossip_completion_count_between_max_value?: number;
+    /**
+     * Number of nodes whose column was completed from cells received as gossipsub partial messages (filter: in_values) (comma-separated list)
+     */
+    partial_gossip_completion_count_in_values?: string;
+    /**
+     * Number of nodes whose column was completed from cells received as gossipsub partial messages (filter: not_in_values) (comma-separated list)
+     */
+    partial_gossip_completion_count_not_in_values?: string;
+    /**
+     * Number of nodes whose column was built from blobs returned by the execution layer (filter: eq)
+     */
+    el_completion_count_eq?: number;
+    /**
+     * Number of nodes whose column was built from blobs returned by the execution layer (filter: ne)
+     */
+    el_completion_count_ne?: number;
+    /**
+     * Number of nodes whose column was built from blobs returned by the execution layer (filter: lt)
+     */
+    el_completion_count_lt?: number;
+    /**
+     * Number of nodes whose column was built from blobs returned by the execution layer (filter: lte)
+     */
+    el_completion_count_lte?: number;
+    /**
+     * Number of nodes whose column was built from blobs returned by the execution layer (filter: gt)
+     */
+    el_completion_count_gt?: number;
+    /**
+     * Number of nodes whose column was built from blobs returned by the execution layer (filter: gte)
+     */
+    el_completion_count_gte?: number;
+    /**
+     * Number of nodes whose column was built from blobs returned by the execution layer (filter: between_min)
+     */
+    el_completion_count_between_min?: number;
+    /**
+     * Number of nodes whose column was built from blobs returned by the execution layer (filter: between_max_value)
+     */
+    el_completion_count_between_max_value?: number;
+    /**
+     * Number of nodes whose column was built from blobs returned by the execution layer (filter: in_values) (comma-separated list)
+     */
+    el_completion_count_in_values?: string;
+    /**
+     * Number of nodes whose column was built from blobs returned by the execution layer (filter: not_in_values) (comma-separated list)
+     */
+    el_completion_count_not_in_values?: string;
+    /**
+     * Number of nodes whose column was recovered by reconstruction from other columns (filter: eq)
+     */
+    reconstruction_completion_count_eq?: number;
+    /**
+     * Number of nodes whose column was recovered by reconstruction from other columns (filter: ne)
+     */
+    reconstruction_completion_count_ne?: number;
+    /**
+     * Number of nodes whose column was recovered by reconstruction from other columns (filter: lt)
+     */
+    reconstruction_completion_count_lt?: number;
+    /**
+     * Number of nodes whose column was recovered by reconstruction from other columns (filter: lte)
+     */
+    reconstruction_completion_count_lte?: number;
+    /**
+     * Number of nodes whose column was recovered by reconstruction from other columns (filter: gt)
+     */
+    reconstruction_completion_count_gt?: number;
+    /**
+     * Number of nodes whose column was recovered by reconstruction from other columns (filter: gte)
+     */
+    reconstruction_completion_count_gte?: number;
+    /**
+     * Number of nodes whose column was recovered by reconstruction from other columns (filter: between_min)
+     */
+    reconstruction_completion_count_between_min?: number;
+    /**
+     * Number of nodes whose column was recovered by reconstruction from other columns (filter: between_max_value)
+     */
+    reconstruction_completion_count_between_max_value?: number;
+    /**
+     * Number of nodes whose column was recovered by reconstruction from other columns (filter: in_values) (comma-separated list)
+     */
+    reconstruction_completion_count_in_values?: string;
+    /**
+     * Number of nodes whose column was recovered by reconstruction from other columns (filter: not_in_values) (comma-separated list)
+     */
+    reconstruction_completion_count_not_in_values?: string;
+    /**
+     * Number of nodes whose column was completed by a path the node did not report (filter: eq)
+     */
+    unknown_completion_count_eq?: number;
+    /**
+     * Number of nodes whose column was completed by a path the node did not report (filter: ne)
+     */
+    unknown_completion_count_ne?: number;
+    /**
+     * Number of nodes whose column was completed by a path the node did not report (filter: lt)
+     */
+    unknown_completion_count_lt?: number;
+    /**
+     * Number of nodes whose column was completed by a path the node did not report (filter: lte)
+     */
+    unknown_completion_count_lte?: number;
+    /**
+     * Number of nodes whose column was completed by a path the node did not report (filter: gt)
+     */
+    unknown_completion_count_gt?: number;
+    /**
+     * Number of nodes whose column was completed by a path the node did not report (filter: gte)
+     */
+    unknown_completion_count_gte?: number;
+    /**
+     * Number of nodes whose column was completed by a path the node did not report (filter: between_min)
+     */
+    unknown_completion_count_between_min?: number;
+    /**
+     * Number of nodes whose column was completed by a path the node did not report (filter: between_max_value)
+     */
+    unknown_completion_count_between_max_value?: number;
+    /**
+     * Number of nodes whose column was completed by a path the node did not report (filter: in_values) (comma-separated list)
+     */
+    unknown_completion_count_in_values?: string;
+    /**
+     * Number of nodes whose column was completed by a path the node did not report (filter: not_in_values) (comma-separated list)
+     */
+    unknown_completion_count_not_in_values?: string;
+    /**
+     * Cells in the completed columns, summed over the nodes that completed it (filter: eq)
+     */
+    cells_total_eq?: number;
+    /**
+     * Cells in the completed columns, summed over the nodes that completed it (filter: ne)
+     */
+    cells_total_ne?: number;
+    /**
+     * Cells in the completed columns, summed over the nodes that completed it (filter: lt)
+     */
+    cells_total_lt?: number;
+    /**
+     * Cells in the completed columns, summed over the nodes that completed it (filter: lte)
+     */
+    cells_total_lte?: number;
+    /**
+     * Cells in the completed columns, summed over the nodes that completed it (filter: gt)
+     */
+    cells_total_gt?: number;
+    /**
+     * Cells in the completed columns, summed over the nodes that completed it (filter: gte)
+     */
+    cells_total_gte?: number;
+    /**
+     * Cells in the completed columns, summed over the nodes that completed it (filter: between_min)
+     */
+    cells_total_between_min?: number;
+    /**
+     * Cells in the completed columns, summed over the nodes that completed it (filter: between_max_value)
+     */
+    cells_total_between_max_value?: number;
+    /**
+     * Cells in the completed columns, summed over the nodes that completed it (filter: in_values) (comma-separated list)
+     */
+    cells_total_in_values?: string;
+    /**
+     * Cells in the completed columns, summed over the nodes that completed it (filter: not_in_values) (comma-separated list)
+     */
+    cells_total_not_in_values?: string;
+    /**
+     * Cells received over gossip, summed over the nodes that completed the column (filter: eq)
+     */
+    cells_from_gossip_eq?: number;
+    /**
+     * Cells received over gossip, summed over the nodes that completed the column (filter: ne)
+     */
+    cells_from_gossip_ne?: number;
+    /**
+     * Cells received over gossip, summed over the nodes that completed the column (filter: lt)
+     */
+    cells_from_gossip_lt?: number;
+    /**
+     * Cells received over gossip, summed over the nodes that completed the column (filter: lte)
+     */
+    cells_from_gossip_lte?: number;
+    /**
+     * Cells received over gossip, summed over the nodes that completed the column (filter: gt)
+     */
+    cells_from_gossip_gt?: number;
+    /**
+     * Cells received over gossip, summed over the nodes that completed the column (filter: gte)
+     */
+    cells_from_gossip_gte?: number;
+    /**
+     * Cells received over gossip, summed over the nodes that completed the column (filter: between_min)
+     */
+    cells_from_gossip_between_min?: number;
+    /**
+     * Cells received over gossip, summed over the nodes that completed the column (filter: between_max_value)
+     */
+    cells_from_gossip_between_max_value?: number;
+    /**
+     * Cells received over gossip, summed over the nodes that completed the column (filter: in_values) (comma-separated list)
+     */
+    cells_from_gossip_in_values?: string;
+    /**
+     * Cells received over gossip, summed over the nodes that completed the column (filter: not_in_values) (comma-separated list)
+     */
+    cells_from_gossip_not_in_values?: string;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over the nodes that completed the column (filter: eq)
+     */
+    cells_from_el_eq?: number;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over the nodes that completed the column (filter: ne)
+     */
+    cells_from_el_ne?: number;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over the nodes that completed the column (filter: lt)
+     */
+    cells_from_el_lt?: number;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over the nodes that completed the column (filter: lte)
+     */
+    cells_from_el_lte?: number;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over the nodes that completed the column (filter: gt)
+     */
+    cells_from_el_gt?: number;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over the nodes that completed the column (filter: gte)
+     */
+    cells_from_el_gte?: number;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over the nodes that completed the column (filter: between_min)
+     */
+    cells_from_el_between_min?: number;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over the nodes that completed the column (filter: between_max_value)
+     */
+    cells_from_el_between_max_value?: number;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over the nodes that completed the column (filter: in_values) (comma-separated list)
+     */
+    cells_from_el_in_values?: string;
+    /**
+     * Cells built from blobs returned by the execution layer, summed over the nodes that completed the column (filter: not_in_values) (comma-separated list)
+     */
+    cells_from_el_not_in_values?: string;
+    /**
+     * Filter avg_partial_contributing_peers using value
+     */
+    avg_partial_contributing_peers_value?: number;
+    /**
+     * Earliest completion of the column by any node, in milliseconds from slot start (filter: eq)
+     */
+    min_completion_slot_start_diff_eq?: number;
+    /**
+     * Earliest completion of the column by any node, in milliseconds from slot start (filter: ne)
+     */
+    min_completion_slot_start_diff_ne?: number;
+    /**
+     * Earliest completion of the column by any node, in milliseconds from slot start (filter: lt)
+     */
+    min_completion_slot_start_diff_lt?: number;
+    /**
+     * Earliest completion of the column by any node, in milliseconds from slot start (filter: lte)
+     */
+    min_completion_slot_start_diff_lte?: number;
+    /**
+     * Earliest completion of the column by any node, in milliseconds from slot start (filter: gt)
+     */
+    min_completion_slot_start_diff_gt?: number;
+    /**
+     * Earliest completion of the column by any node, in milliseconds from slot start (filter: gte)
+     */
+    min_completion_slot_start_diff_gte?: number;
+    /**
+     * Earliest completion of the column by any node, in milliseconds from slot start (filter: between_min)
+     */
+    min_completion_slot_start_diff_between_min?: number;
+    /**
+     * Earliest completion of the column by any node, in milliseconds from slot start (filter: between_max_value)
+     */
+    min_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * Earliest completion of the column by any node, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    min_completion_slot_start_diff_in_values?: string;
+    /**
+     * Earliest completion of the column by any node, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    min_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * Median completion time across nodes, in milliseconds from slot start (filter: eq)
+     */
+    p50_completion_slot_start_diff_eq?: number;
+    /**
+     * Median completion time across nodes, in milliseconds from slot start (filter: ne)
+     */
+    p50_completion_slot_start_diff_ne?: number;
+    /**
+     * Median completion time across nodes, in milliseconds from slot start (filter: lt)
+     */
+    p50_completion_slot_start_diff_lt?: number;
+    /**
+     * Median completion time across nodes, in milliseconds from slot start (filter: lte)
+     */
+    p50_completion_slot_start_diff_lte?: number;
+    /**
+     * Median completion time across nodes, in milliseconds from slot start (filter: gt)
+     */
+    p50_completion_slot_start_diff_gt?: number;
+    /**
+     * Median completion time across nodes, in milliseconds from slot start (filter: gte)
+     */
+    p50_completion_slot_start_diff_gte?: number;
+    /**
+     * Median completion time across nodes, in milliseconds from slot start (filter: between_min)
+     */
+    p50_completion_slot_start_diff_between_min?: number;
+    /**
+     * Median completion time across nodes, in milliseconds from slot start (filter: between_max_value)
+     */
+    p50_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * Median completion time across nodes, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p50_completion_slot_start_diff_in_values?: string;
+    /**
+     * Median completion time across nodes, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p50_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * 90th percentile completion time across nodes, in milliseconds from slot start (filter: eq)
+     */
+    p90_completion_slot_start_diff_eq?: number;
+    /**
+     * 90th percentile completion time across nodes, in milliseconds from slot start (filter: ne)
+     */
+    p90_completion_slot_start_diff_ne?: number;
+    /**
+     * 90th percentile completion time across nodes, in milliseconds from slot start (filter: lt)
+     */
+    p90_completion_slot_start_diff_lt?: number;
+    /**
+     * 90th percentile completion time across nodes, in milliseconds from slot start (filter: lte)
+     */
+    p90_completion_slot_start_diff_lte?: number;
+    /**
+     * 90th percentile completion time across nodes, in milliseconds from slot start (filter: gt)
+     */
+    p90_completion_slot_start_diff_gt?: number;
+    /**
+     * 90th percentile completion time across nodes, in milliseconds from slot start (filter: gte)
+     */
+    p90_completion_slot_start_diff_gte?: number;
+    /**
+     * 90th percentile completion time across nodes, in milliseconds from slot start (filter: between_min)
+     */
+    p90_completion_slot_start_diff_between_min?: number;
+    /**
+     * 90th percentile completion time across nodes, in milliseconds from slot start (filter: between_max_value)
+     */
+    p90_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * 90th percentile completion time across nodes, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p90_completion_slot_start_diff_in_values?: string;
+    /**
+     * 90th percentile completion time across nodes, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p90_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * Latest completion of the column by any node, in milliseconds from slot start (filter: eq)
+     */
+    max_completion_slot_start_diff_eq?: number;
+    /**
+     * Latest completion of the column by any node, in milliseconds from slot start (filter: ne)
+     */
+    max_completion_slot_start_diff_ne?: number;
+    /**
+     * Latest completion of the column by any node, in milliseconds from slot start (filter: lt)
+     */
+    max_completion_slot_start_diff_lt?: number;
+    /**
+     * Latest completion of the column by any node, in milliseconds from slot start (filter: lte)
+     */
+    max_completion_slot_start_diff_lte?: number;
+    /**
+     * Latest completion of the column by any node, in milliseconds from slot start (filter: gt)
+     */
+    max_completion_slot_start_diff_gt?: number;
+    /**
+     * Latest completion of the column by any node, in milliseconds from slot start (filter: gte)
+     */
+    max_completion_slot_start_diff_gte?: number;
+    /**
+     * Latest completion of the column by any node, in milliseconds from slot start (filter: between_min)
+     */
+    max_completion_slot_start_diff_between_min?: number;
+    /**
+     * Latest completion of the column by any node, in milliseconds from slot start (filter: between_max_value)
+     */
+    max_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * Latest completion of the column by any node, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    max_completion_slot_start_diff_in_values?: string;
+    /**
+     * Latest completion of the column by any node, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    max_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * Median completion time across FULL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: eq)
+     */
+    p50_full_gossip_completion_slot_start_diff_eq?: number;
+    /**
+     * Median completion time across FULL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: ne)
+     */
+    p50_full_gossip_completion_slot_start_diff_ne?: number;
+    /**
+     * Median completion time across FULL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: lt)
+     */
+    p50_full_gossip_completion_slot_start_diff_lt?: number;
+    /**
+     * Median completion time across FULL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: lte)
+     */
+    p50_full_gossip_completion_slot_start_diff_lte?: number;
+    /**
+     * Median completion time across FULL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: gt)
+     */
+    p50_full_gossip_completion_slot_start_diff_gt?: number;
+    /**
+     * Median completion time across FULL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: gte)
+     */
+    p50_full_gossip_completion_slot_start_diff_gte?: number;
+    /**
+     * Median completion time across FULL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: between_min)
+     */
+    p50_full_gossip_completion_slot_start_diff_between_min?: number;
+    /**
+     * Median completion time across FULL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: between_max_value)
+     */
+    p50_full_gossip_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * Median completion time across FULL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: in_values) (comma-separated list)
+     */
+    p50_full_gossip_completion_slot_start_diff_in_values?: string;
+    /**
+     * Median completion time across FULL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: not_in_values) (comma-separated list)
+     */
+    p50_full_gossip_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * Median completion time across PARTIAL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: eq)
+     */
+    p50_partial_gossip_completion_slot_start_diff_eq?: number;
+    /**
+     * Median completion time across PARTIAL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: ne)
+     */
+    p50_partial_gossip_completion_slot_start_diff_ne?: number;
+    /**
+     * Median completion time across PARTIAL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: lt)
+     */
+    p50_partial_gossip_completion_slot_start_diff_lt?: number;
+    /**
+     * Median completion time across PARTIAL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: lte)
+     */
+    p50_partial_gossip_completion_slot_start_diff_lte?: number;
+    /**
+     * Median completion time across PARTIAL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: gt)
+     */
+    p50_partial_gossip_completion_slot_start_diff_gt?: number;
+    /**
+     * Median completion time across PARTIAL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: gte)
+     */
+    p50_partial_gossip_completion_slot_start_diff_gte?: number;
+    /**
+     * Median completion time across PARTIAL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: between_min)
+     */
+    p50_partial_gossip_completion_slot_start_diff_between_min?: number;
+    /**
+     * Median completion time across PARTIAL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: between_max_value)
+     */
+    p50_partial_gossip_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * Median completion time across PARTIAL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: in_values) (comma-separated list)
+     */
+    p50_partial_gossip_completion_slot_start_diff_in_values?: string;
+    /**
+     * Median completion time across PARTIAL_GOSSIP completions, in milliseconds from slot start, 0 when there was none (filter: not_in_values) (comma-separated list)
+     */
+    p50_partial_gossip_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * Median completion time across EL completions, in milliseconds from slot start, 0 when there was none (filter: eq)
+     */
+    p50_el_completion_slot_start_diff_eq?: number;
+    /**
+     * Median completion time across EL completions, in milliseconds from slot start, 0 when there was none (filter: ne)
+     */
+    p50_el_completion_slot_start_diff_ne?: number;
+    /**
+     * Median completion time across EL completions, in milliseconds from slot start, 0 when there was none (filter: lt)
+     */
+    p50_el_completion_slot_start_diff_lt?: number;
+    /**
+     * Median completion time across EL completions, in milliseconds from slot start, 0 when there was none (filter: lte)
+     */
+    p50_el_completion_slot_start_diff_lte?: number;
+    /**
+     * Median completion time across EL completions, in milliseconds from slot start, 0 when there was none (filter: gt)
+     */
+    p50_el_completion_slot_start_diff_gt?: number;
+    /**
+     * Median completion time across EL completions, in milliseconds from slot start, 0 when there was none (filter: gte)
+     */
+    p50_el_completion_slot_start_diff_gte?: number;
+    /**
+     * Median completion time across EL completions, in milliseconds from slot start, 0 when there was none (filter: between_min)
+     */
+    p50_el_completion_slot_start_diff_between_min?: number;
+    /**
+     * Median completion time across EL completions, in milliseconds from slot start, 0 when there was none (filter: between_max_value)
+     */
+    p50_el_completion_slot_start_diff_between_max_value?: number;
+    /**
+     * Median completion time across EL completions, in milliseconds from slot start, 0 when there was none (filter: in_values) (comma-separated list)
+     */
+    p50_el_completion_slot_start_diff_in_values?: string;
+    /**
+     * Median completion time across EL completions, in milliseconds from slot start, 0 when there was none (filter: not_in_values) (comma-separated list)
+     */
+    p50_el_completion_slot_start_diff_not_in_values?: string;
+    /**
+     * Partial messages with a body received by sentry nodes, summed over nodes. WIRE capture points count every part, APP capture points only those the gossipsub router passed on (filter: eq)
+     */
+    partial_received_message_count_eq?: number;
+    /**
+     * Partial messages with a body received by sentry nodes, summed over nodes. WIRE capture points count every part, APP capture points only those the gossipsub router passed on (filter: ne)
+     */
+    partial_received_message_count_ne?: number;
+    /**
+     * Partial messages with a body received by sentry nodes, summed over nodes. WIRE capture points count every part, APP capture points only those the gossipsub router passed on (filter: lt)
+     */
+    partial_received_message_count_lt?: number;
+    /**
+     * Partial messages with a body received by sentry nodes, summed over nodes. WIRE capture points count every part, APP capture points only those the gossipsub router passed on (filter: lte)
+     */
+    partial_received_message_count_lte?: number;
+    /**
+     * Partial messages with a body received by sentry nodes, summed over nodes. WIRE capture points count every part, APP capture points only those the gossipsub router passed on (filter: gt)
+     */
+    partial_received_message_count_gt?: number;
+    /**
+     * Partial messages with a body received by sentry nodes, summed over nodes. WIRE capture points count every part, APP capture points only those the gossipsub router passed on (filter: gte)
+     */
+    partial_received_message_count_gte?: number;
+    /**
+     * Partial messages with a body received by sentry nodes, summed over nodes. WIRE capture points count every part, APP capture points only those the gossipsub router passed on (filter: between_min)
+     */
+    partial_received_message_count_between_min?: number;
+    /**
+     * Partial messages with a body received by sentry nodes, summed over nodes. WIRE capture points count every part, APP capture points only those the gossipsub router passed on (filter: between_max_value)
+     */
+    partial_received_message_count_between_max_value?: number;
+    /**
+     * Partial messages with a body received by sentry nodes, summed over nodes. WIRE capture points count every part, APP capture points only those the gossipsub router passed on (filter: in_values) (comma-separated list)
+     */
+    partial_received_message_count_in_values?: string;
+    /**
+     * Partial messages with a body received by sentry nodes, summed over nodes. WIRE capture points count every part, APP capture points only those the gossipsub router passed on (filter: not_in_values) (comma-separated list)
+     */
+    partial_received_message_count_not_in_values?: string;
+    /**
+     * Cells carried by the partial messages received by sentry nodes, duplicates included (filter: eq)
+     */
+    partial_received_cells_eq?: number;
+    /**
+     * Cells carried by the partial messages received by sentry nodes, duplicates included (filter: ne)
+     */
+    partial_received_cells_ne?: number;
+    /**
+     * Cells carried by the partial messages received by sentry nodes, duplicates included (filter: lt)
+     */
+    partial_received_cells_lt?: number;
+    /**
+     * Cells carried by the partial messages received by sentry nodes, duplicates included (filter: lte)
+     */
+    partial_received_cells_lte?: number;
+    /**
+     * Cells carried by the partial messages received by sentry nodes, duplicates included (filter: gt)
+     */
+    partial_received_cells_gt?: number;
+    /**
+     * Cells carried by the partial messages received by sentry nodes, duplicates included (filter: gte)
+     */
+    partial_received_cells_gte?: number;
+    /**
+     * Cells carried by the partial messages received by sentry nodes, duplicates included (filter: between_min)
+     */
+    partial_received_cells_between_min?: number;
+    /**
+     * Cells carried by the partial messages received by sentry nodes, duplicates included (filter: between_max_value)
+     */
+    partial_received_cells_between_max_value?: number;
+    /**
+     * Cells carried by the partial messages received by sentry nodes, duplicates included (filter: in_values) (comma-separated list)
+     */
+    partial_received_cells_in_values?: string;
+    /**
+     * Cells carried by the partial messages received by sentry nodes, duplicates included (filter: not_in_values) (comma-separated list)
+     */
+    partial_received_cells_not_in_values?: string;
+    /**
+     * Distinct peers that sent a partial message with a body for the column to a sentry node (filter: eq)
+     */
+    partial_sender_peer_count_eq?: number;
+    /**
+     * Distinct peers that sent a partial message with a body for the column to a sentry node (filter: ne)
+     */
+    partial_sender_peer_count_ne?: number;
+    /**
+     * Distinct peers that sent a partial message with a body for the column to a sentry node (filter: lt)
+     */
+    partial_sender_peer_count_lt?: number;
+    /**
+     * Distinct peers that sent a partial message with a body for the column to a sentry node (filter: lte)
+     */
+    partial_sender_peer_count_lte?: number;
+    /**
+     * Distinct peers that sent a partial message with a body for the column to a sentry node (filter: gt)
+     */
+    partial_sender_peer_count_gt?: number;
+    /**
+     * Distinct peers that sent a partial message with a body for the column to a sentry node (filter: gte)
+     */
+    partial_sender_peer_count_gte?: number;
+    /**
+     * Distinct peers that sent a partial message with a body for the column to a sentry node (filter: between_min)
+     */
+    partial_sender_peer_count_between_min?: number;
+    /**
+     * Distinct peers that sent a partial message with a body for the column to a sentry node (filter: between_max_value)
+     */
+    partial_sender_peer_count_between_max_value?: number;
+    /**
+     * Distinct peers that sent a partial message with a body for the column to a sentry node (filter: in_values) (comma-separated list)
+     */
+    partial_sender_peer_count_in_values?: string;
+    /**
+     * Distinct peers that sent a partial message with a body for the column to a sentry node (filter: not_in_values) (comma-separated list)
+     */
+    partial_sender_peer_count_not_in_values?: string;
+    /**
+     * Partial messages with a body sent by sentry nodes, summed over nodes (filter: eq)
+     */
+    partial_sent_message_count_eq?: number;
+    /**
+     * Partial messages with a body sent by sentry nodes, summed over nodes (filter: ne)
+     */
+    partial_sent_message_count_ne?: number;
+    /**
+     * Partial messages with a body sent by sentry nodes, summed over nodes (filter: lt)
+     */
+    partial_sent_message_count_lt?: number;
+    /**
+     * Partial messages with a body sent by sentry nodes, summed over nodes (filter: lte)
+     */
+    partial_sent_message_count_lte?: number;
+    /**
+     * Partial messages with a body sent by sentry nodes, summed over nodes (filter: gt)
+     */
+    partial_sent_message_count_gt?: number;
+    /**
+     * Partial messages with a body sent by sentry nodes, summed over nodes (filter: gte)
+     */
+    partial_sent_message_count_gte?: number;
+    /**
+     * Partial messages with a body sent by sentry nodes, summed over nodes (filter: between_min)
+     */
+    partial_sent_message_count_between_min?: number;
+    /**
+     * Partial messages with a body sent by sentry nodes, summed over nodes (filter: between_max_value)
+     */
+    partial_sent_message_count_between_max_value?: number;
+    /**
+     * Partial messages with a body sent by sentry nodes, summed over nodes (filter: in_values) (comma-separated list)
+     */
+    partial_sent_message_count_in_values?: string;
+    /**
+     * Partial messages with a body sent by sentry nodes, summed over nodes (filter: not_in_values) (comma-separated list)
+     */
+    partial_sent_message_count_not_in_values?: string;
+    /**
+     * Cells carried by the partial messages sent by sentry nodes (filter: eq)
+     */
+    partial_sent_cells_eq?: number;
+    /**
+     * Cells carried by the partial messages sent by sentry nodes (filter: ne)
+     */
+    partial_sent_cells_ne?: number;
+    /**
+     * Cells carried by the partial messages sent by sentry nodes (filter: lt)
+     */
+    partial_sent_cells_lt?: number;
+    /**
+     * Cells carried by the partial messages sent by sentry nodes (filter: lte)
+     */
+    partial_sent_cells_lte?: number;
+    /**
+     * Cells carried by the partial messages sent by sentry nodes (filter: gt)
+     */
+    partial_sent_cells_gt?: number;
+    /**
+     * Cells carried by the partial messages sent by sentry nodes (filter: gte)
+     */
+    partial_sent_cells_gte?: number;
+    /**
+     * Cells carried by the partial messages sent by sentry nodes (filter: between_min)
+     */
+    partial_sent_cells_between_min?: number;
+    /**
+     * Cells carried by the partial messages sent by sentry nodes (filter: between_max_value)
+     */
+    partial_sent_cells_between_max_value?: number;
+    /**
+     * Cells carried by the partial messages sent by sentry nodes (filter: in_values) (comma-separated list)
+     */
+    partial_sent_cells_in_values?: string;
+    /**
+     * Cells carried by the partial messages sent by sentry nodes (filter: not_in_values) (comma-separated list)
+     */
+    partial_sent_cells_not_in_values?: string;
+    /**
+     * Validation verdicts on received partial messages that accepted them (filter: eq)
+     */
+    partial_accept_verdict_count_eq?: number;
+    /**
+     * Validation verdicts on received partial messages that accepted them (filter: ne)
+     */
+    partial_accept_verdict_count_ne?: number;
+    /**
+     * Validation verdicts on received partial messages that accepted them (filter: lt)
+     */
+    partial_accept_verdict_count_lt?: number;
+    /**
+     * Validation verdicts on received partial messages that accepted them (filter: lte)
+     */
+    partial_accept_verdict_count_lte?: number;
+    /**
+     * Validation verdicts on received partial messages that accepted them (filter: gt)
+     */
+    partial_accept_verdict_count_gt?: number;
+    /**
+     * Validation verdicts on received partial messages that accepted them (filter: gte)
+     */
+    partial_accept_verdict_count_gte?: number;
+    /**
+     * Validation verdicts on received partial messages that accepted them (filter: between_min)
+     */
+    partial_accept_verdict_count_between_min?: number;
+    /**
+     * Validation verdicts on received partial messages that accepted them (filter: between_max_value)
+     */
+    partial_accept_verdict_count_between_max_value?: number;
+    /**
+     * Validation verdicts on received partial messages that accepted them (filter: in_values) (comma-separated list)
+     */
+    partial_accept_verdict_count_in_values?: string;
+    /**
+     * Validation verdicts on received partial messages that accepted them (filter: not_in_values) (comma-separated list)
+     */
+    partial_accept_verdict_count_not_in_values?: string;
+    /**
+     * Validation verdicts on received partial messages that ignored them (filter: eq)
+     */
+    partial_ignore_verdict_count_eq?: number;
+    /**
+     * Validation verdicts on received partial messages that ignored them (filter: ne)
+     */
+    partial_ignore_verdict_count_ne?: number;
+    /**
+     * Validation verdicts on received partial messages that ignored them (filter: lt)
+     */
+    partial_ignore_verdict_count_lt?: number;
+    /**
+     * Validation verdicts on received partial messages that ignored them (filter: lte)
+     */
+    partial_ignore_verdict_count_lte?: number;
+    /**
+     * Validation verdicts on received partial messages that ignored them (filter: gt)
+     */
+    partial_ignore_verdict_count_gt?: number;
+    /**
+     * Validation verdicts on received partial messages that ignored them (filter: gte)
+     */
+    partial_ignore_verdict_count_gte?: number;
+    /**
+     * Validation verdicts on received partial messages that ignored them (filter: between_min)
+     */
+    partial_ignore_verdict_count_between_min?: number;
+    /**
+     * Validation verdicts on received partial messages that ignored them (filter: between_max_value)
+     */
+    partial_ignore_verdict_count_between_max_value?: number;
+    /**
+     * Validation verdicts on received partial messages that ignored them (filter: in_values) (comma-separated list)
+     */
+    partial_ignore_verdict_count_in_values?: string;
+    /**
+     * Validation verdicts on received partial messages that ignored them (filter: not_in_values) (comma-separated list)
+     */
+    partial_ignore_verdict_count_not_in_values?: string;
+    /**
+     * Validation verdicts on received partial messages that rejected them (filter: eq)
+     */
+    partial_reject_verdict_count_eq?: number;
+    /**
+     * Validation verdicts on received partial messages that rejected them (filter: ne)
+     */
+    partial_reject_verdict_count_ne?: number;
+    /**
+     * Validation verdicts on received partial messages that rejected them (filter: lt)
+     */
+    partial_reject_verdict_count_lt?: number;
+    /**
+     * Validation verdicts on received partial messages that rejected them (filter: lte)
+     */
+    partial_reject_verdict_count_lte?: number;
+    /**
+     * Validation verdicts on received partial messages that rejected them (filter: gt)
+     */
+    partial_reject_verdict_count_gt?: number;
+    /**
+     * Validation verdicts on received partial messages that rejected them (filter: gte)
+     */
+    partial_reject_verdict_count_gte?: number;
+    /**
+     * Validation verdicts on received partial messages that rejected them (filter: between_min)
+     */
+    partial_reject_verdict_count_between_min?: number;
+    /**
+     * Validation verdicts on received partial messages that rejected them (filter: between_max_value)
+     */
+    partial_reject_verdict_count_between_max_value?: number;
+    /**
+     * Validation verdicts on received partial messages that rejected them (filter: in_values) (comma-separated list)
+     */
+    partial_reject_verdict_count_in_values?: string;
+    /**
+     * Validation verdicts on received partial messages that rejected them (filter: not_in_values) (comma-separated list)
+     */
+    partial_reject_verdict_count_not_in_values?: string;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by partial_received_cells this approximates the useful cell ratio (filter: eq)
+     */
+    partial_new_cells_eq?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by partial_received_cells this approximates the useful cell ratio (filter: ne)
+     */
+    partial_new_cells_ne?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by partial_received_cells this approximates the useful cell ratio (filter: lt)
+     */
+    partial_new_cells_lt?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by partial_received_cells this approximates the useful cell ratio (filter: lte)
+     */
+    partial_new_cells_lte?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by partial_received_cells this approximates the useful cell ratio (filter: gt)
+     */
+    partial_new_cells_gt?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by partial_received_cells this approximates the useful cell ratio (filter: gte)
+     */
+    partial_new_cells_gte?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by partial_received_cells this approximates the useful cell ratio (filter: between_min)
+     */
+    partial_new_cells_between_min?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by partial_received_cells this approximates the useful cell ratio (filter: between_max_value)
+     */
+    partial_new_cells_between_max_value?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by partial_received_cells this approximates the useful cell ratio (filter: in_values) (comma-separated list)
+     */
+    partial_new_cells_in_values?: string;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by partial_received_cells this approximates the useful cell ratio (filter: not_in_values) (comma-separated list)
+     */
+    partial_new_cells_not_in_values?: string;
+    /**
+     * The maximum number of fct_data_column_completion_by_slot to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctDataColumnCompletionBySlot` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_data_column_completion_by_slot';
+};
+
+export type FctDataColumnCompletionBySlotServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctDataColumnCompletionBySlotServiceListError =
+  FctDataColumnCompletionBySlotServiceListErrors[keyof FctDataColumnCompletionBySlotServiceListErrors];
+
+export type FctDataColumnCompletionBySlotServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctDataColumnCompletionBySlotResponse;
+};
+
+export type FctDataColumnCompletionBySlotServiceListResponse =
+  FctDataColumnCompletionBySlotServiceListResponses[keyof FctDataColumnCompletionBySlotServiceListResponses];
+
+export type FctDataColumnCompletionBySlotServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_data_column_completion_by_slot/{slot_start_date_time}';
+};
+
+export type FctDataColumnCompletionBySlotServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctDataColumnCompletionBySlotServiceGetError =
+  FctDataColumnCompletionBySlotServiceGetErrors[keyof FctDataColumnCompletionBySlotServiceGetErrors];
+
+export type FctDataColumnCompletionBySlotServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctDataColumnCompletionBySlotResponse;
+};
+
+export type FctDataColumnCompletionBySlotServiceGetResponse =
+  FctDataColumnCompletionBySlotServiceGetResponses[keyof FctDataColumnCompletionBySlotServiceGetResponses];
+
+export type FctDataColumnPartialMessageDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period, by wall clock slot (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period, by wall clock slot (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period, by wall clock slot (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period, by wall clock slot (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period, by wall clock slot (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period, by wall clock slot (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period, by wall clock slot (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period, by wall clock slot (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period, by wall clock slot (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: eq)
+     */
+    node_count_eq?: number;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: ne)
+     */
+    node_count_ne?: number;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: lt)
+     */
+    node_count_lt?: number;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: lte)
+     */
+    node_count_lte?: number;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: gt)
+     */
+    node_count_gt?: number;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: gte)
+     */
+    node_count_gte?: number;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: between_min)
+     */
+    node_count_between_min?: number;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: between_max_value)
+     */
+    node_count_between_max_value?: number;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: in_values) (comma-separated list)
+     */
+    node_count_in_values?: string;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: not_in_values) (comma-separated list)
+     */
+    node_count_not_in_values?: string;
+    /**
+     * Received partial messages that only carried parts metadata (filter: eq)
+     */
+    received_metadata_count_eq?: number;
+    /**
+     * Received partial messages that only carried parts metadata (filter: ne)
+     */
+    received_metadata_count_ne?: number;
+    /**
+     * Received partial messages that only carried parts metadata (filter: lt)
+     */
+    received_metadata_count_lt?: number;
+    /**
+     * Received partial messages that only carried parts metadata (filter: lte)
+     */
+    received_metadata_count_lte?: number;
+    /**
+     * Received partial messages that only carried parts metadata (filter: gt)
+     */
+    received_metadata_count_gt?: number;
+    /**
+     * Received partial messages that only carried parts metadata (filter: gte)
+     */
+    received_metadata_count_gte?: number;
+    /**
+     * Received partial messages that only carried parts metadata (filter: between_min)
+     */
+    received_metadata_count_between_min?: number;
+    /**
+     * Received partial messages that only carried parts metadata (filter: between_max_value)
+     */
+    received_metadata_count_between_max_value?: number;
+    /**
+     * Received partial messages that only carried parts metadata (filter: in_values) (comma-separated list)
+     */
+    received_metadata_count_in_values?: string;
+    /**
+     * Received partial messages that only carried parts metadata (filter: not_in_values) (comma-separated list)
+     */
+    received_metadata_count_not_in_values?: string;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: eq)
+     */
+    received_message_count_eq?: number;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: ne)
+     */
+    received_message_count_ne?: number;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: lt)
+     */
+    received_message_count_lt?: number;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: lte)
+     */
+    received_message_count_lte?: number;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: gt)
+     */
+    received_message_count_gt?: number;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: gte)
+     */
+    received_message_count_gte?: number;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: between_min)
+     */
+    received_message_count_between_min?: number;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: between_max_value)
+     */
+    received_message_count_between_max_value?: number;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: in_values) (comma-separated list)
+     */
+    received_message_count_in_values?: string;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: not_in_values) (comma-separated list)
+     */
+    received_message_count_not_in_values?: string;
+    /**
+     * Received partial messages that carried at least one cell (filter: eq)
+     */
+    received_cell_message_count_eq?: number;
+    /**
+     * Received partial messages that carried at least one cell (filter: ne)
+     */
+    received_cell_message_count_ne?: number;
+    /**
+     * Received partial messages that carried at least one cell (filter: lt)
+     */
+    received_cell_message_count_lt?: number;
+    /**
+     * Received partial messages that carried at least one cell (filter: lte)
+     */
+    received_cell_message_count_lte?: number;
+    /**
+     * Received partial messages that carried at least one cell (filter: gt)
+     */
+    received_cell_message_count_gt?: number;
+    /**
+     * Received partial messages that carried at least one cell (filter: gte)
+     */
+    received_cell_message_count_gte?: number;
+    /**
+     * Received partial messages that carried at least one cell (filter: between_min)
+     */
+    received_cell_message_count_between_min?: number;
+    /**
+     * Received partial messages that carried at least one cell (filter: between_max_value)
+     */
+    received_cell_message_count_between_max_value?: number;
+    /**
+     * Received partial messages that carried at least one cell (filter: in_values) (comma-separated list)
+     */
+    received_cell_message_count_in_values?: string;
+    /**
+     * Received partial messages that carried at least one cell (filter: not_in_values) (comma-separated list)
+     */
+    received_cell_message_count_not_in_values?: string;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: eq)
+     */
+    received_cells_eq?: number;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: ne)
+     */
+    received_cells_ne?: number;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: lt)
+     */
+    received_cells_lt?: number;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: lte)
+     */
+    received_cells_lte?: number;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: gt)
+     */
+    received_cells_gt?: number;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: gte)
+     */
+    received_cells_gte?: number;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: between_min)
+     */
+    received_cells_between_min?: number;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: between_max_value)
+     */
+    received_cells_between_max_value?: number;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: in_values) (comma-separated list)
+     */
+    received_cells_in_values?: string;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: not_in_values) (comma-separated list)
+     */
+    received_cells_not_in_values?: string;
+    /**
+     * Received partial messages that carried the partial data column header (filter: eq)
+     */
+    received_header_count_eq?: number;
+    /**
+     * Received partial messages that carried the partial data column header (filter: ne)
+     */
+    received_header_count_ne?: number;
+    /**
+     * Received partial messages that carried the partial data column header (filter: lt)
+     */
+    received_header_count_lt?: number;
+    /**
+     * Received partial messages that carried the partial data column header (filter: lte)
+     */
+    received_header_count_lte?: number;
+    /**
+     * Received partial messages that carried the partial data column header (filter: gt)
+     */
+    received_header_count_gt?: number;
+    /**
+     * Received partial messages that carried the partial data column header (filter: gte)
+     */
+    received_header_count_gte?: number;
+    /**
+     * Received partial messages that carried the partial data column header (filter: between_min)
+     */
+    received_header_count_between_min?: number;
+    /**
+     * Received partial messages that carried the partial data column header (filter: between_max_value)
+     */
+    received_header_count_between_max_value?: number;
+    /**
+     * Received partial messages that carried the partial data column header (filter: in_values) (comma-separated list)
+     */
+    received_header_count_in_values?: string;
+    /**
+     * Received partial messages that carried the partial data column header (filter: not_in_values) (comma-separated list)
+     */
+    received_header_count_not_in_values?: string;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: eq)
+     */
+    cell_sender_peer_count_eq?: number;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: ne)
+     */
+    cell_sender_peer_count_ne?: number;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: lt)
+     */
+    cell_sender_peer_count_lt?: number;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: lte)
+     */
+    cell_sender_peer_count_lte?: number;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: gt)
+     */
+    cell_sender_peer_count_gt?: number;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: gte)
+     */
+    cell_sender_peer_count_gte?: number;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: between_min)
+     */
+    cell_sender_peer_count_between_min?: number;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: between_max_value)
+     */
+    cell_sender_peer_count_between_max_value?: number;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: in_values) (comma-separated list)
+     */
+    cell_sender_peer_count_in_values?: string;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: not_in_values) (comma-separated list)
+     */
+    cell_sender_peer_count_not_in_values?: string;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: eq)
+     */
+    sent_metadata_count_eq?: number;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: ne)
+     */
+    sent_metadata_count_ne?: number;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: lt)
+     */
+    sent_metadata_count_lt?: number;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: lte)
+     */
+    sent_metadata_count_lte?: number;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: gt)
+     */
+    sent_metadata_count_gt?: number;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: gte)
+     */
+    sent_metadata_count_gte?: number;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: between_min)
+     */
+    sent_metadata_count_between_min?: number;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: between_max_value)
+     */
+    sent_metadata_count_between_max_value?: number;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: in_values) (comma-separated list)
+     */
+    sent_metadata_count_in_values?: string;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: not_in_values) (comma-separated list)
+     */
+    sent_metadata_count_not_in_values?: string;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: eq)
+     */
+    sent_message_count_eq?: number;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: ne)
+     */
+    sent_message_count_ne?: number;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: lt)
+     */
+    sent_message_count_lt?: number;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: lte)
+     */
+    sent_message_count_lte?: number;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: gt)
+     */
+    sent_message_count_gt?: number;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: gte)
+     */
+    sent_message_count_gte?: number;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: between_min)
+     */
+    sent_message_count_between_min?: number;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: between_max_value)
+     */
+    sent_message_count_between_max_value?: number;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: in_values) (comma-separated list)
+     */
+    sent_message_count_in_values?: string;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: not_in_values) (comma-separated list)
+     */
+    sent_message_count_not_in_values?: string;
+    /**
+     * Sent partial messages that carried at least one cell (filter: eq)
+     */
+    sent_cell_message_count_eq?: number;
+    /**
+     * Sent partial messages that carried at least one cell (filter: ne)
+     */
+    sent_cell_message_count_ne?: number;
+    /**
+     * Sent partial messages that carried at least one cell (filter: lt)
+     */
+    sent_cell_message_count_lt?: number;
+    /**
+     * Sent partial messages that carried at least one cell (filter: lte)
+     */
+    sent_cell_message_count_lte?: number;
+    /**
+     * Sent partial messages that carried at least one cell (filter: gt)
+     */
+    sent_cell_message_count_gt?: number;
+    /**
+     * Sent partial messages that carried at least one cell (filter: gte)
+     */
+    sent_cell_message_count_gte?: number;
+    /**
+     * Sent partial messages that carried at least one cell (filter: between_min)
+     */
+    sent_cell_message_count_between_min?: number;
+    /**
+     * Sent partial messages that carried at least one cell (filter: between_max_value)
+     */
+    sent_cell_message_count_between_max_value?: number;
+    /**
+     * Sent partial messages that carried at least one cell (filter: in_values) (comma-separated list)
+     */
+    sent_cell_message_count_in_values?: string;
+    /**
+     * Sent partial messages that carried at least one cell (filter: not_in_values) (comma-separated list)
+     */
+    sent_cell_message_count_not_in_values?: string;
+    /**
+     * Cells carried by sent partial messages (filter: eq)
+     */
+    sent_cells_eq?: number;
+    /**
+     * Cells carried by sent partial messages (filter: ne)
+     */
+    sent_cells_ne?: number;
+    /**
+     * Cells carried by sent partial messages (filter: lt)
+     */
+    sent_cells_lt?: number;
+    /**
+     * Cells carried by sent partial messages (filter: lte)
+     */
+    sent_cells_lte?: number;
+    /**
+     * Cells carried by sent partial messages (filter: gt)
+     */
+    sent_cells_gt?: number;
+    /**
+     * Cells carried by sent partial messages (filter: gte)
+     */
+    sent_cells_gte?: number;
+    /**
+     * Cells carried by sent partial messages (filter: between_min)
+     */
+    sent_cells_between_min?: number;
+    /**
+     * Cells carried by sent partial messages (filter: between_max_value)
+     */
+    sent_cells_between_max_value?: number;
+    /**
+     * Cells carried by sent partial messages (filter: in_values) (comma-separated list)
+     */
+    sent_cells_in_values?: string;
+    /**
+     * Cells carried by sent partial messages (filter: not_in_values) (comma-separated list)
+     */
+    sent_cells_not_in_values?: string;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: eq)
+     */
+    sent_header_count_eq?: number;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: ne)
+     */
+    sent_header_count_ne?: number;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: lt)
+     */
+    sent_header_count_lt?: number;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: lte)
+     */
+    sent_header_count_lte?: number;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: gt)
+     */
+    sent_header_count_gt?: number;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: gte)
+     */
+    sent_header_count_gte?: number;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: between_min)
+     */
+    sent_header_count_between_min?: number;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: between_max_value)
+     */
+    sent_header_count_between_max_value?: number;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: in_values) (comma-separated list)
+     */
+    sent_header_count_in_values?: string;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: not_in_values) (comma-separated list)
+     */
+    sent_header_count_not_in_values?: string;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: eq)
+     */
+    cells_accept_count_eq?: number;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: ne)
+     */
+    cells_accept_count_ne?: number;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: lt)
+     */
+    cells_accept_count_lt?: number;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: lte)
+     */
+    cells_accept_count_lte?: number;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: gt)
+     */
+    cells_accept_count_gt?: number;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: gte)
+     */
+    cells_accept_count_gte?: number;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: between_min)
+     */
+    cells_accept_count_between_min?: number;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: between_max_value)
+     */
+    cells_accept_count_between_max_value?: number;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: in_values) (comma-separated list)
+     */
+    cells_accept_count_in_values?: string;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: not_in_values) (comma-separated list)
+     */
+    cells_accept_count_not_in_values?: string;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: eq)
+     */
+    cells_ignore_count_eq?: number;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: ne)
+     */
+    cells_ignore_count_ne?: number;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: lt)
+     */
+    cells_ignore_count_lt?: number;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: lte)
+     */
+    cells_ignore_count_lte?: number;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: gt)
+     */
+    cells_ignore_count_gt?: number;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: gte)
+     */
+    cells_ignore_count_gte?: number;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: between_min)
+     */
+    cells_ignore_count_between_min?: number;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: between_max_value)
+     */
+    cells_ignore_count_between_max_value?: number;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: in_values) (comma-separated list)
+     */
+    cells_ignore_count_in_values?: string;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: not_in_values) (comma-separated list)
+     */
+    cells_ignore_count_not_in_values?: string;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: eq)
+     */
+    cells_reject_count_eq?: number;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: ne)
+     */
+    cells_reject_count_ne?: number;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: lt)
+     */
+    cells_reject_count_lt?: number;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: lte)
+     */
+    cells_reject_count_lte?: number;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: gt)
+     */
+    cells_reject_count_gt?: number;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: gte)
+     */
+    cells_reject_count_gte?: number;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: between_min)
+     */
+    cells_reject_count_between_min?: number;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: between_max_value)
+     */
+    cells_reject_count_between_max_value?: number;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: in_values) (comma-separated list)
+     */
+    cells_reject_count_in_values?: string;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: not_in_values) (comma-separated list)
+     */
+    cells_reject_count_not_in_values?: string;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: eq)
+     */
+    verdict_cells_eq?: number;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: ne)
+     */
+    verdict_cells_ne?: number;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: lt)
+     */
+    verdict_cells_lt?: number;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: lte)
+     */
+    verdict_cells_lte?: number;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: gt)
+     */
+    verdict_cells_gt?: number;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: gte)
+     */
+    verdict_cells_gte?: number;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: between_min)
+     */
+    verdict_cells_between_min?: number;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: between_max_value)
+     */
+    verdict_cells_between_max_value?: number;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: in_values) (comma-separated list)
+     */
+    verdict_cells_in_values?: string;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: not_in_values) (comma-separated list)
+     */
+    verdict_cells_not_in_values?: string;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: eq)
+     */
+    new_cells_eq?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: ne)
+     */
+    new_cells_ne?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: lt)
+     */
+    new_cells_lt?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: lte)
+     */
+    new_cells_lte?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: gt)
+     */
+    new_cells_gt?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: gte)
+     */
+    new_cells_gte?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: between_min)
+     */
+    new_cells_between_min?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: between_max_value)
+     */
+    new_cells_between_max_value?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: in_values) (comma-separated list)
+     */
+    new_cells_in_values?: string;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: not_in_values) (comma-separated list)
+     */
+    new_cells_not_in_values?: string;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: eq)
+     */
+    header_accept_count_eq?: number;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: ne)
+     */
+    header_accept_count_ne?: number;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: lt)
+     */
+    header_accept_count_lt?: number;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: lte)
+     */
+    header_accept_count_lte?: number;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: gt)
+     */
+    header_accept_count_gt?: number;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: gte)
+     */
+    header_accept_count_gte?: number;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: between_min)
+     */
+    header_accept_count_between_min?: number;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: between_max_value)
+     */
+    header_accept_count_between_max_value?: number;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: in_values) (comma-separated list)
+     */
+    header_accept_count_in_values?: string;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: not_in_values) (comma-separated list)
+     */
+    header_accept_count_not_in_values?: string;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: eq)
+     */
+    header_ignore_count_eq?: number;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: ne)
+     */
+    header_ignore_count_ne?: number;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: lt)
+     */
+    header_ignore_count_lt?: number;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: lte)
+     */
+    header_ignore_count_lte?: number;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: gt)
+     */
+    header_ignore_count_gt?: number;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: gte)
+     */
+    header_ignore_count_gte?: number;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: between_min)
+     */
+    header_ignore_count_between_min?: number;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: between_max_value)
+     */
+    header_ignore_count_between_max_value?: number;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: in_values) (comma-separated list)
+     */
+    header_ignore_count_in_values?: string;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: not_in_values) (comma-separated list)
+     */
+    header_ignore_count_not_in_values?: string;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: eq)
+     */
+    header_reject_count_eq?: number;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: ne)
+     */
+    header_reject_count_ne?: number;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: lt)
+     */
+    header_reject_count_lt?: number;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: lte)
+     */
+    header_reject_count_lte?: number;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: gt)
+     */
+    header_reject_count_gt?: number;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: gte)
+     */
+    header_reject_count_gte?: number;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: between_min)
+     */
+    header_reject_count_between_min?: number;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: between_max_value)
+     */
+    header_reject_count_between_max_value?: number;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: in_values) (comma-separated list)
+     */
+    header_reject_count_in_values?: string;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: not_in_values) (comma-separated list)
+     */
+    header_reject_count_not_in_values?: string;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: eq)
+     */
+    header_node_block_count_eq?: number;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: ne)
+     */
+    header_node_block_count_ne?: number;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: lt)
+     */
+    header_node_block_count_lt?: number;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: lte)
+     */
+    header_node_block_count_lte?: number;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: gt)
+     */
+    header_node_block_count_gt?: number;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: gte)
+     */
+    header_node_block_count_gte?: number;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: between_min)
+     */
+    header_node_block_count_between_min?: number;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: between_max_value)
+     */
+    header_node_block_count_between_max_value?: number;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: in_values) (comma-separated list)
+     */
+    header_node_block_count_in_values?: string;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: not_in_values) (comma-separated list)
+     */
+    header_node_block_count_not_in_values?: string;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: eq)
+     */
+    p50_header_seen_slot_start_diff_eq?: number;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: ne)
+     */
+    p50_header_seen_slot_start_diff_ne?: number;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: lt)
+     */
+    p50_header_seen_slot_start_diff_lt?: number;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: lte)
+     */
+    p50_header_seen_slot_start_diff_lte?: number;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: gt)
+     */
+    p50_header_seen_slot_start_diff_gt?: number;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: gte)
+     */
+    p50_header_seen_slot_start_diff_gte?: number;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: between_min)
+     */
+    p50_header_seen_slot_start_diff_between_min?: number;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: between_max_value)
+     */
+    p50_header_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: in_values) (comma-separated list)
+     */
+    p50_header_seen_slot_start_diff_in_values?: string;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: not_in_values) (comma-separated list)
+     */
+    p50_header_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: eq)
+     */
+    p90_header_seen_slot_start_diff_eq?: number;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: ne)
+     */
+    p90_header_seen_slot_start_diff_ne?: number;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: lt)
+     */
+    p90_header_seen_slot_start_diff_lt?: number;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: lte)
+     */
+    p90_header_seen_slot_start_diff_lte?: number;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: gt)
+     */
+    p90_header_seen_slot_start_diff_gt?: number;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: gte)
+     */
+    p90_header_seen_slot_start_diff_gte?: number;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: between_min)
+     */
+    p90_header_seen_slot_start_diff_between_min?: number;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: between_max_value)
+     */
+    p90_header_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: in_values) (comma-separated list)
+     */
+    p90_header_seen_slot_start_diff_in_values?: string;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: not_in_values) (comma-separated list)
+     */
+    p90_header_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * The maximum number of fct_data_column_partial_message_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctDataColumnPartialMessageDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_data_column_partial_message_daily';
+};
+
+export type FctDataColumnPartialMessageDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctDataColumnPartialMessageDailyServiceListError =
+  FctDataColumnPartialMessageDailyServiceListErrors[keyof FctDataColumnPartialMessageDailyServiceListErrors];
+
+export type FctDataColumnPartialMessageDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctDataColumnPartialMessageDailyResponse;
+};
+
+export type FctDataColumnPartialMessageDailyServiceListResponse =
+  FctDataColumnPartialMessageDailyServiceListResponses[keyof FctDataColumnPartialMessageDailyServiceListResponses];
+
+export type FctDataColumnPartialMessageDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period, by wall clock slot
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_data_column_partial_message_daily/{day_start_date}';
+};
+
+export type FctDataColumnPartialMessageDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctDataColumnPartialMessageDailyServiceGetError =
+  FctDataColumnPartialMessageDailyServiceGetErrors[keyof FctDataColumnPartialMessageDailyServiceGetErrors];
+
+export type FctDataColumnPartialMessageDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctDataColumnPartialMessageDailyResponse;
+};
+
+export type FctDataColumnPartialMessageDailyServiceGetResponse =
+  FctDataColumnPartialMessageDailyServiceGetResponses[keyof FctDataColumnPartialMessageDailyServiceGetResponses];
+
+export type FctDataColumnPartialMessageHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time at the start of the hour, by wall clock slot (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * The wall clock time at the start of the hour, by wall clock slot (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * The wall clock time at the start of the hour, by wall clock slot (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * The wall clock time at the start of the hour, by wall clock slot (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * The wall clock time at the start of the hour, by wall clock slot (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * The wall clock time at the start of the hour, by wall clock slot (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * The wall clock time at the start of the hour, by wall clock slot (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * The wall clock time at the start of the hour, by wall clock slot (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time at the start of the hour, by wall clock slot (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * The wall clock time at the start of the hour, by wall clock slot (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * Consensus client of the sentry nodes. Prysm sentries capture every partial RPC on the wire, Lighthouse sentries only those the gossipsub router passed on (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: eq)
+     */
+    node_count_eq?: number;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: ne)
+     */
+    node_count_ne?: number;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: lt)
+     */
+    node_count_lt?: number;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: lte)
+     */
+    node_count_lte?: number;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: gt)
+     */
+    node_count_gt?: number;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: gte)
+     */
+    node_count_gte?: number;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: between_min)
+     */
+    node_count_between_min?: number;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: between_max_value)
+     */
+    node_count_between_max_value?: number;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: in_values) (comma-separated list)
+     */
+    node_count_in_values?: string;
+    /**
+     * Distinct sentry nodes that sent or received a partial message (filter: not_in_values) (comma-separated list)
+     */
+    node_count_not_in_values?: string;
+    /**
+     * Received partial messages that only carried parts metadata (filter: eq)
+     */
+    received_metadata_count_eq?: number;
+    /**
+     * Received partial messages that only carried parts metadata (filter: ne)
+     */
+    received_metadata_count_ne?: number;
+    /**
+     * Received partial messages that only carried parts metadata (filter: lt)
+     */
+    received_metadata_count_lt?: number;
+    /**
+     * Received partial messages that only carried parts metadata (filter: lte)
+     */
+    received_metadata_count_lte?: number;
+    /**
+     * Received partial messages that only carried parts metadata (filter: gt)
+     */
+    received_metadata_count_gt?: number;
+    /**
+     * Received partial messages that only carried parts metadata (filter: gte)
+     */
+    received_metadata_count_gte?: number;
+    /**
+     * Received partial messages that only carried parts metadata (filter: between_min)
+     */
+    received_metadata_count_between_min?: number;
+    /**
+     * Received partial messages that only carried parts metadata (filter: between_max_value)
+     */
+    received_metadata_count_between_max_value?: number;
+    /**
+     * Received partial messages that only carried parts metadata (filter: in_values) (comma-separated list)
+     */
+    received_metadata_count_in_values?: string;
+    /**
+     * Received partial messages that only carried parts metadata (filter: not_in_values) (comma-separated list)
+     */
+    received_metadata_count_not_in_values?: string;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: eq)
+     */
+    received_message_count_eq?: number;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: ne)
+     */
+    received_message_count_ne?: number;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: lt)
+     */
+    received_message_count_lt?: number;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: lte)
+     */
+    received_message_count_lte?: number;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: gt)
+     */
+    received_message_count_gt?: number;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: gte)
+     */
+    received_message_count_gte?: number;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: between_min)
+     */
+    received_message_count_between_min?: number;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: between_max_value)
+     */
+    received_message_count_between_max_value?: number;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: in_values) (comma-separated list)
+     */
+    received_message_count_in_values?: string;
+    /**
+     * Received partial messages with a body, header-only pushes included (filter: not_in_values) (comma-separated list)
+     */
+    received_message_count_not_in_values?: string;
+    /**
+     * Received partial messages that carried at least one cell (filter: eq)
+     */
+    received_cell_message_count_eq?: number;
+    /**
+     * Received partial messages that carried at least one cell (filter: ne)
+     */
+    received_cell_message_count_ne?: number;
+    /**
+     * Received partial messages that carried at least one cell (filter: lt)
+     */
+    received_cell_message_count_lt?: number;
+    /**
+     * Received partial messages that carried at least one cell (filter: lte)
+     */
+    received_cell_message_count_lte?: number;
+    /**
+     * Received partial messages that carried at least one cell (filter: gt)
+     */
+    received_cell_message_count_gt?: number;
+    /**
+     * Received partial messages that carried at least one cell (filter: gte)
+     */
+    received_cell_message_count_gte?: number;
+    /**
+     * Received partial messages that carried at least one cell (filter: between_min)
+     */
+    received_cell_message_count_between_min?: number;
+    /**
+     * Received partial messages that carried at least one cell (filter: between_max_value)
+     */
+    received_cell_message_count_between_max_value?: number;
+    /**
+     * Received partial messages that carried at least one cell (filter: in_values) (comma-separated list)
+     */
+    received_cell_message_count_in_values?: string;
+    /**
+     * Received partial messages that carried at least one cell (filter: not_in_values) (comma-separated list)
+     */
+    received_cell_message_count_not_in_values?: string;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: eq)
+     */
+    received_cells_eq?: number;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: ne)
+     */
+    received_cells_ne?: number;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: lt)
+     */
+    received_cells_lt?: number;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: lte)
+     */
+    received_cells_lte?: number;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: gt)
+     */
+    received_cells_gt?: number;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: gte)
+     */
+    received_cells_gte?: number;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: between_min)
+     */
+    received_cells_between_min?: number;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: between_max_value)
+     */
+    received_cells_between_max_value?: number;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: in_values) (comma-separated list)
+     */
+    received_cells_in_values?: string;
+    /**
+     * Cells carried by received partial messages, duplicates included (filter: not_in_values) (comma-separated list)
+     */
+    received_cells_not_in_values?: string;
+    /**
+     * Received partial messages that carried the partial data column header (filter: eq)
+     */
+    received_header_count_eq?: number;
+    /**
+     * Received partial messages that carried the partial data column header (filter: ne)
+     */
+    received_header_count_ne?: number;
+    /**
+     * Received partial messages that carried the partial data column header (filter: lt)
+     */
+    received_header_count_lt?: number;
+    /**
+     * Received partial messages that carried the partial data column header (filter: lte)
+     */
+    received_header_count_lte?: number;
+    /**
+     * Received partial messages that carried the partial data column header (filter: gt)
+     */
+    received_header_count_gt?: number;
+    /**
+     * Received partial messages that carried the partial data column header (filter: gte)
+     */
+    received_header_count_gte?: number;
+    /**
+     * Received partial messages that carried the partial data column header (filter: between_min)
+     */
+    received_header_count_between_min?: number;
+    /**
+     * Received partial messages that carried the partial data column header (filter: between_max_value)
+     */
+    received_header_count_between_max_value?: number;
+    /**
+     * Received partial messages that carried the partial data column header (filter: in_values) (comma-separated list)
+     */
+    received_header_count_in_values?: string;
+    /**
+     * Received partial messages that carried the partial data column header (filter: not_in_values) (comma-separated list)
+     */
+    received_header_count_not_in_values?: string;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: eq)
+     */
+    cell_sender_peer_count_eq?: number;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: ne)
+     */
+    cell_sender_peer_count_ne?: number;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: lt)
+     */
+    cell_sender_peer_count_lt?: number;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: lte)
+     */
+    cell_sender_peer_count_lte?: number;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: gt)
+     */
+    cell_sender_peer_count_gt?: number;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: gte)
+     */
+    cell_sender_peer_count_gte?: number;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: between_min)
+     */
+    cell_sender_peer_count_between_min?: number;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: between_max_value)
+     */
+    cell_sender_peer_count_between_max_value?: number;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: in_values) (comma-separated list)
+     */
+    cell_sender_peer_count_in_values?: string;
+    /**
+     * Distinct peers that sent a sentry node at least one cell (filter: not_in_values) (comma-separated list)
+     */
+    cell_sender_peer_count_not_in_values?: string;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: eq)
+     */
+    sent_metadata_count_eq?: number;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: ne)
+     */
+    sent_metadata_count_ne?: number;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: lt)
+     */
+    sent_metadata_count_lt?: number;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: lte)
+     */
+    sent_metadata_count_lte?: number;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: gt)
+     */
+    sent_metadata_count_gt?: number;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: gte)
+     */
+    sent_metadata_count_gte?: number;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: between_min)
+     */
+    sent_metadata_count_between_min?: number;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: between_max_value)
+     */
+    sent_metadata_count_between_max_value?: number;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: in_values) (comma-separated list)
+     */
+    sent_metadata_count_in_values?: string;
+    /**
+     * Sent partial messages that only carried parts metadata (filter: not_in_values) (comma-separated list)
+     */
+    sent_metadata_count_not_in_values?: string;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: eq)
+     */
+    sent_message_count_eq?: number;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: ne)
+     */
+    sent_message_count_ne?: number;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: lt)
+     */
+    sent_message_count_lt?: number;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: lte)
+     */
+    sent_message_count_lte?: number;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: gt)
+     */
+    sent_message_count_gt?: number;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: gte)
+     */
+    sent_message_count_gte?: number;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: between_min)
+     */
+    sent_message_count_between_min?: number;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: between_max_value)
+     */
+    sent_message_count_between_max_value?: number;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: in_values) (comma-separated list)
+     */
+    sent_message_count_in_values?: string;
+    /**
+     * Sent partial messages with a body, header-only pushes included (filter: not_in_values) (comma-separated list)
+     */
+    sent_message_count_not_in_values?: string;
+    /**
+     * Sent partial messages that carried at least one cell (filter: eq)
+     */
+    sent_cell_message_count_eq?: number;
+    /**
+     * Sent partial messages that carried at least one cell (filter: ne)
+     */
+    sent_cell_message_count_ne?: number;
+    /**
+     * Sent partial messages that carried at least one cell (filter: lt)
+     */
+    sent_cell_message_count_lt?: number;
+    /**
+     * Sent partial messages that carried at least one cell (filter: lte)
+     */
+    sent_cell_message_count_lte?: number;
+    /**
+     * Sent partial messages that carried at least one cell (filter: gt)
+     */
+    sent_cell_message_count_gt?: number;
+    /**
+     * Sent partial messages that carried at least one cell (filter: gte)
+     */
+    sent_cell_message_count_gte?: number;
+    /**
+     * Sent partial messages that carried at least one cell (filter: between_min)
+     */
+    sent_cell_message_count_between_min?: number;
+    /**
+     * Sent partial messages that carried at least one cell (filter: between_max_value)
+     */
+    sent_cell_message_count_between_max_value?: number;
+    /**
+     * Sent partial messages that carried at least one cell (filter: in_values) (comma-separated list)
+     */
+    sent_cell_message_count_in_values?: string;
+    /**
+     * Sent partial messages that carried at least one cell (filter: not_in_values) (comma-separated list)
+     */
+    sent_cell_message_count_not_in_values?: string;
+    /**
+     * Cells carried by sent partial messages (filter: eq)
+     */
+    sent_cells_eq?: number;
+    /**
+     * Cells carried by sent partial messages (filter: ne)
+     */
+    sent_cells_ne?: number;
+    /**
+     * Cells carried by sent partial messages (filter: lt)
+     */
+    sent_cells_lt?: number;
+    /**
+     * Cells carried by sent partial messages (filter: lte)
+     */
+    sent_cells_lte?: number;
+    /**
+     * Cells carried by sent partial messages (filter: gt)
+     */
+    sent_cells_gt?: number;
+    /**
+     * Cells carried by sent partial messages (filter: gte)
+     */
+    sent_cells_gte?: number;
+    /**
+     * Cells carried by sent partial messages (filter: between_min)
+     */
+    sent_cells_between_min?: number;
+    /**
+     * Cells carried by sent partial messages (filter: between_max_value)
+     */
+    sent_cells_between_max_value?: number;
+    /**
+     * Cells carried by sent partial messages (filter: in_values) (comma-separated list)
+     */
+    sent_cells_in_values?: string;
+    /**
+     * Cells carried by sent partial messages (filter: not_in_values) (comma-separated list)
+     */
+    sent_cells_not_in_values?: string;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: eq)
+     */
+    sent_header_count_eq?: number;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: ne)
+     */
+    sent_header_count_ne?: number;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: lt)
+     */
+    sent_header_count_lt?: number;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: lte)
+     */
+    sent_header_count_lte?: number;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: gt)
+     */
+    sent_header_count_gt?: number;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: gte)
+     */
+    sent_header_count_gte?: number;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: between_min)
+     */
+    sent_header_count_between_min?: number;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: between_max_value)
+     */
+    sent_header_count_between_max_value?: number;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: in_values) (comma-separated list)
+     */
+    sent_header_count_in_values?: string;
+    /**
+     * Sent partial messages that carried the partial data column header (filter: not_in_values) (comma-separated list)
+     */
+    sent_header_count_not_in_values?: string;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: eq)
+     */
+    cells_accept_count_eq?: number;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: ne)
+     */
+    cells_accept_count_ne?: number;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: lt)
+     */
+    cells_accept_count_lt?: number;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: lte)
+     */
+    cells_accept_count_lte?: number;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: gt)
+     */
+    cells_accept_count_gt?: number;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: gte)
+     */
+    cells_accept_count_gte?: number;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: between_min)
+     */
+    cells_accept_count_between_min?: number;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: between_max_value)
+     */
+    cells_accept_count_between_max_value?: number;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: in_values) (comma-separated list)
+     */
+    cells_accept_count_in_values?: string;
+    /**
+     * Cell verdicts that accepted a received partial message (filter: not_in_values) (comma-separated list)
+     */
+    cells_accept_count_not_in_values?: string;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: eq)
+     */
+    cells_ignore_count_eq?: number;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: ne)
+     */
+    cells_ignore_count_ne?: number;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: lt)
+     */
+    cells_ignore_count_lt?: number;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: lte)
+     */
+    cells_ignore_count_lte?: number;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: gt)
+     */
+    cells_ignore_count_gt?: number;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: gte)
+     */
+    cells_ignore_count_gte?: number;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: between_min)
+     */
+    cells_ignore_count_between_min?: number;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: between_max_value)
+     */
+    cells_ignore_count_between_max_value?: number;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: in_values) (comma-separated list)
+     */
+    cells_ignore_count_in_values?: string;
+    /**
+     * Cell verdicts that ignored a received partial message, for example because its cells were already known (filter: not_in_values) (comma-separated list)
+     */
+    cells_ignore_count_not_in_values?: string;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: eq)
+     */
+    cells_reject_count_eq?: number;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: ne)
+     */
+    cells_reject_count_ne?: number;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: lt)
+     */
+    cells_reject_count_lt?: number;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: lte)
+     */
+    cells_reject_count_lte?: number;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: gt)
+     */
+    cells_reject_count_gt?: number;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: gte)
+     */
+    cells_reject_count_gte?: number;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: between_min)
+     */
+    cells_reject_count_between_min?: number;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: between_max_value)
+     */
+    cells_reject_count_between_max_value?: number;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: in_values) (comma-separated list)
+     */
+    cells_reject_count_in_values?: string;
+    /**
+     * Cell verdicts that rejected a received partial message (filter: not_in_values) (comma-separated list)
+     */
+    cells_reject_count_not_in_values?: string;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: eq)
+     */
+    verdict_cells_eq?: number;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: ne)
+     */
+    verdict_cells_ne?: number;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: lt)
+     */
+    verdict_cells_lt?: number;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: lte)
+     */
+    verdict_cells_lte?: number;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: gt)
+     */
+    verdict_cells_gt?: number;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: gte)
+     */
+    verdict_cells_gte?: number;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: between_min)
+     */
+    verdict_cells_between_min?: number;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: between_max_value)
+     */
+    verdict_cells_between_max_value?: number;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: in_values) (comma-separated list)
+     */
+    verdict_cells_in_values?: string;
+    /**
+     * Cells carried by the partial messages that got a cell verdict (filter: not_in_values) (comma-separated list)
+     */
+    verdict_cells_not_in_values?: string;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: eq)
+     */
+    new_cells_eq?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: ne)
+     */
+    new_cells_ne?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: lt)
+     */
+    new_cells_lt?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: lte)
+     */
+    new_cells_lte?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: gt)
+     */
+    new_cells_gt?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: gte)
+     */
+    new_cells_gte?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: between_min)
+     */
+    new_cells_between_min?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: between_max_value)
+     */
+    new_cells_between_max_value?: number;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: in_values) (comma-separated list)
+     */
+    new_cells_in_values?: string;
+    /**
+     * Cells new to the receiving node that passed verification. Divided by verdict_cells this is the useful cell ratio (filter: not_in_values) (comma-separated list)
+     */
+    new_cells_not_in_values?: string;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: eq)
+     */
+    header_accept_count_eq?: number;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: ne)
+     */
+    header_accept_count_ne?: number;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: lt)
+     */
+    header_accept_count_lt?: number;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: lte)
+     */
+    header_accept_count_lte?: number;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: gt)
+     */
+    header_accept_count_gt?: number;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: gte)
+     */
+    header_accept_count_gte?: number;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: between_min)
+     */
+    header_accept_count_between_min?: number;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: between_max_value)
+     */
+    header_accept_count_between_max_value?: number;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: in_values) (comma-separated list)
+     */
+    header_accept_count_in_values?: string;
+    /**
+     * Header verdicts that accepted a partial data column header (filter: not_in_values) (comma-separated list)
+     */
+    header_accept_count_not_in_values?: string;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: eq)
+     */
+    header_ignore_count_eq?: number;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: ne)
+     */
+    header_ignore_count_ne?: number;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: lt)
+     */
+    header_ignore_count_lt?: number;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: lte)
+     */
+    header_ignore_count_lte?: number;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: gt)
+     */
+    header_ignore_count_gt?: number;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: gte)
+     */
+    header_ignore_count_gte?: number;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: between_min)
+     */
+    header_ignore_count_between_min?: number;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: between_max_value)
+     */
+    header_ignore_count_between_max_value?: number;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: in_values) (comma-separated list)
+     */
+    header_ignore_count_in_values?: string;
+    /**
+     * Header verdicts that ignored a partial data column header (filter: not_in_values) (comma-separated list)
+     */
+    header_ignore_count_not_in_values?: string;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: eq)
+     */
+    header_reject_count_eq?: number;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: ne)
+     */
+    header_reject_count_ne?: number;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: lt)
+     */
+    header_reject_count_lt?: number;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: lte)
+     */
+    header_reject_count_lte?: number;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: gt)
+     */
+    header_reject_count_gt?: number;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: gte)
+     */
+    header_reject_count_gte?: number;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: between_min)
+     */
+    header_reject_count_between_min?: number;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: between_max_value)
+     */
+    header_reject_count_between_max_value?: number;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: in_values) (comma-separated list)
+     */
+    header_reject_count_in_values?: string;
+    /**
+     * Header verdicts that rejected a partial data column header (filter: not_in_values) (comma-separated list)
+     */
+    header_reject_count_not_in_values?: string;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: eq)
+     */
+    header_node_block_count_eq?: number;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: ne)
+     */
+    header_node_block_count_ne?: number;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: lt)
+     */
+    header_node_block_count_lt?: number;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: lte)
+     */
+    header_node_block_count_lte?: number;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: gt)
+     */
+    header_node_block_count_gt?: number;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: gte)
+     */
+    header_node_block_count_gte?: number;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: between_min)
+     */
+    header_node_block_count_between_min?: number;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: between_max_value)
+     */
+    header_node_block_count_between_max_value?: number;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: in_values) (comma-separated list)
+     */
+    header_node_block_count_in_values?: string;
+    /**
+     * Node and Fulu block pairs where the node received a partial data column header (filter: not_in_values) (comma-separated list)
+     */
+    header_node_block_count_not_in_values?: string;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: eq)
+     */
+    p50_header_seen_slot_start_diff_eq?: number;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: ne)
+     */
+    p50_header_seen_slot_start_diff_ne?: number;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: lt)
+     */
+    p50_header_seen_slot_start_diff_lt?: number;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: lte)
+     */
+    p50_header_seen_slot_start_diff_lte?: number;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: gt)
+     */
+    p50_header_seen_slot_start_diff_gt?: number;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: gte)
+     */
+    p50_header_seen_slot_start_diff_gte?: number;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: between_min)
+     */
+    p50_header_seen_slot_start_diff_between_min?: number;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: between_max_value)
+     */
+    p50_header_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: in_values) (comma-separated list)
+     */
+    p50_header_seen_slot_start_diff_in_values?: string;
+    /**
+     * Median time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: not_in_values) (comma-separated list)
+     */
+    p50_header_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: eq)
+     */
+    p90_header_seen_slot_start_diff_eq?: number;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: ne)
+     */
+    p90_header_seen_slot_start_diff_ne?: number;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: lt)
+     */
+    p90_header_seen_slot_start_diff_lt?: number;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: lte)
+     */
+    p90_header_seen_slot_start_diff_lte?: number;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: gt)
+     */
+    p90_header_seen_slot_start_diff_gt?: number;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: gte)
+     */
+    p90_header_seen_slot_start_diff_gte?: number;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: between_min)
+     */
+    p90_header_seen_slot_start_diff_between_min?: number;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: between_max_value)
+     */
+    p90_header_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: in_values) (comma-separated list)
+     */
+    p90_header_seen_slot_start_diff_in_values?: string;
+    /**
+     * 90th percentile time a node first received the header for a block, in milliseconds from slot start, 0 when there was none (filter: not_in_values) (comma-separated list)
+     */
+    p90_header_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * The maximum number of fct_data_column_partial_message_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctDataColumnPartialMessageHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_data_column_partial_message_hourly';
+};
+
+export type FctDataColumnPartialMessageHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctDataColumnPartialMessageHourlyServiceListError =
+  FctDataColumnPartialMessageHourlyServiceListErrors[keyof FctDataColumnPartialMessageHourlyServiceListErrors];
+
+export type FctDataColumnPartialMessageHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctDataColumnPartialMessageHourlyResponse;
+};
+
+export type FctDataColumnPartialMessageHourlyServiceListResponse =
+  FctDataColumnPartialMessageHourlyServiceListResponses[keyof FctDataColumnPartialMessageHourlyServiceListResponses];
+
+export type FctDataColumnPartialMessageHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time at the start of the hour, by wall clock slot
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_data_column_partial_message_hourly/{hour_start_date_time}';
+};
+
+export type FctDataColumnPartialMessageHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctDataColumnPartialMessageHourlyServiceGetError =
+  FctDataColumnPartialMessageHourlyServiceGetErrors[keyof FctDataColumnPartialMessageHourlyServiceGetErrors];
+
+export type FctDataColumnPartialMessageHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctDataColumnPartialMessageHourlyResponse;
+};
+
+export type FctDataColumnPartialMessageHourlyServiceGetResponse =
+  FctDataColumnPartialMessageHourlyServiceGetResponses[keyof FctDataColumnPartialMessageHourlyServiceGetResponses];
 
 export type FctEngineGetBlobsByElClientServiceListData = {
   body?: never;
@@ -72369,6 +79953,710 @@ export type FctPayloadBidHighestValueChunked50MsServiceGetResponses = {
 
 export type FctPayloadBidHighestValueChunked50MsServiceGetResponse =
   FctPayloadBidHighestValueChunked50MsServiceGetResponses[keyof FctPayloadBidHighestValueChunked50MsServiceGetResponses];
+
+export type FctPeerPartialMessageSupportByClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: eq)
+     */
+    peer_implementation_eq?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: ne)
+     */
+    peer_implementation_ne?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: contains)
+     */
+    peer_implementation_contains?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: starts_with)
+     */
+    peer_implementation_starts_with?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: ends_with)
+     */
+    peer_implementation_ends_with?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: like)
+     */
+    peer_implementation_like?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: not_like)
+     */
+    peer_implementation_not_like?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: in_values) (comma-separated list)
+     */
+    peer_implementation_in_values?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: not_in_values) (comma-separated list)
+     */
+    peer_implementation_not_in_values?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: eq)
+     */
+    peer_version_eq?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: ne)
+     */
+    peer_version_ne?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: contains)
+     */
+    peer_version_contains?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: starts_with)
+     */
+    peer_version_starts_with?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: ends_with)
+     */
+    peer_version_ends_with?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: like)
+     */
+    peer_version_like?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: not_like)
+     */
+    peer_version_not_like?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: in_values) (comma-separated list)
+     */
+    peer_version_in_values?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: not_in_values) (comma-separated list)
+     */
+    peer_version_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Hours of the day with peer data on the network, the divisor of the averages (filter: eq)
+     */
+    hour_count_eq?: number;
+    /**
+     * Hours of the day with peer data on the network, the divisor of the averages (filter: ne)
+     */
+    hour_count_ne?: number;
+    /**
+     * Hours of the day with peer data on the network, the divisor of the averages (filter: lt)
+     */
+    hour_count_lt?: number;
+    /**
+     * Hours of the day with peer data on the network, the divisor of the averages (filter: lte)
+     */
+    hour_count_lte?: number;
+    /**
+     * Hours of the day with peer data on the network, the divisor of the averages (filter: gt)
+     */
+    hour_count_gt?: number;
+    /**
+     * Hours of the day with peer data on the network, the divisor of the averages (filter: gte)
+     */
+    hour_count_gte?: number;
+    /**
+     * Hours of the day with peer data on the network, the divisor of the averages (filter: between_min)
+     */
+    hour_count_between_min?: number;
+    /**
+     * Hours of the day with peer data on the network, the divisor of the averages (filter: between_max_value)
+     */
+    hour_count_between_max_value?: number;
+    /**
+     * Hours of the day with peer data on the network, the divisor of the averages (filter: in_values) (comma-separated list)
+     */
+    hour_count_in_values?: string;
+    /**
+     * Hours of the day with peer data on the network, the divisor of the averages (filter: not_in_values) (comma-separated list)
+     */
+    hour_count_not_in_values?: string;
+    /**
+     * Filter avg_connected_peer_count using value
+     */
+    avg_connected_peer_count_value?: number;
+    /**
+     * Filter avg_gossipsub_v13_peer_count using value
+     */
+    avg_gossipsub_v13_peer_count_value?: number;
+    /**
+     * Filter avg_subscribed_peer_count using value
+     */
+    avg_subscribed_peer_count_value?: number;
+    /**
+     * Filter avg_requests_partial_peer_count using value
+     */
+    avg_requests_partial_peer_count_value?: number;
+    /**
+     * Filter avg_supports_sending_partial_peer_count using value
+     */
+    avg_supports_sending_partial_peer_count_value?: number;
+    /**
+     * The maximum number of fct_peer_partial_message_support_by_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerPartialMessageSupportByClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_partial_message_support_by_client_daily';
+};
+
+export type FctPeerPartialMessageSupportByClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerPartialMessageSupportByClientDailyServiceListError =
+  FctPeerPartialMessageSupportByClientDailyServiceListErrors[keyof FctPeerPartialMessageSupportByClientDailyServiceListErrors];
+
+export type FctPeerPartialMessageSupportByClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerPartialMessageSupportByClientDailyResponse;
+};
+
+export type FctPeerPartialMessageSupportByClientDailyServiceListResponse =
+  FctPeerPartialMessageSupportByClientDailyServiceListResponses[keyof FctPeerPartialMessageSupportByClientDailyServiceListResponses];
+
+export type FctPeerPartialMessageSupportByClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_partial_message_support_by_client_daily/{day_start_date}';
+};
+
+export type FctPeerPartialMessageSupportByClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerPartialMessageSupportByClientDailyServiceGetError =
+  FctPeerPartialMessageSupportByClientDailyServiceGetErrors[keyof FctPeerPartialMessageSupportByClientDailyServiceGetErrors];
+
+export type FctPeerPartialMessageSupportByClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerPartialMessageSupportByClientDailyResponse;
+};
+
+export type FctPeerPartialMessageSupportByClientDailyServiceGetResponse =
+  FctPeerPartialMessageSupportByClientDailyServiceGetResponses[keyof FctPeerPartialMessageSupportByClientDailyServiceGetResponses];
+
+export type FctPeerPartialMessageSupportByClientHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time at the start of the hour (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * The wall clock time at the start of the hour (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: eq)
+     */
+    peer_implementation_eq?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: ne)
+     */
+    peer_implementation_ne?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: contains)
+     */
+    peer_implementation_contains?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: starts_with)
+     */
+    peer_implementation_starts_with?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: ends_with)
+     */
+    peer_implementation_ends_with?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: like)
+     */
+    peer_implementation_like?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: not_like)
+     */
+    peer_implementation_not_like?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: in_values) (comma-separated list)
+     */
+    peer_implementation_in_values?: string;
+    /**
+     * Client implementation of the peer from its libp2p agent, empty when no heartbeat identified it (filter: not_in_values) (comma-separated list)
+     */
+    peer_implementation_not_in_values?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: eq)
+     */
+    peer_version_eq?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: ne)
+     */
+    peer_version_ne?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: contains)
+     */
+    peer_version_contains?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: starts_with)
+     */
+    peer_version_starts_with?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: ends_with)
+     */
+    peer_version_ends_with?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: like)
+     */
+    peer_version_like?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: not_like)
+     */
+    peer_version_not_like?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: in_values) (comma-separated list)
+     */
+    peer_version_in_values?: string;
+    /**
+     * Client version of the peer as major.minor.patch, or the raw agent version when it does not parse (filter: not_in_values) (comma-separated list)
+     */
+    peer_version_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Distinct peers connected to a sentry node during the hour, from heartbeats (filter: eq)
+     */
+    connected_peer_count_eq?: number;
+    /**
+     * Distinct peers connected to a sentry node during the hour, from heartbeats (filter: ne)
+     */
+    connected_peer_count_ne?: number;
+    /**
+     * Distinct peers connected to a sentry node during the hour, from heartbeats (filter: lt)
+     */
+    connected_peer_count_lt?: number;
+    /**
+     * Distinct peers connected to a sentry node during the hour, from heartbeats (filter: lte)
+     */
+    connected_peer_count_lte?: number;
+    /**
+     * Distinct peers connected to a sentry node during the hour, from heartbeats (filter: gt)
+     */
+    connected_peer_count_gt?: number;
+    /**
+     * Distinct peers connected to a sentry node during the hour, from heartbeats (filter: gte)
+     */
+    connected_peer_count_gte?: number;
+    /**
+     * Distinct peers connected to a sentry node during the hour, from heartbeats (filter: between_min)
+     */
+    connected_peer_count_between_min?: number;
+    /**
+     * Distinct peers connected to a sentry node during the hour, from heartbeats (filter: between_max_value)
+     */
+    connected_peer_count_between_max_value?: number;
+    /**
+     * Distinct peers connected to a sentry node during the hour, from heartbeats (filter: in_values) (comma-separated list)
+     */
+    connected_peer_count_in_values?: string;
+    /**
+     * Distinct peers connected to a sentry node during the hour, from heartbeats (filter: not_in_values) (comma-separated list)
+     */
+    connected_peer_count_not_in_values?: string;
+    /**
+     * Connected peers that support gossipsub v1.3 (/meshsub/1.3.0), which the partial messages extension requires (filter: eq)
+     */
+    gossipsub_v13_peer_count_eq?: number;
+    /**
+     * Connected peers that support gossipsub v1.3 (/meshsub/1.3.0), which the partial messages extension requires (filter: ne)
+     */
+    gossipsub_v13_peer_count_ne?: number;
+    /**
+     * Connected peers that support gossipsub v1.3 (/meshsub/1.3.0), which the partial messages extension requires (filter: lt)
+     */
+    gossipsub_v13_peer_count_lt?: number;
+    /**
+     * Connected peers that support gossipsub v1.3 (/meshsub/1.3.0), which the partial messages extension requires (filter: lte)
+     */
+    gossipsub_v13_peer_count_lte?: number;
+    /**
+     * Connected peers that support gossipsub v1.3 (/meshsub/1.3.0), which the partial messages extension requires (filter: gt)
+     */
+    gossipsub_v13_peer_count_gt?: number;
+    /**
+     * Connected peers that support gossipsub v1.3 (/meshsub/1.3.0), which the partial messages extension requires (filter: gte)
+     */
+    gossipsub_v13_peer_count_gte?: number;
+    /**
+     * Connected peers that support gossipsub v1.3 (/meshsub/1.3.0), which the partial messages extension requires (filter: between_min)
+     */
+    gossipsub_v13_peer_count_between_min?: number;
+    /**
+     * Connected peers that support gossipsub v1.3 (/meshsub/1.3.0), which the partial messages extension requires (filter: between_max_value)
+     */
+    gossipsub_v13_peer_count_between_max_value?: number;
+    /**
+     * Connected peers that support gossipsub v1.3 (/meshsub/1.3.0), which the partial messages extension requires (filter: in_values) (comma-separated list)
+     */
+    gossipsub_v13_peer_count_in_values?: string;
+    /**
+     * Connected peers that support gossipsub v1.3 (/meshsub/1.3.0), which the partial messages extension requires (filter: not_in_values) (comma-separated list)
+     */
+    gossipsub_v13_peer_count_not_in_values?: string;
+    /**
+     * Distinct peers seen subscribing to a data column topic during the hour by a sentry node that reports the partial flags (filter: eq)
+     */
+    subscribed_peer_count_eq?: number;
+    /**
+     * Distinct peers seen subscribing to a data column topic during the hour by a sentry node that reports the partial flags (filter: ne)
+     */
+    subscribed_peer_count_ne?: number;
+    /**
+     * Distinct peers seen subscribing to a data column topic during the hour by a sentry node that reports the partial flags (filter: lt)
+     */
+    subscribed_peer_count_lt?: number;
+    /**
+     * Distinct peers seen subscribing to a data column topic during the hour by a sentry node that reports the partial flags (filter: lte)
+     */
+    subscribed_peer_count_lte?: number;
+    /**
+     * Distinct peers seen subscribing to a data column topic during the hour by a sentry node that reports the partial flags (filter: gt)
+     */
+    subscribed_peer_count_gt?: number;
+    /**
+     * Distinct peers seen subscribing to a data column topic during the hour by a sentry node that reports the partial flags (filter: gte)
+     */
+    subscribed_peer_count_gte?: number;
+    /**
+     * Distinct peers seen subscribing to a data column topic during the hour by a sentry node that reports the partial flags (filter: between_min)
+     */
+    subscribed_peer_count_between_min?: number;
+    /**
+     * Distinct peers seen subscribing to a data column topic during the hour by a sentry node that reports the partial flags (filter: between_max_value)
+     */
+    subscribed_peer_count_between_max_value?: number;
+    /**
+     * Distinct peers seen subscribing to a data column topic during the hour by a sentry node that reports the partial flags (filter: in_values) (comma-separated list)
+     */
+    subscribed_peer_count_in_values?: string;
+    /**
+     * Distinct peers seen subscribing to a data column topic during the hour by a sentry node that reports the partial flags (filter: not_in_values) (comma-separated list)
+     */
+    subscribed_peer_count_not_in_values?: string;
+    /**
+     * Subscribed peers that requested partial messages on a data column topic (filter: eq)
+     */
+    requests_partial_peer_count_eq?: number;
+    /**
+     * Subscribed peers that requested partial messages on a data column topic (filter: ne)
+     */
+    requests_partial_peer_count_ne?: number;
+    /**
+     * Subscribed peers that requested partial messages on a data column topic (filter: lt)
+     */
+    requests_partial_peer_count_lt?: number;
+    /**
+     * Subscribed peers that requested partial messages on a data column topic (filter: lte)
+     */
+    requests_partial_peer_count_lte?: number;
+    /**
+     * Subscribed peers that requested partial messages on a data column topic (filter: gt)
+     */
+    requests_partial_peer_count_gt?: number;
+    /**
+     * Subscribed peers that requested partial messages on a data column topic (filter: gte)
+     */
+    requests_partial_peer_count_gte?: number;
+    /**
+     * Subscribed peers that requested partial messages on a data column topic (filter: between_min)
+     */
+    requests_partial_peer_count_between_min?: number;
+    /**
+     * Subscribed peers that requested partial messages on a data column topic (filter: between_max_value)
+     */
+    requests_partial_peer_count_between_max_value?: number;
+    /**
+     * Subscribed peers that requested partial messages on a data column topic (filter: in_values) (comma-separated list)
+     */
+    requests_partial_peer_count_in_values?: string;
+    /**
+     * Subscribed peers that requested partial messages on a data column topic (filter: not_in_values) (comma-separated list)
+     */
+    requests_partial_peer_count_not_in_values?: string;
+    /**
+     * Subscribed peers that support sending partial messages on a data column topic (filter: eq)
+     */
+    supports_sending_partial_peer_count_eq?: number;
+    /**
+     * Subscribed peers that support sending partial messages on a data column topic (filter: ne)
+     */
+    supports_sending_partial_peer_count_ne?: number;
+    /**
+     * Subscribed peers that support sending partial messages on a data column topic (filter: lt)
+     */
+    supports_sending_partial_peer_count_lt?: number;
+    /**
+     * Subscribed peers that support sending partial messages on a data column topic (filter: lte)
+     */
+    supports_sending_partial_peer_count_lte?: number;
+    /**
+     * Subscribed peers that support sending partial messages on a data column topic (filter: gt)
+     */
+    supports_sending_partial_peer_count_gt?: number;
+    /**
+     * Subscribed peers that support sending partial messages on a data column topic (filter: gte)
+     */
+    supports_sending_partial_peer_count_gte?: number;
+    /**
+     * Subscribed peers that support sending partial messages on a data column topic (filter: between_min)
+     */
+    supports_sending_partial_peer_count_between_min?: number;
+    /**
+     * Subscribed peers that support sending partial messages on a data column topic (filter: between_max_value)
+     */
+    supports_sending_partial_peer_count_between_max_value?: number;
+    /**
+     * Subscribed peers that support sending partial messages on a data column topic (filter: in_values) (comma-separated list)
+     */
+    supports_sending_partial_peer_count_in_values?: string;
+    /**
+     * Subscribed peers that support sending partial messages on a data column topic (filter: not_in_values) (comma-separated list)
+     */
+    supports_sending_partial_peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_partial_message_support_by_client_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerPartialMessageSupportByClientHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_partial_message_support_by_client_hourly';
+};
+
+export type FctPeerPartialMessageSupportByClientHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerPartialMessageSupportByClientHourlyServiceListError =
+  FctPeerPartialMessageSupportByClientHourlyServiceListErrors[keyof FctPeerPartialMessageSupportByClientHourlyServiceListErrors];
+
+export type FctPeerPartialMessageSupportByClientHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerPartialMessageSupportByClientHourlyResponse;
+};
+
+export type FctPeerPartialMessageSupportByClientHourlyServiceListResponse =
+  FctPeerPartialMessageSupportByClientHourlyServiceListResponses[keyof FctPeerPartialMessageSupportByClientHourlyServiceListResponses];
+
+export type FctPeerPartialMessageSupportByClientHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time at the start of the hour
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_partial_message_support_by_client_hourly/{hour_start_date_time}';
+};
+
+export type FctPeerPartialMessageSupportByClientHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerPartialMessageSupportByClientHourlyServiceGetError =
+  FctPeerPartialMessageSupportByClientHourlyServiceGetErrors[keyof FctPeerPartialMessageSupportByClientHourlyServiceGetErrors];
+
+export type FctPeerPartialMessageSupportByClientHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerPartialMessageSupportByClientHourlyResponse;
+};
+
+export type FctPeerPartialMessageSupportByClientHourlyServiceGetResponse =
+  FctPeerPartialMessageSupportByClientHourlyServiceGetResponses[keyof FctPeerPartialMessageSupportByClientHourlyServiceGetResponses];
 
 export type FctPreparedBlockServiceListData = {
   body?: never;

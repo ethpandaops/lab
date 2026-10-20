@@ -23,6 +23,7 @@ import {
   SignalIcon,
   CircleStackIcon,
   MagnifyingGlassIcon,
+  PuzzlePieceIcon,
 } from '@heroicons/react/24/outline';
 import { NetworkSelect } from '@/components/Ethereum/NetworkSelect';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
@@ -170,6 +171,7 @@ const ethereumConsensusPages: NavItem[] = [
 const ethereumDataAvailabilityPages: NavItem[] = [
   { name: 'Custody', to: '/ethereum/data-availability/custody', icon: CircleStackIcon },
   { name: 'Probes', to: '/ethereum/data-availability/probes', icon: MagnifyingGlassIcon },
+  { name: 'Partial Columns', to: '/ethereum/data-availability/partial-columns', icon: PuzzlePieceIcon },
 ];
 
 const ethereumExecutionPages: NavItem[] = [

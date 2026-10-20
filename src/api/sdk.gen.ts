@@ -207,6 +207,12 @@ import type {
   FctBlockBlobHeadServiceListData,
   FctBlockBlobHeadServiceListErrors,
   FctBlockBlobHeadServiceListResponses,
+  FctBlockDataColumnCompletionServiceGetData,
+  FctBlockDataColumnCompletionServiceGetErrors,
+  FctBlockDataColumnCompletionServiceGetResponses,
+  FctBlockDataColumnCompletionServiceListData,
+  FctBlockDataColumnCompletionServiceListErrors,
+  FctBlockDataColumnCompletionServiceListResponses,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceGetErrors,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponses,
@@ -273,6 +279,12 @@ import type {
   FctBlockMevServiceListData,
   FctBlockMevServiceListErrors,
   FctBlockMevServiceListResponses,
+  FctBlockPartialDataColumnHeaderFirstSeenServiceGetData,
+  FctBlockPartialDataColumnHeaderFirstSeenServiceGetErrors,
+  FctBlockPartialDataColumnHeaderFirstSeenServiceGetResponses,
+  FctBlockPartialDataColumnHeaderFirstSeenServiceListData,
+  FctBlockPartialDataColumnHeaderFirstSeenServiceListErrors,
+  FctBlockPartialDataColumnHeaderFirstSeenServiceListResponses,
   FctBlockPayloadAvailableByNodeServiceGetData,
   FctBlockPayloadAvailableByNodeServiceGetErrors,
   FctBlockPayloadAvailableByNodeServiceGetResponses,
@@ -435,6 +447,36 @@ import type {
   FctDataColumnAvailabilityHourlyServiceListData,
   FctDataColumnAvailabilityHourlyServiceListErrors,
   FctDataColumnAvailabilityHourlyServiceListResponses,
+  FctDataColumnCompletionByPathDailyServiceGetData,
+  FctDataColumnCompletionByPathDailyServiceGetErrors,
+  FctDataColumnCompletionByPathDailyServiceGetResponses,
+  FctDataColumnCompletionByPathDailyServiceListData,
+  FctDataColumnCompletionByPathDailyServiceListErrors,
+  FctDataColumnCompletionByPathDailyServiceListResponses,
+  FctDataColumnCompletionByPathHourlyServiceGetData,
+  FctDataColumnCompletionByPathHourlyServiceGetErrors,
+  FctDataColumnCompletionByPathHourlyServiceGetResponses,
+  FctDataColumnCompletionByPathHourlyServiceListData,
+  FctDataColumnCompletionByPathHourlyServiceListErrors,
+  FctDataColumnCompletionByPathHourlyServiceListResponses,
+  FctDataColumnCompletionBySlotServiceGetData,
+  FctDataColumnCompletionBySlotServiceGetErrors,
+  FctDataColumnCompletionBySlotServiceGetResponses,
+  FctDataColumnCompletionBySlotServiceListData,
+  FctDataColumnCompletionBySlotServiceListErrors,
+  FctDataColumnCompletionBySlotServiceListResponses,
+  FctDataColumnPartialMessageDailyServiceGetData,
+  FctDataColumnPartialMessageDailyServiceGetErrors,
+  FctDataColumnPartialMessageDailyServiceGetResponses,
+  FctDataColumnPartialMessageDailyServiceListData,
+  FctDataColumnPartialMessageDailyServiceListErrors,
+  FctDataColumnPartialMessageDailyServiceListResponses,
+  FctDataColumnPartialMessageHourlyServiceGetData,
+  FctDataColumnPartialMessageHourlyServiceGetErrors,
+  FctDataColumnPartialMessageHourlyServiceGetResponses,
+  FctDataColumnPartialMessageHourlyServiceListData,
+  FctDataColumnPartialMessageHourlyServiceListErrors,
+  FctDataColumnPartialMessageHourlyServiceListResponses,
   FctEngineGetBlobsByElClientHourlyServiceGetData,
   FctEngineGetBlobsByElClientHourlyServiceGetErrors,
   FctEngineGetBlobsByElClientHourlyServiceGetResponses,
@@ -699,6 +741,18 @@ import type {
   FctPayloadBidHighestValueChunked50MsServiceListData,
   FctPayloadBidHighestValueChunked50MsServiceListErrors,
   FctPayloadBidHighestValueChunked50MsServiceListResponses,
+  FctPeerPartialMessageSupportByClientDailyServiceGetData,
+  FctPeerPartialMessageSupportByClientDailyServiceGetErrors,
+  FctPeerPartialMessageSupportByClientDailyServiceGetResponses,
+  FctPeerPartialMessageSupportByClientDailyServiceListData,
+  FctPeerPartialMessageSupportByClientDailyServiceListErrors,
+  FctPeerPartialMessageSupportByClientDailyServiceListResponses,
+  FctPeerPartialMessageSupportByClientHourlyServiceGetData,
+  FctPeerPartialMessageSupportByClientHourlyServiceGetErrors,
+  FctPeerPartialMessageSupportByClientHourlyServiceGetResponses,
+  FctPeerPartialMessageSupportByClientHourlyServiceListData,
+  FctPeerPartialMessageSupportByClientHourlyServiceListErrors,
+  FctPeerPartialMessageSupportByClientHourlyServiceListResponses,
   FctPreparedBlockServiceGetData,
   FctPreparedBlockServiceGetErrors,
   FctPreparedBlockServiceGetResponses,
@@ -1431,6 +1485,10 @@ import {
   zFctBlockBlobHeadServiceGetResponse,
   zFctBlockBlobHeadServiceListData,
   zFctBlockBlobHeadServiceListResponse,
+  zFctBlockDataColumnCompletionServiceGetData,
+  zFctBlockDataColumnCompletionServiceGetResponse,
+  zFctBlockDataColumnCompletionServiceListData,
+  zFctBlockDataColumnCompletionServiceListResponse,
   zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetData,
   zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse,
   zFctBlockDataColumnSidecarFirstSeenByNodeServiceListData,
@@ -1475,6 +1533,10 @@ import {
   zFctBlockMevServiceGetResponse,
   zFctBlockMevServiceListData,
   zFctBlockMevServiceListResponse,
+  zFctBlockPartialDataColumnHeaderFirstSeenServiceGetData,
+  zFctBlockPartialDataColumnHeaderFirstSeenServiceGetResponse,
+  zFctBlockPartialDataColumnHeaderFirstSeenServiceListData,
+  zFctBlockPartialDataColumnHeaderFirstSeenServiceListResponse,
   zFctBlockPayloadAvailableByNodeServiceGetData,
   zFctBlockPayloadAvailableByNodeServiceGetResponse,
   zFctBlockPayloadAvailableByNodeServiceListData,
@@ -1583,6 +1645,26 @@ import {
   zFctDataColumnAvailabilityHourlyServiceGetResponse,
   zFctDataColumnAvailabilityHourlyServiceListData,
   zFctDataColumnAvailabilityHourlyServiceListResponse,
+  zFctDataColumnCompletionByPathDailyServiceGetData,
+  zFctDataColumnCompletionByPathDailyServiceGetResponse,
+  zFctDataColumnCompletionByPathDailyServiceListData,
+  zFctDataColumnCompletionByPathDailyServiceListResponse,
+  zFctDataColumnCompletionByPathHourlyServiceGetData,
+  zFctDataColumnCompletionByPathHourlyServiceGetResponse,
+  zFctDataColumnCompletionByPathHourlyServiceListData,
+  zFctDataColumnCompletionByPathHourlyServiceListResponse,
+  zFctDataColumnCompletionBySlotServiceGetData,
+  zFctDataColumnCompletionBySlotServiceGetResponse,
+  zFctDataColumnCompletionBySlotServiceListData,
+  zFctDataColumnCompletionBySlotServiceListResponse,
+  zFctDataColumnPartialMessageDailyServiceGetData,
+  zFctDataColumnPartialMessageDailyServiceGetResponse,
+  zFctDataColumnPartialMessageDailyServiceListData,
+  zFctDataColumnPartialMessageDailyServiceListResponse,
+  zFctDataColumnPartialMessageHourlyServiceGetData,
+  zFctDataColumnPartialMessageHourlyServiceGetResponse,
+  zFctDataColumnPartialMessageHourlyServiceListData,
+  zFctDataColumnPartialMessageHourlyServiceListResponse,
   zFctEngineGetBlobsByElClientHourlyServiceGetData,
   zFctEngineGetBlobsByElClientHourlyServiceGetResponse,
   zFctEngineGetBlobsByElClientHourlyServiceListData,
@@ -1759,6 +1841,14 @@ import {
   zFctPayloadBidHighestValueChunked50MsServiceGetResponse,
   zFctPayloadBidHighestValueChunked50MsServiceListData,
   zFctPayloadBidHighestValueChunked50MsServiceListResponse,
+  zFctPeerPartialMessageSupportByClientDailyServiceGetData,
+  zFctPeerPartialMessageSupportByClientDailyServiceGetResponse,
+  zFctPeerPartialMessageSupportByClientDailyServiceListData,
+  zFctPeerPartialMessageSupportByClientDailyServiceListResponse,
+  zFctPeerPartialMessageSupportByClientHourlyServiceGetData,
+  zFctPeerPartialMessageSupportByClientHourlyServiceGetResponse,
+  zFctPeerPartialMessageSupportByClientHourlyServiceListData,
+  zFctPeerPartialMessageSupportByClientHourlyServiceListResponse,
   zFctPreparedBlockServiceGetData,
   zFctPreparedBlockServiceGetResponse,
   zFctPreparedBlockServiceListData,
@@ -3483,6 +3573,44 @@ export const fctBlockBlobHeadServiceGet = <ThrowOnError extends boolean = false>
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctBlockDataColumnCompletionServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockDataColumnCompletionServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockDataColumnCompletionServiceListResponses,
+    FctBlockDataColumnCompletionServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockDataColumnCompletionServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockDataColumnCompletionServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_data_column_completion',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockDataColumnCompletionServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockDataColumnCompletionServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockDataColumnCompletionServiceGetResponses,
+    FctBlockDataColumnCompletionServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockDataColumnCompletionServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockDataColumnCompletionServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_data_column_completion/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctBlockDataColumnSidecarFirstSeenServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockDataColumnSidecarFirstSeenServiceListData, ThrowOnError>
 ) =>
@@ -3866,6 +3994,45 @@ export const fctBlockMevHeadServiceGet = <ThrowOnError extends boolean = false>(
     requestValidator: async data => await zFctBlockMevHeadServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockMevHeadServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_mev_head/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockPartialDataColumnHeaderFirstSeenServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockPartialDataColumnHeaderFirstSeenServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockPartialDataColumnHeaderFirstSeenServiceListResponses,
+    FctBlockPartialDataColumnHeaderFirstSeenServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockPartialDataColumnHeaderFirstSeenServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockPartialDataColumnHeaderFirstSeenServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_partial_data_column_header_first_seen',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockPartialDataColumnHeaderFirstSeenServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockPartialDataColumnHeaderFirstSeenServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockPartialDataColumnHeaderFirstSeenServiceGetResponses,
+    FctBlockPartialDataColumnHeaderFirstSeenServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockPartialDataColumnHeaderFirstSeenServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockPartialDataColumnHeaderFirstSeenServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_partial_data_column_header_first_seen/{slot_start_date_time}',
     ...options,
   });
 
@@ -4857,6 +5024,196 @@ export const fctDataColumnAvailabilityHourlyServiceGet = <ThrowOnError extends b
     requestValidator: async data => await zFctDataColumnAvailabilityHourlyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctDataColumnAvailabilityHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_data_column_availability_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnCompletionByPathDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctDataColumnCompletionByPathDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctDataColumnCompletionByPathDailyServiceListResponses,
+    FctDataColumnCompletionByPathDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctDataColumnCompletionByPathDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnCompletionByPathDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_data_column_completion_by_path_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctDataColumnCompletionByPathDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctDataColumnCompletionByPathDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctDataColumnCompletionByPathDailyServiceGetResponses,
+    FctDataColumnCompletionByPathDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctDataColumnCompletionByPathDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnCompletionByPathDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_data_column_completion_by_path_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnCompletionByPathHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctDataColumnCompletionByPathHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctDataColumnCompletionByPathHourlyServiceListResponses,
+    FctDataColumnCompletionByPathHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctDataColumnCompletionByPathHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnCompletionByPathHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_data_column_completion_by_path_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctDataColumnCompletionByPathHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctDataColumnCompletionByPathHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctDataColumnCompletionByPathHourlyServiceGetResponses,
+    FctDataColumnCompletionByPathHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctDataColumnCompletionByPathHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnCompletionByPathHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_data_column_completion_by_path_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnCompletionBySlotServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctDataColumnCompletionBySlotServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctDataColumnCompletionBySlotServiceListResponses,
+    FctDataColumnCompletionBySlotServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctDataColumnCompletionBySlotServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnCompletionBySlotServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_data_column_completion_by_slot',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctDataColumnCompletionBySlotServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctDataColumnCompletionBySlotServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctDataColumnCompletionBySlotServiceGetResponses,
+    FctDataColumnCompletionBySlotServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctDataColumnCompletionBySlotServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnCompletionBySlotServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_data_column_completion_by_slot/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnPartialMessageDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctDataColumnPartialMessageDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctDataColumnPartialMessageDailyServiceListResponses,
+    FctDataColumnPartialMessageDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctDataColumnPartialMessageDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnPartialMessageDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_data_column_partial_message_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctDataColumnPartialMessageDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctDataColumnPartialMessageDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctDataColumnPartialMessageDailyServiceGetResponses,
+    FctDataColumnPartialMessageDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctDataColumnPartialMessageDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnPartialMessageDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_data_column_partial_message_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnPartialMessageHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctDataColumnPartialMessageHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctDataColumnPartialMessageHourlyServiceListResponses,
+    FctDataColumnPartialMessageHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctDataColumnPartialMessageHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnPartialMessageHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_data_column_partial_message_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctDataColumnPartialMessageHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctDataColumnPartialMessageHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctDataColumnPartialMessageHourlyServiceGetResponses,
+    FctDataColumnPartialMessageHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctDataColumnPartialMessageHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctDataColumnPartialMessageHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_data_column_partial_message_hourly/{hour_start_date_time}',
     ...options,
   });
 
@@ -6534,6 +6891,86 @@ export const fctPayloadBidHighestValueChunked50MsServiceGet = <ThrowOnError exte
     requestValidator: async data => await zFctPayloadBidHighestValueChunked50MsServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctPayloadBidHighestValueChunked50MsServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_payload_bid_highest_value_chunked_50ms/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctPeerPartialMessageSupportByClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerPartialMessageSupportByClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerPartialMessageSupportByClientDailyServiceListResponses,
+    FctPeerPartialMessageSupportByClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerPartialMessageSupportByClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctPeerPartialMessageSupportByClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_partial_message_support_by_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerPartialMessageSupportByClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerPartialMessageSupportByClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerPartialMessageSupportByClientDailyServiceGetResponses,
+    FctPeerPartialMessageSupportByClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerPartialMessageSupportByClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctPeerPartialMessageSupportByClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_partial_message_support_by_client_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctPeerPartialMessageSupportByClientHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerPartialMessageSupportByClientHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerPartialMessageSupportByClientHourlyServiceListResponses,
+    FctPeerPartialMessageSupportByClientHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerPartialMessageSupportByClientHourlyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctPeerPartialMessageSupportByClientHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_partial_message_support_by_client_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctPeerPartialMessageSupportByClientHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerPartialMessageSupportByClientHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerPartialMessageSupportByClientHourlyServiceGetResponses,
+    FctPeerPartialMessageSupportByClientHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerPartialMessageSupportByClientHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctPeerPartialMessageSupportByClientHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_partial_message_support_by_client_hourly/{hour_start_date_time}',
     ...options,
   });
 
