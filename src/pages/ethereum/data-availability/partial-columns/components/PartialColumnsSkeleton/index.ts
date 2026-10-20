@@ -1,0 +1,1 @@
+export { PartialColumnsSkeleton } from './PartialColumnsSkeleton';

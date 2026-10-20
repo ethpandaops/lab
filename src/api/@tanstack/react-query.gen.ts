@@ -72,6 +72,8 @@ import {
   fctBlockBlobFirstSeenByNodeServiceList,
   fctBlockBlobHeadServiceGet,
   fctBlockBlobHeadServiceList,
+  fctBlockDataColumnCompletionServiceGet,
+  fctBlockDataColumnCompletionServiceList,
   fctBlockDataColumnSidecarFirstSeenByNodeServiceGet,
   fctBlockDataColumnSidecarFirstSeenByNodeServiceList,
   fctBlockDataColumnSidecarFirstSeenServiceGet,
@@ -94,6 +96,8 @@ import {
   fctBlockMevHeadServiceList,
   fctBlockMevServiceGet,
   fctBlockMevServiceList,
+  fctBlockPartialDataColumnHeaderFirstSeenServiceGet,
+  fctBlockPartialDataColumnHeaderFirstSeenServiceList,
   fctBlockPayloadAvailableByNodeServiceGet,
   fctBlockPayloadAvailableByNodeServiceList,
   fctBlockPayloadBidServiceGet,
@@ -148,6 +152,16 @@ import {
   fctDataColumnAvailabilityDailyServiceList,
   fctDataColumnAvailabilityHourlyServiceGet,
   fctDataColumnAvailabilityHourlyServiceList,
+  fctDataColumnCompletionByPathDailyServiceGet,
+  fctDataColumnCompletionByPathDailyServiceList,
+  fctDataColumnCompletionByPathHourlyServiceGet,
+  fctDataColumnCompletionByPathHourlyServiceList,
+  fctDataColumnCompletionBySlotServiceGet,
+  fctDataColumnCompletionBySlotServiceList,
+  fctDataColumnPartialMessageDailyServiceGet,
+  fctDataColumnPartialMessageDailyServiceList,
+  fctDataColumnPartialMessageHourlyServiceGet,
+  fctDataColumnPartialMessageHourlyServiceList,
   fctEngineGetBlobsByElClientHourlyServiceGet,
   fctEngineGetBlobsByElClientHourlyServiceList,
   fctEngineGetBlobsByElClientServiceGet,
@@ -236,6 +250,10 @@ import {
   fctPayloadBidHighestValueByBuilderChunked50MsServiceList,
   fctPayloadBidHighestValueChunked50MsServiceGet,
   fctPayloadBidHighestValueChunked50MsServiceList,
+  fctPeerPartialMessageSupportByClientDailyServiceGet,
+  fctPeerPartialMessageSupportByClientDailyServiceList,
+  fctPeerPartialMessageSupportByClientHourlyServiceGet,
+  fctPeerPartialMessageSupportByClientHourlyServiceList,
   fctPreparedBlockServiceGet,
   fctPreparedBlockServiceList,
   fctProposerRewardDailyServiceGet,
@@ -641,6 +659,12 @@ import type {
   FctBlockBlobHeadServiceListData,
   FctBlockBlobHeadServiceListError,
   FctBlockBlobHeadServiceListResponse,
+  FctBlockDataColumnCompletionServiceGetData,
+  FctBlockDataColumnCompletionServiceGetError,
+  FctBlockDataColumnCompletionServiceGetResponse,
+  FctBlockDataColumnCompletionServiceListData,
+  FctBlockDataColumnCompletionServiceListError,
+  FctBlockDataColumnCompletionServiceListResponse,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceGetError,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse,
@@ -707,6 +731,12 @@ import type {
   FctBlockMevServiceListData,
   FctBlockMevServiceListError,
   FctBlockMevServiceListResponse,
+  FctBlockPartialDataColumnHeaderFirstSeenServiceGetData,
+  FctBlockPartialDataColumnHeaderFirstSeenServiceGetError,
+  FctBlockPartialDataColumnHeaderFirstSeenServiceGetResponse,
+  FctBlockPartialDataColumnHeaderFirstSeenServiceListData,
+  FctBlockPartialDataColumnHeaderFirstSeenServiceListError,
+  FctBlockPartialDataColumnHeaderFirstSeenServiceListResponse,
   FctBlockPayloadAvailableByNodeServiceGetData,
   FctBlockPayloadAvailableByNodeServiceGetError,
   FctBlockPayloadAvailableByNodeServiceGetResponse,
@@ -869,6 +899,36 @@ import type {
   FctDataColumnAvailabilityHourlyServiceListData,
   FctDataColumnAvailabilityHourlyServiceListError,
   FctDataColumnAvailabilityHourlyServiceListResponse,
+  FctDataColumnCompletionByPathDailyServiceGetData,
+  FctDataColumnCompletionByPathDailyServiceGetError,
+  FctDataColumnCompletionByPathDailyServiceGetResponse,
+  FctDataColumnCompletionByPathDailyServiceListData,
+  FctDataColumnCompletionByPathDailyServiceListError,
+  FctDataColumnCompletionByPathDailyServiceListResponse,
+  FctDataColumnCompletionByPathHourlyServiceGetData,
+  FctDataColumnCompletionByPathHourlyServiceGetError,
+  FctDataColumnCompletionByPathHourlyServiceGetResponse,
+  FctDataColumnCompletionByPathHourlyServiceListData,
+  FctDataColumnCompletionByPathHourlyServiceListError,
+  FctDataColumnCompletionByPathHourlyServiceListResponse,
+  FctDataColumnCompletionBySlotServiceGetData,
+  FctDataColumnCompletionBySlotServiceGetError,
+  FctDataColumnCompletionBySlotServiceGetResponse,
+  FctDataColumnCompletionBySlotServiceListData,
+  FctDataColumnCompletionBySlotServiceListError,
+  FctDataColumnCompletionBySlotServiceListResponse,
+  FctDataColumnPartialMessageDailyServiceGetData,
+  FctDataColumnPartialMessageDailyServiceGetError,
+  FctDataColumnPartialMessageDailyServiceGetResponse,
+  FctDataColumnPartialMessageDailyServiceListData,
+  FctDataColumnPartialMessageDailyServiceListError,
+  FctDataColumnPartialMessageDailyServiceListResponse,
+  FctDataColumnPartialMessageHourlyServiceGetData,
+  FctDataColumnPartialMessageHourlyServiceGetError,
+  FctDataColumnPartialMessageHourlyServiceGetResponse,
+  FctDataColumnPartialMessageHourlyServiceListData,
+  FctDataColumnPartialMessageHourlyServiceListError,
+  FctDataColumnPartialMessageHourlyServiceListResponse,
   FctEngineGetBlobsByElClientHourlyServiceGetData,
   FctEngineGetBlobsByElClientHourlyServiceGetError,
   FctEngineGetBlobsByElClientHourlyServiceGetResponse,
@@ -1133,6 +1193,18 @@ import type {
   FctPayloadBidHighestValueChunked50MsServiceListData,
   FctPayloadBidHighestValueChunked50MsServiceListError,
   FctPayloadBidHighestValueChunked50MsServiceListResponse,
+  FctPeerPartialMessageSupportByClientDailyServiceGetData,
+  FctPeerPartialMessageSupportByClientDailyServiceGetError,
+  FctPeerPartialMessageSupportByClientDailyServiceGetResponse,
+  FctPeerPartialMessageSupportByClientDailyServiceListData,
+  FctPeerPartialMessageSupportByClientDailyServiceListError,
+  FctPeerPartialMessageSupportByClientDailyServiceListResponse,
+  FctPeerPartialMessageSupportByClientHourlyServiceGetData,
+  FctPeerPartialMessageSupportByClientHourlyServiceGetError,
+  FctPeerPartialMessageSupportByClientHourlyServiceGetResponse,
+  FctPeerPartialMessageSupportByClientHourlyServiceListData,
+  FctPeerPartialMessageSupportByClientHourlyServiceListError,
+  FctPeerPartialMessageSupportByClientHourlyServiceListResponse,
   FctPreparedBlockServiceGetData,
   FctPreparedBlockServiceGetError,
   FctPreparedBlockServiceGetResponse,
@@ -3770,6 +3842,66 @@ export const fctBlockBlobHeadServiceGetOptions = (options: Options<FctBlockBlobH
     queryKey: fctBlockBlobHeadServiceGetQueryKey(options),
   });
 
+export const fctBlockDataColumnCompletionServiceListQueryKey = (
+  options?: Options<FctBlockDataColumnCompletionServiceListData>
+) => createQueryKey('fctBlockDataColumnCompletionServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockDataColumnCompletionServiceListOptions = (
+  options?: Options<FctBlockDataColumnCompletionServiceListData>
+) =>
+  queryOptions<
+    FctBlockDataColumnCompletionServiceListResponse,
+    FctBlockDataColumnCompletionServiceListError,
+    FctBlockDataColumnCompletionServiceListResponse,
+    ReturnType<typeof fctBlockDataColumnCompletionServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockDataColumnCompletionServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockDataColumnCompletionServiceListQueryKey(options),
+  });
+
+export const fctBlockDataColumnCompletionServiceGetQueryKey = (
+  options: Options<FctBlockDataColumnCompletionServiceGetData>
+) => createQueryKey('fctBlockDataColumnCompletionServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockDataColumnCompletionServiceGetOptions = (
+  options: Options<FctBlockDataColumnCompletionServiceGetData>
+) =>
+  queryOptions<
+    FctBlockDataColumnCompletionServiceGetResponse,
+    FctBlockDataColumnCompletionServiceGetError,
+    FctBlockDataColumnCompletionServiceGetResponse,
+    ReturnType<typeof fctBlockDataColumnCompletionServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockDataColumnCompletionServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockDataColumnCompletionServiceGetQueryKey(options),
+  });
+
 export const fctBlockDataColumnSidecarFirstSeenServiceListQueryKey = (
   options?: Options<FctBlockDataColumnSidecarFirstSeenServiceListData>
 ) => createQueryKey('fctBlockDataColumnSidecarFirstSeenServiceList', options);
@@ -4398,6 +4530,66 @@ export const fctBlockMevHeadServiceGetOptions = (options: Options<FctBlockMevHea
       return data;
     },
     queryKey: fctBlockMevHeadServiceGetQueryKey(options),
+  });
+
+export const fctBlockPartialDataColumnHeaderFirstSeenServiceListQueryKey = (
+  options?: Options<FctBlockPartialDataColumnHeaderFirstSeenServiceListData>
+) => createQueryKey('fctBlockPartialDataColumnHeaderFirstSeenServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockPartialDataColumnHeaderFirstSeenServiceListOptions = (
+  options?: Options<FctBlockPartialDataColumnHeaderFirstSeenServiceListData>
+) =>
+  queryOptions<
+    FctBlockPartialDataColumnHeaderFirstSeenServiceListResponse,
+    FctBlockPartialDataColumnHeaderFirstSeenServiceListError,
+    FctBlockPartialDataColumnHeaderFirstSeenServiceListResponse,
+    ReturnType<typeof fctBlockPartialDataColumnHeaderFirstSeenServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockPartialDataColumnHeaderFirstSeenServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockPartialDataColumnHeaderFirstSeenServiceListQueryKey(options),
+  });
+
+export const fctBlockPartialDataColumnHeaderFirstSeenServiceGetQueryKey = (
+  options: Options<FctBlockPartialDataColumnHeaderFirstSeenServiceGetData>
+) => createQueryKey('fctBlockPartialDataColumnHeaderFirstSeenServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockPartialDataColumnHeaderFirstSeenServiceGetOptions = (
+  options: Options<FctBlockPartialDataColumnHeaderFirstSeenServiceGetData>
+) =>
+  queryOptions<
+    FctBlockPartialDataColumnHeaderFirstSeenServiceGetResponse,
+    FctBlockPartialDataColumnHeaderFirstSeenServiceGetError,
+    FctBlockPartialDataColumnHeaderFirstSeenServiceGetResponse,
+    ReturnType<typeof fctBlockPartialDataColumnHeaderFirstSeenServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockPartialDataColumnHeaderFirstSeenServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockPartialDataColumnHeaderFirstSeenServiceGetQueryKey(options),
   });
 
 export const fctBlockPayloadServiceListQueryKey = (options?: Options<FctBlockPayloadServiceListData>) =>
@@ -5922,6 +6114,306 @@ export const fctDataColumnAvailabilityHourlyServiceGetOptions = (
       return data;
     },
     queryKey: fctDataColumnAvailabilityHourlyServiceGetQueryKey(options),
+  });
+
+export const fctDataColumnCompletionByPathDailyServiceListQueryKey = (
+  options?: Options<FctDataColumnCompletionByPathDailyServiceListData>
+) => createQueryKey('fctDataColumnCompletionByPathDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnCompletionByPathDailyServiceListOptions = (
+  options?: Options<FctDataColumnCompletionByPathDailyServiceListData>
+) =>
+  queryOptions<
+    FctDataColumnCompletionByPathDailyServiceListResponse,
+    FctDataColumnCompletionByPathDailyServiceListError,
+    FctDataColumnCompletionByPathDailyServiceListResponse,
+    ReturnType<typeof fctDataColumnCompletionByPathDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnCompletionByPathDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnCompletionByPathDailyServiceListQueryKey(options),
+  });
+
+export const fctDataColumnCompletionByPathDailyServiceGetQueryKey = (
+  options: Options<FctDataColumnCompletionByPathDailyServiceGetData>
+) => createQueryKey('fctDataColumnCompletionByPathDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctDataColumnCompletionByPathDailyServiceGetOptions = (
+  options: Options<FctDataColumnCompletionByPathDailyServiceGetData>
+) =>
+  queryOptions<
+    FctDataColumnCompletionByPathDailyServiceGetResponse,
+    FctDataColumnCompletionByPathDailyServiceGetError,
+    FctDataColumnCompletionByPathDailyServiceGetResponse,
+    ReturnType<typeof fctDataColumnCompletionByPathDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnCompletionByPathDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnCompletionByPathDailyServiceGetQueryKey(options),
+  });
+
+export const fctDataColumnCompletionByPathHourlyServiceListQueryKey = (
+  options?: Options<FctDataColumnCompletionByPathHourlyServiceListData>
+) => createQueryKey('fctDataColumnCompletionByPathHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnCompletionByPathHourlyServiceListOptions = (
+  options?: Options<FctDataColumnCompletionByPathHourlyServiceListData>
+) =>
+  queryOptions<
+    FctDataColumnCompletionByPathHourlyServiceListResponse,
+    FctDataColumnCompletionByPathHourlyServiceListError,
+    FctDataColumnCompletionByPathHourlyServiceListResponse,
+    ReturnType<typeof fctDataColumnCompletionByPathHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnCompletionByPathHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnCompletionByPathHourlyServiceListQueryKey(options),
+  });
+
+export const fctDataColumnCompletionByPathHourlyServiceGetQueryKey = (
+  options: Options<FctDataColumnCompletionByPathHourlyServiceGetData>
+) => createQueryKey('fctDataColumnCompletionByPathHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctDataColumnCompletionByPathHourlyServiceGetOptions = (
+  options: Options<FctDataColumnCompletionByPathHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctDataColumnCompletionByPathHourlyServiceGetResponse,
+    FctDataColumnCompletionByPathHourlyServiceGetError,
+    FctDataColumnCompletionByPathHourlyServiceGetResponse,
+    ReturnType<typeof fctDataColumnCompletionByPathHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnCompletionByPathHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnCompletionByPathHourlyServiceGetQueryKey(options),
+  });
+
+export const fctDataColumnCompletionBySlotServiceListQueryKey = (
+  options?: Options<FctDataColumnCompletionBySlotServiceListData>
+) => createQueryKey('fctDataColumnCompletionBySlotServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnCompletionBySlotServiceListOptions = (
+  options?: Options<FctDataColumnCompletionBySlotServiceListData>
+) =>
+  queryOptions<
+    FctDataColumnCompletionBySlotServiceListResponse,
+    FctDataColumnCompletionBySlotServiceListError,
+    FctDataColumnCompletionBySlotServiceListResponse,
+    ReturnType<typeof fctDataColumnCompletionBySlotServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnCompletionBySlotServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnCompletionBySlotServiceListQueryKey(options),
+  });
+
+export const fctDataColumnCompletionBySlotServiceGetQueryKey = (
+  options: Options<FctDataColumnCompletionBySlotServiceGetData>
+) => createQueryKey('fctDataColumnCompletionBySlotServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctDataColumnCompletionBySlotServiceGetOptions = (
+  options: Options<FctDataColumnCompletionBySlotServiceGetData>
+) =>
+  queryOptions<
+    FctDataColumnCompletionBySlotServiceGetResponse,
+    FctDataColumnCompletionBySlotServiceGetError,
+    FctDataColumnCompletionBySlotServiceGetResponse,
+    ReturnType<typeof fctDataColumnCompletionBySlotServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnCompletionBySlotServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnCompletionBySlotServiceGetQueryKey(options),
+  });
+
+export const fctDataColumnPartialMessageDailyServiceListQueryKey = (
+  options?: Options<FctDataColumnPartialMessageDailyServiceListData>
+) => createQueryKey('fctDataColumnPartialMessageDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnPartialMessageDailyServiceListOptions = (
+  options?: Options<FctDataColumnPartialMessageDailyServiceListData>
+) =>
+  queryOptions<
+    FctDataColumnPartialMessageDailyServiceListResponse,
+    FctDataColumnPartialMessageDailyServiceListError,
+    FctDataColumnPartialMessageDailyServiceListResponse,
+    ReturnType<typeof fctDataColumnPartialMessageDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnPartialMessageDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnPartialMessageDailyServiceListQueryKey(options),
+  });
+
+export const fctDataColumnPartialMessageDailyServiceGetQueryKey = (
+  options: Options<FctDataColumnPartialMessageDailyServiceGetData>
+) => createQueryKey('fctDataColumnPartialMessageDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctDataColumnPartialMessageDailyServiceGetOptions = (
+  options: Options<FctDataColumnPartialMessageDailyServiceGetData>
+) =>
+  queryOptions<
+    FctDataColumnPartialMessageDailyServiceGetResponse,
+    FctDataColumnPartialMessageDailyServiceGetError,
+    FctDataColumnPartialMessageDailyServiceGetResponse,
+    ReturnType<typeof fctDataColumnPartialMessageDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnPartialMessageDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnPartialMessageDailyServiceGetQueryKey(options),
+  });
+
+export const fctDataColumnPartialMessageHourlyServiceListQueryKey = (
+  options?: Options<FctDataColumnPartialMessageHourlyServiceListData>
+) => createQueryKey('fctDataColumnPartialMessageHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnPartialMessageHourlyServiceListOptions = (
+  options?: Options<FctDataColumnPartialMessageHourlyServiceListData>
+) =>
+  queryOptions<
+    FctDataColumnPartialMessageHourlyServiceListResponse,
+    FctDataColumnPartialMessageHourlyServiceListError,
+    FctDataColumnPartialMessageHourlyServiceListResponse,
+    ReturnType<typeof fctDataColumnPartialMessageHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnPartialMessageHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnPartialMessageHourlyServiceListQueryKey(options),
+  });
+
+export const fctDataColumnPartialMessageHourlyServiceGetQueryKey = (
+  options: Options<FctDataColumnPartialMessageHourlyServiceGetData>
+) => createQueryKey('fctDataColumnPartialMessageHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctDataColumnPartialMessageHourlyServiceGetOptions = (
+  options: Options<FctDataColumnPartialMessageHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctDataColumnPartialMessageHourlyServiceGetResponse,
+    FctDataColumnPartialMessageHourlyServiceGetError,
+    FctDataColumnPartialMessageHourlyServiceGetResponse,
+    ReturnType<typeof fctDataColumnPartialMessageHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnPartialMessageHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnPartialMessageHourlyServiceGetQueryKey(options),
   });
 
 export const fctEngineGetBlobsByElClientServiceListQueryKey = (
@@ -8477,6 +8969,126 @@ export const fctPayloadBidHighestValueChunked50MsServiceGetOptions = (
       return data;
     },
     queryKey: fctPayloadBidHighestValueChunked50MsServiceGetQueryKey(options),
+  });
+
+export const fctPeerPartialMessageSupportByClientDailyServiceListQueryKey = (
+  options?: Options<FctPeerPartialMessageSupportByClientDailyServiceListData>
+) => createQueryKey('fctPeerPartialMessageSupportByClientDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctPeerPartialMessageSupportByClientDailyServiceListOptions = (
+  options?: Options<FctPeerPartialMessageSupportByClientDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerPartialMessageSupportByClientDailyServiceListResponse,
+    FctPeerPartialMessageSupportByClientDailyServiceListError,
+    FctPeerPartialMessageSupportByClientDailyServiceListResponse,
+    ReturnType<typeof fctPeerPartialMessageSupportByClientDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerPartialMessageSupportByClientDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerPartialMessageSupportByClientDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerPartialMessageSupportByClientDailyServiceGetQueryKey = (
+  options: Options<FctPeerPartialMessageSupportByClientDailyServiceGetData>
+) => createQueryKey('fctPeerPartialMessageSupportByClientDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerPartialMessageSupportByClientDailyServiceGetOptions = (
+  options: Options<FctPeerPartialMessageSupportByClientDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerPartialMessageSupportByClientDailyServiceGetResponse,
+    FctPeerPartialMessageSupportByClientDailyServiceGetError,
+    FctPeerPartialMessageSupportByClientDailyServiceGetResponse,
+    ReturnType<typeof fctPeerPartialMessageSupportByClientDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerPartialMessageSupportByClientDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerPartialMessageSupportByClientDailyServiceGetQueryKey(options),
+  });
+
+export const fctPeerPartialMessageSupportByClientHourlyServiceListQueryKey = (
+  options?: Options<FctPeerPartialMessageSupportByClientHourlyServiceListData>
+) => createQueryKey('fctPeerPartialMessageSupportByClientHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctPeerPartialMessageSupportByClientHourlyServiceListOptions = (
+  options?: Options<FctPeerPartialMessageSupportByClientHourlyServiceListData>
+) =>
+  queryOptions<
+    FctPeerPartialMessageSupportByClientHourlyServiceListResponse,
+    FctPeerPartialMessageSupportByClientHourlyServiceListError,
+    FctPeerPartialMessageSupportByClientHourlyServiceListResponse,
+    ReturnType<typeof fctPeerPartialMessageSupportByClientHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerPartialMessageSupportByClientHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerPartialMessageSupportByClientHourlyServiceListQueryKey(options),
+  });
+
+export const fctPeerPartialMessageSupportByClientHourlyServiceGetQueryKey = (
+  options: Options<FctPeerPartialMessageSupportByClientHourlyServiceGetData>
+) => createQueryKey('fctPeerPartialMessageSupportByClientHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctPeerPartialMessageSupportByClientHourlyServiceGetOptions = (
+  options: Options<FctPeerPartialMessageSupportByClientHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerPartialMessageSupportByClientHourlyServiceGetResponse,
+    FctPeerPartialMessageSupportByClientHourlyServiceGetError,
+    FctPeerPartialMessageSupportByClientHourlyServiceGetResponse,
+    ReturnType<typeof fctPeerPartialMessageSupportByClientHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerPartialMessageSupportByClientHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerPartialMessageSupportByClientHourlyServiceGetQueryKey(options),
   });
 
 export const fctPreparedBlockServiceListQueryKey = (options?: Options<FctPreparedBlockServiceListData>) =>

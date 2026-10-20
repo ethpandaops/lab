@@ -54,6 +54,7 @@ import { Route as EthereumExecutionGasProfilerRouteImport } from './routes/ether
 import { Route as EthereumEpochsEpochRouteImport } from './routes/ethereum/epochs/$epoch'
 import { Route as EthereumEntitiesEntityRouteImport } from './routes/ethereum/entities/$entity'
 import { Route as EthereumDataAvailabilityProbesRouteImport } from './routes/ethereum/data-availability/probes'
+import { Route as EthereumDataAvailabilityPartialColumnsRouteImport } from './routes/ethereum/data-availability/partial-columns'
 import { Route as EthereumDataAvailabilityCustodyRouteImport } from './routes/ethereum/data-availability/custody'
 import { Route as EthereumContractsAddressRouteImport } from './routes/ethereum/contracts/$address'
 import { Route as EthereumConsensusOverviewRouteImport } from './routes/ethereum/consensus/overview'
@@ -306,6 +307,12 @@ const EthereumDataAvailabilityProbesRoute =
     path: '/probes',
     getParentRoute: () => EthereumDataAvailabilityRoute,
   } as any)
+const EthereumDataAvailabilityPartialColumnsRoute =
+  EthereumDataAvailabilityPartialColumnsRouteImport.update({
+    id: '/partial-columns',
+    path: '/partial-columns',
+    getParentRoute: () => EthereumDataAvailabilityRoute,
+  } as any)
 const EthereumDataAvailabilityCustodyRoute =
   EthereumDataAvailabilityCustodyRouteImport.update({
     id: '/custody',
@@ -422,6 +429,7 @@ export interface FileRoutesByFullPath {
   '/ethereum/consensus/overview': typeof EthereumConsensusOverviewRoute
   '/ethereum/contracts/$address': typeof EthereumContractsAddressRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyRouteWithChildren
+  '/ethereum/data-availability/partial-columns': typeof EthereumDataAvailabilityPartialColumnsRoute
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesRouteWithChildren
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
@@ -474,6 +482,7 @@ export interface FileRoutesByTo {
   '/beacon/slot/live': typeof BeaconSlotLiveRoute
   '/ethereum/consensus/overview': typeof EthereumConsensusOverviewRoute
   '/ethereum/contracts/$address': typeof EthereumContractsAddressRoute
+  '/ethereum/data-availability/partial-columns': typeof EthereumDataAvailabilityPartialColumnsRoute
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
   '/ethereum/execution/overview': typeof EthereumExecutionOverviewRoute
@@ -532,6 +541,7 @@ export interface FileRoutesById {
   '/ethereum/consensus/overview': typeof EthereumConsensusOverviewRoute
   '/ethereum/contracts/$address': typeof EthereumContractsAddressRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyRouteWithChildren
+  '/ethereum/data-availability/partial-columns': typeof EthereumDataAvailabilityPartialColumnsRoute
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesRouteWithChildren
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
@@ -595,6 +605,7 @@ export interface FileRouteTypes {
     | '/ethereum/consensus/overview'
     | '/ethereum/contracts/$address'
     | '/ethereum/data-availability/custody'
+    | '/ethereum/data-availability/partial-columns'
     | '/ethereum/data-availability/probes'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
@@ -647,6 +658,7 @@ export interface FileRouteTypes {
     | '/beacon/slot/live'
     | '/ethereum/consensus/overview'
     | '/ethereum/contracts/$address'
+    | '/ethereum/data-availability/partial-columns'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
     | '/ethereum/execution/overview'
@@ -704,6 +716,7 @@ export interface FileRouteTypes {
     | '/ethereum/consensus/overview'
     | '/ethereum/contracts/$address'
     | '/ethereum/data-availability/custody'
+    | '/ethereum/data-availability/partial-columns'
     | '/ethereum/data-availability/probes'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
@@ -1064,6 +1077,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumDataAvailabilityProbesRouteImport
       parentRoute: typeof EthereumDataAvailabilityRoute
     }
+    '/ethereum/data-availability/partial-columns': {
+      id: '/ethereum/data-availability/partial-columns'
+      path: '/partial-columns'
+      fullPath: '/ethereum/data-availability/partial-columns'
+      preLoaderRoute: typeof EthereumDataAvailabilityPartialColumnsRouteImport
+      parentRoute: typeof EthereumDataAvailabilityRoute
+    }
     '/ethereum/data-availability/custody': {
       id: '/ethereum/data-availability/custody'
       path: '/custody'
@@ -1221,6 +1241,7 @@ const EthereumDataAvailabilityProbesRouteWithChildren =
 
 interface EthereumDataAvailabilityRouteChildren {
   EthereumDataAvailabilityCustodyRoute: typeof EthereumDataAvailabilityCustodyRouteWithChildren
+  EthereumDataAvailabilityPartialColumnsRoute: typeof EthereumDataAvailabilityPartialColumnsRoute
   EthereumDataAvailabilityProbesRoute: typeof EthereumDataAvailabilityProbesRouteWithChildren
 }
 
@@ -1228,6 +1249,8 @@ const EthereumDataAvailabilityRouteChildren: EthereumDataAvailabilityRouteChildr
   {
     EthereumDataAvailabilityCustodyRoute:
       EthereumDataAvailabilityCustodyRouteWithChildren,
+    EthereumDataAvailabilityPartialColumnsRoute:
+      EthereumDataAvailabilityPartialColumnsRoute,
     EthereumDataAvailabilityProbesRoute:
       EthereumDataAvailabilityProbesRouteWithChildren,
   }

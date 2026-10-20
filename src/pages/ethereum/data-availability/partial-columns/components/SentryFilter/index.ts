@@ -1,0 +1,1 @@
+export { SentryFilter } from './SentryFilter';

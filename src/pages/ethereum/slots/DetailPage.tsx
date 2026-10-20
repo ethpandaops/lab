@@ -51,8 +51,10 @@ import { formatGasToMillions, ATTESTATION_DEADLINE_MS } from '@/utils';
 import type { ForkVersion } from '@/utils/beacon';
 import { SlotDetailSkeleton } from './components/SlotDetailSkeleton';
 import { EngineTimingsCard } from './components/EngineTimingsCard';
+import { SlotColumnCompletionCard } from './components/SlotColumnCompletionCard';
 import { SlotProgressTimeline } from './components/SlotProgressTimeline';
 import { useSlotEngineTimings } from './hooks/useSlotEngineTimings';
+import { useSlotColumnCompletion } from './hooks/useSlotColumnCompletion';
 import { NodeResourcesPanel } from './components/NodeResources';
 
 /**
@@ -183,6 +185,8 @@ export function DetailPage(): JSX.Element {
 
   // Fetch all slot data
   const { data, isLoading, error } = useSlotDetailData(slot);
+
+  const columnCompletion = useSlotColumnCompletion(slot);
 
   // Fetch engine API timing data (reference nodes only for accurate benchmarks)
   const { data: engineTimingsData, isLoading: engineTimingsLoading } = useSlotEngineTimings({
@@ -1028,6 +1032,7 @@ export function DetailPage(): JSX.Element {
                     )}
                   </>
                 )}
+                <SlotColumnCompletionCard data={columnCompletion} />
               </div>
             </TabPanel>
 
