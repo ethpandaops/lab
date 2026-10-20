@@ -1959,6 +1959,10 @@ export type FctBlockGraffiti = {
    */
   consensus_client_version?: string;
   /**
+   * Staking entity of the proposer from dim_node (ethseer on public networks), empty when the validator has none
+   */
+  entity?: string;
+  /**
    * The epoch number containing the slot
    */
   epoch?: number;
@@ -1994,6 +1998,60 @@ export type FctBlockGraffiti = {
    * The wall clock time when the slot started
    */
   slot_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctBlockGraffitiClientByEntityDaily = {
+  /**
+   * Number of canonical blocks in the day from this entity with this consensus and execution client pair
+   */
+  block_count?: number;
+  /**
+   * Consensus client named by the block graffiti, or unknown
+   */
+  consensus_client?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Staking entity of the proposer from dim_node, empty when the validator has none
+   */
+  entity?: string;
+  /**
+   * Execution client named by the block graffiti, or unknown
+   */
+  execution_client?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctBlockGraffitiClientByEntityHourly = {
+  /**
+   * Number of canonical blocks in the hour from this entity with this consensus and execution client pair
+   */
+  block_count?: number;
+  /**
+   * Consensus client named by the block graffiti, or unknown
+   */
+  consensus_client?: string;
+  /**
+   * Staking entity of the proposer from dim_node, empty when the validator has none
+   */
+  entity?: string;
+  /**
+   * Execution client named by the block graffiti, or unknown
+   */
+  execution_client?: string;
+  /**
+   * The wall clock time at the start of the hour
+   */
+  hour_start_date_time?: number;
   /**
    * Timestamp when the record was last updated
    */
@@ -7139,6 +7197,20 @@ export type GetFctBlockFirstSeenByNodeResponse = {
 };
 
 /**
+ * Response for getting a single fct_block_graffiti_client_by_entity_daily record
+ */
+export type GetFctBlockGraffitiClientByEntityDailyResponse = {
+  item?: FctBlockGraffitiClientByEntityDaily;
+};
+
+/**
+ * Response for getting a single fct_block_graffiti_client_by_entity_hourly record
+ */
+export type GetFctBlockGraffitiClientByEntityHourlyResponse = {
+  item?: FctBlockGraffitiClientByEntityHourly;
+};
+
+/**
  * Response for getting a single fct_block_graffiti_client_daily record
  */
 export type GetFctBlockGraffitiClientDailyResponse = {
@@ -8011,6 +8083,13 @@ export type GetIntContractStorageNextTouchResponse = {
  */
 export type GetIntContractStorageReactivation1mResponse = {
   item?: IntContractStorageReactivation1m;
+};
+
+/**
+ * Response for getting a single int_contract_storage_reactivation_6m record
+ */
+export type GetIntContractStorageReactivation6mResponse = {
+  item?: IntContractStorageReactivation6m;
 };
 
 /**
@@ -9476,6 +9555,33 @@ export type IntContractStorageNextTouch = {
 };
 
 export type IntContractStorageReactivation1m = {
+  /**
+   * Count of slots being reactivated
+   */
+  active_slots?: number;
+  /**
+   * The contract address
+   */
+  address?: string;
+  /**
+   * The block number where this contract was reactivated
+   */
+  block_number?: number;
+  /**
+   * Sum of effective bytes being reactivated
+   */
+  effective_bytes?: number;
+  /**
+   * The original touch block that expired (for matching with expiry records)
+   */
+  touch_block?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntContractStorageReactivation6m = {
   /**
    * Count of slots being reactivated
    */
@@ -12203,6 +12309,34 @@ export type ListFctBlockFirstSeenByNodeResponse = {
 };
 
 /**
+ * Response for listing fct_block_graffiti_client_by_entity_daily records
+ */
+export type ListFctBlockGraffitiClientByEntityDailyResponse = {
+  /**
+   * The list of fct_block_graffiti_client_by_entity_daily.
+   */
+  fct_block_graffiti_client_by_entity_daily?: Array<FctBlockGraffitiClientByEntityDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_graffiti_client_by_entity_hourly records
+ */
+export type ListFctBlockGraffitiClientByEntityHourlyResponse = {
+  /**
+   * The list of fct_block_graffiti_client_by_entity_hourly.
+   */
+  fct_block_graffiti_client_by_entity_hourly?: Array<FctBlockGraffitiClientByEntityHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_block_graffiti_client_daily records
  */
 export type ListFctBlockGraffitiClientDailyResponse = {
@@ -13946,6 +14080,20 @@ export type ListIntContractStorageReactivation1mResponse = {
    * The list of int_contract_storage_reactivation_1m.
    */
   int_contract_storage_reactivation_1m?: Array<IntContractStorageReactivation1m>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_contract_storage_reactivation_6m records
+ */
+export type ListIntContractStorageReactivation6mResponse = {
+  /**
+   * The list of int_contract_storage_reactivation_6m.
+   */
+  int_contract_storage_reactivation_6m?: Array<IntContractStorageReactivation6m>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -32875,6 +33023,42 @@ export type FctBlockGraffitiServiceListData = {
      */
     execution_client_commit_not_in_values?: string;
     /**
+     * Staking entity of the proposer from dim_node (ethseer on public networks), empty when the validator has none (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * Staking entity of the proposer from dim_node (ethseer on public networks), empty when the validator has none (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * Staking entity of the proposer from dim_node (ethseer on public networks), empty when the validator has none (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * Staking entity of the proposer from dim_node (ethseer on public networks), empty when the validator has none (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node (ethseer on public networks), empty when the validator has none (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node (ethseer on public networks), empty when the validator has none (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node (ethseer on public networks), empty when the validator has none (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node (ethseer on public networks), empty when the validator has none (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node (ethseer on public networks), empty when the validator has none (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
      * The maximum number of fct_block_graffiti to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
@@ -32940,6 +33124,602 @@ export type FctBlockGraffitiServiceGetResponses = {
 
 export type FctBlockGraffitiServiceGetResponse =
   FctBlockGraffitiServiceGetResponses[keyof FctBlockGraffitiServiceGetResponses];
+
+export type FctBlockGraffitiClientByEntityDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: eq)
+     */
+    consensus_client_eq?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: ne)
+     */
+    consensus_client_ne?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: contains)
+     */
+    consensus_client_contains?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: starts_with)
+     */
+    consensus_client_starts_with?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: ends_with)
+     */
+    consensus_client_ends_with?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: like)
+     */
+    consensus_client_like?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: not_like)
+     */
+    consensus_client_not_like?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    consensus_client_in_values?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    consensus_client_not_in_values?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: eq)
+     */
+    execution_client_eq?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: ne)
+     */
+    execution_client_ne?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: contains)
+     */
+    execution_client_contains?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: starts_with)
+     */
+    execution_client_starts_with?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: ends_with)
+     */
+    execution_client_ends_with?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: like)
+     */
+    execution_client_like?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: not_like)
+     */
+    execution_client_not_like?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    execution_client_in_values?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    execution_client_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of canonical blocks in the day from this entity with this consensus and execution client pair (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of canonical blocks in the day from this entity with this consensus and execution client pair (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of canonical blocks in the day from this entity with this consensus and execution client pair (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of canonical blocks in the day from this entity with this consensus and execution client pair (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of canonical blocks in the day from this entity with this consensus and execution client pair (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of canonical blocks in the day from this entity with this consensus and execution client pair (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of canonical blocks in the day from this entity with this consensus and execution client pair (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of canonical blocks in the day from this entity with this consensus and execution client pair (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of canonical blocks in the day from this entity with this consensus and execution client pair (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of canonical blocks in the day from this entity with this consensus and execution client pair (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_graffiti_client_by_entity_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockGraffitiClientByEntityDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_graffiti_client_by_entity_daily';
+};
+
+export type FctBlockGraffitiClientByEntityDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientByEntityDailyServiceListError =
+  FctBlockGraffitiClientByEntityDailyServiceListErrors[keyof FctBlockGraffitiClientByEntityDailyServiceListErrors];
+
+export type FctBlockGraffitiClientByEntityDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockGraffitiClientByEntityDailyResponse;
+};
+
+export type FctBlockGraffitiClientByEntityDailyServiceListResponse =
+  FctBlockGraffitiClientByEntityDailyServiceListResponses[keyof FctBlockGraffitiClientByEntityDailyServiceListResponses];
+
+export type FctBlockGraffitiClientByEntityDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_graffiti_client_by_entity_daily/{day_start_date}';
+};
+
+export type FctBlockGraffitiClientByEntityDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientByEntityDailyServiceGetError =
+  FctBlockGraffitiClientByEntityDailyServiceGetErrors[keyof FctBlockGraffitiClientByEntityDailyServiceGetErrors];
+
+export type FctBlockGraffitiClientByEntityDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockGraffitiClientByEntityDailyResponse;
+};
+
+export type FctBlockGraffitiClientByEntityDailyServiceGetResponse =
+  FctBlockGraffitiClientByEntityDailyServiceGetResponses[keyof FctBlockGraffitiClientByEntityDailyServiceGetResponses];
+
+export type FctBlockGraffitiClientByEntityHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time at the start of the hour (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time at the start of the hour (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * The wall clock time at the start of the hour (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: eq)
+     */
+    consensus_client_eq?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: ne)
+     */
+    consensus_client_ne?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: contains)
+     */
+    consensus_client_contains?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: starts_with)
+     */
+    consensus_client_starts_with?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: ends_with)
+     */
+    consensus_client_ends_with?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: like)
+     */
+    consensus_client_like?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: not_like)
+     */
+    consensus_client_not_like?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    consensus_client_in_values?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    consensus_client_not_in_values?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: eq)
+     */
+    execution_client_eq?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: ne)
+     */
+    execution_client_ne?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: contains)
+     */
+    execution_client_contains?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: starts_with)
+     */
+    execution_client_starts_with?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: ends_with)
+     */
+    execution_client_ends_with?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: like)
+     */
+    execution_client_like?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: not_like)
+     */
+    execution_client_not_like?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    execution_client_in_values?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    execution_client_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of canonical blocks in the hour from this entity with this consensus and execution client pair (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of canonical blocks in the hour from this entity with this consensus and execution client pair (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of canonical blocks in the hour from this entity with this consensus and execution client pair (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of canonical blocks in the hour from this entity with this consensus and execution client pair (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of canonical blocks in the hour from this entity with this consensus and execution client pair (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of canonical blocks in the hour from this entity with this consensus and execution client pair (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of canonical blocks in the hour from this entity with this consensus and execution client pair (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of canonical blocks in the hour from this entity with this consensus and execution client pair (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of canonical blocks in the hour from this entity with this consensus and execution client pair (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of canonical blocks in the hour from this entity with this consensus and execution client pair (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_graffiti_client_by_entity_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockGraffitiClientByEntityHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_graffiti_client_by_entity_hourly';
+};
+
+export type FctBlockGraffitiClientByEntityHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientByEntityHourlyServiceListError =
+  FctBlockGraffitiClientByEntityHourlyServiceListErrors[keyof FctBlockGraffitiClientByEntityHourlyServiceListErrors];
+
+export type FctBlockGraffitiClientByEntityHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockGraffitiClientByEntityHourlyResponse;
+};
+
+export type FctBlockGraffitiClientByEntityHourlyServiceListResponse =
+  FctBlockGraffitiClientByEntityHourlyServiceListResponses[keyof FctBlockGraffitiClientByEntityHourlyServiceListResponses];
+
+export type FctBlockGraffitiClientByEntityHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time at the start of the hour
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_graffiti_client_by_entity_hourly/{hour_start_date_time}';
+};
+
+export type FctBlockGraffitiClientByEntityHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientByEntityHourlyServiceGetError =
+  FctBlockGraffitiClientByEntityHourlyServiceGetErrors[keyof FctBlockGraffitiClientByEntityHourlyServiceGetErrors];
+
+export type FctBlockGraffitiClientByEntityHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockGraffitiClientByEntityHourlyResponse;
+};
+
+export type FctBlockGraffitiClientByEntityHourlyServiceGetResponse =
+  FctBlockGraffitiClientByEntityHourlyServiceGetResponses[keyof FctBlockGraffitiClientByEntityHourlyServiceGetResponses];
 
 export type FctBlockGraffitiClientDailyServiceListData = {
   body?: never;
@@ -91347,6 +92127,314 @@ export type IntContractStorageReactivation1mServiceGetResponses = {
 
 export type IntContractStorageReactivation1mServiceGetResponse =
   IntContractStorageReactivation1mServiceGetResponses[keyof IntContractStorageReactivation1mServiceGetResponses];
+
+export type IntContractStorageReactivation6mServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number where this contract was reactivated (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number where this contract was reactivated (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number where this contract was reactivated (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number where this contract was reactivated (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number where this contract was reactivated (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number where this contract was reactivated (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number where this contract was reactivated (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number where this contract was reactivated (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number where this contract was reactivated (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number where this contract was reactivated (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * The contract address (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * The contract address (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * The contract address (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * The contract address (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * The contract address (filter: like)
+     */
+    address_like?: string;
+    /**
+     * The contract address (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * The contract address (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * The contract address (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: eq)
+     */
+    touch_block_eq?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: ne)
+     */
+    touch_block_ne?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lt)
+     */
+    touch_block_lt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: lte)
+     */
+    touch_block_lte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gt)
+     */
+    touch_block_gt?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: gte)
+     */
+    touch_block_gte?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_min)
+     */
+    touch_block_between_min?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: between_max_value)
+     */
+    touch_block_between_max_value?: number;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: in_values) (comma-separated list)
+     */
+    touch_block_in_values?: string;
+    /**
+     * The original touch block that expired (for matching with expiry records) (filter: not_in_values) (comma-separated list)
+     */
+    touch_block_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Count of slots being reactivated (filter: eq)
+     */
+    active_slots_eq?: number;
+    /**
+     * Count of slots being reactivated (filter: ne)
+     */
+    active_slots_ne?: number;
+    /**
+     * Count of slots being reactivated (filter: lt)
+     */
+    active_slots_lt?: number;
+    /**
+     * Count of slots being reactivated (filter: lte)
+     */
+    active_slots_lte?: number;
+    /**
+     * Count of slots being reactivated (filter: gt)
+     */
+    active_slots_gt?: number;
+    /**
+     * Count of slots being reactivated (filter: gte)
+     */
+    active_slots_gte?: number;
+    /**
+     * Count of slots being reactivated (filter: between_min)
+     */
+    active_slots_between_min?: number;
+    /**
+     * Count of slots being reactivated (filter: between_max_value)
+     */
+    active_slots_between_max_value?: number;
+    /**
+     * Count of slots being reactivated (filter: in_values) (comma-separated list)
+     */
+    active_slots_in_values?: string;
+    /**
+     * Count of slots being reactivated (filter: not_in_values) (comma-separated list)
+     */
+    active_slots_not_in_values?: string;
+    /**
+     * Sum of effective bytes being reactivated (filter: eq)
+     */
+    effective_bytes_eq?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: ne)
+     */
+    effective_bytes_ne?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: lt)
+     */
+    effective_bytes_lt?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: lte)
+     */
+    effective_bytes_lte?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: gt)
+     */
+    effective_bytes_gt?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: gte)
+     */
+    effective_bytes_gte?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: between_min)
+     */
+    effective_bytes_between_min?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: between_max_value)
+     */
+    effective_bytes_between_max_value?: number;
+    /**
+     * Sum of effective bytes being reactivated (filter: in_values) (comma-separated list)
+     */
+    effective_bytes_in_values?: string;
+    /**
+     * Sum of effective bytes being reactivated (filter: not_in_values) (comma-separated list)
+     */
+    effective_bytes_not_in_values?: string;
+    /**
+     * The maximum number of int_contract_storage_reactivation_6m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntContractStorageReactivation6m` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_contract_storage_reactivation_6m';
+};
+
+export type IntContractStorageReactivation6mServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageReactivation6mServiceListError =
+  IntContractStorageReactivation6mServiceListErrors[keyof IntContractStorageReactivation6mServiceListErrors];
+
+export type IntContractStorageReactivation6mServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntContractStorageReactivation6mResponse;
+};
+
+export type IntContractStorageReactivation6mServiceListResponse =
+  IntContractStorageReactivation6mServiceListResponses[keyof IntContractStorageReactivation6mServiceListResponses];
+
+export type IntContractStorageReactivation6mServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number where this contract was reactivated
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_contract_storage_reactivation_6m/{block_number}';
+};
+
+export type IntContractStorageReactivation6mServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntContractStorageReactivation6mServiceGetError =
+  IntContractStorageReactivation6mServiceGetErrors[keyof IntContractStorageReactivation6mServiceGetErrors];
+
+export type IntContractStorageReactivation6mServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntContractStorageReactivation6mResponse;
+};
+
+export type IntContractStorageReactivation6mServiceGetResponse =
+  IntContractStorageReactivation6mServiceGetResponses[keyof IntContractStorageReactivation6mServiceGetResponses];
 
 export type IntContractStorageReactivation12mServiceListData = {
   body?: never;

@@ -4,11 +4,15 @@ import {
   buildShareChartConfig,
   computeCoverage,
   dailyDateValues,
+  entityLabel,
+  entityQuery,
+  filterRecords,
   formatClientName,
   normaliseClient,
   summariseClients,
   summarisePairs,
   toClientCountRecords,
+  toEntityOptions,
   type ClientCountRecord,
 } from './client-share';
 
@@ -122,5 +126,60 @@ describe('formatClientName', () => {
 describe('dailyDateValues', () => {
   it('should list the last N UTC days ending today', () => {
     expect(dailyDateValues(3, Date.UTC(2026, 9, 19, 7, 0, 0))).toBe('2026-10-17,2026-10-18,2026-10-19');
+  });
+});
+
+describe('filterRecords', () => {
+  it('returns every record without filters', () => {
+    expect(filterRecords(records, {})).toBe(records);
+  });
+
+  it('applies both client filters', () => {
+    const filtered = filterRecords(records, { consensusClient: 'prysm', executionClient: 'geth' });
+    expect(filtered).toEqual([records[4]]);
+  });
+
+  it('skips the filter of the excepted layer', () => {
+    const filtered = filterRecords(records, { consensusClient: 'prysm', executionClient: 'geth' }, 'consensus');
+    expect(filtered.map(r => r.consensusClient)).toEqual(['lighthouse', 'prysm']);
+    expect(filterRecords(records, { consensusClient: 'prysm' }, 'consensus')).toBe(records);
+  });
+});
+
+describe('toEntityOptions', () => {
+  it('uses each entity latest day and sorts by validators', () => {
+    const options = toEntityOptions([
+      { day_start_date: '2026-10-19', entity: 'lido', validator_count: 90 },
+      { day_start_date: '2026-10-20', entity: 'lido', validator_count: 100 },
+      { day_start_date: '2026-10-19', entity: 'kiln', validator_count: 120 },
+      { day_start_date: '2026-10-20', entity: 'coinbase', validator_count: 100 },
+      { day_start_date: '2026-10-20', entity: '', validator_count: 500 },
+      { day_start_date: '2026-10-20', entity: 'unknown', validator_count: 400 },
+    ]);
+    expect(options).toEqual([
+      { entity: 'kiln', validators: 120 },
+      { entity: 'coinbase', validators: 100 },
+      { entity: 'lido', validators: 100 },
+    ]);
+  });
+});
+
+describe('entity groups', () => {
+  it('adds a group for entities sharing a suffix', () => {
+    const options = toEntityOptions([
+      { day_start_date: '2026-10-20', entity: 'kiln_lido', validator_count: 50 },
+      { day_start_date: '2026-10-20', entity: 'p2porg_lido', validator_count: 40 },
+      { day_start_date: '2026-10-20', entity: 'lido', validator_count: 5 },
+      { day_start_date: '2026-10-20', entity: 'kiln', validator_count: 60 },
+    ]);
+    expect(options[0]).toEqual({ entity: '*lido', validators: 95, label: 'Lido (all node operators)' });
+    expect(options.map(o => o.entity)).toEqual(['*lido', 'kiln', 'kiln_lido', 'p2porg_lido', 'lido']);
+  });
+
+  it('builds the API filter and label for a value', () => {
+    expect(entityQuery('coinbase')).toEqual({ entity_eq: 'coinbase' });
+    expect(entityQuery('*lido')).toEqual({ entity_ends_with: 'lido' });
+    expect(entityLabel('coinbase')).toBe('coinbase');
+    expect(entityLabel('*lido')).toBe('Lido (all node operators)');
   });
 });

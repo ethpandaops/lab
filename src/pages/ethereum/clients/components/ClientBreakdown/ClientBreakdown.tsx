@@ -13,13 +13,13 @@ export interface ClientBreakdownProps {
   summaries: ClientSummary[];
   /** Show shares of identified blocks instead of all blocks */
   identifiedOnly: boolean;
-  /** Client currently used to filter the blocks table */
+  /** Client the page is filtered by */
   selectedClient?: string;
-  /** Called with a client to filter the blocks table, or undefined to clear */
+  /** Called with a client to filter the page by, or undefined to clear */
   onSelect: (client: string | undefined) => void;
 }
 
-/** Ranked clients with share bars; rows filter the blocks table and unknown keeps its own row. */
+/** Ranked clients with share bars; rows filter the page and unknown keeps its own row. */
 export function ClientBreakdown({
   title,
   summaries,

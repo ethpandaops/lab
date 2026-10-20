@@ -4,6 +4,7 @@ import { fctBlockGraffitiServiceList } from '@/api/sdk.gen';
 import type { FctBlockGraffiti } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { BLOCKS_PAGE_SIZE } from '../constants';
+import { entityQuery } from '../utils/client-share';
 
 export interface UseGraffitiBlocksOptions {
   /** Earliest slot start (unix seconds) to include */
@@ -12,6 +13,8 @@ export interface UseGraffitiBlocksOptions {
   consensusClient?: string;
   /** Only blocks whose graffiti names this execution client */
   executionClient?: string;
+  /** Only blocks proposed by this entity or entity group */
+  entity?: string;
 }
 
 export interface UseGraffitiBlocksResult {
@@ -30,11 +33,12 @@ export function useGraffitiBlocks({
   since,
   consensusClient,
   executionClient,
+  entity,
 }: UseGraffitiBlocksOptions): UseGraffitiBlocksResult {
   const { currentNetwork } = useNetwork();
 
   const query = useInfiniteQuery({
-    queryKey: ['graffiti-clients', 'blocks', currentNetwork?.name, since, consensusClient, executionClient],
+    queryKey: ['graffiti-clients', 'blocks', currentNetwork?.name, since, consensusClient, executionClient, entity],
     queryFn: async ({ pageParam, signal }) => {
       const response = await fctBlockGraffitiServiceList({
         query: {
@@ -43,6 +47,7 @@ export function useGraffitiBlocks({
           page_size: BLOCKS_PAGE_SIZE,
           ...(consensusClient && { consensus_client_eq: consensusClient }),
           ...(executionClient && { execution_client_eq: executionClient }),
+          ...(entity && entityQuery(entity)),
           ...(pageParam && { page_token: pageParam }),
         },
         signal,

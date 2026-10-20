@@ -8,10 +8,12 @@ export type TimePeriod = '24h' | '7d' | '30d' | '90d' | '1y' | 'all';
 export const clientsSearchSchema = z.object({
   /** Time period */
   t: z.enum(['24h', '7d', '30d', '90d', '1y', 'all']).optional(),
-  /** Consensus client filter for the blocks table */
+  /** Consensus client filter */
   cl: z.string().optional(),
-  /** Execution client filter for the blocks table */
+  /** Execution client filter */
   el: z.string().optional(),
+  /** Proposer entity filter */
+  entity: z.string().optional(),
   /** Show shares of identified blocks only */
   identified: z.boolean().optional(),
 });
@@ -45,6 +47,9 @@ export const PAGE_SIZE = 10_000;
 
 /** Page size for the blocks table */
 export const BLOCKS_PAGE_SIZE = 25;
+
+/** Validator status whose per-entity counts list the entities to filter by */
+export const ENTITY_OPTIONS_STATUS = 'active_ongoing';
 
 /** Table that holds one row per block, used for bounds and the blocks table */
 export const BLOCK_GRAFFITI_TABLE = 'fct_block_graffiti';

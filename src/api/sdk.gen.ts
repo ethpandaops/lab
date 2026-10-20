@@ -225,6 +225,18 @@ import type {
   FctBlockFirstSeenByNodeServiceListData,
   FctBlockFirstSeenByNodeServiceListErrors,
   FctBlockFirstSeenByNodeServiceListResponses,
+  FctBlockGraffitiClientByEntityDailyServiceGetData,
+  FctBlockGraffitiClientByEntityDailyServiceGetErrors,
+  FctBlockGraffitiClientByEntityDailyServiceGetResponses,
+  FctBlockGraffitiClientByEntityDailyServiceListData,
+  FctBlockGraffitiClientByEntityDailyServiceListErrors,
+  FctBlockGraffitiClientByEntityDailyServiceListResponses,
+  FctBlockGraffitiClientByEntityHourlyServiceGetData,
+  FctBlockGraffitiClientByEntityHourlyServiceGetErrors,
+  FctBlockGraffitiClientByEntityHourlyServiceGetResponses,
+  FctBlockGraffitiClientByEntityHourlyServiceListData,
+  FctBlockGraffitiClientByEntityHourlyServiceListErrors,
+  FctBlockGraffitiClientByEntityHourlyServiceListResponses,
   FctBlockGraffitiClientDailyServiceGetData,
   FctBlockGraffitiClientDailyServiceGetErrors,
   FctBlockGraffitiClientDailyServiceGetResponses,
@@ -993,6 +1005,12 @@ import type {
   IntContractStorageReactivation24mServiceListData,
   IntContractStorageReactivation24mServiceListErrors,
   IntContractStorageReactivation24mServiceListResponses,
+  IntContractStorageReactivation6mServiceGetData,
+  IntContractStorageReactivation6mServiceGetErrors,
+  IntContractStorageReactivation6mServiceGetResponses,
+  IntContractStorageReactivation6mServiceListData,
+  IntContractStorageReactivation6mServiceListErrors,
+  IntContractStorageReactivation6mServiceListResponses,
   IntContractStorageStateByAddressServiceGetData,
   IntContractStorageStateByAddressServiceGetErrors,
   IntContractStorageStateByAddressServiceGetResponses,
@@ -1425,6 +1443,14 @@ import {
   zFctBlockFirstSeenByNodeServiceGetResponse,
   zFctBlockFirstSeenByNodeServiceListData,
   zFctBlockFirstSeenByNodeServiceListResponse,
+  zFctBlockGraffitiClientByEntityDailyServiceGetData,
+  zFctBlockGraffitiClientByEntityDailyServiceGetResponse,
+  zFctBlockGraffitiClientByEntityDailyServiceListData,
+  zFctBlockGraffitiClientByEntityDailyServiceListResponse,
+  zFctBlockGraffitiClientByEntityHourlyServiceGetData,
+  zFctBlockGraffitiClientByEntityHourlyServiceGetResponse,
+  zFctBlockGraffitiClientByEntityHourlyServiceListData,
+  zFctBlockGraffitiClientByEntityHourlyServiceListResponse,
   zFctBlockGraffitiClientDailyServiceGetData,
   zFctBlockGraffitiClientDailyServiceGetResponse,
   zFctBlockGraffitiClientDailyServiceListData,
@@ -1937,6 +1963,10 @@ import {
   zIntContractStorageReactivation24mServiceGetResponse,
   zIntContractStorageReactivation24mServiceListData,
   zIntContractStorageReactivation24mServiceListResponse,
+  zIntContractStorageReactivation6mServiceGetData,
+  zIntContractStorageReactivation6mServiceGetResponse,
+  zIntContractStorageReactivation6mServiceListData,
+  zIntContractStorageReactivation6mServiceListResponse,
   zIntContractStorageStateByAddressServiceGetData,
   zIntContractStorageStateByAddressServiceGetResponse,
   zIntContractStorageStateByAddressServiceListData,
@@ -3594,6 +3624,82 @@ export const fctBlockGraffitiServiceGet = <ThrowOnError extends boolean = false>
     requestValidator: async data => await zFctBlockGraffitiServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockGraffitiServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_graffiti/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockGraffitiClientByEntityDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockGraffitiClientByEntityDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockGraffitiClientByEntityDailyServiceListResponses,
+    FctBlockGraffitiClientByEntityDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientByEntityDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientByEntityDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_by_entity_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockGraffitiClientByEntityDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockGraffitiClientByEntityDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockGraffitiClientByEntityDailyServiceGetResponses,
+    FctBlockGraffitiClientByEntityDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientByEntityDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientByEntityDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_by_entity_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockGraffitiClientByEntityHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockGraffitiClientByEntityHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockGraffitiClientByEntityHourlyServiceListResponses,
+    FctBlockGraffitiClientByEntityHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientByEntityHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientByEntityHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_by_entity_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctBlockGraffitiClientByEntityHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockGraffitiClientByEntityHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockGraffitiClientByEntityHourlyServiceGetResponses,
+    FctBlockGraffitiClientByEntityHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientByEntityHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientByEntityHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_by_entity_hourly/{hour_start_date_time}',
     ...options,
   });
 
@@ -8245,6 +8351,44 @@ export const intContractStorageReactivation1mServiceGet = <ThrowOnError extends 
     requestValidator: async data => await zIntContractStorageReactivation1mServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntContractStorageReactivation1mServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_contract_storage_reactivation_1m/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intContractStorageReactivation6mServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntContractStorageReactivation6mServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntContractStorageReactivation6mServiceListResponses,
+    IntContractStorageReactivation6mServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntContractStorageReactivation6mServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntContractStorageReactivation6mServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_contract_storage_reactivation_6m',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intContractStorageReactivation6mServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntContractStorageReactivation6mServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntContractStorageReactivation6mServiceGetResponses,
+    IntContractStorageReactivation6mServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntContractStorageReactivation6mServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntContractStorageReactivation6mServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_contract_storage_reactivation_6m/{block_number}',
     ...options,
   });
 
