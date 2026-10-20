@@ -172,7 +172,7 @@ describe('entity groups', () => {
       { day_start_date: '2026-10-20', entity: 'lido', validator_count: 5 },
       { day_start_date: '2026-10-20', entity: 'kiln', validator_count: 60 },
     ]);
-    expect(options[0]).toEqual({ entity: '*lido', validators: 95, label: 'Lido (all node operators)' });
+    expect(options[0]).toEqual({ entity: '*lido', validators: 95, label: 'Lido (all operators)' });
     expect(options.map(o => o.entity)).toEqual(['*lido', 'kiln', 'kiln_lido', 'p2porg_lido', 'lido']);
   });
 
@@ -180,6 +180,6 @@ describe('entity groups', () => {
     expect(entityQuery('coinbase')).toEqual({ entity_eq: 'coinbase' });
     expect(entityQuery('*lido')).toEqual({ entity_ends_with: 'lido' });
     expect(entityLabel('coinbase')).toBe('coinbase');
-    expect(entityLabel('*lido')).toBe('Lido (all node operators)');
+    expect(entityLabel('*lido')).toBe('Lido (all operators)');
   });
 });

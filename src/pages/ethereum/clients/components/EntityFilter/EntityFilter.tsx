@@ -35,7 +35,7 @@ export function EntityFilter({ value, onChange, options, disabled = false }: Ent
       disabled={disabled}
       immediate
     >
-      <div className="relative w-full sm:w-56">
+      <div className="relative w-full sm:w-60">
         <ComboboxInput
           aria-label="Entity"
           placeholder="All entities"
