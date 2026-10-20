@@ -77,6 +77,10 @@ export type DimClientRelease = {
    */
   release_date?: number | null;
   /**
+   * GitHub repository the release tags come from, e.g. sigp/lighthouse
+   */
+  repository?: string;
+  /**
    * Git tag of the release in the client repository
    */
   tag?: string;
@@ -8010,13 +8014,6 @@ export type GetIntContractStorageReactivation1mResponse = {
 };
 
 /**
- * Response for getting a single int_contract_storage_reactivation_6m record
- */
-export type GetIntContractStorageReactivation6mResponse = {
-  item?: IntContractStorageReactivation6m;
-};
-
-/**
  * Response for getting a single int_contract_storage_reactivation_12m record
  */
 export type GetIntContractStorageReactivation12mResponse = {
@@ -9479,33 +9476,6 @@ export type IntContractStorageNextTouch = {
 };
 
 export type IntContractStorageReactivation1m = {
-  /**
-   * Count of slots being reactivated
-   */
-  active_slots?: number;
-  /**
-   * The contract address
-   */
-  address?: string;
-  /**
-   * The block number where this contract was reactivated
-   */
-  block_number?: number;
-  /**
-   * Sum of effective bytes being reactivated
-   */
-  effective_bytes?: number;
-  /**
-   * The original touch block that expired (for matching with expiry records)
-   */
-  touch_block?: number;
-  /**
-   * Timestamp when the record was last updated
-   */
-  updated_date_time?: number;
-};
-
-export type IntContractStorageReactivation6m = {
   /**
    * Count of slots being reactivated
    */
@@ -13983,20 +13953,6 @@ export type ListIntContractStorageReactivation1mResponse = {
 };
 
 /**
- * Response for listing int_contract_storage_reactivation_6m records
- */
-export type ListIntContractStorageReactivation6mResponse = {
-  /**
-   * The list of int_contract_storage_reactivation_6m.
-   */
-  int_contract_storage_reactivation_6m?: Array<IntContractStorageReactivation6m>;
-  /**
-   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
-   */
-  next_page_token?: string;
-};
-
-/**
  * Response for listing int_contract_storage_reactivation_12m records
  */
 export type ListIntContractStorageReactivation12mResponse = {
@@ -15582,6 +15538,42 @@ export type DimClientReleaseServiceListData = {
      * Whether the release is a pre-release (GitHub flag, or a pre-release suffix on the version) (filter: ne)
      */
     prerelease_ne?: boolean;
+    /**
+     * GitHub repository the release tags come from, e.g. sigp/lighthouse (filter: eq)
+     */
+    repository_eq?: string;
+    /**
+     * GitHub repository the release tags come from, e.g. sigp/lighthouse (filter: ne)
+     */
+    repository_ne?: string;
+    /**
+     * GitHub repository the release tags come from, e.g. sigp/lighthouse (filter: contains)
+     */
+    repository_contains?: string;
+    /**
+     * GitHub repository the release tags come from, e.g. sigp/lighthouse (filter: starts_with)
+     */
+    repository_starts_with?: string;
+    /**
+     * GitHub repository the release tags come from, e.g. sigp/lighthouse (filter: ends_with)
+     */
+    repository_ends_with?: string;
+    /**
+     * GitHub repository the release tags come from, e.g. sigp/lighthouse (filter: like)
+     */
+    repository_like?: string;
+    /**
+     * GitHub repository the release tags come from, e.g. sigp/lighthouse (filter: not_like)
+     */
+    repository_not_like?: string;
+    /**
+     * GitHub repository the release tags come from, e.g. sigp/lighthouse (filter: in_values) (comma-separated list)
+     */
+    repository_in_values?: string;
+    /**
+     * GitHub repository the release tags come from, e.g. sigp/lighthouse (filter: not_in_values) (comma-separated list)
+     */
+    repository_not_in_values?: string;
     /**
      * The maximum number of dim_client_release to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
@@ -91355,314 +91347,6 @@ export type IntContractStorageReactivation1mServiceGetResponses = {
 
 export type IntContractStorageReactivation1mServiceGetResponse =
   IntContractStorageReactivation1mServiceGetResponses[keyof IntContractStorageReactivation1mServiceGetResponses];
-
-export type IntContractStorageReactivation6mServiceListData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * The block number where this contract was reactivated (filter: eq)
-     */
-    block_number_eq?: number;
-    /**
-     * The block number where this contract was reactivated (filter: ne)
-     */
-    block_number_ne?: number;
-    /**
-     * The block number where this contract was reactivated (filter: lt)
-     */
-    block_number_lt?: number;
-    /**
-     * The block number where this contract was reactivated (filter: lte)
-     */
-    block_number_lte?: number;
-    /**
-     * The block number where this contract was reactivated (filter: gt)
-     */
-    block_number_gt?: number;
-    /**
-     * The block number where this contract was reactivated (filter: gte)
-     */
-    block_number_gte?: number;
-    /**
-     * The block number where this contract was reactivated (filter: between_min)
-     */
-    block_number_between_min?: number;
-    /**
-     * The block number where this contract was reactivated (filter: between_max_value)
-     */
-    block_number_between_max_value?: number;
-    /**
-     * The block number where this contract was reactivated (filter: in_values) (comma-separated list)
-     */
-    block_number_in_values?: string;
-    /**
-     * The block number where this contract was reactivated (filter: not_in_values) (comma-separated list)
-     */
-    block_number_not_in_values?: string;
-    /**
-     * The contract address (filter: eq)
-     */
-    address_eq?: string;
-    /**
-     * The contract address (filter: ne)
-     */
-    address_ne?: string;
-    /**
-     * The contract address (filter: contains)
-     */
-    address_contains?: string;
-    /**
-     * The contract address (filter: starts_with)
-     */
-    address_starts_with?: string;
-    /**
-     * The contract address (filter: ends_with)
-     */
-    address_ends_with?: string;
-    /**
-     * The contract address (filter: like)
-     */
-    address_like?: string;
-    /**
-     * The contract address (filter: not_like)
-     */
-    address_not_like?: string;
-    /**
-     * The contract address (filter: in_values) (comma-separated list)
-     */
-    address_in_values?: string;
-    /**
-     * The contract address (filter: not_in_values) (comma-separated list)
-     */
-    address_not_in_values?: string;
-    /**
-     * The original touch block that expired (for matching with expiry records) (filter: eq)
-     */
-    touch_block_eq?: number;
-    /**
-     * The original touch block that expired (for matching with expiry records) (filter: ne)
-     */
-    touch_block_ne?: number;
-    /**
-     * The original touch block that expired (for matching with expiry records) (filter: lt)
-     */
-    touch_block_lt?: number;
-    /**
-     * The original touch block that expired (for matching with expiry records) (filter: lte)
-     */
-    touch_block_lte?: number;
-    /**
-     * The original touch block that expired (for matching with expiry records) (filter: gt)
-     */
-    touch_block_gt?: number;
-    /**
-     * The original touch block that expired (for matching with expiry records) (filter: gte)
-     */
-    touch_block_gte?: number;
-    /**
-     * The original touch block that expired (for matching with expiry records) (filter: between_min)
-     */
-    touch_block_between_min?: number;
-    /**
-     * The original touch block that expired (for matching with expiry records) (filter: between_max_value)
-     */
-    touch_block_between_max_value?: number;
-    /**
-     * The original touch block that expired (for matching with expiry records) (filter: in_values) (comma-separated list)
-     */
-    touch_block_in_values?: string;
-    /**
-     * The original touch block that expired (for matching with expiry records) (filter: not_in_values) (comma-separated list)
-     */
-    touch_block_not_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: eq)
-     */
-    updated_date_time_eq?: number;
-    /**
-     * Timestamp when the record was last updated (filter: ne)
-     */
-    updated_date_time_ne?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lt)
-     */
-    updated_date_time_lt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lte)
-     */
-    updated_date_time_lte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gt)
-     */
-    updated_date_time_gt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gte)
-     */
-    updated_date_time_gte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_min)
-     */
-    updated_date_time_between_min?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_max_value)
-     */
-    updated_date_time_between_max_value?: number;
-    /**
-     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
-     */
-    updated_date_time_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
-     */
-    updated_date_time_not_in_values?: string;
-    /**
-     * Count of slots being reactivated (filter: eq)
-     */
-    active_slots_eq?: number;
-    /**
-     * Count of slots being reactivated (filter: ne)
-     */
-    active_slots_ne?: number;
-    /**
-     * Count of slots being reactivated (filter: lt)
-     */
-    active_slots_lt?: number;
-    /**
-     * Count of slots being reactivated (filter: lte)
-     */
-    active_slots_lte?: number;
-    /**
-     * Count of slots being reactivated (filter: gt)
-     */
-    active_slots_gt?: number;
-    /**
-     * Count of slots being reactivated (filter: gte)
-     */
-    active_slots_gte?: number;
-    /**
-     * Count of slots being reactivated (filter: between_min)
-     */
-    active_slots_between_min?: number;
-    /**
-     * Count of slots being reactivated (filter: between_max_value)
-     */
-    active_slots_between_max_value?: number;
-    /**
-     * Count of slots being reactivated (filter: in_values) (comma-separated list)
-     */
-    active_slots_in_values?: string;
-    /**
-     * Count of slots being reactivated (filter: not_in_values) (comma-separated list)
-     */
-    active_slots_not_in_values?: string;
-    /**
-     * Sum of effective bytes being reactivated (filter: eq)
-     */
-    effective_bytes_eq?: number;
-    /**
-     * Sum of effective bytes being reactivated (filter: ne)
-     */
-    effective_bytes_ne?: number;
-    /**
-     * Sum of effective bytes being reactivated (filter: lt)
-     */
-    effective_bytes_lt?: number;
-    /**
-     * Sum of effective bytes being reactivated (filter: lte)
-     */
-    effective_bytes_lte?: number;
-    /**
-     * Sum of effective bytes being reactivated (filter: gt)
-     */
-    effective_bytes_gt?: number;
-    /**
-     * Sum of effective bytes being reactivated (filter: gte)
-     */
-    effective_bytes_gte?: number;
-    /**
-     * Sum of effective bytes being reactivated (filter: between_min)
-     */
-    effective_bytes_between_min?: number;
-    /**
-     * Sum of effective bytes being reactivated (filter: between_max_value)
-     */
-    effective_bytes_between_max_value?: number;
-    /**
-     * Sum of effective bytes being reactivated (filter: in_values) (comma-separated list)
-     */
-    effective_bytes_in_values?: string;
-    /**
-     * Sum of effective bytes being reactivated (filter: not_in_values) (comma-separated list)
-     */
-    effective_bytes_not_in_values?: string;
-    /**
-     * The maximum number of int_contract_storage_reactivation_6m to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
-     */
-    page_size?: number;
-    /**
-     * A page token, received from a previous `ListIntContractStorageReactivation6m` call. Provide this to retrieve the subsequent page.
-     */
-    page_token?: string;
-    /**
-     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
-     */
-    order_by?: string;
-  };
-  url: '/api/v1/int_contract_storage_reactivation_6m';
-};
-
-export type IntContractStorageReactivation6mServiceListErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type IntContractStorageReactivation6mServiceListError =
-  IntContractStorageReactivation6mServiceListErrors[keyof IntContractStorageReactivation6mServiceListErrors];
-
-export type IntContractStorageReactivation6mServiceListResponses = {
-  /**
-   * OK
-   */
-  200: ListIntContractStorageReactivation6mResponse;
-};
-
-export type IntContractStorageReactivation6mServiceListResponse =
-  IntContractStorageReactivation6mServiceListResponses[keyof IntContractStorageReactivation6mServiceListResponses];
-
-export type IntContractStorageReactivation6mServiceGetData = {
-  body?: never;
-  path: {
-    /**
-     * The block number where this contract was reactivated
-     */
-    block_number: number;
-  };
-  query?: never;
-  url: '/api/v1/int_contract_storage_reactivation_6m/{block_number}';
-};
-
-export type IntContractStorageReactivation6mServiceGetErrors = {
-  /**
-   * Default error response
-   */
-  default: Status;
-};
-
-export type IntContractStorageReactivation6mServiceGetError =
-  IntContractStorageReactivation6mServiceGetErrors[keyof IntContractStorageReactivation6mServiceGetErrors];
-
-export type IntContractStorageReactivation6mServiceGetResponses = {
-  /**
-   * OK
-   */
-  200: GetIntContractStorageReactivation6mResponse;
-};
-
-export type IntContractStorageReactivation6mServiceGetResponse =
-  IntContractStorageReactivation6mServiceGetResponses[keyof IntContractStorageReactivation6mServiceGetResponses];
 
 export type IntContractStorageReactivation12mServiceListData = {
   body?: never;

@@ -334,8 +334,6 @@ import {
   intContractStorageReactivation1mServiceList,
   intContractStorageReactivation24mServiceGet,
   intContractStorageReactivation24mServiceList,
-  intContractStorageReactivation6mServiceGet,
-  intContractStorageReactivation6mServiceList,
   intContractStorageStateByAddressServiceGet,
   intContractStorageStateByAddressServiceList,
   intContractStorageStateByBlockServiceGet,
@@ -1423,12 +1421,6 @@ import type {
   IntContractStorageReactivation24mServiceListData,
   IntContractStorageReactivation24mServiceListError,
   IntContractStorageReactivation24mServiceListResponse,
-  IntContractStorageReactivation6mServiceGetData,
-  IntContractStorageReactivation6mServiceGetError,
-  IntContractStorageReactivation6mServiceGetResponse,
-  IntContractStorageReactivation6mServiceListData,
-  IntContractStorageReactivation6mServiceListError,
-  IntContractStorageReactivation6mServiceListResponse,
   IntContractStorageStateByAddressServiceGetData,
   IntContractStorageStateByAddressServiceGetError,
   IntContractStorageStateByAddressServiceGetResponse,
@@ -11106,66 +11098,6 @@ export const intContractStorageReactivation1mServiceGetOptions = (
       return data;
     },
     queryKey: intContractStorageReactivation1mServiceGetQueryKey(options),
-  });
-
-export const intContractStorageReactivation6mServiceListQueryKey = (
-  options?: Options<IntContractStorageReactivation6mServiceListData>
-) => createQueryKey('intContractStorageReactivation6mServiceList', options);
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const intContractStorageReactivation6mServiceListOptions = (
-  options?: Options<IntContractStorageReactivation6mServiceListData>
-) =>
-  queryOptions<
-    IntContractStorageReactivation6mServiceListResponse,
-    IntContractStorageReactivation6mServiceListError,
-    IntContractStorageReactivation6mServiceListResponse,
-    ReturnType<typeof intContractStorageReactivation6mServiceListQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await intContractStorageReactivation6mServiceList({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: intContractStorageReactivation6mServiceListQueryKey(options),
-  });
-
-export const intContractStorageReactivation6mServiceGetQueryKey = (
-  options: Options<IntContractStorageReactivation6mServiceGetData>
-) => createQueryKey('intContractStorageReactivation6mServiceGet', options);
-
-/**
- * Get record
- *
- * Retrieve a single record by block_number
- */
-export const intContractStorageReactivation6mServiceGetOptions = (
-  options: Options<IntContractStorageReactivation6mServiceGetData>
-) =>
-  queryOptions<
-    IntContractStorageReactivation6mServiceGetResponse,
-    IntContractStorageReactivation6mServiceGetError,
-    IntContractStorageReactivation6mServiceGetResponse,
-    ReturnType<typeof intContractStorageReactivation6mServiceGetQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await intContractStorageReactivation6mServiceGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: intContractStorageReactivation6mServiceGetQueryKey(options),
   });
 
 export const intContractStorageReactivation12mServiceListQueryKey = (
