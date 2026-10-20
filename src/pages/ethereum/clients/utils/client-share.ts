@@ -280,7 +280,7 @@ const GROUP_MARKER = '*';
 
 /** Entities split per node operator that can also be filtered as a whole, by name suffix */
 export const ENTITY_GROUPS: ReadonlyArray<{ suffix: string; label: string }> = [
-  { suffix: 'lido', label: 'Lido (all node operators)' },
+  { suffix: 'lido', label: 'Lido (all operators)' },
 ];
 
 /** An entity to filter by, with its active validator count */
