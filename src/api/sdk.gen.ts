@@ -225,6 +225,24 @@ import type {
   FctBlockDataColumnSidecarFirstSeenServiceListData,
   FctBlockDataColumnSidecarFirstSeenServiceListErrors,
   FctBlockDataColumnSidecarFirstSeenServiceListResponses,
+  FctBlockFastConfirmationByClientDailyServiceGetData,
+  FctBlockFastConfirmationByClientDailyServiceGetErrors,
+  FctBlockFastConfirmationByClientDailyServiceGetResponses,
+  FctBlockFastConfirmationByClientDailyServiceListData,
+  FctBlockFastConfirmationByClientDailyServiceListErrors,
+  FctBlockFastConfirmationByClientDailyServiceListResponses,
+  FctBlockFastConfirmationByClientHourlyServiceGetData,
+  FctBlockFastConfirmationByClientHourlyServiceGetErrors,
+  FctBlockFastConfirmationByClientHourlyServiceGetResponses,
+  FctBlockFastConfirmationByClientHourlyServiceListData,
+  FctBlockFastConfirmationByClientHourlyServiceListErrors,
+  FctBlockFastConfirmationByClientHourlyServiceListResponses,
+  FctBlockFastConfirmationByNodeServiceGetData,
+  FctBlockFastConfirmationByNodeServiceGetErrors,
+  FctBlockFastConfirmationByNodeServiceGetResponses,
+  FctBlockFastConfirmationByNodeServiceListData,
+  FctBlockFastConfirmationByNodeServiceListErrors,
+  FctBlockFastConfirmationByNodeServiceListResponses,
   FctBlockFirstSeenByNodeServiceGetData,
   FctBlockFirstSeenByNodeServiceGetErrors,
   FctBlockFirstSeenByNodeServiceGetResponses,
@@ -1497,6 +1515,18 @@ import {
   zFctBlockDataColumnSidecarFirstSeenServiceGetResponse,
   zFctBlockDataColumnSidecarFirstSeenServiceListData,
   zFctBlockDataColumnSidecarFirstSeenServiceListResponse,
+  zFctBlockFastConfirmationByClientDailyServiceGetData,
+  zFctBlockFastConfirmationByClientDailyServiceGetResponse,
+  zFctBlockFastConfirmationByClientDailyServiceListData,
+  zFctBlockFastConfirmationByClientDailyServiceListResponse,
+  zFctBlockFastConfirmationByClientHourlyServiceGetData,
+  zFctBlockFastConfirmationByClientHourlyServiceGetResponse,
+  zFctBlockFastConfirmationByClientHourlyServiceListData,
+  zFctBlockFastConfirmationByClientHourlyServiceListResponse,
+  zFctBlockFastConfirmationByNodeServiceGetData,
+  zFctBlockFastConfirmationByNodeServiceGetResponse,
+  zFctBlockFastConfirmationByNodeServiceListData,
+  zFctBlockFastConfirmationByNodeServiceListResponse,
   zFctBlockFirstSeenByNodeServiceGetData,
   zFctBlockFirstSeenByNodeServiceGetResponse,
   zFctBlockFirstSeenByNodeServiceListData,
@@ -3680,6 +3710,120 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGet = <ThrowOnError 
     requestValidator: async data => await zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockFastConfirmationByClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockFastConfirmationByClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockFastConfirmationByClientDailyServiceListResponses,
+    FctBlockFastConfirmationByClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFastConfirmationByClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFastConfirmationByClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_fast_confirmation_by_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockFastConfirmationByClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockFastConfirmationByClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockFastConfirmationByClientDailyServiceGetResponses,
+    FctBlockFastConfirmationByClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFastConfirmationByClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFastConfirmationByClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_fast_confirmation_by_client_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockFastConfirmationByClientHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockFastConfirmationByClientHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockFastConfirmationByClientHourlyServiceListResponses,
+    FctBlockFastConfirmationByClientHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFastConfirmationByClientHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFastConfirmationByClientHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_fast_confirmation_by_client_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctBlockFastConfirmationByClientHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockFastConfirmationByClientHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockFastConfirmationByClientHourlyServiceGetResponses,
+    FctBlockFastConfirmationByClientHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFastConfirmationByClientHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFastConfirmationByClientHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_fast_confirmation_by_client_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockFastConfirmationByNodeServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockFastConfirmationByNodeServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockFastConfirmationByNodeServiceListResponses,
+    FctBlockFastConfirmationByNodeServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFastConfirmationByNodeServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFastConfirmationByNodeServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_fast_confirmation_by_node',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockFastConfirmationByNodeServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockFastConfirmationByNodeServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockFastConfirmationByNodeServiceGetResponses,
+    FctBlockFastConfirmationByNodeServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFastConfirmationByNodeServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFastConfirmationByNodeServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_fast_confirmation_by_node/{slot_start_date_time}',
     ...options,
   });
 

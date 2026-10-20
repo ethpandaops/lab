@@ -58,6 +58,7 @@ import { Route as EthereumDataAvailabilityPartialColumnsRouteImport } from './ro
 import { Route as EthereumDataAvailabilityCustodyRouteImport } from './routes/ethereum/data-availability/custody'
 import { Route as EthereumContractsAddressRouteImport } from './routes/ethereum/contracts/$address'
 import { Route as EthereumConsensusOverviewRouteImport } from './routes/ethereum/consensus/overview'
+import { Route as EthereumConsensusFastConfirmationRouteImport } from './routes/ethereum/consensus/fast-confirmation'
 import { Route as BeaconSlotLiveRouteImport } from './routes/beacon/slot/live'
 import { Route as BeaconBlockProductionLiveRouteImport } from './routes/beacon/block-production/live'
 import { Route as EthereumExecutionTimingsIndexRouteImport } from './routes/ethereum/execution/timings/index'
@@ -331,6 +332,12 @@ const EthereumConsensusOverviewRoute =
     path: '/overview',
     getParentRoute: () => EthereumConsensusRoute,
   } as any)
+const EthereumConsensusFastConfirmationRoute =
+  EthereumConsensusFastConfirmationRouteImport.update({
+    id: '/fast-confirmation',
+    path: '/fast-confirmation',
+    getParentRoute: () => EthereumConsensusRoute,
+  } as any)
 const BeaconSlotLiveRoute = BeaconSlotLiveRouteImport.update({
   id: '/beacon/slot/live',
   path: '/beacon/slot/live',
@@ -426,6 +433,7 @@ export interface FileRoutesByFullPath {
   '/xatu-data/': typeof XatuDataIndexRoute
   '/beacon/block-production/live': typeof BeaconBlockProductionLiveRoute
   '/beacon/slot/live': typeof BeaconSlotLiveRoute
+  '/ethereum/consensus/fast-confirmation': typeof EthereumConsensusFastConfirmationRoute
   '/ethereum/consensus/overview': typeof EthereumConsensusOverviewRoute
   '/ethereum/contracts/$address': typeof EthereumContractsAddressRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyRouteWithChildren
@@ -480,6 +488,7 @@ export interface FileRoutesByTo {
   '/xatu-data': typeof XatuDataIndexRoute
   '/beacon/block-production/live': typeof BeaconBlockProductionLiveRoute
   '/beacon/slot/live': typeof BeaconSlotLiveRoute
+  '/ethereum/consensus/fast-confirmation': typeof EthereumConsensusFastConfirmationRoute
   '/ethereum/consensus/overview': typeof EthereumConsensusOverviewRoute
   '/ethereum/contracts/$address': typeof EthereumContractsAddressRoute
   '/ethereum/data-availability/partial-columns': typeof EthereumDataAvailabilityPartialColumnsRoute
@@ -538,6 +547,7 @@ export interface FileRoutesById {
   '/xatu-data/': typeof XatuDataIndexRoute
   '/beacon/block-production/live': typeof BeaconBlockProductionLiveRoute
   '/beacon/slot/live': typeof BeaconSlotLiveRoute
+  '/ethereum/consensus/fast-confirmation': typeof EthereumConsensusFastConfirmationRoute
   '/ethereum/consensus/overview': typeof EthereumConsensusOverviewRoute
   '/ethereum/contracts/$address': typeof EthereumContractsAddressRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyRouteWithChildren
@@ -602,6 +612,7 @@ export interface FileRouteTypes {
     | '/xatu-data/'
     | '/beacon/block-production/live'
     | '/beacon/slot/live'
+    | '/ethereum/consensus/fast-confirmation'
     | '/ethereum/consensus/overview'
     | '/ethereum/contracts/$address'
     | '/ethereum/data-availability/custody'
@@ -656,6 +667,7 @@ export interface FileRouteTypes {
     | '/xatu-data'
     | '/beacon/block-production/live'
     | '/beacon/slot/live'
+    | '/ethereum/consensus/fast-confirmation'
     | '/ethereum/consensus/overview'
     | '/ethereum/contracts/$address'
     | '/ethereum/data-availability/partial-columns'
@@ -713,6 +725,7 @@ export interface FileRouteTypes {
     | '/xatu-data/'
     | '/beacon/block-production/live'
     | '/beacon/slot/live'
+    | '/ethereum/consensus/fast-confirmation'
     | '/ethereum/consensus/overview'
     | '/ethereum/contracts/$address'
     | '/ethereum/data-availability/custody'
@@ -1105,6 +1118,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumConsensusOverviewRouteImport
       parentRoute: typeof EthereumConsensusRoute
     }
+    '/ethereum/consensus/fast-confirmation': {
+      id: '/ethereum/consensus/fast-confirmation'
+      path: '/fast-confirmation'
+      fullPath: '/ethereum/consensus/fast-confirmation'
+      preLoaderRoute: typeof EthereumConsensusFastConfirmationRouteImport
+      parentRoute: typeof EthereumConsensusRoute
+    }
     '/beacon/slot/live': {
       id: '/beacon/slot/live'
       path: '/beacon/slot/live'
@@ -1186,10 +1206,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface EthereumConsensusRouteChildren {
+  EthereumConsensusFastConfirmationRoute: typeof EthereumConsensusFastConfirmationRoute
   EthereumConsensusOverviewRoute: typeof EthereumConsensusOverviewRoute
 }
 
 const EthereumConsensusRouteChildren: EthereumConsensusRouteChildren = {
+  EthereumConsensusFastConfirmationRoute:
+    EthereumConsensusFastConfirmationRoute,
   EthereumConsensusOverviewRoute: EthereumConsensusOverviewRoute,
 }
 

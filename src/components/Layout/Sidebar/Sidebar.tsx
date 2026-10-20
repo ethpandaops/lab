@@ -5,6 +5,7 @@ import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
 import {
   ArchiveBoxXMarkIcon,
+  BoltIcon,
   ChartBarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -162,6 +163,7 @@ interface NavItem {
 const ethereumConsensusPages: NavItem[] = [
   { name: 'Overview', to: '/ethereum/consensus/overview', icon: PresentationChartLineIcon },
   { name: 'Live', to: '/ethereum/live', icon: PlayCircleIcon },
+  { name: 'Fast Confirmation', to: '/ethereum/consensus/fast-confirmation', icon: BoltIcon },
   { name: 'Epochs', to: '/ethereum/epochs', icon: ClockIcon },
   { name: 'Slots', to: '/ethereum/slots', icon: Square3Stack3DIcon },
   { name: 'Entities', to: '/ethereum/entities', icon: UserGroupIcon },

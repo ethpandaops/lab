@@ -78,6 +78,12 @@ import {
   fctBlockDataColumnSidecarFirstSeenByNodeServiceList,
   fctBlockDataColumnSidecarFirstSeenServiceGet,
   fctBlockDataColumnSidecarFirstSeenServiceList,
+  fctBlockFastConfirmationByClientDailyServiceGet,
+  fctBlockFastConfirmationByClientDailyServiceList,
+  fctBlockFastConfirmationByClientHourlyServiceGet,
+  fctBlockFastConfirmationByClientHourlyServiceList,
+  fctBlockFastConfirmationByNodeServiceGet,
+  fctBlockFastConfirmationByNodeServiceList,
   fctBlockFirstSeenByNodeServiceGet,
   fctBlockFirstSeenByNodeServiceList,
   fctBlockGraffitiClientByEntityDailyServiceGet,
@@ -677,6 +683,24 @@ import type {
   FctBlockDataColumnSidecarFirstSeenServiceListData,
   FctBlockDataColumnSidecarFirstSeenServiceListError,
   FctBlockDataColumnSidecarFirstSeenServiceListResponse,
+  FctBlockFastConfirmationByClientDailyServiceGetData,
+  FctBlockFastConfirmationByClientDailyServiceGetError,
+  FctBlockFastConfirmationByClientDailyServiceGetResponse,
+  FctBlockFastConfirmationByClientDailyServiceListData,
+  FctBlockFastConfirmationByClientDailyServiceListError,
+  FctBlockFastConfirmationByClientDailyServiceListResponse,
+  FctBlockFastConfirmationByClientHourlyServiceGetData,
+  FctBlockFastConfirmationByClientHourlyServiceGetError,
+  FctBlockFastConfirmationByClientHourlyServiceGetResponse,
+  FctBlockFastConfirmationByClientHourlyServiceListData,
+  FctBlockFastConfirmationByClientHourlyServiceListError,
+  FctBlockFastConfirmationByClientHourlyServiceListResponse,
+  FctBlockFastConfirmationByNodeServiceGetData,
+  FctBlockFastConfirmationByNodeServiceGetError,
+  FctBlockFastConfirmationByNodeServiceGetResponse,
+  FctBlockFastConfirmationByNodeServiceListData,
+  FctBlockFastConfirmationByNodeServiceListError,
+  FctBlockFastConfirmationByNodeServiceListResponse,
   FctBlockFirstSeenByNodeServiceGetData,
   FctBlockFirstSeenByNodeServiceGetError,
   FctBlockFirstSeenByNodeServiceGetResponse,
@@ -4020,6 +4044,186 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGetOptions = (
       return data;
     },
     queryKey: fctBlockDataColumnSidecarFirstSeenByNodeServiceGetQueryKey(options),
+  });
+
+export const fctBlockFastConfirmationByClientDailyServiceListQueryKey = (
+  options?: Options<FctBlockFastConfirmationByClientDailyServiceListData>
+) => createQueryKey('fctBlockFastConfirmationByClientDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockFastConfirmationByClientDailyServiceListOptions = (
+  options?: Options<FctBlockFastConfirmationByClientDailyServiceListData>
+) =>
+  queryOptions<
+    FctBlockFastConfirmationByClientDailyServiceListResponse,
+    FctBlockFastConfirmationByClientDailyServiceListError,
+    FctBlockFastConfirmationByClientDailyServiceListResponse,
+    ReturnType<typeof fctBlockFastConfirmationByClientDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockFastConfirmationByClientDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockFastConfirmationByClientDailyServiceListQueryKey(options),
+  });
+
+export const fctBlockFastConfirmationByClientDailyServiceGetQueryKey = (
+  options: Options<FctBlockFastConfirmationByClientDailyServiceGetData>
+) => createQueryKey('fctBlockFastConfirmationByClientDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockFastConfirmationByClientDailyServiceGetOptions = (
+  options: Options<FctBlockFastConfirmationByClientDailyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockFastConfirmationByClientDailyServiceGetResponse,
+    FctBlockFastConfirmationByClientDailyServiceGetError,
+    FctBlockFastConfirmationByClientDailyServiceGetResponse,
+    ReturnType<typeof fctBlockFastConfirmationByClientDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockFastConfirmationByClientDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockFastConfirmationByClientDailyServiceGetQueryKey(options),
+  });
+
+export const fctBlockFastConfirmationByClientHourlyServiceListQueryKey = (
+  options?: Options<FctBlockFastConfirmationByClientHourlyServiceListData>
+) => createQueryKey('fctBlockFastConfirmationByClientHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockFastConfirmationByClientHourlyServiceListOptions = (
+  options?: Options<FctBlockFastConfirmationByClientHourlyServiceListData>
+) =>
+  queryOptions<
+    FctBlockFastConfirmationByClientHourlyServiceListResponse,
+    FctBlockFastConfirmationByClientHourlyServiceListError,
+    FctBlockFastConfirmationByClientHourlyServiceListResponse,
+    ReturnType<typeof fctBlockFastConfirmationByClientHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockFastConfirmationByClientHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockFastConfirmationByClientHourlyServiceListQueryKey(options),
+  });
+
+export const fctBlockFastConfirmationByClientHourlyServiceGetQueryKey = (
+  options: Options<FctBlockFastConfirmationByClientHourlyServiceGetData>
+) => createQueryKey('fctBlockFastConfirmationByClientHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctBlockFastConfirmationByClientHourlyServiceGetOptions = (
+  options: Options<FctBlockFastConfirmationByClientHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockFastConfirmationByClientHourlyServiceGetResponse,
+    FctBlockFastConfirmationByClientHourlyServiceGetError,
+    FctBlockFastConfirmationByClientHourlyServiceGetResponse,
+    ReturnType<typeof fctBlockFastConfirmationByClientHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockFastConfirmationByClientHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockFastConfirmationByClientHourlyServiceGetQueryKey(options),
+  });
+
+export const fctBlockFastConfirmationByNodeServiceListQueryKey = (
+  options?: Options<FctBlockFastConfirmationByNodeServiceListData>
+) => createQueryKey('fctBlockFastConfirmationByNodeServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockFastConfirmationByNodeServiceListOptions = (
+  options?: Options<FctBlockFastConfirmationByNodeServiceListData>
+) =>
+  queryOptions<
+    FctBlockFastConfirmationByNodeServiceListResponse,
+    FctBlockFastConfirmationByNodeServiceListError,
+    FctBlockFastConfirmationByNodeServiceListResponse,
+    ReturnType<typeof fctBlockFastConfirmationByNodeServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockFastConfirmationByNodeServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockFastConfirmationByNodeServiceListQueryKey(options),
+  });
+
+export const fctBlockFastConfirmationByNodeServiceGetQueryKey = (
+  options: Options<FctBlockFastConfirmationByNodeServiceGetData>
+) => createQueryKey('fctBlockFastConfirmationByNodeServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockFastConfirmationByNodeServiceGetOptions = (
+  options: Options<FctBlockFastConfirmationByNodeServiceGetData>
+) =>
+  queryOptions<
+    FctBlockFastConfirmationByNodeServiceGetResponse,
+    FctBlockFastConfirmationByNodeServiceGetError,
+    FctBlockFastConfirmationByNodeServiceGetResponse,
+    ReturnType<typeof fctBlockFastConfirmationByNodeServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockFastConfirmationByNodeServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockFastConfirmationByNodeServiceGetQueryKey(options),
   });
 
 export const fctBlockFirstSeenByNodeServiceListQueryKey = (options?: Options<FctBlockFirstSeenByNodeServiceListData>) =>

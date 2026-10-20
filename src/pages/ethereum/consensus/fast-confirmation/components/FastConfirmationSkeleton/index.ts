@@ -1,0 +1,1 @@
+export { FastConfirmationSkeleton } from './FastConfirmationSkeleton';

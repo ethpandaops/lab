@@ -1949,6 +1949,259 @@ export type FctBlockDataColumnSidecarFirstSeenByNode = {
   username?: string;
 };
 
+export type FctBlockFastConfirmationByClientDaily = {
+  /**
+   * Average milliseconds from slot start to fast confirmation
+   */
+  avg_fast_confirmation_ms?: number;
+  /**
+   * Average milliseconds from slot start to finality
+   */
+  avg_finality_ms?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Observations where the block was only confirmed through an event for a later block
+   */
+  descendant_count?: number;
+  /**
+   * Observations where the node emitted a fast confirmation event for the block itself
+   */
+  direct_count?: number;
+  /**
+   * Maximum milliseconds from slot start to fast confirmation
+   */
+  max_fast_confirmation_ms?: number;
+  /**
+   * Maximum milliseconds from slot start to finality
+   */
+  max_finality_ms?: number;
+  /**
+   * Consensus client implementation running the fast confirmation rule
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * Minimum milliseconds from slot start to fast confirmation
+   */
+  min_fast_confirmation_ms?: number;
+  /**
+   * Minimum milliseconds from slot start to finality
+   */
+  min_finality_ms?: number;
+  /**
+   * Number of fast confirmation nodes running this consensus client
+   */
+  node_count?: number;
+  /**
+   * Number of (canonical block, node) observations
+   */
+  observation_count?: number;
+  /**
+   * Fast confirmation events for blocks that did not become canonical
+   */
+  orphaned_count?: number;
+  /**
+   * Median milliseconds from slot start to fast confirmation
+   */
+  p50_fast_confirmation_ms?: number;
+  /**
+   * Median milliseconds from slot start to finality
+   */
+  p50_finality_ms?: number;
+  /**
+   * Median per-block ratio of time to finality over time to fast confirmation
+   */
+  p50_speedup?: number;
+  /**
+   * 90th percentile milliseconds from slot start to fast confirmation
+   */
+  p90_fast_confirmation_ms?: number;
+  /**
+   * 95th percentile milliseconds from slot start to fast confirmation
+   */
+  p95_fast_confirmation_ms?: number;
+  /**
+   * 95th percentile milliseconds from slot start to finality
+   */
+  p95_finality_ms?: number;
+  /**
+   * 99th percentile milliseconds from slot start to fast confirmation
+   */
+  p99_fast_confirmation_ms?: number;
+  /**
+   * Number of canonical blocks scored for this consensus client
+   */
+  slot_count?: number;
+  /**
+   * Observations where the node did not fast confirm the block within 30 minutes
+   */
+  unconfirmed_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctBlockFastConfirmationByClientHourly = {
+  /**
+   * Average milliseconds from slot start to fast confirmation
+   */
+  avg_fast_confirmation_ms?: number;
+  /**
+   * Average milliseconds from slot start to finality
+   */
+  avg_finality_ms?: number;
+  /**
+   * Observations where the block was only confirmed through an event for a later block
+   */
+  descendant_count?: number;
+  /**
+   * Observations where the node emitted a fast confirmation event for the block itself
+   */
+  direct_count?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Maximum milliseconds from slot start to fast confirmation
+   */
+  max_fast_confirmation_ms?: number;
+  /**
+   * Maximum milliseconds from slot start to finality
+   */
+  max_finality_ms?: number;
+  /**
+   * Consensus client implementation running the fast confirmation rule
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * Minimum milliseconds from slot start to fast confirmation
+   */
+  min_fast_confirmation_ms?: number;
+  /**
+   * Minimum milliseconds from slot start to finality
+   */
+  min_finality_ms?: number;
+  /**
+   * Number of fast confirmation nodes running this consensus client
+   */
+  node_count?: number;
+  /**
+   * Number of (canonical block, node) observations
+   */
+  observation_count?: number;
+  /**
+   * Fast confirmation events for blocks that did not become canonical
+   */
+  orphaned_count?: number;
+  /**
+   * Median milliseconds from slot start to fast confirmation
+   */
+  p50_fast_confirmation_ms?: number;
+  /**
+   * Median milliseconds from slot start to finality
+   */
+  p50_finality_ms?: number;
+  /**
+   * Median per-block ratio of time to finality over time to fast confirmation
+   */
+  p50_speedup?: number;
+  /**
+   * 90th percentile milliseconds from slot start to fast confirmation
+   */
+  p90_fast_confirmation_ms?: number;
+  /**
+   * 95th percentile milliseconds from slot start to fast confirmation
+   */
+  p95_fast_confirmation_ms?: number;
+  /**
+   * 95th percentile milliseconds from slot start to finality
+   */
+  p95_finality_ms?: number;
+  /**
+   * 99th percentile milliseconds from slot start to fast confirmation
+   */
+  p99_fast_confirmation_ms?: number;
+  /**
+   * Number of canonical blocks scored for this consensus client
+   */
+  slot_count?: number;
+  /**
+   * Observations where the node did not fast confirm the block within 30 minutes
+   */
+  unconfirmed_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctBlockFastConfirmationByNode = {
+  /**
+   * The beacon block root hash
+   */
+  block_root?: string;
+  /**
+   * How the block was fast confirmed: direct (an event for this block), descendant (only implied by an event for a later block), or unconfirmed (no confirmation seen within 30 minutes)
+   */
+  confirmation_type?: string;
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Slot of the block whose fast confirmation event first covered this block. Equals slot for direct confirmations
+   */
+  fast_confirmation_slot?: number | null;
+  /**
+   * Milliseconds from slot start until the node fast confirmed this block, directly or through a descendant
+   */
+  fast_confirmed_slot_start_diff?: number | null;
+  /**
+   * Epoch of the finalized checkpoint that first covered this block
+   */
+  finalized_epoch?: number | null;
+  /**
+   * Milliseconds from slot start until the first sentry observed a finalized checkpoint covering this block
+   */
+  finalized_slot_start_diff?: number | null;
+  /**
+   * Name of the sentry node that emitted the fast confirmation events
+   */
+  meta_client_name?: string;
+  /**
+   * Consensus client implementation running the fast confirmation rule
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * Consensus client version running the fast confirmation rule
+   */
+  meta_consensus_version?: string;
+  /**
+   * The slot number of the block
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Chain status of the block: canonical, or orphaned when a node fast confirmed a block that did not become canonical
+   */
+  status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type FctBlockFirstSeenByNode = {
   /**
    * The beacon block root hash
@@ -7932,6 +8185,27 @@ export type GetFctBlockDataColumnSidecarFirstSeenResponse = {
 };
 
 /**
+ * Response for getting a single fct_block_fast_confirmation_by_client_daily record
+ */
+export type GetFctBlockFastConfirmationByClientDailyResponse = {
+  item?: FctBlockFastConfirmationByClientDaily;
+};
+
+/**
+ * Response for getting a single fct_block_fast_confirmation_by_client_hourly record
+ */
+export type GetFctBlockFastConfirmationByClientHourlyResponse = {
+  item?: FctBlockFastConfirmationByClientHourly;
+};
+
+/**
+ * Response for getting a single fct_block_fast_confirmation_by_node record
+ */
+export type GetFctBlockFastConfirmationByNodeResponse = {
+  item?: FctBlockFastConfirmationByNode;
+};
+
+/**
  * Response for getting a single fct_block_first_seen_by_node record
  */
 export type GetFctBlockFirstSeenByNodeResponse = {
@@ -13100,6 +13374,48 @@ export type ListFctBlockDataColumnSidecarFirstSeenResponse = {
    * The list of fct_block_data_column_sidecar_first_seen.
    */
   fct_block_data_column_sidecar_first_seen?: Array<FctBlockDataColumnSidecarFirstSeen>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_fast_confirmation_by_client_daily records
+ */
+export type ListFctBlockFastConfirmationByClientDailyResponse = {
+  /**
+   * The list of fct_block_fast_confirmation_by_client_daily.
+   */
+  fct_block_fast_confirmation_by_client_daily?: Array<FctBlockFastConfirmationByClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_fast_confirmation_by_client_hourly records
+ */
+export type ListFctBlockFastConfirmationByClientHourlyResponse = {
+  /**
+   * The list of fct_block_fast_confirmation_by_client_hourly.
+   */
+  fct_block_fast_confirmation_by_client_hourly?: Array<FctBlockFastConfirmationByClientHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_fast_confirmation_by_node records
+ */
+export type ListFctBlockFastConfirmationByNodeResponse = {
+  /**
+   * The list of fct_block_fast_confirmation_by_node.
+   */
+  fct_block_fast_confirmation_by_node?: Array<FctBlockFastConfirmationByNode>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -33613,6 +33929,2554 @@ export type FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponses = {
 
 export type FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse =
   FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponses[keyof FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponses];
+
+export type FctBlockFastConfirmationByClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: eq)
+     */
+    node_count_eq?: number;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: ne)
+     */
+    node_count_ne?: number;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: lt)
+     */
+    node_count_lt?: number;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: lte)
+     */
+    node_count_lte?: number;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: gt)
+     */
+    node_count_gt?: number;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: gte)
+     */
+    node_count_gte?: number;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: between_min)
+     */
+    node_count_between_min?: number;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: between_max_value)
+     */
+    node_count_between_max_value?: number;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: in_values) (comma-separated list)
+     */
+    node_count_in_values?: string;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: not_in_values) (comma-separated list)
+     */
+    node_count_not_in_values?: string;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Number of (canonical block, node) observations (filter: eq)
+     */
+    observation_count_eq?: number;
+    /**
+     * Number of (canonical block, node) observations (filter: ne)
+     */
+    observation_count_ne?: number;
+    /**
+     * Number of (canonical block, node) observations (filter: lt)
+     */
+    observation_count_lt?: number;
+    /**
+     * Number of (canonical block, node) observations (filter: lte)
+     */
+    observation_count_lte?: number;
+    /**
+     * Number of (canonical block, node) observations (filter: gt)
+     */
+    observation_count_gt?: number;
+    /**
+     * Number of (canonical block, node) observations (filter: gte)
+     */
+    observation_count_gte?: number;
+    /**
+     * Number of (canonical block, node) observations (filter: between_min)
+     */
+    observation_count_between_min?: number;
+    /**
+     * Number of (canonical block, node) observations (filter: between_max_value)
+     */
+    observation_count_between_max_value?: number;
+    /**
+     * Number of (canonical block, node) observations (filter: in_values) (comma-separated list)
+     */
+    observation_count_in_values?: string;
+    /**
+     * Number of (canonical block, node) observations (filter: not_in_values) (comma-separated list)
+     */
+    observation_count_not_in_values?: string;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: eq)
+     */
+    direct_count_eq?: number;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: ne)
+     */
+    direct_count_ne?: number;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: lt)
+     */
+    direct_count_lt?: number;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: lte)
+     */
+    direct_count_lte?: number;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: gt)
+     */
+    direct_count_gt?: number;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: gte)
+     */
+    direct_count_gte?: number;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: between_min)
+     */
+    direct_count_between_min?: number;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: between_max_value)
+     */
+    direct_count_between_max_value?: number;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: in_values) (comma-separated list)
+     */
+    direct_count_in_values?: string;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: not_in_values) (comma-separated list)
+     */
+    direct_count_not_in_values?: string;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: eq)
+     */
+    descendant_count_eq?: number;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: ne)
+     */
+    descendant_count_ne?: number;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: lt)
+     */
+    descendant_count_lt?: number;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: lte)
+     */
+    descendant_count_lte?: number;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: gt)
+     */
+    descendant_count_gt?: number;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: gte)
+     */
+    descendant_count_gte?: number;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: between_min)
+     */
+    descendant_count_between_min?: number;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: between_max_value)
+     */
+    descendant_count_between_max_value?: number;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: in_values) (comma-separated list)
+     */
+    descendant_count_in_values?: string;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: not_in_values) (comma-separated list)
+     */
+    descendant_count_not_in_values?: string;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: eq)
+     */
+    unconfirmed_count_eq?: number;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: ne)
+     */
+    unconfirmed_count_ne?: number;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: lt)
+     */
+    unconfirmed_count_lt?: number;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: lte)
+     */
+    unconfirmed_count_lte?: number;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: gt)
+     */
+    unconfirmed_count_gt?: number;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: gte)
+     */
+    unconfirmed_count_gte?: number;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: between_min)
+     */
+    unconfirmed_count_between_min?: number;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: between_max_value)
+     */
+    unconfirmed_count_between_max_value?: number;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: in_values) (comma-separated list)
+     */
+    unconfirmed_count_in_values?: string;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: not_in_values) (comma-separated list)
+     */
+    unconfirmed_count_not_in_values?: string;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: eq)
+     */
+    orphaned_count_eq?: number;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: ne)
+     */
+    orphaned_count_ne?: number;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: lt)
+     */
+    orphaned_count_lt?: number;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: lte)
+     */
+    orphaned_count_lte?: number;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: gt)
+     */
+    orphaned_count_gt?: number;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: gte)
+     */
+    orphaned_count_gte?: number;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: between_min)
+     */
+    orphaned_count_between_min?: number;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: between_max_value)
+     */
+    orphaned_count_between_max_value?: number;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: in_values) (comma-separated list)
+     */
+    orphaned_count_in_values?: string;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: not_in_values) (comma-separated list)
+     */
+    orphaned_count_not_in_values?: string;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: eq)
+     */
+    avg_fast_confirmation_ms_eq?: number;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: ne)
+     */
+    avg_fast_confirmation_ms_ne?: number;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: lt)
+     */
+    avg_fast_confirmation_ms_lt?: number;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: lte)
+     */
+    avg_fast_confirmation_ms_lte?: number;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: gt)
+     */
+    avg_fast_confirmation_ms_gt?: number;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: gte)
+     */
+    avg_fast_confirmation_ms_gte?: number;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: between_min)
+     */
+    avg_fast_confirmation_ms_between_min?: number;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: between_max_value)
+     */
+    avg_fast_confirmation_ms_between_max_value?: number;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: in_values) (comma-separated list)
+     */
+    avg_fast_confirmation_ms_in_values?: string;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: not_in_values) (comma-separated list)
+     */
+    avg_fast_confirmation_ms_not_in_values?: string;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: eq)
+     */
+    min_fast_confirmation_ms_eq?: number;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: ne)
+     */
+    min_fast_confirmation_ms_ne?: number;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: lt)
+     */
+    min_fast_confirmation_ms_lt?: number;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: lte)
+     */
+    min_fast_confirmation_ms_lte?: number;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: gt)
+     */
+    min_fast_confirmation_ms_gt?: number;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: gte)
+     */
+    min_fast_confirmation_ms_gte?: number;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: between_min)
+     */
+    min_fast_confirmation_ms_between_min?: number;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: between_max_value)
+     */
+    min_fast_confirmation_ms_between_max_value?: number;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: in_values) (comma-separated list)
+     */
+    min_fast_confirmation_ms_in_values?: string;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: not_in_values) (comma-separated list)
+     */
+    min_fast_confirmation_ms_not_in_values?: string;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: eq)
+     */
+    p50_fast_confirmation_ms_eq?: number;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: ne)
+     */
+    p50_fast_confirmation_ms_ne?: number;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: lt)
+     */
+    p50_fast_confirmation_ms_lt?: number;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: lte)
+     */
+    p50_fast_confirmation_ms_lte?: number;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: gt)
+     */
+    p50_fast_confirmation_ms_gt?: number;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: gte)
+     */
+    p50_fast_confirmation_ms_gte?: number;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: between_min)
+     */
+    p50_fast_confirmation_ms_between_min?: number;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: between_max_value)
+     */
+    p50_fast_confirmation_ms_between_max_value?: number;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: in_values) (comma-separated list)
+     */
+    p50_fast_confirmation_ms_in_values?: string;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: not_in_values) (comma-separated list)
+     */
+    p50_fast_confirmation_ms_not_in_values?: string;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: eq)
+     */
+    p90_fast_confirmation_ms_eq?: number;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: ne)
+     */
+    p90_fast_confirmation_ms_ne?: number;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: lt)
+     */
+    p90_fast_confirmation_ms_lt?: number;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: lte)
+     */
+    p90_fast_confirmation_ms_lte?: number;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: gt)
+     */
+    p90_fast_confirmation_ms_gt?: number;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: gte)
+     */
+    p90_fast_confirmation_ms_gte?: number;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: between_min)
+     */
+    p90_fast_confirmation_ms_between_min?: number;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: between_max_value)
+     */
+    p90_fast_confirmation_ms_between_max_value?: number;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: in_values) (comma-separated list)
+     */
+    p90_fast_confirmation_ms_in_values?: string;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: not_in_values) (comma-separated list)
+     */
+    p90_fast_confirmation_ms_not_in_values?: string;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: eq)
+     */
+    p95_fast_confirmation_ms_eq?: number;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: ne)
+     */
+    p95_fast_confirmation_ms_ne?: number;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: lt)
+     */
+    p95_fast_confirmation_ms_lt?: number;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: lte)
+     */
+    p95_fast_confirmation_ms_lte?: number;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: gt)
+     */
+    p95_fast_confirmation_ms_gt?: number;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: gte)
+     */
+    p95_fast_confirmation_ms_gte?: number;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: between_min)
+     */
+    p95_fast_confirmation_ms_between_min?: number;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: between_max_value)
+     */
+    p95_fast_confirmation_ms_between_max_value?: number;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: in_values) (comma-separated list)
+     */
+    p95_fast_confirmation_ms_in_values?: string;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: not_in_values) (comma-separated list)
+     */
+    p95_fast_confirmation_ms_not_in_values?: string;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: eq)
+     */
+    p99_fast_confirmation_ms_eq?: number;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: ne)
+     */
+    p99_fast_confirmation_ms_ne?: number;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: lt)
+     */
+    p99_fast_confirmation_ms_lt?: number;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: lte)
+     */
+    p99_fast_confirmation_ms_lte?: number;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: gt)
+     */
+    p99_fast_confirmation_ms_gt?: number;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: gte)
+     */
+    p99_fast_confirmation_ms_gte?: number;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: between_min)
+     */
+    p99_fast_confirmation_ms_between_min?: number;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: between_max_value)
+     */
+    p99_fast_confirmation_ms_between_max_value?: number;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: in_values) (comma-separated list)
+     */
+    p99_fast_confirmation_ms_in_values?: string;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: not_in_values) (comma-separated list)
+     */
+    p99_fast_confirmation_ms_not_in_values?: string;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: eq)
+     */
+    max_fast_confirmation_ms_eq?: number;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: ne)
+     */
+    max_fast_confirmation_ms_ne?: number;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: lt)
+     */
+    max_fast_confirmation_ms_lt?: number;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: lte)
+     */
+    max_fast_confirmation_ms_lte?: number;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: gt)
+     */
+    max_fast_confirmation_ms_gt?: number;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: gte)
+     */
+    max_fast_confirmation_ms_gte?: number;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: between_min)
+     */
+    max_fast_confirmation_ms_between_min?: number;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: between_max_value)
+     */
+    max_fast_confirmation_ms_between_max_value?: number;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: in_values) (comma-separated list)
+     */
+    max_fast_confirmation_ms_in_values?: string;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: not_in_values) (comma-separated list)
+     */
+    max_fast_confirmation_ms_not_in_values?: string;
+    /**
+     * Average milliseconds from slot start to finality (filter: eq)
+     */
+    avg_finality_ms_eq?: number;
+    /**
+     * Average milliseconds from slot start to finality (filter: ne)
+     */
+    avg_finality_ms_ne?: number;
+    /**
+     * Average milliseconds from slot start to finality (filter: lt)
+     */
+    avg_finality_ms_lt?: number;
+    /**
+     * Average milliseconds from slot start to finality (filter: lte)
+     */
+    avg_finality_ms_lte?: number;
+    /**
+     * Average milliseconds from slot start to finality (filter: gt)
+     */
+    avg_finality_ms_gt?: number;
+    /**
+     * Average milliseconds from slot start to finality (filter: gte)
+     */
+    avg_finality_ms_gte?: number;
+    /**
+     * Average milliseconds from slot start to finality (filter: between_min)
+     */
+    avg_finality_ms_between_min?: number;
+    /**
+     * Average milliseconds from slot start to finality (filter: between_max_value)
+     */
+    avg_finality_ms_between_max_value?: number;
+    /**
+     * Average milliseconds from slot start to finality (filter: in_values) (comma-separated list)
+     */
+    avg_finality_ms_in_values?: string;
+    /**
+     * Average milliseconds from slot start to finality (filter: not_in_values) (comma-separated list)
+     */
+    avg_finality_ms_not_in_values?: string;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: eq)
+     */
+    min_finality_ms_eq?: number;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: ne)
+     */
+    min_finality_ms_ne?: number;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: lt)
+     */
+    min_finality_ms_lt?: number;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: lte)
+     */
+    min_finality_ms_lte?: number;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: gt)
+     */
+    min_finality_ms_gt?: number;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: gte)
+     */
+    min_finality_ms_gte?: number;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: between_min)
+     */
+    min_finality_ms_between_min?: number;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: between_max_value)
+     */
+    min_finality_ms_between_max_value?: number;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: in_values) (comma-separated list)
+     */
+    min_finality_ms_in_values?: string;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: not_in_values) (comma-separated list)
+     */
+    min_finality_ms_not_in_values?: string;
+    /**
+     * Median milliseconds from slot start to finality (filter: eq)
+     */
+    p50_finality_ms_eq?: number;
+    /**
+     * Median milliseconds from slot start to finality (filter: ne)
+     */
+    p50_finality_ms_ne?: number;
+    /**
+     * Median milliseconds from slot start to finality (filter: lt)
+     */
+    p50_finality_ms_lt?: number;
+    /**
+     * Median milliseconds from slot start to finality (filter: lte)
+     */
+    p50_finality_ms_lte?: number;
+    /**
+     * Median milliseconds from slot start to finality (filter: gt)
+     */
+    p50_finality_ms_gt?: number;
+    /**
+     * Median milliseconds from slot start to finality (filter: gte)
+     */
+    p50_finality_ms_gte?: number;
+    /**
+     * Median milliseconds from slot start to finality (filter: between_min)
+     */
+    p50_finality_ms_between_min?: number;
+    /**
+     * Median milliseconds from slot start to finality (filter: between_max_value)
+     */
+    p50_finality_ms_between_max_value?: number;
+    /**
+     * Median milliseconds from slot start to finality (filter: in_values) (comma-separated list)
+     */
+    p50_finality_ms_in_values?: string;
+    /**
+     * Median milliseconds from slot start to finality (filter: not_in_values) (comma-separated list)
+     */
+    p50_finality_ms_not_in_values?: string;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: eq)
+     */
+    p95_finality_ms_eq?: number;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: ne)
+     */
+    p95_finality_ms_ne?: number;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: lt)
+     */
+    p95_finality_ms_lt?: number;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: lte)
+     */
+    p95_finality_ms_lte?: number;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: gt)
+     */
+    p95_finality_ms_gt?: number;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: gte)
+     */
+    p95_finality_ms_gte?: number;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: between_min)
+     */
+    p95_finality_ms_between_min?: number;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: between_max_value)
+     */
+    p95_finality_ms_between_max_value?: number;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: in_values) (comma-separated list)
+     */
+    p95_finality_ms_in_values?: string;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: not_in_values) (comma-separated list)
+     */
+    p95_finality_ms_not_in_values?: string;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: eq)
+     */
+    max_finality_ms_eq?: number;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: ne)
+     */
+    max_finality_ms_ne?: number;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: lt)
+     */
+    max_finality_ms_lt?: number;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: lte)
+     */
+    max_finality_ms_lte?: number;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: gt)
+     */
+    max_finality_ms_gt?: number;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: gte)
+     */
+    max_finality_ms_gte?: number;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: between_min)
+     */
+    max_finality_ms_between_min?: number;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: between_max_value)
+     */
+    max_finality_ms_between_max_value?: number;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: in_values) (comma-separated list)
+     */
+    max_finality_ms_in_values?: string;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: not_in_values) (comma-separated list)
+     */
+    max_finality_ms_not_in_values?: string;
+    /**
+     * Filter p50_speedup using value
+     */
+    p50_speedup_value?: number;
+    /**
+     * The maximum number of fct_block_fast_confirmation_by_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockFastConfirmationByClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_fast_confirmation_by_client_daily';
+};
+
+export type FctBlockFastConfirmationByClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockFastConfirmationByClientDailyServiceListError =
+  FctBlockFastConfirmationByClientDailyServiceListErrors[keyof FctBlockFastConfirmationByClientDailyServiceListErrors];
+
+export type FctBlockFastConfirmationByClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockFastConfirmationByClientDailyResponse;
+};
+
+export type FctBlockFastConfirmationByClientDailyServiceListResponse =
+  FctBlockFastConfirmationByClientDailyServiceListResponses[keyof FctBlockFastConfirmationByClientDailyServiceListResponses];
+
+export type FctBlockFastConfirmationByClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_fast_confirmation_by_client_daily/{day_start_date}';
+};
+
+export type FctBlockFastConfirmationByClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockFastConfirmationByClientDailyServiceGetError =
+  FctBlockFastConfirmationByClientDailyServiceGetErrors[keyof FctBlockFastConfirmationByClientDailyServiceGetErrors];
+
+export type FctBlockFastConfirmationByClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockFastConfirmationByClientDailyResponse;
+};
+
+export type FctBlockFastConfirmationByClientDailyServiceGetResponse =
+  FctBlockFastConfirmationByClientDailyServiceGetResponses[keyof FctBlockFastConfirmationByClientDailyServiceGetResponses];
+
+export type FctBlockFastConfirmationByClientHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: eq)
+     */
+    node_count_eq?: number;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: ne)
+     */
+    node_count_ne?: number;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: lt)
+     */
+    node_count_lt?: number;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: lte)
+     */
+    node_count_lte?: number;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: gt)
+     */
+    node_count_gt?: number;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: gte)
+     */
+    node_count_gte?: number;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: between_min)
+     */
+    node_count_between_min?: number;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: between_max_value)
+     */
+    node_count_between_max_value?: number;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: in_values) (comma-separated list)
+     */
+    node_count_in_values?: string;
+    /**
+     * Number of fast confirmation nodes running this consensus client (filter: not_in_values) (comma-separated list)
+     */
+    node_count_not_in_values?: string;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Number of canonical blocks scored for this consensus client (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Number of (canonical block, node) observations (filter: eq)
+     */
+    observation_count_eq?: number;
+    /**
+     * Number of (canonical block, node) observations (filter: ne)
+     */
+    observation_count_ne?: number;
+    /**
+     * Number of (canonical block, node) observations (filter: lt)
+     */
+    observation_count_lt?: number;
+    /**
+     * Number of (canonical block, node) observations (filter: lte)
+     */
+    observation_count_lte?: number;
+    /**
+     * Number of (canonical block, node) observations (filter: gt)
+     */
+    observation_count_gt?: number;
+    /**
+     * Number of (canonical block, node) observations (filter: gte)
+     */
+    observation_count_gte?: number;
+    /**
+     * Number of (canonical block, node) observations (filter: between_min)
+     */
+    observation_count_between_min?: number;
+    /**
+     * Number of (canonical block, node) observations (filter: between_max_value)
+     */
+    observation_count_between_max_value?: number;
+    /**
+     * Number of (canonical block, node) observations (filter: in_values) (comma-separated list)
+     */
+    observation_count_in_values?: string;
+    /**
+     * Number of (canonical block, node) observations (filter: not_in_values) (comma-separated list)
+     */
+    observation_count_not_in_values?: string;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: eq)
+     */
+    direct_count_eq?: number;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: ne)
+     */
+    direct_count_ne?: number;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: lt)
+     */
+    direct_count_lt?: number;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: lte)
+     */
+    direct_count_lte?: number;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: gt)
+     */
+    direct_count_gt?: number;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: gte)
+     */
+    direct_count_gte?: number;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: between_min)
+     */
+    direct_count_between_min?: number;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: between_max_value)
+     */
+    direct_count_between_max_value?: number;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: in_values) (comma-separated list)
+     */
+    direct_count_in_values?: string;
+    /**
+     * Observations where the node emitted a fast confirmation event for the block itself (filter: not_in_values) (comma-separated list)
+     */
+    direct_count_not_in_values?: string;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: eq)
+     */
+    descendant_count_eq?: number;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: ne)
+     */
+    descendant_count_ne?: number;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: lt)
+     */
+    descendant_count_lt?: number;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: lte)
+     */
+    descendant_count_lte?: number;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: gt)
+     */
+    descendant_count_gt?: number;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: gte)
+     */
+    descendant_count_gte?: number;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: between_min)
+     */
+    descendant_count_between_min?: number;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: between_max_value)
+     */
+    descendant_count_between_max_value?: number;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: in_values) (comma-separated list)
+     */
+    descendant_count_in_values?: string;
+    /**
+     * Observations where the block was only confirmed through an event for a later block (filter: not_in_values) (comma-separated list)
+     */
+    descendant_count_not_in_values?: string;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: eq)
+     */
+    unconfirmed_count_eq?: number;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: ne)
+     */
+    unconfirmed_count_ne?: number;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: lt)
+     */
+    unconfirmed_count_lt?: number;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: lte)
+     */
+    unconfirmed_count_lte?: number;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: gt)
+     */
+    unconfirmed_count_gt?: number;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: gte)
+     */
+    unconfirmed_count_gte?: number;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: between_min)
+     */
+    unconfirmed_count_between_min?: number;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: between_max_value)
+     */
+    unconfirmed_count_between_max_value?: number;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: in_values) (comma-separated list)
+     */
+    unconfirmed_count_in_values?: string;
+    /**
+     * Observations where the node did not fast confirm the block within 30 minutes (filter: not_in_values) (comma-separated list)
+     */
+    unconfirmed_count_not_in_values?: string;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: eq)
+     */
+    orphaned_count_eq?: number;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: ne)
+     */
+    orphaned_count_ne?: number;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: lt)
+     */
+    orphaned_count_lt?: number;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: lte)
+     */
+    orphaned_count_lte?: number;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: gt)
+     */
+    orphaned_count_gt?: number;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: gte)
+     */
+    orphaned_count_gte?: number;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: between_min)
+     */
+    orphaned_count_between_min?: number;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: between_max_value)
+     */
+    orphaned_count_between_max_value?: number;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: in_values) (comma-separated list)
+     */
+    orphaned_count_in_values?: string;
+    /**
+     * Fast confirmation events for blocks that did not become canonical (filter: not_in_values) (comma-separated list)
+     */
+    orphaned_count_not_in_values?: string;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: eq)
+     */
+    avg_fast_confirmation_ms_eq?: number;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: ne)
+     */
+    avg_fast_confirmation_ms_ne?: number;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: lt)
+     */
+    avg_fast_confirmation_ms_lt?: number;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: lte)
+     */
+    avg_fast_confirmation_ms_lte?: number;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: gt)
+     */
+    avg_fast_confirmation_ms_gt?: number;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: gte)
+     */
+    avg_fast_confirmation_ms_gte?: number;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: between_min)
+     */
+    avg_fast_confirmation_ms_between_min?: number;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: between_max_value)
+     */
+    avg_fast_confirmation_ms_between_max_value?: number;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: in_values) (comma-separated list)
+     */
+    avg_fast_confirmation_ms_in_values?: string;
+    /**
+     * Average milliseconds from slot start to fast confirmation (filter: not_in_values) (comma-separated list)
+     */
+    avg_fast_confirmation_ms_not_in_values?: string;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: eq)
+     */
+    min_fast_confirmation_ms_eq?: number;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: ne)
+     */
+    min_fast_confirmation_ms_ne?: number;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: lt)
+     */
+    min_fast_confirmation_ms_lt?: number;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: lte)
+     */
+    min_fast_confirmation_ms_lte?: number;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: gt)
+     */
+    min_fast_confirmation_ms_gt?: number;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: gte)
+     */
+    min_fast_confirmation_ms_gte?: number;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: between_min)
+     */
+    min_fast_confirmation_ms_between_min?: number;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: between_max_value)
+     */
+    min_fast_confirmation_ms_between_max_value?: number;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: in_values) (comma-separated list)
+     */
+    min_fast_confirmation_ms_in_values?: string;
+    /**
+     * Minimum milliseconds from slot start to fast confirmation (filter: not_in_values) (comma-separated list)
+     */
+    min_fast_confirmation_ms_not_in_values?: string;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: eq)
+     */
+    p50_fast_confirmation_ms_eq?: number;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: ne)
+     */
+    p50_fast_confirmation_ms_ne?: number;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: lt)
+     */
+    p50_fast_confirmation_ms_lt?: number;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: lte)
+     */
+    p50_fast_confirmation_ms_lte?: number;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: gt)
+     */
+    p50_fast_confirmation_ms_gt?: number;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: gte)
+     */
+    p50_fast_confirmation_ms_gte?: number;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: between_min)
+     */
+    p50_fast_confirmation_ms_between_min?: number;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: between_max_value)
+     */
+    p50_fast_confirmation_ms_between_max_value?: number;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: in_values) (comma-separated list)
+     */
+    p50_fast_confirmation_ms_in_values?: string;
+    /**
+     * Median milliseconds from slot start to fast confirmation (filter: not_in_values) (comma-separated list)
+     */
+    p50_fast_confirmation_ms_not_in_values?: string;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: eq)
+     */
+    p90_fast_confirmation_ms_eq?: number;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: ne)
+     */
+    p90_fast_confirmation_ms_ne?: number;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: lt)
+     */
+    p90_fast_confirmation_ms_lt?: number;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: lte)
+     */
+    p90_fast_confirmation_ms_lte?: number;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: gt)
+     */
+    p90_fast_confirmation_ms_gt?: number;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: gte)
+     */
+    p90_fast_confirmation_ms_gte?: number;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: between_min)
+     */
+    p90_fast_confirmation_ms_between_min?: number;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: between_max_value)
+     */
+    p90_fast_confirmation_ms_between_max_value?: number;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: in_values) (comma-separated list)
+     */
+    p90_fast_confirmation_ms_in_values?: string;
+    /**
+     * 90th percentile milliseconds from slot start to fast confirmation (filter: not_in_values) (comma-separated list)
+     */
+    p90_fast_confirmation_ms_not_in_values?: string;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: eq)
+     */
+    p95_fast_confirmation_ms_eq?: number;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: ne)
+     */
+    p95_fast_confirmation_ms_ne?: number;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: lt)
+     */
+    p95_fast_confirmation_ms_lt?: number;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: lte)
+     */
+    p95_fast_confirmation_ms_lte?: number;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: gt)
+     */
+    p95_fast_confirmation_ms_gt?: number;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: gte)
+     */
+    p95_fast_confirmation_ms_gte?: number;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: between_min)
+     */
+    p95_fast_confirmation_ms_between_min?: number;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: between_max_value)
+     */
+    p95_fast_confirmation_ms_between_max_value?: number;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: in_values) (comma-separated list)
+     */
+    p95_fast_confirmation_ms_in_values?: string;
+    /**
+     * 95th percentile milliseconds from slot start to fast confirmation (filter: not_in_values) (comma-separated list)
+     */
+    p95_fast_confirmation_ms_not_in_values?: string;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: eq)
+     */
+    p99_fast_confirmation_ms_eq?: number;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: ne)
+     */
+    p99_fast_confirmation_ms_ne?: number;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: lt)
+     */
+    p99_fast_confirmation_ms_lt?: number;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: lte)
+     */
+    p99_fast_confirmation_ms_lte?: number;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: gt)
+     */
+    p99_fast_confirmation_ms_gt?: number;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: gte)
+     */
+    p99_fast_confirmation_ms_gte?: number;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: between_min)
+     */
+    p99_fast_confirmation_ms_between_min?: number;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: between_max_value)
+     */
+    p99_fast_confirmation_ms_between_max_value?: number;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: in_values) (comma-separated list)
+     */
+    p99_fast_confirmation_ms_in_values?: string;
+    /**
+     * 99th percentile milliseconds from slot start to fast confirmation (filter: not_in_values) (comma-separated list)
+     */
+    p99_fast_confirmation_ms_not_in_values?: string;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: eq)
+     */
+    max_fast_confirmation_ms_eq?: number;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: ne)
+     */
+    max_fast_confirmation_ms_ne?: number;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: lt)
+     */
+    max_fast_confirmation_ms_lt?: number;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: lte)
+     */
+    max_fast_confirmation_ms_lte?: number;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: gt)
+     */
+    max_fast_confirmation_ms_gt?: number;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: gte)
+     */
+    max_fast_confirmation_ms_gte?: number;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: between_min)
+     */
+    max_fast_confirmation_ms_between_min?: number;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: between_max_value)
+     */
+    max_fast_confirmation_ms_between_max_value?: number;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: in_values) (comma-separated list)
+     */
+    max_fast_confirmation_ms_in_values?: string;
+    /**
+     * Maximum milliseconds from slot start to fast confirmation (filter: not_in_values) (comma-separated list)
+     */
+    max_fast_confirmation_ms_not_in_values?: string;
+    /**
+     * Average milliseconds from slot start to finality (filter: eq)
+     */
+    avg_finality_ms_eq?: number;
+    /**
+     * Average milliseconds from slot start to finality (filter: ne)
+     */
+    avg_finality_ms_ne?: number;
+    /**
+     * Average milliseconds from slot start to finality (filter: lt)
+     */
+    avg_finality_ms_lt?: number;
+    /**
+     * Average milliseconds from slot start to finality (filter: lte)
+     */
+    avg_finality_ms_lte?: number;
+    /**
+     * Average milliseconds from slot start to finality (filter: gt)
+     */
+    avg_finality_ms_gt?: number;
+    /**
+     * Average milliseconds from slot start to finality (filter: gte)
+     */
+    avg_finality_ms_gte?: number;
+    /**
+     * Average milliseconds from slot start to finality (filter: between_min)
+     */
+    avg_finality_ms_between_min?: number;
+    /**
+     * Average milliseconds from slot start to finality (filter: between_max_value)
+     */
+    avg_finality_ms_between_max_value?: number;
+    /**
+     * Average milliseconds from slot start to finality (filter: in_values) (comma-separated list)
+     */
+    avg_finality_ms_in_values?: string;
+    /**
+     * Average milliseconds from slot start to finality (filter: not_in_values) (comma-separated list)
+     */
+    avg_finality_ms_not_in_values?: string;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: eq)
+     */
+    min_finality_ms_eq?: number;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: ne)
+     */
+    min_finality_ms_ne?: number;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: lt)
+     */
+    min_finality_ms_lt?: number;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: lte)
+     */
+    min_finality_ms_lte?: number;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: gt)
+     */
+    min_finality_ms_gt?: number;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: gte)
+     */
+    min_finality_ms_gte?: number;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: between_min)
+     */
+    min_finality_ms_between_min?: number;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: between_max_value)
+     */
+    min_finality_ms_between_max_value?: number;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: in_values) (comma-separated list)
+     */
+    min_finality_ms_in_values?: string;
+    /**
+     * Minimum milliseconds from slot start to finality (filter: not_in_values) (comma-separated list)
+     */
+    min_finality_ms_not_in_values?: string;
+    /**
+     * Median milliseconds from slot start to finality (filter: eq)
+     */
+    p50_finality_ms_eq?: number;
+    /**
+     * Median milliseconds from slot start to finality (filter: ne)
+     */
+    p50_finality_ms_ne?: number;
+    /**
+     * Median milliseconds from slot start to finality (filter: lt)
+     */
+    p50_finality_ms_lt?: number;
+    /**
+     * Median milliseconds from slot start to finality (filter: lte)
+     */
+    p50_finality_ms_lte?: number;
+    /**
+     * Median milliseconds from slot start to finality (filter: gt)
+     */
+    p50_finality_ms_gt?: number;
+    /**
+     * Median milliseconds from slot start to finality (filter: gte)
+     */
+    p50_finality_ms_gte?: number;
+    /**
+     * Median milliseconds from slot start to finality (filter: between_min)
+     */
+    p50_finality_ms_between_min?: number;
+    /**
+     * Median milliseconds from slot start to finality (filter: between_max_value)
+     */
+    p50_finality_ms_between_max_value?: number;
+    /**
+     * Median milliseconds from slot start to finality (filter: in_values) (comma-separated list)
+     */
+    p50_finality_ms_in_values?: string;
+    /**
+     * Median milliseconds from slot start to finality (filter: not_in_values) (comma-separated list)
+     */
+    p50_finality_ms_not_in_values?: string;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: eq)
+     */
+    p95_finality_ms_eq?: number;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: ne)
+     */
+    p95_finality_ms_ne?: number;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: lt)
+     */
+    p95_finality_ms_lt?: number;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: lte)
+     */
+    p95_finality_ms_lte?: number;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: gt)
+     */
+    p95_finality_ms_gt?: number;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: gte)
+     */
+    p95_finality_ms_gte?: number;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: between_min)
+     */
+    p95_finality_ms_between_min?: number;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: between_max_value)
+     */
+    p95_finality_ms_between_max_value?: number;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: in_values) (comma-separated list)
+     */
+    p95_finality_ms_in_values?: string;
+    /**
+     * 95th percentile milliseconds from slot start to finality (filter: not_in_values) (comma-separated list)
+     */
+    p95_finality_ms_not_in_values?: string;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: eq)
+     */
+    max_finality_ms_eq?: number;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: ne)
+     */
+    max_finality_ms_ne?: number;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: lt)
+     */
+    max_finality_ms_lt?: number;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: lte)
+     */
+    max_finality_ms_lte?: number;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: gt)
+     */
+    max_finality_ms_gt?: number;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: gte)
+     */
+    max_finality_ms_gte?: number;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: between_min)
+     */
+    max_finality_ms_between_min?: number;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: between_max_value)
+     */
+    max_finality_ms_between_max_value?: number;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: in_values) (comma-separated list)
+     */
+    max_finality_ms_in_values?: string;
+    /**
+     * Maximum milliseconds from slot start to finality (filter: not_in_values) (comma-separated list)
+     */
+    max_finality_ms_not_in_values?: string;
+    /**
+     * Filter p50_speedup using value
+     */
+    p50_speedup_value?: number;
+    /**
+     * The maximum number of fct_block_fast_confirmation_by_client_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockFastConfirmationByClientHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_fast_confirmation_by_client_hourly';
+};
+
+export type FctBlockFastConfirmationByClientHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockFastConfirmationByClientHourlyServiceListError =
+  FctBlockFastConfirmationByClientHourlyServiceListErrors[keyof FctBlockFastConfirmationByClientHourlyServiceListErrors];
+
+export type FctBlockFastConfirmationByClientHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockFastConfirmationByClientHourlyResponse;
+};
+
+export type FctBlockFastConfirmationByClientHourlyServiceListResponse =
+  FctBlockFastConfirmationByClientHourlyServiceListResponses[keyof FctBlockFastConfirmationByClientHourlyServiceListResponses];
+
+export type FctBlockFastConfirmationByClientHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_fast_confirmation_by_client_hourly/{hour_start_date_time}';
+};
+
+export type FctBlockFastConfirmationByClientHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockFastConfirmationByClientHourlyServiceGetError =
+  FctBlockFastConfirmationByClientHourlyServiceGetErrors[keyof FctBlockFastConfirmationByClientHourlyServiceGetErrors];
+
+export type FctBlockFastConfirmationByClientHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockFastConfirmationByClientHourlyResponse;
+};
+
+export type FctBlockFastConfirmationByClientHourlyServiceGetResponse =
+  FctBlockFastConfirmationByClientHourlyServiceGetResponses[keyof FctBlockFastConfirmationByClientHourlyServiceGetResponses];
+
+export type FctBlockFastConfirmationByNodeServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * Name of the sentry node that emitted the fast confirmation events (filter: eq)
+     */
+    meta_client_name_eq?: string;
+    /**
+     * Name of the sentry node that emitted the fast confirmation events (filter: ne)
+     */
+    meta_client_name_ne?: string;
+    /**
+     * Name of the sentry node that emitted the fast confirmation events (filter: contains)
+     */
+    meta_client_name_contains?: string;
+    /**
+     * Name of the sentry node that emitted the fast confirmation events (filter: starts_with)
+     */
+    meta_client_name_starts_with?: string;
+    /**
+     * Name of the sentry node that emitted the fast confirmation events (filter: ends_with)
+     */
+    meta_client_name_ends_with?: string;
+    /**
+     * Name of the sentry node that emitted the fast confirmation events (filter: like)
+     */
+    meta_client_name_like?: string;
+    /**
+     * Name of the sentry node that emitted the fast confirmation events (filter: not_like)
+     */
+    meta_client_name_not_like?: string;
+    /**
+     * Name of the sentry node that emitted the fast confirmation events (filter: in_values) (comma-separated list)
+     */
+    meta_client_name_in_values?: string;
+    /**
+     * Name of the sentry node that emitted the fast confirmation events (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_name_not_in_values?: string;
+    /**
+     * The beacon block root hash (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * The beacon block root hash (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * The beacon block root hash (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * The beacon block root hash (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * The beacon block root hash (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * The beacon block root hash (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * The beacon block root hash (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * The beacon block root hash (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * The beacon block root hash (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The slot number of the block (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot number of the block (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot number of the block (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot number of the block (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot number of the block (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot number of the block (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot number of the block (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot number of the block (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot number of the block (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot number of the block (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Chain status of the block: canonical, or orphaned when a node fast confirmed a block that did not become canonical (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * Chain status of the block: canonical, or orphaned when a node fast confirmed a block that did not become canonical (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * Chain status of the block: canonical, or orphaned when a node fast confirmed a block that did not become canonical (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * Chain status of the block: canonical, or orphaned when a node fast confirmed a block that did not become canonical (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * Chain status of the block: canonical, or orphaned when a node fast confirmed a block that did not become canonical (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * Chain status of the block: canonical, or orphaned when a node fast confirmed a block that did not become canonical (filter: like)
+     */
+    status_like?: string;
+    /**
+     * Chain status of the block: canonical, or orphaned when a node fast confirmed a block that did not become canonical (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * Chain status of the block: canonical, or orphaned when a node fast confirmed a block that did not become canonical (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * Chain status of the block: canonical, or orphaned when a node fast confirmed a block that did not become canonical (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * Consensus client implementation running the fast confirmation rule (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * Consensus client version running the fast confirmation rule (filter: eq)
+     */
+    meta_consensus_version_eq?: string;
+    /**
+     * Consensus client version running the fast confirmation rule (filter: ne)
+     */
+    meta_consensus_version_ne?: string;
+    /**
+     * Consensus client version running the fast confirmation rule (filter: contains)
+     */
+    meta_consensus_version_contains?: string;
+    /**
+     * Consensus client version running the fast confirmation rule (filter: starts_with)
+     */
+    meta_consensus_version_starts_with?: string;
+    /**
+     * Consensus client version running the fast confirmation rule (filter: ends_with)
+     */
+    meta_consensus_version_ends_with?: string;
+    /**
+     * Consensus client version running the fast confirmation rule (filter: like)
+     */
+    meta_consensus_version_like?: string;
+    /**
+     * Consensus client version running the fast confirmation rule (filter: not_like)
+     */
+    meta_consensus_version_not_like?: string;
+    /**
+     * Consensus client version running the fast confirmation rule (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_version_in_values?: string;
+    /**
+     * Consensus client version running the fast confirmation rule (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_version_not_in_values?: string;
+    /**
+     * How the block was fast confirmed: direct (an event for this block), descendant (only implied by an event for a later block), or unconfirmed (no confirmation seen within 30 minutes) (filter: eq)
+     */
+    confirmation_type_eq?: string;
+    /**
+     * How the block was fast confirmed: direct (an event for this block), descendant (only implied by an event for a later block), or unconfirmed (no confirmation seen within 30 minutes) (filter: ne)
+     */
+    confirmation_type_ne?: string;
+    /**
+     * How the block was fast confirmed: direct (an event for this block), descendant (only implied by an event for a later block), or unconfirmed (no confirmation seen within 30 minutes) (filter: contains)
+     */
+    confirmation_type_contains?: string;
+    /**
+     * How the block was fast confirmed: direct (an event for this block), descendant (only implied by an event for a later block), or unconfirmed (no confirmation seen within 30 minutes) (filter: starts_with)
+     */
+    confirmation_type_starts_with?: string;
+    /**
+     * How the block was fast confirmed: direct (an event for this block), descendant (only implied by an event for a later block), or unconfirmed (no confirmation seen within 30 minutes) (filter: ends_with)
+     */
+    confirmation_type_ends_with?: string;
+    /**
+     * How the block was fast confirmed: direct (an event for this block), descendant (only implied by an event for a later block), or unconfirmed (no confirmation seen within 30 minutes) (filter: like)
+     */
+    confirmation_type_like?: string;
+    /**
+     * How the block was fast confirmed: direct (an event for this block), descendant (only implied by an event for a later block), or unconfirmed (no confirmation seen within 30 minutes) (filter: not_like)
+     */
+    confirmation_type_not_like?: string;
+    /**
+     * How the block was fast confirmed: direct (an event for this block), descendant (only implied by an event for a later block), or unconfirmed (no confirmation seen within 30 minutes) (filter: in_values) (comma-separated list)
+     */
+    confirmation_type_in_values?: string;
+    /**
+     * How the block was fast confirmed: direct (an event for this block), descendant (only implied by an event for a later block), or unconfirmed (no confirmation seen within 30 minutes) (filter: not_in_values) (comma-separated list)
+     */
+    confirmation_type_not_in_values?: string;
+    /**
+     * Milliseconds from slot start until the node fast confirmed this block, directly or through a descendant (filter: eq)
+     */
+    fast_confirmed_slot_start_diff_eq?: number;
+    /**
+     * Milliseconds from slot start until the node fast confirmed this block, directly or through a descendant (filter: ne)
+     */
+    fast_confirmed_slot_start_diff_ne?: number;
+    /**
+     * Milliseconds from slot start until the node fast confirmed this block, directly or through a descendant (filter: lt)
+     */
+    fast_confirmed_slot_start_diff_lt?: number;
+    /**
+     * Milliseconds from slot start until the node fast confirmed this block, directly or through a descendant (filter: lte)
+     */
+    fast_confirmed_slot_start_diff_lte?: number;
+    /**
+     * Milliseconds from slot start until the node fast confirmed this block, directly or through a descendant (filter: gt)
+     */
+    fast_confirmed_slot_start_diff_gt?: number;
+    /**
+     * Milliseconds from slot start until the node fast confirmed this block, directly or through a descendant (filter: gte)
+     */
+    fast_confirmed_slot_start_diff_gte?: number;
+    /**
+     * Milliseconds from slot start until the node fast confirmed this block, directly or through a descendant (filter: between_min)
+     */
+    fast_confirmed_slot_start_diff_between_min?: number;
+    /**
+     * Milliseconds from slot start until the node fast confirmed this block, directly or through a descendant (filter: between_max_value)
+     */
+    fast_confirmed_slot_start_diff_between_max_value?: number;
+    /**
+     * Milliseconds from slot start until the node fast confirmed this block, directly or through a descendant (filter: in_values) (comma-separated list)
+     */
+    fast_confirmed_slot_start_diff_in_values?: string;
+    /**
+     * Milliseconds from slot start until the node fast confirmed this block, directly or through a descendant (filter: not_in_values) (comma-separated list)
+     */
+    fast_confirmed_slot_start_diff_not_in_values?: string;
+    /**
+     * Slot of the block whose fast confirmation event first covered this block. Equals slot for direct confirmations (filter: eq)
+     */
+    fast_confirmation_slot_eq?: number;
+    /**
+     * Slot of the block whose fast confirmation event first covered this block. Equals slot for direct confirmations (filter: ne)
+     */
+    fast_confirmation_slot_ne?: number;
+    /**
+     * Slot of the block whose fast confirmation event first covered this block. Equals slot for direct confirmations (filter: lt)
+     */
+    fast_confirmation_slot_lt?: number;
+    /**
+     * Slot of the block whose fast confirmation event first covered this block. Equals slot for direct confirmations (filter: lte)
+     */
+    fast_confirmation_slot_lte?: number;
+    /**
+     * Slot of the block whose fast confirmation event first covered this block. Equals slot for direct confirmations (filter: gt)
+     */
+    fast_confirmation_slot_gt?: number;
+    /**
+     * Slot of the block whose fast confirmation event first covered this block. Equals slot for direct confirmations (filter: gte)
+     */
+    fast_confirmation_slot_gte?: number;
+    /**
+     * Slot of the block whose fast confirmation event first covered this block. Equals slot for direct confirmations (filter: between_min)
+     */
+    fast_confirmation_slot_between_min?: number;
+    /**
+     * Slot of the block whose fast confirmation event first covered this block. Equals slot for direct confirmations (filter: between_max_value)
+     */
+    fast_confirmation_slot_between_max_value?: number;
+    /**
+     * Slot of the block whose fast confirmation event first covered this block. Equals slot for direct confirmations (filter: in_values) (comma-separated list)
+     */
+    fast_confirmation_slot_in_values?: string;
+    /**
+     * Slot of the block whose fast confirmation event first covered this block. Equals slot for direct confirmations (filter: not_in_values) (comma-separated list)
+     */
+    fast_confirmation_slot_not_in_values?: string;
+    /**
+     * Milliseconds from slot start until the first sentry observed a finalized checkpoint covering this block (filter: eq)
+     */
+    finalized_slot_start_diff_eq?: number;
+    /**
+     * Milliseconds from slot start until the first sentry observed a finalized checkpoint covering this block (filter: ne)
+     */
+    finalized_slot_start_diff_ne?: number;
+    /**
+     * Milliseconds from slot start until the first sentry observed a finalized checkpoint covering this block (filter: lt)
+     */
+    finalized_slot_start_diff_lt?: number;
+    /**
+     * Milliseconds from slot start until the first sentry observed a finalized checkpoint covering this block (filter: lte)
+     */
+    finalized_slot_start_diff_lte?: number;
+    /**
+     * Milliseconds from slot start until the first sentry observed a finalized checkpoint covering this block (filter: gt)
+     */
+    finalized_slot_start_diff_gt?: number;
+    /**
+     * Milliseconds from slot start until the first sentry observed a finalized checkpoint covering this block (filter: gte)
+     */
+    finalized_slot_start_diff_gte?: number;
+    /**
+     * Milliseconds from slot start until the first sentry observed a finalized checkpoint covering this block (filter: between_min)
+     */
+    finalized_slot_start_diff_between_min?: number;
+    /**
+     * Milliseconds from slot start until the first sentry observed a finalized checkpoint covering this block (filter: between_max_value)
+     */
+    finalized_slot_start_diff_between_max_value?: number;
+    /**
+     * Milliseconds from slot start until the first sentry observed a finalized checkpoint covering this block (filter: in_values) (comma-separated list)
+     */
+    finalized_slot_start_diff_in_values?: string;
+    /**
+     * Milliseconds from slot start until the first sentry observed a finalized checkpoint covering this block (filter: not_in_values) (comma-separated list)
+     */
+    finalized_slot_start_diff_not_in_values?: string;
+    /**
+     * Epoch of the finalized checkpoint that first covered this block (filter: eq)
+     */
+    finalized_epoch_eq?: number;
+    /**
+     * Epoch of the finalized checkpoint that first covered this block (filter: ne)
+     */
+    finalized_epoch_ne?: number;
+    /**
+     * Epoch of the finalized checkpoint that first covered this block (filter: lt)
+     */
+    finalized_epoch_lt?: number;
+    /**
+     * Epoch of the finalized checkpoint that first covered this block (filter: lte)
+     */
+    finalized_epoch_lte?: number;
+    /**
+     * Epoch of the finalized checkpoint that first covered this block (filter: gt)
+     */
+    finalized_epoch_gt?: number;
+    /**
+     * Epoch of the finalized checkpoint that first covered this block (filter: gte)
+     */
+    finalized_epoch_gte?: number;
+    /**
+     * Epoch of the finalized checkpoint that first covered this block (filter: between_min)
+     */
+    finalized_epoch_between_min?: number;
+    /**
+     * Epoch of the finalized checkpoint that first covered this block (filter: between_max_value)
+     */
+    finalized_epoch_between_max_value?: number;
+    /**
+     * Epoch of the finalized checkpoint that first covered this block (filter: in_values) (comma-separated list)
+     */
+    finalized_epoch_in_values?: string;
+    /**
+     * Epoch of the finalized checkpoint that first covered this block (filter: not_in_values) (comma-separated list)
+     */
+    finalized_epoch_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_fast_confirmation_by_node to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockFastConfirmationByNode` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_fast_confirmation_by_node';
+};
+
+export type FctBlockFastConfirmationByNodeServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockFastConfirmationByNodeServiceListError =
+  FctBlockFastConfirmationByNodeServiceListErrors[keyof FctBlockFastConfirmationByNodeServiceListErrors];
+
+export type FctBlockFastConfirmationByNodeServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockFastConfirmationByNodeResponse;
+};
+
+export type FctBlockFastConfirmationByNodeServiceListResponse =
+  FctBlockFastConfirmationByNodeServiceListResponses[keyof FctBlockFastConfirmationByNodeServiceListResponses];
+
+export type FctBlockFastConfirmationByNodeServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_fast_confirmation_by_node/{slot_start_date_time}';
+};
+
+export type FctBlockFastConfirmationByNodeServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockFastConfirmationByNodeServiceGetError =
+  FctBlockFastConfirmationByNodeServiceGetErrors[keyof FctBlockFastConfirmationByNodeServiceGetErrors];
+
+export type FctBlockFastConfirmationByNodeServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockFastConfirmationByNodeResponse;
+};
+
+export type FctBlockFastConfirmationByNodeServiceGetResponse =
+  FctBlockFastConfirmationByNodeServiceGetResponses[keyof FctBlockFastConfirmationByNodeServiceGetResponses];
 
 export type FctBlockFirstSeenByNodeServiceListData = {
   body?: never;
