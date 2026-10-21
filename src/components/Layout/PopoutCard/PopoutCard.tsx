@@ -249,7 +249,12 @@ export function PopoutCard({
     <>
       <div ref={cardRef} className="h-full">
         <Card
-          className={clsx('flex h-full flex-col', noPadding && '[&>div:last-child]:p-0', className)}
+          className={clsx(
+            'flex h-full flex-col',
+            noPadding &&
+              '[&>div:last-child]:p-0 [&>div:last-child]:[--card-inset-y:0px] [&>div:last-child]:[--card-inset:0px]',
+            className
+          )}
           header={
             <div className="flex w-full items-center justify-between gap-4">
               <div className="min-w-0 flex-1 space-y-1">
