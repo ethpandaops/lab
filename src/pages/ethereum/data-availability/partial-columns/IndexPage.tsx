@@ -321,7 +321,9 @@ export function IndexPage(): JSX.Element {
                 </PopoutCard>
 
                 <VersionAdoption versions={versions} isDaily={isDaily} />
+              </div>
 
+              <div className="flex flex-col gap-4">
                 <PopoutCard
                   title="Completion Paths"
                   subtitle={`${periodLabel} share of ${sentryName} sentry column completions by how the column was completed`}
@@ -338,6 +340,7 @@ export function IndexPage(): JSX.Element {
                         showLegend
                         legendPosition="top"
                         enableDataZoom
+                        showDataZoomSlider={inModal}
                         tooltipFormatter={pathShareTooltip}
                         syncGroup={inModal ? undefined : 'partial-columns'}
                       />
@@ -359,10 +362,11 @@ export function IndexPage(): JSX.Element {
                         series={charts.pathLatency}
                         xAxis={{ type: 'category', labels, name: 'Date' }}
                         yAxis={{ name: 'Time (ms)', min: 0, formatter: formatMs }}
-                        height={inModal ? 600 : 320}
+                        height={inModal ? 600 : 240}
                         showLegend
                         legendPosition="top"
                         enableDataZoom
+                        showDataZoomSlider={inModal}
                         tooltipFormatter={latencyTooltip}
                         syncGroup={inModal ? undefined : 'partial-columns'}
                       />
@@ -384,10 +388,11 @@ export function IndexPage(): JSX.Element {
                         series={charts.cellSource}
                         xAxis={{ type: 'category', labels, name: 'Date' }}
                         yAxis={{ name: 'Share (%)', min: 0, max: 100 }}
-                        height={inModal ? 600 : 320}
+                        height={inModal ? 600 : 240}
                         showLegend
                         legendPosition="top"
                         enableDataZoom
+                        showDataZoomSlider={inModal}
                         tooltipFormatter={shareTooltip(charts.cellSource, keys, `${sentryName} sentry cells`)}
                         syncGroup={inModal ? undefined : 'partial-columns'}
                       />
@@ -412,10 +417,11 @@ export function IndexPage(): JSX.Element {
                         xAxis={{ type: 'category', labels, name: 'Date' }}
                         yAxis={{ name: 'Useful (%)', min: 0, max: 100 }}
                         secondaryYAxis={{ name: 'Cells received', min: 0, formatter: formatCompact }}
-                        height={inModal ? 600 : 320}
+                        height={inModal ? 600 : 240}
                         showLegend
                         legendPosition="top"
                         enableDataZoom
+                        showDataZoomSlider={inModal}
                         tooltipFormatter={usefulTooltip}
                         syncGroup={inModal ? undefined : 'partial-columns'}
                       />
@@ -440,10 +446,11 @@ export function IndexPage(): JSX.Element {
                         series={charts.verdicts}
                         xAxis={{ type: 'category', labels, name: 'Date' }}
                         yAxis={{ name: 'Verdicts', min: 0, formatter: formatCompact }}
-                        height={inModal ? 600 : 320}
+                        height={inModal ? 600 : 240}
                         showLegend
                         legendPosition="top"
                         enableDataZoom
+                        showDataZoomSlider={inModal}
                         tooltipFormatter={verdictTooltip}
                         syncGroup={inModal ? undefined : 'partial-columns'}
                       />
@@ -465,7 +472,7 @@ export function IndexPage(): JSX.Element {
                         series={charts.header}
                         xAxis={{ type: 'category', labels, name: 'Date' }}
                         yAxis={{ name: 'Time (ms)', min: 0, formatter: formatMs }}
-                        height={inModal ? 600 : 320}
+                        height={inModal ? 600 : 240}
                         showLegend
                         legendPosition="top"
                         enableDataZoom

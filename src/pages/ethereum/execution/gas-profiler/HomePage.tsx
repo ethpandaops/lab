@@ -1216,7 +1216,7 @@ export function HomePage(): JSX.Element {
       </div>
 
       {/* Receipt Size Per Block */}
-      <div className="mb-6 grid grid-cols-1 lg:grid-cols-2">
+      <div className="mb-6">
         <PopoutCard title="Receipt Size Per Block" anchorId="receipt-size-chart" modalSize="full">
           {({ inModal }) =>
             isReceiptSizeLoading ? (

@@ -2,6 +2,7 @@ import { type JSX, useMemo, useCallback, useState } from 'react';
 import { useSearch, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Container } from '@/components/Layout/Container';
+import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import {
@@ -665,12 +666,9 @@ export function IndexPage(): JSX.Element {
     [transactionsRecords, unifiedTimeKeys, isDaily]
   );
 
-  // Chart subtitles
   return (
     <Container>
-      <div className="mb-8">
-        <h1 className="text-4xl/tight font-bold text-foreground">Execution Overview</h1>
-      </div>
+      <Header title="Execution Overview" />
 
       {/* Time Period Selector */}
       <div className="mb-6 flex flex-wrap items-center gap-6">
@@ -683,7 +681,7 @@ export function IndexPage(): JSX.Element {
 
         {/* Annotations Toggle */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted">Show Forks</span>
+          <span className="text-sm text-muted">Forks</span>
           <Toggle checked={showAnnotations} onChange={setShowAnnotations} size="small" />
         </div>
       </div>
@@ -698,7 +696,7 @@ export function IndexPage(): JSX.Element {
 
       {/* Charts */}
       {!isLoading && (
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div className="flex flex-col gap-4">
           {/* TPS Chart */}
           {tpsChartConfig && (
             <PopoutCard title="Transactions Per Second" anchorId="tps-chart" modalSize="full">
@@ -714,47 +712,12 @@ export function IndexPage(): JSX.Element {
                     name: 'TPS',
                     min: 0,
                   }}
-                  height={inModal ? 600 : 400}
+                  height={inModal ? 600 : 320}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
+                  showDataZoomSlider={inModal}
                   tooltipFormatter={tpsTooltipFormatter}
-                  markLines={showAnnotations ? forkMarkLines : []}
-                  syncGroup={inModal ? undefined : 'execution-overview'}
-                />
-              )}
-            </PopoutCard>
-          )}
-
-          {/* Transactions Chart */}
-          {transactionsChartConfig && (
-            <PopoutCard title="Transactions Per Block" anchorId="transactions-chart" modalSize="full">
-              {({ inModal }) => (
-                <MultiLineChart
-                  series={transactionsChartConfig.series}
-                  xAxis={{
-                    type: 'category',
-                    labels: transactionsChartConfig.labels,
-                    name: 'Date',
-                  }}
-                  yAxis={{
-                    name: 'Txn/Block',
-                    min: 0,
-                  }}
-                  secondaryYAxis={{
-                    name: 'Cumulative',
-                    min: 0,
-                    formatter: (val: number) => {
-                      if (val >= 1_000_000_000) return `${(val / 1_000_000_000).toFixed(1)}B`;
-                      if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(0)}M`;
-                      return String(val);
-                    },
-                  }}
-                  height={inModal ? 600 : 400}
-                  showLegend
-                  legendPosition="top"
-                  enableDataZoom
-                  tooltipFormatter={transactionsTooltipFormatter}
                   markLines={showAnnotations ? forkMarkLines : []}
                   syncGroup={inModal ? undefined : 'execution-overview'}
                 />
@@ -789,11 +752,49 @@ export function IndexPage(): JSX.Element {
                       return String(val);
                     },
                   }}
-                  height={inModal ? 600 : 400}
+                  height={inModal ? 600 : 240}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
+                  showDataZoomSlider={inModal}
                   tooltipFormatter={gasTooltipFormatter}
+                  markLines={showAnnotations ? forkMarkLines : []}
+                  syncGroup={inModal ? undefined : 'execution-overview'}
+                />
+              )}
+            </PopoutCard>
+          )}
+
+          {/* Transactions Chart */}
+          {transactionsChartConfig && (
+            <PopoutCard title="Transactions Per Block" anchorId="transactions-chart" modalSize="full">
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={transactionsChartConfig.series}
+                  xAxis={{
+                    type: 'category',
+                    labels: transactionsChartConfig.labels,
+                    name: 'Date',
+                  }}
+                  yAxis={{
+                    name: 'Txn/Block',
+                    min: 0,
+                  }}
+                  secondaryYAxis={{
+                    name: 'Cumulative',
+                    min: 0,
+                    formatter: (val: number) => {
+                      if (val >= 1_000_000_000) return `${(val / 1_000_000_000).toFixed(1)}B`;
+                      if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(0)}M`;
+                      return String(val);
+                    },
+                  }}
+                  height={inModal ? 600 : 240}
+                  showLegend
+                  legendPosition="top"
+                  enableDataZoom
+                  showDataZoomSlider={inModal}
+                  tooltipFormatter={transactionsTooltipFormatter}
                   markLines={showAnnotations ? forkMarkLines : []}
                   syncGroup={inModal ? undefined : 'execution-overview'}
                 />
@@ -826,7 +827,7 @@ export function IndexPage(): JSX.Element {
                       return String(val);
                     },
                   }}
-                  height={inModal ? 600 : 400}
+                  height={inModal ? 600 : 240}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
