@@ -73,11 +73,17 @@ Constant across all themes:
 
 ## Border Radius
 
-`rounded-sm` everywhere. Cards, buttons, inputs, navigation items, badges, legends.
+Two radii, set as tokens in `src/index.css`:
 
-No mixing of sharp and round. One radius, one feel.
+| Class | Value | Use |
+|---|---|---|
+| `rounded-xs` | 4px | Inline marks: badges, tags, skeleton bars, toggle knobs |
+| `rounded-sm` | 6px | Every container and control: cards, buttons, inputs, selects, toggles, menus, nav items |
+| `rounded-full` | — | Dots, avatars, progress tracks only |
 
----
+`rounded-md` through `rounded-3xl` alias to `rounded-sm`, so legacy classes can't drift. Card,
+Button, ButtonGroup, SelectMenu, Toggle and Checkbox are rounded by default; their `rounded` prop
+exists only to opt out (for example a card bleeding into a page edge).
 
 ## Spacing
 
@@ -299,6 +305,7 @@ Elements with fade-in start with `opacity: 0`.
 - Use locale formatting for slots/epochs (no commas)
 - Override chart grid config in wrapper components unless necessary
 - Mix depth strategies (shadows in dark mode, outlines in light mode)
-- Use `rounded-md`, `rounded-lg` — only `rounded-sm`
+- Reach for `rounded-md`/`rounded-lg` — they alias to `rounded-sm`; write `rounded-sm` (or `rounded-xs` for inline marks)
+- Use `rounded-full` for buttons or segmented controls
 - Add grid lines to charts
 - Use multiple accent colors — terracotta is the accent

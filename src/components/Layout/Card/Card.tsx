@@ -56,7 +56,7 @@ export function Card({
   isInteractive = false,
   onClick,
   featureImage,
-  rounded = false,
+  rounded = true,
   allowContentOverflow = false,
 }: CardProps): JSX.Element {
   const styles = variantStyles[variant];

@@ -56,7 +56,7 @@ export function NetworkSelect({
         <ListboxButton
           title={getNetworkFullLabel(currentNetwork)}
           className={clsx(
-            'relative flex h-11 cursor-pointer items-center gap-2 border border-border bg-surface/50 pr-10 pl-3 text-left shadow-xs backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-surface/70 hover:shadow-sm',
+            'relative flex h-11 cursor-pointer items-center gap-2 rounded-sm border border-border bg-surface/50 pr-10 pl-3 text-left shadow-xs backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-surface/70 hover:shadow-sm',
             expandToFit ? 'w-auto min-w-[140px]' : 'w-full'
           )}
         >
@@ -78,7 +78,7 @@ export function NetworkSelect({
           anchor="bottom start"
           transition
           className={clsx(
-            'z-[9999] mt-1 max-h-96 overflow-auto border border-border bg-surface pb-1 shadow-lg backdrop-blur-xl focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0',
+            'z-[9999] mt-1 max-h-96 overflow-auto rounded-sm border border-border bg-surface pb-1 shadow-lg backdrop-blur-xl focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0',
             expandToFit ? 'w-max min-w-[var(--button-width)]' : 'w-[var(--button-width)]'
           )}
         >

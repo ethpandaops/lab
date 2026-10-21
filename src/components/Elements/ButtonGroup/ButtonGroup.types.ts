@@ -6,7 +6,7 @@ export interface ButtonGroupProps extends ComponentPropsWithoutRef<'span'> {
    */
   children: ReactNode;
   /**
-   * Apply rounded corners to the button group. Default: false
+   * Apply rounded corners to the button group. Default: true
    */
   rounded?: boolean;
 }

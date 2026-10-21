@@ -41,7 +41,7 @@ export function EntityFilter({ value, onChange, options, disabled = false }: Ent
           placeholder="All entities"
           displayValue={(entity: string | null) => (entity ? entityLabel(entity) : '')}
           onChange={event => setSearch(event.target.value)}
-          className="w-full border border-border bg-surface/50 py-2 pr-14 pl-3 text-foreground shadow-xs backdrop-blur-sm transition-all placeholder:text-foreground hover:border-primary/30 hover:bg-surface/70 focus:border-primary/50 focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-sm border border-border bg-surface/50 py-2 pr-14 pl-3 text-foreground shadow-xs backdrop-blur-sm transition-all placeholder:text-foreground hover:border-primary/30 hover:bg-surface/70 focus:border-primary/50 focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
         />
         {value && (
           <button
@@ -61,7 +61,7 @@ export function EntityFilter({ value, onChange, options, disabled = false }: Ent
       <ComboboxOptions
         anchor="bottom start"
         transition
-        className="z-[9999] mt-1 w-[max(var(--input-width),20rem)] overflow-auto border border-border bg-surface shadow-lg backdrop-blur-xl [--anchor-max-height:18rem] empty:invisible data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0"
+        className="z-[9999] mt-1 w-[max(var(--input-width),20rem)] overflow-auto rounded-sm border border-border bg-surface shadow-lg backdrop-blur-xl [--anchor-max-height:18rem] empty:invisible data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0"
       >
         {matches.length === 0 && search.trim() !== '' && (
           <div className="px-3 py-2 text-sm text-muted">No entity matches &ldquo;{search.trim()}&rdquo;</div>

@@ -56,8 +56,8 @@ export interface SelectMenuProps<T> {
   expandToFit?: boolean;
 
   /**
-   * Apply rounded corners (rounded-lg)
-   * @default false
+   * Apply rounded corners (rounded-sm)
+   * @default true
    */
   rounded?: boolean;
 }
