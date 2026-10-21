@@ -54,6 +54,7 @@ import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory, getEtherscanBaseU
 import type { GasProfilerBlockSearch } from './IndexPage.types';
 import type { IntTransactionReceiptSize } from '@/api/types.gen';
 import { formatBytes } from '@/utils';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 /**
  * Available call types for filtering
@@ -1175,6 +1176,7 @@ export function BlockPage(): JSX.Element {
               {({ inModal }) =>
                 data.transactions.length > 0 ? (
                   <ReactECharts
+                    theme={ECHARTS_THEME}
                     option={gasDistributionOption}
                     style={{ height: inModal ? 500 : 280 }}
                     onEvents={{ click: handleTreemapClick }}
@@ -1476,6 +1478,7 @@ export function BlockPage(): JSX.Element {
                 <PopoutCard title="Gas by Contract" subtitle="Top 30 contracts by gas consumption" modalSize="xl">
                   {({ inModal }) => (
                     <ReactECharts
+                      theme={ECHARTS_THEME}
                       option={contractTreemapOption}
                       style={{ height: inModal ? 500 : 280, cursor: 'pointer' }}
                       opts={{ renderer: 'canvas' }}
@@ -1524,6 +1527,7 @@ export function BlockPage(): JSX.Element {
                 >
                   {({ inModal }) => (
                     <ReactECharts
+                      theme={ECHARTS_THEME}
                       option={contractFlowSankeyOption}
                       style={{ height: inModal ? 550 : 320, width: '100%', cursor: 'pointer' }}
                       opts={{ renderer: 'canvas' }}

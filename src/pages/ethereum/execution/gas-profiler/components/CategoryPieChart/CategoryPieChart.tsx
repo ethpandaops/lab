@@ -2,6 +2,7 @@ import { type JSX, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 /**
  * Data item for the pie chart
@@ -147,7 +148,7 @@ export function CategoryPieChart({
             Loading...
           </div>
         ) : data.length > 0 ? (
-          <ReactECharts option={chartOption} style={{ height: chartHeight }} />
+          <ReactECharts theme={ECHARTS_THEME} option={chartOption} style={{ height: chartHeight }} />
         ) : (
           <div className="flex items-center justify-center text-sm text-muted" style={{ height: chartHeight }}>
             {emptyMessage}

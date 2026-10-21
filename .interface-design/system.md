@@ -10,7 +10,7 @@
 
 **Signature element:** The PopoutCard. Every chart lives in an expandable container that breaks out to fullscreen or exports as a branded image. Fork annotations read like geological strata across synchronized chart groups.
 
-**Typeface:** Space Grotesk Variable — geometric precision with personality. Not sterile, not playful. Technical with warmth.
+**Typeface:** Geist for UI text and numbers (`font-sans`), Geist Mono for identifiers — hashes, graffiti, code (`font-mono`). Space Grotesk is the brand display face (`font-display`), used only for the wordmark and the landing hero. Charts get Geist through the registered `lab` ECharts theme (`ECHARTS_THEME`), since canvas text can't inherit CSS fonts.
 
 ---
 
@@ -104,7 +104,7 @@ exists only to opt out (for example a card bleeding into a page edge).
 
 ## Typography
 
-All text uses Space Grotesk Variable.
+All UI text uses Geist (`font-sans`). Identifiers use Geist Mono (`font-mono`). Space Grotesk (`font-display`) is reserved for the brand.
 
 | Role | Classes |
 |---|---|

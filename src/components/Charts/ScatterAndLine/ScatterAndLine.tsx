@@ -9,6 +9,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import { useSharedCrosshairs } from '@/hooks/useSharedCrosshairs';
 import type { ScatterAndLineChartProps } from './ScatterAndLine.types';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -315,6 +316,7 @@ export function ScatterAndLineChart({
   return (
     <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
       <ReactEChartsCore
+        theme={ECHARTS_THEME}
         ref={chartRef}
         echarts={echarts}
         option={option}

@@ -7,6 +7,7 @@ import { CanvasRenderer } from 'echarts/renderers';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { BarChartProps } from './Bar.types';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -242,6 +243,7 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
   return (
     <div className={_height === '100%' ? 'h-full w-full' : 'w-full'}>
       <ReactEChartsCore
+        theme={ECHARTS_THEME}
         ref={ref}
         echarts={echarts}
         option={option}

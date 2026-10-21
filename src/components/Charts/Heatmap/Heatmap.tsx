@@ -14,6 +14,7 @@ import colors from 'tailwindcss/colors';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { resolveCssColorToHex } from '@/utils/color';
 import type { HeatmapChartProps } from './Heatmap.types';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 // Register ECharts components
 echarts.use([
@@ -329,6 +330,7 @@ export function HeatmapChart({
   return (
     <div className="h-full w-full">
       <ReactEChartsCore
+        theme={ECHARTS_THEME}
         echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}

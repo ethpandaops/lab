@@ -55,6 +55,7 @@ import {
   isMainnet,
 } from './utils';
 import type { CallTreeNode, OpcodeStats } from './IndexPage.types';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 /**
  * Format gas value with comma separators
@@ -1181,6 +1182,7 @@ export function TransactionPage(): JSX.Element {
                   <PopoutCard title="Gas by Contract" modalSize="xl">
                     {({ inModal }) => (
                       <ReactECharts
+                        theme={ECHARTS_THEME}
                         option={contractTreemapOption}
                         style={{ height: inModal ? 500 : 280, cursor: 'pointer' }}
                         opts={{ renderer: 'canvas' }}

@@ -8,6 +8,7 @@ import clsx from 'clsx';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { StackedBarProps } from './StackedBar.types';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -307,6 +308,7 @@ export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function
       {/* Chart */}
       {option && (
         <ReactEChartsCore
+          theme={ECHARTS_THEME}
           ref={ref}
           echarts={echarts}
           option={option}

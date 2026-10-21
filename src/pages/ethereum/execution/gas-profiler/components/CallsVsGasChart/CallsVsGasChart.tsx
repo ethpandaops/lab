@@ -3,6 +3,7 @@ import ReactECharts from 'echarts-for-react';
 import clsx from 'clsx';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 /**
  * Data point for the scatter chart
@@ -134,7 +135,7 @@ export function CallsVsGasChart({
                 Log Scale {useLogScale ? 'On' : 'Off'}
               </button>
             </div>
-            <ReactECharts option={chartOption} style={{ height: inModal ? 380 : 260 }} />
+            <ReactECharts theme={ECHARTS_THEME} option={chartOption} style={{ height: inModal ? 380 : 260 }} />
           </div>
         ) : (
           <div className="flex items-center justify-center text-sm text-muted" style={{ height: inModal ? 400 : 280 }}>

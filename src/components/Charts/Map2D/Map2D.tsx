@@ -10,6 +10,7 @@ import type { Map2DChartProps, PointData, PointNodeData, RouteData } from './Map
 const EMPTY_ROUTES: RouteData[] = [];
 const EMPTY_POINTS: PointData[] = [];
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 /**
  * Map2DChart - A high-performance 2D map visualization component using ECharts
@@ -439,6 +440,7 @@ function Map2DChartComponent({
       )}
 
       <ReactECharts
+        theme={ECHARTS_THEME}
         ref={chartRef}
         option={option}
         style={chartStyle}

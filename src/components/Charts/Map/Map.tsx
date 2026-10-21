@@ -10,6 +10,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { useTheme } from '@/hooks/useTheme';
 import { resolveCssColorToHex } from '@/utils/color';
 import { getDataVizColors } from '@/utils/dataVizColors';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -273,6 +274,7 @@ export function MapChart({
   return (
     <div className="h-full w-full">
       <ReactECharts
+        theme={ECHARTS_THEME}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
         notMerge={false}

@@ -2,6 +2,7 @@ import { type JSX, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 /**
  * Bucket definition for histogram
@@ -158,7 +159,7 @@ export function GasHistogram({
     <PopoutCard title={title} subtitle={subtitle}>
       {({ inModal }) =>
         histogramData.buckets.length > 0 ? (
-          <ReactECharts option={chartOption} style={{ height: inModal ? 400 : 280 }} />
+          <ReactECharts theme={ECHARTS_THEME} option={chartOption} style={{ height: inModal ? 400 : 280 }} />
         ) : (
           <div className="flex items-center justify-center text-sm text-muted" style={{ height: inModal ? 400 : 280 }}>
             No data

@@ -42,6 +42,7 @@ import { GlamsterdamPresetModal } from './components/GlamsterdamPresetModal';
 import { useGasSchedule } from './hooks/useGasSchedule';
 import type { GasSchedule, BlockSimulationResult, CallError } from './SimulatePage.types';
 import { GLAMSTERDAM_PRESET } from './SimulatePage.types';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 // Register ECharts components
 echarts.use([LineChart, BarChart, GridComponent, TooltipComponent, LegendComponent, CanvasRenderer]);
@@ -1088,6 +1089,7 @@ export function SimulatePage(): JSX.Element {
           {chartOptions && simState.results.length > 1 && (
             <PopoutCard title="Gas Delta by Block">
               <ReactEChartsCore
+                theme={ECHARTS_THEME}
                 echarts={echarts}
                 option={chartOptions}
                 style={{ height: 180 }}

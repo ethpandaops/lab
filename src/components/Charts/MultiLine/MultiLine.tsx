@@ -20,6 +20,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { SharedCrosshairsContext } from '@/contexts/SharedCrosshairsContext';
 import { Disclosure } from '@/components/Layout/Disclosure';
 import type { MultiLineChartProps } from './MultiLine.types';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 // Register ECharts components
 echarts.use([
@@ -1077,6 +1078,7 @@ export function MultiLineChart({
         onClickCapture={onSeriesClick ? handleChartClick : undefined}
       >
         <ReactEChartsComponent
+          theme={ECHARTS_THEME}
           ref={chartRef}
           echarts={echarts}
           option={option}

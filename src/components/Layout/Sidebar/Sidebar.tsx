@@ -416,7 +416,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
             <img alt="Lab Logo" src="/images/lab.png" className="h-7 w-auto" />
             {!collapsed && (
               <div className="flex flex-col">
-                <span className="font-sans text-lg leading-tight font-bold text-foreground">The Lab</span>
+                <span className="font-display text-lg leading-tight font-bold text-foreground">The Lab</span>
                 <span className="text-2xs leading-tight text-muted">lab.ethpandaops.io</span>
               </div>
             )}

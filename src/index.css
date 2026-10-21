@@ -10,6 +10,8 @@
  */
 
 /* Fonts */
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
 @import '@fontsource-variable/space-grotesk';
 
 @import 'tailwindcss';
@@ -31,6 +33,13 @@
   /* Ultrawide monitor support beyond default 2xl (1536px) */
   --breakpoint-3xl: 120rem; /* 1920px */
   --breakpoint-4xl: 160rem; /* 2560px */
+
+  /* ===== Typefaces ===== */
+  /* Geist for all UI text and numbers, Geist Mono for identifiers (hashes, graffiti, code).
+   * Space Grotesk is the brand display face: wordmark and landing hero only. */
+  --font-sans: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+  --font-display: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
 
   /* ===== Corner Radius ===== */
   /* Two radii only. rounded-xs (4px) for inline marks: badges, tags, skeleton bars.
@@ -343,9 +352,9 @@
     background-color: var(--color-aurora-blue-950);
   }
 
-  /* Apply Space Grotesk for all text */
   body {
-    font-family: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+    font-family: var(--font-sans);
+    font-feature-settings: 'ss01';
     color: var(--foreground-value);
     background-color: var(--background-value);
   }
@@ -354,7 +363,7 @@
   pre,
   kbd,
   samp {
-    font-family: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+    font-family: var(--font-mono);
   }
 
   /* Global focus styles - use primary color */

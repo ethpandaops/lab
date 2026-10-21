@@ -138,7 +138,7 @@ export function HeroSection(): JSX.Element {
 
       {/* Content */}
       <div className="relative z-10 px-4 py-8 text-center sm:px-12 sm:py-12 lg:px-20 lg:py-24">
-        <h1 className="animate-fade-in">
+        <h1 className="animate-fade-in font-display">
           <span className="block text-lg font-light tracking-wide text-foreground/60 sm:text-xl lg:text-2xl">The</span>
           <span className="mt-1 block text-[clamp(4rem,12vw,11rem)] leading-[0.85] font-black tracking-tighter text-foreground">
             Lab
