@@ -20,7 +20,7 @@ export function Stats({ stats, title, className, gridClassName }: StatsProps): J
         className={clsx(
           gridClassName ??
             'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5 4xl:grid-cols-6',
-          'gap-0! overflow-hidden rounded-sm bg-surface outline -outline-offset-1 outline-border'
+          'gap-0! overflow-hidden border-t-2 border-b border-t-foreground border-b-border'
         )}
       >
         {stats.map(item => {
@@ -29,9 +29,9 @@ export function Stats({ stats, title, className, gridClassName }: StatsProps): J
           return (
             <div
               key={item.id}
-              className="relative flex min-w-0 flex-col px-4 py-3.5 shadow-[1px_0_0_0_var(--color-border),0_1px_0_0_var(--color-border)] sm:px-5"
+              className="relative flex min-w-0 flex-col px-6 py-5 shadow-[1px_0_0_0_var(--color-border),0_1px_0_0_var(--color-border)] first:pl-0"
             >
-              <dt className="flex min-w-0 items-center gap-1.5 text-xs/5 font-medium text-muted">
+              <dt className="flex min-w-0 items-center gap-1.5 text-2xs/4 font-semibold tracking-[0.12em] text-muted uppercase">
                 {Icon && (
                   <Icon
                     aria-hidden="true"
@@ -45,7 +45,7 @@ export function Stats({ stats, title, className, gridClassName }: StatsProps): J
               <dd className="mt-1 flex min-w-0 items-baseline gap-2">
                 <span
                   className={clsx(
-                    'truncate text-2xl/8 font-semibold tracking-tight tabular-nums',
+                    'mt-1 truncate font-serif text-5xl/[1.1] font-normal tracking-tight lining-nums tabular-nums',
                     item.valueClassName ?? 'text-foreground'
                   )}
                 >

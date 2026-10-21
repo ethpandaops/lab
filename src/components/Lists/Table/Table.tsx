@@ -40,7 +40,7 @@ export function Table<T = unknown>({
               key={index}
               scope="col"
               className={clsx(
-                'py-2.5 text-left text-xs font-medium whitespace-nowrap text-muted',
+                'py-2.5 text-left text-2xs font-semibold tracking-[0.12em] whitespace-nowrap text-muted uppercase',
                 edgePadding(index),
                 column.headerClassName
               )}
@@ -72,7 +72,7 @@ export function Table<T = unknown>({
                 <td
                   key={colIndex}
                   className={clsx(
-                    'py-2.5 text-sm whitespace-nowrap tabular-nums',
+                    'py-3 text-sm whitespace-nowrap tabular-nums',
                     edgePadding(colIndex),
                     column.cellClassName || 'text-foreground'
                   )}
@@ -92,9 +92,9 @@ export function Table<T = unknown>({
     return (
       <div
         className={clsx(
-          'overflow-x-auto [--table-inset:--spacing(4)] sm:[--table-inset:--spacing(6)]',
+          'overflow-x-auto [--table-inset:0px]',
           // On a page: its own surface, matching Card depth
-          'rounded-sm bg-surface outline -outline-offset-1 outline-border',
+          'border-t-2 border-b border-t-foreground border-b-border in-data-[slot=card-body]:border-t in-data-[slot=card-body]:border-t-border',
           // Inside a Card body: transparent, flush to the card edges, aligned to the card inset
           'in-data-[slot=card-body]:-mx-(--card-inset) in-data-[slot=card-body]:rounded-none in-data-[slot=card-body]:bg-transparent in-data-[slot=card-body]:outline-none in-data-[slot=card-body]:[--table-inset:var(--card-inset)]',
           'in-data-[slot=card-body]:first:-mt-(--card-inset-y) in-data-[slot=card-body]:last:-mb-(--card-inset-y)'

@@ -26,6 +26,7 @@
   "dependencies": {
     "@fontsource-variable/geist": "5.3.0",
     "@fontsource-variable/geist-mono": "5.3.0",
+    "@fontsource-variable/newsreader": "5.3.0",
     "@fontsource-variable/space-grotesk": "5.2.10",
     "@headlessui/react": "2.2.9",
     "@heroicons/react": "2.2.0",

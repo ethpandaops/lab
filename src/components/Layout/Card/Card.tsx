@@ -4,37 +4,37 @@ import type { CardProps, CardVariant } from './Card.types';
 
 const variantStyles: Record<CardVariant, { container: string; header: string; main: string; footer: string }> = {
   default: {
-    container: 'bg-surface outline -outline-offset-1 outline-border',
+    container: 'border-t-2 border-foreground',
     header: '',
     main: '',
     footer: '',
   },
   muted: {
-    container: 'bg-surface outline -outline-offset-1 outline-border',
+    container: 'border-t-2 border-foreground',
     header: 'bg-surface dark:bg-background',
     main: '',
     footer: 'bg-surface dark:bg-background',
   },
   primary: {
-    container: 'bg-surface outline -outline-offset-1 outline-border',
+    container: 'border-t-2 border-foreground',
     header: 'bg-primary/5 dark:bg-primary/10',
     main: '',
     footer: '',
   },
   accent: {
-    container: 'bg-surface outline -outline-offset-1 outline-border',
+    container: 'border-t-2 border-foreground',
     header: 'bg-accent/5 dark:bg-accent/10',
     main: '',
     footer: 'bg-accent/5 dark:bg-accent/10',
   },
   elevated: {
-    container: 'bg-surface outline -outline-offset-1 outline-border',
+    container: 'border-t-2 border-foreground',
     header: 'bg-background dark:bg-background',
     main: '',
     footer: '',
   },
   surface: {
-    container: 'bg-surface outline -outline-offset-1 outline-border',
+    container: 'border-t-2 border-foreground',
     header: 'bg-surface dark:bg-background',
     main: 'bg-background dark:bg-background/50',
     footer: 'bg-surface dark:bg-background',
@@ -60,7 +60,7 @@ export function Card({
   isInteractive = false,
   onClick,
   featureImage,
-  rounded = true,
+  rounded: _rounded = true,
   allowContentOverflow = false,
 }: CardProps): JSX.Element {
   const styles = variantStyles[variant];
@@ -68,8 +68,8 @@ export function Card({
     title !== undefined ? (
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-sm/6 font-semibold text-foreground">{title}</h3>
-          {subtitle && <p className="text-xs/5 text-muted">{subtitle}</p>}
+          <h3 className="truncate font-serif text-2xl/8 font-medium tracking-tight text-foreground">{title}</h3>
+          {subtitle && <p className="mt-0.5 font-serif text-base/6 text-muted italic">{subtitle}</p>}
         </div>
         {actions && <div className="-my-1 -mr-1.5 flex shrink-0 items-center gap-0.5">{actions}</div>}
       </div>
@@ -79,12 +79,13 @@ export function Card({
 
   return (
     <div
+      data-slot="card"
       className={clsx(
-        'relative divide-y divide-border dark:divide-border',
+        'relative',
         !allowContentOverflow && 'overflow-hidden',
-        rounded && 'rounded-sm',
+
         styles.container,
-        isInteractive && 'cursor-pointer transition-colors duration-200 hover:outline-primary/40',
+        isInteractive && 'cursor-pointer transition-colors duration-200 hover:border-primary',
         className
       )}
       onClick={isInteractive ? onClick : undefined}
@@ -96,17 +97,14 @@ export function Card({
           {featureImage}
         </div>
       )}
-      {headerContent && <div className={clsx('relative z-10 px-4 py-3 sm:px-5', styles.header)}>{headerContent}</div>}
+      {headerContent && <div className={clsx('relative z-10 pt-3 pb-5', styles.header)}>{headerContent}</div>}
       <div
         data-slot="card-body"
-        className={clsx(
-          'relative z-10 flex-1 p-4 [--card-inset-y:--spacing(4)] [--card-inset:--spacing(4)] sm:p-5 sm:[--card-inset-y:--spacing(5)] sm:[--card-inset:--spacing(5)]',
-          styles.main
-        )}
+        className={clsx('relative z-10 flex-1 [--card-inset-y:0px] [--card-inset:0px]', styles.main)}
       >
         {children}
       </div>
-      {footer && <div className={clsx('relative z-10 px-4 py-3 sm:px-5', styles.footer)}>{footer}</div>}
+      {footer && <div className={clsx('relative z-10 mt-4 border-t border-border pt-3', styles.footer)}>{footer}</div>}
     </div>
   );
 }
