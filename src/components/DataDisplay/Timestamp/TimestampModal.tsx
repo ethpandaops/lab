@@ -283,7 +283,7 @@ function TimestampRow({ label, value, onCopy, isCopied, badge, isLive }: Timesta
         <div className="flex items-center gap-2">
           <span className="text-xs/5 font-medium text-muted">{label}</span>
           {isLive && (
-            <span className="text-2xs/3 flex items-center gap-1.5 rounded-xs bg-success/20 px-1.5 py-0.5 font-semibold text-success">
+            <span className="flex items-center gap-1.5 rounded-xs bg-success/20 px-1.5 py-0.5 text-2xs/3 font-semibold text-success">
               <span className="relative flex size-1.5">
                 <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-75"></span>
                 <span className="relative inline-flex size-1.5 rounded-full bg-success"></span>
@@ -294,7 +294,7 @@ function TimestampRow({ label, value, onCopy, isCopied, badge, isLive }: Timesta
         </div>
         {badge && !isLive && (
           <div className="mt-1">
-            <span className="text-2xs/3 inline-block rounded-xs bg-accent/10 px-1.5 py-0.5 font-medium text-accent">
+            <span className="inline-block rounded-xs bg-accent/10 px-1.5 py-0.5 text-2xs/3 font-medium text-accent">
               {badge}
             </span>
           </div>

@@ -229,7 +229,7 @@ function SlotTimelineComponent({
               {/* Phase label */}
               <span className="text-xs/4 text-muted">
                 {phase.label}
-                {showTimeLabels && <span className="text-2xs/4 ml-1 text-muted/70">({phase.duration / 1000}s)</span>}
+                {showTimeLabels && <span className="ml-1 text-2xs/4 text-muted/70">({phase.duration / 1000}s)</span>}
               </span>
             </div>
           ))}
