@@ -1,4 +1,4 @@
-import { useQueries } from '@tanstack/react-query';
+import { keepPreviousData, useQueries } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 import {
@@ -13,34 +13,44 @@ import type {
 } from '@/api/types.gen';
 import { useBeaconClock } from '@/hooks/useBeaconClock';
 import { useNetwork } from '@/hooks/useNetwork';
-import { getEpochSlotRange } from '@/utils/beacon';
+import { getEpochSlotRange, slotToEpoch, timestampToSlot } from '@/utils/beacon';
+import { useTableBounds } from '@/hooks/useBounds';
+import { getRangePage } from '@/components/Lists/RangePager';
 
 import type { EpochData, MissedAttestationByEntity, UseEpochsDataReturn } from './useEpochsData.types';
 
+/** Epochs per page */
+export const EPOCHS_PER_PAGE = 10;
+
 /**
- * Hook to fetch data for the last 10 epochs
+ * Hook to fetch one page of epochs
  *
  * Queries using slot range for each epoch:
  * - fct_block_proposer_head: Get block proposal data (canonical, missed)
  * - fct_attestation_correctness_head: Get attestation data
  * - fct_attestation_liveness_by_entity_head: Get missed attestations by entity
  *
- * @returns Epoch data for the last 10 epochs and missed attestations by entity
+ * @param from - Top epoch of the page; undefined follows the current epoch
+ * @returns Epoch data for the page and missed attestations by entity
  */
-export function useEpochsData(): UseEpochsDataReturn {
+export function useEpochsData(from?: number): UseEpochsDataReturn {
   const { currentNetwork } = useNetwork();
   const { epoch: currentEpoch } = useBeaconClock();
+  const { data: proposerBounds } = useTableBounds('fct_block_proposer_head');
 
-  // Generate array of last 10 epochs with their slot ranges
+  const genesisTime = currentNetwork?.genesis_time;
+  const earliest =
+    proposerBounds && genesisTime ? slotToEpoch(timestampToSlot(proposerBounds.min, genesisTime)) + 1 : 0;
+  const page = getRangePage(from, currentEpoch, earliest, EPOCHS_PER_PAGE);
+
   const epochs = useMemo(() => {
     const result: Array<{ epoch: number; firstSlot: number; lastSlot: number }> = [];
-    for (let i = 0; i < 10; i++) {
-      const epoch = Math.max(0, currentEpoch - i);
+    for (let epoch = page.top; epoch >= page.bottom; epoch--) {
       const { firstSlot, lastSlot } = getEpochSlotRange(epoch);
       result.push({ epoch, firstSlot, lastSlot });
     }
     return result;
-  }, [currentEpoch]);
+  }, [page.top, page.bottom]);
 
   // Query block proposer, attestation, and liveness data for all epochs in parallel
   const results = useQueries({
@@ -55,6 +65,7 @@ export function useEpochsData(): UseEpochsDataReturn {
           },
         }),
         enabled: !!currentNetwork && firstSlot >= 0,
+        placeholderData: keepPreviousData,
       },
       // Attestation correctness data
       {
@@ -66,6 +77,7 @@ export function useEpochsData(): UseEpochsDataReturn {
           },
         }),
         enabled: !!currentNetwork && firstSlot >= 0,
+        placeholderData: keepPreviousData,
       },
       // Attestation liveness by entity - filter server-side for missed attestations only
       {
@@ -78,12 +90,14 @@ export function useEpochsData(): UseEpochsDataReturn {
           },
         }),
         enabled: !!currentNetwork && firstSlot >= 0,
+        placeholderData: keepPreviousData,
       },
     ]),
   });
 
   // Check loading and error states
   const isLoading = results.some(result => result.isLoading);
+  const isPlaceholderData = results.some(result => result.isPlaceholderData);
   const error = results.find(result => result.error)?.error as Error | null;
 
   // Process data into EpochData format and missed attestations by entity
@@ -191,7 +205,9 @@ export function useEpochsData(): UseEpochsDataReturn {
     epochs: epochsData,
     missedAttestationsByEntity,
     isLoading,
+    isPlaceholderData,
     error,
     currentEpoch,
+    page,
   };
 }

@@ -1,3 +1,5 @@
+import type { RangePage } from '@/components/Lists/RangePager';
+
 /**
  * Data for a single epoch in the epochs list
  */
@@ -44,4 +46,8 @@ export interface UseEpochsDataReturn {
   error: Error | null;
   /** Current epoch number */
   currentEpoch: number;
+  /** The page range, for the pager */
+  page: RangePage;
+  /** True while another page loads and the previous one is still shown */
+  isPlaceholderData: boolean;
 }

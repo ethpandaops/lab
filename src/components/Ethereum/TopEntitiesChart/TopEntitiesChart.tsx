@@ -86,9 +86,9 @@ export function TopEntitiesChart({
   relativeSlots,
   syncGroup,
 }: TopEntitiesChartProps): React.JSX.Element {
-  const { topEntities, series, minX, maxX, totalCount } = useMemo(() => {
+  const { topEntities, series, minX, maxX, totalCount, entityCount } = useMemo(() => {
     if (data.length === 0) {
-      return { topEntities: [], series: [], minX: 0, maxX: 0, totalCount: 0 };
+      return { topEntities: [], series: [], minX: 0, maxX: 0, totalCount: 0, entityCount: 0 };
     }
 
     // Aggregate total count per entity
@@ -106,7 +106,7 @@ export function TopEntitiesChart({
         : sortedEntities.slice(0, topN).map(([entity]) => entity);
 
     if (topEntities.length === 0) {
-      return { topEntities: [], series: [], minX: 0, maxX: 0, totalCount: 0 };
+      return { topEntities: [], series: [], minX: 0, maxX: 0, totalCount: 0, entityCount: 0 };
     }
 
     // Calculate x-axis range (use provided or calculate from data)
@@ -158,13 +158,15 @@ export function TopEntitiesChart({
       minX,
       maxX,
       totalCount,
+      entityCount: entityTotals.size,
     };
   }, [data, xAxis.min, xAxis.max, topN]);
 
   // Calculate dynamic subtitle if not provided
   const effectiveSubtitle =
     subtitle ??
-    `${totalCount.toLocaleString()} total across ${topEntities.length} ${topEntities.length === 1 ? 'entity' : 'entities'}`;
+    `${totalCount.toLocaleString()} total across ${entityCount} ${entityCount === 1 ? 'entity' : 'entities'}` +
+      (topEntities.length < entityCount ? `, top ${topEntities.length} shown` : '');
 
   const chartHeight = height ?? (inModal ? 600 : 400);
 
@@ -187,7 +189,8 @@ export function TopEntitiesChart({
             name: xAxis.name,
             min: minX,
             max: maxX,
-            formatter: xAxis.formatter,
+            // x values are slots or epochs: identifiers, never locale-formatted
+            formatter: xAxis.formatter ?? ((value: number | string) => String(value)),
           }}
           yAxis={{
             name: yAxis.name,
