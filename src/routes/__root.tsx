@@ -270,9 +270,7 @@ function RootComponent(): JSX.Element {
                       className={`bg-background pt-[65px] transition-all duration-200 lg:min-h-dvh lg:pt-0 ${sidebarCollapsed ? 'lg:pl-14' : 'lg:pl-56'}`}
                     >
                       <FeatureGate>
-                        <div className="z-20 flex h-12 items-center border-b border-border bg-background/85 px-4 backdrop-blur-sm sm:px-6 lg:sticky lg:top-0 lg:px-8">
-                          <Breadcrumb />
-                        </div>
+                        <Breadcrumb className="z-20 h-12 border-b border-border bg-background/85 px-4 backdrop-blur-sm sm:px-6 lg:sticky lg:top-0 lg:px-8" />
                         <Outlet />
                       </FeatureGate>
                     </main>
