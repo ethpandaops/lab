@@ -398,7 +398,7 @@ export function FlameGraph({
                     </button>
                     {/* Dropdown on hover */}
                     <div className="absolute top-full left-0 z-50 hidden min-w-56 pt-1 group-hover:block">
-                      <div className="rounded-xs border border-border bg-background p-2 shadow-lg">
+                      <div className="rounded-sm border border-border bg-background p-2">
                         <div className="mb-1.5 border-b border-border pb-1.5 text-xs text-muted">Full path</div>
                         <div className="space-y-1 text-xs">
                           <button
@@ -579,7 +579,7 @@ export function FlameGraph({
         createPortal(
           <div
             ref={tooltipRef}
-            className="pointer-events-none fixed z-[9999] max-w-md min-w-72 overflow-hidden rounded-sm border border-border bg-background shadow-lg"
+            className="pointer-events-none fixed z-[9999] max-w-md min-w-72 overflow-hidden rounded-sm border border-border bg-background"
             style={{
               left: tooltipPosition.x,
               top: tooltipPosition.y,

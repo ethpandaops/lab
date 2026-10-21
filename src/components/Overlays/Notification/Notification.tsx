@@ -122,8 +122,7 @@ export function Notification({
       >
         <div
           className={clsx(
-            'pointer-events-auto fixed flex items-center gap-3 rounded-sm border px-4 py-3 shadow-lg',
-            'dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
+            'pointer-events-auto fixed flex items-center gap-3 rounded-sm border px-4 py-3',
             getPositionClasses(position),
             getVariantClasses(variant),
             className

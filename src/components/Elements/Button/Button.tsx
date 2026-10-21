@@ -5,47 +5,45 @@ import type { ButtonProps } from './Button.types';
 import './Button.css';
 
 const baseStyles =
-  'inline-flex items-center font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50 focus:outline-hidden';
+  'inline-flex items-center font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 focus:outline-hidden';
 
 const variantStyles = {
   primary: clsx(
-    'bg-primary text-white shadow-xs',
+    'bg-primary text-white',
     'hover:bg-primary/90 disabled:hover:bg-primary',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-    'dark:shadow-none dark:hover:bg-primary/80 dark:focus-visible:outline-primary'
+    'dark:hover:bg-primary/80'
   ),
   secondary: clsx(
-    'bg-surface text-foreground shadow-xs inset-ring inset-ring-border',
+    'bg-surface text-foreground inset-ring inset-ring-border',
     'hover:bg-background disabled:hover:bg-surface',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground',
-    'dark:bg-surface dark:text-foreground dark:shadow-none dark:inset-ring-border',
-    'dark:hover:bg-muted/20 dark:disabled:hover:bg-surface dark:focus-visible:outline-foreground'
+    'dark:hover:bg-muted/20 dark:disabled:hover:bg-surface'
   ),
   soft: clsx(
-    'bg-primary/10 text-primary shadow-xs',
+    'bg-primary/10 text-primary',
     'hover:bg-primary/20 disabled:hover:bg-primary/10',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-    'dark:bg-primary/20 dark:text-primary dark:shadow-none',
-    'dark:hover:bg-primary/30 dark:disabled:hover:bg-primary/20 dark:focus-visible:outline-primary'
+    'dark:bg-primary/20',
+    'dark:hover:bg-primary/30 dark:disabled:hover:bg-primary/20'
   ),
   outline: clsx(
     'bg-transparent text-foreground inset-ring-1 inset-ring-border',
     'hover:bg-muted/10 disabled:hover:bg-transparent',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border',
-    'dark:text-foreground dark:inset-ring-border',
-    'dark:hover:bg-muted/20 dark:focus-visible:outline-border'
+    'dark:hover:bg-muted/20'
   ),
   danger: clsx(
-    'bg-danger text-white shadow-xs',
+    'bg-danger text-white',
     'hover:bg-danger/90 disabled:hover:bg-danger',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger',
-    'dark:shadow-none dark:hover:bg-danger/80 dark:focus-visible:outline-danger'
+    'dark:hover:bg-danger/80'
   ),
   blank: clsx(
     'bg-transparent text-foreground',
     'hover:bg-muted/10 disabled:hover:bg-transparent',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground',
-    'dark:text-foreground dark:hover:bg-muted/10 dark:focus-visible:outline-foreground'
+    'dark:hover:bg-muted/10'
   ),
 };
 
@@ -60,9 +58,9 @@ const sizeStyles = {
 const roundedStyles = {
   xs: 'rounded-xs',
   sm: 'rounded-sm',
-  md: 'rounded-md',
-  lg: 'rounded-lg',
-  xl: 'rounded-xl',
+  md: 'rounded-sm',
+  lg: 'rounded-sm',
+  xl: 'rounded-sm',
   full: 'rounded-full',
 };
 

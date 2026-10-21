@@ -30,6 +30,7 @@ export function Tab({ children, badge, className, hash }: TabProps): React.JSX.E
       className={({ selected }) =>
         clsx(
           'px-4 py-2.5 text-sm font-medium transition-colors focus:outline-hidden',
+          'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
           selected ? 'border-b-2 border-primary text-foreground' : 'text-muted hover:text-foreground',
           className
         )

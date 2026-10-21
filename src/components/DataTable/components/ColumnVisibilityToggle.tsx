@@ -30,7 +30,7 @@ export function ColumnVisibilityToggle<TData>({ table }: ColumnVisibilityToggleP
       <MenuItems
         transition
         className={clsx(
-          'absolute right-0 z-10 mt-2 w-56 origin-top-right border border-border bg-surface shadow-lg transition',
+          'absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-sm border border-border bg-surface transition',
           'data-closed:scale-95 data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out',
           'data-leave:duration-75 data-leave:ease-in',
           'focus:outline-hidden'

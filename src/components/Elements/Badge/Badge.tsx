@@ -124,7 +124,7 @@ export function Badge({
   const sizeClasses = size === 'small' ? 'px-1.5 py-0.5' : 'px-2 py-1';
 
   // Shape classes
-  const shapeClasses = pill ? 'rounded-full' : 'rounded-md';
+  const shapeClasses = pill ? 'rounded-full' : 'rounded-xs';
 
   // Gap classes
   const gapClasses = hasDot ? 'gap-x-1.5' : hasRemoveButton ? 'gap-x-0.5' : '';

@@ -8,20 +8,13 @@ import { Link } from '@tanstack/react-router';
 export function NotFound(): JSX.Element {
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background">
-      {/* Subtle background pattern */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-50"></div>
-
       {/* Content */}
       <div className="relative flex flex-col items-center">
-        <div className="relative">
-          {/* Glow effect */}
-          <div className="absolute inset-0 animate-pulse rounded-full bg-warning/20 blur-3xl"></div>
-          <img src="/images/lab.png" className="relative size-72 object-contain" alt="Lab Logo" />
-        </div>
-        <h1 className="mt-8 text-2xl font-bold text-foreground">Page Not Found</h1>
+        <img src="/images/lab.png" className="size-72 object-contain" alt="" />
+        <h1 className="mt-8 text-2xl/8 font-semibold tracking-tight text-foreground">Page Not Found</h1>
         <Link
           to="/"
-          className="mt-8 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary/90 hover:shadow-md active:scale-95"
+          className="mt-8 inline-flex h-8 items-center rounded-sm bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
           Go Home
         </Link>

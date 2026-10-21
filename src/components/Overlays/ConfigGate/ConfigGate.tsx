@@ -18,9 +18,6 @@ export function ConfigGate({ children }: ConfigGateProps): JSX.Element {
   if (isLoading && !config) {
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background">
-        {/* Animated background effect */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden"></div>
-
         {/* Content */}
         <div className="relative flex flex-col items-center px-4">
           <img
@@ -28,8 +25,7 @@ export function ConfigGate({ children }: ConfigGateProps): JSX.Element {
             className="size-48 animate-spin object-contain sm:size-64 md:size-72"
             alt="Loading..."
           />
-          <p className="mt-6 text-xl font-semibold text-foreground sm:mt-8 sm:text-2xl">Loading Lab...</p>
-          <div className="mt-3 h-1 w-24 animate-pulse rounded-full bg-linear-to-r from-primary to-accent sm:mt-4 sm:w-32"></div>
+          <p className="mt-6 text-2xl/8 font-semibold tracking-tight text-foreground sm:mt-8">Loading Lab...</p>
         </div>
       </div>
     );
@@ -41,25 +37,16 @@ export function ConfigGate({ children }: ConfigGateProps): JSX.Element {
 
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background">
-        {/* Subtle background pattern */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-50"></div>
-
         {/* Content */}
         <div className="relative flex flex-col items-center px-4">
-          <div className="relative">
-            {/* Glow effect */}
-            <div className="absolute inset-0 animate-pulse rounded-full bg-danger/20 blur-3xl"></div>
-            <img
-              src="/images/lab.png"
-              className="relative size-48 rotate-180 object-contain sm:size-64 md:size-72"
-              alt="Lab Logo"
-            />
-          </div>
-          <h1 className="mt-6 text-xl font-bold text-danger sm:mt-8 sm:text-2xl">Failed to Load Configuration</h1>
+          <img src="/images/lab.png" className="size-48 rotate-180 object-contain sm:size-64 md:size-72" alt="" />
+          <h1 className="mt-6 text-xl/8 font-semibold tracking-tight text-danger sm:mt-8 sm:text-2xl/8">
+            Failed to Load Configuration
+          </h1>
           {error && <p className="mt-2 max-w-md text-center text-sm text-muted">{error.message}</p>}
           <button
             onClick={() => window.location.reload()}
-            className="mt-6 rounded-lg bg-danger px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-danger/90 hover:shadow-md active:scale-95 sm:mt-8"
+            className="mt-6 inline-flex h-8 items-center rounded-sm bg-danger px-4 text-sm font-semibold text-white transition-colors hover:bg-danger/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:mt-8"
           >
             Reload Page
           </button>

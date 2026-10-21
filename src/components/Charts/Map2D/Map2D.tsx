@@ -404,7 +404,7 @@ function Map2DChartComponent({
       {/* Fixed hover panel at top */}
       {hoveredPoint && (
         <div className="pointer-events-none absolute top-3 left-1/2 z-10 -translate-x-1/2">
-          <div className="rounded-lg border border-border bg-surface px-4 py-3 shadow-lg">
+          <div className="rounded-sm border border-border bg-surface px-4 py-3">
             <div className="mb-2 border-b border-border pb-2 text-center">
               <span className="text-sm font-semibold text-foreground">{hoveredPoint.name}</span>
               <span className="ml-2 text-xs text-muted">({hoveredPoint.nodes.length} nodes)</span>

@@ -49,7 +49,7 @@ function SimpleVariant({ steps }: { steps: ProgressStep[] }): JSX.Element {
 function PanelsVariant({ steps }: { steps: ProgressStep[] }): JSX.Element {
   return (
     <nav aria-label="Progress">
-      <ol role="list" className="divide-y divide-border rounded-md border border-border md:flex md:divide-y-0">
+      <ol role="list" className="divide-y divide-border rounded-sm border border-border md:flex md:divide-y-0">
         {steps.map((step, stepIdx) => (
           <li key={step.name} className="relative md:flex md:flex-1">
             {step.status === 'complete' ? (

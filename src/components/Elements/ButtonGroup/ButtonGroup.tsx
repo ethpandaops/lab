@@ -22,8 +22,6 @@ const ButtonGroupRoot = forwardRef<HTMLSpanElement, ButtonGroupProps>(
         !rounded && '!rounded-none',
         // Negative margin for overlapping borders
         !isFirst && '-ml-px',
-        // Remove individual button shadow (group has shadow)
-        '!shadow-none',
         // Focus z-index
         'focus:z-10'
       );
@@ -36,11 +34,7 @@ const ButtonGroupRoot = forwardRef<HTMLSpanElement, ButtonGroupProps>(
     });
 
     return (
-      <span
-        ref={ref}
-        className={clsx('isolate inline-flex shadow-xs dark:shadow-none', rounded && 'rounded-sm', className)}
-        {...props}
-      >
+      <span ref={ref} className={clsx('isolate inline-flex', rounded && 'rounded-sm', className)} {...props}>
         {childrenWithPosition}
       </span>
     );

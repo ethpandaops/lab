@@ -22,7 +22,7 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
         onClick={onClick}
         disabled={!onClick}
         className={clsx(
-          'relative flex size-8 shrink-0 items-center justify-center rounded-md',
+          'relative flex size-8 shrink-0 items-center justify-center rounded-sm',
           // Pending state
           status === 'pending' && ['bg-surface text-muted', !onClick && 'cursor-default'],
           // Active state

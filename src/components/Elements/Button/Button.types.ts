@@ -24,9 +24,9 @@ export interface ButtonProps extends ComponentPropsWithoutRef<typeof HeadlessBut
    * The border radius amount
    * - 'xs': Minimal rounding (rounded-xs)
    * - 'sm': Small rounding (rounded-sm)
-   * - 'md': Medium rounding (rounded-md)
-   * - 'lg': Large rounding (rounded-lg)
-   * - 'xl': Extra large rounding (rounded-xl)
+   * - 'md': Same as sm (rounded-sm)
+   * - 'lg': Same as sm (rounded-sm)
+   * - 'xl': Same as sm (rounded-sm)
    * - 'full': Fully rounded pill shape (rounded-full)
    * @default 'sm'
    */

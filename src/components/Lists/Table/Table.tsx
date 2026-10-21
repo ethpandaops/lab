@@ -111,7 +111,7 @@ export function Table<T = unknown>({
       {(title || description) && (
         <div className="sm:flex sm:items-center">
           <div className="sm:flex-auto">
-            {title && <h1 className="text-base/7 font-semibold text-foreground">{title}</h1>}
+            {title && <h2 className="text-sm/6 font-semibold text-foreground">{title}</h2>}
             {description && <p className="mt-2 text-sm/6 text-muted">{description}</p>}
           </div>
         </div>

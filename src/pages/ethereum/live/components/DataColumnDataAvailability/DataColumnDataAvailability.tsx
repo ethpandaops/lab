@@ -1,6 +1,7 @@
 import type { JSX } from 'react';
 import { useMemo, memo } from 'react';
 import clsx from 'clsx';
+import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/16/solid';
 import { HeatmapChart } from '@/components/Charts/Heatmap';
 import type { DataColumnDataAvailabilityProps } from './DataColumnDataAvailability.types';
 import { getDataVizColors } from '@/utils/dataVizColors';
@@ -20,7 +21,7 @@ import { getDataVizColors } from '@/utils/dataVizColors';
  * - Fixed height of 400px regardless of blob count
  *
  * Title includes two status indicators on the right:
- * 1. Data availability: "✓ Data is available" (green) or "✗ Data is available" (red)
+ * 1. Data availability: "Data available" (green) or "Data not available" (red)
  *    - Shows green checkmark if >= 64 columns received, red cross otherwise
  * 2. On-time count: "n columns published on time" - counts columns arriving < 4000ms
  *
@@ -85,11 +86,21 @@ function DataColumnDataAvailabilityComponent({
 
   return (
     <div className={clsx('flex h-full flex-col bg-surface', className)}>
-      <div className="flex shrink-0 items-center justify-between px-3 py-1">
-        <h3 className="text-xs font-semibold text-foreground uppercase">Data Column Availability</h3>
+      <div className="flex shrink-0 items-center justify-between px-3 pt-3 pb-1">
+        <h3 className="text-sm/6 font-semibold text-foreground">Data column availability</h3>
         <div className="flex items-center gap-3">
-          <span className={clsx('text-xs font-medium', isDataAvailable ? 'text-success' : 'text-danger')}>
-            {isDataAvailable ? '✓' : '✗'} Data available
+          <span
+            className={clsx(
+              'flex items-center gap-1 text-xs font-medium',
+              isDataAvailable ? 'text-success' : 'text-danger'
+            )}
+          >
+            {isDataAvailable ? (
+              <CheckCircleIcon aria-hidden="true" className="size-3.5" />
+            ) : (
+              <XCircleIcon aria-hidden="true" className="size-3.5" />
+            )}
+            {isDataAvailable ? 'Data available' : 'Data not available'}
           </span>
           <span className="text-xs text-muted">{onTimeColumnCount} on time</span>
         </div>

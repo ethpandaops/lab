@@ -120,7 +120,7 @@ export function MiniStat({
         {/* Stats content - 2 rows */}
         <div className="flex-1">
           <dt className="text-xs leading-tight font-medium text-muted">{label}</dt>
-          <dd className="text-base leading-tight font-bold text-foreground">{value}</dd>
+          <dd className="text-base leading-tight font-semibold text-foreground">{value}</dd>
         </div>
       </div>
     );
@@ -140,7 +140,7 @@ export function MiniStat({
         {/* Stats content */}
         <div className="flex-1">
           {/* Value */}
-          <div className="text-base leading-tight font-bold text-foreground">{value}</div>
+          <div className="text-base leading-tight font-semibold text-foreground">{value}</div>
           {/* Secondary text */}
           <div className="text-xs leading-tight text-muted">{secondaryText}</div>
         </div>

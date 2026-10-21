@@ -42,7 +42,7 @@ function SidebarComponent({
         {/* Header with Slot number and Epoch subtitle */}
         <div className="mb-3 flex items-center gap-3">
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-foreground">
+            <h2 className="text-xl/7 font-semibold tracking-tight text-foreground tabular-nums">
               Slot <Slot slot={currentSlot} />
             </h2>
             <p className="text-xs text-muted">

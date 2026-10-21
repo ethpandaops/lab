@@ -33,7 +33,7 @@ function MobileSlotHeaderComponent({
             preload="viewport"
             preloadDelay={100}
             params={{ slot: currentSlot.toString() }}
-            className="text-lg font-bold text-foreground hover:text-primary"
+            className="text-lg font-semibold text-foreground tabular-nums hover:text-primary"
           >
             Slot <Slot slot={currentSlot} noLink />
           </Link>

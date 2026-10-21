@@ -107,7 +107,7 @@ export function PopoutCard({
   const modalContent = isRenderFunction ? children({ inModal: true }) : children;
 
   const iconButtonClassName =
-    'group rounded-sm p-1.5 text-muted transition-colors hover:bg-muted/20 hover:text-foreground focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary/50 disabled:opacity-50';
+    'group rounded-sm p-1.5 text-muted transition-colors hover:bg-muted/20 hover:text-foreground focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50';
   const iconClassName = 'size-4';
 
   // Combine subtitle and modalSubtitle for modal description
@@ -345,7 +345,7 @@ export function PopoutCard({
                     <button
                       type="button"
                       disabled={isDownloading}
-                      className="group shrink-0 rounded-sm p-1 transition-colors hover:bg-muted/20 focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary/50 disabled:opacity-50"
+                      className="group shrink-0 rounded-sm p-1 transition-colors hover:bg-muted/20 focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50"
                       aria-label="Export options"
                     >
                       <EllipsisVerticalIcon className="size-5 text-muted transition-colors group-hover:text-foreground dark:text-muted dark:group-hover:text-foreground" />

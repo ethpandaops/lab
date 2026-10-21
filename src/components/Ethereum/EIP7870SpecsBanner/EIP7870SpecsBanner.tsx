@@ -13,7 +13,7 @@ export function EIP7870SpecsBanner({ className }: EIP7870SpecsBannerProps): JSX.
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className={clsx('rounded-xs border border-border bg-surface/50', className)}>
+    <div className={clsx('rounded-sm bg-surface outline -outline-offset-1 outline-border', className)}>
       {/* Collapsed view - always visible */}
       <button
         type="button"

@@ -53,7 +53,7 @@ function AttestationArrivalsComponent({
     <div className={clsx('flex h-full flex-col', className)}>
       <div className="flex h-full flex-col bg-surface p-3">
         <div className="mb-2 shrink-0">
-          <h3 className="text-sm font-semibold text-foreground uppercase">Attestation Arrivals</h3>
+          <h3 className="text-sm/6 font-semibold text-foreground">Attestation arrivals</h3>
         </div>
         <div className="min-h-0 flex-1">
           <MultiLineChart

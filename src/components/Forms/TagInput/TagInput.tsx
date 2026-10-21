@@ -129,11 +129,11 @@ export function TagInput({
       <div
         onClick={handleContainerClick}
         className={clsx(
-          'flex max-h-40 cursor-text flex-wrap items-center gap-1.5 overflow-y-auto rounded-xs border px-2 py-1.5',
-          'bg-surface transition-colors',
+          'flex max-h-40 cursor-text flex-wrap items-center gap-1.5 overflow-y-auto rounded-sm px-2 py-1.5',
+          'bg-surface outline-1 -outline-offset-1 transition-colors',
           error
-            ? 'border-danger/50 focus-within:border-danger focus-within:ring-2 focus-within:ring-danger/50'
-            : 'border-border focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/50',
+            ? 'outline-danger/50 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-danger'
+            : 'outline-border focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary',
           disabled && 'cursor-not-allowed opacity-50'
         )}
       >

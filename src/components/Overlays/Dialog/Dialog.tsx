@@ -27,7 +27,7 @@ const sizeClasses = {
  * Supports different sizes, optional title/description, and custom footer.
  *
  * Features:
- * - Backdrop with blur effect
+ * - Dimmed backdrop
  * - Smooth transitions
  * - Keyboard support (Esc to close)
  * - Focus trap
@@ -105,7 +105,7 @@ export function Dialog({
             <DialogPanel
               ref={panelRef}
               className={clsx(
-                'divide-y divide-border rounded-sm bg-surface shadow-xl dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
+                'divide-y divide-border rounded-sm bg-surface outline -outline-offset-1 outline-border',
                 size === 'fullscreen' && 'flex flex-col overflow-auto',
                 allowContentOverflow && size !== 'fullscreen' ? 'overflow-visible' : undefined,
                 !allowContentOverflow && size !== 'fullscreen' ? 'overflow-hidden' : undefined,
@@ -117,20 +117,14 @@ export function Dialog({
               {(title || showCloseButton) && (
                 <div className="flex items-start justify-between gap-4 px-4 py-4 sm:px-6 sm:py-5">
                   <div className="min-w-0 flex-1 space-y-1.5">
-                    {title && (
-                      <DialogTitle className="text-lg leading-6 font-semibold text-foreground dark:text-foreground">
-                        {title}
-                      </DialogTitle>
-                    )}
-                    {description && (
-                      <Description className="text-sm leading-5 text-muted dark:text-muted">{description}</Description>
-                    )}
+                    {title && <DialogTitle className="text-sm/6 font-semibold text-foreground">{title}</DialogTitle>}
+                    {description && <Description className="text-sm leading-5 text-muted">{description}</Description>}
                   </div>
                   {showCloseButton && !hideCloseButton && (
                     <button
                       type="button"
                       onClick={onClose}
-                      className="shrink-0 rounded-sm p-1.5 text-muted transition-colors hover:bg-border hover:text-foreground dark:hover:bg-muted/20 dark:hover:text-foreground"
+                      className="shrink-0 rounded-sm p-1.5 text-muted transition-colors hover:bg-border hover:text-foreground"
                       aria-label="Close dialog"
                     >
                       <XMarkIcon className="size-5" />
@@ -148,7 +142,7 @@ export function Dialog({
                 )}
               >
                 {!title && !showCloseButton && description && (
-                  <Description className="mb-4 text-sm text-muted dark:text-muted">{description}</Description>
+                  <Description className="mb-4 text-sm text-muted">{description}</Description>
                 )}
                 {children}
               </div>

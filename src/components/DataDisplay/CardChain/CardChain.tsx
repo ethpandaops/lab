@@ -13,7 +13,7 @@ function CardSkeleton(): JSX.Element {
         {/* 3D top face */}
         <div className="absolute -top-2 right-1 left-1 h-3 rounded-t-xs bg-border/30" />
         {/* Main card */}
-        <div className="animate-pulse rounded-xs border-2 border-border/50 bg-surface p-4">
+        <div className="animate-pulse rounded-xs border border-border/50 bg-surface p-4">
           <div className="mb-3 pt-1">
             <div className="mb-1 h-3 w-10 rounded-xs bg-border/50" />
             <div className="h-6 w-24 rounded-xs bg-border/50" />
@@ -79,7 +79,7 @@ function ChainCard({
           {/* Highlight badge */}
           {isHighlighted && (
             <div className="absolute -top-px right-3 rounded-b-xs bg-primary px-2 py-0.5">
-              <span className="text-2xs font-bold tracking-wider text-white">{highlightBadgeText}</span>
+              <span className="text-2xs font-semibold tracking-wider text-white">{highlightBadgeText}</span>
             </div>
           )}
 
@@ -88,7 +88,7 @@ function ChainCard({
             <div className="text-2xs font-medium tracking-wider text-muted uppercase">{item.label}</div>
             <div
               className={clsx(
-                'font-mono text-xl font-bold tabular-nums',
+                'font-mono text-xl font-semibold tabular-nums',
                 isHighlighted ? 'text-primary' : 'text-foreground'
               )}
             >
@@ -118,7 +118,7 @@ function ChainCard({
 
         {/* Hover overlay */}
         <div className="absolute inset-0 flex items-center justify-center bg-primary/0 opacity-0 transition-all duration-300 group-hover:bg-primary/5 group-hover:opacity-100">
-          <div className="rounded-full bg-primary/90 p-2 shadow-lg">
+          <div className="rounded-full bg-primary/90 p-2">
             <ArrowRightIcon className="size-4 text-white" />
           </div>
         </div>
@@ -153,7 +153,7 @@ function NavArrow({
       onClick={onClick}
       disabled={disabled || loading}
       className={clsx(
-        'relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full border-2 transition-all',
+        'relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full border transition-all',
         loading
           ? 'border-primary/50 bg-primary/5 text-primary'
           : !disabled
@@ -164,7 +164,7 @@ function NavArrow({
     >
       {loading ? <ArrowPathIcon className="size-5 animate-spin" /> : <Icon className="size-5" />}
       {showBadge && (
-        <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-primary text-2xs font-bold text-white">
+        <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-primary text-2xs font-semibold text-white">
           {badgeCount > 99 ? '99+' : badgeCount}
         </span>
       )}

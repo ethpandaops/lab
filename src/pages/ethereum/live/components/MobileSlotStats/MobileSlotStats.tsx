@@ -33,7 +33,7 @@ const STATUS_META: Record<string, { label: string; cls: string }> = {
 function Chip({ label, children }: { label: string; children: ReactNode }): JSX.Element {
   return (
     <div className="flex shrink-0 items-baseline gap-1">
-      <span className="text-2xs tracking-wide text-muted/70 uppercase">{label}</span>
+      <span className="text-2xs text-muted">{label}</span>
       <span className="font-mono text-xs font-semibold text-foreground tabular-nums">{children}</span>
     </div>
   );
@@ -62,7 +62,7 @@ export function MobileSlotStats({
     <div className="flex h-full items-center gap-3 overflow-x-auto px-3">
       {fastest && (
         <div className="flex shrink-0 items-center gap-1">
-          <span className="text-2xs tracking-wide text-muted/70 uppercase">Fast</span>
+          <span className="text-2xs text-muted">Fast</span>
           <ClientLogo client={fastest.client} size={12} />
           <span className="font-mono text-xs font-semibold text-primary tabular-nums">{fastest.medianMs}ms</span>
         </div>
@@ -70,7 +70,7 @@ export function MobileSlotStats({
       <Chip label="p90">{propagationP90Ms !== null ? `${(propagationP90Ms / 1000).toFixed(2)}s` : '—'}</Chip>
       {mevEth && (
         <div className="flex shrink-0 items-baseline gap-1">
-          <span className="text-2xs tracking-wide text-muted/70 uppercase">MEV</span>
+          <span className="text-2xs text-muted">MEV</span>
           <span className="font-mono text-xs font-semibold text-success tabular-nums">{mevEth} Ξ</span>
         </div>
       )}
@@ -78,12 +78,7 @@ export function MobileSlotStats({
       <Chip label="gas">{gasPct !== null ? `${gasPct}%` : '—'}</Chip>
       <Chip label="blobs">{blobs > 0 ? blobs : '—'}</Chip>
       {statusMeta && (
-        <span
-          className={clsx(
-            'shrink-0 rounded-sm border px-1.5 py-0.5 text-2xs font-semibold tracking-wide uppercase',
-            statusMeta.cls
-          )}
-        >
+        <span className={clsx('shrink-0 rounded-xs border px-1.5 py-0.5 text-2xs font-medium', statusMeta.cls)}>
           {statusMeta.label}
         </span>
       )}

@@ -13,14 +13,22 @@ import type { StatsProps } from './Stats.types';
  */
 export function Stats({ stats, title, className, gridClassName }: StatsProps): JSX.Element {
   return (
-    <div className={className}>
+    <div
+      className={clsx(
+        // Inside a Card body, bleed to the card edges so the card is the only panel
+        'in-data-[slot=card-body]:-mx-(--card-inset) in-data-[slot=card-body]:first:-mt-(--card-inset-y) in-data-[slot=card-body]:last:-mb-(--card-inset-y)',
+        className
+      )}
+    >
       {title && <h3 className="mb-3 text-sm/6 font-semibold text-foreground">{title}</h3>}
 
       <dl
         className={clsx(
           gridClassName ??
             'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5 4xl:grid-cols-6',
-          'gap-0! overflow-hidden rounded-sm bg-surface outline -outline-offset-1 outline-border'
+          'gap-0! overflow-hidden rounded-sm bg-surface outline -outline-offset-1 outline-border',
+          // Inside a Card body the card is the panel: run flush to its edges with no second outline
+          'in-data-[slot=card-body]:rounded-none in-data-[slot=card-body]:outline-none'
         )}
       >
         {stats.map(item => {

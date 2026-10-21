@@ -34,8 +34,7 @@ export function Toggle({
         'group relative inline-flex shrink-0 cursor-pointer items-center',
         rounded && 'rounded-sm',
         'bg-border transition-colors duration-200 ease-in-out',
-        'dark:bg-border',
-        'focus:outline-2 focus:outline-offset-2 focus:outline-primary',
+        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
         'data-[checked]:bg-primary/30 dark:data-[checked]:bg-primary/40',
         sizeClasses.switch
       )}
@@ -68,8 +67,8 @@ export function Toggle({
         className={clsx(
           'pointer-events-none relative inline-flex transform items-center justify-center',
           rounded && 'rounded-xs',
-          'bg-surface shadow-sm ring-1 ring-border/20 transition-all duration-200 ease-in-out',
-          'group-data-[checked]:ring-primary/50',
+          'bg-surface outline-1 -outline-offset-1 outline-border transition-all duration-200 ease-in-out',
+          'group-data-[checked]:outline-primary/50',
           sizeClasses.knob,
           sizeClasses.knobTranslate
         )}

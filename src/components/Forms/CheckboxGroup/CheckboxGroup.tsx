@@ -185,7 +185,7 @@ export function CheckboxGroup({
   return (
     <fieldset className={className}>
       {legend && (
-        <legend className={srOnlyLegend ? 'sr-only' : 'text-base font-semibold text-foreground'}>{legend}</legend>
+        <legend className={srOnlyLegend ? 'sr-only' : 'text-sm/6 font-semibold text-foreground'}>{legend}</legend>
       )}
       <ListContainer {...listContainerProps}>{options.map(renderCheckbox)}</ListContainer>
     </fieldset>

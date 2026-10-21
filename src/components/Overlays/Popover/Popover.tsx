@@ -70,7 +70,7 @@ export function PopoverButton({ children, ...props }: PopoverButtonProps): JSX.E
  *
  * Features:
  * - Automatic positioning via anchor prop
- * - Styled with background, border, shadow
+ * - Styled with background and hairline border
  * - Dark mode support
  * - Customizable via className
  *
@@ -91,12 +91,7 @@ export function PopoverButton({ children, ...props }: PopoverButtonProps): JSX.E
 export function PopoverPanel({ children, className, ...props }: PopoverPanelProps): JSX.Element {
   return (
     <HeadlessPopoverPanel
-      className={clsx(
-        'z-10 bg-surface shadow-sm',
-        'outline-1 -outline-offset-1 outline-border',
-        'dark:shadow-none',
-        className
-      )}
+      className={clsx('z-10 rounded-sm bg-surface', 'outline-1 -outline-offset-1 outline-border', className)}
       {...props}
     >
       {children}
