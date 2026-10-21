@@ -21,8 +21,8 @@ import {
   RecentActivityTable,
   ValidatorStatusChart,
 } from './components';
-import { EpochSlotsTable } from '../epochs/components';
 import { useEntityDetailData, useEntityValidatorStatusData } from './hooks';
+import { EntityProposals } from './components/EntityProposals';
 import { TIME_RANGE_CONFIG, TIME_PERIOD_OPTIONS, type TimePeriod } from './constants';
 
 export function DetailPage(): React.JSX.Element {
@@ -148,12 +148,7 @@ export function DetailPage(): React.JSX.Element {
 
             {/* Blocks Tab */}
             <TabPanel>
-              <EpochSlotsTable
-                slots={data.slots}
-                showSlotInEpoch={false}
-                enableRealtimeHighlighting={false}
-                sortOrder="desc"
-              />
+              <EntityProposals entity={entityName} />
             </TabPanel>
           </TabPanels>
         </TabGroup>

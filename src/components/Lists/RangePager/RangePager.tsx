@@ -11,6 +11,8 @@ export interface RangePagerProps {
   noun: string;
   /** Navigate to the page whose top row is `from`; undefined returns to the latest page */
   onNavigate: (from: number | undefined) => void;
+  /** Override for Newer, for sparse sequences where the newer page must be looked up */
+  onNewer?: () => void;
   className?: string;
 }
 
@@ -19,7 +21,7 @@ export interface RangePagerProps {
  * the latest page, newer/older steps and a jump to any number. Pages are addressed by their top
  * number so every page has a stable URL.
  */
-export function RangePager({ page, noun, onNavigate, className }: RangePagerProps): JSX.Element {
+export function RangePager({ page, noun, onNavigate, onNewer, className }: RangePagerProps): JSX.Element {
   const [jump, setJump] = useState('');
 
   const submitJump = (event: FormEvent): void => {
@@ -50,7 +52,7 @@ export function RangePager({ page, noun, onNavigate, className }: RangePagerProp
           variant="secondary"
           size="sm"
           disabled={page.newerTop === undefined}
-          onClick={() => onNavigate(page.newerTop)}
+          onClick={() => (onNewer ? onNewer() : onNavigate(page.newerTop))}
           leadingIcon={<ChevronLeftIcon className="size-4" />}
         >
           Newer
