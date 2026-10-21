@@ -547,8 +547,7 @@ export function DetailPage(): JSX.Element {
             <TabPanel>
               <div className="space-y-6">
                 {/* Performance Metrics */}
-                <Card>
-                  <h3 className="mb-4 text-lg font-semibold text-foreground">Performance Metrics</h3>
+                <Card title="Performance Metrics">
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {/* Block First Seen At */}
                     {firstBlockSeen !== null && firstBlockSeen !== Infinity && (
@@ -613,8 +612,7 @@ export function DetailPage(): JSX.Element {
 
                 {/* Network Propagation */}
                 {blockPropagationData.length > 0 && (
-                  <Card>
-                    <h3 className="mb-4 text-lg font-semibold text-foreground">Network Propagation</h3>
+                  <Card title="Network Propagation">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                       <MiniStat label="Block Nodes" value={distinctBlockClients.toLocaleString()} />
                     </div>
@@ -623,8 +621,7 @@ export function DetailPage(): JSX.Element {
 
                 {/* MEV Activity */}
                 {(data.blockMev[0]?.value || data.relayBids.length > 0 || data.builderBids.length > 0) && (
-                  <Card>
-                    <h3 className="mb-4 text-lg font-semibold text-foreground">MEV Activity</h3>
+                  <Card title="MEV Activity">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                       {data.blockMev[0]?.value && data.blockMev[0].value !== '0' && (
                         <MiniStat
@@ -671,8 +668,7 @@ export function DetailPage(): JSX.Element {
 
             {/* Block Tab - All block data in two-column layout */}
             <TabPanel>
-              <Card>
-                <h3 className="mb-4 text-lg font-semibold text-foreground">Block Data</h3>
+              <Card title="Block Data">
                 {effectiveBlockData ? (
                   <dl className="grid grid-cols-1 gap-x-8 gap-y-4 lg:grid-cols-2">
                     {/* Beacon Block Section */}
@@ -1037,8 +1033,7 @@ export function DetailPage(): JSX.Element {
                   <>
                     {/* Blob Metrics - only show if there are actual blobs */}
                     {blobCount > 0 && (
-                      <Card>
-                        <h3 className="mb-4 text-lg font-semibold text-foreground">Blob Metrics</h3>
+                      <Card title="Blob Metrics">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                           <MiniStat label="Blob Count" value={blobCount.toString()} />
 
@@ -1228,8 +1223,7 @@ export function DetailPage(): JSX.Element {
                 ) : (
                   <>
                     {/* Transaction & Gas Metrics */}
-                    <Card>
-                      <h3 className="mb-4 text-lg font-semibold text-foreground">Transactions & Gas</h3>
+                    <Card title="Transactions & Gas">
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         {effectiveBlockData.execution_payload_transactions_count !== null &&
                           effectiveBlockData.execution_payload_transactions_count !== undefined && (

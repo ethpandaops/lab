@@ -157,8 +157,7 @@ export function SlotProgressTimeline({
   // Loading state
   if (isLoading || executionLoading) {
     return (
-      <Card>
-        <h3 className="mb-4 text-lg font-semibold text-foreground">Slot Trace</h3>
+      <Card title="Slot Trace">
         <div className="h-64 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30 bg-[length:200%_100%]" />
       </Card>
     );
@@ -167,8 +166,7 @@ export function SlotProgressTimeline({
   // Empty state
   if (spans.length <= 1) {
     return (
-      <Card>
-        <h3 className="mb-4 text-lg font-semibold text-foreground">Slot Trace</h3>
+      <Card title="Slot Trace">
         <div className="py-8 text-center">
           <p className="text-muted">No trace data available for this slot</p>
         </div>

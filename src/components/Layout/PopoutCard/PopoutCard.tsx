@@ -106,10 +106,9 @@ export function PopoutCard({
   const cardContent = isRenderFunction ? children({ inModal: false }) : children;
   const modalContent = isRenderFunction ? children({ inModal: true }) : children;
 
-  // Title element (may be wrapped with ScrollAnchor)
-  const titleElement = (
-    <h3 className="truncate text-lg/7 font-semibold text-foreground dark:text-foreground">{title}</h3>
-  );
+  const iconButtonClassName =
+    'group rounded-sm p-1.5 text-muted transition-colors hover:bg-muted/20 hover:text-foreground focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary/50 disabled:opacity-50';
+  const iconClassName = 'size-4';
 
   // Combine subtitle and modalSubtitle for modal description
   const modalDescriptionText = [subtitle, modalSubtitle].filter(Boolean).join(' • ');
@@ -130,7 +129,7 @@ export function PopoutCard({
       <div
         className={clsx(
           'grid grid-cols-12 gap-4 border-t border-border bg-muted/5 px-6 py-3',
-          noPadding ? 'mb-0' : '-mx-6 -mb-5'
+          noPadding ? 'mb-0' : '-mx-4 -mb-4 sm:-mx-5 sm:-mb-5'
         )}
       >
         <div className="col-span-9 space-y-1">
@@ -250,73 +249,64 @@ export function PopoutCard({
       <div ref={cardRef} className="h-full">
         <Card
           className={clsx('flex h-full flex-col', noPadding && '[&>div:last-child]:p-0', className)}
-          header={
-            <div className="flex w-full items-center justify-between gap-4">
-              <div className="min-w-0 flex-1 space-y-1">
-                {anchorId ? (
-                  <ScrollAnchor id={anchorId} showLinkIcon={false}>
-                    {titleElement}
-                  </ScrollAnchor>
-                ) : (
-                  titleElement
-                )}
-                {subtitle && <p className="text-sm text-muted dark:text-muted">{subtitle}</p>}
-              </div>
-
-              {/* Custom header actions */}
-              {headerActions && !showLogo && <div className="shrink-0">{headerActions}</div>}
-
-              {/* Action buttons - hidden during screenshot, replaced with logo */}
-              {showLogo ? (
-                <div className="shrink-0">
-                  <img src="/images/ethpandaops.png" alt="ethPandaOps" className="h-10 w-auto" />
-                </div>
-              ) : (
-                <div className="flex shrink-0 items-start gap-2">
-                  {enableDownload && (
-                    <Dropdown
-                      trigger={
-                        <button
-                          type="button"
-                          disabled={isDownloading}
-                          className="group rounded-sm p-1 transition-colors hover:bg-muted/20 focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary/50 disabled:opacity-50"
-                          aria-label="Export options"
-                        >
-                          <EllipsisVerticalIcon className="size-5 text-muted transition-colors group-hover:text-foreground dark:text-muted dark:group-hover:text-foreground" />
-                        </button>
-                      }
-                      align="right"
-                    >
-                      <DropdownSection>
-                        <DropdownItem icon={<ArrowDownTrayIcon className="size-5" />} onClick={handleDownload}>
-                          Download
-                        </DropdownItem>
-                        <CopyToClipboard
-                          content={handleCopyToClipboard}
-                          successMessage="Copied to clipboard!"
-                          errorMessage="Failed to copy image"
-                        >
-                          {({ onClick }) => (
-                            <DropdownItem icon={<ClipboardDocumentIcon className="size-5" />} onClick={onClick}>
-                              Copy to clipboard
-                            </DropdownItem>
-                          )}
-                        </CopyToClipboard>
-                      </DropdownSection>
-                    </Dropdown>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(true)}
-                    className="group rounded-sm p-1 transition-colors hover:bg-muted/20 focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary/50"
-                    aria-label={`Open ${title} in modal`}
+          title={
+            anchorId ? (
+              <ScrollAnchor id={anchorId} showLinkIcon={false} className="max-w-full">
+                {title}
+              </ScrollAnchor>
+            ) : (
+              title
+            )
+          }
+          subtitle={subtitle}
+          actions={
+            showLogo ? (
+              <img src="/images/ethpandaops.png" alt="ethPandaOps" className="h-8 w-auto" />
+            ) : (
+              <>
+                {headerActions}
+                {enableDownload && (
+                  <Dropdown
+                    trigger={
+                      <button
+                        type="button"
+                        disabled={isDownloading}
+                        className={iconButtonClassName}
+                        aria-label="Export options"
+                      >
+                        <EllipsisVerticalIcon className={iconClassName} />
+                      </button>
+                    }
+                    align="right"
                   >
-                    <ArrowsPointingOutIcon className="size-5 text-muted transition-colors group-hover:text-foreground dark:text-muted dark:group-hover:text-foreground" />
-                  </button>
-                </div>
-              )}
-            </div>
+                    <DropdownSection>
+                      <DropdownItem icon={<ArrowDownTrayIcon className="size-5" />} onClick={handleDownload}>
+                        Download
+                      </DropdownItem>
+                      <CopyToClipboard
+                        content={handleCopyToClipboard}
+                        successMessage="Copied to clipboard!"
+                        errorMessage="Failed to copy image"
+                      >
+                        {({ onClick }) => (
+                          <DropdownItem icon={<ClipboardDocumentIcon className="size-5" />} onClick={onClick}>
+                            Copy to clipboard
+                          </DropdownItem>
+                        )}
+                      </CopyToClipboard>
+                    </DropdownSection>
+                  </Dropdown>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(true)}
+                  className={iconButtonClassName}
+                  aria-label={`Open ${title} in modal`}
+                >
+                  <ArrowsPointingOutIcon className={iconClassName} />
+                </button>
+              </>
+            )
           }
           rounded
           allowContentOverflow={allowContentOverflow}

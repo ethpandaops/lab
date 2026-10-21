@@ -87,9 +87,9 @@ No mixing of sharp and round. One radius, one feel.
 |---|---|---|
 | Container padding | responsive | `p-4 sm:p-6 lg:p-8` |
 | Container max-width | responsive | `max-w-screen-2xl 3xl:max-w-screen-3xl 4xl:max-w-screen-4xl` |
-| Card header padding | responsive | `px-4 py-5 sm:px-6` |
-| Card body padding | responsive | `px-4 py-5 sm:p-6` |
-| Card footer padding | responsive | `px-4 py-4 sm:px-6` |
+| Card header padding | responsive | `px-4 py-3 sm:px-5` |
+| Card body padding | responsive | `p-4 sm:p-5` |
+| Card footer padding | responsive | `px-4 py-3 sm:px-5` |
 | Page header margin | 32px | `mb-8` |
 | Grid gap | 24px | `gap-6` |
 | Section dividers | divide-y | `divide-y divide-border` |
@@ -105,8 +105,8 @@ All text uses Space Grotesk Variable.
 | Page title (md) | `text-4xl/tight font-bold text-foreground` |
 | Page title (sm) | `text-2xl/tight font-bold text-foreground` |
 | Page description | `text-base text-muted` |
-| Card title | `text-lg/7 font-semibold text-foreground` |
-| Card subtitle | `text-sm text-muted` |
+| Card title | `text-sm/6 font-semibold text-foreground` (rendered by `Card title`) |
+| Card subtitle | `text-xs/5 text-muted` (rendered by `Card subtitle`) |
 | Section header | `text-xs font-semibold tracking-wider text-foreground` |
 | Subsection header | `text-[10px] font-semibold tracking-wider text-muted/60 uppercase` |
 | Body text | `text-sm text-foreground` |
@@ -138,9 +138,15 @@ bg-surface rounded-sm
 Light: shadow-sm
 Dark: outline outline-border
 Sections: divide-y divide-border
-Header: px-4 py-5 sm:px-6
-Body: px-4 py-5 sm:p-6
+Header: px-4 py-3 sm:px-5
+Body: p-4 sm:p-5
 ```
+
+Pass `title`, `subtitle` and `actions` instead of hand-built header markup. The header row is
+one recipe everywhere: `text-sm/6` semibold title, `text-xs/5` muted subtitle, actions right-aligned
+and pulled into the header's vertical padding so they never make it taller. Header and body share
+the same horizontal inset, so content starting at the body's left edge lines up with the title.
+Rows with their own hover background (`px-2`) offset it with `-mx-2` on the list.
 
 Variants: `default`, `muted`, `primary`, `accent`, `elevated`, `surface`.
 
@@ -148,9 +154,8 @@ Variants: `default`, `muted`, `primary`, `accent`, `elevated`, `surface`.
 
 Wraps Card with expand-to-modal and download capabilities.
 
-- Title: `text-lg/7 font-semibold text-foreground`
-- Subtitle: `text-sm text-muted`
-- Actions (top-right): expand icon + dropdown for export
+- Uses the Card header (`title`/`subtitle`/`actions`)
+- Actions (top-right): `size-4` icons in `p-1.5` buttons — expand + export dropdown
 - Modal size options: `default`, `lg`, `xl`, `full`
 - `anchorId` prop for deep-linking via URL hash
 - Render prop `({ inModal })` for responsive chart heights

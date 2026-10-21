@@ -5,7 +5,13 @@ export type CardVariant = 'default' | 'muted' | 'primary' | 'accent' | 'elevated
 export interface CardProps {
   /** Main content section (body) */
   children: ReactNode;
-  /** Optional header section (top slot) */
+  /** Card title, rendered in the standard header row */
+  title?: ReactNode;
+  /** Secondary line under the title */
+  subtitle?: ReactNode;
+  /** Controls aligned to the right of the title (icon buttons, menus) */
+  actions?: ReactNode;
+  /** Custom header content; prefer `title`/`subtitle`/`actions` so every card header matches */
   header?: ReactNode;
   /** Optional footer section (bottom slot) */
   footer?: ReactNode;

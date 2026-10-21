@@ -51,8 +51,7 @@ export function OpcodeDistribution({ opcodeStats, maxOpcodes = 15 }: OpcodeDistr
 
   if (opcodeStats.length === 0) {
     return (
-      <Card className="p-4">
-        <h3 className="mb-3 text-sm font-medium text-foreground">Opcode Distribution</h3>
+      <Card className="p-4" title="Opcode Distribution">
         <div className="flex h-[200px] items-center justify-center text-sm text-muted">No opcode data available</div>
       </Card>
     );

@@ -121,15 +121,12 @@ export function CompletionBlocksTable({
   return (
     <Card
       rounded
-      header={
-        <div className="flex flex-col gap-1">
-          <h3 className="text-sm/6 font-semibold text-foreground">Blocks</h3>
-          <p className="text-xs/5 text-muted">
-            Column completions across all sentry nodes by path, with completion times from slot start. Node done is when
-            the median node completed its last column, and header is when a node first received the partial column
-            header.
-          </p>
-        </div>
+      title="Blocks"
+      subtitle={
+        <>
+          Column completions across all sentry nodes by path, with completion times from slot start. Node done is when
+          the median node completed its last column, and header is when a node first received the partial column header.
+        </>
       }
     >
       {error && <p className="text-sm text-danger">Failed to load blocks: {error.message}</p>}
