@@ -216,7 +216,6 @@ export function IndexPage(): JSX.Element {
       <Header
         title="Partial Columns"
         description="How sentry nodes complete their custody data columns: cell by cell over gossipsub partial messages, from the execution layer, or as whole columns"
-        showAccent={false}
       />
 
       {!boundsLoading && !hasData ? (

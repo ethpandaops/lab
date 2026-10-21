@@ -65,7 +65,7 @@ export function NetworkSelect({
           </span>
           <span className="flex min-w-0 flex-col">
             {family && (
-              <span className="truncate text-[10px]/3 font-semibold tracking-wider text-muted uppercase">{family}</span>
+              <span className="truncate text-2xs/3 font-semibold tracking-wider text-muted uppercase">{family}</span>
             )}
             <span className="truncate text-base/5 text-foreground">{getNetworkShortLabel(currentNetwork)}</span>
           </span>
@@ -91,7 +91,7 @@ export function NetworkSelect({
             >
               <div
                 aria-hidden="true"
-                className="px-3 pt-2.5 pb-1 text-[10px]/3 font-semibold tracking-wider text-muted/60 uppercase"
+                className="px-3 pt-2.5 pb-1 text-2xs/3 font-semibold tracking-wider text-muted/60 uppercase"
               >
                 {group.label}
               </div>

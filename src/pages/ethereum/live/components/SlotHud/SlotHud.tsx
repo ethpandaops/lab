@@ -94,7 +94,7 @@ function Section({
       className={clsx('flex min-w-0 flex-col gap-1 border-l border-border px-3 first:border-l-0 first:pl-0', className)}
     >
       <div className="flex h-3.5 items-center gap-2">
-        <span className="truncate text-[9px]/3 font-medium tracking-[0.16em] text-muted uppercase">{title}</span>
+        <span className="truncate text-2xs/3 font-medium tracking-[0.16em] text-muted uppercase">{title}</span>
         {accessory}
       </div>
       {children}
@@ -106,10 +106,10 @@ function Section({
 function Row({ k, v, tone, title }: { k: string; v: ReactNode; tone?: string; title?: string }): JSX.Element {
   return (
     <div className="flex items-baseline justify-between gap-2">
-      <span className="shrink-0 text-[9px]/3 tracking-wide text-muted/60 uppercase">{k}</span>
+      <span className="shrink-0 text-2xs/3 tracking-wide text-muted/60 uppercase">{k}</span>
       <span
         title={title}
-        className={clsx('truncate font-mono text-[11px]/3 font-semibold tabular-nums', tone ?? 'text-foreground')}
+        className={clsx('truncate font-mono text-2xs/3 font-semibold tabular-nums', tone ?? 'text-foreground')}
       >
         {v}
       </span>
@@ -180,13 +180,13 @@ export function SlotHud({
               <ClientLogo client={row.client} size={11} />
               <span
                 title={row.client}
-                className={clsx('flex-1 truncate text-[10px]/3', i === 0 ? 'text-foreground' : 'text-muted')}
+                className={clsx('flex-1 truncate text-2xs/3', i === 0 ? 'text-foreground' : 'text-muted')}
               >
                 {row.client}
               </span>
               <span
                 className={clsx(
-                  'shrink-0 font-mono text-[10px]/3 tabular-nums',
+                  'shrink-0 font-mono text-2xs/3 tabular-nums',
                   i === 0 ? 'font-semibold text-primary' : 'text-muted'
                 )}
               >
@@ -227,7 +227,7 @@ export function SlotHud({
               <Fade active={payloadActive || epbs.ptcVotesSeen > 0} className="ml-auto">
                 <span
                   className={clsx(
-                    'inline-block rounded-sm border px-1.5 py-0 text-[9px]/3 font-semibold tracking-wide uppercase',
+                    'inline-block rounded-sm border px-1.5 py-0 text-2xs/3 font-semibold tracking-wide uppercase',
                     payloadStatusMeta.cls
                   )}
                 >
@@ -326,7 +326,7 @@ export function SlotHud({
             <Fade active={blockActive} className="ml-auto">
               <span
                 className={clsx(
-                  'inline-block rounded-sm border px-1.5 py-0 text-[9px]/3 font-semibold tracking-wide uppercase',
+                  'inline-block rounded-sm border px-1.5 py-0 text-2xs/3 font-semibold tracking-wide uppercase',
                   statusMeta.cls
                 )}
               >

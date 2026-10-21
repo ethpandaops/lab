@@ -49,7 +49,7 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
         {/* Label - always rendered with fixed line height */}
         <span
           className={clsx(
-            'text-center text-[11px] leading-tight font-medium',
+            'text-center text-2xs leading-tight font-medium',
             status === 'pending' && 'text-muted/50',
             status === 'active' && 'text-foreground',
             status === 'completed' && 'text-muted'
@@ -61,7 +61,7 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
         {/* Time badge - always rendered with fixed line height */}
         <span
           className={clsx(
-            'text-center font-mono text-[10px] leading-tight',
+            'text-center font-mono text-2xs leading-tight',
             status === 'pending' && 'text-muted/50',
             status === 'active' && (isSuccess ? 'text-success' : 'text-primary'),
             status === 'completed' && (isSuccess ? 'text-success/70' : 'text-muted/70')
@@ -77,7 +77,7 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
         {/* Stats - always rendered with fixed line height, hidden with opacity when empty */}
         <span
           className={clsx(
-            'text-center text-[9px] leading-tight',
+            'text-center text-2xs leading-tight',
             status === 'pending' && 'text-muted/50',
             status === 'active' && 'text-muted',
             status === 'completed' && 'text-muted/70',

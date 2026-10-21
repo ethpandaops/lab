@@ -875,7 +875,7 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      <Header title="Consensus Overview" showAccent={false} />
+      <Header title="Consensus Overview" />
 
       {/* Time Period Selector */}
       <div className="mb-6 flex flex-wrap items-center gap-6">

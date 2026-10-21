@@ -1239,7 +1239,7 @@ function WinrateSection({
                           {standing.implementation}
                         </div>
                         {isTopThree && (
-                          <div className="text-[10px]/4 text-muted/60">{standing.totalWins.toLocaleString()} wins</div>
+                          <div className="text-2xs/4 text-muted/60">{standing.totalWins.toLocaleString()} wins</div>
                         )}
                       </div>
 
@@ -1262,7 +1262,7 @@ function WinrateSection({
 
             {/* Slot count */}
             {totalSlots > 0 && (
-              <div className="mt-3 text-center text-[10px] text-muted/40 tabular-nums">
+              <div className="mt-3 text-center text-2xs text-muted/40 tabular-nums">
                 {totalSlots.toLocaleString()} slots analyzed
               </div>
             )}

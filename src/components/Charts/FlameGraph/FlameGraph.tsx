@@ -424,7 +424,7 @@ export function FlameGraph({
                                 {node.category && nodeColors && (
                                   <span
                                     className={clsx(
-                                      'rounded-xs px-1.5 py-0.5 text-[10px] font-medium text-white',
+                                      'rounded-xs px-1.5 py-0.5 text-2xs font-medium text-white',
                                       nodeColors.bg
                                     )}
                                   >
@@ -459,7 +459,7 @@ export function FlameGraph({
                         {parent.category && parentColors && (
                           <span
                             className={clsx(
-                              'rounded-xs px-1.5 py-0.5 text-[10px] font-medium text-white',
+                              'rounded-xs px-1.5 py-0.5 text-2xs font-medium text-white',
                               parentColors.bg
                             )}
                           >
@@ -485,10 +485,7 @@ export function FlameGraph({
                   >
                     {current.category && currentColors && (
                       <span
-                        className={clsx(
-                          'rounded-xs px-1.5 py-0.5 text-[10px] font-medium text-white',
-                          currentColors.bg
-                        )}
+                        className={clsx('rounded-xs px-1.5 py-0.5 text-2xs font-medium text-white', currentColors.bg)}
                       >
                         {current.category}
                       </span>

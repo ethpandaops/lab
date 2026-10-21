@@ -434,7 +434,7 @@ export function GasScheduleDrawer({
                                 <span className="size-2.5 rounded-full" style={{ backgroundColor: group.color }} />
                                 <span className="text-sm font-medium text-foreground">{group.name}</span>
                                 {modCount > 0 && (
-                                  <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                                  <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-2xs font-medium text-primary">
                                     {modCount}
                                   </span>
                                 )}
@@ -447,7 +447,7 @@ export function GasScheduleDrawer({
                                     key={mult}
                                     type="button"
                                     onClick={() => handleCategoryMultiplier(group.keys, mult)}
-                                    className="rounded-xs px-1.5 py-0.5 text-[10px] font-medium text-muted transition-colors hover:bg-surface hover:text-foreground"
+                                    className="rounded-xs px-1.5 py-0.5 text-2xs font-medium text-muted transition-colors hover:bg-surface hover:text-foreground"
                                   >
                                     ×{mult}
                                   </button>
@@ -537,7 +537,7 @@ export function GasScheduleDrawer({
                                     />
 
                                     {/* Default value label */}
-                                    <span className="w-12 shrink-0 text-right text-[10px] text-muted">
+                                    <span className="w-12 shrink-0 text-right text-2xs text-muted">
                                       ({param.value.toLocaleString()})
                                     </span>
 

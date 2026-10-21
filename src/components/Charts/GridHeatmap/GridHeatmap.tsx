@@ -77,7 +77,7 @@ export function GridHeatmap<T = unknown>({
   };
 
   const textSize: Record<GridCellSize, string> = {
-    '3xs': 'text-[10px]/3', // 10px - compact
+    '3xs': 'text-2xs/3', // 10px - compact
     '2xs': 'text-xs/4', // 12px - readable
     xs: 'text-xs/4',
     sm: 'text-sm/5',
@@ -200,7 +200,7 @@ export function GridHeatmap<T = unknown>({
           {yAxisTitle && (
             <div className="flex shrink-0 items-center justify-center pr-1">
               <span
-                className="text-[10px] font-medium tracking-wider text-muted uppercase"
+                className="text-2xs font-medium tracking-wider text-muted uppercase"
                 style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
               >
                 {yAxisTitle}
@@ -308,7 +308,7 @@ export function GridHeatmap<T = unknown>({
                 {/* Spacer for row labels + y-axis title */}
                 <div className={clsx(labelWidth[cellSize], 'shrink-0')} />
                 {/* Title centered over columns */}
-                <div className="flex-1 text-center text-[10px] font-medium tracking-wider text-muted uppercase">
+                <div className="flex-1 text-center text-2xs font-medium tracking-wider text-muted uppercase">
                   {xAxisTitle}
                 </div>
               </div>

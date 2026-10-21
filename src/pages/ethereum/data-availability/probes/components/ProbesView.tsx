@@ -298,7 +298,7 @@ export function ProbesView({
                 }`}
               >
                 {icon}
-                <span className="text-[10px] font-semibold tracking-wide uppercase">{result}</span>
+                <span className="text-2xs font-semibold tracking-wide uppercase">{result}</span>
               </div>
             </FilterableCell>
           );
@@ -398,7 +398,7 @@ export function ProbesView({
               value={value}
               displayValue={org || `AS${value}`}
               onFilterClick={onFilterClick}
-              className="text-[10px]"
+              className="text-2xs"
             >
               <span title={`AS${value}${org ? ` - ${org}` : ''}`}>{displayText}</span>
             </FilterableCell>
@@ -440,7 +440,7 @@ export function ProbesView({
                   <BlobPosterLogo poster={poster} size={16} />
                 </FilterableCell>
               ))}
-              {hasMore && <span className="shrink-0 text-[10px] text-muted">+{countMap.size - 4}</span>}
+              {hasMore && <span className="shrink-0 text-2xs text-muted">+{countMap.size - 4}</span>}
             </div>
           );
         },
@@ -503,7 +503,7 @@ export function ProbesView({
           const error = info.getValue();
           if (!error) return <span className="text-muted">-</span>;
           return (
-            <span className="text-[10px] text-red-400" title={error}>
+            <span className="text-2xs text-red-400" title={error}>
               {truncateHash(error, 20)}
             </span>
           );
@@ -519,12 +519,7 @@ export function ProbesView({
         cell: info => {
           const value = info.getValue();
           return (
-            <FilterableCell
-              field="node_id"
-              value={value}
-              onFilterClick={onFilterClick}
-              className="font-mono text-[10px]"
-            >
+            <FilterableCell field="node_id" value={value} onFilterClick={onFilterClick} className="font-mono text-2xs">
               {truncateHash(value, 20)}
             </FilterableCell>
           );
@@ -542,7 +537,7 @@ export function ProbesView({
               field="meta_client_version"
               value={value}
               onFilterClick={onFilterClick}
-              className="font-mono text-[10px]"
+              className="font-mono text-2xs"
             >
               {truncateHash(value, 12)}
             </FilterableCell>
@@ -561,7 +556,7 @@ export function ProbesView({
               field="meta_peer_version"
               value={value}
               onFilterClick={onFilterClick}
-              className="font-mono text-[10px]"
+              className="font-mono text-2xs"
             >
               {truncateHash(value, 12)}
             </FilterableCell>
@@ -618,7 +613,7 @@ export function ProbesView({
               value={value}
               displayValue={org || `AS${value}`}
               onFilterClick={onFilterClick}
-              className="text-[10px]"
+              className="text-2xs"
             >
               <span title={`AS${value}${org ? ` - ${org}` : ''}`}>{displayText}</span>
             </FilterableCell>

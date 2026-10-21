@@ -189,17 +189,17 @@ function ErrorCard({
                 className="flex items-center gap-1.5 py-0.5 whitespace-nowrap"
                 style={{ paddingLeft: `${err.depth * 16}px` }}
               >
-                {err.depth > 0 && <span className="text-[10px] text-muted/40">{'\u2514'}</span>}
+                {err.depth > 0 && <span className="text-2xs text-muted/40">{'\u2514'}</span>}
                 <span
                   className={clsx(
-                    'shrink-0 rounded-xs px-1 py-px font-mono text-[10px] font-semibold',
+                    'shrink-0 rounded-xs px-1 py-px font-mono text-2xs font-semibold',
                     isSimulated ? 'bg-red-500/10 text-red-400' : 'bg-amber-500/10 text-amber-500'
                   )}
                 >
                   {err.type}
                 </span>
-                <span className="font-mono text-[11px] text-foreground/70">{err.address}</span>
-                <span className="font-mono text-[11px] text-red-400/70">({err.error})</span>
+                <span className="font-mono text-2xs text-foreground/70">{err.address}</span>
+                <span className="font-mono text-2xs text-red-400/70">({err.error})</span>
               </div>
             ))}
           </div>
@@ -456,7 +456,7 @@ function OpcodeRow({ op, maxGas }: { op: OpcodeRowData; maxGas: number }): JSX.E
                 : op.opcode}
           </span>
           {hasCountChange && (
-            <span className="font-mono text-[11px] text-muted tabular-nums">
+            <span className="font-mono text-2xs text-muted tabular-nums">
               {formatGas(op.originalCount)} &rarr; {formatGas(op.simulatedCount)} execs
             </span>
           )}
@@ -716,7 +716,7 @@ function TransactionImpactView({
               {opt.label}
               <span
                 className={clsx(
-                  'rounded-full px-1.5 py-0.5 font-mono text-[10px] tabular-nums',
+                  'rounded-full px-1.5 py-0.5 font-mono text-2xs tabular-nums',
                   filter === opt.key ? 'bg-primary/10 text-primary' : 'bg-border/30 text-muted'
                 )}
               >
@@ -730,7 +730,7 @@ function TransactionImpactView({
 
         {/* Sort */}
         <div className="flex items-center gap-1 rounded-sm bg-surface/60 p-1">
-          <span className="px-2 text-[10px] font-medium tracking-wide text-muted uppercase">Sort</span>
+          <span className="px-2 text-2xs font-medium tracking-wide text-muted uppercase">Sort</span>
           {sortOptions.map(opt => (
             <button
               key={opt.key}

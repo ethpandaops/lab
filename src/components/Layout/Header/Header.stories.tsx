@@ -27,13 +27,12 @@ export default meta;
 type Story = StoryObj;
 
 /**
- * Default header with title, description, and accent
+ * Default header with title and description
  */
 export const Default: Story = {
   args: {
     title: 'Welcome to the Dashboard',
     description: 'Track your metrics and monitor performance in real-time',
-    showAccent: true,
   },
 };
 
@@ -45,7 +44,6 @@ export const ExtraSmall: Story = {
     title: 'User Settings',
     description: 'Manage your preferences',
     size: 'xs',
-    showAccent: true,
   },
 };
 
@@ -57,7 +55,6 @@ export const Small: Story = {
     title: 'Dashboard Overview',
     description: 'Quick insights and metrics',
     size: 'sm',
-    showAccent: true,
   },
 };
 
@@ -69,7 +66,6 @@ export const Medium: Story = {
     title: 'Welcome to the Dashboard',
     description: 'Track your metrics and monitor performance in real-time',
     size: 'md',
-    showAccent: true,
   },
 };
 
@@ -81,7 +77,6 @@ export const Large: Story = {
     title: 'Analytics Platform',
     description: 'Comprehensive data insights and visualizations for your organization',
     size: 'lg',
-    showAccent: true,
   },
 };
 
@@ -93,7 +88,6 @@ export const ExtraLarge: Story = {
     title: 'Enterprise Dashboard',
     description: 'Advanced monitoring and analytics for large-scale operations and data-driven decision making',
     size: 'xl',
-    showAccent: true,
   },
 };
 
@@ -107,17 +101,6 @@ export const TitleOnly: Story = {
 };
 
 /**
- * Header without accent bar
- */
-export const WithoutAccent: Story = {
-  args: {
-    title: 'User Profile',
-    description: 'Manage your account settings and preferences',
-    showAccent: false,
-  },
-};
-
-/**
  * Header with long title and description
  */
 export const LongContent: Story = {
@@ -125,7 +108,6 @@ export const LongContent: Story = {
     title: 'Comprehensive Analytics Dashboard for Real-Time Monitoring',
     description:
       'This dashboard provides detailed insights into your system performance, user engagement metrics, and operational data across multiple channels and time periods',
-    showAccent: true,
   },
 };
 
@@ -136,6 +118,5 @@ export const ShortTitle: Story = {
   args: {
     title: 'Home',
     description: 'Welcome back!',
-    showAccent: true,
   },
 };

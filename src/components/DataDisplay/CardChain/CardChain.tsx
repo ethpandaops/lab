@@ -93,13 +93,13 @@ function ChainCard({
           {/* Highlight badge */}
           {isHighlighted && (
             <div className="absolute -top-px right-3 rounded-b-xs bg-primary px-2 py-0.5">
-              <span className="text-[10px] font-bold tracking-wider text-white">{highlightBadgeText}</span>
+              <span className="text-2xs font-bold tracking-wider text-white">{highlightBadgeText}</span>
             </div>
           )}
 
           {/* Label and main value */}
           <div className="mb-3 pt-1">
-            <div className="text-[10px] font-medium tracking-wider text-muted uppercase">{item.label}</div>
+            <div className="text-2xs font-medium tracking-wider text-muted uppercase">{item.label}</div>
             <div
               className={clsx(
                 'font-mono text-xl font-bold tabular-nums',
@@ -120,7 +120,7 @@ function ChainCard({
             >
               {item.stats.map(stat => (
                 <div key={stat.label}>
-                  <div className="text-[10px] text-muted">{stat.label}</div>
+                  <div className="text-2xs text-muted">{stat.label}</div>
                   <div className="font-mono text-sm font-semibold text-foreground">
                     {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
                   </div>
@@ -178,7 +178,7 @@ function NavArrow({
     >
       {loading ? <ArrowPathIcon className="size-5 animate-spin" /> : <Icon className="size-5" />}
       {showBadge && (
-        <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+        <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-primary text-2xs font-bold text-white">
           {badgeCount > 99 ? '99+' : badgeCount}
         </span>
       )}

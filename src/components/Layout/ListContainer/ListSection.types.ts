@@ -30,12 +30,6 @@ export interface ListSectionProps {
   defaultCollapsed?: boolean;
 
   /**
-   * Whether to show the accent bar under the header (non-nested sections only)
-   * @default true
-   */
-  showAccent?: boolean;
-
-  /**
    * Additional CSS classes for the section container
    */
   className?: string;

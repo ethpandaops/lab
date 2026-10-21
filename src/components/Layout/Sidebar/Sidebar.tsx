@@ -139,7 +139,7 @@ function SidebarFooter({
             <XIcon className="size-4" />
           </a>
         </div>
-        {window.__VERSION__ && <span className="text-[10px] text-muted/60">{window.__VERSION__.version}</span>}
+        {window.__VERSION__ && <span className="text-2xs text-muted/60">{window.__VERSION__.version}</span>}
         <button
           type="button"
           onClick={onToggleCollapse}
@@ -271,7 +271,7 @@ function SubsectionHeader({ title, collapsed }: { title: string; collapsed: bool
     return null as unknown as JSX.Element;
   }
 
-  return <div className="mb-1 ml-1 text-[10px] font-semibold tracking-wider text-muted/60 uppercase">{title}</div>;
+  return <div className="mb-1 ml-1 text-2xs font-semibold tracking-wider text-muted/60 uppercase">{title}</div>;
 }
 
 export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }: SidebarProps): JSX.Element {
@@ -417,7 +417,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
             {!collapsed && (
               <div className="flex flex-col">
                 <span className="font-sans text-lg leading-tight font-bold text-foreground">The Lab</span>
-                <span className="text-[10px] leading-tight text-muted">lab.ethpandaops.io</span>
+                <span className="text-2xs leading-tight text-muted">lab.ethpandaops.io</span>
               </div>
             )}
           </Link>

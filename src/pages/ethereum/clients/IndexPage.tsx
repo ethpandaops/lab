@@ -152,7 +152,6 @@ export function IndexPage(): JSX.Element {
       <Header
         title="Proposer Clients"
         description="Consensus and execution clients of block proposers, parsed from block graffiti"
-        showAccent={false}
       />
 
       {!boundsLoading && !hasData ? (
