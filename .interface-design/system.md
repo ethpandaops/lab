@@ -187,7 +187,15 @@ Wraps Card with expand-to-modal and download capabilities.
 - Render prop `({ inModal })` for responsive chart heights
 - Download metadata footer: grid with logo, title, subtitle, branding
 
-### Table
+### Stats (KPI strip)
+
+Headline numbers are one panel, not a card per number: a hairline panel split by internal rules.
+- Cell: `px-4 py-3.5 sm:px-5`; label `text-xs/5 font-medium text-muted` with an optional
+  `size-3.5` icon (tinted by `iconColor` when given); value `text-2xl/8 font-semibold tracking-tight tabular-nums`
+- Delta: `text-xs` with a 16px arrow, inline after the value
+- `accentColor` draws a 2px rule on the cell's top edge
+- Pages control columns with `gridClassName`; gaps are always zero
+
 
 `Table` (`src/components/Lists/Table`) has one density for every list of records:
 
