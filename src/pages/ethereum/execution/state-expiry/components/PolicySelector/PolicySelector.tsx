@@ -39,7 +39,7 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
 
         {/* Current header */}
         <div className="flex items-center justify-center gap-1 border-r border-b border-border/30 p-1.5 sm:p-2 lg:p-2.5">
-          <span className="text-[10px] font-bold text-muted sm:text-xs lg:text-sm">Current Contract Storage</span>
+          <span className="text-2xs font-bold text-muted sm:text-xs lg:text-sm">Current Contract Storage</span>
           <Popover className="relative">
             <PopoverButton
               variant="blank"
@@ -79,7 +79,7 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
                 <PopoverButton
                   variant="blank"
                   className={clsx(
-                    'cursor-pointer text-[10px] font-bold text-emerald-600 underline decoration-emerald-600/30 decoration-dotted underline-offset-2 transition-all hover:bg-transparent hover:decoration-emerald-600 sm:text-xs lg:text-sm dark:text-emerald-400 dark:decoration-emerald-400/30 dark:hover:bg-transparent dark:hover:decoration-emerald-400',
+                    'cursor-pointer text-2xs font-bold text-emerald-600 underline decoration-emerald-600/30 decoration-dotted underline-offset-2 transition-all hover:bg-transparent hover:decoration-emerald-600 sm:text-xs lg:text-sm dark:text-emerald-400 dark:decoration-emerald-400/30 dark:hover:bg-transparent dark:hover:decoration-emerald-400',
                     isHovered && 'scale-105'
                   )}
                 >
@@ -104,7 +104,7 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
               <span className="text-xl font-bold text-foreground tabular-nums lg:text-2xl">
                 {formatBytes(currentBytes)}
               </span>
-              <span className="text-[10px] text-muted tabular-nums lg:text-xs">{formatSlots(currentSlots)} slots</span>
+              <span className="text-2xs text-muted tabular-nums lg:text-xs">{formatSlots(currentSlots)} slots</span>
             </>
           ) : (
             <span className="text-sm text-muted/40">—</span>
@@ -201,7 +201,7 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
                           {/* Secondary: Resulting value */}
                           <span
                             className={clsx(
-                              'text-[10px] tabular-nums lg:text-xs',
+                              'text-2xs tabular-nums lg:text-xs',
                               isSelected ? typeConf.textColor : 'text-muted'
                             )}
                           >
@@ -211,7 +211,7 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
                           {data.afterSlots !== null && (
                             <span
                               className={clsx(
-                                'mt-0.5 text-[9px] tabular-nums lg:text-[10px]',
+                                'mt-0.5 text-2xs tabular-nums',
                                 isSelected ? typeConf.textColor : 'text-muted'
                               )}
                             >

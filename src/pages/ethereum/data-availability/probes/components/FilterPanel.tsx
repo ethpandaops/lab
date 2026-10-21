@@ -149,7 +149,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
           <FunnelIcon className="size-4" />
           Filters
           {activeFilterCount > 0 && (
-            <span className="text-primary-foreground rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold">
+            <span className="text-primary-foreground rounded-full bg-primary px-1.5 py-0.5 text-2xs font-bold">
               {activeFilterCount}
             </span>
           )}
@@ -298,7 +298,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
               <h4 className="text-xs font-semibold tracking-wider text-primary uppercase">Prober</h4>
               <div className="space-y-2">
                 <div>
-                  <label className="mb-1 block text-[10px] font-medium text-muted">Client</label>
+                  <label className="mb-1 block text-2xs font-medium text-muted">Client</label>
                   <Input size="sm">
                     <Input.Field
                       type="text"
@@ -309,7 +309,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   </Input>
                 </div>
                 <div>
-                  <label className="mb-1 block text-[10px] font-medium text-muted">Node ID</label>
+                  <label className="mb-1 block text-2xs font-medium text-muted">Node ID</label>
                   <Input size="sm">
                     <Input.Field
                       type="text"
@@ -319,7 +319,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   </Input>
                 </div>
                 <div>
-                  <label className="mb-1 block text-[10px] font-medium text-muted">Version</label>
+                  <label className="mb-1 block text-2xs font-medium text-muted">Version</label>
                   <Input size="sm">
                     <Input.Field
                       type="text"
@@ -332,7 +332,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="mb-1 block text-[10px] font-medium text-muted">Country</label>
+                    <label className="mb-1 block text-2xs font-medium text-muted">Country</label>
                     <Input size="sm">
                       <Input.Field
                         type="text"
@@ -344,7 +344,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                     </Input>
                   </div>
                   <div>
-                    <label className="mb-1 block text-[10px] font-medium text-muted">City</label>
+                    <label className="mb-1 block text-2xs font-medium text-muted">City</label>
                     <Input size="sm">
                       <Input.Field
                         type="text"
@@ -355,7 +355,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   </div>
                 </div>
                 <div>
-                  <label className="mb-1 block text-[10px] font-medium text-muted">ASN</label>
+                  <label className="mb-1 block text-2xs font-medium text-muted">ASN</label>
                   <Input size="sm">
                     <Input.Field
                       type="number"
@@ -374,7 +374,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
               <h4 className="text-xs font-semibold tracking-wider text-primary uppercase">Peer</h4>
               <div className="space-y-2">
                 <div>
-                  <label className="mb-1 block text-[10px] font-medium text-muted">Client</label>
+                  <label className="mb-1 block text-2xs font-medium text-muted">Client</label>
                   <Input size="sm">
                     <Input.Field
                       type="text"
@@ -385,7 +385,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   </Input>
                 </div>
                 <div>
-                  <label className="mb-1 block text-[10px] font-medium text-muted">Peer ID</label>
+                  <label className="mb-1 block text-2xs font-medium text-muted">Peer ID</label>
                   <Input size="sm">
                     <Input.Field
                       type="text"
@@ -396,7 +396,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   </Input>
                 </div>
                 <div>
-                  <label className="mb-1 block text-[10px] font-medium text-muted">Version</label>
+                  <label className="mb-1 block text-2xs font-medium text-muted">Version</label>
                   <Input size="sm">
                     <Input.Field
                       type="text"
@@ -407,7 +407,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="mb-1 block text-[10px] font-medium text-muted">Country</label>
+                    <label className="mb-1 block text-2xs font-medium text-muted">Country</label>
                     <Input size="sm">
                       <Input.Field
                         type="text"
@@ -419,7 +419,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                     </Input>
                   </div>
                   <div>
-                    <label className="mb-1 block text-[10px] font-medium text-muted">City</label>
+                    <label className="mb-1 block text-2xs font-medium text-muted">City</label>
                     <Input size="sm">
                       <Input.Field
                         type="text"
@@ -430,7 +430,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   </div>
                 </div>
                 <div>
-                  <label className="mb-1 block text-[10px] font-medium text-muted">ASN</label>
+                  <label className="mb-1 block text-2xs font-medium text-muted">ASN</label>
                   <Input size="sm">
                     <Input.Field
                       type="number"

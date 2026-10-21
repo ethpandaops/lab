@@ -5,44 +5,42 @@ import type { HeaderProps } from './Header.types';
 const sizeStyles = {
   xs: {
     container: 'mb-2',
-    title: 'mb-0.5 text-sm/tight font-bold text-foreground',
+    title: 'text-sm/5 font-semibold text-foreground',
     description: 'text-xs text-muted',
-    accent: 'mt-1 h-0.5 w-10 rounded-xs bg-linear-to-r from-primary to-accent',
   },
   sm: {
     container: 'mb-4',
-    title: 'mb-1 text-2xl/tight font-bold text-foreground',
-    description: 'text-sm text-muted',
-    accent: 'mt-2 h-0.5 w-16 rounded-xs bg-linear-to-r from-primary to-accent',
+    title: 'text-lg/7 font-semibold tracking-tight text-foreground',
+    description: 'text-sm/6 text-muted',
   },
   md: {
-    container: 'mb-8',
-    title: 'mb-2 text-4xl/tight font-bold text-foreground',
-    description: 'text-base text-muted',
-    accent: 'mt-4 h-1 w-24 rounded-sm bg-linear-to-r from-primary to-accent',
+    container: 'mb-6',
+    title: 'text-2xl/8 font-semibold tracking-tight text-foreground',
+    description: 'mt-1 max-w-3xl text-sm/6 text-muted',
   },
   lg: {
-    container: 'mb-10',
-    title: 'mb-2.5 text-5xl/tight font-bold text-foreground',
-    description: 'text-lg text-muted',
-    accent: 'mt-5 h-1 w-28 rounded-sm bg-linear-to-r from-primary to-accent',
+    container: 'mb-8',
+    title: 'text-3xl/9 font-semibold tracking-tight text-foreground',
+    description: 'mt-1.5 max-w-3xl text-base/7 text-muted',
   },
   xl: {
-    container: 'mb-12',
-    title: 'mb-3 text-6xl/tight font-bold text-foreground',
-    description: 'text-xl text-muted',
-    accent: 'mt-6 h-1.5 w-32 rounded-sm bg-linear-to-r from-primary to-accent',
+    container: 'mb-10',
+    title: 'text-4xl/10 font-semibold tracking-tight text-foreground',
+    description: 'mt-2 max-w-3xl text-lg/8 text-muted',
   },
 };
 
-export function Header({ title, description, showAccent = true, size = 'md', className }: HeaderProps): JSX.Element {
+/**
+ * Page and section heading. Hierarchy comes from size and weight alone; there is no decorative
+ * accent bar.
+ */
+export function Header({ title, description, size = 'md', className }: HeaderProps): JSX.Element {
   const styles = sizeStyles[size];
 
   return (
     <div className={clsx(styles.container, className)}>
       <h1 className={styles.title}>{title}</h1>
       {description && <p className={styles.description}>{description}</p>}
-      {showAccent && <div className={styles.accent} />}
     </div>
   );
 }

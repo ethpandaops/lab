@@ -10,11 +10,6 @@ export interface HeaderProps {
    */
   description?: React.ReactNode;
   /**
-   * Whether to show the gradient accent bar
-   * @default true
-   */
-  showAccent?: boolean;
-  /**
    * The size of the header
    * @default 'md'
    */

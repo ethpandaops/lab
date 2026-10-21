@@ -92,7 +92,7 @@ function DeltaCard({
           {hasCount && (
             <div className="mt-2 border-t border-border/50 pt-2">
               <p className="text-sm font-semibold text-foreground">{formatCountDelta(countDelta)}</p>
-              <p className={clsx('text-[10px] font-medium', countDelta >= 0 ? 'text-warning' : 'text-success')}>
+              <p className={clsx('text-2xs font-medium', countDelta >= 0 ? 'text-warning' : 'text-success')}>
                 {formatPercentage(countPercentChange)} count
               </p>
             </div>
@@ -151,7 +151,7 @@ export function StateDeltaCards({ data }: StateDeltaCardsProps): JSX.Element | n
                 ({formatPercentage(delta.total.percentChange)})
               </span>
             </div>
-            <p className="mt-1 text-[10px] text-muted">
+            <p className="mt-1 text-2xs text-muted">
               Comparing {delta.currentDate} vs {delta.previousDate}
             </p>
           </div>

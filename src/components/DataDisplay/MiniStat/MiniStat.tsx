@@ -104,7 +104,7 @@ export function MiniStat({
         </svg>
         {/* Center percentage text */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-[10px] leading-none font-semibold text-foreground">{percentage.toFixed(0)}%</span>
+          <span className="text-2xs leading-none font-semibold text-foreground">{percentage.toFixed(0)}%</span>
         </div>
       </div>
     );

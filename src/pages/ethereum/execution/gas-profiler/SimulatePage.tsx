@@ -941,7 +941,7 @@ export function SimulatePage(): JSX.Element {
                 <span className="text-sm font-medium text-foreground">
                   Block {simState.currentBlock !== null ? formatGas(simState.currentBlock) : '...'}
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-primary uppercase">
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-2xs font-semibold tracking-wide text-primary uppercase">
                   <span className="size-1.5 animate-pulse rounded-full bg-primary" />
                   Simulating
                 </span>
@@ -1158,7 +1158,7 @@ export function SimulatePage(): JSX.Element {
                   )}
                   {/* Top section: label + block number */}
                   <div className="px-3 pt-2 pb-1.5">
-                    <div className="text-[9px] font-semibold tracking-wider text-muted uppercase">Block</div>
+                    <div className="text-2xs font-semibold tracking-wider text-muted uppercase">Block</div>
                     <div
                       className={clsx(
                         'font-mono text-sm tabular-nums',
@@ -1177,13 +1177,13 @@ export function SimulatePage(): JSX.Element {
                     )}
                   >
                     <div>
-                      <div className="text-[9px] text-muted">Delta</div>
+                      <div className="text-2xs text-muted">Delta</div>
                       <div className={clsx('font-mono text-xs font-semibold tabular-nums', getDeltaColor(delta))}>
                         {formatDelta(delta)}
                       </div>
                     </div>
                     <div>
-                      <div className="text-[9px] text-muted">Div.</div>
+                      <div className="text-2xs text-muted">Div.</div>
                       <div
                         className={clsx(
                           'font-mono text-xs font-semibold tabular-nums',
@@ -1212,14 +1212,14 @@ export function SimulatePage(): JSX.Element {
                   style={{ minWidth: '7.5rem' }}
                 >
                   <div className="px-3 pt-2 pb-1.5">
-                    <div className="text-[9px] font-semibold tracking-wider text-muted/40 uppercase">Block</div>
+                    <div className="text-2xs font-semibold tracking-wider text-muted/40 uppercase">Block</div>
                     <div className="font-mono text-sm text-muted/30 tabular-nums">
                       {startBlockNumber !== null ? formatGas(startBlockNumber + simState.completedBlocks + i) : '...'}
                     </div>
                   </div>
                   <div className="flex items-center gap-3 border-t border-dashed border-border/40 px-3 pt-1.5 pb-2">
                     <div>
-                      <div className="text-[9px] text-muted/30">Delta</div>
+                      <div className="text-2xs text-muted/30">Delta</div>
                       <div className="font-mono text-xs text-muted/20">—</div>
                     </div>
                   </div>

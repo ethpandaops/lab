@@ -15,7 +15,6 @@ export function ListSection({
   nested = false,
   collapsible = false,
   defaultCollapsed = false,
-  showAccent = true,
   className,
   headerClassName,
   contentClassName,
@@ -34,12 +33,7 @@ export function ListSection({
       {title}
     </div>
   ) : (
-    <Header
-      size="xs"
-      title={title}
-      showAccent={showAccent}
-      className={clsx(collapsible && 'cursor-pointer select-none', headerClassName)}
-    />
+    <Header size="xs" title={title} className={clsx(collapsible && 'cursor-pointer select-none', headerClassName)} />
   );
 
   const content = <div className={clsx('mt-1.5', nested && 'ml-2.5', contentClassName)}>{children}</div>;

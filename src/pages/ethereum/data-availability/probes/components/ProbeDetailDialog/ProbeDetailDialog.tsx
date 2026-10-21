@@ -68,7 +68,7 @@ function CopyableBadge({
         type="button"
         onClick={onDrillDown ? handleClick : handleCopy}
         className={clsx(
-          'inline-flex cursor-pointer items-center justify-center rounded border px-1.5 py-0.5 font-mono text-[10px] transition-all',
+          'inline-flex cursor-pointer items-center justify-center rounded border px-1.5 py-0.5 font-mono text-2xs transition-all',
           copied
             ? 'border-green-500/30 bg-green-500/10 text-green-500'
             : onDrillDown
@@ -291,8 +291,8 @@ export function ProbeDetailDialog({
         {/* Error Section - show early for failure probes */}
         {probe.error && (
           <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3">
-            <h4 className="mb-2 text-[10px] font-bold tracking-wider text-red-400 uppercase">Error</h4>
-            <div className="font-mono text-[10px] text-red-300">{probe.error}</div>
+            <h4 className="mb-2 text-2xs font-bold tracking-wider text-red-400 uppercase">Error</h4>
+            <div className="font-mono text-2xs text-red-300">{probe.error}</div>
           </div>
         )}
 
@@ -402,7 +402,7 @@ export function ProbeDetailDialog({
                       value={probe.node_id}
                       field="node_id"
                       onFilter={onFilterClick ? handleFilterAndClose : undefined}
-                      className="font-mono text-[10px]"
+                      className="font-mono text-2xs"
                     />
                   </td>
                   <td className="px-2 py-1 text-muted">-</td>
@@ -414,7 +414,7 @@ export function ProbeDetailDialog({
                       value={probe.meta_client_version}
                       field="meta_client_version"
                       onFilter={onFilterClick ? handleFilterAndClose : undefined}
-                      className="font-mono text-[10px]"
+                      className="font-mono text-2xs"
                     />
                   </td>
                   <td className="px-2 py-1">
@@ -422,7 +422,7 @@ export function ProbeDetailDialog({
                       value={probe.meta_peer_version}
                       field="meta_peer_version"
                       onFilter={onFilterClick ? handleFilterAndClose : undefined}
-                      className="font-mono text-[10px]"
+                      className="font-mono text-2xs"
                     />
                   </td>
                 </tr>
@@ -478,7 +478,7 @@ export function ProbeDetailDialog({
                       }
                       field="meta_client_geo_autonomous_system_number"
                       onFilter={onFilterClick ? handleFilterAndClose : undefined}
-                      className="font-mono text-[10px]"
+                      className="font-mono text-2xs"
                     />
                   </td>
                   <td className="px-2 py-1">
@@ -491,7 +491,7 @@ export function ProbeDetailDialog({
                       }
                       field="meta_peer_geo_autonomous_system_number"
                       onFilter={onFilterClick ? handleFilterAndClose : undefined}
-                      className="font-mono text-[10px]"
+                      className="font-mono text-2xs"
                     />
                   </td>
                 </tr>
@@ -503,7 +503,7 @@ export function ProbeDetailDialog({
                       value={probe.peer_id_unique_key}
                       field="peer_id_unique_key"
                       onFilter={onFilterClick ? handleFilterAndClose : undefined}
-                      className="font-mono text-[10px]"
+                      className="font-mono text-2xs"
                     />
                   </td>
                 </tr>

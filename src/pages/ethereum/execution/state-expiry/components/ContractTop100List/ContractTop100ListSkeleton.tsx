@@ -11,7 +11,7 @@ export function ContractTop100ListSkeleton(): JSX.Element {
     <table className="w-full min-w-[600px] table-fixed border-collapse">
       <TableColGroup />
       <thead className="sticky top-0 z-10 bg-surface">
-        <tr className="border-b border-border/50 text-[10px] font-medium text-muted uppercase">
+        <tr className="border-b border-border/50 text-2xs font-medium text-muted uppercase">
           <th className="px-2 py-1.5 text-center">#</th>
           <th className="px-2 py-1.5 text-left">Contract</th>
           <th className="px-2 py-1.5 text-left">Owner</th>

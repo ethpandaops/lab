@@ -137,7 +137,7 @@ export function DataAvailabilityRowLabel({
       {/* Type badge */}
       <span
         className={clsx(
-          'w-8 shrink-0 rounded-xs px-1 py-px text-center text-[9px] font-medium tracking-wide uppercase transition-colors',
+          'w-8 shrink-0 rounded-xs px-1 py-px text-center text-2xs font-medium tracking-wide uppercase transition-colors',
           isHovered && effectiveCanDrillDown ? 'bg-accent/20 text-accent' : 'bg-muted/20 text-muted'
         )}
       >
@@ -150,7 +150,7 @@ export function DataAvailabilityRowLabel({
           {/* Blob index - fixed width for alignment */}
           <span
             className={clsx(
-              'w-4 shrink-0 text-center font-mono text-[11px] transition-colors',
+              'w-4 shrink-0 text-center font-mono text-2xs transition-colors',
               isHovered && effectiveCanDrillDown ? 'font-semibold text-accent' : 'text-foreground/80'
             )}
           >
@@ -163,7 +163,7 @@ export function DataAvailabilityRowLabel({
               <BlobPosterLogo poster={blobInfo.submitter} size={14} className="shrink-0" />
               <span
                 className={clsx(
-                  'truncate font-mono text-[10px] transition-colors',
+                  'truncate font-mono text-2xs transition-colors',
                   isHovered && effectiveCanDrillDown ? 'text-accent' : 'text-muted'
                 )}
                 title={blobInfo.submitter}
@@ -176,7 +176,7 @@ export function DataAvailabilityRowLabel({
       ) : (
         <span
           className={clsx(
-            'flex-1 truncate text-right font-mono text-[11px] transition-colors',
+            'flex-1 truncate text-right font-mono text-2xs transition-colors',
             isHovered && effectiveCanDrillDown ? 'font-semibold text-accent' : 'text-foreground/80'
           )}
         >

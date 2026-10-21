@@ -24,7 +24,7 @@ type Story = StoryObj<typeof meta>;
 export const WithHeader: Story = {
   args: {
     id: 'with-header',
-    children: <Header size="xs" title="Example Header" showAccent={false} />,
+    children: <Header size="xs" title="Example Header" />,
   },
 };
 
@@ -44,7 +44,7 @@ export const WithoutLinkIcon: Story = {
   args: {
     id: 'no-icon',
     showLinkIcon: false,
-    children: <Header size="xs" title="No Link Icon" showAccent={false} />,
+    children: <Header size="xs" title="No Link Icon" />,
   },
 };
 
@@ -53,7 +53,7 @@ export const DeepLinkingDemo: Story = {
     id: 'deep-link-example',
     children: (
       <div>
-        <Header size="xs" title="Deep Link Section" showAccent={false} />
+        <Header size="xs" title="Deep Link Section" />
         <p className="mt-2 text-sm/6 text-muted">Add #deep-link-example to the URL to jump here on page load.</p>
       </div>
     ),
@@ -64,7 +64,7 @@ export const WithCallback: Story = {
   args: {
     id: 'callback-example',
     onClick: () => console.log('Anchor clicked!'),
-    children: <Header size="xs" title="Click Me (Check Console)" showAccent={false} />,
+    children: <Header size="xs" title="Click Me (Check Console)" />,
   },
 };
 
@@ -72,13 +72,13 @@ export const CustomOffset: Story = {
   args: {
     id: 'custom-offset',
     scrollOffset: 150,
-    children: <Header size="xs" title="Custom Offset (150px)" showAccent={false} />,
+    children: <Header size="xs" title="Custom Offset (150px)" />,
   },
 };
 
 export const RealWorldExample: Story = {
   args: {
     id: 'real-world',
-    children: <Header size="xs" title="Real World Section Example" showAccent={false} />,
+    children: <Header size="xs" title="Real World Section Example" />,
   },
 };

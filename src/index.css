@@ -45,6 +45,12 @@
   --radius-2xl: 0.375rem;
   --radius-3xl: 0.375rem;
 
+  /* ===== Type Scale ===== */
+  /* One step below text-xs for dense labels (axis ticks, HUD keys, badges in tight cells).
+   * Replaces ad hoc text-[9px]/[10px]/[11px]; never go smaller. */
+  --text-2xs: 0.625rem;
+  --text-2xs--line-height: 0.875rem;
+
   /* ===== TIER 1: Primitive Color Scales ===== */
 
   /* Terracotta - warm accent colors with balanced orange undertones */
@@ -282,7 +288,6 @@
       opacity: 1;
     }
   }
-
 }
 
 /* Semantic token mappings

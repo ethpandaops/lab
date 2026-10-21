@@ -54,7 +54,7 @@ function SlotDisplay({ slot }: { slot: number }): JSX.Element {
   const digits = formatSlot(slot).split('');
 
   return (
-    <span className="inline-flex gap-0.5 text-[9px]/3 text-muted/70 tabular-nums transition-colors duration-200 group-hover:text-muted sm:text-[11px]/4">
+    <span className="inline-flex gap-0.5 text-2xs/3 text-muted/70 tabular-nums transition-colors duration-200 group-hover:text-muted sm:leading-4">
       {digits.map((d, i) => (
         <FlipDigit key={`p${digits.length - 1 - i}`} digit={d} />
       ))}
@@ -91,9 +91,9 @@ function NetworkCard({
           {getNetworkShortLabel(network)}
         </span>
       </div>
-      <span className="text-[10px]/3 font-medium tracking-wide text-muted uppercase">{forkLabel}</span>
+      <span className="text-2xs/3 font-medium tracking-wide text-muted uppercase">{forkLabel}</span>
       <div className="flex flex-col items-center gap-1">
-        <span className="text-[8px]/3 font-medium tracking-[0.2em] text-muted/40 uppercase">Slot</span>
+        <span className="text-2xs/3 font-medium tracking-[0.2em] text-muted/40 uppercase">Slot</span>
         <SlotDisplay slot={slot} />
       </div>
     </Link>
@@ -147,7 +147,7 @@ export function HeroSection(): JSX.Element {
 
         <div className="mt-4 flex animate-fade-in-delay items-center justify-center gap-2.5 sm:mt-6 lg:mt-8">
           <img src="/images/lab.png" alt="" className="size-5 opacity-60" />
-          <span className="text-[11px]/3 font-medium tracking-[0.2em] text-muted uppercase">by ethPandaOps</span>
+          <span className="text-2xs/3 font-medium tracking-[0.2em] text-muted uppercase">by ethPandaOps</span>
         </div>
 
         {/* Network instrument panels */}
@@ -156,7 +156,7 @@ export function HeroSection(): JSX.Element {
             {groups.map(group => (
               <Fragment key={group.id}>
                 {group.id !== 'public' && (
-                  <span className="mt-1 text-[10px]/3 font-medium tracking-[0.15em] text-muted/40 uppercase">
+                  <span className="mt-1 text-2xs/3 font-medium tracking-[0.15em] text-muted/40 uppercase">
                     {group.id === 'other' ? 'Devnets' : `${group.label} devnets`}
                   </span>
                 )}

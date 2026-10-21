@@ -129,7 +129,7 @@ function SliderField({
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
-        <label className="text-[10px] font-medium text-muted">{label}</label>
+        <label className="text-2xs font-medium text-muted">{label}</label>
         <span className="text-xs font-medium text-foreground">{displayValue}</span>
       </div>
       <input

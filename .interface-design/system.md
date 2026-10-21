@@ -108,15 +108,19 @@ All text uses Space Grotesk Variable.
 
 | Role | Classes |
 |---|---|
-| Page title (md) | `text-4xl/tight font-bold text-foreground` |
-| Page title (sm) | `text-2xl/tight font-bold text-foreground` |
-| Page description | `text-base text-muted` |
+| Page title (md) | `text-2xl/8 font-semibold tracking-tight text-foreground` |
+| Page title (sm) | `text-lg/7 font-semibold tracking-tight text-foreground` |
+| Page description | `text-sm/6 text-muted max-w-3xl` |
 | Card title | `text-sm/6 font-semibold text-foreground` (rendered by `Card title`) |
 | Card subtitle | `text-xs/5 text-muted` (rendered by `Card subtitle`) |
 | Section header | `text-xs font-semibold tracking-wider text-foreground` |
-| Subsection header | `text-[10px] font-semibold tracking-wider text-muted/60 uppercase` |
+| Subsection header | `text-2xs font-semibold tracking-wider text-muted/60 uppercase` |
 | Body text | `text-sm text-foreground` |
 | Metadata | `text-xs text-muted` |
+| Dense label | `text-2xs` (10px) — axis ticks, HUD keys, badges in tight cells |
+
+The ramp is `text-2xs` → `xs` → `sm` → `base` → `lg` → `2xl`. Never use arbitrary pixel sizes
+(`text-[9px]`, `text-[11px]`); `text-2xs` is the floor.
 
 ---
 
@@ -181,11 +185,10 @@ Wraps Card with expand-to-modal and download capabilities.
 
 ### Header
 
-Page-level header with optional accent bar.
+Page-level header. Size and weight carry the hierarchy; no accent bar or other ornament.
 
-- Accent bar: `h-1 w-24 rounded-sm bg-linear-to-r from-primary to-accent`
 - Sizes: `xs`, `sm`, `md` (default), `lg`, `xl`
-- Margin below: `mb-8` (md)
+- Margin below: `mb-6` (md)
 
 ### Container
 

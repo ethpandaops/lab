@@ -56,9 +56,9 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
             {probe.meta_client_implementation || 'Prober'}
           </div>
           {probe.meta_client_geo_city && (
-            <div className="text-[10px] text-muted sm:text-xs">{probe.meta_client_geo_city}</div>
+            <div className="text-2xs text-muted sm:text-xs">{probe.meta_client_geo_city}</div>
           )}
-          <div className="text-[10px] text-muted sm:text-xs">{probe.meta_client_geo_country || 'Unknown'}</div>
+          <div className="text-2xs text-muted sm:text-xs">{probe.meta_client_geo_country || 'Unknown'}</div>
         </div>
       </div>
 
@@ -70,7 +70,7 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
             {columnsCount} {columnsCount === 1 ? 'Column' : 'Columns'}
           </span>
           <ArrowLongRightIcon className="size-5 text-muted" />
-          <span className="text-[10px] font-medium tracking-wider text-muted uppercase">Request</span>
+          <span className="text-2xs font-medium tracking-wider text-muted uppercase">Request</span>
         </div>
 
         {/* Central Status Node */}
@@ -89,11 +89,11 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
           </div>
           <div className="flex items-center gap-2 leading-none">
             <div className="hidden h-3 w-px bg-border/50 sm:block" />
-            <span className="font-mono text-[10px] font-medium text-foreground sm:text-xs">
+            <span className="font-mono text-2xs font-medium text-foreground sm:text-xs">
               {probe.response_time_ms ? `${probe.response_time_ms}ms` : '---'}
             </span>
             <div className="h-3 w-px bg-border/50 sm:hidden" />
-            <span className="font-mono text-[10px] font-medium text-foreground sm:hidden">
+            <span className="font-mono text-2xs font-medium text-foreground sm:hidden">
               {columnsCount} col{columnsCount !== 1 ? 's' : ''}
             </span>
           </div>
@@ -101,7 +101,7 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
 
         {/* Response Flow (Bottom) - hidden on mobile */}
         <div className="hidden flex-col items-center gap-0.5 sm:flex">
-          <span className="text-[10px] font-medium tracking-wider text-muted uppercase">Response</span>
+          <span className="text-2xs font-medium tracking-wider text-muted uppercase">Response</span>
           <ArrowLongLeftIcon className="size-5 text-muted" />
           <span className="font-mono text-xs font-medium text-foreground">{sizeDisplay}</span>
         </div>
@@ -121,10 +121,8 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
           <div className="text-sm font-bold tracking-tight text-foreground sm:text-base">
             {probe.meta_peer_implementation || 'Peer'}
           </div>
-          {probe.meta_peer_geo_city && (
-            <div className="text-[10px] text-muted sm:text-xs">{probe.meta_peer_geo_city}</div>
-          )}
-          <div className="text-[10px] text-muted sm:text-xs">{probe.meta_peer_geo_country || 'Unknown'}</div>
+          {probe.meta_peer_geo_city && <div className="text-2xs text-muted sm:text-xs">{probe.meta_peer_geo_city}</div>}
+          <div className="text-2xs text-muted sm:text-xs">{probe.meta_peer_geo_country || 'Unknown'}</div>
         </div>
       </div>
     </div>
