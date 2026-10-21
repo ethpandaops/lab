@@ -60,6 +60,16 @@ Constant across all themes:
 
 ---
 
+## Colour Only Exceptions
+
+Data values render in `text-foreground` (or `text-muted` when secondary). Colour marks what needs
+attention: `warning` and `danger` for thresholds, failures, missed/orphaned/late states and lag.
+Good and normal values (participation, Ready, Canonical, Delivered, pass marks) are not green;
+the normal state of a multi-state badge is neutral. `success` remains for live/running
+indicators and transient feedback ("Copied"). Categorical data colours (chart series, call
+types, heatmaps) are data, not judgement. Each Ethereum client has one colour everywhere:
+`getClientColor` in `src/utils/ethereum.ts`.
+
 ## Depth Strategy
 
 **Hairlines only, both themes.** Panels are `bg-surface outline -outline-offset-1 outline-border`;
@@ -280,6 +290,12 @@ grid: { left: 52, right: 16, top: 12, bottom: 28 }
 - Smooth: true (default)
 - Emphasis: symbol size 8, line width 4
 - Animation: 300ms, cubicOut easing
+
+### End labels
+
+MultiLine names each plain line at its right end (2–8 lines; not stacked/area/bar/band series).
+Off on charts narrower than 480px and on charts with a secondary y-axis; `endLabels={false}`
+opts out. Legends stay: they toggle series.
 
 ### Tooltip
 

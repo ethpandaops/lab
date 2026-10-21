@@ -68,7 +68,7 @@ export function RangePager({ page, noun, onNavigate, onNewer, className }: Range
         </Button>
       </div>
 
-      <form onSubmit={submitJump} className="ml-auto flex items-center gap-1">
+      <form onSubmit={submitJump} className="flex w-full items-center gap-1 sm:ml-auto sm:w-auto">
         <label htmlFor={`range-pager-${noun}`} className="sr-only">
           Go to {noun}
         </label>
@@ -78,7 +78,7 @@ export function RangePager({ page, noun, onNavigate, onNewer, className }: Range
           value={jump}
           onChange={event => setJump(event.target.value.replace(/[^\d]/g, ''))}
           placeholder={`Go to ${noun}`}
-          className="h-8 w-36 rounded-sm border border-border bg-surface px-2.5 text-sm text-foreground tabular-nums placeholder:text-muted focus:border-primary focus:ring-0 focus:outline-hidden"
+          className="h-8 min-w-0 flex-1 rounded-sm border border-border bg-surface px-2.5 text-sm text-foreground tabular-nums placeholder:text-muted focus:border-primary focus:ring-0 focus:outline-hidden sm:w-36 sm:flex-none"
         />
         <Button type="submit" variant="secondary" size="sm" disabled={jump === ''}>
           Go

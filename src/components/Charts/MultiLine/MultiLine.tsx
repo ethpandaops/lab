@@ -25,6 +25,8 @@ import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 /** Maximum number of plain lines that get an end-of-line label */
 const MAX_END_LABELS = 8;
+/** Narrowest chart (px) that gets end labels */
+const END_LABEL_MIN_WIDTH = 480;
 
 // Register ECharts components
 echarts.use([
@@ -111,6 +113,20 @@ export function MultiLineChart({
   const chartWrapperRef = useRef<ReactEChartsCore | null>(null);
   // Store the chart instance for sync cleanup
   const chartInstanceRef = useRef<EChartsInstance | null>(null);
+  // Track the chart's width so end labels only render where there is room for them
+  const [isWideEnoughForEndLabels, setIsWideEnoughForEndLabels] = useState(true);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const measureRef = useCallback((node: HTMLDivElement | null) => {
+    resizeObserverRef.current?.disconnect();
+    if (!node || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(entries => {
+      const width = entries[0]?.contentRect.width ?? 0;
+      setIsWideEnoughForEndLabels(width === 0 || width >= END_LABEL_MIN_WIDTH);
+    });
+    observer.observe(node);
+    resizeObserverRef.current = observer;
+  }, []);
+
   // Store dataZoom state to preserve zoom across data updates and legend toggles
   // Using state (not ref) ensures zoom range is included in the option config
   const [zoomRange, setZoomRange] = useState({ start: 0, end: 100 });
@@ -509,7 +525,10 @@ export function MultiLineChart({
       !s.showEndLabel &&
       s.visible !== false &&
       !s.name.startsWith('__');
-    const labelledCount = endLabels ? displayedSeries.filter(canEndLabel).length : 0;
+    // End labels cost ~80px of plot width, too much on a phone-width chart
+    // The right edge belongs to the secondary axis when there is one, so no end labels then
+    const labelledCount =
+      endLabels && isWideEnoughForEndLabels && !secondaryYAxis ? displayedSeries.filter(canEndLabel).length : 0;
     const showEndLabels = labelledCount > 1 && labelledCount <= MAX_END_LABELS;
     const longestEndLabel = showEndLabels
       ? Math.max(...displayedSeries.filter(canEndLabel).map(s => s.name.length))
@@ -943,6 +962,7 @@ export function MultiLineChart({
     connectNulls,
     extendedPalette,
     endLabels,
+    isWideEnoughForEndLabels,
     relativeSlots,
     formatSlotLabel,
     formatSlotTooltip,
@@ -1224,10 +1244,10 @@ export function MultiLineChart({
   // Wrap in card if requested
   if (showCard) {
     return (
-      <div className="rounded-sm border border-border bg-surface p-4">
+      <div ref={measureRef} className="rounded-sm border border-border bg-surface p-4">
         {title && (
-          <div className={subtitle ? 'mb-4' : 'mb-4'}>
-            <h3 className="mb-1 text-lg/7 font-semibold text-foreground">{title}</h3>
+          <div className="mb-4">
+            <h3 className="text-sm/6 font-semibold text-foreground">{title}</h3>
             {subtitle && <p className="text-xs/5 text-muted">{subtitle}</p>}
           </div>
         )}
@@ -1237,5 +1257,9 @@ export function MultiLineChart({
   }
 
   // Return unwrapped chart
-  return <div className={_height === '100%' ? 'h-full w-full' : 'w-full'}>{chartContent}</div>;
+  return (
+    <div ref={measureRef} className={_height === '100%' ? 'h-full w-full' : 'w-full'}>
+      {chartContent}
+    </div>
+  );
 }
