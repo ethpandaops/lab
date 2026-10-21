@@ -1,7 +1,7 @@
 import { type JSX, useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearch, useNavigate, Link } from '@tanstack/react-router';
-import { Button } from '@/components/Elements/Button';
+import { Button, buttonClassName } from '@/components/Elements/Button';
 import { Card } from '@/components/Layout/Card';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
@@ -99,9 +99,8 @@ const SECONDS_PER_HOUR = 3600;
  */
 const SLOTS_PER_EPOCH = 32;
 
-/** Secondary link-button styling (matches Button variant="secondary" size="sm") */
-const SECONDARY_LINK_CLASS =
-  'inline-flex items-center gap-1.5 rounded-sm bg-surface px-2 py-1.5 text-xs font-semibold text-foreground inset-ring inset-ring-border transition-colors hover:bg-background';
+/** Button look for router links */
+const SECONDARY_LINK_CLASS = buttonClassName({ variant: 'secondary', size: 'sm' });
 
 /**
  * Derives the current drill-down level from URL search parameters

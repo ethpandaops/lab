@@ -1,7 +1,8 @@
 /* Hyper Button Animation - Pulsating Border Effect using Tailwind v4 */
 
 @keyframes hyper-pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow:
       0 0 0 0 color-mix(in srgb, var(--color-cyan-500) 70%, transparent),
       0 0 0 0 color-mix(in srgb, var(--color-cyan-500) 40%, transparent),
@@ -18,7 +19,8 @@
 }
 
 @keyframes hyper-pulse-dark {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow:
       0 0 0 0 color-mix(in srgb, var(--color-cyan-400) 70%, transparent),
       0 0 0 0 color-mix(in srgb, var(--color-cyan-400) 40%, transparent),
@@ -36,7 +38,8 @@
 
 /* Special animation for blank variant - pulsating glow, no border */
 @keyframes hyper-pulse-blank {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow:
       0 0 0 0 color-mix(in srgb, var(--color-cyan-500) 0%, transparent),
       0 0 8px 0 color-mix(in srgb, var(--color-cyan-500) 0%, transparent);
@@ -49,7 +52,8 @@
 }
 
 @keyframes hyper-pulse-blank-dark {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow:
       0 0 0 0 color-mix(in srgb, var(--color-cyan-400) 0%, transparent),
       0 0 8px 0 color-mix(in srgb, var(--color-cyan-400) 0%, transparent);
@@ -62,7 +66,8 @@
 }
 
 @keyframes hyper-glow {
-  0%, 100% {
+  0%,
+  100% {
     filter: brightness(1) saturate(1);
   }
   50% {
@@ -71,7 +76,8 @@
 }
 
 @keyframes hyper-glow-blank {
-  0%, 100% {
+  0%,
+  100% {
     filter: brightness(1) saturate(1);
   }
   50% {

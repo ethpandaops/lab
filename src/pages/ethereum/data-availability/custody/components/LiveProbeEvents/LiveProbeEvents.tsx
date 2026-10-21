@@ -1,3 +1,4 @@
+import { buttonClassName } from '@/components/Elements/Button';
 import { type JSX, useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { SignalIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
@@ -193,7 +194,7 @@ export function LiveProbeEvents({
             <Link
               to="/ethereum/data-availability/probes"
               search={probesLinkParams}
-              className="inline-flex items-center gap-1.5 rounded-sm bg-surface px-2 py-1.5 text-xs font-semibold text-foreground inset-ring inset-ring-border transition-colors hover:bg-background"
+              className={buttonClassName({ variant: 'secondary', size: 'sm' })}
             >
               <MagnifyingGlassIcon className="size-3.5" />
               View All

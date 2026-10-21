@@ -1,3 +1,4 @@
+import { buttonClassName } from '@/components/Elements/Button';
 import { Card } from '@/components/Layout/Card';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { ForkInfo } from '@/utils/forks';
@@ -10,7 +11,6 @@ import {
   ForkCountdown,
   ForkCountdownSkeleton,
   ForkQuickLinks,
-  FORK_LINK_BUTTON_CLASS,
   secondsToCountdown,
   type CountdownTime,
 } from '../ForkShared';
@@ -132,7 +132,7 @@ export function ForksHeader({ activeFork, nextFork, allForks }: ForksHeaderProps
 
         {/* Action buttons */}
         <ForkQuickLinks epoch={activeFork.epoch}>
-          <Link to="/ethereum/live" className={FORK_LINK_BUTTON_CLASS}>
+          <Link to="/ethereum/live" className={buttonClassName({ variant: 'secondary', size: 'xs' })}>
             Live View
           </Link>
         </ForkQuickLinks>
@@ -185,7 +185,7 @@ export function ForksHeader({ activeFork, nextFork, allForks }: ForksHeaderProps
 
       {/* Action buttons */}
       <ForkQuickLinks epoch={nextFork.epoch}>
-        <Link to="/ethereum/live" className={FORK_LINK_BUTTON_CLASS}>
+        <Link to="/ethereum/live" className={buttonClassName({ variant: 'secondary', size: 'xs' })}>
           Live View
         </Link>
       </ForkQuickLinks>

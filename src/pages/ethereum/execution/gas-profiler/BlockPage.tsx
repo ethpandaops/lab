@@ -22,6 +22,7 @@ import { Tab } from '@/components/Navigation/Tab';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
+import { Stats } from '@/components/DataDisplay/Stats';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Alert } from '@/components/Feedback/Alert';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -1013,76 +1014,49 @@ export function BlockPage(): JSX.Element {
       </div>
 
       {/* Block Summary - Always visible */}
-      <div className={clsx('mb-6 grid grid-cols-2 gap-4', hasReceiptData ? 'sm:grid-cols-5' : 'sm:grid-cols-4')}>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <QueueListIcon className="size-5 text-primary" />
-            <div>
-              <div className="text-xl font-semibold text-foreground">{data.transactionCount}</div>
-              <div className="text-xs text-muted">
-                Transactions{failedCount > 0 && <span className="text-danger"> ({failedCount} failed)</span>}
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <FireIcon className="size-5 text-success" />
-            <div>
-              <div className="text-xl font-semibold text-foreground">{formatGas(totalBlockGas)}</div>
-              <div className="text-xs text-muted">Total Gas</div>
-            </div>
-          </div>
-        </Card>
-
-        {hasReceiptData && (
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <DocumentTextIcon className="size-5 text-warning" />
-              <div>
-                <div className="flex items-center gap-1 text-xl font-semibold text-foreground">
-                  {formatBytes(totalReceiptBytes)}
-                  <GasTooltip
-                    type="receipt"
-                    size="md"
-                    customContent={
-                      <>
-                        <div className="mb-1.5 text-sm font-medium text-foreground">Receipt Payload Size</div>
-                        <div className="text-xs/5 text-muted">
-                          Number of bytes in the canonical encoded receipt value (type byte + RLP receipt) inserted as
-                          the receipts-trie value. Does not include trie node/path/proof overhead.
-                        </div>
-                      </>
-                    }
-                  />
-                </div>
-                <div className="text-xs text-muted">Receipt Payload</div>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <CodeBracketIcon className="size-5 text-accent" />
-            <div>
-              <div className="text-xl font-semibold text-foreground">{formatGas(data.totalCallFrames)}</div>
-              <div className="text-xs text-muted">Total Calls</div>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <ArrowsPointingOutIcon className="size-5 text-muted" />
-            <div>
-              <div className="text-xl font-semibold text-foreground">{maxBlockDepth}</div>
-              <div className="text-xs text-muted">Max Depth</div>
-            </div>
-          </div>
-        </Card>
-      </div>
+      <Stats
+        className="mb-6"
+        gridClassName={clsx('grid grid-cols-2', hasReceiptData ? 'sm:grid-cols-5' : 'sm:grid-cols-4')}
+        stats={[
+          {
+            id: 'transactions',
+            name: 'Transactions',
+            icon: QueueListIcon,
+            value: String(data.transactionCount),
+            subtitle: failedCount > 0 ? <span className="text-danger">{failedCount} failed</span> : undefined,
+          },
+          { id: 'gas', name: 'Total Gas', icon: FireIcon, value: formatGas(totalBlockGas) },
+          ...(hasReceiptData
+            ? [
+                {
+                  id: 'receipt',
+                  name: (
+                    <span className="inline-flex items-center gap-1">
+                      Receipt Payload
+                      <GasTooltip
+                        type="receipt"
+                        size="md"
+                        customContent={
+                          <>
+                            <div className="mb-1.5 text-sm font-medium text-foreground">Receipt Payload Size</div>
+                            <div className="text-xs/5 text-muted">
+                              Number of bytes in the canonical encoded receipt value (type byte + RLP receipt) inserted
+                              as the receipts-trie value. Does not include trie node/path/proof overhead.
+                            </div>
+                          </>
+                        }
+                      />
+                    </span>
+                  ),
+                  icon: DocumentTextIcon,
+                  value: formatBytes(totalReceiptBytes),
+                },
+              ]
+            : []),
+          { id: 'calls', name: 'Total Calls', icon: CodeBracketIcon, value: formatGas(data.totalCallFrames) },
+          { id: 'depth', name: 'Max Depth', icon: ArrowsPointingOutIcon, value: String(maxBlockDepth) },
+        ]}
+      />
 
       {/* Tabbed Content */}
       <HeadlessTab.Group selectedIndex={selectedTabIndex} onChange={setSelectedTabIndex}>

@@ -10,7 +10,7 @@ import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Badge } from '@/components/Elements/Badge';
-import { Button } from '@/components/Elements/Button';
+import { Button, buttonClassName } from '@/components/Elements/Button';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { useNetwork } from '@/hooks/useNetwork';
@@ -33,7 +33,6 @@ import {
   ForkCountdown,
   ForkQuickLinks,
   ForkStatusBadge,
-  FORK_LINK_BUTTON_CLASS,
   secondsToCountdown,
   type CountdownTime,
 } from './components/ForkShared';
@@ -499,7 +498,7 @@ function ForkHero({ fork, isCurrentFork, previousFork, countdown, genesisTime }:
           <Link
             to="/ethereum/forks/$fork"
             params={{ fork: getForkSlug(previousFork) }}
-            className={FORK_LINK_BUTTON_CLASS}
+            className={buttonClassName({ variant: 'secondary', size: 'xs' })}
           >
             {previousFork.displayName}
           </Link>
@@ -544,7 +543,7 @@ function BPOHero({ bpo, isCurrentBPO, countdown, genesisTime }: BPOHeroProps): R
         <Link
           to="/ethereum/forks/$fork"
           params={{ fork: getForkSlug(bpo.parentFork) }}
-          className={FORK_LINK_BUTTON_CLASS}
+          className={buttonClassName({ variant: 'secondary', size: 'xs' })}
         >
           {bpo.parentFork.displayName}
         </Link>
