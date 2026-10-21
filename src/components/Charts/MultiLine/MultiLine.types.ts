@@ -435,6 +435,12 @@ export interface MultiLineChartProps {
    */
   notMerge?: boolean;
   /**
+   * Label each plain line with its series name at its right end.
+   * Skipped for stacked, area, bar and helper series, for a single line, and when more than 8 lines are shown.
+   * @default true
+   */
+  endLabels?: boolean;
+  /**
    * Callback when a series line is clicked
    * @param seriesName - The name of the clicked series
    */

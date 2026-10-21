@@ -23,6 +23,9 @@ import { Disclosure } from '@/components/Layout/Disclosure';
 import type { MultiLineChartProps } from './MultiLine.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
+/** Maximum number of plain lines that get an end-of-line label */
+const MAX_END_LABELS = 8;
+
 // Register ECharts components
 echarts.use([
   EChartsLine,
@@ -98,6 +101,7 @@ export function MultiLineChart({
   relativeSlots,
   syncGroup,
   notMerge = true,
+  endLabels = true,
   onSeriesClick,
   markLines,
   markAreas,
@@ -498,6 +502,20 @@ export function MultiLineChart({
 
     // Build series configuration
     // Note: Don't filter by visible property here - displayedSeries already handles visibility via visibleSeries state
+    const canEndLabel = (s: (typeof displayedSeries)[number]): boolean =>
+      (s.seriesType ?? 'line') === 'line' &&
+      !s.stack &&
+      !s.showArea &&
+      !s.showEndLabel &&
+      s.visible !== false &&
+      !s.name.startsWith('__');
+    const labelledCount = endLabels ? displayedSeries.filter(canEndLabel).length : 0;
+    const showEndLabels = labelledCount > 1 && labelledCount <= MAX_END_LABELS;
+    const longestEndLabel = showEndLabels
+      ? Math.max(...displayedSeries.filter(canEndLabel).map(s => s.name.length))
+      : 0;
+    const endLabelMargin = showEndLabels ? Math.min(140, Math.ceil(longestEndLabel * 6 + 12)) : 0;
+
     const seriesConfig = displayedSeries.map(s => {
       // Use explicit color or auto-assign from palette
       const originalIndex = series.indexOf(s);
@@ -542,6 +560,18 @@ export function MultiLineChart({
                 color: seriesColor,
               },
             },
+        ...(showEndLabels && canEndLabel(s)
+          ? {
+              endLabel: {
+                show: true,
+                formatter: '{a}',
+                color: seriesColor,
+                fontSize: 11,
+                distance: 6,
+              },
+              labelLayout: { moveOverlap: 'shiftY' as const },
+            }
+          : {}),
         // Add label at the right side of the chart if requested
         ...(s.showEndLabel
           ? {
@@ -679,12 +709,15 @@ export function MultiLineChart({
     const dataZoomBottom = enableDataZoom && showDataZoomSlider ? 28 : 0;
     const hasYAxisName = Boolean(yAxis?.name || secondaryYAxis?.name);
 
-    const gridConfig = grid ?? {
-      left: 52,
-      right: secondaryYAxis ? 56 : 16, // Extra space for secondary y-axis labels
-      top: hasYAxisName ? 32 : 12,
-      bottom: baseBottom + legendBottom + dataZoomBottom,
-    };
+    const gridConfig = grid
+      ? { ...grid, right: (grid.right ?? 16) + endLabelMargin }
+      : {
+          left: 52,
+          // Extra space for secondary y-axis labels, plus end labels when rendered
+          right: (secondaryYAxis ? 56 : 16) + endLabelMargin,
+          top: hasYAxisName ? 32 : 12,
+          bottom: baseBottom + legendBottom + dataZoomBottom,
+        };
 
     // Create default smart tooltip formatter
     // Auto-enable if valueDecimals is set OR if no custom formatter is provided
@@ -909,6 +942,7 @@ export function MultiLineChart({
     zoomRange,
     connectNulls,
     extendedPalette,
+    endLabels,
     relativeSlots,
     formatSlotLabel,
     formatSlotTooltip,
