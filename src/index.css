@@ -377,27 +377,7 @@
 /* Digit flip animations for scoreboard display.
  * Placed outside @theme inline so they're always emitted
  * (keyframes inside @theme are only output when referenced by a token). */
-@keyframes digit-out {
-  from {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-}
 
-@keyframes digit-in {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
 
 /* CardChain slide animations for conveyor belt effect.
  * Placed outside @theme inline so they're always emitted
