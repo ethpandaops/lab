@@ -41,7 +41,7 @@ export function Tab({ children, badge, className, hash }: TabProps): React.JSX.E
       }}
     >
       {children}
-      {badge && <span className="text-2xs/3 ml-2 rounded-xs bg-background px-1.5 py-0.5 font-semibold">{badge}</span>}
+      {badge && <span className="ml-2 rounded-xs bg-background px-1.5 py-0.5 text-2xs/3 font-semibold">{badge}</span>}
     </HeadlessTab>
   );
 }
