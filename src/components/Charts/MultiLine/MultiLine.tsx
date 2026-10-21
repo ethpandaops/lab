@@ -84,6 +84,7 @@ export function MultiLineChart({
   useNativeLegend = false,
   showCard = false,
   enableDataZoom = false,
+  showDataZoomSlider = true,
   tooltipFormatter,
   tooltipTrigger = 'axis',
   tooltipMode = 'default',
@@ -407,6 +408,11 @@ export function MultiLineChart({
     };
 
     const xAxisHasName = xAxis.type === 'value' && Boolean(xAxis.name);
+    const categoryLabels = xAxis.type === 'category' ? xAxis.labels : undefined;
+    const categoryLabelInterval =
+      categoryLabels && new Set(categoryLabels).size < categoryLabels.length
+        ? (index: number, value: string): boolean => index === 0 || categoryLabels[index - 1] !== value
+        : undefined;
 
     const xAxisConfig = {
       type: isTimeAxis ? ('value' as const) : xAxis.type,
@@ -426,6 +432,8 @@ export function MultiLineChart({
         color: themeColors.muted,
         fontSize: 11,
         hideOverlap: true,
+        // Hourly series repeat each day's label; show only the first point of each run
+        interval: categoryLabelInterval,
         formatter:
           xAxis.formatter ||
           (isTimeAxis ? defaultTimeFormatter : undefined) ||
@@ -668,7 +676,7 @@ export function MultiLineChart({
     // Add extra bottom padding for dataZoom slider when enabled
     const baseBottom = xAxisHasName ? 48 : 28;
     const legendBottom = useNativeLegend && showLegend && legendPosition === 'bottom' ? 40 : 0;
-    const dataZoomBottom = enableDataZoom ? 28 : 0;
+    const dataZoomBottom = enableDataZoom && showDataZoomSlider ? 28 : 0;
     const hasYAxisName = Boolean(yAxis?.name || secondaryYAxis?.name);
 
     const gridConfig = grid ?? {
@@ -878,7 +886,7 @@ export function MultiLineChart({
                 handleStyle: { color: themeColors.foreground },
               },
             },
-          ]
+          ].slice(0, showDataZoomSlider ? 2 : 1)
         : undefined,
     };
   }, [
@@ -897,6 +905,7 @@ export function MultiLineChart({
     tooltipTrigger,
     tooltipMode,
     enableDataZoom,
+    showDataZoomSlider,
     zoomRange,
     connectNulls,
     extendedPalette,

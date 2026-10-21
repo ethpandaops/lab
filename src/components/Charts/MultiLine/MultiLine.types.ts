@@ -348,6 +348,12 @@ export interface MultiLineChartProps {
    */
   enableDataZoom?: boolean;
   /**
+   * Show the range slider under the chart when zoom is enabled. Turn off for charts that share a
+   * syncGroup with a chart that already shows one; wheel and drag zoom still work.
+   * @default true
+   */
+  showDataZoomSlider?: boolean;
+  /**
    * Custom tooltip formatter
    */
   tooltipFormatter?: (params: unknown) => string;
