@@ -248,7 +248,12 @@ export function PopoutCard({
     <>
       <div ref={cardRef} className="h-full">
         <Card
-          className={clsx('flex h-full flex-col', noPadding && '[&>div:last-child]:p-0', className)}
+          className={clsx(
+            'flex h-full flex-col',
+            noPadding &&
+              '[&>div:last-child]:p-0 [&>div:last-child]:[--card-inset-y:0px] [&>div:last-child]:[--card-inset:0px]',
+            className
+          )}
           title={
             anchorId ? (
               <ScrollAnchor id={anchorId} showLinkIcon={false} className="max-w-full">

@@ -104,7 +104,15 @@ export function Card({
         </div>
       )}
       {headerContent && <div className={clsx('relative z-10 px-4 py-3 sm:px-5', styles.header)}>{headerContent}</div>}
-      <div className={clsx('relative z-10 flex-1 p-4 sm:p-5', styles.main)}>{children}</div>
+      <div
+        data-slot="card-body"
+        className={clsx(
+          'relative z-10 flex-1 p-4 [--card-inset-y:--spacing(4)] [--card-inset:--spacing(4)] sm:p-5 sm:[--card-inset-y:--spacing(5)] sm:[--card-inset:--spacing(5)]',
+          styles.main
+        )}
+      >
+        {children}
+      </div>
       {footer && <div className={clsx('relative z-10 px-4 py-3 sm:px-5', styles.footer)}>{footer}</div>}
     </div>
   );

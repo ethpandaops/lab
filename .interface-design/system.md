@@ -183,6 +183,19 @@ Wraps Card with expand-to-modal and download capabilities.
 - Render prop `({ inModal })` for responsive chart heights
 - Download metadata footer: grid with logo, title, subtitle, branding
 
+### Table
+
+`Table` (`src/components/Lists/Table`) has one density for every list of records:
+
+- Rows: `py-2.5` (~40px), `divide-y divide-border`, no zebra, `hover:bg-background`
+- Column labels: `text-xs font-medium text-muted` (not bold foreground — the data is the content)
+- Cells: `text-sm text-foreground tabular-nums`; pass `cellClassName` to mute secondary columns
+- Edge columns are padded by `--table-inset`. A `nested` table inside a Card body bleeds to the
+  card edges (rules span the full card) and takes the card's inset, so the first column lines up
+  with the card title. Placed first or last in the body it also absorbs the vertical padding.
+- Placed directly on a page, a `nested` table gets the Card surface and depth; inside a Card body
+  it is transparent (the Card body sets `data-slot="card-body"`, `--card-inset`, `--card-inset-y`).
+
 ### Header
 
 Page-level header. Size and weight carry the hierarchy; no accent bar or other ornament.
