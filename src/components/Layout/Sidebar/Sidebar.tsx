@@ -3,28 +3,7 @@ import { useMemo } from 'react';
 import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
 import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
-import {
-  ArchiveBoxXMarkIcon,
-  ChartBarIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  CubeIcon,
-  DocumentTextIcon,
-  FireIcon,
-  PlayCircleIcon,
-  PresentationChartLineIcon,
-  Square3Stack3DIcon,
-  UserGroupIcon,
-  ClockIcon,
-  CpuChipIcon,
-  MapIcon,
-  WrenchScrewdriverIcon,
-  ServerStackIcon,
-  SignalIcon,
-  CircleStackIcon,
-  MagnifyingGlassIcon,
-  PuzzlePieceIcon,
-} from '@heroicons/react/24/outline';
+import { ChartBarIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { NetworkSelect } from '@/components/Ethereum/NetworkSelect';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
 import { GitHubIcon } from '@/components/Elements/Icons';
@@ -33,6 +12,14 @@ import { useConfig } from '@/hooks/useConfig';
 import { useNetwork } from '@/hooks/useNetwork';
 import { getNetworkFullLabel } from '@/utils/networks';
 import type { SidebarProps } from './Sidebar.types';
+import {
+  ethereumConsensusPages,
+  ethereumDataAvailabilityPages,
+  ethereumExecutionPages,
+  xatuPages,
+  isPageEnabled,
+  type NavItem,
+} from './navigation';
 
 /**
  * Ethereum diamond logo SVG component
@@ -153,60 +140,6 @@ function SidebarFooter({
   );
 }
 
-interface NavItem {
-  name: string;
-  to: string;
-  icon: typeof ChartBarIcon;
-}
-
-const ethereumConsensusPages: NavItem[] = [
-  { name: 'Overview', to: '/ethereum/consensus/overview', icon: PresentationChartLineIcon },
-  { name: 'Live', to: '/ethereum/live', icon: PlayCircleIcon },
-  { name: 'Epochs', to: '/ethereum/epochs', icon: ClockIcon },
-  { name: 'Slots', to: '/ethereum/slots', icon: Square3Stack3DIcon },
-  { name: 'Entities', to: '/ethereum/entities', icon: UserGroupIcon },
-  { name: 'Clients', to: '/ethereum/clients', icon: CpuChipIcon },
-  { name: 'Forks', to: '/ethereum/forks', icon: SignalIcon },
-];
-
-const ethereumDataAvailabilityPages: NavItem[] = [
-  { name: 'Custody', to: '/ethereum/data-availability/custody', icon: CircleStackIcon },
-  { name: 'Probes', to: '/ethereum/data-availability/probes', icon: MagnifyingGlassIcon },
-  { name: 'Partial Columns', to: '/ethereum/data-availability/partial-columns', icon: PuzzlePieceIcon },
-];
-
-const ethereumExecutionPages: NavItem[] = [
-  { name: 'Overview', to: '/ethereum/execution/overview', icon: PresentationChartLineIcon },
-  { name: 'Timings', to: '/ethereum/execution/timings', icon: ClockIcon },
-  { name: 'Payloads', to: '/ethereum/execution/payloads', icon: CubeIcon },
-  { name: 'Gas Profiler', to: '/ethereum/execution/gas-profiler', icon: FireIcon },
-  { name: 'State Growth', to: '/ethereum/execution/state-growth', icon: ServerStackIcon },
-  { name: 'State Expiry', to: '/ethereum/execution/state-expiry', icon: ArchiveBoxXMarkIcon },
-  { name: 'Contracts', to: '/ethereum/contracts', icon: DocumentTextIcon },
-];
-
-const xatuPages: NavItem[] = [
-  { name: 'Contributors', to: '/xatu/contributors', icon: UserGroupIcon },
-  { name: 'Geo Checklist', to: '/xatu/geographical-checklist', icon: MapIcon },
-  { name: 'Local Blocks', to: '/xatu/locally-built-blocks', icon: CubeIcon },
-  { name: 'Fork Readiness', to: '/xatu/fork-readiness', icon: WrenchScrewdriverIcon },
-];
-
-/**
- * Helper function to check if a page is enabled for the current network.
- */
-function isPageEnabled(
-  path: string,
-  features: Array<{ path: string; disabled_networks?: string[] }> | undefined,
-  networkName: string | undefined
-): boolean {
-  if (!features || !networkName) return true;
-  const feature = features.find(f => f.path === path);
-  if (!feature) return true;
-  if (feature.disabled_networks?.includes(networkName)) return false;
-  return true;
-}
-
 /**
  * Navigation link component that handles both collapsed and expanded states
  */
@@ -274,7 +207,13 @@ function SubsectionHeader({ title, collapsed }: { title: string; collapsed: bool
   return <div className="mb-1 ml-1 text-2xs font-semibold tracking-wider text-muted/60 uppercase">{title}</div>;
 }
 
-export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }: SidebarProps): JSX.Element {
+export function Sidebar({
+  sidebarOpen,
+  setSidebarOpen,
+  collapsed,
+  setCollapsed,
+  desktop = true,
+}: SidebarProps): JSX.Element {
   const { data: config } = useConfig();
   const { currentNetwork } = useNetwork();
 
@@ -399,102 +338,104 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
       </Dialog>
 
       {/* Static sidebar for desktop */}
-      <div
-        className={clsx(
-          'hidden border-r border-border bg-background transition-all duration-200 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col',
-          collapsed ? 'lg:w-14' : 'lg:w-56'
-        )}
-      >
-        {/* Header */}
+      {desktop && (
         <div
           className={clsx(
-            'flex h-12 shrink-0 items-center border-b border-border',
-            collapsed ? 'justify-center px-2' : 'justify-between px-3'
+            'hidden border-r border-border bg-background transition-all duration-200 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col',
+            collapsed ? 'lg:w-14' : 'lg:w-56'
           )}
         >
-          <Link to="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
-            <img alt="Lab Logo" src="/images/lab.png" className="h-7 w-auto" />
-            {!collapsed && (
-              <div className="flex flex-col">
-                <span className="font-display text-lg leading-tight font-bold text-foreground">The Lab</span>
-                <span className="text-2xs leading-tight text-muted">lab.ethpandaops.io</span>
-              </div>
+          {/* Header */}
+          <div
+            className={clsx(
+              'flex h-12 shrink-0 items-center border-b border-border',
+              collapsed ? 'justify-center px-2' : 'justify-between px-3'
             )}
-          </Link>
-          {!collapsed && <ThemeToggle />}
-        </div>
+          >
+            <Link to="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
+              <img alt="Lab Logo" src="/images/lab.png" className="h-7 w-auto" />
+              {!collapsed && (
+                <div className="flex flex-col">
+                  <span className="font-display text-lg leading-tight font-bold text-foreground">The Lab</span>
+                  <span className="text-2xs leading-tight text-muted">lab.ethpandaops.io</span>
+                </div>
+              )}
+            </Link>
+            {!collapsed && <ThemeToggle />}
+          </div>
 
-        {/* Scrollable content */}
-        <div className={clsx('flex grow flex-col gap-y-3 overflow-y-auto', collapsed ? 'px-2 py-3' : 'px-3 py-3')}>
-          {/* Network Selector */}
-          {collapsed ? (
-            currentNetwork && (
-              <div className="flex justify-center" title={getNetworkFullLabel(currentNetwork)}>
-                <NetworkIcon networkName={currentNetwork.name} className="size-6" />
-              </div>
-            )
-          ) : (
-            <NetworkSelect showLabel={false} />
-          )}
+          {/* Scrollable content */}
+          <div className={clsx('flex grow flex-col gap-y-3 overflow-y-auto', collapsed ? 'px-2 py-3' : 'px-3 py-3')}>
+            {/* Network Selector */}
+            {collapsed ? (
+              currentNetwork && (
+                <div className="flex justify-center" title={getNetworkFullLabel(currentNetwork)}>
+                  <NetworkIcon networkName={currentNetwork.name} className="size-6" />
+                </div>
+              )
+            ) : (
+              <NetworkSelect showLabel={false} />
+            )}
 
-          {/* Navigation */}
-          <nav className="flex flex-1 flex-col gap-y-4">
-            {/* Ethereum Section */}
-            <div>
-              <SectionHeader title="Ethereum" collapsed={collapsed} type="ethereum" />
-              <div className={clsx('space-y-2', !collapsed && 'mt-1.5')}>
-                {filteredEthereumConsensusPages.length > 0 && (
-                  <div>
-                    <SubsectionHeader title="Consensus" collapsed={collapsed} />
-                    <div className={clsx(collapsed ? 'space-y-1' : 'space-y-0.5')}>
-                      {filteredEthereumConsensusPages.map(page => (
-                        <NavLink key={page.to} page={page} collapsed={collapsed} />
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {filteredEthereumDataAvailabilityPages.length > 0 && (
-                  <div>
-                    <SubsectionHeader title="Data Availability" collapsed={collapsed} />
-                    <div className={clsx(collapsed ? 'space-y-1' : 'space-y-0.5')}>
-                      {filteredEthereumDataAvailabilityPages.map(page => (
-                        <NavLink key={page.to} page={page} collapsed={collapsed} />
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {filteredEthereumExecutionPages.length > 0 && (
-                  <div>
-                    <SubsectionHeader title="Execution" collapsed={collapsed} />
-                    <div className={clsx(collapsed ? 'space-y-1' : 'space-y-0.5')}>
-                      {filteredEthereumExecutionPages.map(page => (
-                        <NavLink key={page.to} page={page} collapsed={collapsed} />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Xatu Section */}
-            {filteredXatuPages.length > 0 && (
+            {/* Navigation */}
+            <nav className="flex flex-1 flex-col gap-y-4">
+              {/* Ethereum Section */}
               <div>
-                <SectionHeader title="Xatu" collapsed={collapsed} type="xatu" />
-                <div className={clsx(collapsed ? 'mt-1 space-y-1' : 'mt-1.5 space-y-0.5')}>
-                  {filteredXatuPages.map(page => (
-                    <NavLink key={page.to} page={page} collapsed={collapsed} />
-                  ))}
+                <SectionHeader title="Ethereum" collapsed={collapsed} type="ethereum" />
+                <div className={clsx('space-y-2', !collapsed && 'mt-1.5')}>
+                  {filteredEthereumConsensusPages.length > 0 && (
+                    <div>
+                      <SubsectionHeader title="Consensus" collapsed={collapsed} />
+                      <div className={clsx(collapsed ? 'space-y-1' : 'space-y-0.5')}>
+                        {filteredEthereumConsensusPages.map(page => (
+                          <NavLink key={page.to} page={page} collapsed={collapsed} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {filteredEthereumDataAvailabilityPages.length > 0 && (
+                    <div>
+                      <SubsectionHeader title="Data Availability" collapsed={collapsed} />
+                      <div className={clsx(collapsed ? 'space-y-1' : 'space-y-0.5')}>
+                        {filteredEthereumDataAvailabilityPages.map(page => (
+                          <NavLink key={page.to} page={page} collapsed={collapsed} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {filteredEthereumExecutionPages.length > 0 && (
+                    <div>
+                      <SubsectionHeader title="Execution" collapsed={collapsed} />
+                      <div className={clsx(collapsed ? 'space-y-1' : 'space-y-0.5')}>
+                        {filteredEthereumExecutionPages.map(page => (
+                          <NavLink key={page.to} page={page} collapsed={collapsed} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            )}
-          </nav>
-        </div>
 
-        {/* Footer */}
-        <div className="shrink-0">
-          <SidebarFooter collapsed={collapsed} onToggleCollapse={() => setCollapsed(!collapsed)} />
+              {/* Xatu Section */}
+              {filteredXatuPages.length > 0 && (
+                <div>
+                  <SectionHeader title="Xatu" collapsed={collapsed} type="xatu" />
+                  <div className={clsx(collapsed ? 'mt-1 space-y-1' : 'mt-1.5 space-y-0.5')}>
+                    {filteredXatuPages.map(page => (
+                      <NavLink key={page.to} page={page} collapsed={collapsed} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </nav>
+          </div>
+
+          {/* Footer */}
+          <div className="shrink-0">
+            <SidebarFooter collapsed={collapsed} onToggleCollapse={() => setCollapsed(!collapsed)} />
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

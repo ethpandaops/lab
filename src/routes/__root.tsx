@@ -19,6 +19,7 @@ import { ThemeToggle } from '@/components/Layout/ThemeToggle';
 import { ConfigGate } from '@/components/Overlays/ConfigGate';
 import { FeatureGate } from '@/components/Overlays/FeatureGate';
 import { Sidebar } from '@/components/Layout/Sidebar';
+import { TopNav } from '@/components/Layout/TopNav';
 import { Breadcrumb } from '@/components/Navigation/Breadcrumb';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
 import { useNetwork } from '@/hooks/useNetwork';
@@ -260,17 +261,19 @@ function RootComponent(): JSX.Element {
                       setSidebarOpen={setSidebarOpen}
                       collapsed={sidebarCollapsed}
                       setCollapsed={setSidebarCollapsed}
+                      desktop={false}
                     />
+
+                    {/* Desktop section bar and page tabs */}
+                    <TopNav />
 
                     {/* Mobile header */}
                     <MobileHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
                     {/* Main content */}
-                    <main
-                      className={`bg-background pt-[65px] transition-all duration-200 lg:min-h-dvh lg:pt-0 ${sidebarCollapsed ? 'lg:pl-14' : 'lg:pl-56'}`}
-                    >
+                    <main className="bg-background pt-[65px] lg:min-h-dvh lg:pt-0">
                       <FeatureGate>
-                        <Breadcrumb className="z-20 h-12 border-b border-border bg-background/85 px-4 backdrop-blur-sm sm:px-6 lg:sticky lg:top-0 lg:px-8" />
+                        <Breadcrumb className="z-20 h-12 border-b border-border bg-background/85 px-4 backdrop-blur-sm sm:px-6 lg:hidden" />
                         <Outlet />
                       </FeatureGate>
                     </main>
