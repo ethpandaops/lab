@@ -1,4 +1,6 @@
 import { type JSX } from 'react';
+import { useNavigate, useSearch } from '@tanstack/react-router';
+import { RangePager } from '@/components/Lists/RangePager';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
@@ -7,6 +9,8 @@ import { SlotTimeline, ClientPairingMatrix, LocallyBuiltBlocksSkeleton } from '.
 import { useSlotBlocks } from './hooks';
 
 export function IndexPage(): JSX.Element {
+  const { from } = useSearch({ from: '/xatu/locally-built-blocks' });
+  const navigate = useNavigate({ from: '/xatu/locally-built-blocks' });
   const {
     slotGroups,
     allExecutionClients,
@@ -19,7 +23,8 @@ export function IndexPage(): JSX.Element {
     isLoading,
     isFetching,
     error,
-  } = useSlotBlocks();
+    page,
+  } = useSlotBlocks(from);
 
   const aboutNote = (
     <InfoBox summary="What these blocks are" className="mb-6">
@@ -57,6 +62,13 @@ export function IndexPage(): JSX.Element {
       </div>
 
       {aboutNote}
+
+      <RangePager
+        page={page}
+        noun="slot"
+        onNavigate={next => navigate({ search: prev => ({ ...prev, from: next }) })}
+        className="mb-4"
+      />
 
       <div className="space-y-6">
         <SlotTimeline
