@@ -57,7 +57,7 @@ function formatPercent(value: number, threshold = 95): ReactNode {
     <span
       className={clsx(
         'tabular-nums',
-        value >= threshold ? 'text-success' : value >= 90 ? 'text-warning' : 'text-danger'
+        value >= threshold ? 'text-foreground' : value >= 90 ? 'text-warning' : 'text-danger'
       )}
     >
       {formatted}
@@ -82,7 +82,7 @@ function formatStatus(status: string, slashed: boolean): ReactNode {
   }
 
   const statusColors: Record<string, string> = {
-    active_ongoing: 'bg-success/10 text-success',
+    active_ongoing: 'bg-muted/10 text-muted',
     active_exiting: 'bg-warning/10 text-warning',
     active_slashed: 'bg-danger/10 text-danger',
     exited_unslashed: 'bg-muted/10 text-muted',
@@ -507,7 +507,7 @@ function ValidatorRow({
                   ? 'text-danger'
                   : row.blockProposal.orphanedCount > 0
                     ? 'text-warning'
-                    : 'text-success'
+                    : 'text-foreground'
               )}
             >
               {row.blockProposal.canonicalCount}/{row.blockProposal.totalProposals}

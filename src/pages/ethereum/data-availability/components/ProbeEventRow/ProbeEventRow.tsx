@@ -16,7 +16,7 @@ import type { ProbeEventRowProps } from './ProbeEventRow.types';
  */
 function ResultIcon({ result }: { result?: string }): JSX.Element {
   if (result === 'success') {
-    return <CheckCircleIcon className="size-4 text-success" />;
+    return <CheckCircleIcon className="size-4 text-muted" />;
   }
   if (result === 'failure') {
     return <XCircleIcon className="size-4 text-warning" />;

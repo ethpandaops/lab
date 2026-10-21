@@ -68,7 +68,7 @@ export interface StatusIconConfig {
 export function getStatusIconConfig(status: string | null): StatusIconConfig {
   switch (status) {
     case 'active_ongoing':
-      return { icon: CheckCircleIcon, colorClass: 'text-success', label: 'Active Ongoing' };
+      return { icon: CheckCircleIcon, colorClass: 'text-muted', label: 'Active Ongoing' };
     case 'active_exiting':
       return {
         icon: ArrowRightStartOnRectangleIcon,

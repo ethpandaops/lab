@@ -9,7 +9,6 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
-import { Badge } from '@/components/Elements/Badge';
 import { Button, buttonClassName } from '@/components/Elements/Button';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
@@ -625,11 +624,7 @@ function BlobScheduleCard({
                       <span className={clsx('text-sm font-medium', isActive ? 'text-foreground' : 'text-muted')}>
                         {bpoSlug ? `${bpoSlug.toUpperCase()} - ` : ''}Max {item.max_blobs_per_block} blobs per block
                       </span>
-                      {isCurrent && (
-                        <Badge color="green" variant="flat">
-                          Active
-                        </Badge>
-                      )}
+                      {isCurrent && <ForkStatusBadge isActive isCurrent label="Active" />}
                     </div>
                   </div>
 

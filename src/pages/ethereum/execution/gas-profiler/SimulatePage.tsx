@@ -101,7 +101,7 @@ function formatDelta(percent: number): string {
 }
 
 function getDeltaColor(percent: number): string {
-  if (percent < -5) return 'text-success';
+  if (percent < -5) return 'text-foreground';
   if (percent > 5) return 'text-danger';
   return 'text-muted';
 }

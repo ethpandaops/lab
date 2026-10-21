@@ -913,7 +913,7 @@ export function TransactionPage(): JSX.Element {
               <div className="mt-4 border-t border-border pt-3 text-center">
                 <div className="inline-flex items-center gap-2">
                   {isSuccess ? (
-                    <CheckCircleIcon className="size-4 text-success" />
+                    <CheckCircleIcon className="size-4 text-muted" />
                   ) : (
                     <XCircleIcon className="size-4 text-danger" />
                   )}

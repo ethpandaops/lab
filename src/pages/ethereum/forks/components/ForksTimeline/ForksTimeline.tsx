@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { Badge } from '@/components/Elements/Badge';
+import { ForkStatusBadge } from '../ForkShared';
 import { Card } from '@/components/Layout/Card';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
@@ -87,11 +87,7 @@ export function ForksTimeline({
                           >
                             {fork.displayName}
                           </Link>
-                          {isCurrentFork && (
-                            <Badge color="green" variant="flat">
-                              Current
-                            </Badge>
-                          )}
+                          {isCurrentFork && <ForkStatusBadge isActive isCurrent label="Current" />}
                         </div>
                         <p className="text-sm text-muted">{fork.description}</p>
                       </div>
@@ -239,11 +235,7 @@ export function ForksTimeline({
                                       </h4>
                                     );
                                   })()}
-                                  {isCurrentBlob && (
-                                    <Badge color="green" variant="flat">
-                                      Active
-                                    </Badge>
-                                  )}
+                                  {isCurrentBlob && <ForkStatusBadge isActive isCurrent label="Active" />}
                                 </div>
                                 <p className="text-sm text-muted">
                                   Max blobs per block: {blobItem.max_blobs_per_block}

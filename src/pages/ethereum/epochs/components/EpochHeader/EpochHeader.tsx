@@ -44,30 +44,22 @@ export function EpochHeader({ epoch, stats, timestamp, p95BlockArrivalTime }: Ep
             id: 'blocks',
             name: 'Blocks',
             value: `${stats.canonicalBlockCount} / 32`,
-            valueClassName: stats.canonicalBlockCount === 32 ? 'text-success' : 'text-foreground',
           },
           {
             id: 'p95-block-arrival',
             name: 'P95 Block Arrival',
             value: hasArrival ? `${p95BlockArrivalTime.toFixed(2)}s` : '-',
             valueClassName: hasArrival
-              ? p95BlockArrivalTime < 0.5
-                ? 'text-success'
-                : p95BlockArrivalTime > 1.0
-                  ? 'text-warning'
-                  : 'text-foreground'
+              ? p95BlockArrivalTime > 1.0
+                ? 'text-warning'
+                : 'text-foreground'
               : 'text-foreground',
           },
           {
             id: 'participation',
             name: 'Attestation Participation',
             value: `${(stats.participationRate * 100).toFixed(2)}%`,
-            valueClassName:
-              stats.participationRate >= 0.99
-                ? 'text-success'
-                : stats.participationRate < 0.95
-                  ? 'text-warning'
-                  : 'text-foreground',
+            valueClassName: stats.participationRate < 0.95 ? 'text-warning' : 'text-foreground',
           },
           {
             id: 'missed-attestations',

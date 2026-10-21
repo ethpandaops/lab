@@ -583,7 +583,7 @@ export function DetailPage(): JSX.Element {
                               100 >
                             90
                               ? 'var(--color-danger)'
-                              : 'var(--color-success)'
+                              : 'var(--color-primary)'
                           }
                         />
                       )}
@@ -1240,7 +1240,7 @@ export function DetailPage(): JSX.Element {
                                   100 >
                                 90
                                   ? 'var(--color-danger)'
-                                  : 'var(--color-success)'
+                                  : 'var(--color-primary)'
                               }
                             />
                           )}

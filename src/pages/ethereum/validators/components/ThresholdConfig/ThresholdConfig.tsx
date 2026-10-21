@@ -2,7 +2,6 @@ import type { JSX } from 'react';
 import { useState } from 'react';
 import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
-import { Button } from '@/components/Elements/Button';
 import { ChevronDownIcon, ChevronUpIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 
 export interface ThresholdValues {
@@ -105,24 +104,25 @@ export function ThresholdConfig({ values, onChange, disabled = false, className 
     <Card
       className={clsx('[&>[data-slot=card-body]:empty]:hidden', className)}
       title={
-        <span className="inline-flex items-center gap-2">
-          <AdjustmentsHorizontalIcon className="size-4 text-muted" />
-          Pass/Fail Thresholds
-          {isCustom && (
-            <span className="rounded-xs bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">Custom</span>
-          )}
-        </span>
-      }
-      actions={
-        <Button
-          variant="blank"
-          size="xs"
-          iconOnly
-          leadingIcon={isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
-          aria-label={isExpanded ? 'Collapse thresholds' : 'Expand thresholds'}
+        <button
+          type="button"
           aria-expanded={isExpanded}
           onClick={() => setIsExpanded(!isExpanded)}
-        />
+          className="flex w-full cursor-pointer items-center justify-between gap-2 text-left"
+        >
+          <span className="inline-flex items-center gap-2">
+            <AdjustmentsHorizontalIcon className="size-4 text-muted" />
+            Pass/Fail Thresholds
+            {isCustom && (
+              <span className="rounded-xs bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">Custom</span>
+            )}
+          </span>
+          {isExpanded ? (
+            <ChevronUpIcon aria-hidden="true" className="size-4 text-muted" />
+          ) : (
+            <ChevronDownIcon aria-hidden="true" className="size-4 text-muted" />
+          )}
+        </button>
       }
     >
       {isExpanded && (

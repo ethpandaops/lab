@@ -26,7 +26,7 @@ function AvailabilityStatus({
 
   const status =
     onTimeColumnCount >= 64
-      ? { label: 'Data available', icon: CheckCircleIcon, tone: 'text-success' }
+      ? { label: 'Data available', icon: CheckCircleIcon, tone: 'text-foreground' }
       : blobCount === 0
         ? { label: 'No blobs', icon: null, tone: 'text-muted' }
         : !pastDeadline || blobCount === null

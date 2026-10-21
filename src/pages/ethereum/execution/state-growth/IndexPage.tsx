@@ -182,17 +182,14 @@ export function IndexPage(): JSX.Element {
                 <div
                   className={clsx(
                     'flex items-center gap-1.5 rounded-sm px-2 py-1',
-                    totalIsPositive ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
+                    totalIsPositive ? 'bg-warning/10 text-warning' : 'bg-surface text-muted'
                   )}
                 >
                   <TotalIcon className="size-4" />
                   <span className="text-sm font-semibold tabular-nums">{formatDeltaBytes(delta.total.delta)}</span>
                 </div>
                 <span
-                  className={clsx(
-                    'text-sm font-medium tabular-nums',
-                    totalIsPositive ? 'text-warning' : 'text-success'
-                  )}
+                  className={clsx('text-sm font-medium tabular-nums', totalIsPositive ? 'text-warning' : 'text-muted')}
                 >
                   {delta.total.percentChange >= 0 ? '+' : ''}
                   {delta.total.percentChange.toFixed(3)}%
@@ -212,7 +209,7 @@ export function IndexPage(): JSX.Element {
                   <span
                     className={clsx(
                       'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
-                      delta.accounts.bytes.delta >= 0 ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
+                      delta.accounts.bytes.delta >= 0 ? 'bg-warning/10 text-warning' : 'bg-surface text-muted'
                     )}
                   >
                     {formatDeltaBytes(delta.accounts.bytes.delta)}
@@ -220,7 +217,7 @@ export function IndexPage(): JSX.Element {
                   <span
                     className={clsx(
                       'text-xs font-medium tabular-nums',
-                      delta.accounts.bytes.delta >= 0 ? 'text-warning' : 'text-success'
+                      delta.accounts.bytes.delta >= 0 ? 'text-warning' : 'text-muted'
                     )}
                   >
                     {delta.accounts.bytes.percentChange >= 0 ? '+' : ''}
@@ -242,7 +239,7 @@ export function IndexPage(): JSX.Element {
                   <span
                     className={clsx(
                       'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
-                      delta.storage.bytes.delta >= 0 ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
+                      delta.storage.bytes.delta >= 0 ? 'bg-warning/10 text-warning' : 'bg-surface text-muted'
                     )}
                   >
                     {formatDeltaBytes(delta.storage.bytes.delta)}
@@ -250,7 +247,7 @@ export function IndexPage(): JSX.Element {
                   <span
                     className={clsx(
                       'text-xs font-medium tabular-nums',
-                      delta.storage.bytes.delta >= 0 ? 'text-warning' : 'text-success'
+                      delta.storage.bytes.delta >= 0 ? 'text-warning' : 'text-muted'
                     )}
                   >
                     {delta.storage.bytes.percentChange >= 0 ? '+' : ''}
@@ -272,7 +269,7 @@ export function IndexPage(): JSX.Element {
                   <span
                     className={clsx(
                       'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
-                      delta.contractCodes.bytes.delta >= 0 ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
+                      delta.contractCodes.bytes.delta >= 0 ? 'bg-warning/10 text-warning' : 'bg-surface text-muted'
                     )}
                   >
                     {formatDeltaBytes(delta.contractCodes.bytes.delta)}
@@ -280,7 +277,7 @@ export function IndexPage(): JSX.Element {
                   <span
                     className={clsx(
                       'text-xs font-medium tabular-nums',
-                      delta.contractCodes.bytes.delta >= 0 ? 'text-warning' : 'text-success'
+                      delta.contractCodes.bytes.delta >= 0 ? 'text-warning' : 'text-muted'
                     )}
                   >
                     {delta.contractCodes.bytes.percentChange >= 0 ? '+' : ''}

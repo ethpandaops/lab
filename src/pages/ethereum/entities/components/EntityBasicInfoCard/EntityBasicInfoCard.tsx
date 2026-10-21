@@ -23,7 +23,7 @@ export function EntityBasicInfoCard({
     <Card
       title={stats.entity}
       actions={
-        <Badge color={stats.rate24h >= 0.99 ? 'green' : stats.rate24h >= 0.95 ? 'yellow' : 'red'} dot>
+        <Badge color={stats.rate24h >= 0.99 ? 'gray' : stats.rate24h >= 0.95 ? 'yellow' : 'red'} dot>
           {rate24h}% online
         </Badge>
       }
@@ -44,8 +44,7 @@ export function EntityBasicInfoCard({
             id: 'online-rate',
             name: '12h Online Rate',
             value: `${rate24h}%`,
-            valueClassName:
-              stats.rate24h >= 0.99 ? 'text-success' : stats.rate24h < 0.95 ? 'text-warning' : 'text-foreground',
+            valueClassName: stats.rate24h < 0.95 ? 'text-warning' : 'text-foreground',
           },
           {
             id: 'proposals',
@@ -56,12 +55,7 @@ export function EntityBasicInfoCard({
             id: 'missed-attestations',
             name: 'Missed Attestations (12h)',
             value: stats.missedAttestations24h.toLocaleString(),
-            valueClassName:
-              stats.missedAttestations24h === 0
-                ? 'text-success'
-                : stats.missedAttestations24h > 1000
-                  ? 'text-warning'
-                  : 'text-foreground',
+            valueClassName: stats.missedAttestations24h > 1000 ? 'text-warning' : 'text-foreground',
           },
         ]}
       />

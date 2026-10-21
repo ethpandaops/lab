@@ -48,7 +48,7 @@ export function RecentActivityTable({ epochs }: RecentActivityTableProps): JSX.E
       },
       {
         header: 'Attestations Attested',
-        accessor: row => <span className="text-success">{row.totalAttestations.toLocaleString()}</span>,
+        accessor: row => <span className="text-foreground">{row.totalAttestations.toLocaleString()}</span>,
       },
       {
         header: 'Attestations Missed',
@@ -61,7 +61,7 @@ export function RecentActivityTable({ epochs }: RecentActivityTableProps): JSX.E
         header: 'Attestation Rate',
         accessor: row => {
           const rate = row.rate * 100;
-          const colorClass = rate >= 99 ? 'text-success' : rate < 95 ? 'text-warning' : 'text-muted';
+          const colorClass = rate >= 99 ? 'text-foreground' : rate < 95 ? 'text-warning' : 'text-muted';
 
           return <span className={colorClass}>{rate.toFixed(2)}%</span>;
         },

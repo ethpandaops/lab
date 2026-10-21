@@ -19,7 +19,7 @@ interface BadgeConfig {
 }
 
 const BADGE_CONFIGS: BadgeConfig[] = [
-  { key: 'active', label: 'Active', dotClass: 'bg-success', badgeClass: 'bg-success/10 text-success' },
+  { key: 'active', label: 'Active', dotClass: 'bg-foreground', badgeClass: 'bg-foreground/10 text-foreground' },
   { key: 'pending', label: 'Pending', dotClass: 'bg-accent', badgeClass: 'bg-accent/10 text-accent' },
   { key: 'exited', label: 'Exited', dotClass: 'bg-muted', badgeClass: 'bg-muted/10 text-muted' },
   { key: 'withdrawal', label: 'Withdrawal', dotClass: 'bg-muted', badgeClass: 'bg-muted/10 text-muted' },

@@ -129,7 +129,7 @@ export function StateMetricCard({
             <p className="mt-0.5 text-sm text-muted tabular-nums">
               {count.toLocaleString()}
               {countDelta !== undefined && (
-                <span className={clsx('ml-1 text-xs', isPositive ? 'text-warning' : 'text-success')}>
+                <span className={clsx('ml-1 text-xs', isPositive ? 'text-warning' : 'text-muted')}>
                   ({countDelta >= 0 ? '+' : ''}
                   {countDelta.toLocaleString()})
                 </span>
@@ -141,13 +141,13 @@ export function StateMetricCard({
             <div
               className={clsx(
                 'flex items-center gap-1 rounded-sm px-1.5 py-0.5',
-                isPositive ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
+                isPositive ? 'bg-warning/10 text-warning' : 'bg-surface text-muted'
               )}
             >
               <Icon className="size-3" />
               <span className="text-xs font-medium tabular-nums">{formatDeltaBytes(deltaBytes)}</span>
             </div>
-            <span className={clsx('text-xs font-medium tabular-nums', isPositive ? 'text-warning' : 'text-success')}>
+            <span className={clsx('text-xs font-medium tabular-nums', isPositive ? 'text-warning' : 'text-muted')}>
               {deltaPercent >= 0 ? '+' : ''}
               {deltaPercent.toFixed(3)}%
             </span>

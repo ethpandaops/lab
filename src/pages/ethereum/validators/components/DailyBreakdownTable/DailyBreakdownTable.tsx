@@ -90,7 +90,7 @@ function formatPercent(value: number | null, threshold = 95): ReactNode {
     <span
       className={clsx(
         'tabular-nums',
-        value >= threshold ? 'text-success' : value >= 90 ? 'text-warning' : 'text-danger'
+        value >= threshold ? 'text-foreground' : value >= 90 ? 'text-warning' : 'text-danger'
       )}
     >
       {value.toFixed(2)}%
@@ -104,7 +104,7 @@ function formatPercent(value: number | null, threshold = 95): ReactNode {
 function formatBoolean(value: boolean | null): ReactNode {
   if (value === null) return <span className="text-muted">-</span>;
   return value ? (
-    <span className="text-success" title="Pass" aria-label="Pass">
+    <span className="text-foreground" title="Pass" aria-label="Pass">
       ✓
     </span>
   ) : (
@@ -121,7 +121,7 @@ function formatProposalStatus(status: 'canonical' | 'orphaned' | 'missed' | null
   if (status === null) return <span className="text-muted">-</span>;
   if (status === 'canonical')
     return (
-      <span className="text-success" title="Pass" aria-label="Pass">
+      <span className="text-foreground" title="Pass" aria-label="Pass">
         ✓
       </span>
     );
@@ -145,7 +145,7 @@ function formatProposalCounts(proposals: { canonical: number; total: number } | 
   if (proposals === null) return <span className="text-muted">-</span>;
   const hasIssues = proposals.canonical < proposals.total;
   return (
-    <span className={clsx('tabular-nums', hasIssues ? 'text-danger' : 'text-success')}>
+    <span className={clsx('tabular-nums', hasIssues ? 'text-danger' : 'text-foreground')}>
       {proposals.canonical}/{proposals.total}
     </span>
   );

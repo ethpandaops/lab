@@ -128,7 +128,7 @@ function FilterButton({
   // missing = red (peer responded but didn't have the data - serious)
   const defaultStyles = {
     all: 'bg-surface text-foreground hover:bg-background',
-    success: 'bg-surface text-success hover:bg-success/10',
+    success: 'bg-surface text-foreground hover:bg-muted/10',
     failure: 'bg-surface text-warning hover:bg-warning/10',
     missing: 'bg-surface text-danger hover:bg-danger/10',
   };
@@ -136,7 +136,7 @@ function FilterButton({
   // Active state styles per variant
   const activeStyles = {
     all: 'bg-primary/10 text-primary inset-ring-primary/50',
-    success: 'bg-success/20 text-success inset-ring-success/50',
+    success: 'bg-muted/20 text-foreground inset-ring-foreground/40',
     failure: 'bg-warning/20 text-warning inset-ring-warning/50',
     missing: 'bg-danger/20 text-danger inset-ring-danger/50',
   };

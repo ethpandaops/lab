@@ -93,7 +93,7 @@ export function GasBreakdownCard({ metadata, network }: GasBreakdownCardProps): 
           showLabels
           showPercentages
           footerRight={refundText}
-          footerRightClassName={metadata.gasRefund > 0 ? 'text-success' : undefined}
+          footerRightClassName={metadata.gasRefund > 0 ? 'text-foreground' : undefined}
           valueFormatter={formatGas}
         />
       )}
@@ -110,7 +110,7 @@ export function GasBreakdownCard({ metadata, network }: GasBreakdownCardProps): 
         </div>
         <div>
           <span className="text-muted">Status</span>
-          <p className={metadata.status === 'success' ? 'font-medium text-success' : 'font-medium text-danger'}>
+          <p className={metadata.status === 'success' ? 'font-medium text-foreground' : 'font-medium text-danger'}>
             {metadata.status === 'success' ? 'Success' : 'Failed'}
           </p>
         </div>

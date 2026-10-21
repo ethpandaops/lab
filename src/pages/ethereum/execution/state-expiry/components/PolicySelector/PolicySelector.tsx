@@ -79,8 +79,8 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
                 <PopoverButton
                   variant="blank"
                   className={clsx(
-                    'cursor-pointer text-2xs font-bold text-success underline decoration-success/30 decoration-dotted underline-offset-2 transition-all hover:bg-transparent hover:decoration-success sm:text-xs lg:text-sm',
-                    isHovered && 'decoration-success'
+                    'cursor-pointer text-2xs font-bold text-foreground underline decoration-muted/40 decoration-dotted underline-offset-2 transition-all hover:bg-transparent hover:decoration-foreground sm:text-xs lg:text-sm',
+                    isHovered && 'decoration-foreground'
                   )}
                 >
                   <span className="lg:hidden">{policyConf.shortLabel}</span>

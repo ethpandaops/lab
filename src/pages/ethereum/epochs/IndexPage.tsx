@@ -129,7 +129,7 @@ export function IndexPage(): React.JSX.Element {
                     row.participationValue < 0.95
                       ? 'text-warning'
                       : row.participationValue >= 0.99
-                        ? 'text-success'
+                        ? 'text-foreground'
                         : 'text-muted'
                   }
                 >

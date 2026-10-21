@@ -18,8 +18,8 @@ function getDurationColorClass(value: number, max: number): string {
 
   const ratio = value / max;
 
-  if (ratio <= 0.25) return 'text-success';
-  if (ratio <= 0.5) return 'text-success/80';
+  if (ratio <= 0.25) return 'text-foreground';
+  if (ratio <= 0.5) return 'text-foreground';
   if (ratio <= 0.75) return 'text-warning';
   return 'text-danger';
 }
@@ -147,7 +147,7 @@ function formatActiveRange(firstSeen: number, lastSeen: number): string {
 function getStatusStyle(status?: string): { bg: string; text: string } {
   switch (status?.toUpperCase()) {
     case 'VALID':
-      return { bg: 'bg-success/10', text: 'text-success' };
+      return { bg: 'bg-muted/10', text: 'text-muted' };
     case 'ERROR':
     case 'INVALID':
       return { bg: 'bg-danger/10', text: 'text-danger' };

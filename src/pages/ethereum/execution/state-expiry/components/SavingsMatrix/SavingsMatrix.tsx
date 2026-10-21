@@ -148,10 +148,10 @@ export function SavingsMatrix({
                     {slotData.hasData ? (
                       <div className="space-y-1">
                         <div className="flex items-baseline justify-between gap-2">
-                          <span className="text-sm font-semibold text-success tabular-nums">
+                          <span className="text-sm font-semibold text-foreground tabular-nums">
                             -{formatBytes(slotData.bytesSaved)}
                           </span>
-                          <span className="bg-success/10 px-1.5 py-0.5 text-xs font-medium text-success tabular-nums">
+                          <span className="bg-muted/10 px-1.5 py-0.5 text-xs font-medium text-foreground tabular-nums">
                             -{slotData.bytesPercent.toFixed(4)}%
                           </span>
                         </div>
@@ -185,10 +185,10 @@ export function SavingsMatrix({
                     {contractData.hasData ? (
                       <div className="space-y-1">
                         <div className="flex items-baseline justify-between gap-2">
-                          <span className="text-sm font-semibold text-success tabular-nums">
+                          <span className="text-sm font-semibold text-foreground tabular-nums">
                             -{formatBytes(contractData.bytesSaved)}
                           </span>
-                          <span className="bg-success/10 px-1.5 py-0.5 text-xs font-medium text-success tabular-nums">
+                          <span className="bg-muted/10 px-1.5 py-0.5 text-xs font-medium text-foreground tabular-nums">
                             -{contractData.bytesPercent.toFixed(4)}%
                           </span>
                         </div>

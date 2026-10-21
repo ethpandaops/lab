@@ -529,7 +529,7 @@ function TraceRow({
 
         {/* Future: Value badge */}
         {extendedData?.value && extendedData.value > 0n && (
-          <span className="shrink-0 rounded-xs bg-success/20 px-1.5 py-0.5 text-xs text-success">
+          <span className="shrink-0 rounded-xs bg-surface px-1.5 py-0.5 text-xs text-foreground">
             Ξ{(Number(extendedData.value) / 1e18).toFixed(4)}
           </span>
         )}

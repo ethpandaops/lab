@@ -25,7 +25,7 @@ function formatEth(wei: string | null | undefined): string | null {
 }
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
-  canonical: { label: 'Proposed', cls: 'border-success/40 bg-success/10 text-success' },
+  canonical: { label: 'Proposed', cls: 'border-border bg-muted/10 text-muted' },
   orphaned: { label: 'Orphaned', cls: 'border-warning/40 bg-warning/10 text-warning' },
   missed: { label: 'Missed', cls: 'border-danger/40 bg-danger/10 text-danger' },
 };
@@ -71,7 +71,7 @@ export function MobileSlotStats({
       {mevEth && (
         <div className="flex shrink-0 items-baseline gap-1">
           <span className="text-2xs text-muted">MEV</span>
-          <span className="font-mono text-xs font-semibold text-success tabular-nums">{mevEth} Ξ</span>
+          <span className="font-mono text-xs font-semibold text-foreground tabular-nums">{mevEth} Ξ</span>
         </div>
       )}
       <Chip label="txs">{bd?.transactionCount != null ? bd.transactionCount.toLocaleString() : '—'}</Chip>

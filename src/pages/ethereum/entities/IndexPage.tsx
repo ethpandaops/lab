@@ -138,7 +138,7 @@ export function IndexPage(): React.JSX.Element {
                 <span
                   className={
                     row.statusType === 'online'
-                      ? 'font-medium text-success'
+                      ? 'font-medium text-foreground'
                       : row.statusType === 'degraded'
                         ? 'font-medium text-warning'
                         : 'font-medium text-danger'
@@ -160,7 +160,7 @@ export function IndexPage(): React.JSX.Element {
                     row.attestationRateValue < 0.95
                       ? 'text-warning'
                       : row.attestationRateValue >= 0.99
-                        ? 'text-success'
+                        ? 'text-foreground'
                         : 'text-muted'
                   }
                 >

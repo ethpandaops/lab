@@ -86,13 +86,13 @@ function DeltaCard({
         <div className="min-w-0 flex-1">
           <p className="text-xs text-muted">{label}</p>
           <p className="mt-1 text-xl font-bold text-foreground">{formatDeltaBytes(bytesDelta)}</p>
-          <p className={clsx('mt-0.5 text-xs font-medium', isPositive ? 'text-warning' : 'text-success')}>
+          <p className={clsx('mt-0.5 text-xs font-medium', isPositive ? 'text-warning' : 'text-muted')}>
             {formatPercentage(bytesPercentChange)}
           </p>
           {hasCount && (
             <div className="mt-2 border-t border-border/50 pt-2">
               <p className="text-sm font-semibold text-foreground">{formatCountDelta(countDelta)}</p>
-              <p className={clsx('text-2xs font-medium', countDelta >= 0 ? 'text-warning' : 'text-success')}>
+              <p className={clsx('text-2xs font-medium', countDelta >= 0 ? 'text-warning' : 'text-muted')}>
                 {formatPercentage(countPercentChange)} count
               </p>
             </div>
@@ -101,7 +101,7 @@ function DeltaCard({
         <div
           className={clsx(
             'shrink-0 rounded-sm p-1.5',
-            isPositive ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
+            isPositive ? 'bg-warning/10 text-warning' : 'bg-surface text-muted'
           )}
         >
           <Icon className="size-4" />
@@ -147,7 +147,7 @@ export function StateDeltaCards({ data }: StateDeltaCardsProps): JSX.Element | n
             <div className="flex flex-wrap items-baseline gap-2">
               <span className="text-sm font-medium text-foreground">Total State Changes:</span>
               <span className="text-xl font-bold text-foreground">{formatDeltaBytes(delta.total.delta)}</span>
-              <span className={clsx('text-sm font-medium', isPositive ? 'text-warning' : 'text-success')}>
+              <span className={clsx('text-sm font-medium', isPositive ? 'text-warning' : 'text-muted')}>
                 ({formatPercentage(delta.total.percentChange)})
               </span>
             </div>

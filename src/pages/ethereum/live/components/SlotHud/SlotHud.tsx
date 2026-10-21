@@ -49,13 +49,13 @@ function gweiOrNull(wei: string | null | undefined): number | null {
 }
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
-  canonical: { label: 'Proposed', cls: 'border-success/40 bg-success/10 text-success' },
+  canonical: { label: 'Proposed', cls: 'border-border bg-muted/10 text-muted' },
   orphaned: { label: 'Orphaned', cls: 'border-warning/40 bg-warning/10 text-warning' },
   missed: { label: 'Missed', cls: 'border-danger/40 bg-danger/10 text-danger' },
 };
 
 const PAYLOAD_STATUS_META: Record<PayloadStatus, { label: string; cls: string }> = {
-  payload_present: { label: 'Delivered', cls: 'border-success/40 bg-success/10 text-success' },
+  payload_present: { label: 'Delivered', cls: 'border-border bg-muted/10 text-muted' },
   payload_late: { label: 'Late', cls: 'border-warning/40 bg-warning/10 text-warning' },
   payload_withheld: { label: 'Withheld', cls: 'border-danger/40 bg-danger/10 text-danger' },
   pending: { label: 'Pending', cls: 'border-border bg-surface text-muted' },
@@ -246,18 +246,14 @@ export function SlotHud({
             <Row
               k="PTC"
               v={epbs.ptcVotesSeen > 0 ? `${epbs.ptcPresentVotes}/${epbs.ptcVotesSeen}` : '—'}
-              tone={
-                epbs.ptcVotesSeen > 0 && epbs.ptcPresentVotes * 2 >= epbs.ptcVotesSeen
-                  ? 'text-success'
-                  : 'text-foreground'
-              }
+              tone="text-foreground"
             />
           </Fade>
         </Section>
       ) : (
         <Section title="MEV" className="flex-1">
           <Fade active={blockActive} className="flex flex-col gap-px">
-            <Row k="Value" v={mevEth ? `${mevEth} Ξ` : '—'} tone={mevEth ? 'text-success' : 'text-muted'} />
+            <Row k="Value" v={mevEth ? `${mevEth} Ξ` : '—'} tone={mevEth ? 'text-foreground' : 'text-muted'} />
             <Row k="Via" v={bd?.mevRelays?.[0] ?? '—'} title={bd?.mevRelays?.join(', ') || undefined} />
             <Row k="Builder" v={shortHex(bd?.builderPubkey)} title={bd?.builderPubkey ?? undefined} />
             <Row k="Type" v={blockType ?? '—'} />
@@ -274,7 +270,7 @@ export function SlotHud({
             <Row
               k="Best"
               v={epbsTopBidEth ? `${epbsTopBidEth} Ξ` : '—'}
-              tone={epbsTopBidEth ? 'text-success' : undefined}
+              tone={epbsTopBidEth ? 'text-foreground' : undefined}
             />
             <Row
               k="First"
@@ -292,7 +288,7 @@ export function SlotHud({
             <Row k="Builders" v={dash(auctionBuilders)} />
             <Row k="Relays" v={dash(auctionRelays)} />
             <Row k="Bids" v={dash(auctionBids, n => n.toLocaleString())} />
-            <Row k="Best" v={topBidEth ? `${topBidEth} Ξ` : '—'} tone={topBidEth ? 'text-success' : undefined} />
+            <Row k="Best" v={topBidEth ? `${topBidEth} Ξ` : '—'} tone={topBidEth ? 'text-foreground' : undefined} />
             <Row k="Top" v={auctionTopRelay ?? '—'} title={auctionTopRelay ?? undefined} />
           </Fade>
         </Section>
@@ -343,11 +339,7 @@ export function SlotHud({
             title={proposerEntity ?? (bd?.proposerIndex != null ? `Validator #${bd.proposerIndex}` : undefined)}
           />
           <Row k="Root" v={shortHex(bd?.blockRoot)} title={bd?.blockRoot ?? undefined} />
-          <Row
-            k="On time"
-            v={bd?.wasOnTime === undefined ? '—' : bd.wasOnTime ? 'yes' : 'no'}
-            tone={bd?.wasOnTime ? 'text-success' : 'text-foreground'}
-          />
+          <Row k="On time" v={bd?.wasOnTime === undefined ? '—' : bd.wasOnTime ? 'yes' : 'no'} tone="text-foreground" />
         </Fade>
       </Section>
     </div>

@@ -121,7 +121,7 @@ export function ResourceGasBreakdown({
                 <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: RESOURCE_COLORS.Refund }} />
                 <span className="text-xs font-medium text-foreground">Refund</span>
               </div>
-              <span className="font-mono text-xs text-success">-{formatGas(refund)}</span>
+              <span className="font-mono text-xs text-foreground">-{formatGas(refund)}</span>
             </div>
           )}
         </div>

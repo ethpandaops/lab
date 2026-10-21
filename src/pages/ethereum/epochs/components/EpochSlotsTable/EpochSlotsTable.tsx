@@ -136,14 +136,14 @@ export function EpochSlotsTable({
           // Past/current slots show their actual status
           if (row.status === 'canonical') {
             return (
-              <Badge color="green" variant="border">
+              <Badge color="gray" variant="border">
                 Canonical
               </Badge>
             );
           }
           if (row.status === 'proposed') {
             return (
-              <Badge color="blue" variant="border">
+              <Badge color="gray" variant="border">
                 Proposed
               </Badge>
             );
@@ -192,7 +192,8 @@ export function EpochSlotsTable({
         header: 'Vote %',
         accessor: row => {
           const participation = row.attestationMax > 0 ? (row.attestationHead / row.attestationMax) * 100 : 0;
-          const colorClass = participation >= 99 ? 'text-success' : participation < 95 ? 'text-warning' : 'text-muted';
+          const colorClass =
+            participation >= 99 ? 'text-foreground' : participation < 95 ? 'text-warning' : 'text-muted';
 
           return <span className={colorClass}>{participation.toFixed(2)}%</span>;
         },

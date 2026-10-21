@@ -183,7 +183,7 @@ export function IndexPage(): JSX.Element {
 
                 return (
                   <span
-                    className={clsx('font-medium', delivered ? 'text-success' : 'text-danger')}
+                    className={clsx('font-medium', delivered ? 'text-foreground' : 'text-danger')}
                     title={`PTC: ${row.ptcPresentVotes ?? 0}/${row.ptcVotesSeen} present votes`}
                   >
                     {delivered ? 'Delivered' : 'Absent'}
@@ -199,7 +199,7 @@ export function IndexPage(): JSX.Element {
         accessor: row => {
           // Show data availability status instead of block status
           if (row.hasData) {
-            return <span className={clsx('font-medium text-success')}>Ready</span>;
+            return <span className={clsx('font-medium text-foreground')}>Ready</span>;
           }
 
           // Check if slot is in the future

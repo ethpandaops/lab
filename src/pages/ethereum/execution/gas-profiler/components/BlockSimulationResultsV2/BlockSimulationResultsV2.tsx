@@ -79,7 +79,7 @@ function formatDelta(percent: number): string {
 }
 
 function getDeltaColor(percent: number): string {
-  if (percent < 0) return 'text-success';
+  if (percent < 0) return 'text-foreground';
   if (percent > 0) return 'text-danger';
   return 'text-muted';
 }
@@ -173,7 +173,7 @@ function ErrorCard({
         <div
           className={clsx(
             'size-1.5 shrink-0 rounded-full',
-            hasErrors ? (isSimulated ? 'bg-danger' : 'bg-warning') : 'bg-success'
+            hasErrors ? (isSimulated ? 'bg-danger' : 'bg-warning') : 'bg-muted'
           )}
         />
         <span className="text-xs font-semibold text-foreground">{label}</span>
@@ -204,7 +204,7 @@ function ErrorCard({
             ))}
           </div>
         ) : (
-          <div className="flex items-center gap-1.5 text-xs text-success">
+          <div className="flex items-center gap-1.5 text-xs text-muted">
             <CheckCircleIcon className="size-3.5" />
             <span>No internal call errors</span>
           </div>
@@ -231,7 +231,7 @@ function GasComparisonSection({
   const isIncrease = result.simulated.gasUsed > result.original.gasUsed;
   const absDelta = Math.abs(result.simulated.gasUsed - result.original.gasUsed);
 
-  const simBarColor = overallDelta > 5 ? 'bg-danger/30' : overallDelta < -5 ? 'bg-success/25' : 'bg-primary/25';
+  const simBarColor = overallDelta > 5 ? 'bg-danger/30' : 'bg-primary/25';
 
   return (
     <div className="space-y-2">
@@ -314,8 +314,8 @@ function GasComparisonSection({
             </>
           ) : (
             <>
-              <CheckCircleIcon className="size-3 text-success" />
-              <span className="text-xs text-success">Within limit</span>
+              <CheckCircleIcon className="size-3 text-muted" />
+              <span className="text-xs text-muted">Within limit</span>
             </>
           )}
           <span className="text-xs text-muted">{formatCompactGas(gasLimit)}</span>
@@ -390,12 +390,7 @@ function ExecutionHealthSection({
       value: `${divergenceSummary.additionalReverts > 0 ? '+' : ''}${divergenceSummary.additionalReverts}`,
       icon: XMarkIcon,
       iconColor: revertsColor,
-      valueClassName:
-        divergenceSummary.additionalReverts > 0
-          ? 'text-danger'
-          : divergenceSummary.additionalReverts < 0
-            ? 'text-success'
-            : 'text-foreground',
+      valueClassName: divergenceSummary.additionalReverts > 0 ? 'text-danger' : 'text-foreground',
       subtitle:
         divergenceSummary.totalOriginalReverts > 0 || divergenceSummary.totalSimulatedReverts > 0
           ? `${divergenceSummary.totalOriginalReverts} \u2192 ${divergenceSummary.totalSimulatedReverts} total`
@@ -771,7 +766,7 @@ function TransactionImpactView({
 
                 {/* Simulated status icon */}
                 {tx.simulatedStatus === 'success' ? (
-                  <CheckCircleIcon className="size-4 shrink-0 text-success" />
+                  <CheckCircleIcon className="size-4 shrink-0 text-muted" />
                 ) : (
                   <XCircleIcon className="size-4 shrink-0 text-danger" />
                 )}
@@ -810,7 +805,7 @@ function TransactionImpactView({
                             {tx.simulatedStatus === 'success' ? 'Success' : 'Failed'}
                           </span>
                         ) : (
-                          <span className={tx.originalStatus === 'success' ? 'text-success' : 'text-danger'}>
+                          <span className={tx.originalStatus === 'success' ? 'text-foreground' : 'text-danger'}>
                             {tx.originalStatus === 'success' ? 'Success' : 'Failed'}
                           </span>
                         )}

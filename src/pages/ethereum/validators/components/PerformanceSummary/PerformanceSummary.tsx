@@ -1,6 +1,7 @@
-import type { JSX, ReactNode } from 'react';
+import type { JSX } from 'react';
 import clsx from 'clsx';
-import { Card } from '@/components/Layout/Card';
+import { Stats } from '@/components/DataDisplay/Stats';
+import type { Stat } from '@/components/DataDisplay/Stats';
 import type { AggregateSummary } from '../../hooks/useValidatorsData.types';
 import type { StatusSummary } from '../../hooks/useValidatorStatus';
 
@@ -26,39 +27,18 @@ interface PerformanceSummaryProps {
   className?: string;
 }
 
-interface MetricCardProps {
-  title: string;
-  value: string;
-  subtitle?: ReactNode;
-  threshold?: number;
-  isLoading?: boolean;
-  passed?: boolean;
+/** Skeleton placeholder shown in place of a value while loading */
+function ValueSkeleton(): JSX.Element {
+  return <span className="block h-8 w-20 animate-pulse rounded-xs bg-muted/20" />;
 }
 
-/**
- * Individual metric card component
- */
-function MetricCard({ title, value, subtitle, threshold, isLoading, passed }: MetricCardProps): JSX.Element {
+/** Value with an optional `/ threshold%` suffix */
+function ValueWithThreshold({ value, threshold }: { value: string; threshold?: number }): JSX.Element {
   return (
-    <Card className="flex flex-col gap-1 p-4">
-      <div className="text-xs font-medium text-muted">{title}</div>
-      <div className="flex items-baseline gap-2">
-        {isLoading ? (
-          <div className="h-8 w-20 animate-pulse rounded-xs bg-muted/20" />
-        ) : (
-          <span
-            className={clsx(
-              'text-2xl font-bold tabular-nums',
-              passed === undefined ? 'text-foreground' : passed ? 'text-success' : 'text-danger'
-            )}
-          >
-            {value}
-          </span>
-        )}
-        {threshold !== undefined && !isLoading && <span className="text-xs text-muted">/ {threshold}%</span>}
-      </div>
-      {subtitle && <div className="text-xs text-muted">{subtitle}</div>}
-    </Card>
+    <>
+      {value}
+      {threshold !== undefined && <span className="ml-2 text-xs font-normal text-muted">/ {threshold}%</span>}
+    </>
   );
 }
 
@@ -70,7 +50,7 @@ interface StatusBadgeConfig {
 }
 
 const STATUS_BADGES: StatusBadgeConfig[] = [
-  { key: 'active', label: 'Active', dotClass: 'bg-success', badgeClass: 'bg-success/10 text-success' },
+  { key: 'active', label: 'Active', dotClass: 'bg-foreground', badgeClass: 'bg-foreground/10 text-foreground' },
   { key: 'pending', label: 'Pending', dotClass: 'bg-accent', badgeClass: 'bg-accent/10 text-accent' },
   { key: 'exited', label: 'Exited', dotClass: 'bg-muted', badgeClass: 'bg-muted/10 text-muted' },
   { key: 'withdrawal', label: 'Withdrawal', dotClass: 'bg-muted', badgeClass: 'bg-muted/10 text-muted' },
@@ -94,7 +74,7 @@ function formatEth(value: number | null): string {
 }
 
 /**
- * Summary cards showing aggregate performance metrics across all validators
+ * Summary strip showing aggregate performance metrics across all validators
  */
 export function PerformanceSummary({
   summary,
@@ -124,110 +104,117 @@ export function PerformanceSummary({
 
   const visibleBadges = statusSummary ? STATUS_BADGES.filter(b => statusSummary[b.key] > 0) : [];
 
-  return (
-    <div className={clsx('grid grid-cols-2 gap-4 lg:grid-cols-3', className)}>
-      <Card className="flex flex-col gap-1 p-4">
-        <div className="text-xs font-medium text-muted">Validators</div>
-        <div className="flex items-baseline gap-2">
-          {isStatusLoading ? (
-            <div className="h-8 w-20 animate-pulse rounded-xs bg-muted/20" />
-          ) : (
-            <span className="text-2xl font-bold text-foreground tabular-nums">{statusSummary?.total ?? 0}</span>
-          )}
-        </div>
-        {isStatusLoading ? (
-          <div className="h-4 w-32 animate-pulse rounded-xs bg-muted/20" />
-        ) : visibleBadges.length > 0 ? (
-          <div className="flex flex-wrap items-center gap-1.5">
-            {visibleBadges.map(badge => (
-              <span
-                key={badge.key}
-                className={clsx(
-                  'inline-flex items-center gap-1 rounded-xs px-1.5 py-0.5 text-xs font-medium',
-                  badge.badgeClass
-                )}
-              >
-                <span className={clsx('size-1.5 rounded-full', badge.dotClass)} />
-                {statusSummary![badge.key]}
-              </span>
-            ))}
-          </div>
-        ) : null}
-      </Card>
+  const verdictClass = (passed: boolean): string => (passed ? 'text-foreground' : 'text-danger');
 
-      <MetricCard
-        title="Attestation Inclusion"
-        value={formatPercent(attestationInclusionRate)}
-        subtitle={`${summary?.attestation.attestedCount ?? 0} / ${summary?.attestation.totalDuties ?? 0} duties`}
-        threshold={thresholds.inclusionRate}
-        isLoading={isLoading}
-        passed={isLoading ? undefined : inclusionPassed}
-      />
-
-      <MetricCard
-        title="Vote Correctness"
-        value={formatPercent(avgCorrectnessRate)}
-        subtitle={
-          <span className="flex flex-wrap gap-x-2">
-            <span>
-              <span className="font-bold lg:hidden">H: </span>
-              <span className="hidden font-bold lg:inline">Head: </span>
-              {formatPercent(summary?.attestation.headCorrectRate ?? 0, 1)}
+  const stats: Stat[] = [
+    {
+      id: 'validators',
+      name: 'Validators',
+      value: isStatusLoading ? <ValueSkeleton /> : (statusSummary?.total ?? 0),
+      subtitle: isStatusLoading ? (
+        <span className="block h-4 w-32 animate-pulse rounded-xs bg-muted/20" />
+      ) : visibleBadges.length > 0 ? (
+        <span className="flex flex-wrap items-center gap-1.5">
+          {visibleBadges.map(badge => (
+            <span
+              key={badge.key}
+              className={clsx(
+                'inline-flex items-center gap-1 rounded-xs px-1.5 py-0.5 text-xs font-medium',
+                badge.badgeClass
+              )}
+            >
+              <span className={clsx('size-1.5 rounded-full', badge.dotClass)} />
+              {statusSummary![badge.key]}
             </span>
-            <span>
-              <span className="font-bold lg:hidden">T: </span>
-              <span className="hidden font-bold lg:inline">Target: </span>
-              {formatPercent(summary?.attestation.targetCorrectRate ?? 0, 1)}
-            </span>
-            <span>
-              <span className="font-bold lg:hidden">S: </span>
-              <span className="hidden font-bold lg:inline">Source: </span>
-              {formatPercent(summary?.attestation.sourceCorrectRate ?? 0, 1)}
-            </span>
+          ))}
+        </span>
+      ) : undefined,
+    },
+    {
+      id: 'attestation-inclusion',
+      name: 'Attestation Inclusion',
+      value: isLoading ? (
+        <ValueSkeleton />
+      ) : (
+        <ValueWithThreshold value={formatPercent(attestationInclusionRate)} threshold={thresholds.inclusionRate} />
+      ),
+      valueClassName: isLoading ? undefined : verdictClass(inclusionPassed),
+      subtitle: `${summary?.attestation.attestedCount ?? 0} / ${summary?.attestation.totalDuties ?? 0} duties`,
+    },
+    {
+      id: 'vote-correctness',
+      name: 'Vote Correctness',
+      value: isLoading ? (
+        <ValueSkeleton />
+      ) : (
+        <ValueWithThreshold value={formatPercent(avgCorrectnessRate)} threshold={thresholds.correctnessRate} />
+      ),
+      valueClassName: isLoading ? undefined : verdictClass(correctnessPassed),
+      subtitle: (
+        <span className="flex flex-wrap gap-x-2 whitespace-normal">
+          <span>
+            <span className="font-bold lg:hidden">H: </span>
+            <span className="hidden font-bold lg:inline">Head: </span>
+            {formatPercent(summary?.attestation.headCorrectRate ?? 0, 1)}
           </span>
-        }
-        threshold={thresholds.correctnessRate}
-        isLoading={isLoading}
-        passed={isLoading ? undefined : correctnessPassed}
-      />
+          <span>
+            <span className="font-bold lg:hidden">T: </span>
+            <span className="hidden font-bold lg:inline">Target: </span>
+            {formatPercent(summary?.attestation.targetCorrectRate ?? 0, 1)}
+          </span>
+          <span>
+            <span className="font-bold lg:hidden">S: </span>
+            <span className="hidden font-bold lg:inline">Source: </span>
+            {formatPercent(summary?.attestation.sourceCorrectRate ?? 0, 1)}
+          </span>
+        </span>
+      ),
+    },
+    {
+      id: 'sync-committee',
+      name: 'Sync Committee',
+      value: isLoading ? (
+        <ValueSkeleton />
+      ) : (
+        <ValueWithThreshold
+          value={summary?.syncCommittee.totalSlots === 0 ? 'N/A' : formatPercent(syncParticipationRate)}
+          threshold={summary?.syncCommittee.totalSlots === 0 ? undefined : thresholds.syncParticipation}
+        />
+      ),
+      valueClassName: isLoading ? undefined : verdictClass(syncPassed),
+      subtitle:
+        summary?.syncCommittee.totalSlots === 0
+          ? 'No duties in period'
+          : `${summary?.syncCommittee.participatedCount ?? 0} / ${summary?.syncCommittee.totalSlots ?? 0} slots`,
+    },
+    {
+      id: 'block-proposals',
+      name: 'Block Proposals',
+      value: isLoading ? (
+        <ValueSkeleton />
+      ) : hasProposals ? (
+        `${blockProposal!.canonicalCount} / ${blockProposal!.totalProposals}`
+      ) : (
+        'N/A'
+      ),
+      valueClassName: isLoading ? undefined : verdictClass(proposalsPassed),
+      subtitle: hasProposals
+        ? [
+            blockProposal!.missedCount > 0 && `${blockProposal!.missedCount} missed`,
+            blockProposal!.orphanedCount > 0 && `${blockProposal!.orphanedCount} orphaned`,
+          ]
+            .filter(Boolean)
+            .join(', ') || 'All canonical'
+        : 'No proposals in period',
+    },
+    {
+      id: 'min-balance',
+      name: 'Min Balance',
+      value: isLoading ? <ValueSkeleton /> : formatEth(minBalance),
+      valueClassName: isLoading ? undefined : verdictClass(balancePassed),
+      subtitle: `Across ${summary?.totalValidators ?? 0} validators`,
+    },
+  ];
 
-      <MetricCard
-        title="Sync Committee"
-        value={summary?.syncCommittee.totalSlots === 0 ? 'N/A' : formatPercent(syncParticipationRate)}
-        subtitle={
-          summary?.syncCommittee.totalSlots === 0
-            ? 'No duties in period'
-            : `${summary?.syncCommittee.participatedCount ?? 0} / ${summary?.syncCommittee.totalSlots ?? 0} slots`
-        }
-        threshold={summary?.syncCommittee.totalSlots === 0 ? undefined : thresholds.syncParticipation}
-        isLoading={isLoading}
-        passed={isLoading ? undefined : syncPassed}
-      />
-
-      <MetricCard
-        title="Block Proposals"
-        value={hasProposals ? `${blockProposal!.canonicalCount} / ${blockProposal!.totalProposals}` : 'N/A'}
-        subtitle={
-          hasProposals
-            ? [
-                blockProposal!.missedCount > 0 && `${blockProposal!.missedCount} missed`,
-                blockProposal!.orphanedCount > 0 && `${blockProposal!.orphanedCount} orphaned`,
-              ]
-                .filter(Boolean)
-                .join(', ') || 'All canonical'
-            : 'No proposals in period'
-        }
-        isLoading={isLoading}
-        passed={isLoading ? undefined : proposalsPassed}
-      />
-
-      <MetricCard
-        title="Min Balance"
-        value={formatEth(minBalance)}
-        subtitle={`Across ${summary?.totalValidators ?? 0} validators`}
-        isLoading={isLoading}
-        passed={isLoading ? undefined : balancePassed}
-      />
-    </div>
-  );
+  return <Stats stats={stats} className={className} gridClassName="grid grid-cols-2 lg:grid-cols-3" />;
 }
