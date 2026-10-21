@@ -245,19 +245,20 @@ Page wrapper. `mx-auto p-4 sm:p-6 lg:p-8 max-w-screen-2xl`.
 ### Grid
 
 ```tsx
-grid: { left: 60, right: 24, top: 16, bottom: 50 }
-// top: 40 if title present
-// right: 70 if dual y-axes
-// bottom: +40 for legend, +40 for dataZoom
+grid: { left: 52, right: 16, top: 12, bottom: 28 }
+// top: 32 when the y-axis has a name (it sits above the axis)
+// right: 56 with a secondary y-axis
+// bottom: 48 when a numeric x-axis has a name, +40 for native legend, +28 for dataZoom
 ```
 
 ### Axes
 
-- Always show axis lines: `axisLine: { show: true }`, color = `themeColors.border`
-- Never show grid lines: `splitLine: { show: false }`
-- Label color: `themeColors.muted`, size 12
-- Name position: `nameLocation: 'middle'`, xAxis gap 30, yAxis gap 50
-- Name color: `themeColors.foreground`, size 12
+- Horizontal hairline grid lines on the value axis (`splitLine` solid, `themeColors.border`); no y-axis line
+- X-axis line in `themeColors.border`, no ticks, `hideOverlap` labels
+- Labels `themeColors.muted`, size 11
+- Y-axis name reads horizontally above the axis (`nameLocation: 'end'`), not rotated beside it
+- X-axis name only on numeric axes ("Slot"); dates and categories label themselves, so "Date" is dropped
+- dataZoom slider: an 8px neutral track with thin handles, no data preview, no accent color
 
 ### Lines
 
@@ -269,7 +270,8 @@ grid: { left: 60, right: 24, top: 16, bottom: 50 }
 
 ### Tooltip
 
-- Background: `themeColors.background`
+- Panel: `themeColors.surface`, 6px radius, soft shadow, padding 8×10
+- Background: `themeColors.surface`
 - Border: `themeColors.border`
 - Text: `themeColors.foreground`, size 12
 - Axis pointer: dashed line in `themeColors.muted`
@@ -363,5 +365,4 @@ Elements with fade-in start with `opacity: 0`.
 - Mix depth strategies (shadows in dark mode, outlines in light mode)
 - Reach for `rounded-md`/`rounded-lg` — they alias to `rounded-sm`; write `rounded-sm` (or `rounded-xs` for inline marks)
 - Use `rounded-full` for buttons or segmented controls
-- Add grid lines to charts
 - Use multiple accent colors — terracotta is the accent

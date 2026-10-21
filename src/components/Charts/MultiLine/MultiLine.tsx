@@ -16,6 +16,7 @@ import {
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { hexToRgba, formatSmartDecimal, getDataVizColors, resolveCssColorToHex } from '@/utils';
+import { CHART_FONT_FAMILY } from '@/utils/dataVizColors';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { SharedCrosshairsContext } from '@/contexts/SharedCrosshairsContext';
 import { Disclosure } from '@/components/Layout/Disclosure';
@@ -405,20 +406,26 @@ export function MultiLineChart({
       return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
     };
 
+    const xAxisHasName = xAxis.type === 'value' && Boolean(xAxis.name);
+
     const xAxisConfig = {
       type: isTimeAxis ? ('value' as const) : xAxis.type,
-      name: xAxis.name,
+      // Dates and category labels describe themselves; only numeric axes keep a name
+      name: xAxisHasName ? xAxis.name : undefined,
       nameLocation: 'middle' as const,
-      nameGap: 30,
-      nameTextStyle: { color: themeColors.muted },
+      nameGap: 28,
+      nameTextStyle: { color: themeColors.muted, fontSize: 11 },
       data: xAxis.type === 'category' ? xAxis.labels : undefined,
       boundaryGap: xAxis.type === 'category',
       axisLine: {
         show: true,
         lineStyle: { color: themeColors.border },
       },
+      axisTick: { show: false },
       axisLabel: {
         color: themeColors.muted,
+        fontSize: 11,
+        hideOverlap: true,
         formatter:
           xAxis.formatter ||
           (isTimeAxis ? defaultTimeFormatter : undefined) ||
@@ -434,20 +441,20 @@ export function MultiLineChart({
     // Build y-axis configuration (primary)
     const primaryYAxisConfig = {
       type: 'value' as const,
+      // Unit label sits above the axis, reading horizontally, instead of rotated alongside it
       name: yAxis?.name,
-      nameLocation: 'middle' as const,
-      nameGap: yAxis?.name ? 35 : 0,
-      nameTextStyle: { color: themeColors.muted },
-      axisLine: {
-        show: true,
-        lineStyle: { color: themeColors.border },
-      },
+      nameLocation: 'end' as const,
+      nameGap: 10,
+      nameTextStyle: { color: themeColors.muted, fontSize: 11, align: 'left' as const, padding: [0, 0, 0, -8] },
+      axisLine: { show: false },
       axisTick: { show: false },
       splitLine: {
-        show: false,
+        show: true,
+        lineStyle: { color: themeColors.border, type: 'solid' as const },
       },
       axisLabel: {
         color: themeColors.muted,
+        fontSize: 11,
         formatter: yAxis?.formatter,
       },
       min: yAxis?.min,
@@ -460,18 +467,16 @@ export function MultiLineChart({
       ? {
           type: 'value' as const,
           name: secondaryYAxis.name,
-          nameLocation: 'middle' as const,
-          nameGap: secondaryYAxis.name ? 45 : 0,
-          nameTextStyle: { color: themeColors.muted },
+          nameLocation: 'end' as const,
+          nameGap: 10,
+          nameTextStyle: { color: themeColors.muted, fontSize: 11, align: 'right' as const, padding: [0, -8, 0, 0] },
           position: 'right' as const,
-          axisLine: {
-            show: true,
-            lineStyle: { color: themeColors.border },
-          },
+          axisLine: { show: false },
           axisTick: { show: false },
           splitLine: { show: false },
           axisLabel: {
             color: themeColors.muted,
+            fontSize: 11,
             formatter: secondaryYAxis.formatter,
           },
           min: secondaryYAxis.min,
@@ -661,14 +666,15 @@ export function MultiLineChart({
 
     // Calculate grid padding - just basic padding, let ECharts handle the rest
     // Add extra bottom padding for dataZoom slider when enabled
-    const baseBottom = 50;
+    const baseBottom = xAxisHasName ? 48 : 28;
     const legendBottom = useNativeLegend && showLegend && legendPosition === 'bottom' ? 40 : 0;
-    const dataZoomBottom = enableDataZoom ? 40 : 0;
+    const dataZoomBottom = enableDataZoom ? 28 : 0;
+    const hasYAxisName = Boolean(yAxis?.name || secondaryYAxis?.name);
 
     const gridConfig = grid ?? {
-      left: 60,
-      right: secondaryYAxis ? 70 : 24, // Extra space for secondary y-axis
-      top: 16,
+      left: 52,
+      right: secondaryYAxis ? 56 : 16, // Extra space for secondary y-axis labels
+      top: hasYAxisName ? 32 : 12,
       bottom: baseBottom + legendBottom + dataZoomBottom,
     };
 
@@ -782,9 +788,12 @@ export function MultiLineChart({
       backgroundColor: themeColors.surface,
       borderColor: themeColors.border,
       borderWidth: 1,
+      padding: [8, 10],
+      extraCssText: 'border-radius: 6px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);',
       textStyle: {
         color: themeColors.foreground,
         fontSize: 12,
+        fontFamily: CHART_FONT_FAMILY,
       },
       axisPointer:
         tooltipTrigger === 'axis'
@@ -843,30 +852,30 @@ export function MultiLineChart({
               end: zoomRange.end,
             },
             {
+              // A slim, neutral range track: no data preview, no move bar, no accent color
               type: 'slider' as const,
               xAxisIndex: 0,
               filterMode: 'none' as const,
-              height: 20,
-              bottom: 10,
+              height: 8,
+              bottom: 6,
               start: zoomRange.start,
               end: zoomRange.end,
-              borderColor: themeColors.border,
-              backgroundColor: 'transparent',
-              fillerColor: hexToRgba(themeColors.primary, 0.2),
+              showDataShadow: false,
+              showDetail: false,
+              brushSelect: false,
+              moveHandleSize: 0,
+              borderColor: 'transparent',
+              borderRadius: 3,
+              backgroundColor: hexToRgba(themeColors.border, 0.5),
+              fillerColor: hexToRgba(themeColors.muted, 0.2),
+              handleIcon: 'path://M0,0 h3 v8 h-3 z',
+              handleSize: '100%',
               handleStyle: {
-                color: themeColors.primary,
-                borderColor: themeColors.primary,
-              },
-              textStyle: {
                 color: themeColors.muted,
+                borderWidth: 0,
               },
-              dataBackground: {
-                lineStyle: { color: themeColors.border },
-                areaStyle: { color: themeColors.border, opacity: 0.1 },
-              },
-              selectedDataBackground: {
-                lineStyle: { color: themeColors.primary },
-                areaStyle: { color: themeColors.primary, opacity: 0.1 },
+              emphasis: {
+                handleStyle: { color: themeColors.foreground },
               },
             },
           ]
@@ -878,7 +887,6 @@ export function MultiLineChart({
     themeColors.border,
     themeColors.muted,
     themeColors.surface,
-    themeColors.primary,
     xAxis,
     yAxis,
     secondaryYAxis,
@@ -1033,7 +1041,9 @@ export function MultiLineChart({
                 <div className="flex flex-col gap-2">
                   {groups.map(group => (
                     <div key={group.name ?? '__ungrouped__'} className="flex items-center gap-2">
-                      {group.name && <span className="text-xs text-muted">{group.name}:</span>}
+                      {group.name && (
+                        <span className="shrink-0 text-xs whitespace-nowrap text-muted">{group.name}</span>
+                      )}
                       <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5">
                         {group.items.map(s => {
                           const isVisible = visibleSeries.has(s.name);
@@ -1129,7 +1139,9 @@ export function MultiLineChart({
                 <div className="flex flex-col gap-2">
                   {groups.map(group => (
                     <div key={group.name ?? '__ungrouped__'} className="flex items-center gap-2">
-                      {group.name && <span className="text-xs text-muted">{group.name}:</span>}
+                      {group.name && (
+                        <span className="shrink-0 text-xs whitespace-nowrap text-muted">{group.name}</span>
+                      )}
                       <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5">
                         {group.items.map(s => {
                           const isVisible = visibleSeries.has(s.name);
