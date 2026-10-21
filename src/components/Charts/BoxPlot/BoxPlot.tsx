@@ -8,6 +8,14 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { BoxPlotProps } from './BoxPlot.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
+import {
+  getChartAxisLabelStyle,
+  getChartAxisLine,
+  getChartAxisNameStyle,
+  getChartTooltipChrome,
+  getChartValueAxisName,
+  getChartValueSplitLine,
+} from '../chartChrome';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -57,7 +65,7 @@ echarts.use([BoxplotChart, GridComponent, TooltipComponent, TitleComponent, Lege
 export function BoxPlot({
   series = [],
   title,
-  titleFontSize = 16,
+  titleFontSize = 14,
   titleFontFamily,
   titleFontWeight = 600,
   titleLeft = 'center',
@@ -130,7 +138,7 @@ export function BoxPlot({
       grid: {
         left: 60,
         right: 24,
-        top: title ? 40 : 16,
+        top: title ? 40 : yAxisTitle ? 32 : 16,
         bottom: 50,
       },
       xAxis: {
@@ -139,23 +147,10 @@ export function BoxPlot({
         name: xAxisTitle,
         nameLocation: 'middle' as const,
         nameGap: 30,
-        nameTextStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
-        axisLine: {
-          show: true,
-          lineStyle: {
-            color: themeColors.border,
-          },
-        },
-        axisTick: {
-          show: false,
-        },
-        axisLabel: {
-          color: themeColors.muted,
-          fontSize: 11,
-        },
+        nameTextStyle: getChartAxisNameStyle(themeColors),
+        axisLine: getChartAxisLine(themeColors),
+        axisTick: { show: false },
+        axisLabel: { ...getChartAxisLabelStyle(themeColors), hideOverlap: true },
         splitLine: {
           show: false,
         },
@@ -163,43 +158,22 @@ export function BoxPlot({
       yAxis: {
         type: 'value' as const,
         name: yAxisTitle,
-        nameLocation: 'middle' as const,
-        nameGap: 65,
-        nameTextStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
+        ...getChartValueAxisName(themeColors),
         min: yMin,
         max: yMax,
         splitNumber: 5,
-        axisLine: {
-          show: true,
-          lineStyle: {
-            color: themeColors.border,
-          },
-        },
-        axisTick: {
-          show: false,
-        },
-        splitLine: {
-          show: false,
-        },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: getChartValueSplitLine(themeColors),
         axisLabel: {
-          color: themeColors.muted,
-          fontSize: 12,
+          ...getChartAxisLabelStyle(themeColors),
           formatter: yAxisFormatter,
         },
       },
       series: processedSeries,
       tooltip: {
         trigger: 'item' as const,
-        backgroundColor: themeColors.background,
-        borderColor: themeColors.border,
-        borderWidth: 1,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
+        ...getChartTooltipChrome(themeColors),
         formatter: (params: { seriesName: string; name: string; value: number[] }) => {
           const [min, q1, median, q3, max] = params.value;
           return `
@@ -233,10 +207,7 @@ export function BoxPlot({
     yMin,
     animationDuration,
     boxWidth,
-    themeColors.foreground,
-    themeColors.border,
-    themeColors.muted,
-    themeColors.background,
+    themeColors,
   ]);
 
   return (

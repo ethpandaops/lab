@@ -10,6 +10,14 @@ import { getDataVizColors } from '@/utils/dataVizColors';
 import { useSharedCrosshairs } from '@/hooks/useSharedCrosshairs';
 import type { ScatterAndLineChartProps } from './ScatterAndLine.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
+import {
+  getChartAxisLabelStyle,
+  getChartAxisLine,
+  getChartAxisNameStyle,
+  getChartTooltipChrome,
+  getChartValueAxisName,
+  getChartValueSplitLine,
+} from '../chartChrome';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -92,7 +100,7 @@ export function ScatterAndLineChart({
       grid: {
         left: 60,
         right: yAxis2Title ? 80 : 24, // Extra space for secondary y-axis if present
-        top: 16,
+        top: yAxisTitle || yAxis2Title ? 32 : 16,
         bottom: showLegend && legendPosition === 'bottom' ? 80 : 50, // Space for legend if present
       },
       xAxis: {
@@ -100,22 +108,15 @@ export function ScatterAndLineChart({
         name: xAxisTitle,
         nameLocation: 'middle' as const,
         nameGap: 32,
-        nameTextStyle: {
-          color: themeColors.muted,
-          fontSize: 12,
-        },
+        nameTextStyle: getChartAxisNameStyle(themeColors),
         min: xMin,
         max: xMax,
         interval: xInterval,
-        axisLine: {
-          show: true,
-          lineStyle: {
-            color: themeColors.border,
-          },
-        },
+        axisLine: getChartAxisLine(themeColors),
+        axisTick: { show: false },
         axisLabel: {
-          color: themeColors.muted,
-          fontSize: 12,
+          ...getChartAxisLabelStyle(themeColors),
+          hideOverlap: true,
           formatter: xAxisFormatter,
         },
         splitLine: {
@@ -127,31 +128,16 @@ export function ScatterAndLineChart({
         {
           type: 'value' as const,
           name: yAxisTitle,
-          nameLocation: 'middle' as const,
-          nameGap: 48,
-          nameTextStyle: {
-            color: themeColors.muted,
-            fontSize: 12,
-          },
+          ...getChartValueAxisName(themeColors),
           min: yMin,
           max: yMax,
-          axisLine: {
-            show: true,
-            lineStyle: {
-              color: themeColors.border,
-            },
-          },
-          axisTick: {
-            show: false,
-          },
+          axisLine: { show: false },
+          axisTick: { show: false },
           axisLabel: {
-            color: themeColors.muted,
-            fontSize: 12,
+            ...getChartAxisLabelStyle(themeColors),
             formatter: yAxisFormatter,
           },
-          splitLine: {
-            show: false,
-          },
+          splitLine: getChartValueSplitLine(themeColors),
         },
         // Secondary Y-axis (right) - only if yAxis2Title is provided
         ...(yAxis2Title
@@ -159,27 +145,18 @@ export function ScatterAndLineChart({
               {
                 type: 'value' as const,
                 name: yAxis2Title,
-                nameLocation: 'middle' as const,
-                nameGap: 50,
+                nameLocation: 'end' as const,
+                nameGap: 10,
                 nameTextStyle: {
-                  color: themeColors.muted,
-                  fontSize: 12,
+                  ...getChartAxisNameStyle(themeColors),
+                  align: 'right' as const,
+                  padding: [0, -8, 0, 0],
                 },
                 min: yAxis2Min,
                 max: yAxis2Max,
-                axisLine: {
-                  show: true,
-                  lineStyle: {
-                    color: themeColors.border,
-                  },
-                },
-                axisTick: {
-                  show: false,
-                },
-                axisLabel: {
-                  color: themeColors.muted,
-                  fontSize: 12,
-                },
+                axisLine: { show: false },
+                axisTick: { show: false },
+                axisLabel: getChartAxisLabelStyle(themeColors),
                 splitLine: {
                   show: false,
                 },
@@ -190,13 +167,7 @@ export function ScatterAndLineChart({
       tooltip: {
         trigger: tooltipTrigger,
         triggerOn: 'mousemove' as const,
-        backgroundColor: themeColors.background,
-        borderColor: themeColors.border,
-        borderWidth: 1,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
+        ...getChartTooltipChrome(themeColors),
         axisPointer:
           tooltipTrigger === 'axis'
             ? {
@@ -307,10 +278,7 @@ export function ScatterAndLineChart({
     legendType,
     animation,
     animationDuration,
-    themeColors.foreground,
-    themeColors.border,
-    themeColors.muted,
-    themeColors.background,
+    themeColors,
   ]);
 
   return (

@@ -797,7 +797,7 @@ export function MultiLineChart({
       borderColor: themeColors.border,
       borderWidth: 1,
       padding: [8, 10],
-      extraCssText: 'border-radius: 6px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);',
+      extraCssText: 'border-radius: 6px;',
       textStyle: {
         color: themeColors.foreground,
         fontSize: 12,

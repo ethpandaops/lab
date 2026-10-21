@@ -15,6 +15,13 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { resolveCssColorToHex } from '@/utils/color';
 import type { HeatmapChartProps } from './Heatmap.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
+import {
+  getChartAxisLabelStyle,
+  getChartAxisLine,
+  getChartAxisNameStyle,
+  getChartTitleTextStyle,
+  getChartTooltipChrome,
+} from '../chartChrome';
 
 // Register ECharts components
 echarts.use([
@@ -95,11 +102,7 @@ export function HeatmapChart({
     title: title
       ? {
           text: title,
-          textStyle: {
-            color: themeColors.foreground,
-            fontSize: 16,
-            fontWeight: 600,
-          },
+          textStyle: getChartTitleTextStyle(themeColors),
           left: 'center',
           top: 8,
         }
@@ -117,26 +120,18 @@ export function HeatmapChart({
       name: xAxisTitle,
       nameLocation: 'middle',
       nameGap: 25,
-      nameTextStyle: {
-        color: themeColors.foreground,
-        fontSize: 12,
-        fontWeight: 600,
-      },
+      nameTextStyle: getChartAxisNameStyle(themeColors),
       splitArea: {
         show: false,
       },
-      axisLine: {
-        show: true,
-        lineStyle: {
-          color: themeColors.border,
-        },
-      },
+      axisLine: getChartAxisLine(themeColors),
+      axisTick: { show: false },
       splitLine: {
         show: false,
       },
       axisLabel: {
-        color: themeColors.muted,
-        fontSize: 10,
+        ...getChartAxisLabelStyle(themeColors),
+        hideOverlap: true,
         rotate: xAxisLabelRotate,
         interval: xAxisShowOnlyMinMax ? (index: number) => index === 0 || index === xLabels.length - 1 : xAxisInterval,
       },
@@ -148,26 +143,17 @@ export function HeatmapChart({
       name: yAxisTitle,
       nameLocation: 'middle',
       nameGap: 50,
-      nameTextStyle: {
-        color: themeColors.foreground,
-        fontSize: 12,
-        fontWeight: 600,
-      },
+      nameTextStyle: getChartAxisNameStyle(themeColors),
       splitArea: {
         show: false,
       },
-      axisLine: {
-        show: true,
-        lineStyle: {
-          color: themeColors.border,
-        },
-      },
+      axisLine: getChartAxisLine(themeColors),
+      axisTick: { show: false },
       splitLine: {
         show: false,
       },
       axisLabel: {
-        color: themeColors.muted,
-        fontSize: 12,
+        ...getChartAxisLabelStyle(themeColors),
         interval: yAxisShowOnlyMinMax ? (index: number) => index === 0 || index === yLabels.length - 1 : undefined,
       },
     },
@@ -310,13 +296,7 @@ export function HeatmapChart({
     ],
     tooltip: {
       trigger: 'item',
-      backgroundColor: themeColors.background,
-      borderColor: themeColors.border,
-      borderWidth: 1,
-      textStyle: {
-        color: themeColors.foreground,
-        fontSize: 12,
-      },
+      ...getChartTooltipChrome(themeColors),
       formatter: tooltipFormatter
         ? (params: { value: [number, number, number] }) => tooltipFormatter(params, xLabels, yLabels)
         : (params: { value: [number, number, number] }) => {
