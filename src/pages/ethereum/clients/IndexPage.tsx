@@ -1,6 +1,5 @@
 import { type JSX, useCallback, useMemo } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import clsx from 'clsx';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
@@ -10,6 +9,7 @@ import { Stats } from '@/components/DataDisplay/Stats';
 import { Toggle } from '@/components/Forms/Toggle';
 import { Button } from '@/components/Elements/Button';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useTableBounds } from '@/hooks/useBounds';
 import { getClientColor } from '@/utils/ethereum';
 import { buildTooltipHtml, formatTooltipDate } from '@/pages/ethereum/execution/overview/overview.utils';
@@ -162,23 +162,12 @@ export function IndexPage(): JSX.Element {
       ) : (
         <div className="flex flex-col gap-6">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            <div className="flex flex-wrap items-center gap-1.5">
-              {TIME_PERIOD_OPTIONS.map(({ value, label }) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setSearch({ t: value })}
-                  className={clsx(
-                    'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                    timePeriod === value
-                      ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
-                      : 'bg-surface text-muted ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
-                  )}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+            <SegmentedControl
+              options={TIME_PERIOD_OPTIONS}
+              value={timePeriod}
+              onChange={value => setSearch({ t: value })}
+              ariaLabel="Time window"
+            />
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
               {entityOptions.options.length > 0 && (
                 <EntityFilter

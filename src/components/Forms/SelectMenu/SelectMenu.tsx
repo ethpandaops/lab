@@ -50,7 +50,7 @@ export function SelectMenu<T>({
       <div className={clsx('relative', showLabel && 'mt-2', className)}>
         <ListboxButton
           className={clsx(
-            'relative cursor-pointer border border-border bg-surface/50 py-2 pr-10 pl-3 text-left shadow-xs backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-surface/70 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50',
+            'relative h-8 cursor-pointer border border-border bg-surface pr-8 pl-2.5 text-left text-sm transition-colors hover:border-primary/40 disabled:cursor-not-allowed disabled:opacity-50',
             rounded && 'rounded-sm',
             expandToFit ? 'w-auto min-w-[140px]' : 'w-full'
           )}
@@ -65,7 +65,7 @@ export function SelectMenu<T>({
             </span>
           </span>
           <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-            <ChevronUpDownIcon aria-hidden="true" className="size-5 text-muted" />
+            <ChevronUpDownIcon aria-hidden="true" className="size-4 text-muted" />
           </span>
         </ListboxButton>
 
@@ -82,7 +82,7 @@ export function SelectMenu<T>({
             <ListboxOption
               key={index}
               value={option.value}
-              className="relative cursor-pointer py-2 pr-9 pl-3 text-foreground transition-colors select-none data-focus:bg-primary/10 data-focus:text-primary data-selected:text-primary"
+              className="relative cursor-pointer py-1.5 pr-9 pl-2.5 text-sm text-foreground transition-colors select-none data-focus:bg-primary/10 data-focus:text-primary data-selected:text-primary"
             >
               <span className="flex items-center gap-2">
                 {option.icon && <span className="flex size-5 shrink-0 items-center justify-center">{option.icon}</span>}

@@ -22,6 +22,7 @@ import {
   createBlobScheduleMarkLines,
 } from '@/components/Charts/MultiLine';
 import { BarChart } from '@/components/Charts/Bar';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import {
   fctOpcodeOpsHourlyServiceList,
   fctOpcodeOpsDailyServiceList,
@@ -1133,23 +1134,12 @@ export function HomePage(): JSX.Element {
 
       {/* Time Period Selector & Filters */}
       <div className="mb-6 flex flex-wrap items-center gap-6">
-        <div className="flex flex-wrap items-center gap-1.5">
-          {TIME_PERIOD_OPTIONS.map(({ value, label }) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => navigate({ search: prev => ({ ...prev, t: value }), replace: true, resetScroll: false })}
-              className={clsx(
-                'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                timePeriod === value
-                  ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
-                  : 'bg-surface text-muted ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
-              )}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          options={TIME_PERIOD_OPTIONS}
+          value={timePeriod}
+          onChange={value => navigate({ search: prev => ({ ...prev, t: value }), replace: true, resetScroll: false })}
+          ariaLabel="Time window"
+        />
 
         {/* TODO: Enable when fork annotation data is available
         <div className="flex items-center gap-2">

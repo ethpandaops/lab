@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { useMemo } from 'react';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
-import clsx from 'clsx';
 
 import { Alert } from '@/components/Feedback/Alert';
 import { Container } from '@/components/Layout/Container';
@@ -9,6 +8,7 @@ import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Tab } from '@/components/Navigation/Tab';
 import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
 import { useTabState } from '@/hooks/useTabState';
 import { Route } from '@/routes/ethereum/entities/$entity';
@@ -114,23 +114,13 @@ export function DetailPage(): React.JSX.Element {
           <TabPanels className="mt-6">
             {/* Validators Tab */}
             <TabPanel>
-              <div className="mb-6 flex flex-wrap items-center gap-1.5">
-                {TIME_PERIOD_OPTIONS.map(({ value, label }) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => navigate({ search: prev => ({ ...prev, t: value }), replace: true })}
-                    className={clsx(
-                      'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                      timePeriod === value
-                        ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
-                        : 'bg-surface text-muted ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
-                    )}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
+              <SegmentedControl
+                options={TIME_PERIOD_OPTIONS}
+                value={timePeriod}
+                onChange={value => navigate({ search: prev => ({ ...prev, t: value }), replace: true })}
+                ariaLabel="Time window"
+                className="mb-6"
+              />
               {validatorStatus.isLoading ? (
                 <LoadingContainer className="h-96" />
               ) : validatorStatus.error ? (
