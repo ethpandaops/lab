@@ -101,7 +101,7 @@ function InfoTooltip({ title, description }: { title: string; description: strin
   const tooltipContent = isVisible && (
     <div
       role="tooltip"
-      className="fixed z-[9999] w-64 -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background p-3 shadow-lg"
+      className="fixed z-[9999] w-64 -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background p-3"
       style={{ top: position.top, left: position.left }}
     >
       <div className="mb-1.5 text-sm font-medium text-foreground">{title}</div>
@@ -307,7 +307,7 @@ export function GasScheduleDrawer({
                 leaveTo="translate-x-full"
               >
                 <DialogPanel className="pointer-events-auto w-screen max-w-lg">
-                  <div className="flex h-full flex-col overflow-y-auto bg-background shadow-xl">
+                  <div className="flex h-full flex-col overflow-y-auto bg-background">
                     {/* Header */}
                     <div className="border-b border-border px-4 py-4">
                       <div className="flex items-center justify-between">
@@ -348,7 +348,7 @@ export function GasScheduleDrawer({
                           type="button"
                           onClick={() => setActiveCategory(null)}
                           className={clsx(
-                            'rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
+                            'rounded-xs px-2.5 py-1 text-xs font-medium transition-colors',
                             activeCategory === null
                               ? 'bg-primary text-white'
                               : 'bg-surface text-muted hover:text-foreground'
@@ -362,7 +362,7 @@ export function GasScheduleDrawer({
                             type="button"
                             onClick={() => setActiveCategory(prev => (prev === group.name ? null : group.name))}
                             className={clsx(
-                              'rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
+                              'rounded-xs px-2.5 py-1 text-xs font-medium transition-colors',
                               activeCategory === group.name
                                 ? 'text-white'
                                 : 'bg-surface text-muted hover:text-foreground'
@@ -400,7 +400,7 @@ export function GasScheduleDrawer({
                             return (
                               <span
                                 key={key}
-                                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs"
+                                className="inline-flex items-center gap-1 rounded-xs bg-primary/10 px-2.5 py-1 text-xs"
                               >
                                 <span className="font-medium text-foreground">{key}</span>
                                 <span className="text-muted">
@@ -434,7 +434,7 @@ export function GasScheduleDrawer({
                                 <span className="size-2.5 rounded-full" style={{ backgroundColor: group.color }} />
                                 <span className="text-sm font-medium text-foreground">{group.name}</span>
                                 {modCount > 0 && (
-                                  <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-2xs font-medium text-primary">
+                                  <span className="rounded-xs bg-primary/10 px-1.5 py-0.5 text-2xs font-medium text-primary">
                                     {modCount}
                                   </span>
                                 )}

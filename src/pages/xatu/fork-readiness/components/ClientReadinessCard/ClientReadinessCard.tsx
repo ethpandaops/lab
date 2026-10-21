@@ -11,31 +11,30 @@ export function ClientReadinessCard({ data }: ClientReadinessCardProps): JSX.Ele
   const { clientName, totalNodes, readyNodes, readyPercentage, minVersion, nodes } = data;
 
   return (
-    <Card className="p-6">
-      {/* Header: Client logo + name + ready count */}
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <ClientLogo client={clientName} size={48} />
-          <div>
-            <h3 className="text-lg font-semibold text-foreground capitalize">{clientName}</h3>
-            <Badge color="gray" variant="flat">
-              v{minVersion}+
-            </Badge>
-          </div>
-        </div>
-        <div className="text-right">
-          <div className="text-2xl font-bold text-foreground">
-            {readyNodes}/{totalNodes}
-          </div>
-        </div>
-      </div>
-
+    <Card
+      title={
+        <span className="flex items-center gap-2 capitalize">
+          <ClientLogo client={clientName} size={28} />
+          {clientName}
+        </span>
+      }
+      subtitle={
+        <Badge color="gray" variant="flat">
+          v{minVersion}+
+        </Badge>
+      }
+      actions={
+        <span className="text-2xl/8 font-semibold text-foreground">
+          {readyNodes}/{totalNodes}
+        </span>
+      }
+    >
       {/* Progress bar */}
-      <div className="-mt-2 mb-4">
+      <div className="mb-4">
         <ProgressBar
           progress={readyPercentage}
           fillColor={readyPercentage === 100 ? 'bg-success' : 'bg-warning'}
-          backgroundColor="bg-zinc-800"
+          backgroundColor="bg-border"
           ariaLabel={`${clientName} readiness`}
         />
       </div>

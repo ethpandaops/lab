@@ -1,6 +1,8 @@
 import { type JSX, useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { BarChart } from '@/components/Charts/Bar';
+import { Button } from '@/components/Elements/Button';
+import { Card } from '@/components/Layout/Card';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { CATEGORY_COLORS, getOpcodeCategory } from '../../utils';
 
@@ -308,7 +310,7 @@ function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JS
 
           return createPortal(
             <div
-              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap shadow-lg"
+              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap"
               style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
             >
               <div className="font-mono font-semibold">{hoveredOpcode}</div>
@@ -457,15 +459,9 @@ function OpcodeTable({ opcodeStats, searchTerm }: { opcodeStats: OpcodeStats[]; 
       {/* Show More Button */}
       {hasMore && (
         <div className="flex justify-center border-t border-border py-4">
-          <button
-            onClick={() => setVisibleCount(sortedData.length)}
-            className="flex items-center gap-2 rounded-sm border border-border bg-surface px-4 py-2 text-sm text-foreground transition-colors hover:bg-background"
-          >
+          <Button variant="secondary" size="sm" onClick={() => setVisibleCount(sortedData.length)}>
             Show All ({remainingCount} more)
-            <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
+          </Button>
         </div>
       )}
     </div>
@@ -491,11 +487,19 @@ export function OpcodeAnalysis({
 
   if (opcodeStats.length === 0) {
     return (
-      <div className="rounded-sm border border-border bg-surface/30 p-8 text-center text-sm text-muted">
-        No opcode data available
-      </div>
+      <div className="rounded-sm border border-border p-8 text-center text-sm text-muted">No opcode data available</div>
     );
   }
+
+  const searchInput = (
+    <input
+      type="text"
+      placeholder="Search opcodes..."
+      value={searchTerm}
+      onChange={e => setSearchTerm(e.target.value)}
+      className="h-8 rounded-sm border border-border bg-surface px-3 text-sm text-foreground placeholder:text-muted focus:border-primary focus:outline-none"
+    />
+  );
 
   return (
     <div className="space-y-6">
@@ -525,21 +529,12 @@ export function OpcodeAnalysis({
 
       {/* Full-width table */}
       {showTable && (
-        <div>
-          <div className="mb-4 flex items-center justify-between">
-            {showHeader && <h3 className="text-sm font-medium text-foreground">Opcode Details</h3>}
-            <input
-              type="text"
-              placeholder="Search opcodes..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="ml-auto rounded-xs border border-border bg-surface px-3 py-1.5 text-sm text-foreground placeholder:text-muted focus:border-primary focus:outline-none"
-            />
-          </div>
+        <Card title={showHeader ? 'Opcode Details' : undefined} actions={searchInput}>
+          {!showHeader && <div className="mb-4 flex justify-end">{searchInput}</div>}
           <div className="overflow-hidden rounded-sm border border-border">
             <OpcodeTable opcodeStats={opcodeStats} searchTerm={searchTerm} />
           </div>
-        </div>
+        </Card>
       )}
     </div>
   );

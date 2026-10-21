@@ -1,3 +1,4 @@
+import { Badge } from '@/components/Elements/Badge';
 import { type JSX, useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useSearch, Link } from '@tanstack/react-router';
 import {
@@ -8,7 +9,6 @@ import {
   AdjustmentsHorizontalIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  XMarkIcon,
   ArrowPathIcon,
   FireIcon,
   ArrowsRightLeftIcon,
@@ -101,8 +101,8 @@ function formatDelta(percent: number): string {
 }
 
 function getDeltaColor(percent: number): string {
-  if (percent < -5) return 'text-green-500';
-  if (percent > 5) return 'text-red-500';
+  if (percent < -5) return 'text-success';
+  if (percent > 5) return 'text-danger';
   return 'text-muted';
 }
 
@@ -771,7 +771,7 @@ export function SimulatePage(): JSX.Element {
                 <AdjustmentsHorizontalIcon className="size-4" />
                 Configure
                 {modifiedCount > 0 && (
-                  <span className="rounded-full bg-primary px-1.5 py-0.5 text-xs text-white">{modifiedCount}</span>
+                  <span className="rounded-xs bg-primary px-1.5 py-0.5 text-xs text-white">{modifiedCount}</span>
                 )}
               </button>
             </div>
@@ -840,26 +840,16 @@ export function SimulatePage(): JSX.Element {
         )}
         {defaultsError &&
           (isSyncingError(defaultsError) ? (
-            <div
-              className="mt-3 overflow-hidden rounded-sm border border-amber-400/30 dark:border-amber-500/20"
-              role="status"
-              aria-live="polite"
-            >
-              <div className="flex items-start gap-3 bg-amber-50/80 p-3.5 dark:bg-amber-500/5">
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-xs bg-amber-100 dark:bg-amber-500/15">
-                  <ArrowPathIcon
-                    className="size-4 animate-spin text-amber-600 dark:text-amber-400"
-                    style={{ animationDuration: '2s' }}
-                  />
+            <div className="mt-3 overflow-hidden rounded-sm border border-warning/30" role="status" aria-live="polite">
+              <div className="flex items-start gap-3 bg-warning/5 p-3.5">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-xs bg-warning/15">
+                  <ArrowPathIcon className="size-4 animate-spin text-warning" style={{ animationDuration: '2s' }} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm/5 font-medium text-amber-800 dark:text-amber-200">Backend nodes are syncing</p>
-                  <p className="mt-0.5 text-xs/4 text-amber-700/70 dark:text-amber-300/60">
-                    Check back shortly and try again.
-                  </p>
+                  <p className="text-sm/5 font-medium text-foreground">Backend nodes are syncing</p>
+                  <p className="mt-0.5 text-xs/4 text-muted">Check back shortly and try again.</p>
                 </div>
               </div>
-              <div className="h-px animate-pulse bg-linear-to-r from-transparent via-amber-400/50 to-transparent" />
             </div>
           ) : (
             <Alert
@@ -886,25 +876,18 @@ export function SimulatePage(): JSX.Element {
           {modifiedEntries.map(([key, value]) => {
             const defaultVal = gasScheduleDefaults?.parameters[key]?.value ?? 0;
             return (
-              <span key={key} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs">
+              <Badge key={key} variant="flat" onRemove={() => handleRemoveOverride(key)}>
                 <span className="font-medium text-foreground">{key}</span>
-                <span className="text-muted">
+                <span className="ml-1 text-muted">
                   {defaultVal}→{value}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveOverride(key)}
-                  className="ml-0.5 text-muted hover:text-foreground"
-                >
-                  <XMarkIcon className="size-3" />
-                </button>
-              </span>
+              </Badge>
             );
           })}
           <button
             type="button"
             onClick={() => setGasSchedule({})}
-            className="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs text-muted transition-colors hover:text-foreground"
+            className="flex items-center gap-1 rounded-sm px-2.5 py-1 text-xs text-muted transition-colors hover:text-foreground"
           >
             <ArrowPathIcon className="size-3" />
             Reset All
@@ -942,10 +925,9 @@ export function SimulatePage(): JSX.Element {
                 <span className="text-sm font-medium text-foreground">
                   Block {simState.currentBlock !== null ? formatGas(simState.currentBlock) : '...'}
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-2xs font-semibold tracking-wide text-primary uppercase">
-                  <span className="size-1.5 animate-pulse rounded-full bg-primary" />
+                <Badge variant="flat" size="small" dot>
                   Simulating
-                </span>
+                </Badge>
               </div>
               <div className="mt-1 flex items-center gap-3 text-xs text-muted">
                 <span>
@@ -987,16 +969,7 @@ export function SimulatePage(): JSX.Element {
             <Card className="overflow-hidden">
               <div className="flex items-start gap-4 p-5" role="status" aria-live="polite">
                 <div className="relative flex size-10 shrink-0 items-center justify-center">
-                  <div
-                    className="absolute inset-0 animate-ping rounded-full bg-amber-400/15"
-                    style={{ animationDuration: '3s' }}
-                  />
-                  <div className="flex size-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-500/10">
-                    <ArrowPathIcon
-                      className="size-5 animate-spin text-amber-500 dark:text-amber-400"
-                      style={{ animationDuration: '2s' }}
-                    />
-                  </div>
+                  <ArrowPathIcon className="size-5 animate-spin text-warning" style={{ animationDuration: '2s' }} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-sm font-semibold text-foreground">Backend Syncing</h3>
@@ -1009,7 +982,6 @@ export function SimulatePage(): JSX.Element {
                   </p>
                 </div>
               </div>
-              <div className="h-px animate-pulse bg-linear-to-r from-transparent via-amber-400/40 to-transparent" />
             </Card>
           ) : (
             <Alert variant="error" title="Simulation failed" description={simState.error ?? 'Unknown error'} />
@@ -1109,7 +1081,7 @@ export function SimulatePage(): JSX.Element {
             <button
               type="button"
               onClick={() => scrollBlockStrip('left')}
-              className="absolute top-1/2 -left-1 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background shadow-sm transition-colors hover:bg-surface"
+              className="absolute top-1/2 -left-1 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-sm border border-border bg-background transition-colors hover:bg-surface"
             >
               <ChevronLeftIcon className="size-4 text-muted" />
             </button>
@@ -1120,7 +1092,7 @@ export function SimulatePage(): JSX.Element {
             <button
               type="button"
               onClick={() => scrollBlockStrip('right')}
-              className="absolute top-1/2 -right-1 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background shadow-sm transition-colors hover:bg-surface"
+              className="absolute top-1/2 -right-1 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-sm border border-border bg-background transition-colors hover:bg-surface"
             >
               <ChevronRightIcon className="size-4 text-muted" />
             </button>
@@ -1146,9 +1118,7 @@ export function SimulatePage(): JSX.Element {
                   onClick={() => setSelectedBlockIndex(index)}
                   className={clsx(
                     'group relative flex shrink-0 flex-col rounded-sm border transition-all',
-                    isSelected
-                      ? 'border-primary bg-primary/10 shadow-xs'
-                      : 'border-border bg-background hover:border-muted hover:shadow-xs'
+                    isSelected ? 'border-primary bg-primary/10' : 'border-border bg-background hover:border-muted'
                   )}
                   style={{ minWidth: '7.5rem' }}
                 >
@@ -1160,7 +1130,7 @@ export function SimulatePage(): JSX.Element {
                   )}
                   {/* Top section: label + block number */}
                   <div className="px-3 pt-2 pb-1.5">
-                    <div className="text-2xs font-semibold tracking-wider text-muted uppercase">Block</div>
+                    <div className="text-2xs font-semibold text-muted">Block</div>
                     <div
                       className={clsx(
                         'font-mono text-sm tabular-nums',
@@ -1189,7 +1159,7 @@ export function SimulatePage(): JSX.Element {
                       <div
                         className={clsx(
                           'font-mono text-xs font-semibold tabular-nums',
-                          divergedCount > 0 ? 'text-amber-500' : 'text-muted'
+                          divergedCount > 0 ? 'text-warning' : 'text-muted'
                         )}
                       >
                         {divergedCount}
@@ -1214,7 +1184,7 @@ export function SimulatePage(): JSX.Element {
                   style={{ minWidth: '7.5rem' }}
                 >
                   <div className="px-3 pt-2 pb-1.5">
-                    <div className="text-2xs font-semibold tracking-wider text-muted/40 uppercase">Block</div>
+                    <div className="text-2xs font-semibold text-muted">Block</div>
                     <div className="font-mono text-sm text-muted/30 tabular-nums">
                       {startBlockNumber !== null ? formatGas(startBlockNumber + simState.completedBlocks + i) : '...'}
                     </div>

@@ -2,6 +2,7 @@ import { type JSX } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fctBlockFirstSeenByNodeServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
+import { ChartEmptyState } from '../ChartEmptyState';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { formatSlot } from '@/utils';
 import { useLatencyChartSeries } from '../../hooks/useLatencyChartData';
@@ -57,11 +58,7 @@ export function BlockLatencyChart({ username }: BlockLatencyChartProps): JSX.Ele
   }
 
   if (dataCount === 0) {
-    return (
-      <div className="flex h-[400px] items-center justify-center rounded-sm border border-border bg-surface text-muted">
-        No block data available for this time range
-      </div>
-    );
+    return <ChartEmptyState subject="block" />;
   }
 
   return (

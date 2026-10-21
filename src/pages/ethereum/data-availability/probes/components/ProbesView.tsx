@@ -279,11 +279,11 @@ export function ProbesView({
           // failure = yellow (transient/one-off failure - less severe)
           // missing = red (peer responded but didn't have the data - serious)
           const icon = isSuccess ? (
-            <CheckCircleIcon className="size-3.5 text-green-500" />
+            <CheckCircleIcon className="size-3.5 text-success" />
           ) : isFailure ? (
-            <XCircleIcon className="size-3.5 text-yellow-500" />
+            <XCircleIcon className="size-3.5 text-warning" />
           ) : (
-            <QuestionMarkCircleIcon className="size-3.5 text-red-500" />
+            <QuestionMarkCircleIcon className="size-3.5 text-danger" />
           );
 
           return (
@@ -291,14 +291,14 @@ export function ProbesView({
               <div
                 className={`inline-flex items-center gap-1 rounded-xs px-1.5 py-0.5 ${
                   isSuccess
-                    ? 'bg-green-500/10 text-green-500'
+                    ? 'bg-success/10 text-success'
                     : isFailure
-                      ? 'bg-yellow-500/10 text-yellow-500'
-                      : 'bg-red-500/10 text-red-500'
+                      ? 'bg-warning/10 text-warning'
+                      : 'bg-danger/10 text-danger'
                 }`}
               >
                 {icon}
-                <span className="text-2xs font-semibold tracking-wide uppercase">{result}</span>
+                <span className="text-2xs font-semibold capitalize">{result}</span>
               </div>
             </FilterableCell>
           );
@@ -468,9 +468,9 @@ export function ProbesView({
         cell: info => {
           const ms = info.getValue();
           if (!ms) return <span className="text-muted">-</span>;
-          let color = 'text-green-500';
-          if (ms > 4000) color = 'text-yellow-500';
-          if (ms > 8000) color = 'text-red-500';
+          let color = 'text-success';
+          if (ms > 4000) color = 'text-warning';
+          if (ms > 8000) color = 'text-danger';
           return <span className={`font-mono text-xs ${color}`}>{ms}ms</span>;
         },
         enableSorting: true,
@@ -503,7 +503,7 @@ export function ProbesView({
           const error = info.getValue();
           if (!error) return <span className="text-muted">-</span>;
           return (
-            <span className="text-2xs text-red-400" title={error}>
+            <span className="text-2xs text-danger" title={error}>
               {truncateHash(error, 20)}
             </span>
           );
@@ -690,41 +690,27 @@ export function ProbesView({
         <div className="flex shrink-0 items-center gap-2">
           {/* Live mode toggle */}
           {onLiveModeToggle && (
-            <button
-              type="button"
+            <Button
+              variant="outline"
+              size="sm"
+              aria-pressed={isLive}
               onClick={onLiveModeToggle}
-              className={`inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-sm font-medium transition-all ${
-                isLive
-                  ? 'border-green-500/50 bg-green-500/20 text-green-400 hover:bg-green-500/30'
-                  : 'border-border bg-surface text-muted hover:border-primary/30 hover:text-foreground'
-              }`}
+              className={isLive ? 'bg-success/10! text-success! inset-ring-success/50!' : 'text-muted!'}
+              leadingIcon={isLive ? <PauseIcon /> : <PlayIcon />}
             >
-              {isLive ? (
-                <>
-                  <span className="relative flex size-2">
-                    <span className="absolute inline-flex size-full animate-ping rounded-full bg-green-400 opacity-75" />
-                    <span className="relative inline-flex size-2 rounded-full bg-green-500" />
-                  </span>
-                  <PauseIcon className="size-4" />
-                  <span>Live</span>
-                </>
-              ) : (
-                <>
-                  <PlayIcon className="size-4" />
-                  <span>Go Live</span>
-                </>
-              )}
-            </button>
+              {isLive && <span className="size-2 rounded-full bg-success" />}
+              {isLive ? 'Live' : 'Go Live'}
+            </Button>
           )}
           {/* Learn more button */}
-          <button
-            type="button"
+          <Button
+            variant="soft"
+            size="sm"
+            leadingIcon={<InformationCircleIcon />}
             onClick={() => setLearnMoreOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-all hover:border-primary/50 hover:bg-primary/20"
           >
-            <InformationCircleIcon className="size-4" />
             Learn more
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -758,15 +744,14 @@ export function ProbesView({
             </p>
             <ul className="mt-2 space-y-1 text-sm">
               <li>
-                <span className="font-medium text-green-500">Success</span> - Peer provided valid data matching KZG
+                <span className="font-medium text-success">Success</span> - Peer provided valid data matching KZG
                 commitments
               </li>
               <li>
-                <span className="font-medium text-yellow-500">Failure</span> - Transient error (timeout, connection
-                issue)
+                <span className="font-medium text-warning">Failure</span> - Transient error (timeout, connection issue)
               </li>
               <li>
-                <span className="font-medium text-red-500">Missing</span> - Peer responded but didn&apos;t have the data
+                <span className="font-medium text-danger">Missing</span> - Peer responded but didn&apos;t have the data
               </li>
             </ul>
           </div>
@@ -784,7 +769,7 @@ export function ProbesView({
       </div>
 
       {/* Data table */}
-      <div className="overflow-hidden rounded-lg border border-border bg-surface">
+      <div className="overflow-hidden rounded-sm border border-border bg-surface">
         {isLive ? (
           // Live mode - simple table without pagination
           <DataTable

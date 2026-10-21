@@ -78,12 +78,7 @@ export function TokenStorageShareCard({ data }: TokenStorageShareCardProps): JSX
     : undefined;
 
   return (
-    <Card rounded className="p-4">
-      {/* Match the "Historical State Growth" PopoutCard title typography */}
-      <div className="mb-3">
-        <h3 className="truncate text-lg/7 font-semibold text-foreground">Storage Slots by Token Type</h3>
-        {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
-      </div>
+    <Card rounded title="Storage Slots by Token Type" subtitle={subtitle}>
       <StackedBar
         segments={segments}
         total={snapshot?.total}

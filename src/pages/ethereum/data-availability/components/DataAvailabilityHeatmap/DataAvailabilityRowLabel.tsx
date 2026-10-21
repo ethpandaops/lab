@@ -137,7 +137,7 @@ export function DataAvailabilityRowLabel({
       {/* Type badge */}
       <span
         className={clsx(
-          'w-8 shrink-0 rounded-xs px-1 py-px text-center text-2xs font-medium tracking-wide uppercase transition-colors',
+          'w-8 shrink-0 rounded-xs px-1 py-px text-center text-2xs font-medium transition-colors',
           isHovered && effectiveCanDrillDown ? 'bg-accent/20 text-accent' : 'bg-muted/20 text-muted'
         )}
       >

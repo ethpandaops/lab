@@ -28,7 +28,7 @@ function getCallTypeStyles(callType: string): { bg: string; text: string } {
     case 'CREATE':
       return { bg: 'bg-orange-500/10', text: 'text-orange-500' };
     case 'CREATE2':
-      return { bg: 'bg-amber-500/10', text: 'text-amber-500' };
+      return { bg: 'bg-warning/10', text: 'text-warning' };
     case 'DELEGATECALL':
       return { bg: 'bg-purple-500/10', text: 'text-purple-400' };
     case 'STATICCALL':

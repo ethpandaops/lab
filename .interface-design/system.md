@@ -187,6 +187,19 @@ Wraps Card with expand-to-modal and download capabilities.
 - Render prop `({ inModal })` for responsive chart heights
 - Download metadata footer: grid with logo, title, subtitle, branding
 
+### Long lists
+
+Any list of a sequence that goes further back than one screen (slots, epochs, an entity's
+proposals) pages through its full indexed history. Never hard-cap to "the last N" and never use
+"Load more".
+- `RangePager` (`src/components/Lists/RangePager`): range on screen, Latest / Newer / Older, and
+  "Go to" a number. Put it above the table (and below long tables).
+- Pages are addressed by their top number in the URL (`?from=`), so every page is linkable.
+- `getRangePage` clamps to the earliest indexed row from `/bounds`, so a jump past the start
+  lands on the oldest page instead of an empty one.
+- Tables that summarise a page (e.g. offline validators by entity) list every row, worst first,
+  with a name filter; charts above them may show the top N but must say so.
+
 ### Stats (KPI strip)
 
 Headline numbers are one panel, not a card per number: a hairline panel split by internal rules.

@@ -76,7 +76,7 @@ const PRESETS: QuickFilterPreset[] = [
   {
     id: 'failures',
     label: 'Failures Only',
-    icon: <XCircleIcon className="size-4 text-yellow-500" />,
+    icon: <XCircleIcon className="size-4 text-warning" />,
     filters: {
       result: 'failure',
     },
@@ -85,7 +85,7 @@ const PRESETS: QuickFilterPreset[] = [
     id: 'missing',
     label: 'Missing Data',
     description: 'Show probes where peer did not have the data',
-    icon: <ExclamationTriangleIcon className="size-4 text-red-500" />,
+    icon: <ExclamationTriangleIcon className="size-4 text-danger" />,
     filters: {
       result: 'missing',
     },
@@ -93,7 +93,7 @@ const PRESETS: QuickFilterPreset[] = [
   {
     id: 'successes',
     label: 'Successes Only',
-    icon: <CheckCircleIcon className="size-4 text-green-500" />,
+    icon: <CheckCircleIcon className="size-4 text-success" />,
     filters: {
       result: 'success',
     },
@@ -136,10 +136,10 @@ export function QuickFilters({ currentFilters, onApplyPreset, onClearFilters }: 
               onClick={() => handlePresetClick(preset)}
               title={preset.description}
               className={clsx(
-                'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-all',
+                'inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs font-medium transition-colors',
                 isActive
-                  ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
-                  : 'bg-surface/50 text-muted ring-1 ring-border hover:bg-surface hover:text-foreground hover:ring-primary/30'
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-border bg-surface text-muted hover:border-primary/40 hover:text-foreground'
               )}
             >
               {preset.blobPosterLogos ? (

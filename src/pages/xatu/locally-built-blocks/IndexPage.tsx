@@ -2,6 +2,7 @@ import { type JSX } from 'react';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
+import { InfoBox } from '@/components/Feedback/InfoBox';
 import { SlotTimeline, ClientPairingMatrix, LocallyBuiltBlocksSkeleton } from './components';
 import { useSlotBlocks } from './hooks';
 
@@ -20,6 +21,13 @@ export function IndexPage(): JSX.Element {
     error,
   } = useSlotBlocks();
 
+  const aboutNote = (
+    <InfoBox summary="What these blocks are" className="mb-6">
+      These blocks were built locally by ethPandaOps sentry nodes. They represent what each node would have proposed if
+      selected as a block proposer.
+    </InfoBox>
+  );
+
   if (error) {
     return (
       <Container>
@@ -33,13 +41,7 @@ export function IndexPage(): JSX.Element {
     return (
       <Container>
         <Header title="Locally Built Blocks" />
-        <div className="mb-6">
-          <Alert
-            variant="info"
-            title="About Locally Built Blocks"
-            description="These blocks were built locally by ethPandaOps sentry nodes. They represent what each node would have proposed if selected as a block proposer."
-          />
-        </div>
+        {aboutNote}
         <LocallyBuiltBlocksSkeleton />
       </Container>
     );
@@ -54,13 +56,7 @@ export function IndexPage(): JSX.Element {
         )}
       </div>
 
-      <div className="mb-6">
-        <Alert
-          variant="info"
-          title="About Locally Built Blocks"
-          description="These blocks were built locally by ethPandaOps sentry nodes. They represent what each node would have proposed if selected as a block proposer."
-        />
-      </div>
+      {aboutNote}
 
       <div className="space-y-6">
         <SlotTimeline

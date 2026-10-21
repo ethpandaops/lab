@@ -2,10 +2,11 @@ import { type JSX, useState, useCallback, useEffect, useMemo } from 'react';
 import { useSearch, useNavigate, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { MagnifyingGlassIcon, ChartBarIcon, BeakerIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, BeakerIcon } from '@heroicons/react/24/outline';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
+import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Divider } from '@/components/Layout/Divider';
 import { Alert } from '@/components/Feedback/Alert';
 // TODO: Re-enable when fork annotation data is available
@@ -118,7 +119,7 @@ function buildTooltipHtml(dateStr: string, sections: TooltipSection[]): string {
     if (idx > 0) {
       html += `<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(128,128,128,0.3);">`;
     }
-    html += `<div style="margin-bottom: 8px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: #9ca3af;">${section.title}</div>`;
+    html += `<div style="margin-bottom: 8px; font-size: 11px; text-transform: none; color: #9ca3af;">${section.title}</div>`;
 
     section.items.forEach(item => {
       const itemHtml = buildTooltipRow(item);
@@ -185,6 +186,9 @@ function isValidBlockNumber(value: string): boolean {
 // ============================================================================
 // COMPONENT
 // ============================================================================
+
+const PAGE_DESCRIPTION =
+  'Analyze Ethereum transaction gas consumption with call tree visualization and opcode breakdown';
 
 /**
  * Gas Profiler Home page - search and network analytics
@@ -992,10 +996,7 @@ export function HomePage(): JSX.Element {
   if (boundsLoading) {
     return (
       <Container>
-        <Header
-          title="Gas Profiler"
-          description="Analyze Ethereum transaction gas consumption with call tree visualization and opcode breakdown"
-        />
+        <Header title="Gas Profiler" description={PAGE_DESCRIPTION} />
         <GasProfilerSkeleton />
       </Container>
     );
@@ -1004,10 +1005,7 @@ export function HomePage(): JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header
-          title="Gas Profiler"
-          description="Analyze Ethereum transaction gas consumption with call tree visualization and opcode breakdown"
-        />
+        <Header title="Gas Profiler" description={PAGE_DESCRIPTION} />
         <Alert variant="error" title="Error loading data" description={error.message} />
       </Container>
     );
@@ -1016,10 +1014,7 @@ export function HomePage(): JSX.Element {
   if (!bounds) {
     return (
       <Container>
-        <Header
-          title="Gas Profiler"
-          description="Analyze Ethereum transaction gas consumption with call tree visualization and opcode breakdown"
-        />
+        <Header title="Gas Profiler" description={PAGE_DESCRIPTION} />
         <Alert variant="warning" title="No data available" description="Blocks are still being indexed." />
       </Container>
     );
@@ -1027,10 +1022,7 @@ export function HomePage(): JSX.Element {
 
   return (
     <Container>
-      <Header
-        title="Gas Profiler"
-        description="Analyze Ethereum transaction gas consumption with call tree visualization and opcode breakdown"
-      />
+      <Header title="Gas Profiler" description={PAGE_DESCRIPTION} />
 
       {/* ============================================================================
           SECTION 1: Search & Explore
@@ -1124,12 +1116,7 @@ export function HomePage(): JSX.Element {
 
       {/* Section Header */}
       <div className="mb-6">
-        <div className="flex items-center gap-3">
-          <div className="rounded-xs bg-primary/10 p-2">
-            <ChartBarIcon className="size-5 text-primary" />
-          </div>
-          <h2 className="text-lg font-semibold text-foreground">Network Analytics</h2>
-        </div>
+        <h2 className="text-lg font-semibold text-foreground">Network Analytics</h2>
       </div>
 
       {/* Time Period Selector & Filters */}
@@ -1155,9 +1142,7 @@ export function HomePage(): JSX.Element {
         <PopoutCard title="Opcodes Per Second" anchorId="ops-chart" modalSize="full">
           {({ inModal }) =>
             isOpcodeOpsLoading ? (
-              <div className="flex h-[320px] items-center justify-center">
-                <div className="animate-pulse text-muted">Loading opcode data...</div>
-              </div>
+              <LoadingContainer className="h-[320px] rounded-sm" />
             ) : opcodesPerSecondConfig ? (
               <MultiLineChart
                 series={opcodesPerSecondConfig.series}
@@ -1189,9 +1174,7 @@ export function HomePage(): JSX.Element {
         <PopoutCard title="Gas by Category" anchorId="gas-by-category" modalSize="full">
           {({ inModal }) =>
             isOpcodeGasLoading ? (
-              <div className="flex h-[420px] items-center justify-center">
-                <div className="animate-pulse text-muted">Loading category data...</div>
-              </div>
+              <LoadingContainer className="h-[420px] rounded-sm" />
             ) : gasByCategoryData.labels.length > 0 ? (
               <BarChart
                 data={gasByCategoryData.data}
@@ -1222,13 +1205,11 @@ export function HomePage(): JSX.Element {
       {/* Opcode Analysis - Charts by Gas and Count */}
       <div className="mb-6">
         {isOpcodeGasLoading ? (
-          <div className="flex h-[320px] items-center justify-center rounded-sm border border-border bg-surface/30">
-            <div className="animate-pulse text-muted">Loading opcode data...</div>
-          </div>
+          <LoadingContainer className="h-[320px] rounded-sm" />
         ) : opcodeStats.length > 0 ? (
           <OpcodeAnalysis opcodeStats={opcodeStats} maxOpcodes={10} showTable={false} />
         ) : (
-          <div className="flex h-[320px] items-center justify-center rounded-sm border border-border bg-surface/30 text-muted">
+          <div className="flex h-[320px] items-center justify-center rounded-sm border border-border text-muted">
             No opcode data available
           </div>
         )}
@@ -1239,9 +1220,7 @@ export function HomePage(): JSX.Element {
         <PopoutCard title="Receipt Size Per Block" anchorId="receipt-size-chart" modalSize="full">
           {({ inModal }) =>
             isReceiptSizeLoading ? (
-              <div className="flex h-[320px] items-center justify-center">
-                <div className="animate-pulse text-muted">Loading receipt size data...</div>
-              </div>
+              <LoadingContainer className="h-[320px] rounded-sm" />
             ) : receiptSizeConfig ? (
               <MultiLineChart
                 series={receiptSizeConfig.series}

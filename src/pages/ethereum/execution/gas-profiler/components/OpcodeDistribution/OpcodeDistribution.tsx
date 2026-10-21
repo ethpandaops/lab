@@ -1,5 +1,6 @@
 import { type JSX, useMemo, useState } from 'react';
 import { BarChart } from '@/components/Charts/Bar';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { Card } from '@/components/Layout/Card';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { OpcodeStats } from '../../IndexPage.types';
@@ -21,6 +22,11 @@ function formatGas(value: number): string {
 }
 
 type SortMode = 'gas' | 'count';
+
+const SORT_OPTIONS = [
+  { value: 'gas', label: 'By Gas' },
+  { value: 'count', label: 'By Count' },
+] as const;
 
 /**
  * Horizontal bar chart showing opcode gas distribution
@@ -51,7 +57,7 @@ export function OpcodeDistribution({ opcodeStats, maxOpcodes = 15 }: OpcodeDistr
 
   if (opcodeStats.length === 0) {
     return (
-      <Card className="p-4" title="Opcode Distribution">
+      <Card title="Opcode Distribution">
         <div className="flex h-[200px] items-center justify-center text-sm text-muted">No opcode data available</div>
       </Card>
     );
@@ -61,9 +67,9 @@ export function OpcodeDistribution({ opcodeStats, maxOpcodes = 15 }: OpcodeDistr
   const totalCount = opcodeStats.reduce((sum, s) => sum + s.count, 0);
 
   return (
-    <Card className="p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-foreground">Opcode Distribution</h3>
+    <Card
+      title="Opcode Distribution"
+      actions={
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-xs">
             <span className="text-muted">Total:</span>
@@ -71,27 +77,15 @@ export function OpcodeDistribution({ opcodeStats, maxOpcodes = 15 }: OpcodeDistr
             <span className="text-muted">|</span>
             <span className="font-medium text-foreground">{totalCount.toLocaleString()} ops</span>
           </div>
-          <div className="flex rounded-xs bg-background p-0.5">
-            <button
-              onClick={() => setSortMode('gas')}
-              className={`rounded-xs px-2 py-1 text-xs font-medium transition-colors ${
-                sortMode === 'gas' ? 'bg-primary text-white' : 'text-muted hover:text-foreground'
-              }`}
-            >
-              By Gas
-            </button>
-            <button
-              onClick={() => setSortMode('count')}
-              className={`rounded-xs px-2 py-1 text-xs font-medium transition-colors ${
-                sortMode === 'count' ? 'bg-primary text-white' : 'text-muted hover:text-foreground'
-              }`}
-            >
-              By Count
-            </button>
-          </div>
+          <SegmentedControl
+            ariaLabel="Sort opcodes by"
+            options={SORT_OPTIONS}
+            value={sortMode}
+            onChange={setSortMode}
+          />
         </div>
-      </div>
-
+      }
+    >
       <BarChart
         data={chartData}
         labels={labels}

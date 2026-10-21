@@ -53,10 +53,8 @@ function ExperimentCardItem({ experiment }: { experiment: ExperimentCard }): JSX
 
   return (
     <Link to={experiment.path} className="block">
-      <Card featureImage={<img src={experiment.imagePath} alt={experiment.name} />}>
-        <div className="flex flex-col gap-3">
-          <h3 className="text-lg/7 font-semibold text-foreground">{experiment.name}</h3>
-        </div>
+      <Card title={experiment.name} featureImage={<img src={experiment.imagePath} alt={experiment.name} />}>
+        {null}
       </Card>
     </Link>
   );

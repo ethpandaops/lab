@@ -1,6 +1,7 @@
 import type { JSX } from 'react';
 import { useState } from 'react';
 import { Dialog } from '@/components/Overlays/Dialog';
+import { Button } from '@/components/Elements/Button';
 import { Card } from '@/components/Layout/Card';
 import type { InsightsDialogProps } from './InsightsDialog.types';
 
@@ -22,8 +23,7 @@ export function InsightsDialog({
     <Dialog open={open} onClose={onClose} title="Data Insights" size="full" className="max-h-[90vh]">
       <div className="max-h-[calc(90vh-8rem)] space-y-6 overflow-y-auto">
         {/* Client Implementation Distribution */}
-        <div>
-          <h3 className="mb-4 text-base/6 font-semibold text-foreground">Client Implementation Distribution</h3>
+        <Card title="Client Implementation Distribution">
           {isLoading ? (
             <div className="grid gap-x-6 gap-y-2 md:grid-cols-2">
               {[1, 2, 3, 4].map(i => (
@@ -55,14 +55,13 @@ export function InsightsDialog({
               ))}
             </div>
           )}
-        </div>
+        </Card>
 
         {/* Top Locations - Side by side */}
         <div className="grid gap-6 md:grid-cols-2">
           {/* Top Countries */}
-          <Card className="h-fit">
+          <Card className="h-fit" title="Top Countries">
             <div className="space-y-4">
-              <h3 className="text-base/6 font-semibold text-foreground">Top Countries</h3>
               {isLoading ? (
                 <div className="space-y-2">
                   {[1, 2, 3, 4, 5].map(i => (
@@ -77,7 +76,7 @@ export function InsightsDialog({
                     {displayedCountries.map((country, index) => (
                       <div
                         key={country.code}
-                        className="flex h-12 items-center justify-between rounded-lg bg-surface px-4"
+                        className="flex h-12 items-center justify-between rounded-sm bg-surface px-4"
                       >
                         <div className="flex items-center gap-3">
                           <span className="text-xs font-semibold text-muted">#{index + 1}</span>
@@ -89,14 +88,14 @@ export function InsightsDialog({
                     ))}
                   </div>
                   {topCountries.length > 5 && (
-                    <button
+                    <Button
+                      variant="secondary"
+                      size="sm"
                       onClick={() => setShowAllCountries(!showAllCountries)}
-                      className="group flex w-full items-center gap-3 text-sm text-muted transition-colors hover:text-foreground"
+                      className="w-full justify-center"
                     >
-                      <div className="h-px flex-1 bg-border transition-colors group-hover:bg-muted" />
-                      <span>{showAllCountries ? 'Show less' : `Show ${topCountries.length - 5} more`}</span>
-                      <div className="h-px flex-1 bg-border transition-colors group-hover:bg-muted" />
-                    </button>
+                      {showAllCountries ? 'Show less' : `Show ${topCountries.length - 5} more`}
+                    </Button>
                   )}
                 </>
               )}
@@ -104,9 +103,8 @@ export function InsightsDialog({
           </Card>
 
           {/* Top Cities */}
-          <Card className="h-fit">
+          <Card className="h-fit" title="Top Cities">
             <div className="space-y-4">
-              <h3 className="text-base/6 font-semibold text-foreground">Top Cities</h3>
               {isLoading ? (
                 <div className="space-y-2">
                   {[1, 2, 3, 4, 5].map(i => (
@@ -121,7 +119,7 @@ export function InsightsDialog({
                     {displayedCities.map((city, index) => (
                       <div
                         key={city.name}
-                        className="flex h-12 items-center justify-between rounded-lg bg-surface px-4"
+                        className="flex h-12 items-center justify-between rounded-sm bg-surface px-4"
                       >
                         <div className="flex items-center gap-3">
                           <span className="text-xs font-semibold text-muted">#{index + 1}</span>
@@ -132,14 +130,14 @@ export function InsightsDialog({
                     ))}
                   </div>
                   {topCities.length > 5 && (
-                    <button
+                    <Button
+                      variant="secondary"
+                      size="sm"
                       onClick={() => setShowAllCities(!showAllCities)}
-                      className="group flex w-full items-center gap-3 text-sm text-muted transition-colors hover:text-foreground"
+                      className="w-full justify-center"
                     >
-                      <div className="h-px flex-1 bg-border transition-colors group-hover:bg-muted" />
-                      <span>{showAllCities ? 'Show less' : `Show ${topCities.length - 5} more`}</span>
-                      <div className="h-px flex-1 bg-border transition-colors group-hover:bg-muted" />
-                    </button>
+                      {showAllCities ? 'Show less' : `Show ${topCities.length - 5} more`}
+                    </Button>
                   )}
                 </>
               )}

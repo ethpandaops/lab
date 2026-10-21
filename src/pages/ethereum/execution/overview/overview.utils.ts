@@ -159,7 +159,7 @@ export function buildTooltipHtml(dateStr: string, sections: TooltipSection[]): s
     if (idx > 0) {
       html += `<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(128,128,128,0.3);">`;
     }
-    html += `<div style="margin-bottom: 8px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: #9ca3af;">${section.title}</div>`;
+    html += `<div style="margin-bottom: 8px; font-size: 11px; text-transform: none; color: #9ca3af;">${section.title}</div>`;
 
     section.items.forEach(item => {
       const fontSize = section.title === 'BANDS' || section.title === 'Gas Limits' ? 12 : 12;

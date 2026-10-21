@@ -98,7 +98,7 @@ export function ContractActionPopover({
   return (
     <div
       ref={popoverRef}
-      className="fixed z-50 w-60 overflow-hidden rounded-sm border border-border bg-background shadow-lg"
+      className="fixed z-50 w-60 overflow-hidden rounded-sm border border-border bg-background"
       style={{ left: x, top: y }}
     >
       {/* Header */}

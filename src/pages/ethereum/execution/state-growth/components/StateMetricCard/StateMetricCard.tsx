@@ -90,8 +90,8 @@ const colorMap = {
   },
   amber: {
     sparkline: 'rgb(251, 191, 36)',
-    bg: 'bg-amber-500/10',
-    text: 'text-amber-400',
+    bg: 'bg-warning/10',
+    text: 'text-warning',
   },
   default: {
     sparkline: 'rgb(96, 165, 250)',
@@ -119,7 +119,7 @@ export function StateMetricCard({
     <Card className={clsx('relative overflow-hidden p-4', isHero && 'col-span-full sm:col-span-1')}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-medium tracking-wider text-muted uppercase">{label}</p>
+          <p className="text-xs font-medium text-muted">{label}</p>
 
           <p className={clsx('mt-1 font-bold text-foreground tabular-nums', isHero ? 'text-3xl' : 'text-2xl')}>
             {formatBytes(currentBytes)}
@@ -129,7 +129,7 @@ export function StateMetricCard({
             <p className="mt-0.5 text-sm text-muted tabular-nums">
               {count.toLocaleString()}
               {countDelta !== undefined && (
-                <span className={clsx('ml-1 text-xs', isPositive ? 'text-amber-400' : 'text-emerald-400')}>
+                <span className={clsx('ml-1 text-xs', isPositive ? 'text-warning' : 'text-success')}>
                   ({countDelta >= 0 ? '+' : ''}
                   {countDelta.toLocaleString()})
                 </span>
@@ -141,15 +141,13 @@ export function StateMetricCard({
             <div
               className={clsx(
                 'flex items-center gap-1 rounded-sm px-1.5 py-0.5',
-                isPositive ? 'bg-amber-500/10 text-amber-400' : 'bg-emerald-500/10 text-emerald-400'
+                isPositive ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
               )}
             >
               <Icon className="size-3" />
               <span className="text-xs font-medium tabular-nums">{formatDeltaBytes(deltaBytes)}</span>
             </div>
-            <span
-              className={clsx('text-xs font-medium tabular-nums', isPositive ? 'text-amber-400' : 'text-emerald-400')}
-            >
+            <span className={clsx('text-xs font-medium tabular-nums', isPositive ? 'text-warning' : 'text-success')}>
               {deltaPercent >= 0 ? '+' : ''}
               {deltaPercent.toFixed(3)}%
             </span>

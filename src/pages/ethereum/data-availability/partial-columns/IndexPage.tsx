@@ -219,8 +219,8 @@ export function IndexPage(): JSX.Element {
       />
 
       {!boundsLoading && !hasData ? (
-        <Card rounded>
-          <h3 className="text-base/7 font-semibold text-foreground">No partial column data for this network</h3>
+        <Card rounded title="No partial column data for this network">
+          {null}
         </Card>
       ) : (
         <div className="flex flex-col gap-6">
@@ -252,11 +252,8 @@ export function IndexPage(): JSX.Element {
           {isLoading || boundsLoading ? (
             <PartialColumnsSkeleton />
           ) : error ? null : noSentryData ? (
-            <Card rounded>
-              <div className="flex flex-col gap-1">
-                <h3 className="text-base/7 font-semibold text-foreground">No completions in this window</h3>
-                <p className="text-sm/6 text-muted">Try a longer window.</p>
-              </div>
+            <Card rounded title="No completions in this window">
+              <p className="text-sm/6 text-muted">Try a longer window.</p>
             </Card>
           ) : (
             <>

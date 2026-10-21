@@ -1,3 +1,4 @@
+import { ExplorerLinks } from './components/ExplorerLinks';
 import { type JSX, useMemo, useCallback, useState, useEffect } from 'react';
 import { useParams, Link } from '@tanstack/react-router';
 import { Route } from '@/routes/ethereum/execution/gas-profiler/tx.$txHash_.call.$callId';
@@ -18,9 +19,6 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
 import { Alert } from '@/components/Feedback/Alert';
-import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
-import { TenderlyIcon } from '@/components/Ethereum/TenderlyIcon';
-import { PhalconIcon } from '@/components/Ethereum/PhalconIcon';
 import { useTransactionGasData, getCallLabel, type CallFrameOpcodeStats } from './hooks/useTransactionGasData';
 import { useFrameOpcodes } from './hooks/useFrameOpcodes';
 import { useAllCallFrameOpcodes } from './hooks/useAllCallFrameOpcodes';
@@ -445,7 +443,7 @@ export function CallPage(): JSX.Element {
                 </button>
                 {/* Dropdown on hover */}
                 <div className="absolute top-full left-0 z-50 hidden min-w-56 pt-1 group-hover:block">
-                  <div className="rounded-xs border border-border bg-background p-2 shadow-lg">
+                  <div className="rounded-xs border border-border bg-background p-2">
                     <div className="mb-1.5 border-b border-border pb-1.5 text-xs text-muted">Full internal tx path</div>
                     <div className="space-y-1 text-xs">
                       <Link
@@ -561,50 +559,33 @@ export function CallPage(): JSX.Element {
           })()}
         </div>
         {/* External links */}
-        <div className="flex items-center gap-2">
-          {currentFrame.target_address && (
-            <a
-              href={`${getEtherscanBaseUrl(currentNetwork?.name)}/address/${currentFrame.target_address}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
-              title="View address on Etherscan"
-            >
-              <EtherscanIcon className="size-4" />
-            </a>
-          )}
-          {isMainnet(currentNetwork?.name) && (
-            <>
-              <a
-                href={`https://dashboard.tenderly.co/tx/mainnet/${txHash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
-                title="View TX on Tenderly"
-              >
-                <TenderlyIcon className="size-4" />
-              </a>
-              <a
-                href={`https://phalcon.blocksec.com/explorer/tx/eth/${txHash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
-                title="View TX on Phalcon"
-              >
-                <PhalconIcon className="size-4" />
-              </a>
-            </>
-          )}
-        </div>
+        <ExplorerLinks
+          etherscan={
+            currentFrame.target_address
+              ? {
+                  href: `${getEtherscanBaseUrl(currentNetwork?.name)}/address/${currentFrame.target_address}`,
+                  title: 'View address on Etherscan',
+                }
+              : undefined
+          }
+          tenderly={
+            isMainnet(currentNetwork?.name)
+              ? { href: `https://dashboard.tenderly.co/tx/mainnet/${txHash}`, title: 'View TX on Tenderly' }
+              : undefined
+          }
+          phalcon={
+            isMainnet(currentNetwork?.name)
+              ? { href: `https://phalcon.blocksec.com/explorer/tx/eth/${txHash}`, title: 'View TX on Phalcon' }
+              : undefined
+          }
+        />
       </div>
 
       {/* Quick Stats Row - Always visible */}
       <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-xs bg-amber-500/10 p-2">
-              <BoltIcon className="size-5 text-amber-500" />
-            </div>
+            <BoltIcon className="size-5 text-warning" />
             <div>
               <div className="text-xl font-semibold text-foreground">{formatGas(selfGas)}</div>
               <div className="text-xs text-muted">Gas</div>
@@ -614,9 +595,7 @@ export function CallPage(): JSX.Element {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-xs bg-primary/10 p-2">
-              <FireIcon className="size-5 text-primary" />
-            </div>
+            <FireIcon className="size-5 text-primary" />
             <div>
               <div className="text-xl font-semibold text-foreground">{formatGas(cumulativeGas)}</div>
               <div className="text-xs text-muted">Cumulative</div>
@@ -626,9 +605,7 @@ export function CallPage(): JSX.Element {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-xs bg-cyan-500/10 p-2">
-              <CodeBracketIcon className="size-5 text-cyan-500" />
-            </div>
+            <CodeBracketIcon className="size-5 text-accent" />
             <div>
               <div className="text-xl font-semibold text-foreground">{childFrames.length}</div>
               <div className="text-xs text-muted">Child Internal Txs</div>
@@ -638,9 +615,7 @@ export function CallPage(): JSX.Element {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-xs bg-purple-500/10 p-2">
-              <CpuChipIcon className="size-5 text-purple-500" />
-            </div>
+            <CpuChipIcon className="size-5 text-muted" />
             <div>
               <div className="text-xl font-semibold text-foreground">{currentFrame.opcode_count ?? 0}</div>
               <div className="text-xs text-muted">Opcodes</div>
@@ -664,17 +639,13 @@ export function CallPage(): JSX.Element {
           {/* Overview Tab */}
           <HeadlessTab.Panel>
             {/* Internal Tx Gas Breakdown */}
-            <Card className="mb-6 overflow-hidden">
-              {/* Header row */}
-              <div className="flex items-center justify-between px-4 py-3">
-                <h3 className="text-sm font-medium text-foreground">Internal Tx Gas Breakdown</h3>
-                <span className="text-xs text-muted">
-                  Internal Tx #{currentFrame.call_frame_id} • Depth {currentFrame.depth}
-                </span>
-              </div>
-
+            <Card
+              className="mb-6"
+              title="Internal Tx Gas Breakdown"
+              subtitle={`Internal Tx #${currentFrame.call_frame_id} • Depth ${currentFrame.depth}`}
+            >
               {/* Gas Formula */}
-              <div className="bg-surface/30 px-4 py-5">
+              <div className="py-1">
                 <GasFormula
                   segments={[
                     {
@@ -701,7 +672,7 @@ export function CallPage(): JSX.Element {
               </div>
 
               {/* Internal tx details - subtle inline display */}
-              <div className="border-t border-border px-4 py-2 text-center">
+              <div className="mt-4 border-t border-border pt-3 text-center">
                 <div className="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
                   <span
                     className={`rounded-xs px-1.5 py-0.5 text-xs font-medium ${callTypeStyles.bg} ${callTypeStyles.text}`}

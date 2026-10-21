@@ -68,9 +68,9 @@ export function GasBreakdownCard({ metadata, network }: GasBreakdownCardProps): 
       : undefined;
 
   return (
-    <Card className="p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-foreground">Gas Breakdown</h3>
+    <Card
+      title="Gas Breakdown"
+      actions={
         <div className="flex items-center gap-4 text-xs">
           <span className="text-muted">
             Total: <span className="font-medium text-foreground">{formatGas(totalBeforeRefund)}</span>
@@ -79,8 +79,8 @@ export function GasBreakdownCard({ metadata, network }: GasBreakdownCardProps): 
             Receipt: <span className="font-medium text-foreground">{formatGas(metadata.receiptGasUsed)}</span>
           </span>
         </div>
-      </div>
-
+      }
+    >
       {metadata.status === 'failed' && metadata.intrinsicGas === null ? (
         <div className="flex h-[80px] items-center justify-center rounded-xs border border-danger/30 bg-danger/10 text-sm text-danger">
           Failed transaction - intrinsic gas not available

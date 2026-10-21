@@ -140,7 +140,7 @@ export function SavingsMatrix({
                 >
                   {/* Battery fill background */}
                   <div
-                    className="absolute inset-0 bg-emerald-500/15 transition-all"
+                    className="absolute inset-0 bg-success/15 transition-all"
                     style={{ width: slotData.hasData ? `${Math.min(slotData.bytesPercent, 100)}%` : '0%' }}
                   />
                   {/* Content */}
@@ -148,10 +148,10 @@ export function SavingsMatrix({
                     {slotData.hasData ? (
                       <div className="space-y-1">
                         <div className="flex items-baseline justify-between gap-2">
-                          <span className="text-sm font-semibold text-emerald-400 tabular-nums">
+                          <span className="text-sm font-semibold text-success tabular-nums">
                             -{formatBytes(slotData.bytesSaved)}
                           </span>
-                          <span className="bg-emerald-500/10 px-1.5 py-0.5 text-xs font-medium text-emerald-400 tabular-nums">
+                          <span className="bg-success/10 px-1.5 py-0.5 text-xs font-medium text-success tabular-nums">
                             -{slotData.bytesPercent.toFixed(4)}%
                           </span>
                         </div>
@@ -177,7 +177,7 @@ export function SavingsMatrix({
                 >
                   {/* Battery fill background */}
                   <div
-                    className="absolute inset-0 bg-emerald-500/15 transition-all"
+                    className="absolute inset-0 bg-success/15 transition-all"
                     style={{ width: contractData.hasData ? `${Math.min(contractData.bytesPercent, 100)}%` : '0%' }}
                   />
                   {/* Content */}
@@ -185,10 +185,10 @@ export function SavingsMatrix({
                     {contractData.hasData ? (
                       <div className="space-y-1">
                         <div className="flex items-baseline justify-between gap-2">
-                          <span className="text-sm font-semibold text-emerald-400 tabular-nums">
+                          <span className="text-sm font-semibold text-success tabular-nums">
                             -{formatBytes(contractData.bytesSaved)}
                           </span>
-                          <span className="bg-emerald-500/10 px-1.5 py-0.5 text-xs font-medium text-emerald-400 tabular-nums">
+                          <span className="bg-success/10 px-1.5 py-0.5 text-xs font-medium text-success tabular-nums">
                             -{contractData.bytesPercent.toFixed(4)}%
                           </span>
                         </div>

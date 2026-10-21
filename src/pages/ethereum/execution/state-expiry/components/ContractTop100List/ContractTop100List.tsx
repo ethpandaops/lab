@@ -167,7 +167,7 @@ export function ContractTop100List({ variant = 'contained' }: ContractTop100List
         <table className="w-full min-w-[600px] table-fixed border-collapse">
           <TableColGroup />
           <thead className="sticky top-0 z-10 bg-surface">
-            <tr className="border-b border-border/50 text-xs font-medium uppercase">
+            <tr className="border-b border-border/50 text-xs font-medium">
               <th className="px-2 py-1.5 text-center text-muted">#</th>
               <th className="px-2 py-1.5 text-left text-muted">Contract</th>
               <th className="px-2 py-1.5 text-left text-muted">Owner</th>
@@ -240,12 +240,7 @@ export function ContractTop100List({ variant = 'contained' }: ContractTop100List
   }
 
   return (
-    <Card className="h-120 overflow-hidden rounded-sm">
-      {/* Title */}
-      <div className="bg-card border-b border-border px-3 py-2">
-        <h3 className="text-base font-semibold text-foreground">Top 100 Contracts</h3>
-      </div>
-
+    <Card title="Top 100 Contracts" className="h-120 overflow-hidden rounded-sm">
       {/* Mobile: Card layout */}
       <ScrollArea orientation="vertical" className="h-[calc(30rem-52px)] md:hidden">
         <div className="pb-10">{mobileContent}</div>

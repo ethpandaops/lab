@@ -8,6 +8,7 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { ProbeEventRow } from '@/pages/ethereum/data-availability/components/ProbeEventRow';
 import { ProbeDetailDialog } from '@/pages/ethereum/data-availability/probes/components/ProbeDetailDialog';
 import { useFuluActivation } from '@/pages/ethereum/data-availability/custody/hooks/useFuluActivation';
+import { Card } from '@/components/Layout/Card';
 import { ScrollArea } from '@/components/Layout/ScrollArea';
 import type { LiveProbeEventsProps, ProbeFilterContext } from './LiveProbeEvents.types';
 
@@ -183,29 +184,23 @@ export function LiveProbeEvents({
 
   return (
     <>
-      <div className="bg-card text-card-foreground h-[32rem] overflow-hidden rounded-lg border border-border shadow-sm">
-        {/* Header */}
-        <div className="border-b border-border bg-muted/20 px-4 py-3">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <h2 className="text-lg font-semibold text-foreground">Recent Probes</h2>
-              <p className="truncate text-sm text-muted">{contextLabel}</p>
-            </div>
-            <div className="flex shrink-0 items-center gap-2">
-              {probesLinkParams && (
-                <Link
-                  to="/ethereum/data-availability/probes"
-                  search={probesLinkParams}
-                  className="flex items-center gap-1.5 rounded-sm border border-accent/30 bg-accent/10 px-2.5 py-1.5 text-xs font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
-                >
-                  <MagnifyingGlassIcon className="size-3.5" />
-                  View All
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
-
+      <Card
+        title="Recent Probes"
+        subtitle={contextLabel}
+        className="h-[32rem] *:data-[slot=card-body]:p-0"
+        actions={
+          probesLinkParams && (
+            <Link
+              to="/ethereum/data-availability/probes"
+              search={probesLinkParams}
+              className="inline-flex items-center gap-1.5 rounded-sm bg-surface px-2 py-1.5 text-xs font-semibold text-foreground inset-ring inset-ring-border transition-colors hover:bg-background"
+            >
+              <MagnifyingGlassIcon className="size-3.5" />
+              View All
+            </Link>
+          )
+        }
+      >
         {/* Events list - scrollable (header is ~70px, so calc remaining height) */}
         <ScrollArea className="h-[calc(32rem-70px)]">
           <div className="px-2 py-2">
@@ -247,7 +242,7 @@ export function LiveProbeEvents({
             )}
           </div>
         </ScrollArea>
-      </div>
+      </Card>
 
       {/* Probe Detail Dialog - using shared component */}
       <ProbeDetailDialog

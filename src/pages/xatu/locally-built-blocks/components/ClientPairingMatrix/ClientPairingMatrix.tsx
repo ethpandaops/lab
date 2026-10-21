@@ -1,5 +1,6 @@
 import { type JSX, useState } from 'react';
 import clsx from 'clsx';
+import { Card } from '@/components/Layout/Card';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { BlockDetailsModal } from '../BlockDetailsModal';
 import { getIntensity } from '../../utils';
@@ -57,26 +58,19 @@ export function ClientPairingMatrix({
 
   if (executionClients.length === 0 || consensusClients.length === 0) {
     return (
-      <div className="rounded-lg border border-border bg-surface p-8 text-center">
-        <p className="text-muted">No client pairings found</p>
-      </div>
+      <Card
+        title="Client Pairings"
+        subtitle="Unique execution + consensus client combinations across all visible slots"
+      >
+        <p className="text-center text-muted">No client pairings found</p>
+      </Card>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="mb-2 flex flex-col gap-1">
-        <div className="flex items-center gap-2">
-          <span className="inline-block h-4 w-1 rounded-full bg-primary"></span>
-          <h2 className="text-lg font-semibold text-foreground">Client Pairings</h2>
-        </div>
-        <p className="ml-3 text-sm text-muted">
-          Unique execution + consensus client combinations across all visible slots
-        </p>
-      </div>
-
-      <div className="overflow-x-auto rounded-lg border border-border bg-surface">
-        <div className="inline-block min-w-full p-4">
+    <Card title="Client Pairings" subtitle="Unique execution + consensus client combinations across all visible slots">
+      <div className="overflow-x-auto">
+        <div className="inline-block min-w-full">
           {/* Consensus client headers */}
           <div className="mb-4 flex gap-0.5">
             <div className="w-28 shrink-0" /> {/* Empty corner for execution client labels */}
@@ -105,8 +99,10 @@ export function ClientPairingMatrix({
                       onClick={() => handleCellClick(execClient, consensusClient)}
                       className={clsx(
                         'flex min-w-20 flex-1 items-center justify-center rounded-sm border text-sm font-medium',
-                        'h-10 transition-all',
-                        count > 0 ? 'cursor-pointer hover:scale-105 hover:shadow-md' : 'cursor-not-allowed opacity-50',
+                        'h-10 transition-colors',
+                        count > 0
+                          ? 'cursor-pointer hover:outline hover:outline-primary/60'
+                          : 'cursor-not-allowed opacity-50',
                         getIntensity(count, maxPairingCount)
                       )}
                       title={`${execClient} + ${consensusClient}: ${count} unique node${count !== 1 ? 's' : ''}`}
@@ -133,6 +129,6 @@ export function ClientPairingMatrix({
           blocks={selectedBlocks}
         />
       )}
-    </div>
+    </Card>
   );
 }

@@ -70,7 +70,7 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
               className={clsx(
                 'flex items-center justify-center border-b border-border/30 p-1.5 transition-colors sm:p-2 lg:p-2.5',
                 !isLastCol && 'border-r',
-                isHovered && 'bg-emerald-500/10 dark:bg-emerald-500/15'
+                isHovered && 'bg-success/10'
               )}
               onMouseEnter={() => setHoveredPolicy(policy)}
               onMouseLeave={() => setHoveredPolicy(null)}
@@ -79,8 +79,8 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
                 <PopoverButton
                   variant="blank"
                   className={clsx(
-                    'cursor-pointer text-2xs font-bold text-emerald-600 underline decoration-emerald-600/30 decoration-dotted underline-offset-2 transition-all hover:bg-transparent hover:decoration-emerald-600 sm:text-xs lg:text-sm dark:text-emerald-400 dark:decoration-emerald-400/30 dark:hover:bg-transparent dark:hover:decoration-emerald-400',
-                    isHovered && 'scale-105'
+                    'cursor-pointer text-2xs font-bold text-success underline decoration-success/30 decoration-dotted underline-offset-2 transition-all hover:bg-transparent hover:decoration-success sm:text-xs lg:text-sm',
+                    isHovered && 'decoration-success'
                   )}
                 >
                   <span className="lg:hidden">{policyConf.shortLabel}</span>

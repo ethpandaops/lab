@@ -31,6 +31,8 @@ function updateUrl(blockNumber: number | null): void {
   window.history.replaceState({}, '', url.toString());
 }
 
+const PAGE_DESCRIPTION = 'Explore block transactions and analyze gas consumption with call tree visualization';
+
 /**
  * Gas Profiler page - Block explorer style with transaction gas analysis
  */
@@ -89,10 +91,7 @@ export function IndexPage(): JSX.Element {
   if (boundsLoading || (isLoading && !data)) {
     return (
       <Container>
-        <Header
-          title="Gas Profiler"
-          description="Explore block transactions and analyze gas consumption with call tree visualization"
-        />
+        <Header title="Gas Profiler" description={PAGE_DESCRIPTION} />
         <GasProfilerSkeleton />
       </Container>
     );
@@ -102,10 +101,7 @@ export function IndexPage(): JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header
-          title="Gas Profiler"
-          description="Explore block transactions and analyze gas consumption with call tree visualization"
-        />
+        <Header title="Gas Profiler" description={PAGE_DESCRIPTION} />
         <Alert variant="error" title="Error loading block data" description={error.message} />
       </Container>
     );
@@ -115,10 +111,7 @@ export function IndexPage(): JSX.Element {
   if (!bounds) {
     return (
       <Container>
-        <Header
-          title="Gas Profiler"
-          description="Explore block transactions and analyze gas consumption with call tree visualization"
-        />
+        <Header title="Gas Profiler" description={PAGE_DESCRIPTION} />
         <Alert
           variant="warning"
           title="No data available"
@@ -130,10 +123,7 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      <Header
-        title="Gas Profiler"
-        description="Explore block transactions and analyze gas consumption with call tree visualization"
-      />
+      <Header title="Gas Profiler" description={PAGE_DESCRIPTION} />
 
       {/* Search toggle button */}
       {!showSearch && (
@@ -150,13 +140,15 @@ export function IndexPage(): JSX.Element {
 
       {/* Search panel (collapsible) */}
       {showSearch && (
-        <Card className="mb-6 p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-medium text-foreground">Search Transaction</h3>
-            <button onClick={() => setShowSearch(false)} className="text-xs text-muted hover:text-foreground">
+        <Card
+          className="mb-6"
+          title="Search Transaction"
+          actions={
+            <button onClick={() => setShowSearch(false)} className="px-1.5 text-xs text-muted hover:text-foreground">
               Cancel
             </button>
-          </div>
+          }
+        >
           <TransactionSearchInput
             txHash=""
             blockNumber=""

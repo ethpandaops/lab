@@ -128,7 +128,7 @@ export const DataAvailabilityCell = ({
 
   const tooltipContent = (
     <div
-      className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs bg-surface px-3 py-2 text-sm/6 whitespace-nowrap text-foreground shadow-lg"
+      className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs bg-surface px-3 py-2 text-sm/6 whitespace-nowrap text-foreground"
       style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
     >
       <div className="font-medium">Column {displayColumnIndex}</div>

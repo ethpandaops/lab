@@ -100,7 +100,7 @@ function DeltaCard({
         </div>
         <div
           className={clsx(
-            'shrink-0 rounded-full p-1.5',
+            'shrink-0 rounded-sm p-1.5',
             isPositive ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
           )}
         >
@@ -123,13 +123,13 @@ export function StateDeltaCards({ data }: StateDeltaCardsProps): JSX.Element | n
     <Card className="p-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         {/* Vertical timeframe toggle */}
-        <div className="flex shrink-0 flex-col gap-1 rounded-md border border-border bg-surface/50 p-1">
+        <div className="flex shrink-0 flex-col gap-1 rounded-sm border border-border bg-surface/50 p-1">
           {TIMEFRAME_OPTIONS.map(option => (
             <button
               key={option.value}
               onClick={() => setTimeframe(option.value)}
               className={clsx(
-                'rounded-xs px-3 py-1.5 text-xs font-medium transition-all',
+                'rounded-xs px-3 py-1.5 text-xs font-medium transition-colors',
                 timeframe === option.value
                   ? 'bg-primary text-white'
                   : 'text-muted hover:bg-muted/10 hover:text-foreground'

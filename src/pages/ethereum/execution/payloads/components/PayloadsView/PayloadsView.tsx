@@ -45,10 +45,10 @@ function truncateHash(hash?: string, length = 10): string {
  */
 function getDurationColorClass(durationMs?: number): string {
   if (durationMs === undefined) return 'text-muted';
-  if (durationMs < 500) return 'text-green-500';
-  if (durationMs < 1000) return 'text-yellow-500';
-  if (durationMs < 2000) return 'text-orange-500';
-  return 'text-red-500';
+  if (durationMs < 500) return 'text-success';
+  if (durationMs < 1000) return 'text-warning';
+  if (durationMs < 2000) return 'text-danger/70';
+  return 'text-danger';
 }
 
 /**
@@ -109,11 +109,11 @@ function StatusBadge({
   const isSyncing = status === 'SYNCING';
 
   const icon = isSuccess ? (
-    <CheckCircleIcon className="size-4 text-green-500" />
+    <CheckCircleIcon className="size-4 text-success" />
   ) : isError ? (
-    <XCircleIcon className="size-4 text-red-500" />
+    <XCircleIcon className="size-4 text-danger" />
   ) : isSyncing ? (
-    <QuestionMarkCircleIcon className="size-4 text-yellow-500" />
+    <QuestionMarkCircleIcon className="size-4 text-warning" />
   ) : (
     <QuestionMarkCircleIcon className="size-4 text-muted" />
   );
@@ -409,10 +409,10 @@ export function PayloadsView({
 
       {/* Live mode indicator bar */}
       {isLive && (
-        <div className="mb-4 flex items-center rounded-sm border border-green-500/30 bg-green-500/10 px-4 py-2">
+        <div className="mb-4 flex items-center rounded-sm border border-success/30 bg-success/10 px-4 py-2">
           <div className="flex items-center gap-3">
-            <SignalIcon className="size-5 text-green-500" />
-            <span className="text-sm font-medium text-green-500">Live Mode Active</span>
+            <SignalIcon className="size-5 text-success" />
+            <span className="text-sm font-medium text-success">Live Mode Active</span>
           </div>
         </div>
       )}
@@ -448,7 +448,7 @@ export function PayloadsView({
           const showReferenceHighlight = !filters.referenceNodes && isReferenceNode;
           return clsx(
             'cursor-pointer transition-colors hover:bg-surface/50',
-            isRowNew(row) && 'animate-pulse bg-green-500/10',
+            isRowNew(row) && 'animate-pulse bg-success/10',
             showReferenceHighlight && 'bg-primary/5 border-l-2 border-l-primary'
           );
         }}

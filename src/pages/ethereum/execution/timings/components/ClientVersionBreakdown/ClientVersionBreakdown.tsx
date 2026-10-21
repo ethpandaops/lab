@@ -2,6 +2,7 @@ import React, { type JSX, useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronUpIcon, ChevronDownIcon, ChevronRightIcon, ServerIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
+import { Badge } from '@/components/Elements/Badge';
 import { Card } from '@/components/Layout/Card';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { ClusterSpecsModal } from '@/components/Ethereum/ClusterSpecsModal';
@@ -276,7 +277,7 @@ function ExpandedRowContent({
                               e.stopPropagation();
                               onClusterClick(clusterName);
                             }}
-                            className="rounded-xs p-0.5 transition-all hover:bg-primary/10 hover:ring-1 hover:ring-primary/30"
+                            className="rounded-xs p-0.5 transition-colors hover:bg-primary/10"
                             title={`View ${clusterName} cluster specs`}
                           >
                             <ServerIcon className={clsx('size-3.5 shrink-0', clusterColor)} />
@@ -684,12 +685,6 @@ export function ClientVersionBreakdown({
   if (aggregatedData.length === 0) {
     const emptyContent = (
       <>
-        {!noCard && (
-          <>
-            <h4 className="mb-2 text-base font-semibold text-foreground">{title}</h4>
-            <p className="mb-4 text-sm text-muted">{description}</p>
-          </>
-        )}
         <div className="flex h-[200px] items-center justify-center text-muted">No client version data available</div>
       </>
     );
@@ -699,21 +694,14 @@ export function ClientVersionBreakdown({
     }
 
     return (
-      <Card>
-        <div className="p-4">{emptyContent}</div>
+      <Card title={title} subtitle={description}>
+        {emptyContent}
       </Card>
     );
   }
 
   const tableContent = (
     <>
-      {!noCard && (
-        <>
-          <h4 className="mb-2 text-base font-semibold text-foreground">{title}</h4>
-          <p className="mb-4 text-sm text-muted">{description}</p>
-        </>
-      )}
-
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-border">
           <thead className="bg-surface">
@@ -916,11 +904,10 @@ export function ClientVersionBreakdown({
                     </td>
                     <td className="px-3 py-3">
                       {hasMultipleVersions ? (
-                        <span
-                          className="rounded-full bg-primary/10 px-1.5 py-0.5 text-xs text-primary"
-                          title={`Aggregate across ${row.versionCount} versions for the selected period`}
-                        >
-                          {row.versionCount} versions
+                        <span title={`Aggregate across ${row.versionCount} versions for the selected period`}>
+                          <Badge variant="flat" size="small">
+                            {row.versionCount} versions
+                          </Badge>
                         </span>
                       ) : (
                         <span className="font-mono text-sm text-muted">{row.version}</span>
@@ -1021,8 +1008,8 @@ export function ClientVersionBreakdown({
 
   return (
     <>
-      <Card>
-        <div className="p-4">{tableContent}</div>
+      <Card title={title} subtitle={description}>
+        {tableContent}
       </Card>
       <ClusterSpecsModal
         open={clusterSpecsOpen}

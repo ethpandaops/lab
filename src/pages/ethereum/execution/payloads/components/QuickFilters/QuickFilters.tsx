@@ -64,20 +64,20 @@ const CORE_PRESETS: QuickFilterPreset[] = [
   {
     id: 'slow-500ms',
     label: '500ms+',
-    icon: <ClockIcon className="size-4 text-yellow-500" />,
+    icon: <ClockIcon className="size-4 text-warning" />,
     filters: { durationMin: 500 },
   },
   {
     id: 'slow-1s',
     label: '1s+',
-    icon: <ClockIcon className="size-4 text-orange-500" />,
+    icon: <ClockIcon className="size-4 text-danger" />,
     filters: { durationMin: 1000 },
   },
   {
     id: 'failures',
     label: 'Failures',
     description: 'INVALID or ERROR status only',
-    icon: <XCircleIcon className="size-4 text-red-500" />,
+    icon: <XCircleIcon className="size-4 text-danger" />,
     filters: { status: 'INVALID,ERROR' },
   },
 ];
@@ -87,13 +87,13 @@ const EXTRA_PRESETS: QuickFilterPreset[] = [
   {
     id: 'high-gas',
     label: '50M+ Gas',
-    icon: <FireIcon className="size-4 text-amber-500" />,
+    icon: <FireIcon className="size-4 text-warning" />,
     filters: { gasUsedMin: 50_000_000 },
   },
   {
     id: 'many-txs',
     label: '300+ Txs',
-    icon: <QueueListIcon className="size-4 text-blue-500" />,
+    icon: <QueueListIcon className="size-4 text-muted" />,
     filters: { txCountMin: 300 },
   },
 ];
@@ -167,18 +167,15 @@ export function QuickFilters({
             type="button"
             onClick={onLiveModeToggle}
             className={clsx(
-              'inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
+              'inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors',
               isLive
-                ? 'bg-green-500/20 text-green-400 ring-2 ring-green-500/30'
-                : 'bg-surface text-muted ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
+                ? 'border-success bg-success/10 text-success'
+                : 'border-border bg-surface text-muted hover:border-primary/40'
             )}
           >
             {isLive ? (
               <>
-                <span className="relative flex size-2">
-                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-green-400 opacity-75" />
-                  <span className="relative inline-flex size-2 rounded-full bg-green-500" />
-                </span>
+                <span className="size-2 rounded-full bg-success" />
                 <PauseIcon className="size-3.5" />
                 <span>Live</span>
               </>
@@ -204,10 +201,10 @@ export function QuickFilters({
               onClick={() => handlePresetClick(preset)}
               title={preset.description}
               className={clsx(
-                'inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
+                'inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors',
                 isActive
-                  ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
-                  : 'bg-surface ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-border bg-surface text-foreground hover:border-primary/40'
               )}
             >
               {preset.icon}
@@ -225,10 +222,10 @@ export function QuickFilters({
               onClick={() => handlePresetClick(preset)}
               title={preset.description}
               className={clsx(
-                'hidden items-center gap-1.5 rounded-sm px-3 py-1.5 text-xs font-medium transition-all sm:inline-flex',
+                'hidden items-center gap-1.5 rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors sm:inline-flex',
                 isActive
-                  ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
-                  : 'bg-surface ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-border bg-surface text-foreground hover:border-primary/40'
               )}
             >
               {preset.icon}
@@ -250,10 +247,10 @@ export function QuickFilters({
               onClick={() => handleClientClick(client)}
               title={`Filter by ${client.name}`}
               className={clsx(
-                'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-medium transition-all',
+                'inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1.5 text-xs font-medium transition-colors',
                 isActive
-                  ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
-                  : 'bg-surface ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-border bg-surface text-foreground hover:border-primary/40'
               )}
             >
               <ClientLogo client={client.id} size={14} />
@@ -271,10 +268,10 @@ export function QuickFilters({
           onClick={handleReferenceNodesToggle}
           title={isReferenceNodesActive ? 'Showing EIP-7870 reference nodes only' : 'Showing all nodes'}
           className={clsx(
-            'inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
+            'inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors',
             isReferenceNodesActive
-              ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
-              : 'bg-surface ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
+              ? 'border-primary bg-primary/10 text-primary'
+              : 'border-border bg-surface text-foreground hover:border-primary/40'
           )}
         >
           <BeakerIcon className="size-4" />

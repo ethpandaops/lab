@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import { useState } from 'react';
-import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { EIP7870SpecsBanner } from '@/components/Ethereum/EIP7870SpecsBanner';
 import { Stats } from '@/components/DataDisplay/Stats';
@@ -61,6 +61,11 @@ function GetBlobsTabSkeleton(): JSX.Element {
     </div>
   );
 }
+
+const PERCENTILE_OPTIONS = [
+  { value: 'p50', label: 'P50' },
+  { value: 'p95', label: 'P95' },
+] as const;
 
 /**
  * GetBlobs tab showing detailed engine_getBlobs timing analysis
@@ -486,11 +491,8 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
           {/* Duration Histogram and Per-Slot Duration - Side by Side */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* Duration Histogram */}
-            <Card>
-              <div className="p-4">
-                <h4 className="mb-4 text-base font-semibold text-foreground" id="blob-duration">
-                  Duration Distribution (50ms buckets)
-                </h4>
+            <PopoutCard title="Duration Distribution (50ms buckets)" anchorId="blob-duration" modalSize="full">
+              <div>
                 {histogramData.length > 0 ? (
                   <BarChart data={histogramData} labels={histogramLabels} color={themeColors.accent} height={375} />
                 ) : (
@@ -499,13 +501,16 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   </div>
                 )}
               </div>
-            </Card>
+            </PopoutCard>
 
             {/* Per-Slot Duration by Client Chart */}
-            <Card>
-              <div className="p-4">
-                <h4 className="mb-2 text-base font-semibold text-foreground">Per-Slot Duration by Client</h4>
-                <p className="mb-4 text-sm text-muted">Median duration for each slot</p>
+            <PopoutCard
+              title="Per-Slot Duration by Client"
+              subtitle="Median duration for each slot"
+              anchorId="blob-slot-duration"
+              modalSize="full"
+            >
+              <div>
                 {hasClientData && slotDurationByClientSeries.some(s => s.data.length > 0) ? (
                   <MultiLineChart
                     series={slotDurationByClientSeries}
@@ -527,27 +532,29 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   <div className="flex h-[300px] items-center justify-center text-muted">No slot data available</div>
                 )}
               </div>
-            </Card>
+            </PopoutCard>
           </div>
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* Status Breakdown */}
-            <Card>
-              <div className="p-4">
-                <h4 className="mb-4 text-base font-semibold text-foreground">Status Distribution</h4>
+            <PopoutCard title="Status Distribution" anchorId="blob-status" modalSize="full">
+              <div>
                 {statusData.some(d => d.value > 0) ? (
                   <BarChart data={statusData} labels={statusLabels} height={250} orientation="horizontal" />
                 ) : (
                   <div className="flex h-[250px] items-center justify-center text-muted">No status data available</div>
                 )}
               </div>
-            </Card>
+            </PopoutCard>
 
             {/* Blob Count Distribution */}
-            <Card>
-              <div className="p-4">
-                <h4 className="mb-2 text-base font-semibold text-foreground">Blob Count Distribution</h4>
-                <p className="mb-4 text-sm text-muted">Number of blobs per request</p>
+            <PopoutCard
+              title="Blob Count Distribution"
+              subtitle="Number of blobs per request"
+              anchorId="blob-count"
+              modalSize="full"
+            >
+              <div>
                 {blobCountData.length > 0 ? (
                   <BarChart data={blobCountData} labels={blobCountLabels} color={themeColors.accent} height={250} />
                 ) : (
@@ -556,44 +563,27 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   </div>
                 )}
               </div>
-            </Card>
+            </PopoutCard>
           </div>
         </>
       ) : (
         /* Hourly trend charts for longer time ranges */
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Hourly Duration (P50/P95 toggle) */}
-          <Card>
-            <div className="p-4">
-              <div className="mb-4 flex items-center justify-between">
-                <h4 className="text-base font-semibold text-foreground">
-                  Hourly {selectedPercentile === 'p50' ? 'P50' : 'P95'} Duration by Client
-                </h4>
-                <div className="flex rounded-md border border-border">
-                  <button
-                    onClick={() => setSelectedPercentile('p50')}
-                    className={clsx(
-                      'px-3 py-1 text-xs font-medium transition-colors',
-                      selectedPercentile === 'p50'
-                        ? 'bg-primary text-white'
-                        : 'bg-transparent text-muted hover:text-foreground'
-                    )}
-                  >
-                    P50
-                  </button>
-                  <button
-                    onClick={() => setSelectedPercentile('p95')}
-                    className={clsx(
-                      'px-3 py-1 text-xs font-medium transition-colors',
-                      selectedPercentile === 'p95'
-                        ? 'bg-primary text-white'
-                        : 'bg-transparent text-muted hover:text-foreground'
-                    )}
-                  >
-                    P95
-                  </button>
-                </div>
-              </div>
+          <PopoutCard
+            title={`Hourly ${selectedPercentile === 'p50' ? 'P50' : 'P95'} Duration by Client`}
+            anchorId="blob-hourly-duration"
+            modalSize="full"
+            headerActions={
+              <SegmentedControl
+                ariaLabel="Percentile"
+                options={PERCENTILE_OPTIONS}
+                value={selectedPercentile}
+                onChange={setSelectedPercentile}
+              />
+            }
+          >
+            <div>
               {(selectedPercentile === 'p50' ? hourlyTrendSeries : hourlyP95Series).length > 0 &&
               (selectedPercentile === 'p50' ? hourlyTrendSeries : hourlyP95Series).some(s => s.data.length > 0) ? (
                 <MultiLineChart
@@ -653,13 +643,16 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                 <div className="flex h-[300px] items-center justify-center text-muted">No hourly data available</div>
               )}
             </div>
-          </Card>
+          </PopoutCard>
 
           {/* Success Rate Over Time */}
-          <Card>
-            <div className="p-4">
-              <h4 className="mb-2 text-base font-semibold text-foreground">Success Rate Over Time</h4>
-              <p className="mb-4 text-sm text-muted">Percentage of successful getBlobs calls per hour by client</p>
+          <PopoutCard
+            title="Success Rate Over Time"
+            subtitle="Percentage of successful getBlobs calls per hour by client"
+            anchorId="blob-success-rate"
+            modalSize="full"
+          >
+            <div>
               {successRateTrendSeries.length > 0 && successRateTrendSeries.some(s => s.data.length > 0) ? (
                 <MultiLineChart
                   series={successRateTrendSeries}
@@ -720,7 +713,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                 <div className="flex h-[300px] items-center justify-center text-muted">No hourly data available</div>
               )}
             </div>
-          </Card>
+          </PopoutCard>
         </div>
       )}
     </div>

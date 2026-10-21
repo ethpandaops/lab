@@ -68,9 +68,9 @@ function CopyableBadge({
         type="button"
         onClick={onDrillDown ? handleClick : handleCopy}
         className={clsx(
-          'inline-flex cursor-pointer items-center justify-center rounded border px-1.5 py-0.5 font-mono text-2xs transition-all',
+          'inline-flex cursor-pointer items-center justify-center rounded-xs border px-1.5 py-0.5 font-mono text-2xs transition-all',
           copied
-            ? 'border-green-500/30 bg-green-500/10 text-green-500'
+            ? 'border-success/30 bg-success/10 text-success'
             : onDrillDown
               ? 'border-border bg-background text-foreground hover:border-primary/30 hover:bg-primary/10 hover:text-primary'
               : 'border-border bg-background text-foreground hover:border-primary/30 hover:bg-primary/10'
@@ -183,9 +183,9 @@ export function ProbeDetailDialog({
               type="button"
               onClick={handleCopyLink}
               className={clsx(
-                'ml-auto flex items-center gap-1.5 rounded border px-2 py-1 text-xs transition-all',
+                'ml-auto flex items-center gap-1.5 rounded-xs border px-2 py-1 text-xs transition-colors',
                 linkCopied
-                  ? 'border-green-500/30 bg-green-500/10 text-green-500'
+                  ? 'border-success/30 bg-success/10 text-success'
                   : 'border-border bg-background text-muted hover:border-primary/30 hover:bg-primary/10 hover:text-primary'
               )}
               title="Copy link to this probe"
@@ -217,10 +217,10 @@ export function ProbeDetailDialog({
                 className={clsx(
                   'text-sm font-medium',
                   probe.result === 'success'
-                    ? 'text-green-600 dark:text-green-400'
+                    ? 'text-success dark:text-success'
                     : probe.result === 'failure'
-                      ? 'text-yellow-600 dark:text-yellow-400'
-                      : 'text-red-600 dark:text-red-400'
+                      ? 'text-warning dark:text-warning'
+                      : 'text-danger dark:text-danger'
                 )}
               >
                 {probe.result === 'success'
@@ -253,12 +253,12 @@ export function ProbeDetailDialog({
                   <div
                     key={poster}
                     className={clsx(
-                      'relative flex items-center gap-2 rounded-lg border px-3 py-2',
+                      'relative flex items-center gap-2 rounded-sm border px-3 py-2',
                       probe.result === 'success'
-                        ? 'border-green-500/30 bg-green-500/5'
+                        ? 'border-success/30 bg-success/5'
                         : probe.result === 'failure'
-                          ? 'border-yellow-500/30 bg-yellow-500/5'
-                          : 'border-red-500/30 bg-red-500/5'
+                          ? 'border-warning/30 bg-warning/5'
+                          : 'border-danger/30 bg-danger/5'
                     )}
                   >
                     {/* Logo with shield overlay */}
@@ -268,10 +268,10 @@ export function ProbeDetailDialog({
                         className={clsx(
                           'absolute -right-1 -bottom-1 size-4 rounded-full bg-background',
                           probe.result === 'success'
-                            ? 'text-green-500'
+                            ? 'text-success'
                             : probe.result === 'failure'
-                              ? 'text-yellow-500'
-                              : 'text-red-500'
+                              ? 'text-warning'
+                              : 'text-danger'
                         )}
                       />
                     </div>
@@ -290,16 +290,16 @@ export function ProbeDetailDialog({
 
         {/* Error Section - show early for failure probes */}
         {probe.error && (
-          <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3">
-            <h4 className="mb-2 text-2xs font-bold tracking-wider text-red-400 uppercase">Error</h4>
-            <div className="font-mono text-2xs text-red-300">{probe.error}</div>
+          <div className="rounded-sm border border-danger/20 bg-danger/5 p-3">
+            <h4 className="mb-2 text-xs font-semibold text-danger">Error</h4>
+            <div className="font-mono text-2xs text-danger">{probe.error}</div>
           </div>
         )}
 
         {/* About */}
         {probe.slot !== undefined && probe.slot !== null && currentNetwork && probe.probe_date_time && (
           <div>
-            <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
+            <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold text-foreground">
               <InformationCircleIcon className="size-4 text-primary" />
               About
             </h4>
@@ -355,14 +355,14 @@ export function ProbeDetailDialog({
 
         {/* Client Details Table */}
         <div>
-          <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
+          <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold text-foreground">
             <CpuChipIcon className="size-4 text-primary" />
             Client Details
           </h4>
 
-          <div className="overflow-x-auto rounded-lg border border-border">
+          <div className="overflow-x-auto rounded-sm border border-border">
             <table className="min-w-full text-xs">
-              <thead className="bg-muted/50 font-medium text-muted uppercase">
+              <thead className="bg-muted/50 font-medium text-muted">
                 <tr>
                   <th className="px-2 py-1 text-left">Attribute</th>
                   <th className="px-2 py-1 text-left">Prober</th>
@@ -370,7 +370,7 @@ export function ProbeDetailDialog({
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                <tr className="bg-card/30">
+                <tr>
                   <td className="px-2 py-1 font-medium text-muted">Client</td>
                   <td className="px-2 py-1">
                     <div className="flex items-center gap-1.5">
@@ -407,7 +407,7 @@ export function ProbeDetailDialog({
                   </td>
                   <td className="px-2 py-1 text-muted">-</td>
                 </tr>
-                <tr className="bg-card/30">
+                <tr>
                   <td className="px-2 py-1 font-medium text-muted">Version</td>
                   <td className="px-2 py-1">
                     <FilterableValue
@@ -449,7 +449,7 @@ export function ProbeDetailDialog({
                     </div>
                   </td>
                 </tr>
-                <tr className="bg-card/30">
+                <tr>
                   <td className="px-2 py-1 font-medium text-muted">City</td>
                   <td className="px-2 py-1">
                     <FilterableValue
@@ -495,7 +495,7 @@ export function ProbeDetailDialog({
                     />
                   </td>
                 </tr>
-                <tr className="bg-card/30">
+                <tr>
                   <td className="px-2 py-1 font-medium text-muted">Peer ID</td>
                   <td className="px-2 py-1 text-muted">-</td>
                   <td className="px-2 py-1">
@@ -515,11 +515,11 @@ export function ProbeDetailDialog({
         {/* Probed Columns */}
         {probe.column_indices && probe.column_indices.length > 0 && (
           <div className="border-t border-border pt-4">
-            <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-foreground uppercase">
+            <h4 className="mb-2 flex items-center gap-2 text-xs font-semibold text-foreground">
               <ListBulletIcon className="size-4 text-primary" />
               Probed Columns
             </h4>
-            <div className="max-h-32 overflow-y-auto rounded border border-border/50 bg-muted/30 p-2">
+            <div className="max-h-32 overflow-y-auto rounded-sm border border-border/50 bg-muted/30 p-2">
               <div className="flex flex-wrap gap-1">
                 {[...probe.column_indices]
                   .sort((a, b) => a - b)

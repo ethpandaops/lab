@@ -16,12 +16,12 @@ import type { ProbeEventRowProps } from './ProbeEventRow.types';
  */
 function ResultIcon({ result }: { result?: string }): JSX.Element {
   if (result === 'success') {
-    return <CheckCircleIcon className="size-4 text-green-500" />;
+    return <CheckCircleIcon className="size-4 text-success" />;
   }
   if (result === 'failure') {
-    return <XCircleIcon className="size-4 text-yellow-500" />;
+    return <XCircleIcon className="size-4 text-warning" />;
   }
-  return <QuestionMarkCircleIcon className="size-4 text-red-500" />;
+  return <QuestionMarkCircleIcon className="size-4 text-danger" />;
 }
 
 /**
@@ -60,7 +60,7 @@ export function ProbeEventRow({ probe, onClick, isNew, showViewIcon }: ProbeEven
       <div className="relative shrink-0">
         <ClientLogo client={peerClient} size={28} />
         {peerCountryCode && (
-          <div className="absolute -right-1.5 -bottom-1 flex size-4 items-center justify-center rounded-full border border-background bg-surface text-2xs shadow-xs">
+          <div className="absolute -right-1.5 -bottom-1 flex size-4 items-center justify-center rounded-full border border-background bg-surface text-2xs">
             {getCountryFlag(peerCountryCode)}
           </div>
         )}

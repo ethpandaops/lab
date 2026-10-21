@@ -32,10 +32,12 @@ export function SegmentedControl<T extends string>({
             key={option.value}
             type="button"
             aria-pressed={isSelected}
+            disabled={option.disabled}
             onClick={() => onChange(option.value)}
             className={clsx(
               'h-full shrink-0 rounded-xs px-2.5 text-xs font-medium whitespace-nowrap transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary/50',
-              isSelected ? 'bg-primary/15 text-primary' : 'text-muted hover:bg-muted/10 hover:text-foreground'
+              isSelected ? 'bg-primary/15 text-primary' : 'text-muted hover:bg-muted/10 hover:text-foreground',
+              'disabled:cursor-not-allowed disabled:text-muted/40 disabled:hover:bg-transparent'
             )}
           >
             {option.label}

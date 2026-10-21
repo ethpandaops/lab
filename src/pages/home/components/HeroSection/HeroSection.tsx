@@ -30,7 +30,7 @@ function FlipDigit({ digit }: { digit: string }): JSX.Element {
   }, [digit]);
 
   return (
-    <span className="relative inline-flex h-4 w-3 items-center justify-center overflow-hidden rounded-[2px] bg-foreground/[0.05] sm:h-5 sm:w-3.5">
+    <span className="relative inline-flex h-4 w-3 items-center justify-center overflow-hidden rounded-xs bg-foreground/[0.05] sm:h-5 sm:w-3.5">
       {outgoing !== null && (
         <span
           className="absolute inset-0 flex items-center justify-center"
@@ -82,18 +82,18 @@ function NetworkCard({
       to="/ethereum/live"
       search={{ network: network.name === 'mainnet' ? undefined : network.name }}
       onClick={() => onSelectNetwork(network)}
-      className="group flex w-36 cursor-pointer flex-col items-center gap-1.5 rounded-sm border border-border/30 bg-surface px-3 py-3 text-center transition-all duration-200 hover:border-primary/25 focus:outline-hidden focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:w-44 sm:gap-2.5 sm:px-5 sm:py-5 lg:w-48"
+      className="group flex w-36 cursor-pointer flex-col items-center gap-1.5 rounded-sm border border-border bg-surface px-3 py-3 text-center transition-colors duration-200 hover:border-primary/40 focus:outline-hidden focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:w-44 sm:gap-2.5 sm:px-5 sm:py-5 lg:w-48"
     >
       <NetworkIcon networkName={network.name} className="size-8 sm:size-12" />
       <div className="flex items-center gap-1.5">
-        <span className="size-1.5 rounded-full bg-success transition-shadow duration-200 group-hover:shadow-[0_0_6px_var(--color-success)]" />
+        <span className="size-1.5 rounded-full bg-success" />
         <span className="text-xs/4 font-semibold tracking-tight text-foreground sm:text-sm/4">
           {getNetworkShortLabel(network)}
         </span>
       </div>
-      <span className="text-2xs/3 font-medium tracking-wide text-muted uppercase">{forkLabel}</span>
+      <span className="text-2xs/3 font-medium text-muted">{forkLabel}</span>
       <div className="flex flex-col items-center gap-1">
-        <span className="text-2xs/3 font-medium tracking-[0.2em] text-muted/40 uppercase">Slot</span>
+        <span className="text-2xs/3 font-medium text-muted">Slot</span>
         <SlotDisplay slot={slot} />
       </div>
     </Link>
@@ -132,7 +132,7 @@ export function HeroSection(): JSX.Element {
 
         <div className="mt-4 flex items-center justify-center gap-2.5 sm:mt-6 lg:mt-8">
           <img src="/images/lab.png" alt="" className="size-5 opacity-60" />
-          <span className="text-2xs/3 font-medium tracking-[0.2em] text-muted uppercase">by ethPandaOps</span>
+          <span className="text-2xs/3 font-medium text-muted">by ethPandaOps</span>
         </div>
 
         {/* Network instrument panels */}
@@ -141,7 +141,7 @@ export function HeroSection(): JSX.Element {
             {groups.map(group => (
               <Fragment key={group.id}>
                 {group.id !== 'public' && (
-                  <span className="mt-1 text-2xs/3 font-medium tracking-[0.15em] text-muted/40 uppercase">
+                  <span className="mt-1 text-2xs/3 font-medium text-muted">
                     {group.id === 'other' ? 'Devnets' : `${group.label} devnets`}
                   </span>
                 )}

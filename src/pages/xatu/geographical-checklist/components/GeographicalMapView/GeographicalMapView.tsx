@@ -258,7 +258,7 @@ export function GeographicalMapView({ nodes, isLoading }: GeographicalMapViewPro
                     : node.meta_client_geo_country || 'Unknown';
 
                 return (
-                  <li key={`${node.username}-${index}`} className="rounded-lg border border-border bg-surface p-4">
+                  <li key={`${node.username}-${index}`} className="rounded-sm border border-border bg-surface p-4">
                     <div className="flex items-center gap-x-3">
                       {node.username ? (
                         <Link

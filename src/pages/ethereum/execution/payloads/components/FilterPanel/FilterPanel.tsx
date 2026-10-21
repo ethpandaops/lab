@@ -77,13 +77,13 @@ function FilterChip({
   onRemove: () => void;
 }): JSX.Element {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs text-primary">
+    <span className="inline-flex items-center gap-1 rounded-xs border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs text-primary">
       <span className="font-medium">{label}:</span>
       <span className="max-w-32 truncate">{value}</span>
       <button
         type="button"
         onClick={onRemove}
-        className="ml-0.5 rounded-full p-0.5 transition-colors hover:bg-primary/20"
+        className="ml-0.5 rounded-xs p-0.5 transition-colors hover:bg-primary/20"
       >
         <XMarkIcon className="size-3" />
       </button>
@@ -212,7 +212,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
           <FunnelIcon className="size-4" />
           Filters
           {activeFilterCount > 0 && (
-            <span className="text-primary-foreground flex size-5 items-center justify-center rounded-full bg-primary text-xs">
+            <span className="text-primary-foreground flex size-5 items-center justify-center rounded-xs bg-primary text-xs">
               {activeFilterCount}
             </span>
           )}
@@ -260,7 +260,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
           {/* Top row: Status and Client filters */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <h4 className="mb-2 text-xs font-semibold tracking-wider text-muted uppercase">Status</h4>
+              <h4 className="mb-2 text-xs font-semibold text-muted">Status</h4>
               <SelectMenu
                 value={draftFilters.status ?? ''}
                 onChange={value => updateDraft('status', value)}
@@ -269,7 +269,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
               />
             </div>
             <div>
-              <h4 className="mb-2 text-xs font-semibold tracking-wider text-muted uppercase">EL Client</h4>
+              <h4 className="mb-2 text-xs font-semibold text-muted">EL Client</h4>
               <SelectMenu
                 value={draftFilters.elClient ?? ''}
                 onChange={value => updateDraft('elClient', value)}
@@ -282,7 +282,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
           {/* Slot and Block number filters */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <h4 className="mb-2 text-xs font-semibold tracking-wider text-muted uppercase">Slot</h4>
+              <h4 className="mb-2 text-xs font-semibold text-muted">Slot</h4>
               <Input size="sm">
                 <Input.Field
                   type="number"
@@ -293,7 +293,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
               </Input>
             </div>
             <div>
-              <h4 className="mb-2 text-xs font-semibold tracking-wider text-muted uppercase">Block</h4>
+              <h4 className="mb-2 text-xs font-semibold text-muted">Block</h4>
               <Input size="sm">
                 <Input.Field
                   type="number"
@@ -306,8 +306,8 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
           </div>
 
           {/* Thresholds section */}
-          <div className="space-y-3 rounded-lg border border-border bg-background p-4">
-            <h4 className="text-xs font-semibold tracking-wider text-primary uppercase">Thresholds</h4>
+          <div className="space-y-3 rounded-sm border border-border bg-background p-4">
+            <h4 className="text-xs font-semibold text-foreground">Thresholds</h4>
             <div className="grid grid-cols-3 gap-6">
               <SliderField
                 label="Duration"
@@ -340,7 +340,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
           </div>
 
           {/* Reference Nodes toggle */}
-          <div className="flex items-center justify-between rounded-lg border border-border bg-background p-4">
+          <div className="flex items-center justify-between rounded-sm border border-border bg-background p-4">
             <div>
               <h4 className="text-sm font-medium text-foreground">Reference Nodes Only</h4>
               <p className="text-xs text-muted">Show only observations from EIP-7870 reference block builder nodes</p>
