@@ -46,13 +46,13 @@
    * rounded-sm (6px) for every container and control. The larger Tailwind steps alias to
    * rounded-sm so md/lg/xl classes cannot drift from it. Use rounded-full only for dots,
    * avatars and progress tracks. */
-  --radius-xs: 0.25rem;
-  --radius-sm: 0.375rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.375rem;
-  --radius-xl: 0.375rem;
-  --radius-2xl: 0.375rem;
-  --radius-3xl: 0.375rem;
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 3px;
+  --radius-lg: 3px;
+  --radius-xl: 3px;
+  --radius-2xl: 3px;
+  --radius-3xl: 3px;
 
   /* ===== Type Scale ===== */
   /* One step below text-xs for dense labels (axis ticks, HUD keys, badges in tight cells).
@@ -328,14 +328,14 @@
     --secondary-value: var(--color-neutral-900);
     --accent-value: var(--color-terracotta-300);
     /* Three distinct steps so panels read without shadows: page, panel, hairline */
-    --background-value: #0f0f0e;
-    --surface-value: #181817;
-    --foreground-value: #f5f5f4;
-    --muted-value: #a19f9a;
-    --border-value: #2c2b29;
+    --background-value: #0a0a0a;
+    --surface-value: #111111;
+    --foreground-value: #ededed;
+    --muted-value: #8f8f8f;
+    --border-value: #242424;
 
     /* Set html background for overscroll */
-    background-color: #0f0f0e;
+    background-color: #0a0a0a;
   }
 
   html.star {
@@ -353,9 +353,15 @@
     background-color: var(--color-aurora-blue-950);
   }
 
+  /* Instrument density: every rem-based size and space drops to 87.5% */
+  html {
+    font-size: 87.5%;
+  }
+
   body {
     font-family: var(--font-sans);
     font-feature-settings: 'ss01';
+    font-variant-numeric: tabular-nums;
     color: var(--foreground-value);
     background-color: var(--background-value);
   }

@@ -29,9 +29,9 @@ export function Stats({ stats, title, className, gridClassName }: StatsProps): J
           return (
             <div
               key={item.id}
-              className="relative flex min-w-0 flex-col px-4 py-3.5 shadow-[1px_0_0_0_var(--color-border),0_1px_0_0_var(--color-border)] sm:px-5"
+              className="relative flex min-w-0 flex-col px-3 py-2.5 shadow-[1px_0_0_0_var(--color-border),0_1px_0_0_var(--color-border)]"
             >
-              <dt className="flex min-w-0 items-center gap-1.5 text-xs/5 font-medium text-muted">
+              <dt className="flex min-w-0 items-center gap-1.5 font-mono text-2xs/4 font-medium tracking-wider text-muted uppercase">
                 {Icon && (
                   <Icon
                     aria-hidden="true"
@@ -45,7 +45,7 @@ export function Stats({ stats, title, className, gridClassName }: StatsProps): J
               <dd className="mt-1 flex min-w-0 items-baseline gap-2">
                 <span
                   className={clsx(
-                    'truncate text-2xl/8 font-semibold tracking-tight tabular-nums',
+                    'truncate font-mono text-2xl/8 font-medium tracking-tight tabular-nums',
                     item.valueClassName ?? 'text-foreground'
                   )}
                 >

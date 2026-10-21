@@ -40,7 +40,7 @@ export function Table<T = unknown>({
               key={index}
               scope="col"
               className={clsx(
-                'py-2.5 text-left text-xs font-medium whitespace-nowrap text-muted',
+                'bg-background/40 py-1.5 text-left font-mono text-2xs font-medium tracking-wider whitespace-nowrap text-muted uppercase',
                 edgePadding(index),
                 column.headerClassName
               )}
@@ -72,7 +72,7 @@ export function Table<T = unknown>({
                 <td
                   key={colIndex}
                   className={clsx(
-                    'py-2.5 text-sm whitespace-nowrap tabular-nums',
+                    'py-1.5 font-mono text-xs whitespace-nowrap tabular-nums',
                     edgePadding(colIndex),
                     column.cellClassName || 'text-foreground'
                   )}

@@ -160,7 +160,7 @@ export function getDataVizColors(): ReturnType<typeof computeDataVizColors> {
 }
 
 /** Font stack for ECharts canvas text; matches the UI's --font-sans. */
-export const CHART_FONT_FAMILY = "'Geist Variable', Geist, system-ui, sans-serif";
+export const CHART_FONT_FAMILY = "'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace";
 
 /**
  * Build ECharts-compatible theme object from ThemeColors
