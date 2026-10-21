@@ -666,15 +666,6 @@ export function IndexPage(): JSX.Element {
   );
 
   // Chart subtitles
-  const subtitles = {
-    tps: isDaily ? 'Daily TPS' : `Hourly TPS over ${config.days} days`,
-    transactions: isDaily
-      ? 'Daily transactions per block with cumulative'
-      : `Hourly transactions over ${config.days} days`,
-    gas: isDaily ? 'Daily gas usage with limit reference' : `Hourly gas metrics over ${config.days} days`,
-    signalling: isDaily ? 'Validator gas limit preferences' : `Gas limit signalling over ${config.days} days`,
-  };
-
   return (
     <Container>
       <div className="mb-8">
@@ -710,7 +701,7 @@ export function IndexPage(): JSX.Element {
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           {/* TPS Chart */}
           {tpsChartConfig && (
-            <PopoutCard title="Transactions Per Second" subtitle={subtitles.tps} anchorId="tps-chart" modalSize="full">
+            <PopoutCard title="Transactions Per Second" anchorId="tps-chart" modalSize="full">
               {({ inModal }) => (
                 <MultiLineChart
                   series={tpsChartConfig.series}
@@ -737,12 +728,7 @@ export function IndexPage(): JSX.Element {
 
           {/* Transactions Chart */}
           {transactionsChartConfig && (
-            <PopoutCard
-              title="Transactions Per Block"
-              subtitle={subtitles.transactions}
-              anchorId="transactions-chart"
-              modalSize="full"
-            >
+            <PopoutCard title="Transactions Per Block" anchorId="transactions-chart" modalSize="full">
               {({ inModal }) => (
                 <MultiLineChart
                   series={transactionsChartConfig.series}
@@ -778,7 +764,7 @@ export function IndexPage(): JSX.Element {
 
           {/* Gas Used Chart */}
           {gasChartConfig && (
-            <PopoutCard title="Gas Used Per Block" subtitle={subtitles.gas} anchorId="gas-chart" modalSize="full">
+            <PopoutCard title="Gas Used Per Block" anchorId="gas-chart" modalSize="full">
               {({ inModal }) => (
                 <MultiLineChart
                   series={gasChartConfig.series}
@@ -817,12 +803,7 @@ export function IndexPage(): JSX.Element {
 
           {/* Gas Limit Signalling Chart */}
           {signallingChartConfig && (
-            <PopoutCard
-              title="Gas Limit Signalling"
-              subtitle={subtitles.signalling}
-              anchorId="gas-signalling-chart"
-              modalSize="full"
-            >
+            <PopoutCard title="Gas Limit Signalling" anchorId="gas-signalling-chart" modalSize="full">
               {({ inModal }) => (
                 <MultiLineChart
                   series={signallingChartConfig.series}

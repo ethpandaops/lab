@@ -1128,7 +1128,7 @@ function WinrateSection({
   return (
     <PopoutCard
       title="Execution Winrate"
-      subtitle="Which execution client had the fastest engine_newPayload per slot"
+      subtitle="Fastest engine_newPayload per slot"
       anchorId="winrate"
       modalSize="full"
     >

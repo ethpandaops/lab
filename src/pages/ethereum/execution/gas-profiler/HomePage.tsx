@@ -1152,12 +1152,7 @@ export function HomePage(): JSX.Element {
       {/* Time Series Charts Row */}
       <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Opcodes Per Second */}
-        <PopoutCard
-          title="Opcodes Per Second"
-          subtitle={`EVM opcode execution rate (${timePeriod})`}
-          anchorId="ops-chart"
-          modalSize="full"
-        >
+        <PopoutCard title="Opcodes Per Second" anchorId="ops-chart" modalSize="full">
           {({ inModal }) =>
             isOpcodeOpsLoading ? (
               <div className="flex h-[320px] items-center justify-center">
@@ -1191,12 +1186,7 @@ export function HomePage(): JSX.Element {
         </PopoutCard>
 
         {/* Gas by Category */}
-        <PopoutCard
-          title="Gas by Category"
-          subtitle={`Opcode category distribution (${timePeriod})`}
-          anchorId="gas-by-category"
-          modalSize="full"
-        >
+        <PopoutCard title="Gas by Category" anchorId="gas-by-category" modalSize="full">
           {({ inModal }) =>
             isOpcodeGasLoading ? (
               <div className="flex h-[420px] items-center justify-center">
@@ -1246,12 +1236,7 @@ export function HomePage(): JSX.Element {
 
       {/* Receipt Size Per Block */}
       <div className="mb-6 grid grid-cols-1 lg:grid-cols-2">
-        <PopoutCard
-          title="Receipt Size Per Block"
-          subtitle={`Total receipt bytes per block (${timePeriod})`}
-          anchorId="receipt-size-chart"
-          modalSize="full"
-        >
+        <PopoutCard title="Receipt Size Per Block" anchorId="receipt-size-chart" modalSize="full">
           {({ inModal }) =>
             isReceiptSizeLoading ? (
               <div className="flex h-[320px] items-center justify-center">

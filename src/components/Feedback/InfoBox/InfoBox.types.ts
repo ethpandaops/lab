@@ -5,6 +5,8 @@ export interface InfoBoxProps {
    * The content to display inside the info box
    */
   children: ReactNode;
+  /** Collapse the note behind this one-line label */
+  summary?: ReactNode;
 
   /**
    * Optional icon to display in the top-left corner

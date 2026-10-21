@@ -204,7 +204,7 @@ export function IndexPage(): JSX.Element {
             </div>
           </div>
 
-          <InfoBox>
+          <InfoBox summary="How this is measured">
             Clients are read from what proposers put in their graffiti: the engine API client version codes most
             consensus clients append (for example <span className="font-mono">GEa579PMfea2</span>) or a client&apos;s
             default version string. Blocks with empty or custom graffiti count as unknown, so these shares describe the

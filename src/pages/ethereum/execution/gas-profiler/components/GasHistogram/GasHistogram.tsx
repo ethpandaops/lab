@@ -17,7 +17,7 @@ export interface GasHistogramProps {
   /** Title for the card */
   title: string;
   /** Subtitle for the card */
-  subtitle: string;
+  subtitle?: string;
   /** Array of gas values to bucket */
   values: number[];
   /** Custom bucket definitions (optional - uses defaults if not provided) */

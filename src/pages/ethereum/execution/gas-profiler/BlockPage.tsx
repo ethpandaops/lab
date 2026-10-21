@@ -1217,7 +1217,6 @@ export function BlockPage(): JSX.Element {
               />
               <GasHistogram
                 title="Transaction Size Distribution"
-                subtitle="How is gas distributed across transactions?"
                 values={transactionGasValues}
                 buckets={TRANSACTION_BUCKETS}
                 yAxisLabel="Transactions"

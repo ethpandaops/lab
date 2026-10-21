@@ -234,7 +234,7 @@ export function IndexPage(): JSX.Element {
             <SentryFilter clients={sentryClients} value={sentry} onChange={client => setSearch({ sentry: client })} />
           </div>
 
-          <InfoBox>
+          <InfoBox summary="How this is measured">
             Gossipsub partial messages (EIP-8136) let peers exchange data columns cell by cell: a node fills what it can
             from its execution layer with getBlobs, tells its peers which cells it has, and receives only the missing
             ones. Lighthouse v8.3.0 and Prysm v7.2.1 turn it on by default. Completion and message numbers come from

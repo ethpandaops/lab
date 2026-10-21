@@ -502,13 +502,13 @@ export function OpcodeAnalysis({
       {/* Two charts side by side */}
       {showCharts && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <PopoutCard title="Opcodes by Gas" subtitle="Top opcodes by gas consumption">
+          <PopoutCard title="Opcodes by Gas">
             {({ inModal }) => (
               <OpcodeByGasChart opcodeStats={opcodeStats} maxOpcodes={maxOpcodes} minHeight={inModal ? 400 : 280} />
             )}
           </PopoutCard>
 
-          <PopoutCard title="Opcodes by Count" subtitle="Top opcodes by execution count">
+          <PopoutCard title="Opcodes by Count">
             {({ inModal }) => (
               <OpcodeByCountChart opcodeStats={opcodeStats} maxOpcodes={maxOpcodes} minHeight={inModal ? 400 : 280} />
             )}
