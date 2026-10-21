@@ -94,9 +94,9 @@ export function Table<T = unknown>({
         className={clsx(
           'overflow-x-auto [--table-inset:--spacing(4)] sm:[--table-inset:--spacing(6)]',
           // On a page: its own surface, matching Card depth
-          'rounded-sm bg-surface shadow-sm dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
+          'rounded-sm bg-surface outline -outline-offset-1 outline-border',
           // Inside a Card body: transparent, flush to the card edges, aligned to the card inset
-          'in-data-[slot=card-body]:-mx-(--card-inset) in-data-[slot=card-body]:rounded-none in-data-[slot=card-body]:bg-transparent in-data-[slot=card-body]:shadow-none in-data-[slot=card-body]:outline-none in-data-[slot=card-body]:[--table-inset:var(--card-inset)]',
+          'in-data-[slot=card-body]:-mx-(--card-inset) in-data-[slot=card-body]:rounded-none in-data-[slot=card-body]:bg-transparent in-data-[slot=card-body]:outline-none in-data-[slot=card-body]:[--table-inset:var(--card-inset)]',
           'in-data-[slot=card-body]:first:-mt-(--card-inset-y) in-data-[slot=card-body]:last:-mb-(--card-inset-y)'
         )}
       >

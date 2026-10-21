@@ -62,14 +62,18 @@ Constant across all themes:
 
 ## Depth Strategy
 
-**Hybrid: shadows (light) + outlines (dark).**
+**Hairlines only, both themes.** Panels are `bg-surface outline -outline-offset-1 outline-border`;
+no shadows in light mode, no lift on hover. The palette has three clearly separated steps —
+page (`background`), panel (`surface`), hairline (`border`) — so panels read without shadows.
+The sidebar uses the page background, so content panels are the only raised surfaces.
 
-- Light mode: `shadow-sm` on cards
-- Dark mode: `outline outline-border` (no shadows — they disappear on dark backgrounds)
-- Star mode: follows dark mode pattern
-- Interactive hover: `-translate-y-0.5 shadow-xs` (light), no shadow change (dark)
-
----
+| Token | Light | Dark |
+|---|---|---|
+| background | sand-100 | #0f0f0e |
+| surface | #fbfaf6 | #181817 |
+| border | #dcd7c5 | #2c2b29 |
+| muted | sand-700 | #a19f9a |
+| foreground | sand-950 | #f5f5f4 |
 
 ## Border Radius
 

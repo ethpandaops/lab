@@ -313,10 +313,10 @@
     --secondary-value: var(--color-sand-200);
     --accent-value: var(--color-terracotta-500);
     --background-value: var(--color-sand-100);
-    --surface-value: var(--color-sand-50);
+    --surface-value: #fbfaf6;
     --foreground-value: var(--color-sand-950);
-    --muted-value: var(--color-sand-600);
-    --border-value: var(--color-sand-300);
+    --muted-value: var(--color-sand-700);
+    --border-value: #dcd7c5;
 
     /* Set html background for overscroll */
     background-color: var(--color-sand-100);
@@ -327,14 +327,15 @@
     --primary-value: var(--color-terracotta-400);
     --secondary-value: var(--color-neutral-900);
     --accent-value: var(--color-terracotta-300);
-    --background-value: var(--color-neutral-950);
-    --surface-value: #242424;
-    --foreground-value: var(--color-neutral-50);
-    --muted-value: var(--color-neutral-400);
-    --border-value: var(--color-neutral-800);
+    /* Three distinct steps so panels read without shadows: page, panel, hairline */
+    --background-value: #0f0f0e;
+    --surface-value: #181817;
+    --foreground-value: #f5f5f4;
+    --muted-value: #a19f9a;
+    --border-value: #2c2b29;
 
     /* Set html background for overscroll */
-    background-color: var(--color-neutral-950);
+    background-color: #0f0f0e;
   }
 
   html.star {

@@ -312,7 +312,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
             transition
             className="relative flex w-full flex-1 transform transition duration-300 ease-in-out data-closed:-translate-x-full"
           >
-            <div className="relative flex grow flex-col bg-surface/95 backdrop-blur-xl">
+            <div className="relative flex grow flex-col bg-background">
               <div className="flex grow flex-col gap-y-4 overflow-y-auto px-4 pt-4">
                 <div className="mb-2">
                   <NetworkSelect showLabel={false} />
@@ -401,7 +401,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
       {/* Static sidebar for desktop */}
       <div
         className={clsx(
-          'hidden border-r border-border bg-surface/95 backdrop-blur-xl transition-all duration-200 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col',
+          'hidden border-r border-border bg-background transition-all duration-200 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col',
           collapsed ? 'lg:w-14' : 'lg:w-56'
         )}
       >
