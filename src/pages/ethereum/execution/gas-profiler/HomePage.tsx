@@ -1140,7 +1140,7 @@ export function HomePage(): JSX.Element {
               type="button"
               onClick={() => navigate({ search: prev => ({ ...prev, t: value }), replace: true, resetScroll: false })}
               className={clsx(
-                'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
+                'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
                 timePeriod === value
                   ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
                   : 'bg-surface text-muted ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'

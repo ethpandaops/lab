@@ -28,8 +28,7 @@ export interface ButtonProps extends ComponentPropsWithoutRef<typeof HeadlessBut
    * - 'lg': Large rounding (rounded-lg)
    * - 'xl': Extra large rounding (rounded-xl)
    * - 'full': Fully rounded pill shape (rounded-full)
-   * - undefined: Square corners (rounded-none)
-   * @default undefined
+   * @default 'sm'
    */
   rounded?: ButtonRounded;
 

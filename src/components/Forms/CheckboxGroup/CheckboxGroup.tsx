@@ -8,7 +8,7 @@ export function CheckboxGroup({
   options,
   variant = 'list',
   className = '',
-  rounded = false,
+  rounded = true,
 }: CheckboxGroupProps): React.JSX.Element {
   // Render checkbox based on variant
   const renderCheckbox = (option: (typeof options)[0]): React.JSX.Element => {

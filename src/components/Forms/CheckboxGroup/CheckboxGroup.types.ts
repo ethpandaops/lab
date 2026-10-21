@@ -65,7 +65,7 @@ export interface CheckboxGroupProps {
    */
   className?: string;
   /**
-   * Apply rounded corners (rounded-sm) to checkboxes. Default: false
+   * Apply rounded corners (rounded-sm) to checkboxes. Default: true
    */
   rounded?: boolean;
 }

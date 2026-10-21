@@ -167,7 +167,7 @@ export function QuickFilters({
             type="button"
             onClick={onLiveModeToggle}
             className={clsx(
-              'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all',
+              'inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
               isLive
                 ? 'bg-green-500/20 text-green-400 ring-2 ring-green-500/30'
                 : 'bg-surface text-muted ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
@@ -204,7 +204,7 @@ export function QuickFilters({
               onClick={() => handlePresetClick(preset)}
               title={preset.description}
               className={clsx(
-                'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all',
+                'inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
                 isActive
                   ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
                   : 'bg-surface ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
@@ -225,7 +225,7 @@ export function QuickFilters({
               onClick={() => handlePresetClick(preset)}
               title={preset.description}
               className={clsx(
-                'hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all sm:inline-flex',
+                'hidden items-center gap-1.5 rounded-sm px-3 py-1.5 text-xs font-medium transition-all sm:inline-flex',
                 isActive
                   ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
                   : 'bg-surface ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
@@ -271,7 +271,7 @@ export function QuickFilters({
           onClick={handleReferenceNodesToggle}
           title={isReferenceNodesActive ? 'Showing EIP-7870 reference nodes only' : 'Showing all nodes'}
           className={clsx(
-            'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all',
+            'inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
             isReferenceNodesActive
               ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
               : 'bg-surface ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'

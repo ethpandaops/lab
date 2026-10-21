@@ -106,7 +106,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const sizeStyle = iconOnly ? iconOnlySizeStyles[size] : sizeStyles[size];
-    const roundedStyle = rounded ? roundedStyles[rounded] : iconOnly ? 'rounded-full' : 'rounded-none';
+    const roundedStyle = roundedStyles[rounded ?? 'sm'];
 
     const buttonClassName = clsx(
       baseStyles,

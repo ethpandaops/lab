@@ -22,7 +22,7 @@ export interface CardProps {
   onClick?: () => void;
   /** Optional feature image element (typically an img) displayed on right side with fade effect */
   featureImage?: ReactNode;
-  /** Apply rounded corners (rounded-sm). Default: false */
+  /** Apply rounded corners (rounded-sm). Default: true */
   rounded?: boolean;
   /** Allow content to overflow card boundaries (useful for tooltips, dropdowns). Default: false */
   allowContentOverflow?: boolean;

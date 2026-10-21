@@ -11,7 +11,7 @@ export function Checkbox({
   disabled,
   name,
   value,
-  rounded = false,
+  rounded = true,
   ...props
 }: CheckboxProps): React.JSX.Element {
   const checkboxId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
