@@ -93,7 +93,7 @@ export function DetailPage(): React.JSX.Element {
   return (
     <Container>
       {/* Unified entity header with stats */}
-      <div className="animate-fade-in">
+      <div>
         <EntityBasicInfoCard
           stats={data.stats}
           activeValidatorCount={validatorStatus.data?.latestActiveCount}
@@ -102,7 +102,7 @@ export function DetailPage(): React.JSX.Element {
       </div>
 
       {/* Tabbed content */}
-      <div className="mt-8 animate-fade-in-delay">
+      <div className="mt-8">
         <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
           <ScrollableTabs>
             <Tab>Validators</Tab>

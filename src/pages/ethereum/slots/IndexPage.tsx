@@ -294,20 +294,12 @@ export function IndexPage(): JSX.Element {
 
             return clsx(
               'transition-all duration-200',
-              row.hasData ? 'cursor-pointer hover:bg-surface/80 hover:shadow-sm' : 'cursor-not-allowed opacity-50',
+              row.hasData ? 'cursor-pointer hover:bg-surface/80' : 'cursor-not-allowed opacity-50',
               isCurrentSlot && 'bg-primary/5 ring-1 ring-primary/20 ring-inset',
               // Subtle epoch alternation (only when not current slot)
               !isCurrentSlot && isEvenEpoch && 'bg-surface/30',
               // Add subtle top border at epoch transitions
-              isEpochTransition && 'border-t-2 border-t-accent/20',
-              // Staggered fade-in animation
-              'animate-in fade-in slide-in-from-bottom-2 duration-300',
-              {
-                'animation-delay-75': rowIndex % 5 === 1,
-                'animation-delay-150': rowIndex % 5 === 2,
-                'animation-delay-200': rowIndex % 5 === 3,
-                'animation-delay-300': rowIndex % 5 === 4,
-              }
+              isEpochTransition && 'border-t-2 border-t-accent/20'
             );
           }}
           getRowStyle={(_, rowIndex) => ({

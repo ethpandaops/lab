@@ -58,25 +58,11 @@ function ChainCard({
         isLast ? 'z-10 scale-105' : 'hover:z-10 hover:scale-[1.02]'
       )}
     >
-      {/* Glow effect for highlighted items */}
-      {isHighlighted && <div className="absolute -inset-3 animate-pulse rounded-xs bg-primary/20 blur-xl" />}
-
-      {/* Top face (3D effect) */}
-      <div
-        className={clsx(
-          'absolute -top-2 right-1 left-1 h-3 rounded-t-xs',
-          isHighlighted ? 'bg-linear-to-b from-primary/40 to-primary/20' : 'bg-linear-to-b from-border/60 to-border/30'
-        )}
-        style={{ transform: 'perspective(500px) rotateX(45deg)' }}
-      />
-
       {/* Main card face */}
       <div
         className={clsx(
-          'relative overflow-hidden rounded-xs border-2 transition-all duration-300',
-          isHighlighted
-            ? 'border-primary bg-linear-to-b from-primary/10 via-surface to-surface shadow-lg shadow-primary/20'
-            : 'border-border/80 bg-linear-to-b from-surface to-background group-hover:border-primary/50 group-hover:shadow-md'
+          'relative overflow-hidden rounded-sm border bg-surface transition-colors',
+          isHighlighted ? 'border-primary' : 'border-border group-hover:border-primary/50'
         )}
       >
         {/* Fill visualization (background) */}
@@ -257,24 +243,13 @@ export function CardChain({
   return (
     <div
       className={clsx(
-        'relative overflow-hidden rounded-xs border border-border bg-linear-to-br from-surface via-surface to-background p-6',
+        'relative overflow-hidden rounded-sm bg-surface p-6 outline -outline-offset-1 outline-border',
         className
       )}
     >
-      {/* Background grid pattern */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)`,
-          backgroundSize: '24px 24px',
-        }}
-      />
-
       {/* Flowing line connecting all cards */}
       <div className="absolute top-1/2 right-[60px] left-[60px] h-[2px] -translate-y-1/2">
-        <div className="h-full w-full bg-linear-to-r from-border via-primary/30 to-primary opacity-60" />
-        {/* Animated pulse along the line */}
-        <div className="absolute inset-0 animate-[shimmer_3s_ease-in-out_infinite] bg-linear-to-r from-transparent via-primary to-transparent opacity-40" />
+        <div className="h-full w-full bg-border" />
       </div>
 
       <div className="relative flex items-center gap-3">

@@ -233,13 +233,6 @@
 
   /* Custom animations */
   --animate-shimmer: shimmer 2s linear infinite;
-  --animate-fade-in: fade-in 0.8s ease-out forwards;
-  --animate-fade-in-delay: fade-in 0.8s ease-out 0.2s forwards;
-  --animate-fade-in-delay-2: fade-in 0.8s ease-out 0.4s forwards;
-  --animate-fade-in-delay-3: fade-in 0.8s ease-out 0.6s forwards;
-  --animate-fade-in-delay-4: fade-in 0.8s ease-out 0.8s forwards;
-  --animate-fade-in-delay-5: fade-in 0.8s ease-out 1s forwards;
-  --animate-fade-in-delay-6: fade-in 0.8s ease-out 1.2s forwards;
   --animate-scroll-travel: scroll-travel 2s ease-in-out infinite;
 
   @keyframes scroll-travel {
@@ -260,17 +253,6 @@
     }
     100% {
       background-position: 200% 0;
-    }
-  }
-
-  @keyframes fade-in {
-    0% {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
     }
   }
 
@@ -379,17 +361,6 @@
   a:focus-visible,
   [role='button']:focus-visible {
     outline: none;
-  }
-
-  /* Initial state for fade-in animations - elements start invisible */
-  .animate-fade-in,
-  .animate-fade-in-delay,
-  .animate-fade-in-delay-2,
-  .animate-fade-in-delay-3,
-  .animate-fade-in-delay-4,
-  .animate-fade-in-delay-5,
-  .animate-fade-in-delay-6 {
-    opacity: 0;
   }
 
   /* Hide scrollbars while maintaining scroll functionality */

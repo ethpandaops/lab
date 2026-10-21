@@ -121,38 +121,23 @@ export function HeroSection(): JSX.Element {
 
   return (
     <div className="relative flex min-h-dvh flex-col justify-start lg:justify-center lg:overflow-hidden">
-      {/* Atmosphere: single centered glow behind title */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div className="absolute top-1/2 left-1/2 h-[60%] w-[50%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/[0.04] blur-[120px]" />
-      </div>
-
-      {/* Measurement surface: dot grid */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
-        aria-hidden="true"
-        style={{
-          backgroundImage: 'radial-gradient(circle, var(--color-foreground) 0.75px, transparent 0.75px)',
-          backgroundSize: '32px 32px',
-        }}
-      />
-
       {/* Content */}
       <div className="relative z-10 px-4 py-8 text-center sm:px-12 sm:py-12 lg:px-20 lg:py-24">
-        <h1 className="animate-fade-in font-display">
+        <h1 className="font-display">
           <span className="block text-lg font-light tracking-wide text-foreground/60 sm:text-xl lg:text-2xl">The</span>
           <span className="mt-1 block text-[clamp(4rem,12vw,11rem)] leading-[0.85] font-black tracking-tighter text-foreground">
             Lab
           </span>
         </h1>
 
-        <div className="mt-4 flex animate-fade-in-delay items-center justify-center gap-2.5 sm:mt-6 lg:mt-8">
+        <div className="mt-4 flex items-center justify-center gap-2.5 sm:mt-6 lg:mt-8">
           <img src="/images/lab.png" alt="" className="size-5 opacity-60" />
           <span className="text-2xs/3 font-medium tracking-[0.2em] text-muted uppercase">by ethPandaOps</span>
         </div>
 
         {/* Network instrument panels */}
         {groups.length > 0 && (
-          <div className="mx-auto mt-6 flex max-w-4xl animate-fade-in-delay-2 flex-col items-center gap-3 sm:mt-8 lg:mt-12">
+          <div className="mx-auto mt-6 flex max-w-4xl flex-col items-center gap-3 sm:mt-8 lg:mt-12">
             {groups.map(group => (
               <Fragment key={group.id}>
                 {group.id !== 'public' && (

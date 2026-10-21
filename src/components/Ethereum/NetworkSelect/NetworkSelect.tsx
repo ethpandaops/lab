@@ -80,7 +80,7 @@ export function NetworkSelect({
           anchor="bottom start"
           transition
           className={clsx(
-            'z-[9999] mt-1 max-h-96 overflow-auto rounded-sm border border-border bg-surface pb-1 shadow-lg backdrop-blur-xl focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0',
+            'z-[9999] mt-1 max-h-96 overflow-auto rounded-sm border border-border bg-surface pb-1 shadow-lg focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0',
             expandToFit ? 'w-max min-w-[var(--button-width)]' : 'w-[var(--button-width)]'
           )}
         >

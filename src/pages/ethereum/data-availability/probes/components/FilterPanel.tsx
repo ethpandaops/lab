@@ -238,7 +238,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                 multiple
               >
                 <div className="relative">
-                  <ListboxButton className="relative w-full cursor-pointer border border-border bg-surface/50 py-2 pr-10 pl-3 text-left shadow-xs backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-surface/70">
+                  <ListboxButton className="relative w-full cursor-pointer border border-border bg-surface py-2 pr-10 pl-3 text-left shadow-xs transition-all hover:border-primary/30 hover:bg-surface">
                     <span className="flex items-center gap-1">
                       {(draftFilters.blobPosters ?? []).length > 0 ? (
                         <>
@@ -259,7 +259,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   </ListboxButton>
                   <ListboxOptions
                     transition
-                    className="absolute z-[9999] mt-1 max-h-60 w-full overflow-auto border border-border bg-surface shadow-lg backdrop-blur-xl data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0"
+                    className="absolute z-[9999] mt-1 max-h-60 w-full overflow-auto border border-border bg-surface shadow-lg data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0"
                   >
                     {BLOB_POSTERS.map(poster => {
                       const displayName = BLOB_POSTER_DISPLAY_NAMES[poster] ?? poster;

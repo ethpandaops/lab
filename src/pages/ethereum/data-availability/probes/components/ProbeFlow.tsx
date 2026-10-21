@@ -75,7 +75,7 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
 
         {/* Central Status Node */}
         <div
-          className={`relative flex flex-col items-center gap-1.5 rounded-lg border px-3 py-2 shadow-xs backdrop-blur-sm sm:flex-row sm:gap-2 sm:rounded-full sm:px-4 sm:py-1.5 ${statusBorder} ${statusBg}`}
+          className={`relative flex flex-col items-center gap-1.5 rounded-lg border px-3 py-2 shadow-xs sm:flex-row sm:gap-2 sm:rounded-full sm:px-4 sm:py-1.5 ${statusBorder} ${statusBg}`}
         >
           <div className="flex items-center gap-2">
             {isSuccess ? (

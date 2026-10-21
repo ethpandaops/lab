@@ -61,7 +61,7 @@ export function EntityFilter({ value, onChange, options, disabled = false }: Ent
       <ComboboxOptions
         anchor="bottom start"
         transition
-        className="z-[9999] mt-1 w-[max(var(--input-width),20rem)] overflow-auto rounded-sm border border-border bg-surface shadow-lg backdrop-blur-xl [--anchor-max-height:18rem] empty:invisible data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0"
+        className="z-[9999] mt-1 w-[max(var(--input-width),20rem)] overflow-auto rounded-sm border border-border bg-surface shadow-lg [--anchor-max-height:18rem] empty:invisible data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0"
       >
         {matches.length === 0 && search.trim() !== '' && (
           <div className="px-3 py-2 text-sm text-muted">No entity matches &ldquo;{search.trim()}&rdquo;</div>

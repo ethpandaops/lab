@@ -9,9 +9,7 @@ export function NotFound(): JSX.Element {
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background">
       {/* Subtle background pattern */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-50">
-        <div className="absolute inset-0 bg-linear-to-br from-warning/5 via-transparent to-warning/10"></div>
-      </div>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-50"></div>
 
       {/* Content */}
       <div className="relative flex flex-col items-center">

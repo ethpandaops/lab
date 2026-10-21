@@ -37,7 +37,7 @@ function SidebarWrapper(props: { initialOpen?: boolean; showToggle?: boolean }):
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       {/* Mock header bar (mobile only) */}
-      <div className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-surface/95 px-4 py-4 backdrop-blur-xl lg:hidden">
+      <div className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-surface px-4 py-4 lg:hidden">
         <div className="flex items-center gap-4">
           <button
             type="button"

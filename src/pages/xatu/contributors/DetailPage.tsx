@@ -207,7 +207,7 @@ export function DetailPage(): JSX.Element {
     return (
       <Container>
         <Header title="Contributor Details" />
-        <div className="rounded-sm border border-border bg-surface/50 p-12 text-center backdrop-blur-sm">
+        <div className="rounded-sm border border-border bg-surface p-12 text-center">
           <h2 className="mb-2 text-2xl/8 font-bold text-foreground">Contributor not found</h2>
           <p className="mb-4 text-muted">No active nodes found for &quot;{id}&quot; in the last 24 hours.</p>
           <Link to="/xatu/contributors" className="text-primary hover:underline">
