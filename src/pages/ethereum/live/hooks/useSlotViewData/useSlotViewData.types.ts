@@ -65,6 +65,8 @@ export interface SlotViewData {
 
   // Blob availability (Deneb/Electra)
   blobCount: number;
+  /** Blobs in the block, or null until the block's blob count has loaded */
+  blockBlobCount: number | null;
   blobFirstSeenData: BlobDataPoint[];
   blobAvailabilityRateData: DataAvailabilityRatePoint[];
   blobContinentalPropagationData: ContinentalPropagationSeries[];

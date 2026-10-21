@@ -12,6 +12,7 @@ function BottomBarComponent({
   blockVersion: _blockVersion,
   blobCount: _blobCount,
   dataColumnBlobCount,
+  blockBlobCount = null,
   dataColumnFirstSeenData,
   currentSlot,
   deduplicatedBlobData,
@@ -52,7 +53,11 @@ function BottomBarComponent({
           )}
 
           {showDataColumnAvailability && (
-            <DataColumnDataAvailability blobCount={dataColumnBlobCount} firstSeenData={dataColumnFirstSeenData} />
+            <DataColumnDataAvailability
+              blobCount={dataColumnBlobCount}
+              blockBlobCount={blockBlobCount}
+              firstSeenData={dataColumnFirstSeenData}
+            />
           )}
 
           {!showBlobAvailability && !showDataColumnAvailability && (
@@ -107,7 +112,11 @@ function BottomBarComponent({
             )}
             {showDataColumnAvailability && (
               <TabPanel className="h-full">
-                <DataColumnDataAvailability blobCount={dataColumnBlobCount} firstSeenData={dataColumnFirstSeenData} />
+                <DataColumnDataAvailability
+                  blobCount={dataColumnBlobCount}
+                  blockBlobCount={blockBlobCount}
+                  firstSeenData={dataColumnFirstSeenData}
+                />
               </TabPanel>
             )}
             <TabPanel className="h-full">
@@ -132,6 +141,7 @@ const arePropsEqual = (prevProps: BottomBarProps, nextProps: BottomBarProps): bo
     prevProps.blockVersion === nextProps.blockVersion &&
     prevProps.currentSlot === nextProps.currentSlot &&
     prevProps.dataColumnBlobCount === nextProps.dataColumnBlobCount &&
+    prevProps.blockBlobCount === nextProps.blockBlobCount &&
     prevProps.dataColumnFirstSeenData === nextProps.dataColumnFirstSeenData &&
     prevProps.deduplicatedBlobData === nextProps.deduplicatedBlobData &&
     prevProps.visibleContinentalPropagationData === nextProps.visibleContinentalPropagationData &&

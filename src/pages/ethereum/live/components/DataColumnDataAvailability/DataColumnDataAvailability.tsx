@@ -1,10 +1,46 @@
 import type { JSX } from 'react';
-import { useMemo, memo } from 'react';
+import { useContext, useMemo, memo } from 'react';
 import clsx from 'clsx';
-import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/16/solid';
+import { CheckCircleIcon, ClockIcon, XCircleIcon } from '@heroicons/react/16/solid';
+import { SlotPlayerProgressContext } from '@/contexts/SlotPlayerContext';
 import { HeatmapChart } from '@/components/Charts/Heatmap';
 import type { DataColumnDataAvailabilityProps } from './DataColumnDataAvailability.types';
 import { getDataVizColors } from '@/utils/dataVizColors';
+
+/**
+ * Availability verdict for the header. Reads replay progress (when inside a slot player) so a
+ * slot is not called unavailable before its columns had time to arrive.
+ */
+function AvailabilityStatus({
+  blobCount,
+  onTimeColumnCount,
+  deadlineMs,
+}: {
+  /** Blobs in the block; null while unknown */
+  blobCount: number | null;
+  onTimeColumnCount: number;
+  deadlineMs: number;
+}): JSX.Element {
+  const progress = useContext(SlotPlayerProgressContext);
+  const pastDeadline = progress === undefined || progress.slotProgress >= deadlineMs;
+
+  const status =
+    onTimeColumnCount >= 64
+      ? { label: 'Data available', icon: CheckCircleIcon, tone: 'text-success' }
+      : blobCount === 0
+        ? { label: 'No blobs', icon: null, tone: 'text-muted' }
+        : !pastDeadline || blobCount === null
+          ? { label: 'Waiting for columns', icon: ClockIcon, tone: 'text-muted' }
+          : { label: 'Data not available', icon: XCircleIcon, tone: 'text-danger' };
+  const Icon = status.icon;
+
+  return (
+    <span className={clsx('flex items-center gap-1 text-xs font-medium', status.tone)}>
+      {Icon && <Icon aria-hidden="true" className="size-3.5" />}
+      {status.label}
+    </span>
+  );
+}
 
 /**
  * DataColumnDataAvailability - Page-specific component for visualizing data column availability
@@ -21,8 +57,9 @@ import { getDataVizColors } from '@/utils/dataVizColors';
  * - Fixed height of 400px regardless of blob count
  *
  * Title includes two status indicators on the right:
- * 1. Data availability: "Data available" (green) or "Data not available" (red)
- *    - Shows green checkmark if >= 64 columns received, red cross otherwise
+ * 1. Data availability: "Data available" (green, >= 64 columns before the deadline), "No blobs" when
+ *    the block carries none, "Waiting for columns" until the deadline passes in the slot replay, and
+ *    "Data not available" (red) only once the deadline has passed with fewer than 64 columns
  * 2. On-time count: "n columns published on time" - counts columns arriving < 4000ms
  *
  * Both indicators respect the provided dataset and only count the visible columns.
@@ -43,6 +80,7 @@ import { getDataVizColors } from '@/utils/dataVizColors';
  */
 function DataColumnDataAvailabilityComponent({
   blobCount,
+  blockBlobCount,
   firstSeenData = [],
   maxTime = 4000,
   className,
@@ -53,11 +91,6 @@ function DataColumnDataAvailabilityComponent({
   const onTimeColumnCount = useMemo(() => {
     return firstSeenData.filter(point => point.time < 4000).length;
   }, [firstSeenData]);
-
-  // Calculate data availability (need >= 64 columns arriving before 4000ms deadline)
-  const isDataAvailable = useMemo(() => {
-    return onTimeColumnCount >= 64;
-  }, [onTimeColumnCount]);
 
   // Prepare heatmap data for HeatmapChart component
   const { heatmapData, xLabels, yLabels } = useMemo(() => {
@@ -89,19 +122,11 @@ function DataColumnDataAvailabilityComponent({
       <div className="flex shrink-0 items-center justify-between px-3 pt-3 pb-1">
         <h3 className="text-sm/6 font-semibold text-foreground">Data column availability</h3>
         <div className="flex items-center gap-3">
-          <span
-            className={clsx(
-              'flex items-center gap-1 text-xs font-medium',
-              isDataAvailable ? 'text-success' : 'text-danger'
-            )}
-          >
-            {isDataAvailable ? (
-              <CheckCircleIcon aria-hidden="true" className="size-3.5" />
-            ) : (
-              <XCircleIcon aria-hidden="true" className="size-3.5" />
-            )}
-            {isDataAvailable ? 'Data available' : 'Data not available'}
-          </span>
+          <AvailabilityStatus
+            blobCount={blockBlobCount === undefined ? blobCount : blockBlobCount}
+            onTimeColumnCount={onTimeColumnCount}
+            deadlineMs={4000}
+          />
           <span className="text-xs text-muted">{onTimeColumnCount} on time</span>
         </div>
       </div>

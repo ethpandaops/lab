@@ -6,6 +6,8 @@ export interface BottomBarProps {
   blockVersion?: string;
   blobCount: number;
   dataColumnBlobCount: number;
+  /** Blobs in the block, or null while unknown */
+  blockBlobCount?: number | null;
   dataColumnFirstSeenData: Array<{ columnId: number; time: number; color?: string }>;
   currentSlot: number;
   deduplicatedBlobData: Array<{ blobId: string; time: number; color?: string }>;

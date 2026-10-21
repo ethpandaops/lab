@@ -506,6 +506,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
               blockVersion={slotData.blockDetails?.blockVersion}
               blobCount={slotData.blobCount}
               dataColumnBlobCount={slotData.dataColumnBlobCount}
+              blockBlobCount={slotData.blockBlobCount}
               currentSlot={currentSlot}
               attestationTotalExpected={slotData.attestationTotalExpected}
               attestationMaxCount={slotData.attestationMaxCount}
@@ -561,6 +562,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
               blockVersion={slotData.blockDetails?.blockVersion}
               blobCount={slotData.blobCount}
               dataColumnBlobCount={slotData.dataColumnBlobCount}
+              blockBlobCount={slotData.blockBlobCount}
               currentSlot={currentSlot}
               attestationTotalExpected={slotData.attestationTotalExpected}
               attestationMaxCount={slotData.attestationMaxCount}
