@@ -103,7 +103,15 @@ function formatPercent(value: number | null, threshold = 95): ReactNode {
  */
 function formatBoolean(value: boolean | null): ReactNode {
   if (value === null) return <span className="text-muted">-</span>;
-  return value ? <span className="text-success">✓</span> : <span className="text-danger">✗</span>;
+  return value ? (
+    <span className="text-success" title="Pass" aria-label="Pass">
+      ✓
+    </span>
+  ) : (
+    <span className="text-danger" title="Fail" aria-label="Fail">
+      ✗
+    </span>
+  );
 }
 
 /**
@@ -111,9 +119,23 @@ function formatBoolean(value: boolean | null): ReactNode {
  */
 function formatProposalStatus(status: 'canonical' | 'orphaned' | 'missed' | null): ReactNode {
   if (status === null) return <span className="text-muted">-</span>;
-  if (status === 'canonical') return <span className="text-success">✓</span>;
-  if (status === 'missed') return <span className="text-danger">✗</span>;
-  return <span className="text-warning">⚠</span>;
+  if (status === 'canonical')
+    return (
+      <span className="text-success" title="Pass" aria-label="Pass">
+        ✓
+      </span>
+    );
+  if (status === 'missed')
+    return (
+      <span className="text-danger" title="Fail" aria-label="Fail">
+        ✗
+      </span>
+    );
+  return (
+    <span className="text-warning" title="Warning" aria-label="Warning">
+      ⚠
+    </span>
+  );
 }
 
 /**

@@ -1,6 +1,8 @@
 import type { JSX } from 'react';
 import { useState } from 'react';
 import clsx from 'clsx';
+import { Card } from '@/components/Layout/Card';
+import { Button } from '@/components/Elements/Button';
 import { ChevronDownIcon, ChevronUpIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 
 export interface ThresholdValues {
@@ -100,28 +102,31 @@ export function ThresholdConfig({ values, onChange, disabled = false, className 
     values.blockProductionRate !== DEFAULT_THRESHOLDS.blockProductionRate;
 
   return (
-    <div className={clsx('rounded-sm border border-border bg-surface', className)}>
-      <button
-        type="button"
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-surface/80"
-      >
-        <div className="flex items-center gap-2">
+    <Card
+      className={clsx('[&>[data-slot=card-body]:empty]:hidden', className)}
+      title={
+        <span className="inline-flex items-center gap-2">
           <AdjustmentsHorizontalIcon className="size-4 text-muted" />
-          <span className="text-sm font-medium text-foreground">Pass/Fail Thresholds</span>
+          Pass/Fail Thresholds
           {isCustom && (
             <span className="rounded-xs bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">Custom</span>
           )}
-        </div>
-        {isExpanded ? (
-          <ChevronUpIcon className="size-4 text-muted" />
-        ) : (
-          <ChevronDownIcon className="size-4 text-muted" />
-        )}
-      </button>
-
+        </span>
+      }
+      actions={
+        <Button
+          variant="blank"
+          size="xs"
+          iconOnly
+          leadingIcon={isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
+          aria-label={isExpanded ? 'Collapse thresholds' : 'Expand thresholds'}
+          aria-expanded={isExpanded}
+          onClick={() => setIsExpanded(!isExpanded)}
+        />
+      }
+    >
       {isExpanded && (
-        <div className="space-y-4 border-t border-border px-4 py-4">
+        <div className="space-y-4">
           <ThresholdInput
             label="Attestation Inclusion"
             value={values.inclusionRate}
@@ -198,7 +203,7 @@ export function ThresholdConfig({ values, onChange, disabled = false, className 
           </div>
         </div>
       )}
-    </div>
+    </Card>
   );
 }
 

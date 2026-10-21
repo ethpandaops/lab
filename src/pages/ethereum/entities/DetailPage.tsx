@@ -66,7 +66,7 @@ export function DetailPage(): React.JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title={entityName} description="Loading entity data..." />
+        <Header title={entityName} />
         <LoadingContainer className="h-96" />
       </Container>
     );

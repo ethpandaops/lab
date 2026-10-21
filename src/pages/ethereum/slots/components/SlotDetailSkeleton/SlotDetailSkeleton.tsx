@@ -52,22 +52,18 @@ export function SlotDetailSkeleton({ slot, epoch }: SlotDetailSkeletonProps): JS
       </div>
 
       {/* Slot Basic Info Card Skeleton */}
-      <div className="overflow-hidden rounded-sm border border-border bg-surface">
-        {/* Header section */}
-        <div className="border-b border-border bg-background px-6 py-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg/7 font-semibold text-foreground">Slot Information</h2>
-            <div className="flex items-center gap-2">
-              <LoadingContainer className="size-5 rounded-sm" />
-              <LoadingContainer className="size-5 rounded-sm" />
-              <LoadingContainer className="size-5 rounded-sm" />
-              <LoadingContainer className="size-5 rounded-sm" />
-            </div>
+      <Card
+        title="Slot Information"
+        actions={
+          <div className="flex items-center gap-2">
+            <LoadingContainer className="size-5 rounded-sm" />
+            <LoadingContainer className="size-5 rounded-sm" />
+            <LoadingContainer className="size-5 rounded-sm" />
+            <LoadingContainer className="size-5 rounded-sm" />
           </div>
-        </div>
-
-        {/* Card content */}
-        <div className="p-6">
+        }
+      >
+        <div>
           <div className="flex flex-col gap-6 lg:flex-row">
             <div className="flex-1 space-y-6">
               {/* Status Section */}
@@ -177,7 +173,7 @@ export function SlotDetailSkeleton({ slot, epoch }: SlotDetailSkeletonProps): JS
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Tabbed Content Skeleton */}
       <div className="mt-8">

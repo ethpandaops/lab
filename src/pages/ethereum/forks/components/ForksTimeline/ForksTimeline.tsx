@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import { Badge } from '@/components/Elements/Badge';
 import { Card } from '@/components/Layout/Card';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
@@ -26,11 +27,9 @@ export function ForksTimeline({
   network,
 }: ForksTimelineProps): React.JSX.Element {
   return (
-    <Card>
-      <div className="p-6">
-        <h3 className="text-lg font-semibold text-foreground">Fork Timeline</h3>
-
-        <div className="mt-6 space-y-8">
+    <Card title="Fork Timeline">
+      <div>
+        <div className="space-y-8">
           {forks.map((fork, forkIndex) => {
             const isActive = currentEpoch >= fork.epoch;
             const isCurrentFork =
@@ -61,12 +60,12 @@ export function ForksTimeline({
                   <div className="relative flex h-14 w-14 flex-none items-center justify-center">
                     <div
                       className={clsx(
-                        'flex h-14 w-14 items-center justify-center rounded-xl text-3xl ring-4 transition-all',
+                        'flex h-14 w-14 items-center justify-center rounded-sm border text-3xl transition-colors',
                         isCurrentFork
-                          ? 'bg-primary/20 shadow-lg ring-primary/20'
+                          ? 'border-primary/30 bg-primary/20'
                           : isActive
-                            ? 'bg-surface ring-accent/10'
-                            : 'bg-surface ring-border'
+                            ? 'border-accent/20 bg-surface'
+                            : 'border-border bg-surface'
                       )}
                     >
                       {fork.emoji}
@@ -89,9 +88,9 @@ export function ForksTimeline({
                             {fork.displayName}
                           </Link>
                           {isCurrentFork && (
-                            <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                            <Badge color="green" variant="flat">
                               Current
-                            </span>
+                            </Badge>
                           )}
                         </div>
                         <p className="text-sm text-muted">{fork.description}</p>
@@ -192,12 +191,12 @@ export function ForksTimeline({
                           <div className="relative flex h-9 w-9 flex-none items-center justify-center">
                             <div
                               className={clsx(
-                                'flex h-9 w-9 items-center justify-center rounded-lg ring-2 transition-all',
+                                'flex h-9 w-9 items-center justify-center rounded-sm border transition-colors',
                                 isCurrentBlob
-                                  ? 'bg-accent/20 shadow-md ring-accent/30'
+                                  ? 'border-accent/30 bg-accent/20'
                                   : isBlobActive
-                                    ? 'bg-surface ring-accent/10'
-                                    : 'bg-surface ring-border'
+                                    ? 'border-accent/20 bg-surface'
+                                    : 'border-border bg-surface'
                               )}
                             >
                               <ArrowTrendingUpIcon
@@ -241,9 +240,9 @@ export function ForksTimeline({
                                     );
                                   })()}
                                   {isCurrentBlob && (
-                                    <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent">
+                                    <Badge color="green" variant="flat">
                                       Active
-                                    </span>
+                                    </Badge>
                                   )}
                                 </div>
                                 <p className="text-sm text-muted">
@@ -316,7 +315,7 @@ export function ForksTimeline({
         </div>
 
         {forks.length === 0 && (
-          <div className="mt-6 flex h-32 items-center justify-center">
+          <div className="flex h-32 items-center justify-center">
             <p className="text-sm text-muted">No forks or blob schedule configured for this network</p>
           </div>
         )}

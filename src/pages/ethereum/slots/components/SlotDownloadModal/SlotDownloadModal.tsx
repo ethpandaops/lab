@@ -1,9 +1,9 @@
 import { type JSX, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowDownTrayIcon, ArrowPathIcon, CubeIcon, Square3Stack3DIcon } from '@heroicons/react/24/outline';
-import clsx from 'clsx';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { Button } from '@/components/Elements/Button';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { Alert } from '@/components/Feedback/Alert';
 import { CopyToClipboard } from '@/components/Elements/CopyToClipboard';
 import { fctBlockBlobHeadServiceListOptions } from '@/api/@tanstack/react-query.gen';
@@ -73,17 +73,32 @@ export function SlotDownloadModal({
     <Dialog open={open} onClose={onClose} title={`Download Slot ${slot}`} size="lg">
       <div className="flex flex-col gap-4">
         {/* Tabs */}
-        <div className="flex gap-1 rounded-sm bg-background p-1">
-          <TabButton active={tab === 'block'} onClick={() => setTab('block')}>
-            <CubeIcon className="size-4" />
-            Block
-          </TabButton>
-          <TabButton active={tab === 'blobs'} onClick={() => setTab('blobs')}>
-            <Square3Stack3DIcon className="size-4" />
-            Blobs
-            <span className="ml-1 rounded-full bg-surface px-1.5 text-xs text-muted">{versionedHashes.length}</span>
-          </TabButton>
-        </div>
+        <SegmentedControl
+          ariaLabel="Download type"
+          value={tab}
+          onChange={setTab}
+          options={[
+            {
+              value: 'block',
+              label: (
+                <span className="inline-flex items-center gap-1.5">
+                  <CubeIcon className="size-4" />
+                  Block
+                </span>
+              ),
+            },
+            {
+              value: 'blobs',
+              label: (
+                <span className="inline-flex items-center gap-1.5">
+                  <Square3Stack3DIcon className="size-4" />
+                  Blobs
+                  <span className="ml-1 rounded-xs bg-surface px-1.5 text-xs text-muted">{versionedHashes.length}</span>
+                </span>
+              ),
+            },
+          ]}
+        />
 
         {error && <Alert variant="error" description={error} />}
 
@@ -174,27 +189,6 @@ export function SlotDownloadModal({
           ))}
       </div>
     </Dialog>
-  );
-}
-
-interface TabButtonProps {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}
-
-function TabButton({ active, onClick, children }: TabButtonProps): JSX.Element {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={clsx(
-        'flex flex-1 items-center justify-center gap-1.5 rounded-sm px-3 py-1.5 text-sm font-medium transition-colors',
-        active ? 'bg-surface text-foreground shadow-sm' : 'text-muted hover:text-foreground'
-      )}
-    >
-      {children}
-    </button>
   );
 }
 

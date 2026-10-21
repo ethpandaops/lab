@@ -196,38 +196,33 @@ export function SlotProgressTimeline({
   });
 
   return (
-    <Card>
-      <div ref={containerRef} className="relative">
-        {/* Header */}
-        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h3 className="text-lg font-semibold text-foreground">Slot Trace</h3>
-            <p className="text-sm text-muted">
-              Event timeline showing when each phase completed relative to slot start
-            </p>
-          </div>
-          <div className="flex shrink-0 flex-wrap items-center gap-4">
-            <label className="flex cursor-pointer items-center gap-2">
-              <Toggle
-                checked={excludeOutliers}
-                onChange={setExcludeOutliers}
-                srLabel="Exclude outliers from parent spans"
-                size="small"
-              />
-              <span className="text-xs text-muted">Exclude outliers</span>
-            </label>
-            {availableUsernames.length > 0 && (
-              <SelectMenu
-                label="Filter by contributor"
-                options={filterOptions}
-                value={selectedUsername ?? ''}
-                onChange={value => setSelectedUsername(value || null)}
-                className="w-48"
-              />
-            )}
-          </div>
+    <Card
+      title="Slot Trace"
+      subtitle="Time from slot start"
+      actions={
+        <div className="flex shrink-0 flex-wrap items-center gap-4">
+          <label className="flex cursor-pointer items-center gap-2">
+            <Toggle
+              checked={excludeOutliers}
+              onChange={setExcludeOutliers}
+              srLabel="Exclude outliers from parent spans"
+              size="small"
+            />
+            <span className="text-xs text-muted">Exclude outliers</span>
+          </label>
+          {availableUsernames.length > 0 && (
+            <SelectMenu
+              label="Filter by contributor"
+              options={filterOptions}
+              value={selectedUsername ?? ''}
+              onChange={value => setSelectedUsername(value || null)}
+              className="w-48"
+            />
+          )}
         </div>
-
+      }
+    >
+      <div ref={containerRef} className="relative">
         {/* Scrollable timeline container for mobile */}
         <div className="overflow-x-auto">
           <div style={{ minWidth: 600 }}>

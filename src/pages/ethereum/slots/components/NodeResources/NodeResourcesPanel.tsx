@@ -288,11 +288,7 @@ export function NodeResourcesPanel({
 
   if (cpuLoading) {
     return (
-      <Card>
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold text-foreground">Node Resources</h3>
-          <p className="text-sm text-muted">Resource metrics from observoor eBPF agent</p>
-        </div>
+      <Card title="Node Resources" subtitle="Resource metrics from observoor eBPF agent">
         <div className="space-y-3">
           <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30" />
           <div className="h-64 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30" />
@@ -324,23 +320,23 @@ export function NodeResourcesPanel({
   return (
     <div className="space-y-4">
       {/* Controls */}
-      <Card>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h3 className="text-lg font-semibold text-foreground">Node Resources</h3>
-            <p className="text-sm text-muted">
-              Data from{' '}
-              <a
-                href="https://github.com/ethpandaops/observoor"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-foreground"
-              >
-                Observoor
-              </a>{' '}
-              across {nodeNames.length} nodes
-            </p>
-          </div>
+      <Card
+        title="Node Resources"
+        subtitle={
+          <>
+            Data from{' '}
+            <a
+              href="https://github.com/ethpandaops/observoor"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-foreground"
+            >
+              Observoor
+            </a>{' '}
+            across {nodeNames.length} nodes
+          </>
+        }
+        actions={
           <div className="flex flex-wrap items-center gap-3">
             <NodeSelector
               nodes={nodeNames}
@@ -367,8 +363,8 @@ export function NodeResourcesPanel({
               </button>
             </div>
           </div>
-        </div>
-
+        }
+      >
         {/* Annotation toggles */}
         {availableAnnotations.length > 0 && (
           <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-border pt-3">

@@ -1,6 +1,6 @@
 import { type JSX, useMemo } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { Alert } from '@/components/Feedback/Alert';
+import { InfoBox } from '@/components/Feedback/InfoBox';
 import { BarChart } from '@/components/Charts/Bar';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { weiToEth, extractExecutionClient } from '@/utils';
@@ -209,10 +209,10 @@ export function PreparedBlocksComparisonChart({
       {({ inModal }) => (
         <div className="space-y-4">
           {/* Disclaimer about prepared blocks */}
-          <Alert
-            variant="info"
-            description="Alternative blocks built by nodes the ethPandaOps team operates. This shows the hypothetical rewards of the best prepared block for each execution client compared to the actually proposed block."
-          />
+          <InfoBox summary="How this is measured">
+            Alternative blocks built by nodes the ethPandaOps team operates. This shows the hypothetical rewards of the
+            best prepared block for each execution client compared to the actually proposed block.
+          </InfoBox>
 
           {/* Show filter info if blocks were filtered */}
           {filteredCount > 0 && (

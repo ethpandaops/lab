@@ -673,9 +673,7 @@ export function DetailPage(): JSX.Element {
                   <dl className="grid grid-cols-1 gap-x-8 gap-y-4 lg:grid-cols-2">
                     {/* Beacon Block Section */}
                     <div className="col-span-1 lg:col-span-2">
-                      <h4 className="mb-4 border-b border-border pb-2 text-sm font-semibold text-foreground">
-                        Beacon Block
-                      </h4>
+                      <h4 className="text-sm font-semibold text-foreground">Beacon Block</h4>
                     </div>
 
                     {effectiveBlockData.block_root && (
@@ -756,9 +754,7 @@ export function DetailPage(): JSX.Element {
 
                     {/* Execution Payload Section */}
                     <div className="col-span-1 mt-6 lg:col-span-2">
-                      <h4 className="mb-4 border-b border-border pb-2 text-sm font-semibold text-foreground">
-                        Execution Payload
-                      </h4>
+                      <h4 className="text-sm font-semibold text-foreground">Execution Payload</h4>
                     </div>
 
                     {effectiveBlockData.execution_payload_block_hash && (
@@ -928,9 +924,7 @@ export function DetailPage(): JSX.Element {
 
                     {/* ETH1 Data Section */}
                     <div className="col-span-1 mt-6 lg:col-span-2">
-                      <h4 className="mb-4 border-b border-border pb-2 text-sm font-semibold text-foreground">
-                        ETH1 Data
-                      </h4>
+                      <h4 className="text-sm font-semibold text-foreground">ETH1 Data</h4>
                     </div>
 
                     {effectiveBlockData.eth1_data_block_hash && (
@@ -1060,13 +1054,10 @@ export function DetailPage(): JSX.Element {
 
                     {/* Blobs - one row per blob with its versioned hash + KZG commitment */}
                     {blobDetails.length > 0 && (
-                      <Card>
-                        <div className="mb-4">
-                          <h3 className="text-lg font-semibold text-foreground">Blobs</h3>
-                          <p className="text-sm text-muted">
-                            {blobDetails.length} blob{blobDetails.length !== 1 ? 's' : ''} in this block
-                          </p>
-                        </div>
+                      <Card
+                        title="Blobs"
+                        subtitle={`${blobDetails.length} blob${blobDetails.length !== 1 ? 's' : ''} in this block`}
+                      >
                         <div className="grid gap-3">
                           {blobDetails.map(blob => (
                             <div
@@ -1096,17 +1087,12 @@ export function DetailPage(): JSX.Element {
 
                     {/* Blob Submitters */}
                     {blobSubmitters.length > 0 && (
-                      <Card>
-                        <div className="mb-4">
-                          <h3 className="text-lg font-semibold text-foreground">Blob Submitters</h3>
-                          <p className="text-sm text-muted">
-                            {blobSubmitters.reduce((sum, s) => sum + (s.versioned_hashes?.length ?? 0), 0)} blob
-                            {blobSubmitters.reduce((sum, s) => sum + (s.versioned_hashes?.length ?? 0), 0) !== 1
-                              ? 's'
-                              : ''}{' '}
-                            across {blobSubmitters.length} transaction{blobSubmitters.length !== 1 ? 's' : ''}
-                          </p>
-                        </div>
+                      <Card
+                        title="Blob Submitters"
+                        subtitle={`${blobSubmitters.reduce((sum, s) => sum + (s.versioned_hashes?.length ?? 0), 0)} blob${
+                          blobSubmitters.reduce((sum, s) => sum + (s.versioned_hashes?.length ?? 0), 0) !== 1 ? 's' : ''
+                        } across ${blobSubmitters.length} transaction${blobSubmitters.length !== 1 ? 's' : ''}`}
+                      >
                         <div className="grid gap-3">
                           {blobSubmitters.map((submitter, index) => (
                             <div

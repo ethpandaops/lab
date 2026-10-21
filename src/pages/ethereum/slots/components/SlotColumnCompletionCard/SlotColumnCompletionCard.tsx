@@ -46,20 +46,16 @@ export function SlotColumnCompletionCard({ data }: SlotColumnCompletionCardProps
   const present = pathTotals.filter(entry => entry.count > 0);
 
   return (
-    <Card>
+    <Card
+      title="Column Completion"
+      subtitle={`${block.node_count ?? 0} sentry nodes`}
+      actions={
+        <Link to="/ethereum/data-availability/partial-columns" className="text-sm text-primary hover:underline">
+          Partial columns
+        </Link>
+      }
+    >
       <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-start justify-between gap-2">
-          <div>
-            <h3 className="text-lg font-semibold text-foreground">Column Completion</h3>
-            <p className="text-sm text-muted">
-              How {block.node_count ?? 0} sentry nodes completed this block&apos;s data columns
-            </p>
-          </div>
-          <Link to="/ethereum/data-availability/partial-columns" className="text-sm text-primary hover:underline">
-            Partial columns
-          </Link>
-        </div>
-
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           <MiniStat
             label="Completions"

@@ -204,7 +204,7 @@ export function IndexPage(): JSX.Element {
     <Container>
       <Header
         title="Validators"
-        description="Analyze validator performance including attestation correctness, sync committee participation, and balance history"
+        description="Attestation correctness, sync committee participation and balance history"
       />
 
       <div className="mt-6 space-y-6">

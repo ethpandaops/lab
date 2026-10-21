@@ -23,7 +23,7 @@ export function IndexPage(): React.JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title="Forks" description="View Ethereum consensus layer fork history and upcoming network upgrades" />
+        <Header title="Forks" description="Consensus layer fork history and upcoming upgrades" />
         <LoadingContainer className="h-96" />
       </Container>
     );
@@ -31,7 +31,7 @@ export function IndexPage(): React.JSX.Element {
 
   return (
     <Container>
-      <Header title="Forks" description="View Ethereum consensus layer fork history and upcoming network upgrades" />
+      <Header title="Forks" description="Consensus layer fork history and upcoming upgrades" />
 
       <div className="space-y-6">
         {/* Header with current and next fork */}

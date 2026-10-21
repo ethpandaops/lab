@@ -1,6 +1,6 @@
 import { useParams, useNavigate, Link } from '@tanstack/react-router';
 import { useMemo, useEffect, useState } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 
@@ -9,6 +9,7 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
+import { Badge } from '@/components/Elements/Badge';
 import { Button } from '@/components/Elements/Button';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
@@ -27,14 +28,16 @@ import {
   type BPOInfo,
 } from '@/utils/forks';
 import { epochToTimestamp } from '@/utils/beacon';
+import {
+  ExternalResourcesCard,
+  ForkCountdown,
+  ForkQuickLinks,
+  ForkStatusBadge,
+  FORK_LINK_BUTTON_CLASS,
+  secondsToCountdown,
+  type CountdownTime,
+} from './components/ForkShared';
 import { Route } from '@/routes/ethereum/forks/$fork';
-
-interface CountdownTime {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-}
 
 /**
  * Fork detail page - comprehensive information about a specific network upgrade.
@@ -136,7 +139,7 @@ export function DetailPage(): React.JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title="Fork Details" description="Loading fork information..." />
+        <Header title="Fork Details" />
         <LoadingContainer className="h-96" />
       </Container>
     );
@@ -418,15 +421,6 @@ function calculateSecondsUntil(epoch: number, isActive: boolean, genesisTime?: n
   return Math.max(0, seconds);
 }
 
-function secondsToCountdown(seconds: number): CountdownTime {
-  return {
-    days: Math.floor(seconds / 86400),
-    hours: Math.floor((seconds % 86400) / 3600),
-    minutes: Math.floor((seconds % 3600) / 60),
-    seconds: Math.floor(seconds % 60),
-  };
-}
-
 interface ForkHeroProps {
   fork: ForkInfo;
   isCurrentFork: boolean;
@@ -435,73 +429,82 @@ interface ForkHeroProps {
   genesisTime?: number;
 }
 
+/** Centered status block: "LIVE NOW" / "ACTIVATED" with its date, or the countdown while upcoming */
+function ActivationStatus({
+  isActive,
+  isCurrent,
+  epoch,
+  countdown,
+  genesisTime,
+}: {
+  isActive: boolean;
+  isCurrent: boolean;
+  epoch: number;
+  countdown: CountdownTime;
+  genesisTime?: number;
+}): React.JSX.Element {
+  if (!isActive) {
+    return (
+      <ForkCountdown
+        countdown={countdown}
+        footer={
+          genesisTime && (
+            <div className="mt-4 text-center text-sm text-muted">
+              Local Time: <Timestamp timestamp={epochToTimestamp(epoch, genesisTime)} format="long" />
+            </div>
+          )
+        }
+      />
+    );
+  }
+
+  return (
+    <div className="mb-6 flex items-center justify-center gap-4 rounded-sm border border-border py-6">
+      <div className="text-center">
+        <div className="text-4xl font-bold text-accent">{isCurrent ? 'LIVE NOW' : 'ACTIVATED'}</div>
+        {genesisTime && (
+          <div className="mt-2 text-sm text-muted">
+            <Timestamp timestamp={epochToTimestamp(epoch, genesisTime)} format="long" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function ForkHero({ fork, isCurrentFork, previousFork, countdown, genesisTime }: ForkHeroProps): React.JSX.Element {
   return (
     <Card>
-      <div className="p-6">
-        {/* Header with emoji and status badges */}
-        <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-4 text-5xl">{fork.emoji}</div>
-          <div className="mb-2 flex flex-wrap items-center justify-center gap-2">
-            <h2 className="text-2xl font-bold text-foreground">{fork.displayName}</h2>
-            {isCurrentFork && (
-              <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                Current
-              </span>
-            )}
-            {fork.isActive && !isCurrentFork && (
-              <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-semibold text-accent">Active</span>
-            )}
-            {!fork.isActive && (
-              <span className="rounded-full bg-muted/20 px-2.5 py-0.5 text-xs font-semibold text-muted">Upcoming</span>
-            )}
-          </div>
-          <p className="text-sm text-muted">{fork.description}</p>
+      {/* Header with emoji and status badges */}
+      <div className="mb-6 flex flex-col items-center text-center">
+        <div className="mb-4 text-5xl">{fork.emoji}</div>
+        <div className="mb-2 flex flex-wrap items-center justify-center gap-2">
+          <h2 className="text-2xl font-semibold text-foreground">{fork.displayName}</h2>
+          <ForkStatusBadge isActive={fork.isActive} isCurrent={isCurrentFork} />
         </div>
-
-        {/* Status display */}
-        {fork.isActive ? (
-          <div className="mb-6 flex items-center justify-center gap-4 rounded-lg bg-accent/5 py-6">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-accent">{isCurrentFork ? 'LIVE NOW' : 'ACTIVATED'}</div>
-              {genesisTime && (
-                <div className="mt-2 text-sm text-muted">
-                  <Timestamp timestamp={epochToTimestamp(fork.epoch, genesisTime)} format="long" />
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          <CountdownDisplay countdown={countdown} genesisTime={genesisTime} epoch={fork.epoch} />
-        )}
-
-        {/* Quick links */}
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <Link
-            to="/ethereum/epochs/$epoch"
-            params={{ epoch: fork.epoch.toString() }}
-            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface"
-          >
-            Epoch {fork.epoch}
-          </Link>
-          <Link
-            to="/ethereum/slots/$slot"
-            params={{ slot: (fork.epoch * 32).toString() }}
-            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface"
-          >
-            Slot {fork.epoch * 32}
-          </Link>
-          {previousFork && (
-            <Link
-              to="/ethereum/forks/$fork"
-              params={{ fork: getForkSlug(previousFork) }}
-              className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface"
-            >
-              {previousFork.displayName}
-            </Link>
-          )}
-        </div>
+        <p className="text-sm text-muted">{fork.description}</p>
       </div>
+
+      <ActivationStatus
+        isActive={fork.isActive}
+        isCurrent={isCurrentFork}
+        epoch={fork.epoch}
+        countdown={countdown}
+        genesisTime={genesisTime}
+      />
+
+      {/* Quick links */}
+      <ForkQuickLinks epoch={fork.epoch}>
+        {previousFork && (
+          <Link
+            to="/ethereum/forks/$fork"
+            params={{ fork: getForkSlug(previousFork) }}
+            className={FORK_LINK_BUTTON_CLASS}
+          >
+            {previousFork.displayName}
+          </Link>
+        )}
+      </ForkQuickLinks>
     </Card>
   );
 }
@@ -516,115 +519,37 @@ interface BPOHeroProps {
 function BPOHero({ bpo, isCurrentBPO, countdown, genesisTime }: BPOHeroProps): React.JSX.Element {
   return (
     <Card>
-      <div className="p-6">
-        {/* Header with emoji and status badges */}
-        <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-4 text-5xl">{bpo.emoji}</div>
-          <div className="mb-2 flex flex-wrap items-center justify-center gap-2">
-            <h2 className="text-2xl font-bold text-foreground">Blob Parameter-Only Fork {bpo.sequenceNumber}</h2>
-            {isCurrentBPO && (
-              <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                Current
-              </span>
-            )}
-            {bpo.isActive && !isCurrentBPO && (
-              <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-semibold text-accent">Active</span>
-            )}
-            {!bpo.isActive && (
-              <span className="rounded-full bg-muted/20 px-2.5 py-0.5 text-xs font-semibold text-muted">Upcoming</span>
-            )}
-          </div>
-          <p className="text-sm text-muted">
-            Max blobs per block: <span className="font-semibold text-foreground">{bpo.maxBlobsPerBlock}</span>
-          </p>
+      {/* Header with emoji and status badges */}
+      <div className="mb-6 flex flex-col items-center text-center">
+        <div className="mb-4 text-5xl">{bpo.emoji}</div>
+        <div className="mb-2 flex flex-wrap items-center justify-center gap-2">
+          <h2 className="text-2xl font-semibold text-foreground">Blob Parameter-Only Fork {bpo.sequenceNumber}</h2>
+          <ForkStatusBadge isActive={bpo.isActive} isCurrent={isCurrentBPO} />
         </div>
-
-        {/* Status display */}
-        {bpo.isActive ? (
-          <div className="mb-6 flex items-center justify-center gap-4 rounded-lg bg-accent/5 py-6">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-accent">{isCurrentBPO ? 'LIVE NOW' : 'ACTIVATED'}</div>
-              {genesisTime && (
-                <div className="mt-2 text-sm text-muted">
-                  <Timestamp timestamp={epochToTimestamp(bpo.epoch, genesisTime)} format="long" />
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          <CountdownDisplay countdown={countdown} genesisTime={genesisTime} epoch={bpo.epoch} />
-        )}
-
-        {/* Quick links */}
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <Link
-            to="/ethereum/epochs/$epoch"
-            params={{ epoch: bpo.epoch.toString() }}
-            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface"
-          >
-            Epoch {bpo.epoch}
-          </Link>
-          <Link
-            to="/ethereum/slots/$slot"
-            params={{ slot: (bpo.epoch * 32).toString() }}
-            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface"
-          >
-            Slot {bpo.epoch * 32}
-          </Link>
-          <Link
-            to="/ethereum/forks/$fork"
-            params={{ fork: getForkSlug(bpo.parentFork) }}
-            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface"
-          >
-            {bpo.parentFork.displayName}
-          </Link>
-        </div>
+        <p className="text-sm text-muted">
+          Max blobs per block: <span className="font-semibold text-foreground">{bpo.maxBlobsPerBlock}</span>
+        </p>
       </div>
+
+      <ActivationStatus
+        isActive={bpo.isActive}
+        isCurrent={isCurrentBPO}
+        epoch={bpo.epoch}
+        countdown={countdown}
+        genesisTime={genesisTime}
+      />
+
+      {/* Quick links */}
+      <ForkQuickLinks epoch={bpo.epoch}>
+        <Link
+          to="/ethereum/forks/$fork"
+          params={{ fork: getForkSlug(bpo.parentFork) }}
+          className={FORK_LINK_BUTTON_CLASS}
+        >
+          {bpo.parentFork.displayName}
+        </Link>
+      </ForkQuickLinks>
     </Card>
-  );
-}
-
-interface CountdownDisplayProps {
-  countdown: CountdownTime;
-  genesisTime?: number;
-  epoch: number;
-}
-
-function CountdownDisplay({ countdown, genesisTime, epoch }: CountdownDisplayProps): React.JSX.Element {
-  return (
-    <div className="mb-6 rounded-lg bg-accent/5 py-6">
-      <div className="mb-3 text-center text-xs font-medium tracking-wider text-muted uppercase">Goes Live In</div>
-      <div className="flex items-center justify-center gap-4">
-        {countdown.days > 0 && (
-          <>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-accent tabular-nums">{countdown.days}</div>
-              <div className="mt-1 text-xs tracking-wider text-muted uppercase">days</div>
-            </div>
-            <div className="text-2xl text-muted">:</div>
-          </>
-        )}
-        <div className="text-center">
-          <div className="text-4xl font-bold text-accent tabular-nums">{countdown.hours}</div>
-          <div className="mt-1 text-xs tracking-wider text-muted uppercase">hours</div>
-        </div>
-        <div className="text-2xl text-muted">:</div>
-        <div className="text-center">
-          <div className="text-4xl font-bold text-accent tabular-nums">{countdown.minutes}</div>
-          <div className="mt-1 text-xs tracking-wider text-muted uppercase">minutes</div>
-        </div>
-        <div className="text-2xl text-muted">:</div>
-        <div className="text-center">
-          <div className="text-4xl font-bold text-accent tabular-nums">{countdown.seconds}</div>
-          <div className="mt-1 text-xs tracking-wider text-muted uppercase">seconds</div>
-        </div>
-      </div>
-      {genesisTime && (
-        <div className="mt-4 text-center text-sm text-muted">
-          Local Time: <Timestamp timestamp={epochToTimestamp(epoch, genesisTime)} format="long" />
-        </div>
-      )}
-    </div>
   );
 }
 
@@ -634,27 +559,21 @@ interface BPOParentForkCardProps {
 
 function BPOParentForkCard({ bpo }: BPOParentForkCardProps): React.JSX.Element {
   return (
-    <Card>
-      <div className="p-6">
-        <h3 className="text-lg font-semibold text-foreground">Parent Fork</h3>
-
-        <div className="mt-6">
-          <Link
-            to="/ethereum/forks/$fork"
-            params={{ fork: getForkSlug(bpo.parentFork) }}
-            className="group flex items-center gap-4 rounded-lg border border-border p-4 transition-colors hover:bg-surface"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-surface text-2xl ring-2 ring-border transition-all group-hover:ring-accent/30">
-              {bpo.parentFork.emoji}
-            </div>
-            <div className="flex-1">
-              <div className="text-lg font-semibold text-foreground">{bpo.parentFork.displayName}</div>
-              <div className="text-sm text-muted">{bpo.parentFork.description}</div>
-            </div>
-            <ChevronRightIcon className="h-5 w-5 text-muted transition-colors group-hover:text-foreground" />
-          </Link>
+    <Card title="Parent Fork">
+      <Link
+        to="/ethereum/forks/$fork"
+        params={{ fork: getForkSlug(bpo.parentFork) }}
+        className="group flex items-center gap-4 rounded-sm border border-border p-4 transition-colors hover:bg-background"
+      >
+        <div className="flex h-12 w-12 items-center justify-center rounded-sm border border-border bg-surface text-2xl transition-colors group-hover:border-accent/30">
+          {bpo.parentFork.emoji}
         </div>
-      </div>
+        <div className="flex-1">
+          <div className="text-lg font-semibold text-foreground">{bpo.parentFork.displayName}</div>
+          <div className="text-sm text-muted">{bpo.parentFork.description}</div>
+        </div>
+        <ChevronRightIcon className="h-5 w-5 text-muted transition-colors group-hover:text-foreground" />
+      </Link>
     </Card>
   );
 }
@@ -675,86 +594,81 @@ function BlobScheduleCard({
   genesisTime,
 }: BlobScheduleCardProps): React.JSX.Element {
   return (
-    <Card>
-      <div className="p-6">
-        <h3 className="text-lg font-semibold text-foreground">Blob Schedule</h3>
-        <p className="mt-1 text-sm text-muted">Blob throughput changes during this fork</p>
+    <Card title="Blob Schedule" subtitle="Blob throughput changes during this fork">
+      <div className="space-y-4">
+        {blobItems.map((item, index) => {
+          const isActive = currentEpoch >= item.epoch;
+          const nextItem = index < blobItems.length - 1 ? blobItems[index + 1] : null;
+          const isCurrent = isActive && (!nextItem || currentEpoch < nextItem.epoch) && isCurrentFork;
+          const bpoSlug = network ? getBPOSlugForBlobItem(network, item, currentEpoch) : null;
 
-        <div className="mt-6 space-y-4">
-          {blobItems.map((item, index) => {
-            const isActive = currentEpoch >= item.epoch;
-            const nextItem = index < blobItems.length - 1 ? blobItems[index + 1] : null;
-            const isCurrent = isActive && (!nextItem || currentEpoch < nextItem.epoch) && isCurrentFork;
-            const bpoSlug = network ? getBPOSlugForBlobItem(network, item, currentEpoch) : null;
-
-            const content = (
-              <>
-                <div className="relative flex h-9 w-9 flex-none items-center justify-center">
-                  <div
-                    className={clsx(
-                      'flex h-9 w-9 items-center justify-center rounded-lg ring-2 transition-all',
-                      isCurrent
-                        ? 'bg-accent/20 shadow-md ring-accent/30'
-                        : isActive
-                          ? 'bg-surface ring-accent/10'
-                          : 'bg-surface ring-border'
-                    )}
-                  >
-                    <ArrowTrendingUpIcon className={clsx('h-5 w-5', isActive ? 'text-accent' : 'text-muted')} />
-                  </div>
+          const content = (
+            <>
+              <div className="relative flex h-9 w-9 flex-none items-center justify-center">
+                <div
+                  className={clsx(
+                    'flex h-9 w-9 items-center justify-center rounded-sm border transition-colors',
+                    isCurrent
+                      ? 'border-accent/30 bg-accent/20'
+                      : isActive
+                        ? 'border-accent/20 bg-surface'
+                        : 'border-border bg-surface'
+                  )}
+                >
+                  <ArrowTrendingUpIcon className={clsx('h-5 w-5', isActive ? 'text-accent' : 'text-muted')} />
                 </div>
+              </div>
 
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-col gap-y-2 sm:flex-row sm:items-start sm:justify-between sm:gap-x-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-x-3">
-                        <span className={clsx('text-sm font-medium', isActive ? 'text-foreground' : 'text-muted')}>
-                          {bpoSlug ? `${bpoSlug.toUpperCase()} - ` : ''}Max {item.max_blobs_per_block} blobs per block
-                        </span>
-                        {isCurrent && (
-                          <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent">
-                            Active
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col items-end gap-y-1">
-                      <div className="flex items-center gap-x-2">
-                        <span className="text-xs text-muted">Epoch</span>
-                        <Epoch epoch={item.epoch} />
-                      </div>
-                      {genesisTime && (
-                        <div className="text-xs text-muted">
-                          <Timestamp timestamp={epochToTimestamp(item.epoch, genesisTime)} format="relative" />
-                        </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-col gap-y-2 sm:flex-row sm:items-start sm:justify-between sm:gap-x-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-x-3">
+                      <span className={clsx('text-sm font-medium', isActive ? 'text-foreground' : 'text-muted')}>
+                        {bpoSlug ? `${bpoSlug.toUpperCase()} - ` : ''}Max {item.max_blobs_per_block} blobs per block
+                      </span>
+                      {isCurrent && (
+                        <Badge color="green" variant="flat">
+                          Active
+                        </Badge>
                       )}
                     </div>
                   </div>
+
+                  <div className="flex flex-col items-end gap-y-1">
+                    <div className="flex items-center gap-x-2">
+                      <span className="text-xs text-muted">Epoch</span>
+                      <Epoch epoch={item.epoch} />
+                    </div>
+                    {genesisTime && (
+                      <div className="text-xs text-muted">
+                        <Timestamp timestamp={epochToTimestamp(item.epoch, genesisTime)} format="relative" />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </>
-            );
-
-            if (bpoSlug) {
-              return (
-                <Link
-                  key={item.epoch}
-                  to="/ethereum/forks/$fork"
-                  params={{ fork: bpoSlug }}
-                  className="-m-2 flex items-start gap-4 rounded-lg p-2 transition-colors hover:bg-surface"
-                >
-                  {content}
-                </Link>
-              );
-            }
-
-            return (
-              <div key={item.epoch} className="flex items-start gap-4">
-                {content}
               </div>
+            </>
+          );
+
+          if (bpoSlug) {
+            return (
+              <Link
+                key={item.epoch}
+                to="/ethereum/forks/$fork"
+                params={{ fork: bpoSlug }}
+                className="-m-2 flex items-start gap-4 rounded-sm p-2 transition-colors hover:bg-background"
+              >
+                {content}
+              </Link>
             );
-          })}
-        </div>
+          }
+
+          return (
+            <div key={item.epoch} className="flex items-start gap-4">
+              {content}
+            </div>
+          );
+        })}
       </div>
     </Card>
   );
@@ -793,75 +707,29 @@ function ForkLinksCard({ fork }: ForkLinksCardProps): React.JSX.Element {
         ]),
   ];
 
-  return (
-    <Card>
-      <div className="p-6">
-        <h3 className="text-lg font-semibold text-foreground">External Resources</h3>
-
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {links.map(link => (
-            <a
-              key={link.href}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-start gap-3 rounded-lg border border-border p-4 transition-colors hover:bg-surface"
-            >
-              <ArrowTopRightOnSquareIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted transition-colors group-hover:text-foreground" />
-              <div>
-                <div className="text-sm font-medium text-foreground">{link.label}</div>
-                <div className="mt-1 text-xs text-muted">{link.description}</div>
-              </div>
-            </a>
-          ))}
-        </div>
-      </div>
-    </Card>
-  );
+  return <ExternalResourcesCard links={links} />;
 }
 
 function BPOLinksCard(): React.JSX.Element {
-  const links = [
-    {
-      label: 'EIP-7892',
-      href: 'https://eips.ethereum.org/EIPS/eip-7892',
-      description: 'Blob Parameter-Only Forks specification',
-    },
-    {
-      label: 'Ethereum Roadmap',
-      href: 'https://ethereum.org/en/roadmap/',
-      description: 'Official Ethereum roadmap and upgrade timeline',
-    },
-    {
-      label: 'Forkcast',
-      href: 'https://forkcast.org',
-      description: 'Track Ethereum network upgrades',
-    },
-  ];
-
   return (
-    <Card>
-      <div className="p-6">
-        <h3 className="text-lg font-semibold text-foreground">External Resources</h3>
-
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {links.map(link => (
-            <a
-              key={link.href}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-start gap-3 rounded-lg border border-border p-4 transition-colors hover:bg-surface"
-            >
-              <ArrowTopRightOnSquareIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted transition-colors group-hover:text-foreground" />
-              <div>
-                <div className="text-sm font-medium text-foreground">{link.label}</div>
-                <div className="mt-1 text-xs text-muted">{link.description}</div>
-              </div>
-            </a>
-          ))}
-        </div>
-      </div>
-    </Card>
+    <ExternalResourcesCard
+      links={[
+        {
+          label: 'EIP-7892',
+          href: 'https://eips.ethereum.org/EIPS/eip-7892',
+          description: 'Blob Parameter-Only Forks specification',
+        },
+        {
+          label: 'Ethereum Roadmap',
+          href: 'https://ethereum.org/en/roadmap/',
+          description: 'Official Ethereum roadmap and upgrade timeline',
+        },
+        {
+          label: 'Forkcast',
+          href: 'https://forkcast.org',
+          description: 'Track Ethereum network upgrades',
+        },
+      ]}
+    />
   );
 }

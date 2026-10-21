@@ -41,10 +41,10 @@ interface MetricCardProps {
 function MetricCard({ title, value, subtitle, threshold, isLoading, passed }: MetricCardProps): JSX.Element {
   return (
     <Card className="flex flex-col gap-1 p-4">
-      <div className="text-xs font-medium tracking-wider text-muted uppercase">{title}</div>
+      <div className="text-xs font-medium text-muted">{title}</div>
       <div className="flex items-baseline gap-2">
         {isLoading ? (
-          <div className="h-8 w-20 animate-pulse rounded-sm bg-muted/20" />
+          <div className="h-8 w-20 animate-pulse rounded-xs bg-muted/20" />
         ) : (
           <span
             className={clsx(
@@ -127,16 +127,16 @@ export function PerformanceSummary({
   return (
     <div className={clsx('grid grid-cols-2 gap-4 lg:grid-cols-3', className)}>
       <Card className="flex flex-col gap-1 p-4">
-        <div className="text-xs font-medium tracking-wider text-muted uppercase">Validators</div>
+        <div className="text-xs font-medium text-muted">Validators</div>
         <div className="flex items-baseline gap-2">
           {isStatusLoading ? (
-            <div className="h-8 w-20 animate-pulse rounded-sm bg-muted/20" />
+            <div className="h-8 w-20 animate-pulse rounded-xs bg-muted/20" />
           ) : (
             <span className="text-2xl font-bold text-foreground tabular-nums">{statusSummary?.total ?? 0}</span>
           )}
         </div>
         {isStatusLoading ? (
-          <div className="h-4 w-32 animate-pulse rounded-sm bg-muted/20" />
+          <div className="h-4 w-32 animate-pulse rounded-xs bg-muted/20" />
         ) : visibleBadges.length > 0 ? (
           <div className="flex flex-wrap items-center gap-1.5">
             {visibleBadges.map(badge => (

@@ -1,5 +1,6 @@
 import { type JSX } from 'react';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
+import { Card } from '@/components/Layout/Card';
 import { Badge } from '@/components/Elements/Badge';
 import { CopyToClipboard } from '@/components/Elements/CopyToClipboard';
 import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
@@ -35,39 +36,29 @@ export function ContractInfoCard({ address, contractOwner }: ContractInfoCardPro
   const etherscanUrl = serviceUrls?.explorer ? `${serviceUrls.explorer}/address/${address}` : null;
 
   return (
-    <div className="overflow-hidden rounded-sm border border-border bg-surface">
-      {/* Header section */}
-      <div className="border-b border-border bg-background px-6 py-4">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">
-              {contractOwner?.contract_name ?? 'Contract'}
-            </h1>
-            <div className="mt-1 flex items-center gap-1">
-              <span className="font-mono text-sm text-muted">{address}</span>
-              <CopyToClipboard content={address} successMessage="Address copied!" />
-            </div>
-          </div>
-
-          {/* External links */}
-          {etherscanUrl && (
-            <div className="flex items-center gap-2">
-              <a
-                href={etherscanUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block opacity-70 transition-opacity hover:opacity-100"
-                aria-label="View on Etherscan"
-              >
-                <EtherscanIcon className="size-5" />
-              </a>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Content section */}
-      <div className="p-6">
+    <Card
+      title={contractOwner?.contract_name ?? 'Contract'}
+      subtitle={
+        <span className="flex items-center gap-1">
+          <span className="font-mono">{address}</span>
+          <CopyToClipboard content={address} successMessage="Address copied!" />
+        </span>
+      }
+      actions={
+        etherscanUrl && (
+          <a
+            href={etherscanUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block opacity-70 transition-opacity hover:opacity-100"
+            aria-label="View on Etherscan"
+          >
+            <EtherscanIcon className="size-5" />
+          </a>
+        )
+      }
+    >
+      <div>
         <div className="flex flex-col gap-6">
           {/* Labels section */}
           {contractOwner?.labels && contractOwner.labels.length > 0 && (
@@ -126,7 +117,7 @@ export function ContractInfoCard({ address, contractOwner }: ContractInfoCardPro
                                 {source}
                                 <ArrowTopRightOnSquareIcon className="size-3" />
                               </a>
-                              <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 rounded-xs bg-foreground px-2 py-1 text-xs whitespace-nowrap text-background opacity-0 shadow-xs transition-opacity group-hover:opacity-100">
+                              <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 rounded-xs bg-foreground px-2 py-1 text-xs whitespace-nowrap text-background opacity-0 transition-opacity group-hover:opacity-100">
                                 {info.description}
                                 <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-foreground" />
                               </span>
@@ -145,6 +136,6 @@ export function ContractInfoCard({ address, contractOwner }: ContractInfoCardPro
             )}
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

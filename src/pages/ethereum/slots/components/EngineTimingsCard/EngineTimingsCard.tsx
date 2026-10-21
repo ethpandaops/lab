@@ -103,12 +103,10 @@ export function EngineTimingsCard({
     <div className={clsx('grid gap-6', showBothSections ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1')}>
       {/* newPayload Section */}
       {hasNewPayloadData && (
-        <Card>
-          <div className="mb-4 flex items-start justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-foreground">engine_newPayload</h3>
-              <p className="text-sm text-muted">Block validation timing</p>
-            </div>
+        <Card
+          title="engine_newPayload"
+          subtitle="Block validation timing"
+          actions={
             <button
               onClick={() => setShowRefNodeInfo(true)}
               className="rounded-xs p-1 text-muted transition-colors hover:text-foreground"
@@ -116,8 +114,8 @@ export function EngineTimingsCard({
             >
               <InformationCircleIcon className="size-5" />
             </button>
-          </div>
-
+          }
+        >
           {/* Summary Stats */}
           <div className="mb-6 grid grid-cols-2 gap-4">
             <MiniStat label="Median" value={`${newPayloadMedian.toFixed(0)} ms`} />
@@ -141,12 +139,10 @@ export function EngineTimingsCard({
 
       {/* getBlobs Section - show if there's timing data or if slot has blobs */}
       {showGetBlobsSection && (
-        <Card>
-          <div className="mb-4 flex items-start justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-foreground">engine_getBlobs</h3>
-              <p className="text-sm text-muted">Blob retrieval timing</p>
-            </div>
+        <Card
+          title="engine_getBlobs"
+          subtitle="Blob retrieval timing"
+          actions={
             <button
               onClick={() => setShowRefNodeInfo(true)}
               className="rounded-xs p-1 text-muted transition-colors hover:text-foreground"
@@ -154,8 +150,8 @@ export function EngineTimingsCard({
             >
               <InformationCircleIcon className="size-5" />
             </button>
-          </div>
-
+          }
+        >
           {hasGetBlobsData ? (
             <>
               {/* Summary Stats */}

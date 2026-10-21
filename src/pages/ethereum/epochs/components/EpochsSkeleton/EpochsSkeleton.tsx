@@ -59,7 +59,7 @@ export function EpochsSkeleton(): JSX.Element {
         </div>
 
         {/* Chart card */}
-        <div className="rounded-lg border border-border bg-surface p-6">
+        <div className="rounded-sm border border-border bg-surface p-6">
           {/* Chart header */}
           <div className="mb-4 flex items-start justify-between">
             <div className="space-y-2">
