@@ -4,37 +4,37 @@ import type { CardProps, CardVariant } from './Card.types';
 
 const variantStyles: Record<CardVariant, { container: string; header: string; main: string; footer: string }> = {
   default: {
-    container: 'bg-surface outline -outline-offset-1 outline-border',
+    container: 'border-t border-border',
     header: '',
     main: '',
     footer: '',
   },
   muted: {
-    container: 'bg-surface outline -outline-offset-1 outline-border',
+    container: 'border-t border-border',
     header: 'bg-surface dark:bg-background',
     main: '',
     footer: 'bg-surface dark:bg-background',
   },
   primary: {
-    container: 'bg-surface outline -outline-offset-1 outline-border',
+    container: 'border-t border-border',
     header: 'bg-primary/5 dark:bg-primary/10',
     main: '',
     footer: '',
   },
   accent: {
-    container: 'bg-surface outline -outline-offset-1 outline-border',
+    container: 'border-t border-border',
     header: 'bg-accent/5 dark:bg-accent/10',
     main: '',
     footer: 'bg-accent/5 dark:bg-accent/10',
   },
   elevated: {
-    container: 'bg-surface outline -outline-offset-1 outline-border',
+    container: 'border-t border-border',
     header: 'bg-background dark:bg-background',
     main: '',
     footer: '',
   },
   surface: {
-    container: 'bg-surface outline -outline-offset-1 outline-border',
+    container: 'border-t border-border',
     header: 'bg-surface dark:bg-background',
     main: 'bg-background dark:bg-background/50',
     footer: 'bg-surface dark:bg-background',
@@ -44,9 +44,8 @@ const variantStyles: Record<CardVariant, { container: string; header: string; ma
 /**
  * Core content container.
  *
- * Every card shares one anatomy: a compact header row (title, optional subtitle, right-aligned
- * actions) separated by a single rule from a body whose inset matches the header, so titles and
- * content line up on the same left edge.
+ * Canvas variant: a card is a ruled section, not a box. A hairline across the top, a title row,
+ * then content flush with the title's left edge. No background, outline or padding of its own.
  */
 export function Card({
   children,
@@ -60,7 +59,7 @@ export function Card({
   isInteractive = false,
   onClick,
   featureImage,
-  rounded = true,
+  rounded: _rounded = true,
   allowContentOverflow = false,
 }: CardProps): JSX.Element {
   const styles = variantStyles[variant];
@@ -68,8 +67,8 @@ export function Card({
     title !== undefined ? (
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-sm/6 font-semibold text-foreground">{title}</h3>
-          {subtitle && <p className="text-xs/5 text-muted">{subtitle}</p>}
+          <h3 className="truncate text-base/7 font-semibold tracking-tight text-foreground">{title}</h3>
+          {subtitle && <p className="text-sm/5 text-muted">{subtitle}</p>}
         </div>
         {actions && <div className="-my-1 -mr-1.5 flex shrink-0 items-center gap-0.5">{actions}</div>}
       </div>
@@ -79,12 +78,13 @@ export function Card({
 
   return (
     <div
+      data-slot="card"
       className={clsx(
-        'relative divide-y divide-border dark:divide-border',
+        'relative',
         !allowContentOverflow && 'overflow-hidden',
-        rounded && 'rounded-sm',
+
         styles.container,
-        isInteractive && 'cursor-pointer transition-colors duration-200 hover:outline-primary/40',
+        isInteractive && 'cursor-pointer transition-colors duration-200 hover:border-primary/60',
         className
       )}
       onClick={isInteractive ? onClick : undefined}
@@ -96,17 +96,14 @@ export function Card({
           {featureImage}
         </div>
       )}
-      {headerContent && <div className={clsx('relative z-10 px-4 py-3 sm:px-5', styles.header)}>{headerContent}</div>}
+      {headerContent && <div className={clsx('relative z-10 pt-4 pb-4', styles.header)}>{headerContent}</div>}
       <div
         data-slot="card-body"
-        className={clsx(
-          'relative z-10 flex-1 p-4 [--card-inset-y:--spacing(4)] [--card-inset:--spacing(4)] sm:p-5 sm:[--card-inset-y:--spacing(5)] sm:[--card-inset:--spacing(5)]',
-          styles.main
-        )}
+        className={clsx('relative z-10 flex-1 pb-2 [--card-inset-y:0px] [--card-inset:0px]', styles.main)}
       >
         {children}
       </div>
-      {footer && <div className={clsx('relative z-10 px-4 py-3 sm:px-5', styles.footer)}>{footer}</div>}
+      {footer && <div className={clsx('relative z-10 border-t border-border py-3', styles.footer)}>{footer}</div>}
     </div>
   );
 }

@@ -401,7 +401,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
       {/* Static sidebar for desktop */}
       <div
         className={clsx(
-          'hidden border-r border-border bg-background transition-all duration-200 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col',
+          'hidden bg-background transition-all duration-200 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col',
           collapsed ? 'lg:w-14' : 'lg:w-56'
         )}
       >

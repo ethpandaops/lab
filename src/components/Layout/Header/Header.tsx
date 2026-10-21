@@ -14,9 +14,9 @@ const sizeStyles = {
     description: 'text-sm/6 text-muted',
   },
   md: {
-    container: 'mb-6',
-    title: 'text-2xl/8 font-semibold tracking-tight text-foreground',
-    description: 'mt-1 max-w-3xl text-sm/6 text-muted',
+    container: 'mb-10',
+    title: 'text-4xl/11 font-semibold tracking-tight text-foreground',
+    description: 'mt-2 max-w-3xl text-base/7 text-muted',
   },
   lg: {
     container: 'mb-8',
