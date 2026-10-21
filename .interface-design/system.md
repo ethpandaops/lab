@@ -114,6 +114,18 @@ All text uses Space Grotesk Variable.
 
 ---
 
+## Controls
+
+Filter rows mix selects, segmented controls and buttons, so they share one size:
+
+| Control | Recipe |
+|---|---|
+| Height | `h-8` (32px) for SelectMenu, SegmentedControl, Button `sm`, filter inputs |
+| Text | `text-sm` (selects, inputs, buttons), `text-xs font-medium` (segments) |
+| Surface | `bg-surface border border-border` — no blur, no shadow |
+| Hover | `hover:border-primary/40` |
+| Chevron | `size-4 text-muted` |
+
 ## Interactive States
 
 | State | Pattern |
@@ -215,10 +227,10 @@ grid: { left: 60, right: 24, top: 16, bottom: 50 }
 
 ### Legend (Interactive)
 
-Pill-style buttons (not native ECharts legend):
-- `rounded-sm border px-2 py-1 text-xs/5`
-- Active: `bg-surface-hover border-border text-foreground`
-- Inactive: `border-transparent bg-surface/50 text-muted/50`
+Borderless toggles (not native ECharts legend), with no rule between legend and chart:
+- `rounded-xs px-1.5 py-0.5 text-xs/5 hover:bg-muted/10`
+- Visible: `text-foreground`, filled dot
+- Hidden: `text-muted/60`, hollow dot
 - Color indicator: `h-2 w-2 rounded-full`
 
 ### Synchronized Crosshairs
@@ -265,9 +277,10 @@ Two-column responsive grid with time controls:
 
 ### Time Period Selector
 
-Button group with pill buttons:
-- Active: `bg-primary text-primary-foreground ring-2 ring-primary/30`
-- Inactive: `bg-surface text-muted ring-1 ring-border`
+`SegmentedControl` (`src/components/Forms/SegmentedControl`) — never hand-roll pill rows.
+- Track: `h-8 rounded-sm bg-surface p-0.5 ring-1 ring-border`
+- Selected segment: `bg-primary/15 text-primary` (the app-wide selected state)
+- Other segments: `text-muted hover:bg-muted/10 hover:text-foreground`
 
 ### Fork Annotations
 

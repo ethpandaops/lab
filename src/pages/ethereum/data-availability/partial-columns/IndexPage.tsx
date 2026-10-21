@@ -1,6 +1,5 @@
 import { type JSX, useCallback, useMemo } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import clsx from 'clsx';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
@@ -9,6 +8,7 @@ import { InfoBox } from '@/components/Feedback/InfoBox';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { SeriesData } from '@/components/Charts/MultiLine';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useTableBounds } from '@/hooks/useBounds';
 import {
   buildTooltipHtml,
@@ -226,23 +226,12 @@ export function IndexPage(): JSX.Element {
       ) : (
         <div className="flex flex-col gap-6">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            <div className="flex flex-wrap items-center gap-1.5">
-              {TIME_PERIOD_OPTIONS.map(({ value, label }) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setSearch({ t: value })}
-                  className={clsx(
-                    'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
-                    timePeriod === value
-                      ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
-                      : 'bg-surface text-muted ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
-                  )}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+            <SegmentedControl
+              options={TIME_PERIOD_OPTIONS}
+              value={timePeriod}
+              onChange={value => setSearch({ t: value })}
+              ariaLabel="Time window"
+            />
             <SentryFilter clients={sentryClients} value={sentry} onChange={client => setSearch({ sentry: client })} />
           </div>
 

@@ -998,7 +998,7 @@ export function MultiLineChart({
 
       {/* Interactive Legend Controls - Top */}
       {showLegend && !useNativeLegend && series.length > 1 && legendPosition === 'top' && (
-        <div className="mb-4 border-b border-border pb-4">
+        <div className="mb-3">
           {enableAggregateToggle && (
             <div className="mb-2 flex items-center justify-end">
               <button
@@ -1033,7 +1033,7 @@ export function MultiLineChart({
                   {groups.map(group => (
                     <div key={group.name ?? '__ungrouped__'} className="flex items-center gap-2">
                       {group.name && <span className="text-xs text-muted">{group.name}:</span>}
-                      <div className="flex flex-wrap items-center gap-1.5">
+                      <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5">
                         {group.items.map(s => {
                           const isVisible = visibleSeries.has(s.name);
                           const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
@@ -1041,10 +1041,8 @@ export function MultiLineChart({
                             <button
                               key={s.name}
                               onClick={() => toggleSeries(s.name)}
-                              className={`flex cursor-pointer items-center gap-1.5 rounded-sm border px-2 py-1 text-xs/5 transition-all ${
-                                isVisible
-                                  ? 'bg-surface-hover border-border text-foreground hover:border-primary/50 hover:bg-primary/10'
-                                  : 'hover:bg-surface-hover/50 border-transparent bg-surface/50 text-muted/50 hover:border-border'
+                              className={`flex cursor-pointer items-center gap-1.5 rounded-xs px-1.5 py-0.5 text-xs/5 transition-colors hover:bg-muted/10 ${
+                                isVisible ? 'text-foreground' : 'text-muted/60'
                               }`}
                             >
                               <span
@@ -1095,7 +1093,7 @@ export function MultiLineChart({
 
       {/* Interactive Legend Controls - Bottom */}
       {showLegend && !useNativeLegend && series.length > 1 && legendPosition === 'bottom' && (
-        <div className="mt-4 border-t border-border pt-4">
+        <div className="mt-3">
           {enableAggregateToggle && (
             <div className="mb-2 flex items-center justify-end">
               <button
@@ -1130,7 +1128,7 @@ export function MultiLineChart({
                   {groups.map(group => (
                     <div key={group.name ?? '__ungrouped__'} className="flex items-center gap-2">
                       {group.name && <span className="text-xs text-muted">{group.name}:</span>}
-                      <div className="flex flex-wrap items-center gap-1.5">
+                      <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5">
                         {group.items.map(s => {
                           const isVisible = visibleSeries.has(s.name);
                           const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
@@ -1138,10 +1136,8 @@ export function MultiLineChart({
                             <button
                               key={s.name}
                               onClick={() => toggleSeries(s.name)}
-                              className={`flex cursor-pointer items-center gap-1.5 rounded-sm border px-2 py-1 text-xs/5 transition-all ${
-                                isVisible
-                                  ? 'bg-surface-hover border-border text-foreground hover:border-primary/50 hover:bg-primary/10'
-                                  : 'hover:bg-surface-hover/50 border-transparent bg-surface/50 text-muted/50 hover:border-border'
+                              className={`flex cursor-pointer items-center gap-1.5 rounded-xs px-1.5 py-0.5 text-xs/5 transition-colors hover:bg-muted/10 ${
+                                isVisible ? 'text-foreground' : 'text-muted/60'
                               }`}
                             >
                               <span

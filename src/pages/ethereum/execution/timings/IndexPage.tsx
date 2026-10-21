@@ -1,5 +1,4 @@
 import { type JSX, useState } from 'react';
-import clsx from 'clsx';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { useSearch, useNavigate } from '@tanstack/react-router';
@@ -9,6 +8,7 @@ import { Tab } from '@/components/Navigation/Tab';
 import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { Alert } from '@/components/Feedback/Alert';
 import { Checkbox } from '@/components/Forms/Checkbox';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useTabState } from '@/hooks/useTabState';
 import { useEngineTimingsData } from './hooks/useEngineTimingsData';
 import { TimingsSkeleton } from './components/TimingsSkeleton';
@@ -60,23 +60,16 @@ export function IndexPage(): JSX.Element {
       />
 
       {/* Time Range Selector */}
-      <div className="mb-6 flex flex-wrap items-center gap-1.5">
-        {(Object.keys(TIME_RANGE_CONFIG) as TimeRange[]).map(r => (
-          <button
-            key={r}
-            type="button"
-            onClick={() => navigate({ search: prev => ({ ...prev, range: r }), replace: true })}
-            className={clsx(
-              'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
-              timeRange === r
-                ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
-                : 'bg-surface text-muted ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
-            )}
-          >
-            {TIME_RANGE_CONFIG[r].label}
-          </button>
-        ))}
-      </div>
+      <SegmentedControl
+        options={(Object.keys(TIME_RANGE_CONFIG) as TimeRange[]).map(r => ({
+          value: r,
+          label: TIME_RANGE_CONFIG[r].label,
+        }))}
+        value={timeRange}
+        onChange={r => navigate({ search: prev => ({ ...prev, range: r }), replace: true })}
+        ariaLabel="Time window"
+        className="mb-6"
+      />
 
       {/* Reference Node Info Dialog */}
       <ReferenceNodesInfoDialog open={showRefNodeInfo} onClose={() => setShowRefNodeInfo(false)} />
