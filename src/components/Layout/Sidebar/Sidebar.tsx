@@ -220,11 +220,11 @@ function NavLink({ page, collapsed }: { page: NavItem; collapsed: boolean }): JS
       preloadDelay={100}
       title={collapsed ? page.name : undefined}
       className={clsx(
-        'group flex items-center gap-x-3 rounded-sm text-muted transition-all hover:bg-primary/10 hover:text-primary',
+        'group flex items-center gap-x-2.5 rounded-sm text-muted transition-colors hover:bg-foreground/5 hover:text-foreground',
         collapsed ? 'justify-center p-2' : 'px-2 py-1 text-sm/5 font-medium'
       )}
       activeProps={{
-        className: 'bg-primary/10 text-primary shadow-xs ring-1 ring-primary/20',
+        className: 'bg-foreground/[0.07] !text-foreground [&>svg]:text-primary',
       }}
     >
       <Icon className="size-4 shrink-0" />
@@ -408,7 +408,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
         {/* Header */}
         <div
           className={clsx(
-            'flex h-12 shrink-0 items-center border-b border-border/50',
+            'flex h-12 shrink-0 items-center border-b border-border',
             collapsed ? 'justify-center px-2' : 'justify-between px-3'
           )}
         >

@@ -211,10 +211,20 @@ Page-level header. Size and weight carry the hierarchy; no accent bar or other o
 
 Page wrapper. `mx-auto p-4 sm:p-6 lg:p-8 max-w-screen-2xl`.
 
+### App frame
+
+- Top bar: `h-12 border-b border-border bg-background/85 backdrop-blur-sm`, sticky on desktop, holds
+  the breadcrumb. Its rule continues the sidebar header's rule, so the frame is one line.
+- Breadcrumb: ancestors `text-muted hover:text-foreground`, current page `font-medium text-foreground`,
+  separators `text-muted/50`. No accent color.
+- Navigation states are neutral: hover `bg-foreground/5 text-foreground`, active
+  `bg-foreground/[0.07] text-foreground` with a primary icon. Primary color marks selection in
+  controls, not navigation.
+
 ### Sidebar
 
 - Width: `w-14` collapsed, `w-56` expanded
-- Background: `bg-surface/95 backdrop-blur-xl`
+- Background: `bg-background` (same as the page)
 - Border: `border-r border-border`
 - Nav items: `rounded-sm px-2 py-1 text-sm/5 font-medium`
 - Icons: `size-4 shrink-0`

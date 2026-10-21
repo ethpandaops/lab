@@ -56,7 +56,7 @@ export function NetworkSelect({
         <ListboxButton
           title={getNetworkFullLabel(currentNetwork)}
           className={clsx(
-            'relative flex h-11 cursor-pointer items-center gap-2 rounded-sm border border-border bg-surface/50 pr-10 pl-3 text-left shadow-xs backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-surface/70 hover:shadow-sm',
+            'relative flex h-10 cursor-pointer items-center gap-2 rounded-sm border border-border bg-surface pr-8 pl-2.5 text-left transition-colors hover:border-primary/40',
             expandToFit ? 'w-auto min-w-[140px]' : 'w-full'
           )}
         >
@@ -67,10 +67,12 @@ export function NetworkSelect({
             {family && (
               <span className="truncate text-2xs/3 font-semibold tracking-wider text-muted uppercase">{family}</span>
             )}
-            <span className="truncate text-base/5 text-foreground">{getNetworkShortLabel(currentNetwork)}</span>
+            <span className="truncate text-sm/5 font-medium text-foreground">
+              {getNetworkShortLabel(currentNetwork)}
+            </span>
           </span>
           <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-            <ChevronUpDownIcon aria-hidden="true" className="size-5 text-muted" />
+            <ChevronUpDownIcon aria-hidden="true" className="size-4 text-muted" />
           </span>
         </ListboxButton>
 

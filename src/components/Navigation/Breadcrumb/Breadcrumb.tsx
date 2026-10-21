@@ -82,10 +82,7 @@ export function Breadcrumb({ className, separator = '/', showHome = true }: Brea
   }
 
   return (
-    <nav
-      aria-label="Breadcrumb"
-      className={clsx('flex items-center gap-2 px-4 py-4 text-sm/6 sm:px-6 lg:px-8', className)}
-    >
+    <nav aria-label="Breadcrumb" className={clsx('flex items-center gap-2 text-sm/6', className)}>
       <ol className="flex items-center gap-2">
         {/* Home icon */}
         {showHome && (
@@ -95,7 +92,7 @@ export function Breadcrumb({ className, separator = '/', showHome = true }: Brea
                 <HomeIcon className="h-4 w-4" />
               </Link>
             </li>
-            <li aria-hidden="true" className="text-muted">
+            <li aria-hidden="true" className="text-muted/50">
               {separator}
             </li>
           </>
@@ -106,17 +103,17 @@ export function Breadcrumb({ className, separator = '/', showHome = true }: Brea
           <li key={crumb.path} className="flex items-center gap-2">
             {crumb.isActive ? (
               // Active breadcrumb (current page)
-              <span className="font-semibold text-foreground" aria-current="page">
+              <span className="font-medium text-foreground" aria-current="page">
                 {crumb.label}
               </span>
             ) : crumb.clickable ? (
               // Clickable parent breadcrumbs
               <>
-                <Link to={crumb.path} className="text-accent transition-colors hover:text-accent/80">
+                <Link to={crumb.path} className="text-muted transition-colors hover:text-foreground">
                   {crumb.label}
                 </Link>
                 {index < breadcrumbs.length - 1 && (
-                  <span aria-hidden="true" className="text-muted">
+                  <span aria-hidden="true" className="text-muted/50">
                     {separator}
                   </span>
                 )}
@@ -126,7 +123,7 @@ export function Breadcrumb({ className, separator = '/', showHome = true }: Brea
               <>
                 <span className="text-muted">{crumb.label}</span>
                 {index < breadcrumbs.length - 1 && (
-                  <span aria-hidden="true" className="text-muted">
+                  <span aria-hidden="true" className="text-muted/50">
                     {separator}
                   </span>
                 )}
