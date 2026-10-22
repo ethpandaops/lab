@@ -3,7 +3,7 @@ import { Container } from '@/components/Layout/Container';
 import { useNetwork } from '@/hooks/useNetwork';
 import { groupNetworks } from '@/utils/networks';
 import { NetworksTable } from './components/NetworksTable';
-import { PageLinks } from './components/PageLinks';
+import { LatestBlocks } from './components/LatestBlocks';
 
 /** Current unix time, updating every second */
 function useNow(): number {
@@ -15,7 +15,7 @@ function useNow(): number {
   return now;
 }
 
-/** Start page: every network's head and indexing state, then the main pages by section. */
+/** Start page: every network's head and indexing state, then the newest blocks on the selected network. */
 export function IndexPage(): JSX.Element {
   const { networks } = useNetwork();
   const groups = useMemo(() => groupNetworks(networks), [networks]);
@@ -31,7 +31,7 @@ export function IndexPage(): JSX.Element {
         {groups.map(group => (
           <NetworksTable key={group.id} group={group} now={now} />
         ))}
-        <PageLinks />
+        <LatestBlocks now={now} />
       </div>
     </Container>
   );
