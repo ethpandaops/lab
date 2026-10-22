@@ -333,6 +333,7 @@ export function buildTpsChartConfig(
         color: '#64748b',
         opacity: 0.06,
         group: 'Bands',
+        initiallyVisible: false,
       }),
     ],
   };
@@ -461,6 +462,7 @@ export function buildGasChartConfig(
       color: '#64748b',
       opacity: 0.06,
       group: 'Bands',
+      initiallyVisible: false,
     })
   );
 
@@ -634,6 +636,7 @@ export function buildTransactionsChartConfig(
         color: '#64748b',
         opacity: 0.06,
         group: 'Bands',
+        initiallyVisible: false,
       }),
     ],
   };

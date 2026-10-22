@@ -25,8 +25,58 @@ import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 /** Maximum number of plain lines that get an end-of-line label */
 const MAX_END_LABELS = 8;
+
+/** Last non-null y value of a series, whatever shape its data takes */
+function lastValue(data: unknown[]): number | null {
+  for (let i = data.length - 1; i >= 0; i--) {
+    const point = data[i];
+    const y = Array.isArray(point)
+      ? point[1]
+      : point !== null && typeof point === 'object'
+        ? (point as { value?: unknown }).value
+        : point;
+    const value = Array.isArray(y) ? y[1] : y;
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+  }
+  return null;
+}
+
+/** Pixel gap end labels need between them (11px text plus breathing room) */
+const END_LABEL_GAP_PX = 18;
+
+/** Whether every pair of line ends is far enough apart, on a plot of the given height, for labels */
+function endLabelsClear(values: (number | null)[], plotHeight: number, axisMin?: number, axisMax?: number): boolean {
+  const ends = values.filter((v): v is number => v !== null).sort((a, b) => a - b);
+  if (ends.length < 2) return ends.length > 0;
+  const low = axisMin ?? Math.min(0, ends[0]);
+  const high = axisMax ?? ends[ends.length - 1];
+  const range = high - low || 1;
+  const minGap = (END_LABEL_GAP_PX / Math.max(plotHeight, 1)) * range;
+  for (let i = 1; i < ends.length; i++) {
+    if (ends[i] - ends[i - 1] < minGap) return false;
+  }
+  return true;
+}
+
+/**
+ * Value-axis bounds. 'dataMin'/'dataMax' would make ECharts start or end the axis on the raw data
+ * value (1.333…, 0.002192), so the first or last tick label is off the grid. Instead they become
+ * `scale: true`: the axis may leave out zero, and ECharts rounds the extent to whole intervals.
+ */
+function valueAxisBounds(
+  min: number | 'dataMin' | undefined,
+  max: number | 'dataMax' | undefined
+): { min?: number; max?: number; scale?: boolean } {
+  return {
+    min: min === 'dataMin' ? undefined : min,
+    max: max === 'dataMax' ? undefined : max,
+    scale: min === 'dataMin' || max === 'dataMax' ? true : undefined,
+  };
+}
 /** Narrowest chart (px) that gets end labels */
 const END_LABEL_MIN_WIDTH = 480;
+/** Minimum horizontal gap (px) between two shown mark-line labels */
+const MARK_LABEL_GAP_PX = 16;
 
 // Register ECharts components
 echarts.use([
@@ -114,14 +164,14 @@ export function MultiLineChart({
   // Store the chart instance for sync cleanup
   const chartInstanceRef = useRef<EChartsInstance | null>(null);
   // Track the chart's width so end labels only render where there is room for them
-  const [isWideEnoughForEndLabels, setIsWideEnoughForEndLabels] = useState(true);
+  const [chartWidth, setChartWidth] = useState(0);
+  const isWideEnoughForEndLabels = chartWidth === 0 || chartWidth >= END_LABEL_MIN_WIDTH;
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const measureRef = useCallback((node: HTMLDivElement | null) => {
     resizeObserverRef.current?.disconnect();
     if (!node || typeof ResizeObserver === 'undefined') return;
     const observer = new ResizeObserver(entries => {
-      const width = entries[0]?.contentRect.width ?? 0;
-      setIsWideEnoughForEndLabels(width === 0 || width >= END_LABEL_MIN_WIDTH);
+      setChartWidth(Math.round(entries[0]?.contentRect.width ?? 0));
     });
     observer.observe(node);
     resizeObserverRef.current = observer;
@@ -485,8 +535,7 @@ export function MultiLineChart({
         fontSize: 11,
         formatter: yAxis?.formatter,
       },
-      min: yAxis?.min,
-      max: yAxis?.max,
+      ...valueAxisBounds(yAxis?.min, yAxis?.max),
       minInterval: yAxis?.minInterval,
     };
 
@@ -507,8 +556,7 @@ export function MultiLineChart({
             fontSize: 11,
             formatter: secondaryYAxis.formatter,
           },
-          min: secondaryYAxis.min,
-          max: secondaryYAxis.max,
+          ...valueAxisBounds(secondaryYAxis.min, secondaryYAxis.max),
           minInterval: secondaryYAxis.minInterval,
         }
       : null;
@@ -529,7 +577,19 @@ export function MultiLineChart({
     // The right edge belongs to the secondary axis when there is one, so no end labels then
     const labelledCount =
       endLabels && isWideEnoughForEndLabels && !secondaryYAxis ? displayedSeries.filter(canEndLabel).length : 0;
-    const showEndLabels = labelledCount > 1 && labelledCount <= MAX_END_LABELS;
+    // Labels sit at each line's last value; when two lines end within a label's height of each
+    // other the labels overprint, so the chart falls back to the legend alone
+    const endValues = displayedSeries.filter(canEndLabel).map(s => lastValue(s.data));
+    const plotHeight = (typeof _height === 'number' ? _height : 300) - 60;
+    const showEndLabels =
+      labelledCount > 1 &&
+      labelledCount <= MAX_END_LABELS &&
+      endLabelsClear(
+        endValues,
+        plotHeight,
+        typeof yAxis?.min === 'number' ? yAxis.min : undefined,
+        typeof yAxis?.max === 'number' ? yAxis.max : undefined
+      );
     const longestEndLabel = showEndLabels
       ? Math.max(...displayedSeries.filter(canEndLabel).map(s => s.name.length))
       : 0;
@@ -651,6 +711,49 @@ export function MultiLineChart({
     // Add annotation series for markLines/markAreas if provided
     const hasMarkLines = markLines && markLines.length > 0;
     const hasMarkAreas = markAreas && markAreas.length > 0;
+    // Mark-line labels are vertical text ~11px wide; where marks crowd (e.g. every fork on an
+    // all-time chart) labels overprint. Keep a label only if it is far enough from the last one
+    // kept, newest first; a crowded mark's name joins the label it would have overprinted.
+    const visibleMarkLabels = new Set<number>();
+    const mergedMarkLabels = new Map<number, string[]>();
+    if (hasMarkLines) {
+      const plotWidth = Math.max((chartWidth || 800) - 52 - 16 - endLabelMargin, 1);
+      const categoryLabels = xAxis.type === 'category' ? xAxis.labels : undefined;
+      const numericXs = markLines!.map(ml => Number(ml.xValue)).filter(Number.isFinite);
+      const xMin = Number(xAxis.min ?? (isTimeAxis ? timeMin : undefined) ?? Math.min(...numericXs));
+      const xMax = Number(xAxis.max ?? (isTimeAxis ? timeMax : undefined) ?? Math.max(...numericXs));
+      const fraction = (value: number | string): number | null => {
+        if (categoryLabels) {
+          const index = categoryLabels.indexOf(String(value));
+          return index < 0 || categoryLabels.length < 2 ? null : index / (categoryLabels.length - 1);
+        }
+        const x = Number(value);
+        return Number.isFinite(x) && xMax > xMin ? (x - xMin) / (xMax - xMin) : null;
+      };
+      const placed = markLines!
+        .map((ml, index) => ({ index, px: fraction(ml.xValue), labelled: !!ml.label }))
+        .filter(m => m.labelled)
+        .sort((a, b) => (b.px ?? 0) - (a.px ?? 0));
+      let lastPx = Infinity;
+      let lastIndex = -1;
+      for (const mark of placed) {
+        if (mark.px === null) {
+          visibleMarkLabels.add(mark.index);
+          continue;
+        }
+        const px = mark.px * plotWidth;
+        if (lastPx - px >= MARK_LABEL_GAP_PX || lastIndex < 0) {
+          visibleMarkLabels.add(mark.index);
+          lastPx = px;
+          lastIndex = mark.index;
+        } else {
+          const names = mergedMarkLabels.get(lastIndex) ?? [];
+          names.unshift(markLines![mark.index].label ?? '');
+          mergedMarkLabels.set(lastIndex, names);
+        }
+      }
+    }
+
     const annotationSeries =
       hasMarkLines || hasMarkAreas
         ? [
@@ -658,19 +761,19 @@ export function MultiLineChart({
               name: '__annotations__',
               type: 'line' as const,
               data: [], // Empty data - this series is only for annotations
-              silent: true, // Don't trigger events
               legendHoverLink: false,
+              tooltip: { show: false },
               ...(hasMarkLines
                 ? {
                     markLine: {
-                      silent: true,
                       symbol: 'none',
                       animation: false,
-                      data: markLines!.map(ml => ({
+                      data: markLines!.map((ml, index) => ({
                         xAxis: ml.xValue,
+                        emphasis: { label: { show: !!ml.label }, lineStyle: { width: ml.lineWidth ?? 1 } },
                         label: {
-                          show: !!ml.label,
-                          formatter: ml.label ?? '',
+                          show: visibleMarkLabels.has(index),
+                          formatter: [...(mergedMarkLabels.get(index) ?? []), ml.label ?? ''].join(' · '),
                           position: ml.labelPosition ?? 'end',
                           rotate: -90,
                           align: 'left',
@@ -942,6 +1045,7 @@ export function MultiLineChart({
         : undefined,
     };
   }, [
+    _height,
     animationDuration,
     themeColors.foreground,
     themeColors.border,
@@ -963,6 +1067,7 @@ export function MultiLineChart({
     extendedPalette,
     endLabels,
     isWideEnoughForEndLabels,
+    chartWidth,
     relativeSlots,
     formatSlotLabel,
     formatSlotTooltip,

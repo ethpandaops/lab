@@ -65,7 +65,7 @@ import {
 export function IndexPage(): JSX.Element {
   const navigate = useNavigate({ from: '/ethereum/execution/overview' });
   const { t } = useSearch({ from: '/ethereum/execution/overview' });
-  const timePeriod: TimePeriod = t ?? '7d';
+  const timePeriod: TimePeriod = t ?? 'all';
   const [showAnnotations, setShowAnnotations] = useState(true);
   const config = TIME_RANGE_CONFIG[timePeriod];
   const isDaily = config.dataType === 'daily';

@@ -139,7 +139,7 @@ export function BlockArrivalTimesChart({
       Math.max(...data.flatMap(d => [d.min, d.p05, d.p50, d.p90].filter((v): v is number => v !== null))) / 1000; // Convert to seconds
 
     // Default to 12 seconds unless data exceeds it
-    const maxY = dataMaxY > 12 ? dataMaxY * 1.1 : 12;
+    const maxY = dataMaxY > 12 ? Math.ceil((dataMaxY * 1.1) / 2) * 2 : 12;
 
     return { series, minX, maxY };
   }, [data, CHART_CATEGORICAL_COLORS, attestationDeadlineSeconds]);
