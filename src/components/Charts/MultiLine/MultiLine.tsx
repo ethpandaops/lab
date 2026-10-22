@@ -862,12 +862,13 @@ export function MultiLineChart({
                           position: ml.labelPosition ?? 'end',
                           rotate: -90,
                           align: 'left',
-                          offset: ml.distance ?? [0, -2],
+                          // Start a little below the plot's top edge, clear of series running along the maximum
+                          offset: ml.distance ?? [10, -2],
                           color: hexToRgba(ml.color ?? themeColors.muted, 0.9),
                           fontSize: 11,
                           // Vertical labels run down from the plot top; a long merged label would
                           // otherwise cross the x-axis, so it ends in an ellipsis at the plot bottom
-                          width: Math.max(plotHeight - 8, 40),
+                          width: Math.max(plotHeight - 18, 40),
                           overflow: 'truncate' as const,
                           // A halo in the surface colour keeps the name legible where it crosses the data
                           textBorderColor: themeColors.surface,
