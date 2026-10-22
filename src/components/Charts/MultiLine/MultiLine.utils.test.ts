@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { createBandSeries, createStatisticSeries } from './MultiLine.utils';
+import { dateCategoryTicks, describe, it, expect } from 'vitest';
+import { createBandSeries, createStatisticSeries, dateCategoryTicks } from './MultiLine.utils';
 
 describe('createBandSeries', () => {
   const lowerValues = [10, 20, 30];
@@ -117,10 +117,10 @@ describe('createStatisticSeries', () => {
     expect(result.color).toBe('#3b82f6');
   });
 
-  it('uses default lineWidth of 2 when not specified', () => {
+  it('uses default lineWidth of 1.5 when not specified', () => {
     const result = createStatisticSeries('Mean', values, config);
 
-    expect(result.lineWidth).toBe(2);
+    expect(result.lineWidth).toBe(1.5);
   });
 
   it('uses custom lineWidth when specified', () => {
@@ -163,5 +163,53 @@ describe('createStatisticSeries', () => {
     const result = createStatisticSeries('Mean', values, config);
 
     expect(result.initiallyVisible).toBeUndefined();
+  });
+});
+
+describe('dateCategoryTicks', () => {
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  /** Daily labels in the overview format, from `start` for `days` days */
+  const daily = (start: Date, days: number): string[] =>
+    Array.from({ length: days }, (_, i) => {
+      const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+      return `${MONTHS[d.getMonth()]} ${d.getDate()} '${String(d.getFullYear()).slice(-2)}`;
+    });
+
+  it('ticks on 1 January for a multi-year range, skipping the partial first year', () => {
+    const labels = daily(new Date(2015, 6, 30), 365 * 11);
+    const ticks = dateCategoryTicks(labels, 12)!;
+    expect([...ticks.values()]).toEqual([
+      '2016',
+      '2017',
+      '2018',
+      '2019',
+      '2020',
+      '2021',
+      '2022',
+      '2023',
+      '2024',
+      '2025',
+      '2026',
+    ]);
+    expect(labels[[...ticks.keys()][0]]).toBe("Jan 1 '16");
+  });
+
+  it('ticks month starts within a year, naming the year on the first tick and each January', () => {
+    const ticks = dateCategoryTicks(daily(new Date(2025, 10, 10), 120), 6)!;
+    expect([...ticks.values()]).toEqual(['Dec 2025', 'Jan 2026', 'Feb', 'Mar']);
+  });
+
+  it('ticks once per day when hourly points repeat each day label', () => {
+    const labels = daily(new Date(2026, 9, 15), 3).flatMap(l => Array(24).fill(l));
+    const ticks = dateCategoryTicks(labels, 12)!;
+    expect([...ticks.entries()]).toEqual([
+      [0, 'Oct 15'],
+      [24, 'Oct 16'],
+      [48, 'Oct 17'],
+    ]);
+  });
+
+  it('returns null for labels that are not dates', () => {
+    expect(dateCategoryTicks(['100', '101', '102'], 12)).toBeNull();
   });
 });

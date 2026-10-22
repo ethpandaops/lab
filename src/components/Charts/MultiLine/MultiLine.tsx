@@ -21,6 +21,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { SharedCrosshairsContext } from '@/contexts/SharedCrosshairsContext';
 import { Disclosure } from '@/components/Layout/Disclosure';
 import type { MultiLineChartProps } from './MultiLine.types';
+import { dateCategoryTicks, formatAxisNumber } from './MultiLine.utils';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 /** Maximum number of plain lines that get an end-of-line label */
@@ -43,6 +44,24 @@ function lastValue(data: unknown[]): number | null {
 
 /** Pixel gap end labels need between them (11px text plus breathing room) */
 const END_LABEL_GAP_PX = 18;
+
+/** `color` laid over `base` at `alpha`, as an opaque hex colour */
+function blendHex(color: string, base: string, alpha: number): string {
+  const rgb = (hex: string): number[] => {
+    const h = hex.replace('#', '');
+    const full = h.length === 3 ? h.replace(/./g, c => c + c) : h.slice(0, 6);
+    return [0, 2, 4].map(i => parseInt(full.slice(i, i + 2), 16));
+  };
+  const [a, b] = [rgb(color), rgb(base)];
+  if (a.some(Number.isNaN) || b.some(Number.isNaN)) return hexToRgba(color, alpha);
+  return `#${a
+    .map((v, i) =>
+      Math.round(v * alpha + b[i] * (1 - alpha))
+        .toString(16)
+        .padStart(2, '0')
+    )
+    .join('')}`;
+}
 
 /** Whether every pair of line ends is far enough apart, on a plot of the given height, for labels */
 function endLabelsClear(values: (number | null)[], plotHeight: number, axisMin?: number, axisMax?: number): boolean {
@@ -479,6 +498,11 @@ export function MultiLineChart({
 
     const xAxisHasName = xAxis.type === 'value' && Boolean(xAxis.name);
     const categoryLabels = xAxis.type === 'category' ? xAxis.labels : undefined;
+    // Date labels tick on calendar boundaries (years, quarters, months, weeks), not every Nth point
+    const dateTicks =
+      categoryLabels && !xAxis.formatter
+        ? dateCategoryTicks(categoryLabels, Math.floor(((chartWidth || 800) - 80) / 75))
+        : null;
     const categoryLabelInterval =
       categoryLabels && new Set(categoryLabels).size < categoryLabels.length
         ? (index: number, value: string): boolean => index === 0 || categoryLabels[index - 1] !== value
@@ -503,9 +527,10 @@ export function MultiLineChart({
         fontSize: 11,
         hideOverlap: true,
         // Hourly series repeat each day's label; show only the first point of each run
-        interval: categoryLabelInterval,
+        interval: dateTicks ? (index: number): boolean => dateTicks.has(index) : categoryLabelInterval,
         formatter:
           xAxis.formatter ||
+          (dateTicks ? (value: string, index: number) => dateTicks.get(index) ?? value : undefined) ||
           (isTimeAxis ? defaultTimeFormatter : undefined) ||
           (relativeSlots ? (value: number) => formatSlotLabel(value) : undefined),
       },
@@ -533,7 +558,7 @@ export function MultiLineChart({
       axisLabel: {
         color: themeColors.muted,
         fontSize: 11,
-        formatter: yAxis?.formatter,
+        formatter: yAxis?.formatter ?? formatAxisNumber,
       },
       ...valueAxisBounds(yAxis?.min, yAxis?.max),
       minInterval: yAxis?.minInterval,
@@ -554,7 +579,7 @@ export function MultiLineChart({
           axisLabel: {
             color: themeColors.muted,
             fontSize: 11,
-            formatter: secondaryYAxis.formatter,
+            formatter: secondaryYAxis.formatter ?? formatAxisNumber,
           },
           ...valueAxisBounds(secondaryYAxis.min, secondaryYAxis.max),
           minInterval: secondaryYAxis.minInterval,
@@ -614,9 +639,12 @@ export function MultiLineChart({
         stack: s.stack,
         yAxisIndex: s.yAxisIndex ?? 0,
         triggerLineEvent: true, // Enable click events on lines
+        // Dense lines (thousands of points across a few hundred pixels) alias into fuzz; LTTB keeps
+        // the shape, peaks included, at the plot's resolution
+        ...(chartType === 'line' && !s.stack && s.data.length > 600 ? { sampling: 'lttb' as const } : {}),
         lineStyle: {
           color: seriesColor,
-          width: s.lineWidth ?? 2,
+          width: s.lineWidth ?? 1.5,
           type: s.lineStyle ?? ('solid' as const),
         },
         itemStyle: {
@@ -675,6 +703,16 @@ export function MultiLineChart({
             }
           : {}),
       };
+
+      // Stacked areas are bands: fill each with an opaque blend over the surface, so grid lines
+      // and neighbouring bands never show through; the fills alone draw the edges
+      if (s.showArea && s.stack) {
+        return {
+          ...baseConfig,
+          lineStyle: { ...baseConfig.lineStyle, width: 0 },
+          areaStyle: { color: blendHex(seriesColor, themeColors.surface, s.areaOpacity ?? 0.85), opacity: 1 },
+        };
+      }
 
       // Add area style if requested
       if (s.showArea) {
@@ -796,7 +834,9 @@ export function MultiLineChart({
                           padding: [2, 4],
                         },
                         lineStyle: {
-                          color: ml.color ?? themeColors.muted,
+                          // Half-strength rules: the annotation layer reads quieter than the data
+                          // (an alpha colour, since lineStyle.opacity would also fade the label)
+                          color: hexToRgba(resolveCssColorToHex(ml.color ?? themeColors.muted), 0.5),
                           type: (ml.lineStyle ?? 'dashed') as 'solid' | 'dashed' | 'dotted',
                           width: ml.lineWidth ?? 1,
                         },
@@ -840,7 +880,9 @@ export function MultiLineChart({
     // Add extra bottom padding for dataZoom slider when enabled
     const baseBottom = xAxisHasName ? 48 : 28;
     const legendBottom = useNativeLegend && showLegend && legendPosition === 'bottom' ? 40 : 0;
-    const dataZoomBottom = enableDataZoom && showDataZoomSlider ? 28 : 0;
+    // The range track is chrome until the chart is zoomed; at full range it shows nothing
+    const sliderVisible = enableDataZoom && showDataZoomSlider && (zoomRange.start > 0.01 || zoomRange.end < 99.99);
+    const dataZoomBottom = sliderVisible ? 28 : 0;
     const hasYAxisName = Boolean(yAxis?.name || secondaryYAxis?.name);
 
     const gridConfig = grid
@@ -1053,7 +1095,7 @@ export function MultiLineChart({
                 handleStyle: { color: themeColors.foreground },
               },
             },
-          ].slice(0, showDataZoomSlider ? 2 : 1)
+          ].slice(0, sliderVisible ? 2 : 1)
         : undefined,
     };
   }, [
