@@ -172,7 +172,7 @@ export function BlockDetailsModal({
         {isPairingContext ? (
           // Pairing context: group by slot, then nodes
           <div className="space-y-2">
-            <h3 className="mb-3 text-sm font-semibold tracking-wide text-muted uppercase">
+            <h3 className="mb-3 text-sm font-semibold text-muted">
               Slots ({slotGroups.length}) • Nodes ({nodeCount})
             </h3>
             <div className="max-h-96 space-y-2 overflow-y-auto">
@@ -184,7 +184,7 @@ export function BlockDetailsModal({
         ) : (
           // Single slot context: group by node only
           <div className="space-y-2">
-            <h3 className="mb-3 text-sm font-semibold tracking-wide text-muted uppercase">Nodes ({nodeCount})</h3>
+            <h3 className="mb-3 text-sm font-semibold text-muted">Nodes ({nodeCount})</h3>
             <div className="max-h-96 space-y-2 overflow-y-auto">
               {nodeGroups.map((nodeGroup, index) => (
                 <NodeCard key={nodeGroup.nodeName} nodeGroup={nodeGroup} index={index} />
@@ -233,7 +233,7 @@ function SlotCard({ slotGroup }: { slotGroup: SlotGroup }): JSX.Element {
     <Disclosure title={title}>
       <div className="space-y-3">
         {nodes.map((nodeGroup, index) => (
-          <div key={nodeGroup.nodeName} className="rounded-lg border border-border bg-background/30 p-3">
+          <div key={nodeGroup.nodeName} className="rounded-sm border border-border bg-background/30 p-3">
             <div className="mb-2 flex items-center gap-2 text-xs">
               <span className="text-muted">#{index + 1}</span>
               <span className="flex-1 truncate text-sm text-foreground">{nodeGroup.nodeName}</span>
@@ -318,7 +318,7 @@ function BlockDetails({
     <div className="grid grid-cols-3 gap-4 pb-2">
       {/* Block Information */}
       <div className="space-y-2">
-        <div className="text-xs font-semibold tracking-wide text-primary uppercase">Block Information</div>
+        <h3 className="text-xs font-semibold text-foreground">Block Information</h3>
 
         <div>
           <div className="text-xs text-muted">Block Number</div>
@@ -358,7 +358,7 @@ function BlockDetails({
 
       {/* Client Information */}
       <div className="space-y-2">
-        <div className="text-xs font-semibold tracking-wide text-primary uppercase">Client Information</div>
+        <h3 className="text-xs font-semibold text-foreground">Client Information</h3>
 
         <div>
           <div className="text-xs text-muted">Node</div>
@@ -400,7 +400,7 @@ function BlockDetails({
 
       {/* Payload Values */}
       <div className="space-y-2">
-        <div className="text-xs font-semibold tracking-wide text-primary uppercase">Payload Values</div>
+        <h3 className="text-xs font-semibold text-foreground">Payload Values</h3>
 
         <div>
           <div className="text-xs text-muted">Execution Value</div>

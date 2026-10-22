@@ -1,4 +1,5 @@
 import { type JSX } from 'react';
+import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 
 /**
@@ -7,27 +8,17 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
  */
 export function ContractInfoCardSkeleton(): JSX.Element {
   return (
-    <div className="overflow-hidden rounded-sm border border-border bg-surface">
-      {/* Header section */}
-      <div className="border-b border-border bg-background px-6 py-4">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            {/* Contract name */}
-            <LoadingContainer className="h-9 w-48 rounded-xs" />
-            {/* Address */}
-            <div className="mt-1 flex items-center gap-1">
-              <LoadingContainer className="h-5 w-80 rounded-xs" />
-              <LoadingContainer className="size-5 rounded-xs" />
-            </div>
-          </div>
-
-          {/* External link placeholder */}
-          <LoadingContainer className="size-5 rounded-xs" />
-        </div>
-      </div>
-
-      {/* Content section */}
-      <div className="p-6">
+    <Card
+      title={<LoadingContainer className="h-5 w-48 rounded-xs" />}
+      subtitle={
+        <span className="flex items-center gap-1">
+          <LoadingContainer className="h-4 w-80 rounded-xs" />
+          <LoadingContainer className="size-4 rounded-xs" />
+        </span>
+      }
+      actions={<LoadingContainer className="size-5 rounded-xs" />}
+    >
+      <div>
         <div className="flex flex-col gap-6">
           {/* Labels section */}
           <div className="flex flex-wrap items-center gap-2">
@@ -65,6 +56,6 @@ export function ContractInfoCardSkeleton(): JSX.Element {
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

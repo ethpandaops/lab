@@ -31,7 +31,7 @@ export function Divider({
     if (children) {
       return (
         <div className={clsx('relative flex items-center justify-between', className)}>
-          <span className="pr-3 text-base font-semibold text-foreground">{children}</span>
+          <span className="pr-3 text-sm/6 font-semibold text-foreground">{children}</span>
           <div className="flex w-full items-center">
             <div aria-hidden="true" className="w-full border-t border-border" />
             {button}
@@ -56,7 +56,7 @@ export function Divider({
       return (
         <div className={clsx('flex items-center', className)}>
           <div className="relative flex justify-start">
-            <span className="pr-3 text-base font-semibold text-foreground">{children}</span>
+            <span className="pr-3 text-sm/6 font-semibold text-foreground">{children}</span>
           </div>
           <div aria-hidden="true" className="w-full border-t border-border" />
         </div>
@@ -67,7 +67,7 @@ export function Divider({
       <div className={clsx('flex items-center', className)}>
         <div aria-hidden="true" className="w-full border-t border-border" />
         <div className="relative flex justify-center">
-          <span className="px-3 text-base font-semibold text-foreground">{children}</span>
+          <span className="px-3 text-sm/6 font-semibold text-foreground">{children}</span>
         </div>
         <div aria-hidden="true" className="w-full border-t border-border" />
       </div>

@@ -1,3 +1,5 @@
+import { ExplorerLinks } from './components/ExplorerLinks';
+import { Button } from '@/components/Elements/Button';
 import { type JSX, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useSearch, useNavigate, Link } from '@tanstack/react-router';
 import { Tab as HeadlessTab } from '@headlessui/react';
@@ -20,11 +22,10 @@ import { Tab } from '@/components/Navigation/Tab';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
+import { Stats } from '@/components/DataDisplay/Stats';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Alert } from '@/components/Feedback/Alert';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
-import { TenderlyIcon } from '@/components/Ethereum/TenderlyIcon';
 import { GasTooltip } from '@/components/DataDisplay/GasTooltip';
 import { intBlockOpcodeGasServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { useBlockTransactions, type TransactionSummary } from './hooks/useBlockTransactions';
@@ -54,6 +55,7 @@ import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory, getEtherscanBaseU
 import type { GasProfilerBlockSearch } from './IndexPage.types';
 import type { IntTransactionReceiptSize } from '@/api/types.gen';
 import { formatBytes } from '@/utils';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 /**
  * Available call types for filtering
@@ -445,7 +447,7 @@ export function BlockPage(): JSX.Element {
               <div style="padding: 12px;">
                 <div style="font-weight: 600; font-size: 14px; color: ${colors.foreground};">${params.name}</div>
                 <div style="margin-top: 8px;">
-                  <div style="color: ${colors.primary}; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">GAS</div>
+                  <div style="color: ${colors.primary}; font-size: 11px; font-weight: 600; text-transform: none;">GAS</div>
                   <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 12px;">
                     <span style="color: ${colors.muted};">Total</span>
                     <span style="font-family: monospace; color: ${colors.foreground};">${formatGas(params.value)} gas</span>
@@ -485,7 +487,7 @@ export function BlockPage(): JSX.Element {
               <div style="padding: 12px;">
                 <!-- Gas Section -->
                 <div style="margin-bottom: 12px;">
-                  <div style="color: ${colors.primary}; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">GAS</div>
+                  <div style="color: ${colors.primary}; font-size: 11px; font-weight: 600; text-transform: none; margin-bottom: 6px;">GAS</div>
                   <div style="display: flex; justify-content: space-between; font-size: 12px;">
                     <span style="color: ${colors.muted};">• Total</span>
                     <span style="font-family: monospace; color: ${colors.foreground};">${formatGas(params.value)} gas</span>
@@ -498,7 +500,7 @@ export function BlockPage(): JSX.Element {
 
                 <!-- Details Section -->
                 <div>
-                  <div style="color: ${colors.primary}; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">DETAILS</div>
+                  <div style="color: ${colors.primary}; font-size: 11px; font-weight: 600; text-transform: none; margin-bottom: 6px;">DETAILS</div>
                   <div style="display: flex; justify-content: space-between; font-size: 12px;">
                     <span style="color: ${colors.muted};">TX Index</span>
                     <span style="font-family: monospace; color: ${colors.foreground};">${d.txIndex}</span>
@@ -965,28 +967,17 @@ export function BlockPage(): JSX.Element {
         </Link>
 
         <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-start">
-          <div className="flex items-center gap-2">
-            <a
-              href={`${getEtherscanBaseUrl(currentNetwork?.name)}/block/${blockNumber}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
-              title="View on Etherscan"
-            >
-              <EtherscanIcon className="size-4" />
-            </a>
-            {isMainnet(currentNetwork?.name) && (
-              <a
-                href={`https://dashboard.tenderly.co/block/1/${blockNumber}/txs`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
-                title="View on Tenderly"
-              >
-                <TenderlyIcon className="size-4" />
-              </a>
-            )}
-          </div>
+          <ExplorerLinks
+            etherscan={{
+              href: `${getEtherscanBaseUrl(currentNetwork?.name)}/block/${blockNumber}`,
+              title: 'View on Etherscan',
+            }}
+            tenderly={
+              isMainnet(currentNetwork?.name)
+                ? { href: `https://dashboard.tenderly.co/block/1/${blockNumber}/txs`, title: 'View on Tenderly' }
+                : undefined
+            }
+          />
 
           <div className="hidden h-4 w-px bg-border sm:block" />
 
@@ -1023,86 +1014,49 @@ export function BlockPage(): JSX.Element {
       </div>
 
       {/* Block Summary - Always visible */}
-      <div className={clsx('mb-6 grid grid-cols-2 gap-4', hasReceiptData ? 'sm:grid-cols-5' : 'sm:grid-cols-4')}>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-xs bg-primary/10 p-2">
-              <QueueListIcon className="size-5 text-primary" />
-            </div>
-            <div>
-              <div className="text-xl font-semibold text-foreground">{data.transactionCount}</div>
-              <div className="text-xs text-muted">
-                Transactions{failedCount > 0 && <span className="text-danger"> ({failedCount} failed)</span>}
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-xs bg-success/10 p-2">
-              <FireIcon className="size-5 text-success" />
-            </div>
-            <div>
-              <div className="text-xl font-semibold text-foreground">{formatGas(totalBlockGas)}</div>
-              <div className="text-xs text-muted">Total Gas</div>
-            </div>
-          </div>
-        </Card>
-
-        {hasReceiptData && (
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-xs bg-warning/10 p-2">
-                <DocumentTextIcon className="size-5 text-warning" />
-              </div>
-              <div>
-                <div className="flex items-center gap-1 text-xl font-semibold text-foreground">
-                  {formatBytes(totalReceiptBytes)}
-                  <GasTooltip
-                    type="receipt"
-                    size="md"
-                    customContent={
-                      <>
-                        <div className="mb-1.5 text-sm font-medium text-foreground">Receipt Payload Size</div>
-                        <div className="text-xs/5 text-muted">
-                          Number of bytes in the canonical encoded receipt value (type byte + RLP receipt) inserted as
-                          the receipts-trie value. Does not include trie node/path/proof overhead.
-                        </div>
-                      </>
-                    }
-                  />
-                </div>
-                <div className="text-xs text-muted">Receipt Payload</div>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-xs bg-cyan-500/10 p-2">
-              <CodeBracketIcon className="size-5 text-cyan-500" />
-            </div>
-            <div>
-              <div className="text-xl font-semibold text-foreground">{formatGas(data.totalCallFrames)}</div>
-              <div className="text-xs text-muted">Total Calls</div>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-xs bg-purple-500/10 p-2">
-              <ArrowsPointingOutIcon className="size-5 text-purple-500" />
-            </div>
-            <div>
-              <div className="text-xl font-semibold text-foreground">{maxBlockDepth}</div>
-              <div className="text-xs text-muted">Max Depth</div>
-            </div>
-          </div>
-        </Card>
-      </div>
+      <Stats
+        className="mb-6"
+        gridClassName={clsx('grid grid-cols-2', hasReceiptData ? 'sm:grid-cols-5' : 'sm:grid-cols-4')}
+        stats={[
+          {
+            id: 'transactions',
+            name: 'Transactions',
+            icon: QueueListIcon,
+            value: String(data.transactionCount),
+            subtitle: failedCount > 0 ? <span className="text-danger">{failedCount} failed</span> : undefined,
+          },
+          { id: 'gas', name: 'Total Gas', icon: FireIcon, value: formatGas(totalBlockGas) },
+          ...(hasReceiptData
+            ? [
+                {
+                  id: 'receipt',
+                  name: (
+                    <span className="inline-flex items-center gap-1">
+                      Receipt Payload
+                      <GasTooltip
+                        type="receipt"
+                        size="md"
+                        customContent={
+                          <>
+                            <div className="mb-1.5 text-sm font-medium text-foreground">Receipt Payload Size</div>
+                            <div className="text-xs/5 text-muted">
+                              Number of bytes in the canonical encoded receipt value (type byte + RLP receipt) inserted
+                              as the receipts-trie value. Does not include trie node/path/proof overhead.
+                            </div>
+                          </>
+                        }
+                      />
+                    </span>
+                  ),
+                  icon: DocumentTextIcon,
+                  value: formatBytes(totalReceiptBytes),
+                },
+              ]
+            : []),
+          { id: 'calls', name: 'Total Calls', icon: CodeBracketIcon, value: formatGas(data.totalCallFrames) },
+          { id: 'depth', name: 'Max Depth', icon: ArrowsPointingOutIcon, value: String(maxBlockDepth) },
+        ]}
+      />
 
       {/* Tabbed Content */}
       <HeadlessTab.Group selectedIndex={selectedTabIndex} onChange={setSelectedTabIndex}>
@@ -1131,12 +1085,8 @@ export function BlockPage(): JSX.Element {
           {/* Overview Tab */}
           <HeadlessTab.Panel>
             {/* Block Gas Breakdown - formula style */}
-            <Card className="mb-6 overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3">
-                <h3 className="text-sm font-medium text-foreground">Block Gas Breakdown</h3>
-                <span className="text-xs text-muted">{data.transactionCount} transactions</span>
-              </div>
-              <div className="bg-surface/30 px-4 py-5">
+            <Card className="mb-6" title="Block Gas Breakdown" subtitle={`${data.transactionCount} transactions`}>
+              <div className="py-1">
                 <GasFormula
                   segments={[
                     {
@@ -1175,6 +1125,7 @@ export function BlockPage(): JSX.Element {
               {({ inModal }) =>
                 data.transactions.length > 0 ? (
                   <ReactECharts
+                    theme={ECHARTS_THEME}
                     option={gasDistributionOption}
                     style={{ height: inModal ? 500 : 280 }}
                     onEvents={{ click: handleTreemapClick }}
@@ -1215,7 +1166,6 @@ export function BlockPage(): JSX.Element {
               />
               <GasHistogram
                 title="Transaction Size Distribution"
-                subtitle="How is gas distributed across transactions?"
                 values={transactionGasValues}
                 buckets={TRANSACTION_BUCKETS}
                 yAxisLabel="Transactions"
@@ -1453,15 +1403,9 @@ export function BlockPage(): JSX.Element {
                 {/* Show More Button */}
                 {filteredTransactions.length > visibleCount && (
                   <div className="flex justify-center border-t border-border py-4">
-                    <button
-                      onClick={() => setVisibleCount(filteredTransactions.length)}
-                      className="flex items-center gap-2 rounded-sm border border-border bg-surface px-4 py-2 text-sm text-foreground transition-colors hover:bg-background"
-                    >
+                    <Button variant="secondary" size="sm" onClick={() => setVisibleCount(filteredTransactions.length)}>
                       Show All ({filteredTransactions.length - visibleCount} more)
-                      <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -1476,6 +1420,7 @@ export function BlockPage(): JSX.Element {
                 <PopoutCard title="Gas by Contract" subtitle="Top 30 contracts by gas consumption" modalSize="xl">
                   {({ inModal }) => (
                     <ReactECharts
+                      theme={ECHARTS_THEME}
                       option={contractTreemapOption}
                       style={{ height: inModal ? 500 : 280, cursor: 'pointer' }}
                       opts={{ renderer: 'canvas' }}
@@ -1524,6 +1469,7 @@ export function BlockPage(): JSX.Element {
                 >
                   {({ inModal }) => (
                     <ReactECharts
+                      theme={ECHARTS_THEME}
                       option={contractFlowSankeyOption}
                       style={{ height: inModal ? 550 : 320, width: '100%', cursor: 'pointer' }}
                       opts={{ renderer: 'canvas' }}

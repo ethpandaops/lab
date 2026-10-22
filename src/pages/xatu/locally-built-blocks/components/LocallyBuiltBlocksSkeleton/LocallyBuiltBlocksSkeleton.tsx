@@ -13,14 +13,13 @@ export function LocallyBuiltBlocksSkeleton(): JSX.Element {
         {/* Section header */}
         <div className="mb-2 flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <span className="inline-block h-4 w-1 rounded-full bg-primary"></span>
             <LoadingContainer className="h-6 w-24 rounded-sm" />
           </div>
-          <LoadingContainer className="ml-3 h-4 w-80 rounded-sm" />
+          <LoadingContainer className="h-4 w-80 rounded-sm" />
         </div>
 
         {/* Timeline matrix */}
-        <div className="rounded-lg border border-border bg-surface p-4">
+        <div className="rounded-sm border border-border bg-surface p-4">
           {/* Slot headers */}
           <div className="mb-4 flex gap-2">
             <div className="w-28 shrink-0" />
@@ -66,14 +65,13 @@ export function LocallyBuiltBlocksSkeleton(): JSX.Element {
         {/* Section header */}
         <div className="mb-2 flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <span className="inline-block h-4 w-1 rounded-full bg-primary"></span>
             <LoadingContainer className="h-6 w-32 rounded-sm" />
           </div>
-          <LoadingContainer className="ml-3 h-4 w-96 rounded-sm" />
+          <LoadingContainer className="h-4 w-96 rounded-sm" />
         </div>
 
         {/* Client pairings matrix */}
-        <div className="rounded-lg border border-border bg-surface p-4">
+        <div className="rounded-sm border border-border bg-surface p-4">
           {/* Consensus client headers */}
           <div className="mb-4 flex gap-2">
             <div className="w-28 shrink-0" />

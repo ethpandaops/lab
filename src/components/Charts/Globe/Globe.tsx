@@ -10,6 +10,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { resolveCssColorToHex } from '@/utils/color';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { GlobeChartProps } from './Globe.types';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -233,6 +234,7 @@ export function GlobeChart({
   return (
     <div className="w-full">
       <ReactECharts
+        theme={ECHARTS_THEME}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
         onChartReady={instance => setEchartsInstance(instance)}

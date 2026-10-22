@@ -10,6 +10,7 @@ import type { Map2DChartProps, PointData, PointNodeData, RouteData } from './Map
 const EMPTY_ROUTES: RouteData[] = [];
 const EMPTY_POINTS: PointData[] = [];
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 /**
  * Map2DChart - A high-performance 2D map visualization component using ECharts
@@ -403,7 +404,7 @@ function Map2DChartComponent({
       {/* Fixed hover panel at top */}
       {hoveredPoint && (
         <div className="pointer-events-none absolute top-3 left-1/2 z-10 -translate-x-1/2">
-          <div className="rounded-lg border border-border bg-surface/95 px-4 py-3 shadow-lg backdrop-blur-sm">
+          <div className="rounded-sm border border-border bg-surface px-4 py-3">
             <div className="mb-2 border-b border-border pb-2 text-center">
               <span className="text-sm font-semibold text-foreground">{hoveredPoint.name}</span>
               <span className="ml-2 text-xs text-muted">({hoveredPoint.nodes.length} nodes)</span>
@@ -421,7 +422,7 @@ function Map2DChartComponent({
                 <tbody>
                   {hoveredPoint.nodes.map((node, idx) => (
                     <tr key={`${node.nodeId}-${idx}`} className="text-foreground">
-                      <td className="max-w-[180px] truncate py-0.5 pr-4 font-mono text-[11px] opacity-80">
+                      <td className="max-w-[180px] truncate py-0.5 pr-4 font-mono text-2xs opacity-80">
                         {node.nodeId}
                       </td>
                       <td className="py-0.5 pr-4">{node.username || <span className="text-muted">—</span>}</td>
@@ -439,6 +440,7 @@ function Map2DChartComponent({
       )}
 
       <ReactECharts
+        theme={ECHARTS_THEME}
         ref={chartRef}
         option={option}
         style={chartStyle}
@@ -447,7 +449,7 @@ function Map2DChartComponent({
         opts={chartOpts}
         onEvents={onEvents}
       />
-      <div className="pointer-events-none absolute bottom-2 left-2 rounded bg-surface/90 px-2 py-1 text-xs text-muted backdrop-blur-sm">
+      <div className="pointer-events-none absolute bottom-2 left-2 rounded bg-surface px-2 py-1 text-xs text-muted">
         Data from nodes contributing to Xatu • Not representative of actual Ethereum network distribution
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { type JSX, type ReactNode, useMemo, useState, useRef, useEffect } from 'react';
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
+import { Card } from '@/components/Layout/Card';
 import { Sparkline } from '@/components/Charts/Sparkline';
 import type {
   ValidatorMetrics,
@@ -56,7 +57,7 @@ function formatPercent(value: number, threshold = 95): ReactNode {
     <span
       className={clsx(
         'tabular-nums',
-        value >= threshold ? 'text-success' : value >= 90 ? 'text-warning' : 'text-danger'
+        value >= threshold ? 'text-foreground' : value >= 90 ? 'text-warning' : 'text-danger'
       )}
     >
       {formatted}
@@ -81,7 +82,7 @@ function formatStatus(status: string, slashed: boolean): ReactNode {
   }
 
   const statusColors: Record<string, string> = {
-    active_ongoing: 'bg-success/10 text-success',
+    active_ongoing: 'bg-muted/10 text-muted',
     active_exiting: 'bg-warning/10 text-warning',
     active_slashed: 'bg-danger/10 text-danger',
     exited_unslashed: 'bg-muted/10 text-muted',
@@ -202,109 +203,111 @@ export function ValidatorTable({
 
   if (isLoading) {
     return (
-      <div className={clsx('rounded-sm border border-border bg-surface', className)}>
-        <div className="p-8 text-center text-muted">Loading validator data...</div>
-      </div>
+      <Card className={className}>
+        <div className="py-4 text-center text-muted">Loading validator data...</div>
+      </Card>
     );
   }
 
   if (validators.length === 0) {
     return (
-      <div className={clsx('rounded-sm border border-border bg-surface', className)}>
-        <div className="p-8 text-center text-muted">No validators to display</div>
-      </div>
+      <Card className={className}>
+        <div className="py-4 text-center text-muted">No validators to display</div>
+      </Card>
     );
   }
 
   return (
-    <div className={clsx('overflow-x-auto rounded-sm border border-border bg-surface', className)}>
-      <table className="w-full text-sm whitespace-nowrap">
-        <thead>
-          <tr className="border-b border-border bg-surface text-xs text-muted">
-            <th className="w-px px-2 py-3" />
-            <th className="px-2 py-3 text-left font-medium">Validator</th>
-            <th className="w-px px-2 py-3 text-right font-medium">Inclusion</th>
-            <th className="w-px px-2 py-3 text-center font-medium">Incl. Trend</th>
-            <th className="hidden w-px px-2 py-3 text-right font-medium lg:table-cell">Head</th>
-            <th className="hidden w-px px-2 py-3 text-center font-medium lg:table-cell">Head Trend</th>
-            <th className="hidden w-px px-2 py-3 text-right font-medium lg:table-cell">Target</th>
-            <th className="hidden w-px px-2 py-3 text-center font-medium lg:table-cell">Target Trend</th>
-            <th className="hidden w-px px-2 py-3 text-right font-medium xl:table-cell">Source</th>
-            <th className="hidden w-px px-2 py-3 text-center font-medium xl:table-cell">Source Trend</th>
-            <th className="hidden w-px px-2 py-3 text-right font-medium xl:table-cell">Avg Delay</th>
-            <th className="hidden w-px px-2 py-3 text-center font-medium xl:table-cell">Delay Trend</th>
-            <th className="w-px px-2 py-3 text-right font-medium">Sync %</th>
-            <th className="hidden w-px px-2 py-3 text-right font-medium lg:table-cell">Proposals</th>
-            <th className="w-px px-2 py-3 text-right font-medium">Min Bal (ETH)</th>
-            <th className="w-px px-2 py-3 text-center font-medium">Bal. Trend</th>
-            <th className="w-px px-2 py-3 text-left font-medium">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {validators.map(row => {
-            const isExpanded = expandedValidator === row.validatorIndex;
-            const attDaily = attestationByValidator.get(row.validatorIndex);
-            const balDaily = balanceByValidator.get(row.validatorIndex);
-            const syncDaily = syncByValidator.get(row.validatorIndex);
-            const valProposals = proposalsByValidator.get(row.validatorIndex);
+    <Card className={className}>
+      <div className="-mx-(--card-inset) -my-(--card-inset-y) overflow-x-auto">
+        <table className="w-full text-sm whitespace-nowrap">
+          <thead>
+            <tr className="border-b border-border bg-surface text-xs text-muted">
+              <th className="w-px px-2 py-3" />
+              <th className="px-2 py-3 text-left font-medium">Validator</th>
+              <th className="w-px px-2 py-3 text-right font-medium">Inclusion</th>
+              <th className="w-px px-2 py-3 text-center font-medium">Incl. Trend</th>
+              <th className="hidden w-px px-2 py-3 text-right font-medium lg:table-cell">Head</th>
+              <th className="hidden w-px px-2 py-3 text-center font-medium lg:table-cell">Head Trend</th>
+              <th className="hidden w-px px-2 py-3 text-right font-medium lg:table-cell">Target</th>
+              <th className="hidden w-px px-2 py-3 text-center font-medium lg:table-cell">Target Trend</th>
+              <th className="hidden w-px px-2 py-3 text-right font-medium xl:table-cell">Source</th>
+              <th className="hidden w-px px-2 py-3 text-center font-medium xl:table-cell">Source Trend</th>
+              <th className="hidden w-px px-2 py-3 text-right font-medium xl:table-cell">Avg Delay</th>
+              <th className="hidden w-px px-2 py-3 text-center font-medium xl:table-cell">Delay Trend</th>
+              <th className="w-px px-2 py-3 text-right font-medium">Sync %</th>
+              <th className="hidden w-px px-2 py-3 text-right font-medium lg:table-cell">Proposals</th>
+              <th className="w-px px-2 py-3 text-right font-medium">Min Bal (ETH)</th>
+              <th className="w-px px-2 py-3 text-center font-medium">Bal. Trend</th>
+              <th className="w-px px-2 py-3 text-left font-medium">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {validators.map(row => {
+              const isExpanded = expandedValidator === row.validatorIndex;
+              const attDaily = attestationByValidator.get(row.validatorIndex);
+              const balDaily = balanceByValidator.get(row.validatorIndex);
+              const syncDaily = syncByValidator.get(row.validatorIndex);
+              const valProposals = proposalsByValidator.get(row.validatorIndex);
 
-            // Extract sparkline data arrays
-            const inclusionSparkline = attDaily?.map(d => d.inclusionRate) ?? [];
-            const headSparkline = attDaily?.map(d => d.headCorrectRate) ?? [];
-            const targetSparkline = attDaily?.map(d => d.targetCorrectRate) ?? [];
-            const sourceSparkline = attDaily?.map(d => d.sourceCorrectRate) ?? [];
-            const delaySparkline = attDaily?.map(d => d.avgInclusionDistance) ?? [];
-            const balanceSparkline = balDaily?.map(d => d.balance) ?? [];
+              // Extract sparkline data arrays
+              const inclusionSparkline = attDaily?.map(d => d.inclusionRate) ?? [];
+              const headSparkline = attDaily?.map(d => d.headCorrectRate) ?? [];
+              const targetSparkline = attDaily?.map(d => d.targetCorrectRate) ?? [];
+              const sourceSparkline = attDaily?.map(d => d.sourceCorrectRate) ?? [];
+              const delaySparkline = attDaily?.map(d => d.avgInclusionDistance) ?? [];
+              const balanceSparkline = balDaily?.map(d => d.balance) ?? [];
 
-            return (
-              <ValidatorRow
-                key={row.validatorIndex}
-                row={row}
-                isExpanded={isExpanded}
-                isHighlighted={selection?.validatorIndex === row.validatorIndex}
-                pubkey={validatorMap?.get(row.validatorIndex)}
-                inclusionSparkline={inclusionSparkline}
-                headSparkline={headSparkline}
-                targetSparkline={targetSparkline}
-                sourceSparkline={sourceSparkline}
-                delaySparkline={delaySparkline}
-                balanceSparkline={balanceSparkline}
-                attestationDaily={attDaily ?? []}
-                balanceDaily={balDaily ?? []}
-                syncCommitteeDaily={syncDaily ?? []}
-                blockProposals={valProposals ?? []}
-                from={from}
-                to={to}
-                getStatusAtTimestamp={getStatusAtTimestamp}
-                selectedDayTimestamp={isExpanded ? selection?.dayTimestamp : undefined}
-                selectedHourTimestamp={isExpanded ? selection?.hourTimestamp : undefined}
-                onDaySelect={
-                  onValidatorSelect
-                    ? (dayTs: number | null) =>
-                        onValidatorSelect({
-                          validatorIndex: row.validatorIndex,
-                          dayTimestamp: dayTs,
-                          hourTimestamp: null,
-                        })
-                    : undefined
-                }
-                onHourSelect={
-                  onValidatorSelect
-                    ? (hourTs: number | null) =>
-                        onValidatorSelect({
-                          validatorIndex: row.validatorIndex,
-                          dayTimestamp: selection?.dayTimestamp ?? null,
-                          hourTimestamp: hourTs,
-                        })
-                    : undefined
-                }
-                onClick={() => handleRowClick(row.validatorIndex)}
-              />
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+              return (
+                <ValidatorRow
+                  key={row.validatorIndex}
+                  row={row}
+                  isExpanded={isExpanded}
+                  isHighlighted={selection?.validatorIndex === row.validatorIndex}
+                  pubkey={validatorMap?.get(row.validatorIndex)}
+                  inclusionSparkline={inclusionSparkline}
+                  headSparkline={headSparkline}
+                  targetSparkline={targetSparkline}
+                  sourceSparkline={sourceSparkline}
+                  delaySparkline={delaySparkline}
+                  balanceSparkline={balanceSparkline}
+                  attestationDaily={attDaily ?? []}
+                  balanceDaily={balDaily ?? []}
+                  syncCommitteeDaily={syncDaily ?? []}
+                  blockProposals={valProposals ?? []}
+                  from={from}
+                  to={to}
+                  getStatusAtTimestamp={getStatusAtTimestamp}
+                  selectedDayTimestamp={isExpanded ? selection?.dayTimestamp : undefined}
+                  selectedHourTimestamp={isExpanded ? selection?.hourTimestamp : undefined}
+                  onDaySelect={
+                    onValidatorSelect
+                      ? (dayTs: number | null) =>
+                          onValidatorSelect({
+                            validatorIndex: row.validatorIndex,
+                            dayTimestamp: dayTs,
+                            hourTimestamp: null,
+                          })
+                      : undefined
+                  }
+                  onHourSelect={
+                    onValidatorSelect
+                      ? (hourTs: number | null) =>
+                          onValidatorSelect({
+                            validatorIndex: row.validatorIndex,
+                            dayTimestamp: selection?.dayTimestamp ?? null,
+                            hourTimestamp: hourTs,
+                          })
+                      : undefined
+                  }
+                  onClick={() => handleRowClick(row.validatorIndex)}
+                />
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </Card>
   );
 }
 
@@ -504,7 +507,7 @@ function ValidatorRow({
                   ? 'text-danger'
                   : row.blockProposal.orphanedCount > 0
                     ? 'text-warning'
-                    : 'text-success'
+                    : 'text-foreground'
               )}
             >
               {row.blockProposal.canonicalCount}/{row.blockProposal.totalProposals}

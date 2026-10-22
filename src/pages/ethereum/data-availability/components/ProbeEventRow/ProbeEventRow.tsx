@@ -16,12 +16,12 @@ import type { ProbeEventRowProps } from './ProbeEventRow.types';
  */
 function ResultIcon({ result }: { result?: string }): JSX.Element {
   if (result === 'success') {
-    return <CheckCircleIcon className="size-4 text-green-500" />;
+    return <CheckCircleIcon className="size-4 text-muted" />;
   }
   if (result === 'failure') {
-    return <XCircleIcon className="size-4 text-yellow-500" />;
+    return <XCircleIcon className="size-4 text-warning" />;
   }
-  return <QuestionMarkCircleIcon className="size-4 text-red-500" />;
+  return <QuestionMarkCircleIcon className="size-4 text-danger" />;
 }
 
 /**
@@ -60,7 +60,7 @@ export function ProbeEventRow({ probe, onClick, isNew, showViewIcon }: ProbeEven
       <div className="relative shrink-0">
         <ClientLogo client={peerClient} size={28} />
         {peerCountryCode && (
-          <div className="absolute -right-1.5 -bottom-1 flex size-4 items-center justify-center rounded-full border border-background bg-surface text-[10px] shadow-xs">
+          <div className="absolute -right-1.5 -bottom-1 flex size-4 items-center justify-center rounded-full border border-background bg-surface text-2xs">
             {getCountryFlag(peerCountryCode)}
           </div>
         )}
@@ -78,7 +78,7 @@ export function ProbeEventRow({ probe, onClick, isNew, showViewIcon }: ProbeEven
         </div>
 
         {/* Row 2: Columns, blob posters, time */}
-        <div className="flex w-full items-center gap-1.5 text-[10px] text-muted">
+        <div className="flex w-full items-center gap-1.5 text-2xs text-muted">
           <span>{columnsCount} cols</span>
           {blobPosters.length > 0 && (
             <>
@@ -87,7 +87,7 @@ export function ProbeEventRow({ probe, onClick, isNew, showViewIcon }: ProbeEven
                 {blobPosters.map(poster => (
                   <BlobPosterLogo key={poster} poster={poster} size={16} className="shrink-0" />
                 ))}
-                {remainingCount > 0 && <span className="shrink-0 text-[9px] text-muted">+{remainingCount}</span>}
+                {remainingCount > 0 && <span className="shrink-0 text-2xs text-muted">+{remainingCount}</span>}
               </div>
             </>
           )}
@@ -95,7 +95,7 @@ export function ProbeEventRow({ probe, onClick, isNew, showViewIcon }: ProbeEven
           <Timestamp
             timestamp={probe.probe_date_time ?? 0}
             format="relative"
-            className="!p-0 text-[10px] !text-muted"
+            className="!p-0 text-2xs !text-muted"
             disableModal
           />
         </div>

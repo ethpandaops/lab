@@ -1,4 +1,4 @@
-import { type UseQueryResult, useQuery } from '@tanstack/react-query';
+import { type UseQueryResult, useQueries, useQuery } from '@tanstack/react-query';
 import type { Bounds, TableBounds, TablesBoundsResult, AggregateBounds } from './useBounds.types';
 import { BASE_URL, PATH_PREFIX, REFETCH_INTERVALS } from '@/utils/api-config';
 import { useNetwork } from '@/hooks/useNetwork';
@@ -146,4 +146,21 @@ export function useTablesBounds(tableNames: string[]): UseQueryResult<TablesBoun
       };
     },
   });
+}
+
+/**
+ * Bounds for several networks at once, keyed by network name. Shares the cache with useBounds,
+ * so the current network's bounds are not fetched twice.
+ */
+export function useNetworksBounds(networkNames: string[]): Record<string, UseQueryResult<Bounds, Error>> {
+  const results = useQueries({
+    queries: networkNames.map(name => ({
+      queryKey: ['bounds', name],
+      queryFn: () => fetchBounds(name),
+      refetchInterval: REFETCH_INTERVALS.BOUNDS,
+      staleTime: Infinity,
+      gcTime: Infinity,
+    })),
+  });
+  return Object.fromEntries(networkNames.map((name, index) => [name, results[index]]));
 }

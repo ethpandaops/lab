@@ -33,7 +33,7 @@ function MobileSlotHeaderComponent({
             preload="viewport"
             preloadDelay={100}
             params={{ slot: currentSlot.toString() }}
-            className="text-lg font-bold text-foreground hover:text-primary"
+            className="text-lg font-semibold text-foreground tabular-nums hover:text-primary"
           >
             Slot <Slot slot={currentSlot} noLink />
           </Link>
@@ -50,7 +50,7 @@ function MobileSlotHeaderComponent({
         {activeFork && (
           <div className="flex flex-col items-center gap-0.5" style={{ color: activeFork.color }}>
             <span className="text-lg leading-none">{activeFork.emoji}</span>
-            <span className="text-[9px] leading-none font-medium">{activeFork.displayName}</span>
+            <span className="text-2xs leading-none font-medium">{activeFork.displayName}</span>
           </div>
         )}
       </div>

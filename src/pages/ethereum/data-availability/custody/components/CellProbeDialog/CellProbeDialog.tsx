@@ -121,24 +121,24 @@ function FilterButton({
 }): JSX.Element {
   // Base style inspired by the codebase's secondary button variant
   const baseStyle =
-    'inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold transition-all rounded-sm shadow-xs inset-ring inset-ring-border';
+    'inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold transition-all rounded-sm inset-ring inset-ring-border';
 
   // Default (inactive) state styles per variant
   // failure = yellow (transient/one-off failure - less severe)
   // missing = red (peer responded but didn't have the data - serious)
   const defaultStyles = {
     all: 'bg-surface text-foreground hover:bg-background',
-    success: 'bg-surface text-green-600 hover:bg-green-500/10',
-    failure: 'bg-surface text-yellow-600 hover:bg-yellow-500/10',
-    missing: 'bg-surface text-red-500 hover:bg-red-500/10',
+    success: 'bg-surface text-foreground hover:bg-muted/10',
+    failure: 'bg-surface text-warning hover:bg-warning/10',
+    missing: 'bg-surface text-danger hover:bg-danger/10',
   };
 
   // Active state styles per variant
   const activeStyles = {
     all: 'bg-primary/10 text-primary inset-ring-primary/50',
-    success: 'bg-green-500/20 text-green-600 inset-ring-green-500/50',
-    failure: 'bg-yellow-500/20 text-yellow-600 inset-ring-yellow-500/50',
-    missing: 'bg-red-500/20 text-red-500 inset-ring-red-500/50',
+    success: 'bg-muted/20 text-foreground inset-ring-foreground/40',
+    failure: 'bg-warning/20 text-warning inset-ring-warning/50',
+    missing: 'bg-danger/20 text-danger inset-ring-danger/50',
   };
 
   return (
@@ -326,7 +326,7 @@ export function CellProbeDialog({
             {isLoading ? (
               'Loading...'
             ) : error ? (
-              <span className="text-red-500">Error loading probes</span>
+              <span className="text-danger">Error loading probes</span>
             ) : (
               <span>
                 {probeCount} {probeCount === 1 ? 'probe' : 'probes'} found

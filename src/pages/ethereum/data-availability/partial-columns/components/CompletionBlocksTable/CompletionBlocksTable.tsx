@@ -1,4 +1,5 @@
 import type { JSX } from 'react';
+import { InfoBox } from '@/components/Feedback/InfoBox';
 import { Card } from '@/components/Layout/Card';
 import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
@@ -121,17 +122,13 @@ export function CompletionBlocksTable({
   return (
     <Card
       rounded
-      header={
-        <div className="flex flex-col gap-1">
-          <h3 className="text-sm/6 font-semibold text-foreground">Blocks</h3>
-          <p className="text-xs/5 text-muted">
-            Column completions across all sentry nodes by path, with completion times from slot start. Node done is when
-            the median node completed its last column, and header is when a node first received the partial column
-            header.
-          </p>
-        </div>
-      }
+      title="Blocks"
+      subtitle="Column completions across all sentry nodes by path, with completion times from slot start."
     >
+      <InfoBox summary="How this is measured" className="mb-4">
+        Node done is when the median node completed its last column, and header is when a node first received the
+        partial column header.
+      </InfoBox>
       {error && <p className="text-sm text-danger">Failed to load blocks: {error.message}</p>}
       {!error && isLoading && (
         <div className="flex flex-col gap-2">

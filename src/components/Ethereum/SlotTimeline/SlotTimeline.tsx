@@ -164,7 +164,7 @@ function SlotTimelineComponent({
             >
               {/* Inline phase labels */}
               {showInlineLabels && (
-                <div className="absolute inset-0 flex items-center justify-center px-2">
+                <div className="absolute inset-0 flex items-center justify-center px-1">
                   <span className={clsx('truncate text-xs/4', phase.textClassName ?? 'font-medium text-background/90')}>
                     {phase.label}
                   </span>
@@ -190,10 +190,7 @@ function SlotTimelineComponent({
           )}
 
           {/* Current time indicator - vertical line */}
-          <div
-            className="absolute top-0 h-full w-0.5 bg-foreground shadow-sm"
-            style={{ left: `${currentTimePercent}%` }}
-          />
+          <div className="absolute top-0 h-full w-0.5 bg-foreground" style={{ left: `${currentTimePercent}%` }} />
         </div>
 
         {/* Time cutover markers */}
@@ -229,7 +226,7 @@ function SlotTimelineComponent({
               {/* Phase label */}
               <span className="text-xs/4 text-muted">
                 {phase.label}
-                {showTimeLabels && <span className="text-2xs/4 ml-1 text-muted/70">({phase.duration / 1000}s)</span>}
+                {showTimeLabels && <span className="ml-1 text-2xs/4 text-muted/70">({phase.duration / 1000}s)</span>}
               </span>
             </div>
           ))}

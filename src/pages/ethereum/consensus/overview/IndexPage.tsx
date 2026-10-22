@@ -14,8 +14,8 @@ import {
 import { useNetwork } from '@/hooks/useNetwork';
 import { useForks } from '@/hooks/useForks';
 import { Toggle } from '@/components/Forms/Toggle';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { epochToTimestamp } from '@/utils/beacon';
-import clsx from 'clsx';
 import {
   fctBlobCountHourlyServiceListOptions,
   fctBlobCountDailyServiceListOptions,
@@ -81,7 +81,7 @@ import {
 export function IndexPage(): JSX.Element {
   const navigate = useNavigate({ from: '/ethereum/consensus/overview' });
   const { t } = useSearch({ from: '/ethereum/consensus/overview' });
-  const timePeriod: TimePeriod = t ?? '7d';
+  const timePeriod: TimePeriod = t ?? 'all';
   const [showAnnotations, setShowAnnotations] = useState(true);
   const config = TIME_RANGE_CONFIG[timePeriod];
   const isDaily = config.dataType === 'daily';
@@ -868,37 +868,21 @@ export function IndexPage(): JSX.Element {
     [makeStatsTooltipFormatter, proposerRewardRecords]
   );
 
-  // --- Subtitles ---
-
-  const windowLabel = config.days === 1 ? '24 hours' : `${config.days} days`;
-  const makeSub = (metric: string): string => (isDaily ? `Daily ${metric}` : `Hourly ${metric} over ${windowLabel}`);
-
   return (
     <Container>
-      <Header title="Consensus Overview" showAccent={false} />
+      <Header title="Consensus Overview" />
 
       {/* Time Period Selector */}
       <div className="mb-6 flex flex-wrap items-center gap-6">
-        <div className="flex flex-wrap items-center gap-1.5">
-          {TIME_PERIOD_OPTIONS.map(({ value, label }) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => navigate({ search: prev => ({ ...prev, t: value }), replace: true })}
-              className={clsx(
-                'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
-                timePeriod === value
-                  ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
-                  : 'bg-surface text-muted ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
-              )}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          options={TIME_PERIOD_OPTIONS}
+          value={timePeriod}
+          onChange={value => navigate({ search: prev => ({ ...prev, t: value }), replace: true })}
+          ariaLabel="Time window"
+        />
 
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted">Show Forks</span>
+          <span className="text-sm text-muted">Forks</span>
           <Toggle checked={showAnnotations} onChange={setShowAnnotations} size="small" />
         </div>
       </div>
@@ -913,37 +897,11 @@ export function IndexPage(): JSX.Element {
 
       {/* Charts */}
       {!isLoading && (
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 3xl:grid-cols-3">
-          {/* Blob Count */}
-          {blobChartConfig && (
-            <PopoutCard
-              title="Blob Count"
-              subtitle={makeSub('blob count per slot')}
-              anchorId="blob-count-chart"
-              modalSize="full"
-            >
-              {({ inModal }) => (
-                <MultiLineChart
-                  series={blobChartConfig.series}
-                  xAxis={{ type: 'category', labels: blobChartConfig.labels, name: 'Date' }}
-                  yAxis={{ name: 'Blobs', min: 'dataMin' }}
-                  height={inModal ? 600 : 280}
-                  showLegend
-                  legendPosition="top"
-                  enableDataZoom
-                  tooltipFormatter={blobTooltipFormatter}
-                  markLines={showAnnotations ? forkMarkLines : []}
-                  syncGroup={inModal ? undefined : 'consensus-overview'}
-                />
-              )}
-            </PopoutCard>
-          )}
-
+        <div className="flex flex-col gap-4">
           {/* Attestation Participation Rate */}
           {attnChartConfig && (
             <PopoutCard
               title="Attestation Participation Rate"
-              subtitle={makeSub('attestation participation rate')}
               anchorId="attestation-participation-chart"
               modalSize="full"
             >
@@ -952,11 +910,33 @@ export function IndexPage(): JSX.Element {
                   series={attnChartConfig.series}
                   xAxis={{ type: 'category', labels: attnChartConfig.labels, name: 'Date' }}
                   yAxis={{ name: 'Participation Rate (%)', min: 'dataMin' }}
-                  height={inModal ? 600 : 280}
+                  height={inModal ? 600 : 320}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
+                  showDataZoomSlider={inModal}
                   tooltipFormatter={attnTooltipFormatter}
+                  markLines={showAnnotations ? forkMarkLines : []}
+                  syncGroup={inModal ? undefined : 'consensus-overview'}
+                />
+              )}
+            </PopoutCard>
+          )}
+
+          {/* Missed Slot Rate */}
+          {missedSlotChartConfig && (
+            <PopoutCard title="Missed Slot Rate" anchorId="missed-slot-rate-chart" modalSize="full">
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={missedSlotChartConfig.series}
+                  xAxis={{ type: 'category', labels: missedSlotChartConfig.labels, name: 'Date' }}
+                  yAxis={{ name: 'Missed Rate (%)', min: 'dataMin' }}
+                  height={inModal ? 600 : 200}
+                  showLegend
+                  legendPosition="top"
+                  enableDataZoom
+                  showDataZoomSlider={inModal}
+                  tooltipFormatter={missedSlotTooltipFormatter}
                   markLines={showAnnotations ? forkMarkLines : []}
                   syncGroup={inModal ? undefined : 'consensus-overview'}
                 />
@@ -966,21 +946,17 @@ export function IndexPage(): JSX.Element {
 
           {/* Head Vote Correctness Rate */}
           {hvChartConfig && (
-            <PopoutCard
-              title="Head Vote Correctness"
-              subtitle={makeSub('head vote correctness rate')}
-              anchorId="head-vote-correctness-chart"
-              modalSize="full"
-            >
+            <PopoutCard title="Head Vote Correctness" anchorId="head-vote-correctness-chart" modalSize="full">
               {({ inModal }) => (
                 <MultiLineChart
                   series={hvChartConfig.series}
                   xAxis={{ type: 'category', labels: hvChartConfig.labels, name: 'Date' }}
                   yAxis={{ name: 'Head Vote Rate (%)', min: 'dataMin' }}
-                  height={inModal ? 600 : 280}
+                  height={inModal ? 600 : 200}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
+                  showDataZoomSlider={inModal}
                   tooltipFormatter={hvTooltipFormatter}
                   markLines={showAnnotations ? forkMarkLines : []}
                   syncGroup={inModal ? undefined : 'consensus-overview'}
@@ -991,71 +967,18 @@ export function IndexPage(): JSX.Element {
 
           {/* Reorgs */}
           {reorgChartConfig && (
-            <PopoutCard
-              title="Reorgs"
-              subtitle={isDaily ? 'Daily reorg events by depth' : `Hourly reorg events over ${windowLabel}`}
-              anchorId="reorg-chart"
-              modalSize="full"
-            >
+            <PopoutCard title="Reorgs" anchorId="reorg-chart" modalSize="full">
               {({ inModal }) => (
                 <MultiLineChart
                   series={reorgChartConfig.series}
                   xAxis={{ type: 'category', labels: reorgChartConfig.labels, name: 'Date' }}
                   yAxis={{ name: 'Reorg Count', min: 'dataMin' }}
-                  height={inModal ? 600 : 280}
+                  height={inModal ? 600 : 200}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
+                  showDataZoomSlider={inModal}
                   tooltipFormatter={reorgTooltipFormatter}
-                  markLines={showAnnotations ? forkMarkLines : []}
-                  syncGroup={inModal ? undefined : 'consensus-overview'}
-                />
-              )}
-            </PopoutCard>
-          )}
-
-          {/* Missed Slot Rate */}
-          {missedSlotChartConfig && (
-            <PopoutCard
-              title="Missed Slot Rate"
-              subtitle={makeSub('missed slot rate')}
-              anchorId="missed-slot-rate-chart"
-              modalSize="full"
-            >
-              {({ inModal }) => (
-                <MultiLineChart
-                  series={missedSlotChartConfig.series}
-                  xAxis={{ type: 'category', labels: missedSlotChartConfig.labels, name: 'Date' }}
-                  yAxis={{ name: 'Missed Rate (%)', min: 'dataMin' }}
-                  height={inModal ? 600 : 280}
-                  showLegend
-                  legendPosition="top"
-                  enableDataZoom
-                  tooltipFormatter={missedSlotTooltipFormatter}
-                  markLines={showAnnotations ? forkMarkLines : []}
-                  syncGroup={inModal ? undefined : 'consensus-overview'}
-                />
-              )}
-            </PopoutCard>
-          )}
-
-          {/* Gloas (ePBS): payload delivery rate judged by the PTC */}
-          {payloadStatusChartConfig && (
-            <PopoutCard
-              title="Payload Delivery (ePBS)"
-              subtitle={`Hourly PTC-judged payload delivery rates over ${windowLabel}`}
-              anchorId="payload-delivery-chart"
-              modalSize="full"
-            >
-              {({ inModal }) => (
-                <MultiLineChart
-                  series={payloadStatusChartConfig.series}
-                  xAxis={{ type: 'category', labels: payloadStatusChartConfig.labels, name: 'Date' }}
-                  yAxis={{ name: 'Rate (%)', min: 'dataMin' }}
-                  height={inModal ? 600 : 280}
-                  showLegend
-                  legendPosition="top"
-                  enableDataZoom
                   markLines={showAnnotations ? forkMarkLines : []}
                   syncGroup={inModal ? undefined : 'consensus-overview'}
                 />
@@ -1065,25 +988,17 @@ export function IndexPage(): JSX.Element {
 
           {/* Block Proposal Status */}
           {proposalStatusChartConfig && (
-            <PopoutCard
-              title="Block Proposal Status"
-              subtitle={
-                isDaily
-                  ? 'Daily block proposal outcome rates'
-                  : `Hourly block proposal outcome rates over ${windowLabel}`
-              }
-              anchorId="block-proposal-status-chart"
-              modalSize="full"
-            >
+            <PopoutCard title="Block Proposal Status" anchorId="block-proposal-status-chart" modalSize="full">
               {({ inModal }) => (
                 <MultiLineChart
                   series={proposalStatusChartConfig.series}
                   xAxis={{ type: 'category', labels: proposalStatusChartConfig.labels, name: 'Date' }}
                   yAxis={{ name: 'Rate (%)', min: 'dataMin' }}
-                  height={inModal ? 600 : 280}
+                  height={inModal ? 600 : 200}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
+                  showDataZoomSlider={inModal}
                   tooltipFormatter={proposalStatusTooltipFormatter}
                   markLines={showAnnotations ? forkMarkLines : []}
                   syncGroup={inModal ? undefined : 'consensus-overview'}
@@ -1094,22 +1009,59 @@ export function IndexPage(): JSX.Element {
 
           {/* Attestation Inclusion Delay */}
           {inclusionDelayChartConfig && (
-            <PopoutCard
-              title="Attestation Inclusion Delay"
-              subtitle={makeSub('attestation inclusion delay')}
-              anchorId="inclusion-delay-chart"
-              modalSize="full"
-            >
+            <PopoutCard title="Attestation Inclusion Delay" anchorId="inclusion-delay-chart" modalSize="full">
               {({ inModal }) => (
                 <MultiLineChart
                   series={inclusionDelayChartConfig.series}
                   xAxis={{ type: 'category', labels: inclusionDelayChartConfig.labels, name: 'Date' }}
                   yAxis={{ name: 'Inclusion Delay (slots)', min: 'dataMin' }}
-                  height={inModal ? 600 : 280}
+                  height={inModal ? 600 : 200}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
+                  showDataZoomSlider={inModal}
                   tooltipFormatter={inclusionDelayTooltipFormatter}
+                  markLines={showAnnotations ? forkMarkLines : []}
+                  syncGroup={inModal ? undefined : 'consensus-overview'}
+                />
+              )}
+            </PopoutCard>
+          )}
+
+          {/* Blob Count */}
+          {blobChartConfig && (
+            <PopoutCard title="Blob Count" anchorId="blob-count-chart" modalSize="full">
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={blobChartConfig.series}
+                  xAxis={{ type: 'category', labels: blobChartConfig.labels, name: 'Date' }}
+                  yAxis={{ name: 'Blobs', min: 'dataMin' }}
+                  height={inModal ? 600 : 200}
+                  showLegend
+                  legendPosition="top"
+                  enableDataZoom
+                  showDataZoomSlider={inModal}
+                  tooltipFormatter={blobTooltipFormatter}
+                  markLines={showAnnotations ? forkMarkLines : []}
+                  syncGroup={inModal ? undefined : 'consensus-overview'}
+                />
+              )}
+            </PopoutCard>
+          )}
+
+          {/* Gloas (ePBS): payload delivery rate judged by the PTC */}
+          {payloadStatusChartConfig && (
+            <PopoutCard title="Payload Delivery (ePBS)" anchorId="payload-delivery-chart" modalSize="full">
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={payloadStatusChartConfig.series}
+                  xAxis={{ type: 'category', labels: payloadStatusChartConfig.labels, name: 'Date' }}
+                  yAxis={{ name: 'Rate (%)', min: 'dataMin' }}
+                  height={inModal ? 600 : 200}
+                  showLegend
+                  legendPosition="top"
+                  enableDataZoom
+                  showDataZoomSlider={inModal}
                   markLines={showAnnotations ? forkMarkLines : []}
                   syncGroup={inModal ? undefined : 'consensus-overview'}
                 />
@@ -1119,18 +1071,13 @@ export function IndexPage(): JSX.Element {
 
           {/* Proposer Reward (MEV Relay) */}
           {proposerRewardChartConfig && (
-            <PopoutCard
-              title="Proposer Reward (MEV Relay)"
-              subtitle={makeSub('MEV proposer reward')}
-              anchorId="proposer-reward-chart"
-              modalSize="full"
-            >
+            <PopoutCard title="Proposer Reward (MEV Relay)" anchorId="proposer-reward-chart" modalSize="full">
               {({ inModal }) => (
                 <MultiLineChart
                   series={proposerRewardChartConfig.series}
                   xAxis={{ type: 'category', labels: proposerRewardChartConfig.labels, name: 'Date' }}
                   yAxis={{ name: 'Reward (ETH)', min: 'dataMin' }}
-                  height={inModal ? 600 : 280}
+                  height={inModal ? 600 : 200}
                   showLegend
                   legendPosition="top"
                   enableDataZoom

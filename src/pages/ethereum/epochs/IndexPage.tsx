@@ -1,9 +1,12 @@
-import { useNavigate } from '@tanstack/react-router';
+import { useCallback } from 'react';
+import { useNavigate, useSearch } from '@tanstack/react-router';
+import clsx from 'clsx';
 
 import { Alert } from '@/components/Feedback/Alert';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Table } from '@/components/Lists/Table';
+import { RangePager } from '@/components/Lists/RangePager';
 
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { TopEntitiesChart } from '@/components/Ethereum/TopEntitiesChart';
@@ -11,9 +14,11 @@ import { Timestamp } from '@/components/DataDisplay/Timestamp';
 
 import { useEpochsData } from './hooks';
 import { EpochsSkeleton } from './components/EpochsSkeleton';
+import { OfflineValidatorsTable } from './components/OfflineValidatorsTable';
 
 /**
- * Epochs list page - displays the last 5 recent epochs
+ * Epochs list page - one page of epochs at a time, newest first, navigable back to the earliest
+ * indexed epoch
  *
  * Shows:
  * - Epoch number
@@ -25,7 +30,14 @@ import { EpochsSkeleton } from './components/EpochsSkeleton';
  */
 export function IndexPage(): React.JSX.Element {
   const navigate = useNavigate();
-  const { epochs, missedAttestationsByEntity, isLoading, error, currentEpoch } = useEpochsData();
+  const { from } = useSearch({ from: '/ethereum/epochs/' });
+  const { epochs, missedAttestationsByEntity, isLoading, isPlaceholderData, error, currentEpoch, page } =
+    useEpochsData(from);
+
+  const goToPage = useCallback(
+    (next: number | undefined) => navigate({ to: '/ethereum/epochs', search: prev => ({ ...prev, from: next }) }),
+    [navigate]
+  );
 
   const tableData = epochs.map(epoch => {
     const isCurrent = epoch.epoch === currentEpoch;
@@ -73,7 +85,9 @@ export function IndexPage(): React.JSX.Element {
     <Container>
       <Header title="Epochs" />
 
-      <div className="mt-6">
+      <RangePager page={page} noun="epoch" onNavigate={goToPage} className="mb-4" />
+
+      <div className={clsx('flex flex-col gap-6 transition-opacity', isPlaceholderData && 'opacity-60')}>
         <Table
           variant="nested"
           data={tableData}
@@ -115,7 +129,7 @@ export function IndexPage(): React.JSX.Element {
                     row.participationValue < 0.95
                       ? 'text-warning'
                       : row.participationValue >= 0.99
-                        ? 'text-success'
+                        ? 'text-foreground'
                         : 'text-muted'
                   }
                 >
@@ -126,10 +140,7 @@ export function IndexPage(): React.JSX.Element {
           ]}
           onRowClick={handleRowClick}
         />
-      </div>
 
-      <div id="metrics" className="mt-8">
-        <h2 className="mb-4 text-xl font-semibold text-foreground">Metrics</h2>
         <TopEntitiesChart
           data={missedAttestationsByEntity.map(m => ({ x: m.epoch, entity: m.entity, count: m.count }))}
           xAxis={{
@@ -139,10 +150,12 @@ export function IndexPage(): React.JSX.Element {
           }}
           yAxis={{ name: 'Missed' }}
           title="Offline Validators"
-          topN={Infinity}
+          topN={10}
           anchorId="offline-validators-chart"
-          emptyMessage="No offline validators detected in these epochs"
+          emptyMessage="No offline validators in these epochs"
         />
+
+        <OfflineValidatorsTable data={missedAttestationsByEntity} epochs={epochs.map(e => e.epoch)} />
       </div>
     </Container>
   );

@@ -547,8 +547,7 @@ export function DetailPage(): JSX.Element {
             <TabPanel>
               <div className="space-y-6">
                 {/* Performance Metrics */}
-                <Card>
-                  <h3 className="mb-4 text-lg font-semibold text-foreground">Performance Metrics</h3>
+                <Card title="Performance Metrics">
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {/* Block First Seen At */}
                     {firstBlockSeen !== null && firstBlockSeen !== Infinity && (
@@ -584,7 +583,7 @@ export function DetailPage(): JSX.Element {
                               100 >
                             90
                               ? 'var(--color-danger)'
-                              : 'var(--color-success)'
+                              : 'var(--color-primary)'
                           }
                         />
                       )}
@@ -613,8 +612,7 @@ export function DetailPage(): JSX.Element {
 
                 {/* Network Propagation */}
                 {blockPropagationData.length > 0 && (
-                  <Card>
-                    <h3 className="mb-4 text-lg font-semibold text-foreground">Network Propagation</h3>
+                  <Card title="Network Propagation">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                       <MiniStat label="Block Nodes" value={distinctBlockClients.toLocaleString()} />
                     </div>
@@ -623,8 +621,7 @@ export function DetailPage(): JSX.Element {
 
                 {/* MEV Activity */}
                 {(data.blockMev[0]?.value || data.relayBids.length > 0 || data.builderBids.length > 0) && (
-                  <Card>
-                    <h3 className="mb-4 text-lg font-semibold text-foreground">MEV Activity</h3>
+                  <Card title="MEV Activity">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                       {data.blockMev[0]?.value && data.blockMev[0].value !== '0' && (
                         <MiniStat
@@ -671,15 +668,12 @@ export function DetailPage(): JSX.Element {
 
             {/* Block Tab - All block data in two-column layout */}
             <TabPanel>
-              <Card>
-                <h3 className="mb-4 text-lg font-semibold text-foreground">Block Data</h3>
+              <Card title="Block Data">
                 {effectiveBlockData ? (
                   <dl className="grid grid-cols-1 gap-x-8 gap-y-4 lg:grid-cols-2">
                     {/* Beacon Block Section */}
                     <div className="col-span-1 lg:col-span-2">
-                      <h4 className="mb-4 border-b border-border pb-2 text-sm font-semibold text-foreground">
-                        Beacon Block
-                      </h4>
+                      <h4 className="text-sm font-semibold text-foreground">Beacon Block</h4>
                     </div>
 
                     {effectiveBlockData.block_root && (
@@ -760,9 +754,7 @@ export function DetailPage(): JSX.Element {
 
                     {/* Execution Payload Section */}
                     <div className="col-span-1 mt-6 lg:col-span-2">
-                      <h4 className="mb-4 border-b border-border pb-2 text-sm font-semibold text-foreground">
-                        Execution Payload
-                      </h4>
+                      <h4 className="text-sm font-semibold text-foreground">Execution Payload</h4>
                     </div>
 
                     {effectiveBlockData.execution_payload_block_hash && (
@@ -932,9 +924,7 @@ export function DetailPage(): JSX.Element {
 
                     {/* ETH1 Data Section */}
                     <div className="col-span-1 mt-6 lg:col-span-2">
-                      <h4 className="mb-4 border-b border-border pb-2 text-sm font-semibold text-foreground">
-                        ETH1 Data
-                      </h4>
+                      <h4 className="text-sm font-semibold text-foreground">ETH1 Data</h4>
                     </div>
 
                     {effectiveBlockData.eth1_data_block_hash && (
@@ -1037,8 +1027,7 @@ export function DetailPage(): JSX.Element {
                   <>
                     {/* Blob Metrics - only show if there are actual blobs */}
                     {blobCount > 0 && (
-                      <Card>
-                        <h3 className="mb-4 text-lg font-semibold text-foreground">Blob Metrics</h3>
+                      <Card title="Blob Metrics">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                           <MiniStat label="Blob Count" value={blobCount.toString()} />
 
@@ -1065,13 +1054,10 @@ export function DetailPage(): JSX.Element {
 
                     {/* Blobs - one row per blob with its versioned hash + KZG commitment */}
                     {blobDetails.length > 0 && (
-                      <Card>
-                        <div className="mb-4">
-                          <h3 className="text-lg font-semibold text-foreground">Blobs</h3>
-                          <p className="text-sm text-muted">
-                            {blobDetails.length} blob{blobDetails.length !== 1 ? 's' : ''} in this block
-                          </p>
-                        </div>
+                      <Card
+                        title="Blobs"
+                        subtitle={`${blobDetails.length} blob${blobDetails.length !== 1 ? 's' : ''} in this block`}
+                      >
                         <div className="grid gap-3">
                           {blobDetails.map(blob => (
                             <div
@@ -1101,17 +1087,12 @@ export function DetailPage(): JSX.Element {
 
                     {/* Blob Submitters */}
                     {blobSubmitters.length > 0 && (
-                      <Card>
-                        <div className="mb-4">
-                          <h3 className="text-lg font-semibold text-foreground">Blob Submitters</h3>
-                          <p className="text-sm text-muted">
-                            {blobSubmitters.reduce((sum, s) => sum + (s.versioned_hashes?.length ?? 0), 0)} blob
-                            {blobSubmitters.reduce((sum, s) => sum + (s.versioned_hashes?.length ?? 0), 0) !== 1
-                              ? 's'
-                              : ''}{' '}
-                            across {blobSubmitters.length} transaction{blobSubmitters.length !== 1 ? 's' : ''}
-                          </p>
-                        </div>
+                      <Card
+                        title="Blob Submitters"
+                        subtitle={`${blobSubmitters.reduce((sum, s) => sum + (s.versioned_hashes?.length ?? 0), 0)} blob${
+                          blobSubmitters.reduce((sum, s) => sum + (s.versioned_hashes?.length ?? 0), 0) !== 1 ? 's' : ''
+                        } across ${blobSubmitters.length} transaction${blobSubmitters.length !== 1 ? 's' : ''}`}
+                      >
                         <div className="grid gap-3">
                           {blobSubmitters.map((submitter, index) => (
                             <div
@@ -1228,8 +1209,7 @@ export function DetailPage(): JSX.Element {
                 ) : (
                   <>
                     {/* Transaction & Gas Metrics */}
-                    <Card>
-                      <h3 className="mb-4 text-lg font-semibold text-foreground">Transactions & Gas</h3>
+                    <Card title="Transactions & Gas">
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         {effectiveBlockData.execution_payload_transactions_count !== null &&
                           effectiveBlockData.execution_payload_transactions_count !== undefined && (
@@ -1260,7 +1240,7 @@ export function DetailPage(): JSX.Element {
                                   100 >
                                 90
                                   ? 'var(--color-danger)'
-                                  : 'var(--color-success)'
+                                  : 'var(--color-primary)'
                               }
                             />
                           )}

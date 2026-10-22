@@ -92,7 +92,7 @@ function MobileHeader({
   const { currentNetwork } = useNetwork();
 
   return (
-    <div className="fixed top-0 right-0 left-0 z-40 flex items-center justify-between border-b border-border bg-surface/95 px-4 py-4 shadow-sm backdrop-blur-xl sm:px-6 lg:hidden">
+    <div className="fixed top-0 right-0 left-0 z-40 flex items-center justify-between border-b border-border bg-background px-4 py-4 sm:px-6 lg:hidden">
       <div className="flex items-center gap-x-6">
         <button
           type="button"
@@ -108,7 +108,7 @@ function MobileHeader({
         </button>
         <Link to="/" className="flex items-center gap-2">
           <img alt="Lab Logo" src="/images/lab.png" className="h-8 w-auto" />
-          <span className="font-sans text-xl font-bold text-foreground">The Lab</span>
+          <span className="font-display text-xl font-bold text-foreground">The Lab</span>
         </Link>
       </div>
       <div className="flex items-center gap-3">
@@ -270,7 +270,7 @@ function RootComponent(): JSX.Element {
                       className={`bg-background pt-[65px] transition-all duration-200 lg:min-h-dvh lg:pt-0 ${sidebarCollapsed ? 'lg:pl-14' : 'lg:pl-56'}`}
                     >
                       <FeatureGate>
-                        <Breadcrumb />
+                        <Breadcrumb className="z-20 h-12 border-b border-border bg-background px-4 sm:px-6 lg:sticky lg:top-0 lg:px-8" />
                         <Outlet />
                       </FeatureGate>
                     </main>

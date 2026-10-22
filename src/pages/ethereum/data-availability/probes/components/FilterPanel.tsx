@@ -2,6 +2,7 @@ import { type JSX, useState } from 'react';
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
 import { clsx } from 'clsx';
 import { Dialog } from '@/components/Overlays/Dialog';
+import { Badge } from '@/components/Elements/Badge';
 import { Button } from '@/components/Elements/Button';
 import { Input } from '@/components/Forms/Input';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
@@ -82,13 +83,13 @@ function FilterChip({
   const displayValue = Array.isArray(value) ? `${value.length} selected` : value;
 
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs text-primary">
+    <span className="inline-flex items-center gap-1 rounded-xs border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs text-primary">
       <span className="font-medium">{label}:</span>
       <span className="max-w-32 truncate">{displayValue}</span>
       <button
         type="button"
         onClick={onRemove}
-        className="ml-0.5 rounded-full p-0.5 transition-colors hover:bg-primary/20"
+        className="ml-0.5 rounded-xs p-0.5 transition-colors hover:bg-primary/20"
       >
         <XMarkIcon className="size-3" />
       </button>
@@ -149,9 +150,9 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
           <FunnelIcon className="size-4" />
           Filters
           {activeFilterCount > 0 && (
-            <span className="text-primary-foreground rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold">
+            <Badge variant="flat" size="small">
               {activeFilterCount}
-            </span>
+            </Badge>
           )}
         </Button>
 
@@ -196,7 +197,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
           {/* Top row: Result and Data filters */}
           <div className="grid grid-cols-4 gap-4">
             <div>
-              <h4 className="mb-2 text-xs font-semibold tracking-wider text-muted uppercase">Result</h4>
+              <h4 className="mb-2 text-xs font-semibold text-muted">Result</h4>
               <SelectMenu
                 value={draftFilters.result || ''}
                 onChange={(v: string) => updateDraft('result', v)}
@@ -205,7 +206,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
               />
             </div>
             <div>
-              <h4 className="mb-2 text-xs font-semibold tracking-wider text-muted uppercase">Slot</h4>
+              <h4 className="mb-2 text-xs font-semibold text-muted">Slot</h4>
               <Input size="sm">
                 <Input.Field
                   type="number"
@@ -217,7 +218,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
               </Input>
             </div>
             <div>
-              <h4 className="mb-2 text-xs font-semibold tracking-wider text-muted uppercase">Column</h4>
+              <h4 className="mb-2 text-xs font-semibold text-muted">Column</h4>
               <Input size="sm">
                 <Input.Field
                   type="number"
@@ -229,7 +230,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
               </Input>
             </div>
             <div>
-              <h4 className="mb-2 text-xs font-semibold tracking-wider text-muted uppercase">Blob Posters</h4>
+              <h4 className="mb-2 text-xs font-semibold text-muted">Blob Posters</h4>
               <Listbox
                 value={draftFilters.blobPosters ?? []}
                 onChange={(selected: string[]) =>
@@ -238,7 +239,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                 multiple
               >
                 <div className="relative">
-                  <ListboxButton className="relative w-full cursor-pointer border border-border bg-surface/50 py-2 pr-10 pl-3 text-left shadow-xs backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-surface/70">
+                  <ListboxButton className="relative w-full cursor-pointer border border-border bg-surface py-2 pr-10 pl-3 text-left transition-all hover:border-primary/30 hover:bg-surface">
                     <span className="flex items-center gap-1">
                       {(draftFilters.blobPosters ?? []).length > 0 ? (
                         <>
@@ -259,7 +260,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   </ListboxButton>
                   <ListboxOptions
                     transition
-                    className="absolute z-[9999] mt-1 max-h-60 w-full overflow-auto border border-border bg-surface shadow-lg backdrop-blur-xl data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0"
+                    className="absolute z-[9999] mt-1 max-h-60 w-full overflow-auto border border-border bg-surface data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0"
                   >
                     {BLOB_POSTERS.map(poster => {
                       const displayName = BLOB_POSTER_DISPLAY_NAMES[poster] ?? poster;
@@ -294,11 +295,11 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
           {/* Main content: Prober and Peer side by side */}
           <div className="grid grid-cols-2 gap-6">
             {/* Prober Section */}
-            <div className="space-y-3 rounded-lg border border-border bg-background p-3">
-              <h4 className="text-xs font-semibold tracking-wider text-primary uppercase">Prober</h4>
+            <div className="space-y-3 rounded-sm border border-border bg-background p-3">
+              <h4 className="text-xs font-semibold text-foreground">Prober</h4>
               <div className="space-y-2">
                 <div>
-                  <label className="mb-1 block text-[10px] font-medium text-muted">Client</label>
+                  <label className="mb-1 block text-2xs font-medium text-muted">Client</label>
                   <Input size="sm">
                     <Input.Field
                       type="text"
@@ -309,7 +310,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   </Input>
                 </div>
                 <div>
-                  <label className="mb-1 block text-[10px] font-medium text-muted">Node ID</label>
+                  <label className="mb-1 block text-2xs font-medium text-muted">Node ID</label>
                   <Input size="sm">
                     <Input.Field
                       type="text"
@@ -319,7 +320,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   </Input>
                 </div>
                 <div>
-                  <label className="mb-1 block text-[10px] font-medium text-muted">Version</label>
+                  <label className="mb-1 block text-2xs font-medium text-muted">Version</label>
                   <Input size="sm">
                     <Input.Field
                       type="text"
@@ -332,7 +333,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="mb-1 block text-[10px] font-medium text-muted">Country</label>
+                    <label className="mb-1 block text-2xs font-medium text-muted">Country</label>
                     <Input size="sm">
                       <Input.Field
                         type="text"
@@ -344,7 +345,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                     </Input>
                   </div>
                   <div>
-                    <label className="mb-1 block text-[10px] font-medium text-muted">City</label>
+                    <label className="mb-1 block text-2xs font-medium text-muted">City</label>
                     <Input size="sm">
                       <Input.Field
                         type="text"
@@ -355,7 +356,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   </div>
                 </div>
                 <div>
-                  <label className="mb-1 block text-[10px] font-medium text-muted">ASN</label>
+                  <label className="mb-1 block text-2xs font-medium text-muted">ASN</label>
                   <Input size="sm">
                     <Input.Field
                       type="number"
@@ -370,11 +371,11 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
             </div>
 
             {/* Peer Section */}
-            <div className="space-y-3 rounded-lg border border-border bg-background p-3">
-              <h4 className="text-xs font-semibold tracking-wider text-primary uppercase">Peer</h4>
+            <div className="space-y-3 rounded-sm border border-border bg-background p-3">
+              <h4 className="text-xs font-semibold text-foreground">Peer</h4>
               <div className="space-y-2">
                 <div>
-                  <label className="mb-1 block text-[10px] font-medium text-muted">Client</label>
+                  <label className="mb-1 block text-2xs font-medium text-muted">Client</label>
                   <Input size="sm">
                     <Input.Field
                       type="text"
@@ -385,7 +386,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   </Input>
                 </div>
                 <div>
-                  <label className="mb-1 block text-[10px] font-medium text-muted">Peer ID</label>
+                  <label className="mb-1 block text-2xs font-medium text-muted">Peer ID</label>
                   <Input size="sm">
                     <Input.Field
                       type="text"
@@ -396,7 +397,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   </Input>
                 </div>
                 <div>
-                  <label className="mb-1 block text-[10px] font-medium text-muted">Version</label>
+                  <label className="mb-1 block text-2xs font-medium text-muted">Version</label>
                   <Input size="sm">
                     <Input.Field
                       type="text"
@@ -407,7 +408,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="mb-1 block text-[10px] font-medium text-muted">Country</label>
+                    <label className="mb-1 block text-2xs font-medium text-muted">Country</label>
                     <Input size="sm">
                       <Input.Field
                         type="text"
@@ -419,7 +420,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                     </Input>
                   </div>
                   <div>
-                    <label className="mb-1 block text-[10px] font-medium text-muted">City</label>
+                    <label className="mb-1 block text-2xs font-medium text-muted">City</label>
                     <Input size="sm">
                       <Input.Field
                         type="text"
@@ -430,7 +431,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   </div>
                 </div>
                 <div>
-                  <label className="mb-1 block text-[10px] font-medium text-muted">ASN</label>
+                  <label className="mb-1 block text-2xs font-medium text-muted">ASN</label>
                   <Input size="sm">
                     <Input.Field
                       type="number"

@@ -183,7 +183,7 @@ export function DataTable<TData>({
         <div className="mb-4 px-4 sm:px-6">
           <div className="sm:flex sm:items-center sm:justify-between">
             <div className="sm:flex-auto">
-              {title && <h1 className="text-base/7 font-semibold text-foreground">{title}</h1>}
+              {title && <h2 className="text-sm/6 font-semibold text-foreground">{title}</h2>}
               {description && <p className="mt-2 text-sm/6 text-muted">{description}</p>}
             </div>
           </div>

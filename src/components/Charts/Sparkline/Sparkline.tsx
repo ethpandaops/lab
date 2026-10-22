@@ -7,6 +7,7 @@ import { CanvasRenderer } from 'echarts/renderers';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { resolveCssColorToHex, hexToRgba } from '@/utils';
 import type { SparklineProps } from './Sparkline.types';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 // Register minimal ECharts components
 echarts.use([LineChart, GridComponent, CanvasRenderer]);
@@ -70,7 +71,14 @@ export function Sparkline({
 
   return (
     <div style={{ width, height }}>
-      <ReactEChartsCore echarts={echarts} option={option} style={{ width, height }} notMerge={true} lazyUpdate={true} />
+      <ReactEChartsCore
+        theme={ECHARTS_THEME}
+        echarts={echarts}
+        option={option}
+        style={{ width, height }}
+        notMerge={true}
+        lazyUpdate={true}
+      />
     </div>
   );
 }

@@ -36,7 +36,7 @@ export function ClusterSpecsModal({ open, onClose, clusterName }: ClusterSpecsMo
     >
       <div className="space-y-4">
         {/* CPU Section */}
-        <div className="rounded-xs border border-border bg-surface/50 p-4">
+        <div className="rounded-sm bg-surface p-4 outline -outline-offset-1 outline-border">
           <div className="mb-3 flex items-center gap-2">
             <CpuChipIcon className="size-4 text-muted" />
             <span className="text-sm font-medium text-foreground">CPU</span>
@@ -66,7 +66,7 @@ export function ClusterSpecsModal({ open, onClose, clusterName }: ClusterSpecsMo
         </div>
 
         {/* Memory Section */}
-        <div className="rounded-xs border border-border bg-surface/50 p-4">
+        <div className="rounded-sm bg-surface p-4 outline -outline-offset-1 outline-border">
           <div className="mb-3 flex items-center gap-2">
             <svg className="size-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path
@@ -94,7 +94,7 @@ export function ClusterSpecsModal({ open, onClose, clusterName }: ClusterSpecsMo
         </div>
 
         {/* Storage Section */}
-        <div className="rounded-xs border border-border bg-surface/50 p-4">
+        <div className="rounded-sm bg-surface p-4 outline -outline-offset-1 outline-border">
           <div className="mb-3 flex items-center gap-2">
             <CircleStackIcon className="size-4 text-muted" />
             <span className="text-sm font-medium text-foreground">Storage</span>

@@ -101,7 +101,7 @@ export function GraffitiBlocksTable({
   onLoadMore,
 }: GraffitiBlocksTableProps): JSX.Element {
   return (
-    <Card rounded header={<h3 className="text-sm/6 font-semibold text-foreground">Blocks</h3>}>
+    <Card rounded title="Blocks">
       {error && <p className="text-sm text-danger">Failed to load blocks: {error.message}</p>}
       {!error && isLoading && (
         <div className="flex flex-col gap-2">

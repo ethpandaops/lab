@@ -1,6 +1,8 @@
 import { type JSX, useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearch, useNavigate, Link } from '@tanstack/react-router';
+import { Button, buttonClassName } from '@/components/Elements/Button';
+import { Card } from '@/components/Layout/Card';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { DataAvailabilityHeatmap } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
@@ -96,6 +98,9 @@ const SECONDS_PER_HOUR = 3600;
  * Number of slots per epoch
  */
 const SLOTS_PER_EPOCH = 32;
+
+/** Button look for router links */
+const SECONDARY_LINK_CLASS = buttonClassName({ variant: 'secondary', size: 'sm' });
 
 /**
  * Derives the current drill-down level from URL search parameters
@@ -983,14 +988,15 @@ export function IndexPage(): JSX.Element {
           }
           className="mb-0"
         />
-        <button
-          type="button"
+        <Button
+          variant="soft"
+          size="sm"
+          className="mt-1 shrink-0"
+          leadingIcon={<InformationCircleIcon />}
           onClick={() => setLearnMoreOpen(true)}
-          className="mt-1 inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-all hover:border-primary/50 hover:bg-primary/20"
         >
-          <InformationCircleIcon className="size-4" />
           Learn more
-        </button>
+        </Button>
       </div>
 
       {/* Learn More Dialog */}
@@ -1011,116 +1017,110 @@ export function IndexPage(): JSX.Element {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
         {/* Main Content: Heatmap (3/4 width) */}
         <div className="lg:col-span-3">
-          <div className="bg-card text-card-foreground rounded-lg border border-border shadow-sm">
-            {/* Header with Level Title */}
-            <div className="border-b border-border bg-muted/20 px-4 py-3">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                {/* Level Title */}
-                <div className="min-w-0">
-                  <h2 className="text-lg font-semibold text-foreground">{getLevelTitle(currentLevel).main}</h2>
-                  <p className="text-sm text-muted">{getLevelTitle(currentLevel).sub}</p>
-                </div>
-
-                {/* Controls */}
-                <div className="flex shrink-0 flex-wrap items-center gap-2">
-                  {/* Detail page links */}
-                  {currentLevel.type === 'epoch' && (
-                    <Link
-                      to="/ethereum/epochs/$epoch"
-                      params={{ epoch: String(currentLevel.epoch) }}
-                      className="flex items-center gap-1.5 rounded-sm border border-accent/30 bg-accent/10 px-2.5 py-1.5 text-xs font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
-                    >
-                      <CubeIcon className="size-3.5" />
-                      <span>Epoch Deep Dive</span>
-                      <ArrowTopRightOnSquareIcon className="size-3" />
-                    </Link>
-                  )}
-                  {currentLevel.type === 'slot' && (
-                    <Link
-                      to="/ethereum/slots/$slot"
-                      params={{ slot: String(currentLevel.slot) }}
-                      className="flex items-center gap-1.5 rounded-sm border border-accent/30 bg-accent/10 px-2.5 py-1.5 text-xs font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
-                    >
-                      <Square2StackIcon className="size-3.5" />
-                      <span>Slot Deep Dive</span>
-                      <ArrowTopRightOnSquareIcon className="size-3" />
-                    </Link>
-                  )}
-                  <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
-                </div>
+          <Card
+            title={getLevelTitle(currentLevel).main}
+            subtitle={getLevelTitle(currentLevel).sub}
+            actions={
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Detail page links */}
+                {currentLevel.type === 'epoch' && (
+                  <Link
+                    to="/ethereum/epochs/$epoch"
+                    params={{ epoch: String(currentLevel.epoch) }}
+                    className={SECONDARY_LINK_CLASS}
+                  >
+                    <CubeIcon className="size-3.5" />
+                    <span>Epoch Deep Dive</span>
+                    <ArrowTopRightOnSquareIcon className="size-3" />
+                  </Link>
+                )}
+                {currentLevel.type === 'slot' && (
+                  <Link
+                    to="/ethereum/slots/$slot"
+                    params={{ slot: String(currentLevel.slot) }}
+                    className={SECONDARY_LINK_CLASS}
+                  >
+                    <Square2StackIcon className="size-3.5" />
+                    <span>Slot Deep Dive</span>
+                    <ArrowTopRightOnSquareIcon className="size-3" />
+                  </Link>
+                )}
+                <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
               </div>
-            </div>
+            }
+          >
+            <div className="space-y-4">
+              {/* Breadcrumb Navigation */}
+              {breadcrumbs.length > 1 && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted">Navigate:</span>
+                  <nav className="flex items-center gap-1 text-sm">
+                    {breadcrumbs.slice(0, -1).map((crumb, index) => {
+                      const Icon = crumb.icon;
+                      return (
+                        <div key={index} className="flex items-center">
+                          {index > 0 && <ChevronRightIcon className="mx-1 size-3 text-muted" />}
+                          <button
+                            type="button"
+                            onClick={crumb.onClick}
+                            className="group flex items-center gap-1.5 rounded-sm px-2 py-1 text-muted transition-colors hover:bg-accent/10 hover:text-accent"
+                          >
+                            <Icon className="size-3.5 opacity-60 group-hover:opacity-100" />
+                            <span className="underline decoration-muted/50 underline-offset-2 group-hover:decoration-accent">
+                              {crumb.label}
+                            </span>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </nav>
 
-            {/* Breadcrumb Navigation */}
-            {breadcrumbs.length > 1 && (
-              <div className="flex items-center gap-2 border-b border-border px-4 py-2">
-                <span className="text-xs font-medium tracking-wide text-muted uppercase">Navigate:</span>
-                <nav className="flex items-center gap-1 text-sm">
-                  {breadcrumbs.slice(0, -1).map((crumb, index) => {
-                    const Icon = crumb.icon;
-                    return (
-                      <div key={index} className="flex items-center">
-                        {index > 0 && <ChevronRightIcon className="mx-1 size-3 text-muted" />}
-                        <button
-                          type="button"
-                          onClick={crumb.onClick}
-                          className="group flex items-center gap-1.5 rounded-sm px-2 py-1 text-muted transition-all hover:bg-accent/10 hover:text-accent"
-                        >
-                          <Icon className="size-3.5 opacity-60 group-hover:opacity-100" />
-                          <span className="underline decoration-muted/50 underline-offset-2 group-hover:decoration-accent">
-                            {crumb.label}
-                          </span>
-                        </button>
-                      </div>
-                    );
-                  })}
-                </nav>
+                  <div className="flex-1" />
 
-                <div className="flex-1" />
+                  {/* Back button */}
+                  <button
+                    type="button"
+                    onClick={breadcrumbs[breadcrumbs.length - 2].onClick}
+                    className="group flex items-center gap-1.5 rounded-sm bg-muted/30 px-2.5 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-accent/10 hover:text-accent"
+                  >
+                    <ArrowLeftIcon className="size-3.5" />
+                    <span>Back</span>
+                  </button>
+                </div>
+              )}
 
-                {/* Back button */}
-                <button
-                  type="button"
-                  onClick={breadcrumbs[breadcrumbs.length - 2].onClick}
-                  className="group flex items-center gap-1.5 rounded-sm bg-muted/30 px-2.5 py-1.5 text-xs font-medium text-muted transition-all hover:bg-accent/10 hover:text-accent"
-                >
-                  <ArrowLeftIcon className="size-3.5" />
-                  <span>Back</span>
-                </button>
-              </div>
-            )}
-
-            {/* Legend Strip */}
-            <div className="border-b border-border bg-muted/30 px-4 py-2">
-              <DataAvailabilityLegend
-                granularity={granularity}
-                viewMode={viewMode}
-                threshold={threshold}
-                orientation="horizontal"
-              />
-            </div>
-
-            {/* Heatmap Area */}
-            <div className="p-4">
-              {isLoading ? (
-                <DataAvailabilitySkeleton />
-              ) : (
-                <DataAvailabilityHeatmap
-                  rows={rows}
+              {/* Legend Strip */}
+              <div className="rounded-sm bg-muted/30 px-3 py-2">
+                <DataAvailabilityLegend
                   granularity={granularity}
-                  filters={filters}
                   viewMode={viewMode}
                   threshold={threshold}
-                  onRowClick={currentLevel.type !== 'slot' ? handleRowClick : undefined}
-                  onCellClick={handleCellClick}
-                  onColumnClick={handleColumnClick}
-                  cellSize="3xs"
-                  showColumnHeader
-                  showLegend={false}
+                  orientation="horizontal"
                 />
-              )}
+              </div>
+
+              {/* Heatmap Area */}
+              <div>
+                {isLoading ? (
+                  <DataAvailabilitySkeleton />
+                ) : (
+                  <DataAvailabilityHeatmap
+                    rows={rows}
+                    granularity={granularity}
+                    filters={filters}
+                    viewMode={viewMode}
+                    threshold={threshold}
+                    onRowClick={currentLevel.type !== 'slot' ? handleRowClick : undefined}
+                    onCellClick={handleCellClick}
+                    onColumnClick={handleColumnClick}
+                    cellSize="3xs"
+                    showColumnHeader
+                    showLegend={false}
+                  />
+                )}
+              </div>
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Sidebar: Live Probes (1/4 width) */}

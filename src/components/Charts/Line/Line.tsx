@@ -9,6 +9,15 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import { useSharedCrosshairs } from '@/hooks/useSharedCrosshairs';
 import type { LineChartProps } from './Line.types';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
+import {
+  getChartAxisLabelStyle,
+  getChartAxisLine,
+  getChartAxisNameStyle,
+  getChartTooltipChrome,
+  getChartValueAxisName,
+  getChartValueSplitLine,
+} from '../chartChrome';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -33,7 +42,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
     data = [820, 932, 901, 934, 1290, 1330, 1320],
     labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     title,
-    titleFontSize = 16,
+    titleFontSize = 14,
     titleFontFamily,
     titleFontWeight = 600,
     titleLeft = 'center',
@@ -99,8 +108,8 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
       grid: {
         left: 60,
         right: 24,
-        top: title ? 40 : 16,
-        bottom: 50,
+        top: title ? 40 : yAxisTitle ? 32 : 16,
+        bottom: xAxisTitle ? 50 : 28,
       },
       xAxis: {
         type: 'category',
@@ -110,19 +119,12 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
         name: xAxisTitle,
         nameLocation: 'middle',
         nameGap: 30,
-        nameTextStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
-        axisLine: {
-          show: true,
-          lineStyle: {
-            color: themeColors.border,
-          },
-        },
+        nameTextStyle: getChartAxisNameStyle(themeColors),
+        axisLine: getChartAxisLine(themeColors),
+        axisTick: { show: false },
         axisLabel: {
-          color: themeColors.muted,
-          fontSize: 12,
+          ...getChartAxisLabelStyle(themeColors),
+          hideOverlap: true,
           interval: xAxisLabelInterval,
         },
         splitLine: {
@@ -133,28 +135,11 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
         type: 'value',
         max: yMax,
         name: yAxisTitle,
-        nameLocation: 'middle',
-        nameGap: 50,
-        nameTextStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
-        axisLine: {
-          show: true,
-          lineStyle: {
-            color: themeColors.border,
-          },
-        },
-        axisTick: {
-          show: false,
-        },
-        splitLine: {
-          show: false,
-        },
-        axisLabel: {
-          color: themeColors.muted,
-          fontSize: 12,
-        },
+        ...getChartValueAxisName(themeColors),
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: getChartValueSplitLine(themeColors),
+        axisLabel: getChartAxisLabelStyle(themeColors),
       },
       series: [
         {
@@ -207,13 +192,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
       tooltip: {
         trigger: 'axis',
         triggerOn: 'mousemove' as const,
-        backgroundColor: themeColors.background,
-        borderColor: themeColors.border,
-        borderWidth: 1,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
+        ...getChartTooltipChrome(themeColors),
         formatter: tooltipFormatter
           ? (
               params: {
@@ -253,16 +232,14 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
       xAxisTitle,
       yAxisTitle,
       tooltipFormatter,
-      themeColors.foreground,
-      themeColors.border,
-      themeColors.muted,
-      themeColors.background,
+      themeColors,
     ]
   );
 
   return (
     <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
       <ReactEChartsCore
+        theme={ECHARTS_THEME}
         ref={combinedRef}
         echarts={echarts}
         option={option}

@@ -42,7 +42,7 @@ function SidebarComponent({
         {/* Header with Slot number and Epoch subtitle */}
         <div className="mb-3 flex items-center gap-3">
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-foreground">
+            <h2 className="text-xl/7 font-semibold tracking-tight text-foreground tabular-nums">
               Slot <Slot slot={currentSlot} />
             </h2>
             <p className="text-xs text-muted">
@@ -52,7 +52,7 @@ function SidebarComponent({
           {activeFork && (
             <div className="flex flex-col items-center gap-0.5" style={{ color: activeFork.color }}>
               <span className="text-2xl leading-none">{activeFork.emoji}</span>
-              <span className="text-[10px] leading-none font-medium">{activeFork.displayName}</span>
+              <span className="text-2xs leading-none font-medium">{activeFork.displayName}</span>
             </div>
           )}
         </div>

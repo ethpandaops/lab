@@ -25,7 +25,7 @@ interface TimelineTooltipProps {
 export function TimelineTooltip({ span, position, containerWidth }: TimelineTooltipProps): JSX.Element {
   return (
     <div
-      className="pointer-events-none absolute z-50 max-w-md min-w-72 rounded border border-border bg-background/95 p-3 shadow-lg backdrop-blur-sm"
+      className="pointer-events-none absolute z-50 max-w-md min-w-72 rounded-sm border border-border bg-background p-3"
       style={{
         left: Math.min(position.x + 16, containerWidth - 320),
         top: position.y + 16,

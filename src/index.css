@@ -10,6 +10,8 @@
  */
 
 /* Fonts */
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
 @import '@fontsource-variable/space-grotesk';
 
 @import 'tailwindcss';
@@ -31,6 +33,32 @@
   /* Ultrawide monitor support beyond default 2xl (1536px) */
   --breakpoint-3xl: 120rem; /* 1920px */
   --breakpoint-4xl: 160rem; /* 2560px */
+
+  /* ===== Typefaces ===== */
+  /* Geist for all UI text and numbers, Geist Mono for identifiers (hashes, graffiti, code).
+   * Space Grotesk is the brand display face: wordmark and landing hero only. */
+  --font-sans: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+  --font-display: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+
+  /* ===== Corner Radius ===== */
+  /* Two radii only. rounded-xs (4px) for inline marks: badges, tags, skeleton bars.
+   * rounded-sm (6px) for every container and control. The larger Tailwind steps alias to
+   * rounded-sm so md/lg/xl classes cannot drift from it. Use rounded-full only for dots,
+   * avatars and progress tracks. */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.375rem;
+  --radius-2xl: 0.375rem;
+  --radius-3xl: 0.375rem;
+
+  /* ===== Type Scale ===== */
+  /* One step below text-xs for dense labels (axis ticks, HUD keys, badges in tight cells).
+   * Replaces ad hoc text-[9px]/[10px]/[11px]; never go smaller. */
+  --text-2xs: 0.625rem;
+  --text-2xs--line-height: 0.875rem;
 
   /* ===== TIER 1: Primitive Color Scales ===== */
 
@@ -205,13 +233,6 @@
 
   /* Custom animations */
   --animate-shimmer: shimmer 2s linear infinite;
-  --animate-fade-in: fade-in 0.8s ease-out forwards;
-  --animate-fade-in-delay: fade-in 0.8s ease-out 0.2s forwards;
-  --animate-fade-in-delay-2: fade-in 0.8s ease-out 0.4s forwards;
-  --animate-fade-in-delay-3: fade-in 0.8s ease-out 0.6s forwards;
-  --animate-fade-in-delay-4: fade-in 0.8s ease-out 0.8s forwards;
-  --animate-fade-in-delay-5: fade-in 0.8s ease-out 1s forwards;
-  --animate-fade-in-delay-6: fade-in 0.8s ease-out 1.2s forwards;
   --animate-scroll-travel: scroll-travel 2s ease-in-out infinite;
 
   @keyframes scroll-travel {
@@ -232,17 +253,6 @@
     }
     100% {
       background-position: 200% 0;
-    }
-  }
-
-  @keyframes fade-in {
-    0% {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
     }
   }
 
@@ -269,7 +279,6 @@
       opacity: 1;
     }
   }
-
 }
 
 /* Semantic token mappings
@@ -286,10 +295,10 @@
     --secondary-value: var(--color-sand-200);
     --accent-value: var(--color-terracotta-500);
     --background-value: var(--color-sand-100);
-    --surface-value: var(--color-sand-50);
+    --surface-value: #fbfaf6;
     --foreground-value: var(--color-sand-950);
-    --muted-value: var(--color-sand-600);
-    --border-value: var(--color-sand-300);
+    --muted-value: var(--color-sand-700);
+    --border-value: #dcd7c5;
 
     /* Set html background for overscroll */
     background-color: var(--color-sand-100);
@@ -300,14 +309,15 @@
     --primary-value: var(--color-terracotta-400);
     --secondary-value: var(--color-neutral-900);
     --accent-value: var(--color-terracotta-300);
-    --background-value: var(--color-neutral-950);
-    --surface-value: #242424;
-    --foreground-value: var(--color-neutral-50);
-    --muted-value: var(--color-neutral-400);
-    --border-value: var(--color-neutral-800);
+    /* Three distinct steps so panels read without shadows: page, panel, hairline */
+    --background-value: #0f0f0e;
+    --surface-value: #181817;
+    --foreground-value: #f5f5f4;
+    --muted-value: #a19f9a;
+    --border-value: #2c2b29;
 
     /* Set html background for overscroll */
-    background-color: var(--color-neutral-950);
+    background-color: #0f0f0e;
   }
 
   html.star {
@@ -325,9 +335,9 @@
     background-color: var(--color-aurora-blue-950);
   }
 
-  /* Apply Space Grotesk for all text */
   body {
-    font-family: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+    font-family: var(--font-sans);
+    font-feature-settings: 'ss01';
     color: var(--foreground-value);
     background-color: var(--background-value);
   }
@@ -336,7 +346,7 @@
   pre,
   kbd,
   samp {
-    font-family: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+    font-family: var(--font-mono);
   }
 
   /* Global focus styles - use primary color */
@@ -353,17 +363,6 @@
     outline: none;
   }
 
-  /* Initial state for fade-in animations - elements start invisible */
-  .animate-fade-in,
-  .animate-fade-in-delay,
-  .animate-fade-in-delay-2,
-  .animate-fade-in-delay-3,
-  .animate-fade-in-delay-4,
-  .animate-fade-in-delay-5,
-  .animate-fade-in-delay-6 {
-    opacity: 0;
-  }
-
   /* Hide scrollbars while maintaining scroll functionality */
   .scrollbar-hide {
     -ms-overflow-style: none; /* IE and Edge */
@@ -378,27 +377,7 @@
 /* Digit flip animations for scoreboard display.
  * Placed outside @theme inline so they're always emitted
  * (keyframes inside @theme are only output when referenced by a token). */
-@keyframes digit-out {
-  from {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-}
 
-@keyframes digit-in {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
 
 /* CardChain slide animations for conveyor belt effect.
  * Placed outside @theme inline so they're always emitted

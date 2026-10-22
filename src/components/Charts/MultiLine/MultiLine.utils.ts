@@ -112,11 +112,16 @@ export function createStatisticSeries(name: string, values: (number | null)[], c
     name,
     data: values,
     color: config.color,
-    lineWidth: config.lineWidth ?? 2,
+    lineWidth: config.lineWidth ?? 1.5,
     lineStyle: config.lineStyle ?? 'solid',
     group: config.group,
     initiallyVisible: config.initiallyVisible,
   };
+}
+
+/** "muir glacier" -> "Muir Glacier" */
+function titleCase(name: string): string {
+  return name.replace(/\b\w/g, c => c.toUpperCase());
 }
 
 export interface ForkMarkLinesOptions {
@@ -179,7 +184,7 @@ export function createForkMarkLines(options: ForkMarkLinesOptions): MarkLineConf
     if (labels.includes(forkLabel)) {
       markLines.push({
         xValue: forkLabel,
-        label: (fork.combinedName ?? fork.displayName).toUpperCase(),
+        label: fork.combinedName ? titleCase(fork.combinedName) : fork.displayName,
         labelPosition: 'end',
         color: '#8b5cf6', // Purple for consensus forks
         lineStyle: 'dashed',
@@ -229,8 +234,8 @@ export function createExecutionForkMarkLines(options: ExecutionForkMarkLinesOpti
 
     // Check if this label exists in chart range
     if (labels.includes(forkLabel)) {
-      // Convert snake_case to UPPER CASE with spaces (e.g., "tangerine_whistle" -> "TANGERINE WHISTLE")
-      const displayName = forkName.toUpperCase().replace(/_/g, ' ');
+      // snake_case to Title Case (e.g., "tangerine_whistle" -> "Tangerine Whistle")
+      const displayName = forkName === 'dao' ? 'DAO' : titleCase(forkName.replace(/_/g, ' '));
 
       markLines.push({
         xValue: forkLabel,
@@ -299,4 +304,86 @@ export function createBlobScheduleMarkLines(options: BlobScheduleMarkLinesOption
   });
 
   return markLines;
+}
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const DATE_LABEL = /^([A-Z][a-z]{2}) (\d{1,2}) '(\d{2})$/;
+
+/** Calendar steps for date ticks, coarsest last; `months` steps align to January, `days` to the 1st and 15th */
+const DATE_TICK_STEPS: Array<{ months?: number; days?: number }> = [
+  { days: 1 },
+  { days: 2 },
+  { days: 7 },
+  { days: 14 },
+  { months: 1 },
+  { months: 3 },
+  { months: 6 },
+  { months: 12 },
+  { months: 24 },
+];
+
+/**
+ * Picks x-axis ticks for a category axis of date labels ("Jan 15 '24", the format the overview
+ * pages and fork mark lines share) so ticks land on calendar boundaries — the first of a year,
+ * quarter, month or week — instead of every Nth point. Returns tick index → tick text, or null
+ * when the labels are not dates. Repeated labels (hourly points of one day) tick once.
+ */
+export function dateCategoryTicks(labels: string[], maxTicks: number): Map<number, string> | null {
+  if (labels.length < 2) return null;
+  const dates: Date[] = [];
+  for (const label of labels) {
+    const m = DATE_LABEL.exec(label);
+    const month = m ? MONTHS.indexOf(m[1]) : -1;
+    if (!m || month < 0) return null;
+    dates.push(new Date(2000 + Number(m[3]), month, Number(m[2])));
+  }
+
+  const spanDays = (dates[dates.length - 1].getTime() - dates[0].getTime()) / 86_400_000;
+  const step =
+    DATE_TICK_STEPS.find(s => spanDays / (s.days ?? (s.months ?? 1) * 30.4) <= Math.max(2, maxTicks)) ??
+    DATE_TICK_STEPS[DATE_TICK_STEPS.length - 1];
+
+  /** Bucket a date falls in for the chosen step; a tick goes on the first label of each bucket */
+  const bucket = (d: Date): number => {
+    if (step.months) return Math.floor((d.getFullYear() * 12 + d.getMonth()) / step.months);
+    if (step.days === 1 || step.days === 2) return Math.floor(Math.round(d.getTime() / 86_400_000) / step.days);
+    if (step.days === 14) return d.getFullYear() * 24 + d.getMonth() * 2 + (d.getDate() >= 15 ? 1 : 0);
+    // Weeks start on Monday
+    return Math.floor((d.getTime() / 86_400_000 + 3) / 7);
+  };
+
+  const years = step.months !== undefined && step.months >= 12;
+  const ticks = new Map<number, string>();
+  let previous = bucket(dates[0]);
+  let previousYear = -1;
+  dates.forEach((d, i) => {
+    const b = bucket(d);
+    if (i > 0 && b === previous) return;
+    previous = b;
+    // The first point only ticks when it starts its bucket, so a range opening mid-period
+    // does not get a tick crowding the next one
+    const startsBucket = step.months
+      ? d.getDate() === 1 && d.getMonth() % step.months === 0
+      : step.days === 7
+        ? d.getDay() === 1
+        : step.days === 14
+          ? d.getDate() === 1 || d.getDate() === 15
+          : step.days === 2
+            ? Math.round(d.getTime() / 86_400_000) % 2 === 0
+            : true;
+    if (i === 0 && !startsBucket) return;
+    const showYear = d.getFullYear() !== previousYear;
+    previousYear = d.getFullYear();
+    ticks.set(
+      i,
+      years
+        ? String(d.getFullYear())
+        : step.months
+          ? showYear
+            ? `${MONTHS[d.getMonth()]} ${d.getFullYear()}`
+            : MONTHS[d.getMonth()]
+          : `${MONTHS[d.getMonth()]} ${d.getDate()}`
+    );
+  });
+  return ticks;
 }

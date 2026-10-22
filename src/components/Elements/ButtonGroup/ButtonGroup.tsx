@@ -3,7 +3,7 @@ import { clsx } from 'clsx';
 import type { ButtonGroupProps } from './ButtonGroup.types';
 
 const ButtonGroupRoot = forwardRef<HTMLSpanElement, ButtonGroupProps>(
-  ({ children, className = '', rounded = false, ...props }, ref) => {
+  ({ children, className = '', rounded = true, ...props }, ref) => {
     const childArray = Children.toArray(children);
     const count = childArray.length;
 
@@ -15,15 +15,13 @@ const ButtonGroupRoot = forwardRef<HTMLSpanElement, ButtonGroupProps>(
 
       const positionClasses = clsx(
         // Rounded corners (only when rounded prop is true)
-        rounded && isFirst && 'rounded-l-md !rounded-r-none',
-        rounded && isLast && 'rounded-r-md !rounded-l-none',
+        rounded && isFirst && 'rounded-l-sm !rounded-r-none',
+        rounded && isLast && 'rounded-r-sm !rounded-l-none',
         rounded && !isFirst && !isLast && '!rounded-none',
         // Square corners (when rounded prop is false)
         !rounded && '!rounded-none',
         // Negative margin for overlapping borders
         !isFirst && '-ml-px',
-        // Remove individual button shadow (group has shadow)
-        '!shadow-none',
         // Focus z-index
         'focus:z-10'
       );
@@ -36,11 +34,7 @@ const ButtonGroupRoot = forwardRef<HTMLSpanElement, ButtonGroupProps>(
     });
 
     return (
-      <span
-        ref={ref}
-        className={clsx('isolate inline-flex shadow-xs dark:shadow-none', rounded && 'rounded-md', className)}
-        {...props}
-      >
+      <span ref={ref} className={clsx('isolate inline-flex', rounded && 'rounded-sm', className)} {...props}>
         {childrenWithPosition}
       </span>
     );

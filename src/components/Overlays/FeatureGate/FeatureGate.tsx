@@ -39,13 +39,9 @@ export function FeatureGate({ children }: FeatureGateProps): JSX.Element {
       <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-6">
         {/* Content */}
         <div className="relative flex flex-col items-center">
-          <div className="relative mb-8">
-            {/* Glow effect */}
-            <div className="absolute inset-0 animate-pulse rounded-full bg-warning/20 blur-3xl"></div>
-            <img src="/images/lab.png" className="relative size-32 object-contain" alt="Lab Logo" />
-          </div>
+          <img src="/images/lab.png" className="mb-8 size-32 object-contain" alt="" />
 
-          <h1 className="text-2xl font-bold text-foreground">Feature Not Available</h1>
+          <h1 className="text-2xl/8 font-semibold tracking-tight text-foreground">Feature Not Available</h1>
           <p className="mt-4 max-w-md text-center text-muted">
             This feature is not available on{' '}
             <span className="font-semibold text-foreground">
@@ -75,7 +71,7 @@ export function FeatureGate({ children }: FeatureGateProps): JSX.Element {
           <div className="mt-8 flex gap-4">
             <Link
               to="/"
-              className="rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary/90 hover:shadow-md active:scale-95"
+              className="inline-flex h-8 items-center rounded-sm bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               Go Home
             </Link>

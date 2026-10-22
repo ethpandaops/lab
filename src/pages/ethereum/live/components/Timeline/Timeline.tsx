@@ -46,7 +46,7 @@ function TimelineComponent({
           <button
             type="button"
             onClick={onBackward}
-            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-muted focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-foreground/5 focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Go backward"
             disabled={!onBackward}
           >
@@ -57,7 +57,7 @@ function TimelineComponent({
           <button
             type="button"
             onClick={onPlayPause}
-            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-muted focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-foreground/5 focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={isPlaying ? 'Pause' : 'Play'}
             disabled={!onPlayPause}
           >
@@ -68,7 +68,7 @@ function TimelineComponent({
           <button
             type="button"
             onClick={onForward}
-            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-muted focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex size-10 items-center justify-center rounded-sm border border-border bg-surface text-foreground transition-colors hover:bg-foreground/5 focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Go forward"
             disabled={!onForward}
           >
@@ -78,7 +78,7 @@ function TimelineComponent({
 
         {/* Right: Current time display */}
         <div className="ml-auto flex items-center gap-2">
-          <span className="text-2xl font-semibold text-foreground">{(currentTime / 1000).toFixed(1)}</span>
+          <span className="text-2xl font-semibold text-foreground tabular-nums">{(currentTime / 1000).toFixed(1)}</span>
           <span className="text-sm text-muted">sec</span>
         </div>
       </div>

@@ -1,3 +1,4 @@
+import { buttonClassName } from '@/components/Elements/Button';
 import { Card } from '@/components/Layout/Card';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { ForkInfo } from '@/utils/forks';
@@ -6,6 +7,13 @@ import { ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useState, useEffect } from 'react';
 import { Link } from '@tanstack/react-router';
+import {
+  ForkCountdown,
+  ForkCountdownSkeleton,
+  ForkQuickLinks,
+  secondsToCountdown,
+  type CountdownTime,
+} from '../ForkShared';
 
 interface ForksHeaderProps {
   activeFork: ForkInfo | null;
@@ -14,11 +22,28 @@ interface ForksHeaderProps {
   allForks: ForkInfo[];
 }
 
-interface CountdownTime {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
+/** Roadmap and Forkcast links shown in the top row of the card */
+function ExternalLinks({ combinedName }: { combinedName?: string }): React.JSX.Element {
+  const linkClass = 'inline-flex items-center gap-1 text-xs text-muted hover:text-foreground';
+
+  return (
+    <div className="flex items-center gap-2">
+      <a href="https://ethereum.org/en/roadmap/" target="_blank" rel="noopener noreferrer" className={linkClass}>
+        Roadmap
+        <ArrowTopRightOnSquareIcon className="h-3 w-3" />
+      </a>
+      <span className="text-border">•</span>
+      <a
+        href={combinedName ? `https://forkcast.org/upgrade/${combinedName}` : 'https://forkcast.org'}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={linkClass}
+      >
+        Forkcast
+        <ArrowTopRightOnSquareIcon className="h-3 w-3" />
+      </a>
+    </div>
+  );
 }
 
 export function ForksHeader({ activeFork, nextFork, allForks }: ForksHeaderProps): React.JSX.Element {
@@ -35,29 +60,13 @@ export function ForksHeader({ activeFork, nextFork, allForks }: ForksHeaderProps
     return Math.max(0, secondsUntilFork);
   };
 
-  const [countdown, setCountdown] = useState<CountdownTime>(() => {
-    const secondsUntilFork = calculateSecondsUntilFork();
-
-    return {
-      days: Math.floor(secondsUntilFork / 86400),
-      hours: Math.floor((secondsUntilFork % 86400) / 3600),
-      minutes: Math.floor((secondsUntilFork % 3600) / 60),
-      seconds: Math.floor(secondsUntilFork % 60),
-    };
-  });
+  const [countdown, setCountdown] = useState<CountdownTime>(() => secondsToCountdown(calculateSecondsUntilFork()));
 
   useEffect(() => {
     if (!nextFork || !currentNetwork?.genesis_time) return;
 
     const updateCountdown = (): void => {
-      const secondsUntilFork = calculateSecondsUntilFork();
-
-      setCountdown({
-        days: Math.floor(secondsUntilFork / 86400),
-        hours: Math.floor((secondsUntilFork % 86400) / 3600),
-        minutes: Math.floor((secondsUntilFork % 3600) / 60),
-        seconds: Math.floor(secondsUntilFork % 60),
-      });
+      setCountdown(secondsToCountdown(calculateSecondsUntilFork()));
     };
 
     // Update immediately when data is available
@@ -95,81 +104,38 @@ export function ForksHeader({ activeFork, nextFork, allForks }: ForksHeaderProps
 
     return (
       <Card>
-        <div className="p-6">
-          <div className="mb-6 flex items-center justify-between">
-            {/* Left: Empty for symmetry */}
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted"></span>
-            </div>
-
-            {/* Right: External links */}
-            <div className="flex items-center gap-2">
-              <a
-                href="https://ethereum.org/en/roadmap/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-muted hover:text-foreground"
-              >
-                Roadmap
-                <ArrowTopRightOnSquareIcon className="h-3 w-3" />
-              </a>
-              <span className="text-border">•</span>
-              <a
-                href={
-                  activeFork.combinedName
-                    ? `https://forkcast.org/upgrade/${activeFork.combinedName}`
-                    : 'https://forkcast.org'
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-muted hover:text-foreground"
-              >
-                Forkcast
-                <ArrowTopRightOnSquareIcon className="h-3 w-3" />
-              </a>
-            </div>
+        <div className="mb-6 flex items-center justify-between">
+          {/* Left: Empty for symmetry */}
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-muted"></span>
           </div>
 
-          {/* Center: Current active fork info */}
-          <div className="mb-6 text-center">
-            <div className="mb-3 text-8xl">{activeFork.emoji}</div>
-            <div className="mb-2 text-xs font-medium tracking-wider text-accent uppercase">Currently Active</div>
-            <h2 className="text-3xl font-bold text-foreground">{activeFork.displayName}</h2>
-            <p className="mt-3 text-sm text-muted">{activeFork.description}</p>
-            {timeSinceActivation && <p className="mt-2 text-sm text-muted">{timeSinceActivation}</p>}
-          </div>
+          {/* Right: External links */}
+          <ExternalLinks combinedName={activeFork.combinedName} />
+        </div>
 
-          {/* "LIVE NOW" display instead of countdown */}
-          <div className="mb-6 flex items-center justify-center gap-4 rounded-lg bg-accent/5 py-6">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-accent">LIVE NOW</div>
-            </div>
-          </div>
+        {/* Center: Current active fork info */}
+        <div className="mb-6 text-center">
+          <div className="mb-3 text-8xl">{activeFork.emoji}</div>
+          <div className="mb-2 text-xs font-medium text-accent">Currently Active</div>
+          <h2 className="text-3xl font-semibold text-foreground">{activeFork.displayName}</h2>
+          <p className="mt-3 text-sm text-muted">{activeFork.description}</p>
+          {timeSinceActivation && <p className="mt-2 text-sm text-muted">{timeSinceActivation}</p>}
+        </div>
 
-          {/* Action buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            <Link
-              to="/ethereum/epochs/$epoch"
-              params={{ epoch: activeFork.epoch.toString() }}
-              className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface"
-            >
-              Epoch {activeFork.epoch}
-            </Link>
-            <Link
-              to="/ethereum/slots/$slot"
-              params={{ slot: (activeFork.epoch * 32).toString() }}
-              className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface"
-            >
-              Slot {activeFork.epoch * 32}
-            </Link>
-            <Link
-              to="/ethereum/live"
-              className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface"
-            >
-              Live View
-            </Link>
+        {/* "LIVE NOW" display instead of countdown */}
+        <div className="mb-6 flex items-center justify-center gap-4 rounded-sm border border-border py-6">
+          <div className="text-center">
+            <div className="text-4xl font-bold text-accent">LIVE NOW</div>
           </div>
         </div>
+
+        {/* Action buttons */}
+        <ForkQuickLinks epoch={activeFork.epoch}>
+          <Link to="/ethereum/live" className={buttonClassName({ variant: 'secondary', size: 'xs' })}>
+            Live View
+          </Link>
+        </ForkQuickLinks>
       </Card>
     );
   }
@@ -185,139 +151,44 @@ export function ForksHeader({ activeFork, nextFork, allForks }: ForksHeaderProps
 
   return (
     <Card>
-      <div className="p-6">
-        <div className="mb-6 flex items-center justify-between">
-          {/* Left: Current fork */}
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted">Active:</span>
-            {activeFork && (
-              <span className="font-medium text-foreground">
-                {activeFork.emoji} {activeFork.displayName}
-              </span>
-            )}
-          </div>
-
-          {/* Right: External links */}
-          <div className="flex items-center gap-2">
-            <a
-              href="https://ethereum.org/en/roadmap/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-muted hover:text-foreground"
-            >
-              Roadmap
-              <ArrowTopRightOnSquareIcon className="h-3 w-3" />
-            </a>
-            <span className="text-border">•</span>
-            <a
-              href={
-                nextFork.combinedName ? `https://forkcast.org/upgrade/${nextFork.combinedName}` : 'https://forkcast.org'
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-muted hover:text-foreground"
-            >
-              Forkcast
-              <ArrowTopRightOnSquareIcon className="h-3 w-3" />
-            </a>
-          </div>
-        </div>
-
-        {/* Center: Next upgrade info */}
-        <div className="mb-6 text-center">
-          <div className="mb-3 text-8xl">{nextFork.emoji}</div>
-          <div className="mb-2 text-xs font-medium tracking-wider text-accent uppercase">Next Upgrade</div>
-          <h2 className="text-3xl font-bold text-foreground">{nextFork.displayName}</h2>
-          <p className="mt-3 text-sm text-muted">{nextFork.description}</p>
-          {currentNetwork?.genesis_time && (
-            <div className="mt-4 text-base font-medium text-foreground">
-              Local Time:{' '}
-              <Timestamp timestamp={epochToTimestamp(nextFork.epoch, currentNetwork.genesis_time)} format="long" />
-            </div>
+      <div className="mb-6 flex items-center justify-between">
+        {/* Left: Current fork */}
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-muted">Active:</span>
+          {activeFork && (
+            <span className="font-medium text-foreground">
+              {activeFork.emoji} {activeFork.displayName}
+            </span>
           )}
         </div>
 
-        {/* Countdown display */}
-        {!currentNetwork?.genesis_time ? (
-          <div className="mb-6 rounded-lg bg-accent/5 py-6">
-            <div className="mb-3 text-center text-xs font-medium tracking-wider text-muted uppercase">Goes Live In</div>
-            <div className="flex items-center justify-center gap-4">
-              <div className="text-center">
-                <div className="h-12 w-16 animate-pulse rounded bg-muted/20"></div>
-                <div className="mt-1 text-xs tracking-wider text-muted uppercase">Days</div>
-              </div>
-              <div className="text-2xl text-muted">:</div>
-              <div className="text-center">
-                <div className="h-12 w-16 animate-pulse rounded bg-muted/20"></div>
-                <div className="mt-1 text-xs tracking-wider text-muted uppercase">Hours</div>
-              </div>
-              <div className="text-2xl text-muted">:</div>
-              <div className="text-center">
-                <div className="h-12 w-16 animate-pulse rounded bg-muted/20"></div>
-                <div className="mt-1 text-xs tracking-wider text-muted uppercase">Minutes</div>
-              </div>
-              <div className="text-2xl text-muted">:</div>
-              <div className="text-center">
-                <div className="h-12 w-16 animate-pulse rounded bg-muted/20"></div>
-                <div className="mt-1 text-xs tracking-wider text-muted uppercase">Seconds</div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="mb-6 rounded-lg bg-accent/5 py-6">
-            <div className="mb-3 text-center text-xs font-medium tracking-wider text-muted uppercase">Goes Live In</div>
-            <div className="flex items-center justify-center gap-4">
-              {countdown.days > 0 && (
-                <>
-                  <div className="text-center">
-                    <div className="text-4xl font-bold text-accent tabular-nums">{countdown.days}</div>
-                    <div className="mt-1 text-xs tracking-wider text-muted uppercase">days</div>
-                  </div>
-                  <div className="text-2xl text-muted">:</div>
-                </>
-              )}
-              <div className="text-center">
-                <div className="text-4xl font-bold text-accent tabular-nums">{countdown.hours}</div>
-                <div className="mt-1 text-xs tracking-wider text-muted uppercase">hours</div>
-              </div>
-              <div className="text-2xl text-muted">:</div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-accent tabular-nums">{countdown.minutes}</div>
-                <div className="mt-1 text-xs tracking-wider text-muted uppercase">minutes</div>
-              </div>
-              <div className="text-2xl text-muted">:</div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-accent tabular-nums">{countdown.seconds}</div>
-                <div className="mt-1 text-xs tracking-wider text-muted uppercase">seconds</div>
-              </div>
-            </div>
+        {/* Right: External links */}
+        <ExternalLinks combinedName={nextFork.combinedName} />
+      </div>
+
+      {/* Center: Next upgrade info */}
+      <div className="mb-6 text-center">
+        <div className="mb-3 text-8xl">{nextFork.emoji}</div>
+        <div className="mb-2 text-xs font-medium text-accent">Next Upgrade</div>
+        <h2 className="text-3xl font-semibold text-foreground">{nextFork.displayName}</h2>
+        <p className="mt-3 text-sm text-muted">{nextFork.description}</p>
+        {currentNetwork?.genesis_time && (
+          <div className="mt-4 text-base font-medium text-foreground">
+            Local Time:{' '}
+            <Timestamp timestamp={epochToTimestamp(nextFork.epoch, currentNetwork.genesis_time)} format="long" />
           </div>
         )}
-
-        {/* Action buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <Link
-            to="/ethereum/epochs/$epoch"
-            params={{ epoch: nextFork.epoch.toString() }}
-            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface"
-          >
-            Epoch {nextFork.epoch}
-          </Link>
-          <Link
-            to="/ethereum/slots/$slot"
-            params={{ slot: (nextFork.epoch * 32).toString() }}
-            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface"
-          >
-            Slot {nextFork.epoch * 32}
-          </Link>
-          <Link
-            to="/ethereum/live"
-            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface"
-          >
-            Live View
-          </Link>
-        </div>
       </div>
+
+      {/* Countdown display */}
+      {!currentNetwork?.genesis_time ? <ForkCountdownSkeleton /> : <ForkCountdown countdown={countdown} />}
+
+      {/* Action buttons */}
+      <ForkQuickLinks epoch={nextFork.epoch}>
+        <Link to="/ethereum/live" className={buttonClassName({ variant: 'secondary', size: 'xs' })}>
+          Live View
+        </Link>
+      </ForkQuickLinks>
     </Card>
   );
 }

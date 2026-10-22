@@ -52,22 +52,18 @@ export function SlotDetailSkeleton({ slot, epoch }: SlotDetailSkeletonProps): JS
       </div>
 
       {/* Slot Basic Info Card Skeleton */}
-      <div className="overflow-hidden rounded-sm border border-border bg-surface">
-        {/* Header section */}
-        <div className="border-b border-border bg-background px-6 py-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg/7 font-semibold text-foreground">Slot Information</h2>
-            <div className="flex items-center gap-2">
-              <LoadingContainer className="size-5 rounded-sm" />
-              <LoadingContainer className="size-5 rounded-sm" />
-              <LoadingContainer className="size-5 rounded-sm" />
-              <LoadingContainer className="size-5 rounded-sm" />
-            </div>
+      <Card
+        title="Slot Information"
+        actions={
+          <div className="flex items-center gap-2">
+            <LoadingContainer className="size-5 rounded-sm" />
+            <LoadingContainer className="size-5 rounded-sm" />
+            <LoadingContainer className="size-5 rounded-sm" />
+            <LoadingContainer className="size-5 rounded-sm" />
           </div>
-        </div>
-
-        {/* Card content */}
-        <div className="p-6">
+        }
+      >
+        <div>
           <div className="flex flex-col gap-6 lg:flex-row">
             <div className="flex-1 space-y-6">
               {/* Status Section */}
@@ -177,7 +173,7 @@ export function SlotDetailSkeleton({ slot, epoch }: SlotDetailSkeletonProps): JS
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Tabbed Content Skeleton */}
       <div className="mt-8">
@@ -196,8 +192,7 @@ export function SlotDetailSkeleton({ slot, epoch }: SlotDetailSkeletonProps): JS
             <TabPanel>
               <div className="space-y-6">
                 {/* Performance Metrics Card */}
-                <Card>
-                  <h3 className="mb-4 text-lg font-semibold text-foreground">Performance Metrics</h3>
+                <Card title="Performance Metrics">
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {['Block First Seen At', 'Gas Used', 'Participation', 'Block Votes'].map(label => (
                       <div key={label}>
@@ -214,8 +209,7 @@ export function SlotDetailSkeleton({ slot, epoch }: SlotDetailSkeletonProps): JS
                 </Card>
 
                 {/* Network Propagation Card */}
-                <Card>
-                  <h3 className="mb-4 text-lg font-semibold text-foreground">Network Propagation</h3>
+                <Card title="Network Propagation">
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <div>
                       <dt className="text-xs font-medium text-muted">Block Nodes</dt>
@@ -227,8 +221,7 @@ export function SlotDetailSkeleton({ slot, epoch }: SlotDetailSkeletonProps): JS
                 </Card>
 
                 {/* MEV Activity Card */}
-                <Card>
-                  <h3 className="mb-4 text-lg font-semibold text-foreground">MEV Activity</h3>
+                <Card title="MEV Activity">
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {['Relays', 'Builders'].map(label => (
                       <div key={label}>

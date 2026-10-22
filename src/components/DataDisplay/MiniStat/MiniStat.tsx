@@ -104,7 +104,7 @@ export function MiniStat({
         </svg>
         {/* Center percentage text */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-[10px] leading-none font-semibold text-foreground">{percentage.toFixed(0)}%</span>
+          <span className="text-2xs leading-none font-semibold text-foreground">{percentage.toFixed(0)}%</span>
         </div>
       </div>
     );
@@ -120,7 +120,7 @@ export function MiniStat({
         {/* Stats content - 2 rows */}
         <div className="flex-1">
           <dt className="text-xs leading-tight font-medium text-muted">{label}</dt>
-          <dd className="text-base leading-tight font-bold text-foreground">{value}</dd>
+          <dd className="text-base leading-tight font-semibold text-foreground">{value}</dd>
         </div>
       </div>
     );
@@ -140,7 +140,7 @@ export function MiniStat({
         {/* Stats content */}
         <div className="flex-1">
           {/* Value */}
-          <div className="text-base leading-tight font-bold text-foreground">{value}</div>
+          <div className="text-base leading-tight font-semibold text-foreground">{value}</div>
           {/* Secondary text */}
           <div className="text-xs leading-tight text-muted">{secondaryText}</div>
         </div>

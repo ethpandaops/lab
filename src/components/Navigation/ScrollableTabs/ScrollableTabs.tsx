@@ -78,7 +78,7 @@ export function ScrollableTabs({ children, className }: ScrollableTabsProps): JS
         <button
           type="button"
           onClick={() => scroll('left')}
-          className="absolute top-0 left-0 z-10 flex h-full items-center bg-gradient-to-r from-surface to-transparent pr-8 pl-2 transition-opacity hover:opacity-80"
+          className="absolute top-0 left-0 z-10 flex h-full items-center border-r border-border bg-surface px-2 transition-colors hover:text-primary"
           aria-label="Scroll tabs left"
         >
           <ChevronLeftIcon className="h-5 w-5 text-foreground" />
@@ -103,7 +103,7 @@ export function ScrollableTabs({ children, className }: ScrollableTabsProps): JS
         <button
           type="button"
           onClick={() => scroll('right')}
-          className="absolute top-0 right-0 z-10 flex h-full items-center bg-gradient-to-l from-surface to-transparent pr-2 pl-8 transition-opacity hover:opacity-80"
+          className="absolute top-0 right-0 z-10 flex h-full items-center border-l border-border bg-surface px-2 transition-colors hover:text-primary"
           aria-label="Scroll tabs right"
         >
           <ChevronRightIcon className="h-5 w-5 text-foreground" />

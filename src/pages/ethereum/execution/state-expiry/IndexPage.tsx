@@ -418,7 +418,7 @@ export function IndexPage(): JSX.Element {
           <Popover className="relative">
             <PopoverButton
               variant="blank"
-              className="inline-flex items-center gap-1.5 border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-emerald-600 hover:bg-emerald-500/20 dark:border-emerald-400/30 dark:bg-emerald-400/10 dark:text-emerald-400 dark:hover:bg-emerald-400/20"
+              className="inline-flex items-center gap-1.5 border border-border bg-muted/10 px-2.5 py-1 text-muted hover:bg-muted/20"
             >
               <ClockIcon className="size-3.5" />
               <span className="font-medium">1-2y</span>

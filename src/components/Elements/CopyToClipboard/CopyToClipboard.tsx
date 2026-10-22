@@ -136,7 +136,7 @@ export function CopyToClipboard({
       type="button"
       onClick={handleCopy}
       disabled={disabled}
-      className={`group rounded-sm p-1 transition-colors hover:bg-muted/20 focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`group rounded-sm p-1 transition-colors hover:bg-muted/20 focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       aria-label={ariaLabel}
     >
       <ClipboardDocumentIcon className="size-5 text-muted transition-colors group-hover:text-foreground dark:text-muted dark:group-hover:text-foreground" />

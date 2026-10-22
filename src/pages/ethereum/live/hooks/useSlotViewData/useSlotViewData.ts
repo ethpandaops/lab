@@ -396,7 +396,8 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     0
   );
 
-  const blobCount = blobCountQuery.data?.fct_block_blob_count_head?.[0]?.blob_count ?? 0;
+  const blockBlobCount = blobCountQuery.data?.fct_block_blob_count_head?.[0]?.blob_count ?? null;
+  const blobCount = blockBlobCount ?? 0;
 
   // TODO: Fix attestation actual count
   // The chunked API returns 2x the correct count (double-counting issue)
@@ -611,6 +612,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       sidebarPhases,
       sidebarItems,
       blobCount,
+      blockBlobCount,
       blobFirstSeenData,
       blobAvailabilityRateData,
       blobContinentalPropagationData,
@@ -644,6 +646,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       sidebarPhases,
       sidebarItems,
       blobCount,
+      blockBlobCount,
       blobFirstSeenData,
       blobAvailabilityRateData,
       blobContinentalPropagationData,

@@ -14,7 +14,7 @@ export function EntitiesSkeleton(): JSX.Element {
     <>
       {/* Search Input Skeleton */}
       <div className="mt-6">
-        <LoadingContainer className="h-10 w-full rounded-md" />
+        <LoadingContainer className="h-10 w-full rounded-sm" />
         <div className="mt-2 flex items-center justify-between">
           <LoadingContainer className="h-4 w-48 rounded-sm" />
           <LoadingContainer className="h-4 w-40 rounded-sm" />

@@ -1,6 +1,7 @@
 import { type JSX } from 'react';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
+import { Card } from '@/components/Layout/Card';
 import { Badge } from '@/components/Elements/Badge';
 import { Slot } from '@/components/Ethereum/Slot';
 import { Epoch } from '@/components/Ethereum/Epoch';
@@ -81,7 +82,7 @@ export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: S
 
   // Determine slot status from proposer data (which has canonical/orphaned/missed status)
   // or from the isOrphaned/isMissedSlot flags
-  const getSlotStatus = (): { label: string; color: 'green' | 'red' | 'yellow' } => {
+  const getSlotStatus = (): { label: string; color: 'gray' | 'red' | 'yellow' } => {
     // Check isMissedSlot prop first (no block data at all)
     if (isMissedSlot) {
       return { label: 'Missed', color: 'red' };
@@ -95,7 +96,7 @@ export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: S
     const statusValue = blockProposer?.status?.toLowerCase();
 
     if (statusValue === 'canonical') {
-      return { label: 'Canonical', color: 'green' };
+      return { label: 'Canonical', color: 'gray' };
     }
     if (statusValue === 'orphaned') {
       return { label: 'Orphaned', color: 'yellow' };
@@ -104,7 +105,7 @@ export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: S
       return { label: 'Missed', color: 'red' };
     }
     // Default to canonical if we have block data but no status
-    return { label: 'Canonical', color: 'green' };
+    return { label: 'Canonical', color: 'gray' };
   };
 
   const status = getSlotStatus();
@@ -162,61 +163,58 @@ export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: S
   ].filter(link => link.url !== null);
 
   return (
-    <div className="overflow-hidden rounded-sm border border-border bg-surface">
-      {/* Tight header section - no padding, integrated into card */}
-      <div className="border-b border-border bg-background px-6 py-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg/7 font-semibold text-foreground">Slot Information</h2>
-          {explorerLinks.length > 0 && (
-            <>
-              {/* Desktop: Show icons directly */}
-              <div className="hidden items-center gap-2 sm:flex">
+    <Card
+      title="Slot Information"
+      allowContentOverflow
+      actions={
+        explorerLinks.length > 0 && (
+          <>
+            {/* Desktop: Show icons directly */}
+            <div className="hidden items-center gap-2 sm:flex">
+              {explorerLinks.map(link => (
+                <a
+                  key={link.type}
+                  href={link.url!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block opacity-70 transition-opacity hover:opacity-100"
+                  aria-label={link.label}
+                >
+                  <link.icon className="h-5 w-5" />
+                </a>
+              ))}
+            </div>
+            {/* Mobile: Show dropdown menu */}
+            <Menu as="div" className="relative sm:hidden">
+              <MenuButton className="inline-flex items-center rounded-sm p-1 opacity-70 transition-opacity hover:opacity-100">
+                <EllipsisVerticalIcon className="h-5 w-5" aria-hidden="true" />
+              </MenuButton>
+              <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-sm border border-border bg-surface focus:outline-none">
                 {explorerLinks.map(link => (
-                  <a
-                    key={link.type}
-                    href={link.url!}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block opacity-70 transition-opacity hover:opacity-100"
-                    aria-label={link.label}
-                  >
-                    <link.icon className="h-5 w-5" />
-                  </a>
+                  <MenuItem key={link.type}>
+                    <a
+                      href={link.url!}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-background"
+                    >
+                      <link.icon className="h-4 w-4" />
+                      {link.label}
+                    </a>
+                  </MenuItem>
                 ))}
-              </div>
-              {/* Mobile: Show dropdown menu */}
-              <Menu as="div" className="relative sm:hidden">
-                <MenuButton className="inline-flex items-center rounded-sm p-1 opacity-70 transition-opacity hover:opacity-100">
-                  <EllipsisVerticalIcon className="h-5 w-5" aria-hidden="true" />
-                </MenuButton>
-                <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-sm border border-border bg-surface shadow-lg focus:outline-none">
-                  {explorerLinks.map(link => (
-                    <MenuItem key={link.type}>
-                      <a
-                        href={link.url!}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-background"
-                      >
-                        <link.icon className="h-4 w-4" />
-                        {link.label}
-                      </a>
-                    </MenuItem>
-                  ))}
-                </MenuItems>
-              </Menu>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Card content */}
-      <div className="p-6">
+              </MenuItems>
+            </Menu>
+          </>
+        )
+      }
+    >
+      <div>
         <div className="flex flex-col gap-6 lg:flex-row">
           <div className="flex-1 space-y-6">
             {/* Status Section */}
             <div className="flex flex-wrap items-center gap-2">
-              <Badge color={wasBlockSeen ? 'green' : 'red'} variant="border">
+              <Badge color={wasBlockSeen ? 'gray' : 'red'} variant="border">
                 {wasBlockSeen ? 'Block Seen' : 'Block Not Seen'}
               </Badge>
               <Badge color={status.color} variant="border">
@@ -386,6 +384,6 @@ export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: S
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

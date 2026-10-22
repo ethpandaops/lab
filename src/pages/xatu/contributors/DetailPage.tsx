@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fctNodeActiveLast24hServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { FctNodeActiveLast24h } from '@/api/types.gen';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { Button } from '@/components/Elements/Button';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
@@ -178,7 +179,7 @@ export function DetailPage(): JSX.Element {
         <UserDetailsSkeleton />
         {!isLoading && slotPlayerLoading && (
           <div className="mt-8">
-            <h2 className="mb-4 text-2xl/8 font-bold text-foreground">Live Metrics</h2>
+            <h2 className="mb-4 text-lg/7 font-semibold text-foreground">Live Metrics</h2>
             <MetricsSkeleton />
           </div>
         )}
@@ -207,8 +208,8 @@ export function DetailPage(): JSX.Element {
     return (
       <Container>
         <Header title="Contributor Details" />
-        <div className="rounded-sm border border-border bg-surface/50 p-12 text-center backdrop-blur-sm">
-          <h2 className="mb-2 text-2xl/8 font-bold text-foreground">Contributor not found</h2>
+        <div className="rounded-sm border border-border bg-surface p-12 text-center">
+          <h2 className="mb-2 text-lg/7 font-semibold text-foreground">Contributor not found</h2>
           <p className="mb-4 text-muted">No active nodes found for &quot;{id}&quot; in the last 24 hours.</p>
           <Link to="/xatu/contributors" className="text-primary hover:underline">
             ← Back to all contributors
@@ -239,7 +240,7 @@ export function DetailPage(): JSX.Element {
     <Container>
       {/* Compact Profile Header */}
       <div className="mb-6 flex flex-wrap items-center gap-3">
-        <h1 className="text-3xl/9 font-bold text-foreground">{username}</h1>
+        <Header title={username} size="lg" className="mb-0" />
         <span
           className={`inline-flex shrink-0 items-center rounded-sm px-1.5 py-0.5 text-xs font-medium inset-ring ${getClassificationBadgeClasses(classification)}`}
         >
@@ -287,18 +288,15 @@ export function DetailPage(): JSX.Element {
       <Table data={showAllNodes ? nodes : nodes.slice(0, 5)} columns={nodeColumns} variant="nested" />
       {nodes.length > 5 && (
         <div className="mt-4 text-center">
-          <button
-            onClick={() => setShowAllNodes(!showAllNodes)}
-            className="text-sm/6 font-medium text-primary hover:underline"
-          >
+          <Button variant="secondary" size="sm" onClick={() => setShowAllNodes(!showAllNodes)}>
             {showAllNodes ? 'Show Less' : `Show More (${nodes.length - 5} more)`}
-          </button>
+          </Button>
         </div>
       )}
 
       {/* Live Metrics Section */}
       <div className="mt-12">
-        <h2 className="mb-6 text-2xl/8 font-bold text-foreground">Propagation Latency Metrics</h2>
+        <h2 className="mb-6 text-lg/7 font-semibold text-foreground">Propagation Latency Metrics</h2>
 
         <div className="mb-6">
           <SlotPlayerControls />

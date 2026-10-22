@@ -45,7 +45,7 @@ function GasInfoTooltip({ type, className }: { type: GasType; className?: string
       </button>
 
       {isVisible && (
-        <div className="absolute bottom-full left-1/2 z-50 mb-2 w-64 -translate-x-1/2 rounded-xs border border-border bg-background p-3 shadow-lg">
+        <div className="absolute bottom-full left-1/2 z-50 mb-2 w-64 -translate-x-1/2 rounded-sm border border-border bg-background p-3">
           <div className="mb-1 text-sm font-medium text-foreground">{explanation.title}</div>
           <div className="text-xs text-muted">{explanation.description}</div>
           <div className="absolute -bottom-1 left-1/2 size-2 -translate-x-1/2 rotate-45 border-r border-b border-border bg-background" />

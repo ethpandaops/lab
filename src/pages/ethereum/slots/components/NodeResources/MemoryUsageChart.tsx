@@ -2,7 +2,7 @@ import { type JSX, useCallback, useMemo, useState } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { SeriesData, MarkLineConfig } from '@/components/Charts/MultiLine/MultiLine.types';
-import { getDataVizColors, getClientLayer } from '@/utils';
+import { getDataVizColors, getClientLayer, getClientColor } from '@/utils';
 import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
@@ -154,7 +154,7 @@ export function MemoryUsageChart({
       chartSeries.push({
         name: capitalize(resolvedClClient || 'CL'),
         data: toPoints(bucketData(clData)),
-        color: CHART_CATEGORICAL_COLORS[0],
+        color: resolvedClClient ? getClientColor(resolvedClClient, 0) : CHART_CATEGORICAL_COLORS[0],
         lineWidth: 2,
         showArea: true,
         areaOpacity: 0.08,
@@ -164,7 +164,7 @@ export function MemoryUsageChart({
       chartSeries.push({
         name: capitalize(resolvedElClient || 'EL'),
         data: toPoints(bucketData(elData)),
-        color: CHART_CATEGORICAL_COLORS[1],
+        color: resolvedElClient ? getClientColor(resolvedElClient, 1) : CHART_CATEGORICAL_COLORS[1],
         lineWidth: 2,
         showArea: true,
         areaOpacity: 0.08,

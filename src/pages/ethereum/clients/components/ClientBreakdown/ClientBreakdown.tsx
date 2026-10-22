@@ -28,11 +28,11 @@ export function ClientBreakdown({
   onSelect,
 }: ClientBreakdownProps): JSX.Element {
   return (
-    <Card rounded header={<h3 className="text-sm/6 font-semibold text-foreground">{title}</h3>}>
+    <Card rounded title={title}>
       {summaries.length === 0 ? (
         <p className="text-sm text-muted">No blocks in this window.</p>
       ) : (
-        <ul className="flex flex-col gap-1">
+        <ul className="-mx-2 flex flex-col gap-0.5">
           {summaries.map((summary, index) => {
             const isUnknown = summary.client === UNKNOWN_CLIENT;
             const share = identifiedOnly ? summary.identifiedShare : summary.share;

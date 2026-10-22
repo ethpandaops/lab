@@ -12,6 +12,8 @@ import { formatEpoch } from '@/utils';
 import { useEntitiesData } from './hooks';
 import { EntitiesSkeleton } from './components/EntitiesSkeleton';
 
+const DESCRIPTION = 'Track validator entities and their performance on the Ethereum beacon chain';
+
 /**
  * Entities list page - displays Ethereum validator entities
  *
@@ -83,10 +85,7 @@ export function IndexPage(): React.JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header
-          title="Entities"
-          description="Track validator entities and their performance on the Ethereum beacon chain"
-        />
+        <Header title="Entities" description={DESCRIPTION} />
         <EntitiesSkeleton />
       </Container>
     );
@@ -95,10 +94,7 @@ export function IndexPage(): React.JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header
-          title="Entities"
-          description="Track validator entities and their performance on the Ethereum beacon chain"
-        />
+        <Header title="Entities" description={DESCRIPTION} />
         <Alert variant="error" title="Error loading entities" description={error.message} />
       </Container>
     );
@@ -106,10 +102,7 @@ export function IndexPage(): React.JSX.Element {
 
   return (
     <Container>
-      <Header
-        title="Entities"
-        description="Track validator entities and their performance on the Ethereum beacon chain"
-      />
+      <Header title="Entities" description={DESCRIPTION} />
 
       <div className="mt-6">
         <Input>
@@ -145,7 +138,7 @@ export function IndexPage(): React.JSX.Element {
                 <span
                   className={
                     row.statusType === 'online'
-                      ? 'font-medium text-success'
+                      ? 'font-medium text-foreground'
                       : row.statusType === 'degraded'
                         ? 'font-medium text-warning'
                         : 'font-medium text-danger'
@@ -167,7 +160,7 @@ export function IndexPage(): React.JSX.Element {
                     row.attestationRateValue < 0.95
                       ? 'text-warning'
                       : row.attestationRateValue >= 0.99
-                        ? 'text-success'
+                        ? 'text-foreground'
                         : 'text-muted'
                   }
                 >

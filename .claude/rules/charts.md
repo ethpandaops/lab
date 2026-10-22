@@ -2,15 +2,20 @@
 
 ## Visual Standards
 
-**Axis Lines:**
+**Axes and grid** (set by the core components; wrappers don't override them):
 
-- **ALWAYS** render both y-axis and x-axis lines unless specifically not needed
-- Set `axisLine: { show: true }` for both xAxis and yAxis
+- The category / time axis draws its axis line; the value axis has no axis line
+- Value axes draw hairline split lines in `border`; category axes draw none
+- Value-axis numbers are compact from 10,000 up ("40M", "1.2B") via `formatAxisNumber` in `chartChrome.ts`; pass a `formatter` only for units (%, ms, ETH)
+- Date category labels ("Jan 15 '24") tick on calendar boundaries — years, quarters, months, weeks or days, picked for the chart's width (`dateCategoryTicks`). Don't thin labels yourself
 
-**Grid Lines:**
+**Marks:**
 
-- **NEVER** render grid lines
-- Set `splitLine: { show: false }` for both xAxis and yAxis
+- Lines default to 1.5px; series over 600 points are LTTB-sampled to the plot's resolution
+- Share stacks (every layer filled) render as opaque bands; confidence bands (`createBandSeries`) stay translucent
+- Fork and other mark lines draw at half strength with title-case names; crowded marks merge into one label ("Istanbul · Muir Glacier", or "Fusaka +2" for three or more)
+- The legend is one wrapping row of groups; swatches match the mark (line, dashed line, or block for areas and bands)
+- The zoom track only appears once a chart is zoomed
 
 **Axis Ranges & Intervals:**
 

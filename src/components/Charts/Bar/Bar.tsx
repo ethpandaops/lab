@@ -7,6 +7,16 @@ import { CanvasRenderer } from 'echarts/renderers';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { BarChartProps } from './Bar.types';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
+import {
+  getChartAxisLabelStyle,
+  formatAxisNumber,
+  getChartAxisLine,
+  getChartAxisNameStyle,
+  getChartTooltipChrome,
+  getChartValueAxisName,
+  getChartValueSplitLine,
+} from '../chartChrome';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -46,7 +56,7 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
     data = [],
     labels = [],
     title,
-    titleFontSize = 16,
+    titleFontSize = 14,
     titleFontFamily,
     titleFontWeight = 600,
     titleLeft = 'center',
@@ -98,48 +108,28 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
     const valueAxisConfig = {
       type: 'value' as const,
       name: axisName,
-      nameLocation: 'middle' as const,
-      nameGap: isHorizontal ? 40 : 50,
-      nameTextStyle: {
-        color: themeColors.foreground,
-        fontSize: 12,
-      },
+      ...(isHorizontal
+        ? { nameLocation: 'middle' as const, nameGap: 40, nameTextStyle: getChartAxisNameStyle(themeColors) }
+        : getChartValueAxisName(themeColors)),
       max,
       splitNumber,
-      axisLine: {
-        show: true,
-        lineStyle: {
-          color: themeColors.border,
-        },
-      },
-      axisTick: {
-        show: false,
-      },
+      axisLine: { show: false },
+      axisTick: { show: false },
       axisLabel: {
-        color: themeColors.muted,
-        fontSize: 11,
-        formatter: valueAxisLabelFormatter,
+        ...getChartAxisLabelStyle(themeColors),
+        formatter: valueAxisLabelFormatter ?? formatAxisNumber,
       },
-      splitLine: {
-        show: false,
-      },
+      splitLine: getChartValueSplitLine(themeColors),
     };
 
     const categoryAxisConfig = {
       type: 'category' as const,
       data: labels,
-      axisLine: {
-        show: true,
-        lineStyle: {
-          color: themeColors.border,
-        },
-      },
-      axisTick: {
-        show: false,
-      },
+      axisLine: getChartAxisLine(themeColors),
+      axisTick: { show: false },
       axisLabel: {
-        color: themeColors.foreground,
-        fontSize: 11,
+        ...getChartAxisLabelStyle(themeColors),
+        hideOverlap: true,
         interval: categoryLabelInterval,
       },
       splitLine: {
@@ -149,7 +139,7 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
 
     // Calculate grid padding based on orientation and axis names
     const gridPadding = {
-      top: title ? 52 : 16,
+      top: title ? 52 : !isHorizontal && axisName ? 32 : 16,
       right: isHorizontal && axisName ? 50 : 24,
       bottom: !isHorizontal && axisName ? 60 : 50,
       left: isHorizontal && axisName ? 60 : 60,
@@ -201,13 +191,7 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
       ],
       tooltip: {
         trigger: 'axis' as const,
-        backgroundColor: themeColors.background,
-        borderColor: themeColors.border,
-        borderWidth: 1,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
+        ...getChartTooltipChrome(themeColors),
         formatter: tooltipFormatter,
       },
     };
@@ -233,15 +217,13 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
     tooltipFormatter,
     categoryLabelInterval,
     valueAxisLabelFormatter,
-    themeColors.foreground,
-    themeColors.border,
-    themeColors.muted,
-    themeColors.background,
+    themeColors,
   ]);
 
   return (
     <div className={_height === '100%' ? 'h-full w-full' : 'w-full'}>
       <ReactEChartsCore
+        theme={ECHARTS_THEME}
         ref={ref}
         echarts={echarts}
         option={option}

@@ -4,6 +4,7 @@ import { fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions } from '@/ap
 import type { FctNodeActiveLast24h } from '@/api/types.gen';
 import { Alert } from '@/components/Feedback/Alert';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
+import { ChartEmptyState } from '../ChartEmptyState';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { formatSlot, meetsMinVersion } from '@/utils';
 import { useLatencyChartSeries } from '../../hooks/useLatencyChartData';
@@ -95,11 +96,7 @@ export function DataColumnLatencyChart({ username, nodes }: DataColumnLatencyCha
       );
     }
 
-    return (
-      <div className="flex h-[400px] items-center justify-center rounded-sm border border-border bg-surface text-muted">
-        No data column data available for this time range
-      </div>
-    );
+    return <ChartEmptyState subject="data column" />;
   }
 
   return (

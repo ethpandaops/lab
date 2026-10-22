@@ -139,7 +139,7 @@ function SidebarFooter({
             <XIcon className="size-4" />
           </a>
         </div>
-        {window.__VERSION__ && <span className="text-[10px] text-muted/60">{window.__VERSION__.version}</span>}
+        {window.__VERSION__ && <span className="text-2xs text-muted/60">{window.__VERSION__.version}</span>}
         <button
           type="button"
           onClick={onToggleCollapse}
@@ -220,11 +220,11 @@ function NavLink({ page, collapsed }: { page: NavItem; collapsed: boolean }): JS
       preloadDelay={100}
       title={collapsed ? page.name : undefined}
       className={clsx(
-        'group flex items-center gap-x-3 rounded-sm text-muted transition-all hover:bg-primary/10 hover:text-primary',
+        'group flex items-center gap-x-2.5 rounded-sm text-muted transition-colors hover:bg-foreground/5 hover:text-foreground',
         collapsed ? 'justify-center p-2' : 'px-2 py-1 text-sm/5 font-medium'
       )}
       activeProps={{
-        className: 'bg-primary/10 text-primary shadow-xs ring-1 ring-primary/20',
+        className: 'bg-foreground/[0.07] !text-foreground [&>svg]:text-primary',
       }}
     >
       <Icon className="size-4 shrink-0" />
@@ -271,7 +271,7 @@ function SubsectionHeader({ title, collapsed }: { title: string; collapsed: bool
     return null as unknown as JSX.Element;
   }
 
-  return <div className="mb-1 ml-1 text-[10px] font-semibold tracking-wider text-muted/60 uppercase">{title}</div>;
+  return <div className="mb-1 ml-1 text-2xs font-semibold tracking-wider text-muted/60 uppercase">{title}</div>;
 }
 
 export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }: SidebarProps): JSX.Element {
@@ -304,7 +304,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
       <Dialog open={sidebarOpen} onClose={setSidebarOpen} className="relative z-30 lg:hidden">
         <DialogBackdrop
           transition
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm transition-opacity duration-300 ease-linear data-closed:opacity-0"
+          className="fixed inset-0 bg-background transition-opacity duration-300 ease-linear data-closed:opacity-0"
         />
 
         <div className="fixed inset-0 flex pt-16">
@@ -312,7 +312,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
             transition
             className="relative flex w-full flex-1 transform transition duration-300 ease-in-out data-closed:-translate-x-full"
           >
-            <div className="relative flex grow flex-col bg-surface/95 backdrop-blur-xl">
+            <div className="relative flex grow flex-col bg-background">
               <div className="flex grow flex-col gap-y-4 overflow-y-auto px-4 pt-4">
                 <div className="mb-2">
                   <NetworkSelect showLabel={false} />
@@ -401,14 +401,14 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
       {/* Static sidebar for desktop */}
       <div
         className={clsx(
-          'hidden border-r border-border bg-surface/95 backdrop-blur-xl transition-all duration-200 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col',
+          'hidden border-r border-border bg-background transition-all duration-200 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col',
           collapsed ? 'lg:w-14' : 'lg:w-56'
         )}
       >
         {/* Header */}
         <div
           className={clsx(
-            'flex h-12 shrink-0 items-center border-b border-border/50',
+            'flex h-12 shrink-0 items-center border-b border-border',
             collapsed ? 'justify-center px-2' : 'justify-between px-3'
           )}
         >
@@ -416,8 +416,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
             <img alt="Lab Logo" src="/images/lab.png" className="h-7 w-auto" />
             {!collapsed && (
               <div className="flex flex-col">
-                <span className="font-sans text-lg leading-tight font-bold text-foreground">The Lab</span>
-                <span className="text-[10px] leading-tight text-muted">lab.ethpandaops.io</span>
+                <span className="font-display text-lg leading-tight font-bold text-foreground">The Lab</span>
+                <span className="text-2xs leading-tight text-muted">lab.ethpandaops.io</span>
               </div>
             )}
           </Link>

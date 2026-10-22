@@ -2,7 +2,7 @@ import { type JSX, useCallback, useMemo, useState } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { SeriesData, MarkLineConfig } from '@/components/Charts/MultiLine/MultiLine.types';
-import { getDataVizColors, getClientLayer } from '@/utils';
+import { getDataVizColors, getClientLayer, getClientColor } from '@/utils';
 import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
@@ -172,8 +172,8 @@ export function CpuUtilizationChart({
 
       const clLabel = capitalize(resolvedClClient || 'CL');
       const elLabel = capitalize(resolvedElClient || 'EL');
-      const clColor = CHART_CATEGORICAL_COLORS[0];
-      const elColor = CHART_CATEGORICAL_COLORS[1];
+      const clColor = resolvedClClient ? getClientColor(resolvedClClient, 0) : CHART_CATEGORICAL_COLORS[0];
+      const elColor = resolvedElClient ? getClientColor(resolvedElClient, 1) : CHART_CATEGORICAL_COLORS[1];
 
       const clBuckets = bucketData(clData);
       const elBuckets = bucketData(elData);

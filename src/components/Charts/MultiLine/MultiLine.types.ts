@@ -348,6 +348,12 @@ export interface MultiLineChartProps {
    */
   enableDataZoom?: boolean;
   /**
+   * Show the range slider under the chart when zoom is enabled. Turn off for charts that share a
+   * syncGroup with a chart that already shows one; wheel and drag zoom still work.
+   * @default true
+   */
+  showDataZoomSlider?: boolean;
+  /**
    * Custom tooltip formatter
    */
   tooltipFormatter?: (params: unknown) => string;
@@ -428,6 +434,12 @@ export interface MultiLineChartProps {
    * @default true
    */
   notMerge?: boolean;
+  /**
+   * Label each plain line with its series name at its right end.
+   * Skipped for stacked, area, bar and helper series, for a single line, and when more than 8 lines are shown.
+   * @default true
+   */
+  endLabels?: boolean;
   /**
    * Callback when a series line is clicked
    * @param seriesName - The name of the clicked series

@@ -1,6 +1,8 @@
 import { type JSX, useState, useMemo } from 'react';
 import clsx from 'clsx';
+import { Button } from '@/components/Elements/Button';
 import { Card } from '@/components/Layout/Card';
+import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { RESOURCE_COLORS } from '../../utils/resourceGas';
 import type { OpcodeResourceRow } from '../../utils/resourceGas';
 
@@ -87,8 +89,8 @@ export function ResourceGasTable({ rows, maxRows = 20, loading = false }: Resour
 
   if (loading) {
     return (
-      <Card className="p-4">
-        <div className="h-48 animate-pulse rounded-xs bg-surface" />
+      <Card>
+        <LoadingContainer className="h-48 rounded-xs" />
       </Card>
     );
   }
@@ -127,17 +129,18 @@ export function ResourceGasTable({ rows, maxRows = 20, loading = false }: Resour
   );
 
   return (
-    <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-foreground">Resource Details</h3>
+    <Card
+      title="Resource Details"
+      actions={
         <input
           type="text"
           placeholder="Search opcodes..."
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
-          className="rounded-xs border border-border bg-surface px-3 py-1.5 text-sm text-foreground placeholder:text-muted focus:border-primary focus:outline-none"
+          className="h-8 rounded-sm border border-border bg-surface px-3 text-sm text-foreground placeholder:text-muted focus:border-primary focus:outline-none"
         />
-      </div>
+      }
+    >
       <div className="overflow-hidden rounded-sm border border-border">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-border">
@@ -177,18 +180,12 @@ export function ResourceGasTable({ rows, maxRows = 20, loading = false }: Resour
 
         {hasMore && (
           <div className="flex justify-center border-t border-border py-4">
-            <button
-              onClick={() => setShowAll(true)}
-              className="flex items-center gap-2 rounded-sm border border-border bg-surface px-4 py-2 text-sm text-foreground transition-colors hover:bg-background"
-            >
+            <Button variant="secondary" size="sm" onClick={() => setShowAll(true)}>
               Show All ({remainingCount} more)
-              <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
+            </Button>
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

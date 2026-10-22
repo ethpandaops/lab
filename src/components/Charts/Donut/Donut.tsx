@@ -7,6 +7,8 @@ import { CanvasRenderer } from 'echarts/renderers';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { DonutProps } from './Donut.types';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
+import { getChartTooltipChrome } from '../chartChrome';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -54,7 +56,7 @@ export const Donut = forwardRef<ReactEChartsCore, DonutProps>(function Donut(
     data = [],
     height = 400,
     title,
-    titleFontSize = 16,
+    titleFontSize = 14,
     titleFontFamily,
     titleFontWeight = 600,
     titleLeft = 'center',
@@ -158,13 +160,7 @@ export const Donut = forwardRef<ReactEChartsCore, DonutProps>(function Donut(
         : undefined,
       tooltip: {
         trigger: 'item',
-        backgroundColor: themeColors.surface,
-        borderColor: themeColors.border,
-        borderWidth: 1,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
+        ...getChartTooltipChrome(themeColors),
         formatter: '{b}: {c} ({d}%)',
       },
       legend: legendConfig,
@@ -190,14 +186,9 @@ export const Donut = forwardRef<ReactEChartsCore, DonutProps>(function Donut(
             label: {
               show: showCenterValue,
               fontSize: centerValueFontSize,
-              fontWeight: 'bold',
+              fontWeight: 600,
               color: themeColors.foreground,
               formatter: '{d}%',
-            },
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: 'rgba(0, 0, 0, 0.3)',
             },
           },
           labelLine: {
@@ -228,14 +219,13 @@ export const Donut = forwardRef<ReactEChartsCore, DonutProps>(function Donut(
     showCenterValue,
     centerValueFontSize,
     animationDuration,
-    themeColors.foreground,
-    themeColors.border,
-    themeColors.surface,
+    themeColors,
   ]);
 
   return (
     <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
       <ReactEChartsCore
+        theme={ECHARTS_THEME}
         ref={ref}
         echarts={echarts}
         option={option}

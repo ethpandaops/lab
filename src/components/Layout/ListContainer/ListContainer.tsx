@@ -29,17 +29,15 @@ const variantStyles: Record<
 > = {
   simple: {
     list: '',
-    listWithDividers: 'divide-y divide-border dark:divide-border',
+    listWithDividers: 'divide-y divide-border',
     item: '',
     itemMobileFull: 'px-4 sm:px-0',
   },
   card: {
-    wrapper:
-      'overflow-hidden bg-surface shadow-sm dark:bg-surface dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
-    wrapperMobileFull:
-      'overflow-hidden bg-surface shadow-sm sm:rounded-sm dark:bg-surface dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
+    wrapper: 'overflow-hidden rounded-sm bg-surface outline -outline-offset-1 outline-border',
+    wrapperMobileFull: 'overflow-hidden bg-surface outline -outline-offset-1 outline-border sm:rounded-sm',
     list: '',
-    listWithDividers: 'divide-y divide-border dark:divide-border',
+    listWithDividers: 'divide-y divide-border',
     item: 'px-6',
     itemMobileFull: 'px-4 sm:px-6',
   },
@@ -48,15 +46,14 @@ const variantStyles: Record<
     wrapperMobileFull:
       'overflow-hidden border border-border bg-surface sm:rounded-sm dark:border-border dark:bg-background',
     list: '',
-    listWithDividers: 'divide-y divide-border dark:divide-border',
+    listWithDividers: 'divide-y divide-border',
     item: 'px-6',
     itemMobileFull: 'px-4 sm:px-6',
   },
   separate: {
     list: 'space-y-3',
-    item: 'overflow-hidden bg-surface px-6 shadow-sm dark:bg-surface dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
-    itemMobileFull:
-      'overflow-hidden bg-surface px-4 shadow-sm sm:rounded-sm sm:px-6 dark:bg-surface dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
+    item: 'overflow-hidden rounded-sm bg-surface px-6 outline -outline-offset-1 outline-border',
+    itemMobileFull: 'overflow-hidden bg-surface px-4 outline -outline-offset-1 outline-border sm:rounded-sm sm:px-6',
   },
 };
 

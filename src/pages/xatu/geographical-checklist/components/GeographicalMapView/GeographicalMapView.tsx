@@ -11,6 +11,7 @@ import { MapPinIcon } from '@heroicons/react/20/solid';
 import { getClassificationBadgeClasses, getRelativeTime, getCountryFlag } from '@/utils';
 import type { GeographicalMapViewProps } from './GeographicalMapView.types';
 import type { ProcessedNode } from '../../hooks/useGeographicalData/useGeographicalData.types';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 interface PointData {
   name?: string;
@@ -223,6 +224,7 @@ export function GeographicalMapView({ nodes, isLoading }: GeographicalMapViewPro
   return (
     <>
       <ReactECharts
+        theme={ECHARTS_THEME}
         ref={chartRef}
         option={option}
         style={{ height: 600, width: '100%' }}
@@ -256,7 +258,7 @@ export function GeographicalMapView({ nodes, isLoading }: GeographicalMapViewPro
                     : node.meta_client_geo_country || 'Unknown';
 
                 return (
-                  <li key={`${node.username}-${index}`} className="rounded-lg border border-border bg-surface p-4">
+                  <li key={`${node.username}-${index}`} className="rounded-sm border border-border bg-surface p-4">
                     <div className="flex items-center gap-x-3">
                       {node.username ? (
                         <Link

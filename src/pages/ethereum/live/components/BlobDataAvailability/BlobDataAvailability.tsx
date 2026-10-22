@@ -150,7 +150,7 @@ function BlobDataAvailabilityComponent({
     return (
       <div className={clsx('flex h-full flex-col bg-surface p-3', className)}>
         <div className="mb-2 shrink-0">
-          <h3 className="text-sm font-semibold text-foreground uppercase">Blob First Seen</h3>
+          <h3 className="text-sm/6 font-semibold text-foreground">Blob first seen</h3>
         </div>
         <div className="min-h-0 flex-1">
           <ScatterAndLineChart
@@ -174,7 +174,7 @@ function BlobDataAvailabilityComponent({
     return (
       <div className={clsx('flex h-full flex-col bg-surface p-3', className)}>
         <div className="mb-2 shrink-0">
-          <h3 className="text-sm font-semibold text-foreground uppercase">Continental Propagation</h3>
+          <h3 className="text-sm/6 font-semibold text-foreground">Continental propagation</h3>
         </div>
         <div className="min-h-0 flex-1">
           <MultiLineChart
@@ -201,7 +201,7 @@ function BlobDataAvailabilityComponent({
         {/* First Seen Chart */}
         <div className="flex h-full flex-col border-r border-border bg-background p-3">
           <div className="mb-2 shrink-0">
-            <h3 className="text-sm font-semibold text-foreground uppercase">Blob First Seen</h3>
+            <h3 className="text-sm/6 font-semibold text-foreground">Blob first seen</h3>
           </div>
           <div className="min-h-0 flex-1">
             <ScatterAndLineChart
@@ -221,7 +221,7 @@ function BlobDataAvailabilityComponent({
         {/* Continental Propagation Chart */}
         <div className="flex h-full flex-col bg-background p-3">
           <div className="mb-2 shrink-0">
-            <h3 className="text-sm font-semibold text-foreground uppercase">Continental Propagation</h3>
+            <h3 className="text-sm/6 font-semibold text-foreground">Continental propagation</h3>
           </div>
           <div className="min-h-0 flex-1">
             <MultiLineChart

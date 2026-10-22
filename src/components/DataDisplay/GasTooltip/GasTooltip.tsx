@@ -76,7 +76,7 @@ export function GasTooltip({
     <div
       id={`gas-tooltip-${type}`}
       role="tooltip"
-      className="fixed z-[9999] w-72 -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background p-3 shadow-lg"
+      className="fixed z-[9999] w-72 -translate-x-1/2 -translate-y-full rounded-sm border border-border bg-background p-3"
       style={{ top: position.top, left: position.left }}
     >
       {customContent ?? (

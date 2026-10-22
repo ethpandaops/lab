@@ -52,9 +52,9 @@ function getColorClasses(color: GasFormulaColor): { border: string; bg: string; 
     case 'purple':
       return { border: 'border-purple-500/30', bg: 'bg-purple-500/5', text: 'text-purple-400' };
     case 'green':
-      return { border: 'border-green-500/30', bg: 'bg-green-500/5', text: 'text-green-400' };
+      return { border: 'border-success/30', bg: 'bg-success/5', text: 'text-success' };
     case 'amber':
-      return { border: 'border-amber-500/30', bg: 'bg-amber-500/5', text: 'text-amber-400' };
+      return { border: 'border-warning/30', bg: 'bg-warning/5', text: 'text-warning' };
     case 'cyan':
       return { border: 'border-cyan-500/30', bg: 'bg-cyan-500/5', text: 'text-cyan-400' };
     default:
@@ -72,9 +72,9 @@ function getValueColor(color: GasFormulaColor): string {
     case 'purple':
       return 'text-purple-500';
     case 'green':
-      return 'text-green-500';
+      return 'text-success';
     case 'amber':
-      return 'text-amber-500';
+      return 'text-warning';
     case 'cyan':
       return 'text-cyan-500';
     default:

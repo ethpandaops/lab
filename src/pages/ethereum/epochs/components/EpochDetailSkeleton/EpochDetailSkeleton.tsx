@@ -1,6 +1,8 @@
 import type { JSX } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
+import { Card } from '@/components/Layout/Card';
+import { Stats } from '@/components/DataDisplay/Stats';
 import { Table } from '@/components/Lists/Table';
 import { Button } from '@/components/Elements/Button';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
@@ -52,44 +54,26 @@ export function EpochDetailSkeleton({ epoch }: EpochDetailSkeletonProps): JSX.El
       </div>
 
       {/* Epoch Header Skeleton */}
-      <div className="overflow-hidden rounded-sm border border-border bg-surface">
-        {/* Header section */}
-        <div className="border-b border-border bg-background px-6 py-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-6">
-              {/* EpochArt skeleton */}
-              <div className="shrink-0">
-                <LoadingContainer className="size-20 rounded-sm" />
-              </div>
-
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight text-foreground">Epoch {formatEpoch(epoch)}</h1>
-                <div className="mt-1">
-                  <LoadingContainer className="h-5 w-56 rounded-sm" />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              <LoadingContainer className="size-8 rounded-sm" />
-              <LoadingContainer className="size-8 rounded-sm" />
-              <LoadingContainer className="size-8 rounded-sm" />
-            </div>
+      <Card
+        title={`Epoch ${formatEpoch(epoch)}`}
+        subtitle={<LoadingContainer className="mt-0.5 h-4 w-56 rounded-xs" />}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <LoadingContainer className="size-8 rounded-sm" />
+            <LoadingContainer className="size-8 rounded-sm" />
+            <LoadingContainer className="size-8 rounded-sm" />
           </div>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4 p-6 sm:grid-cols-4">
-          {['Blocks', 'P95 Block Arrival', 'Attestation Participation', 'Missed Attestations'].map(label => (
-            <div key={label} className="rounded-sm border border-border bg-background p-4">
-              <dt className="text-xs font-medium text-muted">{label}</dt>
-              <dd className="mt-1">
-                <LoadingContainer className="h-6 w-16 rounded-sm" />
-              </dd>
-            </div>
-          ))}
-        </div>
-      </div>
+        }
+      >
+        <Stats
+          gridClassName="grid grid-cols-2 sm:grid-cols-4"
+          stats={['Blocks', 'P95 Block Arrival', 'Attestation Participation', 'Missed Attestations'].map(label => ({
+            id: label,
+            name: label,
+            value: '-',
+          }))}
+        />
+      </Card>
 
       {/* Tabbed Content Skeleton */}
       <div className="mt-8">

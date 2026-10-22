@@ -16,10 +16,124 @@ import {
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { hexToRgba, formatSmartDecimal, getDataVizColors, resolveCssColorToHex } from '@/utils';
+import { CHART_FONT_FAMILY } from '@/utils/dataVizColors';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { SharedCrosshairsContext } from '@/contexts/SharedCrosshairsContext';
 import { Disclosure } from '@/components/Layout/Disclosure';
 import type { MultiLineChartProps } from './MultiLine.types';
+import { dateCategoryTicks } from './MultiLine.utils';
+import { formatAxisNumber } from '../chartChrome';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
+
+/** Maximum number of plain lines that get an end-of-line label */
+const MAX_END_LABELS = 8;
+
+/** Last non-null y value of a series, whatever shape its data takes */
+function lastValue(data: unknown[]): number | null {
+  for (let i = data.length - 1; i >= 0; i--) {
+    const point = data[i];
+    const y = Array.isArray(point)
+      ? point[1]
+      : point !== null && typeof point === 'object'
+        ? (point as { value?: unknown }).value
+        : point;
+    const value = Array.isArray(y) ? y[1] : y;
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+  }
+  return null;
+}
+
+/** Pixel gap end labels need between them (11px text plus breathing room) */
+const END_LABEL_GAP_PX = 18;
+
+/** Legend key drawn like the mark it names: a filled block for areas and bands, a line (dashed when the series is) otherwise */
+function LegendSwatch({
+  series,
+  color,
+  active,
+}: {
+  series: { showArea?: boolean; lineStyle?: string; lineWidth?: number; seriesType?: string };
+  color: string;
+  active: boolean;
+}): React.JSX.Element {
+  const block = series.seriesType === 'bar' || (series.showArea && series.lineWidth === 0);
+  return block ? (
+    <span
+      aria-hidden
+      className="size-2.5 rounded-xs transition-opacity"
+      style={{ backgroundColor: color, opacity: active ? 0.9 : 0.25 }}
+    />
+  ) : (
+    <span
+      aria-hidden
+      className="w-3 transition-opacity"
+      style={{
+        borderTop: `2px ${series.lineStyle === 'dotted' ? 'dotted' : series.lineStyle === 'dashed' ? 'dashed' : 'solid'} ${color}`,
+        opacity: active ? 1 : 0.3,
+      }}
+    />
+  );
+}
+
+/**
+ * Label for marks that share one spot: two names read as a pair ("Petersburg · Constantinople");
+ * three or more name the first and count the rest, so a column of forks stays one short label
+ */
+function mergedMarkLabel(names: string[]): string {
+  return names.length > 2 ? `${names[0]} +${names.length - 1}` : names.join(' · ');
+}
+
+/** `color` laid over `base` at `alpha`, as an opaque hex colour */
+function blendHex(color: string, base: string, alpha: number): string {
+  const rgb = (hex: string): number[] => {
+    const h = hex.replace('#', '');
+    const full = h.length === 3 ? h.replace(/./g, c => c + c) : h.slice(0, 6);
+    return [0, 2, 4].map(i => parseInt(full.slice(i, i + 2), 16));
+  };
+  const [a, b] = [rgb(color), rgb(base)];
+  if (a.some(Number.isNaN) || b.some(Number.isNaN)) return hexToRgba(color, alpha);
+  return `#${a
+    .map((v, i) =>
+      Math.round(v * alpha + b[i] * (1 - alpha))
+        .toString(16)
+        .padStart(2, '0')
+    )
+    .join('')}`;
+}
+
+/** Whether every pair of line ends is far enough apart, on a plot of the given height, for labels */
+function endLabelsClear(values: (number | null)[], plotHeight: number, axisMin?: number, axisMax?: number): boolean {
+  const ends = values.filter((v): v is number => v !== null).sort((a, b) => a - b);
+  if (ends.length < 2) return ends.length > 0;
+  const low = axisMin ?? Math.min(0, ends[0]);
+  const high = axisMax ?? ends[ends.length - 1];
+  const range = high - low || 1;
+  const minGap = (END_LABEL_GAP_PX / Math.max(plotHeight, 1)) * range;
+  for (let i = 1; i < ends.length; i++) {
+    if (ends[i] - ends[i - 1] < minGap) return false;
+  }
+  return true;
+}
+
+/**
+ * Value-axis bounds. 'dataMin'/'dataMax' would make ECharts start or end the axis on the raw data
+ * value (1.333…, 0.002192), so the first or last tick label is off the grid. Instead they become
+ * `scale: true`: the axis may leave out zero, and ECharts rounds the extent to whole intervals.
+ */
+function valueAxisBounds(
+  min: number | 'dataMin' | undefined,
+  max: number | 'dataMax' | undefined
+): { min?: number; max?: number; scale?: boolean } {
+  return {
+    min: min === 'dataMin' ? undefined : min,
+    max: max === 'dataMax' ? undefined : max,
+    scale: min === 'dataMin' || max === 'dataMax' ? true : undefined,
+  };
+}
+/** Narrowest chart (px) that gets end labels */
+const END_LABEL_MIN_WIDTH = 480;
+/** Minimum horizontal gap (px) between two shown mark-line labels */
+const MARK_LABEL_GAP_PX = 16;
 
 // Register ECharts components
 echarts.use([
@@ -82,6 +196,7 @@ export function MultiLineChart({
   useNativeLegend = false,
   showCard = false,
   enableDataZoom = false,
+  showDataZoomSlider = true,
   tooltipFormatter,
   tooltipTrigger = 'axis',
   tooltipMode = 'default',
@@ -95,6 +210,7 @@ export function MultiLineChart({
   relativeSlots,
   syncGroup,
   notMerge = true,
+  endLabels = true,
   onSeriesClick,
   markLines,
   markAreas,
@@ -104,6 +220,20 @@ export function MultiLineChart({
   const chartWrapperRef = useRef<ReactEChartsCore | null>(null);
   // Store the chart instance for sync cleanup
   const chartInstanceRef = useRef<EChartsInstance | null>(null);
+  // Track the chart's width so end labels only render where there is room for them
+  const [chartWidth, setChartWidth] = useState(0);
+  const isWideEnoughForEndLabels = chartWidth === 0 || chartWidth >= END_LABEL_MIN_WIDTH;
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const measureRef = useCallback((node: HTMLDivElement | null) => {
+    resizeObserverRef.current?.disconnect();
+    if (!node || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(entries => {
+      setChartWidth(Math.round(entries[0]?.contentRect.width ?? 0));
+    });
+    observer.observe(node);
+    resizeObserverRef.current = observer;
+  }, []);
+
   // Store dataZoom state to preserve zoom across data updates and legend toggles
   // Using state (not ref) ensures zoom range is included in the option config
   const [zoomRange, setZoomRange] = useState({ start: 0, end: 100 });
@@ -404,22 +534,41 @@ export function MultiLineChart({
       return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
     };
 
+    const xAxisHasName = xAxis.type === 'value' && Boolean(xAxis.name);
+    const categoryLabels = xAxis.type === 'category' ? xAxis.labels : undefined;
+    // Date labels tick on calendar boundaries (years, quarters, months, weeks), not every Nth point
+    const dateTicks =
+      categoryLabels && !xAxis.formatter
+        ? dateCategoryTicks(categoryLabels, Math.floor(((chartWidth || 800) - 80) / 75))
+        : null;
+    const categoryLabelInterval =
+      categoryLabels && new Set(categoryLabels).size < categoryLabels.length
+        ? (index: number, value: string): boolean => index === 0 || categoryLabels[index - 1] !== value
+        : undefined;
+
     const xAxisConfig = {
       type: isTimeAxis ? ('value' as const) : xAxis.type,
-      name: xAxis.name,
+      // Dates and category labels describe themselves; only numeric axes keep a name
+      name: xAxisHasName ? xAxis.name : undefined,
       nameLocation: 'middle' as const,
-      nameGap: 30,
-      nameTextStyle: { color: themeColors.muted },
+      nameGap: 28,
+      nameTextStyle: { color: themeColors.muted, fontSize: 11 },
       data: xAxis.type === 'category' ? xAxis.labels : undefined,
       boundaryGap: xAxis.type === 'category',
       axisLine: {
         show: true,
         lineStyle: { color: themeColors.border },
       },
+      axisTick: { show: false },
       axisLabel: {
         color: themeColors.muted,
+        fontSize: 11,
+        hideOverlap: true,
+        // Hourly series repeat each day's label; show only the first point of each run
+        interval: dateTicks ? (index: number): boolean => dateTicks.has(index) : categoryLabelInterval,
         formatter:
           xAxis.formatter ||
+          (dateTicks ? (value: string, index: number) => dateTicks.get(index) ?? value : undefined) ||
           (isTimeAxis ? defaultTimeFormatter : undefined) ||
           (relativeSlots ? (value: number) => formatSlotLabel(value) : undefined),
       },
@@ -433,24 +582,23 @@ export function MultiLineChart({
     // Build y-axis configuration (primary)
     const primaryYAxisConfig = {
       type: 'value' as const,
+      // Unit label sits above the axis, reading horizontally, instead of rotated alongside it
       name: yAxis?.name,
-      nameLocation: 'middle' as const,
-      nameGap: yAxis?.name ? 35 : 0,
-      nameTextStyle: { color: themeColors.muted },
-      axisLine: {
-        show: true,
-        lineStyle: { color: themeColors.border },
-      },
+      nameLocation: 'end' as const,
+      nameGap: 10,
+      nameTextStyle: { color: themeColors.muted, fontSize: 11, align: 'left' as const, padding: [0, 0, 0, -8] },
+      axisLine: { show: false },
       axisTick: { show: false },
       splitLine: {
-        show: false,
+        show: true,
+        lineStyle: { color: themeColors.border, type: 'solid' as const },
       },
       axisLabel: {
         color: themeColors.muted,
-        formatter: yAxis?.formatter,
+        fontSize: 11,
+        formatter: yAxis?.formatter ?? formatAxisNumber,
       },
-      min: yAxis?.min,
-      max: yAxis?.max,
+      ...valueAxisBounds(yAxis?.min, yAxis?.max),
       minInterval: yAxis?.minInterval,
     };
 
@@ -459,22 +607,19 @@ export function MultiLineChart({
       ? {
           type: 'value' as const,
           name: secondaryYAxis.name,
-          nameLocation: 'middle' as const,
-          nameGap: secondaryYAxis.name ? 45 : 0,
-          nameTextStyle: { color: themeColors.muted },
+          nameLocation: 'end' as const,
+          nameGap: 10,
+          nameTextStyle: { color: themeColors.muted, fontSize: 11, align: 'right' as const, padding: [0, -8, 0, 0] },
           position: 'right' as const,
-          axisLine: {
-            show: true,
-            lineStyle: { color: themeColors.border },
-          },
+          axisLine: { show: false },
           axisTick: { show: false },
           splitLine: { show: false },
           axisLabel: {
             color: themeColors.muted,
-            formatter: secondaryYAxis.formatter,
+            fontSize: 11,
+            formatter: secondaryYAxis.formatter ?? formatAxisNumber,
           },
-          min: secondaryYAxis.min,
-          max: secondaryYAxis.max,
+          ...valueAxisBounds(secondaryYAxis.min, secondaryYAxis.max),
           minInterval: secondaryYAxis.minInterval,
         }
       : null;
@@ -484,6 +629,38 @@ export function MultiLineChart({
 
     // Build series configuration
     // Note: Don't filter by visible property here - displayedSeries already handles visibility via visibleSeries state
+    const canEndLabel = (s: (typeof displayedSeries)[number]): boolean =>
+      (s.seriesType ?? 'line') === 'line' &&
+      !s.stack &&
+      !s.showArea &&
+      !s.showEndLabel &&
+      s.visible !== false &&
+      !s.name.startsWith('__');
+    // End labels cost ~80px of plot width, too much on a phone-width chart
+    // The right edge belongs to the secondary axis when there is one, so no end labels then
+    const labelledCount =
+      endLabels && isWideEnoughForEndLabels && !secondaryYAxis ? displayedSeries.filter(canEndLabel).length : 0;
+    // Labels sit at each line's last value; when two lines end within a label's height of each
+    // other the labels overprint, so the chart falls back to the legend alone
+    const endValues = displayedSeries.filter(canEndLabel).map(s => lastValue(s.data));
+    const plotHeight = (typeof _height === 'number' ? _height : 300) - 60;
+    const showEndLabels =
+      labelledCount > 1 &&
+      labelledCount <= MAX_END_LABELS &&
+      endLabelsClear(
+        endValues,
+        plotHeight,
+        typeof yAxis?.min === 'number' ? yAxis.min : undefined,
+        typeof yAxis?.max === 'number' ? yAxis.max : undefined
+      );
+    const longestEndLabel = showEndLabels
+      ? Math.max(...displayedSeries.filter(canEndLabel).map(s => s.name.length))
+      : 0;
+    const endLabelMargin = showEndLabels ? Math.min(140, Math.ceil(longestEndLabel * 6 + 12)) : 0;
+
+    // Share stacks (every layer filled) render as solid bands; confidence bands stack on an invisible
+    // zero-opacity base and stay translucent so they layer over each other and the grid
+    const bandStacks = new Set(series.filter(s => s.stack && s.areaOpacity === 0).map(s => s.stack));
     const seriesConfig = displayedSeries.map(s => {
       // Use explicit color or auto-assign from palette
       const originalIndex = series.indexOf(s);
@@ -503,9 +680,12 @@ export function MultiLineChart({
         stack: s.stack,
         yAxisIndex: s.yAxisIndex ?? 0,
         triggerLineEvent: true, // Enable click events on lines
+        // Dense lines (thousands of points across a few hundred pixels) alias into fuzz; LTTB keeps
+        // the shape, peaks included, at the plot's resolution
+        ...(chartType === 'line' && !s.stack && s.data.length > 600 ? { sampling: 'lttb' as const } : {}),
         lineStyle: {
           color: seriesColor,
-          width: s.lineWidth ?? 2,
+          width: s.lineWidth ?? 1.5,
           type: s.lineStyle ?? ('solid' as const),
         },
         itemStyle: {
@@ -528,6 +708,18 @@ export function MultiLineChart({
                 color: seriesColor,
               },
             },
+        ...(showEndLabels && canEndLabel(s)
+          ? {
+              endLabel: {
+                show: true,
+                formatter: '{a}',
+                color: seriesColor,
+                fontSize: 11,
+                distance: 6,
+              },
+              labelLayout: { moveOverlap: 'shiftY' as const },
+            }
+          : {}),
         // Add label at the right side of the chart if requested
         ...(s.showEndLabel
           ? {
@@ -552,6 +744,16 @@ export function MultiLineChart({
             }
           : {}),
       };
+
+      // Share stacks: fill each layer with an opaque blend over the surface, so grid lines and
+      // neighbouring layers never show through; the fills alone draw the edges
+      if (s.showArea && s.stack && !bandStacks.has(s.stack)) {
+        return {
+          ...baseConfig,
+          lineStyle: { ...baseConfig.lineStyle, width: 0 },
+          areaStyle: { color: blendHex(seriesColor, themeColors.surface, s.areaOpacity ?? 0.85), opacity: 1 },
+        };
+      }
 
       // Add area style if requested
       if (s.showArea) {
@@ -588,37 +790,95 @@ export function MultiLineChart({
     // Add annotation series for markLines/markAreas if provided
     const hasMarkLines = markLines && markLines.length > 0;
     const hasMarkAreas = markAreas && markAreas.length > 0;
+    // Mark-line labels are vertical text ~11px wide; where marks crowd (e.g. every fork on an
+    // all-time chart) labels overprint. Keep a label only if it is far enough from the last one
+    // kept, newest first; a crowded mark's name joins the label it would have overprinted.
+    const visibleMarkLabels = new Set<number>();
+    const mergedMarkLabels = new Map<number, string[]>();
+    if (hasMarkLines) {
+      const plotWidth = Math.max((chartWidth || 800) - 52 - 16 - endLabelMargin, 1);
+      const categoryLabels = xAxis.type === 'category' ? xAxis.labels : undefined;
+      const numericXs = markLines!.map(ml => Number(ml.xValue)).filter(Number.isFinite);
+      const xMin = Number(xAxis.min ?? (isTimeAxis ? timeMin : undefined) ?? Math.min(...numericXs));
+      const xMax = Number(xAxis.max ?? (isTimeAxis ? timeMax : undefined) ?? Math.max(...numericXs));
+      const fraction = (value: number | string): number | null => {
+        if (categoryLabels) {
+          const index = categoryLabels.indexOf(String(value));
+          return index < 0 || categoryLabels.length < 2 ? null : index / (categoryLabels.length - 1);
+        }
+        const x = Number(value);
+        return Number.isFinite(x) && xMax > xMin ? (x - xMin) / (xMax - xMin) : null;
+      };
+      const placed = markLines!
+        .map((ml, index) => ({ index, px: fraction(ml.xValue), labelled: !!ml.label }))
+        .filter(m => m.labelled)
+        .sort((a, b) => (b.px ?? 0) - (a.px ?? 0));
+      let lastPx = Infinity;
+      let lastIndex = -1;
+      for (const mark of placed) {
+        if (mark.px === null) {
+          visibleMarkLabels.add(mark.index);
+          continue;
+        }
+        const px = mark.px * plotWidth;
+        if (lastPx - px >= MARK_LABEL_GAP_PX || lastIndex < 0) {
+          visibleMarkLabels.add(mark.index);
+          lastPx = px;
+          lastIndex = mark.index;
+        } else {
+          const names = mergedMarkLabels.get(lastIndex) ?? [];
+          names.unshift(markLines![mark.index].label ?? '');
+          mergedMarkLabels.set(lastIndex, names);
+        }
+      }
+    }
+
     const annotationSeries =
       hasMarkLines || hasMarkAreas
         ? [
             {
               name: '__annotations__',
               type: 'line' as const,
+              // Above the data series, so lines near the plot edge cannot cover the labels
+              z: 5,
               data: [], // Empty data - this series is only for annotations
-              silent: true, // Don't trigger events
               legendHoverLink: false,
+              tooltip: { show: false },
               ...(hasMarkLines
                 ? {
                     markLine: {
-                      silent: true,
                       symbol: 'none',
                       animation: false,
-                      data: markLines!.map(ml => ({
+                      data: markLines!.map((ml, index) => ({
                         xAxis: ml.xValue,
+                        // Hovering the line shows the full name when the resting label is truncated
+                        emphasis: {
+                          label: { show: !!ml.label, overflow: 'none' as const },
+                          lineStyle: { width: ml.lineWidth ?? 1 },
+                        },
                         label: {
-                          show: !!ml.label,
-                          formatter: ml.label ?? '',
+                          show: visibleMarkLabels.has(index),
+                          formatter: mergedMarkLabel([...(mergedMarkLabels.get(index) ?? []), ml.label ?? '']),
                           position: ml.labelPosition ?? 'end',
                           rotate: -90,
                           align: 'left',
-                          offset: ml.distance ?? [0, -2],
-                          color: hexToRgba(ml.color ?? themeColors.muted, 0.7),
+                          // Start a little below the plot's top edge, clear of series running along the maximum
+                          offset: ml.distance ?? [10, -2],
+                          color: hexToRgba(ml.color ?? themeColors.muted, 0.9),
                           fontSize: 11,
-                          backgroundColor: 'transparent',
+                          // Vertical labels run down from the plot top; a long merged label would
+                          // otherwise cross the x-axis, so it ends in an ellipsis at the plot bottom
+                          width: Math.max(plotHeight - 18, 40),
+                          overflow: 'truncate' as const,
+                          // A halo in the surface colour keeps the name legible where it crosses the data
+                          textBorderColor: themeColors.surface,
+                          textBorderWidth: 3,
                           padding: [2, 4],
                         },
                         lineStyle: {
-                          color: ml.color ?? themeColors.muted,
+                          // Half-strength rules: the annotation layer reads quieter than the data
+                          // (an alpha colour, since lineStyle.opacity would also fade the label)
+                          color: hexToRgba(resolveCssColorToHex(ml.color ?? themeColors.muted), 0.5),
                           type: (ml.lineStyle ?? 'dashed') as 'solid' | 'dashed' | 'dotted',
                           width: ml.lineWidth ?? 1,
                         },
@@ -660,16 +920,22 @@ export function MultiLineChart({
 
     // Calculate grid padding - just basic padding, let ECharts handle the rest
     // Add extra bottom padding for dataZoom slider when enabled
-    const baseBottom = 50;
+    const baseBottom = xAxisHasName ? 48 : 28;
     const legendBottom = useNativeLegend && showLegend && legendPosition === 'bottom' ? 40 : 0;
-    const dataZoomBottom = enableDataZoom ? 40 : 0;
+    // The range track is chrome until the chart is zoomed; at full range it shows nothing
+    const sliderVisible = enableDataZoom && showDataZoomSlider && (zoomRange.start > 0.01 || zoomRange.end < 99.99);
+    const dataZoomBottom = sliderVisible ? 28 : 0;
+    const hasYAxisName = Boolean(yAxis?.name || secondaryYAxis?.name);
 
-    const gridConfig = grid ?? {
-      left: 60,
-      right: secondaryYAxis ? 70 : 24, // Extra space for secondary y-axis
-      top: 16,
-      bottom: baseBottom + legendBottom + dataZoomBottom,
-    };
+    const gridConfig = grid
+      ? { ...grid, right: (grid.right ?? 16) + endLabelMargin }
+      : {
+          left: 52,
+          // Extra space for secondary y-axis labels, plus end labels when rendered
+          right: (secondaryYAxis ? 56 : 16) + endLabelMargin,
+          top: hasYAxisName ? 32 : 12,
+          bottom: baseBottom + legendBottom + dataZoomBottom,
+        };
 
     // Create default smart tooltip formatter
     // Auto-enable if valueDecimals is set OR if no custom formatter is provided
@@ -781,9 +1047,12 @@ export function MultiLineChart({
       backgroundColor: themeColors.surface,
       borderColor: themeColors.border,
       borderWidth: 1,
+      padding: [8, 10],
+      extraCssText: 'border-radius: 6px;',
       textStyle: {
         color: themeColors.foreground,
         fontSize: 12,
+        fontFamily: CHART_FONT_FAMILY,
       },
       axisPointer:
         tooltipTrigger === 'axis'
@@ -842,42 +1111,42 @@ export function MultiLineChart({
               end: zoomRange.end,
             },
             {
+              // A slim, neutral range track: no data preview, no move bar, no accent color
               type: 'slider' as const,
               xAxisIndex: 0,
               filterMode: 'none' as const,
-              height: 20,
-              bottom: 10,
+              height: 8,
+              bottom: 6,
               start: zoomRange.start,
               end: zoomRange.end,
-              borderColor: themeColors.border,
-              backgroundColor: 'transparent',
-              fillerColor: hexToRgba(themeColors.primary, 0.2),
+              showDataShadow: false,
+              showDetail: false,
+              brushSelect: false,
+              moveHandleSize: 0,
+              borderColor: 'transparent',
+              borderRadius: 3,
+              backgroundColor: hexToRgba(themeColors.border, 0.5),
+              fillerColor: hexToRgba(themeColors.muted, 0.2),
+              handleIcon: 'path://M0,0 h3 v8 h-3 z',
+              handleSize: '100%',
               handleStyle: {
-                color: themeColors.primary,
-                borderColor: themeColors.primary,
-              },
-              textStyle: {
                 color: themeColors.muted,
+                borderWidth: 0,
               },
-              dataBackground: {
-                lineStyle: { color: themeColors.border },
-                areaStyle: { color: themeColors.border, opacity: 0.1 },
-              },
-              selectedDataBackground: {
-                lineStyle: { color: themeColors.primary },
-                areaStyle: { color: themeColors.primary, opacity: 0.1 },
+              emphasis: {
+                handleStyle: { color: themeColors.foreground },
               },
             },
-          ]
+          ].slice(0, sliderVisible ? 2 : 1)
         : undefined,
     };
   }, [
+    _height,
     animationDuration,
     themeColors.foreground,
     themeColors.border,
     themeColors.muted,
     themeColors.surface,
-    themeColors.primary,
     xAxis,
     yAxis,
     secondaryYAxis,
@@ -888,9 +1157,13 @@ export function MultiLineChart({
     tooltipTrigger,
     tooltipMode,
     enableDataZoom,
+    showDataZoomSlider,
     zoomRange,
     connectNulls,
     extendedPalette,
+    endLabels,
+    isWideEnoughForEndLabels,
+    chartWidth,
     relativeSlots,
     formatSlotLabel,
     formatSlotTooltip,
@@ -900,6 +1173,57 @@ export function MultiLineChart({
     markLines,
     markAreas,
   ]);
+
+  // Group series by their group property, maintaining order
+  const legendGroups: Array<{ name: string | null; items: typeof series }> = [];
+  for (const s of series) {
+    if (s.visible === false || (enableAggregateToggle && s.name === aggregateSeriesName)) continue;
+    const groupName = s.group ?? null;
+    let group = legendGroups.find(g => g.name === groupName);
+    if (!group) legendGroups.push((group = { name: groupName, items: [] }));
+    group.items.push(s);
+  }
+  const legendControls = (
+    <>
+      {enableAggregateToggle && (
+        <div className="mb-2 flex items-center justify-end">
+          <button
+            onClick={() => setShowAggregate(!showAggregate)}
+            className={`rounded-sm px-2 py-1 text-xs/5 transition-colors ${
+              showAggregate ? 'bg-muted/20 text-foreground' : 'text-muted hover:bg-muted/10'
+            }`}
+          >
+            {showAggregate ? '✓' : '○'} {aggregateSeriesName}
+          </button>
+        </div>
+      )}
+      {/* One wrapping row: each group is a muted name followed by its series */}
+      <div className="flex max-h-[200px] flex-wrap items-center gap-x-5 gap-y-1 overflow-y-auto">
+        {legendGroups.map(group => (
+          <div key={group.name ?? '__ungrouped__'} className="flex flex-wrap items-center gap-x-0.5 gap-y-0.5">
+            {group.name && <span className="mr-1 text-xs/5 whitespace-nowrap text-muted">{group.name}</span>}
+            {group.items.map(s => {
+              const isVisible = visibleSeries.has(s.name);
+              const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
+              return (
+                <button
+                  key={s.name}
+                  onClick={() => toggleSeries(s.name)}
+                  aria-pressed={isVisible}
+                  className={`flex cursor-pointer items-center gap-1.5 rounded-xs px-1.5 py-0.5 text-xs/5 transition-colors hover:bg-muted/10 ${
+                    isVisible ? 'text-foreground' : 'text-muted/60'
+                  }`}
+                >
+                  <LegendSwatch series={s} color={seriesColor} active={isVisible} />
+                  <span>{s.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </>
+  );
 
   const chartContent = (
     <>
@@ -998,75 +1322,7 @@ export function MultiLineChart({
 
       {/* Interactive Legend Controls - Top */}
       {showLegend && !useNativeLegend && series.length > 1 && legendPosition === 'top' && (
-        <div className="mb-4 border-b border-border pb-4">
-          {enableAggregateToggle && (
-            <div className="mb-2 flex items-center justify-end">
-              <button
-                onClick={() => setShowAggregate(!showAggregate)}
-                className={`rounded-sm px-2 py-1 text-xs/5 transition-colors ${
-                  showAggregate ? 'bg-muted/20 text-foreground' : 'text-muted hover:bg-muted/10'
-                }`}
-              >
-                {showAggregate ? '✓' : '○'} {aggregateSeriesName}
-              </button>
-            </div>
-          )}
-          <div className="max-h-[200px] overflow-y-auto">
-            {(() => {
-              const legendSeries = series.filter(
-                s => s.visible !== false && (!enableAggregateToggle || s.name !== aggregateSeriesName)
-              );
-              // Group series by their group property, maintaining order
-              const groups: Array<{ name: string | null; items: typeof legendSeries }> = [];
-              const seenGroups = new Set<string | null>();
-              legendSeries.forEach(s => {
-                const groupName = s.group ?? null;
-                if (!seenGroups.has(groupName)) {
-                  seenGroups.add(groupName);
-                  groups.push({ name: groupName, items: [] });
-                }
-                groups.find(g => g.name === groupName)?.items.push(s);
-              });
-
-              return (
-                <div className="flex flex-col gap-2">
-                  {groups.map(group => (
-                    <div key={group.name ?? '__ungrouped__'} className="flex items-center gap-2">
-                      {group.name && <span className="text-xs text-muted">{group.name}:</span>}
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        {group.items.map(s => {
-                          const isVisible = visibleSeries.has(s.name);
-                          const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
-                          return (
-                            <button
-                              key={s.name}
-                              onClick={() => toggleSeries(s.name)}
-                              className={`flex cursor-pointer items-center gap-1.5 rounded-sm border px-2 py-1 text-xs/5 transition-all ${
-                                isVisible
-                                  ? 'bg-surface-hover border-border text-foreground hover:border-primary/50 hover:bg-primary/10'
-                                  : 'hover:bg-surface-hover/50 border-transparent bg-surface/50 text-muted/50 hover:border-border'
-                              }`}
-                            >
-                              <span
-                                className="h-2 w-2 rounded-full transition-colors"
-                                style={{
-                                  backgroundColor: isVisible ? seriesColor : 'transparent',
-                                  border: `2px solid ${seriesColor}`,
-                                  opacity: isVisible ? 1 : 0.5,
-                                }}
-                              />
-                              <span className="font-medium">{s.name}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              );
-            })()}
-          </div>
-        </div>
+        <div className="mb-3">{legendControls}</div>
       )}
 
       <div
@@ -1079,6 +1335,7 @@ export function MultiLineChart({
         onClickCapture={onSeriesClick ? handleChartClick : undefined}
       >
         <ReactEChartsComponent
+          theme={ECHARTS_THEME}
           ref={chartRef}
           echarts={echarts}
           option={option}
@@ -1095,75 +1352,7 @@ export function MultiLineChart({
 
       {/* Interactive Legend Controls - Bottom */}
       {showLegend && !useNativeLegend && series.length > 1 && legendPosition === 'bottom' && (
-        <div className="mt-4 border-t border-border pt-4">
-          {enableAggregateToggle && (
-            <div className="mb-2 flex items-center justify-end">
-              <button
-                onClick={() => setShowAggregate(!showAggregate)}
-                className={`rounded-sm px-2 py-1 text-xs/5 transition-colors ${
-                  showAggregate ? 'bg-muted/20 text-foreground' : 'text-muted hover:bg-muted/10'
-                }`}
-              >
-                {showAggregate ? '✓' : '○'} {aggregateSeriesName}
-              </button>
-            </div>
-          )}
-          <div className="max-h-[200px] overflow-y-auto">
-            {(() => {
-              const legendSeries = series.filter(
-                s => s.visible !== false && (!enableAggregateToggle || s.name !== aggregateSeriesName)
-              );
-              // Group series by their group property, maintaining order
-              const groups: Array<{ name: string | null; items: typeof legendSeries }> = [];
-              const seenGroups = new Set<string | null>();
-              legendSeries.forEach(s => {
-                const groupName = s.group ?? null;
-                if (!seenGroups.has(groupName)) {
-                  seenGroups.add(groupName);
-                  groups.push({ name: groupName, items: [] });
-                }
-                groups.find(g => g.name === groupName)?.items.push(s);
-              });
-
-              return (
-                <div className="flex flex-col gap-2">
-                  {groups.map(group => (
-                    <div key={group.name ?? '__ungrouped__'} className="flex items-center gap-2">
-                      {group.name && <span className="text-xs text-muted">{group.name}:</span>}
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        {group.items.map(s => {
-                          const isVisible = visibleSeries.has(s.name);
-                          const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
-                          return (
-                            <button
-                              key={s.name}
-                              onClick={() => toggleSeries(s.name)}
-                              className={`flex cursor-pointer items-center gap-1.5 rounded-sm border px-2 py-1 text-xs/5 transition-all ${
-                                isVisible
-                                  ? 'bg-surface-hover border-border text-foreground hover:border-primary/50 hover:bg-primary/10'
-                                  : 'hover:bg-surface-hover/50 border-transparent bg-surface/50 text-muted/50 hover:border-border'
-                              }`}
-                            >
-                              <span
-                                className="h-2 w-2 rounded-full transition-colors"
-                                style={{
-                                  backgroundColor: isVisible ? seriesColor : 'transparent',
-                                  border: `2px solid ${seriesColor}`,
-                                  opacity: isVisible ? 1 : 0.5,
-                                }}
-                              />
-                              <span className="font-medium">{s.name}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              );
-            })()}
-          </div>
-        </div>
+        <div className="mt-3">{legendControls}</div>
       )}
     </>
   );
@@ -1171,10 +1360,10 @@ export function MultiLineChart({
   // Wrap in card if requested
   if (showCard) {
     return (
-      <div className="rounded-sm border border-border bg-surface p-4">
+      <div ref={measureRef} className="rounded-sm border border-border bg-surface p-4">
         {title && (
-          <div className={subtitle ? 'mb-4' : 'mb-4'}>
-            <h3 className="mb-1 text-lg/7 font-semibold text-foreground">{title}</h3>
+          <div className="mb-4">
+            <h3 className="text-sm/6 font-semibold text-foreground">{title}</h3>
             {subtitle && <p className="text-xs/5 text-muted">{subtitle}</p>}
           </div>
         )}
@@ -1184,5 +1373,11 @@ export function MultiLineChart({
   }
 
   // Return unwrapped chart
-  return <div className={_height === '100%' ? 'h-full w-full' : 'w-full'}>{chartContent}</div>;
+  // At height 100% the legend and the chart share the container: a flex column lets the chart take
+  // what the legend leaves, instead of the full height plus the legend (which clipped the x axis)
+  return (
+    <div ref={measureRef} className={_height === '100%' ? 'flex h-full w-full flex-col' : 'w-full'}>
+      {chartContent}
+    </div>
+  );
 }

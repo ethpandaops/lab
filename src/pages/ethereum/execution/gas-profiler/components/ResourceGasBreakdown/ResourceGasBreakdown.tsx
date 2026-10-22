@@ -1,6 +1,7 @@
 import { type JSX } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Card } from '@/components/Layout/Card';
+import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { BarChart } from '@/components/Charts/Bar';
 import type { ResourceGasEntry } from '../../utils/resourceGas';
 import { RESOURCE_COLORS } from '../../utils/resourceGas';
@@ -56,25 +57,16 @@ export function ResourceGasBreakdown({
 
   if (loading) {
     return (
-      <Card className={className}>
-        <div className="px-4 py-3">
-          <h3 className="text-sm font-medium text-foreground">{title}</h3>
-          {subtitle && <p className="text-xs text-muted">{subtitle}</p>}
-        </div>
-        <div className="px-4 pb-4">
-          <div className="h-48 animate-pulse rounded-sm bg-surface" />
-        </div>
+      <Card className={className} title={title} subtitle={subtitle}>
+        <LoadingContainer className="h-48 rounded-sm" />
       </Card>
     );
   }
 
   if (entries.length === 0) {
     return (
-      <Card className={className}>
-        <div className="px-4 py-3">
-          <h3 className="text-sm font-medium text-foreground">{title}</h3>
-        </div>
-        <div className="px-4 pb-4 text-center text-sm text-muted">No resource gas data available</div>
+      <Card className={className} title={title}>
+        <div className="text-center text-sm text-muted">No resource gas data available</div>
       </Card>
     );
   }
@@ -129,7 +121,7 @@ export function ResourceGasBreakdown({
                 <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: RESOURCE_COLORS.Refund }} />
                 <span className="text-xs font-medium text-foreground">Refund</span>
               </div>
-              <span className="font-mono text-xs text-success">-{formatGas(refund)}</span>
+              <span className="font-mono text-xs text-foreground">-{formatGas(refund)}</span>
             </div>
           )}
         </div>

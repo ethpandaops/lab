@@ -1,3 +1,4 @@
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import type { JSX } from 'react';
 import { useState, useEffect, useMemo } from 'react';
 import clsx from 'clsx';
@@ -24,6 +25,11 @@ export interface NewPayloadTabProps {
   data: EngineTimingsData;
   timeRange: TimeRange;
 }
+
+const PERCENTILE_OPTIONS = [
+  { value: 'p50', label: 'P50' },
+  { value: 'p95', label: 'P95' },
+] as const;
 
 /**
  * NewPayload tab showing detailed engine_newPayload timing analysis
@@ -588,30 +594,12 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
               anchorId="hourly-duration"
               modalSize="full"
               headerActions={
-                <div className="flex rounded-sm border border-border">
-                  <button
-                    onClick={() => setSelectedPercentile('p50')}
-                    className={clsx(
-                      'px-3 py-1 text-xs font-medium transition-colors',
-                      selectedPercentile === 'p50'
-                        ? 'bg-primary text-white'
-                        : 'bg-transparent text-muted hover:text-foreground'
-                    )}
-                  >
-                    P50
-                  </button>
-                  <button
-                    onClick={() => setSelectedPercentile('p95')}
-                    className={clsx(
-                      'px-3 py-1 text-xs font-medium transition-colors',
-                      selectedPercentile === 'p95'
-                        ? 'bg-primary text-white'
-                        : 'bg-transparent text-muted hover:text-foreground'
-                    )}
-                  >
-                    P95
-                  </button>
-                </div>
+                <SegmentedControl
+                  ariaLabel="Percentile"
+                  options={PERCENTILE_OPTIONS}
+                  value={selectedPercentile}
+                  onChange={setSelectedPercentile}
+                />
               }
             >
               {({ inModal }) => (
@@ -1128,7 +1116,7 @@ function WinrateSection({
   return (
     <PopoutCard
       title="Execution Winrate"
-      subtitle="Which execution client had the fastest engine_newPayload per slot"
+      subtitle="Fastest engine_newPayload per slot"
       anchorId="winrate"
       modalSize="full"
     >
@@ -1168,17 +1156,10 @@ function WinrateSection({
                     className={clsx(
                       'relative overflow-hidden',
                       isLeader ? 'rounded-sm border px-4 py-4' : 'rounded-xs px-3 py-2',
-                      isLeader ? 'border-amber-400/30' : '',
+                      isLeader ? 'border-warning/30' : '',
                       !isLeader && isTopThree && medal ? medal.bg : '',
                       !isTopThree ? 'bg-surface/20' : ''
                     )}
-                    style={
-                      isLeader
-                        ? {
-                            background: `linear-gradient(135deg, ${standing.color}05 0%, ${standing.color}12 50%, ${standing.color}05 100%)`,
-                          }
-                        : undefined
-                    }
                   >
                     {/* Proportional fill bar */}
                     <div
@@ -1202,19 +1183,12 @@ function WinrateSection({
                       {/* Medal / Rank */}
                       <span
                         className={clsx(
-                          'shrink-0 text-center',
-                          isLeader
-                            ? 'w-9 text-4xl leading-none'
-                            : isTopThree
-                              ? 'w-8 text-3xl leading-none'
-                              : 'w-5 text-sm/5'
+                          'shrink-0 text-center font-semibold tabular-nums',
+                          isLeader ? 'w-9 text-2xl/8' : isTopThree ? 'w-8 text-xl/7' : 'w-5 text-xs/5',
+                          isTopThree && medal ? medal.text : 'text-muted/50'
                         )}
                       >
-                        {isTopThree && medal ? (
-                          medal.emoji
-                        ) : (
-                          <span className="text-xs/5 font-bold text-muted/50 tabular-nums">{standing.rank}</span>
-                        )}
+                        {standing.rank}
                       </span>
 
                       {/* Logo */}
@@ -1239,17 +1213,17 @@ function WinrateSection({
                           {standing.implementation}
                         </div>
                         {isTopThree && (
-                          <div className="text-[10px]/4 text-muted/60">{standing.totalWins.toLocaleString()} wins</div>
+                          <div className="text-2xs/4 text-muted/60">{standing.totalWins.toLocaleString()} wins</div>
                         )}
                       </div>
 
                       {/* Win rate */}
                       <span
                         className={clsx(
-                          'shrink-0 font-black tracking-tight tabular-nums',
+                          'shrink-0 font-semibold tracking-tight tabular-nums',
                           isLeader ? 'text-2xl/7 text-foreground' : '',
                           !isLeader && isTopThree && medal ? `text-lg/6 ${medal.text}` : '',
-                          !isTopThree ? 'text-sm/5 font-bold text-muted/70' : ''
+                          !isTopThree ? 'text-sm/5 text-muted/70' : ''
                         )}
                       >
                         {standing.winRate > 0 ? `${standing.winRate}%` : '—'}
@@ -1262,7 +1236,7 @@ function WinrateSection({
 
             {/* Slot count */}
             {totalSlots > 0 && (
-              <div className="mt-3 text-center text-[10px] text-muted/40 tabular-nums">
+              <div className="mt-3 text-center text-2xs text-muted/40 tabular-nums">
                 {totalSlots.toLocaleString()} slots analyzed
               </div>
             )}
@@ -1273,9 +1247,9 @@ function WinrateSection({
   );
 }
 
-/** Medal styling per position (gold / silver / bronze) */
-const MEDAL_CONFIG: Record<number, { bg: string; text: string; emoji: string }> = {
-  1: { bg: 'bg-amber-400/10', text: 'text-amber-400', emoji: '🥇' },
-  2: { bg: 'bg-neutral-300/8', text: 'text-neutral-300', emoji: '🥈' },
-  3: { bg: 'bg-amber-600/8', text: 'text-amber-500', emoji: '🥉' },
+/** Rank styling for the podium positions (gold / silver / bronze accents) */
+const MEDAL_CONFIG: Record<number, { bg: string; text: string }> = {
+  1: { bg: 'bg-warning/10', text: 'text-warning' },
+  2: { bg: 'bg-muted/10', text: 'text-foreground' },
+  3: { bg: 'bg-warning/5', text: 'text-warning/70' },
 };

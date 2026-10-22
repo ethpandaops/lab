@@ -16,7 +16,7 @@ const STATUS_LABELS: Record<PayloadStatus, string> = {
 };
 
 const STATUS_COLORS: Record<PayloadStatus, 'green' | 'yellow' | 'red' | 'gray'> = {
-  payload_present: 'green',
+  payload_present: 'gray',
   payload_late: 'yellow',
   payload_withheld: 'red',
   pending: 'gray',

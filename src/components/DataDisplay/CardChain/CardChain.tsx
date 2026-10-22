@@ -13,7 +13,7 @@ function CardSkeleton(): JSX.Element {
         {/* 3D top face */}
         <div className="absolute -top-2 right-1 left-1 h-3 rounded-t-xs bg-border/30" />
         {/* Main card */}
-        <div className="animate-pulse rounded-xs border-2 border-border/50 bg-surface p-4">
+        <div className="animate-pulse rounded-xs border border-border/50 bg-surface p-4">
           <div className="mb-3 pt-1">
             <div className="mb-1 h-3 w-10 rounded-xs bg-border/50" />
             <div className="h-6 w-24 rounded-xs bg-border/50" />
@@ -58,25 +58,11 @@ function ChainCard({
         isLast ? 'z-10 scale-105' : 'hover:z-10 hover:scale-[1.02]'
       )}
     >
-      {/* Glow effect for highlighted items */}
-      {isHighlighted && <div className="absolute -inset-3 animate-pulse rounded-xs bg-primary/20 blur-xl" />}
-
-      {/* Top face (3D effect) */}
-      <div
-        className={clsx(
-          'absolute -top-2 right-1 left-1 h-3 rounded-t-xs',
-          isHighlighted ? 'bg-linear-to-b from-primary/40 to-primary/20' : 'bg-linear-to-b from-border/60 to-border/30'
-        )}
-        style={{ transform: 'perspective(500px) rotateX(45deg)' }}
-      />
-
       {/* Main card face */}
       <div
         className={clsx(
-          'relative overflow-hidden rounded-xs border-2 transition-all duration-300',
-          isHighlighted
-            ? 'border-primary bg-linear-to-b from-primary/10 via-surface to-surface shadow-lg shadow-primary/20'
-            : 'border-border/80 bg-linear-to-b from-surface to-background group-hover:border-primary/50 group-hover:shadow-md'
+          'relative overflow-hidden rounded-sm border bg-surface transition-colors',
+          isHighlighted ? 'border-primary' : 'border-border group-hover:border-primary/50'
         )}
       >
         {/* Fill visualization (background) */}
@@ -93,16 +79,16 @@ function ChainCard({
           {/* Highlight badge */}
           {isHighlighted && (
             <div className="absolute -top-px right-3 rounded-b-xs bg-primary px-2 py-0.5">
-              <span className="text-[10px] font-bold tracking-wider text-white">{highlightBadgeText}</span>
+              <span className="text-2xs font-semibold tracking-wider text-white">{highlightBadgeText}</span>
             </div>
           )}
 
           {/* Label and main value */}
           <div className="mb-3 pt-1">
-            <div className="text-[10px] font-medium tracking-wider text-muted uppercase">{item.label}</div>
+            <div className="text-2xs font-medium tracking-wider text-muted uppercase">{item.label}</div>
             <div
               className={clsx(
-                'font-mono text-xl font-bold tabular-nums',
+                'font-mono text-xl font-semibold tabular-nums',
                 isHighlighted ? 'text-primary' : 'text-foreground'
               )}
             >
@@ -120,7 +106,7 @@ function ChainCard({
             >
               {item.stats.map(stat => (
                 <div key={stat.label}>
-                  <div className="text-[10px] text-muted">{stat.label}</div>
+                  <div className="text-2xs text-muted">{stat.label}</div>
                   <div className="font-mono text-sm font-semibold text-foreground">
                     {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
                   </div>
@@ -132,7 +118,7 @@ function ChainCard({
 
         {/* Hover overlay */}
         <div className="absolute inset-0 flex items-center justify-center bg-primary/0 opacity-0 transition-all duration-300 group-hover:bg-primary/5 group-hover:opacity-100">
-          <div className="rounded-full bg-primary/90 p-2 shadow-lg">
+          <div className="rounded-full bg-primary/90 p-2">
             <ArrowRightIcon className="size-4 text-white" />
           </div>
         </div>
@@ -167,7 +153,7 @@ function NavArrow({
       onClick={onClick}
       disabled={disabled || loading}
       className={clsx(
-        'relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full border-2 transition-all',
+        'relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full border transition-all',
         loading
           ? 'border-primary/50 bg-primary/5 text-primary'
           : !disabled
@@ -178,7 +164,7 @@ function NavArrow({
     >
       {loading ? <ArrowPathIcon className="size-5 animate-spin" /> : <Icon className="size-5" />}
       {showBadge && (
-        <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+        <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-primary text-2xs font-semibold text-white">
           {badgeCount > 99 ? '99+' : badgeCount}
         </span>
       )}
@@ -257,24 +243,13 @@ export function CardChain({
   return (
     <div
       className={clsx(
-        'relative overflow-hidden rounded-xs border border-border bg-linear-to-br from-surface via-surface to-background p-6',
+        'relative overflow-hidden rounded-sm bg-surface p-6 outline -outline-offset-1 outline-border',
         className
       )}
     >
-      {/* Background grid pattern */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)`,
-          backgroundSize: '24px 24px',
-        }}
-      />
-
       {/* Flowing line connecting all cards */}
       <div className="absolute top-1/2 right-[60px] left-[60px] h-[2px] -translate-y-1/2">
-        <div className="h-full w-full bg-linear-to-r from-border via-primary/30 to-primary opacity-60" />
-        {/* Animated pulse along the line */}
-        <div className="absolute inset-0 animate-[shimmer_3s_ease-in-out_infinite] bg-linear-to-r from-transparent via-primary to-transparent opacity-40" />
+        <div className="h-full w-full bg-border" />
       </div>
 
       <div className="relative flex items-center gap-3">

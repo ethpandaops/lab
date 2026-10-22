@@ -1,3 +1,4 @@
+import { ExplorerLinks } from './components/ExplorerLinks';
 import { type JSX, useState, useCallback, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from '@tanstack/react-router';
 import { Route } from '@/routes/ethereum/execution/gas-profiler/tx.$txHash';
@@ -22,9 +23,6 @@ import { Card } from '@/components/Layout/Card';
 import { Alert } from '@/components/Feedback/Alert';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
-import { TenderlyIcon } from '@/components/Ethereum/TenderlyIcon';
-import { PhalconIcon } from '@/components/Ethereum/PhalconIcon';
 import { useTransactionGasData, type CallFrameOpcodeStats } from './hooks/useTransactionGasData';
 import { useAllCallFrameOpcodes } from './hooks/useAllCallFrameOpcodes';
 import {
@@ -55,6 +53,7 @@ import {
   isMainnet,
 } from './utils';
 import type { CallTreeNode, OpcodeStats } from './IndexPage.types';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 /**
  * Format gas value with comma separators
@@ -755,39 +754,19 @@ export function TransactionPage(): JSX.Element {
             Back to Gas Profiler
           </Link>
         )}
-        <div className="flex items-center gap-2">
-          <a
-            href={`${getEtherscanBaseUrl(currentNetwork?.name)}/tx/${txHash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
-            title="View on Etherscan"
-          >
-            <EtherscanIcon className="size-4" />
-          </a>
-          {isMainnet(currentNetwork?.name) && (
-            <>
-              <a
-                href={`https://dashboard.tenderly.co/tx/mainnet/${txHash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
-                title="View on Tenderly"
-              >
-                <TenderlyIcon className="size-4" />
-              </a>
-              <a
-                href={`https://phalcon.blocksec.com/explorer/tx/eth/${txHash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
-                title="View on Phalcon"
-              >
-                <PhalconIcon className="size-4" />
-              </a>
-            </>
-          )}
-        </div>
+        <ExplorerLinks
+          etherscan={{ href: `${getEtherscanBaseUrl(currentNetwork?.name)}/tx/${txHash}`, title: 'View on Etherscan' }}
+          tenderly={
+            isMainnet(currentNetwork?.name)
+              ? { href: `https://dashboard.tenderly.co/tx/mainnet/${txHash}`, title: 'View on Tenderly' }
+              : undefined
+          }
+          phalcon={
+            isMainnet(currentNetwork?.name)
+              ? { href: `https://phalcon.blocksec.com/explorer/tx/eth/${txHash}`, title: 'View on Phalcon' }
+              : undefined
+          }
+        />
       </div>
 
       {/* Quick Stats Row - Always visible */}
@@ -799,9 +778,7 @@ export function TransactionPage(): JSX.Element {
       >
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-xs bg-primary/10 p-2">
-              <FireIcon className="size-5 text-primary" />
-            </div>
+            <FireIcon className="size-5 text-primary" />
             <div>
               <div className="text-xl font-semibold text-foreground">{formatGas(metadata.receiptGasUsed)}</div>
               <div className="text-xs text-muted">Gas Used</div>
@@ -811,9 +788,7 @@ export function TransactionPage(): JSX.Element {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-xs bg-cyan-500/10 p-2">
-              <CodeBracketIcon className="size-5 text-cyan-500" />
-            </div>
+            <CodeBracketIcon className="size-5 text-blob-0" />
             <div>
               <div className="text-xl font-semibold text-foreground">{internalCallCount}</div>
               <div className="text-xs text-muted">Internal Txs</div>
@@ -823,9 +798,7 @@ export function TransactionPage(): JSX.Element {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-xs bg-purple-500/10 p-2">
-              <ArrowsPointingOutIcon className="size-5 text-purple-500" />
-            </div>
+            <ArrowsPointingOutIcon className="size-5 text-muted" />
             <div>
               <div className="text-xl font-semibold text-foreground">{metadata.maxDepth}</div>
               <div className="text-xs text-muted">Max Depth</div>
@@ -836,9 +809,7 @@ export function TransactionPage(): JSX.Element {
         {receiptSize?.receipt_bytes && (
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <div className="rounded-xs bg-teal-500/10 p-2">
-                <DocumentTextIcon className="size-5 text-teal-500" />
-              </div>
+              <DocumentTextIcon className="size-5 text-accent" />
               <div>
                 <div className="flex items-center gap-1 text-xl font-semibold text-foreground">
                   {formatBytes(receiptSize.receipt_bytes)}
@@ -864,9 +835,7 @@ export function TransactionPage(): JSX.Element {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-xs bg-warning/10 p-2">
-              <DocumentTextIcon className="size-5 text-warning" />
-            </div>
+            <DocumentTextIcon className="size-5 text-warning" />
             <div>
               <div className="text-xl font-semibold text-foreground">{contractCounts.total}</div>
               <div className="text-xs text-muted">Contracts</div>
@@ -892,15 +861,13 @@ export function TransactionPage(): JSX.Element {
           {/* Overview Tab */}
           <HeadlessTab.Panel>
             {/* Transaction Gas Breakdown */}
-            <Card className="mb-6 overflow-hidden">
-              {/* Header row */}
-              <div className="flex items-center justify-between px-4 py-3">
-                <h3 className="text-sm font-medium text-foreground">Transaction Gas Breakdown</h3>
-                <span className="text-xs text-muted">Position #{metadata.transactionIndex} in block</span>
-              </div>
-
+            <Card
+              className="mb-6"
+              title="Transaction Gas Breakdown"
+              subtitle={`Position #${metadata.transactionIndex} in block`}
+            >
               {/* Gas Formula */}
-              <div className="bg-surface/30 px-4 py-5">
+              <div className="py-1">
                 <GasFormula
                   segments={[
                     {
@@ -943,10 +910,10 @@ export function TransactionPage(): JSX.Element {
               </div>
 
               {/* TX Hash - subtle inline display */}
-              <div className="border-t border-border px-4 py-2 text-center">
+              <div className="mt-4 border-t border-border pt-3 text-center">
                 <div className="inline-flex items-center gap-2">
                   {isSuccess ? (
-                    <CheckCircleIcon className="size-4 text-success" />
+                    <CheckCircleIcon className="size-4 text-muted" />
                   ) : (
                     <XCircleIcon className="size-4 text-danger" />
                   )}
@@ -978,10 +945,10 @@ export function TransactionPage(): JSX.Element {
                 const overheadPct = totalBytes > 0 ? (overheadBytes / totalBytes) * 100 : 0;
 
                 return (
-                  <Card className="mb-6 overflow-hidden">
-                    {/* Header */}
-                    <div className="flex items-center justify-between px-4 py-3">
-                      <h3 className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+                  <Card
+                    className="mb-6"
+                    title={
+                      <span className="flex items-center gap-1.5">
                         Receipt Payload
                         <GasTooltip
                           type="receipt"
@@ -996,14 +963,12 @@ export function TransactionPage(): JSX.Element {
                             </>
                           }
                         />
-                      </h3>
-                      <span className="text-xs text-muted">
-                        {receiptSize.log_count ?? 0} log{(receiptSize.log_count ?? 0) !== 1 ? 's' : ''} emitted
                       </span>
-                    </div>
-
+                    }
+                    subtitle={`${receiptSize.log_count ?? 0} log${(receiptSize.log_count ?? 0) !== 1 ? 's' : ''} emitted`}
+                  >
                     {/* Proportional bar */}
-                    <div className="bg-surface/30 px-4 py-5">
+                    <div className="py-1">
                       <div className="mb-3">
                         <span className="text-2xl font-semibold text-foreground tabular-nums">
                           {formatBytes(totalBytes)}
@@ -1021,7 +986,7 @@ export function TransactionPage(): JSX.Element {
                         )}
                         {logTopicPct > 0 && (
                           <div
-                            className="bg-cyan-500 transition-all"
+                            className="bg-blob-0 transition-all"
                             style={{ width: `${logTopicPct}%` }}
                             title={`Log Topics: ${formatBytes(logTopicBytes)} (${logTopicPct.toFixed(1)}%)`}
                           />
@@ -1044,7 +1009,7 @@ export function TransactionPage(): JSX.Element {
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <span className="size-2 rounded-full bg-cyan-500" />
+                          <span className="size-2 rounded-full bg-blob-0" />
                           <span className="text-xs text-muted">
                             Log Topics{' '}
                             <span className="font-medium text-foreground">
@@ -1068,8 +1033,8 @@ export function TransactionPage(): JSX.Element {
             {/* Call Tree or Simple Transfer Message */}
             {isSimpleTransfer ? (
               <Card className="mb-6 p-6 text-center">
-                <div className="mb-3 inline-flex rounded-full bg-cyan-500/10 p-3">
-                  <svg className="size-6 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="mb-3 inline-flex rounded-full bg-blob-0/10 p-3">
+                  <svg className="size-6 text-blob-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -1181,6 +1146,7 @@ export function TransactionPage(): JSX.Element {
                   <PopoutCard title="Gas by Contract" modalSize="xl">
                     {({ inModal }) => (
                       <ReactECharts
+                        theme={ECHARTS_THEME}
                         option={contractTreemapOption}
                         style={{ height: inModal ? 500 : 280, cursor: 'pointer' }}
                         opts={{ renderer: 'canvas' }}

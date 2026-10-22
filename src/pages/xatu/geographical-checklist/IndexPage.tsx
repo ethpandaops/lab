@@ -170,10 +170,7 @@ export function IndexPage(): JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header
-          title="Geographical Checklist"
-          description="Global distribution of Contributoor nodes across continents, countries, and cities."
-        />
+        <Header title="Geographical Checklist" description="Contributoor nodes by continent, country and city" />
         <GeographicalChecklistSkeleton />
       </Container>
     );
@@ -190,10 +187,7 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      <Header
-        title="Geographical Checklist"
-        description="Global distribution of Contributoor nodes across continents, countries, and cities."
-      />
+      <Header title="Geographical Checklist" description="Contributoor nodes by continent, country and city" />
 
       <div className="space-y-6">
         {/* Stats */}

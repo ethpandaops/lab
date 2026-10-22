@@ -80,8 +80,24 @@ export const Interactive: Story = {
 };
 
 /**
- * Card with header slot.
- * The header prop provides a dedicated top section.
+ * Standard header: title, subtitle and right-aligned actions share one layout across every card.
+ */
+export const WithTitle: Story = {
+  args: {
+    rounded: true,
+    title: 'Consensus clients',
+    subtitle: 'Share of proposed blocks over 7 days',
+    actions: (
+      <button type="button" className="rounded-sm px-1.5 py-1 text-xs text-muted hover:bg-muted/20">
+        Export
+      </button>
+    ),
+    children: <p className="text-sm/6 text-muted">Body content aligns with the title above.</p>,
+  },
+};
+
+/**
+ * Card with a custom header slot, for headers the standard title row cannot express.
  */
 export const WithHeader: Story = {
   args: {

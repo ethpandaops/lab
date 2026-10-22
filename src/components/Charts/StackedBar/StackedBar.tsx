@@ -8,6 +8,8 @@ import clsx from 'clsx';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { StackedBarProps } from './StackedBar.types';
+import { ECHARTS_THEME } from '@/utils/echarts-theme';
+import { getChartTooltipChrome } from '../chartChrome';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -217,13 +219,7 @@ export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function
       series: seriesData,
       tooltip: {
         trigger: 'item' as const,
-        backgroundColor: themeColors.background,
-        borderColor: themeColors.border,
-        borderWidth: 1,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
+        ...getChartTooltipChrome(themeColors),
         formatter: (params: { seriesName: string; value: number; color: string }) => {
           const segment = segments.find(s => s.name === params.seriesName);
           if (!segment) return '';
@@ -239,7 +235,7 @@ export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function
 
           return `
             <div style="display:flex;align-items:center;gap:8px;">
-              <span style="background:${params.color};width:10px;height:10px;border-radius:2px;display:inline-block;"></span>
+              <span style="background:${params.color};width:10px;height:10px;border-radius:4px;display:inline-block;"></span>
               <span style="font-weight:500;">${params.seriesName}</span>
             </div>
             <div style="margin-top:4px;">
@@ -307,6 +303,7 @@ export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function
       {/* Chart */}
       {option && (
         <ReactEChartsCore
+          theme={ECHARTS_THEME}
           ref={ref}
           echarts={echarts}
           option={option}

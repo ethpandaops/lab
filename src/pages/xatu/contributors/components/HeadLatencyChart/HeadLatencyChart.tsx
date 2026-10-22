@@ -2,6 +2,7 @@ import { type JSX } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fctHeadFirstSeenByNodeServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
+import { ChartEmptyState } from '../ChartEmptyState';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { formatSlot } from '@/utils';
 import { useLatencyChartSeries } from '../../hooks/useLatencyChartData';
@@ -57,11 +58,7 @@ export function HeadLatencyChart({ username }: HeadLatencyChartProps): JSX.Eleme
   }
 
   if (dataCount === 0) {
-    return (
-      <div className="flex h-[400px] items-center justify-center rounded-sm border border-border bg-surface text-muted">
-        No head data available for this time range
-      </div>
-    );
+    return <ChartEmptyState subject="head" />;
   }
 
   return (

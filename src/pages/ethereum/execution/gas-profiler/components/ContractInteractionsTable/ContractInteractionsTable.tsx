@@ -1,3 +1,4 @@
+import { Button } from '@/components/Elements/Button';
 import React, { type JSX, useState, useCallback, useEffect, useMemo } from 'react';
 import { ChevronRightIcon, ChevronDownIcon, CogIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
@@ -33,7 +34,7 @@ function getCallTypeStyles(callType: string): { bg: string; text: string } {
     case 'CREATE':
       return { bg: 'bg-orange-500/10', text: 'text-orange-500' };
     case 'CREATE2':
-      return { bg: 'bg-amber-500/10', text: 'text-amber-500' };
+      return { bg: 'bg-warning/10', text: 'text-warning' };
     case 'DELEGATECALL':
       return { bg: 'bg-purple-500/10', text: 'text-purple-400' };
     case 'STATICCALL':
@@ -75,7 +76,7 @@ function ContractRow({
           {contract.isImplementation && (
             <div className="group relative flex shrink-0 cursor-help items-center">
               <CogIcon className="size-4 text-muted" />
-              <div className="pointer-events-none absolute top-1/2 left-full z-50 ml-2 hidden w-max max-w-48 -translate-y-1/2 rounded-xs border border-border bg-background px-2 py-1 text-xs text-muted shadow-lg group-hover:block">
+              <div className="pointer-events-none absolute top-1/2 left-full z-50 ml-2 hidden w-max max-w-48 -translate-y-1/2 rounded-xs border border-border bg-background px-2 py-1 text-xs text-muted group-hover:block">
                 Delegated contract - runs code on behalf of a proxy
               </div>
             </div>
@@ -166,7 +167,7 @@ function ImplementationRow({
           {/* Indent + cog icon */}
           <div className="group relative flex shrink-0 cursor-help items-center">
             <CogIcon className="size-4 text-muted" />
-            <div className="pointer-events-none absolute top-1/2 left-full z-50 ml-2 hidden w-max max-w-48 -translate-y-1/2 rounded-xs border border-border bg-background px-2 py-1 text-xs text-muted shadow-lg group-hover:block">
+            <div className="pointer-events-none absolute top-1/2 left-full z-50 ml-2 hidden w-max max-w-48 -translate-y-1/2 rounded-xs border border-border bg-background px-2 py-1 text-xs text-muted group-hover:block">
               Delegated contract - runs code on behalf of a proxy
             </div>
           </div>
@@ -383,15 +384,9 @@ export function ContractInteractionsTable({
       {/* Show More Button */}
       {hasMore && (
         <div className="flex justify-center border-t border-border py-4">
-          <button
-            onClick={() => setVisibleCount(contracts.length)}
-            className="flex items-center gap-2 rounded-sm border border-border bg-surface px-4 py-2 text-sm text-foreground transition-colors hover:bg-background"
-          >
+          <Button variant="secondary" size="sm" onClick={() => setVisibleCount(contracts.length)}>
             Show All ({contracts.length - visibleCount} more)
-            <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
+          </Button>
         </div>
       )}
     </div>

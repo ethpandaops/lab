@@ -33,11 +33,10 @@ export function Dropdown({
         anchor={align === 'left' ? 'bottom start' : 'bottom end'}
         transition
         className={clsx(
-          'z-50 mt-2 w-56 rounded-md bg-surface shadow-lg outline-1 outline-border [--anchor-gap:8px]',
-          'transition data-closed:scale-95 data-closed:transform data-closed:opacity-0',
+          'z-50 mt-2 w-56 rounded-sm bg-surface outline-1 -outline-offset-1 outline-border [--anchor-gap:8px]',
+          'transition data-closed:opacity-0',
           'data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in',
-          'dark:bg-surface dark:shadow-none dark:-outline-offset-1 dark:outline-border',
-          withDividers && 'divide-y divide-border dark:divide-border'
+          withDividers && 'divide-y divide-border'
         )}
       >
         {children}
@@ -75,7 +74,7 @@ export function DropdownItem({
       'dark:data-focus:bg-muted/10 dark:data-focus:text-foreground',
     ],
     variant === 'danger' && [
-      'text-danger dark:text-danger',
+      'text-danger',
       'data-focus:bg-danger/10 data-focus:text-danger',
       'dark:data-focus:bg-danger/20',
     ],

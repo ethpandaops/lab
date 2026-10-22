@@ -48,7 +48,7 @@ function buildHelperText(tags: string[], onTagsChange: (tags: string[]) => void)
     <span className="flex items-center justify-between">
       <span className="flex items-center gap-3">
         {(valid.length > 0 || pubkeys.length > 0) && (
-          <span className="text-success">
+          <span className="text-foreground">
             {valid.length > 0 && pubkeys.length > 0
               ? `${valid.length} ${valid.length === 1 ? 'index' : 'indices'} + ${pubkeys.length} ${pubkeys.length === 1 ? 'pubkey' : 'pubkeys'} entered`
               : pubkeys.length > 0

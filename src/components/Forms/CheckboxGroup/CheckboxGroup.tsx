@@ -8,7 +8,7 @@ export function CheckboxGroup({
   options,
   variant = 'list',
   className = '',
-  rounded = false,
+  rounded = true,
 }: CheckboxGroupProps): React.JSX.Element {
   // Render checkbox based on variant
   const renderCheckbox = (option: (typeof options)[0]): React.JSX.Element => {
@@ -185,7 +185,7 @@ export function CheckboxGroup({
   return (
     <fieldset className={className}>
       {legend && (
-        <legend className={srOnlyLegend ? 'sr-only' : 'text-base font-semibold text-foreground'}>{legend}</legend>
+        <legend className={srOnlyLegend ? 'sr-only' : 'text-sm/6 font-semibold text-foreground'}>{legend}</legend>
       )}
       <ListContainer {...listContainerProps}>{options.map(renderCheckbox)}</ListContainer>
     </fieldset>

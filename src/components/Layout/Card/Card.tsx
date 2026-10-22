@@ -4,51 +4,55 @@ import type { CardProps, CardVariant } from './Card.types';
 
 const variantStyles: Record<CardVariant, { container: string; header: string; main: string; footer: string }> = {
   default: {
-    container:
-      'bg-surface shadow-sm dark:bg-surface dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
+    container: 'bg-surface outline -outline-offset-1 outline-border',
     header: '',
     main: '',
     footer: '',
   },
   muted: {
-    container:
-      'bg-surface shadow-sm dark:bg-surface dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
+    container: 'bg-surface outline -outline-offset-1 outline-border',
     header: 'bg-surface dark:bg-background',
     main: '',
     footer: 'bg-surface dark:bg-background',
   },
   primary: {
-    container:
-      'bg-surface shadow-sm dark:bg-surface dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
+    container: 'bg-surface outline -outline-offset-1 outline-border',
     header: 'bg-primary/5 dark:bg-primary/10',
     main: '',
     footer: '',
   },
   accent: {
-    container:
-      'bg-surface shadow-sm dark:bg-surface dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
+    container: 'bg-surface outline -outline-offset-1 outline-border',
     header: 'bg-accent/5 dark:bg-accent/10',
     main: '',
     footer: 'bg-accent/5 dark:bg-accent/10',
   },
   elevated: {
-    container:
-      'bg-surface shadow-sm dark:bg-surface dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
+    container: 'bg-surface outline -outline-offset-1 outline-border',
     header: 'bg-background dark:bg-background',
     main: '',
     footer: '',
   },
   surface: {
-    container:
-      'bg-surface shadow-sm dark:bg-surface dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
+    container: 'bg-surface outline -outline-offset-1 outline-border',
     header: 'bg-surface dark:bg-background',
     main: 'bg-background dark:bg-background/50',
     footer: 'bg-surface dark:bg-background',
   },
 };
 
+/**
+ * Core content container.
+ *
+ * Every card shares one anatomy: a compact header row (title, optional subtitle, right-aligned
+ * actions) separated by a single rule from a body whose inset matches the header, so titles and
+ * content line up on the same left edge.
+ */
 export function Card({
   children,
+  title,
+  subtitle,
+  actions,
   header,
   footer,
   variant = 'default',
@@ -56,10 +60,22 @@ export function Card({
   isInteractive = false,
   onClick,
   featureImage,
-  rounded = false,
+  rounded = true,
   allowContentOverflow = false,
 }: CardProps): JSX.Element {
   const styles = variantStyles[variant];
+  const headerContent =
+    title !== undefined ? (
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <h3 className="truncate text-sm/6 font-semibold text-foreground">{title}</h3>
+          {subtitle && <p className="text-xs/5 text-muted">{subtitle}</p>}
+        </div>
+        {actions && <div className="-my-1 -mr-1.5 flex shrink-0 items-center gap-0.5">{actions}</div>}
+      </div>
+    ) : (
+      header
+    );
 
   return (
     <div
@@ -68,8 +84,7 @@ export function Card({
         !allowContentOverflow && 'overflow-hidden',
         rounded && 'rounded-sm',
         styles.container,
-        isInteractive &&
-          'cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xs dark:hover:shadow-none',
+        isInteractive && 'cursor-pointer transition-colors duration-200 hover:outline-primary/40',
         className
       )}
       onClick={isInteractive ? onClick : undefined}
@@ -81,9 +96,17 @@ export function Card({
           {featureImage}
         </div>
       )}
-      {header && <div className={clsx('relative z-10 px-4 py-5 sm:px-6', styles.header)}>{header}</div>}
-      <div className={clsx('relative z-10 flex-1 px-4 py-5 sm:p-6', styles.main)}>{children}</div>
-      {footer && <div className={clsx('relative z-10 px-4 py-4 sm:px-6', styles.footer)}>{footer}</div>}
+      {headerContent && <div className={clsx('relative z-10 px-4 py-3 sm:px-5', styles.header)}>{headerContent}</div>}
+      <div
+        data-slot="card-body"
+        className={clsx(
+          'relative z-10 flex-1 p-4 [--card-inset-y:--spacing(4)] [--card-inset:--spacing(4)] empty:hidden sm:p-5 sm:[--card-inset-y:--spacing(5)] sm:[--card-inset:--spacing(5)]',
+          styles.main
+        )}
+      >
+        {children}
+      </div>
+      {footer && <div className={clsx('relative z-10 px-4 py-3 sm:px-5', styles.footer)}>{footer}</div>}
     </div>
   );
 }

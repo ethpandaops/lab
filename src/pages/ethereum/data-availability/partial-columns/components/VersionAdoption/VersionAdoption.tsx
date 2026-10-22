@@ -16,14 +16,12 @@ export function VersionAdoption({ versions, isDaily }: VersionAdoptionProps): JS
   return (
     <Card
       rounded
-      header={
-        <div className="flex flex-col gap-1">
-          <h3 className="text-sm/6 font-semibold text-foreground">Client Versions</h3>
-          <p className="text-xs/5 text-muted">
-            Share of each consensus client version&apos;s subscribing peers that request partial messages, with the
-            average number of peers seen per {isDaily ? 'day' : 'hour'}
-          </p>
-        </div>
+      title="Client Versions"
+      subtitle={
+        <>
+          Share of each consensus client version&apos;s subscribing peers that request partial messages, with the
+          average number of peers seen per {isDaily ? 'day' : 'hour'}
+        </>
       }
     >
       {versions.length === 0 ? (

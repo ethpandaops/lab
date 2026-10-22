@@ -2,7 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { fctPreparedBlockServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { FctPreparedBlock } from '@/api/types.gen';
 import { useTableBounds } from '@/hooks/useBounds';
-import { SECONDS_PER_SLOT } from '@/utils/beacon';
+import { useNetwork } from '@/hooks/useNetwork';
+import { slotToTimestamp, timestampToSlot } from '@/utils/beacon';
+import { getRangePage, type RangePage } from '@/components/Lists/RangePager';
 import { parseClientName } from '../utils';
 
 /**
@@ -45,24 +47,30 @@ export interface UseSlotBlocksResult {
   isLoading: boolean;
   isFetching: boolean;
   error: Error | null;
+  /** Page range for the pager */
+  page: RangePage;
 }
 
+/** Slots per page (timeline columns) */
 const SLOTS_TO_SHOW = 6;
 
 /**
- * Hook to fetch prepared blocks and group them by slot
- * Returns the last N slots with their blocks organized by client combinations
- * Uses bounds API to determine the latest available data, then queries by timestamp
+ * Hook to fetch prepared blocks for one page of slots and group them by slot.
+ * `from` is the page's top slot; undefined follows the latest indexed slot. Pages are bounded by
+ * the prepared-block table's indexed range from the bounds API.
  */
-export function useSlotBlocks(): UseSlotBlocksResult {
-  // Get bounds for the fct_prepared_block table
+export function useSlotBlocks(from?: number): UseSlotBlocksResult {
   // Bounds contain timestamps (slot_start_date_time), not slot numbers
   const { data: bounds, isLoading: boundsLoading, error: boundsError } = useTableBounds('fct_prepared_block');
+  const { currentNetwork } = useNetwork();
+  const genesisTime = currentNetwork?.genesis_time;
 
-  // Calculate the timestamp range to query: last N slots worth of time from the max timestamp
-  // Each slot is SECONDS_PER_SLOT (12) seconds
-  const maxTimestamp = bounds?.max;
-  const minTimestamp = maxTimestamp ? maxTimestamp - SLOTS_TO_SHOW * SECONDS_PER_SLOT : undefined;
+  const latestSlot = bounds && genesisTime ? timestampToSlot(bounds.max, genesisTime) : 0;
+  const earliestSlot = bounds && genesisTime ? timestampToSlot(bounds.min, genesisTime) : 0;
+  const page = getRangePage(from, latestSlot, earliestSlot, SLOTS_TO_SHOW);
+
+  const maxTimestamp = bounds && genesisTime ? slotToTimestamp(page.top, genesisTime) : undefined;
+  const minTimestamp = bounds && genesisTime ? slotToTimestamp(page.bottom, genesisTime) : undefined;
 
   const {
     data,
@@ -99,6 +107,7 @@ export function useSlotBlocks(): UseSlotBlocksResult {
       isLoading: false,
       isFetching: false,
       error: boundsError as Error,
+      page,
     };
   }
 
@@ -115,6 +124,7 @@ export function useSlotBlocks(): UseSlotBlocksResult {
       isLoading: false,
       isFetching: false,
       error: error as Error,
+      page,
     };
   }
 
@@ -132,6 +142,7 @@ export function useSlotBlocks(): UseSlotBlocksResult {
       isLoading: true,
       isFetching: true,
       error: null,
+      page,
     };
   }
 
@@ -148,6 +159,7 @@ export function useSlotBlocks(): UseSlotBlocksResult {
       isLoading: false,
       isFetching: dataFetching,
       error: null,
+      page,
     };
   }
 
@@ -274,5 +286,6 @@ export function useSlotBlocks(): UseSlotBlocksResult {
     isLoading: false,
     isFetching: dataFetching,
     error: null,
+    page,
   };
 }

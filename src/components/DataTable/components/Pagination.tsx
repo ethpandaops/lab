@@ -136,7 +136,7 @@ export function Pagination<TData>({ table }: PaginationProps<TData>): JSX.Elemen
                   className={clsx(
                     'min-w-[32px] px-2 py-1 text-sm font-medium transition-colors',
                     isActive ? 'bg-primary text-white' : 'text-foreground hover:bg-primary/10 hover:text-primary',
-                    'rounded-md'
+                    'rounded-sm'
                   )}
                 >
                   {pageIndex + 1}

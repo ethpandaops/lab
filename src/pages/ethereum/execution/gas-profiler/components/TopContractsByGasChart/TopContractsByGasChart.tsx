@@ -58,7 +58,7 @@ export function TopContractsByGasChart({
   }, [contracts, maxContracts]);
 
   return (
-    <PopoutCard title="Top Contracts by Gas" subtitle="Which contracts consumed the most gas?">
+    <PopoutCard title="Top Contracts by Gas">
       {({ inModal }) =>
         chartData.labels.length > 0 ? (
           <BarChart

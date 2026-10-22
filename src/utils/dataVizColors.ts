@@ -159,6 +159,9 @@ export function getDataVizColors(): ReturnType<typeof computeDataVizColors> {
   return cache.colors;
 }
 
+/** Font stack for ECharts canvas text; matches the UI's --font-sans. */
+export const CHART_FONT_FAMILY = "'Geist Variable', Geist, system-ui, sans-serif";
+
 /**
  * Build ECharts-compatible theme object from ThemeColors
  *
@@ -195,7 +198,7 @@ export function buildEChartsTheme(colors: ThemeColors): Record<string, unknown> 
     backgroundColor: 'transparent', // Let CSS handle background
     textStyle: {
       color: colors.foreground,
-      fontFamily: 'Space Grotesk Variable, Space Grotesk, system-ui, sans-serif',
+      fontFamily: CHART_FONT_FAMILY,
     },
 
     // Title defaults

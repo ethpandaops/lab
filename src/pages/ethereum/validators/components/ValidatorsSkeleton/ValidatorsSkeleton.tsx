@@ -1,7 +1,6 @@
 import type { JSX } from 'react';
 import clsx from 'clsx';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
-import { Card } from '@/components/Layout/Card';
 
 interface ValidatorsSkeletonProps {
   /** Additional class names */
@@ -45,13 +44,16 @@ export function ValidatorsSkeleton({ className }: ValidatorsSkeletonProps): JSX.
       <LoadingContainer className="h-12 w-full rounded-sm" shimmer={false} />
 
       {/* Performance summary skeleton */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Card key={i} className="flex flex-col gap-2 p-4">
+      <div className="grid grid-cols-2 overflow-hidden rounded-sm bg-surface outline -outline-offset-1 outline-border lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex flex-col gap-2 px-4 py-3.5 shadow-[1px_0_0_0_var(--color-border),0_1px_0_0_var(--color-border)] sm:px-5"
+          >
             <LoadingContainer className="h-4 w-24 rounded-sm" shimmer={false} />
             <LoadingContainer className="h-8 w-20 rounded-sm" shimmer={false} />
             <LoadingContainer className="h-3 w-32 rounded-sm" shimmer={false} />
-          </Card>
+          </div>
         ))}
       </div>
 

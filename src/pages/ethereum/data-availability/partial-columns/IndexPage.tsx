@@ -1,6 +1,5 @@
 import { type JSX, useCallback, useMemo } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import clsx from 'clsx';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
@@ -9,6 +8,7 @@ import { InfoBox } from '@/components/Feedback/InfoBox';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { SeriesData } from '@/components/Charts/MultiLine';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useTableBounds } from '@/hooks/useBounds';
 import {
   buildTooltipHtml,
@@ -216,37 +216,25 @@ export function IndexPage(): JSX.Element {
       <Header
         title="Partial Columns"
         description="How sentry nodes complete their custody data columns: cell by cell over gossipsub partial messages, from the execution layer, or as whole columns"
-        showAccent={false}
       />
 
       {!boundsLoading && !hasData ? (
-        <Card rounded>
-          <h3 className="text-base/7 font-semibold text-foreground">No partial column data for this network</h3>
+        <Card rounded title="No partial column data for this network">
+          {null}
         </Card>
       ) : (
         <div className="flex flex-col gap-6">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            <div className="flex flex-wrap items-center gap-1.5">
-              {TIME_PERIOD_OPTIONS.map(({ value, label }) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setSearch({ t: value })}
-                  className={clsx(
-                    'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
-                    timePeriod === value
-                      ? 'text-primary-foreground bg-primary ring-2 ring-primary/30'
-                      : 'bg-surface text-muted ring-1 ring-border hover:bg-primary/10 hover:ring-primary/30'
-                  )}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+            <SegmentedControl
+              options={TIME_PERIOD_OPTIONS}
+              value={timePeriod}
+              onChange={value => setSearch({ t: value })}
+              ariaLabel="Time window"
+            />
             <SentryFilter clients={sentryClients} value={sentry} onChange={client => setSearch({ sentry: client })} />
           </div>
 
-          <InfoBox>
+          <InfoBox summary="How this is measured">
             Gossipsub partial messages (EIP-8136) let peers exchange data columns cell by cell: a node fills what it can
             from its execution layer with getBlobs, tells its peers which cells it has, and receives only the missing
             ones. Lighthouse v8.3.0 and Prysm v7.2.1 turn it on by default. Completion and message numbers come from
@@ -264,11 +252,8 @@ export function IndexPage(): JSX.Element {
           {isLoading || boundsLoading ? (
             <PartialColumnsSkeleton />
           ) : error ? null : noSentryData ? (
-            <Card rounded>
-              <div className="flex flex-col gap-1">
-                <h3 className="text-base/7 font-semibold text-foreground">No completions in this window</h3>
-                <p className="text-sm/6 text-muted">Try a longer window.</p>
-              </div>
+            <Card rounded title="No completions in this window">
+              <p className="text-sm/6 text-muted">Try a longer window.</p>
             </Card>
           ) : (
             <>
@@ -336,7 +321,9 @@ export function IndexPage(): JSX.Element {
                 </PopoutCard>
 
                 <VersionAdoption versions={versions} isDaily={isDaily} />
+              </div>
 
+              <div className="flex flex-col gap-4">
                 <PopoutCard
                   title="Completion Paths"
                   subtitle={`${periodLabel} share of ${sentryName} sentry column completions by how the column was completed`}
@@ -353,6 +340,7 @@ export function IndexPage(): JSX.Element {
                         showLegend
                         legendPosition="top"
                         enableDataZoom
+                        showDataZoomSlider={inModal}
                         tooltipFormatter={pathShareTooltip}
                         syncGroup={inModal ? undefined : 'partial-columns'}
                       />
@@ -374,10 +362,11 @@ export function IndexPage(): JSX.Element {
                         series={charts.pathLatency}
                         xAxis={{ type: 'category', labels, name: 'Date' }}
                         yAxis={{ name: 'Time (ms)', min: 0, formatter: formatMs }}
-                        height={inModal ? 600 : 320}
+                        height={inModal ? 600 : 240}
                         showLegend
                         legendPosition="top"
                         enableDataZoom
+                        showDataZoomSlider={inModal}
                         tooltipFormatter={latencyTooltip}
                         syncGroup={inModal ? undefined : 'partial-columns'}
                       />
@@ -399,10 +388,11 @@ export function IndexPage(): JSX.Element {
                         series={charts.cellSource}
                         xAxis={{ type: 'category', labels, name: 'Date' }}
                         yAxis={{ name: 'Share (%)', min: 0, max: 100 }}
-                        height={inModal ? 600 : 320}
+                        height={inModal ? 600 : 240}
                         showLegend
                         legendPosition="top"
                         enableDataZoom
+                        showDataZoomSlider={inModal}
                         tooltipFormatter={shareTooltip(charts.cellSource, keys, `${sentryName} sentry cells`)}
                         syncGroup={inModal ? undefined : 'partial-columns'}
                       />
@@ -427,10 +417,11 @@ export function IndexPage(): JSX.Element {
                         xAxis={{ type: 'category', labels, name: 'Date' }}
                         yAxis={{ name: 'Useful (%)', min: 0, max: 100 }}
                         secondaryYAxis={{ name: 'Cells received', min: 0, formatter: formatCompact }}
-                        height={inModal ? 600 : 320}
+                        height={inModal ? 600 : 240}
                         showLegend
                         legendPosition="top"
                         enableDataZoom
+                        showDataZoomSlider={inModal}
                         tooltipFormatter={usefulTooltip}
                         syncGroup={inModal ? undefined : 'partial-columns'}
                       />
@@ -455,10 +446,11 @@ export function IndexPage(): JSX.Element {
                         series={charts.verdicts}
                         xAxis={{ type: 'category', labels, name: 'Date' }}
                         yAxis={{ name: 'Verdicts', min: 0, formatter: formatCompact }}
-                        height={inModal ? 600 : 320}
+                        height={inModal ? 600 : 240}
                         showLegend
                         legendPosition="top"
                         enableDataZoom
+                        showDataZoomSlider={inModal}
                         tooltipFormatter={verdictTooltip}
                         syncGroup={inModal ? undefined : 'partial-columns'}
                       />
@@ -480,7 +472,7 @@ export function IndexPage(): JSX.Element {
                         series={charts.header}
                         xAxis={{ type: 'category', labels, name: 'Date' }}
                         yAxis={{ name: 'Time (ms)', min: 0, formatter: formatMs }}
-                        height={inModal ? 600 : 320}
+                        height={inModal ? 600 : 240}
                         showLegend
                         legendPosition="top"
                         enableDataZoom

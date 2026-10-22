@@ -2,77 +2,8 @@ import { forwardRef, cloneElement, isValidElement } from 'react';
 import { Button as HeadlessButton } from '@headlessui/react';
 import clsx from 'clsx';
 import type { ButtonProps } from './Button.types';
+import { buttonClassName } from './Button.styles';
 import './Button.css';
-
-const baseStyles =
-  'inline-flex items-center font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50 focus:outline-hidden';
-
-const variantStyles = {
-  primary: clsx(
-    'bg-primary text-white shadow-xs',
-    'hover:bg-primary/90 disabled:hover:bg-primary',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-    'dark:shadow-none dark:hover:bg-primary/80 dark:focus-visible:outline-primary'
-  ),
-  secondary: clsx(
-    'bg-surface text-foreground shadow-xs inset-ring inset-ring-border',
-    'hover:bg-background disabled:hover:bg-surface',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground',
-    'dark:bg-surface dark:text-foreground dark:shadow-none dark:inset-ring-border',
-    'dark:hover:bg-muted/20 dark:disabled:hover:bg-surface dark:focus-visible:outline-foreground'
-  ),
-  soft: clsx(
-    'bg-primary/10 text-primary shadow-xs',
-    'hover:bg-primary/20 disabled:hover:bg-primary/10',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-    'dark:bg-primary/20 dark:text-primary dark:shadow-none',
-    'dark:hover:bg-primary/30 dark:disabled:hover:bg-primary/20 dark:focus-visible:outline-primary'
-  ),
-  outline: clsx(
-    'bg-transparent text-foreground inset-ring-1 inset-ring-border',
-    'hover:bg-muted/10 disabled:hover:bg-transparent',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border',
-    'dark:text-foreground dark:inset-ring-border',
-    'dark:hover:bg-muted/20 dark:focus-visible:outline-border'
-  ),
-  danger: clsx(
-    'bg-danger text-white shadow-xs',
-    'hover:bg-danger/90 disabled:hover:bg-danger',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger',
-    'dark:shadow-none dark:hover:bg-danger/80 dark:focus-visible:outline-danger'
-  ),
-  blank: clsx(
-    'bg-transparent text-foreground',
-    'hover:bg-muted/10 disabled:hover:bg-transparent',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground',
-    'dark:text-foreground dark:hover:bg-muted/10 dark:focus-visible:outline-foreground'
-  ),
-};
-
-const sizeStyles = {
-  xs: 'px-2 py-1 text-xs gap-1.5',
-  sm: 'px-2 py-1.5 text-sm gap-1.5', // Aligned with Input sm
-  md: 'px-2.5 py-1.5 text-sm gap-1.5', // Aligned with Input md
-  lg: 'px-3 py-2 text-sm gap-1.5', // Aligned with Input lg
-  xl: 'px-3.5 py-2.5 text-sm gap-2',
-};
-
-const roundedStyles = {
-  xs: 'rounded-xs',
-  sm: 'rounded-sm',
-  md: 'rounded-md',
-  lg: 'rounded-lg',
-  xl: 'rounded-xl',
-  full: 'rounded-full',
-};
-
-const iconOnlySizeStyles = {
-  xs: 'p-1',
-  sm: 'p-1.5',
-  md: 'p-2',
-  lg: 'p-2',
-  xl: 'p-2.5',
-};
 
 const iconSizeStyles = {
   xs: 'size-4', // 16px - proportional to xs
@@ -105,18 +36,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const sizeStyle = iconOnly ? iconOnlySizeStyles[size] : sizeStyles[size];
-    const roundedStyle = rounded ? roundedStyles[rounded] : iconOnly ? 'rounded-full' : 'rounded-none';
-
-    const buttonClassName = clsx(
-      baseStyles,
-      variantStyles[variant],
-      sizeStyle,
-      roundedStyle,
-      nowrap && 'whitespace-nowrap',
-      hyper && (variant === 'blank' ? 'button-hyper-blank' : 'button-hyper'),
-      className
-    );
+    const classes = buttonClassName({
+      variant,
+      size,
+      rounded,
+      iconOnly,
+      className: clsx(
+        nowrap && 'whitespace-nowrap',
+        hyper && (variant === 'blank' ? 'button-hyper-blank' : 'button-hyper'),
+        className
+      ),
+    });
 
     // Render icon with appropriate styles
     const renderIcon = (icon: React.ReactNode, position: 'leading' | 'trailing'): React.ReactNode | null => {
@@ -132,14 +62,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     if (iconOnly) {
       const icon = leadingIcon || trailingIcon;
       return (
-        <HeadlessButton ref={ref} type={type} className={buttonClassName} {...props}>
+        <HeadlessButton ref={ref} type={type} className={classes} {...props}>
           {renderIcon(icon, 'leading')}
         </HeadlessButton>
       );
     }
 
     return (
-      <HeadlessButton ref={ref} type={type} className={buttonClassName} {...props}>
+      <HeadlessButton ref={ref} type={type} className={classes} {...props}>
         {renderIcon(leadingIcon, 'leading')}
         {children}
         {renderIcon(trailingIcon, 'trailing')}

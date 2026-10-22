@@ -67,7 +67,7 @@ export function ContractStorageButton({
       title="View contract storage"
     >
       <CircleStackIcon className={size === 'sm' ? 'size-3.5' : 'size-4'} />
-      <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted shadow-lg group-hover/storage:block">
+      <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted group-hover/storage:block">
         View contract storage
       </span>
     </Link>

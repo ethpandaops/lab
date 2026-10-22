@@ -19,6 +19,8 @@ export interface DataColumnDataAvailabilityProps {
    * Determines the number of rows in the heatmap
    */
   blobCount: number;
+  /** Blobs in the block, or null while unknown; separates "No blobs" from missing column data */
+  blockBlobCount?: number | null;
   /**
    * First seen data points for each data column (128 columns total)
    * Each point represents when a specific column was first seen

@@ -56,7 +56,7 @@ export function NetworkSelect({
         <ListboxButton
           title={getNetworkFullLabel(currentNetwork)}
           className={clsx(
-            'relative flex h-11 cursor-pointer items-center gap-2 border border-border bg-surface/50 pr-10 pl-3 text-left shadow-xs backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-surface/70 hover:shadow-sm',
+            'relative flex h-10 cursor-pointer items-center gap-2 rounded-sm border border-border bg-surface pr-8 pl-2.5 text-left transition-colors hover:border-primary/40',
             expandToFit ? 'w-auto min-w-[140px]' : 'w-full'
           )}
         >
@@ -65,12 +65,14 @@ export function NetworkSelect({
           </span>
           <span className="flex min-w-0 flex-col">
             {family && (
-              <span className="truncate text-[10px]/3 font-semibold tracking-wider text-muted uppercase">{family}</span>
+              <span className="truncate text-2xs/3 font-semibold tracking-wider text-muted uppercase">{family}</span>
             )}
-            <span className="truncate text-base/5 text-foreground">{getNetworkShortLabel(currentNetwork)}</span>
+            <span className="truncate text-sm/5 font-medium text-foreground">
+              {getNetworkShortLabel(currentNetwork)}
+            </span>
           </span>
           <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-            <ChevronUpDownIcon aria-hidden="true" className="size-5 text-muted" />
+            <ChevronUpDownIcon aria-hidden="true" className="size-4 text-muted" />
           </span>
         </ListboxButton>
 
@@ -78,7 +80,7 @@ export function NetworkSelect({
           anchor="bottom start"
           transition
           className={clsx(
-            'z-[9999] mt-1 max-h-96 overflow-auto border border-border bg-surface pb-1 shadow-lg backdrop-blur-xl focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0',
+            'z-[9999] mt-1 max-h-96 overflow-auto rounded-sm border border-border bg-surface pb-1 focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0',
             expandToFit ? 'w-max min-w-[var(--button-width)]' : 'w-[var(--button-width)]'
           )}
         >
@@ -91,7 +93,7 @@ export function NetworkSelect({
             >
               <div
                 aria-hidden="true"
-                className="px-3 pt-2.5 pb-1 text-[10px]/3 font-semibold tracking-wider text-muted/60 uppercase"
+                className="px-3 pt-2.5 pb-1 text-2xs/3 font-semibold tracking-wider text-muted/60 uppercase"
               >
                 {group.label}
               </div>

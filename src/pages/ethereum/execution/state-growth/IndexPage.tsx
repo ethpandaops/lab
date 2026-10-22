@@ -2,7 +2,9 @@ import { type JSX, useMemo, useCallback, useState } from 'react';
 import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/solid';
 import clsx from 'clsx';
 import { Container } from '@/components/Layout/Container';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { Card } from '@/components/Layout/Card';
+import { Header } from '@/components/Layout/Header';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { formatSmartDecimal } from '@/utils';
@@ -133,31 +135,18 @@ export function IndexPage(): JSX.Element {
     <Container>
       {/* Header with title and global timeframe filter */}
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-4xl/tight font-bold text-foreground">State Growth</h1>
-          <p className="mt-1 text-muted">Data extracted from go-ethereum node</p>
-        </div>
+        <Header title="State Growth" description="Data extracted from go-ethereum node" className="mb-0!" />
 
         {/* Global timeframe toggle */}
         <div className="flex flex-col items-end gap-1">
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted">Compare:</span>
-            <div className="flex items-center gap-0.5 rounded-md border border-border bg-surface/50 p-0.5">
-              {TIMEFRAME_OPTIONS.map(option => (
-                <button
-                  key={option.value}
-                  onClick={() => setTimeframe(option.value)}
-                  className={clsx(
-                    'rounded-xs px-3 py-1.5 text-xs font-medium transition-all',
-                    timeframe === option.value
-                      ? 'bg-primary text-white'
-                      : 'text-muted hover:bg-muted/10 hover:text-foreground'
-                  )}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
+            <SegmentedControl
+              ariaLabel="Compare timeframe"
+              options={TIMEFRAME_OPTIONS}
+              value={timeframe}
+              onChange={setTimeframe}
+            />
           </div>
           {isLoading ? (
             <div className="h-4 w-40 animate-pulse rounded-xs bg-muted/20" />
@@ -185,7 +174,7 @@ export function IndexPage(): JSX.Element {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch lg:gap-12">
             {/* Total State Size */}
             <div className="flex shrink-0 flex-col justify-center">
-              <p className="text-xs font-medium tracking-wider text-muted uppercase">Total State Size</p>
+              <p className="text-xs font-medium text-muted">Total State Size</p>
               <span className="mt-1 text-6xl font-bold text-foreground tabular-nums">
                 {formatBytes(latestData.total_bytes)}
               </span>
@@ -193,17 +182,14 @@ export function IndexPage(): JSX.Element {
                 <div
                   className={clsx(
                     'flex items-center gap-1.5 rounded-sm px-2 py-1',
-                    totalIsPositive ? 'bg-amber-500/10 text-amber-400' : 'bg-emerald-500/10 text-emerald-400'
+                    totalIsPositive ? 'bg-warning/10 text-warning' : 'bg-surface text-muted'
                   )}
                 >
                   <TotalIcon className="size-4" />
                   <span className="text-sm font-semibold tabular-nums">{formatDeltaBytes(delta.total.delta)}</span>
                 </div>
                 <span
-                  className={clsx(
-                    'text-sm font-medium tabular-nums',
-                    totalIsPositive ? 'text-amber-400' : 'text-emerald-400'
-                  )}
+                  className={clsx('text-sm font-medium tabular-nums', totalIsPositive ? 'text-warning' : 'text-muted')}
                 >
                   {delta.total.percentChange >= 0 ? '+' : ''}
                   {delta.total.percentChange.toFixed(3)}%
@@ -215,7 +201,7 @@ export function IndexPage(): JSX.Element {
             <div className="grid min-w-0 flex-1 grid-cols-1 gap-4 sm:grid-cols-3">
               {/* Account Trie */}
               <Card rounded className="p-3">
-                <p className="text-xs font-medium tracking-wider text-muted uppercase">Account Trie</p>
+                <p className="text-xs font-medium text-muted">Account Trie</p>
                 <p className="mt-0.5 text-2xl font-bold text-foreground tabular-nums">
                   {formatBytes(latestData.account_trienode_bytes)}
                 </p>
@@ -223,9 +209,7 @@ export function IndexPage(): JSX.Element {
                   <span
                     className={clsx(
                       'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
-                      delta.accounts.bytes.delta >= 0
-                        ? 'bg-amber-500/10 text-amber-400'
-                        : 'bg-emerald-500/10 text-emerald-400'
+                      delta.accounts.bytes.delta >= 0 ? 'bg-warning/10 text-warning' : 'bg-surface text-muted'
                     )}
                   >
                     {formatDeltaBytes(delta.accounts.bytes.delta)}
@@ -233,7 +217,7 @@ export function IndexPage(): JSX.Element {
                   <span
                     className={clsx(
                       'text-xs font-medium tabular-nums',
-                      delta.accounts.bytes.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
+                      delta.accounts.bytes.delta >= 0 ? 'text-warning' : 'text-muted'
                     )}
                   >
                     {delta.accounts.bytes.percentChange >= 0 ? '+' : ''}
@@ -247,7 +231,7 @@ export function IndexPage(): JSX.Element {
 
               {/* Storage Tries */}
               <Card rounded className="p-3">
-                <p className="text-xs font-medium tracking-wider text-muted uppercase">Storage Tries</p>
+                <p className="text-xs font-medium text-muted">Storage Tries</p>
                 <p className="mt-0.5 text-2xl font-bold text-foreground tabular-nums">
                   {formatBytes(latestData.storage_trienode_bytes)}
                 </p>
@@ -255,9 +239,7 @@ export function IndexPage(): JSX.Element {
                   <span
                     className={clsx(
                       'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
-                      delta.storage.bytes.delta >= 0
-                        ? 'bg-amber-500/10 text-amber-400'
-                        : 'bg-emerald-500/10 text-emerald-400'
+                      delta.storage.bytes.delta >= 0 ? 'bg-warning/10 text-warning' : 'bg-surface text-muted'
                     )}
                   >
                     {formatDeltaBytes(delta.storage.bytes.delta)}
@@ -265,7 +247,7 @@ export function IndexPage(): JSX.Element {
                   <span
                     className={clsx(
                       'text-xs font-medium tabular-nums',
-                      delta.storage.bytes.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
+                      delta.storage.bytes.delta >= 0 ? 'text-warning' : 'text-muted'
                     )}
                   >
                     {delta.storage.bytes.percentChange >= 0 ? '+' : ''}
@@ -279,7 +261,7 @@ export function IndexPage(): JSX.Element {
 
               {/* Contract Codes */}
               <Card rounded className="p-3">
-                <p className="text-xs font-medium tracking-wider text-muted uppercase">Contract Codes</p>
+                <p className="text-xs font-medium text-muted">Contract Codes</p>
                 <p className="mt-0.5 text-2xl font-bold text-foreground tabular-nums">
                   {formatBytes(latestData.contract_code_bytes)}
                 </p>
@@ -287,9 +269,7 @@ export function IndexPage(): JSX.Element {
                   <span
                     className={clsx(
                       'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
-                      delta.contractCodes.bytes.delta >= 0
-                        ? 'bg-amber-500/10 text-amber-400'
-                        : 'bg-emerald-500/10 text-emerald-400'
+                      delta.contractCodes.bytes.delta >= 0 ? 'bg-warning/10 text-warning' : 'bg-surface text-muted'
                     )}
                   >
                     {formatDeltaBytes(delta.contractCodes.bytes.delta)}
@@ -297,7 +277,7 @@ export function IndexPage(): JSX.Element {
                   <span
                     className={clsx(
                       'text-xs font-medium tabular-nums',
-                      delta.contractCodes.bytes.delta >= 0 ? 'text-amber-400' : 'text-emerald-400'
+                      delta.contractCodes.bytes.delta >= 0 ? 'text-warning' : 'text-muted'
                     )}
                   >
                     {delta.contractCodes.bytes.percentChange >= 0 ? '+' : ''}

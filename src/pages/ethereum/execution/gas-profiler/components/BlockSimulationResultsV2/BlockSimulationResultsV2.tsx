@@ -1,3 +1,6 @@
+import { ExplorerLinks } from '../ExplorerLinks';
+import { Button } from '@/components/Elements/Button';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { type JSX, useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from '@tanstack/react-router';
@@ -17,9 +20,6 @@ import { Stats } from '@/components/DataDisplay/Stats';
 import type { Stat } from '@/components/DataDisplay/Stats/Stats.types';
 import { Tab } from '@/components/Navigation/Tab';
 import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
-import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
-import { TenderlyIcon } from '@/components/Ethereum/TenderlyIcon';
-import { PhalconIcon } from '@/components/Ethereum/PhalconIcon';
 import { useNetwork } from '@/hooks/useNetwork';
 import { getOpcodeCategory, CATEGORY_COLORS } from '../../utils/opcodeUtils';
 import { getEtherscanBaseUrl, isMainnet } from '../../utils/explorerLinks';
@@ -79,8 +79,8 @@ function formatDelta(percent: number): string {
 }
 
 function getDeltaColor(percent: number): string {
-  if (percent < 0) return 'text-green-500';
-  if (percent > 0) return 'text-red-500';
+  if (percent < 0) return 'text-foreground';
+  if (percent > 0) return 'text-danger';
   return 'text-muted';
 }
 
@@ -113,7 +113,7 @@ function Tooltip({ title, description, children, className, style, width = 'w-56
     <div
       role="tooltip"
       className={clsx(
-        'pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background p-3 shadow-lg',
+        'pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background p-3',
         width
       )}
       style={{ top: position.top, left: position.left }}
@@ -160,20 +160,20 @@ function ErrorCard({
     <div
       className={clsx(
         'overflow-hidden rounded-xs border',
-        isSimulated && hasErrors ? 'border-red-500/20 bg-red-500/[0.03]' : 'border-border/50 bg-surface/20'
+        isSimulated && hasErrors ? 'border-danger/20 bg-danger/[0.03]' : 'border-border/50 bg-surface/20'
       )}
     >
       {/* Header */}
       <div
         className={clsx(
           'flex items-center gap-2 border-b px-3 py-2',
-          isSimulated && hasErrors ? 'border-red-500/15 bg-red-500/[0.04]' : 'border-border/30 bg-surface/30'
+          isSimulated && hasErrors ? 'border-danger/15 bg-danger/5' : 'border-border/30'
         )}
       >
         <div
           className={clsx(
             'size-1.5 shrink-0 rounded-full',
-            hasErrors ? (isSimulated ? 'bg-red-500' : 'bg-amber-500') : 'bg-green-500'
+            hasErrors ? (isSimulated ? 'bg-danger' : 'bg-warning') : 'bg-muted'
           )}
         />
         <span className="text-xs font-semibold text-foreground">{label}</span>
@@ -189,22 +189,22 @@ function ErrorCard({
                 className="flex items-center gap-1.5 py-0.5 whitespace-nowrap"
                 style={{ paddingLeft: `${err.depth * 16}px` }}
               >
-                {err.depth > 0 && <span className="text-[10px] text-muted/40">{'\u2514'}</span>}
+                {err.depth > 0 && <span className="text-2xs text-muted/40">{'\u2514'}</span>}
                 <span
                   className={clsx(
-                    'shrink-0 rounded-xs px-1 py-px font-mono text-[10px] font-semibold',
-                    isSimulated ? 'bg-red-500/10 text-red-400' : 'bg-amber-500/10 text-amber-500'
+                    'shrink-0 rounded-xs px-1 py-px font-mono text-2xs font-semibold',
+                    isSimulated ? 'bg-danger/10 text-danger' : 'bg-warning/10 text-warning'
                   )}
                 >
                   {err.type}
                 </span>
-                <span className="font-mono text-[11px] text-foreground/70">{err.address}</span>
-                <span className="font-mono text-[11px] text-red-400/70">({err.error})</span>
+                <span className="font-mono text-2xs text-foreground/70">{err.address}</span>
+                <span className="font-mono text-2xs text-danger/70">({err.error})</span>
               </div>
             ))}
           </div>
         ) : (
-          <div className="flex items-center gap-1.5 text-xs text-green-500">
+          <div className="flex items-center gap-1.5 text-xs text-muted">
             <CheckCircleIcon className="size-3.5" />
             <span>No internal call errors</span>
           </div>
@@ -231,7 +231,7 @@ function GasComparisonSection({
   const isIncrease = result.simulated.gasUsed > result.original.gasUsed;
   const absDelta = Math.abs(result.simulated.gasUsed - result.original.gasUsed);
 
-  const simBarColor = overallDelta > 5 ? 'bg-red-500/30' : overallDelta < -5 ? 'bg-green-500/25' : 'bg-primary/25';
+  const simBarColor = overallDelta > 5 ? 'bg-danger/30' : 'bg-primary/25';
 
   return (
     <div className="space-y-2">
@@ -309,13 +309,13 @@ function GasComparisonSection({
         <div className="flex items-center gap-1.5">
           {result.simulated.wouldExceedLimit ? (
             <>
-              <ExclamationTriangleIcon className="size-3 text-red-500" />
-              <span className="text-xs font-medium text-red-500">Exceeds limit</span>
+              <ExclamationTriangleIcon className="size-3 text-danger" />
+              <span className="text-xs font-medium text-danger">Exceeds limit</span>
             </>
           ) : (
             <>
-              <CheckCircleIcon className="size-3 text-green-500" />
-              <span className="text-xs text-green-500">Within limit</span>
+              <CheckCircleIcon className="size-3 text-muted" />
+              <span className="text-xs text-muted">Within limit</span>
             </>
           )}
           <span className="text-xs text-muted">{formatCompactGas(gasLimit)}</span>
@@ -367,7 +367,7 @@ function ExecutionHealthSection({
       value: String(divergenceSummary.divergedCount),
       icon: ArrowsRightLeftIcon,
       iconColor: divergedColor,
-      valueClassName: divergenceSummary.divergedCount > 0 ? 'text-amber-500' : 'text-foreground',
+      valueClassName: divergenceSummary.divergedCount > 0 ? 'text-warning' : 'text-foreground',
       subtitle:
         totalTransactions > 0 && divergenceSummary.divergedCount > 0
           ? `${((divergenceSummary.divergedCount / totalTransactions) * 100).toFixed(1)}% of txs`
@@ -380,7 +380,7 @@ function ExecutionHealthSection({
       value: String(divergenceSummary.statusChanges),
       icon: ExclamationTriangleIcon,
       iconColor: statusColor,
-      valueClassName: divergenceSummary.statusChanges > 0 ? 'text-red-500' : 'text-foreground',
+      valueClassName: divergenceSummary.statusChanges > 0 ? 'text-danger' : 'text-foreground',
       subtitle: divergenceSummary.statusChanges > 0 ? 'tx outcomes changed' : 'all outcomes preserved',
       accentColor: `${statusColor}33`,
     },
@@ -390,12 +390,7 @@ function ExecutionHealthSection({
       value: `${divergenceSummary.additionalReverts > 0 ? '+' : ''}${divergenceSummary.additionalReverts}`,
       icon: XMarkIcon,
       iconColor: revertsColor,
-      valueClassName:
-        divergenceSummary.additionalReverts > 0
-          ? 'text-red-500'
-          : divergenceSummary.additionalReverts < 0
-            ? 'text-green-500'
-            : 'text-foreground',
+      valueClassName: divergenceSummary.additionalReverts > 0 ? 'text-danger' : 'text-foreground',
       subtitle:
         divergenceSummary.totalOriginalReverts > 0 || divergenceSummary.totalSimulatedReverts > 0
           ? `${divergenceSummary.totalOriginalReverts} \u2192 ${divergenceSummary.totalSimulatedReverts} total`
@@ -456,7 +451,7 @@ function OpcodeRow({ op, maxGas }: { op: OpcodeRowData; maxGas: number }): JSX.E
                 : op.opcode}
           </span>
           {hasCountChange && (
-            <span className="font-mono text-[11px] text-muted tabular-nums">
+            <span className="font-mono text-2xs text-muted tabular-nums">
               {formatGas(op.originalCount)} &rarr; {formatGas(op.simulatedCount)} execs
             </span>
           )}
@@ -698,54 +693,45 @@ function TransactionImpactView({
       {/* Filter + Sort bar */}
       <div className="mb-4 flex flex-wrap items-center gap-3">
         {/* Filters */}
-        <div className="flex items-center gap-1 rounded-sm bg-surface/60 p-1">
-          {filterOptions.map(opt => (
-            <button
-              key={opt.key}
-              onClick={() => {
-                setFilter(opt.key);
-                setVisibleCount(20);
-              }}
-              className={clsx(
-                'flex items-center gap-1.5 rounded-xs px-3 py-1.5 text-xs font-medium transition-all',
-                filter === opt.key ? 'bg-background text-foreground shadow-xs' : 'text-muted hover:text-foreground',
-                opt.count === 0 && opt.key !== 'all' && 'opacity-40'
-              )}
-              disabled={opt.count === 0 && opt.key !== 'all'}
-            >
-              {opt.label}
-              <span
-                className={clsx(
-                  'rounded-full px-1.5 py-0.5 font-mono text-[10px] tabular-nums',
-                  filter === opt.key ? 'bg-primary/10 text-primary' : 'bg-border/30 text-muted'
-                )}
-              >
-                {opt.count}
-              </span>
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          ariaLabel="Filter transactions"
+          options={filterOptions.map(opt => ({
+            value: opt.key,
+            label: (
+              <>
+                {opt.label} <span className="font-mono tabular-nums">{opt.count}</span>
+              </>
+            ),
+            disabled: opt.count === 0 && opt.key !== 'all',
+          }))}
+          value={filter}
+          onChange={key => {
+            setFilter(key);
+            setVisibleCount(20);
+          }}
+        />
 
         <div className="flex-1" />
 
         {/* Sort */}
-        <div className="flex items-center gap-1 rounded-sm bg-surface/60 p-1">
-          <span className="px-2 text-[10px] font-medium tracking-wide text-muted uppercase">Sort</span>
-          {sortOptions.map(opt => (
-            <button
-              key={opt.key}
-              onClick={() => toggleSort(opt.key)}
-              className={clsx(
-                'rounded-xs px-2.5 py-1.5 text-xs font-medium transition-all',
-                sortBy === opt.key ? 'bg-background text-foreground shadow-xs' : 'text-muted hover:text-foreground'
-              )}
-            >
-              {opt.label}
-              {sortBy === opt.key && (
-                <span className="ml-1 text-primary">{sortDir === 'desc' ? '\u2193' : '\u2191'}</span>
-              )}
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-muted">Sort</span>
+          <SegmentedControl
+            ariaLabel="Sort transactions"
+            options={sortOptions.map(opt => ({
+              value: opt.key,
+              label: (
+                <>
+                  {opt.label}
+                  {sortBy === opt.key && (
+                    <span className="ml-1 text-primary">{sortDir === 'desc' ? '\u2193' : '\u2191'}</span>
+                  )}
+                </>
+              ),
+            }))}
+            value={sortBy}
+            onChange={toggleSort}
+          />
         </div>
       </div>
 
@@ -780,18 +766,18 @@ function TransactionImpactView({
 
                 {/* Simulated status icon */}
                 {tx.simulatedStatus === 'success' ? (
-                  <CheckCircleIcon className="size-4 shrink-0 text-green-500" />
+                  <CheckCircleIcon className="size-4 shrink-0 text-muted" />
                 ) : (
-                  <XCircleIcon className="size-4 shrink-0 text-red-500" />
+                  <XCircleIcon className="size-4 shrink-0 text-danger" />
                 )}
 
                 {/* Tiny indicator dots for notable items */}
                 {isNotable && (
                   <div className="flex items-center gap-1">
-                    {statusChanged && <div className="size-1.5 rounded-full bg-red-500" title="Status changed" />}
-                    {tx.diverged && <div className="size-1.5 rounded-full bg-amber-500" title="Diverged" />}
+                    {statusChanged && <div className="size-1.5 rounded-full bg-danger" title="Status changed" />}
+                    {tx.diverged && <div className="size-1.5 rounded-full bg-warning" title="Diverged" />}
                     {hasErrors && !statusChanged && (
-                      <div className="size-1.5 rounded-full bg-red-400" title="Call errors" />
+                      <div className="size-1.5 rounded-full bg-danger" title="Call errors" />
                     )}
                   </div>
                 )}
@@ -814,12 +800,12 @@ function TransactionImpactView({
                       <dt className="text-xs text-muted">Status</dt>
                       <dd className="mt-1 text-sm font-semibold">
                         {statusChanged ? (
-                          <span className="text-red-500">
+                          <span className="text-danger">
                             {tx.originalStatus === 'success' ? 'Success' : 'Failed'} &rarr;{' '}
                             {tx.simulatedStatus === 'success' ? 'Success' : 'Failed'}
                           </span>
                         ) : (
-                          <span className={tx.originalStatus === 'success' ? 'text-green-500' : 'text-red-400'}>
+                          <span className={tx.originalStatus === 'success' ? 'text-foreground' : 'text-danger'}>
                             {tx.originalStatus === 'success' ? 'Success' : 'Failed'}
                           </span>
                         )}
@@ -841,7 +827,7 @@ function TransactionImpactView({
                           }
                         >
                           {tx.diverged ? (
-                            <span className="cursor-help text-amber-500 underline decoration-amber-500/30 decoration-dotted underline-offset-2">
+                            <span className="cursor-help text-warning underline decoration-warning/30 decoration-dotted underline-offset-2">
                               Yes
                             </span>
                           ) : (
@@ -868,7 +854,7 @@ function TransactionImpactView({
                       <dt className="text-xs text-muted">Call Errors</dt>
                       <dd className="mt-1 text-sm font-semibold">
                         {hasErrors ? (
-                          <span className="text-red-400">
+                          <span className="text-danger">
                             {tx.originalErrors.length} &rarr; {tx.simulatedErrors.length}
                           </span>
                         ) : (
@@ -921,38 +907,26 @@ function TransactionImpactView({
                     >
                       View tx details &rarr;
                     </Link>
-                    <div className="ml-auto flex items-center gap-2">
-                      <a
-                        href={`${getEtherscanBaseUrl(currentNetwork?.name)}/tx/${tx.hash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
-                        title="View tx on Etherscan"
-                      >
-                        <EtherscanIcon className="size-4" />
-                      </a>
-                      {isMainnet(currentNetwork?.name) && (
-                        <>
-                          <a
-                            href={`https://dashboard.tenderly.co/tx/1/${tx.hash}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
-                            title="View tx on Tenderly"
-                          >
-                            <TenderlyIcon className="size-4" />
-                          </a>
-                          <a
-                            href={`https://phalcon.blocksec.com/explorer/tx/eth/${tx.hash}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
-                            title="View tx on Phalcon"
-                          >
-                            <PhalconIcon className="size-4" />
-                          </a>
-                        </>
-                      )}
+                    <div className="ml-auto">
+                      <ExplorerLinks
+                        etherscan={{
+                          href: `${getEtherscanBaseUrl(currentNetwork?.name)}/tx/${tx.hash}`,
+                          title: 'View tx on Etherscan',
+                        }}
+                        tenderly={
+                          isMainnet(currentNetwork?.name)
+                            ? { href: `https://dashboard.tenderly.co/tx/1/${tx.hash}`, title: 'View tx on Tenderly' }
+                            : undefined
+                        }
+                        phalcon={
+                          isMainnet(currentNetwork?.name)
+                            ? {
+                                href: `https://phalcon.blocksec.com/explorer/tx/eth/${tx.hash}`,
+                                title: 'View tx on Phalcon',
+                              }
+                            : undefined
+                        }
+                      />
                     </div>
                   </div>
                 </div>
@@ -965,12 +939,9 @@ function TransactionImpactView({
       {/* Load more */}
       {filteredAndSorted.length > visibleCount && (
         <div className="mt-4 flex justify-center">
-          <button
-            onClick={() => setVisibleCount(filteredAndSorted.length)}
-            className="flex items-center gap-2 rounded-xs border border-border bg-surface px-4 py-2 text-sm text-foreground transition-colors hover:bg-background"
-          >
+          <Button variant="secondary" size="sm" onClick={() => setVisibleCount(filteredAndSorted.length)}>
             Show All ({filteredAndSorted.length - visibleCount} more)
-          </button>
+          </Button>
         </div>
       )}
 
@@ -1087,27 +1058,21 @@ export function BlockSimulationResultsV2({
             <Tab>Gas Breakdown</Tab>
             <Tab>Transactions</Tab>
           </ScrollableTabs>
-          <div className="flex items-center gap-2 pb-2">
-            <a
-              href={`${getEtherscanBaseUrl(currentNetwork?.name)}/block/${result.blockNumber}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full bg-surface p-1.5 text-muted transition-colors hover:text-foreground"
-              title="View block on Etherscan"
-            >
-              <EtherscanIcon className="size-4" />
-            </a>
-            {isMainnet(currentNetwork?.name) && (
-              <a
-                href={`https://dashboard.tenderly.co/block/1/${result.blockNumber}/txs`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full bg-surface p-1.5 transition-colors hover:opacity-80"
-                title="View block on Tenderly"
-              >
-                <TenderlyIcon className="size-4" />
-              </a>
-            )}
+          <div className="pb-2">
+            <ExplorerLinks
+              etherscan={{
+                href: `${getEtherscanBaseUrl(currentNetwork?.name)}/block/${result.blockNumber}`,
+                title: 'View block on Etherscan',
+              }}
+              tenderly={
+                isMainnet(currentNetwork?.name)
+                  ? {
+                      href: `https://dashboard.tenderly.co/block/1/${result.blockNumber}/txs`,
+                      title: 'View block on Tenderly',
+                    }
+                  : undefined
+              }
+            />
           </div>
         </div>
 

@@ -27,7 +27,7 @@ function getCallTypeStyles(callType: string): { bg: string; text: string } {
     case 'CREATE':
       return { bg: 'bg-orange-500/20', text: 'text-orange-400' };
     case 'CREATE2':
-      return { bg: 'bg-amber-500/20', text: 'text-amber-400' };
+      return { bg: 'bg-warning/20', text: 'text-warning' };
     case 'DELEGATECALL':
       return { bg: 'bg-purple-500/20', text: 'text-purple-400' };
     case 'STATICCALL':
@@ -429,7 +429,7 @@ function TraceRow({
               className={clsx(
                 'cursor-pointer transition-colors',
                 isAddressHighlighted
-                  ? 'rounded-xs bg-amber-200 px-0.5 text-amber-800 dark:bg-amber-500/30 dark:text-amber-300'
+                  ? 'rounded-xs bg-warning/30 px-0.5 text-foreground'
                   : 'text-muted hover:text-foreground'
               )}
               onMouseEnter={handleContractMouseEnter}
@@ -462,10 +462,10 @@ function TraceRow({
         {/* Opcode badges - storage writes (SSTORE) */}
         {opcodeStats && opcodeStats.sstoreCount > 0 && (
           <button onClick={handleOpcodeToggle} className="group/badge relative shrink-0">
-            <span className="cursor-pointer rounded-xs bg-amber-500/20 px-1.5 py-0.5 text-xs text-amber-400 transition-colors hover:bg-amber-500/30">
+            <span className="cursor-pointer rounded-xs bg-warning/20 px-1.5 py-0.5 text-xs text-warning transition-colors hover:bg-warning/30">
               {opcodeStats.sstoreCount} write{opcodeStats.sstoreCount > 1 ? 's' : ''}
             </span>
-            <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted shadow-lg group-hover/badge:block">
+            <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted group-hover/badge:block">
               {opcodeStats.sstoreCount} storage write{opcodeStats.sstoreCount > 1 ? 's' : ''} (
               {formatGasCompact(opcodeStats.sstoreGas)} gas)
             </span>
@@ -478,7 +478,7 @@ function TraceRow({
             <span className="cursor-pointer rounded-xs bg-sky-500/20 px-1.5 py-0.5 text-xs text-sky-400 transition-colors hover:bg-sky-500/30">
               {opcodeStats.sloadCount} read{opcodeStats.sloadCount > 1 ? 's' : ''}
             </span>
-            <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted shadow-lg group-hover/badge:block">
+            <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted group-hover/badge:block">
               {opcodeStats.sloadCount} storage read{opcodeStats.sloadCount > 1 ? 's' : ''} (
               {formatGasCompact(opcodeStats.sloadGas)} gas)
             </span>
@@ -491,7 +491,7 @@ function TraceRow({
             <span className="cursor-pointer rounded-xs bg-violet-500/20 px-1.5 py-0.5 text-xs text-violet-400 transition-colors hover:bg-violet-500/30">
               {opcodeStats.logCount} event{opcodeStats.logCount > 1 ? 's' : ''}
             </span>
-            <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted shadow-lg group-hover/badge:block">
+            <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted group-hover/badge:block">
               {opcodeStats.logCount} event{opcodeStats.logCount > 1 ? 's' : ''} emitted (
               {formatGasCompact(opcodeStats.logGas)} gas)
             </span>
@@ -504,7 +504,7 @@ function TraceRow({
             <span className="cursor-pointer rounded-xs bg-orange-500/20 px-1.5 py-0.5 text-xs text-orange-400 transition-colors hover:bg-orange-500/30">
               {opcodeStats.createCount} deploy{opcodeStats.createCount > 1 ? 's' : ''}
             </span>
-            <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted shadow-lg group-hover/badge:block">
+            <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted group-hover/badge:block">
               {opcodeStats.createCount} contract deployment{opcodeStats.createCount > 1 ? 's' : ''}
             </span>
           </button>
@@ -513,10 +513,10 @@ function TraceRow({
         {/* Opcode badges - self destruct */}
         {opcodeStats && opcodeStats.selfdestructCount > 0 && (
           <button onClick={handleOpcodeToggle} className="group/badge relative shrink-0">
-            <span className="cursor-pointer rounded-xs bg-red-500/20 px-1.5 py-0.5 text-xs text-red-400 transition-colors hover:bg-red-500/30">
+            <span className="cursor-pointer rounded-xs bg-danger/20 px-1.5 py-0.5 text-xs text-danger transition-colors hover:bg-danger/30">
               selfdestruct
             </span>
-            <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted shadow-lg group-hover/badge:block">
+            <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted group-hover/badge:block">
               Contract self-destructs in this call
             </span>
           </button>
@@ -529,7 +529,7 @@ function TraceRow({
 
         {/* Future: Value badge */}
         {extendedData?.value && extendedData.value > 0n && (
-          <span className="shrink-0 rounded-xs bg-green-500/20 px-1.5 py-0.5 text-xs text-green-400">
+          <span className="shrink-0 rounded-xs bg-surface px-1.5 py-0.5 text-xs text-foreground">
             Ξ{(Number(extendedData.value) / 1e18).toFixed(4)}
           </span>
         )}
@@ -552,7 +552,7 @@ function TraceRow({
             )}
           >
             <ChartBarIcon className="size-4" />
-            <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted shadow-lg group-hover/opcode:block">
+            <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted group-hover/opcode:block">
               {isOpcodeExpanded ? 'Hide opcode breakdown' : 'Show opcode breakdown'}
             </span>
           </button>

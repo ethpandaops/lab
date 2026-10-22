@@ -16,8 +16,8 @@ import type { ForkLabelProps } from './ForkLabel.types';
  * <ForkLabel fork="altair" size="sm" showIcon={false} />
  *
  * @example
- * // Large size with custom styling
- * <ForkLabel fork="bellatrix" size="lg" className="shadow-lg" />
+ * // Large size
+ * <ForkLabel fork="bellatrix" size="lg" />
  */
 export function ForkLabel({ fork, className, size = 'md', showIcon = true }: ForkLabelProps): React.JSX.Element {
   // Networks can serve fork names newer than this build knows about; render
@@ -26,7 +26,7 @@ export function ForkLabel({ fork, className, size = 'md', showIcon = true }: For
     version: fork,
     name: fork,
     emoji: '🔮',
-    color: 'bg-gray-100 text-gray-700 dark:bg-gray-400/10 dark:text-gray-400',
+    color: 'bg-muted/10 text-muted',
     description: `Upcoming fork: ${fork}`,
   };
 
@@ -45,7 +45,7 @@ export function ForkLabel({ fork, className, size = 'md', showIcon = true }: For
   return (
     <span
       className={clsx(
-        'inline-flex items-center rounded-md font-semibold tracking-wide uppercase',
+        'inline-flex items-center rounded-xs font-semibold tracking-wide uppercase',
         metadata.color,
         sizeClasses[size],
         className

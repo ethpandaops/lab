@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { CubeIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import { dimContractOwnerServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { Container } from '@/components/Layout/Container';
+import { Alert } from '@/components/Feedback/Alert';
 import { Card } from '@/components/Layout/Card';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { MultiLineChart, type MarkLineConfig } from '@/components/Charts/MultiLine';
@@ -441,9 +442,7 @@ export function ContractPage(): JSX.Element {
       )}
 
       {error ? (
-        <Card className="mt-8 p-6">
-          <p className="text-danger">Failed to load contract data: {error.message}</p>
-        </Card>
+        <Alert variant="error" className="mt-8" description={`Failed to load contract data: ${error.message}`} />
       ) : (
         <div className="mt-8 space-y-4">
           {/* State Expiry Section Title */}

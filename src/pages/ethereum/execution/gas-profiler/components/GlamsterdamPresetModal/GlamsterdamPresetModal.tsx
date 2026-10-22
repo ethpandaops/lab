@@ -1,3 +1,4 @@
+import { Badge } from '@/components/Elements/Badge';
 import { type JSX, useState, useCallback, useMemo } from 'react';
 import { ArrowTopRightOnSquareIcon, ExclamationTriangleIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
@@ -233,9 +234,9 @@ export function GlamsterdamPresetModal({
                   </span>
                   <h3 className="text-sm font-semibold text-foreground">{section.name}</h3>
                   {section.placeholder && (
-                    <span className="rounded-xs bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-600 uppercase dark:text-amber-400">
+                    <Badge color="yellow" variant="flat" size="small">
                       Values TBD
-                    </span>
+                    </Badge>
                   )}
                 </div>
                 <p className="mt-1 text-xs/5 text-muted">{section.description}</p>
@@ -279,7 +280,7 @@ export function GlamsterdamPresetModal({
                     </div>
 
                     {/* Default → New indicator */}
-                    <span className="w-24 shrink-0 text-right font-mono text-[10px] text-muted">
+                    <span className="w-24 shrink-0 text-right font-mono text-2xs text-muted">
                       {defaultValue.toLocaleString()}
                       <span className="mx-1 text-muted/50">&rarr;</span>
                     </span>
@@ -335,9 +336,9 @@ export function GlamsterdamPresetModal({
 
             {/* Optional note about unsimulated parts */}
             {section.note && (
-              <div className="mt-2.5 flex items-start gap-2 rounded-xs bg-amber-500/5 px-3 py-2">
-                <ExclamationTriangleIcon className="mt-0.5 size-3.5 shrink-0 text-amber-500" />
-                <p className="text-[11px]/4 text-muted">{section.note}</p>
+              <div className="mt-2.5 flex items-start gap-2 rounded-xs bg-warning/5 px-3 py-2">
+                <ExclamationTriangleIcon className="mt-0.5 size-3.5 shrink-0 text-warning" />
+                <p className="text-2xs/4 text-muted">{section.note}</p>
               </div>
             )}
           </div>
@@ -346,7 +347,7 @@ export function GlamsterdamPresetModal({
         {/* Not Covered EIPs */}
         <div className="px-6 py-4">
           <div className="mb-3 flex items-center gap-2">
-            <ExclamationTriangleIcon className="size-4 text-amber-500" />
+            <ExclamationTriangleIcon className="size-4 text-warning" />
             <h3 className="text-sm font-semibold text-foreground">Not Simulated</h3>
           </div>
           <div className="space-y-2">
@@ -367,7 +368,7 @@ export function GlamsterdamPresetModal({
                       <ArrowTopRightOnSquareIcon className="size-3.5" />
                     </a>
                   </div>
-                  <p className="mt-0.5 text-[11px]/4 text-muted">{eip.reason}</p>
+                  <p className="mt-0.5 text-2xs/4 text-muted">{eip.reason}</p>
                 </div>
               </div>
             ))}
