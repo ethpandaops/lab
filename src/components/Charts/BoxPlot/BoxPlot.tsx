@@ -10,6 +10,7 @@ import type { BoxPlotProps } from './BoxPlot.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
 import {
   getChartAxisLabelStyle,
+  formatAxisNumber,
   getChartAxisLine,
   getChartAxisNameStyle,
   getChartTooltipChrome,
@@ -167,7 +168,7 @@ export function BoxPlot({
         splitLine: getChartValueSplitLine(themeColors),
         axisLabel: {
           ...getChartAxisLabelStyle(themeColors),
-          formatter: yAxisFormatter,
+          formatter: yAxisFormatter ?? formatAxisNumber,
         },
       },
       series: processedSeries,

@@ -12,6 +12,7 @@ import type { ScatterAndLineChartProps } from './ScatterAndLine.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
 import {
   getChartAxisLabelStyle,
+  formatAxisNumber,
   getChartAxisLine,
   getChartAxisNameStyle,
   getChartTooltipChrome,
@@ -135,7 +136,7 @@ export function ScatterAndLineChart({
           axisTick: { show: false },
           axisLabel: {
             ...getChartAxisLabelStyle(themeColors),
-            formatter: yAxisFormatter,
+            formatter: yAxisFormatter ?? formatAxisNumber,
           },
           splitLine: getChartValueSplitLine(themeColors),
         },
@@ -156,7 +157,7 @@ export function ScatterAndLineChart({
                 max: yAxis2Max,
                 axisLine: { show: false },
                 axisTick: { show: false },
-                axisLabel: getChartAxisLabelStyle(themeColors),
+                axisLabel: { ...getChartAxisLabelStyle(themeColors), formatter: formatAxisNumber },
                 splitLine: {
                   show: false,
                 },

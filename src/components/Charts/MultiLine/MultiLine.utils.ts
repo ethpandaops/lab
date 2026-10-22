@@ -387,11 +387,3 @@ export function dateCategoryTicks(labels: string[], maxTicks: number): Map<numbe
   });
   return ticks;
 }
-
-/** Axis numbers: compact from 10,000 up ("40M", "1.2B"), grouped digits below */
-export function formatAxisNumber(value: number): string {
-  if (Math.abs(value) >= 10_000) {
-    return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(value);
-  }
-  return value.toLocaleString('en-US', { maximumFractionDigits: 6 });
-}

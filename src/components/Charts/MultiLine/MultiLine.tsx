@@ -21,7 +21,8 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { SharedCrosshairsContext } from '@/contexts/SharedCrosshairsContext';
 import { Disclosure } from '@/components/Layout/Disclosure';
 import type { MultiLineChartProps } from './MultiLine.types';
-import { dateCategoryTicks, formatAxisNumber } from './MultiLine.utils';
+import { dateCategoryTicks } from './MultiLine.utils';
+import { formatAxisNumber } from '../chartChrome';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
 
 /** Maximum number of plain lines that get an end-of-line label */
@@ -44,6 +45,43 @@ function lastValue(data: unknown[]): number | null {
 
 /** Pixel gap end labels need between them (11px text plus breathing room) */
 const END_LABEL_GAP_PX = 18;
+
+/** Legend key drawn like the mark it names: a filled block for areas and bands, a line (dashed when the series is) otherwise */
+function LegendSwatch({
+  series,
+  color,
+  active,
+}: {
+  series: { showArea?: boolean; lineStyle?: string; lineWidth?: number; seriesType?: string };
+  color: string;
+  active: boolean;
+}): React.JSX.Element {
+  const block = series.seriesType === 'bar' || (series.showArea && series.lineWidth === 0);
+  return block ? (
+    <span
+      aria-hidden
+      className="size-2.5 rounded-xs transition-opacity"
+      style={{ backgroundColor: color, opacity: active ? 0.9 : 0.25 }}
+    />
+  ) : (
+    <span
+      aria-hidden
+      className="w-3 transition-opacity"
+      style={{
+        borderTop: `2px ${series.lineStyle === 'dotted' ? 'dotted' : series.lineStyle === 'dashed' ? 'dashed' : 'solid'} ${color}`,
+        opacity: active ? 1 : 0.3,
+      }}
+    />
+  );
+}
+
+/**
+ * Label for marks that share one spot: two names read as a pair ("Petersburg · Constantinople");
+ * three or more name the first and count the rest, so a column of forks stays one short label
+ */
+function mergedMarkLabel(names: string[]): string {
+  return names.length > 2 ? `${names[0]} +${names.length - 1}` : names.join(' · ');
+}
 
 /** `color` laid over `base` at `alpha`, as an opaque hex colour */
 function blendHex(color: string, base: string, alpha: number): string {
@@ -620,6 +658,9 @@ export function MultiLineChart({
       : 0;
     const endLabelMargin = showEndLabels ? Math.min(140, Math.ceil(longestEndLabel * 6 + 12)) : 0;
 
+    // Share stacks (every layer filled) render as solid bands; confidence bands stack on an invisible
+    // zero-opacity base and stay translucent so they layer over each other and the grid
+    const bandStacks = new Set(series.filter(s => s.stack && s.areaOpacity === 0).map(s => s.stack));
     const seriesConfig = displayedSeries.map(s => {
       // Use explicit color or auto-assign from palette
       const originalIndex = series.indexOf(s);
@@ -704,9 +745,9 @@ export function MultiLineChart({
           : {}),
       };
 
-      // Stacked areas are bands: fill each with an opaque blend over the surface, so grid lines
-      // and neighbouring bands never show through; the fills alone draw the edges
-      if (s.showArea && s.stack) {
+      // Share stacks: fill each layer with an opaque blend over the surface, so grid lines and
+      // neighbouring layers never show through; the fills alone draw the edges
+      if (s.showArea && s.stack && !bandStacks.has(s.stack)) {
         return {
           ...baseConfig,
           lineStyle: { ...baseConfig.lineStyle, width: 0 },
@@ -817,7 +858,7 @@ export function MultiLineChart({
                         },
                         label: {
                           show: visibleMarkLabels.has(index),
-                          formatter: [...(mergedMarkLabels.get(index) ?? []), ml.label ?? ''].join(' · '),
+                          formatter: mergedMarkLabel([...(mergedMarkLabels.get(index) ?? []), ml.label ?? '']),
                           position: ml.labelPosition ?? 'end',
                           rotate: -90,
                           align: 'left',
@@ -1132,6 +1173,57 @@ export function MultiLineChart({
     markAreas,
   ]);
 
+  // Group series by their group property, maintaining order
+  const legendGroups: Array<{ name: string | null; items: typeof series }> = [];
+  for (const s of series) {
+    if (s.visible === false || (enableAggregateToggle && s.name === aggregateSeriesName)) continue;
+    const groupName = s.group ?? null;
+    let group = legendGroups.find(g => g.name === groupName);
+    if (!group) legendGroups.push((group = { name: groupName, items: [] }));
+    group.items.push(s);
+  }
+  const legendControls = (
+    <>
+      {enableAggregateToggle && (
+        <div className="mb-2 flex items-center justify-end">
+          <button
+            onClick={() => setShowAggregate(!showAggregate)}
+            className={`rounded-sm px-2 py-1 text-xs/5 transition-colors ${
+              showAggregate ? 'bg-muted/20 text-foreground' : 'text-muted hover:bg-muted/10'
+            }`}
+          >
+            {showAggregate ? '✓' : '○'} {aggregateSeriesName}
+          </button>
+        </div>
+      )}
+      {/* One wrapping row: each group is a muted name followed by its series */}
+      <div className="flex max-h-[200px] flex-wrap items-center gap-x-5 gap-y-1 overflow-y-auto">
+        {legendGroups.map(group => (
+          <div key={group.name ?? '__ungrouped__'} className="flex flex-wrap items-center gap-x-0.5 gap-y-0.5">
+            {group.name && <span className="mr-1 text-xs/5 whitespace-nowrap text-muted">{group.name}</span>}
+            {group.items.map(s => {
+              const isVisible = visibleSeries.has(s.name);
+              const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
+              return (
+                <button
+                  key={s.name}
+                  onClick={() => toggleSeries(s.name)}
+                  aria-pressed={isVisible}
+                  className={`flex cursor-pointer items-center gap-1.5 rounded-xs px-1.5 py-0.5 text-xs/5 transition-colors hover:bg-muted/10 ${
+                    isVisible ? 'text-foreground' : 'text-muted/60'
+                  }`}
+                >
+                  <LegendSwatch series={s} color={seriesColor} active={isVisible} />
+                  <span>{s.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </>
+  );
+
   const chartContent = (
     <>
       {/* Title and subtitle (when not using card) */}
@@ -1229,75 +1321,7 @@ export function MultiLineChart({
 
       {/* Interactive Legend Controls - Top */}
       {showLegend && !useNativeLegend && series.length > 1 && legendPosition === 'top' && (
-        <div className="mb-3">
-          {enableAggregateToggle && (
-            <div className="mb-2 flex items-center justify-end">
-              <button
-                onClick={() => setShowAggregate(!showAggregate)}
-                className={`rounded-sm px-2 py-1 text-xs/5 transition-colors ${
-                  showAggregate ? 'bg-muted/20 text-foreground' : 'text-muted hover:bg-muted/10'
-                }`}
-              >
-                {showAggregate ? '✓' : '○'} {aggregateSeriesName}
-              </button>
-            </div>
-          )}
-          <div className="max-h-[200px] overflow-y-auto">
-            {(() => {
-              const legendSeries = series.filter(
-                s => s.visible !== false && (!enableAggregateToggle || s.name !== aggregateSeriesName)
-              );
-              // Group series by their group property, maintaining order
-              const groups: Array<{ name: string | null; items: typeof legendSeries }> = [];
-              const seenGroups = new Set<string | null>();
-              legendSeries.forEach(s => {
-                const groupName = s.group ?? null;
-                if (!seenGroups.has(groupName)) {
-                  seenGroups.add(groupName);
-                  groups.push({ name: groupName, items: [] });
-                }
-                groups.find(g => g.name === groupName)?.items.push(s);
-              });
-
-              return (
-                <div className="flex flex-col gap-2">
-                  {groups.map(group => (
-                    <div key={group.name ?? '__ungrouped__'} className="flex items-center gap-2">
-                      {group.name && (
-                        <span className="shrink-0 text-xs whitespace-nowrap text-muted">{group.name}</span>
-                      )}
-                      <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5">
-                        {group.items.map(s => {
-                          const isVisible = visibleSeries.has(s.name);
-                          const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
-                          return (
-                            <button
-                              key={s.name}
-                              onClick={() => toggleSeries(s.name)}
-                              className={`flex cursor-pointer items-center gap-1.5 rounded-xs px-1.5 py-0.5 text-xs/5 transition-colors hover:bg-muted/10 ${
-                                isVisible ? 'text-foreground' : 'text-muted/60'
-                              }`}
-                            >
-                              <span
-                                className="h-2 w-2 rounded-full transition-colors"
-                                style={{
-                                  backgroundColor: isVisible ? seriesColor : 'transparent',
-                                  border: `2px solid ${seriesColor}`,
-                                  opacity: isVisible ? 1 : 0.5,
-                                }}
-                              />
-                              <span className="font-medium">{s.name}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              );
-            })()}
-          </div>
-        </div>
+        <div className="mb-3">{legendControls}</div>
       )}
 
       <div
@@ -1327,75 +1351,7 @@ export function MultiLineChart({
 
       {/* Interactive Legend Controls - Bottom */}
       {showLegend && !useNativeLegend && series.length > 1 && legendPosition === 'bottom' && (
-        <div className="mt-3">
-          {enableAggregateToggle && (
-            <div className="mb-2 flex items-center justify-end">
-              <button
-                onClick={() => setShowAggregate(!showAggregate)}
-                className={`rounded-sm px-2 py-1 text-xs/5 transition-colors ${
-                  showAggregate ? 'bg-muted/20 text-foreground' : 'text-muted hover:bg-muted/10'
-                }`}
-              >
-                {showAggregate ? '✓' : '○'} {aggregateSeriesName}
-              </button>
-            </div>
-          )}
-          <div className="max-h-[200px] overflow-y-auto">
-            {(() => {
-              const legendSeries = series.filter(
-                s => s.visible !== false && (!enableAggregateToggle || s.name !== aggregateSeriesName)
-              );
-              // Group series by their group property, maintaining order
-              const groups: Array<{ name: string | null; items: typeof legendSeries }> = [];
-              const seenGroups = new Set<string | null>();
-              legendSeries.forEach(s => {
-                const groupName = s.group ?? null;
-                if (!seenGroups.has(groupName)) {
-                  seenGroups.add(groupName);
-                  groups.push({ name: groupName, items: [] });
-                }
-                groups.find(g => g.name === groupName)?.items.push(s);
-              });
-
-              return (
-                <div className="flex flex-col gap-2">
-                  {groups.map(group => (
-                    <div key={group.name ?? '__ungrouped__'} className="flex items-center gap-2">
-                      {group.name && (
-                        <span className="shrink-0 text-xs whitespace-nowrap text-muted">{group.name}</span>
-                      )}
-                      <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5">
-                        {group.items.map(s => {
-                          const isVisible = visibleSeries.has(s.name);
-                          const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
-                          return (
-                            <button
-                              key={s.name}
-                              onClick={() => toggleSeries(s.name)}
-                              className={`flex cursor-pointer items-center gap-1.5 rounded-xs px-1.5 py-0.5 text-xs/5 transition-colors hover:bg-muted/10 ${
-                                isVisible ? 'text-foreground' : 'text-muted/60'
-                              }`}
-                            >
-                              <span
-                                className="h-2 w-2 rounded-full transition-colors"
-                                style={{
-                                  backgroundColor: isVisible ? seriesColor : 'transparent',
-                                  border: `2px solid ${seriesColor}`,
-                                  opacity: isVisible ? 1 : 0.5,
-                                }}
-                              />
-                              <span className="font-medium">{s.name}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              );
-            })()}
-          </div>
-        </div>
+        <div className="mt-3">{legendControls}</div>
       )}
     </>
   );

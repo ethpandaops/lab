@@ -10,6 +10,7 @@ import type { BarChartProps } from './Bar.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
 import {
   getChartAxisLabelStyle,
+  formatAxisNumber,
   getChartAxisLine,
   getChartAxisNameStyle,
   getChartTooltipChrome,
@@ -116,7 +117,7 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
       axisTick: { show: false },
       axisLabel: {
         ...getChartAxisLabelStyle(themeColors),
-        formatter: valueAxisLabelFormatter,
+        formatter: valueAxisLabelFormatter ?? formatAxisNumber,
       },
       splitLine: getChartValueSplitLine(themeColors),
     };
