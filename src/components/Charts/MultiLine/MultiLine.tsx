@@ -760,6 +760,8 @@ export function MultiLineChart({
             {
               name: '__annotations__',
               type: 'line' as const,
+              // Above the data series, so lines near the plot edge cannot cover the labels
+              z: 5,
               data: [], // Empty data - this series is only for annotations
               legendHoverLink: false,
               tooltip: { show: false },
@@ -770,7 +772,11 @@ export function MultiLineChart({
                       animation: false,
                       data: markLines!.map((ml, index) => ({
                         xAxis: ml.xValue,
-                        emphasis: { label: { show: !!ml.label }, lineStyle: { width: ml.lineWidth ?? 1 } },
+                        // Hovering the line shows the full name when the resting label is truncated
+                        emphasis: {
+                          label: { show: !!ml.label, overflow: 'none' as const },
+                          lineStyle: { width: ml.lineWidth ?? 1 },
+                        },
                         label: {
                           show: visibleMarkLabels.has(index),
                           formatter: [...(mergedMarkLabels.get(index) ?? []), ml.label ?? ''].join(' · '),
@@ -778,9 +784,15 @@ export function MultiLineChart({
                           rotate: -90,
                           align: 'left',
                           offset: ml.distance ?? [0, -2],
-                          color: hexToRgba(ml.color ?? themeColors.muted, 0.7),
+                          color: hexToRgba(ml.color ?? themeColors.muted, 0.9),
                           fontSize: 11,
-                          backgroundColor: 'transparent',
+                          // Vertical labels run down from the plot top; a long merged label would
+                          // otherwise cross the x-axis, so it ends in an ellipsis at the plot bottom
+                          width: Math.max(plotHeight - 8, 40),
+                          overflow: 'truncate' as const,
+                          // A halo in the surface colour keeps the name legible where it crosses the data
+                          textBorderColor: themeColors.surface,
+                          textBorderWidth: 3,
                           padding: [2, 4],
                         },
                         lineStyle: {
